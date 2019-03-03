@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.Message.Context;
 import lombok.ToString;
 
 
@@ -47,7 +47,7 @@ public class ParameterMap implements ParameterData
 
 
   @Override
-  public String format(MessageContext context, Object key)
+  public String format(Context context, Object key)
   {
     Message message = getMessageForKey(key);
     if (message == null)
@@ -98,7 +98,7 @@ public class ParameterMap implements ParameterData
 
 
   @Override
-  public String format(MessageContext context) {
+  public String format(Context context) {
     return format(context, null);
   }
 }

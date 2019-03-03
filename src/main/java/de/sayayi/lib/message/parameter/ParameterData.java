@@ -1,6 +1,7 @@
 package de.sayayi.lib.message.parameter;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.Message.Context;
+
 
 /**
  * @author Jeroen Gremmen
@@ -10,10 +11,10 @@ public interface ParameterData
   Type getType();
 
 
-  String format(MessageContext context, Object key);
+  String format(Context context, Object key);
 
 
-  String format(MessageContext context);
+  String format(Context context);
 
 
   public enum Type {

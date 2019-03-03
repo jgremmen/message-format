@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.parser;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.Message.Context;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -25,7 +25,7 @@ public class TextPart implements MessagePart
 
 
   @Override
-  public String getText(MessageContext context) {
+  public String getText(Context context) {
     return text;
   }
 }

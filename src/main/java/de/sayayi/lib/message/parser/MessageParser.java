@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.SimpleMessageContext;
 import de.sayayi.lib.message.parameter.ParameterBoolean;
 import de.sayayi.lib.message.parameter.ParameterData;
 import de.sayayi.lib.message.parameter.ParameterInteger;
@@ -32,17 +31,17 @@ public final class MessageParser
   }
 
 
-  public Message parse() throws ParseException
+  public List<MessagePart> parse() throws ParseException
   {
-    final Context context = new Context(0);
+    final ParseContext context = new ParseContext(0);
 
     parseMessageWithoutQuotes(context);
 
-    return new MultipartMessage(context.parts);
+    return context.parts;
   }
 
 
-  private void parseMessageWithoutQuotes(Context context) throws ParseException
+  private void parseMessageWithoutQuotes(ParseContext context) throws ParseException
   {
     while(context.pos < length)
     {
@@ -70,7 +69,7 @@ public final class MessageParser
   }
 
 
-  private void parseMessageWithQuotes(Context context, boolean allowNestedParameters) throws ParseException
+  private void parseMessageWithQuotes(ParseContext context, boolean allowNestedParameters) throws ParseException
   {
     final char quote = context.getChar();
 
@@ -111,9 +110,9 @@ public final class MessageParser
   }
 
 
-  private String parseString(Context context) throws ParseException
+  private String parseString(ParseContext context) throws ParseException
   {
-    final Context string = new Context(context.pos);
+    final ParseContext string = new ParseContext(context.pos);
 
     parseMessageWithQuotes(string, false);
     context.pos = string.pos;
@@ -122,7 +121,7 @@ public final class MessageParser
   }
 
 
-  private Object parseBoolOrIntOrString(Context context) throws ParseException
+  private Object parseBoolOrIntOrString(ParseContext context) throws ParseException
   {
     char c = context.getChar();
 
@@ -159,7 +158,7 @@ public final class MessageParser
   }
 
 
-  private void parseParameter(Context context) throws ParseException
+  private void parseParameter(ParseContext context) throws ParseException
   {
     int pos;
 
@@ -220,7 +219,7 @@ public final class MessageParser
   }
 
 
-  private ParameterMap parseMap(Context context) throws ParseException
+  private ParameterMap parseMap(ParseContext context) throws ParseException
   {
     final Map<Object,Message> map = new LinkedHashMap<Object,Message>();
 
@@ -244,7 +243,7 @@ public final class MessageParser
 
       if (!foundValidKey || !context.lookAhead("->"))
       {
-        final Context defaultValue = new Context(pos);
+        final ParseContext defaultValue = new ParseContext(pos);
         parseMessageWithQuotes(defaultValue, true);
         map.put(null, new MultipartMessage(defaultValue.parts));
         context.pos = defaultValue.pos;
@@ -254,7 +253,7 @@ public final class MessageParser
       context.pos += 2;
       context.eatWhitespace("map");
 
-      final Context value = new Context(context.pos);
+      final ParseContext value = new ParseContext(context.pos);
       parseMessageWithQuotes(value, true);
       map.put(key, new MultipartMessage(value.parts));
       context.pos = value.pos;
@@ -280,7 +279,7 @@ public final class MessageParser
   }
 
 
-  private String eatName(Context context)
+  private String eatName(ParseContext context)
   {
     final int startPos = context.pos;
 
@@ -297,16 +296,14 @@ public final class MessageParser
   }
 
 
-
-
   @ToString
-  private class Context
+  private final class ParseContext
   {
     List<MessagePart> parts = new ArrayList<MessagePart>();
     int pos;
 
 
-    Context(int pos) {
+    ParseContext(int pos) {
       this.pos = pos;
     }
 
@@ -353,20 +350,5 @@ public final class MessageParser
     char getChar() {
       return text.charAt(pos);
     }
-  }
-
-
-
-
-
-
-
-
-  public static void main(String[] args) throws Exception
-  {
-    final Message m1 = new MessageParser("Es wurde%{count,choice,{0 -> 'n keine Dateien', 1 -> ' eine Datei', 'n %{count,integer} Dateien'}} gespeichert.").parse();
-
-    System.out.println(m1.format(SimpleMessageContext.builder()
-        .with("count", false).buildContext()));
   }
 }

@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.parser;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.Message.Context;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.parameter.ParameterData;
 import de.sayayi.lib.message.parameter.ParameterFormatter;
@@ -32,7 +32,7 @@ public class ParameterPart implements MessagePart
 
 
   @Override
-  public String getText(MessageContext context)
+  public String getText(Context context)
   {
     final ParameterFormatter formatter = MessageFactory.getFormatter(format);
     if (formatter == null)

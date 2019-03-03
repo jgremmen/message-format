@@ -1,7 +1,7 @@
 package de.sayayi.lib.message.parameter;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext;
+
 
 /**
  * @author Jeroen Gremmen
@@ -23,13 +23,13 @@ public class ParameterString implements ParameterData, Message
 
 
   @Override
-  public String format(MessageContext context, Object key) {
+  public String format(Context context, Object key) {
     throw new UnsupportedOperationException();
   }
 
 
   @Override
-  public String format(MessageContext context) {
+  public String format(Context context) {
     return string;
   }
 

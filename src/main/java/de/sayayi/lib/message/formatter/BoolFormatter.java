@@ -1,9 +1,8 @@
 package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.Message.Context;
 import de.sayayi.lib.message.parameter.ParameterData;
-import de.sayayi.lib.message.parameter.ParameterData.Type;
 import de.sayayi.lib.message.parameter.ParameterFormatter;
 import de.sayayi.lib.message.parameter.ParameterMap;
 
@@ -20,7 +19,7 @@ public class BoolFormatter implements ParameterFormatter
 
 
   @Override
-  public String format(String parameter, MessageContext context, ParameterData data)
+  public String format(String parameter, Context context, ParameterData data)
   {
     final Object obj = context.getParameterValue(parameter);
     Boolean value;
@@ -33,7 +32,7 @@ public class BoolFormatter implements ParameterFormatter
       value = Boolean.valueOf(String.valueOf(obj));
 
     // allow custom messages for true/false value?
-    if (data.getType() == Type.MAP)
+    if (data instanceof ParameterMap)
     {
       final Message message = ((ParameterMap)data).getMessageForKey(value);
       if (message != null)

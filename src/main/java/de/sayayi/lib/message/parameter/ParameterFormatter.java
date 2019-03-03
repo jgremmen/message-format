@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.parameter;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.Message.Context;
 
 
 /**
@@ -10,5 +10,5 @@ public interface ParameterFormatter
 {
   String getName();
 
-  String format(String parameter, MessageContext context, ParameterData data);
+  String format(String parameter, Context context, ParameterData data);
 }

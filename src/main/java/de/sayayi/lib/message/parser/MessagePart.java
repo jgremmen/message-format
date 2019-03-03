@@ -1,6 +1,7 @@
 package de.sayayi.lib.message.parser;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.Message.Context;
+
 
 /**
  * @author Jeroen Gremmen
@@ -11,5 +12,5 @@ public interface MessagePart
 
   boolean isSpaceAfter();
 
-  String getText(MessageContext context);
+  String getText(Context context);
 }

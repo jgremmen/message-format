@@ -1,9 +1,11 @@
 package de.sayayi.lib.message.parser;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext;
 
 
 /**
@@ -11,21 +13,26 @@ import de.sayayi.lib.message.MessageContext;
  */
 public class MultipartMessage implements Message
 {
-  private final List<MessagePart> parts;
+  private final Map<Locale,List<MessagePart>> localizedParts;
 
 
   public MultipartMessage(List<MessagePart> parts) {
-    this.parts = parts;
+    localizedParts = Collections.singletonMap(null, parts);
+  }
+
+
+  public MultipartMessage(Map<Locale,List<MessagePart>> localizedParts) {
+    this.localizedParts = localizedParts;
   }
 
 
   @Override
-  public String format(MessageContext context)
+  public String format(Context context)
   {
     final StringBuilder message = new StringBuilder();
     boolean spaceBefore = false;
 
-    for(final MessagePart part: parts)
+    for(final MessagePart part: findMessagePartsByLocale(context.getLocale()))
     {
       final String text = part.getText(context);
 
@@ -40,5 +47,15 @@ public class MultipartMessage implements Message
     }
 
     return message.toString();
+  }
+
+
+  protected List<MessagePart> findMessagePartsByLocale(Locale locale)
+  {
+    List<MessagePart> parts = localizedParts.get(locale);
+    if (parts == null)
+      parts = localizedParts.get(null);
+
+    return parts;
   }
 }
