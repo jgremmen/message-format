@@ -4,7 +4,7 @@ package de.sayayi.lib.message;
 /**
  * @author Jeroen Gremmen
  */
-public interface Message
+public interface MessageAppender
 {
-  String format(MessageContext context);
+  void append(CharSequence text);
 }
