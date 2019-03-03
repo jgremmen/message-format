@@ -1,34 +1,28 @@
 package de.sayayi.lib.message.formatter;
 
-import java.math.BigInteger;
-
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.parameter.ParameterData;
 import de.sayayi.lib.message.parameter.ParameterFormatter;
+import de.sayayi.lib.message.parameter.ParameterMap;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public class IntegerParameterFormatter implements ParameterFormatter
+public final class ChoiceFormatter implements ParameterFormatter
 {
   @Override
   public String getName() {
-    return "integer";
+    return "choice";
   }
 
 
   @Override
   public String format(String parameter, MessageContext context, ParameterData data)
   {
-    final Number value = (Number)context.getParameterValue(parameter);
+    final Object key = context.getParameterValue(parameter);
+    final ParameterMap map = (ParameterMap)data;
 
-    if (value instanceof BigInteger)
-      return value.toString();
-
-    if (value instanceof Number)
-      return Long.toString(value.longValue());
-
-    return null;
+    return map.format(context, key);
   }
 }

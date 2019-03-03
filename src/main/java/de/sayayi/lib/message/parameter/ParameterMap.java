@@ -30,8 +30,7 @@ public class ParameterMap implements ParameterData
   }
 
 
-  @Override
-  public String format(MessageContext context, Object key)
+  public Message getMessageForKey(Object key)
   {
     Message message = map.get(key);
 
@@ -43,6 +42,14 @@ public class ParameterMap implements ParameterData
           break;
         }
 
+    return message;
+  }
+
+
+  @Override
+  public String format(MessageContext context, Object key)
+  {
+    Message message = getMessageForKey(key);
     if (message == null)
       message = map.get(null);
 

@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.sayayi.lib.message.formatter.BoolParameterFormatter;
-import de.sayayi.lib.message.formatter.ChoiceParameterFormatter;
-import de.sayayi.lib.message.formatter.IntegerParameterFormatter;
-import de.sayayi.lib.message.formatter.StringParameterFormatter;
+import de.sayayi.lib.message.formatter.BoolFormatter;
+import de.sayayi.lib.message.formatter.ChoiceFormatter;
+import de.sayayi.lib.message.formatter.IntegerFormatter;
+import de.sayayi.lib.message.formatter.StringFormatter;
 import de.sayayi.lib.message.parameter.ParameterFormatter;
 
 
@@ -20,10 +20,10 @@ public class MessageFactory
 
 
   static {
-    registerFormatter(new StringParameterFormatter());
-    registerFormatter(new BoolParameterFormatter());
-    registerFormatter(new IntegerParameterFormatter());
-    registerFormatter(new ChoiceParameterFormatter());
+    registerFormatter(new StringFormatter());
+    registerFormatter(new BoolFormatter());
+    registerFormatter(new IntegerFormatter());
+    registerFormatter(new ChoiceFormatter());
   }
 
 
