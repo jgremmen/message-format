@@ -1,7 +1,7 @@
 package de.sayayi.lib.message;
 
+import java.text.ParseException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import de.sayayi.lib.message.formatter.BoolFormatter;
@@ -9,12 +9,13 @@ import de.sayayi.lib.message.formatter.ChoiceFormatter;
 import de.sayayi.lib.message.formatter.IntegerFormatter;
 import de.sayayi.lib.message.formatter.StringFormatter;
 import de.sayayi.lib.message.parameter.ParameterFormatter;
+import de.sayayi.lib.message.parser.MessageParser;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public class MessageFactory
+public final class MessageFactory
 {
   private static final Map<String,ParameterFormatter> FORMATTERS = new HashMap<String,ParameterFormatter>();
 
@@ -27,7 +28,7 @@ public class MessageFactory
   }
 
 
-  public static final void registerFormatter(ParameterFormatter formatter)
+  public static void registerFormatter(ParameterFormatter formatter)
   {
     final String name = formatter.getName();
     if (name == null || name.length() == 0)
@@ -37,13 +38,12 @@ public class MessageFactory
   }
 
 
-  public static final ParameterFormatter getFormatter(String name) {
+  public static ParameterFormatter getFormatter(String name) {
     return FORMATTERS.get(name);
   }
 
 
-  public static List<MessagePart> parse(String text)
-  {
-    return null;
+  public static Message parse(String text) throws ParseException {
+    return new MessageParser(text).parse();
   }
 }

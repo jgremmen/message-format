@@ -1,4 +1,4 @@
-package de.sayayi.lib.message;
+package de.sayayi.lib.message.parser;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -6,11 +6,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.SimpleMessageContext;
 import de.sayayi.lib.message.parameter.ParameterBoolean;
 import de.sayayi.lib.message.parameter.ParameterData;
 import de.sayayi.lib.message.parameter.ParameterInteger;
 import de.sayayi.lib.message.parameter.ParameterMap;
-import de.sayayi.lib.message.parameter.ParameterPart;
 import de.sayayi.lib.message.parameter.ParameterString;
 import lombok.ToString;
 

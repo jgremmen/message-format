@@ -1,8 +1,9 @@
-package de.sayayi.lib.message.parameter;
+package de.sayayi.lib.message.parser;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.MessagePart;
+import de.sayayi.lib.message.parameter.ParameterData;
+import de.sayayi.lib.message.parameter.ParameterFormatter;
 import lombok.Getter;
 import lombok.ToString;
 

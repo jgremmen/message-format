@@ -32,11 +32,10 @@ public class BoolFormatter implements ParameterFormatter
     else
       value = Boolean.valueOf(String.valueOf(obj));
 
+    // allow custom messages for true/false value?
     if (data.getType() == Type.MAP)
     {
-      final ParameterMap map = (ParameterMap)data;
-      final Message message = map.getMessageForKey(value);
-
+      final Message message = ((ParameterMap)data).getMessageForKey(value);
       if (message != null)
         return message.format(context);
     }

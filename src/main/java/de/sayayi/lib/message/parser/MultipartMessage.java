@@ -1,6 +1,9 @@
-package de.sayayi.lib.message;
+package de.sayayi.lib.message.parser;
 
 import java.util.List;
+
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageContext;
 
 
 /**

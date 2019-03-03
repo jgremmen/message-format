@@ -1,5 +1,6 @@
-package de.sayayi.lib.message;
+package de.sayayi.lib.message.parser;
 
+import de.sayayi.lib.message.MessageContext;
 import lombok.Getter;
 import lombok.ToString;
 
