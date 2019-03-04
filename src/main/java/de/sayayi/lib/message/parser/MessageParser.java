@@ -245,7 +245,7 @@ public final class MessageParser
       {
         final ParseContext defaultValue = new ParseContext(pos);
         parseMessageWithQuotes(defaultValue, true);
-        map.put(null, new MultipartMessage(defaultValue.parts));
+        map.put(null, new MultipartMessage(null, defaultValue.parts));
         context.pos = defaultValue.pos;
         break;
       }
@@ -255,7 +255,7 @@ public final class MessageParser
 
       final ParseContext value = new ParseContext(context.pos);
       parseMessageWithQuotes(value, true);
-      map.put(key, new MultipartMessage(value.parts));
+      map.put(key, new MultipartMessage(null, value.parts));
       context.pos = value.pos;
 
       context.eatWhitespace("map");

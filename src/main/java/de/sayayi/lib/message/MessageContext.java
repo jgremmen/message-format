@@ -67,7 +67,7 @@ public final class MessageContext implements Context
 
     public Builder withLocale(Locale locale)
     {
-      this.locale = locale;
+      this.locale = (locale == null) ? Locale.ROOT : locale;
       return this;
     }
 

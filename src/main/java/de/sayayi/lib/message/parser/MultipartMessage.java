@@ -5,23 +5,27 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageWithCode;
+import lombok.Getter;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public class MultipartMessage implements Message
+public class MultipartMessage implements MessageWithCode
 {
+  @Getter private final String code;
   private final Map<Locale,List<MessagePart>> localizedParts;
 
 
-  public MultipartMessage(List<MessagePart> parts) {
-    localizedParts = Collections.singletonMap(null, parts);
+  public MultipartMessage(String code, List<MessagePart> parts) {
+    this(code, Collections.<Locale,List<MessagePart>>singletonMap(null, parts));
   }
 
 
-  public MultipartMessage(Map<Locale,List<MessagePart>> localizedParts) {
+  public MultipartMessage(String code, Map<Locale,List<MessagePart>> localizedParts)
+  {
+    this.code = code;
     this.localizedParts = localizedParts;
   }
 
@@ -54,7 +58,7 @@ public class MultipartMessage implements Message
   {
     List<MessagePart> parts = localizedParts.get(locale);
     if (parts == null)
-      parts = localizedParts.get(null);
+      parts = localizedParts.get(Locale.ROOT);
 
     return parts;
   }
