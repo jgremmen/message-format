@@ -3,20 +3,21 @@ package de.sayayi.lib.message;
 import java.lang.reflect.AnnotatedElement;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.formatter.BoolFormatter;
 import de.sayayi.lib.message.formatter.ChoiceFormatter;
+import de.sayayi.lib.message.formatter.DateFormatter;
 import de.sayayi.lib.message.formatter.IntegerFormatter;
 import de.sayayi.lib.message.formatter.StringFormatter;
+import de.sayayi.lib.message.formatter.TimeFormatter;
 import de.sayayi.lib.message.parameter.ParameterFormatter;
+import de.sayayi.lib.message.parser.EmptyMessage;
 import de.sayayi.lib.message.parser.MessageParser;
 import de.sayayi.lib.message.parser.MessagePart;
 import de.sayayi.lib.message.parser.MultipartMessage;
@@ -36,6 +37,8 @@ public final class MessageFactory
     registerFormatter(new BoolFormatter());
     registerFormatter(new IntegerFormatter());
     registerFormatter(new ChoiceFormatter());
+    registerFormatter(new DateFormatter());
+    registerFormatter(new TimeFormatter());
   }
 
 
@@ -78,19 +81,13 @@ public final class MessageFactory
 
   public static MessageWithCode parse(String code, Map<Locale,String> localizedTexts) throws ParseException
   {
+    if (localizedTexts.isEmpty())
+      return new EmptyMessage(code);
+
     final Map<Locale,List<MessagePart>> localizedParts = new LinkedHashMap<Locale,List<MessagePart>>();
 
     for(final Entry<Locale,String> localizedText: localizedTexts.entrySet())
       localizedParts.put(localizedText.getKey(), new MessageParser(localizedText.getValue()).parse());
-
-    if (!localizedTexts.containsKey(Locale.ROOT))
-    {
-      List<MessagePart> parts = localizedParts.get(Locale.getDefault());
-      if (parts == null)
-        parts = localizedParts.values().iterator().next();
-
-      localizedParts.put(Locale.ROOT, parts);
-    }
 
     return new MultipartMessage(code, localizedParts);
   }
@@ -106,18 +103,45 @@ public final class MessageFactory
 
     final Text[] texts = annotation.texts();
     if (texts == null || texts.length == 0)
-      throw new IllegalArgumentException("@Message annotation on  " + element + " contains no texts");
+      return new EmptyMessage(annotation.code());
 
-    final Set<Locale> locales = new HashSet<Locale>();
     final Map<Locale,String> localizedTexts = new LinkedHashMap<Locale,String>();
 
     for(final Text text: texts)
     {
-      final Locale locale = text.locale().isEmpty() ? Locale.ROOT : new Locale(text.locale());
-      if (locales.add(locale))
+      final Locale locale = forLanguageTag(text.locale());
+      if (!localizedTexts.containsKey(locale))
         localizedTexts.put(locale, text.text());
     }
 
     return parse(annotation.code(), localizedTexts);
+  }
+
+
+  private static Locale forLanguageTag(String locale) throws ParseException
+  {
+    if (locale.isEmpty())
+      return Locale.ROOT;
+
+    final int length = locale.length();
+    if (length < 2)
+      throw new ParseException("missing language code for locale " + locale, 0);
+
+    if (!Character.isLowerCase(locale.charAt(0)) || !Character.isLowerCase(locale.charAt(1)))
+        throw new ParseException("invalid language code for locale " + locale, 0);
+
+    if (length == 2)
+      return new Locale(locale);
+
+    if (length != 5)
+      throw new ParseException("unexpected length " + length + " for locale " + locale, 2);
+
+    if (locale.charAt(2) != '-' && locale.charAt(2) != '_')
+      throw new ParseException("missing separator '-' between language and country code for locale " + locale, 2);
+
+    if (!Character.isUpperCase(locale.charAt(3)) || !Character.isUpperCase(locale.charAt(4)))
+      throw new ParseException("invalid country code for locale " + locale, 3);
+
+    return new Locale(locale.substring(0,  2), locale.substring(3, 5));
   }
 }

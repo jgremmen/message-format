@@ -24,12 +24,6 @@ public class ParameterMap implements ParameterData
   }
 
 
-  @Override
-  public Type getType() {
-    return Type.MAP;
-  }
-
-
   public Message getMessageForKey(Object key)
   {
     Message message = map.get(key);

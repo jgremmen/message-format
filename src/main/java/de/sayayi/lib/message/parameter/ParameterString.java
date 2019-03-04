@@ -1,6 +1,7 @@
 package de.sayayi.lib.message.parameter;
 
 import de.sayayi.lib.message.Message;
+import lombok.Getter;
 
 
 /**
@@ -8,17 +9,11 @@ import de.sayayi.lib.message.Message;
  */
 public class ParameterString implements ParameterData, Message
 {
-  private final String string;
+  @Getter private final String value;
 
 
-  public ParameterString(String string) {
-    this.string = string;
-  }
-
-
-  @Override
-  public Type getType() {
-    return Type.STRING;
+  public ParameterString(String value) {
+    this.value = value;
   }
 
 
@@ -30,12 +25,12 @@ public class ParameterString implements ParameterData, Message
 
   @Override
   public String format(Context context) {
-    return string;
+    return value;
   }
 
 
   @Override
   public String toString() {
-    return string;
+    return value;
   }
 }

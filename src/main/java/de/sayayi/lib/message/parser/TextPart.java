@@ -1,5 +1,7 @@
 package de.sayayi.lib.message.parser;
 
+import java.io.Serializable;
+
 import de.sayayi.lib.message.Message.Context;
 import lombok.Getter;
 import lombok.ToString;
@@ -9,8 +11,10 @@ import lombok.ToString;
  * @author Jeroen Gremmen
  */
 @ToString
-public class TextPart implements MessagePart
+public class TextPart implements MessagePart, Serializable
 {
+  private static final long serialVersionUID = 5325056895074186084L;
+
   private final String text;
   @Getter private final boolean spaceBefore;
   @Getter private final boolean spaceAfter;

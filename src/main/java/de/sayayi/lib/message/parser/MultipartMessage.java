@@ -1,19 +1,25 @@
 package de.sayayi.lib.message.parser;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.sayayi.lib.message.MessageWithCode;
 import lombok.Getter;
+import lombok.ToString;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public class MultipartMessage implements MessageWithCode
+@ToString
+public class MultipartMessage implements MessageWithCode, Serializable
 {
+  private static final long serialVersionUID = 3562616383044215265L;
+
   @Getter private final String code;
   private final Map<Locale,List<MessagePart>> localizedParts;
 
@@ -25,7 +31,7 @@ public class MultipartMessage implements MessageWithCode
 
   public MultipartMessage(String code, Map<Locale,List<MessagePart>> localizedParts)
   {
-    this.code = code;
+    this.code = "".equals(code) ? null : code;
     this.localizedParts = localizedParts;
   }
 
@@ -36,7 +42,7 @@ public class MultipartMessage implements MessageWithCode
     final StringBuilder message = new StringBuilder();
     boolean spaceBefore = false;
 
-    for(final MessagePart part: findMessagePartsByLocale(context.getLocale()))
+    for(final MessagePart part: findPartsByLocale(context.getLocale()))
     {
       final String text = part.getText(context);
 
@@ -54,11 +60,37 @@ public class MultipartMessage implements MessageWithCode
   }
 
 
-  protected List<MessagePart> findMessagePartsByLocale(Locale locale)
+  protected List<MessagePart> findPartsByLocale(Locale locale)
   {
-    List<MessagePart> parts = localizedParts.get(locale);
-    if (parts == null)
-      parts = localizedParts.get(Locale.ROOT);
+    final String searchLanguage = locale.getLanguage();
+    final String searchCountry = locale.getCountry();
+
+    int match = -1;
+    List<MessagePart> parts = null;
+
+    for(final Entry<Locale,List<MessagePart>> entry: localizedParts.entrySet())
+    {
+      final Locale keyLocale = entry.getKey();
+
+      if (parts == null)
+        parts = entry.getValue();
+
+      if (match == -1 && (keyLocale == null || Locale.ROOT.equals(keyLocale)))
+      {
+        parts = entry.getValue();
+        match = 0;
+      }
+      else if (keyLocale.getLanguage().equals(searchLanguage))
+      {
+        if (keyLocale.getCountry().equals(searchCountry))
+          return entry.getValue();
+        else if (match < 1)
+        {
+          parts = entry.getValue();
+          match = 1;
+        }
+      }
+    }
 
     return parts;
   }

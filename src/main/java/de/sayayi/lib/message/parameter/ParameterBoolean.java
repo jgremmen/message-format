@@ -1,6 +1,7 @@
 package de.sayayi.lib.message.parameter;
 
 import de.sayayi.lib.message.Message;
+import lombok.Getter;
 
 
 /**
@@ -8,17 +9,11 @@ import de.sayayi.lib.message.Message;
  */
 public class ParameterBoolean implements ParameterData, Message
 {
-  private final boolean value;
+  @Getter private final boolean value;
 
 
   public ParameterBoolean(boolean value) {
     this.value = value;
-  }
-
-
-  @Override
-  public Type getType() {
-    return Type.BOOLEAN;
   }
 
 
