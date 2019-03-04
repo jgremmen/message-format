@@ -1,5 +1,6 @@
 package de.sayayi.lib.message.formatter;
 
+import java.sql.Time;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -56,5 +57,11 @@ public class TimeFormatter implements ParameterFormatter
       return DateFormat.getTimeInstance(DateFormat.SHORT, locale);
 
     return new SimpleDateFormat(format, locale);
+  }
+
+
+  @Override
+  public Class<?>[] getAutodetectTypes() {
+    return new Class<?>[] { Time.class };
   }
 }

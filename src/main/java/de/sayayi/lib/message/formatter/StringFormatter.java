@@ -22,4 +22,10 @@ public class StringFormatter implements ParameterFormatter
     final Object text = context.getParameterValue(parameter);
     return (text == null) ? null : String.valueOf(text).trim();
   }
+
+
+  @Override
+  public Class<?>[] getAutodetectTypes() {
+    return new Class<?>[] { String.class, CharSequence.class, Object.class };
+  }
 }

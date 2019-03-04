@@ -41,6 +41,12 @@ public class DateFormatter implements ParameterFormatter
   }
 
 
+  @Override
+  public Class<?>[] getAutodetectTypes() {
+    return new Class<?>[] { Date.class };
+  }
+
+
   protected DateFormat getFormatter(String format, Locale locale)
   {
     if ("FULL".equalsIgnoreCase(format))

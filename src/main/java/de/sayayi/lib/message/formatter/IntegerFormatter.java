@@ -31,4 +31,13 @@ public class IntegerFormatter implements ParameterFormatter
 
     return null;
   }
+
+
+  @Override
+  public Class<?>[] getAutodetectTypes()
+  {
+    return new Class<?>[] {
+      Integer.class, int.class, Long.class, long.class, BigInteger.class, Short.class, short.class
+    };
+  }
 }

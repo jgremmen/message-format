@@ -25,4 +25,10 @@ public final class ChoiceFormatter implements ParameterFormatter
 
     return map.format(context, key);
   }
+
+
+  @Override
+  public Class<?>[] getAutodetectTypes() {
+    return new Class<?>[0];
+  }
 }

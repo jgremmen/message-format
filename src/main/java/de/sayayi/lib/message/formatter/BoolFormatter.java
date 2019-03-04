@@ -48,4 +48,10 @@ public class BoolFormatter implements ParameterFormatter
 
     return value.toString();
   }
+
+
+  @Override
+  public Class<?>[] getAutodetectTypes() {
+    return new Class<?>[] { Boolean.class, boolean.class };
+  }
 }

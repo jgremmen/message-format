@@ -17,4 +17,7 @@ public interface ParameterFormatter
 
 
   String format(String parameter, Context context, ParameterData data);
+
+
+  Class<?>[] getAutodetectTypes();
 }

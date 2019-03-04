@@ -14,23 +14,21 @@ import lombok.ToString;
  * @author Jeroen Gremmen
  */
 @ToString
-public class ParameterPart implements MessagePart, Serializable
+public class ParameterPart extends MessagePart implements Serializable
 {
   private static final long serialVersionUID = 7026268561936531490L;
 
   @Getter private final String parameter;
   @Getter private final String format;
-  @Getter private final boolean spaceBefore;
-  @Getter private final boolean spaceAfter;
   @Getter private final ParameterData data;
 
 
   public ParameterPart(String parameter, String format, boolean spaceBefore, boolean spaceAfter, ParameterData data)
   {
+    super(spaceBefore, spaceAfter);
+
     this.parameter = parameter;
     this.format = format;
-    this.spaceBefore = spaceBefore;
-    this.spaceAfter = spaceAfter;
     this.data = data;
   }
 

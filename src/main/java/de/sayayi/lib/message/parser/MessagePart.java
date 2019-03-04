@@ -1,16 +1,24 @@
 package de.sayayi.lib.message.parser;
 
 import de.sayayi.lib.message.Message.Context;
+import lombok.Getter;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public interface MessagePart
+public abstract class MessagePart
 {
-  boolean isSpaceBefore();
+  @Getter protected final boolean spaceBefore;
+  @Getter protected final boolean spaceAfter;
 
-  boolean isSpaceAfter();
 
-  String getText(Context context);
+  protected MessagePart(boolean spaceBefore, boolean spaceAfter)
+  {
+    this.spaceBefore = spaceBefore;
+    this.spaceAfter = spaceAfter;
+  }
+
+
+  public abstract String getText(Context context);
 }
