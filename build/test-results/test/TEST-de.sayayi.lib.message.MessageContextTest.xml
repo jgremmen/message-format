@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="de.sayayi.lib.message.MessageContextTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2019-03-04T22:49:01" hostname="ATS-1" time="0.001">
-  <properties/>
-  <testcase name="testContext" classname="de.sayayi.lib.message.MessageContextTest" time="0.001"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
