@@ -1,5 +1,8 @@
 package de.sayayi.lib.message.formatter;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Context;
 import de.sayayi.lib.message.parameter.ParameterData;
@@ -26,6 +29,10 @@ public class BoolFormatter implements ParameterFormatter
 
     if (obj instanceof Boolean)
       value = (Boolean)obj;
+    else if (obj instanceof BigInteger)
+      value = Boolean.valueOf(((BigInteger)obj).signum() != 0);
+    else if (obj instanceof BigDecimal)
+      value = Boolean.valueOf(((BigDecimal)obj).signum() != 0);
     else if (obj instanceof Number)
       value = Boolean.valueOf(((Number)obj).longValue() != 0);
     else

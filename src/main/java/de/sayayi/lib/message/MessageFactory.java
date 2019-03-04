@@ -30,7 +30,8 @@ public final class MessageFactory
   private static final Map<String,ParameterFormatter> FORMATTERS = new HashMap<String,ParameterFormatter>();
 
 
-  static {
+  static
+  {
     registerFormatter(new StringFormatter());
     registerFormatter(new BoolFormatter());
     registerFormatter(new IntegerFormatter());
