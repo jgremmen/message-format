@@ -3,9 +3,8 @@ package de.sayayi.lib.message.parser;
 import java.io.Serializable;
 
 import de.sayayi.lib.message.Message.Context;
-import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.parameter.ParameterData;
-import de.sayayi.lib.message.parameter.ParameterFormatter;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -28,7 +27,7 @@ public class ParameterPart extends MessagePart implements Serializable
     super(spaceBefore, spaceAfter);
 
     this.parameter = parameter;
-    this.format = format;
+    this.format = "".equals(format) ? null : format;
     this.data = data;
   }
 
@@ -36,10 +35,13 @@ public class ParameterPart extends MessagePart implements Serializable
   @Override
   public String getText(Context context)
   {
-    final ParameterFormatter formatter = MessageFactory.getFormatter(format);
-    if (formatter == null)
-      return "??format=" + format + "??";
+    final Object value = context.getParameterValue(parameter);
+    final Class<?> type = (value != null) ? value.getClass() : String.class;
 
-    return formatter.format(parameter, context, data);
+    final ParameterFormatter formatter = context.getFormatter(format, type);
+    if (formatter == null)
+      throw new IllegalStateException("no matching formatter found for parameter " + parameter);
+
+    return formatter.format(parameter, value, format, context, data);
   }
 }

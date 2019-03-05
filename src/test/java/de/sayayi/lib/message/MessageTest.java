@@ -4,11 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.text.ParseException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Test;
 
@@ -24,22 +22,7 @@ public class MessageTest
     final Message m = MessageFactory.parse("Just a simple message without parameters ");
     assertNotNull(m);
 
-    final String text = m.format(new Message.Context() {
-      @Override
-      public Locale getLocale() {
-        return Locale.getDefault();
-      }
-
-      @Override
-      public Object getParameterValue(String parameter) {
-        return null;
-      }
-
-      @Override
-      public Set<String> getParameters() {
-        return Collections.emptySet();
-      }
-    });
+    final String text = m.format(MessageContext.builder().buildContext());
     assertEquals("Just a simple message without parameters", text);
   }
 

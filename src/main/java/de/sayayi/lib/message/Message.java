@@ -3,6 +3,8 @@ package de.sayayi.lib.message;
 import java.util.Locale;
 import java.util.Set;
 
+import de.sayayi.lib.message.formatter.ParameterFormatter;
+
 
 /**
  * Messages are thread safe.
@@ -57,5 +59,8 @@ public interface Message
      * @return  set with all parameter names
      */
     Set<String> getParameters();
+
+
+    ParameterFormatter getFormatter(String format, Class<?> type);
   }
 }
