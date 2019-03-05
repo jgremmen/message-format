@@ -2,6 +2,7 @@ package de.sayayi.lib.message.formatter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -11,6 +12,7 @@ public class GenericFormatterRegistry implements FormatterRegistry
 {
   private final Map<String,NamedParameterFormatter> namedFormatters = new HashMap<String,NamedParameterFormatter>();
   private final Map<Class<?>,ParameterFormatter> typeFormatters = new HashMap<Class<?>,ParameterFormatter>();
+  private final Map<Class<?>,ParameterFormatter> cachedFormatters = new ConcurrentHashMap<Class<?>,ParameterFormatter>(32);
 
 
   @Override
@@ -33,6 +35,8 @@ public class GenericFormatterRegistry implements FormatterRegistry
 
     for(final Class<?> type: formatter.getFormattableTypes())
       typeFormatters.put(type, formatter);
+
+    cachedFormatters.clear();
   }
 
 
@@ -41,9 +45,39 @@ public class GenericFormatterRegistry implements FormatterRegistry
   {
     ParameterFormatter formatter = namedFormatters.get(format);
 
-    while(formatter == null && type != null)
-      if ((formatter = typeFormatters.get(type)) == null)
-        type = type.getSuperclass();
+    if (formatter == null)
+    {
+      boolean cacheResult = false;
+      Class<?> walkType = type;
+
+      formatter = cachedFormatters.get(type);
+
+      while(formatter == null && walkType != null)
+      {
+        if ((formatter = getFormatterForType(walkType)) == null)
+        {
+          cacheResult = true;
+          walkType = walkType.getSuperclass();
+        }
+        else if (cacheResult)
+          cachedFormatters.put(type, formatter);
+      }
+    }
+
+    return formatter;
+  }
+
+
+  protected ParameterFormatter getFormatterForType(Class<?> type)
+  {
+    ParameterFormatter formatter = typeFormatters.get(type);
+
+    if (formatter == null)
+    {
+      for(final Class<?> interfaceType: type.getInterfaces())
+        if ((formatter = typeFormatters.get(interfaceType)) != null)
+          break;
+    }
 
     return formatter;
   }
