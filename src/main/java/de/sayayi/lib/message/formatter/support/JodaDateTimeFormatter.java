@@ -44,12 +44,12 @@ public class JodaDateTimeFormatter implements ParameterFormatter
   public String format(String parameter, Object value, String format, Context context, ParameterData data)
   {
     return  (value instanceof ReadableDateTime)
-        ? getFormatter((ReadableDateTime)value, format, data).print((ReadableInstant)value)
+        ? getFormatter(format, data).print((ReadableInstant)value)
         : getFormatter((BaseLocal)value, format, data).print((ReadablePartial)value);
   }
 
 
-  protected DateTimeFormatter getFormatter(ReadableDateTime datetime, String format, ParameterData data)
+  protected DateTimeFormatter getFormatter(String format, ParameterData data)
   {
     if (data instanceof ParameterString)
       return DateTimeFormat.forPattern(((ParameterString)data).getValue());
