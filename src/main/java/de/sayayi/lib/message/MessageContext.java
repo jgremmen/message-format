@@ -8,7 +8,7 @@ import java.util.Set;
 
 import de.sayayi.lib.message.Message.Context;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
-import de.sayayi.lib.message.formatter.FormatterRegistry;
+import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import lombok.Getter;
 import lombok.ToString;
@@ -22,10 +22,10 @@ public final class MessageContext implements Context
 {
   @Getter private final Locale locale;
   private final Map<String,Object> parameterValues;
-  @Getter private final FormatterRegistry formatters;
+  @Getter private final FormatterService formatters;
 
 
-  private MessageContext(Locale locale, Map<String,Object> parameterValues, FormatterRegistry formatters)
+  private MessageContext(Locale locale, Map<String,Object> parameterValues, FormatterService formatters)
   {
     this.locale = locale;
     this.parameterValues = parameterValues;
@@ -62,7 +62,7 @@ public final class MessageContext implements Context
   public static final class Builder
   {
     private Locale locale;
-    private FormatterRegistry formatters;
+    private FormatterService formatters;
     private final Map<String,Object> parameterValues;
 
 
@@ -70,7 +70,7 @@ public final class MessageContext implements Context
     {
       parameterValues = new HashMap<String,Object>();
       locale = Locale.getDefault();
-      formatters = new DefaultFormatterService();
+      formatters = DefaultFormatterService.getSharedInstance();
     }
 
 
@@ -81,7 +81,7 @@ public final class MessageContext implements Context
     }
 
 
-    public Builder withFormatterRegistry(FormatterRegistry formatters)
+    public Builder withFormatterService(FormatterService formatters)
     {
       this.formatters = formatters;
       return this;

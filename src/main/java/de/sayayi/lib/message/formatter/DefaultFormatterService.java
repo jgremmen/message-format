@@ -1,11 +1,12 @@
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.formatter.support.JodaDateTimeFormatter;
 import de.sayayi.lib.message.formatter.support.BoolFormatter;
 import de.sayayi.lib.message.formatter.support.ChoiceFormatter;
 import de.sayayi.lib.message.formatter.support.DateFormatter;
+import de.sayayi.lib.message.formatter.support.JodaDateTimeFormatter;
 import de.sayayi.lib.message.formatter.support.NumberFormatter;
 import de.sayayi.lib.message.formatter.support.StringFormatter;
+import lombok.Synchronized;
 
 
 /**
@@ -13,6 +14,19 @@ import de.sayayi.lib.message.formatter.support.StringFormatter;
  */
 public class DefaultFormatterService extends GenericFormatterRegistry
 {
+  private static FormatterService INSTANCE = null;
+
+
+  @Synchronized
+  public static final FormatterService getSharedInstance()
+  {
+    if (INSTANCE == null)
+      INSTANCE = new DefaultFormatterService();
+
+    return INSTANCE;
+  }
+
+
   public DefaultFormatterService() {
     addDefaultFormatters();
   }

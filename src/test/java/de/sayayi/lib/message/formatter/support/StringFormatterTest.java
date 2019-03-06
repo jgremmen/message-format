@@ -49,7 +49,7 @@ public class StringFormatterTest
     formatterRegistry.addFormatter(new StringFormatter());
 
     final Context context = MessageContext.builder()
-        .withFormatterRegistry(formatterRegistry)
+        .withFormatterService(formatterRegistry)
         .withParameter("a", " a test ")
         .withParameter("b", null)
         .withParameter("c", Integer.valueOf(1234))
