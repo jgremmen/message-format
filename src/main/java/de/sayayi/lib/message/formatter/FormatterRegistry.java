@@ -1,5 +1,6 @@
 package de.sayayi.lib.message.formatter;
 
+
 /**
  * @author Jeroen Gremmen
  */

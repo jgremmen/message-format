@@ -10,7 +10,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Text
 {
+  /** Message locale. Either the language code (de, es) or the language with country (de_DE, fr_CA) */
   String locale() default "";
 
+  /** Localized message text */
   String text();
 }

@@ -1,5 +1,6 @@
 package de.sayayi.lib.message;
 
+import java.io.Serializable;
 import java.util.Locale;
 import java.util.Set;
 
@@ -11,7 +12,7 @@ import de.sayayi.lib.message.formatter.ParameterFormatter;
  *
  * @author Jeroen Gremmen
  */
-public interface Message
+public interface Message extends Serializable
 {
   /**
    * Formats the message based on the message context provided.

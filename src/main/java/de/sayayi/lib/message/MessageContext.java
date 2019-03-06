@@ -58,7 +58,6 @@ public final class MessageContext implements Context
 
 
 
-
   public static final class Builder
   {
     private Locale locale;
@@ -105,6 +104,13 @@ public final class MessageContext implements Context
     public Builder withParameter(String parameter, long value)
     {
       parameterValues.put(parameter, Long.valueOf(value));
+      return this;
+    }
+
+
+    public Builder withParameter(String parameter, float value)
+    {
+      parameterValues.put(parameter, Float.valueOf(value));
       return this;
     }
 

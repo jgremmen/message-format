@@ -10,7 +10,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Message
 {
+  /** Unique message code */
   String code() default "";
 
+  /** 1..n localized texts */
   Text[] texts();
 }

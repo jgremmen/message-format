@@ -10,6 +10,8 @@ import lombok.Synchronized;
 
 
 /**
+ * Formatter service providing formatters for the most common java types.
+ *
  * @author Jeroen Gremmen
  */
 public class DefaultFormatterService extends GenericFormatterRegistry
@@ -37,7 +39,7 @@ public class DefaultFormatterService extends GenericFormatterRegistry
     addNamedFormatters();
     addTypedFormatters();
 
-    if (hasClass("org.joda.time.base.BaseLocal"))
+    if (hasClass("org.joda.time.DateTime"))
       addJodaTimeFormatters();
   }
 
