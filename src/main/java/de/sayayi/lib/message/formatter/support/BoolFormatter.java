@@ -35,8 +35,10 @@ public class BoolFormatter implements NamedParameterFormatter
       bool = Boolean.valueOf(((BigInteger)value).signum() != 0);
     else if (value instanceof BigDecimal)
       bool = Boolean.valueOf(((BigDecimal)value).signum() != 0);
-    else if (value instanceof Number)
+    else if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long)
       bool = Boolean.valueOf(((Number)value).longValue() != 0);
+    else if (value instanceof Number)
+      bool = Boolean.valueOf(Math.signum(((Number)value).doubleValue()) != 0);
     else
       bool = Boolean.valueOf(String.valueOf(value));
 
