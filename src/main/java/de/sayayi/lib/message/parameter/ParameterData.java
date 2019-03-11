@@ -11,4 +11,6 @@ public interface ParameterData
   String format(Context context, Object key);
 
   String format(Context context);
+
+  Object asObject();
 }

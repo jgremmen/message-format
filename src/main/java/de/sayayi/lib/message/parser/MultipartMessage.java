@@ -1,11 +1,12 @@
 package de.sayayi.lib.message.parser;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.sayayi.lib.message.Message;
+import lombok.Synchronized;
 import lombok.ToString;
 
 
@@ -13,68 +14,52 @@ import lombok.ToString;
  * @author Jeroen Gremmen
  */
 @ToString
-public class MultipartMessage extends AbstractMessage
+public class MultipartMessage extends AbstractMessageWithCode
 {
-  private static final long serialVersionUID = 3562616383044215265L;
+  private static final long serialVersionUID = -8638540396975308919L;
 
-  private final Map<Locale,List<MessagePart>> localizedParts;
+  private final Map<Locale,Message> localizedMessages;
+
+  private Boolean _hasParameter = null;
 
 
-  public MultipartMessage(String code, List<MessagePart> parts) {
-    this(code, Collections.<Locale,List<MessagePart>>singletonMap(null, parts));
+  public MultipartMessage(String code, Message message) {
+    this(code, Collections.<Locale,Message>singletonMap(null, message));
   }
 
 
-  public MultipartMessage(String code, Map<Locale,List<MessagePart>> localizedParts)
+  public MultipartMessage(String code, Map<Locale,Message> localizedMessages)
   {
     super(code);
 
-    this.localizedParts = localizedParts;
+    this.localizedMessages = localizedMessages;
   }
 
 
   @Override
-  public String format(Context context)
-  {
-    final StringBuilder message = new StringBuilder();
-    boolean spaceBefore = false;
-
-    for(final MessagePart part: findPartsByLocale(context.getLocale()))
-    {
-      final String text = part.getText(context);
-
-      if (text != null && !text.isEmpty())
-      {
-        if (spaceBefore || part.isSpaceBefore())
-          message.append(' ');
-
-        message.append(text);
-        spaceBefore = part.isSpaceAfter();
-      }
-    }
-
-    return message.toString();
+  public String format(Context context) {
+    return findMessageByLocale(context.getLocale()).format(context);
   }
 
 
-  protected List<MessagePart> findPartsByLocale(Locale locale)
+  public Message findMessageByLocale(Locale locale)
   {
     final String searchLanguage = locale.getLanguage();
     final String searchCountry = locale.getCountry();
 
     int match = -1;
-    List<MessagePart> parts = null;
+    Message message = null;
 
-    for(final Entry<Locale,List<MessagePart>> entry: localizedParts.entrySet())
+    for(final Entry<Locale,Message> entry: localizedMessages.entrySet())
     {
       final Locale keyLocale = entry.getKey();
 
-      if (parts == null)
-        parts = entry.getValue();
+      if (message == null)
+        message = entry.getValue();
 
       if (match == -1 && (keyLocale == null || Locale.ROOT.equals(keyLocale)))
       {
-        parts = entry.getValue();
+        message = entry.getValue();
         match = 0;
       }
       else if (keyLocale.getLanguage().equals(searchLanguage))
@@ -83,12 +68,32 @@ public class MultipartMessage extends AbstractMessage
           return entry.getValue();
         else if (match < 1)
         {
-          parts = entry.getValue();
+          message = entry.getValue();
           match = 1;
         }
       }
     }
 
-    return parts;
+    return message;
+  }
+
+
+  @Synchronized
+  @Override
+  public boolean hasParameter()
+  {
+    if (_hasParameter == null)
+    {
+      _hasParameter = Boolean.FALSE;
+
+      for(final Message message: localizedMessages.values())
+        if (message.hasParameter())
+        {
+          _hasParameter = Boolean.TRUE;
+          break;
+        }
+    }
+
+    return _hasParameter;
   }
 }

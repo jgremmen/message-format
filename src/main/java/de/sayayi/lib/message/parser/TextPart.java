@@ -3,14 +3,12 @@ package de.sayayi.lib.message.parser;
 import java.io.Serializable;
 
 import de.sayayi.lib.message.Message.Context;
-import lombok.ToString;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@ToString
-public class TextPart extends MessagePart implements Serializable
+public final class TextPart extends MessagePart implements Serializable
 {
   private static final long serialVersionUID = 5325056895074186084L;
 
@@ -28,5 +26,27 @@ public class TextPart extends MessagePart implements Serializable
   @Override
   public String getText(Context context) {
     return text;
+  }
+
+
+  @Override
+  public boolean isParameter() {
+    return false;
+  }
+
+
+  @Override
+  public String toString()
+  {
+    final StringBuilder s = new StringBuilder(getClass().getSimpleName()).append("(text=").append(text);
+
+    if (isSpaceBefore() && isSpaceAfter())
+      s.append(", space-around");
+    else if (isSpaceBefore())
+      s.append(", space-before");
+    else if (isSpaceAfter())
+      s.append(", space-after");
+
+    return s.append(')').toString();
   }
 }

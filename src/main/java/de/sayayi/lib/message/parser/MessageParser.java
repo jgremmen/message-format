@@ -1,7 +1,7 @@
 package de.sayayi.lib.message.parser;
 
-import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,343 +12,338 @@ import de.sayayi.lib.message.parameter.ParameterData;
 import de.sayayi.lib.message.parameter.ParameterInteger;
 import de.sayayi.lib.message.parameter.ParameterMap;
 import de.sayayi.lib.message.parameter.ParameterString;
-import lombok.ToString;
+import de.sayayi.lib.message.parser.MessageLexer.Token;
+import de.sayayi.lib.message.parser.MessageLexer.TokenType;
 
 
-/**
- * @author Jeroen Gremmen
- */
-public final class MessageParser
+public class MessageParser
 {
-  private final String text;
-  private final int length;
+  private final MessageLexer lexer;
+  private final Iterator<Token> tokenIterator;
+  private final List<Token> tokens;
 
 
-  public MessageParser(String text)
+  public MessageParser(String message)
   {
-    this.text = text;
-    length = text.length();
+    lexer = new MessageLexer(message);
+    tokenIterator = lexer.iterator();
+    tokens = new ArrayList<Token>();
   }
 
 
-  public List<MessagePart> parse() throws ParseException
+  protected Token getTokenAt(int idx)
   {
-    final ParseContext context = new ParseContext(0);
+    while(idx >= tokens.size() && tokenIterator.hasNext())
+      tokens.add(tokenIterator.next());
 
-    parseMessageWithoutQuotes(context);
-
-    return context.parts;
+    return (idx < tokens.size()) ? tokens.get(idx) : null;
   }
 
 
-  private void parseMessageWithoutQuotes(ParseContext context) throws ParseException
+  protected TokenType getTypeAt(int idx)
   {
-    while(context.pos < length)
-    {
-      final int pidx = text.indexOf("%{", context.pos);
-      final boolean spaceBefore = !context.parts.isEmpty() && isWhitespace(context.pos);
+    final Token token = getTokenAt(idx);
+    return (token == null) ? null : token.getType();
+  }
 
-      if (pidx >= 0)
-      {
-        if (pidx > context.pos)
+
+  public Message parseMessage()
+  {
+    final Message message = parseMessage(0);
+
+    final Token token = getTokenAt(0);
+    if (token != null)
+      throw new MessageParserException(token.getStart(), "unexpected token " + token.getText());
+
+    return message;
+  }
+
+
+  private Message parseMessage(int t)
+  {
+    final List<MessagePart> parts = new ArrayList<MessagePart>();
+    Token token;
+
+    message: {
+      while((token = getTokenAt(t)) != null)
+        switch(token.getType())
         {
-          context.parts.add(new TextPart(text.substring(context.pos, pidx).trim(), spaceBefore, isWhitespace(pidx - 1)));
-          context.pos = pidx;
+          case TEXT:
+            parts.add(new TextPart(token.getText(), token.isSpaceBefore(), token.isSpaceAfter()));
+            tokens.remove(t);
+            break;
+
+          case PARAM_START:
+            parts.add(parseParameter(t));
+            break;
+
+          default:
+            break message;
         }
+    }
+
+    switch(parts.size())
+    {
+      case 0:
+        return new SimpleEmptyMessage();
+
+      case 1:
+        return new SimpleMessage(parts.get(0));
+
+      default:
+        return new SimpleMultipartMessage(parts);
+    }
+  }
+
+
+  private ParameterPart parseParameter(int t)
+  {
+    final int tokenStart = t;
+    final Token t0 = getTokenAt(t);
+    final Token t1 = getTokenAt(t + 1);
+
+    String parameter = null;
+    String format = null;
+    ParameterData data = null;
+
+    // t0=PARAM_START t1=NAME COMMA NAME COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
+    // t0=PARAM_START t1=NAME COMMA NAME PARAM_END
+    // t0=PARAM_START t1=NAME COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
+    // t0=PARAM_START t1=NAME PARAM_END
+
+    assert t0.getType() == TokenType.PARAM_START;
+    if (t1.getType() != TokenType.NAME)
+      throw new MessageParserException((t1 == null) ? t0.getStart() + 2 : t1.getStart(), "missing parameter name");
+
+    parse: {
+      parameter = t1.getText();
+
+      final Token t2 = getTokenAt(t + 2);
+      if (t2 == null)
+        throw new MessageParserException(t1.getEnd() + 1, "unexpected end of parameter " + parameter);
+
+      // t2=COMMA NAME COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
+      // t2=COMMA NAME PARAM_END
+      // t2=COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
+      // t2=PARAM_END
+
+      if (t2.getType() == TokenType.PARAM_END)
+      {
+        t += 2;
+        break parse;
+      }
+
+      // t2=COMMA NAME COMMA (NUMBER |BOOLEAN | MAP_START ... MAP_END) PARAM_END
+      // t2=COMMA NAME PARAM_END
+      // t2=COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
+
+      if (t2.getType() != TokenType.COMMA)
+        throw new MessageParserException(t2.getStart(), "comma expected in parameter " + parameter);
+
+      final Token t3 = getTokenAt(t + 3);
+      if (t3 == null)
+        throw new MessageParserException(t2.getEnd() + 1, "unexpected end of parameter " + parameter);
+
+      // t3=NAME COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
+      // t3=NAME PARAM_END
+      // t3=(NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
+
+      if (t3.getType() != TokenType.NAME)
+      {
+        // t3=(NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
+
+        t += 3;
+        data = parseParameterData(t);
+        break parse;
       }
       else
       {
-        context.parts.add(new TextPart(text.substring(context.pos).trim(), spaceBefore, false));
-        break;
-      }
+        // t3=NAME COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
+        // t3=NAME PARAM_END
 
-      parseParameter(context);
-    }
+        format = t3.getText();
 
-    context.pos = length;
-  }
+        final Token t4 = getTokenAt(t + 4);
+        if (t4 == null)
+          throw new MessageParserException(t3.getEnd() + 1, "unexpected end of parameter " + parameter);
 
+        // t4=COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
+        // t4=PARAM_END
 
-  private void parseMessageWithQuotes(ParseContext context, boolean allowNestedParameters) throws ParseException
-  {
-    final char quote = context.getChar();
+        t += 4;
 
-    context.pos++;
+        if (t4.getType() == TokenType.PARAM_END)
+          break parse;
 
-    for(;;)
-    {
-      final int pidx = text.indexOf("%{", context.pos);
-      final int qidx = text.indexOf(quote, context.pos);
+        // t4=COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
 
-      if (qidx == -1)
-        throw new ParseException("missing closing quote for message", length);
+        if (t4.getType() != TokenType.COMMA)
+          throw new MessageParserException(t4.getStart(), "comma expected in parameter " + parameter);
 
-      if (pidx >= 0 && pidx < qidx)
-      {
-        if (!allowNestedParameters)
-          throw new ParseException("no nested parameter allowed in message", pidx);
+        // (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
 
-        if (pidx > context.pos)
-        {
-          context.parts.add(new TextPart(text.substring(context.pos, pidx).trim(), isWhitespace(context.pos), isWhitespace(pidx - 1)));
-          context.pos = pidx;
-        }
-      }
-      else if (pidx == -1 || pidx > qidx)
-      {
-        if (qidx > context.pos)
-          context.parts.add(new TextPart(text.substring(context.pos, qidx).trim(), isWhitespace(context.pos), false));
-
-        context.pos = qidx;
-        break;
-      }
-
-      parseParameter(context);
-    }
-
-    context.eatCharacter(quote);
-  }
-
-
-  private String parseString(ParseContext context) throws ParseException
-  {
-    final ParseContext string = new ParseContext(context.pos);
-
-    parseMessageWithQuotes(string, false);
-    context.pos = string.pos;
-
-    return string.parts.isEmpty() ? null : string.parts.get(0).getText(null);
-  }
-
-
-  private Object parseBoolOrIntOrString(ParseContext context) throws ParseException
-  {
-    char c = context.getChar();
-
-    if (c == '"' || c == '\'')
-      return parseString(context);
-
-    if (context.pos + 4 <= length && text.substring(context.pos, context.pos + 4).equals("true"))
-      return Boolean.TRUE;
-    if (context.pos + 5 <= length && text.substring(context.pos, context.pos + 5).equals("false"))
-      return Boolean.FALSE;
-
-    boolean negative = false;
-
-    if (c == '+' || (negative = c == '-'))
-    {
-      context.pos++;
-      if (context.pos >= length)
-        throw new ParseException("unexpected end of integer value", context.pos);
-
-      c = context.getChar();
-    }
-
-    if (!Character.isDigit(c))
-      throw new ParseException("expecting integer value", context.pos);
-
-    int i = 0;
-    while(Character.isDigit(c = context.getChar()))
-    {
-      i = i * 10 + (c - '0');
-      context.pos++;
-    }
-
-    return Integer.valueOf(negative ? -i : i);
-  }
-
-
-  private void parseParameter(ParseContext context) throws ParseException
-  {
-    int pos;
-
-    final boolean spaceBefore = context.pos > 0 && isWhitespace(context.pos - 1);
-
-    context.pos += 2;
-    context.eatWhitespace("parameter");
-
-    String parameter;
-    String format = "string";
-    ParameterData data = null;
-
-    pos = context.pos;
-    if ((parameter = eatName(context)).isEmpty())
-      throw new ParseException("missing parameter name", pos);
-
-    context.eatWhitespace("parameter");
-
-    if (context.checkAndEat(','))
-    {
-      context.eatWhitespace("parameter");
-      pos = context.pos;
-
-      if ((format = eatName(context)).isEmpty())
-        throw new ParseException("missing format for parameter " + parameter, pos);
-
-      context.eatWhitespace("parameter");
-
-      if (context.checkAndEat(','))
-      {
-        context.eatWhitespace("parameter");
-
-        final char c = context.getChar();
-        if (c == '{')
-          data = parseMap(context);
-        else
-          data = toParameterData(parseBoolOrIntOrString(context));
+        data = parseParameterData(++t);
+        break parse;
       }
     }
 
-    context.eatWhitespace("parameter");
-    context.eatCharacter('}');
+    final Token paramEnd = getTokenAt(t);
+    if (paramEnd == null)
+      throw new MessageParserException(t0.getStart(), "unexpected end of parameter " + parameter);
+    if (paramEnd.getType() != TokenType.PARAM_END)
+      throw new MessageParserException(paramEnd.getStart(), "missing closing brace for parameter " + parameter);
 
-    context.parts.add(new ParameterPart(parameter, format, spaceBefore, context.pos < length && isWhitespace(context.pos), data));
+    tokens.subList(tokenStart, t + 1).clear();
+
+    return new ParameterPart(parameter, format, t0.isSpaceBefore(), paramEnd.isSpaceAfter(), data);
   }
 
 
-  private ParameterData toParameterData(Object o)
+  private ParameterData parseParameterData(int t)
   {
-    if (o instanceof String)
-      return new ParameterString((String)o);
-    if (o instanceof Boolean)
-      return new ParameterBoolean(((Boolean)o).booleanValue());
-    if (o instanceof Number)
-      return new ParameterInteger(((Number)o).intValue());
+    final Token t0 = getTokenAt(t);
 
-    return null;
+    // t0=NUMBER
+    // t0=BOOLEAN
+    // t0=TEXT
+    // t0=MAP_START ... MAP_END
+
+    switch(t0.getType())
+    {
+      case NUMBER:
+      case BOOLEAN:
+        return parseNumberBoolean(t);
+
+      case TEXT:
+        tokens.remove(t);
+        return new ParameterString(t0.getText());
+
+      case MAP_START:
+        return parseParameterMap(t);
+
+      default:
+        throw new MessageParserException(t0.getStart(), "unexpected token " + t0.getText());
+    }
   }
 
 
-  private ParameterMap parseMap(ParseContext context) throws ParseException
+  private ParameterData parseNumberBoolean(int t)
+  {
+    final Token t0 = getTokenAt(t);
+    assert t0 != null;
+
+    // t0=NUMBER
+    // t0=BOOLEAN
+
+    switch(t0.getType())
+    {
+      case NUMBER:
+        tokens.remove(t);
+        return new ParameterInteger(Integer.parseInt(t0.getText()));
+
+      case BOOLEAN:
+        tokens.remove(t);
+        return new ParameterBoolean(t0.getNumber() != 0);
+
+      default:
+        throw new MessageParserException(t0.getStart(), "unexpected token " + t0.getText());
+    }
+  }
+
+
+  private ParameterMap parseParameterMap(int t)
   {
     final Map<Object,Message> map = new LinkedHashMap<Object,Message>();
 
-    context.eatCharacter('{');
-    context.eatWhitespace("map");
+    Token t0 = getTokenAt(t);
+    assert t0.getType() == TokenType.MAP_START;
 
-    while(context.getChar() != '}')
-    {
-      final int pos = context.pos;
-      boolean foundValidKey = false;
-      Object key = null;
+    tokens.remove(t);
 
-      try {
-        key = parseBoolOrIntOrString(context);
-        foundValidKey = true;
-      } catch(final ParseException ex) {
-        foundValidKey = false;
-      }
-
-      context.eatWhitespace("map");
-
-      if (!foundValidKey || !context.lookAhead("->"))
+    buildMap: {
+      for(;;)
       {
-        final ParseContext defaultValue = new ParseContext(pos);
-        parseMessageWithQuotes(defaultValue, true);
-        map.put(null, new MultipartMessage(null, defaultValue.parts));
-        context.pos = defaultValue.pos;
-        break;
-      }
+        t0 = getTokenAt(t);
+        if (t0 == null)
+          throw new MessageParserException(lexer.getLength() + 1, "number, boolean or string expected");
 
-      context.pos += 2;
-      context.eatWhitespace("map");
+        Object key = null;
+        Message value = null;
 
-      final ParseContext value = new ParseContext(context.pos);
-      parseMessageWithQuotes(value, true);
-      map.put(key, new MultipartMessage(null, value.parts));
-      context.pos = value.pos;
+        // t1=(NUMBER | BOOLEAN | TEXT) ARROW MESSAGE (COMMA (NUMBER | BOOLEAN | TEXT) ARROW MESSAGE)* MAP_END
+        // t1=MAP_END
 
-      context.eatWhitespace("map");
+        switch(t0.getType())
+        {
+          case NUMBER:
+          case BOOLEAN:
+            key = parseNumberBoolean(t).asObject();
+            break;
 
-      if (context.getChar() != '}')
-      {
-        context.eatCharacter(',');
-        context.eatWhitespace("map");
+          case TEXT:
+          case PARAM_START:
+            final Message m = parseMessage(t);
+            if (getTypeAt(t) == TokenType.MAP_END)
+            {
+              map.put(null, m);
+              break buildMap;
+            }
+
+            if (m.hasParameter())
+              throw new MessageParserException(t0.getStart(), "parameter string is not allowed as a map key");
+
+            key = m.format(null);
+            break;
+
+          case MAP_END:
+            break buildMap;
+
+          default:
+            throw new MessageParserException(t0.getStart(), "unexpected token " + t0.getText());
+        }
+
+        t0 = getTokenAt(t);
+        if (t0 == null || t0.getType() != TokenType.ARROW)
+          throw new MessageParserException((t0 == null) ? lexer.getLength() : t0.getStart(), "-> expected");
+
+        tokens.remove(t);
+
+        value = parseMessage(t);
+        map.put(key, value);
+
+        t0 = getTokenAt(t);
+        if (t0 == null)
+          throw new MessageParserException(lexer.getLength(), "unexpected end of map");
+
+        switch(t0.getType())
+        {
+          case MAP_END:
+            break buildMap;
+
+          case COMMA:
+            tokens.remove(t);
+            break;
+
+          default:
+            throw new MessageParserException(t0.getStart(), "unexpected token " + t0.getText());
+        }
       }
     }
 
-    context.eatWhitespace("map");
-    context.eatCharacter('}');
+    t0 = getTokenAt(t);
+    if (t0 == null || t0.getType() != TokenType.MAP_END)
+      throw new MessageParserException((t0 == null) ? lexer.getLength() : t0.getStart(), "closing brace for map expected");
+
+    tokens.remove(t);
 
     return new ParameterMap(map);
   }
 
 
-  private boolean isWhitespace(int pos) {
-    return text.charAt(pos) == ' ';
-  }
-
-
-  private String eatName(ParseContext context)
+  public static void main(String[] args)
   {
-    final int startPos = context.pos;
+    final MessageParser rule = new MessageParser("Es wurden %{count,choice,{0 -> 'keine Dateien', 1 -> 'eine Datei', '%{count,integer} Dateien'}} gespeichert.");
 
-    for(; context.pos < length; context.pos++)
-    {
-      final char c = text.charAt(context.pos);
-      if (Character.isLetter(c) || (context.pos > startPos && (Character.isDigit(c) || c == '_' || c == '-')))
-        continue;
-
-      break;
-    }
-
-    return text.substring(startPos, context.pos);
-  }
-
-
-  @ToString
-  private final class ParseContext
-  {
-    List<MessagePart> parts = new ArrayList<MessagePart>();
-    int pos;
-
-
-    ParseContext(int pos) {
-      this.pos = pos;
-    }
-
-
-    void eatWhitespace(String msg) throws ParseException
-    {
-      while(pos < length && isWhitespace(pos))
-        pos++;
-
-      if (pos >= length)
-        throw new ParseException("unexpected end of " + msg, length);
-    }
-
-
-    void eatCharacter(char expectedChar) throws ParseException
-    {
-      if (pos >= length || text.charAt(pos) != expectedChar)
-        throw new ParseException("expected " + expectedChar, pos);
-
-      pos++;
-    }
-
-
-    boolean checkAndEat(char expectedCharacter)
-    {
-      if (pos < length && getChar() == expectedCharacter)
-      {
-        pos++;
-        return true;
-      }
-
-      return false;
-    }
-
-
-    boolean lookAhead(String expectedText)
-    {
-      final int endPos = pos + expectedText.length();
-
-      return endPos <= length && text.subSequence(pos, endPos).equals(expectedText);
-    }
-
-
-    char getChar() {
-      return text.charAt(pos);
-    }
+    final Message message = rule.parseMessage();
   }
 }

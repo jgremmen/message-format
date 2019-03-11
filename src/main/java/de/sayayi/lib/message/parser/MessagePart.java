@@ -21,4 +21,7 @@ public abstract class MessagePart
 
 
   public abstract String getText(Context context);
+
+
+  public abstract boolean isParameter();
 }

@@ -9,6 +9,8 @@ import lombok.Getter;
  */
 public class ParameterString implements ParameterData, Message
 {
+  private static final long serialVersionUID = 6702969353416992174L;
+
   @Getter private final String value;
 
 
@@ -32,5 +34,17 @@ public class ParameterString implements ParameterData, Message
   @Override
   public String toString() {
     return value;
+  }
+
+
+  @Override
+  public Object asObject() {
+    return value;
+  }
+
+
+  @Override
+  public boolean hasParameter() {
+    return false;
   }
 }

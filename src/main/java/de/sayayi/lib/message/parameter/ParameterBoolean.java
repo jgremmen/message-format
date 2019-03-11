@@ -9,6 +9,8 @@ import lombok.Getter;
  */
 public class ParameterBoolean implements ParameterData, Message
 {
+  private static final long serialVersionUID = 4014416484591250617L;
+
   @Getter private final boolean value;
 
 
@@ -32,5 +34,17 @@ public class ParameterBoolean implements ParameterData, Message
   @Override
   public String toString() {
     return Boolean.toString(value);
+  }
+
+
+  @Override
+  public Object asObject() {
+    return Boolean.valueOf(value);
+  }
+
+
+  @Override
+  public boolean hasParameter() {
+    return false;
   }
 }

@@ -24,6 +24,14 @@ public interface Message extends Serializable
   String format(Context context);
 
 
+  /**
+   * Tells whether this message contains one or more parameters.
+   *
+   * @return  {@code true} if this message contains parameters, {@code false} otherwise
+   */
+  boolean hasParameter();
+
+
 
 
   /**

@@ -9,6 +9,8 @@ import lombok.Getter;
  */
 public class ParameterInteger implements ParameterData, Message
 {
+  private static final long serialVersionUID = 1858469767517999L;
+
   @Getter private final int value;
 
 
@@ -32,5 +34,17 @@ public class ParameterInteger implements ParameterData, Message
   @Override
   public String toString() {
     return Integer.toString(value);
+  }
+
+
+  @Override
+  public Object asObject() {
+    return Integer.valueOf(value);
+  }
+
+
+  @Override
+  public boolean hasParameter() {
+    return false;
   }
 }

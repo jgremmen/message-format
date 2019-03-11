@@ -3,7 +3,6 @@ package de.sayayi.lib.message;
 import java.lang.reflect.AnnotatedElement;
 import java.text.ParseException;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,8 +10,8 @@ import java.util.Map.Entry;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.parser.EmptyMessage;
 import de.sayayi.lib.message.parser.MessageParser;
-import de.sayayi.lib.message.parser.MessagePart;
 import de.sayayi.lib.message.parser.MultipartMessage;
+import de.sayayi.lib.message.parser.SimpleMessageWithCode;
 
 
 /**
@@ -20,8 +19,8 @@ import de.sayayi.lib.message.parser.MultipartMessage;
  */
 public final class MessageFactory
 {
-  public static Message parse(String text) throws ParseException {
-    return parse(null, text);
+  public static Message parse(String text) {
+    return new MessageParser(text).parseMessage();
   }
 
 
@@ -38,7 +37,7 @@ public final class MessageFactory
    * @throws ParseException
    */
   public static MessageWithCode parse(String code, String text) throws ParseException {
-    return new MultipartMessage(code, new MessageParser(text).parse());
+    return new SimpleMessageWithCode(code, new MessageParser(text).parseMessage());
   }
 
 
@@ -47,10 +46,10 @@ public final class MessageFactory
     if (localizedTexts.isEmpty())
       return new EmptyMessage(code);
 
-    final Map<Locale,List<MessagePart>> localizedParts = new LinkedHashMap<Locale,List<MessagePart>>();
+    final Map<Locale,Message> localizedParts = new LinkedHashMap<Locale,Message>();
 
     for(final Entry<Locale,String> localizedText: localizedTexts.entrySet())
-      localizedParts.put(localizedText.getKey(), new MessageParser(localizedText.getValue()).parse());
+      localizedParts.put(localizedText.getKey(), new MessageParser(localizedText.getValue()).parseMessage());
 
     return new MultipartMessage(code, localizedParts);
   }

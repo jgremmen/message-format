@@ -95,4 +95,10 @@ public class ParameterMap implements ParameterData
   public String format(Context context) {
     return format(context, null);
   }
+
+
+  @Override
+  public Object asObject() {
+    return new UnsupportedOperationException();
+  }
 }
