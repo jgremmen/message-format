@@ -14,9 +14,12 @@ import de.sayayi.lib.message.parameter.ParameterMap;
 import de.sayayi.lib.message.parameter.ParameterString;
 import de.sayayi.lib.message.parser.MessageLexer.Token;
 import de.sayayi.lib.message.parser.MessageLexer.TokenType;
+import de.sayayi.lib.message.spi.EmptyMessage;
+import de.sayayi.lib.message.spi.MultipartMessage;
+import de.sayayi.lib.message.spi.SinglePartMessage;
 
 
-public class MessageParser
+public final class MessageParser
 {
   private final MessageLexer lexer;
   private final Iterator<Token> tokenIterator;
@@ -85,13 +88,13 @@ public class MessageParser
     switch(parts.size())
     {
       case 0:
-        return new SimpleEmptyMessage();
+        return new EmptyMessage();
 
       case 1:
-        return new SimpleMessage(parts.get(0));
+        return new SinglePartMessage(parts.get(0));
 
       default:
-        return new SimpleMultipartMessage(parts);
+        return new MultipartMessage(parts);
     }
   }
 

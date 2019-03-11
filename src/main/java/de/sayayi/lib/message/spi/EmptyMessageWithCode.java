@@ -1,4 +1,4 @@
-package de.sayayi.lib.message.parser;
+package de.sayayi.lib.message.spi;
 
 import lombok.ToString;
 
@@ -7,12 +7,12 @@ import lombok.ToString;
  * @author Jeroen Gremmen
  */
 @ToString
-public final class EmptyMessage extends AbstractMessageWithCode
+public final class EmptyMessageWithCode extends AbstractMessageWithCode
 {
   private static final long serialVersionUID = 1334376878447581605L;
 
 
-  public EmptyMessage(String code) {
+  public EmptyMessageWithCode(String code) {
     super(code);
   }
 

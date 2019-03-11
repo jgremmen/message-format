@@ -1,4 +1,4 @@
-package de.sayayi.lib.message.parser;
+package de.sayayi.lib.message.spi;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.parser.MessagePart;
 import lombok.ToString;
 
 
@@ -13,14 +14,14 @@ import lombok.ToString;
  * @author Jeroen Gremmen
  */
 @ToString
-public class SimpleMultipartMessage implements Message, Serializable
+public class MultipartMessage implements Message, Serializable
 {
   private static final long serialVersionUID = 3562616383044215265L;
 
   private final MessagePart[] parts;
 
 
-  public SimpleMultipartMessage(List<MessagePart> parts) {
+  public MultipartMessage(List<MessagePart> parts) {
     this.parts = parts.toArray(new MessagePart[parts.size()]);
   }
 

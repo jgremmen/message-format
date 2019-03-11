@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.sayayi.lib.message.annotation.Text;
-import de.sayayi.lib.message.parser.EmptyMessage;
 import de.sayayi.lib.message.parser.MessageParser;
-import de.sayayi.lib.message.parser.MultipartMessage;
-import de.sayayi.lib.message.parser.SimpleMessageWithCode;
+import de.sayayi.lib.message.spi.EmptyMessageWithCode;
+import de.sayayi.lib.message.spi.MessageDelegateWithCode;
+import de.sayayi.lib.message.spi.MultipartLocalizedMessageBundleWithCode;
 
 
 /**
@@ -37,21 +37,21 @@ public final class MessageFactory
    * @throws ParseException
    */
   public static MessageWithCode parse(String code, String text) throws ParseException {
-    return new SimpleMessageWithCode(code, new MessageParser(text).parseMessage());
+    return new MessageDelegateWithCode(code, new MessageParser(text).parseMessage());
   }
 
 
   public static MessageWithCode parse(String code, Map<Locale,String> localizedTexts) throws ParseException
   {
     if (localizedTexts.isEmpty())
-      return new EmptyMessage(code);
+      return new EmptyMessageWithCode(code);
 
     final Map<Locale,Message> localizedParts = new LinkedHashMap<Locale,Message>();
 
     for(final Entry<Locale,String> localizedText: localizedTexts.entrySet())
       localizedParts.put(localizedText.getKey(), new MessageParser(localizedText.getValue()).parseMessage());
 
-    return new MultipartMessage(code, localizedParts);
+    return new MultipartLocalizedMessageBundleWithCode(code, localizedParts);
   }
 
 
@@ -65,7 +65,7 @@ public final class MessageFactory
 
     final Text[] texts = annotation.texts();
     if (texts == null || texts.length == 0)
-      return new EmptyMessage(annotation.code());
+      return new EmptyMessageWithCode(annotation.code());
 
     final Map<Locale,String> localizedTexts = new LinkedHashMap<Locale,String>();
 

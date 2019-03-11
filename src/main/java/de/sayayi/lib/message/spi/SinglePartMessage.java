@@ -1,8 +1,9 @@
-package de.sayayi.lib.message.parser;
+package de.sayayi.lib.message.spi;
 
 import java.io.Serializable;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.parser.MessagePart;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -11,14 +12,14 @@ import lombok.ToString;
  * @author Jeroen Gremmen
  */
 @ToString
-public class SimpleMessage implements Message, Serializable
+public class SinglePartMessage implements Message, Serializable
 {
   private static final long serialVersionUID = 702546983985164717L;
 
   @Getter private final MessagePart part;
 
 
-  public SimpleMessage(MessagePart part) {
+  public SinglePartMessage(MessagePart part) {
     this.part = part;
   }
 

@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import de.sayayi.lib.message.annotation.Message;
 import de.sayayi.lib.message.annotation.Text;
-import de.sayayi.lib.message.parser.EmptyMessage;
+import de.sayayi.lib.message.spi.EmptyMessageWithCode;
 
 
 /**
@@ -29,7 +29,7 @@ public class MessageAnnotationTest
     final MessageWithCode msg = MessageFactory.parseAnnotation(
         MessageAnnotationTest.class.getDeclaredField("FIELD"));
 
-    assertTrue(msg instanceof EmptyMessage);
+    assertTrue(msg instanceof EmptyMessageWithCode);
     assertNull(msg.getCode());
   }
 
@@ -41,7 +41,7 @@ public class MessageAnnotationTest
     final MessageWithCode msg = MessageFactory.parseAnnotation(
         MessageAnnotationTest.class.getDeclaredMethod("testEmptyMessageWithCode"));
 
-    assertTrue(msg instanceof EmptyMessage);
+    assertTrue(msg instanceof EmptyMessageWithCode);
     assertEquals("MSG-052", msg.getCode());
   }
 

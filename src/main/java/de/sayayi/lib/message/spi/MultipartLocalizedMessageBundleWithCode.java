@@ -1,4 +1,4 @@
-package de.sayayi.lib.message.parser;
+package de.sayayi.lib.message.spi;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -14,7 +14,7 @@ import lombok.ToString;
  * @author Jeroen Gremmen
  */
 @ToString
-public class MultipartMessage extends AbstractMessageWithCode
+public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWithCode
 {
   private static final long serialVersionUID = -8638540396975308919L;
 
@@ -23,12 +23,12 @@ public class MultipartMessage extends AbstractMessageWithCode
   private Boolean _hasParameter = null;
 
 
-  public MultipartMessage(String code, Message message) {
+  public MultipartLocalizedMessageBundleWithCode(String code, Message message) {
     this(code, Collections.<Locale,Message>singletonMap(null, message));
   }
 
 
-  public MultipartMessage(String code, Map<Locale,Message> localizedMessages)
+  public MultipartLocalizedMessageBundleWithCode(String code, Map<Locale,Message> localizedMessages)
   {
     super(code);
 

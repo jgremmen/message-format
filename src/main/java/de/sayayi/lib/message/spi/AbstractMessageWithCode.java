@@ -1,4 +1,4 @@
-package de.sayayi.lib.message.parser;
+package de.sayayi.lib.message.spi;
 
 import java.io.Serializable;
 
