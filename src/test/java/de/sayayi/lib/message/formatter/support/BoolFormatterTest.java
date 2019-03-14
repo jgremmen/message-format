@@ -54,6 +54,6 @@ public class BoolFormatterTest
         .buildContext();
     final Message msg = MessageFactory.parse("%{a} %{b} %{c} %{c,bool} %{d,bool,{true->'yes',false->'no'}} %{e}");
 
-    assertEquals("false true 1234 no 3.14", msg.format(context));
+    assertEquals("false true 1234 true no 3.14", msg.format(context));
   }
 }

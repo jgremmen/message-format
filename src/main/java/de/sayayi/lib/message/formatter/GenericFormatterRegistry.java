@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import de.sayayi.lib.message.formatter.support.StringFormatter;
+
 
 /**
  * @author Jeroen Gremmen
@@ -14,7 +16,12 @@ public class GenericFormatterRegistry implements FormatterRegistry
   private final Map<Class<?>,ParameterFormatter> typeFormatters = new HashMap<Class<?>,ParameterFormatter>();
   private final Map<Class<?>,ParameterFormatter> cachedFormatters = new ConcurrentHashMap<Class<?>,ParameterFormatter>(32);
 
+  
+  public GenericFormatterRegistry() {
+    addFormatter(new StringFormatter());
+  } 
 
+  
   @Override
   public void addFormatterForType(Class<?> type, ParameterFormatter formatter) {
     typeFormatters.put(type, formatter);
