@@ -1,16 +1,16 @@
 package de.sayayi.lib.message.formatter.support;
 
+import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.formatter.ParameterFormatter;
+import de.sayayi.lib.message.parameter.ParameterData;
+import de.sayayi.lib.message.parameter.ParameterString;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Set;
-
-import de.sayayi.lib.message.Message.Context;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
-import de.sayayi.lib.message.parameter.ParameterData;
-import de.sayayi.lib.message.parameter.ParameterString;
 
 import static java.text.DateFormat.FULL;
 import static java.text.DateFormat.LONG;

@@ -1,16 +1,14 @@
 package de.sayayi.lib.message.formatter.support;
 
-import static de.sayayi.lib.message.MessageFactory.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.Test;
-
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Context;
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
+import org.junit.Test;
+
+import static de.sayayi.lib.message.MessageFactory.parse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**

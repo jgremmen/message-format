@@ -1,17 +1,17 @@
 package de.sayayi.lib.message;
 
+import de.sayayi.lib.message.annotation.Text;
+import de.sayayi.lib.message.parser.MessageParser;
+import de.sayayi.lib.message.spi.EmptyMessageWithCode;
+import de.sayayi.lib.message.spi.MessageDelegateWithCode;
+import de.sayayi.lib.message.spi.MultipartLocalizedMessageBundleWithCode;
+
 import java.lang.reflect.AnnotatedElement;
 import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import de.sayayi.lib.message.annotation.Text;
-import de.sayayi.lib.message.parser.MessageParser;
-import de.sayayi.lib.message.spi.EmptyMessageWithCode;
-import de.sayayi.lib.message.spi.MessageDelegateWithCode;
-import de.sayayi.lib.message.spi.MultipartLocalizedMessageBundleWithCode;
 
 
 /**
@@ -80,7 +80,7 @@ public final class MessageFactory
   }
 
 
-  private static Locale forLanguageTag(String locale) throws ParseException
+  static Locale forLanguageTag(String locale) throws ParseException
   {
     if (locale.isEmpty())
       return Locale.ROOT;

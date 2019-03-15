@@ -1,12 +1,9 @@
 package de.sayayi.lib.message.formatter.support;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
+import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.formatter.ParameterFormatter;
+import de.sayayi.lib.message.parameter.ParameterData;
+import de.sayayi.lib.message.parameter.ParameterString;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.ReadableDateTime;
@@ -16,10 +13,12 @@ import org.joda.time.base.BaseLocal;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import de.sayayi.lib.message.Message.Context;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
-import de.sayayi.lib.message.parameter.ParameterData;
-import de.sayayi.lib.message.parameter.ParameterString;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
