@@ -1,5 +1,6 @@
 package de.sayayi.lib.message.formatter.support;
 
+import static de.sayayi.lib.message.MessageFactory.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -54,7 +55,7 @@ public class StringFormatterTest
         .withParameter("b", null)
         .withParameter("c", Integer.valueOf(1234))
         .buildContext();
-    final Message msg = MessageFactory.parse("This is %{a} %{b} %{c}");
+    final Message msg = parse("This is %{a} %{b} %{c}");
 
     assertEquals("This is a test 1234", msg.format(context));
   }

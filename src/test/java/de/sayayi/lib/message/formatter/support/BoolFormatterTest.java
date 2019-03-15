@@ -1,5 +1,6 @@
 package de.sayayi.lib.message.formatter.support;
 
+import static de.sayayi.lib.message.MessageFactory.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -52,7 +53,7 @@ public class BoolFormatterTest
         .withParameter("d", Integer.valueOf(0))
         .withParameter("e", Double.valueOf(3.14d))
         .buildContext();
-    final Message msg = MessageFactory.parse("%{a} %{b} %{c} %{c,bool} %{d,bool,{true->'yes',false->'no'}} %{e}");
+    final Message msg = parse("%{a} %{b} %{c} %{c,bool} %{d,bool,{true->'yes',false->'no'}} %{e}");
 
     assertEquals("false true 1234 true no 3.14", msg.format(context));
   }

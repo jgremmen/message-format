@@ -21,8 +21,12 @@ public final class ChoiceFormatter implements NamedParameterFormatter
 
 
   @Override
-  public String format(String parameter, Object value, String format, Context context, ParameterData data) {
-    return ((ParameterMap)data).format(context, value);
+  public String format(String parameter, Object value, String format, Context context, ParameterData data)
+  {
+    if (!(data instanceof ParameterMap))
+      throw new IllegalArgumentException("missing choice map for parameter " + parameter);
+
+    return data.format(context, value);
   }
 
 
