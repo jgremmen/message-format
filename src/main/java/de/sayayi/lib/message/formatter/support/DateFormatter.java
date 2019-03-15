@@ -57,7 +57,7 @@ public class DateFormatter implements ParameterFormatter
     if ("long".equals(format))
       return getDateInstance(LONG, locale);
 
-    if (format.isEmpty() || "medium".equals(format))
+    if (format == null || format.isEmpty() || "medium".equals(format))
       return getDateInstance(MEDIUM, locale);
 
     if ("short".equals(format))

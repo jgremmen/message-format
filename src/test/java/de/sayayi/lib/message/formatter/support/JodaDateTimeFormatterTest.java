@@ -1,16 +1,21 @@
 package de.sayayi.lib.message.formatter.support;
 
+import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Context;
 import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
 import de.sayayi.lib.message.parameter.ParameterString;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.ReadableDateTime;
 import org.joda.time.base.BaseLocal;
+import org.junit.Test;
 
+import java.util.Locale;
 import java.util.Set;
 
+import static de.sayayi.lib.message.MessageFactory.*;
 import static java.util.Locale.*;
 import static org.junit.Assert.*;
 
@@ -20,7 +25,7 @@ import static org.junit.Assert.*;
  */
 public class JodaDateTimeFormatterTest
 {
-  @org.junit.Test
+  @Test
   public void testFormattableTypes()
   {
     Set<Class<?>> types = new JodaDateTimeFormatter().getFormattableTypes();
@@ -29,7 +34,7 @@ public class JodaDateTimeFormatterTest
   }
 
 
-  @org.junit.Test
+  @Test
   public void testLocalDate()
   {
     JodaDateTimeFormatter formatter = new JodaDateTimeFormatter();
@@ -46,7 +51,7 @@ public class JodaDateTimeFormatterTest
   }
 
 
-  @org.junit.Test
+  @Test
   public void testLocalTime()
   {
     JodaDateTimeFormatter formatter = new JodaDateTimeFormatter();
@@ -63,7 +68,7 @@ public class JodaDateTimeFormatterTest
   }
 
 
-  @org.junit.Test
+  @Test
   public void testDateTime()
   {
     JodaDateTimeFormatter formatter = new JodaDateTimeFormatter();
@@ -80,7 +85,7 @@ public class JodaDateTimeFormatterTest
   }
 
 
-  @org.junit.Test
+  @Test
   public void testCustomPattern()
   {
     JodaDateTimeFormatter formatter = new JodaDateTimeFormatter();
@@ -93,5 +98,24 @@ public class JodaDateTimeFormatterTest
         formatter.format("a", datetime, null, context, new ParameterString("EEE EEEE")));
     assertEquals("02:40:23,833",
         formatter.format("a", datetime, null, context, new ParameterString("HH:mm:ss,SSS")));
+  }
+
+
+  @Test
+  public void testFormatter() throws Exception
+  {
+    final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
+    formatterRegistry.addFormatter(new JodaDateTimeFormatter());
+
+    final Context context = MessageContext.builder()
+        .withFormatterService(formatterRegistry)
+        .withParameter("a", new LocalDate(1972, 8, 17))
+        .withParameter("b", new LocalTime(16, 45, 9, 123))
+        .withParameter("c", new DateTime(2019, 2, 19, 14, 23, 1, 9))
+        .withLanguage("nl")
+        .buildContext();
+    final Message msg = parse("%{a} %{b,short} %{c,time} %{c,'yyyy-MM-dd MMM'}");
+
+    assertEquals("17-aug-1972 16:45 14:23:01 2019-02-19 feb", msg.format(context));
   }
 }

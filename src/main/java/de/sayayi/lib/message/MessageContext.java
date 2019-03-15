@@ -73,9 +73,23 @@ public final class MessageContext implements Context
     }
 
 
+    public Builder withLanguage(String languageCode)
+    {
+      this.locale = new Locale((languageCode == null) ? "" : languageCode);
+      return this;
+    }
+
+
     public Builder withLocale(Locale locale)
     {
       this.locale = (locale == null) ? Locale.ROOT : locale;
+      return this;
+    }
+
+
+    public Builder withLocale(String language, String country)
+    {
+      this.locale = new Locale((language == null) ? "" : language, (country == null) ? "" : country);
       return this;
     }
 
