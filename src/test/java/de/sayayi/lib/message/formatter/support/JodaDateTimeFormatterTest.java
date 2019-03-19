@@ -8,29 +8,27 @@ import de.sayayi.lib.message.parameter.ParameterString;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
-import org.joda.time.ReadableDateTime;
-import org.joda.time.base.BaseLocal;
 import org.junit.Test;
 
-import java.util.Locale;
-import java.util.Set;
-
-import static de.sayayi.lib.message.MessageFactory.*;
-import static java.util.Locale.*;
-import static org.junit.Assert.*;
+import static de.sayayi.lib.message.MessageFactory.parse;
+import static java.util.Locale.FRANCE;
+import static java.util.Locale.GERMANY;
+import static java.util.Locale.UK;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public class JodaDateTimeFormatterTest
+public class JodaDateTimeFormatterTest extends AbstractFormatterTest
 {
   @Test
   public void testFormattableTypes()
   {
-    Set<Class<?>> types = new JodaDateTimeFormatter().getFormattableTypes();
-    assertTrue(types.contains(BaseLocal.class));
-    assertTrue(types.contains(ReadableDateTime.class));
+    assertFormatterForType(new JodaDateTimeFormatter(), LocalDate.class);
+    assertFormatterForType(new JodaDateTimeFormatter(), LocalTime.class);
+    assertFormatterForType(new JodaDateTimeFormatter(), DateTime.class);
   }
 
 
@@ -112,7 +110,7 @@ public class JodaDateTimeFormatterTest
         .withParameter("a", new LocalDate(1972, 8, 17))
         .withParameter("b", new LocalTime(16, 45, 9, 123))
         .withParameter("c", new DateTime(2019, 2, 19, 14, 23, 1, 9))
-        .withLanguage("nl")
+        .withLocale("nl")
         .buildContext();
     final Message msg = parse("%{a} %{b,short} %{c,time} %{c,'yyyy-MM-dd MMM'}");
 
