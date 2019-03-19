@@ -1,13 +1,15 @@
 package de.sayayi.lib.message.parser;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Iterator;
-
 import de.sayayi.lib.message.parser.MessageLexer.Token;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Iterator;
+
+import static de.sayayi.lib.message.parser.MessageLexer.TokenType.*;
 
 
 /**
@@ -46,32 +48,32 @@ public final class MessageLexer implements Iterable<Token>
 
       if (data.pos == length)
       {
-        if (data.state.isEmpty() || data.state.peek() == State.TEXT)
+        if (data.state.isEmpty() || data.state.peek() == State.IN_TEXT)
           break;
         else
           throw new MessageParserException(length - 1, "unexpected end of message");
       }
 
-      if (data.state.peek() == State.TEXT)
+      if (data.state.peek() == State.IN_TEXT)
       {
         final int idx_p = message.indexOf("%{", data.pos);
 
         if (idx_p == -1)
         {
           data.state.pop();
-          return new Token(start, (data.pos = length) - 1, TokenType.TEXT, message.substring(start).trim(), 0,
+          return new Token(start, (data.pos = length) - 1, TEXT, message.substring(start).trim(), 0,
               isSpace(start) && start > 0, false);
         }
         else if (idx_p > data.pos)
         {
-          return new Token(start, (data.pos = idx_p) - 1, TokenType.TEXT, message.substring(start, idx_p).trim(), 0,
+          return new Token(start, (data.pos = idx_p) - 1, TEXT, message.substring(start, idx_p).trim(), 0,
               isSpace(start) && start > 0, isSpace(idx_p - 1));
         }
         else
         {
           data.pos += 2;
-          data.state.push(State.PARAMETER);
-          return new Token(start, start + 1, TokenType.PARAM_START, "%{", 0,isSpace(start - 1), false);
+          data.state.push(State.IN_PARAMETER);
+          return new Token(start, start + 1, PARAM_START, "%{", 0,isSpace(start - 1), false);
         }
       }
       else if (data.state.peek().isQuotedText())
@@ -92,19 +94,19 @@ public final class MessageLexer implements Iterable<Token>
           if (idx_q == start)
             continue;
 
-          return new Token(start, idx_q - 1, TokenType.TEXT, message.substring(start, idx_q).trim(), 0,
+          return new Token(start, idx_q - 1, TEXT, message.substring(start, idx_q).trim(), 0,
               isSpace(start), isSpace(idx_q - 1));
         }
         else if (idx_p > start)
         {
-          return new Token(start, (data.pos = idx_p) - 1, TokenType.TEXT, message.substring(start, idx_p).trim(), 0,
+          return new Token(start, (data.pos = idx_p) - 1, TEXT, message.substring(start, idx_p).trim(), 0,
               isSpace(start), isSpace(idx_p - 1));
         }
         else
         {
           data.pos += 2;
-          data.state.push(State.PARAMETER);
-          return new Token(start, start + 1, TokenType.PARAM_START, "%{", 0, isSpace(start - 1), false);
+          data.state.push(State.IN_PARAMETER);
+          return new Token(start, start + 1, PARAM_START, "%{", 0, isSpace(start - 1), false);
         }
       }
 
@@ -130,19 +132,19 @@ public final class MessageLexer implements Iterable<Token>
     {
       case ',':
         data.pos++;
-        return new Token(start, start, TokenType.COMMA, ",", 0, false, false);
+        return new Token(start, start, COMMA, ",", 0, false, false);
 
       case '{':
         data.pos++;
-        data.state.push(State.MAP);
-        return new Token(start, start, TokenType.MAP_START, "{", 0, false, false);
+        data.state.push(State.IN_MAP);
+        return new Token(start, start, MAP_START, "{", 0, false, false);
 
       case '}':
         TokenType token = null;
         switch(data.state.peek())
         {
-          case MAP:        token = TokenType.MAP_END; break;
-          case PARAMETER:  token = TokenType.PARAM_END; break;
+          case IN_MAP:        token = MAP_END; break;
+          case IN_PARAMETER:  token = PARAM_END; break;
         }
 
         if (token != null)
@@ -154,10 +156,10 @@ public final class MessageLexer implements Iterable<Token>
         break;
 
       case '-':
-        if (data.pos + 1 < length && message.charAt(data.pos + 1) == '>' && data.state.peek() == State.MAP)
+        if (data.pos + 1 < length && message.charAt(data.pos + 1) == '>' && data.state.peek() == State.IN_MAP)
         {
           data.pos += 2;
-          return new Token(start, start + 1, TokenType.ARROW, "->", 0, false, false);
+          return new Token(start, start + 1, ARROW, "->", 0, false, false);
         }
         break;
 
@@ -169,7 +171,7 @@ public final class MessageLexer implements Iterable<Token>
           if ("true".equalsIgnoreCase(text))
           {
             data.pos = start + 4;
-            return new Token(start, start + 3, TokenType.BOOLEAN, text, 1, false, false);
+            return new Token(start, start + 3, BOOLEAN, text, 1, false, false);
           }
         }
         break;
@@ -182,7 +184,7 @@ public final class MessageLexer implements Iterable<Token>
           if ("false".equalsIgnoreCase(text))
           {
             data.pos = start + 5;
-            return new Token(start, start + 4, TokenType.BOOLEAN, text, 0, false, false);
+            return new Token(start, start + 4, BOOLEAN, text, 0, false, false);
           }
         }
         break;
@@ -190,7 +192,7 @@ public final class MessageLexer implements Iterable<Token>
       case '\'':
       case '"':
         data.pos++;
-        data.state.push((c == '"') ? State.TEXT_DOUBLE_QUOTED : State.TEXT_SINGLE_QUOTED);
+        data.state.push((c == '"') ? State.IN_TEXT_DOUBLE_QUOTED : State.IN_TEXT_SINGLE_QUOTED);
         skipWhitespace(data);
         return null;
     }
@@ -211,7 +213,7 @@ public final class MessageLexer implements Iterable<Token>
       }
 
       data.pos = end + 1;
-      return new Token(start, end, TokenType.NAME, message.substring(start, end + 1), 0, false, false);
+      return new Token(start, end, NAME, message.substring(start, end + 1), 0, false, false);
     }
 
     if (c == '-' && data.pos + 1 < length && Character.isDigit(message.charAt(data.pos + 1)))
@@ -223,7 +225,7 @@ public final class MessageLexer implements Iterable<Token>
         ;
 
       final String number = message.substring(start, data.pos);
-      return new Token(start, data.pos - 1, TokenType.NUMBER, number, Integer.parseInt(number), false, false);
+      return new Token(start, data.pos - 1, NUMBER, number, Integer.parseInt(number), false, false);
     }
 
     throw new MessageParserException(data.pos, "unexpected character '" + c + "' found");
@@ -248,7 +250,7 @@ public final class MessageLexer implements Iterable<Token>
     private TokenIterator()
     {
       state = new ArrayDeque<State>();
-      state.push(State.TEXT);
+      state.push(State.IN_TEXT);
       pos = 0;
 
       token = nextToken(this);
@@ -324,20 +326,16 @@ public final class MessageLexer implements Iterable<Token>
 
   private enum State
   {
-    TEXT,
-    TEXT_SINGLE_QUOTED,
-    TEXT_DOUBLE_QUOTED,
-    PARAMETER,
-    MAP;
+    IN_TEXT, IN_TEXT_SINGLE_QUOTED, IN_TEXT_DOUBLE_QUOTED, IN_PARAMETER, IN_MAP;
 
 
     boolean isQuotedText() {
-      return this == TEXT_SINGLE_QUOTED || this == TEXT_DOUBLE_QUOTED;
+      return this == IN_TEXT_SINGLE_QUOTED || this == IN_TEXT_DOUBLE_QUOTED;
     }
 
 
     char getQuote() {
-      return (this == TEXT_SINGLE_QUOTED) ? '\'' : '"';
+      return (this == IN_TEXT_SINGLE_QUOTED) ? '\'' : '"';
     }
   }
 }

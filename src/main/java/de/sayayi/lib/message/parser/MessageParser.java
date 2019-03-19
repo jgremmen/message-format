@@ -18,6 +18,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static de.sayayi.lib.message.parser.MessageLexer.TokenType.ARROW;
+import static de.sayayi.lib.message.parser.MessageLexer.TokenType.COMMA;
+import static de.sayayi.lib.message.parser.MessageLexer.TokenType.MAP_END;
+import static de.sayayi.lib.message.parser.MessageLexer.TokenType.MAP_START;
+import static de.sayayi.lib.message.parser.MessageLexer.TokenType.NAME;
+import static de.sayayi.lib.message.parser.MessageLexer.TokenType.PARAM_END;
+import static de.sayayi.lib.message.parser.MessageLexer.TokenType.PARAM_START;
+
 
 public final class MessageParser
 {
@@ -114,8 +122,8 @@ public final class MessageParser
     // t0=PARAM_START t1=NAME COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
     // t0=PARAM_START t1=NAME PARAM_END
 
-    assert t0.getType() == TokenType.PARAM_START;
-    if (t1.getType() != TokenType.NAME)
+    assert t0.getType() == PARAM_START;
+    if (t1.getType() != NAME)
       throw new MessageParserException((t1 == null) ? t0.getStart() + 2 : t1.getStart(), "missing parameter name");
 
     parse: {
@@ -130,7 +138,7 @@ public final class MessageParser
       // t2=COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
       // t2=PARAM_END
 
-      if (t2.getType() == TokenType.PARAM_END)
+      if (t2.getType() == PARAM_END)
       {
         t += 2;
         break parse;
@@ -140,7 +148,7 @@ public final class MessageParser
       // t2=COMMA NAME PARAM_END
       // t2=COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
 
-      if (t2.getType() != TokenType.COMMA)
+      if (t2.getType() != COMMA)
         throw new MessageParserException(t2.getStart(), "comma expected in parameter " + parameter);
 
       final Token t3 = getTokenAt(t + 3);
@@ -151,7 +159,7 @@ public final class MessageParser
       // t3=NAME PARAM_END
       // t3=(NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
 
-      if (t3.getType() != TokenType.NAME)
+      if (t3.getType() != NAME)
       {
         // t3=(NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
 
@@ -175,12 +183,12 @@ public final class MessageParser
 
         t += 4;
 
-        if (t4.getType() == TokenType.PARAM_END)
+        if (t4.getType() == PARAM_END)
           break parse;
 
         // t4=COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
 
-        if (t4.getType() != TokenType.COMMA)
+        if (t4.getType() != COMMA)
           throw new MessageParserException(t4.getStart(), "comma expected in parameter " + parameter);
 
         // (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
@@ -193,7 +201,7 @@ public final class MessageParser
     final Token paramEnd = getTokenAt(t);
     if (paramEnd == null)
       throw new MessageParserException(t0.getStart(), "unexpected end of parameter " + parameter);
-    if (paramEnd.getType() != TokenType.PARAM_END)
+    if (paramEnd.getType() != PARAM_END)
       throw new MessageParserException(paramEnd.getStart(), "missing closing brace for parameter " + parameter);
 
     tokens.subList(tokenStart, t + 1).clear();
@@ -208,7 +216,7 @@ public final class MessageParser
 
     // t0=NUMBER
     // t0=BOOLEAN
-    // t0=TEXT
+    // t0=IN_TEXT
     // t0=MAP_START ... MAP_END
 
     switch(t0.getType())
@@ -259,7 +267,7 @@ public final class MessageParser
     final Map<Object,Message> map = new LinkedHashMap<Object,Message>();
 
     Token t0 = getTokenAt(t);
-    assert t0.getType() == TokenType.MAP_START;
+    assert t0.getType() == MAP_START;
 
     tokens.remove(t);
 
@@ -273,7 +281,7 @@ public final class MessageParser
         Object key = null;
         Message value = null;
 
-        // t1=(NUMBER | BOOLEAN | TEXT) ARROW MESSAGE (COMMA (NUMBER | BOOLEAN | TEXT) ARROW MESSAGE)* MAP_END
+        // t1=(NUMBER | BOOLEAN | IN_TEXT) ARROW MESSAGE (COMMA (NUMBER | BOOLEAN | IN_TEXT) ARROW MESSAGE)* MAP_END
         // t1=MAP_END
 
         switch(t0.getType())
@@ -286,7 +294,7 @@ public final class MessageParser
           case TEXT:
           case PARAM_START:
             final Message m = parseMessage(t);
-            if (getTypeAt(t) == TokenType.MAP_END)
+            if (getTypeAt(t) == MAP_END)
             {
               map.put(null, m);
               break buildMap;
@@ -306,7 +314,7 @@ public final class MessageParser
         }
 
         t0 = getTokenAt(t);
-        if (t0 == null || t0.getType() != TokenType.ARROW)
+        if (t0 == null || t0.getType() != ARROW)
           throw new MessageParserException((t0 == null) ? lexer.getLength() : t0.getStart(), "-> expected");
 
         tokens.remove(t);
@@ -334,7 +342,7 @@ public final class MessageParser
     }
 
     t0 = getTokenAt(t);
-    if (t0 == null || t0.getType() != TokenType.MAP_END)
+    if (t0 == null || t0.getType() != MAP_END)
       throw new MessageParserException((t0 == null) ? lexer.getLength() : t0.getStart(), "closing brace for map expected");
 
     tokens.remove(t);
