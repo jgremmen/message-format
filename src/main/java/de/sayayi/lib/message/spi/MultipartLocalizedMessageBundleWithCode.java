@@ -1,13 +1,13 @@
 package de.sayayi.lib.message.spi;
 
+import de.sayayi.lib.message.Message;
+import lombok.Synchronized;
+import lombok.ToString;
+
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import de.sayayi.lib.message.Message;
-import lombok.Synchronized;
-import lombok.ToString;
 
 
 /**
@@ -94,6 +94,6 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
         }
     }
 
-    return _hasParameter;
+    return _hasParameter.booleanValue();
   }
 }

@@ -1,11 +1,5 @@
 package de.sayayi.lib.message.parser;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.parameter.ParameterBoolean;
 import de.sayayi.lib.message.parameter.ParameterData;
@@ -14,9 +8,15 @@ import de.sayayi.lib.message.parameter.ParameterMap;
 import de.sayayi.lib.message.parameter.ParameterString;
 import de.sayayi.lib.message.parser.MessageLexer.Token;
 import de.sayayi.lib.message.parser.MessageLexer.TokenType;
-import de.sayayi.lib.message.spi.EmptyMessage;
+import de.sayayi.lib.message.spi.EmptyMessageWithCode;
 import de.sayayi.lib.message.spi.MultipartMessage;
 import de.sayayi.lib.message.spi.SinglePartMessage;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public final class MessageParser
@@ -88,7 +88,7 @@ public final class MessageParser
     switch(parts.size())
     {
       case 0:
-        return new EmptyMessage();
+        return new EmptyMessageWithCode();
 
       case 1:
         return new SinglePartMessage(parts.get(0));
@@ -340,13 +340,5 @@ public final class MessageParser
     tokens.remove(t);
 
     return new ParameterMap(map);
-  }
-
-
-  public static void main(String[] args)
-  {
-    final MessageParser rule = new MessageParser("Es wurden %{count,choice,{0 -> 'keine Dateien', 1 -> 'eine Datei', '%{count,integer} Dateien'}} gespeichert.");
-
-    final Message message = rule.parseMessage();
   }
 }

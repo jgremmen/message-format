@@ -12,6 +12,11 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
   private static final long serialVersionUID = 1334376878447581605L;
 
 
+  public EmptyMessageWithCode() {
+    this(null);
+  }
+
+
   public EmptyMessageWithCode(String code) {
     super(code);
   }
@@ -19,7 +24,7 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
   @Override
   public String format(Context context) {
-    return "";
+    return null;
   }
 
 
