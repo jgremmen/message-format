@@ -7,18 +7,20 @@ import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
 import org.junit.Test;
 
 import static de.sayayi.lib.message.MessageFactory.parse;
+import static java.util.Locale.ENGLISH;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public class BoolFormatterTest
+public class BoolFormatterTest extends AbstractFormatterTest
 {
   @Test
-  public void testFormattableTypes() {
-    assertTrue(new BoolFormatter().getFormattableTypes().contains(boolean.class));
+  public void testFormattableTypes()
+  {
+    assertFormatterForType(new BoolFormatter(), boolean.class);
+    assertFormatterForType(new BoolFormatter(), Boolean.class);
   }
 
 
@@ -26,14 +28,14 @@ public class BoolFormatterTest
   public void testFormat()
   {
     final BoolFormatter formatter = new BoolFormatter();
-    final Context context = MessageContext.builder().buildContext();
+    final Context context = MessageContext.builder().withLocale("de", "DE").buildContext();
 
-    assertEquals("true", formatter.format("a", Boolean.TRUE, null, context, null));
-    assertEquals("false", formatter.format("b", new Double(0.0), null, context, null));
-    assertEquals("true", formatter.format("c", new Float(-0.0001), null, context, null));
-    assertEquals("false", formatter.format("d", "FALSE", null, context, null));
-    assertEquals("true", formatter.format("e", "TrUe", null, context, null));
-    assertEquals("true", formatter.format("f", Integer.valueOf(-4), null, context, null));
+    assertEquals("wahr", formatter.format("a", Boolean.TRUE, null, context, null));
+    assertEquals("falsch", formatter.format("b", new Double(0.0), null, context, null));
+    assertEquals("wahr", formatter.format("c", new Float(-0.0001), null, context, null));
+    assertEquals("falsch", formatter.format("d", "FALSE", null, context, null));
+    assertEquals("wahr", formatter.format("e", "TrUe", null, context, null));
+    assertEquals("wahr", formatter.format("f", Integer.valueOf(-4), null, context, null));
   }
 
 
@@ -45,6 +47,7 @@ public class BoolFormatterTest
 
     final Context context = MessageContext.builder()
         .withFormatterService(formatterRegistry)
+        .withLocale(ENGLISH)
         .withParameter("a", Boolean.FALSE)
         .withParameter("b", Boolean.TRUE)
         .withParameter("c", Integer.valueOf(1234))

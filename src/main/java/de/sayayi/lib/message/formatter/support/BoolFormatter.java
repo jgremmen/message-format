@@ -1,16 +1,18 @@
 package de.sayayi.lib.message.formatter.support;
 
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import de.sayayi.lib.message.parameter.ParameterData;
+import de.sayayi.lib.message.parameter.ParameterMap;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Context;
-import de.sayayi.lib.message.formatter.NamedParameterFormatter;
-import de.sayayi.lib.message.parameter.ParameterData;
-import de.sayayi.lib.message.parameter.ParameterMap;
+import static java.util.ResourceBundle.getBundle;
 
 
 /**
@@ -50,7 +52,8 @@ public class BoolFormatter implements NamedParameterFormatter
         return message.format(context);
     }
 
-    return bool.toString();
+    return getBundle(getClass().getPackage().getName() + ".Formatter",
+        context.getLocale()).getString(bool.toString());
   }
 
 

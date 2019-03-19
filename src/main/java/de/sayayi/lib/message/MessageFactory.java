@@ -30,7 +30,7 @@ public final class MessageFactory
 
 
   /**
-   * Parse the message {@code text} into a {@link Message} instance which can be used to
+   * Parse the message {@code text} into a {@link Message} instance.
    *
    * @param text
    * @return

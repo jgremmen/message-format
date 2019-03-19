@@ -59,8 +59,7 @@ public class DefaultFormatterService extends GenericFormatterRegistry
   }
 
 
-  protected void addJodaTimeFormatters()
-  {
+  protected void addJodaTimeFormatters() {
     addFormatter(new JodaDateTimeFormatter());
   }
 

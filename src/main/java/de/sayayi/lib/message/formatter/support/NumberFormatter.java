@@ -1,5 +1,10 @@
 package de.sayayi.lib.message.formatter.support;
 
+import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.formatter.ParameterFormatter;
+import de.sayayi.lib.message.parameter.ParameterData;
+import de.sayayi.lib.message.parameter.ParameterString;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
@@ -9,11 +14,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
-
-import de.sayayi.lib.message.Message.Context;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
-import de.sayayi.lib.message.parameter.ParameterData;
-import de.sayayi.lib.message.parameter.ParameterString;
 
 
 /**
@@ -32,20 +32,28 @@ public class NumberFormatter implements ParameterFormatter
 
     final Number value = (Number)v;
 
-    if ((format == null || "integer".equals(format)) && data == null)
-    {
-      if (value instanceof BigInteger)
-        return value.toString();
-
-      if (value instanceof Long || value instanceof Integer || value instanceof Short)
-        return Long.toString(value.longValue());
-    }
+    if (data == null && (format == null || "integer".equals(format)) &&
+        (value instanceof BigInteger || value instanceof Long || value instanceof Integer || value instanceof Short))
+      return value.toString();
 
     // special case: show number as bool
     if (BOOL_FORMATTER.getName().equals(format))
-      return BOOL_FORMATTER.format(parameter, value, format, context, data);
+      return formatBoolean(parameter, value, context, data);
 
     return getFormatter(format, data, context.getLocale()).format(value);
+  }
+
+
+  protected String formatBoolean(String parameter, Number value, Context context, ParameterData data)
+  {
+    ParameterFormatter formatter = context.getFormatter("bool", Boolean.class);
+    Set<Class<?>> types = formatter.getFormattableTypes();
+
+    // if we got some default formatter, use a specific one instead
+    if (!types.contains(Boolean.class) && !types.contains(boolean.class))
+      formatter = BOOL_FORMATTER;
+
+    return formatter.format(parameter, value, "bool", context, data);
   }
 
 
