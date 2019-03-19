@@ -1,13 +1,13 @@
 package de.sayayi.lib.message.spi;
 
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.parser.MessagePart;
+import lombok.ToString;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.parser.MessagePart;
-import lombok.ToString;
 
 
 /**
@@ -22,7 +22,7 @@ public class MultipartMessage implements Message, Serializable
 
 
   public MultipartMessage(List<MessagePart> parts) {
-    this.parts = parts.toArray(new MessagePart[parts.size()]);
+    this.parts = parts.toArray(new MessagePart[0]);
   }
 
 

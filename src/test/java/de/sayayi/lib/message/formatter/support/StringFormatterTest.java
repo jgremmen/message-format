@@ -10,17 +10,18 @@ import java.lang.annotation.RetentionPolicy;
 
 import static de.sayayi.lib.message.MessageFactory.parse;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public class StringFormatterTest
+public class StringFormatterTest extends AbstractFormatterTest
 {
   @Test
-  public void testFormattableTypes() {
-    assertTrue(new StringFormatter().getFormattableTypes().contains(Object.class));
+  public void testFormattableTypes()
+  {
+    assertFormatterForType(new StringFormatter(), Object.class);
+    assertFormatterForType(new StringFormatter(), String.class);
   }
 
 

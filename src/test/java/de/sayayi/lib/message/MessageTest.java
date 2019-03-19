@@ -1,14 +1,14 @@
 package de.sayayi.lib.message;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.Test;
 
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 /**
@@ -39,7 +39,7 @@ public class MessageTest
 
     final Message m = MessageFactory.parse(texts);
 
-    final String nl = m.format(MessageContext.builder().withLocale(new Locale("nl", "NL")).withParameter("n", 1).buildContext());
+    final String nl = m.format(MessageContext.builder().withLocale("nl-NL").withParameter("n", 1).buildContext());
     assertEquals("1 kleur.", nl);
 
     final String uk = m.format(MessageContext.builder().withLocale(Locale.UK).withParameter("n", 4).buildContext());
