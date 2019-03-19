@@ -1,10 +1,10 @@
 package de.sayayi.lib.message;
 
+import de.sayayi.lib.message.formatter.ParameterFormatter;
+
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.Set;
-
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 
 
 /**
@@ -67,7 +67,7 @@ public interface Message extends Serializable
      *
      * @return  set with all parameter names
      */
-    Set<String> getParameters();
+    Set<String> getParameterNames();
 
 
     ParameterFormatter getFormatter(String format, Class<?> type);

@@ -1,11 +1,5 @@
 package de.sayayi.lib.message;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
 import de.sayayi.lib.message.Message.Context;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.FormatterService;
@@ -13,12 +7,19 @@ import de.sayayi.lib.message.formatter.ParameterFormatter;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.text.ParseException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
 
 /**
  * @author Jeroen Gremmen
  */
 @ToString
-public final class MessageContext implements Context
+public class MessageContext implements Context
 {
   @Getter private final Locale locale;
   private final Map<String,Object> parameterValues;
@@ -40,7 +41,7 @@ public final class MessageContext implements Context
 
 
   @Override
-  public Set<String> getParameters() {
+  public Set<String> getParameterNames() {
     return Collections.unmodifiableSet(parameterValues.keySet());
   }
 
@@ -73,9 +74,9 @@ public final class MessageContext implements Context
     }
 
 
-    public Builder withLanguage(String languageCode)
+    public Builder withLocale(String locale) throws ParseException
     {
-      this.locale = new Locale((languageCode == null) ? "" : languageCode);
+      this.locale = MessageFactory.forLanguageTag(locale);
       return this;
     }
 
