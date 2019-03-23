@@ -1,11 +1,11 @@
-package de.sayayi.lib.message.spi;
-
-import java.io.Serializable;
+package de.sayayi.lib.message.impl;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.parser.MessagePart;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.io.Serializable;
 
 
 /**

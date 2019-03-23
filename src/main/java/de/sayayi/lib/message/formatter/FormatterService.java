@@ -8,7 +8,7 @@ public interface FormatterService
 {
   /**
    * <p>
-   *   Returns a parameter formatter for the given {@code format} and {@code type}.
+   *   Returns a data formatter for the given {@code format} and {@code type}.
    * </p>
    * <p>
    *   Implementing classes must make sure that for any combination of parameters {@code format} and
@@ -19,7 +19,7 @@ public interface FormatterService
    * @param format  name of the formatter or {@code null}
    * @param type    type of the value to format
    *
-   * @return  parameter formatter, never {@code null}
+   * @return  data formatter, never {@code null}
    */
   ParameterFormatter getFormatter(String format, Class<?> type);
 }

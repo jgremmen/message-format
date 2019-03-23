@@ -12,7 +12,7 @@ public class MessageParserException extends RuntimeException
   @Getter private final int position;
 
 
-  public MessageParserException(int position, String message)
+  MessageParserException(int position, String message)
   {
     super(message);
 

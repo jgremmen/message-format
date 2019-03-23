@@ -1,9 +1,12 @@
 package de.sayayi.lib.message.formatter;
 
+import de.sayayi.lib.message.formatter.support.ArrayFormatter;
 import de.sayayi.lib.message.formatter.support.BoolFormatter;
 import de.sayayi.lib.message.formatter.support.ChoiceFormatter;
+import de.sayayi.lib.message.formatter.support.CollectionFormatter;
 import de.sayayi.lib.message.formatter.support.DateFormatter;
 import de.sayayi.lib.message.formatter.support.JodaDateTimeFormatter;
+import de.sayayi.lib.message.formatter.support.MapFormatter;
 import de.sayayi.lib.message.formatter.support.NumberFormatter;
 import de.sayayi.lib.message.formatter.support.StringFormatter;
 import lombok.Synchronized;
@@ -20,7 +23,7 @@ public class DefaultFormatterService extends GenericFormatterRegistry
 
 
   @Synchronized
-  public static final FormatterService getSharedInstance()
+  public static FormatterService getSharedInstance()
   {
     if (INSTANCE == null)
       INSTANCE = new DefaultFormatterService();
@@ -56,6 +59,9 @@ public class DefaultFormatterService extends GenericFormatterRegistry
     addFormatter(new StringFormatter());
     addFormatter(new NumberFormatter());
     addFormatter(new DateFormatter());
+    addFormatter(new ArrayFormatter());
+    addFormatter(new CollectionFormatter());
+    addFormatter(new MapFormatter());
   }
 
 

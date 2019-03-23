@@ -1,9 +1,9 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
-import de.sayayi.lib.message.parameter.ParameterData;
-import de.sayayi.lib.message.parameter.ParameterString;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

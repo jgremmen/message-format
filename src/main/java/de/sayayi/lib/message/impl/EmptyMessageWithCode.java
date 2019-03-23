@@ -1,4 +1,4 @@
-package de.sayayi.lib.message.spi;
+package de.sayayi.lib.message.impl;
 
 import lombok.ToString;
 

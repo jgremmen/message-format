@@ -1,10 +1,10 @@
 package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.annotation.Text;
+import de.sayayi.lib.message.impl.EmptyMessageWithCode;
+import de.sayayi.lib.message.impl.MessageDelegateWithCode;
+import de.sayayi.lib.message.impl.MultipartLocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.parser.MessageParser;
-import de.sayayi.lib.message.spi.EmptyMessageWithCode;
-import de.sayayi.lib.message.spi.MessageDelegateWithCode;
-import de.sayayi.lib.message.spi.MultipartLocalizedMessageBundleWithCode;
 
 import java.lang.reflect.AnnotatedElement;
 import java.text.ParseException;
@@ -64,7 +64,7 @@ public final class MessageFactory
       throw new IllegalArgumentException(element.toString() + " has no @Message annotation");
 
     final Text[] texts = annotation.texts();
-    if (texts == null || texts.length == 0)
+    if (texts.length == 0)
       return new EmptyMessageWithCode(annotation.code());
 
     final Map<Locale,String> localizedTexts = new LinkedHashMap<Locale,String>();

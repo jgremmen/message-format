@@ -7,9 +7,9 @@ package de.sayayi.lib.message.formatter;
 public interface NamedParameterFormatter extends ParameterFormatter
 {
   /**
-   * Tells the name of this parameter formatter
+   * Tells the name of this data formatter
    *
-   * @return  parameter formatter name, never {@code null}
+   * @return  data formatter name, never {@code null}
    */
   String getName();
 }

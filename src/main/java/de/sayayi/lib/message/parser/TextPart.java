@@ -1,21 +1,19 @@
 package de.sayayi.lib.message.parser;
 
-import java.io.Serializable;
-
 import de.sayayi.lib.message.Message.Context;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class TextPart extends MessagePart implements Serializable
+final class TextPart extends MessagePart
 {
   private static final long serialVersionUID = 5325056895074186084L;
 
   private final String text;
 
 
-  public TextPart(String text, boolean spaceBefore, boolean spaceAfter)
+  TextPart(String text, boolean spaceBefore, boolean spaceAfter)
   {
     super(spaceBefore, spaceAfter);
 

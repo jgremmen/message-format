@@ -1,9 +1,9 @@
 package de.sayayi.lib.message.formatter;
 
-import java.util.Set;
-
 import de.sayayi.lib.message.Message.Context;
-import de.sayayi.lib.message.parameter.ParameterData;
+import de.sayayi.lib.message.data.ParameterData;
+
+import java.util.Set;
 
 
 /**

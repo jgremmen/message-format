@@ -1,10 +1,10 @@
 package de.sayayi.lib.message.formatter;
 
+import de.sayayi.lib.message.formatter.support.StringFormatter;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import de.sayayi.lib.message.formatter.support.StringFormatter;
 
 
 /**
@@ -16,12 +16,12 @@ public class GenericFormatterRegistry implements FormatterRegistry
   private final Map<Class<?>,ParameterFormatter> typeFormatters = new HashMap<Class<?>,ParameterFormatter>();
   private final Map<Class<?>,ParameterFormatter> cachedFormatters = new ConcurrentHashMap<Class<?>,ParameterFormatter>(32);
 
-  
+
   public GenericFormatterRegistry() {
     addFormatter(new StringFormatter());
-  } 
+  }
 
-  
+
   @Override
   public void addFormatterForType(Class<?> type, ParameterFormatter formatter) {
     typeFormatters.put(type, formatter);
@@ -34,7 +34,7 @@ public class GenericFormatterRegistry implements FormatterRegistry
     if (formatter instanceof NamedParameterFormatter)
     {
       final String format = ((NamedParameterFormatter)formatter).getName();
-      if (format == null || format.length() == 0)
+      if (format == null || format.isEmpty())
         throw new IllegalArgumentException("formatter name must not be empty");
 
       namedFormatters.put(format, (NamedParameterFormatter)formatter);
@@ -75,7 +75,7 @@ public class GenericFormatterRegistry implements FormatterRegistry
   }
 
 
-  protected ParameterFormatter getFormatterForType(Class<?> type)
+  private ParameterFormatter getFormatterForType(Class<?> type)
   {
     ParameterFormatter formatter = typeFormatters.get(type);
 

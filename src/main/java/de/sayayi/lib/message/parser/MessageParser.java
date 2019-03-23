@@ -1,17 +1,18 @@
 package de.sayayi.lib.message.parser;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.parameter.ParameterBoolean;
-import de.sayayi.lib.message.parameter.ParameterData;
-import de.sayayi.lib.message.parameter.ParameterInteger;
-import de.sayayi.lib.message.parameter.ParameterMap;
-import de.sayayi.lib.message.parameter.ParameterString;
+import de.sayayi.lib.message.data.ParameterBoolean;
+import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.data.ParameterInteger;
+import de.sayayi.lib.message.data.ParameterMap;
+import de.sayayi.lib.message.data.ParameterString;
+import de.sayayi.lib.message.impl.EmptyMessageWithCode;
+import de.sayayi.lib.message.impl.MultipartMessage;
+import de.sayayi.lib.message.impl.SinglePartMessage;
 import de.sayayi.lib.message.parser.MessageLexer.Token;
 import de.sayayi.lib.message.parser.MessageLexer.TokenType;
-import de.sayayi.lib.message.spi.EmptyMessageWithCode;
-import de.sayayi.lib.message.spi.MultipartMessage;
-import de.sayayi.lib.message.spi.SinglePartMessage;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -42,7 +43,7 @@ public final class MessageParser
   }
 
 
-  protected Token getTokenAt(int idx)
+  private Token getTokenAt(int idx)
   {
     while(idx >= tokens.size() && tokenIterator.hasNext())
       tokens.add(tokenIterator.next());
@@ -51,7 +52,7 @@ public final class MessageParser
   }
 
 
-  protected TokenType getTypeAt(int idx)
+  private TokenType getTypeAt(int idx)
   {
     final Token token = getTokenAt(idx);
     return (token == null) ? null : token.getType();
@@ -113,25 +114,27 @@ public final class MessageParser
     final Token t0 = getTokenAt(t);
     final Token t1 = getTokenAt(t + 1);
 
-    String parameter = null;
-    String format = null;
-    ParameterData data = null;
-
     // t0=PARAM_START t1=NAME COMMA NAME COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
     // t0=PARAM_START t1=NAME COMMA NAME PARAM_END
     // t0=PARAM_START t1=NAME COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
     // t0=PARAM_START t1=NAME PARAM_END
 
+    assert t0 != null;
     assert t0.getType() == PARAM_START;
-    if (t1.getType() != NAME)
-      throw new MessageParserException((t1 == null) ? t0.getStart() + 2 : t1.getStart(), "missing parameter name");
+
+    if (t1 == null || t1.getType() != NAME)
+      throw new MessageParserException((t1 == null) ? t0.getStart() + 2 : t1.getStart(), "missing data name");
+
+    String parameter;
+    String format = null;
+    ParameterData data = null;
 
     parse: {
       parameter = t1.getText();
 
       final Token t2 = getTokenAt(t + 2);
       if (t2 == null)
-        throw new MessageParserException(t1.getEnd() + 1, "unexpected end of parameter " + parameter);
+        throw new MessageParserException(t1.getEnd() + 1, "unexpected end of data " + parameter);
 
       // t2=COMMA NAME COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
       // t2=COMMA NAME PARAM_END
@@ -149,11 +152,11 @@ public final class MessageParser
       // t2=COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
 
       if (t2.getType() != COMMA)
-        throw new MessageParserException(t2.getStart(), "comma expected in parameter " + parameter);
+        throw new MessageParserException(t2.getStart(), "comma expected in data " + parameter);
 
       final Token t3 = getTokenAt(t + 3);
       if (t3 == null)
-        throw new MessageParserException(t2.getEnd() + 1, "unexpected end of parameter " + parameter);
+        throw new MessageParserException(t2.getEnd() + 1, "unexpected end of data " + parameter);
 
       // t3=NAME COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
       // t3=NAME PARAM_END
@@ -165,7 +168,6 @@ public final class MessageParser
 
         t += 3;
         data = parseParameterData(t);
-        break parse;
       }
       else
       {
@@ -176,7 +178,7 @@ public final class MessageParser
 
         final Token t4 = getTokenAt(t + 4);
         if (t4 == null)
-          throw new MessageParserException(t3.getEnd() + 1, "unexpected end of parameter " + parameter);
+          throw new MessageParserException(t3.getEnd() + 1, "unexpected end of data " + parameter);
 
         // t4=COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
         // t4=PARAM_END
@@ -189,20 +191,19 @@ public final class MessageParser
         // t4=COMMA (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
 
         if (t4.getType() != COMMA)
-          throw new MessageParserException(t4.getStart(), "comma expected in parameter " + parameter);
+          throw new MessageParserException(t4.getStart(), "comma expected in data " + parameter);
 
         // (NUMBER | BOOLEAN | MAP_START ... MAP_END) PARAM_END
 
         data = parseParameterData(++t);
-        break parse;
       }
     }
 
     final Token paramEnd = getTokenAt(t);
     if (paramEnd == null)
-      throw new MessageParserException(t0.getStart(), "unexpected end of parameter " + parameter);
+      throw new MessageParserException(t0.getStart(), "unexpected end of data " + parameter);
     if (paramEnd.getType() != PARAM_END)
-      throw new MessageParserException(paramEnd.getStart(), "missing closing brace for parameter " + parameter);
+      throw new MessageParserException(paramEnd.getStart(), "missing closing brace for data " + parameter);
 
     tokens.subList(tokenStart, t + 1).clear();
 
@@ -213,6 +214,7 @@ public final class MessageParser
   private ParameterData parseParameterData(int t)
   {
     final Token t0 = getTokenAt(t);
+    assert t0 != null;
 
     // t0=NUMBER
     // t0=BOOLEAN
@@ -264,9 +266,11 @@ public final class MessageParser
 
   private ParameterMap parseParameterMap(int t)
   {
-    final Map<Object,Message> map = new LinkedHashMap<Object,Message>();
+    final Map<Serializable,Message> map = new LinkedHashMap<Serializable,Message>();
 
     Token t0 = getTokenAt(t);
+
+    assert t0 != null;
     assert t0.getType() == MAP_START;
 
     tokens.remove(t);
@@ -278,8 +282,7 @@ public final class MessageParser
         if (t0 == null)
           throw new MessageParserException(lexer.getLength() + 1, "number, boolean or string expected");
 
-        Object key = null;
-        Message value = null;
+        Serializable key;
 
         // t1=(NUMBER | BOOLEAN | IN_TEXT) ARROW MESSAGE (COMMA (NUMBER | BOOLEAN | IN_TEXT) ARROW MESSAGE)* MAP_END
         // t1=MAP_END
@@ -301,7 +304,7 @@ public final class MessageParser
             }
 
             if (m.hasParameter())
-              throw new MessageParserException(t0.getStart(), "parameter string is not allowed as a map key");
+              throw new MessageParserException(t0.getStart(), "parameterized string is not allowed as a map key");
 
             key = m.format(null);
             break;
@@ -319,7 +322,7 @@ public final class MessageParser
 
         tokens.remove(t);
 
-        value = parseMessage(t);
+        Message value = parseMessage(t);
         map.put(key, value);
 
         t0 = getTokenAt(t);

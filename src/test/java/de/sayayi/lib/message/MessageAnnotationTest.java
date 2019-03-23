@@ -1,17 +1,16 @@
 package de.sayayi.lib.message;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import de.sayayi.lib.message.annotation.Message;
+import de.sayayi.lib.message.annotation.Text;
+import de.sayayi.lib.message.impl.EmptyMessageWithCode;
+import org.junit.Test;
 
 import java.text.ParseException;
 import java.util.Locale;
 
-import org.junit.Test;
-
-import de.sayayi.lib.message.annotation.Message;
-import de.sayayi.lib.message.annotation.Text;
-import de.sayayi.lib.message.spi.EmptyMessageWithCode;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 /**

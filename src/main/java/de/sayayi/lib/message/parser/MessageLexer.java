@@ -21,7 +21,7 @@ public final class MessageLexer implements Iterable<Token>
   @Getter private final int length;
 
 
-  public MessageLexer(String message) {
+  MessageLexer(String message) {
     length = (this.message = message).length();
   }
 
@@ -284,7 +284,7 @@ public final class MessageLexer implements Iterable<Token>
 
   @ToString
   @EqualsAndHashCode(doNotUseGetters=true)
-  public static final class Token
+  static final class Token
   {
     @Getter int start;
     @Getter int end;

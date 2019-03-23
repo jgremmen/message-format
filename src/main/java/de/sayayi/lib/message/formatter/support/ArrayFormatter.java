@@ -1,8 +1,8 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
-import de.sayayi.lib.message.parameter.ParameterData;
 
 import java.util.Arrays;
 import java.util.HashSet;

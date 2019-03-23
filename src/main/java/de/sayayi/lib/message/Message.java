@@ -41,7 +41,7 @@ public interface Message extends Serializable
    *
    * #see {@link Message#format(Context)}
    */
-  public interface Context
+  interface Context
   {
     /**
      * Tells for which locale the message must be formatted. If no locale is provided ({@code null}) or if no message is available for the given locale,
@@ -53,11 +53,11 @@ public interface Message extends Serializable
 
 
     /**
-     * Returns the value for the named {@code parameter}.
+     * Returns the value for the named {@code data}.
      *
-     * @param parameter  parameter name
+     * @param parameter  data name
      *
-     * @return  parameter value of {@code null} if no value is available for the given parameter name
+     * @return  data value of {@code null} if no value is available for the given data name
      */
     Object getParameterValue(String parameter);
 
@@ -65,7 +65,7 @@ public interface Message extends Serializable
     /**
      * Returns a set with names for all parameters available in this context.
      *
-     * @return  set with all parameter names
+     * @return  set with all data names
      */
     Set<String> getParameterNames();
 

@@ -1,12 +1,13 @@
-package de.sayayi.lib.message.parameter;
-
-import java.math.BigInteger;
-import java.util.Map;
-import java.util.Map.Entry;
+package de.sayayi.lib.message.data;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Context;
 import lombok.ToString;
+
+import java.io.Serializable;
+import java.math.BigInteger;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 /**
@@ -16,20 +17,37 @@ import lombok.ToString;
 @ToString
 public class ParameterMap implements ParameterData
 {
-  private final Map<Object,Message> map;
+  private static final long serialVersionUID = -6514816495058775475L;
+
+  private final Map<Serializable,Message> map;
 
 
-  public ParameterMap(Map<Object,Message> map) {
+  public ParameterMap(Map<Serializable,Message> map) {
     this.map = map;
   }
 
 
-  public Message getMessageForKey(Object key)
+  public Message getMessageFor(boolean key) {
+    return getMessageForKey(key);
+  }
+
+
+  public Message getMessageFor(int key) {
+    return getMessageForKey(key);
+  }
+
+
+  public Message getMessageFor(String key) {
+    return getMessageForKey(key);
+  }
+
+
+  private Message getMessageForKey(Serializable key)
   {
     Message message = map.get(key);
 
     if (message == null && key != null)
-      for(final Entry<Object,Message> entry: map.entrySet())
+      for(final Entry<Serializable,Message> entry: map.entrySet())
         if (compareKey(key, entry.getKey()))
         {
           message = entry.getValue();
@@ -41,7 +59,7 @@ public class ParameterMap implements ParameterData
 
 
   @Override
-  public String format(Context context, Object key)
+  public String format(Context context, Serializable key)
   {
     Message message = getMessageForKey(key);
     if (message == null)
@@ -70,7 +88,7 @@ public class ParameterMap implements ParameterData
   private boolean toBoolean(Object value)
   {
     if (value instanceof Boolean)
-      return ((Boolean)value).booleanValue();
+      return (Boolean)value;
 
     if (value instanceof BigInteger)
       return ((BigInteger)value).signum() != 0;
@@ -98,7 +116,7 @@ public class ParameterMap implements ParameterData
 
 
   @Override
-  public Object asObject() {
+  public Serializable asObject() {
     return new UnsupportedOperationException();
   }
 }

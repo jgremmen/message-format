@@ -1,9 +1,9 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
-import de.sayayi.lib.message.parameter.ParameterData;
-import de.sayayi.lib.message.parameter.ParameterString;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -44,7 +44,7 @@ public class NumberFormatter implements ParameterFormatter
   }
 
 
-  protected String formatBoolean(String parameter, Number value, Context context, ParameterData data)
+  private String formatBoolean(String parameter, Number value, Context context, ParameterData data)
   {
     ParameterFormatter formatter = context.getFormatter("bool", Boolean.class);
     Set<Class<?>> types = formatter.getFormattableTypes();

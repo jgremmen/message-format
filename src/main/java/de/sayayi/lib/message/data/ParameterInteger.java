@@ -1,7 +1,9 @@
-package de.sayayi.lib.message.parameter;
+package de.sayayi.lib.message.data;
 
 import de.sayayi.lib.message.Message;
 import lombok.Getter;
+
+import java.io.Serializable;
 
 
 /**
@@ -20,7 +22,7 @@ public class ParameterInteger implements ParameterData, Message
 
 
   @Override
-  public String format(Context context, Object key) {
+  public String format(Context context, Serializable key) {
     throw new UnsupportedOperationException();
   }
 
@@ -38,8 +40,8 @@ public class ParameterInteger implements ParameterData, Message
 
 
   @Override
-  public Object asObject() {
-    return Integer.valueOf(value);
+  public Serializable asObject() {
+    return value;
   }
 
 

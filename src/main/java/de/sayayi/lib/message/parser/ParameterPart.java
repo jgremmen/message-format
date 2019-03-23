@@ -1,17 +1,15 @@
 package de.sayayi.lib.message.parser;
 
-import java.io.Serializable;
-
 import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
-import de.sayayi.lib.message.parameter.ParameterData;
 import lombok.Getter;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class ParameterPart extends MessagePart implements Serializable
+final class ParameterPart extends MessagePart
 {
   private static final long serialVersionUID = 7026268561936531490L;
 
@@ -20,7 +18,7 @@ public final class ParameterPart extends MessagePart implements Serializable
   @Getter private final ParameterData data;
 
 
-  public ParameterPart(String parameter, String format, boolean spaceBefore, boolean spaceAfter, ParameterData data)
+  ParameterPart(String parameter, String format, boolean spaceBefore, boolean spaceAfter, ParameterData data)
   {
     super(spaceBefore, spaceAfter);
 
@@ -38,7 +36,7 @@ public final class ParameterPart extends MessagePart implements Serializable
 
     final ParameterFormatter formatter = context.getFormatter(format, type);
     if (formatter == null)
-      throw new IllegalStateException("no matching formatter found for parameter " + parameter);
+      throw new IllegalStateException("no matching formatter found for data " + parameter);
 
     return formatter.format(parameter, value, format, context, data);
   }
@@ -53,7 +51,7 @@ public final class ParameterPart extends MessagePart implements Serializable
   @Override
   public String toString()
   {
-    final StringBuilder s = new StringBuilder(getClass().getSimpleName()).append("(parameter=").append(parameter);
+    final StringBuilder s = new StringBuilder(getClass().getSimpleName()).append("(data=").append(parameter);
 
     if (format != null)
       s.append(", format=").append(format);

@@ -1,10 +1,9 @@
-package de.sayayi.lib.message.spi;
+package de.sayayi.lib.message.impl;
 
 import de.sayayi.lib.message.Message;
 import lombok.Synchronized;
 import lombok.ToString;
 
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,12 +19,7 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
 
   private final Map<Locale,Message> localizedMessages;
 
-  private Boolean _hasParameter = null;
-
-
-  public MultipartLocalizedMessageBundleWithCode(String code, Message message) {
-    this(code, Collections.<Locale,Message>singletonMap(null, message));
-  }
+  private Boolean _hasParameter;
 
 
   public MultipartLocalizedMessageBundleWithCode(String code, Map<Locale,Message> localizedMessages)
@@ -42,7 +36,7 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
   }
 
 
-  public Message findMessageByLocale(Locale locale)
+  private Message findMessageByLocale(Locale locale)
   {
     final String searchLanguage = locale.getLanguage();
     final String searchCountry = locale.getCountry();
@@ -94,6 +88,6 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
         }
     }
 
-    return _hasParameter.booleanValue();
+    return _hasParameter;
   }
 }

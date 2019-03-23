@@ -104,35 +104,35 @@ public class MessageContext implements Context
 
     public Builder withParameter(String parameter, boolean value)
     {
-      parameterValues.put(parameter, Boolean.valueOf(value));
+      parameterValues.put(parameter, value);
       return this;
     }
 
 
     public Builder withParameter(String parameter, int value)
     {
-      parameterValues.put(parameter, Integer.valueOf(value));
+      parameterValues.put(parameter, value);
       return this;
     }
 
 
     public Builder withParameter(String parameter, long value)
     {
-      parameterValues.put(parameter, Long.valueOf(value));
+      parameterValues.put(parameter, value);
       return this;
     }
 
 
     public Builder withParameter(String parameter, float value)
     {
-      parameterValues.put(parameter, Float.valueOf(value));
+      parameterValues.put(parameter, value);
       return this;
     }
 
 
     public Builder withParameter(String parameter, double value)
     {
-      parameterValues.put(parameter, Double.valueOf(value));
+      parameterValues.put(parameter, value);
       return this;
     }
 
