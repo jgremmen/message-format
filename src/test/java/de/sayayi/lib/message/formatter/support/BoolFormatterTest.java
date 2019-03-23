@@ -31,16 +31,16 @@ public class BoolFormatterTest extends AbstractFormatterTest
     final Context context = MessageContext.builder().withLocale("de", "DE").buildContext();
 
     assertEquals("wahr", formatter.format("a", Boolean.TRUE, null, context, null));
-    assertEquals("falsch", formatter.format("b", new Double(0.0), null, context, null));
-    assertEquals("wahr", formatter.format("c", new Float(-0.0001), null, context, null));
+    assertEquals("falsch", formatter.format("b", 0.0d, null, context, null));
+    assertEquals("wahr", formatter.format("c", -0.0001f, null, context, null));
     assertEquals("falsch", formatter.format("d", "FALSE", null, context, null));
     assertEquals("wahr", formatter.format("e", "TrUe", null, context, null));
-    assertEquals("wahr", formatter.format("f", Integer.valueOf(-4), null, context, null));
+    assertEquals("wahr", formatter.format("f", -4, null, context, null));
   }
 
 
   @Test
-  public void testFormatter() throws Exception
+  public void testFormatter()
   {
     final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
     formatterRegistry.addFormatter(new BoolFormatter());

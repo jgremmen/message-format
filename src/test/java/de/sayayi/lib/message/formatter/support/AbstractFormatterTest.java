@@ -11,7 +11,7 @@ import static org.junit.Assert.fail;
  */
 public abstract class AbstractFormatterTest
 {
-  protected void assertFormatterForType(ParameterFormatter formatter, Class<?> type)
+  void assertFormatterForType(ParameterFormatter formatter, Class<?> type)
   {
     for(Class<?> formattableType: formatter.getFormattableTypes())
       if (formattableType.isAssignableFrom(type))

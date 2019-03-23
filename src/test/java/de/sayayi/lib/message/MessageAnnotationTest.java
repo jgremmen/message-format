@@ -46,7 +46,7 @@ public class MessageAnnotationTest
 
 
   @Test
-  @Message(texts=@Text(locale="", text="m3"))
+  @Message(texts=@Text(text="m3"))
   public void testMessageWithoutLocale() throws Exception
   {
     final MessageWithCode msg = MessageFactory.parseAnnotation(
@@ -85,7 +85,7 @@ public class MessageAnnotationTest
       @Text(locale="en-US", text="us"),
       @Text(locale="nl", text="nl"),
       @Text(locale="en-GB", text="uk"),
-      @Text(locale="de-DE", text="de"),
+      @Text(locale="de-DE", text="de")
   })
   public void testLocaleSelection() throws Exception
   {

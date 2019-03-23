@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNotNull;
 public class MessageTest
 {
   @Test
-  public void testParse1() throws ParseException
+  public void testParse1()
   {
     final Message m = MessageFactory.parse("Just a simple message without parameters ");
     assertNotNull(m);

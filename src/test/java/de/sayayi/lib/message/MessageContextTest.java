@@ -1,16 +1,14 @@
 package de.sayayi.lib.message;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import de.sayayi.lib.message.Message.Context;
+import org.junit.Test;
 
-import java.text.ParseException;
 import java.util.Date;
 import java.util.Locale;
 
-import org.junit.Test;
-
-import de.sayayi.lib.message.Message.Context;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -19,7 +17,7 @@ import de.sayayi.lib.message.Message.Context;
 public class MessageContextTest
 {
   @Test
-  public void testContext() throws ParseException
+  public void testContext()
   {
     final Context ctx = MessageContext.builder()
         .withLocale(Locale.CHINA)
@@ -32,7 +30,7 @@ public class MessageContextTest
     assertNotNull(ctx);
     assertEquals(Locale.CHINA, ctx.getLocale());
     assertEquals("message", ctx.getParameterValue("name"));
-    assertEquals(Integer.valueOf(3), ctx.getParameterValue("count"));
+    assertEquals(3, ctx.getParameterValue("count"));
     assertTrue(ctx.getParameterValue("today") instanceof Date);
     assertEquals(Boolean.TRUE, ctx.getParameterValue("flag"));
   }

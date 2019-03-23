@@ -43,7 +43,7 @@ public class StringFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testFormatter() throws Exception
+  public void testFormatter()
   {
     final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
     formatterRegistry.addFormatter(new StringFormatter());

@@ -75,7 +75,7 @@ public class DefaultFormatterService extends GenericFormatterRegistry
     try {
       Class.forName(className, false, DefaultFormatterService.class.getClassLoader());
       return true;
-    } catch (final Throwable ex) {
+    } catch(final Throwable ex) {
       return false;
     }
   }
