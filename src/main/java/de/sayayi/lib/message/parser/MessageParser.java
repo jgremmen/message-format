@@ -6,7 +6,8 @@ import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterInteger;
 import de.sayayi.lib.message.data.ParameterMap;
 import de.sayayi.lib.message.data.ParameterString;
-import de.sayayi.lib.message.impl.EmptyMessageWithCode;
+import de.sayayi.lib.message.exception.MessageParserException;
+import de.sayayi.lib.message.impl.EmptyMessage;
 import de.sayayi.lib.message.impl.MultipartMessage;
 import de.sayayi.lib.message.impl.SinglePartMessage;
 import de.sayayi.lib.message.parser.MessageLexer.Token;
@@ -97,7 +98,7 @@ public final class MessageParser
     switch(parts.size())
     {
       case 0:
-        return new EmptyMessageWithCode();
+        return new EmptyMessage();
 
       case 1:
         return new SinglePartMessage(parts.get(0));

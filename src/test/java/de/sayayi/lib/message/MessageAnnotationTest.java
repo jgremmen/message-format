@@ -3,13 +3,12 @@ package de.sayayi.lib.message;
 import de.sayayi.lib.message.annotation.Message;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.impl.EmptyMessageWithCode;
+import org.junit.Before;
 import org.junit.Test;
 
-import java.text.ParseException;
 import java.util.Locale;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 
@@ -18,18 +17,12 @@ import static org.junit.Assert.assertTrue;
  */
 public class MessageAnnotationTest
 {
-  @Message(texts={})
-  private static final char FIELD = 0;
+  private MessageBundle bundle;
 
 
-  @Test
-  public void testEmptyMessageNoCode() throws Exception
-  {
-    final MessageWithCode msg = MessageFactory.parseAnnotation(
-        MessageAnnotationTest.class.getDeclaredField("FIELD"));
-
-    assertTrue(msg instanceof EmptyMessageWithCode);
-    assertNull(msg.getCode());
+  @Before
+  public void initialize() {
+    bundle = new MessageBundle(MessageAnnotationTest.class);
   }
 
 
@@ -37,8 +30,7 @@ public class MessageAnnotationTest
   @Message(code="MSG-052", texts={})
   public void testEmptyMessageWithCode() throws Exception
   {
-    final MessageWithCode msg = MessageFactory.parseAnnotation(
-        MessageAnnotationTest.class.getDeclaredMethod("testEmptyMessageWithCode"));
+    final MessageWithCode msg = bundle.getByCode("MSG-052");
 
     assertTrue(msg instanceof EmptyMessageWithCode);
     assertEquals("MSG-052", msg.getCode());
@@ -46,11 +38,10 @@ public class MessageAnnotationTest
 
 
   @Test
-  @Message(texts=@Text(text="m3"))
+  @Message(code="T3", texts=@Text(text="m3"))
   public void testMessageWithoutLocale() throws Exception
   {
-    final MessageWithCode msg = MessageFactory.parseAnnotation(
-        MessageAnnotationTest.class.getDeclaredMethod("testMessageWithoutLocale"));
+    final MessageWithCode msg = bundle.getByCode("T3");
     ParameterFactory factory = ParameterFactory.DEFAULT;
 
     assertEquals("m3", msg.format(factory));
@@ -60,19 +51,11 @@ public class MessageAnnotationTest
   }
 
 
-  @Test(expected=ParseException.class)
-  @Message(texts=@Text(locale="123", text=""))
-  public void testInvalidLocale() throws Exception {
-    MessageFactory.parseAnnotation(MessageAnnotationTest.class.getDeclaredMethod("testInvalidLocale"));
-  }
-
-
   @Test
-  @Message(texts=@Text(locale="nl-NL", text="nl"))
+  @Message(code="T2", texts=@Text(locale="nl-NL", text="nl"))
   public void testSingleMessageWithLocale() throws Exception
   {
-    final MessageWithCode msg = MessageFactory.parseAnnotation(
-        MessageAnnotationTest.class.getDeclaredMethod("testSingleMessageWithLocale"));
+    final MessageWithCode msg = bundle.getByCode("T2");
     ParameterFactory factory = ParameterFactory.DEFAULT;
 
     assertEquals("nl", msg.format(factory));
@@ -83,7 +66,7 @@ public class MessageAnnotationTest
 
 
   @Test
-  @Message(texts={
+  @Message(code = "T1", texts={
       @Text(locale="en-US", text="us"),
       @Text(locale="nl", text="nl"),
       @Text(locale="en-GB", text="uk"),
@@ -91,8 +74,7 @@ public class MessageAnnotationTest
   })
   public void testLocaleSelection() throws Exception
   {
-    final MessageWithCode msg = MessageFactory.parseAnnotation(
-        MessageAnnotationTest.class.getDeclaredMethod("testLocaleSelection"));
+    final MessageWithCode msg = bundle.getByCode("T1");
     ParameterFactory factory = ParameterFactory.DEFAULT;
 
     assertEquals("us", msg.format(factory.parameters().withLocale(Locale.ROOT)));

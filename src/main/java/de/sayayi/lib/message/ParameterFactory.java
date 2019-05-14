@@ -7,7 +7,6 @@ import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import lombok.Getter;
 
-import java.text.ParseException;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -35,12 +34,8 @@ public class ParameterFactory implements Parameters
 
   public static ParameterFactory createFor(String locale, FormatterService formatterService)
   {
-    try {
-      return new ParameterFactory((locale == null) ? Locale.getDefault() : MessageFactory.forLanguageTag(locale),
-          (formatterService == null) ? DefaultFormatterService.getSharedInstance() : formatterService);
-    } catch(ParseException ex) {
-      throw new IllegalArgumentException(ex.getLocalizedMessage(), ex);
-    }
+    return new ParameterFactory((locale == null) ? Locale.getDefault() : MessageFactory.forLanguageTag(locale),
+        (formatterService == null) ? DefaultFormatterService.getSharedInstance() : formatterService);
   }
 
 
@@ -202,17 +197,7 @@ public class ParameterFactory implements Parameters
     @Override
     public ParameterBuilder withLocale(String locale)
     {
-      if (locale == null)
-        this.locale = ParameterFactory.this.getLocale();
-      else
-      {
-        try {
-          this.locale = MessageFactory.forLanguageTag(locale);
-        } catch(ParseException ex) {
-          throw new IllegalArgumentException(ex.getLocalizedMessage(), ex);
-        }
-      }
-
+      this.locale = (locale == null) ? ParameterFactory.this.getLocale() : MessageFactory.forLanguageTag(locale);
       return this;
     }
   }

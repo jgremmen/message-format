@@ -14,7 +14,23 @@ public abstract class AbstractMessageWithCode implements MessageWithCode
   @Getter protected final String code;
 
 
-  AbstractMessageWithCode(String code) {
-    this.code = "".equals(code) ? null : code;
+  AbstractMessageWithCode(String code)
+  {
+    if (code == null || code.isEmpty())
+      throw new IllegalArgumentException("message code must not be empty");
+
+    this.code = code;
+  }
+
+
+  @Override
+  public int hashCode() {
+    return code.hashCode();
+  }
+
+
+  @Override
+  public boolean equals(Object o) {
+    return this == o || (o instanceof AbstractMessageWithCode && code.equals(((AbstractMessageWithCode)o).code));
   }
 }

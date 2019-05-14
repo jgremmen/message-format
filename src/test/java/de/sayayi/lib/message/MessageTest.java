@@ -2,7 +2,6 @@ package de.sayayi.lib.message;
 
 import org.junit.Test;
 
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -28,7 +27,7 @@ public class MessageTest
 
 
   @Test
-  public void testParseMultiLocale() throws ParseException
+  public void testParseMultiLocale()
   {
     final Map<Locale,String> texts = new HashMap<Locale,String>();
 

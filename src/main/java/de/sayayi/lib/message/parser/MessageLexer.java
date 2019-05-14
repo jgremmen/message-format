@@ -1,5 +1,6 @@
 package de.sayayi.lib.message.parser;
 
+import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.parser.MessageLexer.Token;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

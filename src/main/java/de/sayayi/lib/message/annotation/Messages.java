@@ -6,13 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 
-@Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Message
+public @interface Messages
 {
-  /** Unique message code */
-  String code();
-
-  /** 1..n localized texts */
-  Text[] texts();
+  /** 1..n messages */
+  Message[] messages();
 }

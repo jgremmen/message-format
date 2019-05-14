@@ -1,4 +1,4 @@
-package de.sayayi.lib.message.parser;
+package de.sayayi.lib.message.exception;
 
 import lombok.Getter;
 
@@ -7,12 +7,12 @@ import lombok.Getter;
  * @author Jeroen Gremmen
  */
 @SuppressWarnings("serial")
-public class MessageParserException extends RuntimeException
+public class MessageParserException extends MessageException
 {
   @Getter private final int position;
 
 
-  MessageParserException(int position, String message)
+  public MessageParserException(int position, String message)
   {
     super(message);
 

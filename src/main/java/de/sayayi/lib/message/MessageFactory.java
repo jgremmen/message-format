@@ -1,17 +1,21 @@
 package de.sayayi.lib.message;
 
+import de.sayayi.lib.message.annotation.Messages;
 import de.sayayi.lib.message.annotation.Text;
+import de.sayayi.lib.message.exception.MessageLocaleParseException;
 import de.sayayi.lib.message.impl.EmptyMessageWithCode;
 import de.sayayi.lib.message.impl.MessageDelegateWithCode;
 import de.sayayi.lib.message.impl.MultipartLocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.parser.MessageParser;
 
 import java.lang.reflect.AnnotatedElement;
-import java.text.ParseException;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -19,13 +23,16 @@ import java.util.Map.Entry;
  */
 public final class MessageFactory
 {
+  private static final AtomicInteger CODE_ID = new AtomicInteger(0);
+
+
   public static Message parse(String text) {
     return new MessageParser(text).parseMessage();
   }
 
 
   public static Message parse(Map<Locale,String> localizedTexts) {
-    return parse(null, localizedTexts);
+    return parse("Generated::" + CODE_ID.incrementAndGet(), localizedTexts);
   }
 
 
@@ -54,14 +61,33 @@ public final class MessageFactory
   }
 
 
-  public static MessageWithCode parseAnnotation(AnnotatedElement element) throws ParseException
+  public static Set<MessageWithCode> parseAnnotations(AnnotatedElement element)
   {
-    final de.sayayi.lib.message.annotation.Message annotation =
+    Set<MessageWithCode> messageBundle = new HashSet<MessageWithCode>();
+
+    de.sayayi.lib.message.annotation.Message annotation =
         element.getAnnotation(de.sayayi.lib.message.annotation.Message.class);
+    if (annotation != null)
+      messageBundle.add(parse(annotation));
 
-    if (annotation == null)
-      throw new IllegalArgumentException(element.toString() + " has no @Message annotation");
+    Messages messagesAnnotation = element.getAnnotation(Messages.class);
+    if (messagesAnnotation != null)
+      for(de.sayayi.lib.message.annotation.Message message: messagesAnnotation.messages())
+      {
+        MessageWithCode mwc = parse(message);
 
+        if (!messageBundle.add(mwc))
+          throw new IllegalArgumentException("duplicate message code " + mwc.getCode() + " found");
+
+        messageBundle.add(mwc);
+      }
+
+    return messageBundle;
+  }
+
+
+  public static MessageWithCode parse(de.sayayi.lib.message.annotation.Message annotation)
+  {
     final Text[] texts = annotation.texts();
     if (texts.length == 0)
       return new EmptyMessageWithCode(annotation.code());
@@ -79,29 +105,29 @@ public final class MessageFactory
   }
 
 
-  static Locale forLanguageTag(String locale) throws ParseException
+  static Locale forLanguageTag(String locale)
   {
     if (locale.isEmpty())
       return Locale.ROOT;
 
     final int length = locale.length();
     if (length < 2)
-      throw new ParseException("missing language code for locale " + locale, 0);
+      throw new MessageLocaleParseException("missing language code for locale " + locale);
 
     if (!Character.isLowerCase(locale.charAt(0)) || !Character.isLowerCase(locale.charAt(1)))
-        throw new ParseException("invalid language code for locale " + locale, 0);
+        throw new MessageLocaleParseException("invalid language code for locale " + locale);
 
     if (length == 2)
       return new Locale(locale);
 
     if (length != 5)
-      throw new ParseException("unexpected length " + length + " for locale " + locale, 2);
+      throw new MessageLocaleParseException("unexpected length " + length + " for locale " + locale);
 
     if (locale.charAt(2) != '-' && locale.charAt(2) != '_')
-      throw new ParseException("missing separator '-' between language and country code for locale " + locale, 2);
+      throw new MessageLocaleParseException("missing separator '-' between language and country code for locale " + locale);
 
     if (!Character.isUpperCase(locale.charAt(3)) || !Character.isUpperCase(locale.charAt(4)))
-      throw new ParseException("invalid country code for locale " + locale, 3);
+      throw new MessageLocaleParseException("invalid country code for locale " + locale);
 
     return new Locale(locale.substring(0,  2), locale.substring(3, 5));
   }
