@@ -24,7 +24,7 @@ public final class MessageFactory
   }
 
 
-  public static Message parse(Map<Locale,String> localizedTexts) throws ParseException {
+  public static Message parse(Map<Locale,String> localizedTexts) {
     return parse(null, localizedTexts);
   }
 
@@ -34,14 +34,13 @@ public final class MessageFactory
    *
    * @param text
    * @return
-   * @throws ParseException
    */
-  public static MessageWithCode parse(String code, String text) throws ParseException {
+  public static MessageWithCode parse(String code, String text) {
     return new MessageDelegateWithCode(code, new MessageParser(text).parseMessage());
   }
 
 
-  public static MessageWithCode parse(String code, Map<Locale,String> localizedTexts) throws ParseException
+  public static MessageWithCode parse(String code, Map<Locale,String> localizedTexts)
   {
     if (localizedTexts.isEmpty())
       return new EmptyMessageWithCode(code);

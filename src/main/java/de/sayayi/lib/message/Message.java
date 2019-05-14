@@ -4,6 +4,7 @@ import de.sayayi.lib.message.formatter.ParameterFormatter;
 
 import java.io.Serializable;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -15,13 +16,13 @@ import java.util.Set;
 public interface Message extends Serializable
 {
   /**
-   * Formats the message based on the message context provided.
+   * Formats the message based on the message parameters provided.
    *
-   * @param context  message context
+   * @param parameters  message parameters
    *
    * @return  formatted message
    */
-  String format(Context context);
+  String format(Parameters parameters);
 
 
   /**
@@ -29,27 +30,23 @@ public interface Message extends Serializable
    *
    * @return  {@code true} if this message contains parameters, {@code false} otherwise
    */
-  boolean hasParameter();
+  boolean hasParameters();
 
 
 
 
-  /**
-   * <p>
-   *   The message context provides information required for formatting messages.
-   * </p>
-   *
-   * #see {@link Message#format(Context)}
-   */
-  interface Context
+  interface Parameters
   {
     /**
      * Tells for which locale the message must be formatted. If no locale is provided ({@code null}) or if no message is available for the given locale,
      * the formatter will look for a reasonable default message.
      *
-     * @return  locale or {@code null}
+     * @return  locale, never {@code null}
      */
     Locale getLocale();
+
+
+    ParameterFormatter getFormatter(String format, Class<?> type);
 
 
     /**
@@ -68,8 +65,35 @@ public interface Message extends Serializable
      * @return  set with all data names
      */
     Set<String> getParameterNames();
+  }
 
 
-    ParameterFormatter getFormatter(String format, Class<?> type);
+  interface ParameterBuilder extends Parameters
+  {
+    ParameterBuilder with(String parameter, boolean value);
+
+
+    ParameterBuilder with(String parameter, int value);
+
+
+    ParameterBuilder with(String parameter, long value);
+
+
+    ParameterBuilder with(String parameter, float value);
+
+
+    ParameterBuilder with(String parameter, double value);
+
+
+    ParameterBuilder with(String parameter, Object value);
+
+
+    ParameterBuilder with(Map<String,Object> parameterValues);
+
+
+    ParameterBuilder withLocale(Locale locale);
+
+
+    ParameterBuilder withLocale(String locale);
   }
 }

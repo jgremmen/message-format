@@ -1,8 +1,8 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Context;
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
 import org.joda.time.DateTime;
@@ -36,7 +36,7 @@ public class JodaDateTimeFormatterTest extends AbstractFormatterTest
   public void testLocalDate()
   {
     JodaDateTimeFormatter formatter = new JodaDateTimeFormatter();
-    final Context context = MessageContext.builder().withLocale(GERMANY).buildContext();
+    final ParameterFactory context = ParameterFactory.createFor(GERMANY);
     LocalDate date = new LocalDate(1972, 8, 17);
 
     assertEquals("17.08.72", formatter.format("a", date, "short", context, null));
@@ -53,7 +53,7 @@ public class JodaDateTimeFormatterTest extends AbstractFormatterTest
   public void testLocalTime()
   {
     JodaDateTimeFormatter formatter = new JodaDateTimeFormatter();
-    final Context context = MessageContext.builder().withLocale(GERMANY).buildContext();
+    final ParameterFactory context = ParameterFactory.createFor(GERMANY);
     LocalTime time = new LocalTime(16, 34, 11, 672);
 
     assertEquals("16:34", formatter.format("a", time, "short", context, null));
@@ -70,7 +70,7 @@ public class JodaDateTimeFormatterTest extends AbstractFormatterTest
   public void testDateTime()
   {
     JodaDateTimeFormatter formatter = new JodaDateTimeFormatter();
-    final Context context = MessageContext.builder().withLocale(UK).buildContext();
+    final ParameterFactory context = ParameterFactory.createFor(UK);
     DateTime datetime = new DateTime(1972, 8, 17, 2, 40, 23, 833);
 
     assertEquals("17/08/72 02:40", formatter.format("a", datetime, "short", context, null));
@@ -87,7 +87,7 @@ public class JodaDateTimeFormatterTest extends AbstractFormatterTest
   public void testCustomPattern()
   {
     JodaDateTimeFormatter formatter = new JodaDateTimeFormatter();
-    final Context context = MessageContext.builder().withLocale(FRANCE).buildContext();
+    final ParameterFactory context = ParameterFactory.createFor(FRANCE);
     DateTime datetime = new DateTime(1972, 8, 17, 2, 40, 23, 833);
 
     assertEquals("17 août",
@@ -100,20 +100,19 @@ public class JodaDateTimeFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testFormatter() throws Exception
+  public void testFormatter()
   {
     final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
     formatterRegistry.addFormatter(new JodaDateTimeFormatter());
+    final ParameterFactory context = ParameterFactory.createFor(formatterRegistry);
 
-    final Context context = MessageContext.builder()
-        .withFormatterService(formatterRegistry)
-        .withParameter("a", new LocalDate(1972, 8, 17))
-        .withParameter("b", new LocalTime(16, 45, 9, 123))
-        .withParameter("c", new DateTime(2019, 2, 19, 14, 23, 1, 9))
-        .withLocale("nl")
-        .buildContext();
+    final Parameters parameters = context.parameters()
+        .with("a", new LocalDate(1972, 8, 17))
+        .with("b", new LocalTime(16, 45, 9, 123))
+        .with("c", new DateTime(2019, 2, 19, 14, 23, 1, 9))
+        .withLocale("nl");
     final Message msg = parse("%{a} %{b,short} %{c,time} %{c,'yyyy-MM-dd MMM'}");
 
-    assertEquals("17-aug-1972 16:45 14:23:01 2019-02-19 feb", msg.format(context));
+    assertEquals("17-aug-1972 16:45 14:23:01 2019-02-19 feb", msg.format(parameters));
   }
 }

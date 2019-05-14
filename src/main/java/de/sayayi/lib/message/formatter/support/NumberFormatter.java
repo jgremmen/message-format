@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
@@ -25,7 +25,7 @@ public class NumberFormatter implements ParameterFormatter
 
 
   @Override
-  public String format(String parameter, Object v, String format, Context context, ParameterData data)
+  public String format(String parameter, Object v, String format, Parameters parameters, ParameterData data)
   {
     if (v == null)
       return null;
@@ -33,27 +33,28 @@ public class NumberFormatter implements ParameterFormatter
     final Number value = (Number)v;
 
     if (data == null && (format == null || "integer".equals(format)) &&
-        (value instanceof BigInteger || value instanceof Long || value instanceof Integer || value instanceof Short))
+        (value instanceof BigInteger || value instanceof Long || value instanceof Integer || value instanceof Short ||
+         value instanceof Byte))
       return value.toString();
 
     // special case: show number as bool
-    if (BOOL_FORMATTER.getName().equals(format))
-      return formatBoolean(parameter, value, context, data);
+    if ("bool".equals(format))
+      return formatBoolean(parameter, value, parameters, data);
 
-    return getFormatter(format, data, context.getLocale()).format(value);
+    return getFormatter(format, data, parameters.getLocale()).format(value);
   }
 
 
-  private String formatBoolean(String parameter, Number value, Context context, ParameterData data)
+  private String formatBoolean(String parameter, Number value, Parameters parameters, ParameterData data)
   {
-    ParameterFormatter formatter = context.getFormatter("bool", Boolean.class);
+    ParameterFormatter formatter = parameters.getFormatter("bool", Boolean.class);
     Set<Class<?>> types = formatter.getFormattableTypes();
 
     // if we got some default formatter, use a specific one instead
     if (!types.contains(Boolean.class) && !types.contains(boolean.class))
       formatter = BOOL_FORMATTER;
 
-    return formatter.format(parameter, value, "bool", context, data);
+    return formatter.format(parameter, value, "bool", parameters, data);
   }
 
 
@@ -85,6 +86,7 @@ public class NumberFormatter implements ParameterFormatter
         Float.class, float.class,
         Long.class, long.class,
         Integer.class, int.class,
-        Short.class, short.class));
+        Short.class, short.class,
+        Byte.class, byte.class));
   }
 }

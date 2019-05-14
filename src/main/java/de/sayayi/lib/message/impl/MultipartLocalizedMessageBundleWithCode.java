@@ -31,8 +31,8 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
 
 
   @Override
-  public String format(Context context) {
-    return findMessageByLocale(context.getLocale()).format(context);
+  public String format(Parameters parameters) {
+    return findMessageByLocale(parameters.getLocale()).format(parameters);
   }
 
 
@@ -74,14 +74,14 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
 
   @Synchronized
   @Override
-  public boolean hasParameter()
+  public boolean hasParameters()
   {
     if (_hasParameter == null)
     {
       _hasParameter = Boolean.FALSE;
 
       for(final Message message: localizedMessages.values())
-        if (message.hasParameter())
+        if (message.hasParameters())
         {
           _hasParameter = Boolean.TRUE;
           break;

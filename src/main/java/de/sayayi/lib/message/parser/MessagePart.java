@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.parser;
 
-import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.Message.Parameters;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -24,7 +24,7 @@ public abstract class MessagePart implements Serializable
   }
 
 
-  public abstract String getText(Context context);
+  public abstract String getText(Parameters parameters);
 
 
   public abstract boolean isParameter();

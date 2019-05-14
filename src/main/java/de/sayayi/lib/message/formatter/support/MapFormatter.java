@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 
@@ -15,13 +15,13 @@ import java.util.Set;
 public class MapFormatter implements ParameterFormatter
 {
   @Override
-  public String format(String parameter, Object map, String format, Context context, ParameterData data)
+  public String format(String parameter, Object map, String format, Parameters parameters, ParameterData data)
   {
     if (map == null)
       return null;
 
-    return context.getFormatter(null, Set.class)
-        .format(parameter, ((Map<?,?>)map).entrySet(), format, context, data);
+    return parameters.getFormatter(null, Set.class)
+        .format(parameter, ((Map<?,?>)map).entrySet(), format, parameters, data);
   }
 
 

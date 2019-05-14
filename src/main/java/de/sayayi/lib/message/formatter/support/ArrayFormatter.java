@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 
@@ -20,15 +20,15 @@ import static java.util.ResourceBundle.getBundle;
 public class ArrayFormatter implements ParameterFormatter
 {
   @Override
-  public String format(String parameter, Object array, String format, Context context, ParameterData data)
+  public String format(String parameter, Object array, String format, Parameters parameters, ParameterData data)
   {
     if (array == null)
       return null;
 
     final StringBuilder s = new StringBuilder();
     final Class<?> baseType = array.getClass().getComponentType();
-    final ParameterFormatter formatter = baseType.isPrimitive() ? context.getFormatter(format, baseType) : null;
-    final ResourceBundle bundle = getBundle("Formatter", context.getLocale());
+    final ParameterFormatter formatter = baseType.isPrimitive() ? parameters.getFormatter(format, baseType) : null;
+    final ResourceBundle bundle = getBundle("Formatter", parameters.getLocale());
 
     for(int i = 0, length = getLength(array); i < length; i++)
     {
@@ -38,11 +38,11 @@ public class ArrayFormatter implements ParameterFormatter
         s.append(", ");
 
       if (formatter != null)
-        s.append(formatter.format(null, value, format, context, data));
+        s.append(formatter.format(null, value, format, parameters, data));
       else if (value == array)
         s.append(bundle.getString("thisArray"));
       else if (value != null)
-        s.append(context.getFormatter(format, baseType).format(null, value, format, context, data));
+        s.append(parameters.getFormatter(format, baseType).format(null, value, format, parameters, data));
     }
 
     return s.toString();

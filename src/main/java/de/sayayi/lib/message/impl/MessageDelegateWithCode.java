@@ -24,13 +24,13 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
 
 
   @Override
-  public String format(Context context) {
-    return message.format(context);
+  public String format(Parameters parameters) {
+    return message.format(parameters);
   }
 
 
   @Override
-  public boolean hasParameter() {
-    return message.hasParameter();
+  public boolean hasParameters() {
+    return message.hasParameters();
   }
 }

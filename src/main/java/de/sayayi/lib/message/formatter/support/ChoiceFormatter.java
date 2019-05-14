@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterMap;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
@@ -22,7 +22,7 @@ public final class ChoiceFormatter implements NamedParameterFormatter
 
 
   @Override
-  public String format(String parameter, Object value, String format, Context context, ParameterData data)
+  public String format(String parameter, Object value, String format, Parameters parameters, ParameterData data)
   {
     if (!(data instanceof ParameterMap))
       throw new IllegalArgumentException("missing choice map for data " + parameter);
@@ -30,7 +30,7 @@ public final class ChoiceFormatter implements NamedParameterFormatter
     if (value != null && !(value instanceof Serializable))
       throw new IllegalArgumentException("value must be serializable");
 
-    return data.format(context, (Serializable)value);
+    return data.format(parameters, (Serializable)value);
   }
 
 

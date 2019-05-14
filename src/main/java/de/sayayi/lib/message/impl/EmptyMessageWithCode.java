@@ -23,13 +23,13 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
 
   @Override
-  public String format(Context context) {
+  public String format(Parameters parameters) {
     return null;
   }
 
 
   @Override
-  public boolean hasParameter() {
+  public boolean hasParameters() {
     return false;
   }
 }

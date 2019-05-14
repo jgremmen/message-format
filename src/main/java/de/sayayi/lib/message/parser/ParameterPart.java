@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.parser;
 
-import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import lombok.Getter;
@@ -29,16 +29,16 @@ final class ParameterPart extends MessagePart
 
 
   @Override
-  public String getText(Context context)
+  public String getText(Parameters parameters)
   {
-    final Object value = context.getParameterValue(parameter);
+    final Object value = parameters.getParameterValue(parameter);
     final Class<?> type = (value != null) ? value.getClass() : String.class;
 
-    final ParameterFormatter formatter = context.getFormatter(format, type);
+    final ParameterFormatter formatter = parameters.getFormatter(format, type);
     if (formatter == null)
       throw new IllegalStateException("no matching formatter found for data " + parameter);
 
-    return formatter.format(parameter, value, format, context, data);
+    return formatter.format(parameter, value, format, parameters, data);
   }
 
 

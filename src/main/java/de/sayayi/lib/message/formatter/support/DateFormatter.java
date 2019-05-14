@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
@@ -25,13 +25,13 @@ import static java.text.DateFormat.getDateInstance;
 public class DateFormatter implements ParameterFormatter
 {
   @Override
-  public String format(String parameter, Object value, String format, Context context, ParameterData data)
+  public String format(String parameter, Object value, String format, Parameters parameters, ParameterData data)
   {
-    final Date date = (Date)context.getParameterValue(parameter);
+    final Date date = (Date)parameters.getParameterValue(parameter);
     if (date == null)
       return null;
 
-    final Locale locale = context.getLocale();
+    final Locale locale = parameters.getLocale();
     DateFormat formatter;
 
     if (data instanceof ParameterString)

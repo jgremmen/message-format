@@ -303,7 +303,7 @@ public final class MessageParser
               break buildMap;
             }
 
-            if (m.hasParameter())
+            if (m.hasParameters())
               throw new MessageParserException(t0.getStart(), "parameterized string is not allowed as a map key");
 
             key = m.format(null);

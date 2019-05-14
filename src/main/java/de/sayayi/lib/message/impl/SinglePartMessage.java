@@ -5,14 +5,12 @@ import de.sayayi.lib.message.parser.MessagePart;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.io.Serializable;
-
 
 /**
  * @author Jeroen Gremmen
  */
 @ToString
-public class SinglePartMessage implements Message, Serializable
+public class SinglePartMessage implements Message
 {
   private static final long serialVersionUID = 702546983985164717L;
 
@@ -25,16 +23,16 @@ public class SinglePartMessage implements Message, Serializable
 
 
   @Override
-  public String format(Context context)
+  public String format(Parameters parameters)
   {
-    final String text = part.getText(context);
+    final String text = part.getText(parameters);
 
     return (text == null) ? "" : text;
   }
 
 
   @Override
-  public boolean hasParameter() {
+  public boolean hasParameters() {
     return part.isParameter();
   }
 }

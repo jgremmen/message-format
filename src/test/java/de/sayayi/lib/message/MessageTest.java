@@ -22,7 +22,7 @@ public class MessageTest
     final Message m = MessageFactory.parse("Just a simple message without parameters ");
     assertNotNull(m);
 
-    final String text = m.format(MessageContext.builder().buildContext());
+    final String text = m.format(ParameterFactory.DEFAULT);
     assertEquals("Just a simple message without parameters", text);
   }
 
@@ -39,10 +39,10 @@ public class MessageTest
 
     final Message m = MessageFactory.parse(texts);
 
-    final String nl = m.format(MessageContext.builder().withLocale("nl-NL").withParameter("n", 1).buildContext());
+    final String nl = m.format(ParameterFactory.createFor("nl-NL").parameters().with("n", 1));
     assertEquals("1 kleur.", nl);
 
-    final String uk = m.format(MessageContext.builder().withLocale(Locale.UK).withParameter("n", 4).buildContext());
+    final String uk = m.format(ParameterFactory.createFor(Locale.UK).parameters().with("n", 4));
     assertEquals("4 colours.", uk);
   }
 }

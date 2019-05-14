@@ -22,13 +22,13 @@ public class ParameterString implements ParameterData, Message
 
 
   @Override
-  public String format(Context context, Serializable key) {
+  public String format(Parameters parameters, Serializable key) {
     throw new UnsupportedOperationException();
   }
 
 
   @Override
-  public String format(Context context) {
+  public String format(Parameters parameters) {
     return value;
   }
 
@@ -46,7 +46,7 @@ public class ParameterString implements ParameterData, Message
 
 
   @Override
-  public boolean hasParameter() {
+  public boolean hasParameters() {
     return false;
   }
 }

@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 
@@ -20,7 +20,7 @@ public final class StringFormatter implements NamedParameterFormatter
 
 
   @Override
-  public String format(String parameter, Object value, String format, Context context, ParameterData data)
+  public String format(String parameter, Object value, String format, Parameters parameters, ParameterData data)
   {
     if (value == null)
       return null;

@@ -1,8 +1,8 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Context;
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
 import org.junit.Test;
 
@@ -28,14 +28,14 @@ public class BoolFormatterTest extends AbstractFormatterTest
   public void testFormat()
   {
     final BoolFormatter formatter = new BoolFormatter();
-    final Context context = MessageContext.builder().withLocale("de", "DE").buildContext();
+    final ParameterFactory factory = ParameterFactory.createFor("de-DE");
 
-    assertEquals("wahr", formatter.format("a", Boolean.TRUE, null, context, null));
-    assertEquals("falsch", formatter.format("b", 0.0d, null, context, null));
-    assertEquals("wahr", formatter.format("c", -0.0001f, null, context, null));
-    assertEquals("falsch", formatter.format("d", "FALSE", null, context, null));
-    assertEquals("wahr", formatter.format("e", "TrUe", null, context, null));
-    assertEquals("wahr", formatter.format("f", -4, null, context, null));
+    assertEquals("wahr", formatter.format("a", Boolean.TRUE, null, factory, null));
+    assertEquals("falsch", formatter.format("b", 0.0d, null, factory, null));
+    assertEquals("wahr", formatter.format("c", -0.0001f, null, factory, null));
+    assertEquals("falsch", formatter.format("d", "FALSE", null, factory, null));
+    assertEquals("wahr", formatter.format("e", "TrUe", null, factory, null));
+    assertEquals("wahr", formatter.format("f", -4, null, factory, null));
   }
 
 
@@ -44,18 +44,16 @@ public class BoolFormatterTest extends AbstractFormatterTest
   {
     final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
     formatterRegistry.addFormatter(new BoolFormatter());
+    ParameterFactory factory = ParameterFactory.createFor(ENGLISH, formatterRegistry);
 
-    final Context context = MessageContext.builder()
-        .withFormatterService(formatterRegistry)
-        .withLocale(ENGLISH)
-        .withParameter("a", Boolean.FALSE)
-        .withParameter("b", Boolean.TRUE)
-        .withParameter("c", Integer.valueOf(1234))
-        .withParameter("d", Integer.valueOf(0))
-        .withParameter("e", Double.valueOf(3.14d))
-        .buildContext();
+    final Parameters parameters = factory.parameters()
+        .with("a", Boolean.FALSE)
+        .with("b", Boolean.TRUE)
+        .with("c", Integer.valueOf(1234))
+        .with("d", Integer.valueOf(0))
+        .with("e", Double.valueOf(3.14d));
     final Message msg = parse("%{a} %{b} %{c} %{c,bool} %{d,bool,{true->'yes',false->'no'}} %{e}");
 
-    assertEquals("false true 1234 true no 3.14", msg.format(context));
+    assertEquals("false true 1234 true no 3.14", msg.format(parameters));
   }
 }

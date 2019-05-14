@@ -51,11 +51,12 @@ public class MessageAnnotationTest
   {
     final MessageWithCode msg = MessageFactory.parseAnnotation(
         MessageAnnotationTest.class.getDeclaredMethod("testMessageWithoutLocale"));
+    ParameterFactory factory = ParameterFactory.DEFAULT;
 
-    assertEquals("m3", msg.format(MessageContext.builder().buildContext()));
-    assertEquals("m3", msg.format(MessageContext.builder().withLocale(Locale.ROOT).buildContext()));
-    assertEquals("m3", msg.format(MessageContext.builder().withLocale(Locale.US).buildContext()));
-    assertEquals("m3", msg.format(MessageContext.builder().withLocale(new Locale("xx", "YY")).buildContext()));
+    assertEquals("m3", msg.format(factory));
+    assertEquals("m3", msg.format(factory.parameters().withLocale(Locale.ROOT)));
+    assertEquals("m3", msg.format(factory.parameters().withLocale(Locale.US)));
+    assertEquals("m3", msg.format(factory.parameters().withLocale("xx-YY")));
   }
 
 
@@ -72,11 +73,12 @@ public class MessageAnnotationTest
   {
     final MessageWithCode msg = MessageFactory.parseAnnotation(
         MessageAnnotationTest.class.getDeclaredMethod("testSingleMessageWithLocale"));
+    ParameterFactory factory = ParameterFactory.DEFAULT;
 
-    assertEquals("nl", msg.format(MessageContext.builder().buildContext()));
-    assertEquals("nl", msg.format(MessageContext.builder().withLocale(Locale.ROOT).buildContext()));
-    assertEquals("nl", msg.format(MessageContext.builder().withLocale(Locale.US).buildContext()));
-    assertEquals("nl", msg.format(MessageContext.builder().withLocale(new Locale("xx", "YY")).buildContext()));
+    assertEquals("nl", msg.format(factory));
+    assertEquals("nl", msg.format(factory.parameters().withLocale(Locale.ROOT)));
+    assertEquals("nl", msg.format(factory.parameters().withLocale(Locale.US)));
+    assertEquals("nl", msg.format(factory.parameters().withLocale("xx-YY")));
   }
 
 
@@ -91,11 +93,12 @@ public class MessageAnnotationTest
   {
     final MessageWithCode msg = MessageFactory.parseAnnotation(
         MessageAnnotationTest.class.getDeclaredMethod("testLocaleSelection"));
+    ParameterFactory factory = ParameterFactory.DEFAULT;
 
-    assertEquals("us", msg.format(MessageContext.builder().withLocale(Locale.ROOT).buildContext()));
-    assertEquals("uk", msg.format(MessageContext.builder().withLocale(Locale.UK).buildContext()));
-    assertEquals("nl", msg.format(MessageContext.builder().withLocale(new Locale("nl", "BE")).buildContext()));
-    assertEquals("us", msg.format(MessageContext.builder().withLocale(Locale.CHINESE).buildContext()));
-    assertEquals("de", msg.format(MessageContext.builder().withLocale(new Locale("de", "AT")).buildContext()));
+    assertEquals("us", msg.format(factory.parameters().withLocale(Locale.ROOT)));
+    assertEquals("uk", msg.format(factory.parameters().withLocale(Locale.UK)));
+    assertEquals("nl", msg.format(factory.parameters().withLocale("nl-BE")));
+    assertEquals("us", msg.format(factory.parameters().withLocale(Locale.CHINESE)));
+    assertEquals("de", msg.format(factory.parameters().withLocale("de-AT")));
   }
 }

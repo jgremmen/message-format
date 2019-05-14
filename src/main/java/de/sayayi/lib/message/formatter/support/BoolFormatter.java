@@ -1,7 +1,7 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterMap;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
@@ -27,7 +27,7 @@ public class BoolFormatter implements NamedParameterFormatter
 
 
   @Override
-  public String format(String parameter, Object value, String format, Context context, ParameterData data)
+  public String format(String parameter, Object value, String format, Parameters parameters, ParameterData data)
   {
     Boolean bool;
 
@@ -49,11 +49,11 @@ public class BoolFormatter implements NamedParameterFormatter
     {
       final Message message = ((ParameterMap)data).getMessageFor(bool);
       if (message != null)
-        return message.format(context);
+        return message.format(parameters);
     }
 
     return getBundle(getClass().getPackage().getName() + ".Formatter",
-        context.getLocale()).getString(bool.toString());
+        parameters.getLocale()).getString(bool.toString());
   }
 
 

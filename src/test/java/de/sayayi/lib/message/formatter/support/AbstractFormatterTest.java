@@ -9,7 +9,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Jeroen Gremmen
  */
-public abstract class AbstractFormatterTest
+abstract class AbstractFormatterTest
 {
   void assertFormatterForType(ParameterFormatter formatter, Class<?> type)
   {

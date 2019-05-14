@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 
 import java.util.Set;
@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public interface ParameterFormatter
 {
-  String format(String parameter, Object value, String format, Context context, ParameterData data);
+  String format(String parameter, Object value, String format, Parameters parameters, ParameterData data);
 
   Set<Class<?>> getFormattableTypes();
 }

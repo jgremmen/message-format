@@ -1,7 +1,7 @@
 package de.sayayi.lib.message.data;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.Message.Parameters;
 import lombok.ToString;
 
 import java.io.Serializable;
@@ -59,13 +59,13 @@ public class ParameterMap implements ParameterData
 
 
   @Override
-  public String format(Context context, Serializable key)
+  public String format(Parameters parameters, Serializable key)
   {
     Message message = getMessageForKey(key);
     if (message == null)
       message = map.get(null);
 
-    return (message == null) ? null : message.format(context);
+    return (message == null) ? null : message.format(parameters);
   }
 
 
@@ -110,8 +110,8 @@ public class ParameterMap implements ParameterData
 
 
   @Override
-  public String format(Context context) {
-    return format(context, null);
+  public String format(Parameters parameters) {
+    return format(parameters, null);
   }
 
 

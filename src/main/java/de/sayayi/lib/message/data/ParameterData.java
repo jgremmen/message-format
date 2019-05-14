@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.data;
 
-import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.Message.Parameters;
 
 import java.io.Serializable;
 
@@ -10,9 +10,9 @@ import java.io.Serializable;
  */
 public interface ParameterData extends Serializable
 {
-  String format(Context context, Serializable key);
+  String format(Parameters parameters, Serializable key);
 
-  String format(Context context);
+  String format(Parameters parameters);
 
   Serializable asObject();
 }

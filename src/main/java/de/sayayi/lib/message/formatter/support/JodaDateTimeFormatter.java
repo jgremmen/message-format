@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
@@ -41,9 +41,9 @@ public class JodaDateTimeFormatter implements ParameterFormatter
 
 
   @Override
-  public String format(String parameter, Object value, String format, Context context, ParameterData data)
+  public String format(String parameter, Object value, String format, Parameters parameters, ParameterData data)
   {
-    final Locale locale = context.getLocale();
+    final Locale locale = parameters.getLocale();
 
     if (value instanceof ReadableDateTime)
       return getFormatter(format, data).withLocale(locale).print((ReadableInstant)value);

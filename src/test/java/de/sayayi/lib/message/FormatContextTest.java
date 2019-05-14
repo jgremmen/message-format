@@ -1,6 +1,6 @@
 package de.sayayi.lib.message;
 
-import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.Message.Parameters;
 import org.junit.Test;
 
 import java.util.Date;
@@ -14,18 +14,19 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Jeroen Gremmen
  */
-public class MessageContextTest
+public class FormatContextTest
 {
   @Test
   public void testContext()
   {
-    final Context ctx = MessageContext.builder()
+    ParameterFactory parameterFactory = ParameterFactory.createFor(Locale.CHINA);
+
+    final Parameters ctx = parameterFactory.parameters()
         .withLocale(Locale.CHINA)
-        .withParameter("name", "message")
-        .withParameter("count", 3)
-        .withParameter("today", new Date())
-        .withParameter("flag", true)
-        .buildContext();
+        .with("name", "message")
+        .with("count", 3)
+        .with("today", new Date())
+        .with("flag", true);
 
     assertNotNull(ctx);
     assertEquals(Locale.CHINA, ctx.getLocale());

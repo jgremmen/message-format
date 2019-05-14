@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 
@@ -18,12 +18,12 @@ import static java.util.ResourceBundle.getBundle;
 public class CollectionFormatter implements ParameterFormatter
 {
   @Override
-  public String format(String parameter, Object collection, String format, Context context, ParameterData data)
+  public String format(String parameter, Object collection, String format, Parameters parameters, ParameterData data)
   {
     if (collection == null)
       return null;
 
-    final ResourceBundle bundle = getBundle("Formatter", context.getLocale());
+    final ResourceBundle bundle = getBundle("Formatter", parameters.getLocale());
     final StringBuilder s = new StringBuilder();
     boolean first = true;
 
@@ -37,7 +37,7 @@ public class CollectionFormatter implements ParameterFormatter
       if (value == collection)
         s.append(bundle.getString("thisCollection"));
       else if (value != null)
-        s.append(context.getFormatter(format, value.getClass()).format(null, value, format, context, data));
+        s.append(parameters.getFormatter(format, value.getClass()).format(null, value, format, parameters, data));
     }
 
     return s.toString();

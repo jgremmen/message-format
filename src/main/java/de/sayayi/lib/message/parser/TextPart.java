@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.parser;
 
-import de.sayayi.lib.message.Message.Context;
+import de.sayayi.lib.message.Message.Parameters;
 
 
 /**
@@ -22,7 +22,7 @@ final class TextPart extends MessagePart
 
 
   @Override
-  public String getText(Context context) {
+  public String getText(Parameters parameters) {
     return text;
   }
 

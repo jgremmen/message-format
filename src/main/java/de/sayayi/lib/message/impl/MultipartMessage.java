@@ -24,14 +24,14 @@ public class MultipartMessage implements Message
 
 
   @Override
-  public String format(Context context)
+  public String format(Parameters parameters)
   {
     final StringBuilder message = new StringBuilder();
     boolean spaceBefore = false;
 
     for(final MessagePart part: parts)
     {
-      final String text = part.getText(context);
+      final String text = part.getText(parameters);
 
       if (text != null && !text.isEmpty())
       {
@@ -48,7 +48,7 @@ public class MultipartMessage implements Message
 
 
   @Override
-  public boolean hasParameter() {
+  public boolean hasParameters() {
     return parts.length > 0 && (parts.length > 1 || parts[0].isParameter());
   }
 }
