@@ -66,15 +66,4 @@ public class DefaultFormatterService extends GenericFormatterRegistry
       return false;
     }
   }
-
-
-  @SuppressWarnings("unchecked")
-  private ParameterFormatter newFormatter(String className)
-  {
-    try {
-      return ((Class<ParameterFormatter>)Class.forName(className)).newInstance();
-    } catch(Exception ex) {
-      throw new IllegalStateException("class " + className + "could not be instantiated", ex);
-    }
-  }
 }

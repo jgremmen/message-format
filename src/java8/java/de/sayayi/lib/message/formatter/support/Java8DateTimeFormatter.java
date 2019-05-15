@@ -8,6 +8,7 @@ import de.sayayi.lib.message.formatter.ParameterFormatter;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.Collections;
@@ -15,6 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static java.time.format.DateTimeFormatter.ofLocalizedDate;
+import static java.time.format.DateTimeFormatter.ofLocalizedDateTime;
+import static java.time.format.DateTimeFormatter.ofLocalizedTime;
 import static java.time.format.FormatStyle.FULL;
 import static java.time.format.FormatStyle.LONG;
 import static java.time.format.FormatStyle.MEDIUM;
@@ -38,21 +42,22 @@ public class Java8DateTimeFormatter implements ParameterFormatter
     STYLE.put("date", "M-");
     STYLE.put("time", "-M");
 
-    FORMATTER.put("SS", DateTimeFormatter.ofLocalizedDateTime(SHORT, SHORT));
-    FORMATTER.put("S-", DateTimeFormatter.ofLocalizedDate(SHORT));
-    FORMATTER.put("-S", DateTimeFormatter.ofLocalizedTime(SHORT));
+    FORMATTER.put("SS", ofLocalizedDateTime(SHORT, SHORT));
+    FORMATTER.put("S-", ofLocalizedDate(SHORT));
+    FORMATTER.put("-S", ofLocalizedTime(SHORT));
 
-    FORMATTER.put("MM", DateTimeFormatter.ofLocalizedDateTime(MEDIUM, MEDIUM));
-    FORMATTER.put("M-", DateTimeFormatter.ofLocalizedDate(MEDIUM));
-    FORMATTER.put("-M", DateTimeFormatter.ofLocalizedTime(MEDIUM));
+    FORMATTER.put("MM", ofLocalizedDateTime(MEDIUM, MEDIUM));
+    FORMATTER.put("M-", ofLocalizedDate(MEDIUM));
+    FORMATTER.put("-M", ofLocalizedTime(MEDIUM));
 
-    FORMATTER.put("LL", DateTimeFormatter.ofLocalizedDateTime(LONG, LONG));
-    FORMATTER.put("L-", DateTimeFormatter.ofLocalizedDate(LONG));
-    FORMATTER.put("-L", DateTimeFormatter.ofLocalizedTime(LONG));
+    FORMATTER.put("LL", ofLocalizedDateTime(LONG, LONG));
+    FORMATTER.put("LM", ofLocalizedDateTime(LONG, MEDIUM));
+    FORMATTER.put("L-", ofLocalizedDate(LONG));
+    FORMATTER.put("-L", ofLocalizedTime(LONG));
 
-    FORMATTER.put("FF", DateTimeFormatter.ofLocalizedDateTime(FULL, FULL));
-    FORMATTER.put("F-", DateTimeFormatter.ofLocalizedDate(FULL));
-    FORMATTER.put("-F", DateTimeFormatter.ofLocalizedTime(FULL));
+    FORMATTER.put("FF", ofLocalizedDateTime(FULL, FULL));
+    FORMATTER.put("F-", ofLocalizedDate(FULL));
+    FORMATTER.put("-F", ofLocalizedTime(FULL));
 
     FORMATTER.put("--", null);
   }
@@ -62,8 +67,23 @@ public class Java8DateTimeFormatter implements ParameterFormatter
   public String format(String parameter, Object value, String format, Parameters parameters, ParameterData data)
   {
     final DateTimeFormatter formatter = getFormatter((Temporal)value, format, data);
+    if (formatter == null)
+      return null;
 
-    return (formatter == null) ? null : formatter.withLocale(parameters.getLocale()).format((Temporal)value).trim();
+    String text = formatter
+        .withZone(ZoneId.systemDefault())
+        .withLocale(parameters.getLocale())
+        .format((Temporal)value).trim();
+
+    // strip trailing timezone for local time
+    if (value instanceof LocalTime && ("long".equals(format) || "full".equals(format)))
+    {
+      int idx = text.lastIndexOf(' ');
+      if (idx > 0)
+        text = text.substring(0, idx);
+    }
+
+    return text;
   }
 
 
