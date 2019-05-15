@@ -52,23 +52,12 @@ public class GenericFormatterRegistry implements FormatterRegistry
   {
     ParameterFormatter formatter = namedFormatters.get(format);
 
-    if (formatter == null)
+    if (formatter == null && (formatter = cachedFormatters.get(type)) == null)
     {
-      boolean cacheResult = false;
-      Class<?> walkType = type;
+      for(Class<?> walkType = type; formatter == null && walkType != null; walkType = walkType.getSuperclass())
+        formatter = getFormatterForType(walkType);
 
-      formatter = cachedFormatters.get(type);
-
-      while(formatter == null && walkType != null)
-      {
-        if ((formatter = getFormatterForType(walkType)) == null)
-        {
-          cacheResult = true;
-          walkType = walkType.getSuperclass();
-        }
-        else if (cacheResult)
-          cachedFormatters.put(type, formatter);
-      }
+      cachedFormatters.put(type, formatter);
     }
 
     return formatter;
