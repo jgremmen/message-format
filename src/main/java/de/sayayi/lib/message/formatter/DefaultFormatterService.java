@@ -53,7 +53,7 @@ public class DefaultFormatterService extends GenericFormatterRegistry
     if (hasClass("org.joda.time.DateTime"))
       addFormatter(new de.sayayi.lib.message.formatter.support.JodaDateTimeFormatter());
 
-    if (hasClass("java.time.LocalDate"))
+    if (isJava8())
     {
       addFormatter(new de.sayayi.lib.message.formatter.support.Java8DateTimeFormatter());
       addFormatter(new de.sayayi.lib.message.formatter.support.OptionalFormatter());
@@ -63,6 +63,11 @@ public class DefaultFormatterService extends GenericFormatterRegistry
       addFormatter(new de.sayayi.lib.message.formatter.support.IntSupplierFormatter());
       addFormatter(new de.sayayi.lib.message.formatter.support.BooleanSupplierFormatter());
     }
+  }
+
+
+  protected boolean isJava8() {
+    return hasClass("java.time.LocalDate") && hasClass("java.util.function.DoubleSupplier");
   }
 
 

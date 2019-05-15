@@ -31,23 +31,27 @@ public class ArrayFormatter implements ParameterFormatter
     final Class<?> arrayType = array.getClass();
     final ParameterFormatter formatter =
         arrayType.isPrimitive() ? parameters.getFormatter(format, arrayType.getComponentType()) : null;
-    final ResourceBundle bundle = getBundle("Formatter", parameters.getLocale());
+    final ResourceBundle bundle = getBundle(getClass().getPackage().getName() + ".Formatter",
+        parameters.getLocale());
 
     for(int i = 0; i < length; i++)
     {
       final Object value = get(array, i);
-
-      if (s.length() > 0)
-        s.append(", ");
+      String text = null;
 
       if (value == array)
-        s.append(bundle.getString("thisArray"));
+        text = bundle.getString("thisArray");
       else if (formatter != null)
-        s.append(formatter.format(value, format, parameters, data));
+        text = formatter.format(value, format, parameters, data);
       else if (value != null)
+        text = parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data);
+
+      if (text != null)
       {
-        s.append(parameters.getFormatter(format, value.getClass())
-            .format(value, format, parameters, data));
+        if (s.length() > 0)
+          s.append(", ");
+
+        s.append(text);
       }
     }
 
