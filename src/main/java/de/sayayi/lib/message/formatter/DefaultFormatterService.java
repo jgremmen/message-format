@@ -5,7 +5,6 @@ import de.sayayi.lib.message.formatter.support.BoolFormatter;
 import de.sayayi.lib.message.formatter.support.ChoiceFormatter;
 import de.sayayi.lib.message.formatter.support.CollectionFormatter;
 import de.sayayi.lib.message.formatter.support.DateFormatter;
-import de.sayayi.lib.message.formatter.support.JodaDateTimeFormatter;
 import de.sayayi.lib.message.formatter.support.MapFormatter;
 import de.sayayi.lib.message.formatter.support.NumberFormatter;
 import de.sayayi.lib.message.formatter.support.StringFormatter;
@@ -19,7 +18,7 @@ import lombok.Synchronized;
  */
 public class DefaultFormatterService extends GenericFormatterRegistry
 {
-  private static FormatterService INSTANCE = null;
+  private static FormatterService INSTANCE;
 
 
   @Synchronized
@@ -39,34 +38,22 @@ public class DefaultFormatterService extends GenericFormatterRegistry
 
   protected void addDefaultFormatters()
   {
-    addNamedFormatters();
-    addTypedFormatters();
-
-    if (hasClass("org.joda.time.DateTime"))
-      addJodaTimeFormatters();
-  }
-
-
-  protected void addNamedFormatters()
-  {
+    // named formatters
     addFormatter(new ChoiceFormatter());
     addFormatter(new BoolFormatter());
-  }
 
-
-  protected void addTypedFormatters()
-  {
+    // typed formatters
     addFormatter(new StringFormatter());
     addFormatter(new NumberFormatter());
     addFormatter(new DateFormatter());
     addFormatter(new ArrayFormatter());
     addFormatter(new CollectionFormatter());
     addFormatter(new MapFormatter());
-  }
 
-
-  protected void addJodaTimeFormatters() {
-    addFormatter(new JodaDateTimeFormatter());
+    if (hasClass("org.joda.time.DateTime"))
+      addFormatter(new de.sayayi.lib.message.formatter.support.JodaDateTimeFormatter());
+    if (hasClass("java.time.LocalDate"))
+      addFormatter(new de.sayayi.lib.message.formatter.support.Java8DateTimeFormatter());
   }
 
 
@@ -77,6 +64,17 @@ public class DefaultFormatterService extends GenericFormatterRegistry
       return true;
     } catch(final Throwable ex) {
       return false;
+    }
+  }
+
+
+  @SuppressWarnings("unchecked")
+  private ParameterFormatter newFormatter(String className)
+  {
+    try {
+      return ((Class<ParameterFormatter>)Class.forName(className)).newInstance();
+    } catch(Exception ex) {
+      throw new IllegalStateException("class " + className + "could not be instantiated", ex);
     }
   }
 }

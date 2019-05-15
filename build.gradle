@@ -9,8 +9,40 @@ group = "de.sayayi.lib"
 version = "0.1.0"
 
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceSets {
+  java6
+  java8
+  main {
+    resources {
+      srcDir 'src/java6/resources'
+      srcDir 'src/java8/resources'
+    }
+  }
+}
+
+
+compileJava6Java {
+  sourceCompatibility = 1.6
+  targetCompatibility = 1.6
+}
+
+
+compileJava8Java {
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
+}
+
+
+compileJava {
+  sourceCompatibility = 1.6
+  targetCompatibility = 1.6
+}
+
+
+compileTestJava {
+  sourceCompatibility = 1.6
+  targetCompatibility = 1.6
+}
 
 
 repositories {
@@ -22,7 +54,29 @@ dependencies {
   annotationProcessor "org.projectlombok:lombok:1.18.6"
 
   api 'org.projectlombok:lombok:1.18.6'
-  api 'joda-time:joda-time:2.10.1'
+
+  java6AnnotationProcessor "org.projectlombok:lombok:1.18.6"
+  java6Implementation 'org.projectlombok:lombok:1.18.6'
+  java6Implementation 'joda-time:joda-time:2.10.1'
+
+  java8Implementation files(sourceSets.java6.output.classesDirs) {
+    builtBy compileJava6Java
+  }
+
+  implementation files(sourceSets.java8.output.classesDirs) {
+    builtBy compileJava8Java
+  }
+
+  implementation files(sourceSets.java6.output.classesDirs) {
+    builtBy compileJava6Java
+  }
 
   testImplementation 'junit:junit:4.12'
+  testImplementation 'joda-time:joda-time:2.10.1'
+}
+
+
+jar {
+  from sourceSets.java6.output
+  from sourceSets.java8.output
 }

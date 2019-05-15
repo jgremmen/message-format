@@ -113,6 +113,14 @@ public class ParameterFactory implements Parameters
 
 
     @Override
+    public ParameterBuilder clear()
+    {
+      parameterValues.clear();
+      return this;
+    }
+
+
+    @Override
     public ParameterFormatter getFormatter(String format, Class<?> type) {
       return ParameterFactory.this.getFormatter(format, type);
     }

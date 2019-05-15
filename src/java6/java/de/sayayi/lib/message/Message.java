@@ -70,6 +70,9 @@ public interface Message extends Serializable
 
   interface ParameterBuilder extends Parameters
   {
+    ParameterBuilder clear();
+
+
     ParameterBuilder with(String parameter, boolean value);
 
 
