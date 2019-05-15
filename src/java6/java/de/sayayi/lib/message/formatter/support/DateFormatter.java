@@ -25,10 +25,9 @@ import static java.text.DateFormat.getDateInstance;
 public class DateFormatter implements ParameterFormatter
 {
   @Override
-  public String format(String parameter, Object value, String format, Parameters parameters, ParameterData data)
+  public String format(Object value, String format, Parameters parameters, ParameterData data)
   {
-    final Date date = (Date)parameters.getParameterValue(parameter);
-    if (date == null)
+    if (value == null)
       return null;
 
     final Locale locale = parameters.getLocale();
@@ -39,7 +38,7 @@ public class DateFormatter implements ParameterFormatter
     else
       formatter = getDateInstance(MEDIUM, locale);
 
-    return formatter.format(date);
+    return formatter.format(value);
   }
 
 

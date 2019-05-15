@@ -2,6 +2,7 @@ package de.sayayi.lib.message.parser;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import lombok.Getter;
 
@@ -38,7 +39,11 @@ final class ParameterPart extends MessagePart
     if (formatter == null)
       throw new IllegalStateException("no matching formatter found for data " + parameter);
 
-    return formatter.format(parameter, value, format, parameters, data);
+    try {
+      return formatter.format(value, format, parameters, data);
+    } catch(Exception ex) {
+      throw new MessageException("failed to format parameter " + parameter, ex);
+    }
   }
 
 

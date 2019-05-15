@@ -2,38 +2,31 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.ParameterFormatter;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.LongSupplier;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class StringFormatter implements NamedParameterFormatter
+public class LongSupplierFormatter implements ParameterFormatter
 {
-  @Override
-  public String getName() {
-    return "string";
-  }
-
-
   @Override
   public String format(Object value, String format, Parameters parameters, ParameterData data)
   {
-    if (value == null)
+    LongSupplier supplier = (LongSupplier)value;
+    if (supplier == null)
       return null;
 
-    if (value instanceof char[])
-      value = new String((char[])value);
-
-    return String.valueOf(value).trim();
+    return parameters.getFormatter(format, long.class).format(supplier.getAsLong(), format, parameters, data);
   }
 
 
   @Override
   public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(Object.class);
+    return Collections.singleton(LongSupplier.class);
   }
 }

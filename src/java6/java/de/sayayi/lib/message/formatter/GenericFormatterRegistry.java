@@ -23,8 +23,21 @@ public class GenericFormatterRegistry implements FormatterRegistry
 
 
   @Override
-  public void addFormatterForType(Class<?> type, ParameterFormatter formatter) {
+  public void addFormatterForType(Class<?> type, ParameterFormatter formatter)
+  {
     typeFormatters.put(type, formatter);
+
+    if (!cachedFormatters.isEmpty())
+    {
+      for(Class<?> interfaceClass: type.getInterfaces())
+        cachedFormatters.remove(interfaceClass);
+
+      while(type != null)
+      {
+        cachedFormatters.remove(type);
+        type = type.getSuperclass();
+      }
+    }
   }
 
 
@@ -41,9 +54,7 @@ public class GenericFormatterRegistry implements FormatterRegistry
     }
 
     for(final Class<?> type: formatter.getFormattableTypes())
-      typeFormatters.put(type, formatter);
-
-    cachedFormatters.clear();
+      addFormatterForType(type, formatter);
   }
 
 
@@ -69,11 +80,9 @@ public class GenericFormatterRegistry implements FormatterRegistry
     ParameterFormatter formatter = typeFormatters.get(type);
 
     if (formatter == null)
-    {
       for(final Class<?> interfaceType: type.getInterfaces())
         if ((formatter = typeFormatters.get(interfaceType)) != null)
           break;
-    }
 
     return formatter;
   }

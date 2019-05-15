@@ -25,7 +25,7 @@ public class NumberFormatter implements ParameterFormatter
 
 
   @Override
-  public String format(String parameter, Object v, String format, Parameters parameters, ParameterData data)
+  public String format(Object v, String format, Parameters parameters, ParameterData data)
   {
     if (v == null)
       return null;
@@ -39,13 +39,13 @@ public class NumberFormatter implements ParameterFormatter
 
     // special case: show number as bool
     if ("bool".equals(format))
-      return formatBoolean(parameter, value, parameters, data);
+      return formatBoolean(value, parameters, data);
 
     return getFormatter(format, data, parameters.getLocale()).format(value);
   }
 
 
-  private String formatBoolean(String parameter, Number value, Parameters parameters, ParameterData data)
+  private String formatBoolean(Number value, Parameters parameters, ParameterData data)
   {
     ParameterFormatter formatter = parameters.getFormatter("bool", Boolean.class);
     Set<Class<?>> types = formatter.getFormattableTypes();
@@ -54,7 +54,7 @@ public class NumberFormatter implements ParameterFormatter
     if (!types.contains(Boolean.class) && !types.contains(boolean.class))
       formatter = BOOL_FORMATTER;
 
-    return formatter.format(parameter, value, "bool", parameters, data);
+    return formatter.format(value, "bool", parameters, data);
   }
 
 

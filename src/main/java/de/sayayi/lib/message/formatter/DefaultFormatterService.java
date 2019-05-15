@@ -52,8 +52,17 @@ public class DefaultFormatterService extends GenericFormatterRegistry
 
     if (hasClass("org.joda.time.DateTime"))
       addFormatter(new de.sayayi.lib.message.formatter.support.JodaDateTimeFormatter());
+
     if (hasClass("java.time.LocalDate"))
+    {
       addFormatter(new de.sayayi.lib.message.formatter.support.Java8DateTimeFormatter());
+      addFormatter(new de.sayayi.lib.message.formatter.support.OptionalFormatter());
+      addFormatter(new de.sayayi.lib.message.formatter.support.SupplierFormatter());
+      addFormatter(new de.sayayi.lib.message.formatter.support.DoubleSupplierFormatter());
+      addFormatter(new de.sayayi.lib.message.formatter.support.LongSupplierFormatter());
+      addFormatter(new de.sayayi.lib.message.formatter.support.IntSupplierFormatter());
+      addFormatter(new de.sayayi.lib.message.formatter.support.BooleanSupplierFormatter());
+    }
   }
 
 

@@ -27,7 +27,7 @@ public class BoolFormatter implements NamedParameterFormatter
 
 
   @Override
-  public String format(String parameter, Object value, String format, Parameters parameters, ParameterData data)
+  public String format(Object value, String format, Parameters parameters, ParameterData data)
   {
     Boolean bool;
 

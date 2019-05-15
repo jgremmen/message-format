@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public interface ParameterFormatter
 {
-  String format(String parameter, Object value, String format, Parameters parameters, ParameterData data);
+  String format(Object value, String format, Parameters parameters, ParameterData data);
 
   Set<Class<?>> getFormattableTypes();
 }

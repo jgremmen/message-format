@@ -64,7 +64,7 @@ public class Java8DateTimeFormatter implements ParameterFormatter
 
 
   @Override
-  public String format(String parameter, Object value, String format, Parameters parameters, ParameterData data)
+  public String format(Object value, String format, Parameters parameters, ParameterData data)
   {
     final DateTimeFormatter formatter = getFormatter((Temporal)value, format, data);
     if (formatter == null)

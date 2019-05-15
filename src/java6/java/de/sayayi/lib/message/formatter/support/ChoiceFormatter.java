@@ -22,10 +22,10 @@ public final class ChoiceFormatter implements NamedParameterFormatter
 
 
   @Override
-  public String format(String parameter, Object value, String format, Parameters parameters, ParameterData data)
+  public String format(Object value, String format, Parameters parameters, ParameterData data)
   {
     if (!(data instanceof ParameterMap))
-      throw new IllegalArgumentException("missing choice map for data " + parameter);
+      throw new IllegalArgumentException("data must be a choice map");
 
     if (value != null && !(value instanceof Serializable))
       throw new IllegalArgumentException("value must be serializable");

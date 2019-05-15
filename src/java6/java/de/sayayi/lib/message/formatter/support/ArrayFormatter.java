@@ -20,29 +20,35 @@ import static java.util.ResourceBundle.getBundle;
 public class ArrayFormatter implements ParameterFormatter
 {
   @Override
-  public String format(String parameter, Object array, String format, Parameters parameters, ParameterData data)
+  public String format(Object array, String format, Parameters parameters, ParameterData data)
   {
-    if (array == null)
+    final int length;
+
+    if (array == null || (length = getLength(array)) == 0)
       return null;
 
     final StringBuilder s = new StringBuilder();
-    final Class<?> baseType = array.getClass().getComponentType();
-    final ParameterFormatter formatter = baseType.isPrimitive() ? parameters.getFormatter(format, baseType) : null;
+    final Class<?> arrayType = array.getClass();
+    final ParameterFormatter formatter =
+        arrayType.isPrimitive() ? parameters.getFormatter(format, arrayType.getComponentType()) : null;
     final ResourceBundle bundle = getBundle("Formatter", parameters.getLocale());
 
-    for(int i = 0, length = getLength(array); i < length; i++)
+    for(int i = 0; i < length; i++)
     {
       final Object value = get(array, i);
 
-      if (i > 0)
+      if (s.length() > 0)
         s.append(", ");
 
-      if (formatter != null)
-        s.append(formatter.format(null, value, format, parameters, data));
-      else if (value == array)
+      if (value == array)
         s.append(bundle.getString("thisArray"));
+      else if (formatter != null)
+        s.append(formatter.format(value, format, parameters, data));
       else if (value != null)
-        s.append(parameters.getFormatter(format, baseType).format(null, value, format, parameters, data));
+      {
+        s.append(parameters.getFormatter(format, value.getClass())
+            .format(value, format, parameters, data));
+      }
     }
 
     return s.toString();
@@ -54,7 +60,6 @@ public class ArrayFormatter implements ParameterFormatter
   {
     return new HashSet<Class<?>>(Arrays.<Class<?>>asList(
         Object[].class,
-        char[].class,
         short[].class,
         int[].class,
         long[].class,

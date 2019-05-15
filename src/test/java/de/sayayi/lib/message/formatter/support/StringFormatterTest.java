@@ -31,9 +31,9 @@ public class StringFormatterTest extends AbstractFormatterTest
     final StringFormatter formatter = new StringFormatter();
     final ParameterFactory factory = ParameterFactory.DEFAULT;
 
-    assertEquals("text", formatter.format("a", " text ", null, factory, null));
-    assertEquals("RUNTIME", formatter.format("b", RetentionPolicy.RUNTIME, null, factory, null));
-    assertEquals("hello", formatter.format("c", new Object() {
+    assertEquals("text", formatter.format(" text ", null, factory, null));
+    assertEquals("RUNTIME", formatter.format(RetentionPolicy.RUNTIME, null, factory, null));
+    assertEquals("hello", formatter.format(new Object() {
       @Override
       public String toString() {
         return " hello";

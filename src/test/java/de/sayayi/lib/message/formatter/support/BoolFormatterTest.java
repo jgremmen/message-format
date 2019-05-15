@@ -30,12 +30,12 @@ public class BoolFormatterTest extends AbstractFormatterTest
     final BoolFormatter formatter = new BoolFormatter();
     final ParameterFactory factory = ParameterFactory.createFor("de-DE");
 
-    assertEquals("wahr", formatter.format("a", Boolean.TRUE, null, factory, null));
-    assertEquals("falsch", formatter.format("b", 0.0d, null, factory, null));
-    assertEquals("wahr", formatter.format("c", -0.0001f, null, factory, null));
-    assertEquals("falsch", formatter.format("d", "FALSE", null, factory, null));
-    assertEquals("wahr", formatter.format("e", "TrUe", null, factory, null));
-    assertEquals("wahr", formatter.format("f", -4, null, factory, null));
+    assertEquals("wahr", formatter.format(Boolean.TRUE, null, factory, null));
+    assertEquals("falsch", formatter.format(0.0d, null, factory, null));
+    assertEquals("wahr", formatter.format(-0.0001f, null, factory, null));
+    assertEquals("falsch", formatter.format("FALSE", null, factory, null));
+    assertEquals("wahr", formatter.format("TrUe", null, factory, null));
+    assertEquals("wahr", formatter.format(-4, null, factory, null));
   }
 
 

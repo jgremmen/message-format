@@ -40,13 +40,13 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
     final ParameterFactory context = ParameterFactory.createFor(GERMANY);
     LocalDate date = LocalDate.of(1972, 8, 17);
 
-    assertEquals("17.08.72", formatter.format("a", date, "short", context, null));
-    assertEquals("17.08.1972", formatter.format("a", date, "medium", context, null));
-    assertEquals("17. August 1972", formatter.format("a", date, "long", context, null));
-    assertEquals("Donnerstag, 17. August 1972", formatter.format("a", date, "full", context, null));
-    assertEquals("17.08.1972", formatter.format("a", date, "date", context, null));
+    assertEquals("17.08.72", formatter.format(date, "short", context, null));
+    assertEquals("17.08.1972", formatter.format(date, "medium", context, null));
+    assertEquals("17. August 1972", formatter.format(date, "long", context, null));
+    assertEquals("Donnerstag, 17. August 1972", formatter.format(date, "full", context, null));
+    assertEquals("17.08.1972", formatter.format(date, "date", context, null));
 
-    assertNull(formatter.format("a", date, "time", context, null));
+    assertNull(formatter.format(date, "time", context, null));
   }
 
 
@@ -57,13 +57,13 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
     final ParameterFactory context = ParameterFactory.createFor(GERMANY);
     LocalTime time = LocalTime.of(16, 34, 11, 672000000);
 
-    assertEquals("16:34", formatter.format("a", time, "short", context, null));
-    assertEquals("16:34:11", formatter.format("a", time, "medium", context, null));
-    assertEquals("16:34:11", formatter.format("a", time, "long", context, null));
-    assertEquals("16:34 Uhr", formatter.format("a", time, "full", context, null));
-    assertEquals("16:34:11", formatter.format("a", time, "time", context, null));
+    assertEquals("16:34", formatter.format(time, "short", context, null));
+    assertEquals("16:34:11", formatter.format(time, "medium", context, null));
+    assertEquals("16:34:11", formatter.format(time, "long", context, null));
+    assertEquals("16:34 Uhr", formatter.format(time, "full", context, null));
+    assertEquals("16:34:11", formatter.format(time, "time", context, null));
 
-    assertNull(formatter.format("a", time, "date", context, null));
+    assertNull(formatter.format(time, "date", context, null));
   }
 
 
@@ -74,13 +74,13 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
     final ParameterFactory context = ParameterFactory.createFor(UK);
     LocalDateTime datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
 
-    assertEquals("17/08/72 02:40", formatter.format("a", datetime, "short", context, null));
-    assertEquals("17-Aug-1972 02:40:23", formatter.format("a", datetime, "medium", context, null));
-    assertEquals("17 August 1972 02:40:23 CET", formatter.format("a", datetime, "long", context, null));
-    assertEquals("Thursday, 17 August 1972 02:40:23 o'clock CET", formatter.format("a", datetime, "full", context, null));
+    assertEquals("17/08/72 02:40", formatter.format(datetime, "short", context, null));
+    assertEquals("17-Aug-1972 02:40:23", formatter.format(datetime, "medium", context, null));
+    assertEquals("17 August 1972 02:40:23 CET", formatter.format(datetime, "long", context, null));
+    assertEquals("Thursday, 17 August 1972 02:40:23 o'clock CET", formatter.format(datetime, "full", context, null));
 
-    assertEquals("17-Aug-1972", formatter.format("a", datetime, "date", context, null));
-    assertEquals("02:40:23", formatter.format("a", datetime, "time", context, null));
+    assertEquals("17-Aug-1972", formatter.format(datetime, "date", context, null));
+    assertEquals("02:40:23", formatter.format(datetime, "time", context, null));
   }
 
 
@@ -92,11 +92,11 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
     LocalDateTime datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
 
     assertEquals("17 août",
-        formatter.format("a", datetime, null, context, new ParameterString("dd MMMM")));
+        formatter.format(datetime, null, context, new ParameterString("dd MMMM")));
     assertEquals("jeu. jeudi",
-        formatter.format("a", datetime, null, context, new ParameterString("EEE EEEE")));
+        formatter.format(datetime, null, context, new ParameterString("EEE EEEE")));
     assertEquals("02:40:23,833",
-        formatter.format("a", datetime, null, context, new ParameterString("HH:mm:ss,SSS")));
+        formatter.format(datetime, null, context, new ParameterString("HH:mm:ss,SSS")));
   }
 
 

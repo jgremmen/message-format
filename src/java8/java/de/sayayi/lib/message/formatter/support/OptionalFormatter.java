@@ -2,38 +2,33 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.ParameterFormatter;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class StringFormatter implements NamedParameterFormatter
+public class OptionalFormatter implements ParameterFormatter
 {
-  @Override
-  public String getName() {
-    return "string";
-  }
-
-
   @Override
   public String format(Object value, String format, Parameters parameters, ParameterData data)
   {
-    if (value == null)
+    Optional<?> optional = (Optional<?>)value;
+    if (optional == null || !optional.isPresent())
       return null;
 
-    if (value instanceof char[])
-      value = new String((char[])value);
+    value = optional.get();
 
-    return String.valueOf(value).trim();
+    return parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data);
   }
 
 
   @Override
   public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(Object.class);
+    return Collections.singleton(Optional.class);
   }
 }

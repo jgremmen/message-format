@@ -41,7 +41,7 @@ public class JodaDateTimeFormatter implements ParameterFormatter
 
 
   @Override
-  public String format(String parameter, Object value, String format, Parameters parameters, ParameterData data)
+  public String format(Object value, String format, Parameters parameters, ParameterData data)
   {
     final Locale locale = parameters.getLocale();
 

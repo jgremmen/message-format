@@ -18,26 +18,23 @@ import static java.util.ResourceBundle.getBundle;
 public class CollectionFormatter implements ParameterFormatter
 {
   @Override
-  public String format(String parameter, Object collection, String format, Parameters parameters, ParameterData data)
+  public String format(Object collection, String format, Parameters parameters, ParameterData data)
   {
     if (collection == null)
       return null;
 
     final ResourceBundle bundle = getBundle("Formatter", parameters.getLocale());
     final StringBuilder s = new StringBuilder();
-    boolean first = true;
 
     for(Object value: (Collection)collection)
     {
-      if (first)
-        first = false;
-      else
+      if (s.length() > 0)
         s.append(", ");
 
       if (value == collection)
         s.append(bundle.getString("thisCollection"));
       else if (value != null)
-        s.append(parameters.getFormatter(format, value.getClass()).format(null, value, format, parameters, data));
+        s.append(parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data));
     }
 
     return s.toString();
