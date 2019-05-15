@@ -17,8 +17,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import static de.sayayi.lib.message.MessageFactory.parse;
-import static java.util.Locale.ENGLISH;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -42,6 +40,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @SuppressWarnings("serial")
   public void testBooleanArray()
   {
     GenericFormatterRegistry registry = new GenericFormatterRegistry();
@@ -76,7 +75,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     registry.addFormatter(new NamedParameterFormatter() {
       @Override
       public String format(Object value, String format, Parameters parameters, ParameterData data) {
-        return (value == null) ? null : ((Boolean)value).booleanValue() ? "1" : "0";
+        return (value == null) ? null : (Boolean)value ? "1" : "0";
       }
 
       @Override
@@ -122,7 +121,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
 
       @Override
       public String format(Object value, String format, Parameters parameters, ParameterData data) {
-        return (value == null) ? null : String.format("0x%02x", value);
+        return (value == null) ? null : String.format("0x%02x", (Integer)value);
       }
 
       @Override
@@ -148,23 +147,8 @@ public class ArrayFormatterTest extends AbstractFormatterTest
 
     assertEquals("Test, wahr, -0006", registry.getFormatter(null, int[].class)
         .format(new Object[] { "Test", true, null, -6 }, null , factory, new ParameterString("0000")));
-  }
 
-
-  public void testFormatter()
-  {
-    final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
-    formatterRegistry.addFormatter(new BoolFormatter());
-    ParameterFactory factory = ParameterFactory.createFor(ENGLISH, formatterRegistry);
-
-    final Parameters parameters = factory.parameters()
-        .with("a", Boolean.FALSE)
-        .with("b", Boolean.TRUE)
-        .with("c", Integer.valueOf(1234))
-        .with("d", Integer.valueOf(0))
-        .with("e", Double.valueOf(3.14d));
-    final Message msg = parse("%{a} %{b} %{c} %{c,bool} %{d,bool,{true->'yes',false->'no'}} %{e}");
-
-    assertEquals("false true 1234 true no 3.14", msg.format(parameters));
+    assertEquals("this, is, a, test", registry.getFormatter(null, int[].class)
+        .format(new Object[] { null, "this", null, "is", null, "a", null, "test" }, null , factory, null));
   }
 }
