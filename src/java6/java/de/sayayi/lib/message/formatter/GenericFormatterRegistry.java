@@ -2,7 +2,8 @@ package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.formatter.support.StringFormatter;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,13 +13,27 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GenericFormatterRegistry implements FormatterRegistry
 {
-  private final Map<String,NamedParameterFormatter> namedFormatters = new HashMap<String,NamedParameterFormatter>();
-  private final Map<Class<?>,ParameterFormatter> typeFormatters = new HashMap<Class<?>,ParameterFormatter>();
-  private final Map<Class<?>,ParameterFormatter> cachedFormatters = new ConcurrentHashMap<Class<?>,ParameterFormatter>(32);
+  private static final Comparator<Class<?>> CLASS_SORTER = new Comparator<Class<?>>() {
+    @Override
+    public int compare(Class<?> o1, Class<?> o2) {
+      return (o1 == o2) ? 0 : o1.getName().compareTo(o2.getName());
+    }
+  };
+
+  private final Map<String,NamedParameterFormatter> namedFormatters =
+      new ConcurrentHashMap<String,NamedParameterFormatter>();
+  private final Map<Class<?>,ParameterFormatter> typeFormatters =
+      new ConcurrentHashMap<Class<?>,ParameterFormatter>();
+  private final Map<Class<?>,ParameterFormatter> cachedFormatters =
+      Collections.synchronizedMap(new FixedSizeCacheMap<Class<?>,ParameterFormatter>(CLASS_SORTER, 128));
 
 
-  public GenericFormatterRegistry() {
-    addFormatter(new StringFormatter());
+  public GenericFormatterRegistry()
+  {
+    StringFormatter stringFormatter = new StringFormatter();
+
+    addFormatter(stringFormatter);
+    addFormatterForType(Object.class, stringFormatter);
   }
 
 
@@ -61,12 +76,15 @@ public class GenericFormatterRegistry implements FormatterRegistry
   @Override
   public ParameterFormatter getFormatter(String format, Class<?> type)
   {
-    ParameterFormatter formatter = namedFormatters.get(format);
+    ParameterFormatter formatter = (format == null) ? null : namedFormatters.get(format);
 
     if (formatter == null && (formatter = cachedFormatters.get(type)) == null)
     {
-      for(Class<?> walkType = type; formatter == null && walkType != null; walkType = walkType.getSuperclass())
-        formatter = getFormatterForType(walkType);
+      for(Class<?> t = type; formatter == null && t != null; t = t.getSuperclass())
+        formatter = getFormatterForType(t);
+
+      if (formatter == null)
+        formatter = getFormatter(null, Object.class);
 
       cachedFormatters.put(type, formatter);
     }

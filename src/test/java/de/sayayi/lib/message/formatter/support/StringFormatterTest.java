@@ -20,8 +20,8 @@ public class StringFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormattableTypes()
   {
-    assertFormatterForType(new StringFormatter(), Object.class);
-    assertFormatterForType(new StringFormatter(), String.class);
+    assertFormatterForType(new StringFormatter(), CharSequence.class);
+    assertFormatterForType(new StringFormatter(), char[].class);
   }
 
 

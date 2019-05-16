@@ -4,7 +4,8 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -34,6 +35,6 @@ public final class StringFormatter implements NamedParameterFormatter
 
   @Override
   public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(Object.class);
+    return new HashSet<Class<?>>(Arrays.asList(CharSequence.class, char[].class));
   }
 }
