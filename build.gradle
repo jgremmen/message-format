@@ -74,3 +74,13 @@ jar {
   from sourceSets.java6.output
   from sourceSets.java8.output
 }
+
+
+javadoc {
+  classpath += sourceSets.java6.compileClasspath
+  classpath += sourceSets.java8.compileClasspath
+  source += sourceSets.java6.allJava
+  source += sourceSets.java8.allJava
+
+  failOnError false
+}
