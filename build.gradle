@@ -73,6 +73,8 @@ dependencies {
 jar {
   from sourceSets.java6.output
   from sourceSets.java8.output
+  
+  reproducibleFileOrder true
 }
 
 
