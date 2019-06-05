@@ -17,4 +17,4 @@ cache:
 
 build:
   stage: build
-  script: ./gradlew clean jar javadoc test
+  script: ./gradlew clean build
