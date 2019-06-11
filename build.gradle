@@ -45,12 +45,12 @@ repositories {
 
 
 dependencies {
-  annotationProcessor "org.projectlombok:lombok:1.18.6"
+  annotationProcessor "org.projectlombok:lombok:1.18.8"
 
-  api 'org.projectlombok:lombok:1.18.6'
+  api 'org.projectlombok:lombok:1.18.8'
 
-  java6AnnotationProcessor "org.projectlombok:lombok:1.18.6"
-  java6Implementation 'org.projectlombok:lombok:1.18.6'
+  java6AnnotationProcessor "org.projectlombok:lombok:1.18.8"
+  java6Implementation 'org.projectlombok:lombok:1.18.8'
   java6Implementation 'joda-time:joda-time:2.10.1'
 
   java8Implementation files(sourceSets.java6.output.classesDirs) {
