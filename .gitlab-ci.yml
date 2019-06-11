@@ -18,3 +18,7 @@ cache:
 build:
   stage: build
   script: ./gradlew clean build
+  artifacts:
+    paths:
+      - ./build/libs/*
+    expire_in: 8 weeks
