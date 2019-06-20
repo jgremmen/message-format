@@ -44,14 +44,17 @@ repositories {
 }
 
 
+apply from: file('gradle/versions.gradle')
+
+
 dependencies {
-  annotationProcessor "org.projectlombok:lombok:1.18.8"
+  annotationProcessor "org.projectlombok:lombok:"
 
-  api 'org.projectlombok:lombok:1.18.8'
+  api 'org.projectlombok:lombok:'
 
-  java6AnnotationProcessor "org.projectlombok:lombok:1.18.8"
-  java6Implementation 'org.projectlombok:lombok:1.18.8'
-  java6Implementation 'joda-time:joda-time:2.10.1'
+  java6AnnotationProcessor "org.projectlombok:lombok:"
+  java6Implementation 'org.projectlombok:lombok:'
+  java6Implementation 'joda-time:joda-time:'
 
   java8Implementation files(sourceSets.java6.output.classesDirs) {
     builtBy compileJava6Java
@@ -65,8 +68,12 @@ dependencies {
     builtBy compileJava6Java
   }
 
-  testImplementation 'junit:junit:4.12'
-  testImplementation 'joda-time:joda-time:2.10.1'
+  runtime('joda-time:joda-time:') {
+
+  }
+
+  testImplementation 'junit:junit:'
+  testImplementation 'joda-time:joda-time:'
 }
 
 
@@ -89,16 +96,20 @@ javadoc {
 
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-  classifier = 'javadoc'
+  archiveClassifier.set('javadoc')
   from javadoc.destinationDir
+
+  reproducibleFileOrder true
 }
 
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-  classifier = 'sources'
+  archiveClassifier.set('sources')
   from sourceSets.java6.allSource
   from sourceSets.java8.allSource
   from sourceSets.main.allSource
+
+  reproducibleFileOrder true
 }
 
 
