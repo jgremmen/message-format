@@ -1,12 +1,16 @@
 plugins {
   id 'idea'
   id 'java-library'
+  id 'maven-publish'
+  id 'nebula.optional-base' version '5.0.3'
+  id 'jacoco'
+  id 'signing'
 }
 
 
-description = "Message Format Library"
-group = "de.sayayi.lib"
-version = "0.1.0"
+description 'Message Format Library'
+group 'de.sayayi.lib'
+version '0.1.0'
 
 
 sourceSets {
@@ -19,6 +23,12 @@ sourceSets {
     }
   }
 }
+
+
+apply from: file('gradle/versions.gradle')
+apply from: file('gradle/javadoc.gradle')
+apply from: file('gradle/quality.gradle')
+apply from: file('gradle/publishing.gradle')
 
 
 compileJava6Java {
@@ -44,17 +54,18 @@ repositories {
 }
 
 
-apply from: file('gradle/versions.gradle')
-
-
 dependencies {
   annotationProcessor "org.projectlombok:lombok:"
-
-  api 'org.projectlombok:lombok:'
-
   java6AnnotationProcessor "org.projectlombok:lombok:"
-  java6Implementation 'org.projectlombok:lombok:'
+
+  compileOnly 'org.projectlombok:lombok:'
+  compileOnly 'org.jetbrains:annotations:'
+
+  java6CompileOnly 'org.projectlombok:lombok:'
+  java6CompileOnly 'org.jetbrains:annotations:'
   java6Implementation 'joda-time:joda-time:'
+
+  java8CompileOnly 'org.jetbrains:annotations:'
 
   java8Implementation files(sourceSets.java6.output.classesDirs) {
     builtBy compileJava6Java
@@ -68,52 +79,16 @@ dependencies {
     builtBy compileJava6Java
   }
 
-  runtime('joda-time:joda-time:') {
+//  runtime('joda-time:joda-time:') {
+//  }
 
-  }
-
-  testImplementation 'junit:junit:'
-  testImplementation 'joda-time:joda-time:'
+  testCompile 'junit:junit:'
+  testCompile 'joda-time:joda-time:'
+  testCompile 'org.jetbrains:annotations:'
 }
 
 
 jar {
   from sourceSets.java6.output
   from sourceSets.java8.output
-
-  reproducibleFileOrder true
-}
-
-
-javadoc {
-  classpath += sourceSets.java6.compileClasspath
-  classpath += sourceSets.java8.compileClasspath
-  source += sourceSets.java6.allJava
-  source += sourceSets.java8.allJava
-
-  failOnError false
-}
-
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-  archiveClassifier.set('javadoc')
-  from javadoc.destinationDir
-
-  reproducibleFileOrder true
-}
-
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-  archiveClassifier.set('sources')
-  from sourceSets.java6.allSource
-  from sourceSets.java8.allSource
-  from sourceSets.main.allSource
-
-  reproducibleFileOrder true
-}
-
-
-artifacts {
-  archives sourcesJar
-  archives javadocJar
 }
