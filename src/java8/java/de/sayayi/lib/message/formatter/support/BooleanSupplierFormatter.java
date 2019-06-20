@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
