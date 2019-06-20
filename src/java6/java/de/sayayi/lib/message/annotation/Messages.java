@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Messages
 {
-  /** 1..n messages */
+  /**
+   * 1..n messages.
+   *
+   * @return  messages
+   */
   Message[] messages();
 }
