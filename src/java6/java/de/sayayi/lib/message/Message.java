@@ -16,6 +16,8 @@
 package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -37,7 +39,7 @@ public interface Message extends Serializable
    *
    * @return  formatted message
    */
-  String format(Parameters parameters);
+  String format(@NotNull Parameters parameters);
 
 
   /**
@@ -58,7 +60,7 @@ public interface Message extends Serializable
      *
      * @return  locale, never {@code null}
      */
-    Locale getLocale();
+    @NotNull Locale getLocale();
 
 
     ParameterFormatter getFormatter(String format, Class<?> type);
@@ -69,9 +71,9 @@ public interface Message extends Serializable
      *
      * @param parameter  data name
      *
-     * @return  data value of {@code null} if no value is available for the given data name
+     * @return  data value or {@code null} if no value is available for the given data name
      */
-    Object getParameterValue(String parameter);
+    Object getParameterValue(@NotNull String parameter);
 
 
     /**
@@ -79,39 +81,51 @@ public interface Message extends Serializable
      *
      * @return  set with all data names
      */
-    Set<String> getParameterNames();
+    @SuppressWarnings("unused")
+    @NotNull Set<String> getParameterNames();
   }
 
 
   interface ParameterBuilder extends Parameters
   {
+    @SuppressWarnings("unused")
+    @Contract("-> this")
     ParameterBuilder clear();
 
 
-    ParameterBuilder with(String parameter, boolean value);
+    @Contract("_, _ -> this")
+    ParameterBuilder with(@NotNull String parameter, boolean value);
 
 
-    ParameterBuilder with(String parameter, int value);
+    @Contract("_, _ -> this")
+    ParameterBuilder with(@NotNull String parameter, int value);
 
 
-    ParameterBuilder with(String parameter, long value);
+    @Contract("_, _ -> this")
+    ParameterBuilder with(@NotNull String parameter, long value);
 
 
-    ParameterBuilder with(String parameter, float value);
+    @Contract("_, _ -> this")
+    ParameterBuilder with(@NotNull String parameter, float value);
 
 
-    ParameterBuilder with(String parameter, double value);
+    @Contract("_, _ -> this")
+    ParameterBuilder with(@NotNull String parameter, double value);
 
 
-    ParameterBuilder with(String parameter, Object value);
+    @Contract("_, _ -> this")
+    ParameterBuilder with(@NotNull String parameter, Object value);
 
 
-    ParameterBuilder with(Map<String,Object> parameterValues);
+    @Contract("_ -> this")
+    ParameterBuilder with(@NotNull Map<String,Object> parameterValues);
 
 
-    ParameterBuilder withLocale(Locale locale);
+    @Contract("_ -> this")
+    ParameterBuilder withLocale(@NotNull Locale locale);
 
 
-    ParameterBuilder withLocale(String locale);
+    @Contract("_ -> this")
+    ParameterBuilder withLocale(@NotNull String locale);
   }
 }

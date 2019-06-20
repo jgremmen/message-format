@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@ package de.sayayi.lib.message.exception;
 /**
  * @author Jeroen Gremmen
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "WeakerAccess" })
 public class MessageException extends RuntimeException
 {
   public MessageException(String message) {

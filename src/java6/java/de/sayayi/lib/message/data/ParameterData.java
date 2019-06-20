@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.data;
 
 import de.sayayi.lib.message.Message.Parameters;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
@@ -25,9 +26,11 @@ import java.io.Serializable;
  */
 public interface ParameterData extends Serializable
 {
-  String format(Parameters parameters, Serializable key);
+  String format(@NotNull Parameters parameters, Serializable key);
 
-  String format(Parameters parameters);
+
+  String format(@NotNull Parameters parameters);
+
 
   Serializable asObject();
 }

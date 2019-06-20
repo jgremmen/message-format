@@ -15,6 +15,8 @@
  */
 package de.sayayi.lib.message.formatter;
 
+import org.jetbrains.annotations.NotNull;
+
 
 /**
  * @author Jeroen Gremmen
@@ -26,5 +28,5 @@ public interface NamedParameterFormatter extends ParameterFormatter
    *
    * @return  data formatter name, never {@code null}
    */
-  String getName();
+  @NotNull String getName();
 }

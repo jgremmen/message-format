@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ package de.sayayi.lib.message.data;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -37,7 +38,7 @@ public class ParameterMap implements ParameterData
   private final Map<Serializable,Message> map;
 
 
-  public ParameterMap(Map<Serializable,Message> map) {
+  public ParameterMap(@NotNull Map<Serializable,Message> map) {
     this.map = map;
   }
 
@@ -47,11 +48,13 @@ public class ParameterMap implements ParameterData
   }
 
 
+  @SuppressWarnings("unused")
   public Message getMessageFor(int key) {
     return getMessageForKey(key);
   }
 
 
+  @SuppressWarnings("unused")
   public Message getMessageFor(String key) {
     return getMessageForKey(key);
   }
@@ -74,7 +77,7 @@ public class ParameterMap implements ParameterData
 
 
   @Override
-  public String format(Parameters parameters, Serializable key)
+  public String format(@NotNull Parameters parameters, Serializable key)
   {
     Message message = getMessageForKey(key);
     if (message == null)
@@ -125,7 +128,7 @@ public class ParameterMap implements ParameterData
 
 
   @Override
-  public String format(Parameters parameters) {
+  public String format(@NotNull Parameters parameters) {
     return format(parameters, null);
   }
 

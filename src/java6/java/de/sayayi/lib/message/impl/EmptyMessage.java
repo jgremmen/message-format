@@ -17,6 +17,7 @@ package de.sayayi.lib.message.impl;
 
 import de.sayayi.lib.message.Message;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -29,7 +30,7 @@ public final class EmptyMessage implements Message
 
 
   @Override
-  public String format(Parameters parameters) {
+  public String format(@NotNull Parameters parameters) {
     return null;
   }
 

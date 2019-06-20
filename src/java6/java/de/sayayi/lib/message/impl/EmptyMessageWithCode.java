@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.impl;
 
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -27,13 +28,13 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
   private static final long serialVersionUID = -293629874443616813L;
 
 
-  public EmptyMessageWithCode(String code) {
+  public EmptyMessageWithCode(@NotNull String code) {
     super(code);
   }
 
 
   @Override
-  public String format(Parameters parameters) {
+  public String format(@NotNull Parameters parameters) {
     return null;
   }
 

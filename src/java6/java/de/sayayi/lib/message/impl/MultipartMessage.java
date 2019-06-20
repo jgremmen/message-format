@@ -18,6 +18,7 @@ package de.sayayi.lib.message.impl;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.parser.MessagePart;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -33,13 +34,13 @@ public class MultipartMessage implements Message
   private final MessagePart[] parts;
 
 
-  public MultipartMessage(List<MessagePart> parts) {
+  public MultipartMessage(@NotNull List<MessagePart> parts) {
     this.parts = parts.toArray(new MessagePart[0]);
   }
 
 
   @Override
-  public String format(Parameters parameters)
+  public String format(@NotNull Parameters parameters)
   {
     final StringBuilder message = new StringBuilder();
     boolean spaceBefore = false;

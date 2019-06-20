@@ -17,6 +17,7 @@ package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -38,7 +39,7 @@ public interface ParameterFormatter
    *
    * @return  formatted parameter value or {@code null} if this formatter does not produce any output
    */
-  String format(Object value, String format, Parameters parameters, ParameterData data);
+  String format(Object value, String format, @NotNull Parameters parameters, ParameterData data);
 
 
   /**
@@ -50,5 +51,5 @@ public interface ParameterFormatter
    *
    * @return  a set with supported java types for this formatter, not {@code null}
    */
-  Set<Class<?>> getFormattableTypes();
+  @NotNull Set<Class<?>> getFormattableTypes();
 }

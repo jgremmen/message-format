@@ -15,6 +15,8 @@
  */
 package de.sayayi.lib.message;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -32,6 +34,7 @@ public class MessageBundle
   private final Set<Class<?>> indexedClasses;
 
 
+  @SuppressWarnings("WeakerAccess")
   public MessageBundle()
   {
     messages = new HashMap<String,MessageWithCode>();
@@ -39,20 +42,22 @@ public class MessageBundle
   }
 
 
-  public MessageBundle(Class<?> classWithMessages)
+  public MessageBundle(@NotNull Class<?> classWithMessages)
   {
     this();
     add(classWithMessages);
   }
 
 
-  public MessageWithCode getByCode(String code) {
+  public MessageWithCode getByCode(@NotNull String code) {
     return messages.get(code);
   }
 
 
-  public void add(MessageWithCode message)
+  @SuppressWarnings("WeakerAccess")
+  public void add(@NotNull MessageWithCode message)
   {
+    //noinspection ConstantConditions
     if (message == null)
       throw new NullPointerException("message must not be null");
 
@@ -64,7 +69,8 @@ public class MessageBundle
   }
 
 
-  public void add(Class<?> classWithMessages)
+  @SuppressWarnings("WeakerAccess")
+  public void add(@NotNull Class<?> classWithMessages)
   {
     for(Class<?> clazz = classWithMessages; clazz != null && clazz != Object.class; clazz = clazz.getSuperclass())
       if (!indexedClasses.contains(clazz))

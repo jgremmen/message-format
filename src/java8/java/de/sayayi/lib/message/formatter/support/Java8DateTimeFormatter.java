@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -79,7 +80,7 @@ public class Java8DateTimeFormatter implements ParameterFormatter
 
 
   @Override
-  public String format(Object value, String format, Parameters parameters, ParameterData data)
+  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     final DateTimeFormatter formatter = getFormatter((Temporal)value, format, data);
     if (formatter == null)
@@ -119,6 +120,7 @@ public class Java8DateTimeFormatter implements ParameterFormatter
   }
 
 
+  @NotNull
   @Override
   public Set<Class<?>> getFormattableTypes() {
     return Collections.singleton(Temporal.class);

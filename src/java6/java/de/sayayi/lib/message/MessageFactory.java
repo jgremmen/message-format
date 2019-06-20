@@ -22,6 +22,8 @@ import de.sayayi.lib.message.impl.EmptyMessageWithCode;
 import de.sayayi.lib.message.impl.MessageDelegateWithCode;
 import de.sayayi.lib.message.impl.MultipartLocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.parser.MessageParser;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.HashSet;
@@ -41,12 +43,16 @@ public final class MessageFactory
   private static final AtomicInteger CODE_ID = new AtomicInteger(0);
 
 
-  public static Message parse(String text) {
+  @Contract("_ -> new")
+  @NotNull
+  public static Message parse(@NotNull String text) {
     return new MessageParser(text).parseMessage();
   }
 
 
-  public static Message parse(Map<Locale,String> localizedTexts) {
+  @Contract("_ -> new")
+  @NotNull
+  public static Message parse(@NotNull Map<Locale,String> localizedTexts) {
     return parse("Generated::" + CODE_ID.incrementAndGet(), localizedTexts);
   }
 
@@ -54,15 +60,19 @@ public final class MessageFactory
   /**
    * Parse the message {@code text} into a {@link Message} instance.
    *
-   * @param text
-   * @return
+   * @param code  message code
+   * @param text  message format
+   *
+   * @return  message instance
    */
-  public static MessageWithCode parse(String code, String text) {
+  @NotNull
+  public static MessageWithCode parse(@NotNull String code, @NotNull String text) {
     return new MessageDelegateWithCode(code, new MessageParser(text).parseMessage());
   }
 
 
-  public static MessageWithCode parse(String code, Map<Locale,String> localizedTexts)
+  @NotNull
+  public static MessageWithCode parse(@NotNull String code, @NotNull Map<Locale,String> localizedTexts)
   {
     if (localizedTexts.isEmpty())
       return new EmptyMessageWithCode(code);
@@ -76,7 +86,9 @@ public final class MessageFactory
   }
 
 
-  public static Set<MessageWithCode> parseAnnotations(AnnotatedElement element)
+  @SuppressWarnings("WeakerAccess")
+  @NotNull
+  public static Set<MessageWithCode> parseAnnotations(@NotNull AnnotatedElement element)
   {
     Set<MessageWithCode> messageBundle = new HashSet<MessageWithCode>();
 
@@ -101,7 +113,8 @@ public final class MessageFactory
   }
 
 
-  public static MessageWithCode parse(de.sayayi.lib.message.annotation.Message annotation)
+  @NotNull
+  public static MessageWithCode parse(@NotNull de.sayayi.lib.message.annotation.Message annotation)
   {
     final Text[] texts = annotation.texts();
     if (texts.length == 0)
@@ -120,7 +133,8 @@ public final class MessageFactory
   }
 
 
-  static Locale forLanguageTag(String locale)
+  @NotNull
+  static Locale forLanguageTag(@NotNull String locale)
   {
     if (locale.isEmpty())
       return Locale.ROOT;

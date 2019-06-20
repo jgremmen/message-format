@@ -15,6 +15,8 @@
  */
 package de.sayayi.lib.message;
 
+import org.jetbrains.annotations.NotNull;
+
 
 /**
  * @author Jeroen Gremmen
@@ -26,5 +28,5 @@ public interface MessageWithCode extends Message
    *
    * @return  message code, never {@code null}
    */
-  String getCode();
+  @NotNull String getCode();
 }

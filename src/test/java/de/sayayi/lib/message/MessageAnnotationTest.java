@@ -28,7 +28,7 @@ public class MessageAnnotationTest
 
   @Test
   @Message(code="MSG-052", texts={})
-  public void testEmptyMessageWithCode() throws Exception
+  public void testEmptyMessageWithCode()
   {
     final MessageWithCode msg = bundle.getByCode("MSG-052");
 
@@ -39,7 +39,7 @@ public class MessageAnnotationTest
 
   @Test
   @Message(code="T3", texts=@Text(text="m3"))
-  public void testMessageWithoutLocale() throws Exception
+  public void testMessageWithoutLocale()
   {
     final MessageWithCode msg = bundle.getByCode("T3");
     ParameterFactory factory = ParameterFactory.DEFAULT;
@@ -53,7 +53,7 @@ public class MessageAnnotationTest
 
   @Test
   @Message(code="T2", texts=@Text(locale="nl-NL", text="nl"))
-  public void testSingleMessageWithLocale() throws Exception
+  public void testSingleMessageWithLocale()
   {
     final MessageWithCode msg = bundle.getByCode("T2");
     ParameterFactory factory = ParameterFactory.DEFAULT;
@@ -72,7 +72,7 @@ public class MessageAnnotationTest
       @Text(locale="en-GB", text="uk"),
       @Text(locale="de-DE", text="de")
   })
-  public void testLocaleSelection() throws Exception
+  public void testLocaleSelection()
   {
     final MessageWithCode msg = bundle.getByCode("T1");
     ParameterFactory factory = ParameterFactory.DEFAULT;

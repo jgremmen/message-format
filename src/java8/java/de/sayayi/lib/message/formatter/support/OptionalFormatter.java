@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -30,7 +31,7 @@ import java.util.Set;
 public class OptionalFormatter implements ParameterFormatter
 {
   @Override
-  public String format(Object value, String format, Parameters parameters, ParameterData data)
+  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     Optional<?> optional = (Optional<?>)value;
     if (optional == null || !optional.isPresent())
@@ -42,6 +43,7 @@ public class OptionalFormatter implements ParameterFormatter
   }
 
 
+  @NotNull
   @Override
   public Set<Class<?>> getFormattableTypes() {
     return Collections.singleton(Optional.class);

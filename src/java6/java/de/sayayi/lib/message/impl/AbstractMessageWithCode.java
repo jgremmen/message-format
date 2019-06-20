@@ -17,6 +17,7 @@ package de.sayayi.lib.message.impl;
 
 import de.sayayi.lib.message.MessageWithCode;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -29,8 +30,9 @@ public abstract class AbstractMessageWithCode implements MessageWithCode
   @Getter protected final String code;
 
 
-  AbstractMessageWithCode(String code)
+  AbstractMessageWithCode(@NotNull String code)
   {
+    //noinspection ConstantConditions
     if (code == null || code.isEmpty())
       throw new IllegalArgumentException("message code must not be empty");
 

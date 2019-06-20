@@ -8,6 +8,7 @@ import de.sayayi.lib.message.data.ParameterMap;
 import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.io.Serializable;
@@ -55,12 +56,12 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     ParameterMap booleanMap = new ParameterMap(new HashMap<Serializable,Message>() {
       {
         put(Boolean.TRUE, new Message() {
-          @Override public String format(Parameters parameters) { return "YES"; }
+          @Override public String format(@NotNull Parameters parameters) { return "YES"; }
           @Override public boolean hasParameters() { return false; }
         });
 
         put(Boolean.FALSE, new Message() {
-          @Override public String format(Parameters parameters) { return "NO"; }
+          @Override public String format(@NotNull Parameters parameters) { return "NO"; }
           @Override public boolean hasParameters() { return false; }
         });
       }
@@ -74,15 +75,17 @@ public class ArrayFormatterTest extends AbstractFormatterTest
 
     registry.addFormatter(new NamedParameterFormatter() {
       @Override
-      public String format(Object value, String format, Parameters parameters, ParameterData data) {
+      public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data) {
         return (value == null) ? null : (Boolean)value ? "1" : "0";
       }
 
+      @NotNull
       @Override
       public String getName() {
         return "bool";
       }
 
+      @NotNull
       @Override
       public Set<Class<?>> getFormattableTypes() {
         return new HashSet<>(Arrays.asList(Boolean.class, boolean.class));
@@ -114,16 +117,18 @@ public class ArrayFormatterTest extends AbstractFormatterTest
         .format(new int[] { 1, -7, 248 }, null , factory, new ParameterString("##00")));
 
     registry.addFormatter(new NamedParameterFormatter() {
+      @NotNull
       @Override
       public String getName() {
         return "hex";
       }
 
       @Override
-      public String format(Object value, String format, Parameters parameters, ParameterData data) {
+      public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data) {
         return (value == null) ? null : String.format("0x%02x", (Integer)value);
       }
 
+      @NotNull
       @Override
       public Set<Class<?>> getFormattableTypes() {
         return Collections.singleton(Integer.class);

@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterMap;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -30,6 +31,7 @@ import java.util.Set;
  */
 public final class ChoiceFormatter implements NamedParameterFormatter
 {
+  @NotNull
   @Override
   public String getName() {
     return "choice";
@@ -37,7 +39,7 @@ public final class ChoiceFormatter implements NamedParameterFormatter
 
 
   @Override
-  public String format(Object value, String format, Parameters parameters, ParameterData data)
+  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     if (!(data instanceof ParameterMap))
       throw new IllegalArgumentException("data must be a choice map");
@@ -49,6 +51,7 @@ public final class ChoiceFormatter implements NamedParameterFormatter
   }
 
 
+  @NotNull
   @Override
   public Set<Class<?>> getFormattableTypes() {
     return Collections.emptySet();

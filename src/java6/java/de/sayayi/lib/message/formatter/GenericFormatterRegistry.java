@@ -77,7 +77,7 @@ public class GenericFormatterRegistry implements FormatterRegistry
     if (formatter instanceof NamedParameterFormatter)
     {
       final String format = ((NamedParameterFormatter)formatter).getName();
-      if (format == null || format.isEmpty())
+      if (format.isEmpty())
         throw new IllegalArgumentException("formatter name must not be empty");
 
       namedFormatters.put(format, (NamedParameterFormatter)formatter);
