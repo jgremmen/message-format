@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -35,7 +36,7 @@ import static java.util.ResourceBundle.getBundle;
 public class ArrayFormatter implements ParameterFormatter
 {
   @Override
-  public String format(Object array, String format, Parameters parameters, ParameterData data)
+  public String format(Object array, String format, @NotNull Parameters parameters, ParameterData data)
   {
     final int length;
 
@@ -74,6 +75,7 @@ public class ArrayFormatter implements ParameterFormatter
   }
 
 
+  @NotNull
   @Override
   public Set<Class<?>> getFormattableTypes()
   {

@@ -29,7 +29,7 @@ public class MessageTest
   @Test
   public void testParseMultiLocale()
   {
-    final Map<Locale,String> texts = new HashMap<Locale,String>();
+    final Map<Locale,String> texts = new HashMap<>();
 
     texts.put(Locale.UK, "%{n} %{n,choice,{1 -> 'colour', 'colours'}}.");
     texts.put(new Locale("nl", "NL"), "%{n} %{n,choice,{1 -> 'kleur', 'kleuren'}}.");

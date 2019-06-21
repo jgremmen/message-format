@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,11 +46,13 @@ public class DefaultFormatterService extends GenericFormatterRegistry
   }
 
 
+  @SuppressWarnings("WeakerAccess")
   public DefaultFormatterService() {
     addDefaultFormatters();
   }
 
 
+  @SuppressWarnings("WeakerAccess")
   protected void addDefaultFormatters()
   {
     // named formatters
@@ -81,11 +83,13 @@ public class DefaultFormatterService extends GenericFormatterRegistry
   }
 
 
+  @SuppressWarnings("WeakerAccess")
   protected boolean isJava8() {
     return hasClass("java.time.LocalDate") && hasClass("java.util.function.DoubleSupplier");
   }
 
 
+  @SuppressWarnings("WeakerAccess")
   protected boolean hasClass(String className)
   {
     try {

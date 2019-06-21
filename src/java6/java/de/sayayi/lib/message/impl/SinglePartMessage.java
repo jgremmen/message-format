@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.parser.MessagePart;
 import lombok.Getter;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -32,13 +33,13 @@ public class SinglePartMessage implements Message
   @Getter private final MessagePart part;
 
 
-  public SinglePartMessage(MessagePart part) {
+  public SinglePartMessage(@NotNull MessagePart part) {
     this.part = part;
   }
 
 
   @Override
-  public String format(Parameters parameters)
+  public String format(@NotNull Parameters parameters)
   {
     final String text = part.getText(parameters);
 

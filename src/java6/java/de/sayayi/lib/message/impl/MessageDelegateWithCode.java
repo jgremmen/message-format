@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@ package de.sayayi.lib.message.impl;
 
 import de.sayayi.lib.message.Message;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -30,7 +31,7 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
   private final Message message;
 
 
-  public MessageDelegateWithCode(String code, Message message)
+  public MessageDelegateWithCode(@NotNull String code, @NotNull Message message)
   {
     super(code);
 
@@ -39,7 +40,7 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
 
 
   @Override
-  public String format(Parameters parameters) {
+  public String format(@NotNull Parameters parameters) {
     return message.format(parameters);
   }
 

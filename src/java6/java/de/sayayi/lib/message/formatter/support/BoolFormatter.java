@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterMap;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -35,6 +36,7 @@ import static java.util.ResourceBundle.getBundle;
  */
 public class BoolFormatter implements NamedParameterFormatter
 {
+  @NotNull
   @Override
   public String getName() {
     return "bool";
@@ -42,7 +44,7 @@ public class BoolFormatter implements NamedParameterFormatter
 
 
   @Override
-  public String format(Object value, String format, Parameters parameters, ParameterData data)
+  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     Boolean bool;
 
@@ -72,6 +74,7 @@ public class BoolFormatter implements NamedParameterFormatter
   }
 
 
+  @NotNull
   @Override
   public Set<Class<?>> getFormattableTypes() {
     return new HashSet<Class<?>>(Arrays.<Class<?>>asList(Boolean.class, boolean.class));

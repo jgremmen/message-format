@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,7 @@ public @interface Text
 {
   /** Message locale. Either the language code (de, es) or the language with country (de_DE, fr_CA) */
   String locale() default "";
+
 
   /** Localized message text */
   String text();

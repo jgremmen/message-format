@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,9 +25,26 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Message
 {
-  /** Unique message code */
+  /**
+   * <p>
+   *   Unique message code.
+   * </p>
+   * <p>
+   *   Uniqueness is required to identify and retrieve a message by its {@code code} and is defined within the scope
+   *   of a message bundle.
+   * </p>
+   *
+   * @return  unique message code, not empty
+   *
+   * @see de.sayayi.lib.message.MessageBundle
+   */
   String code();
 
-  /** 1..n localized texts */
+
+  /**
+   * 1..n localized texts.
+   *
+   * @return  localized texts
+   */
   Text[] texts();
 }

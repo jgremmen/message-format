@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ package de.sayayi.lib.message.impl;
 import de.sayayi.lib.message.Message;
 import lombok.Synchronized;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
   private Boolean _hasParameter;
 
 
-  public MultipartLocalizedMessageBundleWithCode(String code, Map<Locale,Message> localizedMessages)
+  public MultipartLocalizedMessageBundleWithCode(@NotNull String code, Map<Locale,Message> localizedMessages)
   {
     super(code);
 
@@ -46,7 +47,7 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
 
 
   @Override
-  public String format(Parameters parameters) {
+  public String format(@NotNull Parameters parameters) {
     return findMessageByLocale(parameters.getLocale()).format(parameters);
   }
 

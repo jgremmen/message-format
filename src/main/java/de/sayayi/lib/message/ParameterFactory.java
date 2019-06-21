@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@ import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -95,11 +96,12 @@ public class ParameterFactory implements Parameters
 
 
   @Override
-  public Object getParameterValue(String parameter) {
+  public Object getParameterValue(@NotNull String parameter) {
     return null;
   }
 
 
+  @NotNull
   @Override
   public Set<String> getParameterNames() {
     return Collections.emptySet();
@@ -142,11 +144,12 @@ public class ParameterFactory implements Parameters
 
 
     @Override
-    public Object getParameterValue(String parameter) {
+    public Object getParameterValue(@NotNull String parameter) {
       return parameterValues.get(parameter);
     }
 
 
+    @NotNull
     @Override
     public Set<String> getParameterNames() {
       return Collections.unmodifiableSet(parameterValues.keySet());
@@ -154,7 +157,7 @@ public class ParameterFactory implements Parameters
 
 
     @Override
-    public ParameterBuilder with(String parameter, boolean value)
+    public ParameterBuilder with(@NotNull String parameter, boolean value)
     {
       parameterValues.put(parameter, value);
       return this;
@@ -162,7 +165,7 @@ public class ParameterFactory implements Parameters
 
 
     @Override
-    public ParameterBuilder with(String parameter, int value)
+    public ParameterBuilder with(@NotNull String parameter, int value)
     {
       parameterValues.put(parameter, value);
       return this;
@@ -170,7 +173,7 @@ public class ParameterFactory implements Parameters
 
 
     @Override
-    public ParameterBuilder with(String parameter, long value)
+    public ParameterBuilder with(@NotNull String parameter, long value)
     {
       parameterValues.put(parameter, value);
       return this;
@@ -178,7 +181,7 @@ public class ParameterFactory implements Parameters
 
 
     @Override
-    public ParameterBuilder with(String parameter, float value)
+    public ParameterBuilder with(@NotNull String parameter, float value)
     {
       parameterValues.put(parameter, value);
       return this;
@@ -186,7 +189,7 @@ public class ParameterFactory implements Parameters
 
 
     @Override
-    public ParameterBuilder with(String parameter, double value)
+    public ParameterBuilder with(@NotNull String parameter, double value)
     {
       parameterValues.put(parameter, value);
       return this;
@@ -194,7 +197,7 @@ public class ParameterFactory implements Parameters
 
 
     @Override
-    public ParameterBuilder with(String parameter, Object value)
+    public ParameterBuilder with(@NotNull String parameter, Object value)
     {
       parameterValues.put(parameter, value);
       return this;
@@ -202,7 +205,7 @@ public class ParameterFactory implements Parameters
 
 
     @Override
-    public ParameterBuilder with(Map<String, Object> parameterValues)
+    public ParameterBuilder with(@NotNull Map<String, Object> parameterValues)
     {
       this.parameterValues.putAll(parameterValues);
       return this;
@@ -210,7 +213,7 @@ public class ParameterFactory implements Parameters
 
 
     @Override
-    public ParameterBuilder withLocale(Locale locale)
+    public ParameterBuilder withLocale(@NotNull Locale locale)
     {
       this.locale = (locale == null) ? ParameterFactory.this.getLocale() : locale;
       return this;
@@ -218,7 +221,7 @@ public class ParameterFactory implements Parameters
 
 
     @Override
-    public ParameterBuilder withLocale(String locale)
+    public ParameterBuilder withLocale(@NotNull String locale)
     {
       this.locale = (locale == null) ? ParameterFactory.this.getLocale() : MessageFactory.forLanguageTag(locale);
       return this;
