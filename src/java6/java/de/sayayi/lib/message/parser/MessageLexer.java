@@ -237,6 +237,7 @@ public final class MessageLexer implements Iterable<Token>
 
     if (Character.isDigit(message.charAt(data.pos)))
     {
+      //noinspection StatementWithEmptyBody
       while(data.pos + 1 < length && Character.isDigit(message.charAt(++data.pos)))
         ;
 

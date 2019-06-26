@@ -128,4 +128,21 @@ public interface Message extends Serializable
     @Contract("_ -> this")
     ParameterBuilder withLocale(@NotNull String locale);
   }
+
+
+  interface WithCode extends Message
+  {
+    /**
+     * Returns a unique message code.
+     *
+     * @return  message code, never {@code null}
+     */
+    @NotNull String getCode();
+  }
+
+
+  interface LocaleAware extends Message
+  {
+    Set<Locale> getLocales();
+  }
 }

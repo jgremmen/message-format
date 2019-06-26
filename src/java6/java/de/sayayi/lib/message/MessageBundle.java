@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message;
 
+import de.sayayi.lib.message.exception.MessageException;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.AnnotatedElement;
@@ -30,14 +31,14 @@ import java.util.Set;
  */
 public class MessageBundle
 {
-  private final Map<String,MessageWithCode> messages;
+  private final Map<String,Message.WithCode> messages;
   private final Set<Class<?>> indexedClasses;
 
 
   @SuppressWarnings("WeakerAccess")
   public MessageBundle()
   {
-    messages = new HashMap<String,MessageWithCode>();
+    messages = new HashMap<String,Message.WithCode>();
     indexedClasses = new HashSet<Class<?>>();
   }
 
@@ -49,13 +50,13 @@ public class MessageBundle
   }
 
 
-  public MessageWithCode getByCode(@NotNull String code) {
+  public Message.WithCode getByCode(@NotNull String code) {
     return messages.get(code);
   }
 
 
   @SuppressWarnings("WeakerAccess")
-  public void add(@NotNull MessageWithCode message)
+  public void add(@NotNull Message.WithCode message)
   {
     //noinspection ConstantConditions
     if (message == null)
@@ -63,7 +64,7 @@ public class MessageBundle
 
     String code = message.getCode();
     if (messages.containsKey(code))
-      throw new IllegalArgumentException("message with code " + code + " already exists in message bundle");
+      throw new MessageException("message with code " + code + " already exists in message bundle");
 
     messages.put(code, message);
   }
@@ -90,7 +91,7 @@ public class MessageBundle
 
   private void add0(AnnotatedElement annotatedElement)
   {
-    for(MessageWithCode message: MessageFactory.parseAnnotations(annotatedElement))
+    for(Message.WithCode message: MessageFactory.parseAnnotations(annotatedElement))
       add(message);
   }
 }

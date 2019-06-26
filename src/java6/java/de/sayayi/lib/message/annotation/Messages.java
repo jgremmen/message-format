@@ -30,5 +30,5 @@ public @interface Messages
    *
    * @return  messages
    */
-  Message[] messages();
+  Message[] value();
 }

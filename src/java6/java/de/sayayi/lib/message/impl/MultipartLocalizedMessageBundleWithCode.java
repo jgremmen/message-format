@@ -16,20 +16,23 @@
 package de.sayayi.lib.message.impl;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.Message.LocaleAware;
 import lombok.Synchronized;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 
 /**
  * @author Jeroen Gremmen
  */
 @ToString
-public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWithCode
+public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWithCode implements LocaleAware
 {
   private static final long serialVersionUID = -8638540396975308919L;
 
@@ -105,5 +108,11 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
     }
 
     return _hasParameter;
+  }
+
+
+  @Override
+  public Set<Locale> getLocales() {
+    return Collections.unmodifiableSet(localizedMessages.keySet());
   }
 }
