@@ -44,7 +44,7 @@ public final class StringFormatter implements NamedParameterFormatter
       return null;
 
     if (value instanceof char[])
-      value = new String((char[])value);
+      return new String((char[])value).trim();
 
     return String.valueOf(value).trim();
   }

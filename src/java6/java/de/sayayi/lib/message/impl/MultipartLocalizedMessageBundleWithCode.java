@@ -41,7 +41,7 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
   private Boolean _hasParameter;
 
 
-  public MultipartLocalizedMessageBundleWithCode(@NotNull String code, Map<Locale,Message> localizedMessages)
+  public MultipartLocalizedMessageBundleWithCode(@NotNull String code, @NotNull Map<Locale,Message> localizedMessages)
   {
     super(code);
 
@@ -111,6 +111,7 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
   }
 
 
+  @NotNull
   @Override
   public Set<Locale> getLocales() {
     return Collections.unmodifiableSet(localizedMessages.keySet());

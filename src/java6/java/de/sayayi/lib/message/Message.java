@@ -122,11 +122,11 @@ public interface Message extends Serializable
 
 
     @Contract("_ -> this")
-    ParameterBuilder withLocale(@NotNull Locale locale);
+    ParameterBuilder withLocale(Locale locale);
 
 
     @Contract("_ -> this")
-    ParameterBuilder withLocale(@NotNull String locale);
+    ParameterBuilder withLocale(String locale);
   }
 
 
@@ -143,6 +143,6 @@ public interface Message extends Serializable
 
   interface LocaleAware extends Message
   {
-    Set<Locale> getLocales();
+    @NotNull Set<Locale> getLocales();
   }
 }

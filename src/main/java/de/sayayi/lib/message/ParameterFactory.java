@@ -213,7 +213,7 @@ public class ParameterFactory implements Parameters
 
 
     @Override
-    public ParameterBuilder withLocale(@NotNull Locale locale)
+    public ParameterBuilder withLocale(Locale locale)
     {
       this.locale = (locale == null) ? ParameterFactory.this.getLocale() : locale;
       return this;
@@ -221,7 +221,7 @@ public class ParameterFactory implements Parameters
 
 
     @Override
-    public ParameterBuilder withLocale(@NotNull String locale)
+    public ParameterBuilder withLocale(String locale)
     {
       this.locale = (locale == null) ? ParameterFactory.this.getLocale() : MessageFactory.forLanguageTag(locale);
       return this;
