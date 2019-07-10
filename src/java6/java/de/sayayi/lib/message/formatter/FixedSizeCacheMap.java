@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.formatter;
 
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -247,6 +248,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
   }
 
 
+  @NotNull
   public Set<K> keySet()
   {
     Set<K> ks;
@@ -278,6 +280,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
   }
 
 
+  @NotNull
   public Set<Entry<K,V>> entrySet()
   {
     Set<Map.Entry<K,V>> es;
