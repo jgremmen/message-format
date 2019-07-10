@@ -16,24 +16,30 @@
 package de.sayayi.lib.message.parser;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterBoolean;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterInteger;
 import de.sayayi.lib.message.data.ParameterMap;
 import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.exception.MessageParserException;
+import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.impl.EmptyMessage;
 import de.sayayi.lib.message.impl.MultipartMessage;
 import de.sayayi.lib.message.impl.SinglePartMessage;
 import de.sayayi.lib.message.parser.MessageLexer.Token;
 import de.sayayi.lib.message.parser.MessageLexer.TokenType;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import static de.sayayi.lib.message.parser.MessageLexer.TokenType.ARROW;
 import static de.sayayi.lib.message.parser.MessageLexer.TokenType.COMMA;
@@ -46,6 +52,34 @@ import static de.sayayi.lib.message.parser.MessageLexer.TokenType.PARAM_START;
 
 public final class MessageParser
 {
+  private static Parameters EMPTY_PARAMETERS = new Parameters() {
+    @NotNull
+    @Override
+    public Locale getLocale() {
+      return Locale.ROOT;
+    }
+
+
+    @Override
+    public ParameterFormatter getFormatter(String format, Class<?> type) {
+      return null;
+    }
+
+
+    @Override
+    public Object getParameterValue(@NotNull String parameter) {
+      return null;
+    }
+
+
+    @NotNull
+    @Override
+    public Set<String> getParameterNames() {
+      return Collections.emptySet();
+    }
+  };
+
+
   private final MessageLexer lexer;
   private final Iterator<Token> tokenIterator;
   private final List<Token> tokens;
@@ -292,6 +326,7 @@ public final class MessageParser
     tokens.remove(t);
 
     buildMap: {
+      //noinspection InfiniteLoopStatement
       for(;;)
       {
         t0 = getTokenAt(t);
@@ -322,7 +357,7 @@ public final class MessageParser
             if (m.hasParameters())
               throw new MessageParserException(t0.getStart(), "parameterized string is not allowed as a map key");
 
-            key = m.format(null);
+            key = m.format(EMPTY_PARAMETERS);
             break;
 
           case MAP_END:

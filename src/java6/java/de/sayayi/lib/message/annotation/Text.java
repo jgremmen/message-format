@@ -15,6 +15,8 @@
  */
 package de.sayayi.lib.message.annotation;
 
+import de.sayayi.lib.message.Message.Parameters;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -25,10 +27,39 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Text
 {
-  /** Message locale. Either the language code (de, es) or the language with country (de_DE, fr_CA) */
+  /**
+   * <p>
+   *   Message locale, either the language code (de, es) or the language with country (de_DE, fr_CA).
+   * </p>
+   * <p>
+   *   The default value corresponds to {@link java.util.Locale#ROOT} which will match any locale used for formatting
+   *   this message.
+   * </p>
+   *
+   * @return  message locale
+   *
+   * @see de.sayayi.lib.message.Message#format(Parameters)
+   */
   String locale() default "";
 
 
-  /** Localized message text */
-  String text();
+  /**
+   * Localized message text.
+   *
+   * @return  message text
+   */
+  String text() default "";
+
+
+  /**
+   * <p>
+   *   Not localized message text.
+   * </p>
+   * <p>
+   *   This value is used only if {@code locale} and {@code text} are not set. Otherwise its value is ignored.
+   * </p>
+   *
+   * @return  message text
+   */
+  String value() default "";
 }

@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.impl;
 
-import de.sayayi.lib.message.MessageWithCode;
+import de.sayayi.lib.message.Message;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @author Jeroen Gremmen
  */
-public abstract class AbstractMessageWithCode implements MessageWithCode
+public abstract class AbstractMessageWithCode implements Message.WithCode
 {
   private static final long serialVersionUID = 1334376878447581605L;
 

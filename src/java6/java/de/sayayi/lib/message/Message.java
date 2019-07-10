@@ -122,10 +122,27 @@ public interface Message extends Serializable
 
 
     @Contract("_ -> this")
-    ParameterBuilder withLocale(@NotNull Locale locale);
+    ParameterBuilder withLocale(Locale locale);
 
 
     @Contract("_ -> this")
-    ParameterBuilder withLocale(@NotNull String locale);
+    ParameterBuilder withLocale(String locale);
+  }
+
+
+  interface WithCode extends Message
+  {
+    /**
+     * Returns a unique message code.
+     *
+     * @return  message code, never {@code null}
+     */
+    @NotNull String getCode();
+  }
+
+
+  interface LocaleAware extends Message
+  {
+    @NotNull Set<Locale> getLocales();
   }
 }

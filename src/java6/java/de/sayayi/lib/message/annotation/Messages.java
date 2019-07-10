@@ -26,9 +26,9 @@ import java.lang.annotation.Target;
 public @interface Messages
 {
   /**
-   * 1..n messages.
+   * 0..n messages.
    *
    * @return  messages
    */
-  Message[] messages();
+  Message[] value() default {};
 }

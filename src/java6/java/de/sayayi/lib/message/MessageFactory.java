@@ -34,6 +34,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.util.Locale.ROOT;
+
 
 /**
  * @author Jeroen Gremmen
@@ -66,16 +68,20 @@ public final class MessageFactory
    * @return  message instance
    */
   @NotNull
-  public static MessageWithCode parse(@NotNull String code, @NotNull String text) {
+  public static Message.WithCode parse(@NotNull String code, @NotNull String text) {
     return new MessageDelegateWithCode(code, new MessageParser(text).parseMessage());
   }
 
 
   @NotNull
-  public static MessageWithCode parse(@NotNull String code, @NotNull Map<Locale,String> localizedTexts)
+  public static Message.WithCode parse(@NotNull String code, @NotNull Map<Locale,String> localizedTexts)
   {
     if (localizedTexts.isEmpty())
       return new EmptyMessageWithCode(code);
+
+    String message = localizedTexts.get(ROOT);
+    if (message != null && localizedTexts.size() == 1)
+      return new MessageDelegateWithCode(code, new MessageParser(message).parseMessage());
 
     final Map<Locale,Message> localizedParts = new LinkedHashMap<Locale,Message>();
 
@@ -88,9 +94,9 @@ public final class MessageFactory
 
   @SuppressWarnings("WeakerAccess")
   @NotNull
-  public static Set<MessageWithCode> parseAnnotations(@NotNull AnnotatedElement element)
+  public static Set<Message.WithCode> parseAnnotations(@NotNull AnnotatedElement element)
   {
-    Set<MessageWithCode> messageBundle = new HashSet<MessageWithCode>();
+    Set<Message.WithCode> messageBundle = new HashSet<Message.WithCode>();
 
     de.sayayi.lib.message.annotation.Message annotation =
         element.getAnnotation(de.sayayi.lib.message.annotation.Message.class);
@@ -99,9 +105,9 @@ public final class MessageFactory
 
     Messages messagesAnnotation = element.getAnnotation(Messages.class);
     if (messagesAnnotation != null)
-      for(de.sayayi.lib.message.annotation.Message message: messagesAnnotation.messages())
+      for(de.sayayi.lib.message.annotation.Message message: messagesAnnotation.value())
       {
-        MessageWithCode mwc = parse(message);
+        Message.WithCode mwc = parse(message);
 
         if (!messageBundle.add(mwc))
           throw new IllegalArgumentException("duplicate message code " + mwc.getCode() + " found");
@@ -114,7 +120,7 @@ public final class MessageFactory
 
 
   @NotNull
-  public static MessageWithCode parse(@NotNull de.sayayi.lib.message.annotation.Message annotation)
+  public static Message.WithCode parse(@NotNull de.sayayi.lib.message.annotation.Message annotation)
   {
     final Text[] texts = annotation.texts();
     if (texts.length == 0)
@@ -125,8 +131,10 @@ public final class MessageFactory
     for(final Text text: texts)
     {
       final Locale locale = forLanguageTag(text.locale());
+      final String value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
+
       if (!localizedTexts.containsKey(locale))
-        localizedTexts.put(locale, text.text());
+        localizedTexts.put(locale, value);
     }
 
     return parse(annotation.code(), localizedTexts);
@@ -137,7 +145,7 @@ public final class MessageFactory
   static Locale forLanguageTag(@NotNull String locale)
   {
     if (locale.isEmpty())
-      return Locale.ROOT;
+      return ROOT;
 
     final int length = locale.length();
     if (length < 2)
