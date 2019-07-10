@@ -113,6 +113,10 @@ public class ParameterFactory implements Parameters
   }
 
 
+  @SuppressWarnings("unused")
+  public ParameterBuilder parameters(Map<String,Object> parameterValues) {
+    return new ParameterBuilderImpl().with(parameterValues);
+  }
 
 
   final class ParameterBuilderImpl implements ParameterBuilder
@@ -205,7 +209,7 @@ public class ParameterFactory implements Parameters
 
 
     @Override
-    public ParameterBuilder with(@NotNull Map<String, Object> parameterValues)
+    public ParameterBuilder with(@NotNull Map<String,Object> parameterValues)
     {
       this.parameterValues.putAll(parameterValues);
       return this;
