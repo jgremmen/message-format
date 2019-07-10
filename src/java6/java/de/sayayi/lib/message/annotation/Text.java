@@ -48,5 +48,18 @@ public @interface Text
    *
    * @return  message text
    */
-  String text();
+  String text() default "";
+
+
+  /**
+   * <p>
+   *   Not localized message text.
+   * </p>
+   * <p>
+   *   This value is used only if {@code locale} and {@code text} are not set. Otherwise its value is ignored.
+   * </p>
+   *
+   * @return  message text
+   */
+  String value() default "";
 }

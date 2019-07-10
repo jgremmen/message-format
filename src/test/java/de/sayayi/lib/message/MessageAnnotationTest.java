@@ -31,13 +31,11 @@ public class MessageAnnotationTest
 
 
   @Test
-  @Messages(value={
-      @Message(code="T4", texts={
-          @Text(locale="en", text="Message %{p1}")
-      }),
-      @Message(code="T5", texts={
-          @Text(locale="en", text="English message"),
-          @Text(locale="de", text="Deutsche Nachricht")
+  @Messages({
+      @Message(code = "T4", texts = @Text(locale = "en", text = "Message %{p1}")),
+      @Message(code = "T5", texts = {
+          @Text(locale = "en", text = "English message"),
+          @Text(locale = "de", text = "Deutsche Nachricht")
       })
   })
   public void testMultiMessageAnotation()
@@ -68,7 +66,7 @@ public class MessageAnnotationTest
 
 
   @Test
-  @Message(code="T3", texts=@Text(text="m3"))
+  @Message(code="T3", texts=@Text("m3"))
   public void testMessageWithoutLocale()
   {
     final WithCode msg = bundle.getByCode("T3");

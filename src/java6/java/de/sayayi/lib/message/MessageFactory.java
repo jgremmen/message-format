@@ -131,8 +131,10 @@ public final class MessageFactory
     for(final Text text: texts)
     {
       final Locale locale = forLanguageTag(text.locale());
+      final String value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
+
       if (!localizedTexts.containsKey(locale))
-        localizedTexts.put(locale, text.text());
+        localizedTexts.put(locale, value);
     }
 
     return parse(annotation.code(), localizedTexts);
