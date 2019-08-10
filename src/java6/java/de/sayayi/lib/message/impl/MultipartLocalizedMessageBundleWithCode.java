@@ -31,6 +31,7 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
+@SuppressWarnings("squid:S2160")
 @ToString
 public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWithCode implements LocaleAware
 {
@@ -38,7 +39,7 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
 
   private final Map<Locale,Message> localizedMessages;
 
-  private Boolean _hasParameter;
+  private Boolean hasParameter;
 
 
   public MultipartLocalizedMessageBundleWithCode(@NotNull String code, @NotNull Map<Locale,Message> localizedMessages)
@@ -95,19 +96,19 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
   @Override
   public boolean hasParameters()
   {
-    if (_hasParameter == null)
+    if (hasParameter == null)
     {
-      _hasParameter = Boolean.FALSE;
+      hasParameter = Boolean.FALSE;
 
       for(final Message message: localizedMessages.values())
         if (message.hasParameters())
         {
-          _hasParameter = Boolean.TRUE;
+          hasParameter = Boolean.TRUE;
           break;
         }
     }
 
-    return _hasParameter;
+    return hasParameter;
   }
 
 

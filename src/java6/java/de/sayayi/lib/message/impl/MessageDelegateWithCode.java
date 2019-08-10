@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @author Jeroen Gremmen
  */
+@SuppressWarnings("squid:S2160")
 @ToString
 public class MessageDelegateWithCode extends AbstractMessageWithCode
 {

@@ -24,6 +24,7 @@ import lombok.ToString;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static de.sayayi.lib.message.parser.MessageLexer.TokenType.*;
 
@@ -37,8 +38,10 @@ public final class MessageLexer implements Iterable<Token>
   @Getter private final int length;
 
 
-  MessageLexer(String message) {
-    length = (this.message = message).length();
+  MessageLexer(String message)
+  {
+    this.message = message;
+    length = message.length();
   }
 
 
@@ -54,6 +57,7 @@ public final class MessageLexer implements Iterable<Token>
   }
 
 
+  @SuppressWarnings({"squid:S3776", "squid:S135", "squid:S3398"})
   private Token nextToken(TokenIterator data)
   {
     Token token = null;
@@ -77,12 +81,14 @@ public final class MessageLexer implements Iterable<Token>
         if (idx_p == -1)
         {
           data.state.pop();
-          return new Token(start, (data.pos = length) - 1, TEXT, message.substring(start).trim(), 0,
+          data.pos = length;
+          return new Token(start, length - 1, TEXT, message.substring(start).trim(), 0,
               isSpace(start) && start > 0, false);
         }
         else if (idx_p > data.pos)
         {
-          return new Token(start, (data.pos = idx_p) - 1, TEXT, message.substring(start, idx_p).trim(), 0,
+          data.pos = idx_p;
+          return new Token(start, idx_p - 1, TEXT, message.substring(start, idx_p).trim(), 0,
               isSpace(start) && start > 0, isSpace(idx_p - 1));
         }
         else
@@ -94,15 +100,15 @@ public final class MessageLexer implements Iterable<Token>
       }
       else if (data.state.peek().isQuotedText())
       {
-        int idx_p = message.indexOf("%{", data.pos);
+        int idxp = message.indexOf("%{", data.pos);
         final int idx_q = message.indexOf(data.state.peek().getQuote(), data.pos);
 
         if (idx_q == -1)
           throw new MessageParserException(data.pos, "quoted text not properly ended");
-        else if (idx_p > idx_q)
-          idx_p = -1;
+        else if (idxp > idx_q)
+          idxp = -1;
 
-        if (idx_p == -1)
+        if (idxp == -1)
         {
           data.state.pop();
           data.pos = idx_q + 1;
@@ -113,10 +119,11 @@ public final class MessageLexer implements Iterable<Token>
           return new Token(start, idx_q - 1, TEXT, message.substring(start, idx_q).trim(), 0,
               isSpace(start), isSpace(idx_q - 1));
         }
-        else if (idx_p > start)
+        else if (idxp > start)
         {
-          return new Token(start, (data.pos = idx_p) - 1, TEXT, message.substring(start, idx_p).trim(), 0,
-              isSpace(start), isSpace(idx_p - 1));
+          data.pos = idxp;
+          return new Token(start, idxp - 1, TEXT, message.substring(start, idxp).trim(), 0,
+              isSpace(start), isSpace(idxp - 1));
         }
         else
         {
@@ -133,7 +140,7 @@ public final class MessageLexer implements Iterable<Token>
   }
 
 
-  @SuppressWarnings("incomplete-switch")
+  @SuppressWarnings({"squid:S3776", "incomplete-switch"})
   private Token nextTokenParameter(TokenIterator data)
   {
     skipWhitespace(data);
@@ -142,9 +149,9 @@ public final class MessageLexer implements Iterable<Token>
       throw new MessageParserException(length - 1, "unexpected end of message");
 
     final int start = data.pos;
-    char c;
+    char c = message.charAt(data.pos);
 
-    switch(c = message.charAt(data.pos))
+    switch(c)
     {
       case ',':
         data.pos++;
@@ -161,6 +168,7 @@ public final class MessageLexer implements Iterable<Token>
         {
           case IN_MAP:        token = MAP_END; break;
           case IN_PARAMETER:  token = PARAM_END; break;
+          default:            break;
         }
 
         if (token != null)
@@ -211,6 +219,9 @@ public final class MessageLexer implements Iterable<Token>
         data.state.push((c == '"') ? State.IN_TEXT_DOUBLE_QUOTED : State.IN_TEXT_SINGLE_QUOTED);
         skipWhitespace(data);
         return null;
+
+      default:
+        break;
     }
 
     if (Character.isLetter(c))
@@ -284,7 +295,7 @@ public final class MessageLexer implements Iterable<Token>
     public Token next()
     {
       if (!hasNext())
-        throw new IllegalStateException("no more tokens available");
+        throw new NoSuchElementException("no more tokens available");
 
       final Token returnToken = token;
       token = nextToken(this);
@@ -295,6 +306,7 @@ public final class MessageLexer implements Iterable<Token>
 
     @Override
     public void remove() {
+      throw new UnsupportedOperationException();
     }
   }
 
@@ -325,6 +337,7 @@ public final class MessageLexer implements Iterable<Token>
   }
 
 
+  @SuppressWarnings("squid:CommentedOutCodeLine")
   public enum TokenType
   {
     PARAM_START,  // %{

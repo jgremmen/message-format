@@ -50,9 +50,10 @@ import static de.sayayi.lib.message.parser.MessageLexer.TokenType.PARAM_END;
 import static de.sayayi.lib.message.parser.MessageLexer.TokenType.PARAM_START;
 
 
+@SuppressWarnings("squid:S1192")
 public final class MessageParser
 {
-  private static Parameters EMPTY_PARAMETERS = new Parameters() {
+  private static final Parameters EMPTY_PARAMETERS = new Parameters() {
     @NotNull
     @Override
     public Locale getLocale() {
@@ -121,6 +122,7 @@ public final class MessageParser
   }
 
 
+  @SuppressWarnings("squid:LabelsShouldNotBeUsedCheck")
   private Message parseMessage(int t)
   {
     final List<MessagePart> parts = new ArrayList<MessagePart>();
@@ -158,6 +160,7 @@ public final class MessageParser
   }
 
 
+  @SuppressWarnings({"squid:S3776", "squid:LabelsShouldNotBeUsedCheck"})
   private ParameterPart parseParameter(int t)
   {
     final int tokenStart = t;
@@ -314,6 +317,7 @@ public final class MessageParser
   }
 
 
+  @SuppressWarnings({"squid:S3776", "squid:LabelsShouldNotBeUsedCheck"})
   private ParameterMap parseParameterMap(int t)
   {
     final Map<Serializable,Message> map = new LinkedHashMap<Serializable,Message>();

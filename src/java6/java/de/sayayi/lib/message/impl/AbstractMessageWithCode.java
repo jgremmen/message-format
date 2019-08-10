@@ -30,6 +30,7 @@ public abstract class AbstractMessageWithCode implements Message.WithCode
   @Getter protected final String code;
 
 
+  @SuppressWarnings("squid:S2589")
   AbstractMessageWithCode(@NotNull String code)
   {
     //noinspection ConstantConditions

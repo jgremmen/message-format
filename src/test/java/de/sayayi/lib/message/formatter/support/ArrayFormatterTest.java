@@ -123,6 +123,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
         return "hex";
       }
 
+      @SuppressWarnings("RedundantCast")
       @Override
       public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data) {
         return (value == null) ? null : String.format("0x%02x", (Integer)value);

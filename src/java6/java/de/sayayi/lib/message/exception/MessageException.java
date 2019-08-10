@@ -19,7 +19,7 @@ package de.sayayi.lib.message.exception;
 /**
  * @author Jeroen Gremmen
  */
-@SuppressWarnings({ "serial", "WeakerAccess" })
+@SuppressWarnings("serial")
 public class MessageException extends RuntimeException
 {
   public MessageException(String message) {

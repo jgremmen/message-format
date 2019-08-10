@@ -45,6 +45,10 @@ public final class MessageFactory
   private static final AtomicInteger CODE_ID = new AtomicInteger(0);
 
 
+  private MessageFactory() {
+  }
+
+
   @Contract("_ -> new")
   @NotNull
   public static Message parse(@NotNull String text) {
