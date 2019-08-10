@@ -27,7 +27,7 @@ import lombok.Getter;
  */
 final class ParameterPart extends MessagePart
 {
-  private static final long serialVersionUID = 7026268561936531490L;
+  private static final long serialVersionUID = 201L;
 
   @Getter private final String parameter;
   @Getter private final String format;

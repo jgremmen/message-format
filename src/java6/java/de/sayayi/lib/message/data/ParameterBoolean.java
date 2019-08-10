@@ -27,7 +27,7 @@ import java.io.Serializable;
  */
 public class ParameterBoolean implements ParameterData, Message
 {
-  private static final long serialVersionUID = 4014416484591250617L;
+  private static final long serialVersionUID = 201L;
 
   @Getter private final boolean value;
 

@@ -33,7 +33,7 @@ import java.util.Map.Entry;
 @ToString
 public class ParameterMap implements ParameterData
 {
-  private static final long serialVersionUID = -6514816495058775475L;
+  private static final long serialVersionUID = 201L;
 
   private final Map<Serializable,Message> map;
 

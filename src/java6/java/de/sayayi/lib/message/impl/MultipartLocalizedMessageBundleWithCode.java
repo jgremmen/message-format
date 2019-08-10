@@ -35,7 +35,7 @@ import java.util.Set;
 @ToString
 public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWithCode implements LocaleAware
 {
-  private static final long serialVersionUID = -8638540396975308919L;
+  private static final long serialVersionUID = 201L;
 
   private final Map<Locale,Message> localizedMessages;
 

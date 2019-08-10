@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 @ToString
 public final class EmptyMessage implements Message
 {
-  private static final long serialVersionUID = 1334376878447581605L;
+  private static final long serialVersionUID = 201L;
 
 
   @Override
