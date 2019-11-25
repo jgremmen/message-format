@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Message
+public @interface MessageDef
 {
   /**
    * <p>

@@ -23,7 +23,7 @@ import de.sayayi.lib.message.Message.Parameters;
  */
 final class TextPart extends MessagePart
 {
-  private static final long serialVersionUID = 5325056895074186084L;
+  private static final long serialVersionUID = 201L;
 
   private final String text;
 

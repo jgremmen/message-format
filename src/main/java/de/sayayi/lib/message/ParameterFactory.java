@@ -23,8 +23,11 @@ import de.sayayi.lib.message.formatter.ParameterFormatter;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Array;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -212,6 +215,32 @@ public class ParameterFactory implements Parameters
     public ParameterBuilder with(@NotNull Map<String,Object> parameterValues)
     {
       this.parameterValues.putAll(parameterValues);
+      return this;
+    }
+
+
+    @Override
+    public ParameterBuilder withNotNull(@NotNull String parameter, Object value, @NotNull Object notNullValue)
+    {
+      parameterValues.put(parameter, value == null ? notNullValue : value);
+      return this;
+    }
+
+
+    @Override
+    public ParameterBuilder withNotEmpty(@NotNull String parameter, Object value, @NotNull Object notEmptyValue)
+    {
+      final boolean empty =
+          value == null ||
+          (value instanceof String && ((String)value).trim().isEmpty()) ||
+          (value instanceof CharSequence && ((CharSequence)value).length() == 0) ||
+          (value instanceof Collection && ((Collection<?>)value).isEmpty()) ||
+          (value instanceof Map && ((Map<?,?>)value).isEmpty()) ||
+          (value.getClass().isArray() && Array.getLength(value) == 0) ||
+          (value instanceof Iterable && !((Iterable<?>)value).iterator().hasNext()) ||
+          (value instanceof Iterator && !((Iterator<?>)value).hasNext());
+
+      parameterValues.put(parameter, empty ? notEmptyValue : value);
       return this;
     }
 

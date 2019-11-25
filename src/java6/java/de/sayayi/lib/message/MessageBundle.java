@@ -55,7 +55,7 @@ public class MessageBundle
   }
 
 
-  @SuppressWarnings("WeakerAccess")
+  @SuppressWarnings({"WeakerAccess", "squid:S2583"})
   public void add(@NotNull Message.WithCode message)
   {
     //noinspection ConstantConditions

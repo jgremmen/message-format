@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.formatter;
 
 import lombok.Getter;
+import lombok.Synchronized;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.AbstractMap;
@@ -32,6 +33,7 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
+@SuppressWarnings("squid:S2160")
 public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
 {
   private final Comparator<Link<K,V>> comparator;
@@ -41,9 +43,9 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
   private Link<K,V>[] entries;
   private int size;
 
-  private transient EntrySet entrySet;
-  private transient KeySet keySet;
-  private transient int modCount;
+  private EntrySet entrySet;
+  private KeySet cacheKeySet;
+  private int modCount;
 
 
   @SuppressWarnings("unused")
@@ -69,6 +71,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
   }
 
 
+  @SuppressWarnings("squid:S3776")
   @Override
   public V put(K key, V value)
   {
@@ -183,6 +186,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
 
 
   @SuppressWarnings("unchecked")
+  @Override
   public V remove(Object key)
   {
     try {
@@ -194,12 +198,14 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
 
 
   @SuppressWarnings("unchecked")
+  @Override
   public boolean containsKey(Object key) {
     return findEntry((K)key) != null;
   }
 
 
   @SuppressWarnings("unchecked")
+  @Override
   public V get(Object key)
   {
     Link<K,V> link = findEntry((K)key);
@@ -238,6 +244,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
   }
 
 
+  @Override
   public void clear()
   {
     meru.previous = meru;
@@ -249,10 +256,14 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
 
 
   @NotNull
+  @Synchronized
+  @Override
   public Set<K> keySet()
   {
-    Set<K> ks;
-    return (ks = keySet) == null ? (keySet = new KeySet()) : ks;
+    if (cacheKeySet == null)
+      cacheKeySet = new KeySet();
+
+    return cacheKeySet;
   }
 
 
@@ -281,10 +292,13 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
 
 
   @NotNull
+  @Synchronized
   public Set<Entry<K,V>> entrySet()
   {
-    Set<Map.Entry<K,V>> es;
-    return (es = entrySet) == null ? (entrySet = new EntrySet()) : es;
+    if (entrySet == null)
+      entrySet = new EntrySet();
+
+    return entrySet;
   }
 
 
@@ -323,6 +337,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
 
   final class EntryIterator extends BaseIterator implements Iterator<Map.Entry<K,V>>
   {
+    @SuppressWarnings("squid:S2272")
     public final Map.Entry<K,V> next() {
       return nextNode();
     }
@@ -331,6 +346,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
 
   final class KeyIterator extends BaseIterator implements Iterator<K>
   {
+    @SuppressWarnings("squid:S2272")
     public final K next() {
       return nextNode().key;
     }
@@ -339,6 +355,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
 
   final class ValueIterator extends BaseIterator implements Iterator<V>
   {
+    @SuppressWarnings("squid:S2272")
     public final V next() {
       return nextNode().value;
     }

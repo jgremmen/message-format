@@ -25,11 +25,12 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class AbstractMessageWithCode implements Message.WithCode
 {
-  private static final long serialVersionUID = 1334376878447581605L;
+  private static final long serialVersionUID = 201L;
 
   @Getter protected final String code;
 
 
+  @SuppressWarnings("squid:S2589")
   AbstractMessageWithCode(@NotNull String code)
   {
     //noinspection ConstantConditions

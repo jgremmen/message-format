@@ -33,15 +33,11 @@ import lombok.Synchronized;
  */
 public class DefaultFormatterService extends GenericFormatterRegistry
 {
-  private static FormatterService INSTANCE;
+  private static final FormatterService INSTANCE = new DefaultFormatterService();
 
 
   @Synchronized
-  public static FormatterService getSharedInstance()
-  {
-    if (INSTANCE == null)
-      INSTANCE = new DefaultFormatterService();
-
+  public static FormatterService getSharedInstance() {
     return INSTANCE;
   }
 
@@ -95,7 +91,7 @@ public class DefaultFormatterService extends GenericFormatterRegistry
     try {
       Class.forName(className, false, DefaultFormatterService.class.getClassLoader());
       return true;
-    } catch(final Throwable ex) {
+    } catch(final Exception ex) {
       return false;
     }
   }

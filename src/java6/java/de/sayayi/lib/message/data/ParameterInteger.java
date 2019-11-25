@@ -27,7 +27,7 @@ import java.io.Serializable;
  */
 public class ParameterInteger implements ParameterData, Message
 {
-  private static final long serialVersionUID = 1858469767517999L;
+  private static final long serialVersionUID = 201L;
 
   @Getter private final int value;
 

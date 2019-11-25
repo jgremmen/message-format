@@ -39,7 +39,8 @@ public class CollectionFormatter implements ParameterFormatter
     if (collection == null)
       return null;
 
-    final ResourceBundle bundle = getBundle("Formatter", parameters.getLocale());
+    final ResourceBundle bundle = getBundle(getClass().getPackage().getName() + ".Formatter",
+        parameters.getLocale());
     final StringBuilder s = new StringBuilder();
 
     for(Object value: (Collection)collection)

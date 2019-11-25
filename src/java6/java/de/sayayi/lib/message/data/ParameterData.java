@@ -32,5 +32,10 @@ public interface ParameterData extends Serializable
   String format(@NotNull Parameters parameters);
 
 
+  /**
+   * Returns the underlying raw data object.
+   *
+   * @return  raw data object, or {@code null}
+   */
   Serializable asObject();
 }

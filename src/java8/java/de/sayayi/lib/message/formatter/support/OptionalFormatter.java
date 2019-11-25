@@ -30,6 +30,7 @@ import java.util.Set;
  */
 public class OptionalFormatter implements ParameterFormatter
 {
+  @SuppressWarnings("squid:S2789")
   @Override
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
