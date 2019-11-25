@@ -16,10 +16,12 @@
 package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.exception.MessageException;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -50,6 +52,19 @@ public class MessageBundle
   }
 
 
+  /**
+   * Returns all codes contained in this message bundle.
+   *
+   * @return  set with all message codes, never {@code null}
+   */
+  @NotNull
+  @Contract(value = "-> new", pure = true)
+  public Set<String> getCodes() {
+    return Collections.unmodifiableSet(messages.keySet());
+  }
+
+
+  @Contract(pure = true)
   public Message.WithCode getByCode(@NotNull String code) {
     return messages.get(code);
   }
