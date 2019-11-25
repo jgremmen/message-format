@@ -2,8 +2,8 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.Message.WithCode;
-import de.sayayi.lib.message.annotation.Message;
-import de.sayayi.lib.message.annotation.Messages;
+import de.sayayi.lib.message.annotation.MessageDef;
+import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.impl.EmptyMessageWithCode;
 import org.junit.Before;
@@ -19,21 +19,21 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Jeroen Gremmen
  */
-public class MessageAnnotationTest
+public class MessageDefAnnotationTest
 {
   private MessageBundle bundle;
 
 
   @Before
   public void initialize() {
-    bundle = new MessageBundle(MessageAnnotationTest.class);
+    bundle = new MessageBundle(MessageDefAnnotationTest.class);
   }
 
 
   @Test
-  @Messages({
-      @Message(code = "T4", texts = @Text(locale = "en", text = "Message %{p1}")),
-      @Message(code = "T5", texts = {
+  @MessageDefs({
+      @MessageDef(code = "T4", texts = @Text(locale = "en", text = "Message %{p1}")),
+      @MessageDef(code = "T5", texts = {
           @Text(locale = "en", text = "English message"),
           @Text(locale = "de", text = "Deutsche Nachricht")
       })
@@ -55,7 +55,7 @@ public class MessageAnnotationTest
 
 
   @Test
-  @Message(code="MSG-052", texts={})
+  @MessageDef(code="MSG-052", texts={})
   public void testEmptyMessageWithCode()
   {
     final WithCode msg = bundle.getByCode("MSG-052");
@@ -66,7 +66,7 @@ public class MessageAnnotationTest
 
 
   @Test
-  @Message(code="T3", texts=@Text("m3"))
+  @MessageDef(code="T3", texts=@Text("m3"))
   public void testMessageWithoutLocale()
   {
     final WithCode msg = bundle.getByCode("T3");
@@ -81,7 +81,7 @@ public class MessageAnnotationTest
 
 
   @Test
-  @Message(code="T2", texts=@Text(locale="nl-NL", text="nl"))
+  @MessageDef(code="T2", texts=@Text(locale="nl-NL", text="nl"))
   public void testSingleMessageWithLocale()
   {
     final WithCode msg = bundle.getByCode("T2");
@@ -95,7 +95,7 @@ public class MessageAnnotationTest
 
 
   @Test
-  @Message(code = "T1", texts={
+  @MessageDef(code = "T1", texts={
       @Text(locale="en-US", text="us"),
       @Text(locale="nl", text="nl"),
       @Text(locale="en-GB", text="uk"),

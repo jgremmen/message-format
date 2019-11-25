@@ -23,12 +23,12 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Messages
+public @interface MessageDefs
 {
   /**
-   * 0..n messages.
+   * 0..n message definitions.
    *
-   * @return  messages
+   * @return  message definitions
    */
-  Message[] value() default {};
+  MessageDef[] value() default {};
 }

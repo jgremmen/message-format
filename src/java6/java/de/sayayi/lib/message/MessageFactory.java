@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message;
 
-import de.sayayi.lib.message.annotation.Messages;
+import de.sayayi.lib.message.annotation.MessageDef;
+import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.exception.MessageLocaleParseException;
 import de.sayayi.lib.message.impl.EmptyMessageWithCode;
@@ -102,16 +103,16 @@ public final class MessageFactory
   {
     Set<Message.WithCode> messageBundle = new HashSet<Message.WithCode>();
 
-    de.sayayi.lib.message.annotation.Message annotation =
-        element.getAnnotation(de.sayayi.lib.message.annotation.Message.class);
+    MessageDef annotation =
+        element.getAnnotation(MessageDef.class);
     if (annotation != null)
       messageBundle.add(parse(annotation));
 
-    Messages messagesAnnotation = element.getAnnotation(Messages.class);
-    if (messagesAnnotation != null)
-      for(de.sayayi.lib.message.annotation.Message message: messagesAnnotation.value())
+    MessageDefs messageDefsAnnotation = element.getAnnotation(MessageDefs.class);
+    if (messageDefsAnnotation != null)
+      for(MessageDef messageDef: messageDefsAnnotation.value())
       {
-        Message.WithCode mwc = parse(message);
+        Message.WithCode mwc = parse(messageDef);
 
         if (!messageBundle.add(mwc))
           throw new IllegalArgumentException("duplicate message code " + mwc.getCode() + " found");
@@ -124,7 +125,7 @@ public final class MessageFactory
 
 
   @NotNull
-  public static Message.WithCode parse(@NotNull de.sayayi.lib.message.annotation.Message annotation)
+  public static Message.WithCode parse(@NotNull MessageDef annotation)
   {
     final Text[] texts = annotation.texts();
     if (texts.length == 0)
