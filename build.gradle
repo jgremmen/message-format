@@ -79,8 +79,8 @@ dependencies {
     builtBy compileJava6Java
   }
 
-  testCompile 'junit:junit:'
-  testCompile 'joda-time:joda-time:'
+  testImplementation 'junit:junit:'
+  testImplementation 'joda-time:joda-time:'
   testCompileOnly 'org.jetbrains:annotations:'
 }
 
