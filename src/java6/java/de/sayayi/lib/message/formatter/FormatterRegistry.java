@@ -26,3 +26,4 @@ public interface FormatterRegistry extends FormatterService
 
   void addFormatter(ParameterFormatter formatter);
 }
+

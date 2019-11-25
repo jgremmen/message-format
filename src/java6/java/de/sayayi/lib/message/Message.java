@@ -121,6 +121,14 @@ public interface Message extends Serializable
     ParameterBuilder with(@NotNull Map<String,Object> parameterValues);
 
 
+    @Contract("_, _, _ -> this")
+    ParameterBuilder withNotNull(@NotNull String parameter, Object value, @NotNull Object notNullValue);
+
+
+    @Contract("_, _, _ -> this")
+    ParameterBuilder withNotEmpty(@NotNull String parameter, Object value, @NotNull Object notEmptyValue);
+
+
     @Contract("_ -> this")
     ParameterBuilder withLocale(Locale locale);
 
