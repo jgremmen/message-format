@@ -23,6 +23,8 @@ import de.sayayi.lib.message.impl.EmptyMessageWithCode;
 import de.sayayi.lib.message.impl.MessageDelegateWithCode;
 import de.sayayi.lib.message.impl.MultipartLocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.parser.MessageParser;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,24 +43,21 @@ import static java.util.Locale.ROOT;
 /**
  * @author Jeroen Gremmen
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MessageFactory
 {
   private static final AtomicInteger CODE_ID = new AtomicInteger(0);
 
 
-  private MessageFactory() {
-  }
-
-
-  @Contract("_ -> new")
   @NotNull
+  @Contract(value = "_ -> new", pure = true)
   public static Message parse(@NotNull String text) {
     return new MessageParser(text).parseMessage();
   }
 
 
-  @Contract("_ -> new")
   @NotNull
+  @Contract(value = "_ -> new", pure = true)
   public static Message parse(@NotNull Map<Locale,String> localizedTexts) {
     return parse("Generated::" + CODE_ID.incrementAndGet(), localizedTexts);
   }
@@ -73,12 +72,14 @@ public final class MessageFactory
    * @return  message instance
    */
   @NotNull
+  @Contract(value = "_, _ -> new", pure = true)
   public static Message.WithCode parse(@NotNull String code, @NotNull String text) {
     return new MessageDelegateWithCode(code, new MessageParser(text).parseMessage());
   }
 
 
   @NotNull
+  @Contract(value = "_, _ -> new", pure = true)
   public static Message.WithCode parse(@NotNull String code, @NotNull Map<Locale,String> localizedTexts)
   {
     if (localizedTexts.isEmpty())
@@ -99,12 +100,12 @@ public final class MessageFactory
 
   @SuppressWarnings("WeakerAccess")
   @NotNull
+  @Contract(value = "_ -> new", pure = true)
   public static Set<Message.WithCode> parseAnnotations(@NotNull AnnotatedElement element)
   {
     Set<Message.WithCode> messageBundle = new HashSet<Message.WithCode>();
 
-    MessageDef annotation =
-        element.getAnnotation(MessageDef.class);
+    MessageDef annotation = element.getAnnotation(MessageDef.class);
     if (annotation != null)
       messageBundle.add(parse(annotation));
 
@@ -125,6 +126,7 @@ public final class MessageFactory
 
 
   @NotNull
+  @Contract(value = "_ -> new", pure = true)
   public static Message.WithCode parse(@NotNull MessageDef annotation)
   {
     final Text[] texts = annotation.texts();
@@ -147,6 +149,7 @@ public final class MessageFactory
 
 
   @NotNull
+  @Contract(pure = true)
   static Locale forLanguageTag(@NotNull String locale)
   {
     if (locale.isEmpty())

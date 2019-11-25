@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -32,12 +33,14 @@ public final class StringFormatter implements NamedParameterFormatter
 {
   @NotNull
   @Override
+  @Contract(pure = true)
   public String getName() {
     return "string";
   }
 
 
   @Override
+  @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     if (value == null)
@@ -52,6 +55,7 @@ public final class StringFormatter implements NamedParameterFormatter
 
   @NotNull
   @Override
+  @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
     return new HashSet<Class<?>>(Arrays.asList(CharSequence.class, char[].class));
   }

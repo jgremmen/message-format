@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.formatter;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -28,5 +29,6 @@ public interface NamedParameterFormatter extends ParameterFormatter
    *
    * @return  data formatter name, never {@code null}
    */
+  @Contract(pure = true)
   @NotNull String getName();
 }

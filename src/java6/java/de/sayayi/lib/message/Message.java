@@ -39,6 +39,7 @@ public interface Message extends Serializable
    *
    * @return  formatted message
    */
+  @Contract(pure = true)
   String format(@NotNull Parameters parameters);
 
 
@@ -47,6 +48,7 @@ public interface Message extends Serializable
    *
    * @return  {@code true} if this message contains parameters, {@code false} otherwise
    */
+  @Contract(pure = true)
   boolean hasParameters();
 
 
@@ -60,6 +62,7 @@ public interface Message extends Serializable
      *
      * @return  locale, never {@code null}
      */
+    @Contract(pure = true)
     @NotNull Locale getLocale();
 
 
@@ -73,6 +76,7 @@ public interface Message extends Serializable
      *
      * @return  data value or {@code null} if no value is available for the given data name
      */
+    @Contract(pure = true)
     Object getParameterValue(@NotNull String parameter);
 
 
@@ -82,6 +86,7 @@ public interface Message extends Serializable
      * @return  set with all data names
      */
     @SuppressWarnings("unused")
+    @Contract(pure = true)
     @NotNull Set<String> getParameterNames();
   }
 
@@ -145,12 +150,14 @@ public interface Message extends Serializable
      *
      * @return  message code, never {@code null}
      */
+    @Contract(pure = true)
     @NotNull String getCode();
   }
 
 
   interface LocaleAware extends Message
   {
+    @Contract(pure = true)
     @NotNull Set<Locale> getLocales();
   }
 }

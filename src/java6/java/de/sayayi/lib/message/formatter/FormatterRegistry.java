@@ -15,15 +15,17 @@
  */
 package de.sayayi.lib.message.formatter;
 
+import org.jetbrains.annotations.NotNull;
+
 
 /**
  * @author Jeroen Gremmen
  */
 public interface FormatterRegistry extends FormatterService
 {
-  void addFormatterForType(Class<?> type, ParameterFormatter formatter);
+  void addFormatterForType(@NotNull Class<?> type, @NotNull ParameterFormatter formatter);
 
 
-  void addFormatter(ParameterFormatter formatter);
+  void addFormatter(@NotNull ParameterFormatter formatter);
 }
 

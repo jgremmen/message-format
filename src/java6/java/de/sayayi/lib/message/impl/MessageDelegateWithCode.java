@@ -17,6 +17,7 @@ package de.sayayi.lib.message.impl;
 
 import de.sayayi.lib.message.Message;
 import lombok.ToString;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -41,12 +42,14 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
 
 
   @Override
+  @Contract(pure = true)
   public String format(@NotNull Parameters parameters) {
     return message.format(parameters);
   }
 
 
   @Override
+  @Contract(pure = true)
   public boolean hasParameters() {
     return message.hasParameters();
   }

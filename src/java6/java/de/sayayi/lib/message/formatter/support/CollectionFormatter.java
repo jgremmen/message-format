@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -34,6 +35,7 @@ import static java.util.ResourceBundle.getBundle;
 public class CollectionFormatter implements ParameterFormatter
 {
   @Override
+  @Contract(pure = true)
   public String format(Object collection, String format, @NotNull Parameters parameters, ParameterData data)
   {
     if (collection == null)
@@ -60,6 +62,7 @@ public class CollectionFormatter implements ParameterFormatter
 
   @NotNull
   @Override
+  @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
     return Collections.<Class<?>>singleton(Collection.class);
   }

@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
@@ -57,6 +58,7 @@ public class JodaDateTimeFormatter implements ParameterFormatter
 
 
   @Override
+  @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     final Locale locale = parameters.getLocale();
@@ -100,6 +102,7 @@ public class JodaDateTimeFormatter implements ParameterFormatter
 
   @NotNull
   @Override
+  @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
     return new HashSet<Class<?>>(Arrays.<Class<?>>asList(BaseLocal.class, ReadableDateTime.class));
   }

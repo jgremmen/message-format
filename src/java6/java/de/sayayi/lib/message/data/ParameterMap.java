@@ -18,6 +18,7 @@ package de.sayayi.lib.message.data;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import lombok.ToString;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -43,18 +44,21 @@ public class ParameterMap implements ParameterData
   }
 
 
+  @Contract(pure = true)
   public Message getMessageFor(boolean key) {
     return getMessageForKey(key);
   }
 
 
   @SuppressWarnings("unused")
+  @Contract(pure = true)
   public Message getMessageFor(int key) {
     return getMessageForKey(key);
   }
 
 
   @SuppressWarnings("unused")
+  @Contract(pure = true)
   public Message getMessageFor(String key) {
     return getMessageForKey(key);
   }
@@ -77,6 +81,7 @@ public class ParameterMap implements ParameterData
 
 
   @Override
+  @Contract(pure = true)
   public String format(@NotNull Parameters parameters, Serializable key)
   {
     Message message = getMessageForKey(key);
@@ -128,12 +133,14 @@ public class ParameterMap implements ParameterData
 
 
   @Override
+  @Contract(pure = true)
   public String format(@NotNull Parameters parameters) {
     return format(parameters, null);
   }
 
 
   @Override
+  @Contract(value = "-> fail", pure = true)
   public Serializable asObject() {
     return new UnsupportedOperationException();
   }

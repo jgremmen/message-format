@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -36,6 +37,7 @@ import static java.util.ResourceBundle.getBundle;
 public class MapFormatter implements ParameterFormatter
 {
   @Override
+  @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     final Map<?,?> map = (Map<?,?>)value;
@@ -76,6 +78,7 @@ public class MapFormatter implements ParameterFormatter
 
   @NotNull
   @Override
+  @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
     return Collections.<Class<?>>singleton(Map.class);
   }

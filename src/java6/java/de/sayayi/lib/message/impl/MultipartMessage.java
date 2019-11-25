@@ -18,6 +18,7 @@ package de.sayayi.lib.message.impl;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.parser.MessagePart;
 import lombok.ToString;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -40,6 +41,7 @@ public class MultipartMessage implements Message
 
 
   @Override
+  @Contract(pure = true)
   public String format(@NotNull Parameters parameters)
   {
     final StringBuilder message = new StringBuilder();
@@ -64,6 +66,7 @@ public class MultipartMessage implements Message
 
 
   @Override
+  @Contract(pure = true)
   public boolean hasParameters() {
     return parts.length > 0 && (parts.length > 1 || parts[0].isParameter());
   }

@@ -20,6 +20,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterMap;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
@@ -38,12 +39,14 @@ public class BoolFormatter implements NamedParameterFormatter
 {
   @NotNull
   @Override
+  @Contract(pure = true)
   public String getName() {
     return "bool";
   }
 
 
   @Override
+  @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     Boolean bool;
@@ -76,6 +79,7 @@ public class BoolFormatter implements NamedParameterFormatter
 
   @NotNull
   @Override
+  @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
     return new HashSet<Class<?>>(Arrays.<Class<?>>asList(Boolean.class, boolean.class));
   }

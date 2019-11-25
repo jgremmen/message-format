@@ -20,6 +20,7 @@ import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import lombok.Getter;
+import org.jetbrains.annotations.Contract;
 
 
 /**
@@ -45,6 +46,7 @@ final class ParameterPart extends MessagePart
 
 
   @Override
+  @Contract(pure = true)
   public String getText(Parameters parameters)
   {
     final Object value = parameters.getParameterValue(parameter);
@@ -63,12 +65,14 @@ final class ParameterPart extends MessagePart
 
 
   @Override
+  @Contract(pure = true)
   public boolean isParameter() {
     return true;
   }
 
 
   @Override
+  @Contract(pure = true)
   public String toString()
   {
     final StringBuilder s = new StringBuilder(getClass().getSimpleName()).append("(data=").append(parameter);
