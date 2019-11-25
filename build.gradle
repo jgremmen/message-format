@@ -10,7 +10,7 @@ plugins {
 
 description 'Message Format Library'
 group 'de.sayayi.lib'
-version '0.2.1'
+version '0.3.0'
 
 
 sourceSets {
@@ -88,4 +88,7 @@ dependencies {
 jar {
   from sourceSets.java6.output
   from sourceSets.java8.output
+
+  reproducibleFileOrder = true
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
