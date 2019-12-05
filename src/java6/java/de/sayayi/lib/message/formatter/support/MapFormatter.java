@@ -34,7 +34,7 @@ import static java.util.ResourceBundle.getBundle;
 /**
  * @author Jeroen Gremmen
  */
-public class MapFormatter implements ParameterFormatter
+public final class MapFormatter implements ParameterFormatter
 {
   @Override
   @Contract(pure = true)

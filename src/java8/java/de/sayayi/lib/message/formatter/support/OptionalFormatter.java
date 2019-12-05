@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public class OptionalFormatter implements ParameterFormatter
+public final class OptionalFormatter implements ParameterFormatter
 {
   @SuppressWarnings("squid:S2789")
   @Override

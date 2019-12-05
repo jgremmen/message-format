@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 /**
  * @author Jeroen Gremmen
  */
-public class SupplierFormatter implements ParameterFormatter
+public final class SupplierFormatter implements ParameterFormatter
 {
   @Override
   @Contract(pure = true)

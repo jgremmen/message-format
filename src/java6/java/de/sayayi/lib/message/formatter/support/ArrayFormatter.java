@@ -34,7 +34,7 @@ import static java.util.ResourceBundle.getBundle;
 /**
  * @author Jeroen Gremmen
  */
-public class ArrayFormatter implements ParameterFormatter
+public final class ArrayFormatter implements ParameterFormatter
 {
   @Override
   @Contract(pure = true)

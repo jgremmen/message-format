@@ -41,7 +41,7 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public class JodaDateTimeFormatter implements ParameterFormatter
+public final class JodaDateTimeFormatter implements ParameterFormatter
 {
   private static final Map<String,String> STYLE = new HashMap<String,String>();
 

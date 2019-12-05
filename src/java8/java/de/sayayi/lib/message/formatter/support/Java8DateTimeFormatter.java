@@ -45,7 +45,7 @@ import static java.time.format.FormatStyle.SHORT;
 /**
  * @author Jeroen Gremmen
  */
-public class Java8DateTimeFormatter implements ParameterFormatter
+public final class Java8DateTimeFormatter implements ParameterFormatter
 {
   private static final Map<String,String> STYLE = new HashMap<>();
   private static final Map<String,DateTimeFormatter> FORMATTER = new HashMap<>();

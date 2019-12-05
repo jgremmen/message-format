@@ -36,7 +36,7 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public class NumberFormatter implements ParameterFormatter
+public final class NumberFormatter implements ParameterFormatter
 {
   private static final BoolFormatter BOOL_FORMATTER = new BoolFormatter();
 

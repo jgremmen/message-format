@@ -32,7 +32,7 @@ import static java.util.ResourceBundle.getBundle;
 /**
  * @author Jeroen Gremmen
  */
-public class CollectionFormatter implements ParameterFormatter
+public final class CollectionFormatter implements ParameterFormatter
 {
   @Override
   @Contract(pure = true)

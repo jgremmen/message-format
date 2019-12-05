@@ -39,7 +39,7 @@ import static java.text.DateFormat.getDateInstance;
 /**
  * @author Jeroen Gremmen
  */
-public class DateFormatter implements ParameterFormatter
+public final class DateFormatter implements ParameterFormatter
 {
   @Override
   @Contract(pure = true)

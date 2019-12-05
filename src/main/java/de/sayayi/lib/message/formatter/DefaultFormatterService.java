@@ -20,6 +20,7 @@ import de.sayayi.lib.message.formatter.support.BoolFormatter;
 import de.sayayi.lib.message.formatter.support.ChoiceFormatter;
 import de.sayayi.lib.message.formatter.support.CollectionFormatter;
 import de.sayayi.lib.message.formatter.support.DateFormatter;
+import de.sayayi.lib.message.formatter.support.FileFormatter;
 import de.sayayi.lib.message.formatter.support.MapFormatter;
 import de.sayayi.lib.message.formatter.support.NumberFormatter;
 import de.sayayi.lib.message.formatter.support.StringFormatter;
@@ -62,6 +63,7 @@ public class DefaultFormatterService extends GenericFormatterRegistry
     addFormatter(new ArrayFormatter());
     addFormatter(new CollectionFormatter());
     addFormatter(new MapFormatter());
+    addFormatter(new FileFormatter());
 
     if (hasClass("org.joda.time.DateTime"))
       addFormatter(new de.sayayi.lib.message.formatter.support.JodaDateTimeFormatter());
@@ -75,6 +77,7 @@ public class DefaultFormatterService extends GenericFormatterRegistry
       addFormatter(new de.sayayi.lib.message.formatter.support.LongSupplierFormatter());
       addFormatter(new de.sayayi.lib.message.formatter.support.IntSupplierFormatter());
       addFormatter(new de.sayayi.lib.message.formatter.support.BooleanSupplierFormatter());
+      addFormatter(new de.sayayi.lib.message.formatter.support.PathFormatter());
     }
   }
 

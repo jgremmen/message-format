@@ -29,7 +29,7 @@ import java.util.function.BooleanSupplier;
 /**
  * @author Jeroen Gremmen
  */
-public class BooleanSupplierFormatter implements ParameterFormatter
+public final class BooleanSupplierFormatter implements ParameterFormatter
 {
   @Override
   @Contract(pure = true)

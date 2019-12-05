@@ -29,7 +29,7 @@ import java.util.function.LongSupplier;
 /**
  * @author Jeroen Gremmen
  */
-public class LongSupplierFormatter implements ParameterFormatter
+public final class LongSupplierFormatter implements ParameterFormatter
 {
   @Override
   @Contract(pure = true)

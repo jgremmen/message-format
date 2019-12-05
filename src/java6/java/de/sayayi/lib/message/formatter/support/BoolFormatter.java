@@ -35,7 +35,7 @@ import static java.util.ResourceBundle.getBundle;
 /**
  * @author Jeroen Gremmen
  */
-public class BoolFormatter implements NamedParameterFormatter
+public final class BoolFormatter implements NamedParameterFormatter
 {
   @NotNull
   @Override
