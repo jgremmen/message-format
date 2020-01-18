@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.impl;
 
 import de.sayayi.lib.message.Message;
+import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,7 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
 {
   private static final long serialVersionUID = 201L;
 
-  private final Message message;
+  @Getter private final Message message;
 
 
   public MessageDelegateWithCode(@NotNull String code, @NotNull Message message)

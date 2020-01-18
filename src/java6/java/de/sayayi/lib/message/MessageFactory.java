@@ -19,6 +19,7 @@ import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.exception.MessageLocaleParseException;
+import de.sayayi.lib.message.impl.EmptyMessage;
 import de.sayayi.lib.message.impl.EmptyMessageWithCode;
 import de.sayayi.lib.message.impl.MessageDelegateWithCode;
 import de.sayayi.lib.message.impl.MultipartLocalizedMessageBundleWithCode;
@@ -145,6 +146,28 @@ public final class MessageFactory
     }
 
     return parse(annotation.code(), localizedTexts);
+  }
+
+
+  @NotNull
+  @Contract(pure = true)
+  public static Message.WithCode withCode(@NotNull String code, @NotNull Message message)
+  {
+    if (message instanceof MessageDelegateWithCode)
+      return new MessageDelegateWithCode(code, ((MessageDelegateWithCode)message).getMessage());
+
+    if (message instanceof Message.WithCode)
+    {
+      Message.WithCode messageWithCode = (Message.WithCode)message;
+
+      if (code.equals(messageWithCode.getCode()))
+        return messageWithCode;
+    }
+
+    if (message instanceof EmptyMessage || message instanceof EmptyMessageWithCode)
+      return new EmptyMessageWithCode(code);
+
+    return new MessageDelegateWithCode(code, message);
   }
 
 

@@ -66,6 +66,7 @@ public interface Message extends Serializable
     @NotNull Locale getLocale();
 
 
+    @NotNull
     ParameterFormatter getFormatter(String format, Class<?> type);
 
 
