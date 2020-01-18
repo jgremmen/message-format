@@ -18,10 +18,9 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Path;
+import java.lang.ref.Reference;
 import java.util.Collections;
 import java.util.Set;
 
@@ -29,31 +28,27 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public final class PathFormatter implements ParameterFormatter
+public final class ReferenceFormatter implements ParameterFormatter
 {
   @Override
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
-    if (value == null)
-      return null;
+    if (value != null)
+    {
+      Reference reference = (Reference)value;
+      value = reference.get();
 
-    Path path = (Path)value;
+      if (value != null)
+        return parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data);
+    }
 
-    if ("name".equals(format))
-      path = path.getFileName();
-    else if ("parent".equals(format))
-      path = path.getParent();
-    else if ("root".equals(format))
-      path = path.getRoot();
-
-    return path == null ? null : path.toString();
+    return null;
   }
 
 
   @NotNull
   @Override
-  @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(Path.class);
+    return Collections.<Class<?>>singleton(Reference.class);
   }
 }

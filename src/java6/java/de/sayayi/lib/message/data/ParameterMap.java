@@ -29,7 +29,6 @@ import java.util.Map.Entry;
 
 /**
  * @author Jeroen Gremmen
- *
  */
 @ToString
 public class ParameterMap implements ParameterData
@@ -61,6 +60,12 @@ public class ParameterMap implements ParameterData
   @Contract(pure = true)
   public Message getMessageFor(String key) {
     return getMessageForKey(key);
+  }
+
+
+  @Contract(pure = true)
+  public boolean hasMessageForKey(Serializable key) {
+    return getMessageForKey(key) != null || map.get(null) != null;
   }
 
 

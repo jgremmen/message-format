@@ -17,11 +17,10 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Path;
+import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
 
@@ -29,24 +28,42 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public final class PathFormatter implements ParameterFormatter
+public final class URIFormatter extends AbstractParameterFormatter
 {
   @Override
+  @SuppressWarnings({"squid:S3358", "squid:S3776"})
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     if (value == null)
       return null;
 
-    Path path = (Path)value;
+    final URI uri = (URI)value;
 
-    if ("name".equals(format))
-      path = path.getFileName();
-    else if ("parent".equals(format))
-      path = path.getParent();
-    else if ("root".equals(format))
-      path = path.getRoot();
+    if ("authority".equals(format))
+      return uri.getAuthority();
+    else if ("fragment".equals(format))
+      return uri.getFragment();
+    else if ("host".equals(format))
+      return uri.getHost();
+    else if ("path".equals(format))
+      return uri.getPath();
+    else if ("port".equals(format))
+    {
+      int port = uri.getPort();
+      return hasMessageFor(port, data)
+          ? data.format(parameters, port) : ((port == -1) ? null : Integer.toString(port));
+    }
+    else if ("query".equals(format))
+      return uri.getQuery();
+    else if ("scheme".equals(format))
+    {
+      String scheme = uri.getScheme();
+      return hasMessageFor(scheme, data) ? data.format(parameters, scheme) : scheme;
+    }
+    else if ("user-info".equals(format))
+      return uri.getUserInfo();
 
-    return path == null ? null : path.toString();
+    return uri.toString();
   }
 
 
@@ -54,6 +71,6 @@ public final class PathFormatter implements ParameterFormatter
   @Override
   @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(Path.class);
+    return Collections.<Class<?>>singleton(URI.class);
   }
 }

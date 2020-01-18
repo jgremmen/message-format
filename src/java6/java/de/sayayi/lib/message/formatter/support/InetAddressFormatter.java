@@ -18,10 +18,9 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Path;
+import java.net.InetAddress;
 import java.util.Collections;
 import java.util.Set;
 
@@ -29,7 +28,7 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public final class PathFormatter implements ParameterFormatter
+public final class InetAddressFormatter implements ParameterFormatter
 {
   @Override
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
@@ -37,23 +36,20 @@ public final class PathFormatter implements ParameterFormatter
     if (value == null)
       return null;
 
-    Path path = (Path)value;
+    InetAddress inetAddress = (InetAddress)value;
 
     if ("name".equals(format))
-      path = path.getFileName();
-    else if ("parent".equals(format))
-      path = path.getParent();
-    else if ("root".equals(format))
-      path = path.getRoot();
+      return inetAddress.getHostName();
+    else if ("canonical".equals(format) || "fqdn".equals(format))
+      return inetAddress.getCanonicalHostName();
 
-    return path == null ? null : path.toString();
+    return inetAddress.getHostAddress();
   }
 
 
   @NotNull
   @Override
-  @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(Path.class);
+    return Collections.<Class<?>>singleton(InetAddress.class);
   }
 }

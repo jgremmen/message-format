@@ -21,8 +21,9 @@ import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -36,21 +37,21 @@ public final class CollectionFormatter implements ParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public String format(Object collection, String format, @NotNull Parameters parameters, ParameterData data)
+  public String format(Object iterable, String format, @NotNull Parameters parameters, ParameterData data)
   {
-    if (collection == null)
+    if (iterable == null)
       return null;
 
     final ResourceBundle bundle = getBundle(getClass().getPackage().getName() + ".Formatter",
         parameters.getLocale());
     final StringBuilder s = new StringBuilder();
 
-    for(Object value: (Collection)collection)
+    for(Object value: (Iterable)iterable)
     {
       if (s.length() > 0)
         s.append(", ");
 
-      if (value == collection)
+      if (value == iterable)
         s.append(bundle.getString("thisCollection"));
       else if (value != null)
         s.append(parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data));
@@ -64,6 +65,6 @@ public final class CollectionFormatter implements ParameterFormatter
   @Override
   @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(Collection.class);
+    return new HashSet<Class<?>>(Arrays.asList(Collection.class, Iterable.class));
   }
 }

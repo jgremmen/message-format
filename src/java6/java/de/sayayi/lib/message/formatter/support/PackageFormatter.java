@@ -21,7 +21,6 @@ import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Set;
 
@@ -29,24 +28,11 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public final class PathFormatter implements ParameterFormatter
+public final class PackageFormatter implements ParameterFormatter
 {
   @Override
-  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
-  {
-    if (value == null)
-      return null;
-
-    Path path = (Path)value;
-
-    if ("name".equals(format))
-      path = path.getFileName();
-    else if ("parent".equals(format))
-      path = path.getParent();
-    else if ("root".equals(format))
-      path = path.getRoot();
-
-    return path == null ? null : path.toString();
+  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data) {
+    return value == null ? null : ((Package)value).getName();
   }
 
 
@@ -54,6 +40,6 @@ public final class PathFormatter implements ParameterFormatter
   @Override
   @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(Path.class);
+    return Collections.<Class<?>>singleton(Package.class);
   }
 }

@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -28,7 +28,7 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public class FileFormatter implements ParameterFormatter
+public final class FileFormatter extends AbstractParameterFormatter
 {
   @Override
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
@@ -44,6 +44,14 @@ public class FileFormatter implements ParameterFormatter
       return file.getPath();
     else if ("parent".equals(format))
       return file.getParent();
+    else if ("extension".equals(format))
+    {
+      String name = file.getName();
+      int dotidx = name.lastIndexOf('.');
+      String extension = (dotidx == -1) ? null : name.substring(dotidx + 1);
+
+      return hasMessageFor(extension, data) ? data.format(parameters, extension) : extension;
+    }
 
     return file.getAbsolutePath();
   }
@@ -51,6 +59,7 @@ public class FileFormatter implements ParameterFormatter
 
   @NotNull
   @Override
+  @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
     return Collections.<Class<?>>singleton(File.class);
   }
