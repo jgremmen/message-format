@@ -121,4 +121,11 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
   public Set<Locale> getLocales() {
     return Collections.unmodifiableSet(localizedMessages.keySet());
   }
+
+
+  @NotNull
+  @Override
+  public Map<Locale,Message> getLocalizedMessages() {
+    return Collections.unmodifiableMap(localizedMessages);
+  }
 }

@@ -160,5 +160,9 @@ public interface Message extends Serializable
   {
     @Contract(pure = true)
     @NotNull Set<Locale> getLocales();
+
+
+    @Contract(pure = true)
+    @NotNull Map<Locale,Message> getLocalizedMessages();
   }
 }
