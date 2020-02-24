@@ -64,6 +64,9 @@ public class DefaultFormatterService extends GenericFormatterRegistry
     addFormatter(new ReferenceFormatter());
     addFormatter(new ThreadLocalFormatter());
     addFormatter(new InetAddressFormatter());
+    addFormatter(new AtomicBooleanFormatter());
+    addFormatter(new AtomicIntegerFormatter());
+    addFormatter(new AtomicLongFormatter());
 
     if (hasClass("org.joda.time.DateTime"))
       addFormatter(new de.sayayi.lib.message.formatter.support.JodaDateTimeFormatter());
