@@ -45,7 +45,7 @@ public final class BitsFormatter implements NamedParameterFormatter
     final int bitCount;
 
     // check preconditions
-    if (value instanceof Number && (bitCount = detectBitCount(data, (Number)value)) > 0)
+    if (value instanceof Number && (bitCount = detectBitCount(data, value)) > 0)
       return format(bitCount, value);
 
     return null;

@@ -30,6 +30,7 @@ import java.util.Set;
  */
 public final class ReferenceFormatter implements ParameterFormatter
 {
+  @SuppressWarnings("rawtypes")
   @Override
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {

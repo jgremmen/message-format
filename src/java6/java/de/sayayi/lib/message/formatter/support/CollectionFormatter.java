@@ -35,6 +35,7 @@ import static java.util.ResourceBundle.getBundle;
  */
 public final class CollectionFormatter implements ParameterFormatter
 {
+  @SuppressWarnings("rawtypes")
   @Override
   @Contract(pure = true)
   public String format(Object iterable, String format, @NotNull Parameters parameters, ParameterData data)

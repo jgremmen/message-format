@@ -41,11 +41,8 @@ public class SinglePartMessage implements Message
 
   @Override
   @Contract(pure = true)
-  public String format(@NotNull Parameters parameters)
-  {
-    final String text = part.getText(parameters);
-
-    return (text == null) ? "" : text;
+  public String format(@NotNull Parameters parameters) {
+    return part.getText(parameters);
   }
 
 

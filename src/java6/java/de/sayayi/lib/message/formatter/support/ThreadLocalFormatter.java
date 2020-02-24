@@ -29,6 +29,7 @@ import java.util.Set;
  */
 public final class ThreadLocalFormatter implements ParameterFormatter
 {
+  @SuppressWarnings("rawtypes")
   @Override
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {

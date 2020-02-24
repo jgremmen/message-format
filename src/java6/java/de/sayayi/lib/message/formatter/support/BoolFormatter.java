@@ -49,7 +49,7 @@ public final class BoolFormatter implements NamedParameterFormatter
   @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
-    Boolean bool;
+    boolean bool;
 
     if (value instanceof Boolean)
       bool = (Boolean)value;
@@ -62,7 +62,7 @@ public final class BoolFormatter implements NamedParameterFormatter
     else if (value instanceof Number)
       bool = Math.signum(((Number)value).doubleValue()) != 0;
     else
-      bool = Boolean.valueOf(String.valueOf(value));
+      bool = Boolean.parseBoolean(String.valueOf(value));
 
     // allow custom messages for true/false value?
     if (data instanceof ParameterMap)
@@ -73,7 +73,7 @@ public final class BoolFormatter implements NamedParameterFormatter
     }
 
     return getBundle(getClass().getPackage().getName() + ".Formatter",
-        parameters.getLocale()).getString(bool.toString());
+        parameters.getLocale()).getString(Boolean.toString(bool));
   }
 
 
