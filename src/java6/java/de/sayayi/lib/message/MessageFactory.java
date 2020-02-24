@@ -30,12 +30,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.AnnotatedElement;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Locale.ROOT;
@@ -168,6 +164,82 @@ public final class MessageFactory
       return new EmptyMessageWithCode(code);
 
     return new MessageDelegateWithCode(code, message);
+  }
+
+
+  @NotNull
+  @Contract(pure = true)
+  public static MessageBundle bundle(@NotNull Properties properties)
+  {
+    MessageBundle bundle = new MessageBundle();
+
+    for(Entry<Object,Object> entry: properties.entrySet())
+      bundle.add(parse(entry.getKey().toString(), String.valueOf(entry.getValue())));
+
+    return bundle;
+  }
+
+
+  @NotNull
+  @Contract(pure = true)
+  public static MessageBundle bundle(@NotNull ResourceBundle resourceBundle)
+  {
+    MessageBundle bundle = new MessageBundle();
+    Locale locale = resourceBundle.getLocale();
+
+    for(String code: resourceBundle.keySet())
+      bundle.add(parse(code, Collections.singletonMap(locale, resourceBundle.getString(code))));
+
+    return bundle;
+  }
+
+
+  @NotNull
+  @Contract(pure = true)
+  public static MessageBundle bundle(@NotNull Map<Locale,Properties> properties)
+  {
+    Map<String,Map<Locale,Message>> localizedMessagesByCode = new HashMap<String,Map<Locale,Message>>();
+
+    for(Entry<Locale,Properties> entry: properties.entrySet())
+      for(Entry<Object,Object> localizedProperty: entry.getValue().entrySet())
+      {
+        String code = localizedProperty.getKey().toString();
+        Message message = parse(String.valueOf(localizedProperty.getValue()));
+
+        Map<Locale,Message> localizedMessages = localizedMessagesByCode.get(code);
+        if (localizedMessages == null)
+        {
+          localizedMessages = new HashMap<Locale,Message>();
+          localizedMessagesByCode.put(code, localizedMessages);
+        }
+
+        localizedMessages.put(entry.getKey(), message);
+      }
+
+    return new MessageBundle(localizedMessagesByCode);
+  }
+
+
+  @NotNull
+  @Contract(pure = true)
+  public static MessageBundle bundle(@NotNull Collection<ResourceBundle> properties)
+  {
+    Map<String,Map<Locale,Message>> localizedMessagesByCode = new HashMap<String,Map<Locale,Message>>();
+
+    for(ResourceBundle resourceBundle: properties)
+      for(String code: resourceBundle.keySet())
+      {
+        Map<Locale,Message> localizedMessages = localizedMessagesByCode.get(code);
+        if (localizedMessages == null)
+        {
+          localizedMessages = new HashMap<Locale,Message>();
+          localizedMessagesByCode.put(code, localizedMessages);
+        }
+
+        localizedMessages.put(resourceBundle.getLocale(), parse(resourceBundle.getString(code)));
+      }
+
+    return new MessageBundle(localizedMessagesByCode);
   }
 
 
