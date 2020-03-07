@@ -158,6 +158,11 @@ public interface Message extends Serializable
 
   interface LocaleAware extends Message
   {
+    /**
+     * Returns a set of all available locales this message supports.
+     *
+     * @return  all available locales, never {@code null}
+     */
     @Contract(pure = true)
     @NotNull Set<Locale> getLocales();
 
