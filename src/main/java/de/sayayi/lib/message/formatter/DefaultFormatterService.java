@@ -48,6 +48,7 @@ public class DefaultFormatterService extends GenericFormatterRegistry
     addFormatter(new ChoiceFormatter());
     addFormatter(new BoolFormatter());
     addFormatter(new BitsFormatter());
+    addFormatter(new GeoFormatter());
 
     // typed formatters
     addFormatter(new StringFormatter());
