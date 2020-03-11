@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.data.ParameterString;
@@ -135,11 +134,16 @@ public class GeoFormatterTest extends AbstractFormatterTest
     ParameterFactory factory = ParameterFactory.createFor(ENGLISH, formatterRegistry);
 
     final Parameters parameters = factory.parameters()
-        .with("lat", dms(51, 34, 16, 0))
+        .with("lat", dms(51, 34, 9, 0))
         .with("lon", dms(4, 48));
-    final Message msg = parse("coordinates %{lon,geo,'longitude'}, %{lat,geo,'latitude'}");
 
-    assertEquals("coordinates 4°48'0\"E, 51°34'16\"N", msg.format(parameters));
+    assertEquals("coordinates 4°48'0\"E, 51°34'9\"N",
+        parse("coordinates %{lon,geo,'longitude'}, %{lat,geo,'latitude'}").format(parameters));
+
+    assertEquals("coordinates 4°48.0' E, 51°34'9.000\"N",
+        parse("coordinates %{lon,geo,'dM LO'}, %{lat,geo,'long-latitude'}").format(parameters));
+
+    assertEquals("51°34'09\"N", parse("%{lat,geo,'d0m0sLA'}").format(parameters));
   }
 
 

@@ -72,7 +72,6 @@ public class GeoFormatter implements NamedParameterFormatter
     if (fmt == null)
       fmt = parseFormatString(formatString);
 
-    Locale locale = parameters.getLocale();
     StringBuilder s = new StringBuilder();
     double v = ((Number)value).doubleValue();
     double[] dms = dmsSplitter(fmt, v);
@@ -86,13 +85,13 @@ public class GeoFormatter implements NamedParameterFormatter
 
     if (fmt.hasMinutes())
     {
-      s.append(format(locale, dms[1], fmt.minuteDigits)).append('\'');
+      s.append(formatMinOrSec(parameters.getLocale(), dms[1], fmt.minuteDigits, fmt.zeroPadMinutes)).append('\'');
       if (fmt.separatorAfterMinute && (fmt.hasLoLa() || fmt.hasSeconds()))
         s.append(' ');
 
       if (fmt.hasSeconds())
       {
-        s.append(format(locale, dms[2], fmt.secondDigits)).append('"');
+        s.append(formatMinOrSec(parameters.getLocale(), dms[2], fmt.secondDigits, fmt.zeroPadSeconds)).append('"');
         if (fmt.separatorAfterSecond && fmt.hasLoLa())
           s.append(' ');
       }
@@ -146,8 +145,14 @@ public class GeoFormatter implements NamedParameterFormatter
 
 
   @SuppressWarnings("squid:S3457")
-  private String format(Locale locale, double d, int digits) {
-    return String.format(locale, "%." + digits + 'f', d);
+  private String formatMinOrSec(Locale locale, double d, int digits, boolean zeropad)
+  {
+    String s = String.format(locale, "%." + digits + 'f', d);
+
+    if (zeropad && d < 10.0)
+      s = "0" + s;
+
+    return s;
   }
 
 
