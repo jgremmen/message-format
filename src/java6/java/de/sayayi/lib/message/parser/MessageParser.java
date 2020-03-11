@@ -61,9 +61,23 @@ public final class MessageParser
     }
 
 
+    @NotNull
     @Override
-    public ParameterFormatter getFormatter(String format, Class<?> type) {
-      return null;
+    public ParameterFormatter getFormatter(String format, Class<?> type)
+    {
+      return new ParameterFormatter() {
+        @Override
+        public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data) {
+          return null;
+        }
+
+
+        @NotNull
+        @Override
+        public Set<Class<?>> getFormattableTypes() {
+          return Collections.emptySet();
+        }
+      };
     }
 
 
