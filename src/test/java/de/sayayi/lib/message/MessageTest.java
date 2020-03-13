@@ -44,4 +44,20 @@ public class MessageTest
     final String uk = m.format(ParameterFactory.createFor(Locale.UK).parameters().with("n", 4));
     assertEquals("4 colours.", uk);
   }
+
+
+  @Test
+  public void testCompareType()
+  {
+    Message m = MessageFactory.parse("%{n,choice,{<0->'negative',>0->'positive','zero'}}");
+
+    assertEquals("negative",
+        m.format(ParameterFactory.createFor(Locale.UK).parameters().with("n", -1)));
+
+    assertEquals("zero",
+        m.format(ParameterFactory.createFor(Locale.UK).parameters().with("n", 0)));
+
+    assertEquals("positive",
+        m.format(ParameterFactory.createFor(Locale.UK).parameters().with("n", 1234)));
+  }
 }

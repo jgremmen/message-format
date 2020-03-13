@@ -35,10 +35,10 @@ public class ParameterMap implements ParameterData
 {
   private static final long serialVersionUID = 201L;
 
-  private final Map<Serializable,Message> map;
+  private final Map<Key,Message> map;
 
 
-  public ParameterMap(@NotNull Map<Serializable,Message> map) {
+  public ParameterMap(@NotNull Map<Key,Message> map) {
     this.map = map;
   }
 
@@ -69,19 +69,32 @@ public class ParameterMap implements ParameterData
   }
 
 
+  @SuppressWarnings("squid:S3776")
   private Message getMessageForKey(Serializable key)
   {
-    Message message = map.get(key);
+    if (key != null)
+      for(final Entry<Key,Message> entry: map.entrySet())
+      {
+        final Key cmpkey = entry.getKey();
 
-    if (message == null && key != null)
-      for(final Entry<Serializable,Message> entry: map.entrySet())
-        if (compareKey(key, entry.getKey()))
+        if (cmpkey != null)
         {
-          message = entry.getValue();
-          break;
-        }
+          final int cmp = compareKey(key, cmpkey.value);
+          final Message message = entry.getValue();
 
-    return message;
+          switch(cmpkey.compareType)
+          {
+            case EQ:  if (cmp == 0) return message; break;
+            case NE:  if (cmp != 0) return message; break;
+            case GT:  if (cmp > 0)  return message; break;
+            case GTE: if (cmp >= 0) return message; break;
+            case LT:  if (cmp < 0)  return message; break;
+            case LTE: if (cmp <= 0) return message; break;
+          }
+        }
+     }
+
+    return map.get(null);
   }
 
 
@@ -97,19 +110,15 @@ public class ParameterMap implements ParameterData
   }
 
 
-  private boolean compareKey(Object key, Object mapKey)
+  private int compareKey(Object key, Object mapKey)
   {
-    try {
-      if (key instanceof Boolean || mapKey instanceof Boolean)
-        return toBoolean(key) == toBoolean(mapKey);
+    if (key instanceof Boolean || mapKey instanceof Boolean)
+      return (toBoolean(key) ? 1 : 0) - (toBoolean(mapKey) ? 1 : 0);
 
-      if (key instanceof Number || mapKey instanceof Number)
-        return toInteger(key) == toInteger(mapKey);
+    if (key instanceof Number || mapKey instanceof Number)
+      return Integer.signum(toInteger(key) - toInteger(mapKey));
 
-      return String.valueOf(key).equals(String.valueOf(mapKey));
-    } catch(final Exception ex) {
-      return false;
-    }
+    return String.valueOf(key).compareTo(String.valueOf(mapKey));
   }
 
 
@@ -148,5 +157,26 @@ public class ParameterMap implements ParameterData
   @Contract(value = "-> fail", pure = true)
   public Serializable asObject() {
     return new UnsupportedOperationException();
+  }
+
+
+  public static class Key implements Serializable
+  {
+    private static final long serialVersionUID = 201L;
+
+    private final CompareType compareType;
+    private final Serializable value;
+
+
+    public Key(CompareType compareType, Serializable value)
+    {
+      this.compareType = compareType;
+      this.value = value;
+    }
+  }
+
+
+  public enum CompareType {
+    LT, LTE, EQ, NE, GT, GTE
   }
 }

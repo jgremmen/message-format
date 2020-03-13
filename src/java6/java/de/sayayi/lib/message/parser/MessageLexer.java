@@ -220,6 +220,39 @@ public final class MessageLexer implements Iterable<Token>
         skipWhitespace(data);
         return null;
 
+      case '=':
+        data.pos++;
+        return new Token(start, start, EQ, "=", 0, false, false);
+
+      case '<':
+        if (start + 1 <= length)
+        {
+          final char c2 = message.charAt(start + 1);
+          if (c2 == '=')
+          {
+            data.pos += 2;
+            return new Token(start, start + 1, LTE,"<=", 0 ,false, false);
+          }
+          else if (c2 == '>')
+          {
+            data.pos += 2;
+            return new Token(start, start + 1, NE,"<>", 0 ,false, false);
+          }
+        }
+
+        data.pos++;
+        return new Token(start, start, LT, "<", 0, false, false);
+
+      case '>':
+        if (start + 1 <= length && message.charAt(start + 1) == '=')
+        {
+          data.pos += 2;
+          return new Token(start, start + 1, GTE, ">=", 0, false, false);
+        }
+
+        data.pos++;
+        return new Token(start, start, GT, ">", 0, false, false);
+
       default:
         break;
     }
@@ -350,6 +383,12 @@ public final class MessageLexer implements Iterable<Token>
     TEXT,
     NUMBER,
     ARROW,        // ->
+    LT,           // <
+    LTE,          // <=
+    EQ,           // =
+    NE,           // <>
+    GT,           // >
+    GTE,          // >=
     ;
   }
 

@@ -51,10 +51,7 @@ final class ParameterPart extends MessagePart
   {
     final Object value = parameters.getParameterValue(parameter);
     final Class<?> type = (value != null) ? value.getClass() : String.class;
-
     final ParameterFormatter formatter = parameters.getFormatter(format, type);
-    if (formatter == null)
-      throw new IllegalStateException("no matching formatter found for data " + parameter);
 
     try {
       return formatter.format(value, format, parameters, data);
