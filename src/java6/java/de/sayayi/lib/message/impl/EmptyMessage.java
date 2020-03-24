@@ -17,6 +17,7 @@ package de.sayayi.lib.message.impl;
 
 import de.sayayi.lib.message.Message;
 import lombok.ToString;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -30,12 +31,14 @@ public final class EmptyMessage implements Message
 
 
   @Override
+  @Contract(value = "_ -> null", pure = true)
   public String format(@NotNull Parameters parameters) {
     return null;
   }
 
 
   @Override
+  @Contract(value = "-> false", pure = true)
   public boolean hasParameters() {
     return false;
   }

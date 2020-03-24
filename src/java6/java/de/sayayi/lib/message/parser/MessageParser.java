@@ -21,6 +21,8 @@ import de.sayayi.lib.message.data.ParameterBoolean;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterInteger;
 import de.sayayi.lib.message.data.ParameterMap;
+import de.sayayi.lib.message.data.ParameterMap.CompareType;
+import de.sayayi.lib.message.data.ParameterMap.Key;
 import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
@@ -41,13 +43,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.ARROW;
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.COMMA;
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.MAP_END;
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.MAP_START;
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.NAME;
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.PARAM_END;
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.PARAM_START;
+import static de.sayayi.lib.message.data.ParameterMap.CompareType.EQ;
+import static de.sayayi.lib.message.data.ParameterMap.CompareType.GT;
+import static de.sayayi.lib.message.data.ParameterMap.CompareType.GTE;
+import static de.sayayi.lib.message.data.ParameterMap.CompareType.LT;
+import static de.sayayi.lib.message.data.ParameterMap.CompareType.LTE;
+import static de.sayayi.lib.message.data.ParameterMap.CompareType.NE;
+import static de.sayayi.lib.message.parser.MessageLexer.TokenType.*;
 
 
 @SuppressWarnings("squid:S1192")
@@ -61,9 +63,23 @@ public final class MessageParser
     }
 
 
+    @NotNull
     @Override
-    public ParameterFormatter getFormatter(String format, Class<?> type) {
-      return null;
+    public ParameterFormatter getFormatter(String format, Class<?> type)
+    {
+      return new ParameterFormatter() {
+        @Override
+        public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data) {
+          return null;
+        }
+
+
+        @NotNull
+        @Override
+        public Set<Class<?>> getFormattableTypes() {
+          return Collections.emptySet();
+        }
+      };
     }
 
 
@@ -317,10 +333,54 @@ public final class MessageParser
   }
 
 
+  private CompareType parseCompareType(int t)
+  {
+    final Token t0 = getTokenAt(t);
+    assert t0 != null;
+
+    // t0=LT
+    // t0=LTE
+    // t0=EQ
+    // t0=NE
+    // t0=GT
+    // t0=GTE
+
+    switch(t0.getType())
+    {
+      case LT:
+        tokens.remove(t);
+        return LT;
+
+      case LTE:
+        tokens.remove(t);
+        return LTE;
+
+      case EQ:
+        tokens.remove(t);
+        return EQ;
+
+      case NE:
+        tokens.remove(t);
+        return NE;
+
+      case GT:
+        tokens.remove(t);
+        return GT;
+
+      case GTE:
+        tokens.remove(t);
+        return GTE;
+
+      default:
+        throw new MessageParserException(t0.getStart(), "unexpected token " + t0.getText());
+    }
+  }
+
+
   @SuppressWarnings({"squid:S3776", "squid:LabelsShouldNotBeUsedCheck"})
   private ParameterMap parseParameterMap(int t)
   {
-    final Map<Serializable,Message> map = new LinkedHashMap<Serializable,Message>();
+    final Map<Key,Message> map = new LinkedHashMap<Key,Message>();
 
     Token t0 = getTokenAt(t);
 
@@ -337,10 +397,47 @@ public final class MessageParser
         if (t0 == null)
           throw new MessageParserException(lexer.getLength() + 1, "number, boolean or string expected");
 
+        CompareType compareType = EQ;
+
+        // t0=(LT \ LTE | EQ | NE | GT | GTE) (NUMBER | BOOLEAN | IN_TEXT) ARROW ...
+        // t0=(NUMBER | BOOLEAN | IN_TEXT) ARROW ...
+        // t0=MAP_END
+
+        switch(t0.getType())
+        {
+          case LTE:
+          case LT:
+          case EQ:
+          case NE:
+          case GT:
+          case GTE:
+            compareType = parseCompareType(t);
+            TokenType nextTokenType = getTypeAt(t);
+            if (nextTokenType != NUMBER && nextTokenType != BOOLEAN && nextTokenType != TEXT)
+              throw new MessageParserException(lexer.getLength() + 1, "number, boolean or string expected");
+            break;
+
+          case NUMBER:
+          case BOOLEAN:
+          case TEXT:
+          case PARAM_START:
+            break;
+
+          case MAP_END:
+            break buildMap;
+
+          default:
+            throw new MessageParserException(t0.getStart(), "unexpected token " + t0.getText());
+        }
+
+        t0 = getTokenAt(t);
+        if (t0 == null)
+          throw new MessageParserException(lexer.getLength() + 1, "number, boolean or string expected");
+
         Serializable key;
 
-        // t1=(NUMBER | BOOLEAN | IN_TEXT) ARROW MESSAGE (COMMA (NUMBER | BOOLEAN | IN_TEXT) ARROW MESSAGE)* MAP_END
-        // t1=MAP_END
+        // t0=(NUMBER | BOOLEAN | IN_TEXT) ARROW MESSAGE (COMMA (NUMBER | BOOLEAN | IN_TEXT) ARROW MESSAGE)* MAP_END
+        // t0=MAP_END
 
         switch(t0.getType())
         {
@@ -378,7 +475,7 @@ public final class MessageParser
         tokens.remove(t);
 
         Message value = parseMessage(t);
-        map.put(key, value);
+        map.put(new Key(compareType, key), value);
 
         t0 = getTokenAt(t);
         if (t0 == null)

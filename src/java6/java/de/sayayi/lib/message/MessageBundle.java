@@ -16,13 +16,18 @@
 package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.exception.MessageException;
+import de.sayayi.lib.message.impl.MultipartLocalizedMessageBundleWithCode;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 
@@ -50,6 +55,28 @@ public class MessageBundle
   }
 
 
+  MessageBundle(@NotNull Map<String,Map<Locale,Message>> localizedMessagesByCode)
+  {
+    this();
+
+    for(Entry<String,Map<Locale,Message>> entry: localizedMessagesByCode.entrySet())
+      add(new MultipartLocalizedMessageBundleWithCode(entry.getKey(), entry.getValue()));
+  }
+
+
+  /**
+   * Returns all codes contained in this message bundle.
+   *
+   * @return  set with all message codes, never {@code null}
+   */
+  @NotNull
+  @Contract(value = "-> new", pure = true)
+  public Set<String> getCodes() {
+    return Collections.unmodifiableSet(messages.keySet());
+  }
+
+
+  @Contract(pure = true)
   public Message.WithCode getByCode(@NotNull String code) {
     return messages.get(code);
   }

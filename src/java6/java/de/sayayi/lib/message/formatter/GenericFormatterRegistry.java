@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.formatter.support.StringFormatter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -53,7 +54,7 @@ public class GenericFormatterRegistry implements FormatterRegistry
 
 
   @Override
-  public void addFormatterForType(Class<?> type, ParameterFormatter formatter)
+  public void addFormatterForType(@NotNull Class<?> type, @NotNull ParameterFormatter formatter)
   {
     typeFormatters.put(type, formatter);
 
@@ -72,7 +73,7 @@ public class GenericFormatterRegistry implements FormatterRegistry
 
 
   @Override
-  public void addFormatter(ParameterFormatter formatter)
+  public void addFormatter(@NotNull ParameterFormatter formatter)
   {
     if (formatter instanceof NamedParameterFormatter)
     {
@@ -88,6 +89,7 @@ public class GenericFormatterRegistry implements FormatterRegistry
   }
 
 
+  @NotNull
   @Override
   public ParameterFormatter getFormatter(String format, Class<?> type)
   {

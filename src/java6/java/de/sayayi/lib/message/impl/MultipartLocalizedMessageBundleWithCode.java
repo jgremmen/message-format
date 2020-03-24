@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.LocaleAware;
 import lombok.Synchronized;
 import lombok.ToString;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -51,6 +52,7 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
 
 
   @Override
+  @Contract(pure = true)
   public String format(@NotNull Parameters parameters) {
     return findMessageByLocale(parameters.getLocale()).format(parameters);
   }
@@ -94,6 +96,7 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
 
   @Synchronized
   @Override
+  @Contract(pure = true)
   public boolean hasParameters()
   {
     if (hasParameter == null)
@@ -114,7 +117,15 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
 
   @NotNull
   @Override
+  @Contract(value = "-> new", pure = true)
   public Set<Locale> getLocales() {
     return Collections.unmodifiableSet(localizedMessages.keySet());
+  }
+
+
+  @NotNull
+  @Override
+  public Map<Locale,Message> getLocalizedMessages() {
+    return Collections.unmodifiableMap(localizedMessages);
   }
 }

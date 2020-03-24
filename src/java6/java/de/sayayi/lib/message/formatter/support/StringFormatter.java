@@ -15,9 +15,12 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
+import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.data.ParameterMap;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -32,26 +35,44 @@ public final class StringFormatter implements NamedParameterFormatter
 {
   @NotNull
   @Override
+  @Contract(pure = true)
   public String getName() {
     return "string";
   }
 
 
   @Override
+  @Contract(pure = true)
+  @SuppressWarnings({"squid:S3358", "squid:S3776"})
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
-    if (value == null)
-      return null;
+    final String string = value == null
+        ? null : ((value instanceof char[]) ? new String((char[])value) : String.valueOf(value)).trim();
+    final boolean isEmpty = string == null || string.isEmpty();
 
-    if (value instanceof char[])
-      return new String((char[])value).trim();
+    Message message = null;
 
-    return String.valueOf(value).trim();
+    if (data instanceof ParameterMap)
+    {
+      final ParameterMap parameterMap = (ParameterMap)data;
+
+      if (string == null && parameterMap.hasMessageForKey("null"))
+        message = parameterMap.getMessageFor("null");
+      else if (isEmpty && parameterMap.hasMessageForKey("empty"))
+        message = parameterMap.getMessageFor("empty");
+      else if (!isEmpty && parameterMap.hasMessageForKey("!empty"))
+        message = parameterMap.getMessageFor("!empty");
+      else if (string != null && parameterMap.hasMessageForKey("!null"))
+        message = parameterMap.getMessageFor("!null");
+    }
+
+    return message == null ? (isEmpty ? null : string) : message.format(parameters);
   }
 
 
   @NotNull
   @Override
+  @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
     return new HashSet<Class<?>>(Arrays.asList(CharSequence.class, char[].class));
   }

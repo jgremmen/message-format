@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Locale;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -111,5 +112,19 @@ public class MessageDefAnnotationTest
     assertEquals("nl", msg.format(factory.parameters().withLocale("nl-BE")));
     assertEquals("us", msg.format(factory.parameters().withLocale(Locale.CHINESE)));
     assertEquals("de", msg.format(factory.parameters().withLocale("de-AT")));
+  }
+
+
+  @Test
+  public void testCodes()
+  {
+    Set<String> codes = bundle.getCodes();
+
+    assertTrue(codes.contains("T1"));
+    assertTrue(codes.contains("T2"));
+    assertTrue(codes.contains("T3"));
+    assertTrue(codes.contains("T4"));
+    assertTrue(codes.contains("T5"));
+    assertTrue(codes.contains("MSG-052"));
   }
 }

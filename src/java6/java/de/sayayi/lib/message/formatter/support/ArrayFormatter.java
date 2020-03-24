@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -33,9 +34,10 @@ import static java.util.ResourceBundle.getBundle;
 /**
  * @author Jeroen Gremmen
  */
-public class ArrayFormatter implements ParameterFormatter
+public final class ArrayFormatter implements ParameterFormatter
 {
   @Override
+  @Contract(pure = true)
   public String format(Object array, String format, @NotNull Parameters parameters, ParameterData data)
   {
     final int length;
@@ -77,6 +79,7 @@ public class ArrayFormatter implements ParameterFormatter
 
   @NotNull
   @Override
+  @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes()
   {
     return new HashSet<Class<?>>(Arrays.<Class<?>>asList(

@@ -26,19 +26,30 @@ import java.util.Set;
 
 
 /**
- * Messages are thread safe.
+ * <p>
+ *   This interface describes a message in its most generic form.
+ * </p>
+ * <p>
+ *   Messages are thread safe.
+ * </p>
+ *
+ * @see LocaleAware
+ * @see WithCode
  *
  * @author Jeroen Gremmen
  */
 public interface Message extends Serializable
 {
   /**
-   * Formats the message based on the message parameters provided.
+   * <p>
+   *   Formats the message based on the message parameters provided.
+   * </p>
    *
    * @param parameters  message parameters
    *
    * @return  formatted message
    */
+  @Contract(pure = true)
   String format(@NotNull Parameters parameters);
 
 
@@ -47,7 +58,9 @@ public interface Message extends Serializable
    *
    * @return  {@code true} if this message contains parameters, {@code false} otherwise
    */
+  @Contract(pure = true)
   boolean hasParameters();
+
 
 
 
@@ -55,15 +68,16 @@ public interface Message extends Serializable
   interface Parameters
   {
     /**
-     * Tells for which locale the message must be formatted. If no locale is provided ({@code null}) or if no message is available for the given locale,
-     * the formatter will look for a reasonable default message.
+     * Tells for which locale the message must be formatted. If no locale is provided or if no message
+     * is available for the given locale, the formatter will look for a reasonable default message.
      *
      * @return  locale, never {@code null}
      */
+    @Contract(pure = true)
     @NotNull Locale getLocale();
 
 
-    ParameterFormatter getFormatter(String format, Class<?> type);
+    @NotNull ParameterFormatter getFormatter(String format, Class<?> type);
 
 
     /**
@@ -73,6 +87,7 @@ public interface Message extends Serializable
      *
      * @return  data value or {@code null} if no value is available for the given data name
      */
+    @Contract(pure = true)
     Object getParameterValue(@NotNull String parameter);
 
 
@@ -82,6 +97,7 @@ public interface Message extends Serializable
      * @return  set with all data names
      */
     @SuppressWarnings("unused")
+    @Contract(pure = true)
     @NotNull Set<String> getParameterNames();
   }
 
@@ -138,6 +154,11 @@ public interface Message extends Serializable
   }
 
 
+  /**
+   * <p>
+   *   A message class implementing this interface provides an additional code uniquely identifying the message.
+   * </p>
+   */
   interface WithCode extends Message
   {
     /**
@@ -145,12 +166,46 @@ public interface Message extends Serializable
      *
      * @return  message code, never {@code null}
      */
+    @Contract(pure = true)
     @NotNull String getCode();
   }
 
 
+  /**
+   * <p>
+   *   Message classes implementing this interface are capable of formatting messages for one or more locales.
+   * </p>
+   */
   interface LocaleAware extends Message
   {
+    /**
+     * {@inheritDoc}
+     * <p>
+     *   The message is formatted with respect to the locale provided by {@code parameters}. If the locale does not
+     *   match any of the localized messages, a default message will be selected using the following rules
+     * </p>
+     * <ol>
+     *   <li>a message with the same language but a different country</li>
+     *   <li>the 1st available message (this may be implementation dependant)</li>
+     * </ol>
+     *
+     * @see Parameters#getLocale()
+     */
+    @Contract(pure = true)
+    @Override
+    String format(@NotNull Parameters parameters);
+
+
+    /**
+     * Returns a set of all available locales this message supports.
+     *
+     * @return  all available locales, never {@code null}
+     */
+    @Contract(pure = true)
     @NotNull Set<Locale> getLocales();
+
+
+    @Contract(pure = true)
+    @NotNull Map<Locale,Message> getLocalizedMessages();
   }
 }

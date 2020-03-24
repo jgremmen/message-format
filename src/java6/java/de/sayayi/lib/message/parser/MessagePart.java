@@ -17,6 +17,7 @@ package de.sayayi.lib.message.parser;
 
 import de.sayayi.lib.message.Message.Parameters;
 import lombok.Getter;
+import org.jetbrains.annotations.Contract;
 
 import java.io.Serializable;
 
@@ -39,8 +40,10 @@ public abstract class MessagePart implements Serializable
   }
 
 
+  @Contract(pure = true)
   public abstract String getText(Parameters parameters);
 
 
+  @Contract(pure = true)
   public abstract boolean isParameter();
 }

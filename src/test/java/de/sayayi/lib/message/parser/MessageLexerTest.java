@@ -1,23 +1,13 @@
 package de.sayayi.lib.message.parser;
 
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.ARROW;
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.BOOLEAN;
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.COMMA;
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.MAP_END;
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.MAP_START;
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.NAME;
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.NUMBER;
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.PARAM_END;
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.PARAM_START;
-import static de.sayayi.lib.message.parser.MessageLexer.TokenType.TEXT;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import de.sayayi.lib.message.parser.MessageLexer.Token;
+import org.junit.Test;
 
 import java.util.Iterator;
 
-import org.junit.Test;
-
-import de.sayayi.lib.message.parser.MessageLexer.Token;
+import static de.sayayi.lib.message.parser.MessageLexer.TokenType.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 
 /**
@@ -126,5 +116,32 @@ public class MessageLexerTest
     assertEquals(new Token(11, 15, BOOLEAN, "FaLsE", 0, false, false), lexer.next());
     assertEquals(new Token(17, 17, PARAM_END, "}", 0, false, false), lexer.next());
     assertFalse(lexer.hasNext());
+  }
+
+
+  @Test
+  public void testCompareType()
+  {
+    final Iterator<Token> lexer = new MessageLexer("%{a,{<0->'negative',=0->'zero',>0->'positive'}}").iterator();
+    assertEquals(new Token(0, 1, PARAM_START, "%{", 0, false, false), lexer.next());
+    assertEquals(new Token(2, 2, NAME, "a", 0, false, false), lexer.next());
+    assertEquals(new Token(3, 3, COMMA, ",", 0, false, false), lexer.next());
+    assertEquals(new Token(4, 4, MAP_START, "{", 0, false, false), lexer.next());
+    assertEquals(new Token(5, 5, LT, "<", 0, false, false), lexer.next());
+    assertEquals(new Token(6, 6, NUMBER, "0", 0, false, false), lexer.next());
+    assertEquals(new Token(7, 8, ARROW, "->", 0, false, false), lexer.next());
+    assertEquals(new Token(10, 17, TEXT, "negative", 0, false, false), lexer.next());
+    assertEquals(new Token(19, 19, COMMA, ",", 0, false, false), lexer.next());
+    assertEquals(new Token(20, 20, EQ, "=", 0, false, false), lexer.next());
+    assertEquals(new Token(21, 21, NUMBER, "0", 0, false, false), lexer.next());
+    assertEquals(new Token(22, 23, ARROW, "->", 0, false, false), lexer.next());
+    assertEquals(new Token(25, 28, TEXT, "zero", 0, false, false), lexer.next());
+    assertEquals(new Token(30, 30, COMMA, ",", 0, false, false), lexer.next());
+    assertEquals(new Token(31, 31, GT, ">", 0, false, false), lexer.next());
+    assertEquals(new Token(32, 32, NUMBER, "0", 0, false, false), lexer.next());
+    assertEquals(new Token(33, 34, ARROW, "->", 0, false, false), lexer.next());
+    assertEquals(new Token(36, 43, TEXT, "positive", 0, false, false), lexer.next());
+    assertEquals(new Token(45, 45, MAP_END, "}", 0, false, false), lexer.next());
+    assertEquals(new Token(46, 46, PARAM_END, "}", 0, false, false), lexer.next());
   }
 }

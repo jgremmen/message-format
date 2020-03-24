@@ -19,20 +19,19 @@ import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.exception.MessageLocaleParseException;
+import de.sayayi.lib.message.impl.EmptyMessage;
 import de.sayayi.lib.message.impl.EmptyMessageWithCode;
 import de.sayayi.lib.message.impl.MessageDelegateWithCode;
 import de.sayayi.lib.message.impl.MultipartLocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.parser.MessageParser;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.AnnotatedElement;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Locale.ROOT;
@@ -41,24 +40,21 @@ import static java.util.Locale.ROOT;
 /**
  * @author Jeroen Gremmen
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MessageFactory
 {
   private static final AtomicInteger CODE_ID = new AtomicInteger(0);
 
 
-  private MessageFactory() {
-  }
-
-
-  @Contract("_ -> new")
   @NotNull
+  @Contract(value = "_ -> new", pure = true)
   public static Message parse(@NotNull String text) {
     return new MessageParser(text).parseMessage();
   }
 
 
-  @Contract("_ -> new")
   @NotNull
+  @Contract(value = "_ -> new", pure = true)
   public static Message parse(@NotNull Map<Locale,String> localizedTexts) {
     return parse("Generated::" + CODE_ID.incrementAndGet(), localizedTexts);
   }
@@ -73,12 +69,14 @@ public final class MessageFactory
    * @return  message instance
    */
   @NotNull
+  @Contract(value = "_, _ -> new", pure = true)
   public static Message.WithCode parse(@NotNull String code, @NotNull String text) {
     return new MessageDelegateWithCode(code, new MessageParser(text).parseMessage());
   }
 
 
   @NotNull
+  @Contract(value = "_, _ -> new", pure = true)
   public static Message.WithCode parse(@NotNull String code, @NotNull Map<Locale,String> localizedTexts)
   {
     if (localizedTexts.isEmpty())
@@ -99,12 +97,12 @@ public final class MessageFactory
 
   @SuppressWarnings("WeakerAccess")
   @NotNull
+  @Contract(value = "_ -> new", pure = true)
   public static Set<Message.WithCode> parseAnnotations(@NotNull AnnotatedElement element)
   {
     Set<Message.WithCode> messageBundle = new HashSet<Message.WithCode>();
 
-    MessageDef annotation =
-        element.getAnnotation(MessageDef.class);
+    MessageDef annotation = element.getAnnotation(MessageDef.class);
     if (annotation != null)
       messageBundle.add(parse(annotation));
 
@@ -125,6 +123,7 @@ public final class MessageFactory
 
 
   @NotNull
+  @Contract(value = "_ -> new", pure = true)
   public static Message.WithCode parse(@NotNull MessageDef annotation)
   {
     final Text[] texts = annotation.texts();
@@ -147,6 +146,105 @@ public final class MessageFactory
 
 
   @NotNull
+  @Contract(pure = true)
+  public static Message.WithCode withCode(@NotNull String code, @NotNull Message message)
+  {
+    if (message instanceof MessageDelegateWithCode)
+      return new MessageDelegateWithCode(code, ((MessageDelegateWithCode)message).getMessage());
+
+    if (message instanceof Message.WithCode)
+    {
+      Message.WithCode messageWithCode = (Message.WithCode)message;
+
+      if (code.equals(messageWithCode.getCode()))
+        return messageWithCode;
+    }
+
+    if (message instanceof EmptyMessage || message instanceof EmptyMessageWithCode)
+      return new EmptyMessageWithCode(code);
+
+    return new MessageDelegateWithCode(code, message);
+  }
+
+
+  @NotNull
+  @Contract(pure = true)
+  public static MessageBundle bundle(@NotNull Properties properties)
+  {
+    MessageBundle bundle = new MessageBundle();
+
+    for(Entry<Object,Object> entry: properties.entrySet())
+      bundle.add(parse(entry.getKey().toString(), String.valueOf(entry.getValue())));
+
+    return bundle;
+  }
+
+
+  @NotNull
+  @Contract(pure = true)
+  public static MessageBundle bundle(@NotNull ResourceBundle resourceBundle)
+  {
+    MessageBundle bundle = new MessageBundle();
+    Locale locale = resourceBundle.getLocale();
+
+    for(String code: resourceBundle.keySet())
+      bundle.add(parse(code, Collections.singletonMap(locale, resourceBundle.getString(code))));
+
+    return bundle;
+  }
+
+
+  @NotNull
+  @Contract(pure = true)
+  public static MessageBundle bundle(@NotNull Map<Locale,Properties> properties)
+  {
+    Map<String,Map<Locale,Message>> localizedMessagesByCode = new HashMap<String,Map<Locale,Message>>();
+
+    for(Entry<Locale,Properties> entry: properties.entrySet())
+      for(Entry<Object,Object> localizedProperty: entry.getValue().entrySet())
+      {
+        String code = localizedProperty.getKey().toString();
+        Message message = parse(String.valueOf(localizedProperty.getValue()));
+
+        Map<Locale,Message> localizedMessages = localizedMessagesByCode.get(code);
+        if (localizedMessages == null)
+        {
+          localizedMessages = new HashMap<Locale,Message>();
+          localizedMessagesByCode.put(code, localizedMessages);
+        }
+
+        localizedMessages.put(entry.getKey(), message);
+      }
+
+    return new MessageBundle(localizedMessagesByCode);
+  }
+
+
+  @NotNull
+  @Contract(pure = true)
+  public static MessageBundle bundle(@NotNull Collection<ResourceBundle> properties)
+  {
+    Map<String,Map<Locale,Message>> localizedMessagesByCode = new HashMap<String,Map<Locale,Message>>();
+
+    for(ResourceBundle resourceBundle: properties)
+      for(String code: resourceBundle.keySet())
+      {
+        Map<Locale,Message> localizedMessages = localizedMessagesByCode.get(code);
+        if (localizedMessages == null)
+        {
+          localizedMessages = new HashMap<Locale,Message>();
+          localizedMessagesByCode.put(code, localizedMessages);
+        }
+
+        localizedMessages.put(resourceBundle.getLocale(), parse(resourceBundle.getString(code)));
+      }
+
+    return new MessageBundle(localizedMessagesByCode);
+  }
+
+
+  @NotNull
+  @Contract(pure = true)
   static Locale forLanguageTag(@NotNull String locale)
   {
     if (locale.isEmpty())

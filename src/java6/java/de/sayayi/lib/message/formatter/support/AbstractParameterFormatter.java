@@ -13,22 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.formatter;
+package de.sayayi.lib.message.formatter.support;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.data.ParameterMap;
+import de.sayayi.lib.message.formatter.ParameterFormatter;
+
+import java.io.Serializable;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public interface NamedParameterFormatter extends ParameterFormatter
+@SuppressWarnings("WeakerAccess")
+public abstract class AbstractParameterFormatter implements ParameterFormatter
 {
-  /**
-   * Tells the name of this data formatter
-   *
-   * @return  data formatter name, never {@code null}
-   */
-  @Contract(pure = true)
-  @NotNull String getName();
+  protected boolean hasMessageFor(Object value, ParameterData parameterData)
+  {
+    return parameterData instanceof ParameterMap &&
+        (value instanceof Serializable || value == null) &&
+        ((ParameterMap)parameterData).hasMessageForKey((Serializable)value);
+  }
 }

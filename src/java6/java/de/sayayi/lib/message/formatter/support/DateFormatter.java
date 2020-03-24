@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DateFormat;
@@ -38,9 +39,10 @@ import static java.text.DateFormat.getDateInstance;
 /**
  * @author Jeroen Gremmen
  */
-public class DateFormatter implements ParameterFormatter
+public final class DateFormatter implements ParameterFormatter
 {
   @Override
+  @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     if (value == null)
@@ -60,6 +62,7 @@ public class DateFormatter implements ParameterFormatter
 
   @NotNull
   @Override
+  @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
     return Collections.<Class<?>>singleton(Date.class);
   }

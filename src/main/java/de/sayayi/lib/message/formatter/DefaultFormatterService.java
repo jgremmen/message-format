@@ -15,15 +15,7 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.formatter.support.ArrayFormatter;
-import de.sayayi.lib.message.formatter.support.BoolFormatter;
-import de.sayayi.lib.message.formatter.support.ChoiceFormatter;
-import de.sayayi.lib.message.formatter.support.CollectionFormatter;
-import de.sayayi.lib.message.formatter.support.DateFormatter;
-import de.sayayi.lib.message.formatter.support.MapFormatter;
-import de.sayayi.lib.message.formatter.support.NumberFormatter;
-import de.sayayi.lib.message.formatter.support.StringFormatter;
-import lombok.Synchronized;
+import de.sayayi.lib.message.formatter.support.*;
 
 
 /**
@@ -36,7 +28,6 @@ public class DefaultFormatterService extends GenericFormatterRegistry
   private static final FormatterService INSTANCE = new DefaultFormatterService();
 
 
-  @Synchronized
   public static FormatterService getSharedInstance() {
     return INSTANCE;
   }
@@ -54,6 +45,8 @@ public class DefaultFormatterService extends GenericFormatterRegistry
     // named formatters
     addFormatter(new ChoiceFormatter());
     addFormatter(new BoolFormatter());
+    addFormatter(new BitsFormatter());
+    addFormatter(new GeoFormatter());
 
     // typed formatters
     addFormatter(new StringFormatter());
@@ -62,6 +55,17 @@ public class DefaultFormatterService extends GenericFormatterRegistry
     addFormatter(new ArrayFormatter());
     addFormatter(new CollectionFormatter());
     addFormatter(new MapFormatter());
+    addFormatter(new FileFormatter());
+    addFormatter(new PackageFormatter());
+    addFormatter(new ClassFormatter());
+    addFormatter(new URIFormatter());
+    addFormatter(new URLFormatter());
+    addFormatter(new ReferenceFormatter());
+    addFormatter(new ThreadLocalFormatter());
+    addFormatter(new InetAddressFormatter());
+    addFormatter(new AtomicBooleanFormatter());
+    addFormatter(new AtomicIntegerFormatter());
+    addFormatter(new AtomicLongFormatter());
 
     if (hasClass("org.joda.time.DateTime"))
       addFormatter(new de.sayayi.lib.message.formatter.support.JodaDateTimeFormatter());
@@ -75,6 +79,7 @@ public class DefaultFormatterService extends GenericFormatterRegistry
       addFormatter(new de.sayayi.lib.message.formatter.support.LongSupplierFormatter());
       addFormatter(new de.sayayi.lib.message.formatter.support.IntSupplierFormatter());
       addFormatter(new de.sayayi.lib.message.formatter.support.BooleanSupplierFormatter());
+      addFormatter(new de.sayayi.lib.message.formatter.support.PathFormatter());
     }
   }
 

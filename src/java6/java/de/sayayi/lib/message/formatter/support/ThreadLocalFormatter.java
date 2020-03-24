@@ -18,35 +18,37 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Set;
-import java.util.function.IntSupplier;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class IntSupplierFormatter implements ParameterFormatter
+public final class ThreadLocalFormatter implements ParameterFormatter
 {
+  @SuppressWarnings("rawtypes")
   @Override
-  @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
-    IntSupplier supplier = (IntSupplier)value;
-    if (supplier == null)
-      return null;
+    if (value != null)
+    {
+      ThreadLocal threadLocal = (ThreadLocal)value;
+      value = threadLocal.get();
 
-    return parameters.getFormatter(format, int.class).format(supplier.getAsInt(), format, parameters, data);
+      if (value != null)
+        return parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data);
+    }
+
+    return null;
   }
 
 
   @NotNull
   @Override
-  @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(IntSupplier.class);
+    return Collections.<Class<?>>singleton(ThreadLocal.class);
   }
 }

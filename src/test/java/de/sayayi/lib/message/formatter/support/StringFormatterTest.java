@@ -10,6 +10,7 @@ import java.lang.annotation.RetentionPolicy;
 
 import static de.sayayi.lib.message.MessageFactory.parse;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 
 /**
@@ -56,5 +57,28 @@ public class StringFormatterTest extends AbstractFormatterTest
     final Message msg = parse("This is %{a} %{b} %{c}");
 
     assertEquals("This is a test 1234", msg.format(parameters));
+  }
+
+
+  @Test
+  public void testFormatterWithMap()
+  {
+    final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
+    final ParameterFactory factory = ParameterFactory.createFor(formatterRegistry);
+
+    final Parameters parameters = factory.parameters()
+        .with("empty", "")
+        .with("null", null)
+        .with("spaces", "  ")
+        .with("text", "hello  ");
+
+    assertNull(parse("%{empty,{'!empty'->'nok'}}").format(parameters));
+    assertEquals("ok", parse("%{empty,{'empty'->'ok'}}").format(parameters));
+    assertEquals("ok", parse("%{null,{'empty'->'nok','null'->'ok'}}").format(parameters));
+    assertEquals("ok", parse("%{null,{'empty'->'ok'}}").format(parameters));
+    assertEquals("ok", parse("%{spaces,{'empty'->'ok'}}").format(parameters));
+    assertEquals("ok", parse("%{spaces,{'!null'->'ok'}}").format(parameters));
+    assertEquals("hello!", parse("%{text,{'!null'->'nok','!empty'->'%{text}!'}}").format(parameters));
+    assertEquals("hello!", parse("%{text,{'!null'->'%{text}!'}}").format(parameters));
   }
 }

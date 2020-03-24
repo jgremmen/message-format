@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.parser;
 
 import de.sayayi.lib.message.Message.Parameters;
+import org.jetbrains.annotations.Contract;
 
 
 /**
@@ -37,18 +38,21 @@ final class TextPart extends MessagePart
 
 
   @Override
+  @Contract(pure = true)
   public String getText(Parameters parameters) {
     return text;
   }
 
 
   @Override
+  @Contract(pure = true)
   public boolean isParameter() {
     return false;
   }
 
 
   @Override
+  @Contract(pure = true)
   public String toString()
   {
     final StringBuilder s = new StringBuilder(getClass().getSimpleName()).append("(text=").append(text);

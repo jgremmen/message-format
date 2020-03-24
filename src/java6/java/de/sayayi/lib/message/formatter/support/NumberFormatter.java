@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
@@ -35,12 +36,13 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public class NumberFormatter implements ParameterFormatter
+public final class NumberFormatter implements ParameterFormatter
 {
   private static final BoolFormatter BOOL_FORMATTER = new BoolFormatter();
 
 
   @Override
+  @Contract(pure = true)
   public String format(Object v, String format, @NotNull Parameters parameters, ParameterData data)
   {
     if (v == null)
@@ -94,6 +96,7 @@ public class NumberFormatter implements ParameterFormatter
 
   @NotNull
   @Override
+  @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes()
   {
     return new HashSet<Class<?>>(Arrays.<Class<?>>asList(

@@ -17,29 +17,43 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.Set;
-import java.util.function.IntSupplier;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class IntSupplierFormatter implements ParameterFormatter
+public final class FileFormatter extends AbstractParameterFormatter
 {
   @Override
-  @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
-    IntSupplier supplier = (IntSupplier)value;
-    if (supplier == null)
+    if (value == null)
       return null;
 
-    return parameters.getFormatter(format, int.class).format(supplier.getAsInt(), format, parameters, data);
+    File file = (File)value;
+
+    if ("name".equals(format))
+      return file.getName();
+    else if ("path".equals(format))
+      return file.getPath();
+    else if ("parent".equals(format))
+      return file.getParent();
+    else if ("extension".equals(format))
+    {
+      String name = file.getName();
+      int dotidx = name.lastIndexOf('.');
+      String extension = (dotidx == -1) ? null : name.substring(dotidx + 1);
+
+      return hasMessageFor(extension, data) ? data.format(parameters, extension) : extension;
+    }
+
+    return file.getAbsolutePath();
   }
 
 
@@ -47,6 +61,6 @@ public final class IntSupplierFormatter implements ParameterFormatter
   @Override
   @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(IntSupplier.class);
+    return Collections.<Class<?>>singleton(File.class);
   }
 }

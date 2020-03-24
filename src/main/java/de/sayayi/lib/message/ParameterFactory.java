@@ -92,6 +92,7 @@ public class ParameterFactory implements Parameters
   }
 
 
+  @NotNull
   @Override
   public ParameterFormatter getFormatter(String format, Class<?> type) {
     return formatterService.getFormatter(format, type);
@@ -144,6 +145,7 @@ public class ParameterFactory implements Parameters
     }
 
 
+    @NotNull
     @Override
     public ParameterFormatter getFormatter(String format, Class<?> type) {
       return ParameterFactory.this.getFormatter(format, type);

@@ -17,6 +17,7 @@ package de.sayayi.lib.message.data;
 
 import de.sayayi.lib.message.Message;
 import lombok.Getter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -38,30 +39,35 @@ public class ParameterInteger implements ParameterData, Message
 
 
   @Override
+  @Contract(value = "_, _ -> fail", pure = true)
   public String format(@NotNull Parameters parameters, Serializable key) {
     throw new UnsupportedOperationException();
   }
 
 
   @Override
+  @Contract(pure = true)
   public String format(@NotNull Parameters parameters) {
     return Integer.toString(value);
   }
 
 
   @Override
+  @Contract(pure = true)
   public String toString() {
     return Integer.toString(value);
   }
 
 
   @Override
+  @Contract(pure = true)
   public Serializable asObject() {
     return value;
   }
 
 
   @Override
+  @Contract(value = "-> false", pure = true)
   public boolean hasParameters() {
     return false;
   }

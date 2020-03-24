@@ -18,35 +18,32 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Set;
-import java.util.function.IntSupplier;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class IntSupplierFormatter implements ParameterFormatter
+public final class AtomicBooleanFormatter implements ParameterFormatter
 {
   @Override
-  @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
-    IntSupplier supplier = (IntSupplier)value;
-    if (supplier == null)
+    if (value == null)
       return null;
 
-    return parameters.getFormatter(format, int.class).format(supplier.getAsInt(), format, parameters, data);
+    return parameters.getFormatter(format, boolean.class)
+        .format(((AtomicBoolean)value).get(), format, parameters, data);
   }
 
 
   @NotNull
   @Override
-  @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(IntSupplier.class);
+    return Collections.<Class<?>>singleton(AtomicBoolean.class);
   }
 }

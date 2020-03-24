@@ -23,23 +23,30 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Set;
-import java.util.function.IntSupplier;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class IntSupplierFormatter implements ParameterFormatter
+public final class ClassFormatter implements ParameterFormatter
 {
   @Override
-  @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
-    IntSupplier supplier = (IntSupplier)value;
-    if (supplier == null)
+    if (value == null)
       return null;
 
-    return parameters.getFormatter(format, int.class).format(supplier.getAsInt(), format, parameters, data);
+    Class<?> clazz = (Class<?>)value;
+
+    if ("name".equals(format))
+      return clazz.getSimpleName();
+    if ("package".equals(format))
+    {
+      return parameters.getFormatter(null, Package.class)
+          .format(clazz.getPackage(), null, parameters, data);
+    }
+
+    return clazz.getName();
   }
 
 
@@ -47,6 +54,6 @@ public final class IntSupplierFormatter implements ParameterFormatter
   @Override
   @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(IntSupplier.class);
+    return Collections.<Class<?>>singleton(Class.class);
   }
 }

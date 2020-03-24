@@ -20,6 +20,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterMap;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
@@ -34,19 +35,21 @@ import static java.util.ResourceBundle.getBundle;
 /**
  * @author Jeroen Gremmen
  */
-public class BoolFormatter implements NamedParameterFormatter
+public final class BoolFormatter implements NamedParameterFormatter
 {
   @NotNull
   @Override
+  @Contract(pure = true)
   public String getName() {
     return "bool";
   }
 
 
   @Override
+  @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
-    Boolean bool;
+    boolean bool;
 
     if (value instanceof Boolean)
       bool = (Boolean)value;
@@ -59,7 +62,7 @@ public class BoolFormatter implements NamedParameterFormatter
     else if (value instanceof Number)
       bool = Math.signum(((Number)value).doubleValue()) != 0;
     else
-      bool = Boolean.valueOf(String.valueOf(value));
+      bool = Boolean.parseBoolean(String.valueOf(value));
 
     // allow custom messages for true/false value?
     if (data instanceof ParameterMap)
@@ -70,12 +73,13 @@ public class BoolFormatter implements NamedParameterFormatter
     }
 
     return getBundle(getClass().getPackage().getName() + ".Formatter",
-        parameters.getLocale()).getString(bool.toString());
+        parameters.getLocale()).getString(Boolean.toString(bool));
   }
 
 
   @NotNull
   @Override
+  @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
     return new HashSet<Class<?>>(Arrays.<Class<?>>asList(Boolean.class, boolean.class));
   }

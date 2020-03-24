@@ -5,19 +5,20 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterMap;
+import de.sayayi.lib.message.data.ParameterMap.Key;
 import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import static de.sayayi.lib.message.data.ParameterMap.CompareType.EQ;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -53,14 +54,14 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     assertEquals("wahr, falsch, wahr", registry.getFormatter(null, boolean[].class)
         .format(new boolean[] { true, false, true }, "bool", factory, null));
 
-    ParameterMap booleanMap = new ParameterMap(new HashMap<Serializable,Message>() {
+    ParameterMap booleanMap = new ParameterMap(new HashMap<Key,Message>() {
       {
-        put(Boolean.TRUE, new Message() {
+        put(new Key(EQ, Boolean.TRUE), new Message() {
           @Override public String format(@NotNull Parameters parameters) { return "YES"; }
           @Override public boolean hasParameters() { return false; }
         });
 
-        put(Boolean.FALSE, new Message() {
+        put(new Key(EQ, Boolean.FALSE), new Message() {
           @Override public String format(@NotNull Parameters parameters) { return "NO"; }
           @Override public boolean hasParameters() { return false; }
         });

@@ -15,6 +15,9 @@
  */
 package de.sayayi.lib.message.formatter;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 
 /**
  * @author Jeroen Gremmen
@@ -38,5 +41,6 @@ public interface FormatterService
    *
    * @see GenericFormatterRegistry
    */
-  ParameterFormatter getFormatter(String format, Class<?> type);
+  @Contract(pure = true)
+  @NotNull ParameterFormatter getFormatter(String format, Class<?> type);
 }

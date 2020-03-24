@@ -13,45 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.impl;
+package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message;
-import lombok.Getter;
-import lombok.ToString;
+import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collections;
+import java.util.Set;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@SuppressWarnings("squid:S2160")
-@ToString
-public class MessageDelegateWithCode extends AbstractMessageWithCode
+public final class PackageFormatter implements ParameterFormatter
 {
-  private static final long serialVersionUID = 201L;
-
-  @Getter private final Message message;
-
-
-  public MessageDelegateWithCode(@NotNull String code, @NotNull Message message)
-  {
-    super(code);
-
-    this.message = message;
+  @Override
+  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data) {
+    return value == null ? null : ((Package)value).getName();
   }
 
 
+  @NotNull
   @Override
-  @Contract(pure = true)
-  public String format(@NotNull Parameters parameters) {
-    return message.format(parameters);
-  }
-
-
-  @Override
-  @Contract(pure = true)
-  public boolean hasParameters() {
-    return message.hasParameters();
+  @Contract(value = "-> new", pure = true)
+  public Set<Class<?>> getFormattableTypes() {
+    return Collections.<Class<?>>singleton(Package.class);
   }
 }

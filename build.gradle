@@ -10,7 +10,7 @@ plugins {
 
 description 'Message Format Library'
 group 'de.sayayi.lib'
-version '0.3.0'
+version '0.3.1'
 
 
 sourceSets {
@@ -91,4 +91,11 @@ jar {
 
   reproducibleFileOrder = true
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+  manifest {
+    attributes['Implementation-Vendor'] = "Jeroen Gremmen"
+    attributes['Implementation-Vendor-Id'] = "de.sayayi"
+    attributes['Implementation-Title'] = "Message Formatting Library"
+    attributes['Implementation-Version'] = "${project.version}"
+  }
 }

@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.parser.MessagePart;
 import lombok.Getter;
 import lombok.ToString;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -39,15 +40,14 @@ public class SinglePartMessage implements Message
 
 
   @Override
-  public String format(@NotNull Parameters parameters)
-  {
-    final String text = part.getText(parameters);
-
-    return (text == null) ? "" : text;
+  @Contract(pure = true)
+  public String format(@NotNull Parameters parameters) {
+    return part.getText(parameters);
   }
 
 
   @Override
+  @Contract(pure = true)
   public boolean hasParameters() {
     return part.isParameter();
   }

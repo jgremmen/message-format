@@ -20,6 +20,7 @@ import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import lombok.Getter;
+import org.jetbrains.annotations.Contract;
 
 
 /**
@@ -45,14 +46,12 @@ final class ParameterPart extends MessagePart
 
 
   @Override
+  @Contract(pure = true)
   public String getText(Parameters parameters)
   {
     final Object value = parameters.getParameterValue(parameter);
     final Class<?> type = (value != null) ? value.getClass() : String.class;
-
     final ParameterFormatter formatter = parameters.getFormatter(format, type);
-    if (formatter == null)
-      throw new IllegalStateException("no matching formatter found for data " + parameter);
 
     try {
       return formatter.format(value, format, parameters, data);
@@ -63,12 +62,14 @@ final class ParameterPart extends MessagePart
 
 
   @Override
+  @Contract(pure = true)
   public boolean isParameter() {
     return true;
   }
 
 
   @Override
+  @Contract(pure = true)
   public String toString()
   {
     final StringBuilder s = new StringBuilder(getClass().getSimpleName()).append("(data=").append(parameter);

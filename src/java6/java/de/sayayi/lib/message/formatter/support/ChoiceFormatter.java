@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterMap;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -33,12 +34,14 @@ public final class ChoiceFormatter implements NamedParameterFormatter
 {
   @NotNull
   @Override
+  @Contract(pure = true)
   public String getName() {
     return "choice";
   }
 
 
   @Override
+  @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     if (!(data instanceof ParameterMap))
@@ -53,6 +56,7 @@ public final class ChoiceFormatter implements NamedParameterFormatter
 
   @NotNull
   @Override
+  @Contract(pure = true)
   public Set<Class<?>> getFormattableTypes() {
     return Collections.emptySet();
   }

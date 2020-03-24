@@ -17,33 +17,57 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.URL;
 import java.util.Collections;
 import java.util.Set;
-import java.util.function.Supplier;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class SupplierFormatter implements ParameterFormatter
+public final class URLFormatter extends AbstractParameterFormatter
 {
   @Override
-  @Contract(pure = true)
+  @SuppressWarnings({"squid:S3358", "squid:S3776"})
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
-    Supplier<?> supplier = (Supplier<?>)value;
-    if (supplier == null)
-      return null;
-
-    value = supplier.get();
     if (value == null)
       return null;
 
-    return parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data);
+    final URL url = (URL)value;
+
+    if ("authority".equals(format))
+      return url.getAuthority();
+    else if ("file".equals(format))
+      return url.getFile();
+    else if ("host".equals(format))
+      return url.getHost();
+    else if ("path".equals(format))
+      return url.getPath();
+    else if ("port".equals(format))
+    {
+      int port = url.getPort();
+      if (port == -1)
+        port = url.getDefaultPort();
+      return hasMessageFor(port, data)
+          ? data.format(parameters, port) : (port == -1 ? null : Integer.toString(port));
+    }
+    else if ("query".equals(format))
+      return url.getQuery();
+    else if ("protocol".equals(format))
+    {
+      String protocol = url.getProtocol();
+      return hasMessageFor(protocol, data) ? data.format(parameters, protocol) : protocol;
+    }
+    else if ("user-info".equals(format))
+      return url.getUserInfo();
+    else if ("ref".equals(format))
+      return url.getRef();
+
+    return url.toExternalForm();
   }
 
 
@@ -51,6 +75,6 @@ public final class SupplierFormatter implements ParameterFormatter
   @Override
   @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(Supplier.class);
+    return Collections.<Class<?>>singleton(URL.class);
   }
 }

@@ -17,29 +17,53 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
-import java.util.function.IntSupplier;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class IntSupplierFormatter implements ParameterFormatter
+public final class URIFormatter extends AbstractParameterFormatter
 {
   @Override
-  @Contract(pure = true)
+  @SuppressWarnings({"squid:S3358", "squid:S3776"})
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
-    IntSupplier supplier = (IntSupplier)value;
-    if (supplier == null)
+    if (value == null)
       return null;
 
-    return parameters.getFormatter(format, int.class).format(supplier.getAsInt(), format, parameters, data);
+    final URI uri = (URI)value;
+
+    if ("authority".equals(format))
+      return uri.getAuthority();
+    else if ("fragment".equals(format))
+      return uri.getFragment();
+    else if ("host".equals(format))
+      return uri.getHost();
+    else if ("path".equals(format))
+      return uri.getPath();
+    else if ("port".equals(format))
+    {
+      int port = uri.getPort();
+      return hasMessageFor(port, data)
+          ? data.format(parameters, port) : ((port == -1) ? null : Integer.toString(port));
+    }
+    else if ("query".equals(format))
+      return uri.getQuery();
+    else if ("scheme".equals(format))
+    {
+      String scheme = uri.getScheme();
+      return hasMessageFor(scheme, data) ? data.format(parameters, scheme) : scheme;
+    }
+    else if ("user-info".equals(format))
+      return uri.getUserInfo();
+
+    return uri.toString();
   }
 
 
@@ -47,6 +71,6 @@ public final class IntSupplierFormatter implements ParameterFormatter
   @Override
   @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(IntSupplier.class);
+    return Collections.<Class<?>>singleton(URI.class);
   }
 }
