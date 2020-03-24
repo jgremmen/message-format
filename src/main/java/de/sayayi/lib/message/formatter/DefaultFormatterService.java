@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.formatter.support.*;
-import lombok.Synchronized;
 
 
 /**
@@ -29,7 +28,6 @@ public class DefaultFormatterService extends GenericFormatterRegistry
   private static final FormatterService INSTANCE = new DefaultFormatterService();
 
 
-  @Synchronized
   public static FormatterService getSharedInstance() {
     return INSTANCE;
   }
