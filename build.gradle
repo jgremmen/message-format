@@ -86,11 +86,12 @@ dependencies {
 
 
 jar {
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
   from sourceSets.java6.output
   from sourceSets.java8.output
 
   reproducibleFileOrder = true
-  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
   manifest {
     attributes['Implementation-Vendor'] = "Jeroen Gremmen"
