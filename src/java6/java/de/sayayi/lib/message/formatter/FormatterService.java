@@ -42,5 +42,5 @@ public interface FormatterService
    * @see GenericFormatterRegistry
    */
   @Contract(pure = true)
-  @NotNull ParameterFormatter getFormatter(String format, Class<?> type);
+  @NotNull ParameterFormatter getFormatter(String format, @NotNull Class<?> type);
 }
