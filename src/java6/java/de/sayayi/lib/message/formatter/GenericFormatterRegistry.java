@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,12 +37,26 @@ public class GenericFormatterRegistry implements FormatterRegistry
     }
   };
 
+  private static final Map<Class<?>,Class<? extends Number>> WRAPPER_CLASS_MAP =
+      new HashMap<Class<?>,Class<? extends Number>>();
+
   private final Map<String,NamedParameterFormatter> namedFormatters =
       new ConcurrentHashMap<String,NamedParameterFormatter>();
   private final Map<Class<?>,ParameterFormatter> typeFormatters =
       new ConcurrentHashMap<Class<?>,ParameterFormatter>();
   private final Map<Class<?>,ParameterFormatter> cachedFormatters =
       Collections.synchronizedMap(new FixedSizeCacheMap<Class<?>,ParameterFormatter>(CLASS_SORTER, 128));
+
+
+  static
+  {
+    WRAPPER_CLASS_MAP.put(double.class, Double.class);
+    WRAPPER_CLASS_MAP.put(float.class, Float.class);
+    WRAPPER_CLASS_MAP.put(long.class, Long.class);
+    WRAPPER_CLASS_MAP.put(int.class, Integer.class);
+    WRAPPER_CLASS_MAP.put(short.class, Short.class);
+    WRAPPER_CLASS_MAP.put(byte.class, Byte.class);
+  }
 
 
   public GenericFormatterRegistry()
@@ -57,18 +72,7 @@ public class GenericFormatterRegistry implements FormatterRegistry
   public void addFormatterForType(@NotNull Class<?> type, @NotNull ParameterFormatter formatter)
   {
     typeFormatters.put(type, formatter);
-
-    if (!cachedFormatters.isEmpty())
-    {
-      for(Class<?> interfaceClass: type.getInterfaces())
-        cachedFormatters.remove(interfaceClass);
-
-      while(type != null)
-      {
-        cachedFormatters.remove(type);
-        type = type.getSuperclass();
-      }
-    }
+    cachedFormatters.clear();
   }
 
 
@@ -91,34 +95,37 @@ public class GenericFormatterRegistry implements FormatterRegistry
 
   @NotNull
   @Override
-  public ParameterFormatter getFormatter(String format, Class<?> type)
+  public ParameterFormatter getFormatter(String format, @NotNull Class<?> type)
   {
     ParameterFormatter formatter = (format == null) ? null : namedFormatters.get(format);
 
     if (formatter == null && (formatter = cachedFormatters.get(type)) == null)
-    {
-      for(Class<?> t = type; formatter == null && t != null; t = t.getSuperclass())
-        formatter = getFormatterForType(t);
-
-      if (formatter == null)
-        formatter = getFormatter(null, Object.class);
-
-      cachedFormatters.put(type, formatter);
-    }
+      cachedFormatters.put(type, formatter = resolveFormatterForType(type));
 
     return formatter;
   }
 
 
-  private ParameterFormatter getFormatterForType(Class<?> type)
+  @NotNull
+  private ParameterFormatter resolveFormatterForType(@NotNull Class<?> type)
   {
-    ParameterFormatter formatter = typeFormatters.get(type);
+    ParameterFormatter formatter = null;
 
-    if (formatter == null)
-      for(final Class<?> interfaceType: type.getInterfaces())
-        if ((formatter = typeFormatters.get(interfaceType)) != null)
-          break;
+    if (type.isPrimitive() && (formatter = typeFormatters.get(type)) == null)
+      type = WRAPPER_CLASS_MAP.get(type);
 
-    return formatter;
+    resolve:{
+      while(formatter == null && type != null)
+        if ((formatter = typeFormatters.get(type)) == null)
+        {
+          for(final Class<?> interfaceType: type.getInterfaces())
+            if ((formatter = typeFormatters.get(interfaceType)) != null)
+              break resolve;
+
+          type = type.getSuperclass();
+        }
+    }
+
+    return formatter == null ? typeFormatters.get(Object.class) : formatter;
   }
 }
