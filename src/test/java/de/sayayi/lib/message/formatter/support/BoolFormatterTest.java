@@ -28,14 +28,14 @@ public class BoolFormatterTest extends AbstractFormatterTest
   public void testFormat()
   {
     final BoolFormatter formatter = new BoolFormatter();
-    final ParameterFactory factory = ParameterFactory.createFor("de-DE");
+    final Parameters parameters = ParameterFactory.createFor("de-DE").noParameters();
 
-    assertEquals("wahr", formatter.format(Boolean.TRUE, null, factory, null));
-    assertEquals("falsch", formatter.format(0.0d, null, factory, null));
-    assertEquals("wahr", formatter.format(-0.0001f, null, factory, null));
-    assertEquals("falsch", formatter.format("FALSE", null, factory, null));
-    assertEquals("wahr", formatter.format("TrUe", null, factory, null));
-    assertEquals("wahr", formatter.format(-4, null, factory, null));
+    assertEquals("wahr", formatter.format(Boolean.TRUE, null, parameters, null));
+    assertEquals("falsch", formatter.format(0.0d, null, parameters, null));
+    assertEquals("wahr", formatter.format(-0.0001f, null, parameters, null));
+    assertEquals("falsch", formatter.format("FALSE", null, parameters, null));
+    assertEquals("wahr", formatter.format("TrUe", null, parameters, null));
+    assertEquals("wahr", formatter.format(-4, null, parameters, null));
   }
 
 
@@ -46,7 +46,7 @@ public class BoolFormatterTest extends AbstractFormatterTest
     formatterRegistry.addFormatter(new BoolFormatter());
     ParameterFactory factory = ParameterFactory.createFor(ENGLISH, formatterRegistry);
 
-    final Parameters parameters = factory.parameters()
+    final Parameters parameters = factory
         .with("a", Boolean.FALSE)
         .with("b", Boolean.TRUE)
         .with("c", Integer.valueOf(1234))

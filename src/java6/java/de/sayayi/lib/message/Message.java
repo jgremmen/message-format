@@ -64,7 +64,6 @@ public interface Message extends Serializable
 
 
 
-
   interface Parameters
   {
     /**
@@ -77,9 +76,30 @@ public interface Message extends Serializable
     @NotNull Locale getLocale();
 
 
-    @NotNull ParameterFormatter getFormatter(@NotNull Class<?> type);
+    /**
+     * Returns the best matching formatter for the given {@code type}.
+     *
+     * @param type  type, never {@code null}
+     *
+     * @return  formatter for the given {@code type}, never {@code null}
+     */
+    @NotNull
+    ParameterFormatter getFormatter(@NotNull Class<?> type);
 
 
+    /**
+     * <p>
+     *   Returns the best matching formatter for the given {@code format} and {@code type}
+     * </p>
+     * <p>
+     *   If {@code format} matches a named formatter it always takes precedence over {@code type}.
+     * </p>
+     *
+     * @param format  formatter name
+     * @param type    type, never {@code null}
+     *
+     * @return  formatter for the given {@code format} and {@code type}, never {@code null}
+     */
     @NotNull ParameterFormatter getFormatter(String format, @NotNull Class<?> type);
 
 
@@ -105,55 +125,69 @@ public interface Message extends Serializable
   }
 
 
-  interface ParameterBuilder extends Parameters
+  interface ParameterBuilderStart
   {
-    @SuppressWarnings("unused")
-    @Contract("-> this")
-    ParameterBuilder clear();
-
-
+    @NotNull
     @Contract("_, _ -> this")
     ParameterBuilder with(@NotNull String parameter, boolean value);
 
 
+    @NotNull
     @Contract("_, _ -> this")
     ParameterBuilder with(@NotNull String parameter, int value);
 
 
+    @NotNull
     @Contract("_, _ -> this")
     ParameterBuilder with(@NotNull String parameter, long value);
 
 
+    @NotNull
     @Contract("_, _ -> this")
     ParameterBuilder with(@NotNull String parameter, float value);
 
 
+    @NotNull
     @Contract("_, _ -> this")
     ParameterBuilder with(@NotNull String parameter, double value);
 
 
+    @NotNull
     @Contract("_, _ -> this")
     ParameterBuilder with(@NotNull String parameter, Object value);
 
 
+    @NotNull
     @Contract("_ -> this")
     ParameterBuilder with(@NotNull Map<String,Object> parameterValues);
 
 
+    @NotNull
     @Contract("_, _, _ -> this")
     ParameterBuilder withNotNull(@NotNull String parameter, Object value, @NotNull Object notNullValue);
 
 
+    @NotNull
     @Contract("_, _, _ -> this")
     ParameterBuilder withNotEmpty(@NotNull String parameter, Object value, @NotNull Object notEmptyValue);
 
 
+    @NotNull
     @Contract("_ -> this")
     ParameterBuilder withLocale(Locale locale);
 
 
+    @NotNull
     @Contract("_ -> this")
     ParameterBuilder withLocale(String locale);
+  }
+
+
+  interface ParameterBuilder extends ParameterBuilderStart, Parameters
+  {
+    @SuppressWarnings("unused")
+    @Contract("-> this")
+    ParameterBuilder clear();
   }
 
 

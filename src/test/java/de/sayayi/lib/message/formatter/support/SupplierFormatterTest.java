@@ -1,5 +1,6 @@
 package de.sayayi.lib.message.formatter.support;
 
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
@@ -23,12 +24,12 @@ public class SupplierFormatterTest
     registry.addFormatter(new BoolFormatter());
     registry.addFormatter(new BooleanSupplierFormatter());
 
-    ParameterFactory factory = ParameterFactory.createFor("de-DE", registry);
+    Parameters noParameters = ParameterFactory.createFor("de-DE", registry).noParameters();
 
     Object value = (BooleanSupplier) () -> true;
 
     assertEquals("wahr", registry.getFormatter(null, value.getClass())
-        .format(value, null, factory, null));
+        .format(value, null, noParameters, null));
   }
 
 
@@ -39,11 +40,11 @@ public class SupplierFormatterTest
     registry.addFormatter(new NumberFormatter());
     registry.addFormatter(new LongSupplierFormatter());
 
-    ParameterFactory factory = ParameterFactory.createFor("en", registry);
+    Parameters noParameters = ParameterFactory.createFor("en", registry).noParameters();
 
     Object value = (LongSupplier) () -> 1234567890L;
 
     assertEquals("1,234,567,890", registry.getFormatter(null, value.getClass())
-        .format(value, null, factory, new ParameterString("###,###,###,###")));
+        .format(value, null, noParameters, new ParameterString("###,###,###,###")));
   }
 }

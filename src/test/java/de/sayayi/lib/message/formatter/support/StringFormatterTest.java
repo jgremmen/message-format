@@ -30,16 +30,16 @@ public class StringFormatterTest extends AbstractFormatterTest
   public void testFormat()
   {
     final StringFormatter formatter = new StringFormatter();
-    final ParameterFactory factory = ParameterFactory.DEFAULT;
+    final Parameters noParameters = ParameterFactory.DEFAULT.noParameters();
 
-    assertEquals("text", formatter.format(" text ", null, factory, null));
-    assertEquals("RUNTIME", formatter.format(RetentionPolicy.RUNTIME, null, factory, null));
+    assertEquals("text", formatter.format(" text ", null, noParameters, null));
+    assertEquals("RUNTIME", formatter.format(RetentionPolicy.RUNTIME, null, noParameters, null));
     assertEquals("hello", formatter.format(new Object() {
       @Override
       public String toString() {
         return " hello";
       }
-    }, null, factory, null));
+    }, null, noParameters, null));
   }
 
 
@@ -50,7 +50,7 @@ public class StringFormatterTest extends AbstractFormatterTest
     formatterRegistry.addFormatter(new StringFormatter());
     final ParameterFactory factory = ParameterFactory.createFor(formatterRegistry);
 
-    final Parameters parameters = factory.parameters()
+    final Parameters parameters = factory
         .with("a", " a test ")
         .with("b", null)
         .with("c", Integer.valueOf(1234));
@@ -66,7 +66,7 @@ public class StringFormatterTest extends AbstractFormatterTest
     final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
     final ParameterFactory factory = ParameterFactory.createFor(formatterRegistry);
 
-    final Parameters parameters = factory.parameters()
+    final Parameters parameters = factory
         .with("empty", "")
         .with("null", null)
         .with("spaces", "  ")

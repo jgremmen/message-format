@@ -21,7 +21,7 @@ public class MessageTest
     final Message m = MessageFactory.parse("Just a simple message without parameters ");
     assertNotNull(m);
 
-    final String text = m.format(ParameterFactory.DEFAULT);
+    final String text = m.format(ParameterFactory.DEFAULT.noParameters());
     assertEquals("Just a simple message without parameters", text);
   }
 
@@ -38,10 +38,10 @@ public class MessageTest
 
     final Message m = MessageFactory.parse(texts);
 
-    final String nl = m.format(ParameterFactory.createFor("nl-NL").parameters().with("n", 1));
+    final String nl = m.format(ParameterFactory.createFor("nl-NL").with("n", 1));
     assertEquals("1 kleur.", nl);
 
-    final String uk = m.format(ParameterFactory.createFor(Locale.UK).parameters().with("n", 4));
+    final String uk = m.format(ParameterFactory.createFor(Locale.UK).with("n", 4));
     assertEquals("4 colours.", uk);
   }
 
@@ -52,12 +52,12 @@ public class MessageTest
     Message m = MessageFactory.parse("%{n,choice,{<0->'negative',>0->'positive','zero'}}");
 
     assertEquals("negative",
-        m.format(ParameterFactory.createFor(Locale.UK).parameters().with("n", -1)));
+        m.format(ParameterFactory.createFor(Locale.UK).with("n", -1)));
 
     assertEquals("zero",
-        m.format(ParameterFactory.createFor(Locale.UK).parameters().with("n", 0)));
+        m.format(ParameterFactory.createFor(Locale.UK).with("n", 0)));
 
     assertEquals("positive",
-        m.format(ParameterFactory.createFor(Locale.UK).parameters().with("n", 1234)));
+        m.format(ParameterFactory.createFor(Locale.UK).with("n", 1234)));
   }
 }

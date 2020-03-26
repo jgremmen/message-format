@@ -21,7 +21,7 @@ public class FormatContextTest
   {
     ParameterFactory parameterFactory = ParameterFactory.createFor(Locale.CHINA);
 
-    final Parameters ctx = parameterFactory.parameters()
+    final Parameters ctx = parameterFactory
         .withLocale(Locale.CHINA)
         .with("name", "message")
         .with("count", 3)

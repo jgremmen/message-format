@@ -49,10 +49,10 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     registry.addFormatter(new ArrayFormatter());
     registry.addFormatter(new BoolFormatter());
 
-    ParameterFactory factory = ParameterFactory.createFor("de-DE", registry);
+    Parameters noParameters = ParameterFactory.createFor("de-DE", registry).noParameters();
 
     assertEquals("wahr, falsch, wahr", registry.getFormatter(null, boolean[].class)
-        .format(new boolean[] { true, false, true }, "bool", factory, null));
+        .format(new boolean[] { true, false, true }, "bool", noParameters, null));
 
     ParameterMap booleanMap = new ParameterMap(new HashMap<Key,Message>() {
       {
@@ -69,10 +69,10 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     });
 
     assertEquals("NO, YES", registry.getFormatter(null, boolean[].class)
-        .format(new boolean[] { false, true }, null, factory, booleanMap));
+        .format(new boolean[] { false, true }, null, noParameters, booleanMap));
 
     assertNull(registry.getFormatter(null, boolean[].class)
-        .format(new boolean[0], null, factory, null));
+        .format(new boolean[0], null, noParameters, null));
 
     registry.addFormatter(new NamedParameterFormatter() {
       @Override
@@ -94,7 +94,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     });
 
     assertEquals("1, 1, 0, 1, 0, 0, 0", registry.getFormatter(null, boolean[].class)
-        .format(new boolean[] { true, true, false, true, false, false, false }, "bool", factory, null));
+        .format(new boolean[] { true, true, false, true, false, false, false }, "bool", noParameters, null));
   }
 
 
@@ -104,18 +104,18 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     GenericFormatterRegistry registry = new GenericFormatterRegistry();
     registry.addFormatter(new ArrayFormatter());
 
-    ParameterFactory factory = ParameterFactory.createFor("de-DE", registry);
+    Parameters noParameters = ParameterFactory.createFor("de-DE", registry).noParameters();
 
     assertEquals("12, -7, 99", registry.getFormatter(null, int[].class)
-        .format(new int[] { 12, -7, 99 }, null , factory, null));
+        .format(new int[] { 12, -7, 99 }, null , noParameters, null));
 
     assertEquals("1, -7, 248", registry.getFormatter(null, int[].class)
-        .format(new int[] { 1, -7, 248 }, null , factory, new ParameterString("##00")));
+        .format(new int[] { 1, -7, 248 }, null , noParameters, new ParameterString("##00")));
 
     registry.addFormatter(new NumberFormatter());
 
     assertEquals("01, -07, 248", registry.getFormatter(null, int[].class)
-        .format(new int[] { 1, -7, 248 }, null , factory, new ParameterString("##00")));
+        .format(new int[] { 1, -7, 248 }, null , noParameters, new ParameterString("##00")));
 
     registry.addFormatter(new NamedParameterFormatter() {
       @NotNull
@@ -138,7 +138,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     });
 
     assertEquals("0x40, 0xda, 0x2e", registry.getFormatter(null, int[].class)
-        .format(new int[] { 64, 218, 46 }, "hex" , factory, null));
+        .format(new int[] { 64, 218, 46 }, "hex" , noParameters, null));
   }
 
 
@@ -150,12 +150,12 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     registry.addFormatter(new BoolFormatter());
     registry.addFormatter(new NumberFormatter());
 
-    ParameterFactory factory = ParameterFactory.createFor("de-DE", registry);
+    Parameters noParameters = ParameterFactory.createFor("de-DE", registry).noParameters();
 
     assertEquals("Test, wahr, -0006", registry.getFormatter(null, int[].class)
-        .format(new Object[] { "Test", true, null, -6 }, null , factory, new ParameterString("0000")));
+        .format(new Object[] { "Test", true, null, -6 }, null , noParameters, new ParameterString("0000")));
 
     assertEquals("this, is, a, test", registry.getFormatter(null, int[].class)
-        .format(new Object[] { null, "this", null, "is", null, "a", null, "test" }, null , factory, null));
+        .format(new Object[] { null, "this", null, "is", null, "a", null, "test" }, null , noParameters, null));
   }
 }
