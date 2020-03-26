@@ -22,15 +22,15 @@ import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 /**
@@ -52,7 +52,7 @@ public final class NumberFormatter implements ParameterFormatter
 
     if (data == null && (format == null || "integer".equals(format)) &&
         (value instanceof BigInteger || value instanceof Long || value instanceof Integer || value instanceof Short ||
-         value instanceof Byte))
+         value instanceof Byte || value instanceof AtomicInteger || value instanceof AtomicLong))
       return value.toString();
 
     // special case: show number as bool
@@ -97,16 +97,7 @@ public final class NumberFormatter implements ParameterFormatter
   @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes()
-  {
-    return new HashSet<Class<?>>(Arrays.<Class<?>>asList(
-        BigDecimal.class,
-        BigInteger.class,
-        Double.class, double.class,
-        Float.class, float.class,
-        Long.class, long.class,
-        Integer.class, int.class,
-        Short.class, short.class,
-        Byte.class, byte.class));
+  public Set<Class<?>> getFormattableTypes() {
+    return Collections.<Class<?>>singleton(Number.class);
   }
 }
