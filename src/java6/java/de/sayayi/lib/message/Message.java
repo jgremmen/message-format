@@ -77,7 +77,10 @@ public interface Message extends Serializable
     @NotNull Locale getLocale();
 
 
-    @NotNull ParameterFormatter getFormatter(String format, Class<?> type);
+    @NotNull ParameterFormatter getFormatter(@NotNull Class<?> type);
+
+
+    @NotNull ParameterFormatter getFormatter(String format, @NotNull Class<?> type);
 
 
     /**

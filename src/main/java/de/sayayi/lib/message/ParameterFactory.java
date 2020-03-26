@@ -94,7 +94,14 @@ public class ParameterFactory implements Parameters
 
   @NotNull
   @Override
-  public ParameterFormatter getFormatter(String format, Class<?> type) {
+  public ParameterFormatter getFormatter(@NotNull Class<?> type) {
+    return getFormatter(null, type);
+  }
+
+
+  @NotNull
+  @Override
+  public ParameterFormatter getFormatter(String format, @NotNull Class<?> type) {
     return formatterService.getFormatter(format, type);
   }
 
@@ -147,7 +154,14 @@ public class ParameterFactory implements Parameters
 
     @NotNull
     @Override
-    public ParameterFormatter getFormatter(String format, Class<?> type) {
+    public ParameterFormatter getFormatter(@NotNull Class<?> type) {
+      return ParameterFactory.this.getFormatter(type);
+    }
+
+
+    @NotNull
+    @Override
+    public ParameterFormatter getFormatter(String format, @NotNull Class<?> type) {
       return ParameterFactory.this.getFormatter(format, type);
     }
 

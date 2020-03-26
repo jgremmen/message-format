@@ -31,9 +31,9 @@ import java.util.Map.Entry;
  * @author Jeroen Gremmen
  */
 @ToString
-public class ParameterMap implements ParameterData
+public final class ParameterMap implements ParameterData
 {
-  private static final long serialVersionUID = 201L;
+  private static final long serialVersionUID = 302L;
 
   private final Map<Key,Message> map;
 

@@ -57,7 +57,7 @@ public final class MapFormatter implements ParameterFormatter
       if (key == value)
         s.append(bundle.getString("thisMap"));
       else if (key != null)
-        s.append(parameters.getFormatter(null, key.getClass()).format(key, null, parameters, null));
+        s.append(parameters.getFormatter(key.getClass()).format(key, null, parameters, null));
       else
         s.append("(null)");
 
@@ -67,7 +67,7 @@ public final class MapFormatter implements ParameterFormatter
       if (val == value)
         s.append(bundle.getString("thisMap"));
       else if (val != null)
-        s.append(parameters.getFormatter(null, val.getClass()).format(val, null, parameters, null));
+        s.append(parameters.getFormatter(val.getClass()).format(val, null, parameters, null));
       else
         s.append("(null)");
     }

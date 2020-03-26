@@ -41,10 +41,7 @@ public final class ClassFormatter implements ParameterFormatter
     if ("name".equals(format))
       return clazz.getSimpleName();
     if ("package".equals(format))
-    {
-      return parameters.getFormatter(null, Package.class)
-          .format(clazz.getPackage(), null, parameters, data);
-    }
+      return parameters.getFormatter(Package.class).format(clazz.getPackage(), null, parameters, data);
 
     return clazz.getName();
   }

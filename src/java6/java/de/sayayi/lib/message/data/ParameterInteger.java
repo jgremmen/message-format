@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.data;
 
 import de.sayayi.lib.message.Message;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -26,16 +27,12 @@ import java.io.Serializable;
 /**
  * @author Jeroen Gremmen
  */
-public class ParameterInteger implements ParameterData, Message
+@AllArgsConstructor
+public final class ParameterInteger implements ParameterData, Message
 {
-  private static final long serialVersionUID = 201L;
+  private static final long serialVersionUID = 302L;
 
   @Getter private final int value;
-
-
-  public ParameterInteger(int value) {
-    this.value = value;
-  }
 
 
   @Override
