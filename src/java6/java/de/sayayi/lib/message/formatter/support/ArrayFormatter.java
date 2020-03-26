@@ -34,7 +34,7 @@ import static java.util.ResourceBundle.getBundle;
 /**
  * @author Jeroen Gremmen
  */
-public final class ArrayFormatter implements ParameterFormatter
+public final class ArrayFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
@@ -42,8 +42,10 @@ public final class ArrayFormatter implements ParameterFormatter
   {
     final int length;
 
-    if (array == null || (length = getLength(array)) == 0)
-      return null;
+    if (array == null)
+      return formatNull(parameters, data);
+    if ((length = getLength(array)) == 0)
+      return formatEmpty(parameters, data);
 
     final StringBuilder s = new StringBuilder();
     final Class<?> arrayType = array.getClass();

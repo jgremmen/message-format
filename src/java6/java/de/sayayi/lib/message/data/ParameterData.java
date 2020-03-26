@@ -15,9 +15,7 @@
  */
 package de.sayayi.lib.message.data;
 
-import de.sayayi.lib.message.Message.Parameters;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
@@ -27,14 +25,6 @@ import java.io.Serializable;
  */
 public interface ParameterData extends Serializable
 {
-  @Contract(pure = true)
-  String format(@NotNull Parameters parameters, Serializable key);
-
-
-  @Contract(pure = true)
-  String format(@NotNull Parameters parameters);
-
-
   /**
    * Returns the underlying raw data object.
    *

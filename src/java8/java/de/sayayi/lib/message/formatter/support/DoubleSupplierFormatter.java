@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +28,7 @@ import java.util.function.DoubleSupplier;
 /**
  * @author Jeroen Gremmen
  */
-public final class DoubleSupplierFormatter implements ParameterFormatter
+public final class DoubleSupplierFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
@@ -37,7 +36,7 @@ public final class DoubleSupplierFormatter implements ParameterFormatter
   {
     DoubleSupplier supplier = (DoubleSupplier)value;
     if (supplier == null)
-      return null;
+      return formatNull(parameters, data);
 
     return parameters.getFormatter(format, double.class).format(supplier.getAsDouble(), format, parameters, data);
   }

@@ -30,7 +30,7 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public final class ChoiceFormatter implements NamedParameterFormatter
+public final class ChoiceFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
 {
   @NotNull
   @Override
@@ -47,10 +47,13 @@ public final class ChoiceFormatter implements NamedParameterFormatter
     if (!(data instanceof ParameterMap))
       throw new IllegalArgumentException("data must be a choice map");
 
-    if (value != null && !(value instanceof Serializable))
+    if (value == null)
+      return formatNull(parameters, data);
+
+    if (!(value instanceof Serializable))
       throw new IllegalArgumentException("value must be serializable");
 
-    return data.format(parameters, (Serializable)value);
+    return ((ParameterMap)data).format(parameters, (Serializable)value);
   }
 
 

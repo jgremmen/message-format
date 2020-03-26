@@ -15,11 +15,9 @@
  */
 package de.sayayi.lib.message.data;
 
-import de.sayayi.lib.message.Message;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
@@ -28,25 +26,11 @@ import java.io.Serializable;
  * @author Jeroen Gremmen
  */
 @AllArgsConstructor
-public final class ParameterString implements ParameterData, Message
+public final class ParameterString implements ParameterData
 {
   private static final long serialVersionUID = 302L;
 
   @Getter private final String value;
-
-
-  @Override
-  @Contract(pure = true)
-  public String format(@NotNull Parameters parameters, Serializable key) {
-    throw new UnsupportedOperationException();
-  }
-
-
-  @Override
-  @Contract(pure = true)
-  public String format(@NotNull Parameters parameters) {
-    return value;
-  }
 
 
   @Override
@@ -60,12 +44,5 @@ public final class ParameterString implements ParameterData, Message
   @Contract(pure = true)
   public Serializable asObject() {
     return value;
-  }
-
-
-  @Override
-  @Contract(value = "-> false", pure = true)
-  public boolean hasParameters() {
-    return false;
   }
 }

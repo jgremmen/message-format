@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterString;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,7 +44,7 @@ import static java.time.format.FormatStyle.SHORT;
 /**
  * @author Jeroen Gremmen
  */
-public final class Java8DateTimeFormatter implements ParameterFormatter
+public final class Java8DateTimeFormatter extends AbstractParameterFormatter
 {
   private static final Map<String,String> STYLE = new HashMap<>();
   private static final Map<String,DateTimeFormatter> FORMATTER = new HashMap<>();
@@ -86,7 +85,7 @@ public final class Java8DateTimeFormatter implements ParameterFormatter
   {
     final DateTimeFormatter formatter = getFormatter((Temporal)value, format, data);
     if (formatter == null)
-      return null;
+      return formatNull(parameters, data);
 
     String text = formatter
         .withZone(ZoneId.systemDefault())

@@ -35,7 +35,7 @@ import static java.util.ResourceBundle.getBundle;
 /**
  * @author Jeroen Gremmen
  */
-public final class BoolFormatter implements NamedParameterFormatter
+public final class BoolFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
 {
   @NotNull
   @Override
@@ -50,6 +50,9 @@ public final class BoolFormatter implements NamedParameterFormatter
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     boolean bool;
+
+    if (value == null)
+      return formatNull(parameters, data);
 
     if (value instanceof Boolean)
       bool = (Boolean)value;
@@ -67,7 +70,7 @@ public final class BoolFormatter implements NamedParameterFormatter
     // allow custom messages for true/false value?
     if (data instanceof ParameterMap)
     {
-      final Message message = ((ParameterMap)data).getMessageFor(bool);
+      final Message message = ((ParameterMap)data).getMessageFor(bool, false);
       if (message != null)
         return message.format(parameters);
     }

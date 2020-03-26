@@ -15,10 +15,11 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
+import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.data.ParameterMap;
 import de.sayayi.lib.message.data.ParameterString;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,18 +35,21 @@ import static java.util.ResourceBundle.getBundle;
 /**
  * @author Jeroen Gremmen
  */
-public final class MapFormatter implements ParameterFormatter
+public final class MapFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     final Map<?,?> map = (Map<?,?>)value;
-    if (map == null || map.isEmpty())
-      return null;
+    if (map == null)
+      return formatNull(parameters, data);
+    if (map.isEmpty())
+      return formatEmpty(parameters, data);
 
-    final ResourceBundle bundle = getBundle("Formatter", parameters.getLocale());
-    final String separator = (data instanceof ParameterString) ? ((ParameterString)data).getValue() : "=";
+    final ResourceBundle bundle = getBundle(getClass().getPackage().getName() + ".Formatter",
+        parameters.getLocale());
+    final String separator = getSeparator(data);
     final StringBuilder s = new StringBuilder();
 
     for(Entry<?,?> entry: map.entrySet())
@@ -54,25 +58,68 @@ public final class MapFormatter implements ParameterFormatter
         s.append(", ");
 
       Object key = entry.getKey();
-      if (key == value)
-        s.append(bundle.getString("thisMap"));
-      else if (key != null)
-        s.append(parameters.getFormatter(key.getClass()).format(key, null, parameters, null));
-      else
-        s.append("(null)");
+      String keyString;
 
-      s.append(separator);
+      if (key == value)
+        keyString = bundle.getString("thisMap");
+      else if (key != null)
+        keyString = trimNotNull(parameters.getFormatter(key.getClass()).format(key, null, parameters, null));
+      else
+        keyString = "(null)";
 
       Object val = entry.getValue();
+      String valueString;
+
       if (val == value)
-        s.append(bundle.getString("thisMap"));
+        valueString = bundle.getString("thisMap");
       else if (val != null)
-        s.append(parameters.getFormatter(val.getClass()).format(val, null, parameters, null));
+        valueString = trimNotNull(parameters.getFormatter(val.getClass()).format(val, null, parameters, null));
       else
-        s.append("(null)");
+        valueString = "(null)";
+
+      s.append((keyString + separator + valueString).trim());
     }
 
     return s.toString();
+  }
+
+
+  private String getSeparator(ParameterData data)
+  {
+    if (hasMessageFor("sep", data))
+    {
+      Message msg = ((ParameterMap)data).getMessageFor("sep", false);
+
+      if (!msg.hasParameters())
+      {
+        String text = msg.format(Parameters.EMPTY);
+
+        if (text == null)
+          text = "";
+
+        if (text.isEmpty() && (msg.isSpaceBefore() || msg.isSpaceAfter()))
+          text = " ";
+        else if (!text.isEmpty())
+        {
+          if (msg.isSpaceBefore())
+            text = " " + text;
+          if (msg.isSpaceAfter())
+            text += " ";
+        }
+
+        return text;
+      }
+    }
+
+    if (data instanceof ParameterString)
+      return ((ParameterString)data).getValue();
+
+    return "=";
+  }
+
+
+  private String trimNotNull(String s) {
+    return s == null ? "" : s.trim();
   }
 
 

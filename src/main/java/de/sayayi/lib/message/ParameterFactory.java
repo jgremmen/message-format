@@ -42,12 +42,13 @@ import java.util.Set;
  * @author Jeroen Gremmen
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class ParameterFactory implements ParameterBuilderStart
+public final class ParameterFactory implements ParameterBuilderStart
 {
   /**
    * Parameter factory for the default system locale. The factory is backed by the shared instance of
    * {@link DefaultFormatterService}.
    *
+   * @see Locale#getDefault()
    * @see DefaultFormatterService#getSharedInstance()
    */
   public static final ParameterFactory DEFAULT =

@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,29 +32,33 @@ import static java.util.ResourceBundle.getBundle;
 /**
  * @author Jeroen Gremmen
  */
-public final class CollectionFormatter implements ParameterFormatter
+public final class CollectionFormatter extends AbstractParameterFormatter
 {
   @SuppressWarnings("rawtypes")
   @Override
   @Contract(pure = true)
-  public String format(Object iterable, String format, @NotNull Parameters parameters, ParameterData data)
+  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
-    if (iterable == null)
-      return null;
+    if (value == null)
+      return formatNull(parameters, data);
+
+    final Iterable iterable = (Iterable)value;
+    if (!iterable.iterator().hasNext())
+      return formatEmpty(parameters, data);
 
     final ResourceBundle bundle = getBundle(getClass().getPackage().getName() + ".Formatter",
         parameters.getLocale());
     final StringBuilder s = new StringBuilder();
 
-    for(Object value: (Iterable)iterable)
+    for(Object element: iterable)
     {
       if (s.length() > 0)
         s.append(", ");
 
-      if (value == iterable)
+      if (element == iterable)
         s.append(bundle.getString("thisCollection"));
-      else if (value != null)
-        s.append(parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data));
+      else if (element != null)
+        s.append(parameters.getFormatter(format, element.getClass()).format(element, format, parameters, data));
     }
 
     return s.toString();

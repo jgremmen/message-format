@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +28,7 @@ import java.util.function.BooleanSupplier;
 /**
  * @author Jeroen Gremmen
  */
-public final class BooleanSupplierFormatter implements ParameterFormatter
+public final class BooleanSupplierFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
@@ -37,7 +36,7 @@ public final class BooleanSupplierFormatter implements ParameterFormatter
   {
     BooleanSupplier supplier = (BooleanSupplier)value;
     if (supplier == null)
-      return null;
+      return formatNull(parameters, data);
 
     return parameters.getFormatter(format, boolean.class).format(supplier.getAsBoolean(), format, parameters, data);
   }

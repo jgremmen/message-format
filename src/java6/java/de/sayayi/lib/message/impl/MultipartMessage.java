@@ -51,9 +51,9 @@ public class MultipartMessage implements Message
     {
       final String text = part.getText(parameters);
 
-      if (text != null && !text.isEmpty())
+      if (!isEmpty(text))
       {
-        if (spaceBefore || part.isSpaceBefore())
+        if ((spaceBefore || part.isSpaceBefore()) && message.length() > 0)
           message.append(' ');
 
         message.append(text);
@@ -69,5 +69,22 @@ public class MultipartMessage implements Message
   @Contract(pure = true)
   public boolean hasParameters() {
     return parts.length > 0 && (parts.length > 1 || parts[0].isParameter());
+  }
+
+
+  @Override
+  public boolean isSpaceBefore() {
+    return parts.length > 0 && parts[0].isSpaceBefore();
+  }
+
+
+  @Override
+  public boolean isSpaceAfter() {
+    return parts.length > 0 && parts[parts.length - 1].isSpaceAfter();
+  }
+
+
+  private static boolean isEmpty(String s) {
+    return s == null || s.isEmpty();
   }
 }

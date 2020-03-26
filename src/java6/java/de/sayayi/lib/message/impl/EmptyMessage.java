@@ -42,4 +42,16 @@ public final class EmptyMessage implements Message
   public boolean hasParameters() {
     return false;
   }
+
+
+  @Override
+  public boolean isSpaceBefore() {
+    return false;
+  }
+
+
+  @Override
+  public boolean isSpaceAfter() {
+    return false;
+  }
 }

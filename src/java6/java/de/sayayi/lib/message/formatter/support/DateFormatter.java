@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterString;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,14 +38,14 @@ import static java.text.DateFormat.getDateInstance;
 /**
  * @author Jeroen Gremmen
  */
-public final class DateFormatter implements ParameterFormatter
+public final class DateFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     if (value == null)
-      return null;
+      return formatNull(parameters, data);
 
     final Locale locale = parameters.getLocale();
     DateFormat formatter;

@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import static de.sayayi.lib.message.MessageFactory.parse;
 import static java.util.Locale.ENGLISH;
+import static java.util.Locale.GERMAN;
 import static org.junit.Assert.assertEquals;
 
 
@@ -55,5 +56,20 @@ public class BoolFormatterTest extends AbstractFormatterTest
     final Message msg = parse("%{a} %{b} %{c} %{c,bool} %{d,bool,{true->'yes',false->'no'}} %{e}");
 
     assertEquals("false true 1234 true no 3.14", msg.format(parameters));
+  }
+
+
+  @Test
+  public void testNamedFormatter()
+  {
+    final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
+    formatterRegistry.addFormatter(new BoolFormatter());
+    ParameterFactory factory = ParameterFactory.createFor(GERMAN, formatterRegistry);
+
+    final Message msg = parse("%{b,bool,{'null'->'<unknown>',true->'yes','no'}}");
+
+    assertEquals("<unknown>", msg.format(factory.with("b", null)));
+    assertEquals("yes", msg.format(factory.with("b", true)));
+    assertEquals("falsch", msg.format(factory.with("b", false)));
   }
 }

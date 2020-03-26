@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,13 +27,13 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public final class ClassFormatter implements ParameterFormatter
+public final class ClassFormatter extends AbstractParameterFormatter
 {
   @Override
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     if (value == null)
-      return null;
+      return formatNull(parameters, data);
 
     Class<?> clazz = (Class<?>)value;
 

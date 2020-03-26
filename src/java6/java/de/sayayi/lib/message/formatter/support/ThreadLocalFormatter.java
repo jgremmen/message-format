@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -27,7 +26,7 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public final class ThreadLocalFormatter implements ParameterFormatter
+public final class ThreadLocalFormatter extends AbstractParameterFormatter
 {
   @SuppressWarnings("rawtypes")
   @Override
@@ -42,7 +41,7 @@ public final class ThreadLocalFormatter implements ParameterFormatter
         return parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data);
     }
 
-    return null;
+    return formatNull(parameters, data);
   }
 
 

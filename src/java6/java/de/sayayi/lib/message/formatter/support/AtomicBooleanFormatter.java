@@ -33,11 +33,8 @@ public final class AtomicBooleanFormatter implements ParameterFormatter
   @Override
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
-    if (value == null)
-      return null;
-
     return parameters.getFormatter(format, boolean.class)
-        .format(((AtomicBoolean)value).get(), format, parameters, data);
+        .format(value == null ? null : ((AtomicBoolean)value).get(), format, parameters, data);
   }
 
 

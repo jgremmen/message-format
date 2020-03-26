@@ -48,25 +48,8 @@ public final class StringFormatter implements NamedParameterFormatter
   {
     final String string = value == null
         ? null : ((value instanceof char[]) ? new String((char[])value) : String.valueOf(value)).trim();
-    final boolean isEmpty = string == null || string.isEmpty();
 
-    Message message = null;
-
-    if (data instanceof ParameterMap)
-    {
-      final ParameterMap parameterMap = (ParameterMap)data;
-
-      if (string == null && parameterMap.hasMessageForKey("null"))
-        message = parameterMap.getMessageFor("null");
-      else if (isEmpty && parameterMap.hasMessageForKey("empty"))
-        message = parameterMap.getMessageFor("empty");
-      else if (!isEmpty && parameterMap.hasMessageForKey("!empty"))
-        message = parameterMap.getMessageFor("!empty");
-      else if (string != null && parameterMap.hasMessageForKey("!null"))
-        message = parameterMap.getMessageFor("!null");
-    }
-
-    return message == null ? (isEmpty ? null : string) : message.format(parameters);
+    return format(string, parameters, data);
   }
 
 
@@ -75,5 +58,29 @@ public final class StringFormatter implements NamedParameterFormatter
   @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
     return new HashSet<Class<?>>(Arrays.asList(CharSequence.class, char[].class));
+  }
+
+
+  public static String format(String value, @NotNull Parameters parameters, ParameterData data)
+  {
+    final boolean isEmpty = value == null || value.isEmpty();
+
+    Message message = null;
+
+    if (data instanceof ParameterMap)
+    {
+      final ParameterMap parameterMap = (ParameterMap)data;
+
+      if (value == null && parameterMap.hasMessageForKey("null", false))
+        message = parameterMap.getMessageFor("null", false);
+      else if (isEmpty && parameterMap.hasMessageForKey("empty", false))
+        message = parameterMap.getMessageFor("empty", false);
+      else if (!isEmpty && parameterMap.hasMessageForKey("!empty", false))
+        message = parameterMap.getMessageFor("!empty", false);
+      else if (value != null && parameterMap.hasMessageForKey("!null", false))
+        message = parameterMap.getMessageFor("!null", false);
+    }
+
+    return message == null ? (isEmpty ? null : value) : message.format(parameters);
   }
 }

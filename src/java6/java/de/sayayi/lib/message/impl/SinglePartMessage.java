@@ -51,4 +51,16 @@ public class SinglePartMessage implements Message
   public boolean hasParameters() {
     return part.isParameter();
   }
+
+
+  @Override
+  public boolean isSpaceBefore() {
+    return part.isSpaceBefore();
+  }
+
+
+  @Override
+  public boolean isSpaceAfter() {
+    return part.isSpaceAfter();
+  }
 }

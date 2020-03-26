@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterInteger;
-import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +29,7 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public final class BitsFormatter implements NamedParameterFormatter
+public final class BitsFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
 {
   @NotNull
   @Override
@@ -54,12 +53,12 @@ public final class BitsFormatter implements NamedParameterFormatter
 
   protected int detectBitCount(ParameterData data, Object value)
   {
-    if (data instanceof ParameterString && "auto".equals(data.asObject()))
+    if ("auto".equals(getDataString(data)))
       return autoDetectBitCount(value);
 
     if (data instanceof ParameterInteger)
     {
-      int bitCount = (Integer)data.asObject();
+      int bitCount = ((ParameterInteger)data).getValue();
       if (bitCount > 0 && bitCount <= 256)
         return bitCount;
     }

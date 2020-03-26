@@ -17,6 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.data.ParameterMap;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -53,14 +54,14 @@ public final class URLFormatter extends AbstractParameterFormatter
       if (port == -1)
         port = url.getDefaultPort();
       return hasMessageFor(port, data)
-          ? data.format(parameters, port) : (port == -1 ? null : Integer.toString(port));
+          ? ((ParameterMap)data).format(parameters, port) : (port == -1 ? null : Integer.toString(port));
     }
     else if ("query".equals(format))
       return url.getQuery();
     else if ("protocol".equals(format))
     {
       String protocol = url.getProtocol();
-      return hasMessageFor(protocol, data) ? data.format(parameters, protocol) : protocol;
+      return hasMessageFor(protocol, data) ? ((ParameterMap)data).format(parameters, protocol) : protocol;
     }
     else if ("user-info".equals(format))
       return url.getUserInfo();

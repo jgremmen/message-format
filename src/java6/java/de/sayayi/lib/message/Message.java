@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -62,10 +63,54 @@ public interface Message extends Serializable
   boolean hasParameters();
 
 
+  @Contract(pure = true)
+  boolean isSpaceBefore();
+
+
+  @Contract(pure = true)
+  boolean isSpaceAfter();
+
+
 
 
   interface Parameters
   {
+    Parameters EMPTY = new Parameters() {
+      @NotNull
+      @Override
+      public Locale getLocale() {
+        return Locale.ROOT;
+      }
+
+
+      @NotNull
+      @Override
+      public ParameterFormatter getFormatter(@NotNull Class<?> type) {
+        throw new UnsupportedOperationException();
+      }
+
+
+      @NotNull
+      @Override
+      public ParameterFormatter getFormatter(String format, @NotNull Class<?> type) {
+        throw new UnsupportedOperationException();
+      }
+
+
+      @Override
+      public Object getParameterValue(@NotNull String parameter) {
+        return null;
+      }
+
+
+      @NotNull
+      @Override
+      public Set<String> getParameterNames() {
+        return Collections.emptySet();
+      }
+    };
+
+
     /**
      * Tells for which locale the message must be formatted. If no locale is provided or if no message
      * is available for the given locale, the formatter will look for a reasonable default message.

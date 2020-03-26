@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @author Jeroen Gremmen
  */
-public final class NumberFormatter implements ParameterFormatter
+public final class NumberFormatter extends AbstractParameterFormatter
 {
   private static final BoolFormatter BOOL_FORMATTER = new BoolFormatter();
 
@@ -46,7 +45,7 @@ public final class NumberFormatter implements ParameterFormatter
   public String format(Object v, String format, @NotNull Parameters parameters, ParameterData data)
   {
     if (v == null)
-      return null;
+      return formatNull(parameters, data);
 
     final Number value = (Number)v;
 
@@ -78,9 +77,6 @@ public final class NumberFormatter implements ParameterFormatter
 
   protected NumberFormat getFormatter(String format, ParameterData data, Locale locale)
   {
-    if (data instanceof ParameterString)
-      return new DecimalFormat(((ParameterString)data).getValue(), new DecimalFormatSymbols(locale));
-
     if ("integer".equals(format))
       return NumberFormat.getIntegerInstance(locale);
 
@@ -89,6 +85,10 @@ public final class NumberFormatter implements ParameterFormatter
 
     if ("currency".equals(format))
       return NumberFormat.getCurrencyInstance(locale);
+
+    final String customFormat = getDataString("format", data);
+    if (customFormat != null)
+      return new DecimalFormat(customFormat, new DecimalFormatSymbols(locale));
 
     return NumberFormat.getNumberInstance(locale);
   }

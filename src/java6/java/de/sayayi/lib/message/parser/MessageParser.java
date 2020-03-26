@@ -305,7 +305,7 @@ public final class MessageParser
 
       case TEXT:
         tokens.remove(t);
-        return new ParameterString(t0.getText());
+        return parseParameterString(t0);
 
       case MAP_START:
         return parseParameterMap(t);
@@ -313,6 +313,24 @@ public final class MessageParser
       default:
         throw new MessageParserException(t0.getStart(), "unexpected token " + t0.getText());
     }
+  }
+
+
+  private ParameterData parseParameterString(Token token)
+  {
+    String text = token.getText();
+
+    if (text.isEmpty() && (token.isSpaceBefore() || token.isSpaceAfter()))
+      text = " ";
+    else if (!text.isEmpty())
+    {
+      if (token.isSpaceBefore())
+        text = " " + text;
+      if (token.isSpaceAfter())
+        text += " ";
+    }
+
+    return new ParameterString(text);
   }
 
 

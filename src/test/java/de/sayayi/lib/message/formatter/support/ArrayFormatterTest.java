@@ -2,6 +2,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterMap;
@@ -59,11 +60,35 @@ public class ArrayFormatterTest extends AbstractFormatterTest
         put(new Key(EQ, Boolean.TRUE), new Message() {
           @Override public String format(@NotNull Parameters parameters) { return "YES"; }
           @Override public boolean hasParameters() { return false; }
+
+
+          @Override
+          public boolean isSpaceBefore() {
+            return false;
+          }
+
+
+          @Override
+          public boolean isSpaceAfter() {
+            return false;
+          }
         });
 
         put(new Key(EQ, Boolean.FALSE), new Message() {
           @Override public String format(@NotNull Parameters parameters) { return "NO"; }
           @Override public boolean hasParameters() { return false; }
+
+
+          @Override
+          public boolean isSpaceBefore() {
+            return false;
+          }
+
+
+          @Override
+          public boolean isSpaceAfter() {
+            return false;
+          }
         });
       }
     });
@@ -157,5 +182,20 @@ public class ArrayFormatterTest extends AbstractFormatterTest
 
     assertEquals("this, is, a, test", registry.getFormatter(null, int[].class)
         .format(new Object[] { null, "this", null, "is", null, "a", null, "test" }, null , noParameters, null));
+  }
+
+
+  @Test
+  public void testEmptyOrNullArray()
+  {
+    GenericFormatterRegistry registry = new GenericFormatterRegistry();
+    registry.addFormatter(new ArrayFormatter());
+
+    ParameterFactory factory = ParameterFactory.DEFAULT;
+
+    Message message = MessageFactory.parse("%{array,{'null'->'null','empty'->'empty'}}");
+
+    assertEquals("null", message.format(factory.with("array", null)));
+    assertEquals("empty", message.format(factory.with("array", new int[0])));
   }
 }

@@ -44,33 +44,33 @@ public final class ParameterMap implements ParameterData
 
 
   @Contract(pure = true)
-  public Message getMessageFor(boolean key) {
-    return getMessageForKey(key);
+  public Message getMessageFor(boolean key, boolean includeDefault) {
+    return getMessageForKey(key, includeDefault);
   }
 
 
   @SuppressWarnings("unused")
   @Contract(pure = true)
-  public Message getMessageFor(int key) {
-    return getMessageForKey(key);
+  public Message getMessageFor(int key, boolean includeDefault) {
+    return getMessageForKey(key, includeDefault);
   }
 
 
   @SuppressWarnings("unused")
   @Contract(pure = true)
-  public Message getMessageFor(String key) {
-    return getMessageForKey(key);
+  public Message getMessageFor(String key, boolean includeDefault) {
+    return getMessageForKey(key, includeDefault);
   }
 
 
   @Contract(pure = true)
-  public boolean hasMessageForKey(Serializable key) {
-    return getMessageForKey(key) != null || map.get(null) != null;
+  public boolean hasMessageForKey(Serializable key, boolean includeDefault) {
+    return getMessageForKey(key, includeDefault) != null;
   }
 
 
   @SuppressWarnings("squid:S3776")
-  private Message getMessageForKey(Serializable key)
+  private Message getMessageForKey(Serializable key, boolean includeDefault)
   {
     if (key != null)
       for(final Entry<Key,Message> entry: map.entrySet())
@@ -79,33 +79,32 @@ public final class ParameterMap implements ParameterData
 
         if (cmpkey != null)
         {
-          final int cmp = compareKey(key, cmpkey.value);
-          final Message message = entry.getValue();
+          try {
+            final int cmp = compareKey(key, cmpkey.value);
+            final Message message = entry.getValue();
 
-          switch(cmpkey.compareType)
-          {
-            case EQ:  if (cmp == 0) return message; break;
-            case NE:  if (cmp != 0) return message; break;
-            case GT:  if (cmp > 0)  return message; break;
-            case GTE: if (cmp >= 0) return message; break;
-            case LT:  if (cmp < 0)  return message; break;
-            case LTE: if (cmp <= 0) return message; break;
+            switch(cmpkey.compareType)
+            {
+              case EQ:  if (cmp == 0) return message; break;
+              case NE:  if (cmp != 0) return message; break;
+              case GT:  if (cmp > 0)  return message; break;
+              case GTE: if (cmp >= 0) return message; break;
+              case LT:  if (cmp < 0)  return message; break;
+              case LTE: if (cmp <= 0) return message; break;
+            }
+          } catch(Exception ignore) {
           }
         }
      }
 
-    return map.get(null);
+    return includeDefault ? map.get(null) : null;
   }
 
 
-  @Override
   @Contract(pure = true)
   public String format(@NotNull Parameters parameters, Serializable key)
   {
-    Message message = getMessageForKey(key);
-    if (message == null)
-      message = map.get(null);
-
+    final Message message = getMessageForKey(key,true);
     return (message == null) ? null : message.format(parameters);
   }
 
@@ -133,7 +132,14 @@ public final class ParameterMap implements ParameterData
     if (value instanceof Number)
       return ((Number)value).longValue() != 0;
 
-    return Boolean.parseBoolean(String.valueOf(value));
+    String string = String.valueOf(value);
+
+    if ("true".equalsIgnoreCase(string))
+      return true;
+    if ("false".equalsIgnoreCase(string))
+      return false;
+
+    throw new IllegalArgumentException("not a bool");
   }
 
 
@@ -143,13 +149,6 @@ public final class ParameterMap implements ParameterData
       return ((Number)value).intValue();
 
     return Integer.parseInt(String.valueOf(value));
-  }
-
-
-  @Override
-  @Contract(pure = true)
-  public String format(@NotNull Parameters parameters) {
-    return format(parameters, null);
   }
 
 

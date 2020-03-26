@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +33,7 @@ import java.util.regex.Pattern;
 /**
  * @author Jeroen Gremmen
  */
-public class GeoFormatter implements NamedParameterFormatter
+public class GeoFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
 {
   private static final Map<String,Format> FORMAT = new HashMap<String,Format>();
 
@@ -65,13 +64,9 @@ public class GeoFormatter implements NamedParameterFormatter
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     if (value == null)
-      return null;
+      return formatNull(parameters, data);
 
-    final String formatString = (data instanceof ParameterString) ? ((ParameterString)data).getValue() : "dms";
-    Format fmt = FORMAT.get(formatString);
-    if (fmt == null)
-      fmt = parseFormatString(formatString);
-
+    Format fmt = getFormat(data);
     StringBuilder s = new StringBuilder();
     double v = ((Number)value).doubleValue();
     double[] dms = dmsSplitter(fmt, v);
@@ -106,6 +101,17 @@ public class GeoFormatter implements NamedParameterFormatter
     }
 
     return s.toString();
+  }
+
+
+  private Format getFormat(ParameterData data)
+  {
+    String formatString = getDataString("format", data);
+    if (formatString == null)
+      formatString = "dms";
+
+    Format format = FORMAT.get(formatString);
+    return format == null ? parseFormatString(formatString) : format;
   }
 
 

@@ -82,14 +82,14 @@ public final class MessageLexer implements Iterable<Token>
         {
           data.state.pop();
           data.pos = length;
-          return new Token(start, length - 1, TEXT, message.substring(start), 0,
-              isSpace(start) && start > 0, false);
+          return new Token(start, length - 1, TEXT, message.substring(start).trim(), 0,
+              isSpace(start), isSpace(length - 1));
         }
         else if (idx_p > data.pos)
         {
           data.pos = idx_p;
-          return new Token(start, idx_p - 1, TEXT, message.substring(start, idx_p), 0,
-              isSpace(start) && start > 0, isSpace(idx_p - 1));
+          return new Token(start, idx_p - 1, TEXT, message.substring(start, idx_p).trim(), 0,
+              isSpace(start), isSpace(idx_p - 1));
         }
         else
         {
@@ -114,15 +114,15 @@ public final class MessageLexer implements Iterable<Token>
           data.pos = idx_q + 1;
 
           if (idx_q == start)
-            continue;
+            return new Token(start, start, TEXT, "", 0, false, false);
 
-          return new Token(start, idx_q - 1, TEXT, message.substring(start, idx_q), 0,
+          return new Token(start, idx_q - 1, TEXT, message.substring(start, idx_q).trim(), 0,
               isSpace(start), isSpace(idx_q - 1));
         }
         else if (idxp > start)
         {
           data.pos = idxp;
-          return new Token(start, idxp - 1, TEXT, message.substring(start, idxp), 0,
+          return new Token(start, idxp - 1, TEXT, message.substring(start, idxp).trim(), 0,
               isSpace(start), isSpace(idxp - 1));
         }
         else
@@ -351,19 +351,17 @@ public final class MessageLexer implements Iterable<Token>
     @Getter int end;
     @Getter TokenType type;
     @Getter String text;
-    @Getter String rawText;
     @Getter int number;
     @Getter boolean spaceBefore;
     @Getter boolean spaceAfter;
 
 
-    Token(int start, int end, TokenType type, String rawText, int number, boolean spaceBefore, boolean spaceAfter)
+    Token(int start, int end, TokenType type, String text, int number, boolean spaceBefore, boolean spaceAfter)
     {
       this.start = start;
       this.end = end;
       this.type = type;
-      this.text = rawText.trim();
-      this.rawText = rawText;
+      this.text = text;
       this.number = number;
       this.spaceBefore = spaceBefore;
       this.spaceAfter = spaceAfter;

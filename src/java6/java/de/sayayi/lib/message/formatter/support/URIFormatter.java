@@ -17,6 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.data.ParameterMap;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,12 +36,12 @@ public final class URIFormatter extends AbstractParameterFormatter
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
     if (value == null)
-      return null;
+      return formatNull(parameters, data);
 
     final URI uri = (URI)value;
 
     if ("authority".equals(format))
-      return uri.getAuthority();
+      return StringFormatter.format(uri.getAuthority(), parameters, data);
     else if ("fragment".equals(format))
       return uri.getFragment();
     else if ("host".equals(format))
@@ -49,16 +50,25 @@ public final class URIFormatter extends AbstractParameterFormatter
       return uri.getPath();
     else if ("port".equals(format))
     {
-      int port = uri.getPort();
-      return hasMessageFor(port, data)
-          ? data.format(parameters, port) : ((port == -1) ? null : Integer.toString(port));
+      final int port = uri.getPort();
+
+      if (port == -1 && hasMessageFor("undefined", data))
+        return ((ParameterMap)data).format(parameters, "undefined");
+      if (port >= 0 && hasMessageFor(port, data))
+        return ((ParameterMap)data).format(parameters, port);
+
+      return port == -1 ? null : Integer.toString(port);
     }
     else if ("query".equals(format))
       return uri.getQuery();
     else if ("scheme".equals(format))
     {
-      String scheme = uri.getScheme();
-      return hasMessageFor(scheme, data) ? data.format(parameters, scheme) : scheme;
+      final String scheme = uri.getScheme();
+
+      if (scheme != null && hasMessageFor(scheme, data))
+        return ((ParameterMap)data).format(parameters, scheme);
+
+      return StringFormatter.format(scheme, parameters, data);
     }
     else if ("user-info".equals(format))
       return uri.getUserInfo();

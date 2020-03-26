@@ -115,6 +115,18 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
   }
 
 
+  @Override
+  public boolean isSpaceBefore() {
+    return false;
+  }
+
+
+  @Override
+  public boolean isSpaceAfter() {
+    return false;
+  }
+
+
   @NotNull
   @Override
   @Contract(value = "-> new", pure = true)

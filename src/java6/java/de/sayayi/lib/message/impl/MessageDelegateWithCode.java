@@ -54,4 +54,16 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
   public boolean hasParameters() {
     return message.hasParameters();
   }
+
+
+  @Override
+  public boolean isSpaceBefore() {
+    return message.isSpaceBefore();
+  }
+
+
+  @Override
+  public boolean isSpaceAfter() {
+    return message.isSpaceAfter();
+  }
 }

@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,16 +28,19 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public final class OptionalFormatter implements ParameterFormatter
+public final class OptionalFormatter extends AbstractParameterFormatter
 {
   @SuppressWarnings("squid:S2789")
   @Override
   @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
   {
-    Optional<?> optional = (Optional<?>)value;
-    if (optional == null || !optional.isPresent())
-      return null;
+    if (value == null)
+      return formatNull(parameters, data);
+
+    final Optional<?> optional = (Optional<?>)value;
+    if (!optional.isPresent())
+      return formatEmpty(parameters, data);
 
     value = optional.get();
 

@@ -15,9 +15,13 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.ParameterData;
 import de.sayayi.lib.message.data.ParameterMap;
+import de.sayayi.lib.message.data.ParameterString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
@@ -30,8 +34,43 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 {
   protected boolean hasMessageFor(Object value, ParameterData parameterData)
   {
-    return parameterData instanceof ParameterMap &&
-        (value instanceof Serializable || value == null) &&
-        ((ParameterMap)parameterData).hasMessageForKey((Serializable)value);
+    return parameterData instanceof ParameterMap && value instanceof Serializable &&
+        ((ParameterMap)parameterData).hasMessageForKey((Serializable)value, false);
+  }
+
+
+  protected String getDataString(ParameterData data) {
+    return (data instanceof ParameterString) ? ((ParameterString)data).getValue() : null;
+  }
+
+
+  protected String getDataString(String key, ParameterData data)
+  {
+    if (data instanceof ParameterString)
+      return ((ParameterString)data).getValue();
+
+    if (data instanceof ParameterMap && key != null)
+    {
+      ParameterMap map = (ParameterMap)data;
+
+      if (map.hasMessageForKey(key, false))
+      {
+        Message message = map.getMessageFor(key, false);
+        if (!message.hasParameters())
+          return message.format(Parameters.EMPTY);
+      }
+    }
+
+    return null;
+  }
+
+
+  protected String formatNull(@NotNull Parameters parameters, ParameterData data) {
+    return StringFormatter.format(null, parameters, data);
+  }
+
+
+  protected String formatEmpty(@NotNull Parameters parameters, ParameterData data) {
+    return StringFormatter.format("", parameters, data);
   }
 }
