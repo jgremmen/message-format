@@ -23,11 +23,11 @@ public class MessageLexerTest
     assertFalse(lexer.hasNext());
 
     lexer = new MessageLexer("test  ").iterator();
-    assertEquals(new Token(0, 5, TEXT, "test", 0, false, false), lexer.next());
+    assertEquals(new Token(0, 5, TEXT, "test  ", 0, false, false), lexer.next());
     assertFalse(lexer.hasNext());
 
     lexer = new MessageLexer(" true  ").iterator();
-    assertEquals(new Token(0, 6, TEXT, "true", 0, false, false), lexer.next());
+    assertEquals(new Token(0, 6, TEXT, " true  ", 0, false, false), lexer.next());
     assertFalse(lexer.hasNext());
   }
 
@@ -36,18 +36,18 @@ public class MessageLexerTest
   public void testSpaceBefore()
   {
     Iterator<Token> lexer = new MessageLexer(" this is a test").iterator();
-    assertEquals(new Token(0, 14, TEXT, "this is a test", 0, false, false), lexer.next());
+    assertEquals(new Token(0, 14, TEXT, " this is a test", 0, false, false), lexer.next());
     assertFalse(lexer.hasNext());
 
     lexer = new MessageLexer("abc %{ ' x%{} y' } def").iterator();
-    assertEquals(new Token(0, 3, TEXT, "abc", 0, false, true), lexer.next());
+    assertEquals(new Token(0, 3, TEXT, "abc ", 0, false, true), lexer.next());
     assertEquals(new Token(4, 5, PARAM_START, "%{", 0, true, false), lexer.next());
-    assertEquals(new Token(9, 9, TEXT, "x", 0, false, false), lexer.next());
+    assertEquals(new Token(8, 9, TEXT, " x", 0, true, false), lexer.next());
     assertEquals(new Token(10, 11, PARAM_START, "%{", 0, false, false), lexer.next());
     assertEquals(new Token(12, 12, PARAM_END, "}", 0, false, true), lexer.next());
-    assertEquals(new Token(13, 14, TEXT, "y", 0, true, false), lexer.next());
+    assertEquals(new Token(13, 14, TEXT, " y", 0, true, false), lexer.next());
     assertEquals(new Token(17, 17, PARAM_END, "}", 0, false, true), lexer.next());
-    assertEquals(new Token(18, 21, TEXT, "def", 0, true, false), lexer.next());
+    assertEquals(new Token(18, 21, TEXT, " def", 0, true, false), lexer.next());
     assertFalse(lexer.hasNext());
   }
 
