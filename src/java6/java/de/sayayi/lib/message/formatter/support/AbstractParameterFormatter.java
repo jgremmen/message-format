@@ -65,6 +65,13 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   }
 
 
+  protected String getDataString(String key, ParameterData data, String defaultValue)
+  {
+    String string = getDataString(key, data);
+    return string == null ? defaultValue : string;
+  }
+
+
   protected String formatNull(@NotNull Parameters parameters, ParameterData data) {
     return StringFormatter.format(null, parameters, data);
   }

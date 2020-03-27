@@ -51,6 +51,8 @@ public final class MapFormatter extends AbstractParameterFormatter
         parameters.getLocale());
     final String separator = getSeparator(data);
     final StringBuilder s = new StringBuilder();
+    final String nullKey = getDataString("null-key", data, "(null)");
+    final String nullValue = getDataString("null-value", data, "(null)");
 
     for(Entry<?,?> entry: map.entrySet())
     {
@@ -65,7 +67,7 @@ public final class MapFormatter extends AbstractParameterFormatter
       else if (key != null)
         keyString = trimNotNull(parameters.getFormatter(key.getClass()).format(key, null, parameters, null));
       else
-        keyString = "(null)";
+        keyString = nullKey;
 
       Object val = entry.getValue();
       String valueString;
@@ -75,7 +77,7 @@ public final class MapFormatter extends AbstractParameterFormatter
       else if (val != null)
         valueString = trimNotNull(parameters.getFormatter(val.getClass()).format(val, null, parameters, null));
       else
-        valueString = "(null)";
+        valueString = nullValue;
 
       s.append((keyString + separator + valueString).trim());
     }
