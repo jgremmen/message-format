@@ -6,8 +6,6 @@ options {
 }
 
 @header {
-package de.sayayi.lib.message.parser;
-
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.data.*;
 import de.sayayi.lib.message.data.ParameterMap.CompareType;

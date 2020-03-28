@@ -5,10 +5,6 @@ options {
 }
 
 
-@header {
-package de.sayayi.lib.message.parser;
-}
-
 
 // ------------------ Default mode ------------------
 PARAM_START
