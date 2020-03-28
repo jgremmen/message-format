@@ -20,5 +20,5 @@ build:
   script: ./gradlew clean build
   artifacts:
     paths:
-      - ./build/libs/*
+      - ./.build/libs/*
     expire_in: 8 weeks
