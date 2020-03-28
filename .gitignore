@@ -1,12 +1,11 @@
 /.gradle/
 /.idea
 /bin
-/build
 /out
-/src-generated/
-/src/java6/antlr/gen/
-/src/java6/antlr/de/sayayi/lib/message/parser/gen/
+/core/src/main/generated/
 
 *.tokens
 *.iml
 .DS_Store
+.build
+

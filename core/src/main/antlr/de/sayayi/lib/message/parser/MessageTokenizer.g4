@@ -96,7 +96,7 @@ MAP_END
         : '}' -> popMode
         ;
 M_ARROW
-        : '->'
+        : '->' | ':'
         ;
 M_WS
         : ' '+ -> skip

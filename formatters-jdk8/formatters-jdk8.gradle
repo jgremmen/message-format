@@ -1,0 +1,15 @@
+description 'Message Format Library (java 8)'
+
+
+dependencies {
+  api project(':core')
+}
+
+
+compileJava {
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
+}
+
+
+compileJava.source sourceSets.main.java

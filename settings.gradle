@@ -1,0 +1,8 @@
+include "core"
+include "formatters-jdk8"
+
+rootProject.name = 'message-format'
+rootProject.children.each { project ->
+  if (!project.name.equals("buildSrc"))
+    project.buildFileName = "${project.name}.gradle"
+}

@@ -12,6 +12,10 @@ import de.sayayi.lib.message.data.ParameterMap.CompareType;
 }
 
 
+fullMessage
+        : message EOF
+        ;
+
 message
         : ( textPart? parameter)* textPart?
         ;
@@ -96,7 +100,7 @@ mapElements
         ;
 
 mapElement
-        : key=mapKey arrow=M_ARROW value=mapValue
+        : key=mapKey M_ARROW value=mapValue
         ;
 
 mapKey
@@ -109,8 +113,10 @@ mapKey
         ;
 
 mapValue
-        : string         # ValueString
-        | quotedMessage  # ValueMessage
+        : string           # ValueString
+        | number=M_NUMBER  # ValueNumber
+        | bool=M_BOOL      # ValueBool
+        | quotedMessage    # ValueMessage
         ;
 
 relationalOperator

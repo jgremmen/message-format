@@ -18,10 +18,10 @@
 javadoc {
   title "Java Message Format Library ${version}"
 
-  classpath += sourceSets.java6.compileClasspath
-  classpath += sourceSets.java8.compileClasspath
-  source += sourceSets.java6.allJava
-  source += sourceSets.java8.allJava
+  classpath += project(':core').sourceSets.main.compileClasspath
+  classpath += project(':formatters-jdk8').sourceSets.main.compileClasspath
+  source += project(':core').sourceSets.main.allJava
+  source += project(':formatters-jdk8').sourceSets.main.allJava
 
   (options as StandardJavadocDocletOptions).with {
     linksOffline 'http://javadox.com/org.jetbrains/annotations/15.0/', 'gradle/javadocs/jetbrains-annotations'

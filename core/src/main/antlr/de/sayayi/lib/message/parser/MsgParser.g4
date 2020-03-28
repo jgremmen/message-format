@@ -9,19 +9,26 @@ options {
 package de.sayayi.lib.message.parser;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.data.*;
 import de.sayayi.lib.message.data.ParameterMap.CompareType;
+import java.util.*;
 }
 
+
+fullMessage returns [Message value]
+        : message  { $value = $message.value; }
+          EOF
+        ;
 
 message returns [Message value] locals [List<MessagePart> parts]
         @init {
           $parts = new ArrayList<MessagePart>();
         }
         : (
-            (textPart { $parts.add($textPart.value); } )?
-            parameter { $parts.add($parameter.value); }
+            (textPart  { $parts.add($textPart.value); } )?
+            parameter  { $parts.add($parameter.value); }
           )*
-          (textPart { $parts.add($textPart.value); } )?
+          (textPart  { $parts.add($textPart.value); } )?
         ;
 
 textPart returns [TextPart value]
@@ -33,9 +40,9 @@ text returns [String value] locals [StringBuilder sb]
           $sb = new StringBuilder();
         }
         @after {
-          $value = $sb.toString();
+          $value = $sb.toString().replaceAll("\\s+", " ");
         }
-        : (CH { $sb.append($CH.text); })+
+        : (CH  { $sb.append($CH.text); })+
         ;
 
 quotedMessage returns [Message value]
@@ -59,25 +66,32 @@ parameter returns [ParameterPart value]
           PARAM_END
         ;
 
-parameterData
+parameterData returns [ParameterData value]
         : string           # DataString
         | number=P_NUMBER  # DataNumber
         | map              # DataMap
         ;
 
-map
-        : MAP_START mapElements (M_COMMA defaultValue=mapValue)? MAP_END
+map returns [Map<MapKey,MapValue> value]
+        @init {
+          $value = new LinkedHashMap<MapKey,MapValue>();
+        }
+        : MAP_START
+          mapElements[$value]
+          (M_COMMA mapValue  { $value.put(null, $mapValue.value); }
+          )?
+          MAP_END
         ;
 
-mapElements
-        : mapElement (M_COMMA mapElement)*
+mapElements [Map<MapKey,MapValue> value]
+        : mapElement[$value] (M_COMMA mapElement[$value])*
         ;
 
-mapElement
-        : key=mapKey arrow=M_ARROW value=mapValue
+mapElement [Map<MapKey,MapValue> value]
+        : mapKey M_ARROW mapValue  { $value.put($mapKey.key, $mapValue.value); }
         ;
 
-mapKey
+mapKey returns [MapKey key]
         : relop=relationalOperator? string           # KeyString
         | relop=relationalOperator? number=M_NUMBER  # KeyNumber
         | bool=M_BOOL                                # KeyBool
@@ -86,17 +100,19 @@ mapKey
         | name=NAME                                  # KeyName
         ;
 
-mapValue
-        : string         # ValueString
-        | quotedMessage  # ValueMessage
+mapValue returns [MapValue value]
+        : string           # ValueString
+        | number=M_NUMBER  # ValueNumber
+        | bool=M_BOOL      # ValueBool
+        | quotedMessage    # ValueMessage
         ;
 
 relationalOperator returns [CompareType cmp]
         : equalOperator  { $cmp = $equalOperator.cmp; }
-        | M_LTE  { $cmp = CompareType.LTE; }
-        | M_LT   { $cmp = CompareType.LT; }
-        | M_GT   { $cmp = CompareType.GT; }
-        | M_GTE  { $cmp = CompareType.GTE; }
+        | M_LTE          { $cmp = CompareType.LTE; }
+        | M_LT           { $cmp = CompareType.LT; }
+        | M_GT           { $cmp = CompareType.GT; }
+        | M_GTE          { $cmp = CompareType.GTE; }
         ;
 
 equalOperator returns [CompareType cmp]
