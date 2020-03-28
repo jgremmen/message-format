@@ -12,11 +12,11 @@ import de.sayayi.lib.message.data.ParameterMap.CompareType;
 }
 
 
-fullMessage
-        : message EOF
+message
+        : message0 EOF
         ;
 
-message
+message0
         : ( textPart? parameter)* textPart?
         ;
 
@@ -35,8 +35,8 @@ character
         ;
 
 quotedMessage
-        : singleQuoteStart message singleQuoteEnd
-        | doubleQuoteStart message doubleQuoteEnd
+        : singleQuoteStart message0 singleQuoteEnd
+        | doubleQuoteStart message0 doubleQuoteEnd
         ;
 
 string

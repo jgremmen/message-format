@@ -34,6 +34,8 @@ dependencies {
 generateGrammarSource {
   outputDirectory = file("src/main/generated")
   arguments << "-lib" << "src/main/antlr/de/sayayi/lib/message/parser"
+
+  exclude "**/MsgParserTest.g4"
 }
 
 
