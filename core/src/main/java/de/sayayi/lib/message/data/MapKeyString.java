@@ -15,16 +15,28 @@
  */
 package de.sayayi.lib.message.data;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 
 /**
  * @author Jeroen Gremmen
  */
-public interface MapValue
+@AllArgsConstructor
+public final class MapKeyString implements MapKey
 {
-  Type getType();
+  private final CompareType compareType;
+  @Getter private final String string;
 
 
-  enum Type {
-    STRING, NUMBER, BOOL, MESSAGE
+  @Override
+  public Type getType() {
+    return Type.STRING;
+  }
+
+
+  @Override
+  public CompareType getCompareType() {
+    return compareType;
   }
 }

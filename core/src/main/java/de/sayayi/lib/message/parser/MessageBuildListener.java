@@ -18,7 +18,7 @@ package de.sayayi.lib.message.parser;
 import de.sayayi.lib.message.impl.EmptyMessage;
 import de.sayayi.lib.message.impl.MultipartMessage;
 import de.sayayi.lib.message.impl.SinglePartMessage;
-import de.sayayi.lib.message.parser.MsgParser.MessageContext;
+import de.sayayi.lib.message.parser.MsgParser.Message0Context;
 import de.sayayi.lib.message.parser.MsgParser.ParameterContext;
 import de.sayayi.lib.message.parser.MsgParser.TextPartContext;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -40,7 +40,7 @@ public class MessageBuildListener extends MsgParserBaseListener
 
 
   @Override
-  public void exitMessage(MessageContext ctx)
+  public void exitMessage0(Message0Context ctx)
   {
     final List<MessagePart> parts = ctx.parts;
 

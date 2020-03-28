@@ -15,16 +15,21 @@
  */
 package de.sayayi.lib.message.data;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 
 /**
  * @author Jeroen Gremmen
  */
-public interface MapValue
+@AllArgsConstructor
+public class MapValueNumber implements MapValue
 {
-  Type getType();
+  @Getter private final int number;
 
 
-  enum Type {
-    STRING, NUMBER, BOOL, MESSAGE
+  @Override
+  public Type getType() {
+    return Type.NUMBER;
   }
 }

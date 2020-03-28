@@ -15,12 +15,12 @@ import java.util.*;
 }
 
 
-fullMessage returns [Message value]
-        : message  { $value = $message.value; }
+message returns [Message value]
+        : message0  { $value = $message0.value; }
           EOF
         ;
 
-message returns [Message value] locals [List<MessagePart> parts]
+message0 returns [Message value] locals [List<MessagePart> parts]
         @init {
           $parts = new ArrayList<MessagePart>();
         }
@@ -46,16 +46,16 @@ text returns [String value] locals [StringBuilder sb]
         ;
 
 quotedMessage returns [Message value]
-        : SINGLE_QUOTE_START message SINGLE_QUOTE_END  { $value = $message.value; }
-        | DOUBLE_QUOTE_START message DOUBLE_QUOTE_END  { $value = $message.value; }
+        : SINGLE_QUOTE_START message0 SINGLE_QUOTE_END  { $value = $message0.value; }
+        | DOUBLE_QUOTE_START message0 DOUBLE_QUOTE_END  { $value = $message0.value; }
         ;
 
 string returns [String value]
         @init {
           $value = "";
         }
-        : SINGLE_QUOTE_START t=text? SINGLE_QUOTE_END  { $value = $t.value; }
-        | DOUBLE_QUOTE_START t=text? DOUBLE_QUOTE_END  { $value = $t.value; }
+        : SINGLE_QUOTE_START (t=text { $value = $t.value; } )? SINGLE_QUOTE_END
+        | DOUBLE_QUOTE_START (t=text { $value = $t.value; } )? DOUBLE_QUOTE_END
         ;
 
 parameter returns [ParameterPart value]
@@ -92,30 +92,40 @@ mapElement [Map<MapKey,MapValue> value]
         ;
 
 mapKey returns [MapKey key]
-        : relop=relationalOperator? string           # KeyString
-        | relop=relationalOperator? number=M_NUMBER  # KeyNumber
-        | bool=M_BOOL                                # KeyBool
-        | eqop=equalOperator? nil=M_NULL             # KeyNull
-        | eqop=equalOperator? empty=M_EMPTY          # KeyEmpty
-        | name=NAME                                  # KeyName
+        : relop=relationalOperator? string
+            { $key = new MapKeyString($relop.cmp, $string.value); }
+        | relop=relationalOperator? number=M_NUMBER
+            { $key = new MapKeyNumber($relop.cmp, Integer.parseInt($number.text)); }
+        | bool=M_BOOL
+            { $key = new MapKeyBool(Boolean.parseBoolean($bool.text)); }
+        | eqop=equalOperator? nil=M_NULL
+            { $key = new MapKeyNull($eqop.cmp); }
+        | eqop=equalOperator? empty=M_EMPTY
+            { $key = new MapKeyEmpty($eqop.cmp); }
+        | name=NAME
+            { $key = new MapKeyName($name.text); }
         ;
 
 mapValue returns [MapValue value]
-        : string           # ValueString
-        | number=M_NUMBER  # ValueNumber
-        | bool=M_BOOL      # ValueBool
-        | quotedMessage    # ValueMessage
+        : string
+            { $value = new MapValueString($string.value); }
+        | number=M_NUMBER
+            { $value = new MapValueNumber(Integer.parseInt($number.text)); }
+        | bool=M_BOOL
+            { $value = new MapValueBool(Boolean.parseBoolean($bool.text)); }
+        | quotedMessage
+            { $value = new MapValueMessage($quotedMessage.value); }
         ;
 
-relationalOperator returns [CompareType cmp]
+relationalOperator returns [MapKey.CompareType cmp]
         : equalOperator  { $cmp = $equalOperator.cmp; }
-        | M_LTE          { $cmp = CompareType.LTE; }
-        | M_LT           { $cmp = CompareType.LT; }
-        | M_GT           { $cmp = CompareType.GT; }
-        | M_GTE          { $cmp = CompareType.GTE; }
+        | M_LTE          { $cmp = MapKey.CompareType.LTE; }
+        | M_LT           { $cmp = MapKey.CompareType.LT; }
+        | M_GT           { $cmp = MapKey.CompareType.GT; }
+        | M_GTE          { $cmp = MapKey.CompareType.GTE; }
         ;
 
-equalOperator returns [CompareType cmp]
-        : M_EQ  { $cmp = CompareType.EQ; }
-        | M_NE  { $cmp = CompareType.NE; }
+equalOperator returns [MapKey.CompareType cmp]
+        : M_EQ  { $cmp = MapKey.CompareType.EQ; }
+        | M_NE  { $cmp = MapKey.CompareType.NE; }
         ;

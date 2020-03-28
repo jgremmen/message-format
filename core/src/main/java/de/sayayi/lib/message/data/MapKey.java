@@ -19,5 +19,20 @@ package de.sayayi.lib.message.data;
 /**
  * @author Jeroen Gremmen
  */
-public interface MapKey {
+public interface MapKey
+{
+  Type getType();
+
+
+  CompareType getCompareType();
+
+
+  enum Type {
+    STRING, NUMBER, BOOL, NULL, EMPTY, NAME
+  }
+
+
+  enum CompareType {
+    LT, LTE, EQ, NE, GT, GTE
+  }
 }
