@@ -40,8 +40,8 @@ quotedMessage
         ;
 
 string
-        : singleQuoteStart t=text? singleQuoteEnd
-        | doubleQuoteStart t=text? doubleQuoteEnd
+        : singleQuoteStart text? singleQuoteEnd
+        | doubleQuoteStart text? doubleQuoteEnd
         ;
 
 singleQuoteStart

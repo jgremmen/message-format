@@ -5,6 +5,7 @@ options {
     tokenVocab = MessageTokenizer;
 }
 
+
 @header {
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.data.*;
@@ -52,8 +53,8 @@ string returns [String value]
         @init {
           $value = "";
         }
-        : SINGLE_QUOTE_START (t=text { $value = $t.value; } )? SINGLE_QUOTE_END
-        | DOUBLE_QUOTE_START (t=text { $value = $t.value; } )? DOUBLE_QUOTE_END
+        : SINGLE_QUOTE_START (t=text  { $value = $t.value; } )? SINGLE_QUOTE_END
+        | DOUBLE_QUOTE_START (t=text  { $value = $t.value; } )? DOUBLE_QUOTE_END
         ;
 
 parameter returns [ParameterPart value]
