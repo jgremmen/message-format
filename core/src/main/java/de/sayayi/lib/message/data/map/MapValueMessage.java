@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.data;
+package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.Message;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -29,6 +30,7 @@ public final class MapValueMessage implements MapValue
   @Getter private final Message message;
 
 
+  @NotNull
   @Override
   public Type getType() {
     return Type.MESSAGE;

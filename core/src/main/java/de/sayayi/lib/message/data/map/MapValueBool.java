@@ -13,47 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.data;
+package de.sayayi.lib.message.data.map;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.Serializable;
-import java.util.Locale;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class MapKeyNull implements MapKey
+@AllArgsConstructor
+public final class MapValueBool implements MapValue
 {
-  private final CompareType compareType;
-
-
-  public MapKeyNull(@NotNull CompareType compareType)
-  {
-    if (compareType != CompareType.EQ && compareType != CompareType.NE)
-      throw new IllegalArgumentException("compareType must be EQ or NE");
-
-    this.compareType = compareType;
-  }
+  @Getter private final boolean bool;
 
 
   @NotNull
   @Override
   public Type getType() {
-    return Type.NULL;
+    return Type.BOOL;
   }
 
 
-  @NotNull
   @Override
-  public MatchResult match(@NotNull Locale locale, Serializable value)
-  {
-    if (value == null && compareType == CompareType.EQ)
-      return MatchResult.EXACT;
-    if (value != null && compareType == CompareType.NE)
-      return MatchResult.EXACT;
-
-    return MatchResult.MISMATCH;
+  public Boolean asObject() {
+    return bool;
   }
 }

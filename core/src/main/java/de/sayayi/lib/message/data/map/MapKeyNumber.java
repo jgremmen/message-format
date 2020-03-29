@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.data;
+package de.sayayi.lib.message.data.map;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Locale;
 
 
@@ -27,16 +29,16 @@ import java.util.Locale;
  * @author Jeroen Gremmen
  */
 @AllArgsConstructor
-public final class MapKeyString implements MapKey
+public final class MapKeyNumber implements MapKey
 {
-  private final CompareType compareType;
-  @Getter private final String string;
+  private CompareType compareType;
+  @Getter private final int number;
 
 
   @NotNull
   @Override
   public Type getType() {
-    return Type.STRING;
+    return Type.NUMBER;
   }
 
 
@@ -51,34 +53,46 @@ public final class MapKeyString implements MapKey
     int cmp = 0;
 
     doMatch: {
-      if (!(value instanceof CharSequence || value instanceof Character))
-        result = MatchResult.LENIENT;
-
-      String text = value.toString();
-
-      if (compareType == CompareType.EQ)
+      if (value instanceof Long || value instanceof Integer || value instanceof Short || value instanceof Byte)
       {
-        if (text.equals(string))
-          break doMatch;
+        cmp = Long.signum(((Number)value).longValue() - number);
+        break doMatch;
+      }
 
-        if (text.toLowerCase(locale).equals(string.toLowerCase(locale)))
-        {
+      if (value instanceof BigInteger)
+      {
+        cmp = ((BigInteger)value).compareTo(BigInteger.valueOf(number));
+        break doMatch;
+      }
+
+      if (value instanceof CharSequence || value instanceof Character)
+      {
+        try {
+          value = new BigDecimal(value.toString());
           result = MatchResult.LENIENT;
-          break doMatch;
+        } catch(Exception ignore) {
         }
-
-        cmp = 1;
-        break doMatch;
       }
 
-      if (compareType == CompareType.NE && !text.toLowerCase(locale).equals(string.toLowerCase(locale)))
+      if (value instanceof BigDecimal)
       {
-        result = MatchResult.LENIENT;
-        cmp = 1;
+        cmp = ((BigDecimal)value).compareTo(BigDecimal.valueOf(number));
         break doMatch;
       }
 
-      cmp = text.compareTo(string);
+      if (value instanceof Float)
+      {
+        cmp = Float.compare((Float)value, number);
+        break doMatch;
+      }
+
+      if (value instanceof Number)
+      {
+        cmp = Double.compare(((Number)value).doubleValue(), number);
+        break doMatch;
+      }
+
+      return MatchResult.MISMATCH;
     }
 
     return compareType.match(cmp) ? result : MatchResult.MISMATCH;

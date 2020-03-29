@@ -13,21 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.data;
+package de.sayayi.lib.message.data.map;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.Serializable;
+import java.util.Locale;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public interface MapValue
+@AllArgsConstructor
+public final class MapKeyName implements MapKey
 {
-  Type getType();
+  @Getter private final String name;
 
 
-  Object asObject();
+  @NotNull
+  @Override
+  public Type getType() {
+    return Type.NAME;
+  }
 
 
-  enum Type {
-    STRING, NUMBER, BOOL, MESSAGE
+  @NotNull
+  @Override
+  public MatchResult match(@NotNull Locale locale, Serializable value)
+  {
+    return (value instanceof CharSequence || value instanceof Character) && value.toString().equals(name)
+        ? MatchResult.EXACT : MatchResult.MISMATCH;
   }
 }

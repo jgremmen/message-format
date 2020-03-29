@@ -13,29 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.data;
+package de.sayayi.lib.message.data.map;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@AllArgsConstructor
-public final class MapValueBool implements MapValue
+public interface MapValue
 {
-  @Getter private final boolean bool;
+  @Contract(pure = true)
+  @NotNull Type getType();
 
 
-  @Override
-  public Type getType() {
-    return Type.BOOL;
-  }
+  @Contract(pure = true)
+  Object asObject();
 
 
-  @Override
-  public Boolean asObject() {
-    return bool;
+  enum Type {
+    STRING, NUMBER, BOOL, MESSAGE
   }
 }

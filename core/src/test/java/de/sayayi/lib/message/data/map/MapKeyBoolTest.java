@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.data;
+package de.sayayi.lib.message.data.map;
 
 import org.junit.Test;
 
 import java.util.Locale;
 
-import static de.sayayi.lib.message.data.MapKey.MatchResult.EXACT;
-import static de.sayayi.lib.message.data.MapKey.MatchResult.LENIENT;
-import static de.sayayi.lib.message.data.MapKey.MatchResult.MISMATCH;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.LENIENT;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
 import static org.junit.Assert.assertEquals;
 
 
