@@ -16,6 +16,7 @@
 package de.sayayi.lib.message;
 
 
+import de.sayayi.lib.message.Message.WithCode;
 import de.sayayi.lib.message.impl.EmptyMessage;
 import de.sayayi.lib.message.impl.EmptyMessageWithCode;
 import org.junit.Test;
@@ -32,11 +33,11 @@ public class MessageFactoryTest
   @Test
   public void testWithCode()
   {
-    Message.WithCode msgWithCode1 = MessageFactory.withCode("ABC", new EmptyMessage());
+    WithCode msgWithCode1 = MessageFactory.withCode("ABC", new EmptyMessage());
     assertEquals("ABC", msgWithCode1.getCode());
     assertTrue(msgWithCode1 instanceof EmptyMessageWithCode);
 
-    Message.WithCode msgWithCode2 = MessageFactory.withCode("ABC", new EmptyMessageWithCode("DEF"));
+    WithCode msgWithCode2 = MessageFactory.withCode("ABC", new EmptyMessageWithCode("DEF"));
     assertEquals("ABC", msgWithCode2.getCode());
     assertTrue(msgWithCode2 instanceof EmptyMessageWithCode);
   }
