@@ -1,4 +1,4 @@
-description 'Message Format Library (java 8)'
+description 'Message Format Java 8 Formatters'
 
 
 dependencies {
@@ -10,6 +10,3 @@ compileJava {
   sourceCompatibility = 1.8
   targetCompatibility = 1.8
 }
-
-
-compileJava.source sourceSets.main.java

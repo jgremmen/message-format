@@ -2,6 +2,8 @@
 /.idea
 /bin
 /out
+/core/src/main/antlr/gen/
+/core/src/main/gen/
 /core/src/main/generated/
 
 *.tokens
