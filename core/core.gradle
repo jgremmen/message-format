@@ -36,6 +36,11 @@ generateGrammarSource {
   arguments += [ '-package', 'de.sayayi.lib.message.parser' ]
 
   exclude "**/MsgParserTest.g4"
+
+  doLast {
+    file('src/main/gen').deleteDir()
+    file('src/main/antlr/gen').deleteDir()
+  }
 }
 
 
@@ -56,5 +61,7 @@ idea {
 
 
 clean.doLast {
+  file('src/main/antlr/gen').deleteDir()
+  file('src/main/gen').deleteDir()
   file('src/main/generated').deleteDir()
 }
