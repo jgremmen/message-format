@@ -16,8 +16,8 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.data.ParameterString;
+import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -81,7 +81,7 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
+  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     final DateTimeFormatter formatter = getFormatter((Temporal)value, format, data);
     if (formatter == null)
@@ -104,10 +104,10 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
   }
 
 
-  private DateTimeFormatter getFormatter(Temporal datetime, String format, ParameterData data)
+  private DateTimeFormatter getFormatter(Temporal datetime, String format, Data data)
   {
-    if (format == null && data instanceof ParameterString)
-      return DateTimeFormatter.ofPattern(((ParameterString)data).getValue());
+    if (format == null && data instanceof DataString)
+      return DateTimeFormatter.ofPattern(((DataString)data).asObject());
 
     final String styleStr = STYLE.get(format);
     final char[] style = (styleStr != null) ? styleStr.toCharArray() : "MM".toCharArray();

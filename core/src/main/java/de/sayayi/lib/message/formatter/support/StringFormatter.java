@@ -17,8 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.data.ParameterMap;
+import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +44,7 @@ public final class StringFormatter implements NamedParameterFormatter
   @Override
   @Contract(pure = true)
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
-  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
+  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     final String string = value == null
         ? null : ((value instanceof char[]) ? new String((char[])value) : String.valueOf(value)).trim();
@@ -61,24 +61,24 @@ public final class StringFormatter implements NamedParameterFormatter
   }
 
 
-  public static String format(String value, @NotNull Parameters parameters, ParameterData data)
+  public static String format(String value, @NotNull Parameters parameters, Data data)
   {
     final boolean isEmpty = value == null || value.isEmpty();
 
     Message message = null;
 
-    if (data instanceof ParameterMap)
+    if (data instanceof DataMap)
     {
-      final ParameterMap parameterMap = (ParameterMap)data;
+      final DataMap parameterMap = (DataMap)data;
 
-      if (value == null && parameterMap.hasMessageForKey("null", false))
-        message = parameterMap.getMessageFor("null", false);
-      else if (isEmpty && parameterMap.hasMessageForKey("empty", false))
-        message = parameterMap.getMessageFor("empty", false);
-      else if (!isEmpty && parameterMap.hasMessageForKey("!empty", false))
-        message = parameterMap.getMessageFor("!empty", false);
-      else if (value != null && parameterMap.hasMessageForKey("!null", false))
-        message = parameterMap.getMessageFor("!null", false);
+      if (value == null && parameterMap.hasMessage("null"))
+        message = parameterMap.getMessage("null");
+      else if (isEmpty && parameterMap.hasMessage("empty"))
+        message = parameterMap.getMessage("empty");
+      else if (!isEmpty && parameterMap.hasMessage("!empty"))
+        message = parameterMap.getMessage("!empty");
+      else if (value != null && parameterMap.hasMessage("!null"))
+        message = parameterMap.getMessage("!null");
     }
 
     return message == null ? (isEmpty ? null : value) : message.format(parameters);

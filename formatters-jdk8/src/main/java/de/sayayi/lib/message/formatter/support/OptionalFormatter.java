@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.data.Data;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +33,7 @@ public final class OptionalFormatter extends AbstractParameterFormatter
   @SuppressWarnings("squid:S2789")
   @Override
   @Contract(pure = true)
-  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
+  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return formatNull(parameters, data);

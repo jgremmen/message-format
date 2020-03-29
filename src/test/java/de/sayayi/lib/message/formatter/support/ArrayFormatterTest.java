@@ -19,10 +19,13 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.ParameterFactory;
-import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.data.ParameterMap;
-import de.sayayi.lib.message.data.ParameterMap.Key;
-import de.sayayi.lib.message.data.ParameterString;
+import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
+import de.sayayi.lib.message.data.DataString;
+import de.sayayi.lib.message.data.map.MapKey;
+import de.sayayi.lib.message.data.map.MapKeyBool;
+import de.sayayi.lib.message.data.map.MapValue;
+import de.sayayi.lib.message.data.map.MapValueMessage;
 import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +37,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import static de.sayayi.lib.message.data.ParameterMap.CompareType.EQ;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -70,9 +72,9 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     assertEquals("wahr, falsch, wahr", registry.getFormatter(null, boolean[].class)
         .format(new boolean[] { true, false, true }, "bool", noParameters, null));
 
-    ParameterMap booleanMap = new ParameterMap(new HashMap<Key,Message>() {
+    DataMap booleanMap = new DataMap(new HashMap<MapKey, MapValue>() {
       {
-        put(new Key(EQ, Boolean.TRUE), new Message() {
+        put(new MapKeyBool(true), new MapValueMessage(new Message() {
           @Override public String format(@NotNull Parameters parameters) { return "YES"; }
           @Override public boolean hasParameters() { return false; }
 
@@ -87,9 +89,9 @@ public class ArrayFormatterTest extends AbstractFormatterTest
           public boolean isSpaceAfter() {
             return false;
           }
-        });
+        }));
 
-        put(new Key(EQ, Boolean.FALSE), new Message() {
+        put(new MapKeyBool(false), new MapValueMessage(new Message() {
           @Override public String format(@NotNull Parameters parameters) { return "NO"; }
           @Override public boolean hasParameters() { return false; }
 
@@ -104,7 +106,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
           public boolean isSpaceAfter() {
             return false;
           }
-        });
+        }));
       }
     });
 
@@ -116,7 +118,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
 
     registry.addFormatter(new NamedParameterFormatter() {
       @Override
-      public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data) {
+      public String format(Object value, String format, @NotNull Parameters parameters, Data data) {
         return (value == null) ? null : (Boolean)value ? "1" : "0";
       }
 
@@ -150,12 +152,12 @@ public class ArrayFormatterTest extends AbstractFormatterTest
         .format(new int[] { 12, -7, 99 }, null , noParameters, null));
 
     assertEquals("1, -7, 248", registry.getFormatter(null, int[].class)
-        .format(new int[] { 1, -7, 248 }, null , noParameters, new ParameterString("##00")));
+        .format(new int[] { 1, -7, 248 }, null , noParameters, new DataString("##00")));
 
     registry.addFormatter(new NumberFormatter());
 
     assertEquals("01, -07, 248", registry.getFormatter(null, int[].class)
-        .format(new int[] { 1, -7, 248 }, null , noParameters, new ParameterString("##00")));
+        .format(new int[] { 1, -7, 248 }, null , noParameters, new DataString("##00")));
 
     registry.addFormatter(new NamedParameterFormatter() {
       @NotNull
@@ -166,7 +168,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
 
       @SuppressWarnings("RedundantCast")
       @Override
-      public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data) {
+      public String format(Object value, String format, @NotNull Parameters parameters, Data data) {
         return (value == null) ? null : String.format("0x%02x", (Integer)value);
       }
 
@@ -193,7 +195,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     Parameters noParameters = ParameterFactory.createFor("de-DE", registry).noParameters();
 
     assertEquals("Test, wahr, -0006", registry.getFormatter(null, int[].class)
-        .format(new Object[] { "Test", true, null, -6 }, null , noParameters, new ParameterString("0000")));
+        .format(new Object[] { "Test", true, null, -6 }, null , noParameters, new DataString("0000")));
 
     assertEquals("this, is, a, test", registry.getFormatter(null, int[].class)
         .format(new Object[] { null, "this", null, "is", null, "a", null, "test" }, null , noParameters, null));

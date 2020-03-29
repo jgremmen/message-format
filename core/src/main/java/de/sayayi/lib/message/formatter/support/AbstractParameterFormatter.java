@@ -17,9 +17,9 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.data.ParameterMap;
-import de.sayayi.lib.message.data.ParameterString;
+import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
+import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,30 +32,30 @@ import java.io.Serializable;
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractParameterFormatter implements ParameterFormatter
 {
-  protected boolean hasMessageFor(Object value, ParameterData parameterData)
+  protected boolean hasMessageFor(Object value, Data parameterData)
   {
-    return parameterData instanceof ParameterMap && value instanceof Serializable &&
-        ((ParameterMap)parameterData).hasMessageForKey((Serializable)value, false);
+    return parameterData instanceof DataMap && value instanceof Serializable &&
+        ((DataMap)parameterData).hasMessage((Serializable)value);
   }
 
 
-  protected String getDataString(ParameterData data) {
-    return (data instanceof ParameterString) ? ((ParameterString)data).getValue() : null;
+  protected String getDataString(Data data) {
+    return (data instanceof DataString) ? ((DataString)data).asObject() : null;
   }
 
 
-  protected String getDataString(String key, ParameterData data)
+  protected String getDataString(String key, Data data)
   {
-    if (data instanceof ParameterString)
-      return ((ParameterString)data).getValue();
+    if (data instanceof DataString)
+      return ((DataString)data).asObject();
 
-    if (data instanceof ParameterMap && key != null)
+    if (data instanceof DataMap && key != null)
     {
-      ParameterMap map = (ParameterMap)data;
+      DataMap map = (DataMap)data;
 
-      if (map.hasMessageForKey(key, false))
+      if (map.hasMessage(key))
       {
-        Message message = map.getMessageFor(key, false);
+        Message message = map.getMessage(key);
         if (!message.hasParameters())
           return message.format(Parameters.EMPTY);
       }
@@ -65,19 +65,19 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   }
 
 
-  protected String getDataString(String key, ParameterData data, String defaultValue)
+  protected String getDataString(String key, Data data, String defaultValue)
   {
     String string = getDataString(key, data);
     return string == null ? defaultValue : string;
   }
 
 
-  protected String formatNull(@NotNull Parameters parameters, ParameterData data) {
+  protected String formatNull(@NotNull Parameters parameters, Data data) {
     return StringFormatter.format(null, parameters, data);
   }
 
 
-  protected String formatEmpty(@NotNull Parameters parameters, ParameterData data) {
+  protected String formatEmpty(@NotNull Parameters parameters, Data data) {
     return StringFormatter.format("", parameters, data);
   }
 }

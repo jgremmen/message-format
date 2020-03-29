@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
-import de.sayayi.lib.message.data.ParameterString;
+import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
 import de.sayayi.lib.message.formatter.support.GeoFormatter.Format;
 import org.junit.Test;
@@ -107,22 +107,22 @@ public class GeoFormatterTest extends AbstractFormatterTest
 
     // short-longitude
     assertEquals("4°48'E", formatter.format(dms(4, 48), null,
-        ParameterFactory.createFor(ROOT).noParameters(), new ParameterString("short-longitude")));
+        ParameterFactory.createFor(ROOT).noParameters(), new DataString("short-longitude")));
 
     // longitude
     assertEquals("19°0'0\"W",
         formatter.format(-dms(18, 59, 59, 501), null,
-        ParameterFactory.createFor(ROOT).noParameters(), new ParameterString("longitude")));
+        ParameterFactory.createFor(ROOT).noParameters(), new DataString("longitude")));
 
     // medium-longitude
     assertEquals("18°59'59,9\"E",
         formatter.format(dms(18, 59, 59, 891), null,
-        ParameterFactory.createFor(GERMANY).noParameters(), new ParameterString("medium-longitude")));
+        ParameterFactory.createFor(GERMANY).noParameters(), new DataString("medium-longitude")));
 
     // long-longitude
     assertEquals("18°59'59.891\"W",
         formatter.format(-dms(18, 59, 59, 891), null,
-            ParameterFactory.createFor(UK).noParameters(), new ParameterString("long-longitude")));
+            ParameterFactory.createFor(UK).noParameters(), new DataString("long-longitude")));
   }
 
 

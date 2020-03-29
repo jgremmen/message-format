@@ -15,29 +15,26 @@
  */
 package de.sayayi.lib.message.data.map;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import de.sayayi.lib.message.data.DataString;
 import org.jetbrains.annotations.NotNull;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@AllArgsConstructor
-public final class MapValueString implements MapValue
+public final class MapValueString extends DataString implements MapValue
 {
-  @Getter private final String string;
+  private static final long serialVersionUID = 400L;
+
+
+  public MapValueString(String string) {
+    super(string);
+  }
 
 
   @NotNull
   @Override
   public Type getType() {
     return Type.STRING;
-  }
-
-
-  @Override
-  public String asObject() {
-    return string;
   }
 }

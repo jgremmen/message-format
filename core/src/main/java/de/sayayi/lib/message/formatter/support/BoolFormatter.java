@@ -17,8 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.data.ParameterMap;
+import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +47,7 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
 
   @Override
   @Contract(pure = true)
-  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
+  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     boolean bool;
 
@@ -68,9 +68,9 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
       bool = Boolean.parseBoolean(String.valueOf(value));
 
     // allow custom messages for true/false value?
-    if (data instanceof ParameterMap)
+    if (data instanceof DataMap)
     {
-      final Message message = ((ParameterMap)data).getMessageFor(bool, false);
+      final Message message = ((DataMap)data).getMessage(bool);
       if (message != null)
         return message.format(parameters);
     }

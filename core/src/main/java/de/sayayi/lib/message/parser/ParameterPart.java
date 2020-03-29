@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.parser;
 
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import lombok.Getter;
@@ -32,10 +32,10 @@ final class ParameterPart extends MessagePart
 
   @Getter private final String parameter;
   @Getter private final String format;
-  @Getter private final ParameterData data;
+  @Getter private final Data data;
 
 
-  ParameterPart(String parameter, String format, boolean spaceBefore, boolean spaceAfter, ParameterData data)
+  ParameterPart(String parameter, String format, boolean spaceBefore, boolean spaceAfter, Data data)
   {
     super(spaceBefore, spaceAfter);
 

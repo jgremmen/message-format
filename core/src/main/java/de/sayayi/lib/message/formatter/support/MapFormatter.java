@@ -17,9 +17,9 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.data.ParameterMap;
-import de.sayayi.lib.message.data.ParameterString;
+import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
+import de.sayayi.lib.message.data.DataString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +39,7 @@ public final class MapFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
+  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     final Map<?,?> map = (Map<?,?>)value;
     if (map == null)
@@ -86,11 +86,11 @@ public final class MapFormatter extends AbstractParameterFormatter
   }
 
 
-  private String getSeparator(ParameterData data)
+  private String getSeparator(Data data)
   {
     if (hasMessageFor("sep", data))
     {
-      Message msg = ((ParameterMap)data).getMessageFor("sep", false);
+      Message msg = ((DataMap)data).getMessage("sep");
 
       if (!msg.hasParameters())
       {
@@ -113,8 +113,8 @@ public final class MapFormatter extends AbstractParameterFormatter
       }
     }
 
-    if (data instanceof ParameterString)
-      return ((ParameterString)data).getValue();
+    if (data instanceof DataString)
+      return ((DataString)data).asObject();
 
     return "=";
   }

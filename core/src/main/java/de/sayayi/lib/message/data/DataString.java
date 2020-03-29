@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Jeroen Gremmen
+ * Copyright 2020 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,32 @@
 package de.sayayi.lib.message.data;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.jetbrains.annotations.Contract;
-
-import java.io.Serializable;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
  * @author Jeroen Gremmen
  */
 @AllArgsConstructor
-public final class ParameterInteger implements ParameterData
+public class DataString implements Data
 {
-  private static final long serialVersionUID = 302L;
+  private static final long serialVersionUID = 400L;
 
-  @Getter private final int value;
+  private final String string;
 
 
   @Override
   @Contract(pure = true)
   public String toString() {
-    return Integer.toString(value);
+    return string;
   }
 
 
+  @NotNull
   @Override
   @Contract(pure = true)
-  public Serializable asObject() {
-    return value;
+  public String asObject() {
+    return string;
   }
 }

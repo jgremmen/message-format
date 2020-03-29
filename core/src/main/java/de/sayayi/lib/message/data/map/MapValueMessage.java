@@ -17,7 +17,6 @@ package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.Message;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -27,7 +26,9 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public final class MapValueMessage implements MapValue
 {
-  @Getter private final Message message;
+  private static final long serialVersionUID = 400L;
+
+  private final Message message;
 
 
   @NotNull
@@ -37,6 +38,7 @@ public final class MapValueMessage implements MapValue
   }
 
 
+  @NotNull
   @Override
   public Message asObject() {
     return message;

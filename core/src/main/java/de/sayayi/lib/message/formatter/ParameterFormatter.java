@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.data.Data;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +41,7 @@ public interface ParameterFormatter
    * @return  formatted parameter value or {@code null} if this formatter does not produce any output
    */
   @Contract(pure = true)
-  String format(Object value, String format, @NotNull Parameters parameters, ParameterData data);
+  String format(Object value, String format, @NotNull Parameters parameters, Data data);
 
 
   /**

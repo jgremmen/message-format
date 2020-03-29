@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +38,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public String format(Object array, String format, @NotNull Parameters parameters, ParameterData data)
+  public String format(Object array, String format, @NotNull Parameters parameters, Data data)
   {
     final int length;
 

@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class AtomicBooleanFormatter implements ParameterFormatter
 {
   @Override
-  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
+  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     return parameters.getFormatter(format, boolean.class)
         .format(value == null ? null : ((AtomicBoolean)value).get(), format, parameters, data);

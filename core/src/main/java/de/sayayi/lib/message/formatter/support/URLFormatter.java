@@ -16,8 +16,7 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.data.ParameterMap;
+import de.sayayi.lib.message.data.Data;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +32,7 @@ public final class URLFormatter extends AbstractParameterFormatter
 {
   @Override
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
-  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
+  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return null;
@@ -53,15 +52,17 @@ public final class URLFormatter extends AbstractParameterFormatter
       int port = url.getPort();
       if (port == -1)
         port = url.getDefaultPort();
-      return hasMessageFor(port, data)
-          ? ((ParameterMap)data).format(parameters, port) : (port == -1 ? null : Integer.toString(port));
+      return Integer.toString(port);
+//      return hasMessageFor(port, data)
+//          ? ((DataMap)data).format(parameters, port) : (port == -1 ? null : Integer.toString(port));
     }
     else if ("query".equals(format))
       return url.getQuery();
     else if ("protocol".equals(format))
     {
       String protocol = url.getProtocol();
-      return hasMessageFor(protocol, data) ? ((ParameterMap)data).format(parameters, protocol) : protocol;
+      return protocol;
+//      return hasMessageFor(protocol, data) ? ((DataMap)data).format(parameters, protocol) : protocol;
     }
     else if ("user-info".equals(format))
       return url.getUserInfo();

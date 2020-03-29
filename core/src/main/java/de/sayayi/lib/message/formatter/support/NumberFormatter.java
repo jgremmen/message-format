@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +42,7 @@ public final class NumberFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public String format(Object v, String format, @NotNull Parameters parameters, ParameterData data)
+  public String format(Object v, String format, @NotNull Parameters parameters, Data data)
   {
     if (v == null)
       return formatNull(parameters, data);
@@ -62,7 +62,7 @@ public final class NumberFormatter extends AbstractParameterFormatter
   }
 
 
-  private String formatBoolean(Number value, Parameters parameters, ParameterData data)
+  private String formatBoolean(Number value, Parameters parameters, Data data)
   {
     ParameterFormatter formatter = parameters.getFormatter("bool", Boolean.class);
     Set<Class<?>> types = formatter.getFormattableTypes();
@@ -75,7 +75,7 @@ public final class NumberFormatter extends AbstractParameterFormatter
   }
 
 
-  protected NumberFormat getFormatter(String format, ParameterData data, Locale locale)
+  protected NumberFormat getFormatter(String format, Data data, Locale locale)
   {
     if ("integer".equals(format))
       return NumberFormat.getIntegerInstance(locale);

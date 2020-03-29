@@ -70,10 +70,10 @@ parameter returns [ParameterPart value]
           PARAM_END
         ;
 
-data returns [ParameterData value]
-        : string           # DataString
-        | number=P_NUMBER  # DataNumber
-        | map              # DataMap
+data returns [Data value]
+        : string           { $value = new DataString($string.value); }
+        | number=P_NUMBER  { $value = new DataNumber(Long.parseLong($number.text)); }
+        | map              { $value = new DataMap($map.value); }
         ;
 
 map returns [Map<MapKey,MapValue> value]
@@ -95,15 +95,15 @@ mapElement [Map<MapKey,MapValue> value]
         ;
 
 mapKey returns [MapKey key]
-        : relop=relationalOperator? string
+        : relop=relationalOperatorOptional string
             { $key = new MapKeyString($relop.cmp, $string.value); }
-        | relop=relationalOperator? number=M_NUMBER
+        | relop=relationalOperatorOptional number=M_NUMBER
             { $key = new MapKeyNumber($relop.cmp, Long.parseLong($number.text)); }
         | bool=M_BOOL
             { $key = new MapKeyBool(Boolean.parseBoolean($bool.text)); }
-        | eqop=equalOperator? nil=M_NULL
+        | eqop=equalOperatorOptional nil=M_NULL
             { $key = new MapKeyNull($eqop.cmp); }
-        | eqop=equalOperator? empty=M_EMPTY
+        | eqop=equalOperatorOptional empty=M_EMPTY
             { $key = new MapKeyEmpty($eqop.cmp); }
         | name=NAME
             { $key = new MapKeyName($name.text); }
@@ -120,12 +120,26 @@ mapValue returns [MapValue value]
             { $value = new MapValueMessage($quotedMessage.value); }
         ;
 
+relationalOperatorOptional returns [MapKey.CompareType cmp]
+        @init {
+          $cmp = MapKey.CompareType.EQ;
+        }
+        : (relationalOperator { $cmp = $relationalOperator.cmp; } )?
+        ;
+
 relationalOperator returns [MapKey.CompareType cmp]
         : equalOperator  { $cmp = $equalOperator.cmp; }
         | M_LTE          { $cmp = MapKey.CompareType.LTE; }
         | M_LT           { $cmp = MapKey.CompareType.LT; }
         | M_GT           { $cmp = MapKey.CompareType.GT; }
         | M_GTE          { $cmp = MapKey.CompareType.GTE; }
+        ;
+
+equalOperatorOptional returns [MapKey.CompareType cmp]
+        @init {
+          $cmp = MapKey.CompareType.EQ;
+        }
+        : (equalOperator { $cmp = $equalOperator.cmp; } )?
         ;
 
 equalOperator returns [MapKey.CompareType cmp]

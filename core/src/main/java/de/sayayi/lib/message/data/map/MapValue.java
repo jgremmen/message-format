@@ -15,22 +15,24 @@
  */
 package de.sayayi.lib.message.data.map;
 
-
+import de.sayayi.lib.message.data.Data;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.Serializable;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public interface MapValue
+public interface MapValue extends Data
 {
   @Contract(pure = true)
   @NotNull Type getType();
 
 
   @Contract(pure = true)
-  Object asObject();
+  @NotNull Serializable asObject();
 
 
   enum Type {

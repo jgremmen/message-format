@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.data.map;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -26,7 +25,9 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public final class MapValueBool implements MapValue
 {
-  @Getter private final boolean bool;
+  private static final long serialVersionUID = 400L;
+
+  private final boolean bool;
 
 
   @NotNull
@@ -36,6 +37,7 @@ public final class MapValueBool implements MapValue
   }
 
 
+  @NotNull
   @Override
   public Boolean asObject() {
     return bool;

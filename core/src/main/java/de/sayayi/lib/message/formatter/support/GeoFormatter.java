@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.data.ParameterData;
+import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -61,7 +61,7 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
 
   @Override
   @SuppressWarnings("squid:S3776")
-  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
+  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return formatNull(parameters, data);
@@ -104,7 +104,7 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
   }
 
 
-  private Format getFormat(ParameterData data)
+  private Format getFormat(Data data)
   {
     String formatString = getDataString("format", data);
     if (formatString == null)

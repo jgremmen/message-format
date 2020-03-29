@@ -23,9 +23,13 @@ import de.sayayi.lib.message.impl.EmptyMessage;
 import de.sayayi.lib.message.impl.EmptyMessageWithCode;
 import de.sayayi.lib.message.impl.MessageDelegateWithCode;
 import de.sayayi.lib.message.impl.MultipartLocalizedMessageBundleWithCode;
-import de.sayayi.lib.message.parser.MessageParser;
+import de.sayayi.lib.message.parser.MessageBuildListener;
+import de.sayayi.lib.message.parser.MessageTokenizer;
+import de.sayayi.lib.message.parser.MsgParser;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.BufferedTokenStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,8 +52,14 @@ public final class MessageFactory
 
   @NotNull
   @Contract(value = "_ -> new", pure = true)
-  public static Message parse(@NotNull String text) {
-    return new MessageParser(text).parseMessage();
+  public static Message parse(@NotNull String text)
+  {
+    BufferedTokenStream tokenStream = new BufferedTokenStream(new MessageTokenizer(new ANTLRInputStream(text)));
+    MsgParser parser = new MsgParser(tokenStream);
+
+    parser.addParseListener(new MessageBuildListener(tokenStream));
+
+    return parser.message().value;
   }
 
 
@@ -71,7 +81,7 @@ public final class MessageFactory
   @NotNull
   @Contract(value = "_, _ -> new", pure = true)
   public static Message.WithCode parse(@NotNull String code, @NotNull String text) {
-    return new MessageDelegateWithCode(code, new MessageParser(text).parseMessage());
+    return new MessageDelegateWithCode(code, parse(text));
   }
 
 
@@ -84,12 +94,12 @@ public final class MessageFactory
 
     String message = localizedTexts.get(ROOT);
     if (message != null && localizedTexts.size() == 1)
-      return new MessageDelegateWithCode(code, new MessageParser(message).parseMessage());
+      return new MessageDelegateWithCode(code, parse(message));
 
     final Map<Locale,Message> localizedParts = new LinkedHashMap<Locale,Message>();
 
     for(final Entry<Locale,String> localizedText: localizedTexts.entrySet())
-      localizedParts.put(localizedText.getKey(), new MessageParser(localizedText.getValue()).parseMessage());
+      localizedParts.put(localizedText.getKey(), parse(localizedText.getValue()));
 
     return new MultipartLocalizedMessageBundleWithCode(code, localizedParts);
   }

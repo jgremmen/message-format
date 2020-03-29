@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Jeroen Gremmen
+ * Copyright 2020 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,8 @@
  */
 package de.sayayi.lib.message.data;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
@@ -25,24 +24,13 @@ import java.io.Serializable;
 /**
  * @author Jeroen Gremmen
  */
-@AllArgsConstructor
-public final class ParameterString implements ParameterData
+public interface Data extends Serializable
 {
-  private static final long serialVersionUID = 302L;
-
-  @Getter private final String value;
-
-
-  @Override
+  /**
+   * Returns the underlying raw data object.
+   *
+   * @return  raw data object, never {@code null}
+   */
   @Contract(pure = true)
-  public String toString() {
-    return value;
-  }
-
-
-  @Override
-  @Contract(pure = true)
-  public Serializable asObject() {
-    return value;
-  }
+  @NotNull Object asObject();
 }

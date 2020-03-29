@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
-import de.sayayi.lib.message.data.ParameterString;
+import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
 import org.junit.Test;
 
@@ -60,6 +60,6 @@ public class SupplierFormatterTest
     Object value = (LongSupplier) () -> 1234567890L;
 
     assertEquals("1,234,567,890", registry.getFormatter(null, value.getClass())
-        .format(value, null, noParameters, new ParameterString("###,###,###,###")));
+        .format(value, null, noParameters, new DataString("###,###,###,###")));
   }
 }

@@ -22,8 +22,10 @@ import de.sayayi.lib.message.parser.MsgParser.DataContext;
 import de.sayayi.lib.message.parser.MsgParser.Message0Context;
 import de.sayayi.lib.message.parser.MsgParser.ParameterContext;
 import de.sayayi.lib.message.parser.MsgParser.TextPartContext;
+import lombok.AllArgsConstructor;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
 
 import java.util.List;
 
@@ -31,8 +33,12 @@ import java.util.List;
 /**
  * @author Jeroen Gremmen
  */
+@AllArgsConstructor
 public final class MessageBuildListener extends MsgParserBaseListener
 {
+  private final TokenStream tokenStream;
+
+
   @Override
   public void exitTextPart(TextPartContext ctx)
   {
@@ -77,11 +83,14 @@ public final class MessageBuildListener extends MsgParserBaseListener
 
   private boolean exitParameter_isSpaceAtTokenIndex(ParserRuleContext ctx, int i)
   {
-    TerminalNode tn = ctx.getToken(MessageTokenizer.CH, i);
-    if (tn == null)
+    if (i < 0)
       return false;
 
-    String text = tn.getSymbol().getText();
+    Token token = tokenStream.get(i);
+    if (token == null || token.getType() == Token.EOF)
+      return false;
+
+    String text = token.getText();
     if (text == null || text.isEmpty())
       return false;
 

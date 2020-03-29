@@ -16,8 +16,8 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.data.ParameterInteger;
+import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataNumber;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +39,7 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
 
 
   @Override
-  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
+  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     final int bitCount;
 
@@ -51,14 +51,14 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
   }
 
 
-  protected int detectBitCount(ParameterData data, Object value)
+  protected int detectBitCount(Data data, Object value)
   {
     if ("auto".equals(getDataString(data)))
       return autoDetectBitCount(value);
 
-    if (data instanceof ParameterInteger)
+    if (data instanceof DataNumber)
     {
-      int bitCount = ((ParameterInteger)data).getValue();
+      int bitCount = ((Number)data.asObject()).intValue();
       if (bitCount > 0 && bitCount <= 256)
         return bitCount;
     }

@@ -16,8 +16,7 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.data.ParameterMap;
+import de.sayayi.lib.message.data.Data;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +32,7 @@ public final class URIFormatter extends AbstractParameterFormatter
 {
   @Override
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
-  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
+  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return formatNull(parameters, data);
@@ -52,10 +51,10 @@ public final class URIFormatter extends AbstractParameterFormatter
     {
       final int port = uri.getPort();
 
-      if (port == -1 && hasMessageFor("undefined", data))
-        return ((ParameterMap)data).format(parameters, "undefined");
-      if (port >= 0 && hasMessageFor(port, data))
-        return ((ParameterMap)data).format(parameters, port);
+//      if (port == -1 && hasMessageFor("undefined", data))
+//        return ((ParameterMap)data).format(parameters, "undefined");
+//      if (port >= 0 && hasMessageFor(port, data))
+//        return ((ParameterMap)data).format(parameters, port);
 
       return port == -1 ? null : Integer.toString(port);
     }
@@ -65,8 +64,8 @@ public final class URIFormatter extends AbstractParameterFormatter
     {
       final String scheme = uri.getScheme();
 
-      if (scheme != null && hasMessageFor(scheme, data))
-        return ((ParameterMap)data).format(parameters, scheme);
+//      if (scheme != null && hasMessageFor(scheme, data))
+//        return ((DataMap)data).format(parameters, scheme);
 
       return StringFormatter.format(scheme, parameters, data);
     }

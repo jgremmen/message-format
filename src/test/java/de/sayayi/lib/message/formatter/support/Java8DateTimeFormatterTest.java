@@ -18,7 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
-import de.sayayi.lib.message.data.ParameterString;
+import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
 import org.junit.Test;
 
@@ -107,11 +107,11 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
     LocalDateTime datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
 
     assertEquals("17 août",
-        formatter.format(datetime, null, noParameters, new ParameterString("dd MMMM")));
+        formatter.format(datetime, null, noParameters, new DataString("dd MMMM")));
     assertEquals("jeu. jeudi",
-        formatter.format(datetime, null, noParameters, new ParameterString("EEE EEEE")));
+        formatter.format(datetime, null, noParameters, new DataString("EEE EEEE")));
     assertEquals("02:40:23,833",
-        formatter.format(datetime, null, noParameters, new ParameterString("HH:mm:ss,SSS")));
+        formatter.format(datetime, null, noParameters, new DataString("HH:mm:ss,SSS")));
   }
 
 

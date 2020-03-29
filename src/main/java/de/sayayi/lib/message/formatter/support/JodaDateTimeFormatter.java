@@ -16,8 +16,8 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.data.ParameterString;
+import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -59,7 +59,7 @@ public final class JodaDateTimeFormatter implements ParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data)
+  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     final Locale locale = parameters.getLocale();
 
@@ -72,10 +72,10 @@ public final class JodaDateTimeFormatter implements ParameterFormatter
   }
 
 
-  protected DateTimeFormatter getFormatter(String format, ParameterData data)
+  protected DateTimeFormatter getFormatter(String format, Data data)
   {
-    if (format == null && data instanceof ParameterString)
-      return DateTimeFormat.forPattern(((ParameterString)data).getValue());
+    if (format == null && data instanceof DataString)
+      return DateTimeFormat.forPattern(((DataString)data).asObject());
 
     final String style = STYLE.get(format);
 
@@ -83,10 +83,10 @@ public final class JodaDateTimeFormatter implements ParameterFormatter
   }
 
 
-  protected DateTimeFormatter getFormatter(BaseLocal datetime, String format, ParameterData data)
+  protected DateTimeFormatter getFormatter(BaseLocal datetime, String format, Data data)
   {
-    if (format == null && data instanceof ParameterString)
-      return DateTimeFormat.forPattern(((ParameterString)data).getValue());
+    if (format == null && data instanceof DataString)
+      return DateTimeFormat.forPattern(((DataString)data).asObject());
 
     final String styleStr = STYLE.get(format);
     final char[] style = (styleStr != null) ? styleStr.toCharArray() : "MM".toCharArray();
