@@ -17,6 +17,12 @@ package de.sayayi.lib.message.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Locale;
 
 
 /**
@@ -29,14 +35,66 @@ public final class MapKeyNumber implements MapKey
   @Getter private final int number;
 
 
+  @NotNull
   @Override
   public Type getType() {
     return Type.NUMBER;
   }
 
 
+  @NotNull
   @Override
-  public CompareType getCompareType() {
-    return compareType;
+  public MatchResult match(@NotNull Locale locale, Serializable value)
+  {
+    if (value == null)
+      return MatchResult.MISMATCH;
+
+    MatchResult result = MatchResult.EXACT;
+    int cmp = 0;
+
+    doMatch: {
+      if (value instanceof Long || value instanceof Integer || value instanceof Short || value instanceof Byte)
+      {
+        cmp = Long.signum(((Number)value).longValue() - number);
+        break doMatch;
+      }
+
+      if (value instanceof BigInteger)
+      {
+        cmp = ((BigInteger)value).compareTo(BigInteger.valueOf(number));
+        break doMatch;
+      }
+
+      if (value instanceof Float)
+      {
+        cmp = Float.compare((Float)value, number);
+        break doMatch;
+      }
+
+      if (value instanceof CharSequence || value instanceof Character)
+      {
+        try {
+          value = new BigDecimal(value.toString());
+          result = MatchResult.LENIENT;
+        } catch(Exception ignore) {
+        }
+      }
+
+      if (value instanceof BigDecimal)
+      {
+        cmp = ((BigDecimal)value).compareTo(BigDecimal.valueOf(number));
+        break doMatch;
+      }
+
+      if (value instanceof Number)
+      {
+        cmp = Double.compare(((Number)value).doubleValue(), number);
+        break doMatch;
+      }
+
+      return MatchResult.MISMATCH;
+    }
+
+    return compareType.match(cmp) ? result : MatchResult.MISMATCH;
   }
 }

@@ -17,6 +17,12 @@ package de.sayayi.lib.message.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Locale;
 
 
 /**
@@ -28,14 +34,45 @@ public final class MapKeyBool implements MapKey
   @Getter private final boolean bool;
 
 
+  @NotNull
   @Override
   public Type getType() {
     return Type.BOOL;
   }
 
 
+  @NotNull
   @Override
-  public CompareType getCompareType() {
-    return CompareType.EQ;
+  public MatchResult match(@NotNull Locale locale, Serializable value)
+  {
+    if (value != null)
+    {
+      if (value instanceof Boolean && (Boolean)value == bool)
+        return MatchResult.EXACT;
+
+      if ("true".equals(value) && bool)
+        return MatchResult.LENIENT;
+      if ("false".equals(value) && !bool)
+        return MatchResult.LENIENT;
+
+      if (value instanceof BigInteger && (((BigInteger)value).signum() != 0) == bool)
+        return MatchResult.LENIENT;
+
+      if (value instanceof CharSequence || value instanceof Character)
+      {
+        try {
+          value = new BigDecimal(value.toString());
+        } catch(Exception ignore) {
+        }
+      }
+
+      if (value instanceof BigDecimal && (((BigDecimal)value).signum() != 0) == bool)
+       return MatchResult.LENIENT;
+
+      if (value instanceof Number && (((Number)value).longValue() != 0) == bool)
+        return MatchResult.LENIENT;
+    }
+
+    return MatchResult.MISMATCH;
   }
 }

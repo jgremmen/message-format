@@ -16,15 +16,21 @@
 package de.sayayi.lib.message.data;
 
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.Serializable;
+import java.util.Locale;
+
+
 /**
  * @author Jeroen Gremmen
  */
 public interface MapKey
 {
-  Type getType();
+  @NotNull Type getType();
 
 
-  CompareType getCompareType();
+  @NotNull MatchResult match(@NotNull Locale locale, Serializable value);
 
 
   enum Type {
@@ -32,7 +38,29 @@ public interface MapKey
   }
 
 
-  enum CompareType {
-    LT, LTE, EQ, NE, GT, GTE
+  enum CompareType
+  {
+    LT, LTE, EQ, NE, GT, GTE;
+
+
+    boolean match(int signum)
+    {
+      switch(this)
+      {
+        case EQ:   return signum == 0;
+        case NE:   return signum != 0;
+        case LT:   return signum < 0;
+        case LTE:  return signum <= 0;
+        case GT:   return signum > 0;
+        case GTE:  return signum >= 0;
+      }
+
+      return false;
+    }
+  }
+
+
+  enum MatchResult {
+    EXACT, LENIENT, MISMATCH;
   }
 }

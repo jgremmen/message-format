@@ -17,6 +17,10 @@ package de.sayayi.lib.message.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.Serializable;
+import java.util.Locale;
 
 
 /**
@@ -28,14 +32,18 @@ public final class MapKeyName implements MapKey
   @Getter private final String name;
 
 
+  @NotNull
   @Override
   public Type getType() {
     return Type.NAME;
   }
 
 
+  @NotNull
   @Override
-  public CompareType getCompareType() {
-    return CompareType.EQ;
+  public MatchResult match(@NotNull Locale locale, Serializable value)
+  {
+    return (value instanceof CharSequence || value instanceof Character) && value.toString().equals(name)
+        ? MatchResult.EXACT : MatchResult.MISMATCH;
   }
 }

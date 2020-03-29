@@ -15,26 +15,64 @@
  */
 package de.sayayi.lib.message.data;
 
-import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@AllArgsConstructor
 public final class MapKeyEmpty implements MapKey
 {
   private final CompareType compareType;
 
 
+  public MapKeyEmpty(CompareType compareType)
+  {
+    if (compareType != CompareType.EQ && compareType != CompareType.NE)
+      throw new IllegalArgumentException("compareType must be EQ or NE");
+
+    this.compareType = compareType;
+  }
+
+
+  @NotNull
   @Override
   public Type getType() {
     return Type.EMPTY;
   }
 
 
+  @NotNull
   @Override
-  public CompareType getCompareType() {
-    return compareType;
+  public MatchResult match(@NotNull Locale locale, Serializable value)
+  {
+    MatchResult result = MatchResult.EXACT;
+    boolean empty =
+        value == null ||
+        (value instanceof String && ((String)value).isEmpty()) ||
+        (value instanceof CharSequence && ((CharSequence)value).length() == 0) ||
+        (value instanceof Collection && ((Collection<?>)value).isEmpty()) ||
+        (value instanceof Map && ((Map<?,?>)value).isEmpty()) ||
+        (value.getClass().isArray() && Array.getLength(value) == 0) ||
+        (value instanceof Iterable && !((Iterable<?>)value).iterator().hasNext()) ||
+        (value instanceof Iterator && !((Iterator<?>)value).hasNext());
+
+    if (!empty)
+    {
+      result = MatchResult.LENIENT;
+      empty =
+          (value instanceof String && ((String)value).trim().isEmpty()) ||
+          (value instanceof CharSequence && ((CharSequence)value).toString().trim().isEmpty()) ||
+          (value instanceof Character && Character.isWhitespace((Character)value));
+    }
+
+    return compareType.match(empty ? 0 : 1) ? result : MatchResult.MISMATCH;
   }
 }

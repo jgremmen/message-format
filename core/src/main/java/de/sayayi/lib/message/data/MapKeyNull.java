@@ -15,26 +15,45 @@
  */
 package de.sayayi.lib.message.data;
 
-import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.Serializable;
+import java.util.Locale;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@AllArgsConstructor
 public final class MapKeyNull implements MapKey
 {
   private final CompareType compareType;
 
 
-  @Override
-  public Type getType() {
-    return Type.EMPTY;
+  public MapKeyNull(@NotNull CompareType compareType)
+  {
+    if (compareType != CompareType.EQ && compareType != CompareType.NE)
+      throw new IllegalArgumentException("compareType must be EQ or NE");
+
+    this.compareType = compareType;
   }
 
 
+  @NotNull
   @Override
-  public CompareType getCompareType() {
-    return compareType;
+  public Type getType() {
+    return Type.NULL;
+  }
+
+
+  @NotNull
+  @Override
+  public MatchResult match(@NotNull Locale locale, Serializable value)
+  {
+    if (value == null && compareType == CompareType.EQ)
+      return MatchResult.EXACT;
+    if (value != null && compareType == CompareType.NE)
+      return MatchResult.EXACT;
+
+    return MatchResult.MISMATCH;
   }
 }
