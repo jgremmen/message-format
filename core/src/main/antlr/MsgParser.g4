@@ -7,10 +7,9 @@ options {
 
 
 @header {
-import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.*;
 import de.sayayi.lib.message.data.*;
 import de.sayayi.lib.message.data.map.*;
-import de.sayayi.lib.message.data.ParameterMap.CompareType;
 import java.util.*;
 }
 
@@ -58,15 +57,20 @@ string returns [String value]
         | DOUBLE_QUOTE_START (t=text  { $value = $t.value; } )? DOUBLE_QUOTE_END
         ;
 
+forceQuotedMessage returns [Message value]
+        : quotedMessage  { $value = $quotedMessage.value; }
+        | string  { $value = MessageFactory.parse($string.value); }
+        ;
+
 parameter returns [ParameterPart value]
         : PARAM_START
           name=NAME
           (P_COMMA format=NAME)?
-          (P_COMMA data=parameterData)?
+          (P_COMMA data)?
           PARAM_END
         ;
 
-parameterData returns [ParameterData value]
+data returns [ParameterData value]
         : string           # DataString
         | number=P_NUMBER  # DataNumber
         | map              # DataMap
@@ -78,8 +82,7 @@ map returns [Map<MapKey,MapValue> value]
         }
         : MAP_START
           mapElements[$value]
-          (M_COMMA mapValue  { $value.put(null, $mapValue.value); }
-          )?
+          (M_COMMA forceQuotedMessage  { $value.put(null, new MapValueMessage($forceQuotedMessage.value)); } )?
           MAP_END
         ;
 
@@ -95,7 +98,7 @@ mapKey returns [MapKey key]
         : relop=relationalOperator? string
             { $key = new MapKeyString($relop.cmp, $string.value); }
         | relop=relationalOperator? number=M_NUMBER
-            { $key = new MapKeyNumber($relop.cmp, Integer.parseInt($number.text)); }
+            { $key = new MapKeyNumber($relop.cmp, Long.parseLong($number.text)); }
         | bool=M_BOOL
             { $key = new MapKeyBool(Boolean.parseBoolean($bool.text)); }
         | eqop=equalOperator? nil=M_NULL
@@ -110,7 +113,7 @@ mapValue returns [MapValue value]
         : string
             { $value = new MapValueString($string.value); }
         | number=M_NUMBER
-            { $value = new MapValueNumber(Integer.parseInt($number.text)); }
+            { $value = new MapValueNumber(Long.parseLong($number.text)); }
         | bool=M_BOOL
             { $value = new MapValueBool(Boolean.parseBoolean($bool.text)); }
         | quotedMessage

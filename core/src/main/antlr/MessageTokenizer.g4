@@ -7,6 +7,7 @@ options {
 
 
 // ------------------ Default mode ------------------
+
 PARAM_START
         : ParamStart -> pushMode(PARAMETER)
         ;
@@ -16,7 +17,7 @@ CH
         | TextChar
         ;
 CTRL_CHAR
-        : [\u0000-\u001f]+ -> skip
+        : CtrlChar+ -> skip
         ;
 
 
@@ -36,7 +37,7 @@ CH1
         | TextChar
         ;
 CTRL_CHAR1
-        : [\u0000-\u001f]+ -> skip
+        : CtrlChar+ -> skip
         ;
 
 
@@ -56,7 +57,7 @@ CH2
         | TextChar
         ;
 CTRL_CHAR2
-        : [\u0000-\u001f]+ -> skip
+        : CtrlChar+ -> skip
         ;
 
 
@@ -85,7 +86,7 @@ P_DQ_START
         : '"' -> pushMode(TEXT2)
         ;
 P_WS
-        : [\u0000-\u0020]+ -> skip
+        : (CtrlChar | ' ')+ -> skip
         ;
 MAP_START
         : '{' -> pushMode(MAP)
@@ -103,7 +104,7 @@ M_ARROW
         : '->' | ':'
         ;
 M_WS
-        : [\u0000-\u0020]+ -> skip
+        : (CtrlChar | ' ')+ -> skip
         ;
 M_COMMA
         : ','
@@ -169,6 +170,10 @@ fragment ParamStart
 fragment BoolLiteral
         : 'true'
         | 'false'
+        ;
+
+fragment CtrlChar
+        : [\u0000-\u001f]
         ;
 
 fragment TextChar

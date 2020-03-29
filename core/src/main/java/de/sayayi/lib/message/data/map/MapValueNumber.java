@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public final class MapValueNumber implements MapValue
 {
-  @Getter private final int number;
+  @Getter private final long number;
 
 
   @NotNull
@@ -37,7 +37,7 @@ public final class MapValueNumber implements MapValue
 
 
   @Override
-  public Integer asObject() {
+  public Long asObject() {
     return number;
   }
 }

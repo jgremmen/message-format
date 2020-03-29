@@ -32,7 +32,7 @@ import java.util.Locale;
 public final class MapKeyNumber implements MapKey
 {
   private CompareType compareType;
-  @Getter private final int number;
+  @Getter private final long number;
 
 
   @NotNull

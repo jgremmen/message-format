@@ -18,6 +18,7 @@ package de.sayayi.lib.message.parser;
 import de.sayayi.lib.message.impl.EmptyMessage;
 import de.sayayi.lib.message.impl.MultipartMessage;
 import de.sayayi.lib.message.impl.SinglePartMessage;
+import de.sayayi.lib.message.parser.MsgParser.DataContext;
 import de.sayayi.lib.message.parser.MsgParser.Message0Context;
 import de.sayayi.lib.message.parser.MsgParser.ParameterContext;
 import de.sayayi.lib.message.parser.MsgParser.TextPartContext;
@@ -27,7 +28,10 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import java.util.List;
 
 
-public class MessageBuildListener extends MsgParserBaseListener
+/**
+ * @author Jeroen Gremmen
+ */
+public final class MessageBuildListener extends MsgParserBaseListener
 {
   @Override
   public void exitTextPart(TextPartContext ctx)
@@ -61,11 +65,13 @@ public class MessageBuildListener extends MsgParserBaseListener
   @Override
   public void exitParameter(ParameterContext ctx)
   {
+    final DataContext data = ctx.data();
+
     ctx.value = new ParameterPart(ctx.name.getText(),
         ctx.format == null ? null : ctx.format.getText(),
         exitParameter_isSpaceAtTokenIndex(ctx, ctx.getStart().getTokenIndex() - 1),
         exitParameter_isSpaceAtTokenIndex(ctx, ctx.getStop().getTokenIndex() + 1),
-        ctx.data == null ? null : ctx.data.value);
+        data == null ? null : data.value);
   }
 
 

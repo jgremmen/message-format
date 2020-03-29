@@ -4,20 +4,13 @@ options {
     tokenVocab = MessageTokenizer;
 }
 
-@header {
-package de.sayayi.lib.message.parser;
-
-import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.data.ParameterMap.CompareType;
-}
-
 
 message
         : message0 EOF
         ;
 
 message0
-        : ( textPart? parameter)* textPart?
+        : ( textPart? parameter )* textPart?
         ;
 
 textPart
@@ -42,6 +35,11 @@ quotedMessage
 string
         : singleQuoteStart text? singleQuoteEnd
         | doubleQuoteStart text? doubleQuoteEnd
+        ;
+
+forceQuotedMessage
+        : string
+        | quotedMessage
         ;
 
 singleQuoteStart
@@ -71,7 +69,7 @@ parameter
         : parameterStart
           name
           (P_COMMA format=name)?
-          (P_COMMA data=parameterData)?
+          (P_COMMA data)?
           parameterEnd
         ;
 
@@ -85,14 +83,14 @@ parameterEnd
         : PARAM_END
         ;
 
-parameterData
+data
         : string           # DataString
         | number=P_NUMBER  # DataNumber
         | map              # DataMap
         ;
 
 map
-        : MAP_START mapElements (M_COMMA defaultValue=mapValue)? MAP_END
+        : MAP_START mapElements (M_COMMA forceQuotedMessage)? MAP_END
         ;
 
 mapElements
