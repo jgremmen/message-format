@@ -24,7 +24,7 @@ import lombok.Getter;
  * @author Jeroen Gremmen
  */
 @AllArgsConstructor
-public class MapValueMessage implements MapValue
+public final class MapValueMessage implements MapValue
 {
   @Getter private final Message message;
 
@@ -32,5 +32,11 @@ public class MapValueMessage implements MapValue
   @Override
   public Type getType() {
     return Type.MESSAGE;
+  }
+
+
+  @Override
+  public Message asObject() {
+    return message;
   }
 }

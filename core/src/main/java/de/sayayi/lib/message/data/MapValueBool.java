@@ -23,7 +23,7 @@ import lombok.Getter;
  * @author Jeroen Gremmen
  */
 @AllArgsConstructor
-public class MapValueBool implements MapValue
+public final class MapValueBool implements MapValue
 {
   @Getter private final boolean bool;
 
@@ -31,5 +31,11 @@ public class MapValueBool implements MapValue
   @Override
   public Type getType() {
     return Type.BOOL;
+  }
+
+
+  @Override
+  public Boolean asObject() {
+    return bool;
   }
 }

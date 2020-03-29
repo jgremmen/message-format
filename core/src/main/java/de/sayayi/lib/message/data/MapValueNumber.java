@@ -23,7 +23,7 @@ import lombok.Getter;
  * @author Jeroen Gremmen
  */
 @AllArgsConstructor
-public class MapValueNumber implements MapValue
+public final class MapValueNumber implements MapValue
 {
   @Getter private final int number;
 
@@ -31,5 +31,11 @@ public class MapValueNumber implements MapValue
   @Override
   public Type getType() {
     return Type.NUMBER;
+  }
+
+
+  @Override
+  public Integer asObject() {
+    return number;
   }
 }

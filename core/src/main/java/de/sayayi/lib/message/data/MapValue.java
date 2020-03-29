@@ -24,6 +24,9 @@ public interface MapValue
   Type getType();
 
 
+  Object asObject();
+
+
   enum Type {
     STRING, NUMBER, BOOL, MESSAGE
   }
