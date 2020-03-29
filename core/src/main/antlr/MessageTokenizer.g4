@@ -15,6 +15,9 @@ CH
         | EscapeSequence
         | TextChar
         ;
+CTRL_CHAR
+        : [\u0000-\u001f]+ -> skip
+        ;
 
 
 
@@ -31,6 +34,9 @@ CH1
         : ' '+
         | EscapeSequence
         | TextChar
+        ;
+CTRL_CHAR1
+        : [\u0000-\u001f]+ -> skip
         ;
 
 
@@ -49,7 +55,9 @@ CH2
         | EscapeSequence
         | TextChar
         ;
-
+CTRL_CHAR2
+        : [\u0000-\u001f]+ -> skip
+        ;
 
 
 // ------------------ In parameter mode ------------------
@@ -77,7 +85,7 @@ P_DQ_START
         : '"' -> pushMode(TEXT2)
         ;
 P_WS
-        : ' '+ -> skip
+        : [\u0000-\u0020]+ -> skip
         ;
 MAP_START
         : '{' -> pushMode(MAP)
@@ -95,7 +103,7 @@ M_ARROW
         : '->' | ':'
         ;
 M_WS
-        : ' '+ -> skip
+        : [\u0000-\u0020]+ -> skip
         ;
 M_COMMA
         : ','
