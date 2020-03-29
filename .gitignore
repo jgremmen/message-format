@@ -1,13 +1,15 @@
 /.gradle/
 /.idea
-/bin
-/out
+
+.build/
+bin/
+out/
+
+# core
 /core/src/main/antlr/gen/
 /core/src/main/gen/
 /core/src/main/generated/
-
 *.tokens
+
 *.iml
 .DS_Store
-.build
-

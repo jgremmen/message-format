@@ -24,6 +24,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Locale;
 
+import static de.sayayi.lib.message.data.MapKey.MatchResult.EXACT;
+import static de.sayayi.lib.message.data.MapKey.MatchResult.LENIENT;
+import static de.sayayi.lib.message.data.MapKey.MatchResult.MISMATCH;
+
 
 /**
  * @author Jeroen Gremmen
@@ -48,15 +52,15 @@ public final class MapKeyBool implements MapKey
     if (value != null)
     {
       if (value instanceof Boolean && (Boolean)value == bool)
-        return MatchResult.EXACT;
+        return EXACT;
 
       if ("true".equals(value) && bool)
-        return MatchResult.LENIENT;
+        return LENIENT;
       if ("false".equals(value) && !bool)
-        return MatchResult.LENIENT;
+        return LENIENT;
 
-      if (value instanceof BigInteger && (((BigInteger)value).signum() != 0) == bool)
-        return MatchResult.LENIENT;
+      if (value instanceof BigInteger)
+        return ((((BigInteger)value).signum() != 0) == bool) ? LENIENT : MISMATCH;
 
       if (value instanceof CharSequence || value instanceof Character)
       {
@@ -66,13 +70,13 @@ public final class MapKeyBool implements MapKey
         }
       }
 
-      if (value instanceof BigDecimal && (((BigDecimal)value).signum() != 0) == bool)
-       return MatchResult.LENIENT;
+      if (value instanceof BigDecimal)
+       return ((((BigDecimal)value).signum() != 0) == bool) ? LENIENT : MISMATCH;
 
       if (value instanceof Number && (((Number)value).longValue() != 0) == bool)
-        return MatchResult.LENIENT;
+        return LENIENT;
     }
 
-    return MatchResult.MISMATCH;
+    return MISMATCH;
   }
 }

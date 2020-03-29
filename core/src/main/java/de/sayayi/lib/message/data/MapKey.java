@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.data;
 
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -27,9 +28,11 @@ import java.util.Locale;
  */
 public interface MapKey
 {
+  @Contract(pure = true)
   @NotNull Type getType();
 
 
+  @Contract(pure = true)
   @NotNull MatchResult match(@NotNull Locale locale, Serializable value);
 
 
