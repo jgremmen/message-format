@@ -1,7 +1,7 @@
-parser grammar MsgParserTest;
+parser grammar MessageParserTest;
 
 options {
-    tokenVocab = MessageTokenizer;
+    tokenVocab = MessageLexer;
 }
 
 

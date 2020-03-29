@@ -18,10 +18,10 @@ package de.sayayi.lib.message.parser;
 import de.sayayi.lib.message.impl.EmptyMessage;
 import de.sayayi.lib.message.impl.MultipartMessage;
 import de.sayayi.lib.message.impl.SinglePartMessage;
-import de.sayayi.lib.message.parser.MsgParser.DataContext;
-import de.sayayi.lib.message.parser.MsgParser.Message0Context;
-import de.sayayi.lib.message.parser.MsgParser.ParameterContext;
-import de.sayayi.lib.message.parser.MsgParser.TextPartContext;
+import de.sayayi.lib.message.parser.MessageParser.DataContext;
+import de.sayayi.lib.message.parser.MessageParser.Message0Context;
+import de.sayayi.lib.message.parser.MessageParser.ParameterContext;
+import de.sayayi.lib.message.parser.MessageParser.TextPartContext;
 import lombok.AllArgsConstructor;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -34,7 +34,7 @@ import java.util.List;
  * @author Jeroen Gremmen
  */
 @AllArgsConstructor
-public final class MessageBuildListener extends MsgParserBaseListener
+public final class MessageBuildListener extends MessageParserBaseListener
 {
   private final TokenStream tokenStream;
 
@@ -87,7 +87,7 @@ public final class MessageBuildListener extends MsgParserBaseListener
       return false;
 
     Token token = tokenStream.get(i);
-    if (token == null || token.getType() == Token.EOF)
+    if (token.getType() == Token.EOF)
       return false;
 
     String text = token.getText();

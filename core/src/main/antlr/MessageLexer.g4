@@ -1,4 +1,4 @@
-lexer grammar MessageTokenizer;
+lexer grammar MessageLexer;
 
 options {
     superClass = AbstractMessageLexer;

@@ -39,35 +39,35 @@ abstract class AbstractMessageLexer extends Lexer
     switch(t.getType())
     {
       // %{
-      case MessageTokenizer.PARAM_START1:
-      case MessageTokenizer.PARAM_START2:
-        t.setType(MessageTokenizer.PARAM_START);
+      case MessageLexer.PARAM_START1:
+      case MessageLexer.PARAM_START2:
+        t.setType(MessageLexer.PARAM_START);
         break;
 
       // '
-      case MessageTokenizer.P_SQ_START:
-      case MessageTokenizer.M_SQ_START:
-        t.setType(MessageTokenizer.SINGLE_QUOTE_START);
+      case MessageLexer.P_SQ_START:
+      case MessageLexer.M_SQ_START:
+        t.setType(MessageLexer.SINGLE_QUOTE_START);
         break;
 
       // "
-      case MessageTokenizer.P_DQ_START:
-      case MessageTokenizer.M_DQ_START:
-        t.setType(MessageTokenizer.DOUBLE_QUOTE_START);
+      case MessageLexer.P_DQ_START:
+      case MessageLexer.M_DQ_START:
+        t.setType(MessageLexer.DOUBLE_QUOTE_START);
         break;
 
       // character
-      case MessageTokenizer.CH1:
-      case MessageTokenizer.CH2:
-        t.setType(MessageTokenizer.CH);
-      case MessageTokenizer.CH:
-        emit_fixCharacter(t);
+      case MessageLexer.CH1:
+      case MessageLexer.CH2:
+        t.setType(MessageLexer.CH);
+      case MessageLexer.CH:
+        emit_fixEscapeCharacter(t);
         break;
 
       // name
-      case MessageTokenizer.P_NAME:
-      case MessageTokenizer.M_NAME:
-        t.setType(MessageTokenizer.NAME);
+      case MessageLexer.P_NAME:
+      case MessageLexer.M_NAME:
+        t.setType(MessageLexer.NAME);
         break;
     }
 
@@ -75,7 +75,7 @@ abstract class AbstractMessageLexer extends Lexer
   }
 
 
-  private void emit_fixCharacter(WritableToken token)
+  private void emit_fixEscapeCharacter(WritableToken token)
   {
     final String text = token.getText();
 
