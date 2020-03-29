@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,6 +41,8 @@ import java.util.Set;
 public final class DataMap implements Data
 {
   private static final long serialVersionUID = 400L;
+
+  private static final EnumSet<Type> MESSAGE_VALUE_TYPES = EnumSet.of(Type.MESSAGE, Type.STRING);
 
   @Getter private final Map<MapKey,MapValue> map;
 
@@ -89,16 +92,17 @@ public final class DataMap implements Data
   }
 
 
+
   @Contract(pure = true)
   public boolean hasMessage(Serializable key) {
-    return map.containsKey(null) || find(key, null, null) != null;
+    return map.containsKey(null) || find(key, null, MESSAGE_VALUE_TYPES) != null;
   }
 
 
   @Contract(pure = true)
   public Message getMessage(Serializable key)
   {
-    MapValue mapValue = find(key, null, null);
+    MapValue mapValue = find(key, null, MESSAGE_VALUE_TYPES);
 
     if (mapValue == null)
       return (Message)map.get(null).asObject();

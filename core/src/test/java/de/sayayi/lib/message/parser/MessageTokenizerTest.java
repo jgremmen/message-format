@@ -30,39 +30,39 @@ public class MessageTokenizerTest
   @Test
   public void testDefaultMode()
   {
-    MessageTokenizer tokenizer = createFor("hi  \\u0021%{");
+    MessageLexer lexer = createFor("hi  \\u0021%{");
 
     // h
-    Token token = tokenizer.nextToken();
+    Token token = lexer.nextToken();
     assertEquals("h", token.getText());
-    assertEquals(MessageTokenizer.CH, token.getType());
+    assertEquals(MessageLexer.CH, token.getType());
 
     // i
-    token = tokenizer.nextToken();
+    token = lexer.nextToken();
     assertEquals("i", token.getText());
-    assertEquals(MessageTokenizer.CH, token.getType());
+    assertEquals(MessageLexer.CH, token.getType());
 
     // <space>
-    token = tokenizer.nextToken();
+    token = lexer.nextToken();
     assertEquals("  ", token.getText());
-    assertEquals(MessageTokenizer.CH, token.getType());
+    assertEquals(MessageLexer.CH, token.getType());
     assertEquals(2, token.getCharPositionInLine());
 
     // \u0021
-    token = tokenizer.nextToken();
+    token = lexer.nextToken();
     assertEquals("!", token.getText());
-    assertEquals(MessageTokenizer.CH, token.getType());
+    assertEquals(MessageLexer.CH, token.getType());
     assertEquals(4, token.getCharPositionInLine());
 
     // %{
-    token = tokenizer.nextToken();
+    token = lexer.nextToken();
     assertEquals("%{", token.getText());
-    assertEquals(MessageTokenizer.PARAM_START, token.getType());
+    assertEquals(MessageLexer.PARAM_START, token.getType());
     assertEquals(10, token.getCharPositionInLine());
   }
 
 
-  private MessageTokenizer createFor(String msg) {
-    return new MessageTokenizer(new ANTLRInputStream(msg));
+  private MessageLexer createFor(String msg) {
+    return new MessageLexer(new ANTLRInputStream(msg));
   }
 }
