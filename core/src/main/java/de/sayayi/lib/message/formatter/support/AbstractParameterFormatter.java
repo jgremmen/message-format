@@ -48,13 +48,19 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
-  protected String getConfigValueString(@NotNull String name, Data data, String defaultValue)
+  protected String getConfigValueString(@NotNull String name, Data data, boolean checkDataString, String defaultValue)
   {
-    if (!(data instanceof DataMap))
-      return defaultValue;
+    if (data instanceof DataMap)
+    {
+      MapValueString string = (MapValueString)((DataMap)data).find(name, NAME_TYPE, MapValue.STRING_TYPE);
+      if (string != null)
+        return string.asObject();
+    }
 
-    MapValueString string = (MapValueString)((DataMap)data).find(name, NAME_TYPE, MapValue.STRING_TYPE);
-    return string == null ? defaultValue : string.asObject();
+    if (data instanceof DataString)
+      return ((DataString)data).asObject();
+
+    return defaultValue;
   }
 
 

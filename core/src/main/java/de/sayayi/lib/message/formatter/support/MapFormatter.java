@@ -48,8 +48,8 @@ public final class MapFormatter extends AbstractParameterFormatter
         parameters.getLocale());
     final String separator = getSeparator(data);
     final StringBuilder s = new StringBuilder();
-    final String nullKey = getConfigValueString("null-key", data, "(null)").trim();
-    final String nullValue = getConfigValueString("null-value", data, "(null)").trim();
+    final String nullKey = getConfigValueString("null-key", data, false, "(null)").trim();
+    final String nullValue = getConfigValueString("null-value", data, false, "(null)").trim();
 
     for(Entry<?,?> entry: map.entrySet())
     {
@@ -85,10 +85,7 @@ public final class MapFormatter extends AbstractParameterFormatter
 
   private String getSeparator(Data data)
   {
-    String sep = getConfigValueString("sep", data, null);
-
-    if (sep == null)
-      sep = getDataString(data, "=");
+    String sep = getConfigValueString("sep", data, true,"=");
     if (sep.isEmpty())
       return sep;
 

@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.data.DataString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -47,15 +46,10 @@ public final class DateFormatter extends AbstractParameterFormatter
     if (value == null)
       return formatNull(parameters, data);
 
-    final Locale locale = parameters.getLocale();
-    DateFormat formatter;
+    final DateFormat formatter = getFormatter(
+        getConfigValueString("format", data, true, null), parameters.getLocale());
 
-    if (data instanceof DataString)
-      formatter = getFormatter(((DataString)data).asObject(), locale);
-    else
-      formatter = getDateInstance(MEDIUM, locale);
-
-    return formatter.format(value);
+    return formatString(formatter.format(value), parameters, data);
   }
 
 

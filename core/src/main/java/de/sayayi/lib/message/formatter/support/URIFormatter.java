@@ -60,7 +60,7 @@ public final class URIFormatter extends AbstractParameterFormatter
 
       if (port == -1)
       {
-        String undefined = getConfigValueString("undefined", data, null);
+        String undefined = getConfigValueString("undefined", data, false,null);
         if (undefined != null)
           return undefined;
       }

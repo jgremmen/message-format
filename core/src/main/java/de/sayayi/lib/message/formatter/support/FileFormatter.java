@@ -42,7 +42,7 @@ public final class FileFormatter extends AbstractParameterFormatter
     if ((s = s.trim()).isEmpty())
       return formatEmpty(parameters, data);
 
-    return s;
+    return formatString(s, parameters, data);
   }
 
 
