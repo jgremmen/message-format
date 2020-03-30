@@ -18,6 +18,7 @@ package de.sayayi.lib.message;
 import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
+import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.exception.MessageLocaleParseException;
 import de.sayayi.lib.message.impl.EmptyMessage;
 import de.sayayi.lib.message.impl.EmptyMessageWithCode;
@@ -113,7 +114,7 @@ public final class MessageFactory
         Message.WithCode mwc = parse(messageDef);
 
         if (!messageBundle.add(mwc))
-          throw new IllegalArgumentException("duplicate message code " + mwc.getCode() + " found");
+          throw new MessageException("duplicate message code " + mwc.getCode() + " found");
 
         messageBundle.add(mwc);
       }

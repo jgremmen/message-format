@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.parser;
 
 import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.WritableToken;
 
@@ -23,7 +24,7 @@ import org.antlr.v4.runtime.WritableToken;
 /**
  * @author Jeroen Gremmen
  */
-abstract class AbstractLexer extends org.antlr.v4.runtime.Lexer
+abstract class AbstractLexer extends Lexer
 {
   protected AbstractLexer(CharStream input) {
     super(input);
