@@ -89,7 +89,7 @@ P_BOOL
         : BoolLiteral
         ;
 P_NAME
-        : NameStartChar NameChar*
+        : DashedName
         ;
 P_NUMBER
         : Number
@@ -134,7 +134,7 @@ M_BOOL
         : BoolLiteral
         ;
 M_NAME
-        : NameStartChar NameChar*
+        : DashedName
         ;
 M_NUMBER
         : Number
@@ -196,6 +196,14 @@ fragment CtrlChar
 
 fragment TextChar
         : '\u0020'..'\uffff'
+        ;
+
+fragment DashedName
+        : Name ('-' Name)*
+        ;
+
+fragment Name
+        : NameStartChar NameChar*
         ;
 
 fragment NameChar

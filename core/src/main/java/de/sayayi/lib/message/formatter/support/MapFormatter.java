@@ -15,11 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.data.DataMap;
-import de.sayayi.lib.message.data.DataString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,8 +48,8 @@ public final class MapFormatter extends AbstractParameterFormatter
         parameters.getLocale());
     final String separator = getSeparator(data);
     final StringBuilder s = new StringBuilder();
-    final String nullKey = getDataString("null-key", data, "(null)");
-    final String nullValue = getDataString("null-value", data, "(null)");
+    final String nullKey = getConfigValueString("null-key", data, "(null)").trim();
+    final String nullValue = getConfigValueString("null-value", data, "(null)").trim();
 
     for(Entry<?,?> entry: map.entrySet())
     {
@@ -88,35 +85,23 @@ public final class MapFormatter extends AbstractParameterFormatter
 
   private String getSeparator(Data data)
   {
-    if (hasMessageFor("sep", data))
-    {
-      Message msg = ((DataMap)data).getMessage("sep", null);
+    String sep = getConfigValueString("sep", data);
+    if (sep == null)
+      sep = getDataString(data);
 
-      if (!msg.hasParameters())
-      {
-        String text = msg.format(Parameters.EMPTY);
+    if (sep == null)
+      return "=";
+    else if (sep.isEmpty())
+      return sep;
 
-        if (text == null)
-          text = "";
+    StringBuilder separator = new StringBuilder(sep.trim());
 
-        if (text.isEmpty() && (msg.isSpaceBefore() || msg.isSpaceAfter()))
-          text = " ";
-        else if (!text.isEmpty())
-        {
-          if (msg.isSpaceBefore())
-            text = " " + text;
-          if (msg.isSpaceAfter())
-            text += " ";
-        }
+    if (Character.isSpaceChar(sep.charAt(0)))
+      separator.insert(0, ' ');
+    if (Character.isSpaceChar(sep.charAt(sep.length() - 1)))
+      separator.append(' ');
 
-        return text;
-      }
-    }
-
-    if (data instanceof DataString)
-      return ((DataString)data).asObject();
-
-    return "=";
+    return separator.toString();
   }
 
 

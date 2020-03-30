@@ -47,7 +47,7 @@ public class MapFormatterTest extends AbstractFormatterTest
 
     ParameterFactory factory = ParameterFactory.createFor(Locale.UK);
 
-    Message message = MessageFactory.parse("%{map1} %{map2,{'sep'->'   -> '}} %{map3,':  '}");
+    Message message = MessageFactory.parse("%{map1} %{map2,{sep:'   -> '}} %{map3,':  '}");
 
     assertEquals("key=value",
         message.format(factory.with("map1", Collections.singletonMap("key", "value"))));
@@ -68,7 +68,7 @@ public class MapFormatterTest extends AbstractFormatterTest
 
     ParameterFactory factory = ParameterFactory.createFor(Locale.UK);
 
-    Message message = MessageFactory.parse("%{map1} %{map2,{'null-key'->'key','null-value'->'value'}}");
+    Message message = MessageFactory.parse("%{map1} %{map2,{null-key:'key',null-value:'value'}}");
 
     assertEquals("(null)=(null)",
         message.format(factory.with("map1", Collections.singletonMap(null, null))));

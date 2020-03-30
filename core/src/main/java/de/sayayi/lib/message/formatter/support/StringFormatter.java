@@ -76,7 +76,7 @@ public final class StringFormatter implements NamedParameterFormatter
     {
       final DataMap parameterMap = (DataMap)data;
 
-      message = parameterMap.getMessage(value, EMPTY_NULL_TYPES);
+      message = parameterMap.getMessage(value, EMPTY_NULL_TYPES, false);
     }
 
     return message == null ? (isEmpty ? null : value) : message.format(parameters);

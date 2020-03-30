@@ -94,18 +94,21 @@ public final class DataMap implements Data
 
 
   @Contract(pure = true)
-  public boolean hasMessage(Serializable key, Set<MapKey.Type> keyTypes) {
-    return map.containsKey(null) || find(key, keyTypes, MESSAGE_VALUE_TYPES) != null;
+  public boolean hasMessage(Serializable key, Set<MapKey.Type> keyTypes, boolean includeDefault) {
+    return (includeDefault && map.containsKey(null)) || find(key, keyTypes, MESSAGE_VALUE_TYPES) != null;
   }
 
 
   @Contract(pure = true)
-  public Message getMessage(Serializable key, Set<MapKey.Type> keyTypes)
+  public Message getMessage(Serializable key, Set<MapKey.Type> keyTypes, boolean includeDefault)
   {
     MapValue mapValue = find(key, keyTypes, MESSAGE_VALUE_TYPES);
 
     if (mapValue == null)
     {
+      if (!includeDefault)
+        return null;
+
       mapValue = map.get(null);
       return mapValue == null ? null : (Message)map.get(null).asObject();
     }

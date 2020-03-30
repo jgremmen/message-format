@@ -20,10 +20,14 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.DataString;
+import de.sayayi.lib.message.data.map.MapKey.Type;
+import de.sayayi.lib.message.data.map.MapValue;
+import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.util.EnumSet;
 
 
 /**
@@ -32,10 +36,34 @@ import java.io.Serializable;
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractParameterFormatter implements ParameterFormatter
 {
+  protected MapValue getConfigValue(@NotNull String name, Data data) {
+    return data instanceof DataMap ? ((DataMap)data).find(name, EnumSet.of(Type.NAME), null) : null;
+  }
+
+
+  protected String getConfigValueString(@NotNull String name, Data data)
+  {
+    if (!(data instanceof DataMap))
+      return null;
+
+    MapValueString string = (MapValueString)((DataMap)data)
+        .find(name, EnumSet.of(Type.NAME), EnumSet.of(MapValue.Type.STRING));
+
+    return string == null ? null : string.asObject();
+  }
+
+
+  protected String getConfigValueString(@NotNull String name, Data data, String defaultValue)
+  {
+    String value = getConfigValueString(name, data);
+    return value == null ? defaultValue : value;
+  }
+
+
   protected boolean hasMessageFor(Object value, Data parameterData)
   {
     return parameterData instanceof DataMap && value instanceof Serializable &&
-        ((DataMap)parameterData).hasMessage((Serializable)value, null);
+        ((DataMap)parameterData).hasMessage((Serializable)value, null, false);
   }
 
 
@@ -53,9 +81,9 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
     {
       DataMap map = (DataMap)data;
 
-      if (map.hasMessage(key, null))
+      if (map.hasMessage(key, null, false))
       {
-        Message message = map.getMessage(key, null);
+        Message message = map.getMessage(key, null, false);
         if (!message.hasParameters())
           return message.format(Parameters.EMPTY);
       }

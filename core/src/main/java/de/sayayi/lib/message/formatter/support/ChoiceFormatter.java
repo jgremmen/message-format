@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
+import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -46,15 +47,15 @@ public final class ChoiceFormatter extends AbstractParameterFormatter implements
   public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (!(data instanceof DataMap))
-      throw new IllegalArgumentException("data must be a choice map");
+      throw new MessageException("data must be a choice map");
 
     if (value == null)
       return formatNull(parameters, data);
 
     if (!(value instanceof Serializable))
-      throw new IllegalArgumentException("value must be serializable");
+      throw new MessageException("value must be serializable");
 
-    final Message message = ((DataMap)data).getMessage((Serializable)value, null);
+    final Message message = ((DataMap)data).getMessage((Serializable)value, null, true);
 
     return message == null ? null : message.format(parameters);
   }
