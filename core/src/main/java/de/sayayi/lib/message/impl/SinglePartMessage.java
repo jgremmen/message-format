@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 @ToString
 public class SinglePartMessage implements Message
 {
-  private static final long serialVersionUID = 201L;
+  private static final long serialVersionUID = 400L;
 
   @Getter private final MessagePart part;
 

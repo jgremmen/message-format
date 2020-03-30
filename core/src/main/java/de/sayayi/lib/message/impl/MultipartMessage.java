@@ -30,7 +30,7 @@ import java.util.List;
 @ToString
 public class MultipartMessage implements Message
 {
-  private static final long serialVersionUID = 201L;
+  private static final long serialVersionUID = 400L;
 
   private final MessagePart[] parts;
 

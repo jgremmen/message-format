@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 @ToString
 public final class EmptyMessageWithCode extends AbstractMessageWithCode
 {
-  private static final long serialVersionUID = 201L;
+  private static final long serialVersionUID = 400L;
 
 
   public EmptyMessageWithCode(@NotNull String code) {

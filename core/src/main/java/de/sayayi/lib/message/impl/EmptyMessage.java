@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class EmptyMessage implements Message
 {
-  private static final long serialVersionUID = 201L;
+  private static final long serialVersionUID = 400L;
 
   public static final Message INSTANCE = new EmptyMessage();
 
