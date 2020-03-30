@@ -29,6 +29,8 @@ import java.util.EnumSet;
 public interface MapValue extends Data
 {
   EnumSet<Type> STRING_MESSAGE_TYPE = EnumSet.of(Type.STRING, Type.MESSAGE);
+  EnumSet<Type> STRING_TYPE = EnumSet.of(Type.STRING);
+  EnumSet<Type> BOOL_TYPE = EnumSet.of(Type.BOOL);
 
 
   @Contract(pure = true)

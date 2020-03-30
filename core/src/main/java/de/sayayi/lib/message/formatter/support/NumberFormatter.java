@@ -64,7 +64,7 @@ public final class NumberFormatter extends AbstractParameterFormatter
 
   private String formatBoolean(Number value, Parameters parameters, Data data)
   {
-    ParameterFormatter formatter = parameters.getFormatter("bool", Boolean.class);
+    ParameterFormatter formatter = parameters.getFormatter("bool", boolean.class);
     Set<Class<?>> types = formatter.getFormattableTypes();
 
     // if we got some default formatter, use a specific one instead

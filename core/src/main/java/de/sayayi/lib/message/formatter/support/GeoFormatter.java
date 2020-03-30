@@ -106,7 +106,7 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
 
   private Format getFormat(Data data)
   {
-    String formatString = getConfigValueString("format", data);
+    String formatString = getConfigValueString("format", data, null);
     if (formatString == null)
       formatString = getDataString(data, "dms");
 

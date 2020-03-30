@@ -30,10 +30,8 @@ import java.util.Set;
 public final class PackageFormatter extends AbstractParameterFormatter
 {
   @Override
-  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
-  {
-
-    return value == null ? formatNull(parameters, data) : ((Package)value).getName();
+  public String format(Object value, String format, @NotNull Parameters parameters, Data data) {
+    return formatString(value == null ? null : ((Package)value).getName(), parameters, data);
   }
 
 

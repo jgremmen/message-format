@@ -33,16 +33,14 @@ public final class ReferenceFormatter extends AbstractParameterFormatter
   @Override
   public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
-    if (value != null)
-    {
-      Reference reference = (Reference)value;
-      value = reference.get();
+    if (value == null)
+      return formatNull(parameters, data);
 
-      if (value != null)
-        return parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data);
-    }
+    value = ((Reference)value).get();
 
-    return formatNull(parameters, data);
+    return value != null
+        ? parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data)
+        : formatEmpty(parameters, data);
   }
 
 

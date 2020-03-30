@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetAddress;
@@ -28,22 +27,26 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public final class InetAddressFormatter implements ParameterFormatter
+public final class InetAddressFormatter extends AbstractParameterFormatter
 {
   @Override
   public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
-    if (value == null)
-      return null;
+    String s = null;
 
-    InetAddress inetAddress = (InetAddress)value;
+    if (value != null)
+    {
+      final InetAddress inetAddress = (InetAddress)value;
 
-    if ("name".equals(format))
-      return inetAddress.getHostName();
-    else if ("canonical".equals(format) || "fqdn".equals(format))
-      return inetAddress.getCanonicalHostName();
+      if ("name".equals(format))
+        s = inetAddress.getHostName();
+      else if ("canonical".equals(format) || "fqdn".equals(format))
+        s = inetAddress.getCanonicalHostName();
+      else
+        s = inetAddress.getHostAddress();
+    }
 
-    return inetAddress.getHostAddress();
+    return formatString(s, parameters, data);
   }
 
 

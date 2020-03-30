@@ -85,13 +85,11 @@ public final class MapFormatter extends AbstractParameterFormatter
 
   private String getSeparator(Data data)
   {
-    String sep = getConfigValueString("sep", data);
-    if (sep == null)
-      sep = getDataString(data);
+    String sep = getConfigValueString("sep", data, null);
 
     if (sep == null)
-      return "=";
-    else if (sep.isEmpty())
+      sep = getDataString(data, "=");
+    if (sep.isEmpty())
       return sep;
 
     StringBuilder separator = new StringBuilder(sep.trim());

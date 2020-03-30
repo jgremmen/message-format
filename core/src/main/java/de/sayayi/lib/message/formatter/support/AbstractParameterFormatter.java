@@ -23,6 +23,7 @@ import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.data.map.MapKey;
 import de.sayayi.lib.message.data.map.MapKey.Type;
 import de.sayayi.lib.message.data.map.MapValue;
+import de.sayayi.lib.message.data.map.MapValueBool;
 import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.impl.EmptyMessage;
@@ -47,22 +48,23 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   }
 
 
-  protected String getConfigValueString(@NotNull String name, Data data)
+  protected String getConfigValueString(@NotNull String name, Data data, String defaultValue)
   {
     if (!(data instanceof DataMap))
-      return null;
+      return defaultValue;
 
-    MapValueString string = (MapValueString)((DataMap)data)
-        .find(name, NAME_TYPE, EnumSet.of(MapValue.Type.STRING));
-
-    return string == null ? null : string.asObject();
+    MapValueString string = (MapValueString)((DataMap)data).find(name, NAME_TYPE, MapValue.STRING_TYPE);
+    return string == null ? defaultValue : string.asObject();
   }
 
 
-  protected String getConfigValueString(@NotNull String name, Data data, String defaultValue)
+  protected boolean getConfigValueBool(@NotNull String name, Data data, boolean defaultValue)
   {
-    String value = getConfigValueString(name, data);
-    return value == null ? defaultValue : value;
+    if (!(data instanceof DataMap))
+      return defaultValue;
+
+    MapValueBool bool = (MapValueBool)((DataMap)data).find(name, NAME_TYPE, MapValue.BOOL_TYPE);
+    return bool == null ? defaultValue :bool.asObject();
   }
 
 
