@@ -100,7 +100,7 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
         text = text.substring(0, idx);
     }
 
-    return text;
+    return formatString(text, parameters, data);
   }
 
 

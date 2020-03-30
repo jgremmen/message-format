@@ -34,7 +34,7 @@ public final class DoubleSupplierFormatter extends AbstractParameterFormatter
   @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
-    DoubleSupplier supplier = (DoubleSupplier)value;
+    final DoubleSupplier supplier = (DoubleSupplier)value;
     if (supplier == null)
       return formatNull(parameters, data);
 

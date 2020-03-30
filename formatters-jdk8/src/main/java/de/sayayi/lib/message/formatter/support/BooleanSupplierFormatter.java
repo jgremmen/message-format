@@ -34,7 +34,7 @@ public final class BooleanSupplierFormatter extends AbstractParameterFormatter
   @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
-    BooleanSupplier supplier = (BooleanSupplier)value;
+    final BooleanSupplier supplier = (BooleanSupplier)value;
     if (supplier == null)
       return formatNull(parameters, data);
 
