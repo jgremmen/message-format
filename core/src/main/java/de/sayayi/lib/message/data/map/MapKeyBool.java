@@ -19,7 +19,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Locale;
@@ -47,7 +46,7 @@ public final class MapKeyBool implements MapKey
 
   @NotNull
   @Override
-  public MatchResult match(@NotNull Locale locale, Serializable value)
+  public MatchResult match(@NotNull Locale locale, Object value)
   {
     if (value != null)
     {

@@ -17,7 +17,6 @@ package de.sayayi.lib.message.data.map;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.Locale;
 
 
@@ -47,7 +46,7 @@ public final class MapKeyNull implements MapKey
 
   @NotNull
   @Override
-  public MatchResult match(@NotNull Locale locale, Serializable value)
+  public MatchResult match(@NotNull Locale locale, Object value)
   {
     if (value == null && compareType == CompareType.EQ)
       return MatchResult.EXACT;

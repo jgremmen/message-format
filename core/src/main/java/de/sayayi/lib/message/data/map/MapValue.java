@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.util.EnumSet;
 
 
 /**
@@ -27,6 +28,9 @@ import java.io.Serializable;
  */
 public interface MapValue extends Data
 {
+  EnumSet<Type> STRING_MESSAGE_TYPE = EnumSet.of(Type.STRING, Type.MESSAGE);
+
+
   @Contract(pure = true)
   @NotNull Type getType();
 

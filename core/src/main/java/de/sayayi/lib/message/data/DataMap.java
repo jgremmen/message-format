@@ -16,10 +16,10 @@
 package de.sayayi.lib.message.data;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.data.map.MapKey;
 import de.sayayi.lib.message.data.map.MapValue;
 import de.sayayi.lib.message.data.map.MapValue.Type;
+import de.sayayi.lib.message.data.map.MapValueString;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
@@ -27,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,8 +40,6 @@ import java.util.Set;
 public final class DataMap implements Data
 {
   private static final long serialVersionUID = 400L;
-
-  private static final EnumSet<Type> MESSAGE_VALUE_TYPES = EnumSet.of(Type.MESSAGE, Type.STRING);
 
   @Getter private final Map<MapKey,MapValue> map;
 
@@ -63,7 +60,7 @@ public final class DataMap implements Data
 
 
   @Contract(pure = true)
-  public MapValue find(Serializable key, Set<MapKey.Type> keyTypes, Set<MapValue.Type> valueTypes)
+  public MapValue find(Object key, Set<MapKey.Type> keyTypes, Set<MapValue.Type> valueTypes)
   {
     MapValue found = null;
 
@@ -95,14 +92,14 @@ public final class DataMap implements Data
 
   @Contract(pure = true)
   public boolean hasMessage(Serializable key, Set<MapKey.Type> keyTypes, boolean includeDefault) {
-    return (includeDefault && map.containsKey(null)) || find(key, keyTypes, MESSAGE_VALUE_TYPES) != null;
+    return (includeDefault && map.containsKey(null)) || find(key, keyTypes, MapValue.STRING_MESSAGE_TYPE) != null;
   }
 
 
   @Contract(pure = true)
   public Message getMessage(Serializable key, Set<MapKey.Type> keyTypes, boolean includeDefault)
   {
-    MapValue mapValue = find(key, keyTypes, MESSAGE_VALUE_TYPES);
+    MapValue mapValue = find(key, keyTypes, MapValue.STRING_MESSAGE_TYPE);
 
     if (mapValue == null)
     {
@@ -114,7 +111,7 @@ public final class DataMap implements Data
     }
 
     if (mapValue.getType() == Type.STRING)
-      return MessageFactory.parse(mapValue.asObject().toString());
+      return ((MapValueString)mapValue).asMessage();
 
     return (Message)mapValue.asObject();
   }

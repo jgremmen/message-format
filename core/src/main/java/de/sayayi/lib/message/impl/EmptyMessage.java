@@ -16,6 +16,8 @@
 package de.sayayi.lib.message.impl;
 
 import de.sayayi.lib.message.Message;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -25,9 +27,12 @@ import org.jetbrains.annotations.NotNull;
  * @author Jeroen Gremmen
  */
 @ToString
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class EmptyMessage implements Message
 {
   private static final long serialVersionUID = 201L;
+
+  public static final Message INSTANCE = new EmptyMessage();
 
 
   @Override

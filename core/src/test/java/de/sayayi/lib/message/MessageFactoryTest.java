@@ -34,7 +34,7 @@ public class MessageFactoryTest
   @Test
   public void testWithCode()
   {
-    WithCode msgWithCode1 = MessageFactory.withCode("ABC", new EmptyMessage());
+    WithCode msgWithCode1 = MessageFactory.withCode("ABC", EmptyMessage.INSTANCE);
     assertEquals("ABC", msgWithCode1.getCode());
     assertTrue(msgWithCode1 instanceof EmptyMessageWithCode);
 
@@ -44,6 +44,7 @@ public class MessageFactoryTest
   }
 
 
+  @SuppressWarnings("ResultOfMethodCallIgnored")
   @Test(expected = MessageParserException.class)
   public void testSyntaxError() {
     MessageFactory.parse("%{x,{true false:1}");

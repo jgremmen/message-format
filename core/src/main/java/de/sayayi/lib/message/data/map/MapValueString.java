@@ -15,6 +15,8 @@
  */
 package de.sayayi.lib.message.data.map;
 
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.data.DataString;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,5 +38,11 @@ public final class MapValueString extends DataString implements MapValue
   @Override
   public Type getType() {
     return Type.STRING;
+  }
+
+
+  @NotNull
+  public Message asMessage() {
+    return MessageFactory.parse(asObject());
   }
 }

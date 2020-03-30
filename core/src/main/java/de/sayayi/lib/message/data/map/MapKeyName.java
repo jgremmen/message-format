@@ -19,7 +19,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.Locale;
 
 
@@ -41,7 +40,7 @@ public final class MapKeyName implements MapKey
 
   @NotNull
   @Override
-  public MatchResult match(@NotNull Locale locale, Serializable value)
+  public MatchResult match(@NotNull Locale locale, Object value)
   {
     return (value instanceof CharSequence || value instanceof Character) && value.toString().equals(name)
         ? MatchResult.EXACT : MatchResult.MISMATCH;

@@ -17,7 +17,6 @@ package de.sayayi.lib.message.data.map;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
@@ -51,7 +50,7 @@ public final class MapKeyEmpty implements MapKey
 
   @NotNull
   @Override
-  public MatchResult match(@NotNull Locale locale, Serializable value)
+  public MatchResult match(@NotNull Locale locale, Object value)
   {
     MatchResult result = MatchResult.EXACT;
     boolean empty =

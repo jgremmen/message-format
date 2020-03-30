@@ -99,7 +99,7 @@ public final class MessageParserSupport extends MessageParser
       switch(parts.size())
       {
         case 0:
-          ctx.value = new EmptyMessage();
+          ctx.value = EmptyMessage.INSTANCE;
           break;
 
         case 1:
