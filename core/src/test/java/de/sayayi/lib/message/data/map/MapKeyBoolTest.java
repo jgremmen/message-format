@@ -17,11 +17,10 @@ package de.sayayi.lib.message.data.map;
 
 import org.junit.Test;
 
-import java.util.Locale;
-
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.LENIENT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
+import static java.util.Locale.ROOT;
 import static org.junit.Assert.assertEquals;
 
 
@@ -32,17 +31,17 @@ public class MapKeyBoolTest
 {
   @Test
   public void testMatchNull() {
-    assertEquals(MISMATCH, new MapKeyBool(true).match(Locale.ROOT, null));
+    assertEquals(MISMATCH, new MapKeyBool(true).match(ROOT, null));
   }
 
 
   @Test
   public void testMatchBoolean()
   {
-    assertEquals(EXACT, new MapKeyBool(true).match(Locale.ROOT, true));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(Locale.ROOT, false));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(Locale.ROOT, true));
-    assertEquals(EXACT, new MapKeyBool(false).match(Locale.ROOT, false));
+    assertEquals(EXACT, new MapKeyBool(true).match(ROOT, true));
+    assertEquals(MISMATCH, new MapKeyBool(true).match(ROOT, false));
+    assertEquals(MISMATCH, new MapKeyBool(false).match(ROOT, true));
+    assertEquals(EXACT, new MapKeyBool(false).match(ROOT, false));
   }
 
 
@@ -50,58 +49,58 @@ public class MapKeyBoolTest
   public void testMatchNumber()
   {
     // byte
-    assertEquals(MISMATCH, new MapKeyBool(true).match(Locale.ROOT, (byte)0));
-    assertEquals(LENIENT, new MapKeyBool(true).match(Locale.ROOT, (byte)100));
+    assertEquals(MISMATCH, new MapKeyBool(true).match(ROOT, (byte)0));
+    assertEquals(LENIENT, new MapKeyBool(true).match(ROOT, (byte)100));
 
-    assertEquals(LENIENT, new MapKeyBool(false).match(Locale.ROOT, (byte)0));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(Locale.ROOT, Byte.MIN_VALUE));
+    assertEquals(LENIENT, new MapKeyBool(false).match(ROOT, (byte)0));
+    assertEquals(MISMATCH, new MapKeyBool(false).match(ROOT, Byte.MIN_VALUE));
 
     // integer
-    assertEquals(MISMATCH, new MapKeyBool(true).match(Locale.ROOT, 0));
-    assertEquals(LENIENT, new MapKeyBool(true).match(Locale.ROOT, 100));
+    assertEquals(MISMATCH, new MapKeyBool(true).match(ROOT, 0));
+    assertEquals(LENIENT, new MapKeyBool(true).match(ROOT, 100));
 
-    assertEquals(LENIENT, new MapKeyBool(false).match(Locale.ROOT, 0));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(Locale.ROOT, Integer.MAX_VALUE));
+    assertEquals(LENIENT, new MapKeyBool(false).match(ROOT, 0));
+    assertEquals(MISMATCH, new MapKeyBool(false).match(ROOT, Integer.MAX_VALUE));
 
     // long
-    assertEquals(MISMATCH, new MapKeyBool(true).match(Locale.ROOT, 0L));
-    assertEquals(LENIENT, new MapKeyBool(true).match(Locale.ROOT, -100L));
+    assertEquals(MISMATCH, new MapKeyBool(true).match(ROOT, 0L));
+    assertEquals(LENIENT, new MapKeyBool(true).match(ROOT, -100L));
 
-    assertEquals(LENIENT, new MapKeyBool(false).match(Locale.ROOT, 0L));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(Locale.ROOT, Long.MIN_VALUE));
+    assertEquals(LENIENT, new MapKeyBool(false).match(ROOT, 0L));
+    assertEquals(MISMATCH, new MapKeyBool(false).match(ROOT, Long.MIN_VALUE));
   }
 
 
   @Test
   public void testMatchString()
   {
-    assertEquals(LENIENT, new MapKeyBool(true).match(Locale.ROOT, "true"));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(Locale.ROOT, "false"));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(Locale.ROOT, "TRUE"));
+    assertEquals(LENIENT, new MapKeyBool(true).match(ROOT, "true"));
+    assertEquals(MISMATCH, new MapKeyBool(true).match(ROOT, "false"));
+    assertEquals(MISMATCH, new MapKeyBool(true).match(ROOT, "TRUE"));
 
-    assertEquals(LENIENT, new MapKeyBool(false).match(Locale.ROOT, "false"));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(Locale.ROOT, "true"));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(Locale.ROOT, "FALSE"));
+    assertEquals(LENIENT, new MapKeyBool(false).match(ROOT, "false"));
+    assertEquals(MISMATCH, new MapKeyBool(false).match(ROOT, "true"));
+    assertEquals(MISMATCH, new MapKeyBool(false).match(ROOT, "FALSE"));
 
-    assertEquals(LENIENT, new MapKeyBool(true).match(Locale.ROOT, "0.9"));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(Locale.ROOT, "-0"));
-    assertEquals(LENIENT, new MapKeyBool(true).match(Locale.ROOT, "+1234567890000000"));
+    assertEquals(LENIENT, new MapKeyBool(true).match(ROOT, "0.9"));
+    assertEquals(MISMATCH, new MapKeyBool(true).match(ROOT, "-0"));
+    assertEquals(LENIENT, new MapKeyBool(true).match(ROOT, "+1234567890000000"));
 
-    assertEquals(LENIENT, new MapKeyBool(false).match(Locale.ROOT, "+0"));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(Locale.ROOT, "1e-100"));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(Locale.ROOT, "-1234567890000000"));
+    assertEquals(LENIENT, new MapKeyBool(false).match(ROOT, "+0"));
+    assertEquals(MISMATCH, new MapKeyBool(false).match(ROOT, "1e-100"));
+    assertEquals(MISMATCH, new MapKeyBool(false).match(ROOT, "-1234567890000000"));
   }
 
 
   @Test
   public void testMatchCharacter()
   {
-    assertEquals(LENIENT, new MapKeyBool(true).match(Locale.ROOT, '5'));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(Locale.ROOT, (char)1));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(Locale.ROOT, 'Y'));
+    assertEquals(LENIENT, new MapKeyBool(true).match(ROOT, '5'));
+    assertEquals(MISMATCH, new MapKeyBool(true).match(ROOT, (char)1));
+    assertEquals(MISMATCH, new MapKeyBool(true).match(ROOT, 'Y'));
 
-    assertEquals(LENIENT, new MapKeyBool(false).match(Locale.ROOT, '0'));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(Locale.ROOT, '9'));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(Locale.ROOT, (char)0));
+    assertEquals(LENIENT, new MapKeyBool(false).match(ROOT, '0'));
+    assertEquals(MISMATCH, new MapKeyBool(false).match(ROOT, '9'));
+    assertEquals(MISMATCH, new MapKeyBool(false).match(ROOT, (char)0));
   }
 }

@@ -54,7 +54,7 @@ public final class ChoiceFormatter extends AbstractParameterFormatter implements
     if (!(value instanceof Serializable))
       throw new IllegalArgumentException("value must be serializable");
 
-    final Message message = ((DataMap)data).getMessage((Serializable)value);
+    final Message message = ((DataMap)data).getMessage((Serializable)value, null);
 
     return message == null ? null : message.format(parameters);
   }

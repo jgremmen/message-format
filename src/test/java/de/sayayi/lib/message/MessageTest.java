@@ -64,7 +64,7 @@ public class MessageTest
   @Test
   public void testCompareType()
   {
-    Message m = MessageFactory.parse("%{n,choice,{<0->'negative',>0->'positive','zero'}}");
+    Message m = MessageFactory.parse("%{n,choice,{<0:'negative',>0:'positive','zero'}}");
 
     assertEquals("negative",
         m.format(ParameterFactory.createFor(Locale.UK).with("n", -1)));

@@ -70,7 +70,7 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
     // allow custom messages for true/false value?
     if (data instanceof DataMap)
     {
-      final Message message = ((DataMap)data).getMessage(bool);
+      final Message message = ((DataMap)data).getMessage(bool, null);
       if (message != null)
         return message.format(parameters);
     }

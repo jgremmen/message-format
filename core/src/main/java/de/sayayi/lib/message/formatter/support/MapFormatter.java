@@ -90,7 +90,7 @@ public final class MapFormatter extends AbstractParameterFormatter
   {
     if (hasMessageFor("sep", data))
     {
-      Message msg = ((DataMap)data).getMessage("sep");
+      Message msg = ((DataMap)data).getMessage("sep", null);
 
       if (!msg.hasParameters())
       {

@@ -35,7 +35,7 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   protected boolean hasMessageFor(Object value, Data parameterData)
   {
     return parameterData instanceof DataMap && value instanceof Serializable &&
-        ((DataMap)parameterData).hasMessage((Serializable)value);
+        ((DataMap)parameterData).hasMessage((Serializable)value, null);
   }
 
 
@@ -53,9 +53,9 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
     {
       DataMap map = (DataMap)data;
 
-      if (map.hasMessage(key))
+      if (map.hasMessage(key, null))
       {
-        Message message = map.getMessage(key);
+        Message message = map.getMessage(key, null);
         if (!message.hasParameters())
           return message.format(Parameters.EMPTY);
       }
