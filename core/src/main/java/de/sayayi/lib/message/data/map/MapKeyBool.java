@@ -37,6 +37,11 @@ public final class MapKeyBool implements MapKey
   @Getter private final boolean bool;
 
 
+  public MapKeyBool(@NotNull String bool) {
+    this(Boolean.parseBoolean(bool));
+  }
+
+
   @NotNull
   @Override
   public Type getType() {

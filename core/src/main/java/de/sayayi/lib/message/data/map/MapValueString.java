@@ -29,7 +29,7 @@ public final class MapValueString extends DataString implements MapValue
   private static final long serialVersionUID = 400L;
 
 
-  public MapValueString(String string) {
+  public MapValueString(@NotNull String string) {
     super(string);
   }
 

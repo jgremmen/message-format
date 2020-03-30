@@ -86,9 +86,9 @@ parameter returns [ParameterPart value]
         ;
 
 data returns [Data value]
-        : string         { $value = new DataString($string.value); }
-        | number=NUMBER  { $value = new DataNumber(Long.parseLong($number.text)); }
-        | map            { $value = new DataMap($map.value); }
+        : string  { $value = new DataString($string.value); }
+        | NUMBER  { $value = new DataNumber($NUMBER.text); }
+        | map     { $value = new DataMap($map.value); }
         ;
 
 map returns [Map<MapKey,MapValue> value]
@@ -112,25 +112,25 @@ mapElement [Map<MapKey,MapValue> value]
 mapKey returns [MapKey key]
         : relop=relationalOperatorOptional string
             { $key = new MapKeyString($relop.cmp, $string.value); }
-        | relop=relationalOperatorOptional number=NUMBER
-            { $key = new MapKeyNumber($relop.cmp, Long.parseLong($number.text)); }
-        | bool=BOOL
-            { $key = new MapKeyBool(Boolean.parseBoolean($bool.text)); }
-        | eqop=equalOperatorOptional nil=NULL
+        | relop=relationalOperatorOptional NUMBER
+            { $key = new MapKeyNumber($relop.cmp, $NUMBER.text); }
+        | BOOL
+            { $key = new MapKeyBool($BOOL.text); }
+        | eqop=equalOperatorOptional NULL
             { $key = new MapKeyNull($eqop.cmp); }
-        | eqop=equalOperatorOptional empty=EMPTY
+        | eqop=equalOperatorOptional EMPTY
             { $key = new MapKeyEmpty($eqop.cmp); }
-        | name=NAME
-            { $key = new MapKeyName($name.text); }
+        | NAME
+            { $key = new MapKeyName($NAME.text); }
         ;
 
 mapValue returns [MapValue value]
         : string
             { $value = new MapValueString($string.value); }
-        | number=NUMBER
-            { $value = new MapValueNumber(Long.parseLong($number.text)); }
-        | bool=BOOL
-            { $value = new MapValueBool(Boolean.parseBoolean($bool.text)); }
+        | NUMBER
+            { $value = new MapValueNumber($NUMBER.text); }
+        | BOOL
+            { $value = new MapValueBool($BOOL.text); }
         | quotedMessage
             { $value = new MapValueMessage($quotedMessage.value); }
         ;

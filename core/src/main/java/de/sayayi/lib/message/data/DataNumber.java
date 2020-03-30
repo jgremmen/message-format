@@ -31,6 +31,11 @@ public class DataNumber implements Data
   private final long number;
 
 
+  public DataNumber(@NotNull String number) {
+    this(Long.parseLong(number));
+  }
+
+
   @Override
   @Contract(pure = true)
   public String toString() {

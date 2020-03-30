@@ -34,6 +34,11 @@ public final class MapKeyNumber implements MapKey
   @Getter private final long number;
 
 
+  public MapKeyNumber(@NotNull CompareType compareType, @NotNull String number) {
+    this(compareType, Long.parseLong(number));
+  }
+
+
   @NotNull
   @Override
   public Type getType() {

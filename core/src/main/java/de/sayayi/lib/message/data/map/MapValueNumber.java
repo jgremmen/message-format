@@ -32,6 +32,11 @@ public final class MapValueNumber extends DataNumber implements MapValue
   }
 
 
+  public MapValueNumber(@NotNull String number) {
+    super(number);
+  }
+
+
   @NotNull
   @Override
   public Type getType() {

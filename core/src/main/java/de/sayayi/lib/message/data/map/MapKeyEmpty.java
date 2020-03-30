@@ -32,7 +32,7 @@ public final class MapKeyEmpty implements MapKey
   private final CompareType compareType;
 
 
-  public MapKeyEmpty(CompareType compareType)
+  public MapKeyEmpty(@NotNull CompareType compareType)
   {
     if (compareType != CompareType.EQ && compareType != CompareType.NE)
       throw new IllegalArgumentException("compareType must be EQ or NE");

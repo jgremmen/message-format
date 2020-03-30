@@ -30,6 +30,11 @@ public final class MapValueBool implements MapValue
   private final boolean bool;
 
 
+  public MapValueBool(@NotNull String bool) {
+    this(Boolean.parseBoolean(bool));
+  }
+
+
   @NotNull
   @Override
   public Type getType() {
