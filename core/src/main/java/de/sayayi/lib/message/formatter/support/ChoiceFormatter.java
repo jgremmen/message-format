@@ -19,14 +19,21 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
+import de.sayayi.lib.message.data.map.MapKey.Type;
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Set;
+
+import static de.sayayi.lib.message.data.map.MapKey.Type.BOOL;
+import static de.sayayi.lib.message.data.map.MapKey.Type.EMPTY;
+import static de.sayayi.lib.message.data.map.MapKey.Type.NULL;
+import static de.sayayi.lib.message.data.map.MapKey.Type.NUMBER;
+import static de.sayayi.lib.message.data.map.MapKey.Type.STRING;
 
 
 /**
@@ -34,6 +41,9 @@ import java.util.Set;
  */
 public final class ChoiceFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
 {
+  public static final EnumSet<Type> KEY_TYPES = EnumSet.of(NULL, EMPTY, BOOL, NUMBER, STRING);
+
+
   @NotNull
   @Override
   @Contract(pure = true)
@@ -49,16 +59,10 @@ public final class ChoiceFormatter extends AbstractParameterFormatter implements
     if (!(data instanceof DataMap))
       throw new MessageException("data must be a choice map");
 
-    if (value == null)
-      return formatNull(parameters, data);
-
-    if (!(value instanceof Serializable))
-      throw new MessageException("value must be serializable");
-
-    final Message message = ((DataMap)data).getMessage((Serializable)value, null, true);
-
+    final Message message = ((DataMap)data).getMessage(value, KEY_TYPES, true);
     return message == null ? null : message.format(parameters);
   }
+
 
 
   @NotNull

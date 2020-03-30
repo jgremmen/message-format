@@ -25,7 +25,6 @@ import java.lang.annotation.RetentionPolicy;
 
 import static de.sayayi.lib.message.MessageFactory.parse;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 
 /**
@@ -87,7 +86,7 @@ public class StringFormatterTest extends AbstractFormatterTest
         .with("spaces", "  ")
         .with("text", "hello  ");
 
-    assertNull(parse("%{empty,{!empty->'nok'}}").format(parameters));
+    assertEquals("", parse("%{empty,{!empty->'nok'}}").format(parameters));
     assertEquals("ok", parse("%{empty,{empty->'ok'}}").format(parameters));
     assertEquals("ok", parse("%{null,{empty->'ok',null->'nok'}}").format(parameters));
     assertEquals("ok", parse("%{null,{empty->'ok'}}").format(parameters));

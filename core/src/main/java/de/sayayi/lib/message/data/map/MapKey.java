@@ -29,6 +29,8 @@ import java.util.Locale;
 public interface MapKey
 {
   EnumSet<Type> EMPTY_NULL_TYPE = EnumSet.of(Type.EMPTY, Type.NULL);
+  EnumSet<Type> STRING_TYPE = EnumSet.of(Type.STRING);
+  EnumSet<Type> NAME_TYPE = EnumSet.of(Type.NAME);
 
 
   @Contract(pure = true)

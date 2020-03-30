@@ -15,18 +15,13 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.data.DataMap;
-import de.sayayi.lib.message.data.map.MapKey;
-import de.sayayi.lib.message.data.map.MapKey.Type;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,7 +29,7 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public final class StringFormatter implements NamedParameterFormatter
+public final class StringFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
 {
   @NotNull
   @Override
@@ -49,10 +44,9 @@ public final class StringFormatter implements NamedParameterFormatter
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
   public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
-    final String string = value == null
-        ? null : ((value instanceof char[]) ? new String((char[])value) : String.valueOf(value)).trim();
-
-    return format(string, parameters, data);
+    return formatString(
+        value == null ? null : ((value instanceof char[]) ? new String((char[])value) : String.valueOf(value)).trim(),
+        parameters, data);
   }
 
 
@@ -61,24 +55,5 @@ public final class StringFormatter implements NamedParameterFormatter
   @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
     return new HashSet<Class<?>>(Arrays.asList(CharSequence.class, char[].class));
-  }
-
-
-  private static final EnumSet<MapKey.Type> EMPTY_NULL_TYPES = EnumSet.of(Type.EMPTY, Type.NULL);
-
-  public static String format(String value, @NotNull Parameters parameters, Data data)
-  {
-    final boolean isEmpty = value == null || value.isEmpty();
-
-    Message message = null;
-
-    if (data instanceof DataMap)
-    {
-      final DataMap parameterMap = (DataMap)data;
-
-      message = parameterMap.getMessage(value, EMPTY_NULL_TYPES, false);
-    }
-
-    return message == null ? (isEmpty ? null : value) : message.format(parameters);
   }
 }

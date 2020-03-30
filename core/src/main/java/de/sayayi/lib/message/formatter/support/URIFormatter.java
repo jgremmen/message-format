@@ -15,14 +15,21 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
+import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.map.MapKey.Type;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Set;
+
+import static de.sayayi.lib.message.data.map.MapKey.Type.EMPTY;
+import static de.sayayi.lib.message.data.map.MapKey.Type.NULL;
+import static de.sayayi.lib.message.data.map.MapKey.Type.STRING;
 
 
 /**
@@ -40,7 +47,7 @@ public final class URIFormatter extends AbstractParameterFormatter
     final URI uri = (URI)value;
 
     if ("authority".equals(format))
-      return StringFormatter.format(uri.getAuthority(), parameters, data);
+      return parameters.getFormatter(String.class).format(uri.getAuthority(), null, parameters, data);
     else if ("fragment".equals(format))
       return uri.getFragment();
     else if ("host".equals(format))
@@ -51,10 +58,18 @@ public final class URIFormatter extends AbstractParameterFormatter
     {
       final int port = uri.getPort();
 
-//      if (port == -1 && hasMessageFor("undefined", data))
-//        return ((ParameterMap)data).format(parameters, "undefined");
-//      if (port >= 0 && hasMessageFor(port, data))
-//        return ((ParameterMap)data).format(parameters, port);
+      if (port == -1)
+      {
+        String undefined = getConfigValueString("undefined", data);
+        if (undefined != null)
+          return undefined;
+      }
+      else if (port >= 0)
+      {
+        Message msg = getMessage(port, EnumSet.of(Type.NUMBER), data, false);
+        if (msg != null)
+          return msg.format(parameters);
+      }
 
       return port == -1 ? null : Integer.toString(port);
     }
@@ -63,11 +78,9 @@ public final class URIFormatter extends AbstractParameterFormatter
     else if ("scheme".equals(format))
     {
       final String scheme = uri.getScheme();
+      final Message msg = getMessage(scheme, EnumSet.of(STRING, EMPTY, NULL), data, false);
 
-//      if (scheme != null && hasMessageFor(scheme, data))
-//        return ((DataMap)data).format(parameters, scheme);
-
-      return StringFormatter.format(scheme, parameters, data);
+      return msg != null ? msg.format(parameters) : scheme;
     }
     else if ("user-info".equals(format))
       return uri.getUserInfo();

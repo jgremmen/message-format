@@ -97,7 +97,7 @@ public final class DataMap implements Data
 
 
   @Contract(pure = true)
-  public Message getMessage(Serializable key, Set<MapKey.Type> keyTypes, boolean includeDefault)
+  public Message getMessage(Object key, Set<MapKey.Type> keyTypes, boolean includeDefault)
   {
     MapValue mapValue = find(key, keyTypes, MapValue.STRING_MESSAGE_TYPE);
 

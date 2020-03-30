@@ -18,7 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.data.DataMap;
+import de.sayayi.lib.message.data.map.MapKey.Type;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -68,12 +69,9 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
       bool = Boolean.parseBoolean(String.valueOf(value));
 
     // allow custom messages for true/false value?
-    if (data instanceof DataMap)
-    {
-      final Message message = ((DataMap)data).getMessage(bool, null, false);
-      if (message != null)
-        return message.format(parameters);
-    }
+    Message message = getMessage(bool, EnumSet.of(Type.BOOL), data, false);
+    if (message != null)
+      return message.format(parameters);
 
     return getBundle(getClass().getPackage().getName() + ".Formatter",
         parameters.getLocale()).getString(Boolean.toString(bool));

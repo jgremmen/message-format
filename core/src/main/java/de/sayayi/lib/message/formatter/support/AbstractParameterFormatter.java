@@ -23,17 +23,14 @@ import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.data.map.MapKey;
 import de.sayayi.lib.message.data.map.MapKey.Type;
 import de.sayayi.lib.message.data.map.MapValue;
-import de.sayayi.lib.message.data.map.MapValueMessage;
 import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.impl.EmptyMessage;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.EnumSet;
 
 import static de.sayayi.lib.message.data.map.MapKey.EMPTY_NULL_TYPE;
-import static de.sayayi.lib.message.data.map.MapValue.STRING_MESSAGE_TYPE;
 
 
 /**
@@ -69,31 +66,27 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   }
 
 
-  protected Message matchEmptyNullMessage(Object value, Data data)
+  protected Message getMessage(Object value, EnumSet<MapKey.Type> keyTypes, Data data, boolean notNull)
   {
     Message message = null;
 
     if (data instanceof DataMap)
-    {
-      final MapValue mapValue = ((DataMap)data).find(value, EMPTY_NULL_TYPE, STRING_MESSAGE_TYPE);
+      message = ((DataMap)data).getMessage(value, keyTypes, false);
 
-      message = mapValue.getType() == MapValue.Type.STRING
-          ? ((MapValueString)mapValue).asMessage() : ((MapValueMessage)mapValue).asObject();
-    }
+    if (message == null && notNull)
+      message = EmptyMessage.INSTANCE;
 
-    return message == null ? EmptyMessage.INSTANCE : message;
-  }
-
-
-  protected boolean hasMessageFor(Object value, Data parameterData)
-  {
-    return parameterData instanceof DataMap && value instanceof Serializable &&
-        ((DataMap)parameterData).hasMessage((Serializable)value, null, false);
+    return message;
   }
 
 
   protected String getDataString(Data data) {
-    return (data instanceof DataString) ? ((DataString)data).asObject() : null;
+    return getDataString(data, null);
+  }
+
+
+  protected String getDataString(Data data, String defaultValue) {
+    return (data instanceof DataString) ? ((DataString)data).asObject() : defaultValue;
   }
 
 
@@ -126,12 +119,19 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   protected String formatNull(@NotNull Parameters parameters, Data data) {
-    return matchEmptyNullMessage(null, data).format(parameters);
+    return getMessage(null, EMPTY_NULL_TYPE, data, true).format(parameters);
   }
 
 
   protected String formatEmpty(@NotNull Parameters parameters, Data data) {
-    return matchEmptyNullMessage("", data).format(parameters);
+    return getMessage("", EMPTY_NULL_TYPE, data, true).format(parameters);
+  }
+
+
+  protected String formatString(String value, @NotNull Parameters parameters, Data data)
+  {
+    Message msg = getMessage(value, ChoiceFormatter.KEY_TYPES, data, false);
+    return msg == null ? value : msg.format(parameters);
   }
 
 

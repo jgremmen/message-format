@@ -39,8 +39,10 @@ public final class MapFormatter extends AbstractParameterFormatter
   public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     final Map<?,?> map = (Map<?,?>)value;
-    if (map == null || map.isEmpty())
-      return matchEmptyNullMessage(map, data).format(parameters);
+    if (map == null)
+      return formatNull(parameters, data);
+    if (map.isEmpty())
+      return formatEmpty(parameters, data);
 
     final ResourceBundle bundle = getBundle(getClass().getPackage().getName() + ".Formatter",
         parameters.getLocale());

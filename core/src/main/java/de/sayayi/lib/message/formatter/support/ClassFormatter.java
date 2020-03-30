@@ -32,17 +32,20 @@ public final class ClassFormatter extends AbstractParameterFormatter
   @Override
   public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
-    if (value == null)
-      return formatNull(parameters, data);
+    String s = null;
 
-    Class<?> clazz = (Class<?>)value;
+    if (value != null)
+    {
+      final Class<?> clazz = (Class<?>)value;
 
-    if ("name".equals(format))
-      return clazz.getSimpleName();
-    if ("package".equals(format))
-      return parameters.getFormatter(Package.class).format(clazz.getPackage(), null, parameters, data);
+      if ("name".equals(format))
+        s = clazz.getSimpleName();
 
-    return clazz.getName();
+      if ("package".equals(format))
+        return parameters.getFormatter(Package.class).format(clazz.getPackage(), null, parameters, data);
+    }
+
+    return formatString(s, parameters, data);
   }
 
 
