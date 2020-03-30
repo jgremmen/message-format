@@ -27,7 +27,6 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.DefaultErrorStrategy;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
@@ -37,6 +36,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.lang.Character.isSpaceChar;
 
 
 /**
@@ -86,7 +87,7 @@ public final class MessageParserSupport extends MessageParser
       final String text = ctx.text().value;
       final int length = text.length();
 
-      ctx.value = new TextPart(text.trim(), text.charAt(0) == ' ', text.charAt(length - 1) == ' ');
+      ctx.value = new TextPart(text.trim(), isSpaceChar(text.charAt(0)), isSpaceChar(text.charAt(length - 1)));
     }
 
 
@@ -119,13 +120,13 @@ public final class MessageParserSupport extends MessageParser
 
       ctx.value = new ParameterPart(ctx.name.getText(),
           ctx.format == null ? null : ctx.format.getText(),
-          exitParameter_isSpaceAtTokenIndex(ctx, ctx.getStart().getTokenIndex() - 1),
-          exitParameter_isSpaceAtTokenIndex(ctx, ctx.getStop().getTokenIndex() + 1),
+          exitParameter_isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
+          exitParameter_isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
           data == null ? null : data.value);
     }
 
 
-    private boolean exitParameter_isSpaceAtTokenIndex(ParserRuleContext ctx, int i)
+    private boolean exitParameter_isSpaceAtTokenIndex(int i)
     {
       if (i >= 0)
       {
@@ -134,7 +135,7 @@ public final class MessageParserSupport extends MessageParser
         if (token.getType() != Token.EOF)
         {
           final String text = token.getText();
-          return text != null && !text.isEmpty() && text.charAt(0) == ' ';
+          return text != null && !text.isEmpty() && isSpaceChar(text.charAt(0));
         }
       }
 
@@ -166,23 +167,23 @@ public final class MessageParserSupport extends MessageParser
     public void syntaxError(Recognizer<?,?> recognizer, Object offendingSymbol, int line, int charPositionInLine,
                             String msg, RecognitionException ex)
     {
-      Token token = (Token)offendingSymbol;
-      StringBuilder text = new StringBuilder(message);
+      final Token token = (Token)offendingSymbol;
+      final StringBuilder text = new StringBuilder(message);
 
       text.insert(0, ":\n");
       text.insert(0, msg);
       text.append('\n');
 
-      char[] spaces = new char[charPositionInLine];
+      final char[] spaces = new char[charPositionInLine];
       Arrays.fill(spaces, ' ');
       text.append(spaces);
 
-      char[] marker = token.getType() == Token.EOF
-          ? new char[1] : new char[token.getStopIndex() + 1 - charPositionInLine];
+      int stopIndex = token.getType() == Token.EOF ? charPositionInLine : token.getStopIndex();
+      final char[] marker = new char[stopIndex + 1 - charPositionInLine];
       Arrays.fill(marker, '^');
       text.append(marker);
 
-      throw new MessageParserException(charPositionInLine, text.toString());
+      throw new MessageParserException(message, charPositionInLine, stopIndex, text.toString(), ex);
     }
   }
 
@@ -193,7 +194,7 @@ public final class MessageParserSupport extends MessageParser
     private static final Vocabulary INSTANCE = new Vocab();
 
     private static final Map<Integer,Name> TOKEN_NAMES = new HashMap<Integer,Name>();
-    private static int maxTokenType = 0;
+    private static int maxTokenType;
 
 
     static
@@ -252,12 +253,12 @@ public final class MessageParserSupport extends MessageParser
     }
 
 
-    private static void add(int token, String literal, String symbolic)
+    private static void add(int tokenType, String literal, String symbolic)
     {
-      TOKEN_NAMES.put(token, new Name(literal, symbolic));
+      TOKEN_NAMES.put(tokenType, new Name(literal, symbolic));
 
-      if (token > maxTokenType)
-        maxTokenType = token;
+      if (tokenType > maxTokenType)
+        maxTokenType = tokenType;
     }
 
 

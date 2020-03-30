@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.exception;
 
+
 import lombok.Getter;
 
 
@@ -24,13 +25,17 @@ import lombok.Getter;
 @SuppressWarnings("serial")
 public class MessageParserException extends MessageException
 {
-  @Getter private final int position;
+  @Getter private final String input;
+  @Getter private final int startIndex;
+  @Getter private final int stopIndex;
 
 
-  public MessageParserException(int position, String message)
+  public MessageParserException(String input, int startIndex, int stopIndex, String message, Throwable cause)
   {
-    super(message);
+    super(message, cause);
 
-    this.position = position;
+    this.input = input;
+    this.startIndex = startIndex;
+    this.stopIndex = stopIndex;
   }
 }
