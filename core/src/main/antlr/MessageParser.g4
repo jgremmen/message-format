@@ -65,15 +65,15 @@ forceQuotedMessage returns [Message value]
 parameter returns [ParameterPart value]
         : PARAM_START
           name=NAME
-          (P_COMMA format=NAME)?
-          (P_COMMA data)?
+          (COMMA format=NAME)?
+          (COMMA data)?
           PARAM_END
         ;
 
 data returns [Data value]
-        : string           { $value = new DataString($string.value); }
-        | number=P_NUMBER  { $value = new DataNumber(Long.parseLong($number.text)); }
-        | map              { $value = new DataMap($map.value); }
+        : string         { $value = new DataString($string.value); }
+        | number=NUMBER  { $value = new DataNumber(Long.parseLong($number.text)); }
+        | map            { $value = new DataMap($map.value); }
         ;
 
 map returns [Map<MapKey,MapValue> value]
@@ -82,28 +82,28 @@ map returns [Map<MapKey,MapValue> value]
         }
         : MAP_START
           mapElements[$value]
-          (M_COMMA forceQuotedMessage  { $value.put(null, new MapValueMessage($forceQuotedMessage.value)); } )?
+          (COMMA forceQuotedMessage  { $value.put(null, new MapValueMessage($forceQuotedMessage.value)); } )?
           MAP_END
         ;
 
 mapElements [Map<MapKey,MapValue> value]
-        : mapElement[$value] (M_COMMA mapElement[$value])*
+        : mapElement[$value] (COMMA mapElement[$value])*
         ;
 
 mapElement [Map<MapKey,MapValue> value]
-        : mapKey M_ARROW mapValue  { $value.put($mapKey.key, $mapValue.value); }
+        : mapKey ARROW_OR_COLON mapValue  { $value.put($mapKey.key, $mapValue.value); }
         ;
 
 mapKey returns [MapKey key]
         : relop=relationalOperatorOptional string
             { $key = new MapKeyString($relop.cmp, $string.value); }
-        | relop=relationalOperatorOptional number=M_NUMBER
+        | relop=relationalOperatorOptional number=NUMBER
             { $key = new MapKeyNumber($relop.cmp, Long.parseLong($number.text)); }
-        | bool=M_BOOL
+        | bool=BOOL
             { $key = new MapKeyBool(Boolean.parseBoolean($bool.text)); }
-        | eqop=equalOperatorOptional nil=M_NULL
+        | eqop=equalOperatorOptional nil=NULL
             { $key = new MapKeyNull($eqop.cmp); }
-        | eqop=equalOperatorOptional empty=M_EMPTY
+        | eqop=equalOperatorOptional empty=EMPTY
             { $key = new MapKeyEmpty($eqop.cmp); }
         | name=NAME
             { $key = new MapKeyName($name.text); }
@@ -112,9 +112,9 @@ mapKey returns [MapKey key]
 mapValue returns [MapValue value]
         : string
             { $value = new MapValueString($string.value); }
-        | number=M_NUMBER
+        | number=NUMBER
             { $value = new MapValueNumber(Long.parseLong($number.text)); }
-        | bool=M_BOOL
+        | bool=BOOL
             { $value = new MapValueBool(Boolean.parseBoolean($bool.text)); }
         | quotedMessage
             { $value = new MapValueMessage($quotedMessage.value); }
@@ -129,10 +129,10 @@ relationalOperatorOptional returns [MapKey.CompareType cmp]
 
 relationalOperator returns [MapKey.CompareType cmp]
         : equalOperator  { $cmp = $equalOperator.cmp; }
-        | M_LTE          { $cmp = MapKey.CompareType.LTE; }
-        | M_LT           { $cmp = MapKey.CompareType.LT; }
-        | M_GT           { $cmp = MapKey.CompareType.GT; }
-        | M_GTE          { $cmp = MapKey.CompareType.GTE; }
+        | LTE            { $cmp = MapKey.CompareType.LTE; }
+        | LT             { $cmp = MapKey.CompareType.LT; }
+        | GT             { $cmp = MapKey.CompareType.GT; }
+        | GTE            { $cmp = MapKey.CompareType.GTE; }
         ;
 
 equalOperatorOptional returns [MapKey.CompareType cmp]
@@ -143,6 +143,6 @@ equalOperatorOptional returns [MapKey.CompareType cmp]
         ;
 
 equalOperator returns [MapKey.CompareType cmp]
-        : M_EQ  { $cmp = MapKey.CompareType.EQ; }
-        | M_NE  { $cmp = MapKey.CompareType.NE; }
+        : EQ  { $cmp = MapKey.CompareType.EQ; }
+        | NE  { $cmp = MapKey.CompareType.NE; }
         ;

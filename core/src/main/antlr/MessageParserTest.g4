@@ -98,15 +98,15 @@ mapElements
         ;
 
 mapElement
-        : key=mapKey M_ARROW value=mapValue
+        : key=mapKey ARROW_OR_COLON value=mapValue
         ;
 
 mapKey
         : relop=relationalOperator? string           # KeyString
         | relop=relationalOperator? number=M_NUMBER  # KeyNumber
         | bool=M_BOOL                                # KeyBool
-        | eqop=equalOperator? nil=M_NULL             # KeyNull
-        | eqop=equalOperator? empty=M_EMPTY          # KeyEmpty
+        | eqop=equalOperator? nil=NULL               # KeyNull
+        | eqop=equalOperator? empty=EMPTY            # KeyEmpty
         | name                                       # KeyName
         ;
 
@@ -119,13 +119,13 @@ mapValue
 
 relationalOperator
         : equalOperator
-        | M_LTE
-        | M_LT
-        | M_GT
-        | M_GTE
+        | LTE
+        | LT
+        | GT
+        | GTE
         ;
 
 equalOperator
-        : M_EQ
-        | M_NE
+        : EQ
+        | NE
         ;

@@ -16,9 +16,11 @@
 package de.sayayi.lib.message.parser;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.junit.Test;
 
+import static de.sayayi.lib.message.parser.MessageLexer.CH;
 import static org.junit.Assert.assertEquals;
 
 
@@ -30,28 +32,28 @@ public class MessageTokenizerTest
   @Test
   public void testDefaultMode()
   {
-    MessageLexer lexer = createFor("hi  \\u0021%{");
+    Lexer lexer = createFor("hi  \\u0021%{");
 
     // h
     Token token = lexer.nextToken();
     assertEquals("h", token.getText());
-    assertEquals(MessageLexer.CH, token.getType());
+    assertEquals(CH, token.getType());
 
     // i
     token = lexer.nextToken();
     assertEquals("i", token.getText());
-    assertEquals(MessageLexer.CH, token.getType());
+    assertEquals(CH, token.getType());
 
     // <space>
     token = lexer.nextToken();
     assertEquals("  ", token.getText());
-    assertEquals(MessageLexer.CH, token.getType());
+    assertEquals(CH, token.getType());
     assertEquals(2, token.getCharPositionInLine());
 
     // \u0021
     token = lexer.nextToken();
     assertEquals("!", token.getText());
-    assertEquals(MessageLexer.CH, token.getType());
+    assertEquals(CH, token.getType());
     assertEquals(4, token.getCharPositionInLine());
 
     // %{

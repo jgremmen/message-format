@@ -23,13 +23,9 @@ import de.sayayi.lib.message.impl.EmptyMessage;
 import de.sayayi.lib.message.impl.EmptyMessageWithCode;
 import de.sayayi.lib.message.impl.MessageDelegateWithCode;
 import de.sayayi.lib.message.impl.MultipartLocalizedMessageBundleWithCode;
-import de.sayayi.lib.message.parser.MessageBuildListener;
-import de.sayayi.lib.message.parser.MessageLexer;
-import de.sayayi.lib.message.parser.MessageParser;
+import de.sayayi.lib.message.parser.MessageParserSupport;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.BufferedTokenStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -52,14 +48,8 @@ public final class MessageFactory
 
   @NotNull
   @Contract(value = "_ -> new", pure = true)
-  public static Message parse(@NotNull String text)
-  {
-    BufferedTokenStream tokenStream = new BufferedTokenStream(new MessageLexer(new ANTLRInputStream(text)));
-    MessageParser parser = new MessageParser(tokenStream);
-
-    parser.addParseListener(new MessageBuildListener(tokenStream));
-
-    return parser.message().value;
+  public static Message parse(@NotNull String text) {
+    return MessageParserSupport.parse(text);
   }
 
 

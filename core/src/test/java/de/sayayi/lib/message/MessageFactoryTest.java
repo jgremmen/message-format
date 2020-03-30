@@ -17,6 +17,7 @@ package de.sayayi.lib.message;
 
 
 import de.sayayi.lib.message.Message.WithCode;
+import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.impl.EmptyMessage;
 import de.sayayi.lib.message.impl.EmptyMessageWithCode;
 import org.junit.Test;
@@ -40,5 +41,11 @@ public class MessageFactoryTest
     WithCode msgWithCode2 = MessageFactory.withCode("ABC", new EmptyMessageWithCode("DEF"));
     assertEquals("ABC", msgWithCode2.getCode());
     assertTrue(msgWithCode2 instanceof EmptyMessageWithCode);
+  }
+
+
+  @Test(expected = MessageParserException.class)
+  public void testSyntaxError() {
+    MessageFactory.parse("%{x,{true false:1}");
   }
 }

@@ -27,7 +27,7 @@ import java.io.Serializable;
  */
 public abstract class MessagePart implements Serializable
 {
-  private static final long serialVersionUID = 201L;
+  private static final long serialVersionUID = 400L;
 
   @Getter protected final boolean spaceBefore;
   @Getter protected final boolean spaceAfter;

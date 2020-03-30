@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.parser;
 
 import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.WritableToken;
 
@@ -24,9 +23,9 @@ import org.antlr.v4.runtime.WritableToken;
 /**
  * @author Jeroen Gremmen
  */
-abstract class AbstractMessageLexer extends Lexer
+abstract class AbstractLexer extends org.antlr.v4.runtime.Lexer
 {
-  protected AbstractMessageLexer(CharStream input) {
+  protected AbstractLexer(CharStream input) {
     super(input);
   }
 
@@ -42,6 +41,12 @@ abstract class AbstractMessageLexer extends Lexer
       case MessageLexer.PARAM_START1:
       case MessageLexer.PARAM_START2:
         t.setType(MessageLexer.PARAM_START);
+        break;
+
+      // ,
+      case MessageLexer.P_COMMA:
+      case MessageLexer.M_COMMA:
+        t.setType(MessageLexer.COMMA);
         break;
 
       // '
@@ -68,6 +73,18 @@ abstract class AbstractMessageLexer extends Lexer
       case MessageLexer.P_NAME:
       case MessageLexer.M_NAME:
         t.setType(MessageLexer.NAME);
+        break;
+
+      // number
+      case MessageLexer.P_NUMBER:
+      case MessageLexer.M_NUMBER:
+        t.setType(MessageLexer.NUMBER);
+        break;
+
+      // bool
+      case MessageLexer.P_BOOL:
+      case MessageLexer.M_BOOL:
+        t.setType(MessageLexer.BOOL);
         break;
     }
 

@@ -1,7 +1,7 @@
 lexer grammar MessageLexer;
 
 options {
-    superClass = AbstractMessageLexer;
+    superClass = AbstractLexer;
 }
 
 
@@ -100,7 +100,7 @@ mode MAP;
 MAP_END
         : '}' -> popMode
         ;
-M_ARROW
+ARROW_OR_COLON
         : '->' | ':'
         ;
 M_WS
@@ -109,10 +109,10 @@ M_WS
 M_COMMA
         : ','
         ;
-M_NULL
+NULL
         : 'null'
         ;
-M_EMPTY
+EMPTY
         : 'empty'
         ;
 M_BOOL
@@ -130,22 +130,22 @@ M_SQ_START
 M_DQ_START
         : '"' -> pushMode(TEXT2)
         ;
-M_EQ
+EQ
         : '='
         ;
-M_NE
+NE
         : '<>' | '!'
         ;
-M_LT
+LT
         : '<'
         ;
-M_LTE
+LTE
         : '<='
         ;
-M_GT
+GT
         : '>'
         ;
-M_GTE
+GTE
         : '>='
         ;
 
@@ -157,7 +157,10 @@ mode NOP;
 
 SINGLE_QUOTE_START : '\'' ;
 DOUBLE_QUOTE_START : '"' ;
-NAME               : ',' ;
+NAME               : '=' ;
+COMMA              : ',' ;
+NUMBER             : '>' ;
+BOOL               : '<' ;
 
 
 

@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Contract;
  */
 final class ParameterPart extends MessagePart
 {
-  private static final long serialVersionUID = 201L;
+  private static final long serialVersionUID = 400L;
 
   @Getter private final String parameter;
   @Getter private final String format;
