@@ -17,8 +17,6 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.data.DataString;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.LocalDate;
@@ -41,7 +39,7 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public final class JodaDateTimeFormatter implements ParameterFormatter
+public final class JodaDateTimeFormatter extends AbstractParameterFormatter
 {
   private static final Map<String,String> STYLE = new HashMap<String,String>();
 
@@ -61,42 +59,35 @@ public final class JodaDateTimeFormatter implements ParameterFormatter
   @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
+    if (value == null)
+      return formatNull(parameters, data);
+
+    if (!STYLE.containsKey(format))
+      format = getConfigValueString("format", data, true, null);
+
     final Locale locale = parameters.getLocale();
+    final DateTimeFormatter formatter;
 
-    if (value instanceof ReadableDateTime)
-      return getFormatter(format, data).withLocale(locale).print((ReadableInstant)value);
+    if (format != null && !STYLE.containsKey(format))
+      formatter = DateTimeFormat.forPattern(format).withLocale(locale);
+    else
+    {
+      final char[] style = (format == null ? "MM" : STYLE.get(format)).toCharArray();
 
-    final DateTimeFormatter formatter = getFormatter((BaseLocal)value, format, data);
+      if (value instanceof LocalDate)
+        style[1] = '-';
+      else if (value instanceof LocalTime)
+        style[0] = '-';
 
-    return (formatter == null) ? null : formatter.withLocale(locale).print((ReadablePartial)value).trim();
-  }
+      if (style[0] == '-' && style[1] == '-')
+        return formatEmpty(parameters, data);
 
+      formatter = DateTimeFormat.forStyle(new String(style)).withLocale(locale);
+    }
 
-  protected DateTimeFormatter getFormatter(String format, Data data)
-  {
-    if (format == null && data instanceof DataString)
-      return DateTimeFormat.forPattern(((DataString)data).asObject());
-
-    final String style = STYLE.get(format);
-
-    return DateTimeFormat.forStyle((style == null) ? "MM" : style);
-  }
-
-
-  protected DateTimeFormatter getFormatter(BaseLocal datetime, String format, Data data)
-  {
-    if (format == null && data instanceof DataString)
-      return DateTimeFormat.forPattern(((DataString)data).asObject());
-
-    final String styleStr = STYLE.get(format);
-    final char[] style = (styleStr != null) ? styleStr.toCharArray() : "MM".toCharArray();
-
-    if (datetime instanceof LocalDate)
-      style[1] = '-';
-    else if (datetime instanceof LocalTime)
-      style[0] = '-';
-
-    return (style[0] == '-' && style[1] == '-') ? null : DateTimeFormat.forStyle(new String(style));
+    return (value instanceof ReadablePartial
+        ? formatter.print((ReadablePartial)value)
+        : formatter.print((ReadableInstant)value)).trim();
   }
 
 
