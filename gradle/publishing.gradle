@@ -30,9 +30,12 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 
 task sourcesJar(type: Jar, dependsOn: classes) {
   archiveClassifier.set('sources')
-  from sourceSets.java6.allSource
-  from sourceSets.java8.allSource
+
+  from project(':core').sourceSets.main.allSource
+  from project('formatters-jdk8').sourceSets.main.allSource
   from sourceSets.main.allSource
+
+  exclude "**/*.tokens"
 }
 
 

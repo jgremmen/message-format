@@ -85,6 +85,6 @@ public class BoolFormatterTest extends AbstractFormatterTest
 
     assertEquals("<unknown>", msg.format(factory.with("b", null)));
     assertEquals("yes", msg.format(factory.with("b", true)));
-    assertEquals("falsch", msg.format(factory.with("b", false)));
+    assertEquals("no", msg.format(factory.with("b", false)));
   }
 }
