@@ -20,10 +20,10 @@ allprojects {
   group = "de.sayayi.lib"
   version = "0.4.0"
 
-  ext.lombokVersion = "1.18.6"
-  ext.antlrVersion = "4.5.3"
+  ext.lombokVersion = "1.18.12"
+  ext.antlrVersion = "4.5.3"  // last java 6 version
   ext.junitVersion = "4.12"
-  ext.jodatimeVersion = "2.10.1"
+  ext.jodatimeVersion = "2.10.5"
   ext.jetbrainsAnnotationsVersion = "13.0"
 
   repositories {
