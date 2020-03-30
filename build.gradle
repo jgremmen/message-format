@@ -27,7 +27,7 @@ allprojects {
   ext.jetbrainsAnnotationsVersion = "13.0"
 
   repositories {
-    jcenter();
+    jcenter()
   }
 
   dependencies {

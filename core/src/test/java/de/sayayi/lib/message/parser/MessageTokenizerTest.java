@@ -21,6 +21,7 @@ import org.antlr.v4.runtime.Token;
 import org.junit.Test;
 
 import static de.sayayi.lib.message.parser.MessageLexer.CH;
+import static de.sayayi.lib.message.parser.MessageLexer.PARAM_START;
 import static org.junit.Assert.assertEquals;
 
 
@@ -59,7 +60,7 @@ public class MessageTokenizerTest
     // %{
     token = lexer.nextToken();
     assertEquals("%{", token.getText());
-    assertEquals(MessageLexer.PARAM_START, token.getType());
+    assertEquals(PARAM_START, token.getType());
     assertEquals(10, token.getCharPositionInLine());
   }
 
