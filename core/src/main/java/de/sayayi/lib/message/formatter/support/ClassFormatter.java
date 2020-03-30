@@ -40,9 +40,10 @@ public final class ClassFormatter extends AbstractParameterFormatter
 
       if ("name".equals(format))
         s = clazz.getSimpleName();
-
-      if ("package".equals(format))
+      else if ("package".equals(format))
         return parameters.getFormatter(Package.class).format(clazz.getPackage(), null, parameters, data);
+      else
+        s = clazz.getName();
     }
 
     return formatString(s, parameters, data);
