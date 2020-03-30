@@ -81,7 +81,7 @@ public class BoolFormatterTest extends AbstractFormatterTest
     formatterRegistry.addFormatter(new BoolFormatter());
     ParameterFactory factory = ParameterFactory.createFor(GERMAN, formatterRegistry);
 
-    final Message msg = parse("%{b,bool,{'null'->'<unknown>',true->'yes','no'}}");
+    final Message msg = parse("%{b,bool,{null->'<unknown>',true->'yes','no'}}");
 
     assertEquals("<unknown>", msg.format(factory.with("b", null)));
     assertEquals("yes", msg.format(factory.with("b", true)));
