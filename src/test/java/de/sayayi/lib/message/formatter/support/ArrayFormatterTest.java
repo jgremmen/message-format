@@ -210,7 +210,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
 
     ParameterFactory factory = ParameterFactory.DEFAULT;
 
-    Message message = MessageFactory.parse("%{array,{null->'null',empty->'empty'}}");
+    Message message = MessageFactory.parse("%{array,{null:'null',empty:'empty'}}");
 
     assertEquals("null", message.format(factory.with("array", null)));
     assertEquals("empty", message.format(factory.with("array", new int[0])));

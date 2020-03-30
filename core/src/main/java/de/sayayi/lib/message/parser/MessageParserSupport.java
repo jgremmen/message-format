@@ -199,7 +199,7 @@ public final class MessageParserSupport extends MessageParser
 
     static
     {
-      add(MessageLexer.ARROW_OR_COLON, "'->' or ':'", "ARROW");
+      add(MessageLexer.COLON, "':'", "COLON");
       add(MessageLexer.COMMA, "','", "COMMA");
       add(MessageLexer.DOUBLE_QUOTE_END, "\"", "DOUBLE_QUOTE_END");
       add(MessageLexer.DOUBLE_QUOTE_START, "\"", "DOUBLE_QUOTE_START");

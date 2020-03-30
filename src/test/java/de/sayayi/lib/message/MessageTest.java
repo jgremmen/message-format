@@ -46,10 +46,10 @@ public class MessageTest
   {
     final Map<Locale,String> texts = new HashMap<>();
 
-    texts.put(Locale.UK, "%{n} %{n,choice,{1 -> 'colour', 'colours'}}.");
-    texts.put(new Locale("nl", "NL"), "%{n} %{n,choice,{1 -> 'kleur', 'kleuren'}}.");
-    texts.put(Locale.GERMAN, "%{n} %{n,choice,{1 -> 'Farbe', 'Farben'}}.");
-    texts.put(Locale.US, "%{n} %{n,choice,{1 -> 'color', 'colors'}}.");
+    texts.put(Locale.UK, "%{n} %{n,choice,{1:'colour', 'colours'}}.");
+    texts.put(new Locale("nl", "NL"), "%{n} %{n,choice,{1 : 'kleur', 'kleuren'}}.");
+    texts.put(Locale.GERMAN, "%{n} %{n,choice,{1: 'Farbe', 'Farben'}}.");
+    texts.put(Locale.US, "%{n} %{n,choice,{1:'color', 'colors'}}.");
 
     final Message m = MessageFactory.parse(texts);
 

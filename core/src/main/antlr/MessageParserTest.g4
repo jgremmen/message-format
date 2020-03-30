@@ -113,7 +113,7 @@ mapElements
         ;
 
 mapElement
-        : key=mapKey ARROW_OR_COLON value=mapValue
+        : key=mapKey COLON value=mapValue
         ;
 
 mapKey

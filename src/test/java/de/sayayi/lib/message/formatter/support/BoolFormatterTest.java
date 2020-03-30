@@ -68,7 +68,7 @@ public class BoolFormatterTest extends AbstractFormatterTest
         .with("c", Integer.valueOf(1234))
         .with("d", Integer.valueOf(0))
         .with("e", Double.valueOf(3.14d));
-    final Message msg = parse("%{a} %{b} %{c} %{c,bool} %{d,bool,{true->'yes',false->'no'}} %{e}");
+    final Message msg = parse("%{a} %{b} %{c} %{c,bool} %{d,bool,{true:'yes',false:'no'}} %{e}");
 
     assertEquals("false true 1234 true no 3.14", msg.format(parameters));
   }
@@ -81,7 +81,7 @@ public class BoolFormatterTest extends AbstractFormatterTest
     formatterRegistry.addFormatter(new BoolFormatter());
     ParameterFactory factory = ParameterFactory.createFor(GERMAN, formatterRegistry);
 
-    final Message msg = parse("%{b,bool,{null->'<unknown>',true->'yes',false:'no'}}");
+    final Message msg = parse("%{b,bool,{null:'<unknown>',true:'yes',false:'no'}}");
 
     assertEquals("<unknown>", msg.format(factory.with("b", null)));
     assertEquals("yes", msg.format(factory.with("b", true)));

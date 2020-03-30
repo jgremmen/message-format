@@ -106,7 +106,7 @@ mapElements [Map<MapKey,MapValue> value]
         ;
 
 mapElement [Map<MapKey,MapValue> value]
-        : mapKey ARROW_OR_COLON mapValue  { $value.put($mapKey.key, $mapValue.value); }
+        : mapKey COLON mapValue  { $value.put($mapKey.key, $mapValue.value); }
         ;
 
 mapKey returns [MapKey key]

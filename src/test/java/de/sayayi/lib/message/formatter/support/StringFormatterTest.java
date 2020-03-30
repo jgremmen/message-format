@@ -86,13 +86,13 @@ public class StringFormatterTest extends AbstractFormatterTest
         .with("spaces", "  ")
         .with("text", "hello  ");
 
-    assertEquals("", parse("%{empty,{!empty->'nok'}}").format(parameters));
-    assertEquals("ok", parse("%{empty,{empty->'ok'}}").format(parameters));
-    assertEquals("ok", parse("%{null,{empty->'ok',null->'nok'}}").format(parameters));
-    assertEquals("ok", parse("%{null,{empty->'ok'}}").format(parameters));
-    assertEquals("ok", parse("%{spaces,{empty->'ok'}}").format(parameters));
-    assertEquals("ok", parse("%{spaces,{!null->'ok'}}").format(parameters));
-    assertEquals("hello!", parse("%{text,{null->'nok',!empty->'%{text}!'}}").format(parameters));
-    assertEquals("hello!", parse("%{text,{!null->'%{text}!'}}").format(parameters));
+    assertEquals("", parse("%{empty,{!empty:'nok'}}").format(parameters));
+    assertEquals("ok", parse("%{empty,{empty:'ok'}}").format(parameters));
+    assertEquals("ok", parse("%{null,{empty:'ok',null:'nok'}}").format(parameters));
+    assertEquals("ok", parse("%{null,{empty:'ok'}}").format(parameters));
+    assertEquals("ok", parse("%{spaces,{empty:'ok'}}").format(parameters));
+    assertEquals("ok", parse("%{spaces,{!null:'ok'}}").format(parameters));
+    assertEquals("hello!", parse("%{text,{null:'nok',!empty:'%{text}!'}}").format(parameters));
+    assertEquals("hello!", parse("%{text,{!null:'%{text}!'}}").format(parameters));
   }
 }
