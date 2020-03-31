@@ -28,6 +28,8 @@ public final class MapValueString extends DataString implements MapValue
 {
   private static final long serialVersionUID = 400L;
 
+  private Message message;
+
 
   public MapValueString(@NotNull String string) {
     super(string);
@@ -42,7 +44,11 @@ public final class MapValueString extends DataString implements MapValue
 
 
   @NotNull
-  public Message asMessage() {
-    return MessageFactory.parse(asObject());
+  public synchronized Message asMessage()
+  {
+    if (message == null)
+      message = MessageFactory.parse(asObject());
+
+    return message;
   }
 }
