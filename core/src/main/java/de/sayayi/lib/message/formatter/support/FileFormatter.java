@@ -15,10 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.data.map.MapKey;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,19 +33,11 @@ public final class FileFormatter extends AbstractParameterFormatter
   @Override
   public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
-    String s = value == null ? null : format0((File)value, format, parameters, data);
+    if (value == null)
+      return null;
 
-    if (s == null)
-      return formatNull(parameters, data);
-    if ((s = s.trim()).isEmpty())
-      return formatEmpty(parameters, data);
+    final File file = (File)value;
 
-    return formatString(s, parameters, data);
-  }
-
-
-  private String format0(File file, String format, @NotNull Parameters parameters, Data data)
-  {
     if ("name".equals(format))
       return file.getName();
     else if ("path".equals(format))
@@ -58,13 +48,8 @@ public final class FileFormatter extends AbstractParameterFormatter
     {
       String name = file.getName();
       int dotidx = name.lastIndexOf('.');
-      if (dotidx == -1)
-        return null;
 
-      String extension = name.substring(dotidx + 1);
-      Message msg = getMessage(extension, MapKey.STRING_TYPE, data, false);
-
-      return msg == null ? extension : msg.format(parameters);
+      return dotidx == -1 ? "" : name.substring(dotidx + 1);
     }
 
     return file.getAbsolutePath();
