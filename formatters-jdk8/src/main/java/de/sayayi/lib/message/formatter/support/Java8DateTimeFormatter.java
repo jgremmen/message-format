@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.data.DataString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -83,9 +82,28 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
   @Contract(pure = true)
   public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
-    final DateTimeFormatter formatter = getFormatter((Temporal)value, format, data);
-    if (formatter == null)
-      return formatNull(parameters, data);
+    if (value == null)
+      return null;
+
+    if (!STYLE.containsKey(format))
+      format = getConfigValueString("format", data, true, null);
+
+    final DateTimeFormatter formatter;
+
+    if (format != null && !STYLE.containsKey(format))
+      formatter = DateTimeFormatter.ofPattern(format);
+    else
+    {
+      final char[] style = (format == null ? "MM" : STYLE.get(format)).toCharArray();
+
+      if (value instanceof LocalDate)
+        style[1] = '-';
+      else if (value instanceof LocalTime || value instanceof OffsetTime)
+        style[0] = '-';
+
+      if ((formatter = FORMATTER.get(new String(style))) == null)
+        return "";
+    }
 
     String text = formatter
         .withZone(ZoneId.systemDefault())
@@ -100,24 +118,7 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
         text = text.substring(0, idx);
     }
 
-    return formatString(text, parameters, data);
-  }
-
-
-  private DateTimeFormatter getFormatter(Temporal datetime, String format, Data data)
-  {
-    if (format == null && data instanceof DataString)
-      return DateTimeFormatter.ofPattern(((DataString)data).asObject());
-
-    final String styleStr = STYLE.get(format);
-    final char[] style = (styleStr != null) ? styleStr.toCharArray() : "MM".toCharArray();
-
-    if (datetime instanceof LocalDate)
-      style[1] = '-';
-    else if (datetime instanceof LocalTime || datetime instanceof OffsetTime)
-      style[0] = '-';
-
-    return FORMATTER.get(new String(style));
+    return text;
   }
 
 

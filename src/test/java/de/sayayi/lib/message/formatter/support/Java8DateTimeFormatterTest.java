@@ -31,7 +31,6 @@ import static java.util.Locale.FRANCE;
 import static java.util.Locale.GERMANY;
 import static java.util.Locale.UK;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 
 /**
@@ -61,7 +60,7 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
     assertEquals("Donnerstag, 17. August 1972", formatter.format(date, "full", noParameters, null));
     assertEquals("17.08.1972", formatter.format(date, "date", noParameters, null));
 
-    assertNull(formatter.format(date, "time", noParameters, null));
+    assertEquals("", formatter.format(date, "time", noParameters, null));
   }
 
 
@@ -78,7 +77,7 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
     assertEquals("16:34 Uhr", formatter.format(time, "full", noParameters, null));
     assertEquals("16:34:11", formatter.format(time, "time", noParameters, null));
 
-    assertNull(formatter.format(time, "date", noParameters, null));
+    assertEquals("", formatter.format(time, "date", noParameters, null));
   }
 
 

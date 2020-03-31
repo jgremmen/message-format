@@ -44,12 +44,12 @@ public final class DateFormatter extends AbstractParameterFormatter
   public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return formatNull(parameters, data);
+      return null;
 
     final DateFormat formatter = getFormatter(
         getConfigValueString("format", data, true, null), parameters.getLocale());
 
-    return formatString(formatter.format(value), parameters, data);
+    return formatter.format(value);
   }
 
 
