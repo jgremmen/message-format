@@ -36,7 +36,7 @@ public final class BooleanSupplierFormatter extends AbstractParameterFormatter
   {
     final BooleanSupplier supplier = (BooleanSupplier)value;
     if (supplier == null)
-      return formatNull(parameters, data);
+      return null;
 
     return parameters.getFormatter(format, boolean.class).format(supplier.getAsBoolean(), format, parameters, data);
   }

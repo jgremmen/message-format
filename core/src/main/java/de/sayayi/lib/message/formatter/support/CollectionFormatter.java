@@ -40,11 +40,11 @@ public final class CollectionFormatter extends AbstractParameterFormatter
   public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return formatNull(parameters, data);
+      return null;
 
     final Iterable iterable = (Iterable)value;
     if (!iterable.iterator().hasNext())
-      return formatEmpty(parameters, data);
+      return "";
 
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
     final StringBuilder s = new StringBuilder();

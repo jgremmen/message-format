@@ -36,11 +36,11 @@ public final class SupplierFormatter extends AbstractParameterFormatter
   {
     final Supplier<?> supplier = (Supplier<?>)value;
     if (supplier == null)
-      return formatNull(parameters, data);
+      return null;
 
     value = supplier.get();
     if (value == null)
-      return formatNull(parameters, data);
+      return null;
 
     return parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data);
   }

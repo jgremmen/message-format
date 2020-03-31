@@ -40,10 +40,8 @@ public final class ArrayFormatter extends AbstractParameterFormatter
   {
     final int length;
 
-    if (array == null)
-      return formatNull(parameters, data);
-    if ((length = getLength(array)) == 0)
-      return formatEmpty(parameters, data);
+    if (array == null || (length = getLength(array)) == 0)
+      return null;
 
     final StringBuilder s = new StringBuilder();
     final Class<?> arrayType = array.getClass();

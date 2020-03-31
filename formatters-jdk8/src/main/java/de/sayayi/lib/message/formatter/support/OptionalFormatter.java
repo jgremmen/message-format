@@ -36,11 +36,11 @@ public final class OptionalFormatter extends AbstractParameterFormatter
   public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return formatNull(parameters, data);
+      return null;
 
     final Optional<?> optional = (Optional<?>)value;
     if (!optional.isPresent())
-      return formatEmpty(parameters, data);
+      return "";
 
     value = optional.get();
 

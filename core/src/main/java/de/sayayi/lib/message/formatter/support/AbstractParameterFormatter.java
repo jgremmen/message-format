@@ -141,7 +141,7 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   @Contract(pure = true)
   protected String formatString(String value, @NotNull Parameters parameters, Data data)
   {
-    Message msg = getMessage(value, ChoiceFormatter.KEY_TYPES, data, false);
+    Message msg = getMessage(value, NON_NAME_KEY_TYPES, data, false);
     return msg == null ? value : msg.format(parameters);
   }
 

@@ -45,7 +45,7 @@ public final class NumberFormatter extends AbstractParameterFormatter
   public String formatValue(Object v, String format, @NotNull Parameters parameters, Data data)
   {
     if (v == null)
-      return formatNull(parameters, data);
+      return null;
 
     final Number value = (Number)v;
 

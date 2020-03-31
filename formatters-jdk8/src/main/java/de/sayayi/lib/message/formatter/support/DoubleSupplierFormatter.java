@@ -36,7 +36,7 @@ public final class DoubleSupplierFormatter extends AbstractParameterFormatter
   {
     final DoubleSupplier supplier = (DoubleSupplier)value;
     if (supplier == null)
-      return formatNull(parameters, data);
+      return null;
 
     return parameters.getFormatter(format, double.class).format(supplier.getAsDouble(), format, parameters, data);
   }

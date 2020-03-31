@@ -36,7 +36,7 @@ public final class LongSupplierFormatter extends AbstractParameterFormatter
   {
     final LongSupplier supplier = (LongSupplier)value;
     if (supplier == null)
-      return formatNull(parameters, data);
+      return null;
 
     return parameters.getFormatter(format, long.class).format(supplier.getAsLong(), format, parameters, data);
   }

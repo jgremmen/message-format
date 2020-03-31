@@ -33,13 +33,12 @@ public final class ThreadLocalFormatter extends AbstractParameterFormatter
   public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return formatNull(parameters, data);
+      return null;
 
     value = ((ThreadLocal)value).get();
 
     return value != null
-        ? parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data)
-        : formatEmpty(parameters, data);
+        ? parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data) : "";
   }
 
 

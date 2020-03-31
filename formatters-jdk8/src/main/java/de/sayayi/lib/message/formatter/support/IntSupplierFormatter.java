@@ -36,7 +36,7 @@ public final class IntSupplierFormatter extends AbstractParameterFormatter
   {
     final IntSupplier supplier = (IntSupplier)value;
     if (supplier == null)
-      return formatNull(parameters, data);
+      return null;
 
     return parameters.getFormatter(format, int.class).format(supplier.getAsInt(), format, parameters, data);
   }

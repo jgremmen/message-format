@@ -46,7 +46,7 @@ public final class ClassFormatter extends AbstractParameterFormatter
         s = clazz.getName();
     }
 
-    return formatString(s, parameters, data);
+    return s;
   }
 
 
