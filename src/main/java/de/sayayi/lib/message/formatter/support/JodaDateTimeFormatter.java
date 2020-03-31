@@ -57,10 +57,10 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return formatNull(parameters, data);
+      return null;
 
     if (!STYLE.containsKey(format))
       format = getConfigValueString("format", data, true, null);
@@ -80,7 +80,7 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
         style[0] = '-';
 
       if (style[0] == '-' && style[1] == '-')
-        return formatEmpty(parameters, data);
+        return "";
 
       formatter = DateTimeFormat.forStyle(new String(style)).withLocale(locale);
     }

@@ -32,7 +32,7 @@ public final class SupplierFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     final Supplier<?> supplier = (Supplier<?>)value;
     if (supplier == null)

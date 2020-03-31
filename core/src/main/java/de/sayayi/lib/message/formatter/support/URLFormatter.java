@@ -32,7 +32,7 @@ public final class URLFormatter extends AbstractParameterFormatter
 {
   @Override
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
-  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return null;

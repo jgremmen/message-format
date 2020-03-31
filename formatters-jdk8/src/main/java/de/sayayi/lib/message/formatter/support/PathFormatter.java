@@ -31,7 +31,7 @@ import java.util.Set;
 public final class PathFormatter extends AbstractParameterFormatter
 {
   @Override
-  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return formatNull(parameters, data);

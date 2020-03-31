@@ -30,7 +30,6 @@ import static java.util.Locale.FRANCE;
 import static java.util.Locale.GERMANY;
 import static java.util.Locale.UK;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 
 /**
@@ -60,7 +59,7 @@ public class JodaDateTimeFormatterTest extends AbstractFormatterTest
     assertEquals("Donnerstag, 17. August 1972", formatter.format(date, "full", context, null));
     assertEquals("17.08.1972", formatter.format(date, "date", context, null));
 
-    assertNull(formatter.format(date, "time", context, null));
+    assertEquals("", formatter.format(date, "time", context, null));
   }
 
 
@@ -77,7 +76,7 @@ public class JodaDateTimeFormatterTest extends AbstractFormatterTest
     assertEquals("16:34 Uhr", formatter.format(time, "full", noParameters, null));
     assertEquals("16:34:11", formatter.format(time, "time", noParameters, null));
 
-    assertNull(formatter.format(time, "date", noParameters, null));
+    assertEquals("", formatter.format(time, "date", noParameters, null));
   }
 
 
@@ -129,5 +128,22 @@ public class JodaDateTimeFormatterTest extends AbstractFormatterTest
     final Message msg = parse("%{a} %{b,short} %{c,time} %{c,'yyyy-MM-dd MMM'}");
 
     assertEquals("17-aug-1972 16:45 14:23:01 2019-02-19 feb", msg.format(parameters));
+  }
+
+
+  @Test
+  public void testMap()
+  {
+    final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
+    formatterRegistry.addFormatter(new JodaDateTimeFormatter());
+    final ParameterFactory factory = ParameterFactory.createFor(formatterRegistry);
+
+    assertEquals("2020", parse("%{d,{!null:'%{d,\'yyyy\'}'}}").format(
+        factory.with("d", new LocalDate(2020, 1, 1))));
+
+    assertEquals("empty", parse("%{d,{empty:'empty'}}").format(factory.with("d", null)));
+
+    assertEquals("empty", parse("%{d,time,{empty:'empty'}}").format(
+        factory.with("d", LocalDate.now())));
   }
 }

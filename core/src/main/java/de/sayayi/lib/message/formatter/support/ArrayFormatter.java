@@ -36,7 +36,7 @@ import static java.util.ResourceBundle.getBundle;
 public final class ArrayFormatter extends AbstractParameterFormatter
 {
   @Override
-  public String format(Object array, String format, @NotNull Parameters parameters, Data data)
+  public String formatValue(Object array, String format, @NotNull Parameters parameters, Data data)
   {
     final int length;
 
@@ -49,8 +49,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter
     final Class<?> arrayType = array.getClass();
     final ParameterFormatter formatter =
         arrayType.isPrimitive() ? parameters.getFormatter(format, arrayType.getComponentType()) : null;
-    final ResourceBundle bundle = getBundle(getClass().getPackage().getName() + ".Formatter",
-        parameters.getLocale());
+    final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
 
     for(int i = 0; i < length; i++)
     {

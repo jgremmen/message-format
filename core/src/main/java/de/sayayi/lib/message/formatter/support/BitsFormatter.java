@@ -39,7 +39,7 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
 
 
   @Override
-  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     final int bitCount;
 

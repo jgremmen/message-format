@@ -25,7 +25,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
@@ -86,13 +85,6 @@ public final class DataMap implements Data
     }
 
     return found;
-  }
-
-
-
-  @Contract(pure = true)
-  public boolean hasMessage(Serializable key, Set<MapKey.Type> keyTypes, boolean includeDefault) {
-    return (includeDefault && map.containsKey(null)) || find(key, keyTypes, MapValue.STRING_MESSAGE_TYPE) != null;
   }
 
 

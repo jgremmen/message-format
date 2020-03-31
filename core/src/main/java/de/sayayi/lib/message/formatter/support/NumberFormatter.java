@@ -42,7 +42,7 @@ public final class NumberFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public String format(Object v, String format, @NotNull Parameters parameters, Data data)
+  public String formatValue(Object v, String format, @NotNull Parameters parameters, Data data)
   {
     if (v == null)
       return formatNull(parameters, data);

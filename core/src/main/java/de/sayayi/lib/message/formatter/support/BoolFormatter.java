@@ -30,6 +30,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
+import static de.sayayi.lib.message.data.map.MapKey.EMPTY_NULL_TYPE;
 import static java.util.ResourceBundle.getBundle;
 
 
@@ -50,10 +51,14 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
   @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
-    boolean bool;
+    Message msg = getMessage(value, EMPTY_NULL_TYPE, data, false);
+    if (msg != null)
+      return msg.format(parameters);
 
     if (value == null)
-      return formatNull(parameters, data);
+      return null;
+
+    boolean bool;
 
     if (value instanceof Boolean)
       bool = (Boolean)value;
@@ -69,12 +74,24 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
       bool = Boolean.parseBoolean(String.valueOf(value));
 
     // allow custom messages for true/false value?
-    Message message = getMessage(bool, EnumSet.of(Type.BOOL), data, false);
-    if (message != null)
-      return message.format(parameters);
+    if ((msg = getMessage(bool, EnumSet.of(Type.BOOL), data, false)) != null)
+      return msg.format(parameters);
 
-    return getBundle(getClass().getPackage().getName() + ".Formatter",
-        parameters.getLocale()).getString(Boolean.toString(bool));
+    // get translated boolean value
+    String s = Boolean.toString(bool);
+    try {
+      s = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale()).getString(s);
+    } catch(Exception ignore) {
+    }
+
+    msg = getMessage(s, NON_NAME_KEY_TYPES, data, false);
+    return msg == null ? s : msg.format(parameters);
+  }
+
+
+  @Override
+  protected String formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
+    return null;
   }
 
 

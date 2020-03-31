@@ -20,7 +20,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.DataString;
-import de.sayayi.lib.message.data.map.MapKey;
+import de.sayayi.lib.message.data.map.MapKey.Type;
 import de.sayayi.lib.message.data.map.MapValue;
 import de.sayayi.lib.message.data.map.MapValueBool;
 import de.sayayi.lib.message.data.map.MapValueString;
@@ -41,6 +41,33 @@ import static de.sayayi.lib.message.data.map.MapKey.NAME_TYPE;
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractParameterFormatter implements ParameterFormatter
 {
+  public static final String FORMATTER_BUNDLE_NAME =
+      AbstractParameterFormatter.class.getPackage().getName() + ".Formatter";
+
+  public static final EnumSet<Type> NON_NAME_KEY_TYPES =
+      EnumSet.of(Type.NULL, Type.EMPTY, Type.BOOL, Type.NUMBER, Type.STRING);
+
+
+  @Override
+  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
+  {
+    // handle empty, !empty, null and !null first
+    Message msg = getMessage(value, EMPTY_NULL_TYPE, data, false);
+    if (msg != null)
+      return msg.format(parameters);
+
+    String s = formatValue(value, format, parameters, data);
+
+    // map result against map keys...
+    msg = getMessage(s, NON_NAME_KEY_TYPES, data, false);
+
+    return msg == null ? s : msg.format(parameters);
+  }
+
+
+  protected abstract String formatValue(Object value, String format, @NotNull Parameters parameters, Data data);
+
+
   @Contract(pure = true)
   protected MapValue getConfigValue(@NotNull String name, Data data) {
     return data instanceof DataMap ? ((DataMap)data).find(name, NAME_TYPE, null) : null;
@@ -76,17 +103,14 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
-  protected Message getMessage(Object value, EnumSet<MapKey.Type> keyTypes, Data data, boolean notNull)
+  protected Message getMessage(Object value, EnumSet<Type> keyTypes, Data data, boolean notNull)
   {
     Message message = null;
 
     if (data instanceof DataMap)
       message = ((DataMap)data).getMessage(value, keyTypes, false);
 
-    if (message == null && notNull)
-      message = EmptyMessage.INSTANCE;
-
-    return message;
+    return message == null && notNull ? EmptyMessage.INSTANCE : message;
   }
 
 

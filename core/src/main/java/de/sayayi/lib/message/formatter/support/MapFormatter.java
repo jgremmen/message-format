@@ -36,7 +36,7 @@ public final class MapFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     final Map<?,?> map = (Map<?,?>)value;
     if (map == null)
@@ -44,8 +44,7 @@ public final class MapFormatter extends AbstractParameterFormatter
     if (map.isEmpty())
       return formatEmpty(parameters, data);
 
-    final ResourceBundle bundle = getBundle(getClass().getPackage().getName() + ".Formatter",
-        parameters.getLocale());
+    final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
     final String separator = getSeparator(data);
     final StringBuilder s = new StringBuilder();
     final String nullKey = getConfigValueString("null-key", data, false, "(null)").trim();

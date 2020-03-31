@@ -64,6 +64,11 @@ public final class ChoiceFormatter extends AbstractParameterFormatter implements
   }
 
 
+  @Override
+  protected String formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
+    return null;
+  }
+
 
   @NotNull
   @Override

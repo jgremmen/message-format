@@ -61,10 +61,10 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
 
   @Override
   @SuppressWarnings("squid:S3776")
-  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return formatNull(parameters, data);
+      return null;
 
     Format fmt = getFormat(data);
     StringBuilder s = new StringBuilder();
@@ -75,19 +75,19 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
       s.append('-');
 
     s.append((int)dms[0]).append('°');
-    if (fmt.separatorAfterDegree && (fmt.hasLoLa() || fmt.hasMinutes()))
+    if (fmt.separatorAfterDegree)
       s.append(' ');
 
     if (fmt.hasMinutes())
     {
       s.append(formatMinOrSec(parameters.getLocale(), dms[1], fmt.minuteDigits, fmt.zeroPadMinutes)).append('\'');
-      if (fmt.separatorAfterMinute && (fmt.hasLoLa() || fmt.hasSeconds()))
+      if (fmt.separatorAfterMinute)
         s.append(' ');
 
       if (fmt.hasSeconds())
       {
         s.append(formatMinOrSec(parameters.getLocale(), dms[2], fmt.secondDigits, fmt.zeroPadSeconds)).append('"');
-        if (fmt.separatorAfterSecond && fmt.hasLoLa())
+        if (fmt.separatorAfterSecond)
           s.append(' ');
       }
     }
@@ -100,7 +100,7 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
         s.append(v < 0 ? 'S' : 'N');
     }
 
-    return s.toString();
+    return s.toString().trim();
   }
 
 

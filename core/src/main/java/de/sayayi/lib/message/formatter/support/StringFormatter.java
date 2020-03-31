@@ -42,11 +42,8 @@ public final class StringFormatter extends AbstractParameterFormatter implements
   @Override
   @Contract(pure = true)
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
-  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
-  {
-    return formatString(
-        value == null ? null : ((value instanceof char[]) ? new String((char[])value) : String.valueOf(value)).trim(),
-        parameters, data);
+  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
+    return value == null ? null : ((value instanceof char[]) ? new String((char[])value) : String.valueOf(value)).trim();
   }
 
 

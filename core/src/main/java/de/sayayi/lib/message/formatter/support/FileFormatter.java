@@ -33,7 +33,7 @@ import java.util.Set;
 public final class FileFormatter extends AbstractParameterFormatter
 {
   @Override
-  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     String s = value == null ? null : format0((File)value, format, parameters, data);
 

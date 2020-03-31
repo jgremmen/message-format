@@ -37,7 +37,7 @@ public final class CollectionFormatter extends AbstractParameterFormatter
   @SuppressWarnings("rawtypes")
   @Override
   @Contract(pure = true)
-  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return formatNull(parameters, data);
@@ -46,8 +46,7 @@ public final class CollectionFormatter extends AbstractParameterFormatter
     if (!iterable.iterator().hasNext())
       return formatEmpty(parameters, data);
 
-    final ResourceBundle bundle = getBundle(getClass().getPackage().getName() + ".Formatter",
-        parameters.getLocale());
+    final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
     final StringBuilder s = new StringBuilder();
 
     for(Object element: iterable)

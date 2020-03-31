@@ -81,7 +81,7 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     final DateTimeFormatter formatter = getFormatter((Temporal)value, format, data);
     if (formatter == null)
