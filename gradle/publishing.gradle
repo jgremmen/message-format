@@ -85,6 +85,15 @@ publishing {
           developerConnection = 'scm:git:git://github.com/jgremmen/message-format.git'
           url = 'https://github.com/jgremmen/message-format'
         }
+
+        withXml {
+          Node pomNode = asNode()
+          pomNode.dependencies.'*'.findAll() {
+            it.groupId.text() == 'de.sayayi.lib'
+          }.each() {
+            it.parent().remove(it)
+          }
+        }
       }
     }
   }

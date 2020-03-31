@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.exception;
 
-import org.antlr.v4.runtime.misc.ParseCancellationException;
+import de.sayayi.lib.message.antlr.misc.ParseCancellationException;
 
 
 /**

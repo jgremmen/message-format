@@ -1,8 +1,19 @@
+buildscript {
+  repositories {
+    jcenter()
+  }
+
+  dependencies {
+    classpath "org.anarres.jarjar:jarjar-gradle:1.0.1"
+  }
+}
+
+
 plugins {
   id 'base'
   id 'java-library'
   id 'maven-publish'
-//  id 'nebula.optional-base' version '5.0.3'
+  id 'nebula.optional-base' version '5.0.3'
   id 'jacoco'
   id 'signing'
 }
@@ -51,7 +62,7 @@ dependencies {
   api project(':core')
   api project('formatters-jdk8')
 
-  implementation "joda-time:joda-time:${jodatimeVersion}"
+  implementation "joda-time:joda-time:${jodatimeVersion}", optional
 }
 
 
@@ -66,19 +77,29 @@ apply from: file('gradle/quality.gradle')
 apply from: file('gradle/publishing.gradle')
 
 
-jar {
-  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+project(':formatters-jdk8').afterEvaluate {
+  jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-  from project(':core').sourceSets.main.output
-  from project(':formatters-jdk8').sourceSets.main.output
+    from project(':core').sourceSets.main.output
+    from project(':formatters-jdk8').sourceSets.main.output
 
-  reproducibleFileOrder = true
+    from project(':core').configurations.compileClasspath.collect { jar ->
+      if (jar.name.startsWith("antlr-runtime-")) {
+        zipTree(jar).matching {
+          exclude 'META-INF/**'
+        }
+      }
+    }
 
-  manifest {
-    attributes['Implementation-Vendor'] = "Jeroen Gremmen"
-    attributes['Implementation-Vendor-Id'] = "de.sayayi"
-    attributes['Implementation-Title'] = "Message Formatting Library"
-    attributes['Implementation-Version'] = "${project.version}"
+    reproducibleFileOrder = true
+
+    manifest {
+      attributes['Implementation-Vendor'] = "Jeroen Gremmen"
+      attributes['Implementation-Vendor-Id'] = "de.sayayi"
+      attributes['Implementation-Title'] = "Message Formatting Library"
+      attributes['Implementation-Version'] = "${project.version}"
+    }
   }
 }
 

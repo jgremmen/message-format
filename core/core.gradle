@@ -1,6 +1,7 @@
 plugins {
   id 'antlr'
   id 'idea'
+  id 'org.anarres.jarjar'
 }
 
 
@@ -25,7 +26,15 @@ sourceSets {
 
 
 dependencies {
-  implementation "org.antlr:antlr4-runtime:${antlrVersion}"
+  implementation jarjar.repackage("jarjar-antlr") {
+    from "org.antlr:antlr4-runtime:${antlrVersion}"
+    destinationName "antlr-runtime-${antlrVersion}-repackaged.jar"
+
+    classDelete "org.antlr.v4.runtime.tree.xpath.**"
+    classDelete "org.antlr.v4.runtime.tree.pattern.**"
+
+    classRename 'org.antlr.v4.runtime.**', 'de.sayayi.lib.message.antlr.@1'
+  }
 
   antlr "org.antlr:antlr4:${antlrVersion}"
 }
@@ -36,6 +45,15 @@ generateGrammarSource {
   arguments += [ '-package', 'de.sayayi.lib.message.parser' ]
 
   exclude "**/MessageParserTest.g4"
+
+  doLast {
+    fileTree(dir: "src/main/generated", include: "**/*.java").each { f ->
+      ant.replaceregexp(file: f,
+                        match: "org\\.antlr\\.v4\\.runtime\\.(.*)",
+                        replace: "de.sayayi.lib.message.antlr.\\1",
+                        byline: true)
+    }
+  }
 }
 
 
