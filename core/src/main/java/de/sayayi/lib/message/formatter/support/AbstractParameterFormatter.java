@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
+import de.sayayi.lib.message.data.DataNumber;
 import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.data.map.MapKey.Type;
 import de.sayayi.lib.message.data.map.MapValue;
@@ -41,10 +42,17 @@ import static de.sayayi.lib.message.data.map.MapKey.NAME_TYPE;
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractParameterFormatter implements ParameterFormatter
 {
+  /**
+   * Name of the formatter resource bundle.
+   */
   public static final String FORMATTER_BUNDLE_NAME =
       AbstractParameterFormatter.class.getPackage().getName() + ".Formatter";
 
-  public static final EnumSet<Type> NON_NAME_KEY_TYPES =
+
+  /**
+   * A set containing all data map key types, except for {@link Type#NAME}.
+   */
+  public static final EnumSet<Type> NO_NAME_KEY_TYPES =
       EnumSet.of(Type.NULL, Type.EMPTY, Type.BOOL, Type.NUMBER, Type.STRING);
 
 
@@ -59,7 +67,7 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
     String s = formatValue(value, format, parameters, data);
 
     // map result against map keys...
-    msg = getMessage(s, NON_NAME_KEY_TYPES, data, false);
+    msg = getMessage(s, NO_NAME_KEY_TYPES, data, false);
 
     return msg == null ? s : msg.format(parameters);
   }
@@ -69,8 +77,19 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
-  protected MapValue getConfigValue(@NotNull String name, Data data) {
-    return data instanceof DataMap ? ((DataMap)data).find(name, NAME_TYPE, null) : null;
+  protected Data getConfigValue(@NotNull String name, Data data, boolean checkDataValue)
+  {
+    if (data instanceof DataMap)
+    {
+      MapValue mapValue = ((DataMap)data).find(name, NAME_TYPE, null);
+      if (mapValue != null)
+        return mapValue;
+    }
+
+    if (checkDataValue && (data instanceof DataString || data instanceof DataNumber))
+      return data;
+
+    return null;
   }
 
 
@@ -84,7 +103,7 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
         return string.asObject();
     }
 
-    if (data instanceof DataString)
+    if (checkDataString && data instanceof DataString)
       return ((DataString)data).asObject();
 
     return defaultValue;
@@ -141,7 +160,7 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   @Contract(pure = true)
   protected String formatString(String value, @NotNull Parameters parameters, Data data)
   {
-    Message msg = getMessage(value, NON_NAME_KEY_TYPES, data, false);
+    Message msg = getMessage(value, NO_NAME_KEY_TYPES, data, false);
     return msg == null ? value : msg.format(parameters);
   }
 

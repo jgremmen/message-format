@@ -84,7 +84,7 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
     } catch(Exception ignore) {
     }
 
-    msg = getMessage(s, NON_NAME_KEY_TYPES, data, false);
+    msg = getMessage(s, NO_NAME_KEY_TYPES, data, false);
     return msg == null ? s : msg.format(parameters);
   }
 

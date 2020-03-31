@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataNumber;
+import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,24 +42,23 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
   @Override
   public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
-    final int bitCount;
+    if (!(value instanceof Number))
+      return null;
 
-    // check preconditions
-    if (value instanceof Number && (bitCount = detectBitCount(data, value)) > 0)
-      return format(bitCount, value);
-
-    return null;
+    final int bitCount = detectBitCount(data, value);
+    return bitCount > 0 ? format(bitCount, value) : "";
   }
 
 
   protected int detectBitCount(Data data, Object value)
   {
-    if ("auto".equals(getDataString(data)))
+    Data dataValue = getConfigValue("length", data, true);
+    if (dataValue instanceof DataString && "auto".equals(dataValue.asObject()))
       return autoDetectBitCount(value);
 
     if (data instanceof DataNumber)
     {
-      int bitCount = ((Number)data.asObject()).intValue();
+      int bitCount = ((DataNumber)data).asObject().intValue();
       if (bitCount > 0 && bitCount <= 256)
         return bitCount;
     }
@@ -116,7 +116,7 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
 
   protected String format(int bitCount, Object value)
   {
-    char[] bits = new char[bitCount];
+    final char[] bits = new char[bitCount];
 
     if (value instanceof BigInteger && bitCount > 64)
       formatBigInteger(bits, (BigInteger)value);
@@ -129,7 +129,7 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
 
   protected void formatLong(char[] bits, long value)
   {
-    for(int n = bits.length; --n >= 0; value /= 2)
+    for(int n = bits.length; --n >= 0; value >>= 1)
       bits[n] = (char)('0' + (value & 1));
   }
 

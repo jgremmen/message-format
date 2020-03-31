@@ -48,7 +48,7 @@ public final class ChoiceFormatter extends AbstractParameterFormatter implements
     if (!(data instanceof DataMap))
       throw new MessageException("data must be a choice map");
 
-    final Message message = ((DataMap)data).getMessage(value, NON_NAME_KEY_TYPES, true);
+    final Message message = ((DataMap)data).getMessage(value, NO_NAME_KEY_TYPES, true);
     return message == null ? null : message.format(parameters);
   }
 
