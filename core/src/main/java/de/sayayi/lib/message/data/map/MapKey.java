@@ -68,7 +68,29 @@ public interface MapKey
   }
 
 
-  enum MatchResult {
-    EXACT, LENIENT, MISMATCH;
+  enum MatchResult
+  {
+    /** no match */
+    MISMATCH,
+
+    /** empty = "  " */
+    TYPELESS_LENIENT,
+
+    /** null or empty */
+    TYPELESS_EXACT,
+
+    /** same value meaning (eg. 0 = false, "yes" = "Yes") */
+    LENIENT,
+
+    /** same value but different type (eg. 4 = "4") */
+    EQUIVALENT,
+
+    /** exact match (type equality) */
+    EXACT;
+
+
+    public static MatchResult max(@NotNull MatchResult m1, @NotNull MatchResult m2) {
+      return m1.compareTo(m2) >= 0 ? m1 : m2;
+    }
   }
 }
