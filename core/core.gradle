@@ -30,8 +30,14 @@ dependencies {
     from "org.antlr:antlr4-runtime:${antlrVersion}"
     destinationName "antlr-runtime-${antlrVersion}-repackaged.jar"
 
-    classDelete "org.antlr.v4.runtime.tree.xpath.**"
+    // remove unused classes...
+    classDelete "org.antlr.v4.runtime.atn.ATNSerializer*"
+    classDelete "org.antlr.v4.runtime.ParserInterpreter*"
+    classDelete "org.antlr.v4.runtime.TokenStreamRewriter*"
     classDelete "org.antlr.v4.runtime.tree.pattern.**"
+    classDelete "org.antlr.v4.runtime.tree.Trees"
+    classDelete "org.antlr.v4.runtime.tree.xpath.**"
+    classDelete "org.antlr.v4.runtime.Unbuffered*"
 
     classRename 'org.antlr.v4.runtime.**', 'de.sayayi.lib.message.antlr.@1'
   }
