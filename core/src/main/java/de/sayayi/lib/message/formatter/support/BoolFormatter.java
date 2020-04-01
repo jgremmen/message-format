@@ -51,7 +51,7 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
   @Contract(pure = true)
   public String format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
-    Message msg = getMessage(value, EMPTY_NULL_TYPE, data, false);
+    Message msg = getMessage(value, EMPTY_NULL_TYPE, parameters, data, false);
     if (msg != null)
       return msg.format(parameters);
 
@@ -74,7 +74,7 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
       bool = Boolean.parseBoolean(String.valueOf(value));
 
     // allow custom messages for true/false value?
-    if ((msg = getMessage(bool, EnumSet.of(Type.BOOL), data, false)) != null)
+    if ((msg = getMessage(bool, EnumSet.of(Type.BOOL), parameters, data, false)) != null)
       return msg.format(parameters);
 
     // get translated boolean value
@@ -84,7 +84,7 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
     } catch(Exception ignore) {
     }
 
-    msg = getMessage(s, NO_NAME_KEY_TYPES, data, false);
+    msg = getMessage(s, NO_NAME_KEY_TYPES, parameters, data, false);
     return msg == null ? s : msg.format(parameters);
   }
 

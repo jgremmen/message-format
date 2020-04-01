@@ -17,6 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.map.MapKey.CompareType;
+import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import org.jetbrains.annotations.NotNull;
 
@@ -71,6 +73,12 @@ public final class ArrayFormatter extends AbstractParameterFormatter
     }
 
     return s.toString();
+  }
+
+
+  @Override
+  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
+    return compareType.match(getLength(value)) ? MatchResult.TYPELESS_EXACT : null;
   }
 
 

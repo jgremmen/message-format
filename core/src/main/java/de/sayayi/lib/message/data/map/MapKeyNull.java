@@ -15,9 +15,8 @@
  */
 package de.sayayi.lib.message.data.map;
 
+import de.sayayi.lib.message.Message.Parameters;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Locale;
 
 
 /**
@@ -46,12 +45,12 @@ public final class MapKeyNull implements MapKey
 
   @NotNull
   @Override
-  public MatchResult match(@NotNull Locale locale, Object value)
+  public MatchResult match(@NotNull Parameters parameters, Object value)
   {
     if (value == null && compareType == CompareType.EQ)
-      return MatchResult.EXACT;
+      return MatchResult.TYPELESS_EXACT;
     if (value != null && compareType == CompareType.NE)
-      return MatchResult.EXACT;
+      return MatchResult.TYPELESS_EXACT;
 
     return MatchResult.MISMATCH;
   }

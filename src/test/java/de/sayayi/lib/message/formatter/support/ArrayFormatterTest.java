@@ -23,6 +23,8 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.data.map.MapKey;
+import de.sayayi.lib.message.data.map.MapKey.CompareType;
+import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.data.map.MapKeyBool;
 import de.sayayi.lib.message.data.map.MapValue;
 import de.sayayi.lib.message.data.map.MapValueMessage;
@@ -133,6 +135,11 @@ public class ArrayFormatterTest extends AbstractFormatterTest
       public Set<Class<?>> getFormattableTypes() {
         return new HashSet<>(Arrays.asList(Boolean.class, boolean.class));
       }
+
+      @Override
+      public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
+        return null;
+      }
     });
 
     assertEquals("1, 1, 0, 1, 0, 0, 0", registry.getFormatter(null, boolean[].class)
@@ -176,6 +183,11 @@ public class ArrayFormatterTest extends AbstractFormatterTest
       @Override
       public Set<Class<?>> getFormattableTypes() {
         return Collections.singleton(Integer.class);
+      }
+
+      @Override
+      public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
+        return null;
       }
     });
 

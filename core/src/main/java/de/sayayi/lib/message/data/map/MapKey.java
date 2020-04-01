@@ -15,12 +15,11 @@
  */
 package de.sayayi.lib.message.data.map;
 
-
+import de.sayayi.lib.message.Message.Parameters;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
-import java.util.Locale;
 
 
 /**
@@ -38,7 +37,7 @@ public interface MapKey
 
 
   @Contract(pure = true)
-  @NotNull MatchResult match(@NotNull Locale locale, Object value);
+  @NotNull MatchResult match(@NotNull Parameters parameters, Object value);
 
 
   enum Type {
@@ -51,7 +50,7 @@ public interface MapKey
     LT, LTE, EQ, NE, GT, GTE;
 
 
-    boolean match(int signum)
+    public boolean match(int signum)
     {
       switch(this)
       {
@@ -87,10 +86,5 @@ public interface MapKey
 
     /** exact match (type equality) */
     EXACT;
-
-
-    public static MatchResult max(@NotNull MatchResult m1, @NotNull MatchResult m2) {
-      return m1.compareTo(m2) >= 0 ? m1 : m2;
-    }
   }
 }

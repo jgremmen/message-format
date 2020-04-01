@@ -17,6 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.map.MapKey.CompareType;
+import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,6 +47,12 @@ public final class OptionalFormatter extends AbstractParameterFormatter
     value = optional.get();
 
     return parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data);
+  }
+
+
+  @Override
+  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
+    return compareType.match(((Optional<?>)value).isPresent() ? 1 : 0) ? MatchResult.TYPELESS_EXACT : null;
   }
 
 

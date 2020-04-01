@@ -66,7 +66,7 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
     if (value == null)
       return null;
 
-    Format fmt = getFormat(data);
+    Format fmt = getFormat(parameters, data);
     StringBuilder s = new StringBuilder();
     double v = ((Number)value).doubleValue();
     double[] dms = dmsSplitter(fmt, v);
@@ -104,9 +104,9 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
   }
 
 
-  private Format getFormat(Data data)
+  private Format getFormat(Parameters parameters, Data data)
   {
-    String formatString = getConfigValueString("format", data, true, "dms");
+    String formatString = getConfigValueString("format", parameters, data, true, "dms");
     Format format = FORMAT.get(formatString);
 
     return format == null ? parseFormatString(formatString) : format;

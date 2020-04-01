@@ -17,6 +17,8 @@ package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.map.MapKey.CompareType;
+import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,4 +57,16 @@ public interface ParameterFormatter
    */
   @Contract(pure = true)
   @NotNull Set<Class<?>> getFormattableTypes();
+
+
+  /**
+   * Check whether the given {@code value} is empty as defined by this formatter.
+   *
+   * @param compareType  comparison type (either {@link CompareType#EQ} or {@link CompareType#NE}), never {@code null}
+   * @param value  object to check for emptyness, never {@code null}
+   *
+   * @return  {@link MatchResult#TYPELESS_EXACT}, {@link MatchResult#TYPELESS_LENIENT} or {@code null}
+   */
+  @Contract(pure = true)
+  MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value);
 }

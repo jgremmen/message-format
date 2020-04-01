@@ -60,13 +60,13 @@ public final class URIFormatter extends AbstractParameterFormatter
 
       if (port == -1)
       {
-        String undefined = getConfigValueString("undefined", data, false,null);
+        String undefined = getConfigValueString("undefined", parameters, data, false,null);
         if (undefined != null)
           return undefined;
       }
       else if (port >= 0)
       {
-        Message msg = getMessage(port, EnumSet.of(Type.NUMBER), data, false);
+        Message msg = getMessage(port, EnumSet.of(Type.NUMBER), parameters, data, false);
         if (msg != null)
           return msg.format(parameters);
       }
@@ -78,7 +78,7 @@ public final class URIFormatter extends AbstractParameterFormatter
     else if ("scheme".equals(format))
     {
       final String scheme = uri.getScheme();
-      final Message msg = getMessage(scheme, EnumSet.of(STRING, EMPTY, NULL), data, false);
+      final Message msg = getMessage(scheme, EnumSet.of(STRING, EMPTY, NULL), parameters, data, false);
 
       return msg != null ? msg.format(parameters) : scheme;
     }

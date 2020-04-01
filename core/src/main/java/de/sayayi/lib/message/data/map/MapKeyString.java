@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.data.map;
 
+import de.sayayi.lib.message.Message.Parameters;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -41,12 +42,13 @@ public final class MapKeyString implements MapKey
 
   @NotNull
   @Override
-  public MatchResult match(@NotNull Locale locale, Object value)
+  public MatchResult match(@NotNull Parameters parameters, Object value)
   {
     if (value == null)
       return MatchResult.MISMATCH;
 
     MatchResult result = MatchResult.EXACT;
+    Locale locale = parameters.getLocale();
     int cmp = 0;
 
     doMatch: {
