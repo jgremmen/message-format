@@ -18,7 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
-import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
+import de.sayayi.lib.message.formatter.GenericFormatterService;
 import org.junit.Test;
 
 import java.lang.annotation.RetentionPolicy;
@@ -60,7 +60,7 @@ public class StringFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatter()
   {
-    final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
+    final GenericFormatterService formatterRegistry = new GenericFormatterService();
     formatterRegistry.addFormatter(new StringFormatter());
     final ParameterFactory factory = ParameterFactory.createFor(formatterRegistry);
 
@@ -77,7 +77,7 @@ public class StringFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatterWithMap()
   {
-    final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
+    final GenericFormatterService formatterRegistry = new GenericFormatterService();
     final ParameterFactory factory = ParameterFactory.createFor(formatterRegistry);
 
     final Parameters parameters = factory
@@ -88,7 +88,7 @@ public class StringFormatterTest extends AbstractFormatterTest
 
     assertEquals("", parse("%{empty,{!empty:'nok'}}").format(parameters));
     assertEquals("ok", parse("%{empty,{empty:'ok'}}").format(parameters));
-    assertEquals("ok", parse("%{null,{empty:'ok',null:'nok'}}").format(parameters));
+    assertEquals("ok", parse("%{null,{empty:'nok',null:'ok'}}").format(parameters));
     assertEquals("ok", parse("%{null,{empty:'ok'}}").format(parameters));
     assertEquals("ok", parse("%{spaces,{empty:'ok'}}").format(parameters));
     assertEquals("ok", parse("%{spaces,{!null:'ok'}}").format(parameters));

@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
-import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
+import de.sayayi.lib.message.formatter.GenericFormatterService;
 import org.junit.Test;
 
 import java.io.File;
@@ -52,7 +52,7 @@ public class FileFormatterTest
   @Test
   public void testFormatter()
   {
-    final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
+    final GenericFormatterService formatterRegistry = new GenericFormatterService();
     formatterRegistry.addFormatter(new FileFormatter());
     ParameterFactory factory = ParameterFactory.createFor(ROOT, formatterRegistry);
 

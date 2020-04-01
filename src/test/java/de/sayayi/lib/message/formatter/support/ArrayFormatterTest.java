@@ -26,7 +26,7 @@ import de.sayayi.lib.message.data.map.MapKey;
 import de.sayayi.lib.message.data.map.MapKeyBool;
 import de.sayayi.lib.message.data.map.MapValue;
 import de.sayayi.lib.message.data.map.MapValueMessage;
-import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
+import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -63,7 +63,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
   @SuppressWarnings("serial")
   public void testBooleanArray()
   {
-    GenericFormatterRegistry registry = new GenericFormatterRegistry();
+    GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new ArrayFormatter());
     registry.addFormatter(new BoolFormatter());
 
@@ -143,7 +143,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
   @Test
   public void testIntegerArray()
   {
-    GenericFormatterRegistry registry = new GenericFormatterRegistry();
+    GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new ArrayFormatter());
 
     Parameters noParameters = ParameterFactory.createFor("de-DE", registry).noParameters();
@@ -187,7 +187,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
   @Test
   public void testObjectArray()
   {
-    GenericFormatterRegistry registry = new GenericFormatterRegistry();
+    GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new ArrayFormatter());
     registry.addFormatter(new BoolFormatter());
     registry.addFormatter(new NumberFormatter());
@@ -205,7 +205,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
   @Test
   public void testEmptyOrNullArray()
   {
-    GenericFormatterRegistry registry = new GenericFormatterRegistry();
+    GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new ArrayFormatter());
 
     ParameterFactory factory = ParameterFactory.DEFAULT;

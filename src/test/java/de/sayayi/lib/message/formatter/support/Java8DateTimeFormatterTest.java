@@ -19,7 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.data.DataString;
-import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
+import de.sayayi.lib.message.formatter.GenericFormatterService;
 import org.junit.Test;
 
 import java.time.LocalDate;
@@ -117,7 +117,7 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatter()
   {
-    final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
+    final GenericFormatterService formatterRegistry = new GenericFormatterService();
     formatterRegistry.addFormatter(new Java8DateTimeFormatter());
     final ParameterFactory factory = ParameterFactory.createFor(formatterRegistry);
 

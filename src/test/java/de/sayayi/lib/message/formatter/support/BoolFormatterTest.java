@@ -18,7 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
-import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
+import de.sayayi.lib.message.formatter.GenericFormatterService;
 import org.junit.Test;
 
 import static de.sayayi.lib.message.MessageFactory.parse;
@@ -58,7 +58,7 @@ public class BoolFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatter()
   {
-    final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
+    final GenericFormatterService formatterRegistry = new GenericFormatterService();
     formatterRegistry.addFormatter(new BoolFormatter());
     ParameterFactory factory = ParameterFactory.createFor(ENGLISH, formatterRegistry);
 
@@ -77,7 +77,7 @@ public class BoolFormatterTest extends AbstractFormatterTest
   @Test
   public void testNamedFormatter()
   {
-    final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
+    final GenericFormatterService formatterRegistry = new GenericFormatterService();
     formatterRegistry.addFormatter(new BoolFormatter());
     ParameterFactory factory = ParameterFactory.createFor(GERMAN, formatterRegistry);
 

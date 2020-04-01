@@ -18,7 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
-import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
+import de.sayayi.lib.message.formatter.GenericFormatterService;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -54,7 +54,7 @@ public class ClassFormatterTest
   @Test
   public void testFormatter()
   {
-    final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
+    final GenericFormatterService formatterRegistry = new GenericFormatterService();
     formatterRegistry.addFormatter(new ClassFormatter());
     ParameterFactory factory = ParameterFactory.createFor(ROOT, formatterRegistry);
 
@@ -65,6 +65,6 @@ public class ClassFormatterTest
         .with("d", null);
     final Message msg = parse("%{a} %{b,package,{empty:'?',null:'#'}} %{c,name} %{d,{null:'-'}}");
 
-    assertEquals("java.util.Map ? int[] -", msg.format(parameters));
+    assertEquals("java.util.Map # int[] -", msg.format(parameters));
   }
 }

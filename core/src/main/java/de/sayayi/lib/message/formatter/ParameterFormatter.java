@@ -48,8 +48,8 @@ public interface ParameterFormatter
    * <p>
    *   Returns a set of java types which are supported by this formatter.
    * </p>
-   * On registration {@link FormatterRegistry#addFormatter(ParameterFormatter)} existing types which are also supported
-   * by this formatter will be overridden.
+   * On registration {@link FormatterService.WithRegistry#addFormatter(ParameterFormatter)} existing types which are
+   * also supported by this formatter will be overridden.
    *
    * @return  a set with supported java types for this formatter, not {@code null}
    */
