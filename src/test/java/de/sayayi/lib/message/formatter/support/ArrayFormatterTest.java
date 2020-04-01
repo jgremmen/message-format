@@ -1,12 +1,31 @@
+/*
+ * Copyright 2020 Jeroen Gremmen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.ParameterFactory;
-import de.sayayi.lib.message.data.ParameterData;
-import de.sayayi.lib.message.data.ParameterMap;
-import de.sayayi.lib.message.data.ParameterMap.Key;
-import de.sayayi.lib.message.data.ParameterString;
+import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
+import de.sayayi.lib.message.data.DataString;
+import de.sayayi.lib.message.data.map.MapKey;
+import de.sayayi.lib.message.data.map.MapKeyBool;
+import de.sayayi.lib.message.data.map.MapValue;
+import de.sayayi.lib.message.data.map.MapValueMessage;
 import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +37,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import static de.sayayi.lib.message.data.ParameterMap.CompareType.EQ;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -49,34 +67,58 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     registry.addFormatter(new ArrayFormatter());
     registry.addFormatter(new BoolFormatter());
 
-    ParameterFactory factory = ParameterFactory.createFor("de-DE", registry);
+    Parameters noParameters = ParameterFactory.createFor("de-DE", registry).noParameters();
 
     assertEquals("wahr, falsch, wahr", registry.getFormatter(null, boolean[].class)
-        .format(new boolean[] { true, false, true }, "bool", factory, null));
+        .format(new boolean[] { true, false, true }, "bool", noParameters, null));
 
-    ParameterMap booleanMap = new ParameterMap(new HashMap<Key,Message>() {
+    DataMap booleanMap = new DataMap(new HashMap<MapKey, MapValue>() {
       {
-        put(new Key(EQ, Boolean.TRUE), new Message() {
+        put(new MapKeyBool(true), new MapValueMessage(new Message() {
           @Override public String format(@NotNull Parameters parameters) { return "YES"; }
           @Override public boolean hasParameters() { return false; }
-        });
 
-        put(new Key(EQ, Boolean.FALSE), new Message() {
+
+          @Override
+          public boolean isSpaceBefore() {
+            return false;
+          }
+
+
+          @Override
+          public boolean isSpaceAfter() {
+            return false;
+          }
+        }));
+
+        put(new MapKeyBool(false), new MapValueMessage(new Message() {
           @Override public String format(@NotNull Parameters parameters) { return "NO"; }
           @Override public boolean hasParameters() { return false; }
-        });
+
+
+          @Override
+          public boolean isSpaceBefore() {
+            return false;
+          }
+
+
+          @Override
+          public boolean isSpaceAfter() {
+            return false;
+          }
+        }));
       }
     });
 
     assertEquals("NO, YES", registry.getFormatter(null, boolean[].class)
-        .format(new boolean[] { false, true }, null, factory, booleanMap));
+        .format(new boolean[] { false, true }, null, noParameters, booleanMap));
 
     assertNull(registry.getFormatter(null, boolean[].class)
-        .format(new boolean[0], null, factory, null));
+        .format(new boolean[0], null, noParameters, null));
 
     registry.addFormatter(new NamedParameterFormatter() {
       @Override
-      public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data) {
+      public String format(Object value, String format, @NotNull Parameters parameters, Data data) {
         return (value == null) ? null : (Boolean)value ? "1" : "0";
       }
 
@@ -94,7 +136,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     });
 
     assertEquals("1, 1, 0, 1, 0, 0, 0", registry.getFormatter(null, boolean[].class)
-        .format(new boolean[] { true, true, false, true, false, false, false }, "bool", factory, null));
+        .format(new boolean[] { true, true, false, true, false, false, false }, "bool", noParameters, null));
   }
 
 
@@ -104,18 +146,18 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     GenericFormatterRegistry registry = new GenericFormatterRegistry();
     registry.addFormatter(new ArrayFormatter());
 
-    ParameterFactory factory = ParameterFactory.createFor("de-DE", registry);
+    Parameters noParameters = ParameterFactory.createFor("de-DE", registry).noParameters();
 
     assertEquals("12, -7, 99", registry.getFormatter(null, int[].class)
-        .format(new int[] { 12, -7, 99 }, null , factory, null));
+        .format(new int[] { 12, -7, 99 }, null , noParameters, null));
 
     assertEquals("1, -7, 248", registry.getFormatter(null, int[].class)
-        .format(new int[] { 1, -7, 248 }, null , factory, new ParameterString("##00")));
+        .format(new int[] { 1, -7, 248 }, null , noParameters, new DataString("##00")));
 
     registry.addFormatter(new NumberFormatter());
 
     assertEquals("01, -07, 248", registry.getFormatter(null, int[].class)
-        .format(new int[] { 1, -7, 248 }, null , factory, new ParameterString("##00")));
+        .format(new int[] { 1, -7, 248 }, null , noParameters, new DataString("##00")));
 
     registry.addFormatter(new NamedParameterFormatter() {
       @NotNull
@@ -126,7 +168,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
 
       @SuppressWarnings("RedundantCast")
       @Override
-      public String format(Object value, String format, @NotNull Parameters parameters, ParameterData data) {
+      public String format(Object value, String format, @NotNull Parameters parameters, Data data) {
         return (value == null) ? null : String.format("0x%02x", (Integer)value);
       }
 
@@ -138,7 +180,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     });
 
     assertEquals("0x40, 0xda, 0x2e", registry.getFormatter(null, int[].class)
-        .format(new int[] { 64, 218, 46 }, "hex" , factory, null));
+        .format(new int[] { 64, 218, 46 }, "hex" , noParameters, null));
   }
 
 
@@ -150,12 +192,27 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     registry.addFormatter(new BoolFormatter());
     registry.addFormatter(new NumberFormatter());
 
-    ParameterFactory factory = ParameterFactory.createFor("de-DE", registry);
+    Parameters noParameters = ParameterFactory.createFor("de-DE", registry).noParameters();
 
     assertEquals("Test, wahr, -0006", registry.getFormatter(null, int[].class)
-        .format(new Object[] { "Test", true, null, -6 }, null , factory, new ParameterString("0000")));
+        .format(new Object[] { "Test", true, null, -6 }, null , noParameters, new DataString("0000")));
 
     assertEquals("this, is, a, test", registry.getFormatter(null, int[].class)
-        .format(new Object[] { null, "this", null, "is", null, "a", null, "test" }, null , factory, null));
+        .format(new Object[] { null, "this", null, "is", null, "a", null, "test" }, null , noParameters, null));
+  }
+
+
+  @Test
+  public void testEmptyOrNullArray()
+  {
+    GenericFormatterRegistry registry = new GenericFormatterRegistry();
+    registry.addFormatter(new ArrayFormatter());
+
+    ParameterFactory factory = ParameterFactory.DEFAULT;
+
+    Message message = MessageFactory.parse("%{array,{null:'null',empty:'empty'}}");
+
+    assertEquals("null", message.format(factory.with("array", null)));
+    assertEquals("empty", message.format(factory.with("array", new int[0])));
   }
 }

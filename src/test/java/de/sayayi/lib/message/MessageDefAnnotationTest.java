@@ -1,3 +1,18 @@
+/*
+ * Copyright 2020 Jeroen Gremmen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.Message.LocaleAware;
@@ -73,10 +88,10 @@ public class MessageDefAnnotationTest
     final WithCode msg = bundle.getByCode("T3");
     ParameterFactory factory = ParameterFactory.DEFAULT;
 
-    assertEquals("m3", msg.format(factory));
-    assertEquals("m3", msg.format(factory.parameters().withLocale(Locale.ROOT)));
-    assertEquals("m3", msg.format(factory.parameters().withLocale(Locale.US)));
-    assertEquals("m3", msg.format(factory.parameters().withLocale("xx-YY")));
+    assertEquals("m3", msg.format(factory.noParameters()));
+    assertEquals("m3", msg.format(factory.withLocale(Locale.ROOT)));
+    assertEquals("m3", msg.format(factory.withLocale(Locale.US)));
+    assertEquals("m3", msg.format(factory.withLocale("xx-YY")));
     assertFalse(msg instanceof LocaleAware);
   }
 
@@ -88,10 +103,10 @@ public class MessageDefAnnotationTest
     final WithCode msg = bundle.getByCode("T2");
     ParameterFactory factory = ParameterFactory.DEFAULT;
 
-    assertEquals("nl", msg.format(factory));
-    assertEquals("nl", msg.format(factory.parameters().withLocale(Locale.ROOT)));
-    assertEquals("nl", msg.format(factory.parameters().withLocale(Locale.US)));
-    assertEquals("nl", msg.format(factory.parameters().withLocale("xx-YY")));
+    assertEquals("nl", msg.format(factory.noParameters()));
+    assertEquals("nl", msg.format(factory.withLocale(Locale.ROOT)));
+    assertEquals("nl", msg.format(factory.withLocale(Locale.US)));
+    assertEquals("nl", msg.format(factory.withLocale("xx-YY")));
   }
 
 
@@ -107,11 +122,11 @@ public class MessageDefAnnotationTest
     final WithCode msg = bundle.getByCode("T1");
     ParameterFactory factory = ParameterFactory.DEFAULT;
 
-    assertEquals("us", msg.format(factory.parameters().withLocale(Locale.ROOT)));
-    assertEquals("uk", msg.format(factory.parameters().withLocale(Locale.UK)));
-    assertEquals("nl", msg.format(factory.parameters().withLocale("nl-BE")));
-    assertEquals("us", msg.format(factory.parameters().withLocale(Locale.CHINESE)));
-    assertEquals("de", msg.format(factory.parameters().withLocale("de-AT")));
+    assertEquals("us", msg.format(factory.withLocale(Locale.ROOT)));
+    assertEquals("uk", msg.format(factory.withLocale(Locale.UK)));
+    assertEquals("nl", msg.format(factory.withLocale("nl-BE")));
+    assertEquals("us", msg.format(factory.withLocale(Locale.CHINESE)));
+    assertEquals("de", msg.format(factory.withLocale("de-AT")));
   }
 
 

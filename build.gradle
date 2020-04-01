@@ -1,5 +1,16 @@
+buildscript {
+  repositories {
+    jcenter()
+  }
+
+  dependencies {
+    classpath "org.anarres.jarjar:jarjar-gradle:1.0.1"
+  }
+}
+
+
 plugins {
-  id 'idea'
+  id 'base'
   id 'java-library'
   id 'maven-publish'
   id 'nebula.optional-base' version '5.0.3'
@@ -8,38 +19,50 @@ plugins {
 }
 
 
-description 'Message Format Library'
-group 'de.sayayi.lib'
-version '0.3.1'
+description = 'Message Format Library'
 
 
-sourceSets {
-  java6
-  java8
-  main {
-    resources {
-      srcDir 'src/java6/resources'
-      srcDir 'src/java8/resources'
-    }
+allprojects {
+  buildDir = ".build"
+
+  apply plugin: "base"
+  apply plugin: "java-library"
+
+  group = "de.sayayi.lib"
+  version = "0.4.0"
+
+  ext.lombokVersion = "1.18.12"
+  ext.antlrVersion = "4.5.3"  // last java 6 version
+  ext.junitVersion = "4.12"
+  ext.jodatimeVersion = "2.10.5"
+  ext.jetbrainsAnnotationsVersion = "13.0"
+
+  repositories {
+    jcenter()
+  }
+
+  dependencies {
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    compileOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
+
+    testImplementation "junit:junit:${junitVersion}"
+    testCompileOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
+  }
+
+  compileTestJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
   }
 }
 
 
-apply from: file('gradle/versions.gradle')
-apply from: file('gradle/javadoc.gradle')
-apply from: file('gradle/quality.gradle')
-apply from: file('gradle/publishing.gradle')
+dependencies {
+  api project(':core')
+  api project('formatters-jdk8')
 
-
-compileJava6Java {
-  sourceCompatibility = 1.6
-  targetCompatibility = 1.6
-}
-
-
-compileJava8Java {
-  sourceCompatibility = 1.8
-  targetCompatibility = 1.8
+  implementation "joda-time:joda-time:${jodatimeVersion}", optional
 }
 
 
@@ -49,53 +72,46 @@ compileJava {
 }
 
 
-repositories {
-  jcenter()
-}
+apply from: file('gradle/javadoc.gradle')
+apply from: file('gradle/quality.gradle')
+apply from: file('gradle/publishing.gradle')
 
 
-dependencies {
-  annotationProcessor "org.projectlombok:lombok:"
-  java6AnnotationProcessor "org.projectlombok:lombok:"
+project(':formatters-jdk8').afterEvaluate {
+  jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-  compileOnly 'org.projectlombok:lombok:'
-  compileOnly 'org.jetbrains:annotations:'
+    from project(':core').sourceSets.main.output
+    from project(':formatters-jdk8').sourceSets.main.output
 
-  java6CompileOnly 'org.projectlombok:lombok:'
-  java6CompileOnly 'org.jetbrains:annotations:'
-  java6Implementation 'joda-time:joda-time:'
+    from project(':core').configurations.compileClasspath.collect { jar ->
+      if (jar.name.startsWith("antlr-runtime-")) {
+        zipTree(jar).matching {
+          exclude 'META-INF/**'
+        }
+      }
+    }
 
-  java8CompileOnly 'org.jetbrains:annotations:'
+    reproducibleFileOrder = true
 
-  java8Implementation files(sourceSets.java6.output.classesDirs) {
-    builtBy compileJava6Java
-  }
-
-  implementation files(sourceSets.java8.output.classesDirs) {
-    builtBy compileJava8Java
-  }
-
-  implementation files(sourceSets.java6.output.classesDirs) {
-    builtBy compileJava6Java
-  }
-
-  testImplementation 'junit:junit:'
-  testImplementation 'joda-time:joda-time:'
-  testCompileOnly 'org.jetbrains:annotations:'
-}
-
-
-jar {
-  from sourceSets.java6.output
-  from sourceSets.java8.output
-
-  reproducibleFileOrder = true
-  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-  manifest {
-    attributes['Implementation-Vendor'] = "Jeroen Gremmen"
-    attributes['Implementation-Vendor-Id'] = "de.sayayi"
-    attributes['Implementation-Title'] = "Message Formatting Library"
-    attributes['Implementation-Version'] = "${project.version}"
+    manifest {
+      attributes['Implementation-Vendor'] = "Jeroen Gremmen"
+      attributes['Implementation-Vendor-Id'] = "de.sayayi"
+      attributes['Implementation-Title'] = "Message Formatting Library"
+      attributes['Implementation-Version'] = "${project.version}"
+    }
   }
 }
+
+
+clean {
+  subprojects.each {
+    it.afterEvaluate {
+      def cleanTask = it.tasks.findByName('clean')
+      if (cleanTask) {
+        dependsOn(cleanTask)
+      }
+    }
+  }
+}
+
