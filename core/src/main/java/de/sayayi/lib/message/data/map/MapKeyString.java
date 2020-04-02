@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.text.Collator;
 import java.util.Locale;
 
 
@@ -55,7 +56,7 @@ public final class MapKeyString implements MapKey
       if (!(value instanceof CharSequence || value instanceof Character))
         result = MatchResult.LENIENT;
 
-      String text = value.toString();
+      final String text = value.toString();
 
       if (compareType == CompareType.EQ)
       {
@@ -79,7 +80,7 @@ public final class MapKeyString implements MapKey
         break doMatch;
       }
 
-      cmp = text.compareTo(string);
+      cmp = Collator.getInstance(locale).compare(text, string);
     }
 
     return compareType.match(cmp) ? result : MatchResult.MISMATCH;
