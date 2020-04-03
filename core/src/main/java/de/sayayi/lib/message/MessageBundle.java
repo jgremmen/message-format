@@ -110,9 +110,9 @@ public class MessageBundle
           add0(method);
 
         add0(clazz);
-      }
 
-    indexedClasses.add(classWithMessages);
+        indexedClasses.add(clazz);
+      }
   }
 
 
