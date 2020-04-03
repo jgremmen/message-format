@@ -17,6 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.map.MapKey.CompareType;
+import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,10 +47,12 @@ public final class MapFormatter extends AbstractParameterFormatter
       return formatEmpty(parameters, data);
 
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
-    final String separator = getSeparator(data);
+    final String separator = getSeparator(parameters, data);
     final StringBuilder s = new StringBuilder();
-    final String nullKey = getConfigValueString("null-key", data, false, "(null)").trim();
-    final String nullValue = getConfigValueString("null-value", data, false, "(null)").trim();
+    final String nullKey =
+        getConfigValueString("null-key", parameters, data, false, "(null)").trim();
+    final String nullValue =
+        getConfigValueString("null-value", parameters, data, false, "(null)").trim();
 
     for(Entry<?,?> entry: map.entrySet())
     {
@@ -82,9 +86,9 @@ public final class MapFormatter extends AbstractParameterFormatter
   }
 
 
-  private String getSeparator(Data data)
+  private String getSeparator(Parameters parameters, Data data)
   {
-    String sep = getConfigValueString("sep", data, true,"=");
+    String sep = getConfigValueString("sep", parameters, data, true,"=");
     if (sep.isEmpty())
       return sep;
 
@@ -96,6 +100,12 @@ public final class MapFormatter extends AbstractParameterFormatter
       separator.append(' ');
 
     return separator.toString();
+  }
+
+
+  @Override
+  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
+    return compareType.match(((Map<?,?>)value).size()) ? MatchResult.TYPELESS_EXACT : null;
   }
 
 

@@ -29,7 +29,7 @@ allprojects {
   apply plugin: "java-library"
 
   group = "de.sayayi.lib"
-  version = "0.4.0"
+  version = "0.4.1"
 
   ext.lombokVersion = "1.18.12"
   ext.antlrVersion = "4.5.3"  // last java 6 version

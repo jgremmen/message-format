@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Jeroen Gremmen
+ * Copyright 2020 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.formatter;
+package de.sayayi.lib.message;
 
-import org.jetbrains.annotations.NotNull;
+import de.sayayi.lib.message.annotation.MessageDef;
+import de.sayayi.lib.message.annotation.Text;
+import org.junit.Test;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public interface FormatterRegistry extends FormatterService
+public class MessageBundleTest
 {
-  void addFormatterForType(@NotNull Class<?> type, @NotNull ParameterFormatter formatter);
+  @Test
+  public void testClassInheritance()
+  {
+    MessageBundle bundle = new MessageBundle();
+    bundle.add(E1.class);
+    bundle.add(E2.class);
+  }
 
 
-  void addFormatter(@NotNull ParameterFormatter formatter);
+
+  public static class Base
+  {
+    @MessageDef(code = "base", texts = @Text("Hello"))
+    public void someMethod() {
+    }
+  }
+
+
+  public static class E1 extends Base {
+  }
+
+
+  public static class E2 extends Base {
+  }
 }
-

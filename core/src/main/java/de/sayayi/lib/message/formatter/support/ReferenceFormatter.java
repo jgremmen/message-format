@@ -17,6 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.map.MapKey.CompareType;
+import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.Reference;
@@ -40,6 +42,12 @@ public final class ReferenceFormatter extends AbstractParameterFormatter
 
     return value != null
         ? parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data) : "";
+  }
+
+
+  @Override
+  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
+    return compareType.match(((Reference<?>)value).get() == null ? 0 : 1) ? MatchResult.TYPELESS_EXACT : null;
   }
 
 

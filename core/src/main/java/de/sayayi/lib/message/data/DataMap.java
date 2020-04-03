@@ -16,7 +16,9 @@
 package de.sayayi.lib.message.data;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.map.MapKey;
+import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.data.map.MapValue;
 import de.sayayi.lib.message.data.map.MapValue.Type;
 import de.sayayi.lib.message.data.map.MapValueString;
@@ -26,7 +28,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -59,9 +60,10 @@ public final class DataMap implements Data
 
 
   @Contract(pure = true)
-  public MapValue find(Object key, Set<MapKey.Type> keyTypes, Set<MapValue.Type> valueTypes)
+  public MapValue find(Object key, Parameters parameters, Set<MapKey.Type> keyTypes, Set<MapValue.Type> valueTypes)
   {
-    MapValue found = null;
+    MatchResult bestMatchResult = MatchResult.MISMATCH;
+    MapValue bestMatch = null;
 
     for(Entry<MapKey,MapValue> entry: map.entrySet())
     {
@@ -73,25 +75,28 @@ public final class DataMap implements Data
 
       if ((keyTypes == null || keyTypes.contains(mapKey.getType()) &&
           (valueTypes == null || valueTypes.contains(mapValue.getType()))))
-        switch(mapKey.match(Locale.ROOT, key))
-        {
-          case LENIENT:
-            found = entry.getValue();
-            break;
+      {
+        MatchResult matchResult = mapKey.match(parameters, key);
 
-          case EXACT:
-            return entry.getValue();
+        if (matchResult == MatchResult.EXACT)
+          return entry.getValue();
+
+        if (matchResult.compareTo(bestMatchResult) > 0)
+        {
+          bestMatchResult = matchResult;
+          bestMatch = entry.getValue();
         }
+      }
     }
 
-    return found;
+    return bestMatch;
   }
 
 
   @Contract(pure = true)
-  public Message getMessage(Object key, Set<MapKey.Type> keyTypes, boolean includeDefault)
+  public Message getMessage(Object key, Parameters parameters, Set<MapKey.Type> keyTypes, boolean includeDefault)
   {
-    MapValue mapValue = find(key, keyTypes, MapValue.STRING_MESSAGE_TYPE);
+    MapValue mapValue = find(key, parameters, keyTypes, MapValue.STRING_MESSAGE_TYPE);
 
     if (mapValue == null)
     {

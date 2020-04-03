@@ -45,14 +45,14 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
     if (!(value instanceof Number))
       return null;
 
-    final int bitCount = detectBitCount(data, value);
+    final int bitCount = detectBitCount(parameters, data, value);
     return bitCount > 0 ? format(bitCount, value) : "";
   }
 
 
-  protected int detectBitCount(Data data, Object value)
+  protected int detectBitCount(Parameters parameters, Data data, Object value)
   {
-    Data dataValue = getConfigValue("length", data, true);
+    Data dataValue = getConfigValue("length", parameters, data, true);
     if (dataValue instanceof DataString && "auto".equals(dataValue.asObject()))
       return autoDetectBitCount(value);
 

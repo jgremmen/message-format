@@ -17,6 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.map.MapKey.CompareType;
+import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -61,6 +63,17 @@ public final class CollectionFormatter extends AbstractParameterFormatter
     }
 
     return s.toString();
+  }
+
+
+  @Override
+  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value)
+  {
+    final int cmp = value instanceof Collection
+        ? ((Collection<?>)value).size()
+        : (((Iterable<?>)value).iterator().hasNext() ? 1 : 0);
+
+    return compareType.match(cmp) ? MatchResult.TYPELESS_EXACT : null;
   }
 
 

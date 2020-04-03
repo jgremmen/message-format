@@ -19,7 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.data.DataString;
-import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
+import de.sayayi.lib.message.formatter.GenericFormatterService;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
@@ -116,7 +116,7 @@ public class JodaDateTimeFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatter()
   {
-    final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
+    final GenericFormatterService formatterRegistry = new GenericFormatterService();
     formatterRegistry.addFormatter(new JodaDateTimeFormatter());
     final ParameterFactory factory = ParameterFactory.createFor(formatterRegistry);
 
@@ -134,7 +134,7 @@ public class JodaDateTimeFormatterTest extends AbstractFormatterTest
   @Test
   public void testMap()
   {
-    final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
+    final GenericFormatterService formatterRegistry = new GenericFormatterService();
     formatterRegistry.addFormatter(new JodaDateTimeFormatter());
     final ParameterFactory factory = ParameterFactory.createFor(formatterRegistry);
 

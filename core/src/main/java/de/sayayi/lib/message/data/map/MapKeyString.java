@@ -15,10 +15,12 @@
  */
 package de.sayayi.lib.message.data.map;
 
+import de.sayayi.lib.message.Message.Parameters;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.text.Collator;
 import java.util.Locale;
 
 
@@ -41,19 +43,20 @@ public final class MapKeyString implements MapKey
 
   @NotNull
   @Override
-  public MatchResult match(@NotNull Locale locale, Object value)
+  public MatchResult match(@NotNull Parameters parameters, Object value)
   {
     if (value == null)
       return MatchResult.MISMATCH;
 
     MatchResult result = MatchResult.EXACT;
+    Locale locale = parameters.getLocale();
     int cmp = 0;
 
     doMatch: {
       if (!(value instanceof CharSequence || value instanceof Character))
         result = MatchResult.LENIENT;
 
-      String text = value.toString();
+      final String text = value.toString();
 
       if (compareType == CompareType.EQ)
       {
@@ -77,7 +80,7 @@ public final class MapKeyString implements MapKey
         break doMatch;
       }
 
-      cmp = text.compareTo(string);
+      cmp = Collator.getInstance(locale).compare(text, string);
     }
 
     return compareType.match(cmp) ? result : MatchResult.MISMATCH;

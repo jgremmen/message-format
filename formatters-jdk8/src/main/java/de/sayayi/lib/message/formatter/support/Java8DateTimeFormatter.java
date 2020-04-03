@@ -86,7 +86,7 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
       return null;
 
     if (!STYLE.containsKey(format))
-      format = getConfigValueString("format", data, true, null);
+      format = getConfigValueString("format", parameters, data, true, null);
 
     final DateTimeFormatter formatter;
 

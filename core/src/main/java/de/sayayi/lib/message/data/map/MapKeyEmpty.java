@@ -15,13 +15,12 @@
  */
 package de.sayayi.lib.message.data.map;
 
+import de.sayayi.lib.message.Message.Parameters;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_LENIENT;
 
 
 /**
@@ -50,28 +49,14 @@ public final class MapKeyEmpty implements MapKey
 
   @NotNull
   @Override
-  public MatchResult match(@NotNull Locale locale, Object value)
+  public MatchResult match(@NotNull Parameters parameters, Object value)
   {
-    MatchResult result = MatchResult.EXACT;
-    boolean empty =
-        value == null ||
-        (value instanceof String && ((String)value).isEmpty()) ||
-        (value instanceof CharSequence && ((CharSequence)value).length() == 0) ||
-        (value instanceof Collection && ((Collection<?>)value).isEmpty()) ||
-        (value instanceof Map && ((Map<?,?>)value).isEmpty()) ||
-        (value.getClass().isArray() && Array.getLength(value) == 0) ||
-        (value instanceof Iterable && !((Iterable<?>)value).iterator().hasNext()) ||
-        (value instanceof Iterator && !((Iterator<?>)value).hasNext());
+    if (value == null)
+      return compareType == CompareType.EQ ? TYPELESS_LENIENT : MISMATCH;
 
-    if (!empty)
-    {
-      result = MatchResult.LENIENT;
-      empty =
-          (value instanceof String && ((String)value).trim().isEmpty()) ||
-          (value instanceof CharSequence && ((CharSequence)value).toString().trim().isEmpty()) ||
-          (value instanceof Character && Character.isWhitespace((Character)value));
-    }
+    final MatchResult result = parameters.getFormatter(value.getClass()).matchEmpty(compareType, value);
+    assert result == TYPELESS_LENIENT || result == TYPELESS_EXACT || result == null;
 
-    return compareType.match(empty ? 0 : 1) ? result : MatchResult.MISMATCH;
+    return result == null ? MISMATCH : result;
   }
 }

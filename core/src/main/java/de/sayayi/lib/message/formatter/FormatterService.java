@@ -39,8 +39,20 @@ public interface FormatterService
    *
    * @return  data formatter, never {@code null}
    *
-   * @see GenericFormatterRegistry
+   * @see GenericFormatterService
    */
   @Contract(pure = true)
   @NotNull ParameterFormatter getFormatter(String format, @NotNull Class<?> type);
+
+
+
+
+  interface WithRegistry extends FormatterService
+  {
+    void addFormatterForType(@NotNull Class<?> type, @NotNull ParameterFormatter formatter);
+
+
+    void addFormatter(@NotNull ParameterFormatter formatter);
+
+  }
 }

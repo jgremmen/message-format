@@ -26,7 +26,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Collections;
-import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -58,7 +57,7 @@ public final class NumberFormatter extends AbstractParameterFormatter
     if ("bool".equals(format))
       return formatBoolean(value, parameters, data);
 
-    return getFormatter(format, data, parameters.getLocale()).format(value);
+    return getFormatter(format, parameters, data).format(value);
   }
 
 
@@ -75,22 +74,22 @@ public final class NumberFormatter extends AbstractParameterFormatter
   }
 
 
-  protected NumberFormat getFormatter(String format, Data data, Locale locale)
+  protected NumberFormat getFormatter(String format, Parameters parameters, Data data)
   {
     if ("integer".equals(format))
-      return NumberFormat.getIntegerInstance(locale);
+      return NumberFormat.getIntegerInstance(parameters.getLocale());
 
     if ("percent".equals(format))
-      return NumberFormat.getPercentInstance(locale);
+      return NumberFormat.getPercentInstance(parameters.getLocale());
 
     if ("currency".equals(format))
-      return NumberFormat.getCurrencyInstance(locale);
+      return NumberFormat.getCurrencyInstance(parameters.getLocale());
 
-    String customFormat = getConfigValueString("format", data, true, null);
+    String customFormat = getConfigValueString("format", parameters, data, true, null);
     if (customFormat != null)
-      return new DecimalFormat(customFormat, new DecimalFormatSymbols(locale));
+      return new DecimalFormat(customFormat, new DecimalFormatSymbols(parameters.getLocale()));
 
-    return NumberFormat.getNumberInstance(locale);
+    return NumberFormat.getNumberInstance(parameters.getLocale());
   }
 
 

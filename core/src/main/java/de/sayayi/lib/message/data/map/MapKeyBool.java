@@ -15,14 +15,15 @@
  */
 package de.sayayi.lib.message.data.map;
 
+import de.sayayi.lib.message.Message.Parameters;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Locale;
 
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EQUIVALENT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.LENIENT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
@@ -51,7 +52,7 @@ public final class MapKeyBool implements MapKey
 
   @NotNull
   @Override
-  public MatchResult match(@NotNull Locale locale, Object value)
+  public MatchResult match(@NotNull Parameters parameters, Object value)
   {
     if (value != null)
     {
@@ -59,9 +60,9 @@ public final class MapKeyBool implements MapKey
         return EXACT;
 
       if ("true".equals(value) && bool)
-        return LENIENT;
+        return EQUIVALENT;
       if ("false".equals(value) && !bool)
-        return LENIENT;
+        return EQUIVALENT;
 
       if (value instanceof BigInteger)
         return ((((BigInteger)value).signum() != 0) == bool) ? LENIENT : MISMATCH;

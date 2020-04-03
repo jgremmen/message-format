@@ -23,7 +23,7 @@ import de.sayayi.lib.message.formatter.support.*;
  *
  * @author Jeroen Gremmen
  */
-public class DefaultFormatterService extends GenericFormatterRegistry
+public class DefaultFormatterService extends GenericFormatterService
 {
   private static final FormatterService INSTANCE = new DefaultFormatterService();
 

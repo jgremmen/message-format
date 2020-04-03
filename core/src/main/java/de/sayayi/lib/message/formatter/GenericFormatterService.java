@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author Jeroen Gremmen
  */
-public class GenericFormatterRegistry implements FormatterRegistry
+public class GenericFormatterService implements FormatterService.WithRegistry
 {
   private static final Comparator<Class<?>> CLASS_SORTER = new Comparator<Class<?>>() {
     @Override
@@ -59,7 +59,7 @@ public class GenericFormatterRegistry implements FormatterRegistry
   }
 
 
-  public GenericFormatterRegistry()
+  public GenericFormatterService()
   {
     StringFormatter stringFormatter = new StringFormatter();
 

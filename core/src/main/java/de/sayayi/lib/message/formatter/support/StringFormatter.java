@@ -17,6 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.map.MapKey.CompareType;
+import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +26,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_LENIENT;
 
 
 /**
@@ -44,6 +49,20 @@ public final class StringFormatter extends AbstractParameterFormatter implements
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
   public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
     return value == null ? null : ((value instanceof char[]) ? new String((char[])value) : String.valueOf(value)).trim();
+  }
+
+
+  @Override
+  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value)
+  {
+    final String s = value instanceof char[] ? new String((char[])value) : String.valueOf(value);
+    final boolean empty = s.isEmpty();
+    final boolean lenientEmpty = s.trim().isEmpty();
+
+    if (compareType == CompareType.EQ)
+      return empty ? TYPELESS_EXACT : (lenientEmpty ? TYPELESS_LENIENT : null);
+    else
+      return lenientEmpty ? (empty ? null : TYPELESS_LENIENT) : TYPELESS_EXACT;
   }
 
 

@@ -18,7 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.data.DataString;
-import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
+import de.sayayi.lib.message.formatter.GenericFormatterService;
 import org.junit.Test;
 
 import java.util.function.BooleanSupplier;
@@ -35,7 +35,7 @@ public class SupplierFormatterTest
   @Test
   public void testBooleanSupplier()
   {
-    GenericFormatterRegistry registry = new GenericFormatterRegistry();
+    GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new BoolFormatter());
     registry.addFormatter(new BooleanSupplierFormatter());
 
@@ -51,7 +51,7 @@ public class SupplierFormatterTest
   @Test
   public void testLongSupplier()
   {
-    GenericFormatterRegistry registry = new GenericFormatterRegistry();
+    GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new NumberFormatter());
     registry.addFormatter(new LongSupplierFormatter());
 

@@ -18,7 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.ParameterFactory;
-import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
+import de.sayayi.lib.message.formatter.GenericFormatterService;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -42,7 +42,7 @@ public class MapFormatterTest extends AbstractFormatterTest
   @Test
   public void testSeparator()
   {
-    GenericFormatterRegistry registry = new GenericFormatterRegistry();
+    GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new MapFormatter());
 
     ParameterFactory factory = ParameterFactory.createFor(Locale.UK);
@@ -63,7 +63,7 @@ public class MapFormatterTest extends AbstractFormatterTest
   @Test
   public void testNullKeyValue()
   {
-    GenericFormatterRegistry registry = new GenericFormatterRegistry();
+    GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new MapFormatter());
 
     ParameterFactory factory = ParameterFactory.createFor(Locale.UK);

@@ -15,13 +15,13 @@
  */
 package de.sayayi.lib.message.data.map;
 
+import de.sayayi.lib.message.Message.Parameters;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Locale;
 
 
 /**
@@ -48,7 +48,7 @@ public final class MapKeyNumber implements MapKey
 
   @NotNull
   @Override
-  public MatchResult match(@NotNull Locale locale, Object value)
+  public MatchResult match(@NotNull Parameters parameters, Object value)
   {
     if (value == null)
       return MatchResult.MISMATCH;

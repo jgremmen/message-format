@@ -18,7 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.data.DataString;
-import de.sayayi.lib.message.formatter.GenericFormatterRegistry;
+import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.formatter.support.GeoFormatter.Format;
 import org.junit.Test;
 
@@ -129,7 +129,7 @@ public class GeoFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatter()
   {
-    final GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
+    final GenericFormatterService formatterRegistry = new GenericFormatterService();
     formatterRegistry.addFormatter(new GeoFormatter());
     ParameterFactory factory = ParameterFactory.createFor(ENGLISH, formatterRegistry);
 
