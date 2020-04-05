@@ -78,9 +78,8 @@ publishing {
       artifactId 'message-format-nodep'
 
       from project.shadow.component(publication)
-      jar.classifier null
       artifact javadocJar
-//      artifact sourcesJar.outputs.files
+      artifact sourcesJar
 
       versionMapping {
         usage('java-runtime') {

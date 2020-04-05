@@ -66,7 +66,6 @@ compileJava {
 
 apply from: file('gradle/javadoc.gradle')
 apply from: file('gradle/quality.gradle')
-apply from: file('gradle/publishing.gradle')
 
 
 tasks.withType(Jar) {
@@ -102,7 +101,7 @@ jar {
 
 shadowJar {
   group 'build'
-  archiveFileName = "message-format-${project.version}-nodep.jar"
+  archiveFileName = "${project.name}-${project.version}-nodep.jar"
   archiveClassifier = null
 
   dependencies {
@@ -177,3 +176,4 @@ clean {
   }
 }
 
+apply from: file('gradle/publishing.gradle')
