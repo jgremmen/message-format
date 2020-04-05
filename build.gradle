@@ -102,7 +102,7 @@ jar {
 
 shadowJar {
   group 'build'
-  archiveFileName = "message-format-${version}-nodep.jar"
+  archiveFileName = "message-format-${project.version}-nodep.jar"
   archiveClassifier = null
 
   dependencies {
