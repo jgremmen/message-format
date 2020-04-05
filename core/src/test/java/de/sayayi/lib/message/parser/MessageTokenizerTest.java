@@ -15,9 +15,9 @@
  */
 package de.sayayi.lib.message.parser;
 
-import de.sayayi.lib.message.antlr.ANTLRInputStream;
-import de.sayayi.lib.message.antlr.Lexer;
-import de.sayayi.lib.message.antlr.Token;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
 import org.junit.Test;
 
 import static de.sayayi.lib.message.parser.MessageLexer.CH;
