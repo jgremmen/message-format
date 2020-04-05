@@ -1,9 +1,8 @@
 plugins {
-  id 'com.github.johnrengelman.shadow' version '5.2.0'
   id 'base'
   id 'java-library'
   id 'maven-publish'
-  id 'nebula.optional-base' version '5.0.3'
+  id 'com.github.johnrengelman.shadow' version '5.2.0'
   id 'jacoco'
   id 'signing'
 }
@@ -49,12 +48,10 @@ allprojects {
 
 
 dependencies {
-  compile gradleApi()
-
   compile project(':core')
   compile project(':formatters-jdk8')
 
-  implementation "joda-time:joda-time:${jodatimeVersion}", optional
+  implementation "joda-time:joda-time:${jodatimeVersion}"
 }
 
 
@@ -77,7 +74,7 @@ tasks.withType(Jar) {
     attributes(
         'Implementation-Vendor': "Jeroen Gremmen",
         'Implementation-Vendor-Id': "de.sayayi",
-        'Implementation-Title': "Message Formatting Library",
+        'Implementation-Title': "${project.description}",
         'Implementation-Version': "${project.version}",
         'Built-Date': new Date().format('yyyy-MM-dd HH:mm:ss')
     )
@@ -101,8 +98,9 @@ jar {
 
 shadowJar {
   group 'build'
+
   archiveFileName = "${project.name}-${project.version}-nodep.jar"
-  archiveClassifier = null
+  archiveClassifier = null  // set by shadowJar but interferes with publishing
 
   dependencies {
     exclude(dependency(":joda-time:"))
@@ -122,7 +120,7 @@ shadowJar {
   relocate 'org.antlr.v4.runtime', 'de.sayayi.lib.message.antlr'
 
   manifest {
-    attributes['Implementation-Title'] = "Message Formatting Library (no dependencies)"
+    attributes['Implementation-Title'] = "${project.description} (no dependencies)"
   }
 }
 
@@ -156,7 +154,6 @@ task shadowTest(type: Test, group: 'verification') {
   doFirst {
     classpath = shadowJar.outputs.files + classpath
     classpath -= compileJava.outputs.files + processResources.outputs.files + configurations.runtime
-    println classpath.asList()
   }
 }
 
@@ -175,5 +172,6 @@ clean {
     }
   }
 }
+
 
 apply from: file('gradle/publishing.gradle')

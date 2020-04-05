@@ -56,15 +56,13 @@ publishing {
         }
 
         withXml {
-          Node pomNode = asNode()
+          def dependenciesNode = asNode().dependencies[0]
 
-          pomNode.dependencies.'*'.findAll() {
-            it.groupId.text() == 'de.sayayi.lib'
-          }.each() {
+          dependenciesNode.'*'.findAll().each() {
             it.parent().remove(it)
           }
 
-          def dependency = pomNode.dependencies[0].appendNode('dependency')
+          def dependency = dependenciesNode.appendNode('dependency')
           dependency.appendNode('groupId', 'org.antlr')
           dependency.appendNode('artifactId', 'antlr4-runtime')
           dependency.appendNode('version', "${antlrVersion}")
@@ -116,12 +114,8 @@ publishing {
         }
 
         withXml {
-          Node pomNode = asNode()
-          pomNode.dependencies.'*'.findAll() {
-            it.groupId.text() == 'de.sayayi.lib'
-          }.each() {
-            it.parent().remove(it)
-          }
+          def dependenciesNode = asNode().dependencies[0]
+          dependenciesNode.parent().remove(dependenciesNode)
         }
       }
     }
