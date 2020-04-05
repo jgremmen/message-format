@@ -15,10 +15,10 @@
  */
 package de.sayayi.lib.message.parser;
 
-import de.sayayi.lib.message.antlr.CharStream;
-import de.sayayi.lib.message.antlr.Lexer;
-import de.sayayi.lib.message.antlr.Token;
-import de.sayayi.lib.message.antlr.WritableToken;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.WritableToken;
 
 
 /**

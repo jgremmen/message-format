@@ -2,7 +2,7 @@ description 'Message Format Java 8 Formatters'
 
 
 dependencies {
-  api project(':core')
+  implementation project(':core')
 }
 
 

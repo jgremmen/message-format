@@ -1,15 +1,5 @@
-buildscript {
-  repositories {
-    jcenter()
-  }
-
-  dependencies {
-    classpath "org.anarres.jarjar:jarjar-gradle:1.0.1"
-  }
-}
-
-
 plugins {
+  id 'com.github.johnrengelman.shadow' version '5.2.0'
   id 'base'
   id 'java-library'
   id 'maven-publish'
@@ -29,10 +19,10 @@ allprojects {
   apply plugin: "java-library"
 
   group = "de.sayayi.lib"
-  version = "0.4.1"
+  version = "0.4.2"
 
   ext.lombokVersion = "1.18.12"
-  ext.antlrVersion = "4.5.3"  // last java 6 version
+  ext.antlrVersion = "4.5.3"  // latest java 6 version
   ext.junitVersion = "4.12"
   ext.jodatimeVersion = "2.10.5"
   ext.jetbrainsAnnotationsVersion = "13.0"
@@ -59,8 +49,10 @@ allprojects {
 
 
 dependencies {
-  api project(':core')
-  api project('formatters-jdk8')
+  compile gradleApi()
+
+  compile project(':core')
+  compile project(':formatters-jdk8')
 
   implementation "joda-time:joda-time:${jodatimeVersion}", optional
 }
@@ -77,31 +69,101 @@ apply from: file('gradle/quality.gradle')
 apply from: file('gradle/publishing.gradle')
 
 
-project(':formatters-jdk8').afterEvaluate {
-  jar {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+tasks.withType(Jar) {
+  from files('LICENSE')
 
-    from project(':core').sourceSets.main.output
-    from project(':formatters-jdk8').sourceSets.main.output
+  reproducibleFileOrder true
 
-    from project(':core').configurations.compileClasspath.collect { jar ->
-      if (jar.name.startsWith("antlr-runtime-")) {
-        zipTree(jar).matching {
-          exclude 'META-INF/**'
-        }
-      }
-    }
-
-    reproducibleFileOrder = true
-
-    manifest {
-      attributes['Implementation-Vendor'] = "Jeroen Gremmen"
-      attributes['Implementation-Vendor-Id'] = "de.sayayi"
-      attributes['Implementation-Title'] = "Message Formatting Library"
-      attributes['Implementation-Version'] = "${project.version}"
-    }
+  manifest {
+    attributes(
+        'Implementation-Vendor': "Jeroen Gremmen",
+        'Implementation-Vendor-Id': "de.sayayi",
+        'Implementation-Title': "Message Formatting Library",
+        'Implementation-Version': "${project.version}",
+        'Built-Date': new Date().format('yyyy-MM-dd HH:mm:ss')
+    )
   }
 }
+
+
+java {
+  withSourcesJar()
+}
+
+
+jar {
+  includeEmptyDirs = false
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+  from project(':core').sourceSets.main.output
+  from project(':formatters-jdk8').sourceSets.main.output
+}
+
+
+shadowJar {
+  group 'build'
+  archiveFileName = "message-format-${version}-nodep.jar"
+  archiveClassifier = null
+
+  dependencies {
+    exclude(dependency(":joda-time:"))
+  }
+
+  exclude 'META-INF/maven/**'
+  exclude "org/antlr/v4/runtime/atn/ATNSerializer*"
+  exclude "org/antlr/v4/runtime/ParserInterpreter*"
+  exclude "org/antlr/v4/runtime/TokenStreamRewriter*"
+  exclude "org/antlr/v4/runtime/tree/pattern/**"
+  exclude "org/antlr/v4/runtime/tree/Trees"
+  exclude "org/antlr/v4/runtime/tree/xpath/**"
+  exclude "org/antlr/v4/runtime/Unbuffered*"
+
+  minimize()
+
+  relocate 'org.antlr.v4.runtime', 'de.sayayi.lib.message.antlr'
+
+  manifest {
+    attributes['Implementation-Title'] = "Message Formatting Library (no dependencies)"
+  }
+}
+
+
+sourcesJar {
+  dependsOn ':core:generateGrammarSource'
+
+  from project(':core').sourceSets.main.allSource
+  from project(':formatters-jdk8').sourceSets.main.allSource
+
+  exclude "**/*.tokens"
+  exclude "**/*.g4"
+}
+
+
+test {
+  dependsOn jar
+
+  doFirst {
+    classpath = jar.outputs.files + classpath
+    classpath -= compileJava.outputs.files + processResources.outputs.files +
+                 project(':core').jar.outputs.files + project(':formatters-jdk8').jar.outputs.files
+    println classpath.asList()
+  }
+}
+
+
+task shadowTest(type: Test, group: 'verification') {
+  dependsOn shadowJar
+
+  doFirst {
+    classpath = shadowJar.outputs.files + classpath
+    classpath -= compileJava.outputs.files + processResources.outputs.files + configurations.runtime
+    println classpath.asList()
+  }
+}
+
+
+assemble.dependsOn shadowJar
+build.dependsOn shadowTest
 
 
 clean {

@@ -16,14 +16,6 @@
 package de.sayayi.lib.message.parser;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.antlr.ANTLRInputStream;
-import de.sayayi.lib.message.antlr.BaseErrorListener;
-import de.sayayi.lib.message.antlr.BufferedTokenStream;
-import de.sayayi.lib.message.antlr.DefaultErrorStrategy;
-import de.sayayi.lib.message.antlr.RecognitionException;
-import de.sayayi.lib.message.antlr.Recognizer;
-import de.sayayi.lib.message.antlr.Token;
-import de.sayayi.lib.message.antlr.Vocabulary;
 import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.impl.EmptyMessage;
 import de.sayayi.lib.message.impl.MultipartMessage;
@@ -31,6 +23,14 @@ import de.sayayi.lib.message.impl.SinglePartMessage;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.BufferedTokenStream;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.Vocabulary;
 
 import java.util.Arrays;
 import java.util.HashMap;
