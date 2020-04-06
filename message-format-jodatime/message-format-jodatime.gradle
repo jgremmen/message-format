@@ -67,21 +67,6 @@ publishing {
       }
     }
   }
-
-  repositories {
-    maven {
-      name = "mavenTemp"
-      url = "$buildDir/repository"
-    }
-    maven {
-      name = "mavenCentral"
-      url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-      credentials {
-        username = project.findProperty('mavenCentral.username')
-        password = project.findProperty('mavenCentral.password')
-      }
-    }
-  }
 }
 
 
