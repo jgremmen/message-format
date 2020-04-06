@@ -37,7 +37,7 @@ public final class EnumFormatter extends AbstractParameterFormatter
     final Enum<?> enm = (Enum<?>)value;
 
     if ("ordinal".equals(format))
-      return Integer.toString(enm.ordinal());
+      return parameters.getFormatter(int.class).format(enm.ordinal(), null, parameters, data);
 
     return enm.name();
   }
