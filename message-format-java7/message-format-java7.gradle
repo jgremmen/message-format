@@ -14,24 +14,19 @@
  * limitations under the License.
  */
 
-description 'Message Format Library (java 8 formatters)'
-
-
-dependencies {
-  implementation project(':message-format-java7')
-}
+description 'Message Format Library (java 7 formatters)'
 
 
 compileJava {
-  sourceCompatibility = 1.8
-  targetCompatibility = 1.8
+  sourceCompatibility = 1.7
+  targetCompatibility = 1.7
 }
 
 
 publishing {
   publications {
 
-    java8(MavenPublication) {
+    java7(MavenPublication) {
       from components.java
 
       pom {
@@ -68,5 +63,5 @@ publishing {
 
 
 signing {
-  sign publishing.publications.java8
+  sign publishing.publications.java7
 }

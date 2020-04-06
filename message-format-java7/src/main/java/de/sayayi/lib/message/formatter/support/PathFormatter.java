@@ -34,7 +34,7 @@ public final class PathFormatter extends AbstractParameterFormatter
   public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return formatNull(parameters, data);
+      return null;
 
     Path path = (Path)value;
 
@@ -45,7 +45,7 @@ public final class PathFormatter extends AbstractParameterFormatter
     else if ("root".equals(format))
       path = path.getRoot();
 
-    return path == null ? null : path.toString();
+    return path == null ? "" : path.toString();
   }
 
 
@@ -53,6 +53,6 @@ public final class PathFormatter extends AbstractParameterFormatter
   @Override
   @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(Path.class);
+    return Collections.<Class<?>>singleton(Path.class);
   }
 }
