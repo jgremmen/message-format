@@ -6,6 +6,7 @@ de.sayayi.lib.message.formatter.support.ChoiceFormatter
 de.sayayi.lib.message.formatter.support.ClassFormatter
 de.sayayi.lib.message.formatter.support.CollectionFormatter
 de.sayayi.lib.message.formatter.support.DateFormatter
+de.sayayi.lib.message.formatter.support.EnumFormatter
 de.sayayi.lib.message.formatter.support.FileFormatter
 de.sayayi.lib.message.formatter.support.GeoFormatter
 de.sayayi.lib.message.formatter.support.InetAddressFormatter
