@@ -70,6 +70,7 @@ afterEvaluate {
 
     (options as StandardJavadocDocletOptions).with {
       linksOffline 'http://javadox.com/org.jetbrains/annotations/15.0/', "${rootDir}/gradle/javadocs/jetbrains-annotations"
+      linksOffline 'https://www.antlr.org/api/Java/', "${rootDir}/gradle/javadocs/antlr4-runtime"
 
       encoding 'UTF-8'
 
