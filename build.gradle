@@ -18,6 +18,7 @@ description = 'Message Format Library Projects'
 
 
 ext {
+  moduleProjects = subprojects.findAll { it.name.startsWith("message-format") }
   formatterProjects = subprojects.findAll { it.name.startsWith("message-format-") }
 }
 
@@ -32,12 +33,7 @@ allprojects {
 }
 
 
-subprojects {
-  apply plugin: "java-library"
-  apply plugin: "maven-publish"
-  apply plugin: "jacoco"
-  apply plugin: "signing"
-
+configure(moduleProjects) {
   ext.lombokVersion = "1.18.12"
   ext.junitVersion = "4.12"
   ext.jetbrainsAnnotationsVersion = "13.0"

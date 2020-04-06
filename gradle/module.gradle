@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+apply plugin: "java-library"
+apply plugin: "maven-publish"
+apply plugin: "jacoco"
+apply plugin: "signing"
+
+
 dependencies {
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
@@ -36,7 +42,9 @@ java {
 }
 
 
-jar {
+tasks.withType(Jar) {
+  includeEmptyDirs = false
+
   manifest {
     attributes(
         "Implementation-Vendor": "Jeroen Gremmen",
@@ -52,6 +60,35 @@ jar {
     include "LICENSE"
     into "META-INF"
     expand(copyright: new Date().format("yyyy"), version: project.version)
+  }
+}
+
+
+afterEvaluate {
+  javadoc {
+    title "${project.description} ${version}"
+
+    (options as StandardJavadocDocletOptions).with {
+      linksOffline 'http://javadox.com/org.jetbrains/annotations/15.0/', "${rootDir}/gradle/javadocs/jetbrains-annotations"
+
+      encoding 'UTF-8'
+
+      group("Message Core", [
+          "de.sayayi.lib.message",
+          "de.sayayi.lib.message.annotation",
+          "de.sayayi.lib.message.data*",
+          "de.sayayi.lib.message.exception",
+          "de.sayayi.lib.message.impl",
+          "de.sayayi.lib.message.parser"
+      ])
+      group("Message Formatters", [
+          "de.sayayi.lib.message.formatter*"
+      ])
+
+      noQualifiers 'java.util', 'java.lang'
+    }
+
+    failOnError false
   }
 }
 

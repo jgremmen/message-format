@@ -69,35 +69,11 @@ compileJava {
 compileJava.dependsOn generateGrammarSource
 
 
-javadoc {
-  title "${project.description} ${version}"
-
-  (options as StandardJavadocDocletOptions).with {
-    linksOffline 'http://javadox.com/org.jetbrains/annotations/15.0/', '../gradle/javadocs/jetbrains-annotations'
-
-    encoding 'UTF-8'
-
-    group("Message Core API", ["de.sayayi.lib.message", "de.sayayi.lib.message.annotation", "de.sayayi.lib.message.exception"])
-    group("Message Formatter API", ["de.sayayi.lib.message.formatter*", "de.sayayi.lib.message.data"])
-
-    noQualifiers 'java.util', 'java.lang'
-  }
-
-  failOnError false
-}
-
-
 sourcesJar {
   dependsOn generateGrammarSource
 
   exclude "**/*.tokens"
   exclude "**/*.g4"
-}
-
-
-jar {
-  includeEmptyDirs = false
-  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 
