@@ -129,7 +129,7 @@ public class JodaDateTimeFormatterTest
     final DefaultFormatterService formatterRegistry = new DefaultFormatterService();
     final ParameterFactory factory = ParameterFactory.createFor(formatterRegistry);
 
-    assertEquals("2020", parse("%{d,{!null:'%{d,\'yyyy\'}'}}").format(
+    assertEquals("2020", parse("%{d,{!null:'%{d,'yyyy'}'}}").format(
         factory.with("d", new LocalDate(2020, 1, 1))));
 
     assertEquals("empty", parse("%{d,{empty:'empty'}}").format(factory.with("d", null)));
