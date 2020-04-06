@@ -37,6 +37,7 @@ public final class ClassFormatter extends AbstractParameterFormatter
     if (value != null)
     {
       final Class<?> clazz = (Class<?>)value;
+      format = getConfigFormat(format, data, true, null);
 
       if ("name".equals(format))
         s = clazz.getSimpleName();

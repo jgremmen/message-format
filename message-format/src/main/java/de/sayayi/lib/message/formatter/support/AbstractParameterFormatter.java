@@ -124,6 +124,19 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
+  protected String getConfigFormat(String format, Data data, boolean checkDataString, String defaultFormat)
+  {
+    String configFormat =
+        getConfigValueString("format", Parameters.EMPTY, data, checkDataString, null);
+
+    if (configFormat == null && format != null)
+      configFormat = format;
+
+    return configFormat == null ? defaultFormat : configFormat;
+  }
+
+
+  @Contract(pure = true)
   protected Message getMessage(Object value, EnumSet<Type> keyTypes, Parameters parameters, Data data, boolean notNull)
   {
     Message message = null;

@@ -67,4 +67,20 @@ public class ClassFormatterTest
 
     assertEquals("java.util.Map # int[] -", msg.format(parameters));
   }
+
+
+  @Test
+  public void testConfigFormat()
+  {
+    final GenericFormatterService formatterRegistry = new GenericFormatterService();
+    formatterRegistry.addFormatter(new ClassFormatter());
+    formatterRegistry.addFormatter(new PackageFormatter());
+    ParameterFactory factory = ParameterFactory.createFor(ROOT, formatterRegistry);
+
+    final Parameters parameters = factory.with("class", Map.class);
+
+    assertEquals("java.util", parse("%{class,{format:'package'}}").format(parameters));
+    assertEquals("java.util", parse("%{class,'package'}").format(parameters));
+    assertEquals("java.util", parse("%{class,package}").format(parameters));
+  }
 }
