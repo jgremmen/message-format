@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
+import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +31,7 @@ import java.util.Set;
 /**
  * @author Jeroen Gremmen
  */
-public final class OptionalFormatter extends AbstractParameterFormatter
+public final class OptionalFormatter extends AbstractParameterFormatter implements EmptyMatcher
 {
   @SuppressWarnings("squid:S2789")
   @Override

@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
+import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +35,7 @@ import static java.util.ResourceBundle.getBundle;
 /**
  * @author Jeroen Gremmen
  */
-public final class CollectionFormatter extends AbstractParameterFormatter
+public final class CollectionFormatter extends AbstractParameterFormatter implements EmptyMatcher
 {
   @SuppressWarnings("rawtypes")
   @Override

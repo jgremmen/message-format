@@ -20,6 +20,7 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +35,7 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_LENIENT
 /**
  * @author Jeroen Gremmen
  */
-public final class StringFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
+public final class StringFormatter extends AbstractParameterFormatter implements NamedParameterFormatter, EmptyMatcher
 {
   @NotNull
   @Override

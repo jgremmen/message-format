@@ -20,6 +20,7 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -35,7 +36,7 @@ import static java.util.ResourceBundle.getBundle;
 /**
  * @author Jeroen Gremmen
  */
-public final class ArrayFormatter extends AbstractParameterFormatter
+public final class ArrayFormatter extends AbstractParameterFormatter implements EmptyMatcher
 {
   @Override
   public String formatValue(Object array, String format, @NotNull Parameters parameters, Data data)

@@ -21,8 +21,6 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.DataNumber;
 import de.sayayi.lib.message.data.DataString;
-import de.sayayi.lib.message.data.map.MapKey.CompareType;
-import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.data.map.MapKey.Type;
 import de.sayayi.lib.message.data.map.MapValue;
 import de.sayayi.lib.message.data.map.MapValueBool;
@@ -76,12 +74,6 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   protected abstract String formatValue(Object value, String format, @NotNull Parameters parameters, Data data);
-
-
-  @Override
-  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return null;
-  }
 
 
   @Contract(pure = true)

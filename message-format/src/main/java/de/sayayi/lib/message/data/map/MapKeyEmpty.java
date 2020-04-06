@@ -16,6 +16,8 @@
 package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.formatter.ParameterFormatter;
+import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
@@ -54,9 +56,16 @@ public final class MapKeyEmpty implements MapKey
     if (value == null)
       return compareType == CompareType.EQ ? TYPELESS_LENIENT : MISMATCH;
 
-    final MatchResult result = parameters.getFormatter(value.getClass()).matchEmpty(compareType, value);
-    assert result == TYPELESS_LENIENT || result == TYPELESS_EXACT || result == null;
+    final ParameterFormatter formatter = parameters.getFormatter(value.getClass());
+    if (formatter instanceof EmptyMatcher)
+    {
+      final MatchResult result = ((EmptyMatcher)formatter).matchEmpty(compareType, value);
+      assert result == TYPELESS_LENIENT || result == TYPELESS_EXACT || result == null;
 
-    return result == null ? MISMATCH : result;
+      if (result != null)
+        return result;
+    }
+
+    return MISMATCH;
   }
 }
