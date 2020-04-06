@@ -20,5 +20,7 @@ build:
   script: ./gradlew clean build
   artifacts:
     paths:
-      - ./.build/libs/*
+      - ./message-format/.build/libs/*
+      - ./message-format-java8/.build/libs/*
+      - ./message-format-jodatime/.build/libs/*
     expire_in: 8 weeks
