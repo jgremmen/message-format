@@ -37,6 +37,7 @@ public final class FileFormatter extends AbstractParameterFormatter
       return null;
 
     final File file = (File)value;
+    format = getConfigFormat(format, data, true, null);
 
     if ("name".equals(format))
       return file.getName();

@@ -46,11 +46,8 @@ public final class DateFormatter extends AbstractParameterFormatter
     if (value == null)
       return null;
 
-    final DateFormat formatter = getFormatter(
-        getConfigValueString("format", parameters, data, true, null),
-        parameters.getLocale());
-
-    return formatter.format(value);
+    return getFormatter(getConfigFormat(format, data, true, null),
+        parameters.getLocale()).format(value);
   }
 
 

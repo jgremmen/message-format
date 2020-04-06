@@ -37,6 +37,7 @@ public final class InetAddressFormatter extends AbstractParameterFormatter
     if (value != null)
     {
       final InetAddress inetAddress = (InetAddress)value;
+      format = getConfigFormat(format, data, true, null);
 
       if ("name".equals(format))
         s = inetAddress.getHostName();
@@ -46,7 +47,7 @@ public final class InetAddressFormatter extends AbstractParameterFormatter
         s = inetAddress.getHostAddress();
     }
 
-    return formatString(s, parameters, data);
+    return s;
   }
 
 

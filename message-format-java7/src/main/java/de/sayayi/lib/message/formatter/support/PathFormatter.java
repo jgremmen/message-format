@@ -37,6 +37,7 @@ public final class PathFormatter extends AbstractParameterFormatter
       return null;
 
     Path path = (Path)value;
+    format = getConfigFormat(format, data, true, null);
 
     if ("name".equals(format))
       path = path.getFileName();
