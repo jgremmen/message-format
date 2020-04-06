@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.data.DataString;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -125,8 +126,7 @@ public class JodaDateTimeFormatterTest
   @Test
   public void testMap()
   {
-    final GenericFormatterService formatterRegistry = new GenericFormatterService();
-    formatterRegistry.addFormatter(new JodaDateTimeFormatter());
+    final DefaultFormatterService formatterRegistry = new DefaultFormatterService();
     final ParameterFactory factory = ParameterFactory.createFor(formatterRegistry);
 
     assertEquals("2020", parse("%{d,{!null:'%{d,\'yyyy\'}'}}").format(
