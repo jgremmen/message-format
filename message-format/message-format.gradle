@@ -1,0 +1,272 @@
+/*
+ * Copyright 2020 Jeroen Gremmen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+  id 'antlr'
+  id 'idea'
+  id 'com.github.johnrengelman.shadow' version '5.2.0'
+}
+
+
+description = 'Message Format Library'
+
+
+configurations {
+  compile {
+    extendsFrom = extendsFrom.findAll { it != configurations.antlr }
+  }
+}
+
+
+sourceSets {
+  main {
+    java.srcDirs = [ "src/main/java", "src/main/generated" ]
+  }
+  test {
+    java.srcDirs = [ "src/test/java", "src/test/generated" ]
+  }
+}
+
+
+def antlrVersion = "4.5.3"
+
+
+dependencies {
+  // antlr 4.5.3 is the latest java 6 compatible version
+  implementation "org.antlr:antlr4-runtime:${antlrVersion}"
+
+  antlr "org.antlr:antlr4:${antlrVersion}"
+}
+
+
+generateGrammarSource {
+  outputDirectory = file("src/main/generated/de/sayayi/lib/message/parser")
+  arguments += [ '-package', 'de.sayayi.lib.message.parser' ]
+
+  exclude "**/MessageParserTest.g4"
+}
+
+
+compileJava {
+  sourceCompatibility = 1.6
+  targetCompatibility = 1.6
+}
+
+
+compileJava.dependsOn generateGrammarSource
+
+
+javadoc {
+  title "${project.description} ${version}"
+
+  (options as StandardJavadocDocletOptions).with {
+    linksOffline 'http://javadox.com/org.jetbrains/annotations/15.0/', '../gradle/javadocs/jetbrains-annotations'
+
+    encoding 'UTF-8'
+
+    group("Message Core API", ["de.sayayi.lib.message", "de.sayayi.lib.message.annotation", "de.sayayi.lib.message.exception"])
+    group("Message Formatter API", ["de.sayayi.lib.message.formatter*", "de.sayayi.lib.message.data"])
+
+    noQualifiers 'java.util', 'java.lang'
+  }
+
+  failOnError false
+}
+
+
+sourcesJar {
+  dependsOn generateGrammarSource
+
+  exclude "**/*.tokens"
+  exclude "**/*.g4"
+}
+
+
+jar {
+  includeEmptyDirs = false
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+
+shadowJar {
+  group 'build'
+
+  archiveFileName = "${rootProject.name}-${project.version}-nodep.jar"
+  archiveClassifier.set(null)  // set by shadowJar but interferes with publishing
+
+  exclude 'META-INF/maven/**'
+  exclude "org/antlr/v4/runtime/atn/ATNSerializer*"
+  exclude "org/antlr/v4/runtime/ParserInterpreter*"
+  exclude "org/antlr/v4/runtime/TokenStreamRewriter*"
+  exclude "org/antlr/v4/runtime/tree/pattern/**"
+  exclude "org/antlr/v4/runtime/tree/Trees"
+  exclude "org/antlr/v4/runtime/tree/xpath/**"
+  exclude "org/antlr/v4/runtime/Unbuffered*"
+
+  minimize()
+
+  relocate 'org.antlr.v4.runtime', 'de.sayayi.lib.message.antlr'
+
+  manifest {
+    attributes['Implementation-Title'] = "${rootProject.description} (no dependencies)"
+  }
+}
+
+
+test {
+  dependsOn jar
+
+  doFirst {
+    classpath = jar.outputs.files + classpath
+    classpath -= compileJava.outputs.files + processResources.outputs.files
+  }
+}
+
+
+task shadowTest(type: Test, group: 'verification') {
+  dependsOn shadowJar
+
+  exclude '**/MessageTokenizerTest*'
+
+  doFirst {
+    classpath = shadowJar.outputs.files + classpath
+    classpath -= compileJava.outputs.files + processResources.outputs.files + configurations.runtime
+  }
+}
+
+
+assemble.dependsOn shadowJar
+build.dependsOn shadowTest
+
+
+publishing {
+  publications {
+
+    dep(MavenPublication) {
+      artifactId 'message-format'
+
+      from components.java
+
+      versionMapping {
+        usage('java-runtime') {
+          fromResolutionResult()
+        }
+      }
+
+      pom {
+        name = 'Java Message Format Library'
+        description = 'Highly configurable message format library supporting message definition through annotations'
+        url = 'https://github.com/jgremmen/message-format'
+        inceptionYear = '2019'
+
+        licenses {
+          license {
+            name = 'Apache License, Version 2.0'
+            url = 'http://www.apache.org/licenses/LICENSE-2.0'
+            distribution = 'repo'
+          }
+        }
+
+        developers {
+          developer {
+            id = 'jgremmen'
+            name = 'Jeroen Gremmen'
+            email = 'jeroen.gremmen@sayayi.de'
+          }
+        }
+
+        scm {
+          connection = 'scm:git:git://github.com/jgremmen/message-format.git'
+          developerConnection = 'scm:git:git://github.com/jgremmen/message-format.git'
+          url = 'https://github.com/jgremmen/message-format'
+        }
+      }
+    }
+
+
+    noDep(MavenPublication) { publication ->
+      artifactId 'message-format-nodep'
+
+      from project.shadow.component(publication)
+      artifact javadocJar
+      artifact sourcesJar
+
+      pom {
+        name = 'Java Message Format Library (no dependencies)'
+        description = 'Highly configurable message format library supporting message definition through annotations'
+        url = 'https://github.com/jgremmen/message-format'
+        inceptionYear = '2019'
+
+        licenses {
+          license {
+            name = 'Apache License, Version 2.0'
+            url = 'http://www.apache.org/licenses/LICENSE-2.0'
+            distribution = 'repo'
+          }
+        }
+
+        developers {
+          developer {
+            id = 'jgremmen'
+            name = 'Jeroen Gremmen'
+            email = 'jeroen.gremmen@sayayi.de'
+          }
+        }
+
+        scm {
+          connection = 'scm:git:git://github.com/jgremmen/message-format.git'
+          developerConnection = 'scm:git:git://github.com/jgremmen/message-format.git'
+          url = 'https://github.com/jgremmen/message-format'
+        }
+      }
+    }
+  }
+
+  repositories {
+    maven {
+      name = "mavenTemp"
+      url = "$buildDir/repository"
+    }
+    maven {
+      name = "mavenCentral"
+      url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+      credentials {
+        username = project.findProperty('mavenCentral.username')
+        password = project.findProperty('mavenCentral.password')
+      }
+    }
+  }
+}
+
+
+signing {
+  sign publishing.publications.dep
+  sign publishing.publications.noDep
+}
+
+
+clean.doLast {
+  file('src/main/antlr/gen').deleteDir()
+  file('src/main/gen').deleteDir()
+  file('src/main/generated').deleteDir()
+}
+
+
+idea {
+  module {
+    resourceDirs += file("src/main/antlr")
+  }
+}

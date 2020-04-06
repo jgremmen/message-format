@@ -1,165 +1,56 @@
-plugins {
-  id 'base'
-  id 'java-library'
-  id 'maven-publish'
-  id 'com.github.johnrengelman.shadow' version '5.2.0'
-  id 'jacoco'
-  id 'signing'
+/*
+ * Copyright 2020 Jeroen Gremmen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+description = 'Message Format Library Projects'
+
+
+ext {
+  formatterProjects = subprojects.findAll { it.name.startsWith("message-format-") }
 }
-
-
-description = 'Message Format Library'
 
 
 allprojects {
   buildDir = ".build"
 
   apply plugin: "base"
-  apply plugin: "java-library"
 
   group = "de.sayayi.lib"
   version = "0.4.2"
+}
+
+
+subprojects {
+  apply plugin: "java-library"
+  apply plugin: "maven-publish"
+  apply plugin: "jacoco"
+  apply plugin: "signing"
 
   ext.lombokVersion = "1.18.12"
-  ext.antlrVersion = "4.5.3"  // latest java 6 version
   ext.junitVersion = "4.12"
-  ext.jodatimeVersion = "2.10.5"
   ext.jetbrainsAnnotationsVersion = "13.0"
 
-  repositories {
-    jcenter()
-  }
+  apply from: "${rootDir}/gradle/module.gradle"
+}
 
+
+configure(formatterProjects) {
   dependencies {
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    compileOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
-
-    testImplementation "junit:junit:${junitVersion}"
-    testCompileOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
-  }
-
-  compileTestJava {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    implementation project(':message-format')
   }
 }
-
-
-dependencies {
-  compile project(':core')
-  compile project(':formatters-jdk8')
-
-  implementation "joda-time:joda-time:${jodatimeVersion}"
-}
-
-
-compileJava {
-  sourceCompatibility = 1.6
-  targetCompatibility = 1.6
-}
-
-
-apply from: file('gradle/javadoc.gradle')
-apply from: file('gradle/quality.gradle')
-
-
-tasks.withType(Jar) {
-  from files('LICENSE')
-
-  reproducibleFileOrder true
-
-  manifest {
-    attributes(
-        'Implementation-Vendor': "Jeroen Gremmen",
-        'Implementation-Vendor-Id': "de.sayayi",
-        'Implementation-Title': "${project.description}",
-        'Implementation-Version': "${project.version}",
-        'Built-Date': new Date().format('yyyy-MM-dd HH:mm:ss')
-    )
-  }
-}
-
-
-java {
-  withSourcesJar()
-}
-
-
-jar {
-  includeEmptyDirs = false
-  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-  from project(':core').sourceSets.main.output
-  from project(':formatters-jdk8').sourceSets.main.output
-}
-
-
-shadowJar {
-  group 'build'
-
-  archiveFileName = "${project.name}-${project.version}-nodep.jar"
-  archiveClassifier = null  // set by shadowJar but interferes with publishing
-
-  dependencies {
-    exclude(dependency(":joda-time:"))
-  }
-
-  exclude 'META-INF/maven/**'
-  exclude "org/antlr/v4/runtime/atn/ATNSerializer*"
-  exclude "org/antlr/v4/runtime/ParserInterpreter*"
-  exclude "org/antlr/v4/runtime/TokenStreamRewriter*"
-  exclude "org/antlr/v4/runtime/tree/pattern/**"
-  exclude "org/antlr/v4/runtime/tree/Trees"
-  exclude "org/antlr/v4/runtime/tree/xpath/**"
-  exclude "org/antlr/v4/runtime/Unbuffered*"
-
-  minimize()
-
-  relocate 'org.antlr.v4.runtime', 'de.sayayi.lib.message.antlr'
-
-  manifest {
-    attributes['Implementation-Title'] = "${project.description} (no dependencies)"
-  }
-}
-
-
-sourcesJar {
-  dependsOn ':core:generateGrammarSource'
-
-  from project(':core').sourceSets.main.allSource
-  from project(':formatters-jdk8').sourceSets.main.allSource
-
-  exclude "**/*.tokens"
-  exclude "**/*.g4"
-}
-
-
-test {
-  dependsOn jar
-
-  doFirst {
-    classpath = jar.outputs.files + classpath
-    classpath -= compileJava.outputs.files + processResources.outputs.files +
-                 project(':core').jar.outputs.files + project(':formatters-jdk8').jar.outputs.files
-    println classpath.asList()
-  }
-}
-
-
-task shadowTest(type: Test, group: 'verification') {
-  dependsOn shadowJar
-
-  doFirst {
-    classpath = shadowJar.outputs.files + classpath
-    classpath -= compileJava.outputs.files + processResources.outputs.files + configurations.runtime
-  }
-}
-
-
-assemble.dependsOn shadowJar
-build.dependsOn shadowTest
 
 
 clean {
@@ -172,6 +63,3 @@ clean {
     }
   }
 }
-
-
-apply from: file('gradle/publishing.gradle')

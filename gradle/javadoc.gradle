@@ -36,8 +36,3 @@ javadoc {
 
   failOnError false
 }
-
-
-java {
-  withJavadocJar()
-}
