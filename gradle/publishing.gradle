@@ -15,42 +15,11 @@
  */
 
 
-tasks.withType(Jar) {
-  from files('LICENSE')
-
-  reproducibleFileOrder true
-}
-
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-  archiveClassifier.set('javadoc')
-  from javadoc.destinationDir
-}
-
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-  archiveClassifier.set('sources')
-
-  from project(':core').sourceSets.main.allSource
-  from project('formatters-jdk8').sourceSets.main.allSource
-  from sourceSets.main.allSource
-
-  exclude "**/*.tokens"
-}
-
-
-artifacts {
-  archives javadocJar
-  archives sourcesJar
-}
-
-
 publishing {
   publications {
-    maven(MavenPublication) {
+
+    dep(MavenPublication) {
       from components.java
-      artifact javadocJar
-      artifact sourcesJar
 
       versionMapping {
         usage('java-runtime') {
@@ -87,12 +56,66 @@ publishing {
         }
 
         withXml {
-          Node pomNode = asNode()
-          pomNode.dependencies.'*'.findAll() {
-            it.groupId.text() == 'de.sayayi.lib'
-          }.each() {
+          def dependenciesNode = asNode().dependencies[0]
+
+          dependenciesNode.'*'.findAll().each() {
             it.parent().remove(it)
           }
+
+          def dependency = dependenciesNode.appendNode('dependency')
+          dependency.appendNode('groupId', 'org.antlr')
+          dependency.appendNode('artifactId', 'antlr4-runtime')
+          dependency.appendNode('version', "${antlrVersion}")
+          dependency.appendNode('scope', 'runtime')
+        }
+      }
+    }
+
+
+    noDep(MavenPublication) { publication ->
+      artifactId 'message-format-nodep'
+
+      from project.shadow.component(publication)
+      artifact javadocJar
+      artifact sourcesJar
+
+      versionMapping {
+        usage('java-runtime') {
+          fromResolutionResult()
+        }
+      }
+
+      pom {
+        name = 'Java Message Format Library (no dependencies)'
+        description = 'Highly configurable message format library supporting message definition through annotations'
+        url = 'https://github.com/jgremmen/message-format'
+        inceptionYear = '2019'
+
+        licenses {
+          license {
+            name = 'Apache License, Version 2.0'
+            url = 'http://www.apache.org/licenses/LICENSE-2.0'
+            distribution = 'repo'
+          }
+        }
+
+        developers {
+          developer {
+            id = 'jgremmen'
+            name = 'Jeroen Gremmen'
+            email = 'jeroen.gremmen@sayayi.de'
+          }
+        }
+
+        scm {
+          connection = 'scm:git:git://github.com/jgremmen/message-format.git'
+          developerConnection = 'scm:git:git://github.com/jgremmen/message-format.git'
+          url = 'https://github.com/jgremmen/message-format'
+        }
+
+        withXml {
+          def dependenciesNode = asNode().dependencies[0]
+          dependenciesNode.parent().remove(dependenciesNode)
         }
       }
     }
@@ -100,7 +123,11 @@ publishing {
 
   repositories {
     maven {
-      // maven central
+      name = "mavenTemp"
+      url = "$buildDir/repo"
+    }
+    maven {
+      name = "mavenCentral"
       url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
       credentials {
         username = project.findProperty('mavenCentral.username')
@@ -112,5 +139,6 @@ publishing {
 
 
 signing {
-  sign publishing.publications.maven
+  sign publishing.publications.dep
+  sign publishing.publications.noDep
 }

@@ -1,105 +1,50 @@
-buildscript {
-  repositories {
-    jcenter()
-  }
+/*
+ * Copyright 2020 Jeroen Gremmen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-  dependencies {
-    classpath "org.anarres.jarjar:jarjar-gradle:1.0.1"
-  }
+description = 'Message Format Library Projects'
+
+
+ext {
+  moduleProjects = subprojects.findAll { it.name.startsWith("message-format") }
+  formatterProjects = subprojects.findAll { it.name.startsWith("message-format-") }
 }
-
-
-plugins {
-  id 'base'
-  id 'java-library'
-  id 'maven-publish'
-  id 'nebula.optional-base' version '5.0.3'
-  id 'jacoco'
-  id 'signing'
-}
-
-
-description = 'Message Format Library'
 
 
 allprojects {
   buildDir = ".build"
 
   apply plugin: "base"
-  apply plugin: "java-library"
 
   group = "de.sayayi.lib"
-  version = "0.4.1"
+  version = "0.4.2"
+}
 
+
+configure(moduleProjects) {
   ext.lombokVersion = "1.18.12"
-  ext.antlrVersion = "4.5.3"  // last java 6 version
   ext.junitVersion = "4.12"
-  ext.jodatimeVersion = "2.10.5"
   ext.jetbrainsAnnotationsVersion = "13.0"
 
-  repositories {
-    jcenter()
-  }
+  apply from: "${rootDir}/gradle/module.gradle"
+}
 
+
+configure(formatterProjects) {
   dependencies {
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    compileOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
-
-    testImplementation "junit:junit:${junitVersion}"
-    testCompileOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
-  }
-
-  compileTestJava {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-  }
-}
-
-
-dependencies {
-  api project(':core')
-  api project('formatters-jdk8')
-
-  implementation "joda-time:joda-time:${jodatimeVersion}", optional
-}
-
-
-compileJava {
-  sourceCompatibility = 1.6
-  targetCompatibility = 1.6
-}
-
-
-apply from: file('gradle/javadoc.gradle')
-apply from: file('gradle/quality.gradle')
-apply from: file('gradle/publishing.gradle')
-
-
-project(':formatters-jdk8').afterEvaluate {
-  jar {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    from project(':core').sourceSets.main.output
-    from project(':formatters-jdk8').sourceSets.main.output
-
-    from project(':core').configurations.compileClasspath.collect { jar ->
-      if (jar.name.startsWith("antlr-runtime-")) {
-        zipTree(jar).matching {
-          exclude 'META-INF/**'
-        }
-      }
-    }
-
-    reproducibleFileOrder = true
-
-    manifest {
-      attributes['Implementation-Vendor'] = "Jeroen Gremmen"
-      attributes['Implementation-Vendor-Id'] = "de.sayayi"
-      attributes['Implementation-Title'] = "Message Formatting Library"
-      attributes['Implementation-Version'] = "${project.version}"
-    }
+    implementation project(':message-format')
   }
 }
 
@@ -114,4 +59,3 @@ clean {
     }
   }
 }
-

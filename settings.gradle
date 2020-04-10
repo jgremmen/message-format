@@ -1,8 +1,10 @@
-include "core"
-include "formatters-jdk8"
+include "message-format"
+include "message-format-java7"
+include "message-format-java8"
+include "message-format-jodatime"
+include "message-format-jsr354"
 
-rootProject.name = 'message-format'
-rootProject.children.each { project ->
-  if (!project.name.equals("buildSrc"))
-    project.buildFileName = "${project.name}.gradle"
+rootProject.name = 'message-format-projects'
+rootProject.children.each {project ->
+  project.buildFileName = "${project.name}.gradle"
 }

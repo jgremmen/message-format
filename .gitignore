@@ -5,10 +5,10 @@
 bin/
 out/
 
-# core
-/core/src/main/antlr/gen/
-/core/src/main/gen/
-/core/src/main/generated/
+# message-format
+/message-format/src/main/antlr/gen/
+/message-format/src/main/gen/
+/message-format/src/main/generated/
 *.tokens
 
 *.iml
