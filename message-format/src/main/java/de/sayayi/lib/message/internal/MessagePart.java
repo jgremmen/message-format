@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Jeroen Gremmen
+ * Copyright 2020 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parser;
+package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message.Parameters;
-import lombok.Getter;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
@@ -25,25 +25,38 @@ import java.io.Serializable;
 /**
  * @author Jeroen Gremmen
  */
-public abstract class MessagePart implements Serializable
+public interface MessagePart extends Serializable
 {
-  private static final long serialVersionUID = 400L;
-
-  @Getter protected final boolean spaceBefore;
-  @Getter protected final boolean spaceAfter;
+  @Contract(pure = true)
+  boolean isSpaceBefore();
 
 
-  MessagePart(boolean spaceBefore, boolean spaceAfter)
+  @Contract(pure = true)
+  boolean isSpaceAfter();
+
+
+  interface Text extends MessagePart
   {
-    this.spaceBefore = spaceBefore;
-    this.spaceAfter = spaceAfter;
+    TextPart EMPTY = new TextPart("");
+    TextPart NULL = new TextPart(null);
+
+
+    /**
+     * Returns the text for this message part.
+     *
+     * @return  trimmed text or {@code null}
+     */
+    @Contract(pure = true)
+    String getText();
+
+
+    boolean isEmpty();
   }
 
 
-  @Contract(pure = true)
-  public abstract String getText(Parameters parameters);
-
-
-  @Contract(pure = true)
-  public abstract boolean isParameter();
+  interface Parameter extends MessagePart
+  {
+    @Contract(pure = true)
+    @NotNull Text getText(@NotNull Parameters parameters);
+  }
 }

@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
+import de.sayayi.lib.message.internal.TextPart;
 import org.junit.Test;
 
 import java.util.function.BooleanSupplier;
@@ -43,7 +44,7 @@ public class SupplierFormatterTest
 
     Object value = (BooleanSupplier) () -> true;
 
-    assertEquals("wahr", registry.getFormatter(null, value.getClass())
+    assertEquals(new TextPart("wahr"), registry.getFormatter(null, value.getClass())
         .format(value, null, noParameters, null));
   }
 
@@ -59,7 +60,7 @@ public class SupplierFormatterTest
 
     Object value = (LongSupplier) () -> 1234567890L;
 
-    assertEquals("1,234,567,890", registry.getFormatter(null, value.getClass())
+    assertEquals(new TextPart("1,234,567,890"), registry.getFormatter(null, value.getClass())
         .format(value, null, noParameters, new DataString("###,###,###,###")));
   }
 }

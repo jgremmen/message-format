@@ -17,6 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,9 +31,10 @@ import java.util.Set;
  */
 public final class PackageFormatter extends AbstractParameterFormatter
 {
+  @NotNull
   @Override
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
-    return formatString(value == null ? null : ((Package)value).getName(), parameters, data);
+  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
+    return value == null ? Text.NULL : new TextPart(((Package)value).getName());
   }
 
 

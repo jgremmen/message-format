@@ -19,10 +19,10 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.data.DataNumber;
 import de.sayayi.lib.message.data.DataString;
+import de.sayayi.lib.message.internal.TextPart;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 
@@ -47,15 +47,15 @@ public class BitsFormatterTest
     BitsFormatter formatter = new BitsFormatter();
     Parameters parameters = ParameterFactory.DEFAULT.noParameters();
 
-    assertEquals("11111111", formatter.format((byte)0xff, null, parameters, null));
-    assertEquals("00000000", formatter.format((byte)0, null, parameters, null));
-    assertEquals("10101010", formatter.format((byte)0xaa, null, parameters, null));
-    assertEquals("01010101", formatter.format((byte)0x55, null, parameters, null));
-    assertEquals("10101", formatter.format((byte)0x15, null, parameters, new DataString("auto")));
-    assertEquals("0", formatter.format((byte)0, null, parameters, new DataString("auto")));
-    assertEquals("101", formatter.format((byte)0x15, null, parameters, new DataNumber(3)));
-    assertNull(formatter.format(null, null, parameters, null));
-    assertNull(formatter.format("hello", null, parameters, null));
+    assertEquals(new TextPart("11111111"), formatter.format((byte)0xff, null, parameters, null));
+    assertEquals(new TextPart("00000000"), formatter.format((byte)0, null, parameters, null));
+    assertEquals(new TextPart("10101010"), formatter.format((byte)0xaa, null, parameters, null));
+    assertEquals(new TextPart("01010101"), formatter.format((byte)0x55, null, parameters, null));
+    assertEquals(new TextPart("10101"), formatter.format((byte)0x15, null, parameters, new DataString("auto")));
+    assertEquals(new TextPart("0"), formatter.format((byte)0, null, parameters, new DataString("auto")));
+    assertEquals(new TextPart("101"), formatter.format((byte)0x15, null, parameters, new DataNumber(3)));
+    assertEquals(TextPart.NULL, formatter.format(null, null, parameters, null));
+    assertEquals(TextPart.NULL, formatter.format("hello", null, parameters, null));
   }
 
 
@@ -65,12 +65,12 @@ public class BitsFormatterTest
     BitsFormatter formatter = new BitsFormatter();
     Parameters parameters = ParameterFactory.DEFAULT.noParameters();
 
-    assertEquals("1111111111111111", formatter.format((short)0xffff, null, parameters, null));
-    assertEquals("0000000000000000", formatter.format((short)0, null, parameters, null));
-    assertEquals("1010101010101010", formatter.format((short)0xaaaa, null, parameters, null));
-    assertEquals("0101010101010101", formatter.format((short)0x5555, null, parameters, null));
-    assertEquals("101010101", formatter.format((short)0x155, null, parameters, new DataString("auto")));
-    assertEquals("0", formatter.format((short)0, null, parameters, new DataString("auto")));
-    assertEquals("010110", formatter.format((byte)0x456, null, parameters, new DataNumber(6)));
+    assertEquals(new TextPart("1111111111111111"), formatter.format((short)0xffff, null, parameters, null));
+    assertEquals(new TextPart("0000000000000000"), formatter.format((short)0, null, parameters, null));
+    assertEquals(new TextPart("1010101010101010"), formatter.format((short)0xaaaa, null, parameters, null));
+    assertEquals(new TextPart("0101010101010101"), formatter.format((short)0x5555, null, parameters, null));
+    assertEquals(new TextPart("101010101"), formatter.format((short)0x155, null, parameters, new DataString("auto")));
+    assertEquals(new TextPart("0"), formatter.format((short)0, null, parameters, new DataString("auto")));
+    assertEquals(new TextPart("010110"), formatter.format((byte)0x456, null, parameters, new DataNumber(6)));
   }
 }

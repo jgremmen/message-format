@@ -17,6 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.TextPart;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetAddress;
@@ -29,8 +31,9 @@ import java.util.Set;
  */
 public final class InetAddressFormatter extends AbstractParameterFormatter
 {
+  @NotNull
   @Override
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     String s = null;
 
@@ -47,7 +50,7 @@ public final class InetAddressFormatter extends AbstractParameterFormatter
         s = inetAddress.getHostAddress();
     }
 
-    return s;
+    return s == null ? Text.NULL : new TextPart(s);
   }
 
 

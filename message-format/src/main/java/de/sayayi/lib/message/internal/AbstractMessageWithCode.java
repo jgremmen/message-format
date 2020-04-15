@@ -13,50 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.impl;
+package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.jetbrains.annotations.Contract;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@ToString
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class EmptyMessage implements Message
+abstract class AbstractMessageWithCode implements Message.WithCode
 {
   private static final long serialVersionUID = 400L;
 
-  public static final Message INSTANCE = new EmptyMessage();
+  @Getter protected final String code;
 
 
-  @Override
-  @Contract(value = "_ -> null", pure = true)
-  public String format(@NotNull Parameters parameters) {
-    return null;
+  @SuppressWarnings("squid:S2589")
+  AbstractMessageWithCode(@NotNull String code)
+  {
+    //noinspection ConstantConditions
+    if (code == null || code.isEmpty())
+      throw new IllegalArgumentException("message code must not be empty");
+
+    this.code = code;
   }
 
 
   @Override
-  @Contract(value = "-> false", pure = true)
-  public boolean hasParameters() {
-    return false;
+  public int hashCode() {
+    return code.hashCode();
   }
 
 
   @Override
-  public boolean isSpaceBefore() {
-    return false;
-  }
-
-
-  @Override
-  public boolean isSpaceAfter() {
-    return false;
+  public boolean equals(Object o) {
+    return this == o || (o instanceof AbstractMessageWithCode && code.equals(((AbstractMessageWithCode)o).code));
   }
 }

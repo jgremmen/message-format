@@ -16,7 +16,7 @@
 package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.exception.MessageException;
-import de.sayayi.lib.message.impl.MultipartLocalizedMessageBundleWithCode;
+import de.sayayi.lib.message.internal.MultipartLocalizedMessageBundleWithCode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.impl;
+package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.parser.MessagePart;
-import lombok.Getter;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -27,40 +27,36 @@ import org.jetbrains.annotations.NotNull;
  * @author Jeroen Gremmen
  */
 @ToString
-public class SinglePartMessage implements Message
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class EmptyMessage implements Message.WithSpaces
 {
   private static final long serialVersionUID = 400L;
 
-  @Getter private final MessagePart part;
-
-
-  public SinglePartMessage(@NotNull MessagePart part) {
-    this.part = part;
-  }
+  public static final Message.WithSpaces INSTANCE = new EmptyMessage();
 
 
   @Override
-  @Contract(pure = true)
+  @Contract(value = "_ -> null", pure = true)
   public String format(@NotNull Parameters parameters) {
-    return part.getText(parameters);
+    return null;
   }
 
 
   @Override
-  @Contract(pure = true)
+  @Contract(value = "-> false", pure = true)
   public boolean hasParameters() {
-    return part.isParameter();
+    return false;
   }
 
 
   @Override
   public boolean isSpaceBefore() {
-    return part.isSpaceBefore();
+    return false;
   }
 
 
   @Override
   public boolean isSpaceAfter() {
-    return part.isSpaceAfter();
+    return false;
   }
 }

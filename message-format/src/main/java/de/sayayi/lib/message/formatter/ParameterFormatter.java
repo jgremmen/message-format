@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
+import de.sayayi.lib.message.internal.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +44,7 @@ public interface ParameterFormatter
    * @return  formatted parameter value or {@code null} if this formatter does not produce any output
    */
   @Contract(pure = true)
-  String format(Object value, String format, @NotNull Parameters parameters, Data data);
+  Text format(Object value, String format, @NotNull Parameters parameters, Data data);
 
 
   /**

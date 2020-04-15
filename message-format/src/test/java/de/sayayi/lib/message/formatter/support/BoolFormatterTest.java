@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
+import de.sayayi.lib.message.internal.TextPart;
 import org.junit.Test;
 
 import static de.sayayi.lib.message.MessageFactory.parse;
@@ -46,12 +47,12 @@ public class BoolFormatterTest extends AbstractFormatterTest
     final BoolFormatter formatter = new BoolFormatter();
     final Parameters parameters = ParameterFactory.createFor("de-DE").noParameters();
 
-    assertEquals("wahr", formatter.format(Boolean.TRUE, null, parameters, null));
-    assertEquals("falsch", formatter.format(0.0d, null, parameters, null));
-    assertEquals("wahr", formatter.format(-0.0001f, null, parameters, null));
-    assertEquals("falsch", formatter.format("FALSE", null, parameters, null));
-    assertEquals("wahr", formatter.format("TrUe", null, parameters, null));
-    assertEquals("wahr", formatter.format(-4, null, parameters, null));
+    assertEquals(new TextPart("wahr"), formatter.format(Boolean.TRUE, null, parameters, null));
+    assertEquals(new TextPart("falsch"), formatter.format(0.0d, null, parameters, null));
+    assertEquals(new TextPart("wahr"), formatter.format(-0.0001f, null, parameters, null));
+    assertEquals(new TextPart("falsch"), formatter.format("FALSE", null, parameters, null));
+    assertEquals(new TextPart("wahr"), formatter.format("TrUe", null, parameters, null));
+    assertEquals(new TextPart("wahr"), formatter.format(-4, null, parameters, null));
   }
 
 

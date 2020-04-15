@@ -20,10 +20,10 @@ import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.exception.MessageLocaleParseException;
-import de.sayayi.lib.message.impl.EmptyMessage;
-import de.sayayi.lib.message.impl.EmptyMessageWithCode;
-import de.sayayi.lib.message.impl.MessageDelegateWithCode;
-import de.sayayi.lib.message.impl.MultipartLocalizedMessageBundleWithCode;
+import de.sayayi.lib.message.internal.EmptyMessage;
+import de.sayayi.lib.message.internal.EmptyMessageWithCode;
+import de.sayayi.lib.message.internal.MessageDelegateWithCode;
+import de.sayayi.lib.message.internal.MultipartLocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.parser.MessageParserSupport;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -49,7 +49,7 @@ public final class MessageFactory
 
   @NotNull
   @Contract(value = "_ -> new", pure = true)
-  public static Message parse(@NotNull String text) {
+  public static Message.WithSpaces parse(@NotNull String text) {
     return MessageParserSupport.parse(text);
   }
 

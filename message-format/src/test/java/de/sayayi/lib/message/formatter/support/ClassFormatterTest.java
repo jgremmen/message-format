@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
+import de.sayayi.lib.message.internal.TextPart;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -40,13 +41,13 @@ public class ClassFormatterTest
     final ClassFormatter formatter = new ClassFormatter();
     final Parameters parameters = ParameterFactory.createFor(ROOT).noParameters();
 
-    Assert.assertEquals("java.lang.String",
+    Assert.assertEquals(new TextPart("java.lang.String"),
         formatter.format(String.class, null, parameters, null));
-    Assert.assertEquals("java.lang",
+    Assert.assertEquals(new TextPart("java.lang"),
         formatter.format(String.class, "package", parameters, null));
-    Assert.assertEquals("String",
+    Assert.assertEquals(new TextPart("String"),
         formatter.format(String.class, "name", parameters, null));
-    Assert.assertEquals("double",
+    Assert.assertEquals(new TextPart("double"),
         formatter.format(double.class, null, parameters, null));
   }
 

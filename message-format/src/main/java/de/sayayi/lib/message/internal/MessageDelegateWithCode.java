@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.impl;
+package de.sayayi.lib.message.internal;
 
+import de.sayayi.lib.message.Message;
+import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -23,39 +25,33 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @author Jeroen Gremmen
  */
+@SuppressWarnings("squid:S2160")
 @ToString
-public final class EmptyMessageWithCode extends AbstractMessageWithCode
+public class MessageDelegateWithCode extends AbstractMessageWithCode
 {
   private static final long serialVersionUID = 400L;
 
+  @Getter private final Message message;
 
-  public EmptyMessageWithCode(@NotNull String code) {
+
+  public MessageDelegateWithCode(@NotNull String code, @NotNull Message message)
+  {
     super(code);
+
+    this.message = message;
   }
 
 
   @Override
-  @Contract(value = "_ -> null", pure = true)
+  @Contract(pure = true)
   public String format(@NotNull Parameters parameters) {
-    return null;
+    return message.format(parameters);
   }
 
 
   @Override
-  @Contract(value = "-> false", pure = true)
+  @Contract(pure = true)
   public boolean hasParameters() {
-    return false;
-  }
-
-
-  @Override
-  public boolean isSpaceBefore() {
-    return false;
-  }
-
-
-  @Override
-  public boolean isSpaceAfter() {
-    return false;
+    return message.hasParameters();
   }
 }

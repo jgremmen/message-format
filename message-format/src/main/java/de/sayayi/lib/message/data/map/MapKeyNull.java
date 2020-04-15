@@ -16,12 +16,14 @@
 package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.Message.Parameters;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 
 /**
  * @author Jeroen Gremmen
  */
+@ToString(doNotUseGetters = true)
 public final class MapKeyNull implements MapKey
 {
   private final CompareType compareType;

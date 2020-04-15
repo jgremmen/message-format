@@ -20,6 +20,7 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.internal.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.Reference;
@@ -33,16 +34,15 @@ import java.util.Set;
 public final class ReferenceFormatter extends AbstractParameterFormatter implements EmptyMatcher
 {
   @SuppressWarnings("rawtypes")
+  @NotNull
   @Override
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return null;
+      return Text.NULL;
 
-    value = ((Reference)value).get();
-
-    return value != null
-        ? parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data) : "";
+    return (value = ((Reference)value).get()) != null
+        ? parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data) : Text.EMPTY;
   }
 
 

@@ -94,7 +94,8 @@ public final class DataMap implements Data
 
 
   @Contract(pure = true)
-  public Message getMessage(Object key, Parameters parameters, Set<MapKey.Type> keyTypes, boolean includeDefault)
+  public Message.WithSpaces getMessage(Object key, Parameters parameters, Set<MapKey.Type> keyTypes,
+                                       boolean includeDefault)
   {
     MapValue mapValue = find(key, parameters, keyTypes, MapValue.STRING_MESSAGE_TYPE);
 
@@ -104,12 +105,12 @@ public final class DataMap implements Data
         return null;
 
       mapValue = map.get(null);
-      return mapValue == null ? null : (Message)map.get(null).asObject();
+      return mapValue == null ? null : (Message.WithSpaces)map.get(null).asObject();
     }
 
     if (mapValue.getType() == Type.STRING)
       return ((MapValueString)mapValue).asMessage();
 
-    return (Message)mapValue.asObject();
+    return (Message.WithSpaces)mapValue.asObject();
   }
 }

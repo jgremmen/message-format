@@ -18,6 +18,8 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.TextPart;
 import org.junit.Test;
 
 import java.io.File;
@@ -25,7 +27,6 @@ import java.io.File;
 import static de.sayayi.lib.message.MessageFactory.parse;
 import static java.util.Locale.ROOT;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 
 /**
@@ -41,11 +42,11 @@ public class FileFormatterTest
 
     File f = new File("/path1/path2/filename.ext");
 
-    assertNull(formatter.format(null, null, parameters, null));
-    assertEquals("/path1/path2/filename.ext", formatter.format(f, null, parameters, null));
-    assertEquals("filename.ext", formatter.format(f, "name", parameters, null));
-    assertEquals("/path1/path2", formatter.format(f, "parent", parameters, null));
-    assertEquals("ext", formatter.format(f, "extension", parameters, null));
+    assertEquals(Text.NULL, formatter.format(null, null, parameters, null));
+    assertEquals(new TextPart("/path1/path2/filename.ext"), formatter.format(f, null, parameters, null));
+    assertEquals(new TextPart("filename.ext"), formatter.format(f, "name", parameters, null));
+    assertEquals(new TextPart("/path1/path2"), formatter.format(f, "parent", parameters, null));
+    assertEquals(new TextPart("ext"), formatter.format(f, "extension", parameters, null));
   }
 
 

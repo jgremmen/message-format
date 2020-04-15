@@ -47,4 +47,10 @@ public final class MapValueBool implements MapValue
   public Boolean asObject() {
     return bool;
   }
+
+
+  @Override
+  public String toString() {
+    return Boolean.toString(bool);
+  }
 }

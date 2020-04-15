@@ -18,6 +18,8 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,29 +41,30 @@ public final class NumberFormatter extends AbstractParameterFormatter
   private static final BoolFormatter BOOL_FORMATTER = new BoolFormatter();
 
 
+  @NotNull
   @Override
   @Contract(pure = true)
-  public String formatValue(Object v, String format, @NotNull Parameters parameters, Data data)
+  public Text formatValue(Object v, String format, @NotNull Parameters parameters, Data data)
   {
     if (v == null)
-      return null;
+      return Text.NULL;
 
     final Number value = (Number)v;
 
     if (data == null && (format == null || "integer".equals(format)) &&
         (value instanceof BigInteger || value instanceof Long || value instanceof Integer || value instanceof Short ||
          value instanceof Byte || value instanceof AtomicInteger || value instanceof AtomicLong))
-      return value.toString();
+      return new TextPart(value.toString());
 
     // special case: show number as bool
     if ("bool".equals(format))
       return formatBoolean(value, parameters, data);
 
-    return getFormatter(format, parameters, data).format(value);
+    return new TextPart(getFormatter(format, parameters, data).format(value));
   }
 
 
-  private String formatBoolean(Number value, Parameters parameters, Data data)
+  private Text formatBoolean(Number value, Parameters parameters, Data data)
   {
     ParameterFormatter formatter = parameters.getFormatter("bool", boolean.class);
     Set<Class<?>> types = formatter.getFormattableTypes();

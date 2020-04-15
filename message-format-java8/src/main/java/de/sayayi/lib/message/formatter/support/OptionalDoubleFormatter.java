@@ -20,6 +20,7 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.internal.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,17 +35,18 @@ import java.util.Set;
  */
 public final class OptionalDoubleFormatter extends AbstractParameterFormatter implements EmptyMatcher
 {
+  @NotNull
   @SuppressWarnings("squid:S2789")
   @Override
   @Contract(pure = true)
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return null;
+      return Text.NULL;
 
     final OptionalDouble optional = (OptionalDouble)value;
     if (!optional.isPresent())
-      return "";
+      return Text.EMPTY;
 
     return parameters.getFormatter(format, double.class).format(optional.getAsDouble(), format, parameters, data);
   }

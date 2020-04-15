@@ -17,6 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,46 +32,47 @@ import java.util.Set;
  */
 public final class URLFormatter extends AbstractParameterFormatter
 {
+  @NotNull
   @Override
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return null;
+      return Text.NULL;
 
     final URL url = (URL)value;
 
     if ("authority".equals(format))
-      return url.getAuthority();
+      return new TextPart(url.getAuthority());
     else if ("file".equals(format))
-      return url.getFile();
+      return new TextPart(url.getFile());
     else if ("host".equals(format))
-      return url.getHost();
+      return new TextPart(url.getHost());
     else if ("path".equals(format))
-      return url.getPath();
+      return new TextPart(url.getPath());
     else if ("port".equals(format))
     {
       int port = url.getPort();
       if (port == -1)
         port = url.getDefaultPort();
-      return Integer.toString(port);
+      return new TextPart(Integer.toString(port));
 //      return hasMessageFor(port, data)
 //          ? ((DataMap)data).format(parameters, port) : (port == -1 ? null : Integer.toString(port));
     }
     else if ("query".equals(format))
-      return url.getQuery();
+      return new TextPart(url.getQuery());
     else if ("protocol".equals(format))
     {
       String protocol = url.getProtocol();
-      return protocol;
+      return new TextPart(protocol);
 //      return hasMessageFor(protocol, data) ? ((DataMap)data).format(parameters, protocol) : protocol;
     }
     else if ("user-info".equals(format))
-      return url.getUserInfo();
+      return new TextPart(url.getUserInfo());
     else if ("ref".equals(format))
-      return url.getRef();
+      return new TextPart(url.getRef());
 
-    return url.toExternalForm();
+    return new TextPart(url.toExternalForm());
   }
 
 

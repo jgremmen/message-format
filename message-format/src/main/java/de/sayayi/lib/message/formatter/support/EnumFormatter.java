@@ -17,6 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.TextPart;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -28,17 +30,18 @@ import java.util.Set;
  */
 public final class EnumFormatter extends AbstractParameterFormatter
 {
+  @NotNull
   @Override
-  protected String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  protected Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return null;
+      return Text.NULL;
 
     final Enum<?> enm = (Enum<?>)value;
 
     return "ordinal".equals(getConfigFormat(format, data, true, null))
         ? parameters.getFormatter(int.class).format(enm.ordinal(), null, parameters, data)
-        : enm.name();
+        : new TextPart(enm.name());
   }
 
 

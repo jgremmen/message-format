@@ -20,6 +20,8 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataNumber;
 import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.TextPart;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
@@ -39,14 +41,15 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
   }
 
 
+  @NotNull
   @Override
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (!(value instanceof Number))
-      return null;
+      return Text.NULL;
 
     final int bitCount = detectBitCount(parameters, data, value);
-    return bitCount > 0 ? format(bitCount, value) : "";
+    return bitCount > 0 ? new TextPart(format(bitCount, value)) : Text.EMPTY;
   }
 
 

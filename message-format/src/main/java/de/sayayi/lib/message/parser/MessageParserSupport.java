@@ -17,9 +17,12 @@ package de.sayayi.lib.message.parser;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.exception.MessageParserException;
-import de.sayayi.lib.message.impl.EmptyMessage;
-import de.sayayi.lib.message.impl.MultipartMessage;
-import de.sayayi.lib.message.impl.SinglePartMessage;
+import de.sayayi.lib.message.internal.EmptyMessage;
+import de.sayayi.lib.message.internal.MessagePart;
+import de.sayayi.lib.message.internal.ParameterPart;
+import de.sayayi.lib.message.internal.ParameterizedMessage;
+import de.sayayi.lib.message.internal.TextMessage;
+import de.sayayi.lib.message.internal.TextPart;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -63,7 +66,7 @@ public final class MessageParserSupport extends MessageParser
   }
 
 
-  public static Message parse(String text)
+  public static Message.WithSpaces parse(String text)
   {
     MessageContext messageContext = new MessageParserSupport(text).message();
 
@@ -82,12 +85,8 @@ public final class MessageParserSupport extends MessageParser
   private final class ParserListener extends MessageParserBaseListener
   {
     @Override
-    public void exitTextPart(TextPartContext ctx)
-    {
-      final String text = ctx.text().value;
-      final int length = text.length();
-
-      ctx.value = new TextPart(text.trim(), isSpaceChar(text.charAt(0)), isSpaceChar(text.charAt(length - 1)));
+    public void exitTextPart(TextPartContext ctx) {
+      ctx.value = new TextPart(ctx.text().value);
     }
 
 
@@ -95,21 +94,14 @@ public final class MessageParserSupport extends MessageParser
     public void exitMessage0(Message0Context ctx)
     {
       final List<MessagePart> parts = ctx.parts;
+      final int partCount = parts.size();
 
-      switch(parts.size())
-      {
-        case 0:
-          ctx.value = EmptyMessage.INSTANCE;
-          break;
-
-        case 1:
-          ctx.value = new SinglePartMessage(parts.get(0));
-          break;
-
-        default:
-          ctx.value = new MultipartMessage(parts);
-          break;
-      }
+      if (partCount == 0)
+        ctx.value = EmptyMessage.INSTANCE;
+      else if (partCount == 1 && parts.get(0) instanceof TextPart)
+        ctx.value = new TextMessage((TextPart)parts.get(0));
+      else
+        ctx.value = new ParameterizedMessage(parts);
     }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Jeroen Gremmen
+ * Copyright 2020 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,41 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parser;
+package de.sayayi.lib.message.internal;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.jetbrains.annotations.Contract;
+
+import static java.lang.Character.isSpaceChar;
 
 
 /**
  * @author Jeroen Gremmen
  */
-final class TextPart extends MessagePart
+@EqualsAndHashCode(doNotUseGetters = true)
+public final class TextPart implements Text
 {
-  private static final long serialVersionUID = 400L;
+  private static final long serialVersionUID = 500L;
 
-  private final String text;
+  @Getter private final String text;
+  @Getter private final boolean spaceBefore;
+  @Getter private final boolean spaceAfter;
 
 
-  TextPart(String text, boolean spaceBefore, boolean spaceAfter)
+  public TextPart(String text) {
+    this(text, false, false);
+  }
+
+
+  public TextPart(String text, boolean spaceBefore, boolean spaceAfter)
   {
-    super(spaceBefore, spaceAfter);
+    final boolean empty = text == null || text.isEmpty();
 
-    this.text = text;
+    this.text = empty ? null : text.trim();
+    this.spaceBefore = spaceBefore || (!empty && isSpaceChar(text.charAt(0)));
+    this.spaceAfter = spaceAfter || (!empty && isSpaceChar(text.charAt(text.length() - 1)));
   }
 
 
   @Override
-  @Contract(pure = true)
-  public String getText(Parameters parameters) {
-    return text;
-  }
-
-
-  @Override
-  @Contract(pure = true)
-  public boolean isParameter() {
-    return false;
+  public boolean isEmpty() {
+    return text == null || text.isEmpty();
   }
 
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.impl;
+package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.LocaleAware;
@@ -112,18 +112,6 @@ public class MultipartLocalizedMessageBundleWithCode extends AbstractMessageWith
     }
 
     return hasParameter;
-  }
-
-
-  @Override
-  public boolean isSpaceBefore() {
-    return false;
-  }
-
-
-  @Override
-  public boolean isSpaceAfter() {
-    return false;
   }
 
 
