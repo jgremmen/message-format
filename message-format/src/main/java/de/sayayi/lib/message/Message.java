@@ -63,12 +63,17 @@ public interface Message extends Serializable
   boolean hasParameters();
 
 
-  @Contract(pure = true)
-  boolean isSpaceBefore();
 
 
-  @Contract(pure = true)
-  boolean isSpaceAfter();
+  interface WithSpaces extends Message
+  {
+    @Contract(pure = true)
+    boolean isSpaceBefore();
+
+
+    @Contract(pure = true)
+    boolean isSpaceAfter();
+  }
 
 
 

@@ -21,6 +21,8 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,19 +45,23 @@ public final class ChoiceFormatter extends AbstractParameterFormatter implements
 
   @Override
   @Contract(pure = true)
-  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public Text format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (!(data instanceof DataMap))
       throw new MessageException("data must be a choice map");
 
-    final Message message = ((DataMap)data).getMessage(value, parameters, NO_NAME_KEY_TYPES, true);
-    return message == null ? null : message.format(parameters);
+    final Message.WithSpaces message =
+        ((DataMap)data).getMessage(value, parameters, NO_NAME_KEY_TYPES, true);
+
+    return message == null
+        ? null : new TextPart(message.format(parameters), message.isSpaceBefore(), message.isSpaceAfter());
   }
 
 
+  @NotNull
   @Override
-  protected String formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
-    return null;
+  protected Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
+    throw new IllegalStateException();
   }
 
 

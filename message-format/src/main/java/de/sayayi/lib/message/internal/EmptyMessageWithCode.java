@@ -13,42 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.impl;
+package de.sayayi.lib.message.internal;
 
-import de.sayayi.lib.message.Message;
-import lombok.Getter;
+import lombok.ToString;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public abstract class AbstractMessageWithCode implements Message.WithCode
+@ToString
+public final class EmptyMessageWithCode extends AbstractMessageWithCode
 {
   private static final long serialVersionUID = 400L;
 
-  @Getter protected final String code;
 
-
-  @SuppressWarnings("squid:S2589")
-  AbstractMessageWithCode(@NotNull String code)
-  {
-    //noinspection ConstantConditions
-    if (code == null || code.isEmpty())
-      throw new IllegalArgumentException("message code must not be empty");
-
-    this.code = code;
+  public EmptyMessageWithCode(@NotNull String code) {
+    super(code);
   }
 
 
   @Override
-  public int hashCode() {
-    return code.hashCode();
+  @Contract(value = "_ -> null", pure = true)
+  public String format(@NotNull Parameters parameters) {
+    return null;
   }
 
 
   @Override
-  public boolean equals(Object o) {
-    return this == o || (o instanceof AbstractMessageWithCode && code.equals(((AbstractMessageWithCode)o).code));
+  @Contract(value = "-> false", pure = true)
+  public boolean hasParameters() {
+    return false;
   }
 }

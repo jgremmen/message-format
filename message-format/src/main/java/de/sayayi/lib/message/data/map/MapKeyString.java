@@ -18,6 +18,7 @@ package de.sayayi.lib.message.data.map;
 import de.sayayi.lib.message.Message.Parameters;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.Collator;
@@ -27,6 +28,7 @@ import java.util.Locale;
 /**
  * @author Jeroen Gremmen
  */
+@ToString(doNotUseGetters = true)
 @AllArgsConstructor
 public final class MapKeyString implements MapKey
 {

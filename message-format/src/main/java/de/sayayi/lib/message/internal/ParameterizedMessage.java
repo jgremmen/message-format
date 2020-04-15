@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.impl;
+package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.parser.MessagePart;
+import de.sayayi.lib.message.internal.MessagePart.Text;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -28,14 +28,23 @@ import java.util.List;
  * @author Jeroen Gremmen
  */
 @ToString
-public class MultipartMessage implements Message
+public class ParameterizedMessage implements Message.WithSpaces
 {
   private static final long serialVersionUID = 400L;
 
   private final MessagePart[] parts;
 
 
-  public MultipartMessage(@NotNull List<MessagePart> parts) {
+  public ParameterizedMessage(@NotNull List<MessagePart> parts)
+  {
+    findParameter: {
+      for(MessagePart part: parts)
+        if (part instanceof ParameterPart)
+          break findParameter;
+
+      throw new IllegalArgumentException("parts must contain at least 1 parameter part");
+    }
+
     this.parts = parts.toArray(new MessagePart[0]);
   }
 
@@ -47,17 +56,17 @@ public class MultipartMessage implements Message
     final StringBuilder message = new StringBuilder();
     boolean spaceBefore = false;
 
-    for(final MessagePart part: parts)
+    for(MessagePart part: parts)
     {
-      final String text = part.getText(parameters);
+      final Text textPart = part instanceof ParameterPart ? ((ParameterPart)part).getText(parameters) : (Text)part;
 
-      if (!isEmpty(text))
+      if (!textPart.isEmpty())
       {
-        if ((spaceBefore || part.isSpaceBefore()) && message.length() > 0)
+        if ((spaceBefore || textPart.isSpaceBefore()) && message.length() > 0)
           message.append(' ');
 
-        message.append(text);
-        spaceBefore = part.isSpaceAfter();
+        message.append(textPart.getText());
+        spaceBefore = textPart.isSpaceAfter();
       }
     }
 
@@ -68,23 +77,18 @@ public class MultipartMessage implements Message
   @Override
   @Contract(pure = true)
   public boolean hasParameters() {
-    return parts.length > 0 && (parts.length > 1 || parts[0].isParameter());
+    return true;
   }
 
 
   @Override
   public boolean isSpaceBefore() {
-    return parts.length > 0 && parts[0].isSpaceBefore();
+    return parts[0].isSpaceBefore();
   }
 
 
   @Override
   public boolean isSpaceAfter() {
-    return parts.length > 0 && parts[parts.length - 1].isSpaceAfter();
-  }
-
-
-  private static boolean isEmpty(String s) {
-    return s == null || s.isEmpty();
+    return parts[parts.length - 1].isSpaceAfter();
   }
 }

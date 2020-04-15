@@ -20,7 +20,7 @@ import de.sayayi.lib.message.Message.WithCode;
 import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
-import de.sayayi.lib.message.impl.EmptyMessageWithCode;
+import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import org.junit.Before;
 import org.junit.Test;
 

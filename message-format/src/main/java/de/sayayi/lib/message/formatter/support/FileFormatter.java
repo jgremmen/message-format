@@ -17,6 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,30 +32,31 @@ import java.util.Set;
  */
 public final class FileFormatter extends AbstractParameterFormatter
 {
+  @NotNull
   @Override
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return null;
+      return Text.NULL;
 
     final File file = (File)value;
     format = getConfigFormat(format, data, true, null);
 
     if ("name".equals(format))
-      return file.getName();
+      return new TextPart(file.getName());
     else if ("path".equals(format))
-      return file.getPath();
+      return new TextPart(file.getPath());
     else if ("parent".equals(format))
-      return file.getParent();
+      return new TextPart(file.getParent());
     else if ("extension".equals(format))
     {
       String name = file.getName();
       int dotidx = name.lastIndexOf('.');
 
-      return dotidx == -1 ? "" : name.substring(dotidx + 1);
+      return dotidx == -1 ? Text.EMPTY : new TextPart(name.substring(dotidx + 1));
     }
 
-    return file.getAbsolutePath();
+    return new TextPart(file.getAbsolutePath());
   }
 
 

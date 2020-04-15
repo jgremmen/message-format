@@ -18,8 +18,8 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.Message.WithCode;
 import de.sayayi.lib.message.exception.MessageParserException;
-import de.sayayi.lib.message.impl.EmptyMessage;
-import de.sayayi.lib.message.impl.EmptyMessageWithCode;
+import de.sayayi.lib.message.internal.EmptyMessage;
+import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

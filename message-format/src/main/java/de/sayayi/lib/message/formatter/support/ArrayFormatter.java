@@ -21,6 +21,8 @@ import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.TextPart;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -38,13 +40,16 @@ import static java.util.ResourceBundle.getBundle;
  */
 public final class ArrayFormatter extends AbstractParameterFormatter implements EmptyMatcher
 {
+  @NotNull
   @Override
-  public String formatValue(Object array, String format, @NotNull Parameters parameters, Data data)
+  public Text formatValue(Object array, String format, @NotNull Parameters parameters, Data data)
   {
-    final int length;
+    if (array == null)
+      return Text.NULL;
 
-    if (array == null || (length = getLength(array)) == 0)
-      return null;
+    final int length = getLength(array);
+    if (length == 0)
+      return Text.EMPTY;
 
     final StringBuilder s = new StringBuilder();
     final Class<?> arrayType = array.getClass();
@@ -55,25 +60,25 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
     for(int i = 0; i < length; i++)
     {
       final Object value = get(array, i);
-      String text = null;
+      Text text = null;
 
       if (value == array)
-        text = bundle.getString("thisArray");
+        text = new TextPart(bundle.getString("thisArray"));
       else if (formatter != null)
         text = formatter.format(value, format, parameters, data);
       else if (value != null)
         text = parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data);
 
-      if (text != null)
+      if (text != null && !text.isEmpty())
       {
         if (s.length() > 0)
           s.append(", ");
 
-        s.append(text);
+        s.append(text.getText());
       }
     }
 
-    return s.toString();
+    return new TextPart(s.toString());
   }
 
 

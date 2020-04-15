@@ -23,18 +23,19 @@ options {
 
 @header {
 import de.sayayi.lib.message.*;
+import de.sayayi.lib.message.internal.*;
 import de.sayayi.lib.message.data.*;
 import de.sayayi.lib.message.data.map.*;
 import java.util.*;
 }
 
 
-message returns [Message value]
+message returns [Message.WithSpaces value]
         : message0  { $value = $message0.value; }
           EOF
         ;
 
-message0 returns [Message value] locals [List<MessagePart> parts]
+message0 returns [Message.WithSpaces value] locals [List<MessagePart> parts]
         @init {
           $parts = new ArrayList<MessagePart>();
         }
@@ -59,7 +60,7 @@ text returns [String value] locals [StringBuilder sb]
         : (CH  { $sb.append($CH.text); })+
         ;
 
-quotedMessage returns [Message value]
+quotedMessage returns [Message.WithSpaces value]
         : SINGLE_QUOTE_START message0 SINGLE_QUOTE_END  { $value = $message0.value; }
         | DOUBLE_QUOTE_START message0 DOUBLE_QUOTE_END  { $value = $message0.value; }
         ;
@@ -72,7 +73,7 @@ string returns [String value]
         | DOUBLE_QUOTE_START (t=text  { $value = $t.value; } )? DOUBLE_QUOTE_END
         ;
 
-forceQuotedMessage returns [Message value]
+forceQuotedMessage returns [Message.WithSpaces value]
         : quotedMessage  { $value = $quotedMessage.value; }
         | string  { $value = MessageFactory.parse($string.value); }
         ;

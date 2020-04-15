@@ -17,6 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.LocalDate;
@@ -55,12 +57,13 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
   }
 
 
+  @NotNull
   @Override
   @Contract(pure = true)
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return null;
+      return Text.NULL;
 
     if (!STYLE.containsKey(format))
       format = getConfigValueString("format", parameters, data, true, null);
@@ -80,14 +83,14 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
         style[0] = '-';
 
       if (style[0] == '-' && style[1] == '-')
-        return "";
+        return Text.EMPTY;
 
       formatter = DateTimeFormat.forStyle(new String(style)).withLocale(locale);
     }
 
-    return (value instanceof ReadablePartial
+    return new TextPart((value instanceof ReadablePartial
         ? formatter.print((ReadablePartial)value)
-        : formatter.print((ReadableInstant)value)).trim();
+        : formatter.print((ReadableInstant)value)).trim());
   }
 
 

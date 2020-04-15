@@ -19,6 +19,8 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.Type;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,23 +39,24 @@ import static de.sayayi.lib.message.data.map.MapKey.Type.STRING;
  */
 public final class URIFormatter extends AbstractParameterFormatter
 {
+  @NotNull
   @Override
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return formatNull(parameters, data);
+      return Text.NULL;
 
     final URI uri = (URI)value;
 
     if ("authority".equals(format))
       return parameters.getFormatter(String.class).format(uri.getAuthority(), null, parameters, data);
     else if ("fragment".equals(format))
-      return uri.getFragment();
+      return new TextPart(uri.getFragment());
     else if ("host".equals(format))
-      return uri.getHost();
+      return new TextPart(uri.getHost());
     else if ("path".equals(format))
-      return uri.getPath();
+      return new TextPart(uri.getPath());
     else if ("port".equals(format))
     {
       final int port = uri.getPort();
@@ -62,30 +65,32 @@ public final class URIFormatter extends AbstractParameterFormatter
       {
         String undefined = getConfigValueString("undefined", parameters, data, false,null);
         if (undefined != null)
-          return undefined;
+          return new TextPart(undefined);
       }
       else if (port >= 0)
       {
-        Message msg = getMessage(port, EnumSet.of(Type.NUMBER), parameters, data, false);
+        Message.WithSpaces msg = getMessage(port, EnumSet.of(Type.NUMBER), parameters, data, false);
         if (msg != null)
-          return msg.format(parameters);
+          return new TextPart(msg.format(parameters), msg.isSpaceBefore(), msg.isSpaceAfter());
       }
 
-      return port == -1 ? null : Integer.toString(port);
+      return port == -1 ? Text.NULL : new TextPart(Integer.toString(port));
     }
     else if ("query".equals(format))
-      return uri.getQuery();
+      return new TextPart(uri.getQuery());
     else if ("scheme".equals(format))
     {
       final String scheme = uri.getScheme();
-      final Message msg = getMessage(scheme, EnumSet.of(STRING, EMPTY, NULL), parameters, data, false);
+      final Message.WithSpaces msg = getMessage(scheme, EnumSet.of(STRING, EMPTY, NULL), parameters, data, false);
 
-      return msg != null ? msg.format(parameters) : scheme;
+      return msg != null
+          ? new TextPart(msg.format(parameters), msg.isSpaceBefore(), msg.isSpaceAfter())
+          : new TextPart(scheme);
     }
     else if ("user-info".equals(format))
-      return uri.getUserInfo();
+      return new TextPart(uri.getUserInfo());
 
-    return uri.toString();
+    return new TextPart(uri.toString());
   }
 
 

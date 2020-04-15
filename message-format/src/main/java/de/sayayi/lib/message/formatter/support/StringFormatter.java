@@ -21,6 +21,8 @@ import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,11 +47,15 @@ public final class StringFormatter extends AbstractParameterFormatter implements
   }
 
 
+  @NotNull
   @Override
   @Contract(pure = true)
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
-    return value == null ? null : ((value instanceof char[]) ? new String((char[])value) : String.valueOf(value)).trim();
+  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  {
+    return value == null
+        ? Text.NULL
+        : new TextPart(((value instanceof char[]) ? new String((char[])value) : String.valueOf(value)).trim());
   }
 
 

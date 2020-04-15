@@ -17,6 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -78,12 +80,13 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
   }
 
 
+  @NotNull
   @Override
   @Contract(pure = true)
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return null;
+      return Text.NULL;
 
     if (!STYLE.containsKey(format))
       format = getConfigValueString("format", parameters, data, true, null);
@@ -102,7 +105,7 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
         style[0] = '-';
 
       if ((formatter = FORMATTER.get(new String(style))) == null)
-        return "";
+        return Text.EMPTY;
     }
 
     String text = formatter
@@ -118,7 +121,7 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
         text = text.substring(0, idx);
     }
 
-    return text;
+    return new TextPart(text);
   }
 
 

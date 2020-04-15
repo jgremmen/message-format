@@ -17,6 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,17 +34,18 @@ import java.util.Set;
  */
 public final class MonetaryAmountFormatter extends AbstractParameterFormatter
 {
+  @NotNull
   @Override
   @Contract(pure = true)
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return null;
+      return Text.NULL;
 
     final MonetaryAmount monetaryAmount = (MonetaryAmount)value;
     final MonetaryAmountFormat monetaryFormat = MonetaryFormats.getAmountFormat(parameters.getLocale());
 
-    return monetaryFormat.format(monetaryAmount);
+    return new TextPart(monetaryFormat.format(monetaryAmount));
   }
 
 

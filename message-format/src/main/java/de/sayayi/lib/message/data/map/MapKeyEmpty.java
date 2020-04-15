@@ -18,6 +18,7 @@ package de.sayayi.lib.message.data.map;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
@@ -28,6 +29,7 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_LENIENT
 /**
  * @author Jeroen Gremmen
  */
+@ToString(doNotUseGetters = true)
 public final class MapKeyEmpty implements MapKey
 {
   private final CompareType compareType;

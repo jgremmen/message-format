@@ -20,6 +20,8 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,15 +39,16 @@ import static java.util.ResourceBundle.getBundle;
  */
 public final class MapFormatter extends AbstractParameterFormatter implements EmptyMatcher
 {
+  @NotNull
   @Override
   @Contract(pure = true)
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     final Map<?,?> map = (Map<?,?>)value;
     if (map == null)
-      return formatNull(parameters, data);
+      return Text.NULL;
     if (map.isEmpty())
-      return formatEmpty(parameters, data);
+      return Text.EMPTY;
 
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
     final String separator = getSeparator(parameters, data);
@@ -83,7 +86,7 @@ public final class MapFormatter extends AbstractParameterFormatter implements Em
       s.append((keyString + separator + valueString).trim());
     }
 
-    return s.toString();
+    return new TextPart(s.toString());
   }
 
 
