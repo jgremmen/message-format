@@ -17,35 +17,36 @@ package de.sayayi.lib.message.formatter;
 
 import lombok.Getter;
 import lombok.Synchronized;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.AbstractMap;
-import java.util.AbstractSet;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.*;
 
 
 /**
  * @author Jeroen Gremmen
  */
 @SuppressWarnings("squid:S2160")
-public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
+public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneable, Serializable
 {
+  private static final long serialVersionUID = 8127450864651796228L;
+
   private final Comparator<Link<K,V>> comparator;
-  private final Link<K,V> meru;
   private final int maxSize;
 
-  private Link<K,V>[] entries;
+  private transient Link<K,V> meru;
+  private transient Link<K,V>[] entries;
   private int size;
 
-  private EntrySet entrySet;
-  private KeySet cacheKeySet;
-  private int modCount;
+  private transient int modCount;
+
+  private transient EntrySet entrySet;
+  private transient KeySet cacheKeySet;
+  private transient ValueCollection cacheValueCollection;
 
 
   @SuppressWarnings("unused")
@@ -73,7 +74,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
 
   @SuppressWarnings("squid:S3776")
   @Override
-  public V put(K key, V value)
+  public V put(@NotNull K key, V value)
   {
     Link<K,V> link = new Link<K,V>(key);
     int idx = Arrays.binarySearch(entries, 0, size, link, comparator);
@@ -152,11 +153,11 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
     if (size == entries.length)
     {
       int newSize = Math.min(entries.length * 3 / 2, maxSize);
-      Link[] newEntries = new Link[newSize];
+      @SuppressWarnings("unchecked")
+      Link<K,V>[] newEntries = new Link[newSize];
 
       System.arraycopy(entries, 0, newEntries, 0, size);
-      //noinspection unchecked
-      entries = (Link<K,V>[])newEntries;
+      entries = newEntries;
     }
   }
 
@@ -201,6 +202,17 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
   @Override
   public boolean containsKey(Object key) {
     return findEntry((K)key) != null;
+  }
+
+
+  @Override
+  public boolean containsValue(Object value)
+  {
+    for(Link<K,V> link = meru.next; link != meru; link = link.next)
+      if (value == null ? link.value == null : value.equals(link.value))
+        return true;
+
+    return false;
   }
 
 
@@ -257,6 +269,17 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
 
   @NotNull
   @Synchronized
+  public Set<Entry<K,V>> entrySet()
+  {
+    if (entrySet == null)
+      entrySet = new EntrySet();
+
+    return entrySet;
+  }
+
+
+  @NotNull
+  @Synchronized
   @Override
   public Set<K> keySet()
   {
@@ -267,23 +290,126 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
   }
 
 
+  @NotNull
+  @Synchronized
+  @Override
+  public Collection<V> values()
+  {
+    if (cacheValueCollection == null)
+      cacheValueCollection = new ValueCollection();
+
+    return cacheValueCollection;
+  }
+
+
+  @SuppressWarnings("unchecked")
+  @Contract("-> new")
+  public FixedSizeCacheMap<K,V> clone()
+  {
+    try {
+      @SuppressWarnings("unchecked")
+      FixedSizeCacheMap<K,V> m = (FixedSizeCacheMap<K,V>)super.clone();
+
+      m.modCount = 0;
+      m.meru = new Link<K,V>(null);
+      m.entries = new Link[size];
+
+      Link<K,V> lastLink = m.meru;
+      Link<K,V> srcLink = meru.next;
+
+      for(int n = 0; n < size; n++)
+      {
+        Link<K,V> link = new Link<K,V>(srcLink.key);
+        link.value = srcLink.value;
+
+        lastLink.next = m.entries[n] = link;
+        link.previous = lastLink;
+
+        lastLink = link;
+
+        srcLink = srcLink.next;
+      }
+
+      m.meru.previous = lastLink;
+      lastLink.next = m.meru;
+
+      Arrays.sort(m.entries, m.comparator);
+
+      return m;
+    } catch(CloneNotSupportedException e) {
+      throw new InternalError();
+    }
+  }
+
+
+  private void writeObject(ObjectOutputStream s) throws IOException
+  {
+    final int expectedModCount = modCount;
+
+    s.defaultWriteObject();
+
+    for(Link<K,V> link = meru.next; link != meru; link = link.next)
+    {
+      s.writeObject(link.key);
+      s.writeObject(link.value);
+    }
+
+    if (expectedModCount != modCount)
+      throw new ConcurrentModificationException();
+  }
+
+
+  @SuppressWarnings("unchecked")
+  private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException
+  {
+    s.defaultReadObject();
+
+    meru = new Link<K,V>(null);
+    entries = new Link[size];
+
+    Link<K,V> lastLink = meru;
+
+    for(int n = 0; n < size; n++)
+    {
+      Link<K,V> link = new Link<K,V>((K)s.readObject());
+      link.value = (V)s.readObject();
+
+      lastLink.next = entries[n] = link;
+      link.previous = lastLink;
+
+      lastLink = link;
+    }
+
+    meru.previous = lastLink;
+    lastLink.next = meru;
+
+    Arrays.sort(entries, comparator);
+  }
+
+
+
+
   final class KeySet extends AbstractSet<K>
   {
     public final int size() {
       return size;
     }
 
+
     public final void clear() {
       FixedSizeCacheMap.this.clear();
     }
+
 
     public final Iterator<K> iterator() {
       return new KeyIterator();
     }
 
+
     public final boolean contains(Object o) {
       return containsKey(o);
     }
+
 
     public final boolean remove(Object key) {
       return FixedSizeCacheMap.this.remove(key) != null;
@@ -291,14 +417,44 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
   }
 
 
-  @NotNull
-  @Synchronized
-  public Set<Entry<K,V>> entrySet()
+  final class ValueCollection extends AbstractCollection<V>
   {
-    if (entrySet == null)
-      entrySet = new EntrySet();
+    @Override
+    public int size() {
+      return size;
+    }
 
-    return entrySet;
+
+    @Override
+    public void clear() {
+      FixedSizeCacheMap.this.clear();
+    }
+
+
+    @Override
+    public Iterator<V> iterator() {
+      return new ValueIterator();
+    }
+
+
+    @Override
+    public boolean contains(Object o) {
+      return containsValue(o);
+    }
+
+
+    @Override
+    public boolean remove(Object o)
+    {
+      for(Link<K,V> link = meru.next; link != meru; link = link.next)
+        if (o == null ? link.value == null : o.equals(link.value))
+        {
+          remove0(link);
+          return true;
+        }
+
+      return false;
+    }
   }
 
 
@@ -308,18 +464,22 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
       return size;
     }
 
+
     public final void clear() {
       FixedSizeCacheMap.this.clear();
     }
+
 
     public final Iterator<Entry<K,V>> iterator() {
       return new EntryIterator();
     }
 
+
     @SuppressWarnings("unchecked")
     public final boolean contains(Object o) {
       return (o instanceof FixedSizeCacheMap.Link) && findEntry(((Link<K,V>)o).key) == o;
     }
+
 
     public final boolean remove(Object o)
     {
@@ -367,6 +527,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
     Link<K,V> next;
     Link<K,V> current;
     int expectedModCount;
+
 
     BaseIterator()
     {
@@ -446,13 +607,13 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V>
     {
       if (this == o)
         return true;
-      if (!(o instanceof FixedSizeCacheMap.Link))
+      if (!(o instanceof Link))
         return false;
 
-      //noinspection unchecked
+      @SuppressWarnings("unchecked")
       Link<K,V> that = (Link<K,V>)o;
 
-      return key.equals(that.key) && ((value == null) ? that.value == null : value.equals(that.value));
+      return key.equals(that.key) && (value == null ? that.value == null : value.equals(that.value));
     }
 
 
