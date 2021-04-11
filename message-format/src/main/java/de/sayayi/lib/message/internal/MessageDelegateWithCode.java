@@ -21,6 +21,8 @@ import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Set;
+
 
 /**
  * @author Jeroen Gremmen
@@ -29,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 @ToString
 public class MessageDelegateWithCode extends AbstractMessageWithCode
 {
-  private static final long serialVersionUID = 400L;
+  private static final long serialVersionUID = 500L;
 
   @Getter private final Message message;
 
@@ -53,5 +55,12 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
   @Contract(pure = true)
   public boolean hasParameters() {
     return message.hasParameters();
+  }
+
+
+  @NotNull
+  @Override
+  public Set<String> getParameterNames() {
+    return message.getParameterNames();
   }
 }

@@ -17,8 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.internal.MessagePart.Text;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.LocalDate;
@@ -36,6 +35,10 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 
 
 /**
@@ -63,7 +66,7 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
   public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return Text.NULL;
+      return nullText();
 
     if (!STYLE.containsKey(format))
       format = getConfigValueString("format", parameters, data, true, null);
@@ -83,14 +86,14 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
         style[0] = '-';
 
       if (style[0] == '-' && style[1] == '-')
-        return Text.EMPTY;
+        return emptyText();
 
       formatter = DateTimeFormat.forStyle(new String(style)).withLocale(locale);
     }
 
-    return new TextPart((value instanceof ReadablePartial
+    return noSpaceText(value instanceof ReadablePartial
         ? formatter.print((ReadablePartial)value)
-        : formatter.print((ReadableInstant)value)).trim());
+        : formatter.print((ReadableInstant)value));
   }
 
 

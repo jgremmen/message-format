@@ -21,8 +21,10 @@ import de.sayayi.lib.message.data.map.MapKey;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.data.map.MapValue;
 import de.sayayi.lib.message.data.map.MapValue.Type;
+import de.sayayi.lib.message.data.map.MapValueMessage;
 import de.sayayi.lib.message.data.map.MapValueString;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -31,12 +33,15 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 
 /**
  * @author Jeroen Gremmen
  */
 @AllArgsConstructor
+@EqualsAndHashCode(doNotUseGetters = true)
 public final class DataMap implements Data
 {
   private static final long serialVersionUID = 400L;
@@ -112,5 +117,21 @@ public final class DataMap implements Data
       return ((MapValueString)mapValue).asMessage();
 
     return (Message.WithSpaces)mapValue.asObject();
+  }
+
+
+  /**
+   * Returns all parameter names occurring in messages in this map.
+   *
+   * @return  all parameter names, never {@code null}
+   */
+  @NotNull
+  @Contract(pure = true)
+  public Set<String> getParameterNames()
+  {
+    return map.values().stream()
+        .filter(mapValue -> mapValue instanceof MapValueMessage)
+        .flatMap(mapValue -> ((MapValueMessage)mapValue).asObject().getParameterNames().stream())
+        .collect(Collectors.toCollection(TreeSet::new));
   }
 }

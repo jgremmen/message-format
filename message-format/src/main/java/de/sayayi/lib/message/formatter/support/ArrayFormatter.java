@@ -21,8 +21,9 @@ import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
-import de.sayayi.lib.message.internal.MessagePart.Text;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -30,6 +31,9 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.lang.reflect.Array.get;
 import static java.lang.reflect.Array.getLength;
 import static java.util.ResourceBundle.getBundle;
@@ -38,18 +42,18 @@ import static java.util.ResourceBundle.getBundle;
 /**
  * @author Jeroen Gremmen
  */
-public final class ArrayFormatter extends AbstractParameterFormatter implements EmptyMatcher
+public final class ArrayFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
 {
   @NotNull
   @Override
   public Text formatValue(Object array, String format, @NotNull Parameters parameters, Data data)
   {
     if (array == null)
-      return Text.NULL;
+      return nullText();
 
     final int length = getLength(array);
     if (length == 0)
-      return Text.EMPTY;
+      return emptyText();
 
     final StringBuilder s = new StringBuilder();
     final Class<?> arrayType = array.getClass();
@@ -78,13 +82,19 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
       }
     }
 
-    return new TextPart(s.toString());
+    return noSpaceText(s.toString());
   }
 
 
   @Override
   public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
     return compareType.match(getLength(value)) ? MatchResult.TYPELESS_EXACT : null;
+  }
+
+
+  @Override
+  public int size(@NotNull Object value) {
+    return getLength(value);
   }
 
 

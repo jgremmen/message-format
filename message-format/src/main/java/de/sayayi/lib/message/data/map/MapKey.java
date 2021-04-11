@@ -25,6 +25,7 @@ import java.util.EnumSet;
 /**
  * @author Jeroen Gremmen
  */
+@SuppressWarnings({"java:S1214", "java:S2386"})
 public interface MapKey
 {
   EnumSet<Type> EMPTY_NULL_TYPE = EnumSet.of(Type.EMPTY, Type.NULL);
@@ -40,9 +41,13 @@ public interface MapKey
   @NotNull MatchResult match(@NotNull Parameters parameters, Object value);
 
 
+
+
   enum Type {
     STRING, NUMBER, BOOL, NULL, EMPTY, NAME
   }
+
+
 
 
   enum CompareType
@@ -65,6 +70,8 @@ public interface MapKey
       return false;
     }
   }
+
+
 
 
   enum MatchResult

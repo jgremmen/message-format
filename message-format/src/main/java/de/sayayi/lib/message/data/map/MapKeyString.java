@@ -24,6 +24,11 @@ import org.jetbrains.annotations.NotNull;
 import java.text.Collator;
 import java.util.Locale;
 
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EQUIVALENT;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.LENIENT;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
+
 
 /**
  * @author Jeroen Gremmen
@@ -48,15 +53,15 @@ public final class MapKeyString implements MapKey
   public MatchResult match(@NotNull Parameters parameters, Object value)
   {
     if (value == null)
-      return MatchResult.MISMATCH;
+      return MISMATCH;
 
-    MatchResult result = MatchResult.EXACT;
+    MatchResult result = EXACT;
     Locale locale = parameters.getLocale();
     int cmp = 0;
 
     doMatch: {
       if (!(value instanceof CharSequence || value instanceof Character))
-        result = MatchResult.LENIENT;
+        result = EQUIVALENT;
 
       final String text = value.toString();
 
@@ -67,7 +72,7 @@ public final class MapKeyString implements MapKey
 
         if (text.toLowerCase(locale).equals(string.toLowerCase(locale)))
         {
-          result = MatchResult.LENIENT;
+          result = LENIENT;
           break doMatch;
         }
 
@@ -77,7 +82,7 @@ public final class MapKeyString implements MapKey
 
       if (compareType == CompareType.NE && !text.toLowerCase(locale).equals(string.toLowerCase(locale)))
       {
-        result = MatchResult.LENIENT;
+        result = LENIENT;
         cmp = 1;
         break doMatch;
       }
@@ -85,6 +90,6 @@ public final class MapKeyString implements MapKey
       cmp = Collator.getInstance(locale).compare(text, string);
     }
 
-    return compareType.match(cmp) ? result : MatchResult.MISMATCH;
+    return compareType.match(cmp) ? result : MISMATCH;
   }
 }

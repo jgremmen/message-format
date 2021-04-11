@@ -16,19 +16,19 @@
 package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.exception.MessageException;
-import de.sayayi.lib.message.internal.MultipartLocalizedMessageBundleWithCode;
+import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+
+import static java.util.Collections.unmodifiableSet;
 
 
 /**
@@ -43,8 +43,8 @@ public class MessageBundle
   @SuppressWarnings("WeakerAccess")
   public MessageBundle()
   {
-    messages = new HashMap<String,Message.WithCode>();
-    indexedClasses = new HashSet<Class<?>>();
+    messages = new HashMap<>();
+    indexedClasses = new HashSet<>();
   }
 
 
@@ -59,8 +59,8 @@ public class MessageBundle
   {
     this();
 
-    for(Entry<String,Map<Locale,Message>> entry: localizedMessagesByCode.entrySet())
-      add(new MultipartLocalizedMessageBundleWithCode(entry.getKey(), entry.getValue()));
+    localizedMessagesByCode.forEach(
+        (code,localizedMessages) -> add(new LocalizedMessageBundleWithCode(code, localizedMessages)));
   }
 
 
@@ -72,7 +72,7 @@ public class MessageBundle
   @NotNull
   @Contract(value = "-> new", pure = true)
   public Set<String> getCodes() {
-    return Collections.unmodifiableSet(messages.keySet());
+    return unmodifiableSet(messages.keySet());
   }
 
 
@@ -116,9 +116,7 @@ public class MessageBundle
   }
 
 
-  private void add0(AnnotatedElement annotatedElement)
-  {
-    for(Message.WithCode message: MessageFactory.parseAnnotations(annotatedElement))
-      add(message);
+  private void add0(AnnotatedElement annotatedElement) {
+    MessageFactory.parseAnnotations(annotatedElement).forEach(this::add);
   }
 }

@@ -18,11 +18,11 @@ package de.sayayi.lib.message.parser;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.EmptyMessage;
-import de.sayayi.lib.message.internal.MessagePart;
-import de.sayayi.lib.message.internal.ParameterPart;
 import de.sayayi.lib.message.internal.ParameterizedMessage;
 import de.sayayi.lib.message.internal.TextMessage;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.internal.part.MessagePart;
+import de.sayayi.lib.message.internal.part.ParameterPart;
+import de.sayayi.lib.message.internal.part.TextPart;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -141,12 +141,8 @@ public final class MessageParserSupport extends MessageParser
   private static final class ErrorHandler extends DefaultErrorStrategy
   {
     @Override
-    protected String getTokenErrorDisplay(Token t)
-    {
-      if (t != null && t.getType() == Token.EOF)
-        return "end of message";
-
-      return super.getTokenErrorDisplay(t);
+    protected String getTokenErrorDisplay(Token t) {
+      return t != null && t.getType() == Token.EOF ? "end of message" : super.getTokenErrorDisplay(t);
     }
   }
 
@@ -180,12 +176,14 @@ public final class MessageParserSupport extends MessageParser
   }
 
 
+
+
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   private static class Vocab implements Vocabulary
   {
     private static final Vocabulary INSTANCE = new Vocab();
 
-    private static final Map<Integer,Name> TOKEN_NAMES = new HashMap<Integer,Name>();
+    private static final Map<Integer,Name> TOKEN_NAMES = new HashMap<>();
     private static int maxTokenType;
 
 
@@ -252,6 +250,8 @@ public final class MessageParserSupport extends MessageParser
       if (tokenType > maxTokenType)
         maxTokenType = tokenType;
     }
+
+
 
 
     @AllArgsConstructor

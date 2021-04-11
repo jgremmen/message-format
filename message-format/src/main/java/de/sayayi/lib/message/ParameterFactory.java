@@ -37,6 +37,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Collections.emptySet;
+
 
 /**
  * @author Jeroen Gremmen
@@ -66,15 +68,15 @@ public final class ParameterFactory implements ParameterBuilderStart
     if (locale == null && formatterService == null)
       return DEFAULT;
 
-    return new ParameterFactory((locale == null) ? Locale.getDefault() : locale,
-        (formatterService == null) ? DefaultFormatterService.getSharedInstance() : formatterService);
+    return new ParameterFactory(locale == null ? Locale.getDefault() : locale,
+        formatterService == null ? DefaultFormatterService.getSharedInstance() : formatterService);
   }
 
 
   @NotNull
   @Contract(value = "!null, null -> new; null, !null -> new; !null, !null -> new", pure = true)
   public static ParameterFactory createFor(String locale, FormatterService formatterService) {
-    return createFor((locale == null) ? null : MessageFactory.forLanguageTag(locale), formatterService);
+    return createFor(locale == null ? null : MessageFactory.forLanguageTag(locale), formatterService);
   }
 
 
@@ -218,7 +220,7 @@ public final class ParameterFactory implements ParameterBuilderStart
 
     private ParameterBuilderImpl()
     {
-      parameterValues = new HashMap<String,Object>();
+      parameterValues = new HashMap<>();
       locale = ParameterFactory.this.locale;
     }
 
@@ -362,7 +364,7 @@ public final class ParameterFactory implements ParameterBuilderStart
     @Override
     public ParameterBuilder withLocale(String locale)
     {
-      this.locale = (locale == null) ? ParameterFactory.this.getLocale() : MessageFactory.forLanguageTag(locale);
+      this.locale = locale == null ? ParameterFactory.this.getLocale() : MessageFactory.forLanguageTag(locale);
       return this;
     }
   }
@@ -401,7 +403,7 @@ public final class ParameterFactory implements ParameterBuilderStart
     @NotNull
     @Override
     public Set<String> getParameterNames() {
-      return Collections.emptySet();
+      return emptySet();
     }
   }
 }

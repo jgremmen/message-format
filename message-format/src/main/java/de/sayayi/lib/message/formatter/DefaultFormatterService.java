@@ -47,7 +47,6 @@ public class DefaultFormatterService extends GenericFormatterService
   }
 
 
-  @SuppressWarnings("WhileLoopReplaceableByForEach")
   protected void addFormattersFromService()
   {
     final ServiceLoader<ParameterFormatter> serviceLoader = ServiceLoader.load(ParameterFormatter.class);

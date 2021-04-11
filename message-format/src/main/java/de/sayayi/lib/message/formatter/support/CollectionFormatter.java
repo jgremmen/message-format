@@ -20,8 +20,8 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
-import de.sayayi.lib.message.internal.MessagePart.Text;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,13 +31,17 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.ResourceBundle.getBundle;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class CollectionFormatter extends AbstractParameterFormatter implements EmptyMatcher
+public final class CollectionFormatter extends AbstractParameterFormatter
+    implements EmptyMatcher, SizeQueryable
 {
   @NotNull
   @SuppressWarnings("rawtypes")
@@ -46,11 +50,11 @@ public final class CollectionFormatter extends AbstractParameterFormatter implem
   public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return Text.NULL;
+      return nullText();
 
     final Iterable iterable = (Iterable)value;
     if (!iterable.iterator().hasNext())
-      return Text.EMPTY;
+      return emptyText();
 
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
     final StringBuilder s = new StringBuilder();
@@ -66,7 +70,7 @@ public final class CollectionFormatter extends AbstractParameterFormatter implem
         s.append(parameters.getFormatter(format, element.getClass()).format(element, format, parameters, data));
     }
 
-    return new TextPart(s.toString());
+    return noSpaceText(s.toString());
   }
 
 
@@ -78,6 +82,21 @@ public final class CollectionFormatter extends AbstractParameterFormatter implem
         : (((Iterable<?>)value).iterator().hasNext() ? 1 : 0);
 
     return compareType.match(cmp) ? MatchResult.TYPELESS_EXACT : null;
+  }
+
+
+  @Override
+  public int size(@NotNull Object value)
+  {
+    if (value instanceof Collection)
+      return ((Collection<?>)value).size();
+
+    int size = 0;
+
+    for(Object ignored: (Iterable<?>)value)
+      size++;
+
+    return size;
   }
 
 

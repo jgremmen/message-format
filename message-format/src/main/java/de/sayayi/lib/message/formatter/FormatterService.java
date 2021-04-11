@@ -53,6 +53,5 @@ public interface FormatterService
 
 
     void addFormatter(@NotNull ParameterFormatter formatter);
-
   }
 }

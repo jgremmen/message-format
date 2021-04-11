@@ -71,8 +71,13 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   @Override
   public void addFormatterForType(@NotNull Class<?> type, @NotNull ParameterFormatter formatter)
   {
-    typeFormatters.put(type, formatter);
-    cachedFormatters.clear();
+    ParameterFormatter currentFormatter = typeFormatters.get(type);
+
+    if (currentFormatter == null || currentFormatter.getPriority() < formatter.getPriority())
+    {
+      typeFormatters.put(type, formatter);
+      cachedFormatters.clear();
+    }
   }
 
 
@@ -85,7 +90,9 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       if (format.isEmpty())
         throw new IllegalArgumentException("formatter name must not be empty");
 
-      namedFormatters.put(format, (NamedParameterFormatter)formatter);
+      ParameterFormatter currentFormatter = namedFormatters.get(format);
+      if (currentFormatter == null || currentFormatter.getPriority() < formatter.getPriority())
+        namedFormatters.put(format, (NamedParameterFormatter)formatter);
     }
 
     for(final Class<?> type: formatter.getFormattableTypes())
@@ -106,6 +113,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
+  @SuppressWarnings("java:S1119")
   @NotNull
   private ParameterFormatter resolveFormatterForType(@NotNull Class<?> type)
   {

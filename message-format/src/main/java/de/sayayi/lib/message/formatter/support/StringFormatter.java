@@ -21,8 +21,8 @@ import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
-import de.sayayi.lib.message.internal.MessagePart.Text;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,12 +32,15 @@ import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_LENIENT;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class StringFormatter extends AbstractParameterFormatter implements NamedParameterFormatter, EmptyMatcher
+public final class StringFormatter extends AbstractParameterFormatter
+    implements NamedParameterFormatter, EmptyMatcher, SizeQueryable
 {
   @NotNull
   @Override
@@ -54,12 +57,12 @@ public final class StringFormatter extends AbstractParameterFormatter implements
   public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     return value == null
-        ? Text.NULL
-        : new TextPart(((value instanceof char[]) ? new String((char[])value) : String.valueOf(value)).trim());
+        ? nullText() : noSpaceText(value instanceof char[] ? new String((char[])value) : String.valueOf(value));
   }
 
 
   @Override
+  @SuppressWarnings("java:S3358")
   public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value)
   {
     final String s = value instanceof char[] ? new String((char[])value) : String.valueOf(value);
@@ -70,6 +73,12 @@ public final class StringFormatter extends AbstractParameterFormatter implements
       return empty ? TYPELESS_EXACT : (lenientEmpty ? TYPELESS_LENIENT : null);
     else
       return lenientEmpty ? (empty ? null : TYPELESS_LENIENT) : TYPELESS_EXACT;
+  }
+
+
+  @Override
+  public int size(@NotNull Object value) {
+    return value instanceof char[] ? ((char[])value).length : ((CharSequence)value).length();
   }
 
 

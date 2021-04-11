@@ -20,8 +20,8 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.Type;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
-import de.sayayi.lib.message.internal.MessagePart.Text;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,6 +33,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.EMPTY_NULL_TYPE;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.messageToText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.ResourceBundle.getBundle;
 
 
@@ -49,6 +52,7 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
   }
 
 
+  @NotNull
   @Override
   @Contract(pure = true)
   public Text format(Object value, String format, @NotNull Parameters parameters, Data data)
@@ -58,7 +62,7 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
       return new TextPart(msg.format(parameters), msg.isSpaceBefore(), msg.isSpaceAfter());
 
     if (value == null)
-      return null;
+      return nullText();
 
     boolean bool;
 
@@ -77,7 +81,7 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
 
     // allow custom messages for true/false value?
     if ((msg = getMessage(bool, EnumSet.of(Type.BOOL), parameters, data, false)) != null)
-      return new TextPart(msg.format(parameters), msg.isSpaceBefore(), msg.isSpaceAfter());
+      return messageToText(msg, parameters);
 
     // get translated boolean value
     String s = Boolean.toString(bool);
@@ -87,7 +91,7 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
     }
 
     return (msg = getMessage(s, NO_NAME_KEY_TYPES, parameters, data, false)) == null
-        ? new TextPart(s) : new TextPart(msg.format(parameters), msg.isSpaceBefore(), msg.isSpaceAfter());
+        ? noSpaceText(s) : messageToText(msg, parameters);
   }
 
 

@@ -17,13 +17,14 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.internal.MessagePart.Text;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetAddress;
 import java.util.Collections;
 import java.util.Set;
+
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 
 
 /**
@@ -50,7 +51,7 @@ public final class InetAddressFormatter extends AbstractParameterFormatter
         s = inetAddress.getHostAddress();
     }
 
-    return s == null ? Text.NULL : new TextPart(s);
+    return noSpaceText(s);
   }
 
 

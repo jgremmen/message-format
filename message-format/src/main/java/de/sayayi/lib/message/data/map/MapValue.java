@@ -31,6 +31,7 @@ public interface MapValue extends Data
   EnumSet<Type> STRING_MESSAGE_TYPE = EnumSet.of(Type.STRING, Type.MESSAGE);
   EnumSet<Type> STRING_TYPE = EnumSet.of(Type.STRING);
   EnumSet<Type> BOOL_TYPE = EnumSet.of(Type.BOOL);
+  EnumSet<Type> NUMBER_TYPE = EnumSet.of(Type.NUMBER);
 
 
   @Contract(pure = true)
@@ -39,6 +40,8 @@ public interface MapValue extends Data
 
   @Contract(pure = true)
   @NotNull Serializable asObject();
+
+
 
 
   enum Type {

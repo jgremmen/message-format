@@ -18,8 +18,8 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
-import de.sayayi.lib.message.internal.MessagePart.Text;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.TextPart;
 import org.junit.Test;
 
 import java.io.File;

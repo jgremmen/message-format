@@ -16,12 +16,16 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.MessagePart;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.ParameterPart;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 /**
@@ -30,11 +34,12 @@ import java.util.List;
 @ToString
 public class ParameterizedMessage implements Message.WithSpaces
 {
-  private static final long serialVersionUID = 400L;
+  private static final long serialVersionUID = 500L;
 
   private final MessagePart[] parts;
 
 
+  @SuppressWarnings("java:S1119")
   public ParameterizedMessage(@NotNull List<MessagePart> parts)
   {
     findParameter: {
@@ -75,9 +80,23 @@ public class ParameterizedMessage implements Message.WithSpaces
 
 
   @Override
-  @Contract(pure = true)
+  @Contract(value = "-> true", pure = true)
   public boolean hasParameters() {
     return true;
+  }
+
+
+  @NotNull
+  @Override
+  public Set<String> getParameterNames()
+  {
+    final Set<String> parameterNames = new TreeSet<>();
+
+    for(MessagePart part: parts)
+      if (part instanceof ParameterPart)
+        parameterNames.addAll(((ParameterPart)part).getParameterNames());
+
+    return parameterNames;
   }
 
 

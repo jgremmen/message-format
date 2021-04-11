@@ -19,7 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
-import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,8 +41,9 @@ public interface ParameterFormatter
    *                    {@code null}
    * @param data        parameter data provided by the parameter definition or {@code null}
    *
-   * @return  formatted parameter value or {@code null} if this formatter does not produce any output
+   * @return  formatted parameter value, never {@code null}
    */
+  @NotNull
   @Contract(pure = true)
   Text format(Object value, String format, @NotNull Parameters parameters, Data data);
 
@@ -60,6 +61,12 @@ public interface ParameterFormatter
   @NotNull Set<Class<?>> getFormattableTypes();
 
 
+  @Contract(pure = true)
+  int getPriority();
+
+
+
+
   interface EmptyMatcher
   {
     /**
@@ -72,5 +79,14 @@ public interface ParameterFormatter
      */
     @Contract(pure = true)
     MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value);
+  }
+
+
+
+
+  interface SizeQueryable
+  {
+    @Contract(pure = true)
+    int size(@NotNull Object value);
   }
 }

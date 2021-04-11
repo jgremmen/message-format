@@ -22,8 +22,8 @@ import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.exception.MessageLocaleParseException;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
+import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.internal.MessageDelegateWithCode;
-import de.sayayi.lib.message.internal.MultipartLocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.parser.MessageParserSupport;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -31,10 +31,19 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.AnnotatedElement;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.util.Collections.singletonMap;
 import static java.util.Locale.ROOT;
 
 
@@ -83,16 +92,15 @@ public final class MessageFactory
     if (localizedTexts.isEmpty())
       return new EmptyMessageWithCode(code);
 
-    String message = localizedTexts.get(ROOT);
+    final String message = localizedTexts.get(ROOT);
     if (message != null && localizedTexts.size() == 1)
       return new MessageDelegateWithCode(code, parse(message));
 
-    final Map<Locale,Message> localizedParts = new LinkedHashMap<Locale,Message>();
+    final Map<Locale,Message> localizedParts = new LinkedHashMap<>();
 
-    for(final Entry<Locale,String> localizedText: localizedTexts.entrySet())
-      localizedParts.put(localizedText.getKey(), parse(localizedText.getValue()));
+    localizedTexts.forEach((locale,text) -> localizedParts.put(locale, parse(text)));
 
-    return new MultipartLocalizedMessageBundleWithCode(code, localizedParts);
+    return new LocalizedMessageBundleWithCode(code, localizedParts);
   }
 
 
@@ -101,7 +109,7 @@ public final class MessageFactory
   @Contract(value = "_ -> new", pure = true)
   public static Set<Message.WithCode> parseAnnotations(@NotNull AnnotatedElement element)
   {
-    Set<Message.WithCode> messageBundle = new HashSet<Message.WithCode>();
+    final Set<Message.WithCode> messageBundle = new HashSet<>();
 
     MessageDef annotation = element.getAnnotation(MessageDef.class);
     if (annotation != null)
@@ -131,7 +139,7 @@ public final class MessageFactory
     if (texts.length == 0)
       return new EmptyMessageWithCode(annotation.code());
 
-    final Map<Locale,String> localizedTexts = new LinkedHashMap<Locale,String>();
+    final Map<Locale,String> localizedTexts = new LinkedHashMap<>();
 
     for(final Text text: texts)
     {
@@ -172,10 +180,9 @@ public final class MessageFactory
   @Contract(pure = true)
   public static MessageBundle bundle(@NotNull Properties properties)
   {
-    MessageBundle bundle = new MessageBundle();
+    final MessageBundle bundle = new MessageBundle();
 
-    for(Entry<Object,Object> entry: properties.entrySet())
-      bundle.add(parse(entry.getKey().toString(), String.valueOf(entry.getValue())));
+    properties.forEach((k,v) -> bundle.add(parse(k.toString(), String.valueOf(v))));
 
     return bundle;
   }
@@ -185,11 +192,11 @@ public final class MessageFactory
   @Contract(pure = true)
   public static MessageBundle bundle(@NotNull ResourceBundle resourceBundle)
   {
-    MessageBundle bundle = new MessageBundle();
-    Locale locale = resourceBundle.getLocale();
+    final MessageBundle bundle = new MessageBundle();
+    final Locale locale = resourceBundle.getLocale();
 
-    for(String code: resourceBundle.keySet())
-      bundle.add(parse(code, Collections.singletonMap(locale, resourceBundle.getString(code))));
+    resourceBundle.keySet().forEach(
+        code -> bundle.add(parse(code, singletonMap(locale, resourceBundle.getString(code)))));
 
     return bundle;
   }
@@ -199,22 +206,13 @@ public final class MessageFactory
   @Contract(pure = true)
   public static MessageBundle bundle(@NotNull Map<Locale,Properties> properties)
   {
-    Map<String,Map<Locale,Message>> localizedMessagesByCode = new HashMap<String,Map<Locale,Message>>();
+    final Map<String,Map<Locale,Message>> localizedMessagesByCode = new HashMap<>();
 
     for(Entry<Locale,Properties> entry: properties.entrySet())
       for(Entry<Object,Object> localizedProperty: entry.getValue().entrySet())
       {
-        String code = localizedProperty.getKey().toString();
-        Message message = parse(String.valueOf(localizedProperty.getValue()));
-
-        Map<Locale,Message> localizedMessages = localizedMessagesByCode.get(code);
-        if (localizedMessages == null)
-        {
-          localizedMessages = new HashMap<Locale,Message>();
-          localizedMessagesByCode.put(code, localizedMessages);
-        }
-
-        localizedMessages.put(entry.getKey(), message);
+        localizedMessagesByCode.computeIfAbsent(localizedProperty.getKey().toString(), k -> new HashMap<>())
+            .put(entry.getKey(), parse(String.valueOf(localizedProperty.getValue())));
       }
 
     return new MessageBundle(localizedMessagesByCode);
@@ -225,19 +223,13 @@ public final class MessageFactory
   @Contract(pure = true)
   public static MessageBundle bundle(@NotNull Collection<ResourceBundle> properties)
   {
-    Map<String,Map<Locale,Message>> localizedMessagesByCode = new HashMap<String,Map<Locale,Message>>();
+    final Map<String,Map<Locale,Message>> localizedMessagesByCode = new HashMap<>();
 
     for(ResourceBundle resourceBundle: properties)
       for(String code: resourceBundle.keySet())
       {
-        Map<Locale,Message> localizedMessages = localizedMessagesByCode.get(code);
-        if (localizedMessages == null)
-        {
-          localizedMessages = new HashMap<Locale,Message>();
-          localizedMessagesByCode.put(code, localizedMessages);
-        }
-
-        localizedMessages.put(resourceBundle.getLocale(), parse(resourceBundle.getString(code)));
+        localizedMessagesByCode.computeIfAbsent(code, k -> new HashMap<>())
+            .put(resourceBundle.getLocale(), parse(resourceBundle.getString(code)));
       }
 
     return new MessageBundle(localizedMessagesByCode);

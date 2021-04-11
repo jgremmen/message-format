@@ -32,7 +32,7 @@ import java.math.BigInteger;
 @AllArgsConstructor
 public final class MapKeyNumber implements MapKey
 {
-  private CompareType compareType;
+  private final CompareType compareType;
   @Getter private final long number;
 
 

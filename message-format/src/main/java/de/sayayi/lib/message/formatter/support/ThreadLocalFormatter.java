@@ -20,11 +20,14 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
-import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Set;
+
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 
 
 /**
@@ -37,11 +40,11 @@ public final class ThreadLocalFormatter extends AbstractParameterFormatter imple
   public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return Text.NULL;
+      return nullText();
 
     return (value = ((ThreadLocal<?>)value).get()) != null
         ? parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data)
-        : Text.EMPTY;
+        : emptyText();
   }
 
 

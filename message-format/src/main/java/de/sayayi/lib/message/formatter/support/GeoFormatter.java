@@ -18,8 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
-import de.sayayi.lib.message.internal.MessagePart.Text;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +29,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 
 
 /**
@@ -67,7 +69,7 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
   public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return Text.NULL;
+      return nullText();
 
     final Format fmt = getFormat(format, data);
     final StringBuilder s = new StringBuilder();
@@ -103,7 +105,7 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
         s.append(v < 0 ? 'S' : 'N');
     }
 
-    return new TextPart(s.toString().trim());
+    return noSpaceText(s.toString());
   }
 
 
@@ -142,9 +144,9 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
     final int factor = DIGIT_FACTOR[fmt.secondDigits];
     millis = ((millis + factor / 2) / factor) * factor;
 
-    final int degree = (int)(millis / DEGREE_MILLIS);
+    final long degree = millis / DEGREE_MILLIS;
     millis -= degree * DEGREE_MILLIS;
-    final int minute = (int)(millis / MINUTE_MILLIS);
+    final long minute = millis / MINUTE_MILLIS;
     millis -= minute * MINUTE_MILLIS;
 
     return new double[] { degree, minute, millis / 1000.0 };

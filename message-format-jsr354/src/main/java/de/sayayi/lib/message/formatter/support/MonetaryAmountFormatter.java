@@ -17,8 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.internal.MessagePart.Text;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,6 +26,9 @@ import javax.money.format.MonetaryAmountFormat;
 import javax.money.format.MonetaryFormats;
 import java.util.Collections;
 import java.util.Set;
+
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 
 
 /**
@@ -40,12 +42,12 @@ public final class MonetaryAmountFormatter extends AbstractParameterFormatter
   public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return Text.NULL;
+      return nullText();
 
     final MonetaryAmount monetaryAmount = (MonetaryAmount)value;
     final MonetaryAmountFormat monetaryFormat = MonetaryFormats.getAmountFormat(parameters.getLocale());
 
-    return new TextPart(monetaryFormat.format(monetaryAmount));
+    return noSpaceText(monetaryFormat.format(monetaryAmount));
   }
 
 

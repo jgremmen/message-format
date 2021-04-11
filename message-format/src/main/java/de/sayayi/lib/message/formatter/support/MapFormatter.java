@@ -20,8 +20,8 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
-import de.sayayi.lib.message.internal.MessagePart.Text;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,13 +31,17 @@ import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.ResourceBundle.getBundle;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class MapFormatter extends AbstractParameterFormatter implements EmptyMatcher
+public final class MapFormatter extends AbstractParameterFormatter
+    implements EmptyMatcher, SizeQueryable
 {
   @NotNull
   @Override
@@ -46,9 +50,9 @@ public final class MapFormatter extends AbstractParameterFormatter implements Em
   {
     final Map<?,?> map = (Map<?,?>)value;
     if (map == null)
-      return Text.NULL;
+      return nullText();
     if (map.isEmpty())
-      return Text.EMPTY;
+      return emptyText();
 
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
     final String separator = getSeparator(parameters, data);
@@ -86,7 +90,7 @@ public final class MapFormatter extends AbstractParameterFormatter implements Em
       s.append((keyString + separator + valueString).trim());
     }
 
-    return new TextPart(s.toString());
+    return noSpaceText(s.toString());
   }
 
 
@@ -110,6 +114,12 @@ public final class MapFormatter extends AbstractParameterFormatter implements Em
   @Override
   public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
     return compareType.match(((Map<?,?>)value).size()) ? MatchResult.TYPELESS_EXACT : null;
+  }
+
+
+  @Override
+  public int size(@NotNull Object value) {
+    return ((Map<?,?>)value).size();
   }
 
 

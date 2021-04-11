@@ -23,7 +23,7 @@ options {
 
 @header {
 import de.sayayi.lib.message.*;
-import de.sayayi.lib.message.internal.*;
+import de.sayayi.lib.message.internal.part.*;
 import de.sayayi.lib.message.data.*;
 import de.sayayi.lib.message.data.map.*;
 import java.util.*;

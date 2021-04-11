@@ -19,8 +19,8 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.Type;
-import de.sayayi.lib.message.internal.MessagePart.Text;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,6 +32,7 @@ import java.util.Set;
 import static de.sayayi.lib.message.data.map.MapKey.Type.EMPTY;
 import static de.sayayi.lib.message.data.map.MapKey.Type.NULL;
 import static de.sayayi.lib.message.data.map.MapKey.Type.STRING;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 
 
 /**
@@ -45,7 +46,7 @@ public final class URIFormatter extends AbstractParameterFormatter
   public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return Text.NULL;
+      return nullText();
 
     final URI uri = (URI)value;
 
@@ -74,7 +75,7 @@ public final class URIFormatter extends AbstractParameterFormatter
           return new TextPart(msg.format(parameters), msg.isSpaceBefore(), msg.isSpaceAfter());
       }
 
-      return port == -1 ? Text.NULL : new TextPart(Integer.toString(port));
+      return port == -1 ? nullText() : new TextPart(Integer.toString(port));
     }
     else if ("query".equals(format))
       return new TextPart(uri.getQuery());

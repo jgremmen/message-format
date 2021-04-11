@@ -17,8 +17,8 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.internal.MessagePart.Text;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,37 +26,49 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Set;
 
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+
 
 /**
  * @author Jeroen Gremmen
  */
-public final class FileFormatter extends AbstractParameterFormatter
+public final class FileFormatter extends AbstractParameterFormatter implements SizeQueryable
 {
   @NotNull
   @Override
   public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return Text.NULL;
+      return nullText();
 
     final File file = (File)value;
     format = getConfigFormat(format, data, true, null);
 
     if ("name".equals(format))
-      return new TextPart(file.getName());
+      return noSpaceText(file.getName());
     else if ("path".equals(format))
-      return new TextPart(file.getPath());
+      return noSpaceText(file.getPath());
     else if ("parent".equals(format))
-      return new TextPart(file.getParent());
+      return noSpaceText(file.getParent());
     else if ("extension".equals(format))
     {
       String name = file.getName();
       int dotidx = name.lastIndexOf('.');
 
-      return dotidx == -1 ? Text.EMPTY : new TextPart(name.substring(dotidx + 1));
+      return dotidx == -1 ? emptyText() : noSpaceText(name.substring(dotidx + 1));
     }
 
-    return new TextPart(file.getAbsolutePath());
+    return noSpaceText(file.getAbsolutePath());
+  }
+
+
+  @Override
+  public int size(@NotNull Object value)
+  {
+    final File file = (File)value;
+    return file.isFile() && file.canRead() ? (int)file.length() : -1;
   }
 
 

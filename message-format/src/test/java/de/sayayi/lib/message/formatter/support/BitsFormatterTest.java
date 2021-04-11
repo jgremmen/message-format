@@ -19,7 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.data.DataNumber;
 import de.sayayi.lib.message.data.DataString;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.internal.part.TextPart;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

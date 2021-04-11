@@ -18,8 +18,8 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
-import de.sayayi.lib.message.internal.MessagePart.Text;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,6 +31,9 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 
 
 /**
@@ -47,7 +50,7 @@ public final class NumberFormatter extends AbstractParameterFormatter
   public Text formatValue(Object v, String format, @NotNull Parameters parameters, Data data)
   {
     if (v == null)
-      return Text.NULL;
+      return nullText();
 
     final Number value = (Number)v;
 
@@ -60,7 +63,7 @@ public final class NumberFormatter extends AbstractParameterFormatter
     if ("bool".equals(format))
       return formatBoolean(value, parameters, data);
 
-    return new TextPart(getFormatter(format, parameters, data).format(value));
+    return noSpaceText(getFormatter(format, parameters, data).format(value));
   }
 
 

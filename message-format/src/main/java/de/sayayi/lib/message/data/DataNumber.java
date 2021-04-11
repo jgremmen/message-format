@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.data;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Jeroen Gremmen
  */
 @AllArgsConstructor
+@EqualsAndHashCode(doNotUseGetters = true)
 public class DataNumber implements Data
 {
   private static final long serialVersionUID = 400L;

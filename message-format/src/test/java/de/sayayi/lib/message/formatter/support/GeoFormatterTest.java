@@ -20,7 +20,7 @@ import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.formatter.support.GeoFormatter.Format;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.internal.part.TextPart;
 import org.junit.Test;
 
 import static de.sayayi.lib.message.MessageFactory.parse;

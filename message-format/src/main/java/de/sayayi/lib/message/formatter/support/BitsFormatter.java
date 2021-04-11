@@ -20,13 +20,16 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataNumber;
 import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
-import de.sayayi.lib.message.internal.MessagePart.Text;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Set;
+
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 
 
 /**
@@ -46,10 +49,10 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
   public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (!(value instanceof Number))
-      return Text.NULL;
+      return nullText();
 
     final int bitCount = detectBitCount(parameters, data, value);
-    return bitCount > 0 ? new TextPart(format(bitCount, value)) : Text.EMPTY;
+    return bitCount > 0 ? noSpaceText(format(bitCount, value)) : emptyText();
   }
 
 

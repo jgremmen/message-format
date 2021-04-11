@@ -21,13 +21,14 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
-import de.sayayi.lib.message.internal.MessagePart.Text;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Set;
+
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.messageToText;
 
 
 /**
@@ -43,6 +44,7 @@ public final class ChoiceFormatter extends AbstractParameterFormatter implements
   }
 
 
+  @NotNull
   @Override
   @Contract(pure = true)
   public Text format(Object value, String format, @NotNull Parameters parameters, Data data)
@@ -53,8 +55,7 @@ public final class ChoiceFormatter extends AbstractParameterFormatter implements
     final Message.WithSpaces message =
         ((DataMap)data).getMessage(value, parameters, NO_NAME_KEY_TYPES, true);
 
-    return message == null
-        ? null : new TextPart(message.format(parameters), message.isSpaceBefore(), message.isSpaceAfter());
+    return messageToText(message, parameters);
   }
 
 

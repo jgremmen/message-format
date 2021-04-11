@@ -63,21 +63,20 @@ public interface Message extends Serializable
   boolean hasParameters();
 
 
+  @NotNull
+  @Contract(pure = true)
+  Set<String> getParameterNames();
 
 
-  interface WithSpaces extends Message
-  {
-    @Contract(pure = true)
-    boolean isSpaceBefore();
 
 
-    @Contract(pure = true)
-    boolean isSpaceAfter();
+  interface WithSpaces extends Message, SpacesAware {
   }
 
 
 
 
+  @SuppressWarnings("java:S1214")
   interface Parameters
   {
     Parameters EMPTY = new Parameters() {
@@ -175,6 +174,8 @@ public interface Message extends Serializable
   }
 
 
+
+
   interface ParameterBuilderStart
   {
     @NotNull
@@ -233,12 +234,16 @@ public interface Message extends Serializable
   }
 
 
+
+
   interface ParameterBuilder extends ParameterBuilderStart, Parameters
   {
     @SuppressWarnings("unused")
     @Contract("-> this")
     ParameterBuilder clear();
   }
+
+
 
 
   /**
@@ -256,6 +261,8 @@ public interface Message extends Serializable
     @Contract(pure = true)
     @NotNull String getCode();
   }
+
+
 
 
   /**

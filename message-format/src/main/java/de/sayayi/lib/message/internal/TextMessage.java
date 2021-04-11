@@ -16,10 +16,14 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import lombok.Getter;
 import lombok.ToString;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collections;
+import java.util.Set;
 
 
 /**
@@ -28,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
 @ToString(doNotUseGetters = true)
 public final class TextMessage implements Message.WithSpaces
 {
-  private static final long serialVersionUID = 400L;
+  private static final long serialVersionUID = 500L;
 
   private final String text;
 
@@ -62,7 +66,15 @@ public final class TextMessage implements Message.WithSpaces
 
 
   @Override
+  @Contract(value = "-> false", pure = true)
   public boolean hasParameters() {
     return false;
+  }
+
+
+  @NotNull
+  @Override
+  public Set<String> getParameterNames() {
+    return Collections.emptySet();
   }
 }

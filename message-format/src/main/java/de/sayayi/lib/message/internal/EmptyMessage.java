@@ -22,6 +22,10 @@ import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Set;
+
+import static java.util.Collections.emptySet;
+
 
 /**
  * @author Jeroen Gremmen
@@ -30,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class EmptyMessage implements Message.WithSpaces
 {
-  private static final long serialVersionUID = 400L;
+  private static final long serialVersionUID = 500L;
 
   public static final Message.WithSpaces INSTANCE = new EmptyMessage();
 
@@ -46,6 +50,13 @@ public final class EmptyMessage implements Message.WithSpaces
   @Contract(value = "-> false", pure = true)
   public boolean hasParameters() {
     return false;
+  }
+
+
+  @NotNull
+  @Override
+  public Set<String> getParameterNames() {
+    return emptySet();
   }
 
 

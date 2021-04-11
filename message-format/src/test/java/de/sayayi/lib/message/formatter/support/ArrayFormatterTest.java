@@ -28,8 +28,8 @@ import de.sayayi.lib.message.data.map.MapValue;
 import de.sayayi.lib.message.data.map.MapValueMessage;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
-import de.sayayi.lib.message.internal.MessagePart.Text;
-import de.sayayi.lib.message.internal.TextPart;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -78,6 +78,8 @@ public class ArrayFormatterTest extends AbstractFormatterTest
         put(new MapKeyBool(true), new MapValueMessage(new Message.WithSpaces() {
           @Override public String format(@NotNull Parameters parameters) { return "YES"; }
           @Override public boolean hasParameters() { return false; }
+          @NotNull
+          @Override public Set<String> getParameterNames() { return Collections.emptySet(); }
           @Override public boolean isSpaceBefore() { return false; }
           @Override public boolean isSpaceAfter() { return false; }
         }));
@@ -85,6 +87,8 @@ public class ArrayFormatterTest extends AbstractFormatterTest
         put(new MapKeyBool(false), new MapValueMessage(new Message.WithSpaces() {
           @Override public String format(@NotNull Parameters parameters) { return "NO"; }
           @Override public boolean hasParameters() { return false; }
+          @NotNull
+          @Override public Set<String> getParameterNames() { return Collections.emptySet(); }
           @Override public boolean isSpaceBefore() { return false; }
           @Override public boolean isSpaceAfter() { return false; }
         }));
@@ -94,10 +98,11 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     assertEquals(new TextPart("NO, YES"), registry.getFormatter(null, boolean[].class)
         .format(new boolean[] { false, true }, null, noParameters, booleanMap));
 
-    assertEquals(TextPart.NULL, registry.getFormatter(null, boolean[].class)
+    assertEquals(TextPart.EMPTY, registry.getFormatter(null, boolean[].class)
         .format(new boolean[0], null, noParameters, null));
 
     registry.addFormatter(new NamedParameterFormatter() {
+      @NotNull
       @Override
       public Text format(Object value, String format, @NotNull Parameters parameters, Data data) {
         return (value == null) ? null : new TextPart((Boolean)value ? "1" : "0");
@@ -113,6 +118,11 @@ public class ArrayFormatterTest extends AbstractFormatterTest
       @Override
       public Set<Class<?>> getFormattableTypes() {
         return new HashSet<>(Arrays.asList(Boolean.class, boolean.class));
+      }
+
+      @Override
+      public int getPriority() {
+        return 1;
       }
     });
 
@@ -147,6 +157,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
         return "hex";
       }
 
+      @NotNull
       @SuppressWarnings("RedundantCast")
       @Override
       public Text format(Object value, String format, @NotNull Parameters parameters, Data data) {
@@ -157,6 +168,11 @@ public class ArrayFormatterTest extends AbstractFormatterTest
       @Override
       public Set<Class<?>> getFormattableTypes() {
         return Collections.singleton(Integer.class);
+      }
+
+      @Override
+      public int getPriority() {
+        return 0;
       }
     });
 

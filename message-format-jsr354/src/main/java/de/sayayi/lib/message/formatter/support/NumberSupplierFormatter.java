@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.internal.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,6 +25,8 @@ import javax.money.NumberSupplier;
 import javax.money.NumberValue;
 import java.util.Collections;
 import java.util.Set;
+
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 
 
 /**
@@ -38,11 +40,11 @@ public final class NumberSupplierFormatter extends AbstractParameterFormatter
   public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return Text.NULL;
+      return nullText();
 
     final NumberValue numberValue = ((NumberSupplier)value).getNumber();
     if (numberValue == null)
-      return Text.NULL;
+      return nullText();
 
     return parameters.getFormatter(format, numberValue.getClass()).format(numberValue, format, parameters, data);
   }
