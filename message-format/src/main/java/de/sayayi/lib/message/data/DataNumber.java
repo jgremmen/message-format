@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 @EqualsAndHashCode(doNotUseGetters = true)
 public class DataNumber implements Data
 {
-  private static final long serialVersionUID = 400L;
+  private static final long serialVersionUID = 500L;
 
   private final long number;
 

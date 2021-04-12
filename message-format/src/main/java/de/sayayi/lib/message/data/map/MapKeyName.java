@@ -21,6 +21,9 @@ import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
+
 
 /**
  * @author Jeroen Gremmen
@@ -32,18 +35,16 @@ public final class MapKeyName implements MapKey
   @Getter private final String name;
 
 
-  @NotNull
   @Override
-  public Type getType() {
+  public @NotNull Type getType() {
     return Type.NAME;
   }
 
 
-  @NotNull
   @Override
-  public MatchResult match(@NotNull Parameters parameters, Object value)
+  public @NotNull MatchResult match(@NotNull Parameters parameters, Object value)
   {
     return (value instanceof CharSequence || value instanceof Character) && value.toString().equals(name)
-        ? MatchResult.EXACT : MatchResult.MISMATCH;
+        ? EXACT : MISMATCH;
   }
 }

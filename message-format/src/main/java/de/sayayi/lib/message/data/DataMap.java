@@ -36,6 +36,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import static de.sayayi.lib.message.data.map.MapValue.STRING_MESSAGE_TYPE;
+
 
 /**
  * @author Jeroen Gremmen
@@ -44,7 +46,7 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(doNotUseGetters = true)
 public final class DataMap implements Data
 {
-  private static final long serialVersionUID = 400L;
+  private static final long serialVersionUID = 500L;
 
   @Getter private final Map<MapKey,MapValue> map;
 
@@ -56,10 +58,9 @@ public final class DataMap implements Data
   }
 
 
-  @NotNull
   @Override
   @Contract(pure = true)
-  public Map<MapKey,MapValue> asObject() {
+  public @NotNull Map<MapKey,MapValue> asObject() {
     return Collections.unmodifiableMap(map);
   }
 
@@ -102,15 +103,14 @@ public final class DataMap implements Data
   public Message.WithSpaces getMessage(Object key, Parameters parameters, Set<MapKey.Type> keyTypes,
                                        boolean includeDefault)
   {
-    MapValue mapValue = find(key, parameters, keyTypes, MapValue.STRING_MESSAGE_TYPE);
+    MapValue mapValue = find(key, parameters, keyTypes, STRING_MESSAGE_TYPE);
 
     if (mapValue == null)
     {
-      if (!includeDefault)
-        return null;
+      if (includeDefault)
+        mapValue = map.get(null);
 
-      mapValue = map.get(null);
-      return mapValue == null ? null : (Message.WithSpaces)map.get(null).asObject();
+      return mapValue == null ? null : (Message.WithSpaces)mapValue.asObject();
     }
 
     if (mapValue.getType() == Type.STRING)
@@ -125,9 +125,8 @@ public final class DataMap implements Data
    *
    * @return  all parameter names, never {@code null}
    */
-  @NotNull
   @Contract(pure = true)
-  public Set<String> getParameterNames()
+  public @NotNull Set<String> getParameterNames()
   {
     return map.values().stream()
         .filter(mapValue -> mapValue instanceof MapValueMessage)

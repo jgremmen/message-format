@@ -61,12 +61,12 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
     if (maxSize < 2)
       throw new IllegalArgumentException("maxSize must be at least 2");
 
-    this.comparator = new LinkSorter<K,V>(comparator);
+    this.comparator = new LinkSorter<>(comparator);
     this.maxSize = maxSize;
 
     //noinspection unchecked
-    entries = (Link<K,V>[])new Link[Math.min(16, maxSize)];
-    meru = new Link<K,V>(null);
+    entries = new Link[Math.min(16, maxSize)];
+    meru = new Link<>(null);
 
     clear();
   }
@@ -76,7 +76,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   @Override
   public V put(@NotNull K key, V value)
   {
-    Link<K,V> link = new Link<K,V>(key);
+    Link<K,V> link = new Link<>(key);
     int idx = Arrays.binarySearch(entries, 0, size, link, comparator);
     V oldValue = null;
 
@@ -191,7 +191,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   public V remove(Object key)
   {
     try {
-      return remove0(new Link<K,V>((K)key));
+      return remove0(new Link<>((K)key));
     } catch(ClassCastException ex) {
       return null;
     }
@@ -209,7 +209,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   public boolean containsValue(Object value)
   {
     for(Link<K,V> link = meru.next; link != meru; link = link.next)
-      if (value == null ? link.value == null : value.equals(link.value))
+      if (Objects.equals(value, link.value))
         return true;
 
     return false;
@@ -232,7 +232,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
 
   private Link<K,V> findEntry(K key)
   {
-    int idx = Arrays.binarySearch(entries, 0, size, new Link<K,V>(key), comparator);
+    int idx = Arrays.binarySearch(entries, 0, size, new Link<>(key), comparator);
     return (idx >= 0) ? entries[idx] : null;
   }
 
@@ -302,8 +302,8 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   }
 
 
-  @SuppressWarnings("unchecked")
   @Contract("-> new")
+  @SuppressWarnings({"unchecked", "java:S2975"})
   public FixedSizeCacheMap<K,V> clone()
   {
     try {
@@ -311,7 +311,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
       FixedSizeCacheMap<K,V> m = (FixedSizeCacheMap<K,V>)super.clone();
 
       m.modCount = 0;
-      m.meru = new Link<K,V>(null);
+      m.meru = new Link<>(null);
       m.entries = new Link[size];
 
       Link<K,V> lastLink = m.meru;
@@ -319,7 +319,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
 
       for(int n = 0; n < size; n++)
       {
-        Link<K,V> link = new Link<K,V>(srcLink.key);
+        Link<K,V> link = new Link<>(srcLink.key);
         link.value = srcLink.value;
 
         lastLink.next = m.entries[n] = link;
@@ -342,6 +342,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   }
 
 
+  @SuppressWarnings("java:S2583")
   private void writeObject(ObjectOutputStream s) throws IOException
   {
     final int expectedModCount = modCount;
@@ -364,14 +365,14 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   {
     s.defaultReadObject();
 
-    meru = new Link<K,V>(null);
+    meru = new Link<>(null);
     entries = new Link[size];
 
     Link<K,V> lastLink = meru;
 
     for(int n = 0; n < size; n++)
     {
-      Link<K,V> link = new Link<K,V>((K)s.readObject());
+      Link<K,V> link = new Link<>((K)s.readObject());
       link.value = (V)s.readObject();
 
       lastLink.next = entries[n] = link;
@@ -417,6 +418,8 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   }
 
 
+
+
   final class ValueCollection extends AbstractCollection<V>
   {
     @Override
@@ -447,7 +450,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
     public boolean remove(Object o)
     {
       for(Link<K,V> link = meru.next; link != meru; link = link.next)
-        if (o == null ? link.value == null : o.equals(link.value))
+        if (Objects.equals(o, link.value))
         {
           remove0(link);
           return true;
@@ -456,6 +459,8 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
       return false;
     }
   }
+
+
 
 
   final class EntrySet extends AbstractSet<Entry<K,V>>
@@ -495,6 +500,8 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   }
 
 
+
+
   final class EntryIterator extends BaseIterator implements Iterator<Map.Entry<K,V>>
   {
     @SuppressWarnings("squid:S2272")
@@ -502,6 +509,8 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
       return nextNode();
     }
   }
+
+
 
 
   final class KeyIterator extends BaseIterator implements Iterator<K>
@@ -513,6 +522,8 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   }
 
 
+
+
   final class ValueIterator extends BaseIterator implements Iterator<V>
   {
     @SuppressWarnings("squid:S2272")
@@ -520,6 +531,8 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
       return nextNode().value;
     }
   }
+
+
 
 
   abstract class BaseIterator
@@ -572,6 +585,8 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   }
 
 
+
+
   private static class Link<K,V> implements Map.Entry<K,V>
   {
     @Getter K key;
@@ -613,7 +628,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
       @SuppressWarnings("unchecked")
       Link<K,V> that = (Link<K,V>)o;
 
-      return key.equals(that.key) && (value == null ? that.value == null : value.equals(that.value));
+      return key.equals(that.key) && Objects.equals(value, that.value);
     }
 
 
@@ -622,6 +637,8 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
       return String.valueOf(key) + '=' + value;
     }
   }
+
+
 
 
   private static class LinkSorter<K,V> implements Comparator<Link<K,V>>
@@ -637,7 +654,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
     @SuppressWarnings("unchecked")
     @Override
     public int compare(Link<K,V> o1, Link<K,V> o2) {
-      return (comparator == null) ? ((Comparable<K>)o1.key).compareTo(o2.key) : comparator.compare(o1.key, o2.key);
+      return comparator == null ? ((Comparable<K>)o1.key).compareTo(o2.key) : comparator.compare(o1.key, o2.key);
     }
   }
 }

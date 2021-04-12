@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import java.text.Collator;
 import java.util.Locale;
 
+import static de.sayayi.lib.message.data.map.MapKey.CompareType.EQ;
+import static de.sayayi.lib.message.data.map.MapKey.CompareType.NE;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EQUIVALENT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.LENIENT;
@@ -41,16 +43,15 @@ public final class MapKeyString implements MapKey
   @Getter private final String string;
 
 
-  @NotNull
   @Override
-  public Type getType() {
+  public @NotNull Type getType() {
     return Type.STRING;
   }
 
 
-  @NotNull
   @Override
-  public MatchResult match(@NotNull Parameters parameters, Object value)
+  @SuppressWarnings("java:S1119")
+  public @NotNull MatchResult match(@NotNull Parameters parameters, Object value)
   {
     if (value == null)
       return MISMATCH;
@@ -65,7 +66,7 @@ public final class MapKeyString implements MapKey
 
       final String text = value.toString();
 
-      if (compareType == CompareType.EQ)
+      if (compareType == EQ)
       {
         if (text.equals(string))
           break doMatch;
@@ -80,7 +81,7 @@ public final class MapKeyString implements MapKey
         break doMatch;
       }
 
-      if (compareType == CompareType.NE && !text.toLowerCase(locale).equals(string.toLowerCase(locale)))
+      if (compareType == NE && !text.toLowerCase(locale).equals(string.toLowerCase(locale)))
       {
         result = LENIENT;
         cmp = 1;

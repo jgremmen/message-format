@@ -45,16 +45,15 @@ public final class MapKeyBool implements MapKey
   }
 
 
-  @NotNull
   @Override
-  public Type getType() {
+  public @NotNull Type getType() {
     return Type.BOOL;
   }
 
 
-  @NotNull
   @Override
-  public MatchResult match(@NotNull Parameters parameters, Object value)
+  @SuppressWarnings({"java:S3776", "java:S5411", "java:S108"})
+  public @NotNull MatchResult match(@NotNull Parameters parameters, Object value)
   {
     if (value != null)
     {

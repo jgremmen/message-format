@@ -26,6 +26,7 @@ import java.util.EnumSet;
 /**
  * @author Jeroen Gremmen
  */
+@SuppressWarnings({"java:S2386", "java:S1214"})
 public interface MapValue extends Data
 {
   EnumSet<Type> STRING_MESSAGE_TYPE = EnumSet.of(Type.STRING, Type.MESSAGE);
