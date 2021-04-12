@@ -21,11 +21,11 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 
 
 /**
@@ -33,10 +33,9 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
  */
 public final class SupplierFormatter extends AbstractParameterFormatter
 {
-  @NotNull
   @Override
   @Contract(pure = true)
-  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     final Supplier<?> supplier = (Supplier<?>)value;
     if (supplier == null)
@@ -50,10 +49,9 @@ public final class SupplierFormatter extends AbstractParameterFormatter
   }
 
 
-  @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(Supplier.class);
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return singleton(Supplier.class);
   }
 }

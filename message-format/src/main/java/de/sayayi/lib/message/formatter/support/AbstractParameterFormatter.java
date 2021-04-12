@@ -60,9 +60,8 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
       EnumSet.of(Type.NULL, Type.EMPTY, Type.BOOL, Type.NUMBER, Type.STRING);
 
 
-  @NotNull
   @Override
-  public Text format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     // handle empty, !empty, null and !null first
     Message.WithSpaces msg = getMessage(value, EMPTY_NULL_TYPE, parameters, data, false);
@@ -78,8 +77,7 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   }
 
 
-  @NotNull
-  protected abstract Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data);
+  protected abstract @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data);
 
 
   public int getPriority() {
@@ -210,16 +208,14 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   }
 
 
-  @NotNull
   @Contract(pure = true)
-  protected String trimNotNull(String s) {
+  protected @NotNull String trimNotNull(String s) {
     return s == null ? "" : s.trim();
   }
 
 
-  @NotNull
   @Contract(pure = true)
-  protected String trimNotNull(Text text)
+  protected @NotNull String trimNotNull(Text text)
   {
     if (text == null)
       return "";

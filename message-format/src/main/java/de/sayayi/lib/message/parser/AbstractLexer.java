@@ -32,6 +32,7 @@ abstract class AbstractLexer extends Lexer
 
 
   @Override
+  @SuppressWarnings({"java:S131", "java:S125", "java:S128"})
   public void emit(Token token)
   {
     WritableToken t = (WritableToken)token;
@@ -93,6 +94,7 @@ abstract class AbstractLexer extends Lexer
   }
 
 
+  @SuppressWarnings({"java:S100", "java:S1301", "java:S131"})
   private void emit_fixEscapeCharacter(WritableToken token)
   {
     final String text = token.getText();

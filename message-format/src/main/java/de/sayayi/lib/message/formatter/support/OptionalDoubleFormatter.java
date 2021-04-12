@@ -25,13 +25,14 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.Set;
 
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 
 
 /**
@@ -40,11 +41,10 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 public final class OptionalDoubleFormatter extends AbstractParameterFormatter
     implements EmptyMatcher, SizeQueryable
 {
-  @NotNull
   @SuppressWarnings("squid:S2789")
   @Override
   @Contract(pure = true)
-  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
@@ -59,7 +59,7 @@ public final class OptionalDoubleFormatter extends AbstractParameterFormatter
 
   @Override
   public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return compareType.match(((Optional<?>)value).isPresent() ? 1 : 0) ? MatchResult.TYPELESS_EXACT : null;
+    return compareType.match(((Optional<?>)value).isPresent() ? 1 : 0) ? TYPELESS_EXACT : null;
   }
 
 
@@ -69,10 +69,9 @@ public final class OptionalDoubleFormatter extends AbstractParameterFormatter
   }
 
 
-  @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(OptionalDouble.class);
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return singleton(OptionalDouble.class);
   }
 }

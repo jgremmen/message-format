@@ -29,7 +29,6 @@ import org.joda.time.base.BaseLocal;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -39,6 +38,7 @@ import java.util.Set;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Arrays.asList;
 
 
 /**
@@ -46,7 +46,7 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
  */
 public final class JodaDateTimeFormatter extends AbstractParameterFormatter
 {
-  private static final Map<String,String> STYLE = new HashMap<String,String>();
+  private static final Map<String,String> STYLE = new HashMap<>();
 
 
   static
@@ -60,10 +60,9 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
   }
 
 
-  @NotNull
   @Override
   @Contract(pure = true)
-  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
@@ -97,10 +96,9 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
   }
 
 
-  @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return new HashSet<Class<?>>(Arrays.<Class<?>>asList(BaseLocal.class, ReadableDateTime.class));
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return new HashSet<>(asList(BaseLocal.class, ReadableDateTime.class));
   }
 }

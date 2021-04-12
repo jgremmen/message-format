@@ -23,10 +23,10 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 
 
 /**
@@ -34,10 +34,9 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
  */
 public final class URLFormatter extends AbstractParameterFormatter
 {
-  @NotNull
   @Override
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
-  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
@@ -78,10 +77,9 @@ public final class URLFormatter extends AbstractParameterFormatter
   }
 
 
-  @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(URL.class);
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return singleton(URL.class);
   }
 }

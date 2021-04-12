@@ -118,6 +118,7 @@ public final class MessageParserSupport extends MessageParser
     }
 
 
+    @SuppressWarnings("java:S100")
     private boolean exitParameter_isSpaceAtTokenIndex(int i)
     {
       if (i >= 0)
@@ -257,8 +258,8 @@ public final class MessageParserSupport extends MessageParser
     @AllArgsConstructor
     private static final class Name
     {
-      String literal;
-      String symbol;
+      final String literal;
+      final String symbol;
     }
   }
 }

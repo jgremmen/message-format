@@ -10,13 +10,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.Type.STRING;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.emptySet;
 
 
 /**
@@ -35,15 +35,13 @@ public final class FileSizeFormatter extends AbstractParameterFormatter implemen
 
 
   @Override
-  @NotNull
-  public String getName() {
+  public @NotNull String getName() {
     return "filesize";
   }
 
 
-  @NotNull
   @Override
-  protected Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  protected @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (!(value instanceof Number))
       return nullText();
@@ -79,9 +77,8 @@ public final class FileSizeFormatter extends AbstractParameterFormatter implemen
 
 
   @Override
-  @NotNull
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.emptySet();
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return emptySet();
   }
 
 

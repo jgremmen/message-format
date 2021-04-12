@@ -82,10 +82,9 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
   }
 
 
-  @NotNull
   @Override
   @Contract(pure = true)
-  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
@@ -127,10 +126,9 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
   }
 
 
-  @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
+  public @NotNull Set<Class<?>> getFormattableTypes() {
     return Collections.singleton(Temporal.class);
   }
 }

@@ -25,11 +25,12 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.Reference;
-import java.util.Collections;
 import java.util.Set;
 
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 
 
 /**
@@ -39,9 +40,8 @@ public final class ReferenceFormatter extends AbstractParameterFormatter
     implements EmptyMatcher, SizeQueryable
 {
   @SuppressWarnings("rawtypes")
-  @NotNull
   @Override
-  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
@@ -53,7 +53,7 @@ public final class ReferenceFormatter extends AbstractParameterFormatter
 
   @Override
   public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return compareType.match(((Reference<?>)value).get() == null ? 0 : 1) ? MatchResult.TYPELESS_EXACT : null;
+    return compareType.match(((Reference<?>)value).get() == null ? 0 : 1) ? TYPELESS_EXACT : null;
   }
 
 
@@ -63,9 +63,8 @@ public final class ReferenceFormatter extends AbstractParameterFormatter
   }
 
 
-  @NotNull
   @Override
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(Reference.class);
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return singleton(Reference.class);
   }
 }

@@ -36,37 +36,33 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor(access = PRIVATE)
 public final class MessagePartFactory
 {
-  @NotNull
   @Contract(pure = true)
-  public static Text nullText() {
+  public static @NotNull Text nullText() {
     return NULL;
   }
 
 
-  @NotNull
   @Contract(pure = true)
-  public static Text emptyText() {
+  public static @NotNull Text emptyText() {
     return EMPTY;
   }
 
 
-  @NotNull
   @Contract(pure = true)
   @SuppressWarnings("java:S3358")
-  public static Text noSpaceText(String text) {
+  public static @NotNull Text noSpaceText(String text) {
     return text == null ? NULL : (text.trim().isEmpty() ? EMPTY : new NoSpaceTextPart(text));
   }
 
 
-  @NotNull
   @Contract(pure = true)
   @SuppressWarnings("java:S3358")
-  public static Text spacedText(String text) {
+  public static @NotNull Text spacedText(String text) {
     return text == null ? NULL : (text.isEmpty() ? EMPTY : new TextPart(text));
   }
 
 
-  public static Text addSpaces(Text text, boolean spaceBefore, boolean spaceAfter)
+  public static @NotNull Text addSpaces(@NotNull Text text, boolean spaceBefore, boolean spaceAfter)
   {
     final boolean textSpaceBefore = text.isSpaceBefore();
     final boolean textSpaceAfter = text.isSpaceAfter();
@@ -78,9 +74,8 @@ public final class MessagePartFactory
   }
 
 
-  @NotNull
   @Contract(pure = true)
-  public static Text messageToText(Message.WithSpaces message, @NotNull Parameters parameters)
+  public static @NotNull Text messageToText(Message.WithSpaces message, @NotNull Parameters parameters)
   {
     return message == null
         ? NULL : new TextPart(message.format(parameters), message.isSpaceBefore(), message.isSpaceAfter());

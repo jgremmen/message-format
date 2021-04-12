@@ -25,10 +25,10 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.messageToText;
+import static java.util.Collections.emptySet;
 
 
 /**
@@ -36,18 +36,16 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.messageToTe
  */
 public final class SizeFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
 {
-  @NotNull
   @Override
   @Contract(pure = true)
-  public String getName() {
+  public @NotNull String getName() {
     return "size";
   }
 
 
-  @NotNull
   @Override
   @Contract(pure = true)
-  public Text format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (!(data instanceof DataMap))
       throw new MessageException("data must be a choice map");
@@ -59,17 +57,15 @@ public final class SizeFormatter extends AbstractParameterFormatter implements N
   }
 
 
-  @NotNull
   @Override
-  protected Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
+  protected @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
     throw new IllegalStateException();
   }
 
 
-  @NotNull
   @Override
   @Contract(pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.emptySet();
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return emptySet();
   }
 }

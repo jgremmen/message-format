@@ -23,12 +23,12 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 
 
 /**
@@ -36,9 +36,8 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
  */
 public final class FileFormatter extends AbstractParameterFormatter implements SizeQueryable
 {
-  @NotNull
   @Override
-  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
@@ -72,10 +71,9 @@ public final class FileFormatter extends AbstractParameterFormatter implements S
   }
 
 
-  @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(File.class);
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return singleton(File.class);
   }
 }

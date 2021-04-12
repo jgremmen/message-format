@@ -56,7 +56,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
   public GenericFormatterService()
   {
-    StringFormatter stringFormatter = new StringFormatter();
+    final StringFormatter stringFormatter = new StringFormatter();
 
     addFormatter(stringFormatter);
     addFormatterForType(Object.class, stringFormatter);
@@ -66,7 +66,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   @Override
   public void addFormatterForType(@NotNull Class<?> type, @NotNull ParameterFormatter formatter)
   {
-    ParameterFormatter currentFormatter = typeFormatters.get(type);
+    final ParameterFormatter currentFormatter = typeFormatters.get(type);
 
     if (currentFormatter == null || currentFormatter.getPriority() < formatter.getPriority())
     {

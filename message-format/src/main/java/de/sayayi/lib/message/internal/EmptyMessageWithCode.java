@@ -52,9 +52,8 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
   }
 
 
-  @NotNull
   @Override
-  public Set<String> getParameterNames() {
+  public @NotNull Set<String> getParameterNames() {
     return emptySet();
   }
 }

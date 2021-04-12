@@ -26,16 +26,17 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.lang.reflect.Array.get;
 import static java.lang.reflect.Array.getLength;
+import static java.util.Arrays.asList;
 import static java.util.ResourceBundle.getBundle;
 
 
@@ -44,9 +45,8 @@ import static java.util.ResourceBundle.getBundle;
  */
 public final class ArrayFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
 {
-  @NotNull
   @Override
-  public Text formatValue(Object array, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object array, String format, @NotNull Parameters parameters, Data data)
   {
     if (array == null)
       return nullText();
@@ -88,7 +88,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
 
   @Override
   public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return compareType.match(getLength(value)) ? MatchResult.TYPELESS_EXACT : null;
+    return compareType.match(getLength(value)) ? TYPELESS_EXACT : null;
   }
 
 
@@ -98,17 +98,10 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
   }
 
 
-  @NotNull
   @Override
-  public Set<Class<?>> getFormattableTypes()
+  public @NotNull Set<Class<?>> getFormattableTypes()
   {
-    return new HashSet<Class<?>>(Arrays.<Class<?>>asList(
-        Object[].class,
-        short[].class,
-        int[].class,
-        long[].class,
-        float[].class,
-        double[].class,
-        boolean[].class));
+    return new HashSet<>(asList(
+        Object[].class, short[].class, int[].class, long[].class, float[].class, double[].class, boolean[].class));
   }
 }

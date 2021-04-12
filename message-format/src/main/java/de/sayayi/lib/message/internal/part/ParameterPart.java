@@ -58,10 +58,9 @@ public final class ParameterPart implements Parameter
   }
 
 
-  @NotNull
   @Override
   @Contract(pure = true)
-  public Text getText(@NotNull Parameters parameters)
+  public @NotNull Text getText(@NotNull Parameters parameters)
   {
     final Object value = parameters.getParameterValue(parameter);
     final Class<?> type = value != null ? value.getClass() : String.class;
@@ -75,9 +74,8 @@ public final class ParameterPart implements Parameter
   }
 
 
-  @NotNull
   @Contract(pure = true)
-  public Set<String> getParameterNames()
+  public @NotNull Set<String> getParameterNames()
   {
     final Set<String> parameterNames = new TreeSet<>();
 

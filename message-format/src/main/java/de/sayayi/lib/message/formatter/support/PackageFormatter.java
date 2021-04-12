@@ -21,11 +21,11 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 
 
 /**
@@ -33,17 +33,15 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
  */
 public final class PackageFormatter extends AbstractParameterFormatter
 {
-  @NotNull
   @Override
-  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
     return value == null ? nullText() : noSpaceText(((Package)value).getName());
   }
 
 
-  @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(Package.class);
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return singleton(Package.class);
   }
 }

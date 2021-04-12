@@ -45,10 +45,9 @@ public class DataNumber implements Data
   }
 
 
-  @NotNull
   @Override
   @Contract(pure = true)
-  public Long asObject() {
+  public @NotNull Long asObject() {
     return number;
   }
 }

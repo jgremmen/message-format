@@ -27,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,6 +35,7 @@ import static de.sayayi.lib.message.data.map.MapKey.EMPTY_NULL_TYPE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.messageToText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Arrays.asList;
 import static java.util.ResourceBundle.getBundle;
 
 
@@ -44,18 +44,16 @@ import static java.util.ResourceBundle.getBundle;
  */
 public final class BoolFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
 {
-  @NotNull
   @Override
   @Contract(pure = true)
-  public String getName() {
+  public @NotNull String getName() {
     return "bool";
   }
 
 
-  @NotNull
   @Override
   @Contract(pure = true)
-  public Text format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     Message.WithSpaces msg = getMessage(value, EMPTY_NULL_TYPE, parameters, data, false);
     if (msg != null)
@@ -95,17 +93,15 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
   }
 
 
-  @NotNull
   @Override
-  protected Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
+  protected @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
     throw new IllegalStateException();
   }
 
 
-  @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return new HashSet<Class<?>>(Arrays.<Class<?>>asList(Boolean.class, boolean.class));
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return new HashSet<>(asList(Boolean.class, boolean.class));
   }
 }

@@ -26,7 +26,6 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,6 +33,7 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_LENIENT;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Arrays.asList;
 
 
 /**
@@ -42,19 +42,17 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 public final class StringFormatter extends AbstractParameterFormatter
     implements NamedParameterFormatter, EmptyMatcher, SizeQueryable
 {
-  @NotNull
   @Override
   @Contract(pure = true)
-  public String getName() {
+  public @NotNull String getName() {
     return "string";
   }
 
 
-  @NotNull
   @Override
   @Contract(pure = true)
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
-  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     return value == null
         ? nullText() : noSpaceText(value instanceof char[] ? new String((char[])value) : String.valueOf(value));
@@ -82,10 +80,9 @@ public final class StringFormatter extends AbstractParameterFormatter
   }
 
 
-  @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return new HashSet<Class<?>>(Arrays.asList(CharSequence.class, char[].class));
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return new HashSet<>(asList(CharSequence.class, char[].class));
   }
 }

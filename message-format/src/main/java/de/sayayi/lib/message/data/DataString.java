@@ -40,10 +40,9 @@ public class DataString implements Data
   }
 
 
-  @NotNull
   @Override
   @Contract(pure = true)
-  public String asObject() {
+  public @NotNull String asObject() {
     return string;
   }
 }

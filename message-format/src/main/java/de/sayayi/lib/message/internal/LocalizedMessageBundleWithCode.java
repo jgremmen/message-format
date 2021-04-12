@@ -119,9 +119,8 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
   }
 
 
-  @NotNull
   @Override
-  public Set<String> getParameterNames()
+  public @NotNull Set<String> getParameterNames()
   {
     if (!hasParameters())
       return Collections.emptySet();
@@ -135,17 +134,15 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
   }
 
 
-  @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Locale> getLocales() {
+  public @NotNull Set<Locale> getLocales() {
     return unmodifiableSet(localizedMessages.keySet());
   }
 
 
-  @NotNull
   @Override
-  public Map<Locale,Message> getLocalizedMessages() {
+  public @NotNull Map<Locale,Message> getLocalizedMessages() {
     return unmodifiableMap(localizedMessages);
   }
 }

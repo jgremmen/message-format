@@ -39,7 +39,7 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
  */
 public class GeoFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
 {
-  private static final Map<String,Format> FORMAT = new HashMap<String,Format>();
+  private static final Map<String,Format> FORMAT = new HashMap<>();
 
   static {
     // longitude
@@ -57,16 +57,14 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
 
 
   @Override
-  @NotNull
-  public String getName() {
+  public @NotNull String getName() {
     return "geo";
   }
 
 
-  @NotNull
   @Override
   @SuppressWarnings("squid:S3776")
-  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
@@ -165,9 +163,8 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
   }
 
 
-  @NotNull
   @Override
-  public Set<Class<?>> getFormattableTypes() {
+  public @NotNull Set<Class<?>> getFormattableTypes() {
     return Collections.emptySet();
   }
 
@@ -186,7 +183,7 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
      8 = (LO|LA)  ->  longitude
    */
 
-  static Format parseFormatString(@NotNull String formatString)
+  static @NotNull Format parseFormatString(@NotNull String formatString)
   {
     Matcher matcher = PATTERN_FORMAT.matcher(formatString.trim());
     if (!matcher.matches())
@@ -217,6 +214,8 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
 
     return format;
   }
+
+
 
 
   @NoArgsConstructor

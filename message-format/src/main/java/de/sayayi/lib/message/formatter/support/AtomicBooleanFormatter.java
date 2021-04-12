@@ -30,18 +30,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public final class AtomicBooleanFormatter extends AbstractParameterFormatter
 {
-  @NotNull
   @Override
-  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     return parameters.getFormatter(format, boolean.class)
         .format(value == null ? null : ((AtomicBoolean)value).get(), format, parameters, data);
   }
 
 
-  @NotNull
   @Override
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(AtomicBoolean.class);
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return Collections.singleton(AtomicBoolean.class);
   }
 }

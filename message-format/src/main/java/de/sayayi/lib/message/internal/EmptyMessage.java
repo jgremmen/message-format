@@ -53,9 +53,8 @@ public final class EmptyMessage implements Message.WithSpaces
   }
 
 
-  @NotNull
   @Override
-  public Set<String> getParameterNames() {
+  public @NotNull Set<String> getParameterNames() {
     return emptySet();
   }
 

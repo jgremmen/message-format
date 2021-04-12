@@ -27,13 +27,13 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 
 
 /**
@@ -44,10 +44,9 @@ public final class NumberFormatter extends AbstractParameterFormatter
   private static final BoolFormatter BOOL_FORMATTER = new BoolFormatter();
 
 
-  @NotNull
   @Override
   @Contract(pure = true)
-  public Text formatValue(Object v, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object v, String format, @NotNull Parameters parameters, Data data)
   {
     if (v == null)
       return nullText();
@@ -99,10 +98,9 @@ public final class NumberFormatter extends AbstractParameterFormatter
   }
 
 
-  @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(Number.class);
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return singleton(Number.class);
   }
 }

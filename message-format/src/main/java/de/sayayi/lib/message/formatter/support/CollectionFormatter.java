@@ -25,15 +25,16 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Arrays.asList;
 import static java.util.ResourceBundle.getBundle;
 
 
@@ -43,11 +44,10 @@ import static java.util.ResourceBundle.getBundle;
 public final class CollectionFormatter extends AbstractParameterFormatter
     implements EmptyMatcher, SizeQueryable
 {
-  @NotNull
   @SuppressWarnings("rawtypes")
   @Override
   @Contract(pure = true)
-  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
@@ -81,7 +81,7 @@ public final class CollectionFormatter extends AbstractParameterFormatter
         ? ((Collection<?>)value).size()
         : (((Iterable<?>)value).iterator().hasNext() ? 1 : 0);
 
-    return compareType.match(cmp) ? MatchResult.TYPELESS_EXACT : null;
+    return compareType.match(cmp) ? TYPELESS_EXACT : null;
   }
 
 
@@ -100,10 +100,9 @@ public final class CollectionFormatter extends AbstractParameterFormatter
   }
 
 
-  @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return new HashSet<Class<?>>(Arrays.asList(Collection.class, Iterable.class));
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return new HashSet<>(asList(Collection.class, Iterable.class));
   }
 }

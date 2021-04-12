@@ -56,6 +56,7 @@ public class ParameterizedMessage implements Message.WithSpaces
 
   @Override
   @Contract(pure = true)
+  @SuppressWarnings("java:S4838")
   public String format(@NotNull Parameters parameters)
   {
     final StringBuilder message = new StringBuilder();
@@ -86,9 +87,9 @@ public class ParameterizedMessage implements Message.WithSpaces
   }
 
 
-  @NotNull
   @Override
-  public Set<String> getParameterNames()
+  @SuppressWarnings("java:S4838")
+  public @NotNull Set<String> getParameterNames()
   {
     final Set<String> parameterNames = new TreeSet<>();
 

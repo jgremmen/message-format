@@ -24,12 +24,12 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.emptySet;
 
 
 /**
@@ -37,16 +37,14 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
  */
 public final class BitsFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
 {
-  @NotNull
   @Override
-  public String getName() {
+  public @NotNull String getName() {
     return "bits";
   }
 
 
-  @NotNull
   @Override
-  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (!(value instanceof Number))
       return nullText();
@@ -147,9 +145,8 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
   }
 
 
-  @NotNull
   @Override
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.emptySet();
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return emptySet();
   }
 }

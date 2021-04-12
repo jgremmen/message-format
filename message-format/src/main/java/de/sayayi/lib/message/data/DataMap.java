@@ -36,6 +36,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.data.map.MapValue.STRING_MESSAGE_TYPE;
 
 
@@ -68,7 +70,7 @@ public final class DataMap implements Data
   @Contract(pure = true)
   public MapValue find(Object key, Parameters parameters, Set<MapKey.Type> keyTypes, Set<MapValue.Type> valueTypes)
   {
-    MatchResult bestMatchResult = MatchResult.MISMATCH;
+    MatchResult bestMatchResult = MISMATCH;
     MapValue bestMatch = null;
 
     for(Entry<MapKey,MapValue> entry: map.entrySet())
@@ -84,7 +86,7 @@ public final class DataMap implements Data
       {
         MatchResult matchResult = mapKey.match(parameters, key);
 
-        if (matchResult == MatchResult.EXACT)
+        if (matchResult == EXACT)
           return entry.getValue();
 
         if (matchResult.compareTo(bestMatchResult) > 0)
