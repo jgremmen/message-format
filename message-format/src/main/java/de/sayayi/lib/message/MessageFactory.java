@@ -56,16 +56,14 @@ public final class MessageFactory
   private static final AtomicInteger CODE_ID = new AtomicInteger(0);
 
 
-  @NotNull
   @Contract(value = "_ -> new", pure = true)
-  public static Message.WithSpaces parse(@NotNull String text) {
+  public static @NotNull Message.WithSpaces parse(@NotNull String text) {
     return MessageParserSupport.parse(text);
   }
 
 
-  @NotNull
   @Contract(value = "_ -> new", pure = true)
-  public static Message parse(@NotNull Map<Locale,String> localizedTexts) {
+  public static @NotNull Message parse(@NotNull Map<Locale,String> localizedTexts) {
     return parse("Generated::" + CODE_ID.incrementAndGet(), localizedTexts);
   }
 
@@ -78,16 +76,14 @@ public final class MessageFactory
    *
    * @return  message instance
    */
-  @NotNull
   @Contract(value = "_, _ -> new", pure = true)
-  public static Message.WithCode parse(@NotNull String code, @NotNull String text) {
+  public static @NotNull Message.WithCode parse(@NotNull String code, @NotNull String text) {
     return new MessageDelegateWithCode(code, parse(text));
   }
 
 
-  @NotNull
   @Contract(value = "_, _ -> new", pure = true)
-  public static Message.WithCode parse(@NotNull String code, @NotNull Map<Locale,String> localizedTexts)
+  public static @NotNull Message.WithCode parse(@NotNull String code, @NotNull Map<Locale,String> localizedTexts)
   {
     if (localizedTexts.isEmpty())
       return new EmptyMessageWithCode(code);
@@ -105,9 +101,8 @@ public final class MessageFactory
 
 
   @SuppressWarnings("WeakerAccess")
-  @NotNull
   @Contract(value = "_ -> new", pure = true)
-  public static Set<Message.WithCode> parseAnnotations(@NotNull AnnotatedElement element)
+  public static @NotNull Set<Message.WithCode> parseAnnotations(@NotNull AnnotatedElement element)
   {
     final Set<Message.WithCode> messageBundle = new HashSet<>();
 
@@ -131,13 +126,17 @@ public final class MessageFactory
   }
 
 
-  @NotNull
   @Contract(value = "_ -> new", pure = true)
-  public static Message.WithCode parse(@NotNull MessageDef annotation)
+  public static @NotNull Message.WithCode parse(@NotNull MessageDef annotation)
   {
     final Text[] texts = annotation.texts();
+    final String code = annotation.code();
+
     if (texts.length == 0)
-      return new EmptyMessageWithCode(annotation.code());
+    {
+      String text = annotation.text();
+      return text.isEmpty() ? new EmptyMessageWithCode(code) : parse(code, text);
+    }
 
     final Map<Locale,String> localizedTexts = new LinkedHashMap<>();
 
@@ -150,20 +149,19 @@ public final class MessageFactory
         localizedTexts.put(locale, value);
     }
 
-    return parse(annotation.code(), localizedTexts);
+    return parse(code, localizedTexts);
   }
 
 
-  @NotNull
   @Contract(pure = true)
-  public static Message.WithCode withCode(@NotNull String code, @NotNull Message message)
+  public static @NotNull Message.WithCode withCode(@NotNull String code, @NotNull Message message)
   {
     if (message instanceof MessageDelegateWithCode)
       return new MessageDelegateWithCode(code, ((MessageDelegateWithCode)message).getMessage());
 
     if (message instanceof Message.WithCode)
     {
-      Message.WithCode messageWithCode = (Message.WithCode)message;
+      final Message.WithCode messageWithCode = (Message.WithCode)message;
 
       if (code.equals(messageWithCode.getCode()))
         return messageWithCode;
@@ -176,9 +174,8 @@ public final class MessageFactory
   }
 
 
-  @NotNull
   @Contract(pure = true)
-  public static MessageBundle bundle(@NotNull Properties properties)
+  public static @NotNull MessageBundle bundle(@NotNull Properties properties)
   {
     final MessageBundle bundle = new MessageBundle();
 
@@ -188,9 +185,8 @@ public final class MessageFactory
   }
 
 
-  @NotNull
   @Contract(pure = true)
-  public static MessageBundle bundle(@NotNull ResourceBundle resourceBundle)
+  public static @NotNull MessageBundle bundle(@NotNull ResourceBundle resourceBundle)
   {
     final MessageBundle bundle = new MessageBundle();
     final Locale locale = resourceBundle.getLocale();
@@ -202,9 +198,8 @@ public final class MessageFactory
   }
 
 
-  @NotNull
   @Contract(pure = true)
-  public static MessageBundle bundle(@NotNull Map<Locale,Properties> properties)
+  public static @NotNull MessageBundle bundle(@NotNull Map<Locale,Properties> properties)
   {
     final Map<String,Map<Locale,Message>> localizedMessagesByCode = new HashMap<>();
 
@@ -219,9 +214,8 @@ public final class MessageFactory
   }
 
 
-  @NotNull
   @Contract(pure = true)
-  public static MessageBundle bundle(@NotNull Collection<ResourceBundle> properties)
+  public static @NotNull MessageBundle bundle(@NotNull Collection<ResourceBundle> properties)
   {
     final Map<String,Map<Locale,Message>> localizedMessagesByCode = new HashMap<>();
 
@@ -236,9 +230,8 @@ public final class MessageFactory
   }
 
 
-  @NotNull
   @Contract(pure = true)
-  static Locale forLanguageTag(@NotNull String locale)
+  static @NotNull Locale forLanguageTag(@NotNull String locale)
   {
     if (locale.isEmpty())
       return ROOT;

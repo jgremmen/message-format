@@ -51,5 +51,13 @@ public @interface MessageDef
    *
    * @return  localized texts
    */
-  Text[] texts();
+  Text[] texts() default {};
+
+
+  /**
+   * Message text. Short for {@code texts = @Text("...")}
+   *
+   * @return  message text
+   */
+  String text() default "";
 }
