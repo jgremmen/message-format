@@ -17,7 +17,7 @@
 description = 'Message Format Library (joda time formatters)'
 
 
-def jodatimeVersion = "2.10.5"
+def jodatimeVersion = "2.10.10"
 
 
 dependencies {
@@ -26,8 +26,8 @@ dependencies {
 
 
 compileJava {
-  sourceCompatibility = 1.6
-  targetCompatibility = 1.6
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
 }
 
 

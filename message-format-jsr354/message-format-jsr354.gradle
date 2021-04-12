@@ -18,7 +18,7 @@ description 'Message Format Library (JSR 354 formatters)'
 
 
 dependencies {
-  implementation "javax.money:money-api:1.0.3"
+  implementation "javax.money:money-api:1.1"
 }
 
 
@@ -31,7 +31,7 @@ compileJava {
 publishing {
   publications {
 
-    money(MavenPublication) {
+    jsr354(MavenPublication) {
       from components.java
 
       pom {
@@ -68,5 +68,5 @@ publishing {
 
 
 signing {
-  sign publishing.publications.money
+  sign publishing.publications.jsr354
 }
