@@ -17,6 +17,7 @@ de.sayayi.lib.message.formatter.support.IntSupplierFormatter
 de.sayayi.lib.message.formatter.support.Java8DateTimeFormatter
 de.sayayi.lib.message.formatter.support.LongSupplierFormatter
 de.sayayi.lib.message.formatter.support.MapFormatter
+de.sayayi.lib.message.formatter.support.MethodFormatter
 de.sayayi.lib.message.formatter.support.NumberFormatter
 de.sayayi.lib.message.formatter.support.OptionalDoubleFormatter
 de.sayayi.lib.message.formatter.support.OptionalFormatter
