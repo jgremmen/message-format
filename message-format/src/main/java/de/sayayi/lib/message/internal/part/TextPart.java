@@ -52,7 +52,7 @@ public final class TextPart implements Text
 
   @Override
   public boolean isEmpty() {
-    return text == null;
+    return text == null || text.isEmpty();
   }
 
 
