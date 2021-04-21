@@ -26,15 +26,14 @@ tokens {
 }
 
 
+
 // ------------------ Default mode ------------------
 
 PARAM_START
         : ParamStart -> pushMode(PARAMETER)
         ;
 CH
-        : ' '+
-        | EscapeSequence
-        | TextChar
+        : Character
         ;
 CTRL_CHAR
         : CtrlChar+ -> skip
@@ -52,10 +51,7 @@ SINGLE_QUOTE_END
         : '\'' -> popMode
         ;
 CH1
-        : (  ' '+
-           | EscapeSequence
-           | TextChar
-          ) -> type(CH)
+        : Character -> type(CH)
         ;
 CTRL_CHAR1
         : CtrlChar+ -> skip
@@ -73,14 +69,12 @@ DOUBLE_QUOTE_END
         : '"' -> popMode
         ;
 CH2
-        : (  ' '+
-           | EscapeSequence
-           | TextChar
-          ) -> type(CH)
+        : Character -> type(CH)
         ;
 CTRL_CHAR2
         : CtrlChar+ -> skip
         ;
+
 
 
 // ------------------ In parameter mode ------------------
@@ -215,6 +209,12 @@ fragment NameStartChar
 
 fragment Number
         : '-'? [0-9]+
+        ;
+
+fragment Character
+        : ' '+
+        | EscapeSequence
+        | TextChar
         ;
 
 fragment EscapeSequence

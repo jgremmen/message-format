@@ -59,7 +59,12 @@ public final class MessageParserSupport extends MessageParser
   private MessageParserSupport(String message)
   {
     //noinspection deprecation
-    super(new BufferedTokenStream(new MessageLexer(new ANTLRInputStream(message))));
+    super(new BufferedTokenStream(new MessageLexer(new ANTLRInputStream(message)) {
+      @Override
+      public Vocabulary getVocabulary() {
+        return MessageVocabulary.INSTANCE;
+      }
+    }));
 
     this.message = message;
 
@@ -161,7 +166,7 @@ public final class MessageParserSupport extends MessageParser
     @Override
     public void exitString(StringContext ctx)
     {
-      TextContext text = ctx.text();
+      final TextContext text = ctx.text();
       ctx.value = text == null ? "" : text.value;
     }
 
@@ -169,7 +174,7 @@ public final class MessageParserSupport extends MessageParser
     @Override
     public void exitForceQuotedMessage(ForceQuotedMessageContext ctx)
     {
-      QuotedMessageContext quotedMessage = ctx.quotedMessage();
+      final QuotedMessageContext quotedMessage = ctx.quotedMessage();
       ctx.value = quotedMessage != null ? quotedMessage.value : MessageFactory.parse(ctx.string().value);
     }
 
@@ -228,7 +233,7 @@ public final class MessageParserSupport extends MessageParser
     {
       ctx.value = ctx.mapElements().value;
 
-      ForceQuotedMessageContext forceQuotedMessage = ctx.forceQuotedMessage();
+      final ForceQuotedMessageContext forceQuotedMessage = ctx.forceQuotedMessage();
       if (forceQuotedMessage != null)
         ctx.value.put(null, new MapValueMessage(forceQuotedMessage.value));
     }

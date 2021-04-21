@@ -15,6 +15,7 @@
  */
 parser grammar MessageParser;
 
+
 options {
     language = Java;
     tokenVocab = MessageLexer;
