@@ -58,6 +58,7 @@ public final class MessageParserSupport extends MessageParser
 
   private MessageParserSupport(String message)
   {
+    //noinspection deprecation
     super(new BufferedTokenStream(new MessageLexer(new ANTLRInputStream(message))));
 
     this.message = message;
@@ -128,23 +129,24 @@ public final class MessageParserSupport extends MessageParser
     @Override
     public void exitText(TextContext ctx)
     {
-      StringBuilder text = new StringBuilder();
-      boolean lastCharIsSpace = false;
+      final StringBuilder text = new StringBuilder();
 
-      for(TerminalNode ch: ctx.CH())
-        for(char c: ch.getText().toCharArray())
-          if (isSpaceChar(c))
-          {
-            if (!lastCharIsSpace)
-              text.append(' ');
+      for(final TerminalNode chNode: ctx.CH())
+      {
+        final String chText = chNode.getText();
+        final char firstChar = chText.charAt(0);
 
-            lastCharIsSpace = true;
-          }
-          else
-          {
-            text.append(c);
-            lastCharIsSpace = false;
-          }
+        if (isSpaceChar(firstChar))
+          text.append(' ');
+        else if (firstChar == '\\')
+        {
+          // handle escape characters
+          text.append(chText.length() == 2
+              ? chText.charAt(1) : (char)Integer.parseInt(chText.substring(2), 16));
+        }
+        else
+          text.append(firstChar);
+      }
 
       ctx.value = text.toString();
     }

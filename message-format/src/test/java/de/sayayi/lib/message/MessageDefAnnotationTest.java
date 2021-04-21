@@ -49,7 +49,7 @@ public class MessageDefAnnotationTest
   @MessageDef(code = "T4", texts = @Text(locale = "en", text = "Message %{p1}"))
   @MessageDef(code = "T5", texts = {
       @Text(locale = "en", text = "English message"),
-      @Text(locale = "de", text = "Deutsche Nachricht")
+      @Text(locale = "de", text = "Deutsche   Nachricht")
   })
   public void testMultiMessageAnotation()
   {

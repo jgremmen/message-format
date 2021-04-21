@@ -15,10 +15,6 @@
  */
 lexer grammar MessageLexer;
 
-options {
-    superClass = AbstractLexer;
-}
-
 
 tokens {
     BOOL,
