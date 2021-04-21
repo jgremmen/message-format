@@ -16,6 +16,12 @@
 package de.sayayi.lib.message.parser;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.data.DataMap;
+import de.sayayi.lib.message.data.DataNumber;
+import de.sayayi.lib.message.data.DataString;
+import de.sayayi.lib.message.data.map.MapKey.CompareType;
+import de.sayayi.lib.message.data.map.*;
 import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.ParameterizedMessage;
@@ -23,9 +29,6 @@ import de.sayayi.lib.message.internal.TextMessage;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.ParameterPart;
 import de.sayayi.lib.message.internal.part.TextPart;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.BufferedTokenStream;
@@ -34,13 +37,15 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import static java.lang.Character.isSpaceChar;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 
 /**
@@ -66,17 +71,23 @@ public final class MessageParserSupport extends MessageParser
   }
 
 
-  public static Message.WithSpaces parse(String text)
-  {
-    MessageContext messageContext = new MessageParserSupport(text).message();
+  public static Message.WithSpaces parse(String text) {
+    return new MessageParserSupport(text).message().value;
+  }
 
-    return messageContext.value;
+
+  @Override
+  public void exitRule()
+  {
+    // fix ANTLR bug
+    if (!getErrorHandler().inErrorRecoveryMode(this))
+      super.exitRule();
   }
 
 
   @Override
   public Vocabulary getVocabulary() {
-    return Vocab.INSTANCE;
+    return MessageVocabulary.INSTANCE;
   }
 
 
@@ -85,15 +96,18 @@ public final class MessageParserSupport extends MessageParser
   private final class ParserListener extends MessageParserBaseListener
   {
     @Override
-    public void exitTextPart(TextPartContext ctx) {
-      ctx.value = new TextPart(ctx.text().value);
+    public void exitMessage(MessageContext ctx) {
+      ctx.value = ctx.message0().value;
     }
 
 
     @Override
     public void exitMessage0(Message0Context ctx)
     {
-      final List<MessagePart> parts = ctx.parts;
+      final List<MessagePart> parts = ctx.children.stream()
+          .map(pt -> pt instanceof ParameterContext
+              ? ((ParameterContext)pt).value : ((TextPartContext)pt).value)
+          .collect(toList());
       final int partCount = parts.size();
 
       if (partCount == 0)
@@ -102,6 +116,59 @@ public final class MessageParserSupport extends MessageParser
         ctx.value = new TextMessage((TextPart)parts.get(0));
       else
         ctx.value = new ParameterizedMessage(parts);
+    }
+
+
+    @Override
+    public void exitTextPart(TextPartContext ctx) {
+      ctx.value = new TextPart(ctx.text().value);
+    }
+
+
+    @Override
+    public void exitText(TextContext ctx)
+    {
+      StringBuilder text = new StringBuilder();
+      boolean lastCharIsSpace = false;
+
+      for(TerminalNode ch: ctx.CH())
+        for(char c: ch.getText().toCharArray())
+          if (isSpaceChar(c))
+          {
+            if (!lastCharIsSpace)
+              text.append(' ');
+
+            lastCharIsSpace = true;
+          }
+          else
+          {
+            text.append(c);
+            lastCharIsSpace = false;
+          }
+
+      ctx.value = text.toString();
+    }
+
+
+    @Override
+    public void exitQuotedMessage(QuotedMessageContext ctx) {
+      ctx.value = ctx.message0().value;
+    }
+
+
+    @Override
+    public void exitString(StringContext ctx)
+    {
+      TextContext text = ctx.text();
+      ctx.value = text == null ? "" : text.value;
+    }
+
+
+    @Override
+    public void exitForceQuotedMessage(ForceQuotedMessageContext ctx)
+    {
+      QuotedMessageContext quotedMessage = ctx.quotedMessage();
+      ctx.value = quotedMessage != null ? quotedMessage.value : MessageFactory.parse(ctx.string().value);
     }
 
 
@@ -133,6 +200,162 @@ public final class MessageParserSupport extends MessageParser
       }
 
       return false;
+    }
+
+
+    @Override
+    public void exitDataString(DataStringContext ctx) {
+      ctx.value = new DataString(ctx.string().value);
+    }
+
+
+    @Override
+    public void exitDataNumber(DataNumberContext ctx) {
+      ctx.value = new DataNumber(ctx.NUMBER().getText());
+    }
+
+
+    @Override
+    public void exitDataMap(DataMapContext ctx) {
+      ctx.value = new DataMap(ctx.map().value);
+    }
+
+
+    @Override
+    public void exitMap(MapContext ctx)
+    {
+      ctx.value = ctx.mapElements().value;
+
+      ForceQuotedMessageContext forceQuotedMessage = ctx.forceQuotedMessage();
+      if (forceQuotedMessage != null)
+        ctx.value.put(null, new MapValueMessage(forceQuotedMessage.value));
+    }
+
+
+    @Override
+    public void exitMapElements(MapElementsContext ctx)
+    {
+      ctx.value = ctx.mapElement().stream()
+          .collect(toMap(mec -> mec.key, mec -> mec.value, (a, b) -> b, LinkedHashMap::new));
+    }
+
+
+    @Override
+    public void exitMapElement(MapElementContext ctx)
+    {
+      ctx.key = ctx.mapKey().key;
+      ctx.value = ctx.mapValue().value;
+    }
+
+
+    @Override
+    public void exitMapKeyString(MapKeyStringContext ctx) {
+      ctx.key = new MapKeyString(ctx.relationalOperatorOptional().cmp, ctx.string().value);
+    }
+
+
+    @Override
+    public void exitMapKeyNumber(MapKeyNumberContext ctx) {
+      ctx.key = new MapKeyNumber(ctx.relationalOperatorOptional().cmp, ctx.NUMBER().getText());
+    }
+
+
+    @Override
+    public void exitMapKeyBool(MapKeyBoolContext ctx) {
+      ctx.key = new MapKeyBool(ctx.BOOL().getText());
+    }
+
+
+    @Override
+    public void exitMapKeyNull(MapKeyNullContext ctx) {
+      ctx.key = new MapKeyNull(ctx.equalOperatorOptional().cmp);
+    }
+
+
+    @Override
+    public void exitMapKeyEmpty(MapKeyEmptyContext ctx) {
+      ctx.key = new MapKeyEmpty(ctx.equalOperatorOptional().cmp);
+    }
+
+
+    @Override
+    public void exitMapKeyName(MapKeyNameContext ctx) {
+      ctx.key = new MapKeyName(ctx.NAME().getText());
+    }
+
+
+    @Override
+    public void exitMapValueString(MapValueStringContext ctx) {
+      ctx.value = new MapValueString(ctx.string().value);
+    }
+
+
+    @Override
+    public void exitMapValueNumber(MapValueNumberContext ctx) {
+      ctx.value = new MapValueNumber(ctx.NUMBER().getText());
+    }
+
+
+    @Override
+    public void exitMapValueBool(MapValueBoolContext ctx) {
+      ctx.value = new MapValueBool(ctx.BOOL().getText());
+    }
+
+
+    @Override
+    public void exitMapValueMessage(MapValueMessageContext ctx) {
+      ctx.value = new MapValueMessage(ctx.quotedMessage().value);
+    }
+
+
+    @Override
+    public void exitRelationalOperatorOptional(RelationalOperatorOptionalContext ctx)
+    {
+      RelationalOperatorContext relationalOperator = ctx.relationalOperator();
+      ctx.cmp = relationalOperator == null ? CompareType.EQ : relationalOperator.cmp;
+    }
+
+
+    @Override
+    public void exitRelationalOperator(RelationalOperatorContext ctx)
+    {
+      EqualOperatorContext equalOperator = ctx.equalOperator();
+
+      if (equalOperator != null)
+        ctx.cmp = equalOperator.cmp;
+      else
+        switch(((TerminalNode)ctx.getChild(0)).getSymbol().getType())
+        {
+          case LTE:
+            ctx.cmp = CompareType.LTE;
+            break;
+
+          case LT:
+            ctx.cmp = CompareType.LT;
+            break;
+
+          case GT:
+            ctx.cmp = CompareType.GT;
+            break;
+
+          case GTE:
+            ctx.cmp = CompareType.GTE;
+            break;
+        }
+    }
+
+
+    @Override
+    public void exitEqualOperatorOptional(EqualOperatorOptionalContext ctx)
+    {
+      EqualOperatorContext equalOperator = ctx.equalOperator();
+      ctx.cmp = equalOperator == null ? CompareType.EQ : equalOperator.cmp;
+    }
+
+
+    @Override
+    public void exitEqualOperator(EqualOperatorContext ctx) {
+      ctx.cmp = ctx.EQ() != null ? CompareType.EQ : CompareType.NE;
     }
   }
 
@@ -173,93 +396,6 @@ public final class MessageParserSupport extends MessageParser
       text.append(marker);
 
       throw new MessageParserException(message, charPositionInLine, stopIndex, text.toString(), ex);
-    }
-  }
-
-
-
-
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  private static class Vocab implements Vocabulary
-  {
-    private static final Vocabulary INSTANCE = new Vocab();
-
-    private static final Map<Integer,Name> TOKEN_NAMES = new HashMap<>();
-    private static int maxTokenType;
-
-
-    static
-    {
-      add(MessageLexer.COLON, "':'", "COLON");
-      add(MessageLexer.COMMA, "','", "COMMA");
-      add(MessageLexer.DOUBLE_QUOTE_END, "\"", "DOUBLE_QUOTE_END");
-      add(MessageLexer.DOUBLE_QUOTE_START, "\"", "DOUBLE_QUOTE_START");
-      add(MessageLexer.EMPTY, "'empty'", "EMPTY");
-      add(MessageLexer.EQ, "'='", "EQ");
-      add(MessageLexer.GT, "'>'", "GT");
-      add(MessageLexer.GTE, "'>='", "GTE");
-      add(MessageLexer.LT, "'<'", "LT");
-      add(MessageLexer.LTE, "'<='", "LTE");
-      add(MessageLexer.M_BOOL, "'true' or 'false'", "BOOL");
-      add(MessageLexer.M_NUMBER, "<number>", "NUMBER");
-      add(MessageLexer.MAP_END, "'}'", "MAP_END");
-      add(MessageLexer.MAP_START, "'{'", "MAP_START");
-      add(MessageLexer.NAME, "<name>", "NAME");
-      add(MessageLexer.NE, "'<='", "NE");
-      add(MessageLexer.NULL, "'null'", "NULL");
-      add(MessageLexer.P_BOOL, "'true' or 'false'", "BOOL");
-      add(MessageLexer.P_NUMBER, "<number>", "NUMBER");
-      add(MessageLexer.PARAM_END, "'}'", "PARAM_END");
-      add(MessageLexer.PARAM_START, "'%{'", "PARAM_START");
-      add(MessageLexer.SINGLE_QUOTE_END, "'", "SINGLE_QUOTE_END");
-      add(MessageLexer.SINGLE_QUOTE_START, "'", "SINGLE_QUOTE_START");
-    }
-
-
-    @Override
-    public int getMaxTokenType() {
-      return maxTokenType;
-    }
-
-
-    @Override
-    public String getLiteralName(int tokenType) {
-      return TOKEN_NAMES.containsKey(tokenType) ? TOKEN_NAMES.get(tokenType).literal : null;
-    }
-
-
-    @Override
-    public String getSymbolicName(int tokenType) {
-      return TOKEN_NAMES.containsKey(tokenType) ? TOKEN_NAMES.get(tokenType).symbol : null;
-    }
-
-
-    @Override
-    public String getDisplayName(int tokenType)
-    {
-      if (!TOKEN_NAMES.containsKey(tokenType))
-        return Integer.toString(tokenType);
-
-      return TOKEN_NAMES.get(tokenType).literal;
-    }
-
-
-    private static void add(int tokenType, String literal, String symbolic)
-    {
-      TOKEN_NAMES.put(tokenType, new Name(literal, symbolic));
-
-      if (tokenType > maxTokenType)
-        maxTokenType = tokenType;
-    }
-
-
-
-
-    @AllArgsConstructor
-    private static final class Name
-    {
-      final String literal;
-      final String symbol;
     }
   }
 }

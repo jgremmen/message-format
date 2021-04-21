@@ -41,11 +41,10 @@ sourceSets {
 }
 
 
-def antlrVersion = "4.5.3"
+def antlrVersion = "4.9.2"
 
 
 dependencies {
-  // antlr 4.5.3 is the latest java 6 compatible version
   implementation "org.antlr:antlr4-runtime:${antlrVersion}"
 
   antlr "org.antlr:antlr4:${antlrVersion}"

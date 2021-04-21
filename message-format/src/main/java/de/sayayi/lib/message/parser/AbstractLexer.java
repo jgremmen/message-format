@@ -35,60 +35,9 @@ abstract class AbstractLexer extends Lexer
   @SuppressWarnings({"java:S131", "java:S125", "java:S128"})
   public void emit(Token token)
   {
-    WritableToken t = (WritableToken)token;
-
-    switch(t.getType())
-    {
-      // %{
-      case MessageLexer.PARAM_START1:
-      case MessageLexer.PARAM_START2:
-        t.setType(MessageLexer.PARAM_START);
-        break;
-
-      // ,
-      case MessageLexer.P_COMMA:
-      case MessageLexer.M_COMMA:
-        t.setType(MessageLexer.COMMA);
-        break;
-
-      // '
-      case MessageLexer.P_SQ_START:
-      case MessageLexer.M_SQ_START:
-        t.setType(MessageLexer.SINGLE_QUOTE_START);
-        break;
-
-      // "
-      case MessageLexer.P_DQ_START:
-      case MessageLexer.M_DQ_START:
-        t.setType(MessageLexer.DOUBLE_QUOTE_START);
-        break;
-
-      // character
-      case MessageLexer.CH1:
-      case MessageLexer.CH2:
-        t.setType(MessageLexer.CH);
-      case MessageLexer.CH:
-        emit_fixEscapeCharacter(t);
-        break;
-
-      // name
-      case MessageLexer.P_NAME:
-      case MessageLexer.M_NAME:
-        t.setType(MessageLexer.NAME);
-        break;
-
-      // number
-      case MessageLexer.P_NUMBER:
-      case MessageLexer.M_NUMBER:
-        t.setType(MessageLexer.NUMBER);
-        break;
-
-      // bool
-      case MessageLexer.P_BOOL:
-      case MessageLexer.M_BOOL:
-        t.setType(MessageLexer.BOOL);
-        break;
-    }
+    // character
+    if (token.getType() == MessageLexer.CH)
+      emit_fixEscapeCharacter((WritableToken)token);
 
     super.emit(token);
   }
