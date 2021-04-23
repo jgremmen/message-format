@@ -38,6 +38,7 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -56,15 +57,9 @@ public final class MessageParserSupport extends MessageParser
   private final String message;
 
 
-  private MessageParserSupport(String message)
+  private MessageParserSupport(@NotNull String message)
   {
-    //noinspection deprecation
-    super(new BufferedTokenStream(new MessageLexer(new ANTLRInputStream(message)) {
-      @Override
-      public Vocabulary getVocabulary() {
-        return MessageVocabulary.INSTANCE;
-      }
-    }));
+    super(new BufferedTokenStream(new Lexer(message)));
 
     this.message = message;
 
@@ -94,6 +89,23 @@ public final class MessageParserSupport extends MessageParser
   @Override
   public Vocabulary getVocabulary() {
     return MessageVocabulary.INSTANCE;
+  }
+
+
+
+
+  private static final class Lexer extends MessageLexer
+  {
+    @SuppressWarnings("deprecation")
+    public Lexer(@NotNull String message) {
+      super(new ANTLRInputStream(message));
+    }
+
+
+    @Override
+    public Vocabulary getVocabulary() {
+      return MessageVocabulary.INSTANCE;
+    }
   }
 
 
@@ -318,7 +330,7 @@ public final class MessageParserSupport extends MessageParser
     @Override
     public void exitRelationalOperatorOptional(RelationalOperatorOptionalContext ctx)
     {
-      RelationalOperatorContext relationalOperator = ctx.relationalOperator();
+      final RelationalOperatorContext relationalOperator = ctx.relationalOperator();
       ctx.cmp = relationalOperator == null ? CompareType.EQ : relationalOperator.cmp;
     }
 
@@ -326,7 +338,7 @@ public final class MessageParserSupport extends MessageParser
     @Override
     public void exitRelationalOperator(RelationalOperatorContext ctx)
     {
-      EqualOperatorContext equalOperator = ctx.equalOperator();
+      final EqualOperatorContext equalOperator = ctx.equalOperator();
 
       if (equalOperator != null)
         ctx.cmp = equalOperator.cmp;
@@ -355,7 +367,7 @@ public final class MessageParserSupport extends MessageParser
     @Override
     public void exitEqualOperatorOptional(EqualOperatorOptionalContext ctx)
     {
-      EqualOperatorContext equalOperator = ctx.equalOperator();
+      final EqualOperatorContext equalOperator = ctx.equalOperator();
       ctx.cmp = equalOperator == null ? CompareType.EQ : equalOperator.cmp;
     }
 

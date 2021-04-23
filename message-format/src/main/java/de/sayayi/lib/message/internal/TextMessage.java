@@ -25,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.Set;
 
+import static java.lang.Character.isSpaceChar;
+
 
 /**
  * @author Jeroen Gremmen
@@ -52,8 +54,8 @@ public final class TextMessage implements Message.WithSpaces
   {
     final boolean empty = text.isEmpty();
 
-    spaceBefore = !empty && Character.isSpaceChar(text.charAt(0));
-    spaceAfter = !empty && Character.isSpaceChar(text.charAt(text.length() - 1));
+    spaceBefore = !empty && isSpaceChar(text.charAt(0));
+    spaceAfter = !empty && isSpaceChar(text.charAt(text.length() - 1));
 
     this.text = text.trim();
   }

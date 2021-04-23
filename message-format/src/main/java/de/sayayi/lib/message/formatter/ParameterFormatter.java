@@ -27,6 +27,15 @@ import java.util.Set;
 
 
 /**
+ * <p>
+ *   A parameter formatter takes care of formatting a parameter value.
+ * </p>
+ * <p>
+ *   If {@link #getFormattableTypes()} returns a non-empty collection, parameter values that match one of the
+ *   types in the collection will be formatted using this parameter formatter. If the returned collection is empty,
+ *   the formatter is selected only if it implements {@link NamedParameterFormatter} and is referenced by name.
+ * </p>
+ *
  * @author Jeroen Gremmen
  */
 public interface ParameterFormatter
@@ -43,17 +52,18 @@ public interface ParameterFormatter
    *
    * @return  formatted parameter value, never {@code null}
    */
-  @NotNull
   @Contract(pure = true)
-  Text format(Object value, String format, @NotNull Parameters parameters, Data data);
+  @NotNull Text format(Object value, String format, @NotNull Parameters parameters, Data data);
 
 
   /**
    * <p>
    *   Returns a set of java types which are supported by this formatter.
    * </p>
-   * On registration {@link FormatterService.WithRegistry#addFormatter(ParameterFormatter)} existing types which are
-   * also supported by this formatter will be overridden.
+   * <p>
+   *   On registration {@link FormatterService.WithRegistry#addFormatter(ParameterFormatter)} existing types which are
+   *   also supported by this formatter will be overridden.
+   * </p>
    *
    * @return  a set with supported java types for this formatter, not {@code null}
    */

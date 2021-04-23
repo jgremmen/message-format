@@ -47,11 +47,21 @@ public interface FormatterService
 
 
 
+  /**
+   * Add registry functionality to a formatter service.
+   */
   interface WithRegistry extends FormatterService
   {
+    @Contract(mutates = "this")
     void addFormatterForType(@NotNull Class<?> type, @NotNull ParameterFormatter formatter);
 
 
+    /**
+     * Add parameter formatter to the formatter service.
+     *
+     * @param formatter  parameter formatter
+     */
+    @Contract(mutates = "this")
     void addFormatter(@NotNull ParameterFormatter formatter);
   }
 }
