@@ -24,7 +24,7 @@ import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.internal.MessageDelegateWithCode;
-import de.sayayi.lib.message.parser.MessageParserSupport;
+import de.sayayi.lib.message.parser.MessageCompiler;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Contract;
@@ -58,7 +58,7 @@ public final class MessageFactory
 
   @Contract(value = "_ -> new", pure = true)
   public static @NotNull Message.WithSpaces parse(@NotNull String text) {
-    return MessageParserSupport.parse(text);
+    return MessageCompiler.compileMessage(text);
   }
 
 

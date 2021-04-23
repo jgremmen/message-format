@@ -30,7 +30,7 @@ import static lombok.AccessLevel.PRIVATE;
  * @author Jeroen Gremmen
  */
 @NoArgsConstructor(access = PRIVATE)
-public enum MessageVocabulary implements Vocabulary
+enum MessageVocabulary implements Vocabulary
 {
   INSTANCE;
 
@@ -54,7 +54,7 @@ public enum MessageVocabulary implements Vocabulary
     add(MAP_END, "'}'", "MAP_END");
     add(MAP_START, "'{'", "MAP_START");
     add(NAME, "<name>", "NAME");
-    add(NE, "'<='", "NE");
+    add(NE, "'<>' or '!'", "NE");
     add(NULL, "'null'", "NULL");
     add(NUMBER, "<number>", "NUMBER");
     add(PARAM_END, "'}'", "PARAM_END");
@@ -95,7 +95,7 @@ public enum MessageVocabulary implements Vocabulary
 
 
 
-  @AllArgsConstructor
+  @AllArgsConstructor(access = PRIVATE)
   private static final class Name
   {
     final String literal;
