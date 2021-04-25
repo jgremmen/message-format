@@ -104,7 +104,7 @@ task testShadowJar(type: ShadowJar) {
   archiveAppendix.set('test')
 
   from sourceSets.test.output
-  configurations = [project.configurations.testRuntimeOnly]
+  configurations = [project.configurations.testRuntimeClasspath]
 
   relocate 'org.antlr.v4.runtime', 'de.sayayi.lib.message.antlr'
 }
