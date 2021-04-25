@@ -17,9 +17,8 @@
 plugins {
   id 'antlr'
   id 'idea'
-  id 'com.github.johnrengelman.shadow' version '5.2.0'
+  id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
-
 
 description = 'Message Format Library'
 
@@ -27,16 +26,6 @@ description = 'Message Format Library'
 configurations {
   compile {
     extendsFrom = extendsFrom.findAll { it != configurations.antlr }
-  }
-}
-
-
-sourceSets {
-  main {
-    java.srcDirs = [ "src/main/java", "src/main/generated" ]
-  }
-  test {
-    java.srcDirs = [ "src/test/java", "src/test/generated" ]
   }
 }
 
@@ -52,7 +41,7 @@ dependencies {
 
 
 generateGrammarSource {
-  outputDirectory = file("src/main/generated/de/sayayi/lib/message/parser")
+  outputDirectory = file("${buildDir}/generated-src/antlr/main/de/sayayi/lib/message/parser")
   arguments += [ '-package', 'de.sayayi.lib.message.parser' ]
 
   exclude "**/MessageParserTest.g4"
@@ -76,10 +65,17 @@ sourcesJar {
 }
 
 
+jar {
+  manifest {
+    attributes['Implementation-Title'] = "${project.description}"
+  }
+}
+
+
 shadowJar {
   group 'build'
 
-  archiveFileName = "${rootProject.name}-${project.version}-nodep.jar"
+  archiveAppendix.set('nodep')
   archiveClassifier.set(null)  // set by shadowJar but interferes with publishing
 
   exclude 'META-INF/maven/**'
@@ -96,8 +92,21 @@ shadowJar {
   relocate 'org.antlr.v4.runtime', 'de.sayayi.lib.message.antlr'
 
   manifest {
-    attributes['Implementation-Title'] = "${rootProject.description} (no dependencies)"
+    attributes['Implementation-Title'] = "${project.description} (no dependencies)"
   }
+}
+
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+task testShadowJar(type: ShadowJar) {
+  dependsOn compileTestJava
+
+  archiveAppendix.set('test')
+
+  from sourceSets.test.output
+  configurations = [project.configurations.testRuntime]
+
+  relocate 'org.antlr.v4.runtime', 'de.sayayi.lib.message.antlr'
 }
 
 
@@ -112,13 +121,11 @@ test {
 
 
 task shadowTest(type: Test, group: 'verification') {
-  dependsOn shadowJar
-
-  exclude '**/MessageTokenizerTest*'
+  dependsOn shadowJar, testShadowJar
 
   doFirst {
-    classpath = shadowJar.outputs.files + classpath
-    classpath -= compileJava.outputs.files + processResources.outputs.files + configurations.runtime
+    classpath = shadowJar.outputs.files + testShadowJar.outputs.files + classpath -
+        compileJava.outputs.files - compileTestJava.outputs.files
   }
 }
 
@@ -219,9 +226,9 @@ signing {
 
 
 clean.doLast {
-  file('src/main/antlr/gen').deleteDir()
-  file('src/main/gen').deleteDir()
-  file('src/main/generated').deleteDir()
+  fileTree("${projectDir}/src/main").matching {
+    include "antlr/*.tokens"
+  }.files.forEach({ it.delete() })
 }
 
 
