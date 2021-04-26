@@ -205,6 +205,8 @@ publishing {
     noDep(MavenPublication) { publication ->
       artifactId 'message-format-nodep'
 
+      alias = true
+
       from project.shadow.component(publication)
       artifact javadocShadowJar
       artifact sourcesShadowJar
