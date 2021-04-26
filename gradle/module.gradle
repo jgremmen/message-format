@@ -44,6 +44,8 @@ java {
 
 tasks.withType(Jar) {
   includeEmptyDirs = false
+  preserveFileTimestamps = true
+  reproducibleFileOrder = true
 
   manifest {
     attributes(
