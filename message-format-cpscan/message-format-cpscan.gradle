@@ -39,9 +39,7 @@ shadowJar {
 
   dependencies {
     exclude project(':message-format')
-    exclude(dependency {
-      it.moduleGroup == 'org.antlr'
-    })
+    exclude(dependency { it.moduleGroup == 'org.antlr' })
   }
 
   exclude 'META-INF/maven/**'
@@ -52,7 +50,7 @@ shadowJar {
   relocate 'org.objectweb.asm', 'de.sayayi.lib.message.scanner.asm'
 
   manifest {
-    attributes['Implementation-Title'] = "${project.description} (no dependencies)"
+    attributes['Implementation-Title'] = "${project.description}"
   }
 }
 
