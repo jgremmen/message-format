@@ -82,6 +82,12 @@ public class MessageBundle
   }
 
 
+  @Contract(pure = true)
+  public boolean hasMessageWithCode(String code) {
+    return code != null && messages.containsKey(code);
+  }
+
+
   @SuppressWarnings({"WeakerAccess", "squid:S2583"})
   public void add(@NotNull Message.WithCode message)
   {
@@ -89,8 +95,8 @@ public class MessageBundle
     if (message == null)
       throw new NullPointerException("message must not be null");
 
-    String code = message.getCode();
-    if (messages.containsKey(code))
+    final String code = message.getCode();
+    if (hasMessageWithCode(code))
       throw new MessageException("message with code " + code + " already exists in message bundle");
 
     messages.put(code, message);
