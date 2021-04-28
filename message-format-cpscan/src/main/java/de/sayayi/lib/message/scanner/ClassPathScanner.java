@@ -65,7 +65,7 @@ public final class ClassPathScanner
                           ClassLoader classLoader)
   {
     this.messageBundle = messageBundle;
-    this.classLoader = classLoader == null ? ClassPathScanner.class.getClassLoader() : classLoader;
+    this.classLoader = classLoader == null ? ClassLoader.getSystemClassLoader() : classLoader;
 
     packages = packageNames.stream()
         .map(name -> {
@@ -103,7 +103,6 @@ public final class ClassPathScanner
   private void run_directory(@NotNull File baseDirectory, @NotNull File directory) throws IOException
   {
     final File[] files = directory.listFiles();
-
     if (files != null)
     {
       final Path baseDirectoryPath = baseDirectory.toPath();
