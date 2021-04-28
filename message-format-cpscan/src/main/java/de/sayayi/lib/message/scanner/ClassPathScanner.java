@@ -54,7 +54,7 @@ public final class ClassPathScanner
 {
   private static final String MESSAGE_DEFS_DESCRIPTOR = getDescriptor(MessageDefs.class);
   private static final String MESSAGE_DEF_DESCRIPTOR = getDescriptor(MessageDef.class);
-  private static final String TEXT_DESCRIPTOR =  getDescriptor(Text.class);
+  private static final String TEXT_DESCRIPTOR = getDescriptor(Text.class);
 
   private final MessageBundle messageBundle;
   private final ClassLoader classLoader;
@@ -69,8 +69,8 @@ public final class ClassPathScanner
 
     packages = packageNames.stream()
         .map(name -> {
-          String path = name.replace('.', '/');
-          return path.endsWith("/") ? path : (path + '/');
+          String path = name.replace('.', File.separatorChar);
+          return path.endsWith(File.separator) ? path : (path + File.separatorChar);
         })
         .collect(Collectors.toSet());
   }
