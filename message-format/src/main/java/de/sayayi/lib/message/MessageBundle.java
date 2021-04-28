@@ -19,6 +19,7 @@ import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
@@ -71,6 +72,7 @@ public class MessageBundle
    */
   @NotNull
   @Contract(value = "-> new", pure = true)
+  @Unmodifiable
   public Set<String> getCodes() {
     return unmodifiableSet(messages.keySet());
   }
@@ -88,6 +90,7 @@ public class MessageBundle
   }
 
 
+  @Contract(mutates = "this")
   @SuppressWarnings({"WeakerAccess", "squid:S2583"})
   public void add(@NotNull Message.WithCode message)
   {
@@ -103,6 +106,7 @@ public class MessageBundle
   }
 
 
+  @Contract(mutates = "this")
   @SuppressWarnings("WeakerAccess")
   public void add(@NotNull Class<?> classWithMessages)
   {
