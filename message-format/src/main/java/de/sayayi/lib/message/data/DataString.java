@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.data;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,9 +25,10 @@ import org.jetbrains.annotations.NotNull;
  * @author Jeroen Gremmen
  */
 @AllArgsConstructor
+@EqualsAndHashCode(doNotUseGetters = true)
 public class DataString implements Data
 {
-  private static final long serialVersionUID = 400L;
+  private static final long serialVersionUID = 500L;
 
   private final String string;
 
@@ -38,10 +40,9 @@ public class DataString implements Data
   }
 
 
-  @NotNull
   @Override
   @Contract(pure = true)
-  public String asObject() {
+  public @NotNull String asObject() {
     return string;
   }
 }

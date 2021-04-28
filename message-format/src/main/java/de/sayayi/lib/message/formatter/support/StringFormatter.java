@@ -21,26 +21,30 @@ import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_LENIENT;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Arrays.asList;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class StringFormatter extends AbstractParameterFormatter implements NamedParameterFormatter, EmptyMatcher
+public final class StringFormatter extends AbstractParameterFormatter
+    implements NamedParameterFormatter, EmptyMatcher, SizeQueryable
 {
-  @NotNull
   @Override
   @Contract(pure = true)
-  public String getName() {
+  public @NotNull String getName() {
     return "string";
   }
 
@@ -48,12 +52,15 @@ public final class StringFormatter extends AbstractParameterFormatter implements
   @Override
   @Contract(pure = true)
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
-    return value == null ? null : ((value instanceof char[]) ? new String((char[])value) : String.valueOf(value)).trim();
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  {
+    return value == null
+        ? nullText() : noSpaceText(value instanceof char[] ? new String((char[])value) : String.valueOf(value));
   }
 
 
   @Override
+  @SuppressWarnings("java:S3358")
   public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value)
   {
     final String s = value instanceof char[] ? new String((char[])value) : String.valueOf(value);
@@ -67,10 +74,15 @@ public final class StringFormatter extends AbstractParameterFormatter implements
   }
 
 
-  @NotNull
+  @Override
+  public int size(@NotNull Object value) {
+    return value instanceof char[] ? ((char[])value).length : ((CharSequence)value).length();
+  }
+
+
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return new HashSet<Class<?>>(Arrays.asList(CharSequence.class, char[].class));
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return new HashSet<>(asList(CharSequence.class, char[].class));
   }
 }

@@ -18,19 +18,25 @@ package de.sayayi.lib.message.data.map;
 import de.sayayi.lib.message.Message.Parameters;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.LENIENT;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
+
 
 /**
  * @author Jeroen Gremmen
  */
+@ToString(doNotUseGetters = true)
 @AllArgsConstructor
 public final class MapKeyNumber implements MapKey
 {
-  private CompareType compareType;
+  private final CompareType compareType;
   @Getter private final long number;
 
 
@@ -39,22 +45,21 @@ public final class MapKeyNumber implements MapKey
   }
 
 
-  @NotNull
   @Override
-  public Type getType() {
+  public @NotNull Type getType() {
     return Type.NUMBER;
   }
 
 
-  @NotNull
   @Override
-  public MatchResult match(@NotNull Parameters parameters, Object value)
+  @SuppressWarnings({"java:S3776", "java:S1119", "java:S108"})
+  public @NotNull MatchResult match(@NotNull Parameters parameters, Object value)
   {
     if (value == null)
-      return MatchResult.MISMATCH;
+      return MISMATCH;
 
-    MatchResult result = MatchResult.EXACT;
-    int cmp = 0;
+    MatchResult result = EXACT;
+    int cmp;
 
     doMatch: {
       if (value instanceof Long || value instanceof Integer || value instanceof Short || value instanceof Byte)
@@ -73,7 +78,7 @@ public final class MapKeyNumber implements MapKey
       {
         try {
           value = new BigDecimal(value.toString());
-          result = MatchResult.LENIENT;
+          result = LENIENT;
         } catch(Exception ignore) {
         }
       }
@@ -96,9 +101,9 @@ public final class MapKeyNumber implements MapKey
         break doMatch;
       }
 
-      return MatchResult.MISMATCH;
+      return MISMATCH;
     }
 
-    return compareType.match(cmp) ? result : MatchResult.MISMATCH;
+    return compareType.match(cmp) ? result : MISMATCH;
   }
 }

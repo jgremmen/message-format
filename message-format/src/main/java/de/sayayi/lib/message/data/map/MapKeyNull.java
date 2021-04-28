@@ -16,12 +16,18 @@
 package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.Message.Parameters;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
+
+import static de.sayayi.lib.message.data.map.MapKey.CompareType.EQ;
+import static de.sayayi.lib.message.data.map.MapKey.CompareType.NE;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 
 
 /**
  * @author Jeroen Gremmen
  */
+@ToString(doNotUseGetters = true)
 public final class MapKeyNull implements MapKey
 {
   private final CompareType compareType;
@@ -29,28 +35,26 @@ public final class MapKeyNull implements MapKey
 
   public MapKeyNull(@NotNull CompareType compareType)
   {
-    if (compareType != CompareType.EQ && compareType != CompareType.NE)
+    if (compareType != EQ && compareType != NE)
       throw new IllegalArgumentException("compareType must be EQ or NE");
 
     this.compareType = compareType;
   }
 
 
-  @NotNull
   @Override
-  public Type getType() {
+  public @NotNull Type getType() {
     return Type.NULL;
   }
 
 
-  @NotNull
   @Override
-  public MatchResult match(@NotNull Parameters parameters, Object value)
+  public @NotNull MatchResult match(@NotNull Parameters parameters, Object value)
   {
-    if (value == null && compareType == CompareType.EQ)
-      return MatchResult.TYPELESS_EXACT;
-    if (value != null && compareType == CompareType.NE)
-      return MatchResult.TYPELESS_EXACT;
+    if (value == null && compareType == EQ)
+      return TYPELESS_EXACT;
+    if (value != null && compareType == NE)
+      return TYPELESS_EXACT;
 
     return MatchResult.MISMATCH;
   }

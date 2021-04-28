@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,13 +30,16 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+
 
 /**
  * @author Jeroen Gremmen
  */
 public class GeoFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
 {
-  private static final Map<String,Format> FORMAT = new HashMap<String,Format>();
+  private static final Map<String,Format> FORMAT = new HashMap<>();
 
   static {
     // longitude
@@ -53,18 +57,17 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
 
 
   @Override
-  @NotNull
-  public String getName() {
+  public @NotNull String getName() {
     return "geo";
   }
 
 
   @Override
   @SuppressWarnings("squid:S3776")
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return null;
+      return nullText();
 
     final Format fmt = getFormat(format, data);
     final StringBuilder s = new StringBuilder();
@@ -100,7 +103,7 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
         s.append(v < 0 ? 'S' : 'N');
     }
 
-    return s.toString().trim();
+    return noSpaceText(s.toString());
   }
 
 
@@ -139,9 +142,9 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
     final int factor = DIGIT_FACTOR[fmt.secondDigits];
     millis = ((millis + factor / 2) / factor) * factor;
 
-    final int degree = (int)(millis / DEGREE_MILLIS);
+    final long degree = millis / DEGREE_MILLIS;
     millis -= degree * DEGREE_MILLIS;
-    final int minute = (int)(millis / MINUTE_MILLIS);
+    final long minute = millis / MINUTE_MILLIS;
     millis -= minute * MINUTE_MILLIS;
 
     return new double[] { degree, minute, millis / 1000.0 };
@@ -160,9 +163,8 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
   }
 
 
-  @NotNull
   @Override
-  public Set<Class<?>> getFormattableTypes() {
+  public @NotNull Set<Class<?>> getFormattableTypes() {
     return Collections.emptySet();
   }
 
@@ -181,7 +183,7 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
      8 = (LO|LA)  ->  longitude
    */
 
-  static Format parseFormatString(@NotNull String formatString)
+  static @NotNull Format parseFormatString(@NotNull String formatString)
   {
     Matcher matcher = PATTERN_FORMAT.matcher(formatString.trim());
     if (!matcher.matches())
@@ -212,6 +214,8 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
 
     return format;
   }
+
+
 
 
   @NoArgsConstructor

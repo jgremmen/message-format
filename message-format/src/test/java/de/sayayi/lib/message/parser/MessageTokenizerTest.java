@@ -53,7 +53,7 @@ public class MessageTokenizerTest
 
     // \u0021
     token = lexer.nextToken();
-    assertEquals("!", token.getText());
+    assertEquals("\\u0021", token.getText());
     assertEquals(CH, token.getType());
     assertEquals(4, token.getCharPositionInLine());
 
@@ -65,6 +65,7 @@ public class MessageTokenizerTest
   }
 
 
+  @SuppressWarnings({ "SameParameterValue", "deprecation" })
   private MessageLexer createFor(String msg) {
     return new MessageLexer(new ANTLRInputStream(msg));
   }

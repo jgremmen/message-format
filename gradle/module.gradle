@@ -32,7 +32,7 @@ dependencies {
 
 
 repositories {
-  jcenter()
+  mavenCentral()
 }
 
 
@@ -44,6 +44,8 @@ java {
 
 tasks.withType(Jar) {
   includeEmptyDirs = false
+  preserveFileTimestamps = true
+  reproducibleFileOrder = true
 
   manifest {
     attributes(
@@ -79,7 +81,7 @@ afterEvaluate {
           "de.sayayi.lib.message.annotation",
           "de.sayayi.lib.message.data*",
           "de.sayayi.lib.message.exception",
-          "de.sayayi.lib.message.impl",
+          "de.sayayi.lib.message.internal*",
           "de.sayayi.lib.message.parser"
       ])
       group("Message Formatters", [
@@ -91,6 +93,12 @@ afterEvaluate {
 
     failOnError false
   }
+}
+
+
+compileJava {
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
 }
 
 

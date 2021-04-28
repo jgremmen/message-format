@@ -17,7 +17,7 @@
 plugins {
   id 'antlr'
   id 'idea'
-  id 'com.github.johnrengelman.shadow' version '5.2.0'
+  id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
 
 
@@ -31,21 +31,10 @@ configurations {
 }
 
 
-sourceSets {
-  main {
-    java.srcDirs = [ "src/main/java", "src/main/generated" ]
-  }
-  test {
-    java.srcDirs = [ "src/test/java", "src/test/generated" ]
-  }
-}
-
-
-def antlrVersion = "4.5.3"
+def antlrVersion = "4.9.2"
 
 
 dependencies {
-  // antlr 4.5.3 is the latest java 6 compatible version
   implementation "org.antlr:antlr4-runtime:${antlrVersion}"
 
   antlr "org.antlr:antlr4:${antlrVersion}"
@@ -53,16 +42,8 @@ dependencies {
 
 
 generateGrammarSource {
-  outputDirectory = file("src/main/generated/de/sayayi/lib/message/parser")
+  outputDirectory = file("${buildDir}/generated-src/antlr/main/de/sayayi/lib/message/parser")
   arguments += [ '-package', 'de.sayayi.lib.message.parser' ]
-
-  exclude "**/MessageParserTest.g4"
-}
-
-
-compileJava {
-  sourceCompatibility = 1.6
-  targetCompatibility = 1.6
 }
 
 
@@ -77,10 +58,43 @@ sourcesJar {
 }
 
 
+jar {
+  manifest {
+    attributes['Implementation-Title'] = "${project.description}"
+  }
+}
+
+
+task javadocShadowJar(type: Jar, group: 'build') {
+  dependsOn javadocJar
+
+  archiveAppendix.set('nodep')
+  archiveClassifier.set('javadoc')
+
+  with javadocJar
+
+  duplicatesStrategy DuplicatesStrategy.EXCLUDE
+}
+
+
+task sourcesShadowJar(type: Jar, group: 'build') {
+  dependsOn sourcesJar
+
+  archiveAppendix.set('nodep')
+  archiveClassifier.set('sources')
+
+  with sourcesJar
+
+  duplicatesStrategy DuplicatesStrategy.EXCLUDE
+}
+
+
 shadowJar {
   group 'build'
 
-  archiveFileName = "${rootProject.name}-${project.version}-nodep.jar"
+  dependsOn sourcesShadowJar, javadocShadowJar
+
+  archiveAppendix.set('nodep')
   archiveClassifier.set(null)  // set by shadowJar but interferes with publishing
 
   exclude 'META-INF/maven/**'
@@ -97,29 +111,30 @@ shadowJar {
   relocate 'org.antlr.v4.runtime', 'de.sayayi.lib.message.antlr'
 
   manifest {
-    attributes['Implementation-Title'] = "${rootProject.description} (no dependencies)"
+    attributes['Implementation-Title'] = "${project.description} (no dependencies)"
   }
 }
 
 
-test {
-  dependsOn jar
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+task testShadowJar(type: ShadowJar) {
+  dependsOn compileTestJava
 
-  doFirst {
-    classpath = jar.outputs.files + classpath
-    classpath -= compileJava.outputs.files + processResources.outputs.files
-  }
+  archiveAppendix.set('test')
+
+  from sourceSets.test.output
+  configurations = [project.configurations.testRuntimeClasspath]
+
+  relocate 'org.antlr.v4.runtime', 'de.sayayi.lib.message.antlr'
 }
 
 
 task shadowTest(type: Test, group: 'verification') {
-  dependsOn shadowJar
-
-  exclude '**/MessageTokenizerTest*'
+  dependsOn shadowJar, testShadowJar
 
   doFirst {
-    classpath = shadowJar.outputs.files + classpath
-    classpath -= compileJava.outputs.files + processResources.outputs.files + configurations.runtime
+    classpath = shadowJar.outputs.files + testShadowJar.outputs.files + classpath -
+        compileJava.outputs.files - compileTestJava.outputs.files
   }
 }
 
@@ -132,9 +147,9 @@ publishing {
   publications {
 
     dep(MavenPublication) {
-      artifactId 'message-format'
-
-      from components.java
+      artifact jar
+      artifact javadocJar
+      artifact sourcesJar
 
       versionMapping {
         usage('java-runtime') {
@@ -169,6 +184,20 @@ publishing {
           developerConnection = 'scm:git:git://github.com/jgremmen/message-format.git'
           url = 'https://github.com/jgremmen/message-format'
         }
+
+        withXml {
+          def dependenciesNode = asNode().appendNode('dependencies')
+
+          configurations.implementation.allDependencies.each {
+            if (it.name == 'antlr4-runtime')
+            {
+              def dependencyNode = dependenciesNode.appendNode('dependency')
+              dependencyNode.appendNode('groupId', it.group)
+              dependencyNode.appendNode('artifactId', it.name)
+              dependencyNode.appendNode('version', it.version)
+            }
+          }
+        }
       }
     }
 
@@ -176,9 +205,11 @@ publishing {
     noDep(MavenPublication) { publication ->
       artifactId 'message-format-nodep'
 
+      alias = true
+
       from project.shadow.component(publication)
-      artifact javadocJar
-      artifact sourcesJar
+      artifact javadocShadowJar
+      artifact sourcesShadowJar
 
       pom {
         name = 'Java Message Format Library (no dependencies)'
@@ -220,9 +251,10 @@ signing {
 
 
 clean.doLast {
-  file('src/main/antlr/gen').deleteDir()
-  file('src/main/gen').deleteDir()
-  file('src/main/generated').deleteDir()
+  fileTree("${projectDir}/src/main").matching {
+    include "antlr/*.tokens"
+  }.files.forEach({ it.delete() })
+  file("${projectDir}/src/main/gen").delete()
 }
 
 

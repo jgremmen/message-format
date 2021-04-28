@@ -21,7 +21,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 /**
  * @author Jeroen Gremmen
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "java:S110"})
 public class MessageException extends ParseCancellationException
 {
   public MessageException(String message) {

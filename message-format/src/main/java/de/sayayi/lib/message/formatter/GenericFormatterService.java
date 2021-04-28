@@ -18,11 +18,12 @@ package de.sayayi.lib.message.formatter;
 import de.sayayi.lib.message.formatter.support.StringFormatter;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static java.util.Collections.synchronizedMap;
 
 
 /**
@@ -30,38 +31,32 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GenericFormatterService implements FormatterService.WithRegistry
 {
-  private static final Comparator<Class<?>> CLASS_SORTER = new Comparator<Class<?>>() {
-    @Override
-    public int compare(Class<?> o1, Class<?> o2) {
-      return (o1 == o2) ? 0 : o1.getName().compareTo(o2.getName());
-    }
-  };
+  private static final Comparator<Class<?>> CLASS_SORTER =
+      (o1, o2) -> o1 == o2 ? 0 : o1.getName().compareTo(o2.getName());
 
-  private static final Map<Class<?>,Class<? extends Number>> WRAPPER_CLASS_MAP =
-      new HashMap<Class<?>,Class<? extends Number>>();
+  private static final Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
 
-  private final Map<String,NamedParameterFormatter> namedFormatters =
-      new ConcurrentHashMap<String,NamedParameterFormatter>();
-  private final Map<Class<?>,ParameterFormatter> typeFormatters =
-      new ConcurrentHashMap<Class<?>,ParameterFormatter>();
+  private final Map<String,NamedParameterFormatter> namedFormatters = new ConcurrentHashMap<>();
+  private final Map<Class<?>,ParameterFormatter> typeFormatters = new ConcurrentHashMap<>();
   private final Map<Class<?>,ParameterFormatter> cachedFormatters =
-      Collections.synchronizedMap(new FixedSizeCacheMap<Class<?>,ParameterFormatter>(CLASS_SORTER, 128));
+      synchronizedMap(new FixedSizeCacheMap<>(CLASS_SORTER, 128));
 
 
   static
   {
+    WRAPPER_CLASS_MAP.put(char.class, Character.class);
+    WRAPPER_CLASS_MAP.put(byte.class, Byte.class);
     WRAPPER_CLASS_MAP.put(double.class, Double.class);
     WRAPPER_CLASS_MAP.put(float.class, Float.class);
-    WRAPPER_CLASS_MAP.put(long.class, Long.class);
     WRAPPER_CLASS_MAP.put(int.class, Integer.class);
+    WRAPPER_CLASS_MAP.put(long.class, Long.class);
     WRAPPER_CLASS_MAP.put(short.class, Short.class);
-    WRAPPER_CLASS_MAP.put(byte.class, Byte.class);
   }
 
 
   public GenericFormatterService()
   {
-    StringFormatter stringFormatter = new StringFormatter();
+    final StringFormatter stringFormatter = new StringFormatter();
 
     addFormatter(stringFormatter);
     addFormatterForType(Object.class, stringFormatter);
@@ -71,8 +66,13 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   @Override
   public void addFormatterForType(@NotNull Class<?> type, @NotNull ParameterFormatter formatter)
   {
-    typeFormatters.put(type, formatter);
-    cachedFormatters.clear();
+    final ParameterFormatter currentFormatter = typeFormatters.get(type);
+
+    if (currentFormatter == null || currentFormatter.getPriority() < formatter.getPriority())
+    {
+      typeFormatters.put(type, formatter);
+      cachedFormatters.clear();
+    }
   }
 
 
@@ -85,7 +85,9 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       if (format.isEmpty())
         throw new IllegalArgumentException("formatter name must not be empty");
 
-      namedFormatters.put(format, (NamedParameterFormatter)formatter);
+      ParameterFormatter currentFormatter = namedFormatters.get(format);
+      if (currentFormatter == null || currentFormatter.getPriority() < formatter.getPriority())
+        namedFormatters.put(format, (NamedParameterFormatter)formatter);
     }
 
     for(final Class<?> type: formatter.getFormattableTypes())
@@ -93,11 +95,10 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
-  @NotNull
   @Override
-  public ParameterFormatter getFormatter(String format, @NotNull Class<?> type)
+  public @NotNull ParameterFormatter getFormatter(String format, @NotNull Class<?> type)
   {
-    ParameterFormatter formatter = (format == null) ? null : namedFormatters.get(format);
+    ParameterFormatter formatter = format == null ? null : namedFormatters.get(format);
 
     if (formatter == null && (formatter = cachedFormatters.get(type)) == null)
       cachedFormatters.put(type, formatter = resolveFormatterForType(type));
@@ -106,8 +107,8 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
-  @NotNull
-  private ParameterFormatter resolveFormatterForType(@NotNull Class<?> type)
+  @SuppressWarnings("java:S1119")
+  private @NotNull ParameterFormatter resolveFormatterForType(@NotNull Class<?> type)
   {
     ParameterFormatter formatter = null;
 

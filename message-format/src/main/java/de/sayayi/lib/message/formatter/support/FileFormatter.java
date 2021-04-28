@@ -17,50 +17,63 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.Set;
+
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class FileFormatter extends AbstractParameterFormatter
+public final class FileFormatter extends AbstractParameterFormatter implements SizeQueryable
 {
   @Override
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return null;
+      return nullText();
 
     final File file = (File)value;
     format = getConfigFormat(format, data, true, null);
 
     if ("name".equals(format))
-      return file.getName();
+      return noSpaceText(file.getName());
     else if ("path".equals(format))
-      return file.getPath();
+      return noSpaceText(file.getPath());
     else if ("parent".equals(format))
-      return file.getParent();
+      return noSpaceText(file.getParent());
     else if ("extension".equals(format))
     {
       String name = file.getName();
       int dotidx = name.lastIndexOf('.');
 
-      return dotidx == -1 ? "" : name.substring(dotidx + 1);
+      return dotidx == -1 ? emptyText() : noSpaceText(name.substring(dotidx + 1));
     }
 
-    return file.getAbsolutePath();
+    return noSpaceText(file.getAbsolutePath());
   }
 
 
-  @NotNull
+  @Override
+  public int size(@NotNull Object value)
+  {
+    final File file = (File)value;
+    return file.isFile() && file.canRead() ? (int)file.length() : -1;
+  }
+
+
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(File.class);
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return singleton(File.class);
   }
 }

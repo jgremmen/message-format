@@ -17,10 +17,14 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Set;
+
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 
 
 /**
@@ -29,22 +33,21 @@ import java.util.Set;
 public final class EnumFormatter extends AbstractParameterFormatter
 {
   @Override
-  protected String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  protected @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return null;
+      return nullText();
 
     final Enum<?> enm = (Enum<?>)value;
 
     return "ordinal".equals(getConfigFormat(format, data, true, null))
         ? parameters.getFormatter(int.class).format(enm.ordinal(), null, parameters, data)
-        : enm.name();
+        : noSpaceText(enm.name());
   }
 
 
-  @NotNull
   @Override
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(Enum.class);
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return singleton(Enum.class);
   }
 }

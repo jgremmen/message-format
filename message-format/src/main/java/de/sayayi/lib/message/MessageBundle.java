@@ -16,19 +16,20 @@
 package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.exception.MessageException;
-import de.sayayi.lib.message.impl.MultipartLocalizedMessageBundleWithCode;
+import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+
+import static java.util.Collections.unmodifiableSet;
 
 
 /**
@@ -43,8 +44,8 @@ public class MessageBundle
   @SuppressWarnings("WeakerAccess")
   public MessageBundle()
   {
-    messages = new HashMap<String,Message.WithCode>();
-    indexedClasses = new HashSet<Class<?>>();
+    messages = new HashMap<>();
+    indexedClasses = new HashSet<>();
   }
 
 
@@ -59,8 +60,8 @@ public class MessageBundle
   {
     this();
 
-    for(Entry<String,Map<Locale,Message>> entry: localizedMessagesByCode.entrySet())
-      add(new MultipartLocalizedMessageBundleWithCode(entry.getKey(), entry.getValue()));
+    localizedMessagesByCode.forEach(
+        (code,localizedMessages) -> add(new LocalizedMessageBundleWithCode(code, localizedMessages)));
   }
 
 
@@ -71,8 +72,9 @@ public class MessageBundle
    */
   @NotNull
   @Contract(value = "-> new", pure = true)
+  @Unmodifiable
   public Set<String> getCodes() {
-    return Collections.unmodifiableSet(messages.keySet());
+    return unmodifiableSet(messages.keySet());
   }
 
 
@@ -82,6 +84,13 @@ public class MessageBundle
   }
 
 
+  @Contract(pure = true)
+  public boolean hasMessageWithCode(String code) {
+    return code != null && messages.containsKey(code);
+  }
+
+
+  @Contract(mutates = "this")
   @SuppressWarnings({"WeakerAccess", "squid:S2583"})
   public void add(@NotNull Message.WithCode message)
   {
@@ -89,14 +98,15 @@ public class MessageBundle
     if (message == null)
       throw new NullPointerException("message must not be null");
 
-    String code = message.getCode();
-    if (messages.containsKey(code))
+    final String code = message.getCode();
+    if (hasMessageWithCode(code))
       throw new MessageException("message with code " + code + " already exists in message bundle");
 
     messages.put(code, message);
   }
 
 
+  @Contract(mutates = "this")
   @SuppressWarnings("WeakerAccess")
   public void add(@NotNull Class<?> classWithMessages)
   {
@@ -116,9 +126,7 @@ public class MessageBundle
   }
 
 
-  private void add0(AnnotatedElement annotatedElement)
-  {
-    for(Message.WithCode message: MessageFactory.parseAnnotations(annotatedElement))
-      add(message);
+  private void add0(AnnotatedElement annotatedElement) {
+    MessageFactory.parseAnnotations(annotatedElement).forEach(this::add);
   }
 }

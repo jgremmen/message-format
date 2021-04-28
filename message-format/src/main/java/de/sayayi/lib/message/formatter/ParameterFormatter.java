@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,6 +27,15 @@ import java.util.Set;
 
 
 /**
+ * <p>
+ *   A parameter formatter takes care of formatting a parameter value.
+ * </p>
+ * <p>
+ *   If {@link #getFormattableTypes()} returns a non-empty collection, parameter values that match one of the
+ *   types in the collection will be formatted using this parameter formatter. If the returned collection is empty,
+ *   the formatter is selected only if it implements {@link NamedParameterFormatter} and is referenced by name.
+ * </p>
+ *
  * @author Jeroen Gremmen
  */
 public interface ParameterFormatter
@@ -40,23 +50,31 @@ public interface ParameterFormatter
    *                    {@code null}
    * @param data        parameter data provided by the parameter definition or {@code null}
    *
-   * @return  formatted parameter value or {@code null} if this formatter does not produce any output
+   * @return  formatted parameter value, never {@code null}
    */
   @Contract(pure = true)
-  String format(Object value, String format, @NotNull Parameters parameters, Data data);
+  @NotNull Text format(Object value, String format, @NotNull Parameters parameters, Data data);
 
 
   /**
    * <p>
    *   Returns a set of java types which are supported by this formatter.
    * </p>
-   * On registration {@link FormatterService.WithRegistry#addFormatter(ParameterFormatter)} existing types which are
-   * also supported by this formatter will be overridden.
+   * <p>
+   *   On registration {@link FormatterService.WithRegistry#addFormatter(ParameterFormatter)} existing types which are
+   *   also supported by this formatter will be overridden.
+   * </p>
    *
    * @return  a set with supported java types for this formatter, not {@code null}
    */
   @Contract(pure = true)
   @NotNull Set<Class<?>> getFormattableTypes();
+
+
+  @Contract(pure = true)
+  int getPriority();
+
+
 
 
   interface EmptyMatcher
@@ -71,5 +89,14 @@ public interface ParameterFormatter
      */
     @Contract(pure = true)
     MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value);
+  }
+
+
+
+
+  interface SizeQueryable
+  {
+    @Contract(pure = true)
+    int size(@NotNull Object value);
   }
 }

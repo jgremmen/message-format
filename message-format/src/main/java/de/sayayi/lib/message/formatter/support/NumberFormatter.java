@@ -18,6 +18,8 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,10 +27,13 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 
 
 /**
@@ -41,27 +46,27 @@ public final class NumberFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public String formatValue(Object v, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object v, String format, @NotNull Parameters parameters, Data data)
   {
     if (v == null)
-      return null;
+      return nullText();
 
     final Number value = (Number)v;
 
     if (data == null && (format == null || "integer".equals(format)) &&
         (value instanceof BigInteger || value instanceof Long || value instanceof Integer || value instanceof Short ||
          value instanceof Byte || value instanceof AtomicInteger || value instanceof AtomicLong))
-      return value.toString();
+      return new TextPart(value.toString());
 
     // special case: show number as bool
     if ("bool".equals(format))
       return formatBoolean(value, parameters, data);
 
-    return getFormatter(format, parameters, data).format(value);
+    return noSpaceText(getFormatter(format, parameters, data).format(value));
   }
 
 
-  private String formatBoolean(Number value, Parameters parameters, Data data)
+  private Text formatBoolean(Number value, Parameters parameters, Data data)
   {
     ParameterFormatter formatter = parameters.getFormatter("bool", boolean.class);
     Set<Class<?>> types = formatter.getFormattableTypes();
@@ -93,10 +98,9 @@ public final class NumberFormatter extends AbstractParameterFormatter
   }
 
 
-  @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(Number.class);
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return singleton(Number.class);
   }
 }

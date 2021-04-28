@@ -21,6 +21,8 @@ import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.TextPart;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
@@ -45,13 +47,13 @@ public class JodaDateTimeFormatterTest
     final Parameters context = ParameterFactory.createFor(GERMANY).noParameters();
     LocalDate date = new LocalDate(1972, 8, 17);
 
-    assertEquals("17.08.72", formatter.format(date, "short", context, null));
-    assertEquals("17.08.1972", formatter.format(date, "medium", context, null));
-    assertEquals("17. August 1972", formatter.format(date, "long", context, null));
-    assertEquals("Donnerstag, 17. August 1972", formatter.format(date, "full", context, null));
-    assertEquals("17.08.1972", formatter.format(date, "date", context, null));
+    assertEquals(new TextPart("17.08.72"), formatter.format(date, "short", context, null));
+    assertEquals(new TextPart("17.08.1972"), formatter.format(date, "medium", context, null));
+    assertEquals(new TextPart("17. August 1972"), formatter.format(date, "long", context, null));
+    assertEquals(new TextPart("Donnerstag, 17. August 1972"), formatter.format(date, "full", context, null));
+    assertEquals(new TextPart("17.08.1972"), formatter.format(date, "date", context, null));
 
-    assertEquals("", formatter.format(date, "time", context, null));
+    assertEquals(Text.EMPTY, formatter.format(date, "time", context, null));
   }
 
 
@@ -62,13 +64,13 @@ public class JodaDateTimeFormatterTest
     final Parameters noParameters = ParameterFactory.createFor(GERMANY).noParameters();
     LocalTime time = new LocalTime(16, 34, 11, 672);
 
-    assertEquals("16:34", formatter.format(time, "short", noParameters, null));
-    assertEquals("16:34:11", formatter.format(time, "medium", noParameters, null));
-    assertEquals("16:34:11", formatter.format(time, "long", noParameters, null));
-    assertEquals("16:34 Uhr", formatter.format(time, "full", noParameters, null));
-    assertEquals("16:34:11", formatter.format(time, "time", noParameters, null));
+    assertEquals(new TextPart("16:34"), formatter.format(time, "short", noParameters, null));
+    assertEquals(new TextPart("16:34:11"), formatter.format(time, "medium", noParameters, null));
+    assertEquals(new TextPart("16:34:11"), formatter.format(time, "long", noParameters, null));
+    assertEquals(new TextPart("16:34 Uhr"), formatter.format(time, "full", noParameters, null));
+    assertEquals(new TextPart("16:34:11"), formatter.format(time, "time", noParameters, null));
 
-    assertEquals("", formatter.format(time, "date", noParameters, null));
+    assertEquals(Text.EMPTY, formatter.format(time, "date", noParameters, null));
   }
 
 
@@ -79,13 +81,13 @@ public class JodaDateTimeFormatterTest
     final Parameters noParameters = ParameterFactory.createFor(UK).noParameters();
     DateTime datetime = new DateTime(1972, 8, 17, 2, 40, 23, 833);
 
-    assertEquals("17/08/72 02:40", formatter.format(datetime, "short", noParameters, null));
-    assertEquals("17-Aug-1972 02:40:23", formatter.format(datetime, "medium", noParameters, null));
-    assertEquals("17 August 1972 02:40:23 CET", formatter.format(datetime, "long", noParameters, null));
-    assertEquals("Thursday, 17 August 1972 02:40:23 o'clock CET", formatter.format(datetime, "full", noParameters, null));
+    assertEquals(new TextPart("17/08/72 02:40"), formatter.format(datetime, "short", noParameters, null));
+    assertEquals(new TextPart("17-Aug-1972 02:40:23"), formatter.format(datetime, "medium", noParameters, null));
+    assertEquals(new TextPart("17 August 1972 02:40:23 CET"), formatter.format(datetime, "long", noParameters, null));
+    assertEquals(new TextPart("Thursday, 17 August 1972 02:40:23 o'clock CET"), formatter.format(datetime, "full", noParameters, null));
 
-    assertEquals("17-Aug-1972", formatter.format(datetime, "date", noParameters, null));
-    assertEquals("02:40:23", formatter.format(datetime, "time", noParameters, null));
+    assertEquals(new TextPart("17-Aug-1972"), formatter.format(datetime, "date", noParameters, null));
+    assertEquals(new TextPart("02:40:23"), formatter.format(datetime, "time", noParameters, null));
   }
 
 
@@ -96,11 +98,11 @@ public class JodaDateTimeFormatterTest
     final Parameters noParameters = ParameterFactory.createFor(FRANCE).noParameters();
     DateTime datetime = new DateTime(1972, 8, 17, 2, 40, 23, 833);
 
-    assertEquals("17 août",
+    assertEquals(new TextPart("17 août"),
         formatter.format(datetime, null, noParameters, new DataString("dd MMMM")));
-    assertEquals("jeu. jeudi",
+    assertEquals(new TextPart("jeu. jeudi"),
         formatter.format(datetime, null, noParameters, new DataString("EEE EEEE")));
-    assertEquals("02:40:23,833",
+    assertEquals(new TextPart("02:40:23,833"),
         formatter.format(datetime, null, noParameters, new DataString("HH:mm:ss,SSS")));
   }
 

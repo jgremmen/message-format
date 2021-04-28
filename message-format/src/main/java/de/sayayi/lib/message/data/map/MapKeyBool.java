@@ -18,6 +18,7 @@ package de.sayayi.lib.message.data.map;
 import de.sayayi.lib.message.Message.Parameters;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
@@ -32,6 +33,7 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
 /**
  * @author Jeroen Gremmen
  */
+@ToString(doNotUseGetters = true)
 @AllArgsConstructor
 public final class MapKeyBool implements MapKey
 {
@@ -43,16 +45,15 @@ public final class MapKeyBool implements MapKey
   }
 
 
-  @NotNull
   @Override
-  public Type getType() {
+  public @NotNull Type getType() {
     return Type.BOOL;
   }
 
 
-  @NotNull
   @Override
-  public MatchResult match(@NotNull Parameters parameters, Object value)
+  @SuppressWarnings({"java:S3776", "java:S5411", "java:S108"})
+  public @NotNull MatchResult match(@NotNull Parameters parameters, Object value)
   {
     if (value != null)
     {

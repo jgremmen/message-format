@@ -18,10 +18,14 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.Message.WithCode;
 import de.sayayi.lib.message.exception.MessageParserException;
-import de.sayayi.lib.message.impl.EmptyMessage;
-import de.sayayi.lib.message.impl.EmptyMessageWithCode;
+import de.sayayi.lib.message.internal.EmptyMessage;
+import de.sayayi.lib.message.internal.EmptyMessageWithCode;
+import de.sayayi.lib.message.internal.ParameterizedMessage;
 import org.junit.Test;
 
+import java.util.Locale;
+
+import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -31,6 +35,16 @@ import static org.junit.Assert.assertTrue;
  */
 public class MessageFactoryTest
 {
+  @Test
+  public void testParseString()
+  {
+    Message.WithSpaces msg = MessageFactory.parse("this is %{test}");
+    assertEquals(singleton("test"), msg.getParameterNames());
+    assertTrue(msg instanceof ParameterizedMessage);
+    assertTrue(msg.hasParameters());
+  }
+
+
   @Test
   public void testWithCode()
   {
@@ -48,5 +62,13 @@ public class MessageFactoryTest
   @Test(expected = MessageParserException.class)
   public void testSyntaxError() {
     MessageFactory.parse("%{x,{true false:1}");
+  }
+
+
+  @Test
+  public void testForLanguageTag()
+  {
+    assertEquals(Locale.ROOT, MessageFactory.forLanguageTag(""));
+    assertEquals(Locale.GERMANY, MessageFactory.forLanguageTag("de_DE"));
   }
 }

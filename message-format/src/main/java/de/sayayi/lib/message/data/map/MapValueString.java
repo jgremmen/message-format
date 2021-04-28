@@ -28,7 +28,7 @@ public final class MapValueString extends DataString implements MapValue
 {
   private static final long serialVersionUID = 400L;
 
-  private Message message;
+  private Message.WithSpaces message;
 
 
   public MapValueString(@NotNull String string) {
@@ -44,7 +44,7 @@ public final class MapValueString extends DataString implements MapValue
 
 
   @NotNull
-  public synchronized Message asMessage()
+  public synchronized Message.WithSpaces asMessage()
   {
     if (message == null)
       message = MessageFactory.parse(asObject());

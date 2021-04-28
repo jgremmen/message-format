@@ -17,21 +17,24 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Set;
 
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.text.DateFormat.FULL;
 import static java.text.DateFormat.LONG;
 import static java.text.DateFormat.MEDIUM;
 import static java.text.DateFormat.SHORT;
 import static java.text.DateFormat.getDateInstance;
+import static java.util.Collections.singleton;
 
 
 /**
@@ -41,21 +44,20 @@ public final class DateFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return null;
+      return nullText();
 
-    return getFormatter(getConfigFormat(format, data, true, null),
-        parameters.getLocale()).format(value);
+    return noSpaceText(getFormatter(getConfigFormat(format, data, true, null),
+        parameters.getLocale()).format(value));
   }
 
 
-  @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(Date.class);
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return singleton(Date.class);
   }
 
 

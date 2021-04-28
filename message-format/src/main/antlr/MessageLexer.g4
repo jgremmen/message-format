@@ -15,8 +15,14 @@
  */
 lexer grammar MessageLexer;
 
-options {
-    superClass = AbstractLexer;
+
+tokens {
+    BOOL,
+    NUMBER,
+    COMMA,
+    NAME,
+    SINGLE_QUOTE_START,
+    DOUBLE_QUOTE_START
 }
 
 
@@ -27,9 +33,7 @@ PARAM_START
         : ParamStart -> pushMode(PARAMETER)
         ;
 CH
-        : ' '+
-        | EscapeSequence
-        | TextChar
+        : Character
         ;
 CTRL_CHAR
         : CtrlChar+ -> skip
@@ -41,15 +45,13 @@ CTRL_CHAR
 mode TEXT1;
 
 PARAM_START1
-        : ParamStart -> pushMode(PARAMETER)
+        : ParamStart -> pushMode(PARAMETER), type(PARAM_START)
         ;
 SINGLE_QUOTE_END
         : '\'' -> popMode
         ;
 CH1
-        : ' '+
-        | EscapeSequence
-        | TextChar
+        : Character -> type(CH)
         ;
 CTRL_CHAR1
         : CtrlChar+ -> skip
@@ -61,19 +63,18 @@ CTRL_CHAR1
 mode TEXT2;
 
 PARAM_START2
-        : ParamStart -> pushMode(PARAMETER)
+        : ParamStart -> pushMode(PARAMETER), type(PARAM_START)
         ;
 DOUBLE_QUOTE_END
         : '"' -> popMode
         ;
 CH2
-        : ' '+
-        | EscapeSequence
-        | TextChar
+        : Character -> type(CH)
         ;
 CTRL_CHAR2
         : CtrlChar+ -> skip
         ;
+
 
 
 // ------------------ In parameter mode ------------------
@@ -83,22 +84,22 @@ PARAM_END
         : '}' -> popMode
         ;
 P_COMMA
-        : ','
+        : ',' -> type(COMMA)
         ;
 P_BOOL
-        : BoolLiteral
+        : BoolLiteral -> type(BOOL)
         ;
 P_NAME
-        : DashedName
+        : DashedName -> type(NAME)
         ;
 P_NUMBER
-        : Number
+        : Number -> type(NUMBER)
         ;
 P_SQ_START
-        : '\'' -> pushMode(TEXT1)
+        : '\'' -> pushMode(TEXT1), type(SINGLE_QUOTE_START)
         ;
 P_DQ_START
-        : '"' -> pushMode(TEXT2)
+        : '"' -> pushMode(TEXT2), type(DOUBLE_QUOTE_START)
         ;
 P_WS
         : (CtrlChar | ' ')+ -> skip
@@ -122,7 +123,7 @@ M_WS
         : (CtrlChar | ' ')+ -> skip
         ;
 M_COMMA
-        : ','
+        : ',' -> type(COMMA)
         ;
 NULL
         : 'null'
@@ -131,19 +132,19 @@ EMPTY
         : 'empty'
         ;
 M_BOOL
-        : BoolLiteral
+        : BoolLiteral -> type(BOOL)
         ;
 M_NAME
-        : DashedName
+        : DashedName -> type(NAME)
         ;
 M_NUMBER
-        : Number
+        : Number -> type(NUMBER)
         ;
 M_SQ_START
-        : '\'' -> pushMode(TEXT1)
+        : '\'' -> pushMode(TEXT1), type(SINGLE_QUOTE_START)
         ;
 M_DQ_START
-        : '"' -> pushMode(TEXT2)
+        : '"' -> pushMode(TEXT2), type(DOUBLE_QUOTE_START)
         ;
 EQ
         : '='
@@ -163,19 +164,6 @@ GT
 GTE
         : '>='
         ;
-
-
-
-// ------------------ Nop mode ------------------
-// this mode isn't used but only there to define token names
-mode NOP;
-
-SINGLE_QUOTE_START : '\'' ;
-DOUBLE_QUOTE_START : '"' ;
-NAME               : '=' ;
-COMMA              : ',' ;
-NUMBER             : '>' ;
-BOOL               : '<' ;
 
 
 
@@ -222,6 +210,12 @@ fragment NameStartChar
 
 fragment Number
         : '-'? [0-9]+
+        ;
+
+fragment Character
+        : ' '+
+        | EscapeSequence
+        | TextChar
         ;
 
 fragment EscapeSequence

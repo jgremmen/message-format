@@ -1,6 +1,5 @@
 include "message-format"
-include "message-format-java7"
-include "message-format-java8"
+include "message-format-cpscan"
 include "message-format-jodatime"
 include "message-format-jsr354"
 

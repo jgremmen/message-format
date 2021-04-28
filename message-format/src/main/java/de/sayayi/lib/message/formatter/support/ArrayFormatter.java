@@ -21,30 +21,39 @@ import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.lang.reflect.Array.get;
 import static java.lang.reflect.Array.getLength;
+import static java.util.Arrays.asList;
 import static java.util.ResourceBundle.getBundle;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class ArrayFormatter extends AbstractParameterFormatter implements EmptyMatcher
+public final class ArrayFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
 {
   @Override
-  public String formatValue(Object array, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object array, String format, @NotNull Parameters parameters, Data data)
   {
-    final int length;
+    if (array == null)
+      return nullText();
 
-    if (array == null || (length = getLength(array)) == 0)
-      return null;
+    final int length = getLength(array);
+    if (length == 0)
+      return emptyText();
 
     final StringBuilder s = new StringBuilder();
     final Class<?> arrayType = array.getClass();
@@ -55,45 +64,44 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
     for(int i = 0; i < length; i++)
     {
       final Object value = get(array, i);
-      String text = null;
+      Text text = null;
 
       if (value == array)
-        text = bundle.getString("thisArray");
+        text = new TextPart(bundle.getString("thisArray"));
       else if (formatter != null)
         text = formatter.format(value, format, parameters, data);
       else if (value != null)
         text = parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data);
 
-      if (text != null)
+      if (text != null && !text.isEmpty())
       {
         if (s.length() > 0)
           s.append(", ");
 
-        s.append(text);
+        s.append(text.getText());
       }
     }
 
-    return s.toString();
+    return noSpaceText(s.toString());
   }
 
 
   @Override
   public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return compareType.match(getLength(value)) ? MatchResult.TYPELESS_EXACT : null;
+    return compareType.match(getLength(value)) ? TYPELESS_EXACT : null;
   }
 
 
-  @NotNull
   @Override
-  public Set<Class<?>> getFormattableTypes()
+  public int size(@NotNull Object value) {
+    return getLength(value);
+  }
+
+
+  @Override
+  public @NotNull Set<Class<?>> getFormattableTypes()
   {
-    return new HashSet<Class<?>>(Arrays.<Class<?>>asList(
-        Object[].class,
-        short[].class,
-        int[].class,
-        long[].class,
-        float[].class,
-        double[].class,
-        boolean[].class));
+    return new HashSet<>(asList(
+        Object[].class, short[].class, int[].class, long[].class, float[].class, double[].class, boolean[].class));
   }
 }

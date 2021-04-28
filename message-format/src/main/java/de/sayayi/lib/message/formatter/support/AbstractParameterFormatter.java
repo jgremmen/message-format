@@ -24,16 +24,20 @@ import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.data.map.MapKey.Type;
 import de.sayayi.lib.message.data.map.MapValue;
 import de.sayayi.lib.message.data.map.MapValueBool;
+import de.sayayi.lib.message.data.map.MapValueNumber;
 import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
-import de.sayayi.lib.message.impl.EmptyMessage;
+import de.sayayi.lib.message.internal.EmptyMessage;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.EMPTY_NULL_TYPE;
 import static de.sayayi.lib.message.data.map.MapKey.NAME_TYPE;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.messageToText;
 
 
 /**
@@ -52,28 +56,33 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   /**
    * A set containing all data map key types, except for {@link Type#NAME}.
    */
-  public static final EnumSet<Type> NO_NAME_KEY_TYPES =
+  protected static final Set<Type> NO_NAME_KEY_TYPES =
       EnumSet.of(Type.NULL, Type.EMPTY, Type.BOOL, Type.NUMBER, Type.STRING);
 
 
   @Override
-  public String format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text format(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     // handle empty, !empty, null and !null first
-    Message msg = getMessage(value, EMPTY_NULL_TYPE, parameters, data, false);
+    Message.WithSpaces msg = getMessage(value, EMPTY_NULL_TYPE, parameters, data, false);
     if (msg != null)
-      return msg.format(parameters);
+      return messageToText(msg, parameters);
 
-    String s = formatValue(value, format, parameters, data);
+    Text text = formatValue(value, format, parameters, data);
 
     // map result against map keys...
-    msg = getMessage(s, NO_NAME_KEY_TYPES, parameters, data, false);
+    msg = getMessage(text.getText(), NO_NAME_KEY_TYPES, parameters, data, false);
 
-    return msg == null ? s : msg.format(parameters);
+    return msg == null ? text : messageToText(msg, parameters);
   }
 
 
-  protected abstract String formatValue(Object value, String format, @NotNull Parameters parameters, Data data);
+  protected abstract @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data);
+
+
+  public int getPriority() {
+    return 0;
+  }
 
 
   @Contract(pure = true)
@@ -112,6 +121,24 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
+  protected long getConfigValueNumber(@NotNull String name, @NotNull Parameters parameters, Data data,
+                                      boolean checkDataNumber, long defaultValue)
+  {
+    if (data instanceof DataMap)
+    {
+      MapValueNumber number = (MapValueNumber)((DataMap)data).find(name, parameters, NAME_TYPE, MapValue.NUMBER_TYPE);
+      if (number != null)
+        return number.asObject();
+    }
+
+    if (checkDataNumber && data instanceof DataNumber)
+      return ((DataNumber)data).asObject();
+
+    return defaultValue;
+  }
+
+
+  @Contract(pure = true)
   protected boolean getConfigValueBool(@NotNull String name, @NotNull Parameters parameters, Data data,
                                        boolean defaultValue)
   {
@@ -137,9 +164,10 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
-  protected Message getMessage(Object value, EnumSet<Type> keyTypes, Parameters parameters, Data data, boolean notNull)
+  protected Message.WithSpaces getMessage(Object value, Set<Type> keyTypes, Parameters parameters, Data data,
+                                          boolean notNull)
   {
-    Message message = null;
+    Message.WithSpaces message = null;
 
     if (data instanceof DataMap)
       message = ((DataMap)data).getMessage(value, parameters, keyTypes, false);
@@ -180,9 +208,20 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   }
 
 
-  @NotNull
   @Contract(pure = true)
-  protected String trimNotNull(String s) {
+  protected @NotNull String trimNotNull(String s) {
     return s == null ? "" : s.trim();
+  }
+
+
+  @Contract(pure = true)
+  protected @NotNull String trimNotNull(Text text)
+  {
+    if (text == null)
+      return "";
+
+    String s = text.getText();
+
+    return s == null ? "" : s;
   }
 }

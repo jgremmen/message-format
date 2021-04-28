@@ -17,6 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,22 +26,25 @@ import javax.money.CurrencyUnit;
 import java.util.Collections;
 import java.util.Set;
 
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+
 
 /**
  * @author Jeroen Gremmen
  */
 public final class CurrencySupplierFormatter extends AbstractParameterFormatter
 {
+  @NotNull
   @Override
   @Contract(pure = true)
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return null;
+      return nullText();
 
     final CurrencyUnit currencyUnit = ((CurrencySupplier)value).getCurrency();
     if (currencyUnit == null)
-      return null;
+      return nullText();
 
     return parameters.getFormatter(format, CurrencyUnit.class).format(currencyUnit, format, parameters, data);
   }

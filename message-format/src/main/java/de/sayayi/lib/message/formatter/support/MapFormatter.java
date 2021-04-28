@@ -20,32 +20,39 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 import static java.util.ResourceBundle.getBundle;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class MapFormatter extends AbstractParameterFormatter implements EmptyMatcher
+public final class MapFormatter extends AbstractParameterFormatter
+    implements EmptyMatcher, SizeQueryable
 {
   @Override
   @Contract(pure = true)
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     final Map<?,?> map = (Map<?,?>)value;
     if (map == null)
-      return formatNull(parameters, data);
+      return nullText();
     if (map.isEmpty())
-      return formatEmpty(parameters, data);
+      return emptyText();
 
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
     final String separator = getSeparator(parameters, data);
@@ -83,7 +90,7 @@ public final class MapFormatter extends AbstractParameterFormatter implements Em
       s.append((keyString + separator + valueString).trim());
     }
 
-    return s.toString();
+    return noSpaceText(s.toString());
   }
 
 
@@ -106,14 +113,19 @@ public final class MapFormatter extends AbstractParameterFormatter implements Em
 
   @Override
   public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return compareType.match(((Map<?,?>)value).size()) ? MatchResult.TYPELESS_EXACT : null;
+    return compareType.match(((Map<?,?>)value).size()) ? TYPELESS_EXACT : null;
   }
 
 
-  @NotNull
+  @Override
+  public int size(@NotNull Object value) {
+    return ((Map<?,?>)value).size();
+  }
+
+
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(Map.class);
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return singleton(Map.class);
   }
 }

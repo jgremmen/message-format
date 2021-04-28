@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.ParameterFactory;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
+import de.sayayi.lib.message.internal.part.TextPart;
 import org.junit.Test;
 
 import java.lang.annotation.RetentionPolicy;
@@ -46,9 +47,9 @@ public class StringFormatterTest extends AbstractFormatterTest
     final StringFormatter formatter = new StringFormatter();
     final Parameters noParameters = ParameterFactory.DEFAULT.noParameters();
 
-    assertEquals("text", formatter.format(" text ", null, noParameters, null));
-    assertEquals("RUNTIME", formatter.format(RetentionPolicy.RUNTIME, null, noParameters, null));
-    assertEquals("hello", formatter.format(new Object() {
+    assertEquals(new TextPart("text"), formatter.format(" text ", null, noParameters, null));
+    assertEquals(new TextPart("RUNTIME"), formatter.format(RetentionPolicy.RUNTIME, null, noParameters, null));
+    assertEquals(new TextPart("hello"), formatter.format(new Object() {
       @Override
       public String toString() {
         return " hello";

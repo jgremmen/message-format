@@ -18,9 +18,8 @@ package de.sayayi.lib.message;
 import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.Message.WithCode;
 import de.sayayi.lib.message.annotation.MessageDef;
-import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
-import de.sayayi.lib.message.impl.EmptyMessageWithCode;
+import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,12 +46,10 @@ public class MessageDefAnnotationTest
 
 
   @Test
-  @MessageDefs({
-      @MessageDef(code = "T4", texts = @Text(locale = "en", text = "Message %{p1}")),
-      @MessageDef(code = "T5", texts = {
-          @Text(locale = "en", text = "English message"),
-          @Text(locale = "de", text = "Deutsche Nachricht")
-      })
+  @MessageDef(code = "T4", texts = @Text(locale = "en", text = "Message %{p1}"))
+  @MessageDef(code = "T5", texts = {
+      @Text(locale = "en", text = "English message"),
+      @Text(locale = "de", text = "Deutsche   Nachricht")
   })
   public void testMultiMessageAnotation()
   {
@@ -82,7 +79,7 @@ public class MessageDefAnnotationTest
 
 
   @Test
-  @MessageDef(code="T3", texts=@Text("m3"))
+  @MessageDef(code="T3", text="m3")
   public void testMessageWithoutLocale()
   {
     final WithCode msg = bundle.getByCode("T3");

@@ -21,8 +21,10 @@ import de.sayayi.lib.message.data.map.MapKey;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.data.map.MapValue;
 import de.sayayi.lib.message.data.map.MapValue.Type;
+import de.sayayi.lib.message.data.map.MapValueMessage;
 import de.sayayi.lib.message.data.map.MapValueString;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -31,15 +33,22 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
+import static de.sayayi.lib.message.data.map.MapValue.STRING_MESSAGE_TYPE;
 
 
 /**
  * @author Jeroen Gremmen
  */
 @AllArgsConstructor
+@EqualsAndHashCode(doNotUseGetters = true)
 public final class DataMap implements Data
 {
-  private static final long serialVersionUID = 400L;
+  private static final long serialVersionUID = 500L;
 
   @Getter private final Map<MapKey,MapValue> map;
 
@@ -51,10 +60,9 @@ public final class DataMap implements Data
   }
 
 
-  @NotNull
   @Override
   @Contract(pure = true)
-  public Map<MapKey,MapValue> asObject() {
+  public @NotNull Map<MapKey,MapValue> asObject() {
     return Collections.unmodifiableMap(map);
   }
 
@@ -62,7 +70,7 @@ public final class DataMap implements Data
   @Contract(pure = true)
   public MapValue find(Object key, Parameters parameters, Set<MapKey.Type> keyTypes, Set<MapValue.Type> valueTypes)
   {
-    MatchResult bestMatchResult = MatchResult.MISMATCH;
+    MatchResult bestMatchResult = MISMATCH;
     MapValue bestMatch = null;
 
     for(Entry<MapKey,MapValue> entry: map.entrySet())
@@ -78,7 +86,7 @@ public final class DataMap implements Data
       {
         MatchResult matchResult = mapKey.match(parameters, key);
 
-        if (matchResult == MatchResult.EXACT)
+        if (matchResult == EXACT)
           return entry.getValue();
 
         if (matchResult.compareTo(bestMatchResult) > 0)
@@ -94,22 +102,37 @@ public final class DataMap implements Data
 
 
   @Contract(pure = true)
-  public Message getMessage(Object key, Parameters parameters, Set<MapKey.Type> keyTypes, boolean includeDefault)
+  public Message.WithSpaces getMessage(Object key, Parameters parameters, Set<MapKey.Type> keyTypes,
+                                       boolean includeDefault)
   {
-    MapValue mapValue = find(key, parameters, keyTypes, MapValue.STRING_MESSAGE_TYPE);
+    MapValue mapValue = find(key, parameters, keyTypes, STRING_MESSAGE_TYPE);
 
     if (mapValue == null)
     {
-      if (!includeDefault)
-        return null;
+      if (includeDefault)
+        mapValue = map.get(null);
 
-      mapValue = map.get(null);
-      return mapValue == null ? null : (Message)map.get(null).asObject();
+      return mapValue == null ? null : (Message.WithSpaces)mapValue.asObject();
     }
 
     if (mapValue.getType() == Type.STRING)
       return ((MapValueString)mapValue).asMessage();
 
-    return (Message)mapValue.asObject();
+    return (Message.WithSpaces)mapValue.asObject();
+  }
+
+
+  /**
+   * Returns all parameter names occurring in messages in this map.
+   *
+   * @return  all parameter names, never {@code null}
+   */
+  @Contract(pure = true)
+  public @NotNull Set<String> getParameterNames()
+  {
+    return map.values().stream()
+        .filter(mapValue -> mapValue instanceof MapValueMessage)
+        .flatMap(mapValue -> ((MapValueMessage)mapValue).asObject().getParameterNames().stream())
+        .collect(Collectors.toCollection(TreeSet::new));
   }
 }

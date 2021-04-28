@@ -18,8 +18,11 @@ package de.sayayi.lib.message.data.map;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+import static de.sayayi.lib.message.data.map.MapKey.CompareType.EQ;
+import static de.sayayi.lib.message.data.map.MapKey.CompareType.NE;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_LENIENT;
@@ -28,6 +31,7 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_LENIENT
 /**
  * @author Jeroen Gremmen
  */
+@ToString(doNotUseGetters = true)
 public final class MapKeyEmpty implements MapKey
 {
   private final CompareType compareType;
@@ -35,26 +39,24 @@ public final class MapKeyEmpty implements MapKey
 
   public MapKeyEmpty(@NotNull CompareType compareType)
   {
-    if (compareType != CompareType.EQ && compareType != CompareType.NE)
+    if (compareType != EQ && compareType != NE)
       throw new IllegalArgumentException("compareType must be EQ or NE");
 
     this.compareType = compareType;
   }
 
 
-  @NotNull
   @Override
-  public Type getType() {
+  public @NotNull Type getType() {
     return Type.EMPTY;
   }
 
 
-  @NotNull
   @Override
-  public MatchResult match(@NotNull Parameters parameters, Object value)
+  public @NotNull MatchResult match(@NotNull Parameters parameters, Object value)
   {
     if (value == null)
-      return compareType == CompareType.EQ ? TYPELESS_LENIENT : MISMATCH;
+      return compareType == EQ ? TYPELESS_LENIENT : MISMATCH;
 
     final ParameterFormatter formatter = parameters.getFormatter(value.getClass());
     if (formatter instanceof EmptyMatcher)

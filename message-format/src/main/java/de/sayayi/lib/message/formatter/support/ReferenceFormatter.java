@@ -20,41 +20,51 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.Reference;
-import java.util.Collections;
 import java.util.Set;
+
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class ReferenceFormatter extends AbstractParameterFormatter implements EmptyMatcher
+public final class ReferenceFormatter extends AbstractParameterFormatter
+    implements EmptyMatcher, SizeQueryable
 {
   @SuppressWarnings("rawtypes")
   @Override
-  public String formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
   {
     if (value == null)
-      return null;
+      return nullText();
 
-    value = ((Reference)value).get();
-
-    return value != null
-        ? parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data) : "";
+    return (value = ((Reference)value).get()) != null
+        ? parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data) : emptyText();
   }
 
 
   @Override
   public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return compareType.match(((Reference<?>)value).get() == null ? 0 : 1) ? MatchResult.TYPELESS_EXACT : null;
+    return compareType.match(((Reference<?>)value).get() == null ? 0 : 1) ? TYPELESS_EXACT : null;
   }
 
 
-  @NotNull
   @Override
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(Reference.class);
+  public int size(@NotNull Object value) {
+    return ((Reference<?>)value).get() != null ? 1 : 0;
+  }
+
+
+  @Override
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return singleton(Reference.class);
   }
 }
