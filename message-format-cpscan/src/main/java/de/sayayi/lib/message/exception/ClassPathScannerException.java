@@ -13,31 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message;
-
-import de.sayayi.lib.message.scanner.ClassPathScanner;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Set;
+package de.sayayi.lib.message.exception;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public class ClassPathMessageBundle extends MessageBundle
+public final class ClassPathScannerException extends RuntimeException
 {
-  public ClassPathMessageBundle(@NotNull Set<String> packageNames) {
-    this(packageNames, null);
-  }
+  private static final long serialVersionUID = -1425872452526457018L;
 
 
-  public ClassPathMessageBundle(@NotNull Set<String> packageNames, ClassLoader classLoader) {
-    new ClassPathScanner(this, packageNames, classLoader).run();
-  }
-
-
-  @Override
-  public final void add(@NotNull Class<?> classWithMessages) {
-    throw new UnsupportedOperationException();
+  public ClassPathScannerException(String message, Throwable cause) {
+    super(message, cause);
   }
 }

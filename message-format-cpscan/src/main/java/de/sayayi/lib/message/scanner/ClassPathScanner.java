@@ -19,6 +19,7 @@ import de.sayayi.lib.message.MessageBundle;
 import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
+import de.sayayi.lib.message.exception.ClassPathScannerException;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -43,6 +45,7 @@ import java.util.stream.Collectors;
 
 import static de.sayayi.lib.message.MessageFactory.parse;
 import static org.objectweb.asm.Opcodes.ASM9;
+import static org.objectweb.asm.Type.getDescriptor;
 
 
 /**
@@ -50,11 +53,9 @@ import static org.objectweb.asm.Opcodes.ASM9;
  */
 public final class ClassPathScanner
 {
-  private static final String MESSAGE_DEFS_DESCRIPTOR =
-      "L" + MessageDefs.class.getName().replace('.', '/') + ';';
-  private static final String MESSAGE_DEF_DESCRIPTOR =
-      "L" + MessageDef.class.getName().replace('.', '/') + ';';
-  private static final String TEXT_DESCRIPTOR = "L" + Text.class.getName().replace('.', '/') + ';';
+  private static final String MESSAGE_DEFS_DESCRIPTOR = getDescriptor(MessageDefs.class);
+  private static final String MESSAGE_DEF_DESCRIPTOR = getDescriptor(MessageDef.class);
+  private static final String TEXT_DESCRIPTOR =  getDescriptor(Text.class);
 
   private final MessageBundle messageBundle;
   private final ClassLoader classLoader;
@@ -76,37 +77,48 @@ public final class ClassPathScanner
   }
 
 
-  public void run() throws IOException
+  public void run()
   {
-    final Set<URL> urls = new LinkedHashSet<>();
+    try {
+      final Set<URL> urls = new LinkedHashSet<>();
 
-    for(ClassLoader cl = classLoader; cl != null; cl = cl.getParent())
-      if (cl instanceof URLClassLoader)
-        urls.addAll(Arrays.asList(((URLClassLoader)cl).getURLs()));
+      for(ClassLoader cl = classLoader; cl != null; cl = cl.getParent())
+        if (cl instanceof URLClassLoader)
+          urls.addAll(Arrays.asList(((URLClassLoader)cl).getURLs()));
 
-    for(final URL url: urls)
-    {
-      final File fileOrDirectory = new File(url.getPath());
+      for(final URL url: urls)
+      {
+        final File fileOrDirectory = new File(url.getPath());
 
-      if (fileOrDirectory.isDirectory())
-        run_directory(fileOrDirectory, fileOrDirectory);
-      else if (fileOrDirectory.getName().endsWith(".jar"))
-        run_jar(url);
+        if (fileOrDirectory.isDirectory())
+          run_directory(fileOrDirectory, fileOrDirectory);
+        else if (fileOrDirectory.getName().endsWith(".jar"))
+          run_jar(url);
+      }
+    } catch(Exception ex) {
+      throw new ClassPathScannerException("failed to scan class path for messages", ex);
     }
   }
 
 
-  private void run_directory(@NotNull File root, @NotNull File directory) throws IOException
+  private void run_directory(@NotNull File baseDirectory, @NotNull File directory) throws IOException
   {
-    for(final File file: directory.listFiles())
-      if (file.isDirectory())
-        run_directory(root, file);
-      else if (matchClassPath(root.toPath().relativize(file.toPath()).toString()))
-      {
-        try(InputStream classInputStream = new FileInputStream(file)) {
-          run_class(classInputStream);
+    final File[] files = directory.listFiles();
+
+    if (files != null)
+    {
+      final Path baseDirectoryPath = baseDirectory.toPath();
+
+      for(final File file: files)
+        if (file.isDirectory())
+          run_directory(baseDirectory, file);
+        else if (matchClassPath(baseDirectoryPath.relativize(file.toPath()).toString()))
+        {
+          try(InputStream classInputStream = new FileInputStream(file)) {
+            run_class(classInputStream);
+          }
         }
-      }
+    }
   }
 
 
@@ -281,20 +293,12 @@ public final class ClassPathScanner
     @Override
     public void visit(String name, Object value)
     {
-      switch(name)
-      {
-        case "locale":
-          locale = (String)value;
-          break;
-
-        case "text":
-          text = (String)value;
-          break;
-
-        case "value":
-          this.value = (String)value;
-          break;
-      }
+      if ("locale".equals(name))
+        locale = (String)value;
+      else if ("text".equals(name))
+        text = (String)value;
+      else if ("value".equals(name))
+        this.value = (String)value;
     }
 
 
