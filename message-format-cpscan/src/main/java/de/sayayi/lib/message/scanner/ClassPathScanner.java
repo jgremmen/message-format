@@ -26,7 +26,6 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -115,7 +114,7 @@ public final class ClassPathScanner
         else if (matchClassPath(baseDirectoryPath.relativize(file.toPath()).toString()))
         {
           try(InputStream classInputStream = new FileInputStream(file)) {
-            run_class(classInputStream);
+            new ClassReader(classInputStream).accept(new MainClassVisitor(), 0);
           }
         }
     }
@@ -136,19 +135,10 @@ public final class ClassPathScanner
             final byte[] classBytes = new byte[classSize];
 
             if (jarInputStream.read(classBytes, 0, classBytes.length) == classSize)
-            {
-              try(final InputStream classInputStream = new ByteArrayInputStream(classBytes)) {
-                run_class(classInputStream);
-              }
-            }
+              new ClassReader(classBytes).accept(new MainClassVisitor(), 0);
           }
         }
     }
-  }
-
-
-  private void run_class(@NotNull InputStream classInputStream) throws IOException {
-    new ClassReader(classInputStream).accept(new MainClassVisitor(), 0);
   }
 
 
