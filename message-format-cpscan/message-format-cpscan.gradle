@@ -25,6 +25,10 @@ description = 'Message Format Library (classpath scanner)'
 def asmVersion = "9.1"
 
 
+jar.enabled = false
+jar.group = ''
+
+
 dependencies {
   api project(':message-format')
 
@@ -55,7 +59,13 @@ shadowJar {
 }
 
 
-jar.enabled = false
+test {
+  dependsOn shadowJar
+
+  doFirst {
+    classpath = shadowJar.outputs.files + classpath - compileJava.outputs.files
+  }
+}
 
 
 assemble.dependsOn shadowJar
@@ -66,6 +76,8 @@ publishing {
 
     cpscan(MavenPublication) { publication ->
       from project.shadow.component(publication)
+      artifact javadocJar
+      artifact sourcesJar
 
       pom {
         name = "${project.description}"

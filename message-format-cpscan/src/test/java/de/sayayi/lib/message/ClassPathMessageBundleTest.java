@@ -28,23 +28,31 @@ import static org.junit.Assert.assertTrue;
  * @author Jeroen Gremmen
  */
 @MessageDefs({
-    @MessageDef(code = "123", texts = {
+    @MessageDef(code = "CLASS", texts = {
         @Text(locale = "de", text = "Deutsch"),
-        @Text("Andere Sprache")
+        @Text("Other language")
     })
 })
 public final class ClassPathMessageBundleTest
 {
-  @MessageDef(code = "TEST", text = "Hallo")
-  @MessageDef(code = "NEW", texts = @Text("Neu"))
+  @MessageDef(code = "M1", text = "Method message 1")
+  @MessageDef(code = "M2", texts = @Text("Method message 2"))
   @Test
   public void testScan() throws Exception
   {
     final ClassPathMessageBundle bundle = new ClassPathMessageBundle(
         singleton(ClassPathMessageBundleTest.class.getPackage().getName()));
 
-    assertTrue(bundle.hasMessageWithCode("TEST"));
-    assertTrue(bundle.hasMessageWithCode("123"));
-    assertTrue(bundle.hasMessageWithCode("NEW"));
+    assertTrue(bundle.hasMessageWithCode("CLASS"));
+    assertTrue(bundle.hasMessageWithCode("M1"));
+    assertTrue(bundle.hasMessageWithCode("M2"));
+    assertTrue(bundle.hasMessageWithCode("INNER"));
+  }
+
+
+
+
+  @MessageDef(code = "INNER", text = "Inner class")
+  private static final class InnerClass {
   }
 }
