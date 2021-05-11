@@ -37,6 +37,8 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
 @AllArgsConstructor
 public final class MapKeyBool implements MapKey
 {
+  private static final long serialVersionUID = 500L;
+
   @Getter private final boolean bool;
 
 

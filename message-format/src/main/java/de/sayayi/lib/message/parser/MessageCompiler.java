@@ -130,8 +130,7 @@ public final class MessageCompiler
       public void exitMessage0(Message0Context ctx)
       {
         final List<MessagePart> parts = ctx.children.stream()
-            .map(pt -> pt instanceof ParameterContext
-                ? ((ParameterContext)pt).value : ((TextPartContext)pt).value)
+            .map(pt -> pt instanceof ParameterContext ? ((ParameterContext)pt).value : ((TextPartContext)pt).value)
             .collect(toList());
         final int partCount = parts.size();
 

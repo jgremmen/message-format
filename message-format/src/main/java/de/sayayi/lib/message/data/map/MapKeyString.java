@@ -39,6 +39,8 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
 @AllArgsConstructor
 public final class MapKeyString implements MapKey
 {
+  private static final long serialVersionUID = 500L;
+
   private final CompareType compareType;
   @Getter private final String string;
 

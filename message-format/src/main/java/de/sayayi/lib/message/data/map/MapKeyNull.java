@@ -30,6 +30,8 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 @ToString(doNotUseGetters = true)
 public final class MapKeyNull implements MapKey
 {
+  private static final long serialVersionUID = 500L;
+
   private final CompareType compareType;
 
 

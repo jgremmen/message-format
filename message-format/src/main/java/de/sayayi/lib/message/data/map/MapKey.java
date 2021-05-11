@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.EnumSet;
 
 
@@ -26,7 +27,7 @@ import java.util.EnumSet;
  * @author Jeroen Gremmen
  */
 @SuppressWarnings({"java:S1214", "java:S2386"})
-public interface MapKey
+public interface MapKey extends Serializable
 {
   EnumSet<Type> EMPTY_NULL_TYPE = EnumSet.of(Type.EMPTY, Type.NULL);
   EnumSet<Type> STRING_TYPE = EnumSet.of(Type.STRING);
