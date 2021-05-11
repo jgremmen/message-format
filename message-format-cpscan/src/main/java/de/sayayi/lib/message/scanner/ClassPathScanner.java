@@ -37,6 +37,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -59,6 +60,8 @@ public final class ClassPathScanner
   private static final String MESSAGE_DEFS_DESCRIPTOR = getDescriptor(MessageDefs.class);
   private static final String MESSAGE_DEF_DESCRIPTOR = getDescriptor(MessageDef.class);
   private static final String TEXT_DESCRIPTOR = getDescriptor(Text.class);
+
+  private static final Set<String> ZIP_PROTOCOLS = new HashSet<>(Arrays.asList("zip", "jar", "war"));
 
   private final MessageBundle messageBundle;
   private final ClassLoader classLoader;
@@ -98,17 +101,16 @@ public final class ClassPathScanner
     {
       final URL url = urls.nextElement();
 
-      if (scan_isZip(url))
+      if (ZIP_PROTOCOLS.contains(url.getProtocol()))
         scan_zipEntries(url, classPathPrefix);
       else
       {
         final String directory = url.getFile();
-        final String baseDirectory = directory.endsWith(classPathPrefix)
-            ? directory.substring(0, directory.length() - classPathPrefix.length()) : directory;
+        final File baseDirectory = new File(directory.endsWith(classPathPrefix)
+            ? directory.substring(0, directory.length() - classPathPrefix.length()) : directory);
 
-        final File bd = new File(baseDirectory);
-        if (bd.isDirectory())
-          scan_directory(bd, new File(directory));
+        if (baseDirectory.isDirectory())
+          scan_directory(baseDirectory, new File(directory));
       }
     }
   }
@@ -131,19 +133,12 @@ public final class ClassPathScanner
 
           if (classNamePath.endsWith(".class") && scan_checkVisited(classNamePath))
           {
-            try(InputStream classInputStream = new FileInputStream(file)) {
+            try(final InputStream classInputStream = new FileInputStream(file)) {
               scan_parseClass(classInputStream);
             }
           }
         }
     }
-  }
-
-
-  private boolean scan_isZip(@NotNull URL url)
-  {
-    String protocol = url.getProtocol();
-    return "zip".equals(protocol) || "jar".equals(protocol) || "war".equals(protocol);
   }
 
 
@@ -153,11 +148,7 @@ public final class ClassPathScanner
     final ZipFile zipFile;
 
     if (con instanceof JarURLConnection)
-    {
-      // Should usually be the case for traditional JAR files.
-      JarURLConnection jarCon = (JarURLConnection)con;
-      zipFile = jarCon.getJarFile();
-    }
+      zipFile = ((JarURLConnection)con).getJarFile();
     else
     {
       final String urlFile = zipUrl.getFile();
@@ -193,7 +184,7 @@ public final class ClassPathScanner
   }
 
 
-  private ZipFile scan_createZipFileFromUrl(@NotNull String zipFileUrl) throws IOException
+  private @NotNull ZipFile scan_createZipFileFromUrl(@NotNull String zipFileUrl) throws IOException
   {
     if (zipFileUrl.startsWith("file:"))
     {
