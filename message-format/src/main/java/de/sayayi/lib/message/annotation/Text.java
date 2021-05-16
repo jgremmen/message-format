@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.annotation;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -41,7 +42,7 @@ public @interface Text
    *
    * @return  message locale
    *
-   * @see de.sayayi.lib.message.Message#format(Parameters)
+   * @see de.sayayi.lib.message.Message#format(MessageContext, Parameters)
    */
   String locale() default "";
 

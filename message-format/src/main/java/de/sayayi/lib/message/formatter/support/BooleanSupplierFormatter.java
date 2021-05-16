@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -35,13 +36,15 @@ public final class BooleanSupplierFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     final BooleanSupplier supplier = (BooleanSupplier)value;
     if (supplier == null)
       return nullText();
 
-    return parameters.getFormatter(format, boolean.class).format(supplier.getAsBoolean(), format, parameters, data);
+    return messageContext.getFormatter(format, boolean.class)
+        .format(messageContext, supplier.getAsBoolean(), format, parameters, data);
   }
 
 

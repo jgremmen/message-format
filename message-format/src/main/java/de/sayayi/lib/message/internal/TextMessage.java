@@ -16,6 +16,8 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import lombok.Getter;
 import lombok.ToString;
@@ -62,7 +64,7 @@ public final class TextMessage implements Message.WithSpaces
 
 
   @Override
-  public String format(@NotNull Parameters parameters) {
+  public String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
     return text;
   }
 

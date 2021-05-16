@@ -35,16 +35,14 @@ public final class MapValueBool implements MapValue
   }
 
 
-  @NotNull
   @Override
-  public Type getType() {
+  public @NotNull Type getType() {
     return Type.BOOL;
   }
 
 
-  @NotNull
   @Override
-  public Boolean asObject() {
+  public @NotNull Boolean asObject() {
     return bool;
   }
 

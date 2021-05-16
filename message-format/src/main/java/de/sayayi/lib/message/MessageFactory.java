@@ -24,8 +24,9 @@ import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.internal.MessageDelegateWithCode;
+import de.sayayi.lib.message.parser.MessageCacheResolver;
 import de.sayayi.lib.message.parser.MessageCompiler;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,28 +43,39 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static de.sayayi.lib.message.parser.MessageCacheResolver.IDENTITY;
 import static java.util.Collections.singletonMap;
 import static java.util.Locale.ROOT;
-import static lombok.AccessLevel.PRIVATE;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@NoArgsConstructor(access = PRIVATE)
-public final class MessageFactory
+public class MessageFactory
 {
+  public static final MessageFactory NO_CACHE_INSTANCE = new MessageFactory(IDENTITY);
+
   private static final AtomicInteger CODE_ID = new AtomicInteger(0);
 
+  @Getter private final MessageCacheResolver messageCacheResolver;
+  private final MessageCompiler messageCompiler;
 
-  @Contract(value = "_ -> new", pure = true)
-  public static @NotNull Message.WithSpaces parse(@NotNull String text) {
-    return MessageCompiler.compileMessage(text);
+
+  public MessageFactory(@NotNull MessageCacheResolver messageCacheResolver)
+  {
+    this.messageCacheResolver = messageCacheResolver;
+    messageCompiler = new MessageCompiler(this);
   }
 
 
   @Contract(value = "_ -> new", pure = true)
-  public static @NotNull Message parse(@NotNull Map<Locale,String> localizedTexts) {
+  public @NotNull Message.WithSpaces parse(@NotNull String text) {
+    return messageCompiler.compileMessage(text);
+  }
+
+
+  @Contract(value = "_ -> new", pure = true)
+  public @NotNull Message parse(@NotNull Map<Locale,String> localizedTexts) {
     return parse("Generated::" + CODE_ID.incrementAndGet(), localizedTexts);
   }
 
@@ -77,13 +89,13 @@ public final class MessageFactory
    * @return  message instance
    */
   @Contract(value = "_, _ -> new", pure = true)
-  public static @NotNull Message.WithCode parse(@NotNull String code, @NotNull String text) {
+  public @NotNull Message.WithCode parse(@NotNull String code, @NotNull String text) {
     return new MessageDelegateWithCode(code, parse(text));
   }
 
 
   @Contract(value = "_, _ -> new", pure = true)
-  public static @NotNull Message.WithCode parse(@NotNull String code, @NotNull Map<Locale,String> localizedTexts)
+  public @NotNull Message.WithCode parse(@NotNull String code, @NotNull Map<Locale,String> localizedTexts)
   {
     if (localizedTexts.isEmpty())
       return new EmptyMessageWithCode(code);
@@ -102,7 +114,7 @@ public final class MessageFactory
 
   @SuppressWarnings("WeakerAccess")
   @Contract(value = "_ -> new", pure = true)
-  public static @NotNull Set<Message.WithCode> parseAnnotations(@NotNull AnnotatedElement element)
+  public @NotNull Set<Message.WithCode> parseAnnotations(@NotNull AnnotatedElement element)
   {
     final Set<Message.WithCode> messageBundle = new HashSet<>();
 
@@ -127,7 +139,7 @@ public final class MessageFactory
 
 
   @Contract(value = "_ -> new", pure = true)
-  public static @NotNull Message.WithCode parse(@NotNull MessageDef annotation)
+  public @NotNull Message.WithCode parse(@NotNull MessageDef annotation)
   {
     final Text[] texts = annotation.texts();
     final String code = annotation.code();
@@ -154,7 +166,7 @@ public final class MessageFactory
 
 
   @Contract(pure = true)
-  public static @NotNull Message.WithCode withCode(@NotNull String code, @NotNull Message message)
+  public @NotNull Message.WithCode withCode(@NotNull String code, @NotNull Message message)
   {
     if (message instanceof MessageDelegateWithCode)
       return new MessageDelegateWithCode(code, ((MessageDelegateWithCode)message).getMessage());
@@ -175,9 +187,9 @@ public final class MessageFactory
 
 
   @Contract(pure = true)
-  public static @NotNull MessageBundle bundle(@NotNull Properties properties)
+  public @NotNull MessageBundle bundle(@NotNull Properties properties)
   {
-    final MessageBundle bundle = new MessageBundle();
+    final MessageBundle bundle = new MessageBundle(this);
 
     properties.forEach((k,v) -> bundle.add(parse(k.toString(), String.valueOf(v))));
 
@@ -186,9 +198,9 @@ public final class MessageFactory
 
 
   @Contract(pure = true)
-  public static @NotNull MessageBundle bundle(@NotNull ResourceBundle resourceBundle)
+  public @NotNull MessageBundle bundle(@NotNull ResourceBundle resourceBundle)
   {
-    final MessageBundle bundle = new MessageBundle();
+    final MessageBundle bundle = new MessageBundle(this);
     final Locale locale = resourceBundle.getLocale();
 
     resourceBundle.keySet().forEach(
@@ -199,7 +211,7 @@ public final class MessageFactory
 
 
   @Contract(pure = true)
-  public static @NotNull MessageBundle bundle(@NotNull Map<Locale,Properties> properties)
+  public @NotNull MessageBundle bundle(@NotNull Map<Locale,Properties> properties)
   {
     final Map<String,Map<Locale,Message>> localizedMessagesByCode = new HashMap<>();
 
@@ -210,12 +222,12 @@ public final class MessageFactory
             .put(entry.getKey(), parse(String.valueOf(localizedProperty.getValue())));
       }
 
-    return new MessageBundle(localizedMessagesByCode);
+    return new MessageBundle(this, localizedMessagesByCode);
   }
 
 
   @Contract(pure = true)
-  public static @NotNull MessageBundle bundle(@NotNull Collection<ResourceBundle> properties)
+  public @NotNull MessageBundle bundle(@NotNull Collection<ResourceBundle> properties)
   {
     final Map<String,Map<Locale,Message>> localizedMessagesByCode = new HashMap<>();
 
@@ -226,7 +238,7 @@ public final class MessageFactory
             .put(resourceBundle.getLocale(), parse(resourceBundle.getString(code)));
       }
 
-    return new MessageBundle(localizedMessagesByCode);
+    return new MessageBundle(this, localizedMessagesByCode);
   }
 
 

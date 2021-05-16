@@ -26,12 +26,16 @@ import java.util.Set;
  */
 public class ClassPathMessageBundle extends MessageBundle
 {
-  public ClassPathMessageBundle(@NotNull Set<String> packageNames) {
-    this(packageNames, null);
+  public ClassPathMessageBundle(@NotNull MessageFactory messageFactory, @NotNull Set<String> packageNames) {
+    this(messageFactory, packageNames, null);
   }
 
 
-  public ClassPathMessageBundle(@NotNull Set<String> packageNames, ClassLoader classLoader) {
+  public ClassPathMessageBundle(@NotNull MessageFactory messageFactory, @NotNull Set<String> packageNames,
+                                ClassLoader classLoader)
+  {
+    super(messageFactory);
+
     new ClassPathScanner(this, packageNames, classLoader).run();
   }
 

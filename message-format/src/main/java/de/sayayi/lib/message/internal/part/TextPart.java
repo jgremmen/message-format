@@ -19,6 +19,8 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 
+import java.util.Objects;
+
 import static java.lang.Character.isSpaceChar;
 
 
@@ -67,13 +69,13 @@ public final class TextPart implements Text
     final Text that = (Text)o;
 
     return spaceBefore == that.isSpaceBefore() && spaceAfter == that.isSpaceAfter() &&
-        (text == null ? that.getText() == null : text.equals(that.getText()));
+        Objects.equals(text, that.getText());
   }
 
 
   @Override
   public int hashCode() {
-    return isEmpty() ? 0 : text.hashCode();
+    return (isEmpty() ? 0 : text.hashCode()) * 11 + (spaceBefore ? 8 : 0) + (spaceAfter ? 2 : 0);
   }
 
 

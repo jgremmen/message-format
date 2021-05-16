@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.internal.part;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.SpacesAware;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -54,6 +55,6 @@ public interface MessagePart extends SpacesAware, Serializable
   interface Parameter extends MessagePart
   {
     @Contract(pure = true)
-    @NotNull Text getText(@NotNull Parameters parameters);
+    @NotNull Text getText(@NotNull MessageContext messageContext, @NotNull Parameters parameters);
   }
 }

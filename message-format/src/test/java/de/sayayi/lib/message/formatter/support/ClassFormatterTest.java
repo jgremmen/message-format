@@ -16,8 +16,9 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.ParameterFactory;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.part.TextPart;
 import org.junit.Assert;
@@ -25,7 +26,7 @@ import org.junit.Test;
 
 import java.util.Map;
 
-import static de.sayayi.lib.message.MessageFactory.parse;
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.ROOT;
 import static org.junit.Assert.assertEquals;
 
@@ -39,16 +40,18 @@ public class ClassFormatterTest
   public void testFormat()
   {
     final ClassFormatter formatter = new ClassFormatter();
-    final Parameters parameters = ParameterFactory.createFor(ROOT).noParameters();
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE,
+        ROOT);
+    final Parameters parameters = context.noParameters();
 
     Assert.assertEquals(new TextPart("java.lang.String"),
-        formatter.format(String.class, null, parameters, null));
+        formatter.format(context, String.class, null, parameters, null));
     Assert.assertEquals(new TextPart("java.lang"),
-        formatter.format(String.class, "package", parameters, null));
+        formatter.format(context, String.class, "package", parameters, null));
     Assert.assertEquals(new TextPart("String"),
-        formatter.format(String.class, "name", parameters, null));
+        formatter.format(context, String.class, "name", parameters, null));
     Assert.assertEquals(new TextPart("double"),
-        formatter.format(double.class, null, parameters, null));
+        formatter.format(context, double.class, null, parameters, null));
   }
 
 
@@ -57,16 +60,17 @@ public class ClassFormatterTest
   {
     final GenericFormatterService formatterRegistry = new GenericFormatterService();
     formatterRegistry.addFormatter(new ClassFormatter());
-    ParameterFactory factory = ParameterFactory.createFor(ROOT, formatterRegistry);
+    final MessageContext context = new MessageContext(formatterRegistry, NO_CACHE_INSTANCE, ROOT);
 
-    final Parameters parameters = factory
+    final Parameters parameters = context.parameters()
         .with("a", Map.class)
         .with("b", long.class)
         .with("c", int[].class)
         .with("d", null);
-    final Message msg = parse("%{a} %{b,package,{empty:'?',null:'#'}} %{c,name} %{d,{null:'-'}}");
+    final Message msg = context.getMessageFactory()
+        .parse("%{a} %{b,package,{empty:'?',null:'#'}} %{c,name} %{d,{null:'-'}}");
 
-    assertEquals("java.util.Map # int[] -", msg.format(parameters));
+    assertEquals("java.util.Map # int[] -", msg.format(context, parameters));
   }
 
 
@@ -76,12 +80,15 @@ public class ClassFormatterTest
     final GenericFormatterService formatterRegistry = new GenericFormatterService();
     formatterRegistry.addFormatter(new ClassFormatter());
     formatterRegistry.addFormatter(new PackageFormatter());
-    ParameterFactory factory = ParameterFactory.createFor(ROOT, formatterRegistry);
 
-    final Parameters parameters = factory.with("class", Map.class);
+    final MessageContext context = new MessageContext(formatterRegistry, NO_CACHE_INSTANCE, ROOT);
+    final Parameters parameters = context.parameters().with("class", Map.class);
 
-    assertEquals("java.util", parse("%{class,{format:'package'}}").format(parameters));
-    assertEquals("java.util", parse("%{class,'package'}").format(parameters));
-    assertEquals("java.util", parse("%{class,package}").format(parameters));
+    assertEquals("java.util", context.getMessageFactory().parse("%{class,{format:'package'}}")
+        .format(context, parameters));
+    assertEquals("java.util", context.getMessageFactory().parse("%{class,'package'}")
+        .format(context, parameters));
+    assertEquals("java.util", context.getMessageFactory().parse("%{class,package}")
+        .format(context, parameters));
   }
 }

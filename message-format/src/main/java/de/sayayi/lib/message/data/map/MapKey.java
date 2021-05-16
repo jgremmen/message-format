@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.data.map;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +40,7 @@ public interface MapKey extends Serializable
 
 
   @Contract(pure = true)
-  @NotNull MatchResult match(@NotNull Parameters parameters, Object value);
+  @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Parameters parameters, Object value);
 
 
 

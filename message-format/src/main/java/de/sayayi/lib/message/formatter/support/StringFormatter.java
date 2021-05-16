@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
@@ -52,7 +53,8 @@ public final class StringFormatter extends AbstractParameterFormatter
   @Override
   @Contract(pure = true)
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     return value == null
         ? nullText() : noSpaceText(value instanceof char[] ? new String((char[])value) : String.valueOf(value));

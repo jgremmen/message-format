@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -62,13 +63,14 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
 
     if (!STYLE.containsKey(format))
-      format = getConfigValueString("format", parameters, data, true, null);
+      format = getConfigValueString(messageContext, "format", parameters, data, true, null);
 
     final Locale locale = parameters.getLocale();
     final DateTimeFormatter formatter;

@@ -19,6 +19,8 @@ import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.Text;
 import org.junit.Test;
 
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+
 
 /**
  * @author Jeroen Gremmen
@@ -28,7 +30,7 @@ public class MessageBundleTest
   @Test
   public void testClassInheritance()
   {
-    MessageBundle bundle = new MessageBundle();
+    MessageBundle bundle = new MessageBundle(NO_CACHE_INSTANCE);
     bundle.add(E1.class);
     bundle.add(E2.class);
   }
@@ -37,6 +39,7 @@ public class MessageBundleTest
 
   public static class Base
   {
+    @SuppressWarnings("unused")
     @MessageDef(code = "base", texts = @Text("Hello"))
     public void someMethod() {
     }

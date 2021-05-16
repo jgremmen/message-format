@@ -15,6 +15,8 @@
  */
 package de.sayayi.lib.message.internal;
 
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -39,8 +41,8 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
 
   @Override
-  @Contract(value = "_ -> null", pure = true)
-  public String format(@NotNull Parameters parameters) {
+  @Contract(value = "_, _ -> null", pure = true)
+  public String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
     return null;
   }
 

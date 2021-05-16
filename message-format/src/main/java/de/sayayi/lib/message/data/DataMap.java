@@ -16,7 +16,8 @@
 package de.sayayi.lib.message.data;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.map.MapKey;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.data.map.MapValue;
@@ -68,7 +69,8 @@ public final class DataMap implements Data
 
 
   @Contract(pure = true)
-  public MapValue find(Object key, Parameters parameters, Set<MapKey.Type> keyTypes, Set<MapValue.Type> valueTypes)
+  public MapValue find(@NotNull MessageContext messageContext, Object key, Parameters parameters,
+                       Set<MapKey.Type> keyTypes, Set<MapValue.Type> valueTypes)
   {
     MatchResult bestMatchResult = MISMATCH;
     MapValue bestMatch = null;
@@ -84,7 +86,7 @@ public final class DataMap implements Data
       if ((keyTypes == null || keyTypes.contains(mapKey.getType()) &&
           (valueTypes == null || valueTypes.contains(mapValue.getType()))))
       {
-        MatchResult matchResult = mapKey.match(parameters, key);
+        MatchResult matchResult = mapKey.match(messageContext, parameters, key);
 
         if (matchResult == EXACT)
           return entry.getValue();
@@ -102,10 +104,10 @@ public final class DataMap implements Data
 
 
   @Contract(pure = true)
-  public Message.WithSpaces getMessage(Object key, Parameters parameters, Set<MapKey.Type> keyTypes,
-                                       boolean includeDefault)
+  public Message.WithSpaces getMessage(@NotNull MessageContext messageContext, Object key, Parameters parameters,
+                                       Set<MapKey.Type> keyTypes, boolean includeDefault)
   {
-    MapValue mapValue = find(key, parameters, keyTypes, STRING_MESSAGE_TYPE);
+    MapValue mapValue = find(messageContext, key, parameters, keyTypes, STRING_MESSAGE_TYPE);
 
     if (mapValue == null)
     {
@@ -116,7 +118,7 @@ public final class DataMap implements Data
     }
 
     if (mapValue.getType() == Type.STRING)
-      return ((MapValueString)mapValue).asMessage();
+      return ((MapValueString)mapValue).asMessage(messageContext.getMessageFactory());
 
     return (Message.WithSpaces)mapValue.asObject();
   }

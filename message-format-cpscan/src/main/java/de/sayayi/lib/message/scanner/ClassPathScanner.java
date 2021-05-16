@@ -47,7 +47,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import static de.sayayi.lib.message.MessageFactory.parse;
 import static org.objectweb.asm.Opcodes.ASM9;
 import static org.objectweb.asm.Type.getDescriptor;
 
@@ -319,8 +318,10 @@ public final class ClassPathScanner
 
 
     @Override
-    public void visitEnd() {
-      messageBundle.add(parse(new MessageDefImpl(code, text, texts.toArray(new Text[0]))));
+    public void visitEnd()
+    {
+      messageBundle.add(messageBundle.getMessageFactory().parse(
+          new MessageDefImpl(code, text, texts.toArray(new Text[0]))));
     }
   }
 

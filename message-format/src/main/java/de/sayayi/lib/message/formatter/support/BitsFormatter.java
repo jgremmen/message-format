@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataNumber;
 import de.sayayi.lib.message.data.DataString;
@@ -44,19 +45,20 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
 
 
   @Override
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     if (!(value instanceof Number))
       return nullText();
 
-    final int bitCount = detectBitCount(parameters, data, value);
+    final int bitCount = detectBitCount(messageContext, parameters, data, value);
     return bitCount > 0 ? noSpaceText(format(bitCount, value)) : emptyText();
   }
 
 
-  protected int detectBitCount(Parameters parameters, Data data, Object value)
+  protected int detectBitCount(@NotNull MessageContext messageContext, Parameters parameters, Data data, Object value)
   {
-    Data dataValue = getConfigValue("length", parameters, data, true);
+    Data dataValue = getConfigValue(messageContext, "length", parameters, data, true);
     if (dataValue instanceof DataString && "auto".equals(dataValue.asObject()))
       return autoDetectBitCount(value);
 

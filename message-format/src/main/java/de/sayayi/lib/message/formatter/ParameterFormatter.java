@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
@@ -53,7 +54,8 @@ public interface ParameterFormatter
    * @return  formatted parameter value, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull Text format(Object value, String format, @NotNull Parameters parameters, Data data);
+  @NotNull Text format(@NotNull MessageContext messageContext, Object value, String format,
+                       @NotNull Parameters parameters, Data data);
 
 
   /**

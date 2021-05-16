@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.data.map;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,7 +52,8 @@ public final class MapKeyNull implements MapKey
 
 
   @Override
-  public @NotNull MatchResult match(@NotNull Parameters parameters, Object value)
+  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Parameters parameters,
+                                    Object value)
   {
     if (value == null && compareType == EQ)
       return TYPELESS_EXACT;

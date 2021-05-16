@@ -16,6 +16,8 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.ParameterPart;
@@ -57,14 +59,16 @@ public class ParameterizedMessage implements Message.WithSpaces
   @Override
   @Contract(pure = true)
   @SuppressWarnings("java:S4838")
-  public String format(@NotNull Parameters parameters)
+  public String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters)
   {
     final StringBuilder message = new StringBuilder();
     boolean spaceBefore = false;
 
     for(MessagePart part: parts)
     {
-      final Text textPart = part instanceof ParameterPart ? ((ParameterPart)part).getText(parameters) : (Text)part;
+      final Text textPart = part instanceof ParameterPart
+          ? ((ParameterPart)part).getText(messageContext, parameters)
+          : (Text)part;
 
       if (!textPart.isEmpty())
       {

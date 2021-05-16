@@ -16,15 +16,15 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.ParameterFactory;
+import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.Locale;
 import java.util.Map;
 
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static java.util.Locale.UK;
 import static org.junit.Assert.assertEquals;
 
 
@@ -45,18 +45,18 @@ public class MapFormatterTest extends AbstractFormatterTest
     GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new MapFormatter());
 
-    ParameterFactory factory = ParameterFactory.createFor(Locale.UK);
+    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, UK);
 
-    Message message = MessageFactory.parse("%{map1} %{map2,{sep:'   -> '}} %{map3,':  '}");
+    Message message = context.getMessageFactory().parse("%{map1} %{map2,{sep:'   -> '}} %{map3,':  '}");
 
     assertEquals("key=value",
-        message.format(factory.with("map1", Collections.singletonMap("key", "value"))));
+        message.format(context, context.parameters().with("map1", Collections.singletonMap("key", "value"))));
 
     assertEquals("key -> value",
-        message.format(factory.with("map2", Collections.singletonMap("key", "value"))));
+        message.format(context, context.parameters().with("map2", Collections.singletonMap("key", "value"))));
 
     assertEquals("key: value",
-        message.format(factory.with("map3", Collections.singletonMap("key", "value"))));
+        message.format(context, context.parameters().with("map3", Collections.singletonMap("key", "value"))));
   }
 
 
@@ -66,14 +66,14 @@ public class MapFormatterTest extends AbstractFormatterTest
     GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new MapFormatter());
 
-    ParameterFactory factory = ParameterFactory.createFor(Locale.UK);
+    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, UK);
 
-    Message message = MessageFactory.parse("%{map1} %{map2,{null-key:'key',null-value:'value'}}");
+    Message message = context.getMessageFactory().parse("%{map1} %{map2,{null-key:'key',null-value:'value'}}");
 
     assertEquals("(null)=(null)",
-        message.format(factory.with("map1", Collections.singletonMap(null, null))));
+        message.format(context, context.parameters().with("map1", Collections.singletonMap(null, null))));
 
     assertEquals("key=value",
-        message.format(factory.with("map2", Collections.singletonMap(null, null))));
+        message.format(context, context.parameters().with("map2", Collections.singletonMap(null, null))));
   }
 }

@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.data.map;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
@@ -53,7 +54,8 @@ public final class MapKeyString implements MapKey
 
   @Override
   @SuppressWarnings("java:S1119")
-  public @NotNull MatchResult match(@NotNull Parameters parameters, Object value)
+  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Parameters parameters,
+                                    Object value)
   {
     if (value == null)
       return MISMATCH;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jeroen Gremmen
+ * Copyright 2021 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,32 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.data.map;
+package de.sayayi.lib.message.parser;
 
-import de.sayayi.lib.message.Message;
-import lombok.AllArgsConstructor;
+import de.sayayi.lib.message.internal.part.MessagePart;
 import org.jetbrains.annotations.NotNull;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@AllArgsConstructor
-public final class MapValueMessage implements MapValue
+public interface MessageCacheResolver
 {
-  private static final long serialVersionUID = 500L;
-
-  private final Message.WithSpaces message;
-
-
-  @Override
-  public @NotNull Type getType() {
-    return Type.MESSAGE;
-  }
+  MessageCacheResolver IDENTITY = new MessageCacheResolver() {
+    @Override
+    public <T extends MessagePart> @NotNull T normalize(@NotNull T part) {
+      return part;
+    }
+  };
 
 
-  @Override
-  public @NotNull Message.WithSpaces asObject() {
-    return message;
-  }
+  /**
+   * Normalize the given message part. The returned part may be replaced with an identical cached version
+   * in order to reduce memory load.
+   *
+   * @param part  message part
+   *
+   * @return  message part
+   */
+  <T extends MessagePart> @NotNull T normalize(@NotNull T part);
 }

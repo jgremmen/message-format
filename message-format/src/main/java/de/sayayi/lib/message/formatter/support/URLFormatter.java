@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
@@ -36,7 +37,8 @@ public final class URLFormatter extends AbstractParameterFormatter
 {
   @Override
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();

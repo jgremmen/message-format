@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -24,11 +25,11 @@ import org.jetbrains.annotations.NotNull;
 import javax.money.MonetaryAmount;
 import javax.money.format.MonetaryAmountFormat;
 import javax.money.format.MonetaryFormats;
-import java.util.Collections;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 
 
 /**
@@ -36,10 +37,10 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
  */
 public final class MonetaryAmountFormatter extends AbstractParameterFormatter
 {
-  @NotNull
   @Override
   @Contract(pure = true)
-  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
@@ -51,10 +52,9 @@ public final class MonetaryAmountFormatter extends AbstractParameterFormatter
   }
 
 
-  @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(MonetaryAmount.class);
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return singleton(MonetaryAmount.class);
   }
 }

@@ -16,9 +16,8 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.ParameterFactory;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.DataString;
@@ -39,6 +38,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static org.junit.Assert.assertEquals;
 
 
@@ -68,15 +68,16 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     registry.addFormatter(new ArrayFormatter());
     registry.addFormatter(new BoolFormatter());
 
-    Parameters noParameters = ParameterFactory.createFor("de-DE", registry).noParameters();
+    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, "de-DE");
+    Parameters noParameters = context.noParameters();
 
     assertEquals(new TextPart("wahr, falsch, wahr"), registry.getFormatter(null, boolean[].class)
-        .format(new boolean[] { true, false, true }, "bool", noParameters, null));
+        .format(context, new boolean[] { true, false, true }, "bool", noParameters, null));
 
     DataMap booleanMap = new DataMap(new HashMap<MapKey, MapValue>() {
       {
         put(new MapKeyBool(true), new MapValueMessage(new Message.WithSpaces() {
-          @Override public String format(@NotNull Parameters parameters) { return "YES"; }
+          @Override public String format(@NotNull MessageContext context, @NotNull MessageContext.Parameters parameters) { return "YES"; }
           @Override public boolean hasParameters() { return false; }
           @NotNull
           @Override public Set<String> getParameterNames() { return Collections.emptySet(); }
@@ -85,7 +86,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
         }));
 
         put(new MapKeyBool(false), new MapValueMessage(new Message.WithSpaces() {
-          @Override public String format(@NotNull Parameters parameters) { return "NO"; }
+          @Override public String format(@NotNull MessageContext context, @NotNull MessageContext.Parameters parameters) { return "NO"; }
           @Override public boolean hasParameters() { return false; }
           @NotNull
           @Override public Set<String> getParameterNames() { return Collections.emptySet(); }
@@ -96,15 +97,15 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     });
 
     assertEquals(new TextPart("NO, YES"), registry.getFormatter(null, boolean[].class)
-        .format(new boolean[] { false, true }, null, noParameters, booleanMap));
+        .format(context, new boolean[] { false, true }, null, noParameters, booleanMap));
 
     assertEquals(TextPart.EMPTY, registry.getFormatter(null, boolean[].class)
-        .format(new boolean[0], null, noParameters, null));
+        .format(context, new boolean[0], null, noParameters, null));
 
     registry.addFormatter(new NamedParameterFormatter() {
       @NotNull
       @Override
-      public Text format(Object value, String format, @NotNull Parameters parameters, Data data) {
+      public Text format(@NotNull MessageContext context, Object value, String format, @NotNull MessageContext.Parameters parameters, Data data) {
         return (value == null) ? null : new TextPart((Boolean)value ? "1" : "0");
       }
 
@@ -127,7 +128,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     });
 
     assertEquals(new TextPart("1, 1, 0, 1, 0, 0, 0"), registry.getFormatter(null, boolean[].class)
-        .format(new boolean[] { true, true, false, true, false, false, false }, "bool", noParameters, null));
+        .format(context, new boolean[] { true, true, false, true, false, false, false }, "bool", noParameters, null));
   }
 
 
@@ -137,18 +138,19 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new ArrayFormatter());
 
-    Parameters noParameters = ParameterFactory.createFor("de-DE", registry).noParameters();
+    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, "de-DE");
+    Parameters noParameters = context.noParameters();
 
     assertEquals(new TextPart("12, -7, 99"), registry.getFormatter(null, int[].class)
-        .format(new int[] { 12, -7, 99 }, null , noParameters, null));
+        .format(context, new int[] { 12, -7, 99 }, null , noParameters, null));
 
     assertEquals(new TextPart("1, -7, 248"), registry.getFormatter(null, int[].class)
-        .format(new int[] { 1, -7, 248 }, null , noParameters, new DataString("##00")));
+        .format(context, new int[] { 1, -7, 248 }, null , noParameters, new DataString("##00")));
 
     registry.addFormatter(new NumberFormatter());
 
     assertEquals(new TextPart("01, -07, 248"), registry.getFormatter(null, int[].class)
-        .format(new int[] { 1, -7, 248 }, null , noParameters, new DataString("##00")));
+        .format(context, new int[] { 1, -7, 248 }, null , noParameters, new DataString("##00")));
 
     registry.addFormatter(new NamedParameterFormatter() {
       @NotNull
@@ -160,7 +162,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
       @NotNull
       @SuppressWarnings("RedundantCast")
       @Override
-      public Text format(Object value, String format, @NotNull Parameters parameters, Data data) {
+      public Text format(@NotNull MessageContext context, Object value, String format, @NotNull MessageContext.Parameters parameters, Data data) {
         return (value == null) ? null : new TextPart(String.format("0x%02x", (Integer)value));
       }
 
@@ -177,7 +179,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     });
 
     assertEquals(new TextPart("0x40, 0xda, 0x2e"), registry.getFormatter(null, int[].class)
-        .format(new int[] { 64, 218, 46 }, "hex" , noParameters, null));
+        .format(context, new int[] { 64, 218, 46 }, "hex" , noParameters, null));
   }
 
 
@@ -189,13 +191,14 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     registry.addFormatter(new BoolFormatter());
     registry.addFormatter(new NumberFormatter());
 
-    Parameters noParameters = ParameterFactory.createFor("de-DE", registry).noParameters();
+    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, "de-DE");
+    Parameters noParameters = context.noParameters();
 
     assertEquals(new TextPart("Test, wahr, -0006"), registry.getFormatter(null, int[].class)
-        .format(new Object[] { "Test", true, null, -6 }, null , noParameters, new DataString("0000")));
+        .format(context, new Object[] { "Test", true, null, -6 }, null , noParameters, new DataString("0000")));
 
     assertEquals(new TextPart("this, is, a, test"), registry.getFormatter(null, int[].class)
-        .format(new Object[] { null, "this", null, "is", null, "a", null, "test" }, null , noParameters, null));
+        .format(context, new Object[] { null, "this", null, "is", null, "a", null, "test" }, null , noParameters, null));
   }
 
 
@@ -205,11 +208,11 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new ArrayFormatter());
 
-    ParameterFactory factory = ParameterFactory.DEFAULT;
+    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE);
 
-    Message message = MessageFactory.parse("%{array,{null:'null',empty:'empty'}}");
+    Message message = context.getMessageFactory().parse("%{array,{null:'null',empty:'empty'}}");
 
-    assertEquals("null", message.format(factory.with("array", null)));
-    assertEquals("empty", message.format(factory.with("array", new int[0])));
+    assertEquals("null", message.format(context, context.parameters().with("array", null)));
+    assertEquals("empty", message.format(context, context.parameters().with("array", new int[0])));
   }
 }

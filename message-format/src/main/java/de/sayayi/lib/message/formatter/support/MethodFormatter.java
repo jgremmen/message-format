@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -37,7 +38,8 @@ public final class MethodFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
@@ -47,11 +49,11 @@ public final class MethodFormatter extends AbstractParameterFormatter
     if ("name".equals(format))
       return noSpaceText(method.getName());
     if ("class".equals(format))
-      return parameters.getFormatter(Class.class).format(method.getDeclaringClass(), null, parameters, data);
+      return messageContext.getFormatter(Class.class).format(messageContext, method.getDeclaringClass(), null, parameters, data);
     if ("return-type".equals(format))
     {
       final Type returnType = method.getGenericReturnType();
-      return parameters.getFormatter(returnType.getClass()).format(returnType, null, parameters, data);
+      return messageContext.getFormatter(returnType.getClass()).format(messageContext, returnType, null, parameters, data);
     }
 
     return noSpaceText(method.toString());

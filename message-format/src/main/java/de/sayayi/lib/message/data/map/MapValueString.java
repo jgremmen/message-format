@@ -44,10 +44,10 @@ public final class MapValueString extends DataString implements MapValue
 
 
   @NotNull
-  public synchronized Message.WithSpaces asMessage()
+  public synchronized Message.WithSpaces asMessage(@NotNull MessageFactory messageFactory)
   {
     if (message == null)
-      message = MessageFactory.parse(asObject());
+      message = messageFactory.parse(asObject());
 
     return message;
   }

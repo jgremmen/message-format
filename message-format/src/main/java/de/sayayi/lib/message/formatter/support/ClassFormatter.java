@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -33,19 +34,20 @@ import static java.util.Collections.singleton;
 public final class ClassFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     String s = null;
 
     if (value != null)
     {
       final Class<?> clazz = (Class<?>)value;
-      format = getConfigFormat(format, data, true, null);
+      format = getConfigFormat(messageContext, format, data, true, null);
 
       if ("name".equals(format))
         s = clazz.getSimpleName();
       else if ("package".equals(format))
-        return parameters.getFormatter(Package.class).format(clazz.getPackage(), null, parameters, data);
+        return messageContext.getFormatter(Package.class).format(messageContext, clazz.getPackage(), null, parameters, data);
       else
         s = clazz.getName();
     }

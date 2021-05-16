@@ -15,8 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.ParameterFactory;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
@@ -24,7 +25,7 @@ import org.junit.Test;
 
 import java.io.File;
 
-import static de.sayayi.lib.message.MessageFactory.parse;
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.ROOT;
 import static org.junit.Assert.assertEquals;
 
@@ -38,15 +39,17 @@ public class FileFormatterTest
   public void testFormat()
   {
     final FileFormatter formatter = new FileFormatter();
-    final Parameters parameters = ParameterFactory.createFor(ROOT).noParameters();
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE,
+        ROOT);
+    final Parameters parameters = context.noParameters();
 
     File f = new File("/path1/path2/filename.ext");
 
-    assertEquals(Text.NULL, formatter.format(null, null, parameters, null));
-    assertEquals(new TextPart("/path1/path2/filename.ext"), formatter.format(f, null, parameters, null));
-    assertEquals(new TextPart("filename.ext"), formatter.format(f, "name", parameters, null));
-    assertEquals(new TextPart("/path1/path2"), formatter.format(f, "parent", parameters, null));
-    assertEquals(new TextPart("ext"), formatter.format(f, "extension", parameters, null));
+    assertEquals(Text.NULL, formatter.format(context, null, null, parameters, null));
+    assertEquals(new TextPart("/path1/path2/filename.ext"), formatter.format(context, f, null, parameters, null));
+    assertEquals(new TextPart("filename.ext"), formatter.format(context, f, "name", parameters, null));
+    assertEquals(new TextPart("/path1/path2"), formatter.format(context, f, "parent", parameters, null));
+    assertEquals(new TextPart("ext"), formatter.format(context, f, "extension", parameters, null));
   }
 
 
@@ -55,10 +58,10 @@ public class FileFormatterTest
   {
     final GenericFormatterService formatterRegistry = new GenericFormatterService();
     formatterRegistry.addFormatter(new FileFormatter());
-    ParameterFactory factory = ParameterFactory.createFor(ROOT, formatterRegistry);
+    final MessageContext context = new MessageContext(formatterRegistry, NO_CACHE_INSTANCE, ROOT);
 
-    assertEquals("file.jpg = image/jpeg", parse("%{f,name}  =  %{f,extension,{'jpg':'image/jpeg'}}")
-        .format(factory.with("f", new File("/test/file.jpg"))));
-
+    assertEquals("file.jpg = image/jpeg", context.getMessageFactory().
+        parse("%{f,name}  =  %{f,extension,{'jpg':'image/jpeg'}}").format(
+            context, context.parameters().with("f", new File("/test/file.jpg"))));
   }
 }

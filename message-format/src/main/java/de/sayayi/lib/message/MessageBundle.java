@@ -17,6 +17,7 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
+import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -37,28 +38,34 @@ import static java.util.Collections.unmodifiableSet;
  */
 public class MessageBundle
 {
+  @Getter private final MessageFactory messageFactory;
+
   private final Map<String,Message.WithCode> messages;
   private final Set<Class<?>> indexedClasses;
 
 
   @SuppressWarnings("WeakerAccess")
-  public MessageBundle()
+  public MessageBundle(@NotNull MessageFactory messageFactory)
   {
+    this.messageFactory = messageFactory;
+
     messages = new HashMap<>();
     indexedClasses = new HashSet<>();
   }
 
 
-  public MessageBundle(@NotNull Class<?> classWithMessages)
+  public MessageBundle(@NotNull MessageFactory messageFactory, @NotNull Class<?> classWithMessages)
   {
-    this();
+    this(messageFactory);
+
     add(classWithMessages);
   }
 
 
-  MessageBundle(@NotNull Map<String,Map<Locale,Message>> localizedMessagesByCode)
+  MessageBundle(@NotNull MessageFactory messageFactory,
+                @NotNull Map<String,Map<Locale,Message>> localizedMessagesByCode)
   {
-    this();
+    this(messageFactory);
 
     localizedMessagesByCode.forEach(
         (code,localizedMessages) -> add(new LocalizedMessageBundleWithCode(code, localizedMessages)));
@@ -127,6 +134,6 @@ public class MessageBundle
 
 
   private void add0(AnnotatedElement annotatedElement) {
-    MessageFactory.parseAnnotations(annotatedElement).forEach(this::add);
+    messageFactory.parseAnnotations(annotatedElement).forEach(this::add);
   }
 }

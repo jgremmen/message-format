@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
@@ -46,7 +47,8 @@ import static java.util.ResourceBundle.getBundle;
 public final class ArrayFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
 {
   @Override
-  public @NotNull Text formatValue(Object array, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object array, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     if (array == null)
       return nullText();
@@ -58,7 +60,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
     final StringBuilder s = new StringBuilder();
     final Class<?> arrayType = array.getClass();
     final ParameterFormatter formatter =
-        arrayType.isPrimitive() ? parameters.getFormatter(format, arrayType.getComponentType()) : null;
+        arrayType.isPrimitive() ? messageContext.getFormatter(format, arrayType.getComponentType()) : null;
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
 
     for(int i = 0; i < length; i++)
@@ -69,9 +71,9 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
       if (value == array)
         text = new TextPart(bundle.getString("thisArray"));
       else if (formatter != null)
-        text = formatter.format(value, format, parameters, data);
+        text = formatter.format(messageContext, value, format, parameters, data);
       else if (value != null)
-        text = parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data);
+        text = messageContext.getFormatter(format, value.getClass()).format(messageContext, value, format, parameters, data);
 
       if (text != null && !text.isEmpty())
       {

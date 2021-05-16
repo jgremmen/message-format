@@ -17,6 +17,8 @@ package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.LocaleAware;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import lombok.Synchronized;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
@@ -57,8 +59,8 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
 
   @Override
   @Contract(pure = true)
-  public String format(@NotNull Parameters parameters) {
-    return findMessageByLocale(parameters.getLocale()).format(parameters);
+  public String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
+    return findMessageByLocale(parameters.getLocale()).format(messageContext, parameters);
   }
 
 

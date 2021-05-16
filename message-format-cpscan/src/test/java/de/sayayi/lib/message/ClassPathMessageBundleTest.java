@@ -20,6 +20,7 @@ import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
 import org.junit.Test;
 
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Collections.singleton;
 import static org.junit.Assert.assertTrue;
 
@@ -27,6 +28,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Jeroen Gremmen
  */
+@SuppressWarnings("SimplifiableAnnotation")
 @MessageDefs({
     @MessageDef(code = "CLASS", texts = {
         @Text(locale = "de", text = "Deutsch"),
@@ -38,9 +40,9 @@ public final class ClassPathMessageBundleTest
   @MessageDef(code = "M1", text = "Method message 1")
   @MessageDef(code = "M2", texts = @Text("Method message 2"))
   @Test
-  public void testScan() throws Exception
+  public void testScan()
   {
-    final ClassPathMessageBundle bundle = new ClassPathMessageBundle(
+    final ClassPathMessageBundle bundle = new ClassPathMessageBundle(NO_CACHE_INSTANCE,
         singleton(ClassPathMessageBundleTest.class.getPackage().getName()));
 
     assertTrue(bundle.hasMessageWithCode("CLASS"));
@@ -52,6 +54,7 @@ public final class ClassPathMessageBundleTest
 
 
 
+  @SuppressWarnings("unused")
   @MessageDef(code = "INNER", text = "Inner class")
   private static final class InnerClass {
   }

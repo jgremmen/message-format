@@ -16,8 +16,7 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.ParameterFactory;
+import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import org.junit.Test;
 
@@ -25,6 +24,7 @@ import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Set;
 
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static org.junit.Assert.assertEquals;
 
 
@@ -46,13 +46,13 @@ public class MethodFormatterTest extends AbstractFormatterTest
     registry.addFormatter(new MethodFormatter());
     registry.addFormatter(new ClassFormatter());
 
-    ParameterFactory factory = ParameterFactory.createFor(Locale.UK);
+    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, Locale.UK);
 
-    Message message = MessageFactory.parse("%{m} %{m,name} %{m,return-type} %{m,class}");
+    Message message = context.getMessageFactory().parse("%{m} %{m,name} %{m,return-type} %{m,class}");
 
     assertEquals("protected static " + Set.class.getName() + " " + MethodFormatterTest.class.getName() +
         ".dummy() dummy " + Set.class.getName() + "<" + String.class.getName() + "> " +
-        MethodFormatterTest.class.getName(), message.format(factory.with("m",
+        MethodFormatterTest.class.getName(), message.format(context, context.parameters().with("m",
         MethodFormatterTest.class.getDeclaredMethod("dummy"))));
   }
 

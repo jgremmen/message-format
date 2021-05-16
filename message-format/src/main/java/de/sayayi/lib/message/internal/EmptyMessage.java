@@ -16,6 +16,8 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -40,8 +42,8 @@ public final class EmptyMessage implements Message.WithSpaces
 
 
   @Override
-  @Contract(value = "_ -> null", pure = true)
-  public String format(@NotNull Parameters parameters) {
+  @Contract(value = "_, _ -> null", pure = true)
+  public String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
     return null;
   }
 

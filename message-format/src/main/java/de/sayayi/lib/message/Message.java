@@ -15,12 +15,11 @@
  */
 package de.sayayi.lib.message;
 
-import de.sayayi.lib.message.formatter.ParameterFormatter;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +50,22 @@ public interface Message extends Serializable
    * @return  formatted message
    */
   @Contract(pure = true)
-  String format(@NotNull Parameters parameters);
+  String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters);
+
+
+  /**
+   * <p>
+   *   Formats the message based on the message parameters provided.
+   * </p>
+   *
+   * @param parameterValues  message parameter values
+   *
+   * @return  formatted message
+   */
+  @Contract(pure = true)
+  default String format(@NotNull MessageContext messageContext, @NotNull Map<String,Object> parameterValues) {
+    return format(messageContext, messageContext.parameters(parameterValues));
+  }
 
 
   /**
@@ -63,184 +77,13 @@ public interface Message extends Serializable
   boolean hasParameters();
 
 
-  @NotNull
   @Contract(pure = true)
-  Set<String> getParameterNames();
+  @NotNull Set<String> getParameterNames();
 
 
 
 
   interface WithSpaces extends Message, SpacesAware {
-  }
-
-
-
-
-  @SuppressWarnings("java:S1214")
-  interface Parameters
-  {
-    Parameters EMPTY = new Parameters() {
-      @NotNull
-      @Override
-      public Locale getLocale() {
-        return Locale.ROOT;
-      }
-
-
-      @NotNull
-      @Override
-      public ParameterFormatter getFormatter(@NotNull Class<?> type) {
-        throw new UnsupportedOperationException();
-      }
-
-
-      @NotNull
-      @Override
-      public ParameterFormatter getFormatter(String format, @NotNull Class<?> type) {
-        throw new UnsupportedOperationException();
-      }
-
-
-      @Override
-      public Object getParameterValue(@NotNull String parameter) {
-        return null;
-      }
-
-
-      @NotNull
-      @Override
-      public Set<String> getParameterNames() {
-        return Collections.emptySet();
-      }
-    };
-
-
-    /**
-     * Tells for which locale the message must be formatted. If no locale is provided or if no message
-     * is available for the given locale, the formatter will look for a reasonable default message.
-     *
-     * @return  locale, never {@code null}
-     */
-    @Contract(pure = true)
-    @NotNull Locale getLocale();
-
-
-    /**
-     * Returns the best matching formatter for the given {@code type}.
-     *
-     * @param type  type, never {@code null}
-     *
-     * @return  formatter for the given {@code type}, never {@code null}
-     */
-    @NotNull
-    ParameterFormatter getFormatter(@NotNull Class<?> type);
-
-
-    /**
-     * <p>
-     *   Returns the best matching formatter for the given {@code format} and {@code type}
-     * </p>
-     * <p>
-     *   If {@code format} matches a named formatter it always takes precedence over {@code type}.
-     * </p>
-     *
-     * @param format  formatter name
-     * @param type    type, never {@code null}
-     *
-     * @return  formatter for the given {@code format} and {@code type}, never {@code null}
-     */
-    @NotNull ParameterFormatter getFormatter(String format, @NotNull Class<?> type);
-
-
-    /**
-     * Returns the value for the named {@code data}.
-     *
-     * @param parameter  data name
-     *
-     * @return  data value or {@code null} if no value is available for the given data name
-     */
-    @Contract(pure = true)
-    Object getParameterValue(@NotNull String parameter);
-
-
-    /**
-     * Returns a set with names for all parameters available in this context.
-     *
-     * @return  set with all data names
-     */
-    @SuppressWarnings("unused")
-    @Contract(pure = true)
-    @NotNull Set<String> getParameterNames();
-  }
-
-
-
-
-  interface ParameterBuilderStart
-  {
-    @NotNull
-    @Contract("_, _ -> this")
-    ParameterBuilder with(@NotNull String parameter, boolean value);
-
-
-    @NotNull
-    @Contract("_, _ -> this")
-    ParameterBuilder with(@NotNull String parameter, int value);
-
-
-    @NotNull
-    @Contract("_, _ -> this")
-    ParameterBuilder with(@NotNull String parameter, long value);
-
-
-    @NotNull
-    @Contract("_, _ -> this")
-    ParameterBuilder with(@NotNull String parameter, float value);
-
-
-    @NotNull
-    @Contract("_, _ -> this")
-    ParameterBuilder with(@NotNull String parameter, double value);
-
-
-    @NotNull
-    @Contract("_, _ -> this")
-    ParameterBuilder with(@NotNull String parameter, Object value);
-
-
-    @NotNull
-    @Contract("_ -> this")
-    ParameterBuilder with(@NotNull Map<String,Object> parameterValues);
-
-
-    @NotNull
-    @Contract("_, _, _ -> this")
-    ParameterBuilder withNotNull(@NotNull String parameter, Object value, @NotNull Object notNullValue);
-
-
-    @NotNull
-    @Contract("_, _, _ -> this")
-    ParameterBuilder withNotEmpty(@NotNull String parameter, Object value, @NotNull Object notEmptyValue);
-
-
-    @NotNull
-    @Contract("_ -> this")
-    ParameterBuilder withLocale(Locale locale);
-
-
-    @NotNull
-    @Contract("_ -> this")
-    ParameterBuilder withLocale(String locale);
-  }
-
-
-
-
-  interface ParameterBuilder extends ParameterBuilderStart, Parameters
-  {
-    @SuppressWarnings("unused")
-    @Contract("-> this")
-    ParameterBuilder clear();
   }
 
 
@@ -287,7 +130,7 @@ public interface Message extends Serializable
      */
     @Contract(pure = true)
     @Override
-    String format(@NotNull Parameters parameters);
+    String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters);
 
 
     /**

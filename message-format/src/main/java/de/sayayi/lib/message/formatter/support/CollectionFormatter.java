@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
@@ -41,13 +42,13 @@ import static java.util.ResourceBundle.getBundle;
 /**
  * @author Jeroen Gremmen
  */
-public final class CollectionFormatter extends AbstractParameterFormatter
-    implements EmptyMatcher, SizeQueryable
+public final class CollectionFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
 {
   @SuppressWarnings("rawtypes")
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
@@ -67,7 +68,7 @@ public final class CollectionFormatter extends AbstractParameterFormatter
       if (element == iterable)
         s.append(bundle.getString("thisCollection"));
       else if (element != null)
-        s.append(parameters.getFormatter(format, element.getClass()).format(element, format, parameters, data));
+        s.append(messageContext.getFormatter(format, element.getClass()).format(messageContext, element, format, parameters, data));
     }
 
     return noSpaceText(s.toString());

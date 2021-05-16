@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -23,10 +24,10 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.money.NumberSupplier;
 import javax.money.NumberValue;
-import java.util.Collections;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 
 
 /**
@@ -34,10 +35,10 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
  */
 public final class NumberSupplierFormatter extends AbstractParameterFormatter
 {
-  @NotNull
   @Override
   @Contract(pure = true)
-  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
@@ -46,7 +47,8 @@ public final class NumberSupplierFormatter extends AbstractParameterFormatter
     if (numberValue == null)
       return nullText();
 
-    return parameters.getFormatter(format, numberValue.getClass()).format(numberValue, format, parameters, data);
+    return messageContext.getFormatter(format, numberValue.getClass())
+        .format(messageContext, numberValue, format, parameters, data);
   }
 
 
@@ -54,6 +56,6 @@ public final class NumberSupplierFormatter extends AbstractParameterFormatter
   @Override
   @Contract(value = "-> new", pure = true)
   public Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(NumberSupplier.class);
+    return singleton(NumberSupplier.class);
   }
 }

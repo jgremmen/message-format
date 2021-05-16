@@ -29,7 +29,7 @@ import de.sayayi.lib.message.internal.TextMessage;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.ParameterPart;
 import de.sayayi.lib.message.internal.part.TextPart;
-import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.BufferedTokenStream;
@@ -48,16 +48,18 @@ import java.util.List;
 import static java.lang.Character.isSpaceChar;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static lombok.AccessLevel.PRIVATE;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@NoArgsConstructor(access = PRIVATE)
-public final class MessageCompiler
+@AllArgsConstructor
+public class MessageCompiler
 {
-  public static Message.WithSpaces compileMessage(String text) {
+  private final MessageFactory messageFactory;
+
+
+  public @NotNull Message.WithSpaces compileMessage(String text) {
     return new Parser(text).message().value;
   }
 
@@ -81,7 +83,7 @@ public final class MessageCompiler
 
 
 
-  private static final class Parser extends MessageParser
+  private final class Parser extends MessageParser
   {
     private final String message;
 
@@ -145,7 +147,7 @@ public final class MessageCompiler
 
       @Override
       public void exitTextPart(TextPartContext ctx) {
-        ctx.value = new TextPart(ctx.text().value);
+        ctx.value = messageFactory.getMessageCacheResolver().normalize(new TextPart(ctx.text().value));
       }
 
 
@@ -193,7 +195,7 @@ public final class MessageCompiler
       public void exitForceQuotedMessage(ForceQuotedMessageContext ctx)
       {
         final QuotedMessageContext quotedMessage = ctx.quotedMessage();
-        ctx.value = quotedMessage != null ? quotedMessage.value : MessageFactory.parse(ctx.string().value);
+        ctx.value = quotedMessage != null ? quotedMessage.value : messageFactory.parse(ctx.string().value);
       }
 
 
@@ -202,11 +204,11 @@ public final class MessageCompiler
       {
         final DataContext data = ctx.data();
 
-        ctx.value = new ParameterPart(ctx.name.getText(),
+        ctx.value = messageFactory.getMessageCacheResolver().normalize(new ParameterPart(ctx.name.getText(),
             ctx.format == null ? null : ctx.format.getText(),
             exitParameter_isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
             exitParameter_isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
-            data == null ? null : data.value);
+            data == null ? null : data.value));
       }
 
 

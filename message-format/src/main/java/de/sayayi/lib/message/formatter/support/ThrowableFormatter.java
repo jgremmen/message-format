@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +34,8 @@ import static java.util.Collections.singleton;
 public final class ThrowableFormatter extends AbstractParameterFormatter
 {
   @Override
-  protected @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
+  protected @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                      @NotNull Parameters parameters, Data data) {
     return value == null ? nullText() : noSpaceText(((Throwable)value).getLocalizedMessage());
   }
 

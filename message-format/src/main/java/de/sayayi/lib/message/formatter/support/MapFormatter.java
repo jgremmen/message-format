@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
@@ -41,12 +42,12 @@ import static java.util.ResourceBundle.getBundle;
 /**
  * @author Jeroen Gremmen
  */
-public final class MapFormatter extends AbstractParameterFormatter
-    implements EmptyMatcher, SizeQueryable
+public final class MapFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     final Map<?,?> map = (Map<?,?>)value;
     if (map == null)
@@ -55,12 +56,12 @@ public final class MapFormatter extends AbstractParameterFormatter
       return emptyText();
 
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
-    final String separator = getSeparator(parameters, data);
+    final String separator = getSeparator(messageContext, parameters, data);
     final StringBuilder s = new StringBuilder();
-    final String nullKey =
-        getConfigValueString("null-key", parameters, data, false, "(null)").trim();
-    final String nullValue =
-        getConfigValueString("null-value", parameters, data, false, "(null)").trim();
+    final String nullKey = getConfigValueString(messageContext, "null-key", parameters, data,
+        false, "(null)").trim();
+    final String nullValue = getConfigValueString(messageContext, "null-value", parameters, data,
+        false, "(null)").trim();
 
     for(Entry<?,?> entry: map.entrySet())
     {
@@ -73,7 +74,7 @@ public final class MapFormatter extends AbstractParameterFormatter
       if (key == value)
         keyString = bundle.getString("thisMap");
       else if (key != null)
-        keyString = trimNotNull(parameters.getFormatter(key.getClass()).format(key, null, parameters, null));
+        keyString = trimNotNull(messageContext.getFormatter(key.getClass()).format(messageContext, key, null, parameters, null));
       else
         keyString = nullKey;
 
@@ -83,7 +84,7 @@ public final class MapFormatter extends AbstractParameterFormatter
       if (val == value)
         valueString = bundle.getString("thisMap");
       else if (val != null)
-        valueString = trimNotNull(parameters.getFormatter(val.getClass()).format(val, null, parameters, null));
+        valueString = trimNotNull(messageContext.getFormatter(val.getClass()).format(messageContext, val, null, parameters, null));
       else
         valueString = nullValue;
 
@@ -94,9 +95,9 @@ public final class MapFormatter extends AbstractParameterFormatter
   }
 
 
-  private String getSeparator(Parameters parameters, Data data)
+  private String getSeparator(@NotNull MessageContext messageContext, Parameters parameters, Data data)
   {
-    String sep = getConfigValueString("sep", parameters, data, true,"=");
+    String sep = getConfigValueString(messageContext, "sep", parameters, data, true,"=");
     if (sep.isEmpty())
       return sep;
 

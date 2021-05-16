@@ -16,7 +16,8 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.Type;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
@@ -53,11 +54,12 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text format(@NotNull MessageContext messageContext, Object value, String format,
+                              @NotNull Parameters parameters, Data data)
   {
-    Message.WithSpaces msg = getMessage(value, EMPTY_NULL_TYPE, parameters, data, false);
+    Message.WithSpaces msg = getMessage(messageContext, value, EMPTY_NULL_TYPE, parameters, data, false);
     if (msg != null)
-      return new TextPart(msg.format(parameters), msg.isSpaceBefore(), msg.isSpaceAfter());
+      return new TextPart(msg.format(messageContext, parameters), msg.isSpaceBefore(), msg.isSpaceAfter());
 
     if (value == null)
       return nullText();
@@ -78,8 +80,8 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
       bool = Boolean.parseBoolean(String.valueOf(value));
 
     // allow custom messages for true/false value?
-    if ((msg = getMessage(bool, EnumSet.of(Type.BOOL), parameters, data, false)) != null)
-      return messageToText(msg, parameters);
+    if ((msg = getMessage(messageContext, bool, EnumSet.of(Type.BOOL), parameters, data, false)) != null)
+      return messageToText(messageContext, msg, parameters);
 
     // get translated boolean value
     String s = Boolean.toString(bool);
@@ -88,13 +90,14 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
     } catch(Exception ignore) {
     }
 
-    return (msg = getMessage(s, NO_NAME_KEY_TYPES, parameters, data, false)) == null
-        ? noSpaceText(s) : messageToText(msg, parameters);
+    return (msg = getMessage(messageContext, s, NO_NAME_KEY_TYPES, parameters, data, false)) == null
+        ? noSpaceText(s) : messageToText(messageContext, msg, parameters);
   }
 
 
   @Override
-  protected @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
+  protected @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                      @NotNull Parameters parameters, Data data) {
     throw new IllegalStateException();
   }
 

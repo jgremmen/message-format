@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.Message.WithCode;
 import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.Text;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +27,7 @@ import org.junit.Test;
 import java.util.Locale;
 import java.util.Set;
 
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -41,7 +43,7 @@ public class MessageDefAnnotationTest
 
   @Before
   public void initialize() {
-    bundle = new MessageBundle(MessageDefAnnotationTest.class);
+    bundle = new MessageBundle(NO_CACHE_INSTANCE, MessageDefAnnotationTest.class);
   }
 
 
@@ -69,6 +71,7 @@ public class MessageDefAnnotationTest
 
   @Test
   @MessageDef(code="MSG-052", texts={})
+  @SuppressWarnings("DefaultAnnotationParam")
   public void testEmptyMessageWithCode()
   {
     final WithCode msg = bundle.getByCode("MSG-052");
@@ -83,12 +86,12 @@ public class MessageDefAnnotationTest
   public void testMessageWithoutLocale()
   {
     final WithCode msg = bundle.getByCode("T3");
-    ParameterFactory factory = ParameterFactory.DEFAULT;
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
-    assertEquals("m3", msg.format(factory.noParameters()));
-    assertEquals("m3", msg.format(factory.withLocale(Locale.ROOT)));
-    assertEquals("m3", msg.format(factory.withLocale(Locale.US)));
-    assertEquals("m3", msg.format(factory.withLocale("xx-YY")));
+    assertEquals("m3", msg.format(context, context.noParameters()));
+    assertEquals("m3", msg.format(context, context.parameters().withLocale(Locale.ROOT)));
+    assertEquals("m3", msg.format(context, context.parameters().withLocale(Locale.US)));
+    assertEquals("m3", msg.format(context, context.parameters().withLocale("xx-YY")));
     assertFalse(msg instanceof LocaleAware);
   }
 
@@ -98,12 +101,13 @@ public class MessageDefAnnotationTest
   public void testSingleMessageWithLocale()
   {
     final WithCode msg = bundle.getByCode("T2");
-    ParameterFactory factory = ParameterFactory.DEFAULT;
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(),
+        NO_CACHE_INSTANCE);
 
-    assertEquals("nl", msg.format(factory.noParameters()));
-    assertEquals("nl", msg.format(factory.withLocale(Locale.ROOT)));
-    assertEquals("nl", msg.format(factory.withLocale(Locale.US)));
-    assertEquals("nl", msg.format(factory.withLocale("xx-YY")));
+    assertEquals("nl", msg.format(context, context.noParameters()));
+    assertEquals("nl", msg.format(context, context.parameters().withLocale(Locale.ROOT)));
+    assertEquals("nl", msg.format(context, context.parameters().withLocale(Locale.US)));
+    assertEquals("nl", msg.format(context, context.parameters().withLocale("xx-YY")));
   }
 
 
@@ -117,13 +121,14 @@ public class MessageDefAnnotationTest
   public void testLocaleSelection()
   {
     final WithCode msg = bundle.getByCode("T1");
-    ParameterFactory factory = ParameterFactory.DEFAULT;
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(),
+        NO_CACHE_INSTANCE);
 
-    assertEquals("us", msg.format(factory.withLocale(Locale.ROOT)));
-    assertEquals("uk", msg.format(factory.withLocale(Locale.UK)));
-    assertEquals("nl", msg.format(factory.withLocale("nl-BE")));
-    assertEquals("us", msg.format(factory.withLocale(Locale.CHINESE)));
-    assertEquals("de", msg.format(factory.withLocale("de-AT")));
+    assertEquals("us", msg.format(context, context.parameters().withLocale(Locale.ROOT)));
+    assertEquals("uk", msg.format(context, context.parameters().withLocale(Locale.UK)));
+    assertEquals("nl", msg.format(context, context.parameters().withLocale("nl-BE")));
+    assertEquals("us", msg.format(context, context.parameters().withLocale(Locale.CHINESE)));
+    assertEquals("de", msg.format(context, context.parameters().withLocale("de-AT")));
   }
 
 

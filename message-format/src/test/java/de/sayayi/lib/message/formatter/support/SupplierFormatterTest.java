@@ -15,8 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.ParameterFactory;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.part.TextPart;
@@ -25,6 +25,7 @@ import org.junit.Test;
 import java.util.function.BooleanSupplier;
 import java.util.function.LongSupplier;
 
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static org.junit.Assert.assertEquals;
 
 
@@ -40,12 +41,13 @@ public class SupplierFormatterTest
     registry.addFormatter(new BoolFormatter());
     registry.addFormatter(new BooleanSupplierFormatter());
 
-    Parameters noParameters = ParameterFactory.createFor("de-DE", registry).noParameters();
+    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, "de-DE");
+    Parameters noParameters = context.noParameters();
 
     Object value = (BooleanSupplier) () -> true;
 
     assertEquals(new TextPart("wahr"), registry.getFormatter(null, value.getClass())
-        .format(value, null, noParameters, null));
+        .format(context, value, null, noParameters, null));
   }
 
 
@@ -56,11 +58,12 @@ public class SupplierFormatterTest
     registry.addFormatter(new NumberFormatter());
     registry.addFormatter(new LongSupplierFormatter());
 
-    Parameters noParameters = ParameterFactory.createFor("en", registry).noParameters();
+    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, "en");
+    Parameters noParameters = context.noParameters();
 
     Object value = (LongSupplier) () -> 1234567890L;
 
     assertEquals(new TextPart("1,234,567,890"), registry.getFormatter(null, value.getClass())
-        .format(value, null, noParameters, new DataString("###,###,###,###")));
+        .format(context, value, null, noParameters, new DataString("###,###,###,###")));
   }
 }
