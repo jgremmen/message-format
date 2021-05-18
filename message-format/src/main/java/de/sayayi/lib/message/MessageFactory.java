@@ -24,6 +24,7 @@ import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.internal.MessageDelegateWithCode;
+import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.parser.MessageCacheResolver;
 import de.sayayi.lib.message.parser.MessageCompiler;
 import lombok.Getter;
@@ -43,17 +44,20 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static de.sayayi.lib.message.parser.MessageCacheResolver.IDENTITY;
 import static java.util.Collections.singletonMap;
 import static java.util.Locale.ROOT;
 
 
 /**
+ * Factory implementation for creating message instances from various sources.
+ *
  * @author Jeroen Gremmen
  */
 public class MessageFactory
 {
-  public static final MessageFactory NO_CACHE_INSTANCE = new MessageFactory(IDENTITY);
+  public static final MessageFactory NO_CACHE_INSTANCE = new MessageFactory(new MessageCacheResolver() {
+    @Override public <T extends MessagePart> @NotNull T normalize(@NotNull T part) { return part; }
+  });
 
   private static final AtomicInteger CODE_ID = new AtomicInteger(0);
 
@@ -61,6 +65,11 @@ public class MessageFactory
   private final MessageCompiler messageCompiler;
 
 
+  /**
+   * Construct a new message factory with the given {@code messageCacheResolver}.
+   *
+   * @param messageCacheResolver  message cache resolver, never {@code null}
+   */
   public MessageFactory(@NotNull MessageCacheResolver messageCacheResolver)
   {
     this.messageCacheResolver = messageCacheResolver;
@@ -68,6 +77,13 @@ public class MessageFactory
   }
 
 
+  /**
+   * Parse a message format text into a message instance.
+   *
+   * @param text  message format text, not {@code null}
+   *
+   * @return  message instance, never {@code null}
+   */
   @Contract(value = "_ -> new", pure = true)
   public @NotNull Message.WithSpaces parse(@NotNull String text) {
     return messageCompiler.compileMessage(text);
@@ -116,11 +132,11 @@ public class MessageFactory
   @Contract(value = "_ -> new", pure = true)
   public @NotNull Set<Message.WithCode> parseAnnotations(@NotNull AnnotatedElement element)
   {
-    final Set<Message.WithCode> messageBundle = new HashSet<>();
+    final Set<Message.WithCode> messages = new HashSet<>();
 
     MessageDef annotation = element.getAnnotation(MessageDef.class);
     if (annotation != null)
-      messageBundle.add(parse(annotation));
+      messages.add(parse(annotation));
 
     MessageDefs messageDefsAnnotation = element.getAnnotation(MessageDefs.class);
     if (messageDefsAnnotation != null)
@@ -128,13 +144,13 @@ public class MessageFactory
       {
         Message.WithCode mwc = parse(messageDef);
 
-        if (!messageBundle.add(mwc))
+        if (!messages.add(mwc))
           throw new MessageException("duplicate message code " + mwc.getCode() + " found");
 
-        messageBundle.add(mwc);
+        messages.add(mwc);
       }
 
-    return messageBundle;
+    return messages;
   }
 
 

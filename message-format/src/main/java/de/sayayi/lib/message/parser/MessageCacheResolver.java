@@ -24,14 +24,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface MessageCacheResolver
 {
-  MessageCacheResolver IDENTITY = new MessageCacheResolver() {
-    @Override
-    public <T extends MessagePart> @NotNull T normalize(@NotNull T part) {
-      return part;
-    }
-  };
-
-
   /**
    * Normalize the given message part. The returned part may be replaced with an identical cached version
    * in order to reduce memory load.

@@ -26,7 +26,7 @@ import static java.util.Arrays.copyOf;
 /**
  * @author Jeroen Gremmen
  */
-public final class LRUMessagePartCache
+public final class LRUMessagePartCache implements MessageCacheResolver
 {
   private final int maxSize;
   private MessagePart[] parts;
@@ -36,6 +36,9 @@ public final class LRUMessagePartCache
 
   public LRUMessagePartCache(int maxSize)
   {
+    if (maxSize <= 0)
+      throw new IllegalArgumentException("maxSize must be a positive number");
+
     this.maxSize = maxSize;
 
     parts = null;
@@ -43,6 +46,7 @@ public final class LRUMessagePartCache
   }
 
 
+  @Override
   @Contract(mutates = "this")
   public <T extends MessagePart> @NotNull T normalize(@NotNull T part)
   {

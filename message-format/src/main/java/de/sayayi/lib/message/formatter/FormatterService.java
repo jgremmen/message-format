@@ -20,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
+ * This class provides parameter formatters for all java types.
+ *
  * @author Jeroen Gremmen
  */
 public interface FormatterService

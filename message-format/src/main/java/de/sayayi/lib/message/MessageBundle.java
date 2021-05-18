@@ -77,10 +77,9 @@ public class MessageBundle
    *
    * @return  set with all message codes, never {@code null}
    */
-  @NotNull
   @Contract(value = "-> new", pure = true)
   @Unmodifiable
-  public Set<String> getCodes() {
+  public @NotNull Set<String> getCodes() {
     return unmodifiableSet(messages.keySet());
   }
 
@@ -133,7 +132,7 @@ public class MessageBundle
   }
 
 
-  private void add0(AnnotatedElement annotatedElement) {
+  private void add0(@NotNull AnnotatedElement annotatedElement) {
     messageFactory.parseAnnotations(annotatedElement).forEach(this::add);
   }
 }
