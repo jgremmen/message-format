@@ -74,7 +74,7 @@ public final class LRUMessagePartCache implements MessageCacheResolver
           size++;
       }
       else
-        arraycopy(parts, 0, parts, 1, n - 1);
+        arraycopy(parts, 0, parts, 1, n);
 
       parts[0] = cachedPart;
     }
