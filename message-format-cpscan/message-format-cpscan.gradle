@@ -15,7 +15,7 @@
  */
 
 plugins {
-  id 'com.github.johnrengelman.shadow' version '6.1.0'
+  id 'nebula.optional-base' version '5.0.3'
 }
 
 
@@ -23,61 +23,35 @@ description = 'Message Format Library (classpath scanner)'
 
 
 def asmVersion = "9.1"
-
-
-jar.enabled = false
-jar.group = ''
+def classgraphVersion = "4.8.108"
+def springContextVersion = "5.2.15.RELEASE"
 
 
 dependencies {
   api project(':message-format')
 
-  implementation "org.ow2.asm:asm:${asmVersion}"
+  // ASM
+  implementation "org.ow2.asm:asm:${asmVersion}", optional
+
+  // Classgraph
+  implementation "io.github.classgraph:classgraph:${classgraphVersion}", optional
+
+  // Spring context
+  implementation "org.springframework:spring-context:${springContextVersion}", optional
 }
-
-
-shadowJar {
-  group 'build'
-
-  archiveClassifier.set(null)  // set by shadowJar but interferes with publishing
-
-  dependencies {
-    exclude project(':message-format')
-    exclude(dependency { it.moduleGroup == 'org.antlr' })
-  }
-
-  exclude 'META-INF/maven/**'
-  exclude 'module-info.class'
-
-  minimize()
-
-  relocate 'org.objectweb.asm', 'de.sayayi.lib.message.scanner.asm'
-
-  manifest {
-    attributes['Implementation-Title'] = "${project.description}"
-  }
-}
-
-
-test {
-  dependsOn shadowJar
-
-  doFirst {
-    classpath = shadowJar.outputs.files + classpath - compileJava.outputs.files
-  }
-}
-
-
-assemble.dependsOn shadowJar
 
 
 publishing {
   publications {
 
-    cpscan(MavenPublication) { publication ->
-      from project.shadow.component(publication)
-      artifact javadocJar
-      artifact sourcesJar
+    cpscan(MavenPublication) {
+      from components.java
+
+      versionMapping {
+        usage('java-runtime') {
+          fromResolutionResult()
+        }
+      }
 
       pom {
         name = "${project.description}"

@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.scanner;
+package de.sayayi.lib.message.scanner.asm;
 
 import de.sayayi.lib.message.MessageBundle;
 import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.exception.ClassPathScannerException;
+import de.sayayi.lib.message.scanner.MessageDefImpl;
+import de.sayayi.lib.message.scanner.TextImpl;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
@@ -34,8 +37,6 @@ import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -54,7 +55,7 @@ import static org.objectweb.asm.Type.getDescriptor;
 /**
  * @author Jeroen Gremmen
  */
-public final class ClassPathScanner
+final class AsmClassPathScanner
 {
   private static final String MESSAGE_DEFS_DESCRIPTOR = getDescriptor(MessageDefs.class);
   private static final String MESSAGE_DEF_DESCRIPTOR = getDescriptor(MessageDef.class);
@@ -68,8 +69,8 @@ public final class ClassPathScanner
   private final Set<String> visitedClasses;
 
 
-  public ClassPathScanner(@NotNull MessageBundle messageBundle, @NotNull Set<String> packageNames,
-                          ClassLoader classLoader)
+  public AsmClassPathScanner(@NotNull MessageBundle messageBundle, @NotNull Set<String> packageNames,
+                             ClassLoader classLoader)
   {
     this.messageBundle = messageBundle;
     this.classLoader = classLoader == null ? ClassLoader.getSystemClassLoader() : classLoader;
@@ -82,7 +83,7 @@ public final class ClassPathScanner
   public void run()
   {
     try {
-      for(final String packageName: packageNames)
+      for(val packageName: packageNames)
         scan(packageName);
     } catch(Exception ex) {
       throw new ClassPathScannerException("failed to scan class path for messages", ex);
@@ -98,14 +99,14 @@ public final class ClassPathScanner
 
     for(final Enumeration<URL> urls = classLoader.getResources(classPathPrefix); urls.hasMoreElements();)
     {
-      final URL url = urls.nextElement();
+      val url = urls.nextElement();
 
       if (ZIP_PROTOCOLS.contains(url.getProtocol()))
         scan_zipEntries(url, classPathPrefix);
       else
       {
-        final String directory = url.getFile();
-        final File baseDirectory = new File(directory.endsWith(classPathPrefix)
+        val directory = url.getFile();
+        val baseDirectory = new File(directory.endsWith(classPathPrefix)
             ? directory.substring(0, directory.length() - classPathPrefix.length()) : directory);
 
         if (baseDirectory.isDirectory())
@@ -117,22 +118,22 @@ public final class ClassPathScanner
 
   private void scan_directory(@NotNull File baseDirectory, @NotNull File directory) throws IOException
   {
-    final File[] files = directory.listFiles();
+    val files = directory.listFiles();
     if (files != null)
     {
-      final Path baseDirectoryPath = baseDirectory.toPath();
+      val baseDirectoryPath = baseDirectory.toPath();
 
-      for(final File file: files)
+      for(val file: files)
         if (file.isDirectory())
           scan_directory(baseDirectory, file);
         else
         {
-          final String classNamePath =
+          val classNamePath =
               baseDirectoryPath.relativize(file.toPath()).toString().replace('\\', '/');
 
           if (classNamePath.endsWith(".class") && scan_checkVisited(classNamePath))
           {
-            try(final InputStream classInputStream = new FileInputStream(file)) {
+            try(val classInputStream = new FileInputStream(file)) {
               scan_parseClass(classInputStream);
             }
           }
@@ -143,14 +144,14 @@ public final class ClassPathScanner
 
   private void scan_zipEntries(@NotNull URL zipUrl, @NotNull String classPathPrefix) throws IOException
   {
-    final URLConnection con = zipUrl.openConnection();
+    val con = zipUrl.openConnection();
     final ZipFile zipFile;
 
     if (con instanceof JarURLConnection)
       zipFile = ((JarURLConnection)con).getJarFile();
     else
     {
-      final String urlFile = zipUrl.getFile();
+      val urlFile = zipUrl.getFile();
       try {
         int separatorIndex = urlFile.indexOf("*/");
         if (separatorIndex == -1)
@@ -165,14 +166,14 @@ public final class ClassPathScanner
     try {
       for(Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements();)
       {
-        final ZipEntry zipEntry = entries.nextElement();
-        final String classPathName = zipEntry.getName();
+        val zipEntry = entries.nextElement();
+        val classPathName = zipEntry.getName();
 
         if (classPathName.endsWith(".class") &&
             classPathName.startsWith(classPathPrefix) &&
             scan_checkVisited(classPathName))
         {
-          try(final InputStream classInputStream = zipFile.getInputStream(zipEntry)) {
+          try(val classInputStream = zipFile.getInputStream(zipEntry)) {
             scan_parseClass(classInputStream);
           }
         }

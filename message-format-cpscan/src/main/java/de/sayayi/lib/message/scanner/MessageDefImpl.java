@@ -28,7 +28,7 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @SuppressWarnings("ClassExplicitlyAnnotation")
-class MessageDefImpl implements MessageDef
+public class MessageDefImpl implements MessageDef
 {
   private final String code;
   private final String text;

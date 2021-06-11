@@ -15,29 +15,35 @@
  */
 package de.sayayi.lib.message;
 
-import de.sayayi.lib.message.scanner.ClassPathScanner;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
+
+import static java.util.Objects.requireNonNull;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public class ClassPathMessageBundle extends MessageBundle
+public abstract class AbstractScannedMessageBundle extends MessageBundle
 {
-  public ClassPathMessageBundle(@NotNull MessageFactory messageFactory, @NotNull Set<String> packageNames) {
-    this(messageFactory, packageNames, null);
+  protected AbstractScannedMessageBundle(@NotNull MessageFactory messageFactory, @NotNull Set<String> packageNames) {
+    this(messageFactory, packageNames, requireNonNull(ClassLoader.getSystemClassLoader()));
   }
 
 
-  public ClassPathMessageBundle(@NotNull MessageFactory messageFactory, @NotNull Set<String> packageNames,
-                                ClassLoader classLoader)
+  protected AbstractScannedMessageBundle(@NotNull MessageFactory messageFactory, @NotNull Set<String> packageNames,
+                                         @NotNull ClassLoader classLoader)
   {
     super(messageFactory);
 
-    new ClassPathScanner(this, packageNames, classLoader).run();
+    scan(packageNames, classLoader);
   }
+
+
+  @Contract(mutates = "this")
+  protected abstract void scan(@NotNull Set<String> packageNames, @NotNull ClassLoader classLoader);
 
 
   @Override
