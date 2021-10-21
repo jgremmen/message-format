@@ -23,6 +23,7 @@ import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -62,13 +63,23 @@ public final class CollectionFormatter extends AbstractParameterFormatter implem
 
     for(Object element: iterable)
     {
-      if (s.length() > 0)
-        s.append(", ");
+      Text text = null;
 
       if (element == iterable)
-        s.append(bundle.getString("thisCollection"));
+        text = new TextPart(bundle.getString("thisCollection"));
       else if (element != null)
-        s.append(messageContext.getFormatter(format, element.getClass()).format(messageContext, element, format, parameters, data));
+      {
+        text = messageContext.getFormatter(format, element.getClass())
+            .format(messageContext, element, format, parameters, data);
+      }
+
+      if (text != null && !text.isEmpty())
+      {
+        if (s.length() > 0)
+          s.append(", ");
+
+        s.append(text.getText());
+      }
     }
 
     return noSpaceText(s.toString());
