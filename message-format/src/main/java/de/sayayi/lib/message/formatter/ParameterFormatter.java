@@ -44,6 +44,7 @@ public interface ParameterFormatter
   /**
    * Formats the parameter value to a string representation.
    *
+   * @param messageContext  message context providing formatting information, never {@code null}
    * @param value       parameter value (can be {@code null})
    * @param format      formatter name used by the parameter or {@code null}. Eg.: {@code %{val,myformat}}
    * @param parameters  parameter values available for formatting the current message. Additionally, this instance
@@ -98,6 +99,13 @@ public interface ParameterFormatter
 
   interface SizeQueryable
   {
+    /**
+     * Returns the size of the given {@code value}.
+     *
+     * @param value  object to calculate the size of
+     *
+     * @return  value size
+     */
     @Contract(pure = true)
     int size(@NotNull Object value);
   }

@@ -28,6 +28,7 @@ public interface MessageCacheResolver
    * Normalize the given message part. The returned part may be replaced with an identical cached version
    * in order to reduce memory load.
    *
+   * @param <T>   message part implementation type
    * @param part  message part
    *
    * @return  message part
