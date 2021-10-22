@@ -100,7 +100,7 @@ public class JodaDateTimeFormatterTest
   @Test
   public void testCustomPattern()
   {
-    JodaDateTimeFormatter formatter = new JodaDateTimeFormatter();
+    final JodaDateTimeFormatter formatter = new JodaDateTimeFormatter();
     final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(),
         MessageFactory.NO_CACHE_INSTANCE, FRANCE);
     final Parameters noParameters = context.noParameters();

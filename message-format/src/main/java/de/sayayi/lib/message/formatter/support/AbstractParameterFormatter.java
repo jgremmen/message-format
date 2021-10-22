@@ -70,7 +70,7 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
     if (msg != null)
       return messageToText(messageContext, msg, parameters);
 
-    Text text = formatValue(messageContext, value, format, parameters, data);
+    final Text text = formatValue(messageContext, value, format, parameters, data);
 
     // map result against map keys...
     msg = getMessage(messageContext, text.getText(), NO_NAME_KEY_TYPES, parameters, data, false);
@@ -89,7 +89,8 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
-  protected Data getConfigValue(@NotNull MessageContext messageContext, @NotNull String name, @NotNull Parameters parameters, Data data, boolean checkDataValue)
+  protected Data getConfigValue(@NotNull MessageContext messageContext, @NotNull String name,
+                                @NotNull Parameters parameters, Data data, boolean checkDataValue)
   {
     if (data instanceof DataMap)
     {
@@ -112,7 +113,9 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   {
     if (data instanceof DataMap)
     {
-      MapValueString string = (MapValueString)((DataMap)data).find(messageContext, name, parameters, NAME_TYPE, MapValue.STRING_TYPE);
+      final MapValueString string = (MapValueString)((DataMap)data).find(messageContext, name, parameters, NAME_TYPE,
+          MapValue.STRING_TYPE);
+
       if (string != null)
         return string.asObject();
     }
@@ -131,7 +134,9 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   {
     if (data instanceof DataMap)
     {
-      MapValueNumber number = (MapValueNumber)((DataMap)data).find(messageContext, name, parameters, NAME_TYPE, MapValue.NUMBER_TYPE);
+      final MapValueNumber number = (MapValueNumber)((DataMap)data).find(messageContext, name, parameters, NAME_TYPE,
+          MapValue.NUMBER_TYPE);
+
       if (number != null)
         return number.asObject();
     }
@@ -150,7 +155,9 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
     if (!(data instanceof DataMap))
       return defaultValue;
 
-    MapValueBool bool = (MapValueBool)((DataMap)data).find(messageContext, name, parameters, NAME_TYPE, MapValue.BOOL_TYPE);
+    final MapValueBool bool = (MapValueBool)((DataMap)data).find(messageContext, name, parameters, NAME_TYPE,
+        MapValue.BOOL_TYPE);
+
     return bool == null ? defaultValue :bool.asObject();
   }
 
@@ -182,15 +189,15 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   }
 
 
-  @Contract(pure = true)
+  @Contract(value = "null -> null", pure = true)
   protected String getDataString(Data data) {
     return getDataString(data, null);
   }
 
 
-  @Contract(pure = true)
+  @Contract(value = "null, _ -> param2", pure = true)
   protected String getDataString(Data data, String defaultValue) {
-    return (data instanceof DataString) ? ((DataString)data).asObject() : defaultValue;
+    return data instanceof DataString ? ((DataString)data).asObject() : defaultValue;
   }
 
 
@@ -214,7 +221,7 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   protected String formatString(@NotNull MessageContext messageContext, String value,
                                 @NotNull Parameters parameters, Data data)
   {
-    Message msg = getMessage(messageContext, value, NO_NAME_KEY_TYPES, parameters, data, false);
+    final Message msg = getMessage(messageContext, value, NO_NAME_KEY_TYPES, parameters, data, false);
     return msg == null ? value : msg.format(messageContext, parameters);
   }
 

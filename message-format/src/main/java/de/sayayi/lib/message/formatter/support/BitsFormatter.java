@@ -56,7 +56,7 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
   }
 
 
-  protected int detectBitCount(@NotNull MessageContext messageContext, Parameters parameters, Data data, Object value)
+  private int detectBitCount(@NotNull MessageContext messageContext, Parameters parameters, Data data, Object value)
   {
     Data dataValue = getConfigValue(messageContext, "length", parameters, data, true);
     if (dataValue instanceof DataString && "auto".equals(dataValue.asObject()))
@@ -73,7 +73,7 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
   }
 
 
-  protected int autoDetectBitCount(Object value)
+  private int autoDetectBitCount(Object value)
   {
     // auto detect for big integer in range 0..Long.MAX_VALUE
     if (value instanceof BigInteger)
@@ -105,7 +105,7 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
   }
 
 
-  protected int detectBitCountByRange(Object value)
+  private int detectBitCountByRange(Object value)
   {
     if (value instanceof Byte)
       return 8;
@@ -120,7 +120,7 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
   }
 
 
-  protected String format(int bitCount, Object value)
+  private String format(int bitCount, Object value)
   {
     final char[] bits = new char[bitCount];
 
@@ -133,14 +133,14 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
   }
 
 
-  protected void formatLong(char[] bits, long value)
+  private void formatLong(char[] bits, long value)
   {
     for(int n = bits.length; --n >= 0; value >>= 1)
       bits[n] = (char)('0' + (value & 1));
   }
 
 
-  protected void formatBigInteger(char[] bits, BigInteger value)
+  private void formatBigInteger(char[] bits, BigInteger value)
   {
     for(int n = bits.length; --n >= 0; value = value.shiftRight(1))
       bits[n] = value.testBit(0) ? '1' : '0';

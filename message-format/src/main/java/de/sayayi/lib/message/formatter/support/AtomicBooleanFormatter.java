@@ -21,9 +21,10 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static java.util.Collections.singleton;
 
 
 /**
@@ -42,6 +43,6 @@ public final class AtomicBooleanFormatter extends AbstractParameterFormatter
 
   @Override
   public @NotNull Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(AtomicBoolean.class);
+    return singleton(AtomicBoolean.class);
   }
 }

@@ -19,7 +19,6 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.data.map.MapKey.Type;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
@@ -33,6 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.EMPTY_NULL_TYPE;
+import static de.sayayi.lib.message.data.map.MapKey.Type.BOOL;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.messageToText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
@@ -80,7 +80,7 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
       bool = Boolean.parseBoolean(String.valueOf(value));
 
     // allow custom messages for true/false value?
-    if ((msg = getMessage(messageContext, bool, EnumSet.of(Type.BOOL), parameters, data, false)) != null)
+    if ((msg = getMessage(messageContext, bool, EnumSet.of(BOOL), parameters, data, false)) != null)
       return messageToText(messageContext, msg, parameters);
 
     // get translated boolean value
