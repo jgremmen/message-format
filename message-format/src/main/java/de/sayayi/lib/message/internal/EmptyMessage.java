@@ -24,9 +24,9 @@ import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
+import java.util.SortedSet;
 
-import static java.util.Collections.emptySet;
+import static java.util.Collections.emptySortedSet;
 
 
 /**
@@ -56,8 +56,8 @@ public final class EmptyMessage implements Message.WithSpaces
 
 
   @Override
-  public @NotNull Set<String> getParameterNames() {
-    return emptySet();
+  public @NotNull SortedSet<String> getParameterNames() {
+    return emptySortedSet();
   }
 
 

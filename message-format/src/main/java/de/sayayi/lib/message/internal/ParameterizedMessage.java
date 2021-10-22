@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 
@@ -93,9 +93,9 @@ public class ParameterizedMessage implements Message.WithSpaces
 
   @Override
   @SuppressWarnings("java:S4838")
-  public @NotNull Set<String> getParameterNames()
+  public @NotNull SortedSet<String> getParameterNames()
   {
-    final Set<String> parameterNames = new TreeSet<>();
+    final SortedSet<String> parameterNames = new TreeSet<>();
 
     for(MessagePart part: parts)
       if (part instanceof ParameterPart)

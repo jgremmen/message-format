@@ -24,13 +24,14 @@ import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
+import static java.util.Collections.emptySortedSet;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 
@@ -122,12 +123,12 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
 
 
   @Override
-  public @NotNull Set<String> getParameterNames()
+  public @NotNull SortedSet<String> getParameterNames()
   {
     if (!hasParameters())
-      return Collections.emptySet();
+      return emptySortedSet();
 
-    Set<String> parameterNames = new TreeSet<>();
+    SortedSet<String> parameterNames = new TreeSet<>();
 
     for(Message message: localizedMessages.values())
       parameterNames.addAll(message.getParameterNames());

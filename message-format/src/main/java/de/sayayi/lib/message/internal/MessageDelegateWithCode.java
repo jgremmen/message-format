@@ -23,7 +23,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
+import java.util.SortedSet;
 
 
 /**
@@ -61,7 +61,7 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
 
 
   @Override
-  public @NotNull Set<String> getParameterNames() {
+  public @NotNull SortedSet<String> getParameterNames() {
     return message.getParameterNames();
   }
 }

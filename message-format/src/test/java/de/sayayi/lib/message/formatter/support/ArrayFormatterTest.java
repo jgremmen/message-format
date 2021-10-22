@@ -37,8 +37,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static java.util.Collections.emptySortedSet;
 import static org.junit.Assert.assertEquals;
 
 
@@ -80,7 +82,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
           @Override public String format(@NotNull MessageContext context, @NotNull MessageContext.Parameters parameters) { return "YES"; }
           @Override public boolean hasParameters() { return false; }
           @NotNull
-          @Override public Set<String> getParameterNames() { return Collections.emptySet(); }
+          @Override public SortedSet<String> getParameterNames() { return emptySortedSet(); }
           @Override public boolean isSpaceBefore() { return false; }
           @Override public boolean isSpaceAfter() { return false; }
         }));
@@ -89,7 +91,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
           @Override public String format(@NotNull MessageContext context, @NotNull MessageContext.Parameters parameters) { return "NO"; }
           @Override public boolean hasParameters() { return false; }
           @NotNull
-          @Override public Set<String> getParameterNames() { return Collections.emptySet(); }
+          @Override public SortedSet<String> getParameterNames() { return emptySortedSet(); }
           @Override public boolean isSpaceBefore() { return false; }
           @Override public boolean isSpaceAfter() { return false; }
         }));

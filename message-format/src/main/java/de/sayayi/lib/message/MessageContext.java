@@ -27,10 +27,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import static java.util.Collections.emptySet;
-import static java.util.Collections.unmodifiableSet;
+import static java.util.Collections.emptySortedSet;
+import static java.util.Collections.unmodifiableSortedSet;
 
 
 /**
@@ -116,8 +117,8 @@ public class MessageContext
 
 
       @Override
-      public @NotNull Set<String> getParameterNames() {
-        return emptySet();
+      public @NotNull SortedSet<String> getParameterNames() {
+        return emptySortedSet();
       }
     };
   }
@@ -142,8 +143,8 @@ public class MessageContext
 
 
       @Override
-      public @NotNull Set<String> getParameterNames() {
-        return emptySet();
+      public @NotNull SortedSet<String> getParameterNames() {
+        return emptySortedSet();
       }
     };
 
@@ -176,7 +177,7 @@ public class MessageContext
      */
     @SuppressWarnings("unused")
     @Contract(pure = true)
-    @NotNull Set<String> getParameterNames();
+    @NotNull SortedSet<String> getParameterNames();
   }
 
 
@@ -296,8 +297,8 @@ public class MessageContext
 
 
     @Override
-    public @NotNull Set<String> getParameterNames() {
-      return unmodifiableSet(parameterValues.keySet());
+    public @NotNull SortedSet<String> getParameterNames() {
+      return unmodifiableSortedSet(new TreeSet<>(parameterValues.keySet()));
     }
   }
 }

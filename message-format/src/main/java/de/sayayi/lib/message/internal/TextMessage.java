@@ -24,10 +24,10 @@ import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.Set;
+import java.util.SortedSet;
 
 import static java.lang.Character.isSpaceChar;
+import static java.util.Collections.emptySortedSet;
 
 
 /**
@@ -77,7 +77,7 @@ public final class TextMessage implements Message.WithSpaces
 
 
   @Override
-  public @NotNull Set<String> getParameterNames() {
-    return Collections.emptySet();
+  public @NotNull SortedSet<String> getParameterNames() {
+    return emptySortedSet();
   }
 }

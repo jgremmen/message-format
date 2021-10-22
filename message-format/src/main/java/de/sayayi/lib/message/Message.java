@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 
 /**
@@ -45,7 +46,8 @@ public interface Message extends Serializable
    *   Formats the message based on the message parameters provided.
    * </p>
    *
-   * @param parameters  message parameters
+   * @param messageContext  message context providing formatting information, never {@code null}
+   * @param parameters      message parameters, never {@code null}
    *
    * @return  formatted message
    */
@@ -58,7 +60,8 @@ public interface Message extends Serializable
    *   Formats the message based on the message parameters provided.
    * </p>
    *
-   * @param parameterValues  message parameter values
+   * @param messageContext   message context providing formatting information, never {@code null}
+   * @param parameterValues  message parameter values, never {@code null}
    *
    * @return  formatted message
    */
@@ -78,7 +81,7 @@ public interface Message extends Serializable
 
 
   @Contract(pure = true)
-  @NotNull Set<String> getParameterNames();
+  @NotNull SortedSet<String> getParameterNames();
 
 
 
