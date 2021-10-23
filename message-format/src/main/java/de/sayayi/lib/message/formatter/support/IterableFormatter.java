@@ -28,7 +28,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -36,14 +35,14 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
-import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static java.util.ResourceBundle.getBundle;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class CollectionFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
+public final class IterableFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
 {
   @SuppressWarnings("rawtypes")
   @Override
@@ -115,6 +114,6 @@ public final class CollectionFormatter extends AbstractParameterFormatter implem
   @Override
   @Contract(value = "-> new", pure = true)
   public @NotNull Set<Class<?>> getFormattableTypes() {
-    return new HashSet<>(asList(Collection.class, Iterable.class));
+    return singleton(Iterable.class);
   }
 }

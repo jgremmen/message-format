@@ -5,7 +5,6 @@ de.sayayi.lib.message.formatter.support.BooleanSupplierFormatter
 de.sayayi.lib.message.formatter.support.BoolFormatter
 de.sayayi.lib.message.formatter.support.ChoiceFormatter
 de.sayayi.lib.message.formatter.support.ClassFormatter
-de.sayayi.lib.message.formatter.support.CollectionFormatter
 de.sayayi.lib.message.formatter.support.DateFormatter
 de.sayayi.lib.message.formatter.support.DoubleSupplierFormatter
 de.sayayi.lib.message.formatter.support.EnumFormatter
@@ -14,6 +13,7 @@ de.sayayi.lib.message.formatter.support.FileSizeFormatter
 de.sayayi.lib.message.formatter.support.GeoFormatter
 de.sayayi.lib.message.formatter.support.InetAddressFormatter
 de.sayayi.lib.message.formatter.support.IntSupplierFormatter
+de.sayayi.lib.message.formatter.support.IterableFormatter
 de.sayayi.lib.message.formatter.support.Java8DateTimeFormatter
 de.sayayi.lib.message.formatter.support.LongSupplierFormatter
 de.sayayi.lib.message.formatter.support.MapFormatter
