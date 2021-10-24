@@ -147,7 +147,7 @@ public class MessageCompiler
 
       @Override
       public void exitTextPart(TextPartContext ctx) {
-        ctx.value = messageFactory.getMessageCacheResolver().normalize(new TextPart(ctx.text().value));
+        ctx.value = messageFactory.getMessagePartResolver().normalize(new TextPart(ctx.text().value));
       }
 
 
@@ -204,7 +204,7 @@ public class MessageCompiler
       {
         final DataContext data = ctx.data();
 
-        ctx.value = messageFactory.getMessageCacheResolver().normalize(new ParameterPart(ctx.name.getText(),
+        ctx.value = messageFactory.getMessagePartResolver().normalize(new ParameterPart(ctx.name.getText(),
             ctx.format == null ? null : ctx.format.getText(),
             exitParameter_isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
             exitParameter_isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),

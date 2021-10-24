@@ -13,25 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parser.cache;
+package de.sayayi.lib.message.parser.resolver;
 
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.internal.ParameterizedMessage;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.TextPart;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.platform.commons.util.ReflectionUtils.tryToReadFieldValue;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public class LRUMessagePartCacheTest
+public class LRUMessagePartResolverTest
 {
   @Test
   public void testNoEviction()
   {
-    final LRUMessagePartCache cache = new LRUMessagePartCache(4);
+    final LRUMessagePartResolver cache = new LRUMessagePartResolver(4);
     final MessagePart mp1 = new TextPart("mp1");
     final MessagePart mp2 = new TextPart("mp2");
     final MessagePart mp3 = new TextPart("mp3");
@@ -49,7 +54,7 @@ public class LRUMessagePartCacheTest
   @Test
   public void testWithEviction()
   {
-    final LRUMessagePartCache cache = new LRUMessagePartCache(4);
+    final LRUMessagePartResolver cache = new LRUMessagePartResolver(4);
     final MessagePart mp1 = new TextPart("mp1");
     final MessagePart mp2 = new TextPart("mp2");
     final MessagePart mp3 = new TextPart("mp3");
@@ -67,5 +72,20 @@ public class LRUMessagePartCacheTest
     assertNotSame(mp2, cache.normalize(new TextPart("mp2")));  // evicts mp3
     assertSame(mp4, cache.normalize(new TextPart("mp4")));
     assertSame(mp6, cache.normalize(new TextPart("mp6")));
+  }
+
+
+  @Test
+  public void testCache() throws Exception
+  {
+    final LRUMessagePartResolver resolver = new LRUMessagePartResolver(10);
+    final Message.WithSpaces msg = new MessageFactory(resolver).parse("this is %{a,number} and %{b}this is %{b}");
+    final MessagePart[] parts = (MessagePart[])
+        tryToReadFieldValue(ParameterizedMessage.class, "parts", (ParameterizedMessage)msg).get();
+
+    assertEquals(6, parts.length);
+
+    assertSame(parts[0], parts[4]);
+    assertSame(parts[3], parts[5]);
   }
 }

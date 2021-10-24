@@ -26,7 +26,7 @@ import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.internal.MessageDelegateWithCode;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.parser.MessageCompiler;
-import de.sayayi.lib.message.parser.cache.MessageCacheResolver;
+import de.sayayi.lib.message.parser.resolver.MessagePartResolver;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -55,24 +55,24 @@ import static java.util.Locale.ROOT;
  */
 public class MessageFactory
 {
-  public static final MessageFactory NO_CACHE_INSTANCE = new MessageFactory(new MessageCacheResolver() {
+  public static final MessageFactory NO_CACHE_INSTANCE = new MessageFactory(new MessagePartResolver() {
     @Override public <T extends MessagePart> @NotNull T normalize(@NotNull T part) { return part; }
   });
 
   private static final AtomicInteger CODE_ID = new AtomicInteger(0);
 
-  @Getter private final MessageCacheResolver messageCacheResolver;
+  @Getter private final MessagePartResolver messagePartResolver;
   private final MessageCompiler messageCompiler;
 
 
   /**
    * Construct a new message factory with the given {@code messageCacheResolver}.
    *
-   * @param messageCacheResolver  message cache resolver, never {@code null}
+   * @param messagePartResolver  message cache resolver, never {@code null}
    */
-  public MessageFactory(@NotNull MessageCacheResolver messageCacheResolver)
+  public MessageFactory(@NotNull MessagePartResolver messagePartResolver)
   {
-    this.messageCacheResolver = messageCacheResolver;
+    this.messagePartResolver = messagePartResolver;
     messageCompiler = new MessageCompiler(this);
   }
 

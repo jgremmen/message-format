@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parser.cache;
+package de.sayayi.lib.message.parser.resolver;
 
 import de.sayayi.lib.message.internal.part.MessagePart;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @author Jeroen Gremmen
  */
-public interface MessageCacheResolver
+public interface MessagePartResolver
 {
   /**
    * Normalize the given message part. The returned part may be replaced with an identical cached version

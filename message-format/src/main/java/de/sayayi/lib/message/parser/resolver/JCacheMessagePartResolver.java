@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parser.cache;
+package de.sayayi.lib.message.parser.resolver;
 
 
 import de.sayayi.lib.message.internal.part.MessagePart;
@@ -25,12 +25,12 @@ import javax.cache.Cache;
 /**
  * @author Jeroen Gremmen
  */
-public class JCacheMessagePartCache implements MessageCacheResolver
+public class JCacheMessagePartResolver implements MessagePartResolver
 {
   private final Cache<MessagePart,MessagePart> cache;
 
 
-  public JCacheMessagePartCache(@NotNull Cache<MessagePart,MessagePart> cache) {
+  public JCacheMessagePartResolver(@NotNull Cache<MessagePart,MessagePart> cache) {
     this.cache = cache;
   }
 

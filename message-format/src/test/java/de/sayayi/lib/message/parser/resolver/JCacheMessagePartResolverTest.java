@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parser.cache;
+package de.sayayi.lib.message.parser.resolver;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
@@ -36,9 +36,9 @@ import static org.junit.platform.commons.util.ReflectionUtils.tryToReadFieldValu
 /**
  * @author Jeroen Gremmen
  */
-public class JCacheMessagePartCacheTest
+public class JCacheMessagePartResolverTest
 {
-  private static MessageCacheResolver resolver;
+  private static MessagePartResolver resolver;
 
 
   @BeforeAll
@@ -53,7 +53,7 @@ public class JCacheMessagePartCacheTest
 
     final Cache<MessagePart,MessagePart> cache = cacheManager.createCache("message-part-cache", config);
 
-    resolver = new JCacheMessagePartCache(cache);
+    resolver = new JCacheMessagePartResolver(cache);
   }
 
 
