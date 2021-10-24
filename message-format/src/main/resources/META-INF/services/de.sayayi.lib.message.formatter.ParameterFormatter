@@ -29,7 +29,6 @@ de.sayayi.lib.message.formatter.support.ReferenceFormatter
 de.sayayi.lib.message.formatter.support.SizeFormatter
 de.sayayi.lib.message.formatter.support.StringFormatter
 de.sayayi.lib.message.formatter.support.SupplierFormatter
-de.sayayi.lib.message.formatter.support.ThreadLocalFormatter
 de.sayayi.lib.message.formatter.support.ThrowableFormatter
 de.sayayi.lib.message.formatter.support.URIFormatter
 de.sayayi.lib.message.formatter.support.URLFormatter

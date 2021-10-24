@@ -49,11 +49,16 @@ public final class MethodFormatter extends AbstractParameterFormatter
     if ("name".equals(format))
       return noSpaceText(method.getName());
     if ("class".equals(format))
-      return messageContext.getFormatter(Class.class).format(messageContext, method.getDeclaringClass(), null, parameters, data);
+    {
+      return messageContext.getFormatter(Class.class)
+          .format(messageContext, method.getDeclaringClass(), null, parameters, data);
+    }
     if ("return-type".equals(format))
     {
       final Type returnType = method.getGenericReturnType();
-      return messageContext.getFormatter(returnType.getClass()).format(messageContext, returnType, null, parameters, data);
+
+      return messageContext.getFormatter(returnType.getClass())
+          .format(messageContext, returnType, null, parameters, data);
     }
 
     return noSpaceText(method.toString());

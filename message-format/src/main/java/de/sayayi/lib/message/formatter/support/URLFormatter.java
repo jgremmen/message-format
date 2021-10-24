@@ -19,13 +19,13 @@ import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URL;
 import java.util.Set;
 
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Collections.singleton;
 
@@ -46,36 +46,28 @@ public final class URLFormatter extends AbstractParameterFormatter
     final URL url = (URL)value;
 
     if ("authority".equals(format))
-      return new TextPart(url.getAuthority());
+      return noSpaceText(url.getAuthority());
     else if ("file".equals(format))
-      return new TextPart(url.getFile());
+      return noSpaceText(url.getFile());
     else if ("host".equals(format))
-      return new TextPart(url.getHost());
+      return noSpaceText(url.getHost());
     else if ("path".equals(format))
-      return new TextPart(url.getPath());
+      return noSpaceText(url.getPath());
     else if ("port".equals(format))
     {
       int port = url.getPort();
-      if (port == -1)
-        port = url.getDefaultPort();
-      return new TextPart(Integer.toString(port));
-//      return hasMessageFor(port, data)
-//          ? ((DataMap)data).format(parameters, port) : (port == -1 ? null : Integer.toString(port));
+      return noSpaceText(Integer.toString(port == -1 ? url.getDefaultPort() : port));
     }
     else if ("query".equals(format))
-      return new TextPart(url.getQuery());
+      return noSpaceText(url.getQuery());
     else if ("protocol".equals(format))
-    {
-      String protocol = url.getProtocol();
-      return new TextPart(protocol);
-//      return hasMessageFor(protocol, data) ? ((DataMap)data).format(parameters, protocol) : protocol;
-    }
+      return noSpaceText(url.getProtocol());
     else if ("user-info".equals(format))
-      return new TextPart(url.getUserInfo());
+      return noSpaceText(url.getUserInfo());
     else if ("ref".equals(format))
-      return new TextPart(url.getRef());
+      return noSpaceText(url.getRef());
 
-    return new TextPart(url.toExternalForm());
+    return noSpaceText(url.toExternalForm());
   }
 
 

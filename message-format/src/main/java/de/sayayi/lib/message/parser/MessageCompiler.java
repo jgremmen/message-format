@@ -39,6 +39,7 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -59,7 +60,8 @@ public class MessageCompiler
   private final MessageFactory messageFactory;
 
 
-  public @NotNull Message.WithSpaces compileMessage(String text) {
+  @Contract(pure = true)
+  public @NotNull Message.WithSpaces compileMessage(@NotNull String text) {
     return new Parser(text).message().value;
   }
 

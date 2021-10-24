@@ -39,11 +39,10 @@ public final class SupplierFormatter extends AbstractParameterFormatter
   public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
                                    @NotNull Parameters parameters, Data data)
   {
-    final Supplier<?> supplier = (Supplier<?>)value;
-    if (supplier == null)
+    if (value == null)
       return nullText();
 
-    value = supplier.get();
+    value = ((Supplier<?>)value).get();
     if (value == null)
       return nullText();
 

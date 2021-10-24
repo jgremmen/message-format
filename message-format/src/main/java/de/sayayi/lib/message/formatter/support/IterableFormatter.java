@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -53,18 +54,19 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
     if (value == null)
       return nullText();
 
-    final Iterable iterable = (Iterable)value;
-    if (!iterable.iterator().hasNext())
+    final Iterator iterator = ((Iterable)value).iterator();
+    if (!iterator.hasNext())
       return emptyText();
 
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
     final StringBuilder s = new StringBuilder();
 
-    for(Object element: iterable)
+    while(iterator.hasNext())
     {
+      final Object element = iterator.next();
       Text text = null;
 
-      if (element == iterable)
+      if (element == value)
         text = new TextPart(bundle.getString("thisCollection"));
       else if (element != null)
       {

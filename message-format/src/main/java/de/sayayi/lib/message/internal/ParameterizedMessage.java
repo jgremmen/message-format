@@ -45,7 +45,7 @@ public class ParameterizedMessage implements Message.WithSpaces
   public ParameterizedMessage(@NotNull List<MessagePart> parts)
   {
     findParameter: {
-      for(MessagePart part: parts)
+      for(final MessagePart part: parts)
         if (part instanceof ParameterPart)
           break findParameter;
 
@@ -64,7 +64,7 @@ public class ParameterizedMessage implements Message.WithSpaces
     final StringBuilder message = new StringBuilder();
     boolean spaceBefore = false;
 
-    for(MessagePart part: parts)
+    for(final MessagePart part: parts)
     {
       final Text textPart = part instanceof ParameterPart
           ? ((ParameterPart)part).getText(messageContext, parameters)
@@ -97,7 +97,7 @@ public class ParameterizedMessage implements Message.WithSpaces
   {
     final SortedSet<String> parameterNames = new TreeSet<>();
 
-    for(MessagePart part: parts)
+    for(final MessagePart part: parts)
       if (part instanceof ParameterPart)
         parameterNames.addAll(((ParameterPart)part).getParameterNames());
 

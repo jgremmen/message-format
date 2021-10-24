@@ -81,8 +81,8 @@ public final class NumberFormatter extends AbstractParameterFormatter
   }
 
 
-  protected NumberFormat getFormatter(@NotNull MessageContext messageContext, String format, Parameters parameters,
-                                      Data data)
+  private NumberFormat getFormatter(@NotNull MessageContext messageContext, String format, Parameters parameters,
+                                    Data data)
   {
     if ("integer".equals(format))
       return NumberFormat.getIntegerInstance(parameters.getLocale());
