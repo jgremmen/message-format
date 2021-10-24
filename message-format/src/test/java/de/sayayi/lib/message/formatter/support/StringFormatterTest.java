@@ -22,12 +22,12 @@ import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.part.TextPart;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.RetentionPolicy;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**

@@ -26,7 +26,8 @@ dependencies {
   compileOnly "org.projectlombok:lombok:${lombokVersion}"
   compileOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
 
-  testImplementation "junit:junit:${junitVersion}"
+  testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+  testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
   testCompileOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
 }
 
@@ -43,6 +44,11 @@ java {
 
   withJavadocJar()
   withSourcesJar()
+}
+
+
+test {
+  useJUnitPlatform()
 }
 
 

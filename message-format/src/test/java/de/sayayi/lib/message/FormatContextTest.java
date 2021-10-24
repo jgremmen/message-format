@@ -17,7 +17,7 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 
@@ -25,9 +25,9 @@ import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Locale.CHINA;
 import static java.util.Locale.UK;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**

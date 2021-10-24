@@ -30,7 +30,7 @@ import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,7 +41,7 @@ import java.util.SortedSet;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Collections.emptySortedSet;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**

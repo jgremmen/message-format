@@ -23,7 +23,7 @@ import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,7 +33,7 @@ import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.FRANCE;
 import static java.util.Locale.GERMANY;
 import static java.util.Locale.UK;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**

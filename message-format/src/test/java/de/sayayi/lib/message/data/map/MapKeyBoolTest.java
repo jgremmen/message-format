@@ -17,14 +17,14 @@ package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EQUIVALENT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.LENIENT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**

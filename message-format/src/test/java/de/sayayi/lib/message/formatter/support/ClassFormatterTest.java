@@ -21,14 +21,13 @@ import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.part.TextPart;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.ROOT;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -44,13 +43,13 @@ public class ClassFormatterTest
         ROOT);
     final Parameters parameters = context.noParameters();
 
-    Assert.assertEquals(new TextPart("java.lang.String"),
+    assertEquals(new TextPart("java.lang.String"),
         formatter.format(context, String.class, null, parameters, null));
-    Assert.assertEquals(new TextPart("java.lang"),
+    assertEquals(new TextPart("java.lang"),
         formatter.format(context, String.class, "package", parameters, null));
-    Assert.assertEquals(new TextPart("String"),
+    assertEquals(new TextPart("String"),
         formatter.format(context, String.class, "name", parameters, null));
-    Assert.assertEquals(new TextPart("double"),
+    assertEquals(new TextPart("double"),
         formatter.format(context, double.class, null, parameters, null));
   }
 

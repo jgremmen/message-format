@@ -35,7 +35,7 @@ allprojects {
 
 configure(moduleProjects) {
   ext.lombokVersion = "1.18.22"
-  ext.junitVersion = "4.13.2"
+  ext.junitVersion = "5.8.1"
   ext.jetbrainsAnnotationsVersion = "22.0.0"
 
   apply from: "${rootDir}/gradle/module.gradle"

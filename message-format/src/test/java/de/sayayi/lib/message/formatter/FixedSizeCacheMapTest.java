@@ -15,14 +15,15 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -95,9 +96,12 @@ public class FixedSizeCacheMapTest
   }
 
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testTooSmallCacheSize() {
-    new FixedSizeCacheMap<String,String>(1);
+  @Test
+  public void testTooSmallCacheSize()
+  {
+    assertThrows(IllegalArgumentException.class, () -> {
+      new FixedSizeCacheMap<String,String>(1);
+    });
   }
 
 

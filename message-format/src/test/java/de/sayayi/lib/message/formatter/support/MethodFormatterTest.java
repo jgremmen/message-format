@@ -18,14 +18,14 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Set;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**

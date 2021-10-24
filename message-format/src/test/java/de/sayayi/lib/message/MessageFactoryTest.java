@@ -20,13 +20,14 @@ import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import de.sayayi.lib.message.internal.ParameterizedMessage;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Locale;
 
 import static java.util.Collections.singleton;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -58,9 +59,12 @@ public class MessageFactoryTest
 
 
   @SuppressWarnings("ResultOfMethodCallIgnored")
-  @Test(expected = MessageParserException.class)
-  public void testSyntaxError() {
-    MessageFactory.NO_CACHE_INSTANCE.parse("%{x,{true false:1}");
+  @Test
+  public void testSyntaxError()
+  {
+    assertThrows(MessageParserException.class, () -> {
+      MessageFactory.NO_CACHE_INSTANCE.parse("%{x,{true false:1}");
+    });
   }
 
 

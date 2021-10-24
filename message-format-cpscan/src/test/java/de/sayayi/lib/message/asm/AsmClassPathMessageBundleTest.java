@@ -19,11 +19,11 @@ import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.scanner.asm.AsmClassPathMessageBundle;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Collections.singleton;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**

@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 
 /**

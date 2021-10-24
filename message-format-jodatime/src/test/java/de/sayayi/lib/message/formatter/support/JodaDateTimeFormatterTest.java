@@ -27,12 +27,12 @@ import de.sayayi.lib.message.internal.part.TextPart;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static java.util.Locale.FRANCE;
 import static java.util.Locale.GERMANY;
 import static java.util.Locale.UK;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**

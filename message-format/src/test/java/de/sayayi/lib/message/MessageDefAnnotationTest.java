@@ -21,16 +21,16 @@ import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Locale;
 import java.util.Set;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -38,11 +38,11 @@ import static org.junit.Assert.assertTrue;
  */
 public class MessageDefAnnotationTest
 {
-  private MessageBundle bundle;
+  private static MessageBundle bundle;
 
 
-  @Before
-  public void initialize() {
+  @BeforeAll
+  static void initialize() {
     bundle = new MessageBundle(NO_CACHE_INSTANCE, MessageDefAnnotationTest.class);
   }
 

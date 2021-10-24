@@ -17,7 +17,7 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.Text;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 
