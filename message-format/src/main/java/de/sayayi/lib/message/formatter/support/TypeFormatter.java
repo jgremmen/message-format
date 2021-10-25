@@ -53,7 +53,7 @@ public final class TypeFormatter extends AbstractParameterFormatter
   }
 
 
-  static String toString(@NotNull Type type, String typeFormat)
+  static String toString(@NotNull Type type, @NotNull String typeFormat)
   {
     // c = short class
     // j = no java.lang. prefix
@@ -95,9 +95,9 @@ public final class TypeFormatter extends AbstractParameterFormatter
     final String formattedClass = (typeFormat.indexOf('j') >= 0 && name.startsWith("java.lang.")) ||
                                   (typeFormat.indexOf('u') >= 0 && name.startsWith("java.util."))
         ? name.substring(10)
-        : name + arraySuffix;
+        : name;
 
-    return formattedClass.replaceAll("\\$[0-9]*", ".");
+    return formattedClass.replaceAll("\\$[0-9]*", ".") + arraySuffix;
   }
 
 

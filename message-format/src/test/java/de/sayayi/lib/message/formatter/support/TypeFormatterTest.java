@@ -21,7 +21,6 @@ import org.junit.platform.commons.util.ReflectionUtils;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -66,8 +65,7 @@ class TypeFormatterTest
   void testToStringJavaClass()
   {
     assertEquals("java.lang.reflect.Method", TypeFormatter.toString(Method.class, ""));
-    assertEquals("java.lang.reflect.Method", TypeFormatter.toString(Method.class, "CJ"));
-    assertEquals("reflect.Method", TypeFormatter.toString(Method.class, "Cj"));
+    assertEquals("reflect.Method", TypeFormatter.toString(Method.class, "j"));
     assertEquals("Method", TypeFormatter.toString(Method.class, "c"));
   }
 
@@ -77,8 +75,6 @@ class TypeFormatterTest
   {
     assertEquals("de.sayayi.lib.message.formatter.support.TypeFormatter",
         TypeFormatter.toString(TypeFormatter.class, ""));
-    assertEquals("de.sayayi.lib.message.formatter.support.TypeFormatter",
-        TypeFormatter.toString(TypeFormatter.class, "C"));
     assertEquals("TypeFormatter",
         TypeFormatter.toString(TypeFormatter.class, "c"));
   }
@@ -103,7 +99,7 @@ class TypeFormatterTest
     final Method method = ReflectionUtils.findMethod(Collections.class, "unmodifiableMap", Map.class).get();
 
     assertEquals("java.util.Map<K, V>", TypeFormatter.toString(method.getGenericReturnType(), ""));
-    assertEquals("Map<K, V>", TypeFormatter.toString(method.getGenericReturnType(), "Cu"));
+    assertEquals("Map<K, V>", TypeFormatter.toString(method.getGenericReturnType(), "u"));
     assertEquals("Map<K, V>", TypeFormatter.toString(method.getGenericReturnType(), "c"));
 
     final Type arg0 = method.getGenericParameterTypes()[0];
@@ -132,7 +128,7 @@ class TypeFormatterTest
 
     final Type m1arg0 = method1.getGenericParameterTypes()[0];
     assertEquals("java.util.List<? super T>", TypeFormatter.toString(m1arg0, ""));
-    assertEquals("List<? super T>", TypeFormatter.toString(m1arg0, "Cu"));
+    assertEquals("List<? super T>", TypeFormatter.toString(m1arg0, "u"));
     assertEquals("List<? super T>", TypeFormatter.toString(m1arg0, "c"));
 
     //noinspection OptionalGetWithoutIsPresent
@@ -167,7 +163,6 @@ class TypeFormatterTest
 
 
   @SuppressWarnings("unused")
-  private static <T extends Iterable<String> & Enumeration<String>> void internalMethod2(
-      @SuppressWarnings("unused") T dummy) {
+  private static <T extends Iterable<String>> void internalMethod2(@SuppressWarnings("unused") T dummy) {
   }
 }
