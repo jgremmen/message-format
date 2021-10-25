@@ -21,8 +21,10 @@ import org.junit.platform.commons.util.ReflectionUtils;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -112,6 +114,17 @@ class TypeFormatterTest
 
 
   @Test
+  void testToStringTypeVariable()
+  {
+    //noinspection OptionalGetWithoutIsPresent
+    final Method method = ReflectionUtils.findMethod(TypeFormatterTest.class, "internalMethod2", Iterable.class).get();
+    final Type type = method.getGenericParameterTypes()[0];
+
+    assertEquals("T", TypeFormatter.toString(type, ""));
+  }
+
+
+  @Test
   void testToStringWildcard()
   {
     //noinspection OptionalGetWithoutIsPresent
@@ -129,5 +142,32 @@ class TypeFormatterTest
     assertEquals("java.util.List<?>", TypeFormatter.toString(m2arg0, ""));
     assertEquals("List<?>", TypeFormatter.toString(m2arg0, "u"));
     assertEquals("List<?>", TypeFormatter.toString(m2arg0, "c"));
+  }
+
+
+  @Test
+  void testToStringGenericArray()
+  {
+    //noinspection OptionalGetWithoutIsPresent
+    final Method method = ReflectionUtils.findMethod(TypeFormatterTest.class, "internalMethod1").get();
+    final Type type = method.getGenericReturnType();
+
+    assertEquals("java.util.Optional<? extends java.lang.Number>[]", TypeFormatter.toString(type, ""));
+    assertEquals("java.util.Optional<? extends Number>[]", TypeFormatter.toString(type, "j"));
+    assertEquals("Optional<? extends java.lang.Number>[]", TypeFormatter.toString(type, "u"));
+    assertEquals("Optional<? extends Number>[]", TypeFormatter.toString(type, "ju"));
+    assertEquals("Optional<? extends Number>[]", TypeFormatter.toString(type, "c"));
+  }
+
+
+  @SuppressWarnings("unused")
+  private static Optional<? extends Number>[] internalMethod1() {
+    return null;
+  }
+
+
+  @SuppressWarnings("unused")
+  private static <T extends Iterable<String> & Enumeration<String>> void internalMethod2(
+      @SuppressWarnings("unused") T dummy) {
   }
 }
