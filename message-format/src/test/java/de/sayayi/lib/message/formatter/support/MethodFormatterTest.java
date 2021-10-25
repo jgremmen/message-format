@@ -44,7 +44,7 @@ public class MethodFormatterTest extends AbstractFormatterTest
   {
     GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new MethodFormatter());
-    registry.addFormatter(new ClassFormatter());
+    registry.addFormatter(new TypeFormatter());
 
     final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, Locale.UK);
 

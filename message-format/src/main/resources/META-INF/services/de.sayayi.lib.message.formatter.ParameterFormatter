@@ -4,7 +4,6 @@ de.sayayi.lib.message.formatter.support.BitsFormatter
 de.sayayi.lib.message.formatter.support.BooleanSupplierFormatter
 de.sayayi.lib.message.formatter.support.BoolFormatter
 de.sayayi.lib.message.formatter.support.ChoiceFormatter
-de.sayayi.lib.message.formatter.support.ClassFormatter
 de.sayayi.lib.message.formatter.support.DateFormatter
 de.sayayi.lib.message.formatter.support.DoubleSupplierFormatter
 de.sayayi.lib.message.formatter.support.EnumFormatter
@@ -30,5 +29,6 @@ de.sayayi.lib.message.formatter.support.SizeFormatter
 de.sayayi.lib.message.formatter.support.StringFormatter
 de.sayayi.lib.message.formatter.support.SupplierFormatter
 de.sayayi.lib.message.formatter.support.ThrowableFormatter
+de.sayayi.lib.message.formatter.support.TypeFormatter
 de.sayayi.lib.message.formatter.support.URIFormatter
 de.sayayi.lib.message.formatter.support.URLFormatter
