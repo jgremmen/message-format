@@ -21,6 +21,7 @@ import org.junit.platform.commons.util.ReflectionUtils;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -117,6 +118,9 @@ class TypeFormatterTest
     final Type type = method.getGenericParameterTypes()[0];
 
     assertEquals("T", TypeFormatter.toString(type, ""));
+
+    assertEquals("<T extends Iterable<String> & Enumeration<String>>",
+        TypeFormatter.toString(type, "Tju"));
   }
 
 
@@ -163,6 +167,6 @@ class TypeFormatterTest
 
 
   @SuppressWarnings("unused")
-  private static <T extends Iterable<String>> void internalMethod2(@SuppressWarnings("unused") T dummy) {
+  private static <T extends Iterable<String> & Enumeration<String>> void internalMethod2(@SuppressWarnings("unused") T dummy) {
   }
 }

@@ -69,7 +69,7 @@ public final class TypeFormatter extends AbstractParameterFormatter
       return toString_parameterized((ParameterizedType)type, typeFormat);
 
     if (type instanceof TypeVariable)
-      return ((TypeVariable<?>)type).getName();
+      return toString_typeVariable((TypeVariable<?>)type, typeFormat);
 
     if (type instanceof WildcardType)
       return toString_wildcard((WildcardType)type, typeFormat);
@@ -132,6 +132,28 @@ public final class TypeFormatter extends AbstractParameterFormatter
     }
 
     return formattedType.toString();
+  }
+
+
+  private static String toString_typeVariable(@NotNull TypeVariable<?> typeVariable, @NotNull String typeFormat)
+  {
+    if (typeFormat.indexOf('T') < 0)
+      return typeVariable.getName();
+
+    final StringBuilder formattedTypeVariable = new StringBuilder();
+    formattedTypeVariable.append('<').append(typeVariable.getName());
+
+    final Type[] bounds = typeVariable.getBounds();
+    if (bounds != null && bounds.length > 0)
+    {
+      final String typeFormat0 = typeFormat.replace("T", "");
+
+      formattedTypeVariable.append(" extends ").append(Arrays.stream(bounds)
+          .map(t -> toString(t, typeFormat0))
+          .collect(joining(" & ")));
+    }
+
+    return formattedTypeVariable.append('>').toString();
   }
 
 
