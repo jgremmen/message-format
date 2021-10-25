@@ -53,7 +53,7 @@ public final class TypeFormatter extends AbstractParameterFormatter
   }
 
 
-  static String toString(@NotNull Type type, @NotNull String typeFormat)
+  public static String toString(@NotNull Type type, @NotNull String typeFormat)
   {
     // c = short class
     // j = no java.lang. prefix
