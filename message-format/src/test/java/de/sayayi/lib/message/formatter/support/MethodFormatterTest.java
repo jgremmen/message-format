@@ -42,13 +42,11 @@ public class MethodFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat() throws Exception
   {
-    GenericFormatterService registry = new GenericFormatterService();
+    final GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new MethodFormatter());
-    registry.addFormatter(new TypeFormatter());
 
     final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, Locale.UK);
-
-    Message message = context.getMessageFactory().parse("%{m} %{m,name} %{m,return-type} %{m,class}");
+    final Message message = context.getMessageFactory().parse("%{m} %{m,name} %{m,return-type} %{m,class}");
 
     assertEquals("protected static " + Set.class.getName() + " " + MethodFormatterTest.class.getName() +
         ".dummy() dummy " + Set.class.getSimpleName() + "<" + String.class.getSimpleName() + "> " +

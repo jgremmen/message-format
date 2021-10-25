@@ -23,7 +23,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
@@ -49,17 +48,9 @@ public final class MethodFormatter extends AbstractParameterFormatter
     if ("name".equals(format))
       return noSpaceText(method.getName());
     if ("class".equals(format))
-    {
-      return messageContext.getFormatter(Class.class)
-          .format(messageContext, method.getDeclaringClass(), null, parameters, data);
-    }
+      return noSpaceText(TypeFormatter.toString(method.getDeclaringClass(), "Cju"));
     if ("return-type".equals(format))
-    {
-      final Type returnType = method.getGenericReturnType();
-
-      return messageContext.getFormatter(returnType.getClass())
-          .format(messageContext, returnType, null, parameters, data);
-    }
+      return noSpaceText(TypeFormatter.toString(method.getGenericReturnType(), "Cju"));
 
     return noSpaceText(method.toString());
   }
