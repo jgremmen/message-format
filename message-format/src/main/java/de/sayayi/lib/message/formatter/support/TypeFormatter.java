@@ -49,7 +49,7 @@ public final class TypeFormatter extends AbstractParameterFormatter
       return nullText();
 
     return noSpaceText(toString((Type)value,
-        getConfigValueString(messageContext, "type", parameters, data, true, "Cj")));
+        getConfigValueString(messageContext, "type", parameters, data, true, "Cju")));
   }
 
 

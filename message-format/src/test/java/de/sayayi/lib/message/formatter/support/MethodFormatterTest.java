@@ -51,7 +51,7 @@ public class MethodFormatterTest extends AbstractFormatterTest
     Message message = context.getMessageFactory().parse("%{m} %{m,name} %{m,return-type} %{m,class}");
 
     assertEquals("protected static " + Set.class.getName() + " " + MethodFormatterTest.class.getName() +
-        ".dummy() dummy " + Set.class.getName() + "<" + String.class.getName() + "> " +
+        ".dummy() dummy " + Set.class.getSimpleName() + "<" + String.class.getSimpleName() + "> " +
         MethodFormatterTest.class.getName(), message.format(context, context.parameters().with("m",
         MethodFormatterTest.class.getDeclaredMethod("dummy"))));
   }
