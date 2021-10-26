@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parser.resolver;
+package de.sayayi.lib.message.parser.normalizer;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
@@ -31,12 +31,12 @@ import static org.junit.platform.commons.util.ReflectionUtils.tryToReadFieldValu
 /**
  * @author Jeroen Gremmen
  */
-public class LRUMessagePartResolverTest
+public class LRUMessagePartNormalizerTest
 {
   @Test
   public void testNoEviction()
   {
-    final LRUMessagePartResolver cache = new LRUMessagePartResolver(4);
+    final LRUMessagePartNormalizer cache = new LRUMessagePartNormalizer(4);
     final MessagePart mp1 = new TextPart("mp1");
     final MessagePart mp2 = new TextPart("mp2");
     final MessagePart mp3 = new TextPart("mp3");
@@ -54,7 +54,7 @@ public class LRUMessagePartResolverTest
   @Test
   public void testWithEviction()
   {
-    final LRUMessagePartResolver cache = new LRUMessagePartResolver(4);
+    final LRUMessagePartNormalizer cache = new LRUMessagePartNormalizer(4);
     final MessagePart mp1 = new TextPart("mp1");
     final MessagePart mp2 = new TextPart("mp2");
     final MessagePart mp3 = new TextPart("mp3");
@@ -78,7 +78,7 @@ public class LRUMessagePartResolverTest
   @Test
   public void testCache() throws Exception
   {
-    final LRUMessagePartResolver resolver = new LRUMessagePartResolver(10);
+    final LRUMessagePartNormalizer resolver = new LRUMessagePartNormalizer(10);
     final Message.WithSpaces msg = new MessageFactory(resolver).parse("this is %{a,number} and %{b}this is %{b}");
     final MessagePart[] parts = (MessagePart[])
         tryToReadFieldValue(ParameterizedMessage.class, "parts", (ParameterizedMessage)msg).get();

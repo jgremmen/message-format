@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parser.resolver;
-
+package de.sayayi.lib.message.parser.normalizer;
 
 import de.sayayi.lib.message.internal.part.MessagePart;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.cache.Cache;
@@ -25,14 +25,10 @@ import javax.cache.Cache;
 /**
  * @author Jeroen Gremmen
  */
-public class JCacheMessagePartResolver implements MessagePartResolver
+@AllArgsConstructor
+public final class JCacheMessagePartNormalizer implements MessagePartNormalizer
 {
-  private final Cache<MessagePart,MessagePart> cache;
-
-
-  public JCacheMessagePartResolver(@NotNull Cache<MessagePart,MessagePart> cache) {
-    this.cache = cache;
-  }
+  private final @NotNull Cache<MessagePart,MessagePart> cache;
 
 
   /**

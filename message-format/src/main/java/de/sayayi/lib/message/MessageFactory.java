@@ -26,7 +26,7 @@ import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.internal.MessageDelegateWithCode;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.parser.MessageCompiler;
-import de.sayayi.lib.message.parser.resolver.MessagePartResolver;
+import de.sayayi.lib.message.parser.normalizer.MessagePartNormalizer;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -55,24 +55,24 @@ import static java.util.Locale.ROOT;
  */
 public class MessageFactory
 {
-  public static final MessageFactory NO_CACHE_INSTANCE = new MessageFactory(new MessagePartResolver() {
+  public static final MessageFactory NO_CACHE_INSTANCE = new MessageFactory(new MessagePartNormalizer() {
     @Override public <T extends MessagePart> @NotNull T normalize(@NotNull T part) { return part; }
   });
 
   private static final AtomicInteger CODE_ID = new AtomicInteger(0);
 
-  @Getter private final MessagePartResolver messagePartResolver;
+  @Getter private final MessagePartNormalizer messagePartNormalizer;
   private final MessageCompiler messageCompiler;
 
 
   /**
-   * Construct a new message factory with the given {@code messageCacheResolver}.
+   * Construct a new message factory with the given {@code messagePartNormalizer}.
    *
-   * @param messagePartResolver  message cache resolver, never {@code null}
+   * @param messagePartNormalizer  message part normalizer instance, never {@code null}
    */
-  public MessageFactory(@NotNull MessagePartResolver messagePartResolver)
+  public MessageFactory(@NotNull MessagePartNormalizer messagePartNormalizer)
   {
-    this.messagePartResolver = messagePartResolver;
+    this.messagePartNormalizer = messagePartNormalizer;
     messageCompiler = new MessageCompiler(this);
   }
 

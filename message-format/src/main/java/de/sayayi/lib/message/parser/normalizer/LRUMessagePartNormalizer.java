@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parser.resolver;
+package de.sayayi.lib.message.parser.normalizer;
 
 import de.sayayi.lib.message.internal.part.MessagePart;
 import org.jetbrains.annotations.Contract;
@@ -26,7 +26,7 @@ import static java.util.Arrays.copyOf;
 /**
  * @author Jeroen Gremmen
  */
-public final class LRUMessagePartResolver implements MessagePartResolver
+public final class LRUMessagePartNormalizer implements MessagePartNormalizer
 {
   private final int maxSize;
   private MessagePart[] parts;
@@ -34,7 +34,7 @@ public final class LRUMessagePartResolver implements MessagePartResolver
   private int size;
 
 
-  public LRUMessagePartResolver(int maxSize)
+  public LRUMessagePartNormalizer(int maxSize)
   {
     if (maxSize <= 0)
       throw new IllegalArgumentException("maxSize must be a positive number");
