@@ -26,10 +26,10 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.messageToText;
+import static java.util.Collections.emptySet;
 
 
 /**
@@ -69,6 +69,6 @@ public final class ChoiceFormatter extends AbstractParameterFormatter implements
   @Override
   @Contract(pure = true)
   public @NotNull Set<Class<?>> getFormattableTypes() {
-    return Collections.emptySet();
+    return emptySet();
   }
 }

@@ -28,7 +28,6 @@ import java.time.OffsetTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -43,6 +42,7 @@ import static java.time.format.FormatStyle.FULL;
 import static java.time.format.FormatStyle.LONG;
 import static java.time.format.FormatStyle.MEDIUM;
 import static java.time.format.FormatStyle.SHORT;
+import static java.util.Collections.singleton;
 
 
 /**
@@ -131,6 +131,6 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
   @Override
   @Contract(value = "-> new", pure = true)
   public @NotNull Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(Temporal.class);
+    return singleton(Temporal.class);
   }
 }

@@ -22,11 +22,11 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.function.LongSupplier;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 
 
 /**
@@ -51,6 +51,6 @@ public final class LongSupplierFormatter extends AbstractParameterFormatter
   @Override
   @Contract(value = "-> new", pure = true)
   public @NotNull Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(LongSupplier.class);
+    return singleton(LongSupplier.class);
   }
 }

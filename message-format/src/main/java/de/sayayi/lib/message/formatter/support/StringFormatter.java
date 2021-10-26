@@ -34,7 +34,7 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_LENIENT;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
-import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableSet;
 
 
 /**
@@ -43,6 +43,20 @@ import static java.util.Arrays.asList;
 public final class StringFormatter extends AbstractParameterFormatter
     implements NamedParameterFormatter, EmptyMatcher, SizeQueryable
 {
+  private static final Set<Class<?>> FORMATTABLE_TYPES;
+
+
+  static
+  {
+    final Set<Class<?>> formattableTypes = new HashSet<>(4);
+
+    formattableTypes.add(CharSequence.class);
+    formattableTypes.add(char[].class);
+
+    FORMATTABLE_TYPES = unmodifiableSet(formattableTypes);
+  }
+
+
   @Override
   @Contract(pure = true)
   public @NotNull String getName() {
@@ -85,6 +99,6 @@ public final class StringFormatter extends AbstractParameterFormatter
   @Override
   @Contract(value = "-> new", pure = true)
   public @NotNull Set<Class<?>> getFormattableTypes() {
-    return new HashSet<>(asList(CharSequence.class, char[].class));
+    return FORMATTABLE_TYPES;
   }
 }

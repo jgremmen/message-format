@@ -23,7 +23,6 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -33,6 +32,7 @@ import java.util.regex.Pattern;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.emptySet;
 
 
 /**
@@ -167,7 +167,7 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
 
   @Override
   public @NotNull Set<Class<?>> getFormattableTypes() {
-    return Collections.emptySet();
+    return emptySet();
   }
 
 

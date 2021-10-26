@@ -37,7 +37,7 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.lang.reflect.Array.get;
 import static java.lang.reflect.Array.getLength;
-import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.ResourceBundle.getBundle;
 
 
@@ -46,6 +46,25 @@ import static java.util.ResourceBundle.getBundle;
  */
 public final class ArrayFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
 {
+  private static final Set<Class<?>> FORMATTABLE_TYPES;
+
+
+  static
+  {
+    final Set<Class<?>> formattableTypes = new HashSet<>();
+
+    formattableTypes.add(Object[].class);
+    formattableTypes.add(short[].class);
+    formattableTypes.add(int[].class);
+    formattableTypes.add(long[].class);
+    formattableTypes.add(float[].class);
+    formattableTypes.add(double[].class);
+    formattableTypes.add(boolean[].class);
+
+    FORMATTABLE_TYPES = unmodifiableSet(formattableTypes);
+  }
+
+
   @Override
   public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object array, String format,
                                    @NotNull Parameters parameters, Data data)
@@ -101,9 +120,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
 
 
   @Override
-  public @NotNull Set<Class<?>> getFormattableTypes()
-  {
-    return new HashSet<>(asList(
-        Object[].class, short[].class, int[].class, long[].class, float[].class, double[].class, boolean[].class));
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return FORMATTABLE_TYPES;
   }
 }

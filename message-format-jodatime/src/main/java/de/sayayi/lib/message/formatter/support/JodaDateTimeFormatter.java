@@ -39,7 +39,7 @@ import java.util.Set;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
-import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableSet;
 
 
 /**
@@ -47,6 +47,7 @@ import static java.util.Arrays.asList;
  */
 public final class JodaDateTimeFormatter extends AbstractParameterFormatter
 {
+  private static final Set<Class<?>> FORMATTABLE_TYPES;
   private static final Map<String,String> STYLE = new HashMap<>();
 
 
@@ -58,6 +59,13 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
     STYLE.put("full", "FF");
     STYLE.put("date", "M-");
     STYLE.put("time", "-M");
+
+    final Set<Class<?>> formattableTypes = new HashSet<>(4);
+
+    formattableTypes.add(BaseLocal.class);
+    formattableTypes.add(ReadableDateTime.class);
+
+    FORMATTABLE_TYPES = unmodifiableSet(formattableTypes);
   }
 
 
@@ -101,6 +109,6 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
   @Override
   @Contract(value = "-> new", pure = true)
   public @NotNull Set<Class<?>> getFormattableTypes() {
-    return new HashSet<>(asList(BaseLocal.class, ReadableDateTime.class));
+    return FORMATTABLE_TYPES;
   }
 }
