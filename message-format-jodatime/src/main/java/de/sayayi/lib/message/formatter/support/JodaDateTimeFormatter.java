@@ -107,7 +107,7 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
+  @Contract(pure = true)
   public @NotNull Set<Class<?>> getFormattableTypes() {
     return FORMATTABLE_TYPES;
   }

@@ -67,7 +67,6 @@ public final class SizeFormatter extends AbstractParameterFormatter implements N
 
 
   @Override
-  @Contract(pure = true)
   public @NotNull Set<Class<?>> getFormattableTypes() {
     return emptySet();
   }

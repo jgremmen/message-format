@@ -97,7 +97,6 @@ public final class StringFormatter extends AbstractParameterFormatter
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
   public @NotNull Set<Class<?>> getFormattableTypes() {
     return FORMATTABLE_TYPES;
   }

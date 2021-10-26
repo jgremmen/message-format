@@ -116,7 +116,6 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
   public @NotNull Set<Class<?>> getFormattableTypes() {
     return FORMATTABLE_TYPES;
   }

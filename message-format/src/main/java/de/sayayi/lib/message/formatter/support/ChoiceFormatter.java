@@ -67,7 +67,6 @@ public final class ChoiceFormatter extends AbstractParameterFormatter implements
 
 
   @Override
-  @Contract(pure = true)
   public @NotNull Set<Class<?>> getFormattableTypes() {
     return emptySet();
   }
