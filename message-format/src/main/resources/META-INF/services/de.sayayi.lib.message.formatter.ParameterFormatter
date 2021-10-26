@@ -7,6 +7,7 @@ de.sayayi.lib.message.formatter.support.ChoiceFormatter
 de.sayayi.lib.message.formatter.support.DateFormatter
 de.sayayi.lib.message.formatter.support.DoubleSupplierFormatter
 de.sayayi.lib.message.formatter.support.EnumFormatter
+de.sayayi.lib.message.formatter.support.FieldFormatter
 de.sayayi.lib.message.formatter.support.FileFormatter
 de.sayayi.lib.message.formatter.support.FileSizeFormatter
 de.sayayi.lib.message.formatter.support.GeoFormatter

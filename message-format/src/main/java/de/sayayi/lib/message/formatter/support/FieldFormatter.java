@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Jeroen Gremmen
+ * Copyright 2021 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,43 +22,58 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class ClassFormatter extends AbstractParameterFormatter
+public final class FieldFormatter extends AbstractParameterFormatter
 {
   @Override
+  @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
                                    @NotNull Parameters parameters, Data data)
   {
-    String s = null;
+    if (value == null)
+      return nullText();
 
-    if (value != null)
+    final Field field = (Field)value;
+    final StringBuilder formattedField = new StringBuilder();
+    final String fieldFormat =
+        getConfigValueString(messageContext, "field", parameters, data, true, "juM");
+
+    if ("type".equals(format))
+      return noSpaceText(TypeFormatter.toString(field.getGenericType(), fieldFormat));
+
+    if (!"name".equals(format))
     {
-      final Class<?> clazz = (Class<?>)value;
-      format = getConfigFormat(messageContext, format, data, true, null);
+      // c = short class
+      // j = no java.lang. prefix
+      // u = no java.util. prefix
+      // M = with modifiers
 
-      if ("name".equals(format))
-        s = clazz.getSimpleName();
-      else if ("package".equals(format))
-        return messageContext.getFormatter(Package.class).format(messageContext, clazz.getPackage(), null, parameters, data);
-      else
-        s = clazz.getName();
+      if (fieldFormat.indexOf('M') >= 0)
+        formattedField.append(Modifier.toString(field.getModifiers())).append(' ');
+
+      formattedField.append(TypeFormatter.toString(field.getGenericType(), fieldFormat)).append(' ');
     }
 
-    return noSpaceText(s);
+    formattedField.append(field.getName());
+
+    return noSpaceText(formattedField.toString());
   }
 
 
   @Override
   @Contract(value = "-> new", pure = true)
   public @NotNull Set<Class<?>> getFormattableTypes() {
-    return singleton(Class.class);
+    return singleton(Field.class);
   }
 }
