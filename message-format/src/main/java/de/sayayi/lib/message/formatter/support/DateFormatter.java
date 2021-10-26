@@ -63,7 +63,7 @@ public final class DateFormatter extends AbstractParameterFormatter
   }
 
 
-  protected DateFormat getFormatter(String format, Locale locale)
+  private DateFormat getFormatter(String format, Locale locale)
   {
     if ("full".equals(format))
       return getDateInstance(FULL, locale);
