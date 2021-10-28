@@ -40,9 +40,9 @@ import static java.util.Collections.unmodifiableSortedSet;
 @AllArgsConstructor
 public class MessageContext
 {
-  private final FormatterService formatterService;
-  @Getter private final MessageFactory messageFactory;
-  @Getter private final Locale locale;
+  private final @NotNull FormatterService formatterService;
+  @Getter private final @NotNull MessageFactory messageFactory;
+  @Getter private final @NotNull Locale locale;
 
 
   public MessageContext(@NotNull FormatterService formatterService, @NotNull MessageFactory messageFactory,

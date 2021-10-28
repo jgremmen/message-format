@@ -61,7 +61,7 @@ public class MessageFactory
 
   private static final AtomicInteger CODE_ID = new AtomicInteger(0);
 
-  @Getter private final MessagePartNormalizer messagePartNormalizer;
+  @Getter private final @NotNull MessagePartNormalizer messagePartNormalizer;
   private final MessageCompiler messageCompiler;
 
 

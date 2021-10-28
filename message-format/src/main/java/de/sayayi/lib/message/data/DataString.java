@@ -30,12 +30,12 @@ public class DataString implements Data
 {
   private static final long serialVersionUID = 500L;
 
-  private final String string;
+  private final @NotNull String string;
 
 
   @Override
   @Contract(pure = true)
-  public String toString() {
+  public @NotNull String toString() {
     return string;
   }
 

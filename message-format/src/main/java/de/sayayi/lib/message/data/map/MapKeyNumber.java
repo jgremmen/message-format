@@ -39,7 +39,7 @@ public final class MapKeyNumber implements MapKey
 {
   private static final long serialVersionUID = 500L;
 
-  private final CompareType compareType;
+  private final @NotNull CompareType compareType;
   @Getter private final long number;
 
 

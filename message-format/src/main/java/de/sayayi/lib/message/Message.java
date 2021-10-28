@@ -80,6 +80,11 @@ public interface Message extends Serializable
   boolean hasParameters();
 
 
+  /**
+   * Return a set of all parameters provided with this message.
+   *
+   * @return  parameter names, never {@code null}
+   */
   @Contract(pure = true)
   @NotNull SortedSet<String> getParameterNames();
 

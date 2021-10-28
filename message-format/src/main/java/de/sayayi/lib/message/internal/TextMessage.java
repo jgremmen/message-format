@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.SortedSet;
 
-import static java.lang.Character.isSpaceChar;
 import static java.util.Collections.emptySortedSet;
 
 
@@ -49,17 +48,6 @@ public final class TextMessage implements Message.WithSpaces
     text = textPart.getText();
     spaceBefore = textPart.isSpaceBefore();
     spaceAfter = textPart.isSpaceAfter();
-  }
-
-
-  public TextMessage(@NotNull String text)
-  {
-    final boolean empty = text.isEmpty();
-
-    spaceBefore = !empty && isSpaceChar(text.charAt(0));
-    spaceAfter = !empty && isSpaceChar(text.charAt(text.length() - 1));
-
-    this.text = text.trim();
   }
 
 

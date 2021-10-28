@@ -28,7 +28,7 @@ public final class MapValueMessage implements MapValue
 {
   private static final long serialVersionUID = 500L;
 
-  private final Message.WithSpaces message;
+  private final @NotNull Message.WithSpaces message;
 
 
   @Override

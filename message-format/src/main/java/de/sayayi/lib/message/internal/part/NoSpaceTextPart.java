@@ -28,7 +28,7 @@ public final class NoSpaceTextPart implements Text
 {
   private static final long serialVersionUID = 500L;
 
-  @Getter private final String text;
+  @Getter private final @NotNull String text;
 
 
   public NoSpaceTextPart(@NotNull String text) {

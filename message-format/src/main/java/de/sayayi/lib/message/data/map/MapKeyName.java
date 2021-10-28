@@ -35,7 +35,7 @@ public final class MapKeyName implements MapKey
 {
   private static final long serialVersionUID = 500L;
 
-  @Getter private final String name;
+  @Getter private final @NotNull String name;
 
 
   @Override

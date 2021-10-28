@@ -26,20 +26,19 @@ import de.sayayi.lib.message.data.map.MapValueMessage;
 import de.sayayi.lib.message.data.map.MapValueString;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.data.map.MapValue.STRING_MESSAGE_TYPE;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.stream.Collectors.toCollection;
 
 
 /**
@@ -51,7 +50,7 @@ public final class DataMap implements Data
 {
   private static final long serialVersionUID = 500L;
 
-  @Getter private final Map<MapKey,MapValue> map;
+  private final @NotNull Map<MapKey,MapValue> map;
 
 
   @Override
@@ -64,7 +63,7 @@ public final class DataMap implements Data
   @Override
   @Contract(pure = true)
   public @NotNull Map<MapKey,MapValue> asObject() {
-    return Collections.unmodifiableMap(map);
+    return unmodifiableMap(map);
   }
 
 
@@ -135,6 +134,6 @@ public final class DataMap implements Data
     return map.values().stream()
         .filter(mapValue -> mapValue instanceof MapValueMessage)
         .flatMap(mapValue -> ((MapValueMessage)mapValue).asObject().getParameterNames().stream())
-        .collect(Collectors.toCollection(TreeSet::new));
+        .collect(toCollection(TreeSet::new));
   }
 }

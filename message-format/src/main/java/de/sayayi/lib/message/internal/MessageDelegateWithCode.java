@@ -35,7 +35,7 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
 {
   private static final long serialVersionUID = 500L;
 
-  @Getter private final Message message;
+  @Getter private final @NotNull Message message;
 
 
   public MessageDelegateWithCode(@NotNull String code, @NotNull Message message)
