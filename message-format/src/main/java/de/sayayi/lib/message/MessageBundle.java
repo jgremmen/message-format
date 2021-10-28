@@ -38,7 +38,7 @@ import static java.util.Collections.unmodifiableSet;
  */
 public class MessageBundle
 {
-  @Getter private final MessageFactory messageFactory;
+  @Getter private final @NotNull MessageFactory messageFactory;
 
   private final Map<String,Message.WithCode> messages;
   private final Set<Class<?>> indexedClasses;
@@ -90,7 +90,7 @@ public class MessageBundle
   }
 
 
-  @Contract(pure = true)
+  @Contract(value = "null -> false", pure = true)
   public boolean hasMessageWithCode(String code) {
     return code != null && messages.containsKey(code);
   }
@@ -119,10 +119,10 @@ public class MessageBundle
     for(Class<?> clazz = classWithMessages; clazz != null && clazz != Object.class; clazz = clazz.getSuperclass())
       if (!indexedClasses.contains(clazz))
       {
-        for(Class<?> ifClass: clazz.getInterfaces())
+        for(final Class<?> ifClass: clazz.getInterfaces())
           add(ifClass);
 
-        for(Method method: clazz.getDeclaredMethods())
+        for(final Method method: clazz.getDeclaredMethods())
           add0(method);
 
         add0(clazz);

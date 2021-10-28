@@ -37,7 +37,7 @@ public final class MapKeyEmpty implements MapKey
 {
   private static final long serialVersionUID = 500L;
 
-  private final CompareType compareType;
+  private final @NotNull CompareType compareType;
 
 
   public MapKeyEmpty(@NotNull CompareType compareType)

@@ -36,9 +36,8 @@ public final class MapValueString extends DataString implements MapValue
   }
 
 
-  @NotNull
   @Override
-  public Type getType() {
+  public @NotNull Type getType() {
     return Type.STRING;
   }
 

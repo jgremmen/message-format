@@ -27,7 +27,7 @@ abstract class AbstractMessageWithCode implements Message.WithCode
 {
   private static final long serialVersionUID = 500L;
 
-  @Getter protected final String code;
+  @Getter protected final @NotNull String code;
 
 
   @SuppressWarnings("squid:S2589")

@@ -45,7 +45,7 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
 {
   private static final long serialVersionUID = 500L;
 
-  private final Map<Locale,Message> localizedMessages;
+  private final @NotNull Map<Locale,Message> localizedMessages;
 
   private Boolean hasParameter;
 
@@ -128,7 +128,7 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
     if (!hasParameters())
       return emptySortedSet();
 
-    SortedSet<String> parameterNames = new TreeSet<>();
+    final SortedSet<String> parameterNames = new TreeSet<>();
 
     for(Message message: localizedMessages.values())
       parameterNames.addAll(message.getParameterNames());

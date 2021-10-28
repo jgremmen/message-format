@@ -52,14 +52,14 @@ public final class MessagePartFactory
   @Contract(pure = true)
   @SuppressWarnings("java:S3358")
   public static @NotNull Text noSpaceText(String text) {
-    return text == null ? NULL : (text.trim().isEmpty() ? EMPTY : new NoSpaceTextPart(text));
+    return text == null ? NULL : text.trim().isEmpty() ? EMPTY : new NoSpaceTextPart(text);
   }
 
 
   @Contract(pure = true)
   @SuppressWarnings("java:S3358")
   public static @NotNull Text spacedText(String text) {
-    return text == null ? NULL : (text.isEmpty() ? EMPTY : new TextPart(text));
+    return text == null ? NULL : text.isEmpty() ? EMPTY : new TextPart(text);
   }
 
 
@@ -68,10 +68,9 @@ public final class MessagePartFactory
     final boolean textSpaceBefore = text.isSpaceBefore();
     final boolean textSpaceAfter = text.isSpaceAfter();
 
-    if ((textSpaceBefore || spaceBefore) == textSpaceBefore && (textSpaceAfter || spaceAfter) == textSpaceAfter)
-      return text;
-
-    return new TextPart(text.getText(), textSpaceBefore || spaceBefore, textSpaceAfter || spaceAfter);
+    return (textSpaceBefore || spaceBefore) == textSpaceBefore && (textSpaceAfter || spaceAfter) == textSpaceAfter
+        ? text
+        : new TextPart(text.getText(), textSpaceBefore || spaceBefore, textSpaceAfter || spaceAfter);
   }
 
 
