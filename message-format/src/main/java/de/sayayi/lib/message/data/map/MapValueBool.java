@@ -18,21 +18,21 @@ package de.sayayi.lib.message.data.map;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import static lombok.AccessLevel.PRIVATE;
+
 
 /**
  * @author Jeroen Gremmen
  */
-@AllArgsConstructor
-public final class MapValueBool implements MapValue
+@AllArgsConstructor(access = PRIVATE)
+public enum MapValueBool implements MapValue
 {
+  FALSE(false),
+  TRUE(true);
+
   private static final long serialVersionUID = 500L;
 
   private final boolean bool;
-
-
-  public MapValueBool(@NotNull String bool) {
-    this(Boolean.parseBoolean(bool));
-  }
 
 
   @Override

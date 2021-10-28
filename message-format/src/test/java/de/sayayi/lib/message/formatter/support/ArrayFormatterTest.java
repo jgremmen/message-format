@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Collections.emptySortedSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -78,7 +79,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
 
     DataMap booleanMap = new DataMap(new HashMap<MapKey, MapValue>() {
       {
-        put(new MapKeyBool(true), new MapValueMessage(new Message.WithSpaces() {
+        put(MapKeyBool.TRUE, new MapValueMessage(new Message.WithSpaces() {
           @Override public String format(@NotNull MessageContext context, @NotNull MessageContext.Parameters parameters) { return "YES"; }
           @Override public boolean hasParameters() { return false; }
           @NotNull
@@ -87,7 +88,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
           @Override public boolean isSpaceAfter() { return false; }
         }));
 
-        put(new MapKeyBool(false), new MapValueMessage(new Message.WithSpaces() {
+        put(MapKeyBool.FALSE, new MapValueMessage(new Message.WithSpaces() {
           @Override public String format(@NotNull MessageContext context, @NotNull MessageContext.Parameters parameters) { return "NO"; }
           @Override public boolean hasParameters() { return false; }
           @NotNull
@@ -105,21 +106,19 @@ public class ArrayFormatterTest extends AbstractFormatterTest
         .format(context, new boolean[0], null, noParameters, null));
 
     registry.addFormatter(new NamedParameterFormatter() {
-      @NotNull
       @Override
-      public Text format(@NotNull MessageContext context, Object value, String format, @NotNull MessageContext.Parameters parameters, Data data) {
-        return (value == null) ? null : new TextPart((Boolean)value ? "1" : "0");
+      public @NotNull Text format(@NotNull MessageContext context, Object value, String format,
+                                  @NotNull MessageContext.Parameters parameters, Data data) {
+        return value == null ? nullText() : new TextPart((Boolean)value ? "1" : "0");
       }
 
-      @NotNull
       @Override
-      public String getName() {
+      public @NotNull String getName() {
         return "bool";
       }
 
-      @NotNull
       @Override
-      public Set<Class<?>> getFormattableTypes() {
+      public @NotNull Set<Class<?>> getFormattableTypes() {
         return new HashSet<>(Arrays.asList(Boolean.class, boolean.class));
       }
 
@@ -155,22 +154,20 @@ public class ArrayFormatterTest extends AbstractFormatterTest
         .format(context, new int[] { 1, -7, 248 }, null , noParameters, new DataString("##00")));
 
     registry.addFormatter(new NamedParameterFormatter() {
-      @NotNull
       @Override
-      public String getName() {
+      public @NotNull String getName() {
         return "hex";
       }
 
-      @NotNull
       @SuppressWarnings("RedundantCast")
       @Override
-      public Text format(@NotNull MessageContext context, Object value, String format, @NotNull MessageContext.Parameters parameters, Data data) {
-        return (value == null) ? null : new TextPart(String.format("0x%02x", (Integer)value));
+      public @NotNull Text format(@NotNull MessageContext context, Object value, String format,
+                                  @NotNull MessageContext.Parameters parameters, Data data) {
+        return value == null ? nullText() : new TextPart(String.format("0x%02x", (Integer)value));
       }
 
-      @NotNull
       @Override
-      public Set<Class<?>> getFormattableTypes() {
+      public @NotNull Set<Class<?>> getFormattableTypes() {
         return Collections.singleton(Integer.class);
       }
 

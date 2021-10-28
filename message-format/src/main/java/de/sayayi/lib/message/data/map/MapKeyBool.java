@@ -29,23 +29,22 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EQUIVALENT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.LENIENT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
+import static lombok.AccessLevel.PRIVATE;
 
 
 /**
  * @author Jeroen Gremmen
  */
 @ToString(doNotUseGetters = true)
-@AllArgsConstructor
-public final class MapKeyBool implements MapKey
+@AllArgsConstructor(access = PRIVATE)
+public enum MapKeyBool implements MapKey
 {
+  FALSE(false),
+  TRUE(true);
+
   private static final long serialVersionUID = 500L;
 
   @Getter private final boolean bool;
-
-
-  public MapKeyBool(@NotNull String bool) {
-    this(Boolean.parseBoolean(bool));
-  }
 
 
   @Override
