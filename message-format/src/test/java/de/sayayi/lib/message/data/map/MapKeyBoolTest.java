@@ -24,6 +24,8 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EQUIVALENT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.LENIENT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
+import static de.sayayi.lib.message.data.map.MapKeyBool.FALSE;
+import static de.sayayi.lib.message.data.map.MapKeyBool.TRUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -37,7 +39,7 @@ public class MapKeyBoolTest
   {
     final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
-    assertEquals(MISMATCH, new MapKeyBool(true).match(context, context.noParameters(), null));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), null));
   }
 
 
@@ -46,10 +48,10 @@ public class MapKeyBoolTest
   {
     final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
-    assertEquals(EXACT, new MapKeyBool(true).match(context, context.noParameters(), true));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(context, context.noParameters(), false));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(context, context.noParameters(), true));
-    assertEquals(EXACT, new MapKeyBool(false).match(context, context.noParameters(), false));
+    assertEquals(EXACT, TRUE.match(context, context.noParameters(), true));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), false));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), true));
+    assertEquals(EXACT, FALSE.match(context, context.noParameters(), false));
   }
 
 
@@ -59,25 +61,25 @@ public class MapKeyBoolTest
     final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
     // byte
-    assertEquals(MISMATCH, new MapKeyBool(true).match(context, context.noParameters(), (byte)0));
-    assertEquals(LENIENT, new MapKeyBool(true).match(context, context.noParameters(), (byte)100));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), (byte)0));
+    assertEquals(LENIENT, TRUE.match(context, context.noParameters(), (byte)100));
 
-    assertEquals(LENIENT, new MapKeyBool(false).match(context, context.noParameters(), (byte)0));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(context, context.noParameters(), Byte.MIN_VALUE));
+    assertEquals(LENIENT, FALSE.match(context, context.noParameters(), (byte)0));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), Byte.MIN_VALUE));
 
     // integer
-    assertEquals(MISMATCH, new MapKeyBool(true).match(context, context.noParameters(), 0));
-    assertEquals(LENIENT, new MapKeyBool(true).match(context, context.noParameters(), 100));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), 0));
+    assertEquals(LENIENT, TRUE.match(context, context.noParameters(), 100));
 
-    assertEquals(LENIENT, new MapKeyBool(false).match(context, context.noParameters(), 0));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(context, context.noParameters(), Integer.MAX_VALUE));
+    assertEquals(LENIENT, FALSE.match(context, context.noParameters(), 0));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), Integer.MAX_VALUE));
 
     // long
-    assertEquals(MISMATCH, new MapKeyBool(true).match(context, context.noParameters(), 0L));
-    assertEquals(LENIENT, new MapKeyBool(true).match(context, context.noParameters(), -100L));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), 0L));
+    assertEquals(LENIENT, TRUE.match(context, context.noParameters(), -100L));
 
-    assertEquals(LENIENT, new MapKeyBool(false).match(context, context.noParameters(), 0L));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(context, context.noParameters(), Long.MIN_VALUE));
+    assertEquals(LENIENT, FALSE.match(context, context.noParameters(), 0L));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), Long.MIN_VALUE));
   }
 
 
@@ -86,21 +88,21 @@ public class MapKeyBoolTest
   {
     final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
-    assertEquals(EQUIVALENT, new MapKeyBool(true).match(context, context.noParameters(), "true"));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(context, context.noParameters(), "false"));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(context, context.noParameters(), "TRUE"));
+    assertEquals(EQUIVALENT, TRUE.match(context, context.noParameters(), "true"));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), "false"));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), "TRUE"));
 
-    assertEquals(EQUIVALENT, new MapKeyBool(false).match(context, context.noParameters(), "false"));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(context, context.noParameters(), "true"));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(context, context.noParameters(), "FALSE"));
+    assertEquals(EQUIVALENT, FALSE.match(context, context.noParameters(), "false"));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), "true"));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), "FALSE"));
 
-    assertEquals(LENIENT, new MapKeyBool(true).match(context, context.noParameters(), "0.9"));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(context, context.noParameters(), "-0"));
-    assertEquals(LENIENT, new MapKeyBool(true).match(context, context.noParameters(), "+1234567890000000"));
+    assertEquals(LENIENT, TRUE.match(context, context.noParameters(), "0.9"));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), "-0"));
+    assertEquals(LENIENT, TRUE.match(context, context.noParameters(), "+1234567890000000"));
 
-    assertEquals(LENIENT, new MapKeyBool(false).match(context, context.noParameters(), "+0"));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(context, context.noParameters(), "1e-100"));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(context, context.noParameters(), "-1234567890000000"));
+    assertEquals(LENIENT, FALSE.match(context, context.noParameters(), "+0"));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), "1e-100"));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), "-1234567890000000"));
   }
 
 
@@ -109,12 +111,12 @@ public class MapKeyBoolTest
   {
     final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
-    assertEquals(LENIENT, new MapKeyBool(true).match(context, context.noParameters(), '5'));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(context, context.noParameters(), (char)1));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(context, context.noParameters(), 'Y'));
+    assertEquals(LENIENT, TRUE.match(context, context.noParameters(), '5'));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), (char)1));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), 'Y'));
 
-    assertEquals(LENIENT, new MapKeyBool(false).match(context, context.noParameters(), '0'));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(context, context.noParameters(), '9'));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(context, context.noParameters(), (char)0));
+    assertEquals(LENIENT, FALSE.match(context, context.noParameters(), '0'));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), '9'));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), (char)0));
   }
 }

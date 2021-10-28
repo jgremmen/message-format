@@ -46,6 +46,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -57,7 +58,7 @@ import static java.util.stream.Collectors.toMap;
 @AllArgsConstructor
 public class MessageCompiler
 {
-  private final MessageFactory messageFactory;
+  private final @NotNull MessageFactory messageFactory;
 
 
   @Contract(pure = true)
@@ -291,7 +292,7 @@ public class MessageCompiler
 
       @Override
       public void exitMapKeyBool(MapKeyBoolContext ctx) {
-        ctx.key = new MapKeyBool(ctx.BOOL().getText());
+        ctx.key = parseBoolean(ctx.BOOL().getText()) ? MapKeyBool.TRUE : MapKeyBool.FALSE;
       }
 
 
@@ -327,7 +328,7 @@ public class MessageCompiler
 
       @Override
       public void exitMapValueBool(MapValueBoolContext ctx) {
-        ctx.value = new MapValueBool(ctx.BOOL().getText());
+        ctx.value = parseBoolean(ctx.BOOL().getText()) ? MapValueBool.TRUE : MapValueBool.FALSE;
       }
 
 
