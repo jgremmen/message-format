@@ -74,7 +74,7 @@ public enum MapKeyBool implements MapKey
           return EQUIVALENT;
 
         try {
-          value = new BigDecimal(string);
+          value = new BigDecimal(value.toString());
         } catch(Exception ignore) {
         }
       }
