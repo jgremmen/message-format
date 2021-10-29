@@ -89,7 +89,7 @@ mapKey returns [MapKey key]
         | relationalOperatorOptional NUMBER  #mapKeyNumber
         | BOOL                               #mapKeyBool
         | equalOperatorOptional NULL         #mapKeyNull
-        | eqop=equalOperatorOptional EMPTY   #mapKeyEmpty
+        | equalOperatorOptional EMPTY        #mapKeyEmpty
         | NAME                               #mapKeyName
         ;
 

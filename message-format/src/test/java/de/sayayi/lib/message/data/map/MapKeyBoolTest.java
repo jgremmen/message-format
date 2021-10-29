@@ -90,11 +90,11 @@ public class MapKeyBoolTest
 
     assertEquals(EQUIVALENT, TRUE.match(context, context.noParameters(), "true"));
     assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), "false"));
-    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), "TRUE"));
+    assertEquals(EQUIVALENT, TRUE.match(context, context.noParameters(), "TRUE"));
 
     assertEquals(EQUIVALENT, FALSE.match(context, context.noParameters(), "false"));
     assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), "true"));
-    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), "FALSE"));
+    assertEquals(EQUIVALENT, FALSE.match(context, context.noParameters(), "FALSE"));
 
     assertEquals(LENIENT, TRUE.match(context, context.noParameters(), "0.9"));
     assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), "-0"));

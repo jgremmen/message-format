@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.UK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -35,11 +36,10 @@ public class MessageTest
   @Test
   public void testParse1()
   {
-    final Message m = MessageFactory.NO_CACHE_INSTANCE.parse("Just a simple message without parameters ");
+    final Message m = NO_CACHE_INSTANCE.parse("Just a simple message without parameters ");
     assertNotNull(m);
 
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(),
-        MessageFactory.NO_CACHE_INSTANCE);
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
     final String text = m.format(context, context.noParameters());
     assertEquals("Just a simple message without parameters", text);
   }
@@ -55,9 +55,8 @@ public class MessageTest
     texts.put(Locale.GERMAN, "%{n} %{n,choice,{1: 'Farbe', 'Farben'}}.");
     texts.put(Locale.US, "%{n} %{n,choice,{1:'color', 'colors'}}.");
 
-    final Message m = MessageFactory.NO_CACHE_INSTANCE.parse(texts);
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(),
-        MessageFactory.NO_CACHE_INSTANCE);
+    final Message m = NO_CACHE_INSTANCE.parse(texts);
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
     final String nl = m.format(context, context.parameters().withLocale("nl-NL").with("n", 1));
     assertEquals("1 kleur.", nl);
@@ -70,8 +69,7 @@ public class MessageTest
   @Test
   public void testCompareType()
   {
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(),
-        MessageFactory.NO_CACHE_INSTANCE);
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
     Message m = context.getMessageFactory().parse("%{n,choice,{<0:'negative',>0:'positive','zero'}}");
 
     assertEquals("negative",

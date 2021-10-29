@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public final class MapValueMessage implements MapValue
 {
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 600L;
 
   private final @NotNull Message.WithSpaces message;
 

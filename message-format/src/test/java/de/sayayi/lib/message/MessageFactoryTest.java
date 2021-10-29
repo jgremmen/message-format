@@ -60,11 +60,8 @@ public class MessageFactoryTest
 
   @SuppressWarnings("ResultOfMethodCallIgnored")
   @Test
-  public void testSyntaxError()
-  {
-    assertThrows(MessageParserException.class, () -> {
-      MessageFactory.NO_CACHE_INSTANCE.parse("%{x,{true false:1}");
-    });
+  public void testSyntaxError() {
+    assertThrows(MessageParserException.class, () -> MessageFactory.NO_CACHE_INSTANCE.parse("%{x,{true false:1}"));
   }
 
 

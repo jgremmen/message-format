@@ -48,7 +48,7 @@ import static java.util.stream.Collectors.toCollection;
 @EqualsAndHashCode(doNotUseGetters = true)
 public final class DataMap implements Data
 {
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 600L;
 
   private final @NotNull Map<MapKey,MapValue> map;
 

@@ -42,7 +42,7 @@ public enum MapKeyBool implements MapKey
   FALSE(false),
   TRUE(true);
 
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 600L;
 
   @Getter private final boolean bool;
 
@@ -63,18 +63,18 @@ public enum MapKeyBool implements MapKey
       if (value instanceof Boolean && (Boolean)value == bool)
         return EXACT;
 
-      if ("true".equals(value) && bool)
-        return EQUIVALENT;
-      if ("false".equals(value) && !bool)
-        return EQUIVALENT;
-
       if (value instanceof BigInteger)
         return ((((BigInteger)value).signum() != 0) == bool) ? LENIENT : MISMATCH;
 
       if (value instanceof CharSequence || value instanceof Character)
       {
+        final String string = value.toString();
+
+        if (("true".equalsIgnoreCase(string) && bool) || ("false".equalsIgnoreCase(string) && !bool))
+          return EQUIVALENT;
+
         try {
-          value = new BigDecimal(value.toString());
+          value = new BigDecimal(string);
         } catch(Exception ignore) {
         }
       }

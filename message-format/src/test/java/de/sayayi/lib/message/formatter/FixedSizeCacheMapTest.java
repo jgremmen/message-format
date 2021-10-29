@@ -63,6 +63,7 @@ public class FixedSizeCacheMapTest
     map.put(45, "45");
     map.put(2, "2");
     map.put(16, "16");
+
     assertEquals("2", map.put(2, "2-new"));
 
     assertEquals(3, map.size());
@@ -83,6 +84,7 @@ public class FixedSizeCacheMapTest
     map.put(31, "31");
     map.put(8, "8");
     map.put(1, "1");
+
     assertEquals("1", map.values().iterator().next());
 
     assertEquals("31", map.get(31));

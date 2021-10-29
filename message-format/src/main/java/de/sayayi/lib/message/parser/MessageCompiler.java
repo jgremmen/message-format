@@ -322,7 +322,7 @@ public class MessageCompiler
 
       @Override
       public void exitMapValueNumber(MapValueNumberContext ctx) {
-        ctx.value = new MapValueNumber(ctx.NUMBER().getText());
+        ctx.value = new MapValueNumber(Long.parseLong(ctx.NUMBER().getText()));
       }
 
 

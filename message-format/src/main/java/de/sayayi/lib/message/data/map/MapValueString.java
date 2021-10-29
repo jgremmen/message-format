@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class MapValueString extends DataString implements MapValue
 {
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 600L;
 
   private Message.WithSpaces message;
 

@@ -93,7 +93,7 @@ public final class NumberFormatter extends AbstractParameterFormatter
     if ("currency".equals(format))
       return NumberFormat.getCurrencyInstance(parameters.getLocale());
 
-    String customFormat = getConfigValueString(messageContext, "format", parameters, data, true, null);
+    String customFormat = getConfigValueString(messageContext, "number", parameters, data, true, null);
     if (customFormat != null)
       return new DecimalFormat(customFormat, new DecimalFormatSymbols(parameters.getLocale()));
 

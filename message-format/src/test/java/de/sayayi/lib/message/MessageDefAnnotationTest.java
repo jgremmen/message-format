@@ -101,8 +101,7 @@ public class MessageDefAnnotationTest
   public void testSingleMessageWithLocale()
   {
     final WithCode msg = bundle.getByCode("T2");
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(),
-        NO_CACHE_INSTANCE);
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
     assertEquals("nl", msg.format(context, context.noParameters()));
     assertEquals("nl", msg.format(context, context.parameters().withLocale(Locale.ROOT)));
@@ -121,8 +120,7 @@ public class MessageDefAnnotationTest
   public void testLocaleSelection()
   {
     final WithCode msg = bundle.getByCode("T1");
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(),
-        NO_CACHE_INSTANCE);
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
     assertEquals("us", msg.format(context, context.parameters().withLocale(Locale.ROOT)));
     assertEquals("uk", msg.format(context, context.parameters().withLocale(Locale.UK)));

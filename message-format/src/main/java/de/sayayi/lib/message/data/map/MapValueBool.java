@@ -30,7 +30,7 @@ public enum MapValueBool implements MapValue
   FALSE(false),
   TRUE(true);
 
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 600L;
 
   private final boolean bool;
 
