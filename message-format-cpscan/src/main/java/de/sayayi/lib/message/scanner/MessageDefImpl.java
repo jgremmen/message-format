@@ -18,6 +18,7 @@ package de.sayayi.lib.message.scanner;
 import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.Text;
 import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -32,7 +33,7 @@ public class MessageDefImpl implements MessageDef
 {
   private final String code;
   private final String text;
-  private final Text[] texts;
+  private final @NotNull Text[] texts;
 
 
   @Override

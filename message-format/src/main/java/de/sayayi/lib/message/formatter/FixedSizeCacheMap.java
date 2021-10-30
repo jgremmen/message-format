@@ -392,27 +392,27 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
 
   final class KeySet extends AbstractSet<K>
   {
-    public final int size() {
+    public int size() {
       return size;
     }
 
 
-    public final void clear() {
+    public void clear() {
       FixedSizeCacheMap.this.clear();
     }
 
 
-    public final Iterator<K> iterator() {
+    public @NotNull Iterator<K> iterator() {
       return new KeyIterator();
     }
 
 
-    public final boolean contains(Object o) {
+    public boolean contains(Object o) {
       return containsKey(o);
     }
 
 
-    public final boolean remove(Object key) {
+    public boolean remove(Object key) {
       return FixedSizeCacheMap.this.remove(key) != null;
     }
   }
@@ -435,7 +435,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
 
 
     @Override
-    public Iterator<V> iterator() {
+    public @NotNull Iterator<V> iterator() {
       return new ValueIterator();
     }
 
@@ -465,28 +465,28 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
 
   final class EntrySet extends AbstractSet<Entry<K,V>>
   {
-    public final int size() {
+    public int size() {
       return size;
     }
 
 
-    public final void clear() {
+    public void clear() {
       FixedSizeCacheMap.this.clear();
     }
 
 
-    public final Iterator<Entry<K,V>> iterator() {
+    public @NotNull Iterator<Entry<K,V>> iterator() {
       return new EntryIterator();
     }
 
 
     @SuppressWarnings("unchecked")
-    public final boolean contains(Object o) {
+    public boolean contains(Object o) {
       return (o instanceof FixedSizeCacheMap.Link) && findEntry(((Link<K,V>)o).key) == o;
     }
 
 
-    public final boolean remove(Object o)
+    public boolean remove(Object o)
     {
       if (o instanceof FixedSizeCacheMap.Link)
       {
@@ -502,10 +502,10 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
 
 
 
-  final class EntryIterator extends BaseIterator implements Iterator<Map.Entry<K,V>>
+  final class EntryIterator extends BaseIterator implements Iterator<Entry<K,V>>
   {
     @SuppressWarnings("squid:S2272")
-    public final Map.Entry<K,V> next() {
+    public Entry<K,V> next() {
       return nextNode();
     }
   }
@@ -516,7 +516,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   final class KeyIterator extends BaseIterator implements Iterator<K>
   {
     @SuppressWarnings("squid:S2272")
-    public final K next() {
+    public K next() {
       return nextNode().key;
     }
   }
@@ -527,7 +527,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   final class ValueIterator extends BaseIterator implements Iterator<V>
   {
     @SuppressWarnings("squid:S2272")
-    public final V next() {
+    public V next() {
       return nextNode().value;
     }
   }
@@ -587,7 +587,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
 
 
 
-  private static class Link<K,V> implements Map.Entry<K,V>
+  private static class Link<K,V> implements Entry<K,V>
   {
     @Getter K key;
     @Getter V value;

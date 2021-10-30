@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.util.Collections.unmodifiableSet;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -100,11 +101,7 @@ public class MessageBundle
   @SuppressWarnings({"WeakerAccess", "squid:S2583"})
   public void add(@NotNull Message.WithCode message)
   {
-    //noinspection ConstantConditions
-    if (message == null)
-      throw new NullPointerException("message must not be null");
-
-    final String code = message.getCode();
+    final String code = requireNonNull(message, "message must not be null").getCode();
     if (hasMessageWithCode(code))
       throw new MessageException("message with code " + code + " already exists in message bundle");
 
