@@ -43,7 +43,7 @@ import static java.util.Collections.unmodifiableSet;
 @ToString
 public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode implements LocaleAware
 {
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 600L;
 
   private final @NotNull Map<Locale,Message> localizedMessages;
 

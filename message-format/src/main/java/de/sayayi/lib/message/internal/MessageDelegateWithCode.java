@@ -33,7 +33,7 @@ import java.util.SortedSet;
 @ToString
 public class MessageDelegateWithCode extends AbstractMessageWithCode
 {
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 600L;
 
   @Getter private final @NotNull Message message;
 

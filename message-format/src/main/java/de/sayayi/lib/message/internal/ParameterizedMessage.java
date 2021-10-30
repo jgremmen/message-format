@@ -36,7 +36,7 @@ import java.util.TreeSet;
 @ToString
 public class ParameterizedMessage implements Message.WithSpaces
 {
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 600L;
 
   private final MessagePart[] parts;
 
