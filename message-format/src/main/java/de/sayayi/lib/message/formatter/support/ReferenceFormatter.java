@@ -56,13 +56,13 @@ public final class ReferenceFormatter extends AbstractParameterFormatter
 
   @Override
   public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return compareType.match(((Reference<?>)value).get() == null ? 0 : 1) ? TYPELESS_EXACT : null;
+    return compareType.match(size(value)) ? TYPELESS_EXACT : null;
   }
 
 
   @Override
   public int size(@NotNull Object value) {
-    return ((Reference<?>)value).get() != null ? 1 : 0;
+    return ((Reference<?>)value).get() == null ? 0 : 1;
   }
 
 
