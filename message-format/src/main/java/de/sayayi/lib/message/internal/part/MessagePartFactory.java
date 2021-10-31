@@ -16,7 +16,8 @@
 package de.sayayi.lib.message.internal.part;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Contract;
@@ -51,14 +52,14 @@ public final class MessagePartFactory
   @Contract(pure = true)
   @SuppressWarnings("java:S3358")
   public static @NotNull Text noSpaceText(String text) {
-    return text == null ? NULL : (text.trim().isEmpty() ? EMPTY : new NoSpaceTextPart(text));
+    return text == null ? NULL : text.trim().isEmpty() ? EMPTY : new NoSpaceTextPart(text);
   }
 
 
   @Contract(pure = true)
   @SuppressWarnings("java:S3358")
   public static @NotNull Text spacedText(String text) {
-    return text == null ? NULL : (text.isEmpty() ? EMPTY : new TextPart(text));
+    return text == null ? NULL : text.isEmpty() ? EMPTY : new TextPart(text);
   }
 
 
@@ -67,17 +68,18 @@ public final class MessagePartFactory
     final boolean textSpaceBefore = text.isSpaceBefore();
     final boolean textSpaceAfter = text.isSpaceAfter();
 
-    if ((textSpaceBefore || spaceBefore) == textSpaceBefore && (textSpaceAfter || spaceAfter) == textSpaceAfter)
-      return text;
-
-    return new TextPart(text.getText(), textSpaceBefore || spaceBefore, textSpaceAfter || spaceAfter);
+    return (textSpaceBefore || spaceBefore) == textSpaceBefore && (textSpaceAfter || spaceAfter) == textSpaceAfter
+        ? text
+        : new TextPart(text.getText(), textSpaceBefore || spaceBefore, textSpaceAfter || spaceAfter);
   }
 
 
   @Contract(pure = true)
-  public static @NotNull Text messageToText(Message.WithSpaces message, @NotNull Parameters parameters)
+  public static @NotNull Text messageToText(@NotNull MessageContext messageContext, Message.WithSpaces message,
+                                            @NotNull Parameters parameters)
   {
     return message == null
-        ? NULL : new TextPart(message.format(parameters), message.isSpaceBefore(), message.isSpaceAfter());
+        ? NULL
+        : new TextPart(message.format(messageContext, parameters), message.isSpaceBefore(), message.isSpaceAfter());
   }
 }

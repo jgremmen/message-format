@@ -26,7 +26,7 @@ import java.lang.annotation.Annotation;
  */
 @AllArgsConstructor
 @SuppressWarnings("ClassExplicitlyAnnotation")
-class TextImpl implements Text
+public class TextImpl implements Text
 {
   private final String locale;
   private final String text;

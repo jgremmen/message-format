@@ -15,14 +15,17 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static java.util.Collections.singleton;
 
 
 /**
@@ -31,15 +34,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class AtomicBooleanFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
-    return parameters.getFormatter(format, boolean.class)
-        .format(value == null ? null : ((AtomicBoolean)value).get(), format, parameters, data);
+    return messageContext.getFormatter(format, boolean.class)
+        .format(messageContext, value == null ? null : ((AtomicBoolean)value).get(), format, parameters, data);
   }
 
 
   @Override
+  @Contract(value = "-> new", pure = true)
   public @NotNull Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(AtomicBoolean.class);
+    return singleton(AtomicBoolean.class);
   }
 }

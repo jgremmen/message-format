@@ -1,6 +1,7 @@
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
@@ -41,13 +42,15 @@ public final class FileSizeFormatter extends AbstractParameterFormatter implemen
 
 
   @Override
-  protected @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  protected @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                      @NotNull Parameters parameters, Data data)
   {
     if (!(value instanceof Number))
       return nullText();
 
     val size = ((Number)value).longValue();
-    var scale = normalizeScale(getConfigValueNumber("scale", parameters, data, true, 1));
+    var scale = normalizeScale(
+        getConfigValueNumber(messageContext, "scale", parameters, data, true, 1));
     val s = new StringBuilder();
     final int unitIndex;
 
@@ -66,13 +69,13 @@ public final class FileSizeFormatter extends AbstractParameterFormatter implemen
     }
 
     val unit = UNITS[unitIndex];
-    val unitMessage = getMessage(unit, EnumSet.of(STRING), parameters, data, false);
+    val unitMessage = getMessage(messageContext, unit, EnumSet.of(STRING), parameters, data, false);
 
     if ((unitMessage != null && unitMessage.isSpaceBefore()) ||
-        getConfigValueBool("space", parameters, data, false))
+        getConfigValueBool(messageContext, "space", parameters, data, false))
       s.append(' ');
 
-    return noSpaceText(s.append(unitMessage == null ? unit : unitMessage.format(parameters)).toString());
+    return noSpaceText(s.append(unitMessage == null ? unit : unitMessage.format(messageContext, parameters)).toString());
   }
 
 

@@ -19,10 +19,12 @@ build:
   stage: build
   script: ./gradlew clean build
   artifacts:
+    name: "message-format-artifacts"
     paths:
-      - ./message-format/.build/libs/*
-      - ./message-format-java7/.build/libs/*
-      - ./message-format-java8/.build/libs/*
-      - ./message-format-jodatime/.build/libs/*
-      - ./message-format-jsr354/.build/libs/*
-    expire_in: 8 weeks
+      - message-format/.build/libs/*.jar
+      - message-format-cpscan/.build/libs/*.jar
+      - message-format-jodatime/.build/libs/*.jar
+      - message-format-jsr354/.build/libs/*.jar
+    exclude:
+      - message-format/.build/libs/message-format-test-*.jar
+    expire_in: 2 weeks

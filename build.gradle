@@ -29,14 +29,14 @@ allprojects {
   apply plugin: "base"
 
   group = "de.sayayi.lib"
-  version = "0.5.0"
+  version = "0.6.0"
 }
 
 
 configure(moduleProjects) {
-  ext.lombokVersion = "1.18.20"
-  ext.junitVersion = "4.13.2"
-  ext.jetbrainsAnnotationsVersion = "20.1.0"
+  ext.lombokVersion = "1.18.22"
+  ext.junitVersion = "5.8.1"
+  ext.jetbrainsAnnotationsVersion = "22.0.0"
 
   apply from: "${rootDir}/gradle/module.gradle"
 }

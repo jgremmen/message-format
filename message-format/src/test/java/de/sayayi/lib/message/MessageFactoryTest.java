@@ -15,19 +15,19 @@
  */
 package de.sayayi.lib.message;
 
-
 import de.sayayi.lib.message.Message.WithCode;
 import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import de.sayayi.lib.message.internal.ParameterizedMessage;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Locale;
 
 import static java.util.Collections.singleton;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -38,7 +38,7 @@ public class MessageFactoryTest
   @Test
   public void testParseString()
   {
-    Message.WithSpaces msg = MessageFactory.parse("this is %{test}");
+    Message.WithSpaces msg = MessageFactory.NO_CACHE_INSTANCE.parse("this is %{test}");
     assertEquals(singleton("test"), msg.getParameterNames());
     assertTrue(msg instanceof ParameterizedMessage);
     assertTrue(msg.hasParameters());
@@ -48,20 +48,20 @@ public class MessageFactoryTest
   @Test
   public void testWithCode()
   {
-    WithCode msgWithCode1 = MessageFactory.withCode("ABC", EmptyMessage.INSTANCE);
+    WithCode msgWithCode1 = MessageFactory.NO_CACHE_INSTANCE.withCode("ABC", EmptyMessage.INSTANCE);
     assertEquals("ABC", msgWithCode1.getCode());
     assertTrue(msgWithCode1 instanceof EmptyMessageWithCode);
 
-    WithCode msgWithCode2 = MessageFactory.withCode("ABC", new EmptyMessageWithCode("DEF"));
+    WithCode msgWithCode2 = MessageFactory.NO_CACHE_INSTANCE.withCode("ABC", new EmptyMessageWithCode("DEF"));
     assertEquals("ABC", msgWithCode2.getCode());
     assertTrue(msgWithCode2 instanceof EmptyMessageWithCode);
   }
 
 
   @SuppressWarnings("ResultOfMethodCallIgnored")
-  @Test(expected = MessageParserException.class)
+  @Test
   public void testSyntaxError() {
-    MessageFactory.parse("%{x,{true false:1}");
+    assertThrows(MessageParserException.class, () -> MessageFactory.NO_CACHE_INSTANCE.parse("%{x,{true false:1}"));
   }
 
 

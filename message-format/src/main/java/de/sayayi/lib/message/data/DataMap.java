@@ -16,7 +16,8 @@
 package de.sayayi.lib.message.data;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.map.MapKey;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.data.map.MapValue;
@@ -25,20 +26,19 @@ import de.sayayi.lib.message.data.map.MapValueMessage;
 import de.sayayi.lib.message.data.map.MapValueString;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.data.map.MapValue.STRING_MESSAGE_TYPE;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.stream.Collectors.toCollection;
 
 
 /**
@@ -48,9 +48,9 @@ import static de.sayayi.lib.message.data.map.MapValue.STRING_MESSAGE_TYPE;
 @EqualsAndHashCode(doNotUseGetters = true)
 public final class DataMap implements Data
 {
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 600L;
 
-  @Getter private final Map<MapKey,MapValue> map;
+  private final @NotNull Map<MapKey,MapValue> map;
 
 
   @Override
@@ -63,12 +63,13 @@ public final class DataMap implements Data
   @Override
   @Contract(pure = true)
   public @NotNull Map<MapKey,MapValue> asObject() {
-    return Collections.unmodifiableMap(map);
+    return unmodifiableMap(map);
   }
 
 
   @Contract(pure = true)
-  public MapValue find(Object key, Parameters parameters, Set<MapKey.Type> keyTypes, Set<MapValue.Type> valueTypes)
+  public MapValue find(@NotNull MessageContext messageContext, Object key, Parameters parameters,
+                       Set<MapKey.Type> keyTypes, Set<MapValue.Type> valueTypes)
   {
     MatchResult bestMatchResult = MISMATCH;
     MapValue bestMatch = null;
@@ -84,7 +85,7 @@ public final class DataMap implements Data
       if ((keyTypes == null || keyTypes.contains(mapKey.getType()) &&
           (valueTypes == null || valueTypes.contains(mapValue.getType()))))
       {
-        MatchResult matchResult = mapKey.match(parameters, key);
+        MatchResult matchResult = mapKey.match(messageContext, parameters, key);
 
         if (matchResult == EXACT)
           return entry.getValue();
@@ -102,10 +103,10 @@ public final class DataMap implements Data
 
 
   @Contract(pure = true)
-  public Message.WithSpaces getMessage(Object key, Parameters parameters, Set<MapKey.Type> keyTypes,
-                                       boolean includeDefault)
+  public Message.WithSpaces getMessage(@NotNull MessageContext messageContext, Object key, Parameters parameters,
+                                       Set<MapKey.Type> keyTypes, boolean includeDefault)
   {
-    MapValue mapValue = find(key, parameters, keyTypes, STRING_MESSAGE_TYPE);
+    MapValue mapValue = find(messageContext, key, parameters, keyTypes, STRING_MESSAGE_TYPE);
 
     if (mapValue == null)
     {
@@ -116,7 +117,7 @@ public final class DataMap implements Data
     }
 
     if (mapValue.getType() == Type.STRING)
-      return ((MapValueString)mapValue).asMessage();
+      return ((MapValueString)mapValue).asMessage(messageContext.getMessageFactory());
 
     return (Message.WithSpaces)mapValue.asObject();
   }
@@ -133,6 +134,6 @@ public final class DataMap implements Data
     return map.values().stream()
         .filter(mapValue -> mapValue instanceof MapValueMessage)
         .flatMap(mapValue -> ((MapValueMessage)mapValue).asObject().getParameterNames().stream())
-        .collect(Collectors.toCollection(TreeSet::new));
+        .collect(toCollection(TreeSet::new));
   }
 }

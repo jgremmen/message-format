@@ -16,7 +16,8 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.Type;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
@@ -42,7 +43,8 @@ public final class URIFormatter extends AbstractParameterFormatter
 {
   @Override
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
@@ -50,7 +52,7 @@ public final class URIFormatter extends AbstractParameterFormatter
     final URI uri = (URI)value;
 
     if ("authority".equals(format))
-      return parameters.getFormatter(String.class).format(uri.getAuthority(), null, parameters, data);
+      return messageContext.getFormatter(String.class).format(messageContext, uri.getAuthority(), null, parameters, data);
     else if ("fragment".equals(format))
       return new TextPart(uri.getFragment());
     else if ("host".equals(format))
@@ -63,15 +65,17 @@ public final class URIFormatter extends AbstractParameterFormatter
 
       if (port == -1)
       {
-        String undefined = getConfigValueString("undefined", parameters, data, false,null);
+        String undefined = getConfigValueString(messageContext, "undefined", parameters, data,
+            false,null);
         if (undefined != null)
           return new TextPart(undefined);
       }
       else if (port >= 0)
       {
-        Message.WithSpaces msg = getMessage(port, EnumSet.of(Type.NUMBER), parameters, data, false);
+        Message.WithSpaces msg = getMessage(messageContext, port, EnumSet.of(Type.NUMBER), parameters, data,
+            false);
         if (msg != null)
-          return new TextPart(msg.format(parameters), msg.isSpaceBefore(), msg.isSpaceAfter());
+          return new TextPart(msg.format(messageContext, parameters), msg.isSpaceBefore(), msg.isSpaceAfter());
       }
 
       return port == -1 ? nullText() : new TextPart(Integer.toString(port));
@@ -81,10 +85,11 @@ public final class URIFormatter extends AbstractParameterFormatter
     else if ("scheme".equals(format))
     {
       final String scheme = uri.getScheme();
-      final Message.WithSpaces msg = getMessage(scheme, EnumSet.of(STRING, EMPTY, NULL), parameters, data, false);
+      final Message.WithSpaces msg = getMessage(messageContext, scheme, EnumSet.of(STRING, EMPTY, NULL), parameters,
+          data, false);
 
       return msg != null
-          ? new TextPart(msg.format(parameters), msg.isSpaceBefore(), msg.isSpaceAfter())
+          ? new TextPart(msg.format(messageContext, parameters), msg.isSpaceBefore(), msg.isSpaceAfter())
           : new TextPart(scheme);
     }
     else if ("user-info".equals(format))

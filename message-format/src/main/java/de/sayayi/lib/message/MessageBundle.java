@@ -17,6 +17,7 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
+import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.util.Collections.unmodifiableSet;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -37,28 +39,34 @@ import static java.util.Collections.unmodifiableSet;
  */
 public class MessageBundle
 {
+  @Getter private final @NotNull MessageFactory messageFactory;
+
   private final Map<String,Message.WithCode> messages;
   private final Set<Class<?>> indexedClasses;
 
 
   @SuppressWarnings("WeakerAccess")
-  public MessageBundle()
+  public MessageBundle(@NotNull MessageFactory messageFactory)
   {
+    this.messageFactory = messageFactory;
+
     messages = new HashMap<>();
     indexedClasses = new HashSet<>();
   }
 
 
-  public MessageBundle(@NotNull Class<?> classWithMessages)
+  public MessageBundle(@NotNull MessageFactory messageFactory, @NotNull Class<?> classWithMessages)
   {
-    this();
+    this(messageFactory);
+
     add(classWithMessages);
   }
 
 
-  MessageBundle(@NotNull Map<String,Map<Locale,Message>> localizedMessagesByCode)
+  MessageBundle(@NotNull MessageFactory messageFactory,
+                @NotNull Map<String,Map<Locale,Message>> localizedMessagesByCode)
   {
-    this();
+    this(messageFactory);
 
     localizedMessagesByCode.forEach(
         (code,localizedMessages) -> add(new LocalizedMessageBundleWithCode(code, localizedMessages)));
@@ -70,10 +78,9 @@ public class MessageBundle
    *
    * @return  set with all message codes, never {@code null}
    */
-  @NotNull
   @Contract(value = "-> new", pure = true)
   @Unmodifiable
-  public Set<String> getCodes() {
+  public @NotNull Set<String> getCodes() {
     return unmodifiableSet(messages.keySet());
   }
 
@@ -84,7 +91,7 @@ public class MessageBundle
   }
 
 
-  @Contract(pure = true)
+  @Contract(value = "null -> false", pure = true)
   public boolean hasMessageWithCode(String code) {
     return code != null && messages.containsKey(code);
   }
@@ -94,11 +101,7 @@ public class MessageBundle
   @SuppressWarnings({"WeakerAccess", "squid:S2583"})
   public void add(@NotNull Message.WithCode message)
   {
-    //noinspection ConstantConditions
-    if (message == null)
-      throw new NullPointerException("message must not be null");
-
-    final String code = message.getCode();
+    final String code = requireNonNull(message, "message must not be null").getCode();
     if (hasMessageWithCode(code))
       throw new MessageException("message with code " + code + " already exists in message bundle");
 
@@ -113,10 +116,10 @@ public class MessageBundle
     for(Class<?> clazz = classWithMessages; clazz != null && clazz != Object.class; clazz = clazz.getSuperclass())
       if (!indexedClasses.contains(clazz))
       {
-        for(Class<?> ifClass: clazz.getInterfaces())
+        for(final Class<?> ifClass: clazz.getInterfaces())
           add(ifClass);
 
-        for(Method method: clazz.getDeclaredMethods())
+        for(final Method method: clazz.getDeclaredMethods())
           add0(method);
 
         add0(clazz);
@@ -126,7 +129,7 @@ public class MessageBundle
   }
 
 
-  private void add0(AnnotatedElement annotatedElement) {
-    MessageFactory.parseAnnotations(annotatedElement).forEach(this::add);
+  private void add0(@NotNull AnnotatedElement annotatedElement) {
+    messageFactory.parseAnnotations(annotatedElement).forEach(this::add);
   }
 }

@@ -16,16 +16,17 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.ParameterFactory;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.part.TextPart;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static de.sayayi.lib.message.MessageFactory.parse;
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.ENGLISH;
 import static java.util.Locale.GERMAN;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -45,14 +46,16 @@ public class BoolFormatterTest extends AbstractFormatterTest
   public void testFormat()
   {
     final BoolFormatter formatter = new BoolFormatter();
-    final Parameters parameters = ParameterFactory.createFor("de-DE").noParameters();
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE,
+        "de-DE");
+    final Parameters parameters = context.noParameters();
 
-    assertEquals(new TextPart("wahr"), formatter.format(Boolean.TRUE, null, parameters, null));
-    assertEquals(new TextPart("falsch"), formatter.format(0.0d, null, parameters, null));
-    assertEquals(new TextPart("wahr"), formatter.format(-0.0001f, null, parameters, null));
-    assertEquals(new TextPart("falsch"), formatter.format("FALSE", null, parameters, null));
-    assertEquals(new TextPart("wahr"), formatter.format("TrUe", null, parameters, null));
-    assertEquals(new TextPart("wahr"), formatter.format(-4, null, parameters, null));
+    assertEquals(new TextPart("wahr"), formatter.format(context, Boolean.TRUE, null, parameters, null));
+    assertEquals(new TextPart("falsch"), formatter.format(context, 0.0d, null, parameters, null));
+    assertEquals(new TextPart("wahr"), formatter.format(context, -0.0001f, null, parameters, null));
+    assertEquals(new TextPart("falsch"), formatter.format(context, "FALSE", null, parameters, null));
+    assertEquals(new TextPart("wahr"), formatter.format(context, "TrUe", null, parameters, null));
+    assertEquals(new TextPart("wahr"), formatter.format(context, -4, null, parameters, null));
   }
 
 
@@ -61,17 +64,18 @@ public class BoolFormatterTest extends AbstractFormatterTest
   {
     final GenericFormatterService formatterRegistry = new GenericFormatterService();
     formatterRegistry.addFormatter(new BoolFormatter());
-    ParameterFactory factory = ParameterFactory.createFor(ENGLISH, formatterRegistry);
+    final MessageContext context = new MessageContext(formatterRegistry, NO_CACHE_INSTANCE, ENGLISH);
 
-    final Parameters parameters = factory
+    final Parameters parameters = context.parameters()
         .with("a", Boolean.FALSE)
         .with("b", Boolean.TRUE)
         .with("c", Integer.valueOf(1234))
         .with("d", Integer.valueOf(0))
         .with("e", Double.valueOf(3.14d));
-    final Message msg = parse("%{a} %{b} %{c} %{c,bool} %{d,bool,{true:'yes',false:'no'}} %{e}");
+    final Message msg = context.getMessageFactory()
+        .parse("%{a} %{b} %{c} %{c,bool} %{d,bool,{true:'yes',false:'no'}} %{e}");
 
-    assertEquals("false true 1234 true no 3.14", msg.format(parameters));
+    assertEquals("false true 1234 true no 3.14", msg.format(context, parameters));
   }
 
 
@@ -80,12 +84,12 @@ public class BoolFormatterTest extends AbstractFormatterTest
   {
     final GenericFormatterService formatterRegistry = new GenericFormatterService();
     formatterRegistry.addFormatter(new BoolFormatter());
-    ParameterFactory factory = ParameterFactory.createFor(GERMAN, formatterRegistry);
+    final MessageContext context = new MessageContext(formatterRegistry, NO_CACHE_INSTANCE, GERMAN);
 
-    final Message msg = parse("%{b,bool,{null:'<unknown>',true:'yes',false:'no'}}");
+    final Message msg = context.getMessageFactory().parse("%{b,bool,{null:'<unknown>',true:'yes',false:'no'}}");
 
-    assertEquals("<unknown>", msg.format(factory.with("b", null)));
-    assertEquals("yes", msg.format(factory.with("b", true)));
-    assertEquals("no", msg.format(factory.with("b", false)));
+    assertEquals("<unknown>", msg.format(context, context.parameters().with("b", null)));
+    assertEquals("yes", msg.format(context, context.parameters().with("b", true)));
+    assertEquals("no", msg.format(context, context.parameters().with("b", false)));
   }
 }

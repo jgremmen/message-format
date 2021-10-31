@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.internal.part;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.exception.MessageException;
@@ -60,14 +61,14 @@ public final class ParameterPart implements Parameter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text getText(@NotNull Parameters parameters)
+  public @NotNull Text getText(@NotNull MessageContext messageContext, @NotNull Parameters parameters)
   {
     final Object value = parameters.getParameterValue(parameter);
     final Class<?> type = value != null ? value.getClass() : String.class;
-    final ParameterFormatter formatter = parameters.getFormatter(format, type);
+    final ParameterFormatter formatter = messageContext.getFormatter(format, type);
 
     try {
-      return addSpaces(formatter.format(value, format, parameters, data), spaceBefore, spaceAfter);
+      return addSpaces(formatter.format(messageContext, value, format, parameters, data), spaceBefore, spaceAfter);
     } catch(Exception ex) {
       throw new MessageException("failed to format parameter " + parameter, ex);
     }

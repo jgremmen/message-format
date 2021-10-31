@@ -13,31 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message;
+package de.sayayi.lib.message.parser.normalizer;
 
-import de.sayayi.lib.message.scanner.ClassPathScanner;
+import de.sayayi.lib.message.internal.part.MessagePart;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Set;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public class ClassPathMessageBundle extends MessageBundle
+public interface MessagePartNormalizer
 {
-  public ClassPathMessageBundle(@NotNull Set<String> packageNames) {
-    this(packageNames, null);
-  }
-
-
-  public ClassPathMessageBundle(@NotNull Set<String> packageNames, ClassLoader classLoader) {
-    new ClassPathScanner(this, packageNames, classLoader).run();
-  }
-
-
-  @Override
-  public final void add(@NotNull Class<?> classWithMessages) {
-    throw new UnsupportedOperationException();
-  }
+  /**
+   * Normalize the given message part. The returned part may be replaced with an identical cached version
+   * in order to reduce memory load.
+   *
+   * @param <T>   message part implementation type
+   * @param part  message part
+   *
+   * @return  message part
+   */
+  <T extends MessagePart> @NotNull T normalize(@NotNull T part);
 }

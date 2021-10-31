@@ -15,14 +15,15 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -62,6 +63,7 @@ public class FixedSizeCacheMapTest
     map.put(45, "45");
     map.put(2, "2");
     map.put(16, "16");
+
     assertEquals("2", map.put(2, "2-new"));
 
     assertEquals(3, map.size());
@@ -82,6 +84,7 @@ public class FixedSizeCacheMapTest
     map.put(31, "31");
     map.put(8, "8");
     map.put(1, "1");
+
     assertEquals("1", map.values().iterator().next());
 
     assertEquals("31", map.get(31));
@@ -95,9 +98,12 @@ public class FixedSizeCacheMapTest
   }
 
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testTooSmallCacheSize() {
-    new FixedSizeCacheMap<String,String>(1);
+  @Test
+  public void testTooSmallCacheSize()
+  {
+    assertThrows(IllegalArgumentException.class, () -> {
+      new FixedSizeCacheMap<String,String>(1);
+    });
   }
 
 

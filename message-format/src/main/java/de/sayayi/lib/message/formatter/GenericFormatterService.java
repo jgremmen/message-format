@@ -20,7 +20,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Collections.synchronizedMap;
@@ -119,7 +121,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       while(formatter == null && type != null)
         if ((formatter = typeFormatters.get(type)) == null)
         {
-          for(final Class<?> interfaceType: type.getInterfaces())
+          for(final Class<?> interfaceType: getInterfaceTypes(type))
             if ((formatter = typeFormatters.get(interfaceType)) != null)
               break resolve;
 
@@ -128,5 +130,20 @@ public class GenericFormatterService implements FormatterService.WithRegistry
     }
 
     return formatter == null ? typeFormatters.get(Object.class) : formatter;
+  }
+
+
+  private static @NotNull Set<Class<?>> getInterfaceTypes(@NotNull Class<?> type)
+  {
+    final Set<Class<?>> interfaceTypes = new LinkedHashSet<>();
+
+    for(final Class<?> interfaceType: type.getInterfaces())
+      if (!interfaceTypes.contains(interfaceType))
+      {
+        interfaceTypes.add(interfaceType);
+        interfaceTypes.addAll(getInterfaceTypes(interfaceType));
+      }
+
+    return interfaceTypes;
   }
 }

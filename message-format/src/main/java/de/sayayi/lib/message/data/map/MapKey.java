@@ -15,10 +15,12 @@
  */
 package de.sayayi.lib.message.data.map;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.EnumSet;
 
 
@@ -26,7 +28,7 @@ import java.util.EnumSet;
  * @author Jeroen Gremmen
  */
 @SuppressWarnings({"java:S1214", "java:S2386"})
-public interface MapKey
+public interface MapKey extends Serializable
 {
   EnumSet<Type> EMPTY_NULL_TYPE = EnumSet.of(Type.EMPTY, Type.NULL);
   EnumSet<Type> STRING_TYPE = EnumSet.of(Type.STRING);
@@ -38,7 +40,7 @@ public interface MapKey
 
 
   @Contract(pure = true)
-  @NotNull MatchResult match(@NotNull Parameters parameters, Object value);
+  @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Parameters parameters, Object value);
 
 
 

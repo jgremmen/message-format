@@ -15,14 +15,18 @@
  */
 package de.sayayi.lib.message.data.map;
 
-import org.junit.Test;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import org.junit.jupiter.api.Test;
 
-import static de.sayayi.lib.message.ParameterFactory.DEFAULT;
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EQUIVALENT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.LENIENT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
-import static org.junit.Assert.assertEquals;
+import static de.sayayi.lib.message.data.map.MapKeyBool.FALSE;
+import static de.sayayi.lib.message.data.map.MapKeyBool.TRUE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -31,77 +35,88 @@ import static org.junit.Assert.assertEquals;
 public class MapKeyBoolTest
 {
   @Test
-  public void testMatchNull() {
-    assertEquals(MISMATCH, new MapKeyBool(true).match(DEFAULT.noParameters(), null));
+  public void testMatchNull()
+  {
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), null));
   }
 
 
   @Test
   public void testMatchBoolean()
   {
-    assertEquals(EXACT, new MapKeyBool(true).match(DEFAULT.noParameters(), true));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(DEFAULT.noParameters(), false));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(DEFAULT.noParameters(), true));
-    assertEquals(EXACT, new MapKeyBool(false).match(DEFAULT.noParameters(), false));
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+
+    assertEquals(EXACT, TRUE.match(context, context.noParameters(), true));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), false));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), true));
+    assertEquals(EXACT, FALSE.match(context, context.noParameters(), false));
   }
 
 
   @Test
   public void testMatchNumber()
   {
-    // byte
-    assertEquals(MISMATCH, new MapKeyBool(true).match(DEFAULT.noParameters(), (byte)0));
-    assertEquals(LENIENT, new MapKeyBool(true).match(DEFAULT.noParameters(), (byte)100));
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
-    assertEquals(LENIENT, new MapKeyBool(false).match(DEFAULT.noParameters(), (byte)0));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(DEFAULT.noParameters(), Byte.MIN_VALUE));
+    // byte
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), (byte)0));
+    assertEquals(LENIENT, TRUE.match(context, context.noParameters(), (byte)100));
+
+    assertEquals(LENIENT, FALSE.match(context, context.noParameters(), (byte)0));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), Byte.MIN_VALUE));
 
     // integer
-    assertEquals(MISMATCH, new MapKeyBool(true).match(DEFAULT.noParameters(), 0));
-    assertEquals(LENIENT, new MapKeyBool(true).match(DEFAULT.noParameters(), 100));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), 0));
+    assertEquals(LENIENT, TRUE.match(context, context.noParameters(), 100));
 
-    assertEquals(LENIENT, new MapKeyBool(false).match(DEFAULT.noParameters(), 0));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(DEFAULT.noParameters(), Integer.MAX_VALUE));
+    assertEquals(LENIENT, FALSE.match(context, context.noParameters(), 0));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), Integer.MAX_VALUE));
 
     // long
-    assertEquals(MISMATCH, new MapKeyBool(true).match(DEFAULT.noParameters(), 0L));
-    assertEquals(LENIENT, new MapKeyBool(true).match(DEFAULT.noParameters(), -100L));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), 0L));
+    assertEquals(LENIENT, TRUE.match(context, context.noParameters(), -100L));
 
-    assertEquals(LENIENT, new MapKeyBool(false).match(DEFAULT.noParameters(), 0L));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(DEFAULT.noParameters(), Long.MIN_VALUE));
+    assertEquals(LENIENT, FALSE.match(context, context.noParameters(), 0L));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), Long.MIN_VALUE));
   }
 
 
   @Test
   public void testMatchString()
   {
-    assertEquals(EQUIVALENT, new MapKeyBool(true).match(DEFAULT.noParameters(), "true"));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(DEFAULT.noParameters(), "false"));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(DEFAULT.noParameters(), "TRUE"));
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
-    assertEquals(EQUIVALENT, new MapKeyBool(false).match(DEFAULT.noParameters(), "false"));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(DEFAULT.noParameters(), "true"));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(DEFAULT.noParameters(), "FALSE"));
+    assertEquals(EQUIVALENT, TRUE.match(context, context.noParameters(), "true"));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), "false"));
+    assertEquals(EQUIVALENT, TRUE.match(context, context.noParameters(), "TRUE"));
 
-    assertEquals(LENIENT, new MapKeyBool(true).match(DEFAULT.noParameters(), "0.9"));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(DEFAULT.noParameters(), "-0"));
-    assertEquals(LENIENT, new MapKeyBool(true).match(DEFAULT.noParameters(), "+1234567890000000"));
+    assertEquals(EQUIVALENT, FALSE.match(context, context.noParameters(), "false"));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), "true"));
+    assertEquals(EQUIVALENT, FALSE.match(context, context.noParameters(), "FALSE"));
 
-    assertEquals(LENIENT, new MapKeyBool(false).match(DEFAULT.noParameters(), "+0"));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(DEFAULT.noParameters(), "1e-100"));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(DEFAULT.noParameters(), "-1234567890000000"));
+    assertEquals(LENIENT, TRUE.match(context, context.noParameters(), "0.9"));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), "-0"));
+    assertEquals(LENIENT, TRUE.match(context, context.noParameters(), "+1234567890000000"));
+
+    assertEquals(LENIENT, FALSE.match(context, context.noParameters(), "+0"));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), "1e-100"));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), "-1234567890000000"));
   }
 
 
   @Test
   public void testMatchCharacter()
   {
-    assertEquals(LENIENT, new MapKeyBool(true).match(DEFAULT.noParameters(), '5'));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(DEFAULT.noParameters(), (char)1));
-    assertEquals(MISMATCH, new MapKeyBool(true).match(DEFAULT.noParameters(), 'Y'));
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
-    assertEquals(LENIENT, new MapKeyBool(false).match(DEFAULT.noParameters(), '0'));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(DEFAULT.noParameters(), '9'));
-    assertEquals(MISMATCH, new MapKeyBool(false).match(DEFAULT.noParameters(), (char)0));
+    assertEquals(LENIENT, TRUE.match(context, context.noParameters(), '5'));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), (char)1));
+    assertEquals(MISMATCH, TRUE.match(context, context.noParameters(), 'Y'));
+
+    assertEquals(LENIENT, FALSE.match(context, context.noParameters(), '0'));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), '9'));
+    assertEquals(MISMATCH, FALSE.match(context, context.noParameters(), (char)0));
   }
 }

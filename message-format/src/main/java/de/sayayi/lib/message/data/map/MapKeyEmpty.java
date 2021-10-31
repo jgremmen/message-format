@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.data.map;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import lombok.ToString;
@@ -34,7 +35,9 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_LENIENT
 @ToString(doNotUseGetters = true)
 public final class MapKeyEmpty implements MapKey
 {
-  private final CompareType compareType;
+  private static final long serialVersionUID = 600L;
+
+  private final @NotNull CompareType compareType;
 
 
   public MapKeyEmpty(@NotNull CompareType compareType)
@@ -53,12 +56,13 @@ public final class MapKeyEmpty implements MapKey
 
 
   @Override
-  public @NotNull MatchResult match(@NotNull Parameters parameters, Object value)
+  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Parameters parameters,
+                                    Object value)
   {
     if (value == null)
       return compareType == EQ ? TYPELESS_LENIENT : MISMATCH;
 
-    final ParameterFormatter formatter = parameters.getFormatter(value.getClass());
+    final ParameterFormatter formatter = messageContext.getFormatter(value.getClass());
     if (formatter instanceof EmptyMatcher)
     {
       final MatchResult result = ((EmptyMatcher)formatter).matchEmpty(compareType, value);

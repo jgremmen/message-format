@@ -16,6 +16,8 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.ParameterPart;
@@ -24,7 +26,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 
@@ -34,7 +36,7 @@ import java.util.TreeSet;
 @ToString
 public class ParameterizedMessage implements Message.WithSpaces
 {
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 600L;
 
   private final MessagePart[] parts;
 
@@ -43,7 +45,7 @@ public class ParameterizedMessage implements Message.WithSpaces
   public ParameterizedMessage(@NotNull List<MessagePart> parts)
   {
     findParameter: {
-      for(MessagePart part: parts)
+      for(final MessagePart part: parts)
         if (part instanceof ParameterPart)
           break findParameter;
 
@@ -57,14 +59,16 @@ public class ParameterizedMessage implements Message.WithSpaces
   @Override
   @Contract(pure = true)
   @SuppressWarnings("java:S4838")
-  public String format(@NotNull Parameters parameters)
+  public String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters)
   {
     final StringBuilder message = new StringBuilder();
     boolean spaceBefore = false;
 
-    for(MessagePart part: parts)
+    for(final MessagePart part: parts)
     {
-      final Text textPart = part instanceof ParameterPart ? ((ParameterPart)part).getText(parameters) : (Text)part;
+      final Text textPart = part instanceof ParameterPart
+          ? ((ParameterPart)part).getText(messageContext, parameters)
+          : (Text)part;
 
       if (!textPart.isEmpty())
       {
@@ -89,11 +93,11 @@ public class ParameterizedMessage implements Message.WithSpaces
 
   @Override
   @SuppressWarnings("java:S4838")
-  public @NotNull Set<String> getParameterNames()
+  public @NotNull SortedSet<String> getParameterNames()
   {
-    final Set<String> parameterNames = new TreeSet<>();
+    final SortedSet<String> parameterNames = new TreeSet<>();
 
-    for(MessagePart part: parts)
+    for(final MessagePart part: parts)
       if (part instanceof ParameterPart)
         parameterNames.addAll(((ParameterPart)part).getParameterNames());
 

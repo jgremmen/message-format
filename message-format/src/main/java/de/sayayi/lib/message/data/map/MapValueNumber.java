@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class MapValueNumber extends DataNumber implements MapValue
 {
-  private static final long serialVersionUID = 400L;
+  private static final long serialVersionUID = 600L;
 
 
   public MapValueNumber(long number) {
@@ -32,14 +32,8 @@ public final class MapValueNumber extends DataNumber implements MapValue
   }
 
 
-  public MapValueNumber(@NotNull String number) {
-    super(number);
-  }
-
-
-  @NotNull
   @Override
-  public Type getType() {
+  public @NotNull Type getType() {
     return Type.NUMBER;
   }
 }

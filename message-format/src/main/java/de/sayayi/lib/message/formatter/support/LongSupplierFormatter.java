@@ -15,17 +15,18 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.function.LongSupplier;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 
 
 /**
@@ -35,19 +36,21 @@ public final class LongSupplierFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     final LongSupplier supplier = (LongSupplier)value;
     if (supplier == null)
       return nullText();
 
-    return parameters.getFormatter(format, long.class).format(supplier.getAsLong(), format, parameters, data);
+    return messageContext.getFormatter(format, long.class)
+        .format(messageContext, supplier.getAsLong(), format, parameters, data);
   }
 
 
   @Override
   @Contract(value = "-> new", pure = true)
   public @NotNull Set<Class<?>> getFormattableTypes() {
-    return Collections.singleton(LongSupplier.class);
+    return singleton(LongSupplier.class);
   }
 }

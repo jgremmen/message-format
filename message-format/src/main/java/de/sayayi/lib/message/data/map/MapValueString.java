@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class MapValueString extends DataString implements MapValue
 {
-  private static final long serialVersionUID = 400L;
+  private static final long serialVersionUID = 600L;
 
   private Message.WithSpaces message;
 
@@ -36,18 +36,17 @@ public final class MapValueString extends DataString implements MapValue
   }
 
 
-  @NotNull
   @Override
-  public Type getType() {
+  public @NotNull Type getType() {
     return Type.STRING;
   }
 
 
   @NotNull
-  public synchronized Message.WithSpaces asMessage()
+  public synchronized Message.WithSpaces asMessage(@NotNull MessageFactory messageFactory)
   {
     if (message == null)
-      message = MessageFactory.parse(asObject());
+      message = messageFactory.parse(asObject());
 
     return message;
   }

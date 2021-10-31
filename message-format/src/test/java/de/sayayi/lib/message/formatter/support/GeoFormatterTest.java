@@ -15,23 +15,24 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.ParameterFactory;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.DataString;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.formatter.support.GeoFormatter.Format;
 import de.sayayi.lib.message.internal.part.TextPart;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static de.sayayi.lib.message.MessageFactory.parse;
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.ENGLISH;
 import static java.util.Locale.GERMANY;
 import static java.util.Locale.ROOT;
 import static java.util.Locale.UK;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -104,26 +105,28 @@ public class GeoFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatLongitude()
   {
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE,
+        ROOT);
     final GeoFormatter formatter = new GeoFormatter();
 
     // short-longitude
-    assertEquals(new TextPart("4°48'E"), formatter.format(dms(4, 48), null,
-        ParameterFactory.createFor(ROOT).noParameters(), new DataString("short-longitude")));
+    assertEquals(new TextPart("4°48'E"), formatter.format(context, dms(4, 48), null,
+        context.noParameters(), new DataString("short-longitude")));
 
     // longitude
     assertEquals(new TextPart("19°0'0\"W"),
-        formatter.format(-dms(18, 59, 59, 501), null,
-        ParameterFactory.createFor(ROOT).noParameters(), new DataString("longitude")));
+        formatter.format(context, -dms(18, 59, 59, 501), null,
+        context.noParameters(), new DataString("longitude")));
 
     // medium-longitude
     assertEquals(new TextPart("18°59'59,9\"E"),
-        formatter.format(dms(18, 59, 59, 891), null,
-        ParameterFactory.createFor(GERMANY).noParameters(), new DataString("medium-longitude")));
+        formatter.format(context, dms(18, 59, 59, 891), null,
+        context.parameters().withLocale(GERMANY), new DataString("medium-longitude")));
 
     // long-longitude
     assertEquals(new TextPart("18°59'59.891\"W"),
-        formatter.format(-dms(18, 59, 59, 891), null,
-            ParameterFactory.createFor(UK).noParameters(), new DataString("long-longitude")));
+        formatter.format(context, -dms(18, 59, 59, 891), null,
+            context.parameters().withLocale(UK), new DataString("long-longitude")));
   }
 
 
@@ -132,19 +135,22 @@ public class GeoFormatterTest extends AbstractFormatterTest
   {
     final GenericFormatterService formatterRegistry = new GenericFormatterService();
     formatterRegistry.addFormatter(new GeoFormatter());
-    ParameterFactory factory = ParameterFactory.createFor(ENGLISH, formatterRegistry);
+    final MessageContext context = new MessageContext(formatterRegistry, NO_CACHE_INSTANCE, ENGLISH);
 
-    final Parameters parameters = factory
+    final Parameters parameters = context.parameters()
         .with("lat", dms(51, 34, 9, 0))
         .with("lon", dms(4, 48));
 
     assertEquals("coordinates 4°48'0\"E, 51°34'9\"N",
-        parse("coordinates %{lon,geo,'longitude'}, %{lat,geo,'latitude'}").format(parameters));
+        context.getMessageFactory().parse("coordinates %{lon,geo,'longitude'}, %{lat,geo,'latitude'}")
+            .format(context, parameters));
 
     assertEquals("coordinates 4°48.0' E, 51°34'9.000\"N",
-        parse("coordinates %{lon,geo,'dM LO'}, %{lat,geo,'long-latitude'}").format(parameters));
+        context.getMessageFactory().parse("coordinates %{lon,geo,'dM LO'}, %{lat,geo,'long-latitude'}")
+            .format(context, parameters));
 
-    assertEquals("51°34'09\"N", parse("%{lat,geo,'d0m0sLA'}").format(parameters));
+    assertEquals("51°34'09\"N", context.getMessageFactory().parse("%{lat,geo,'d0m0sLA'}")
+        .format(context, parameters));
   }
 
 

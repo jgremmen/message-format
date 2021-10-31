@@ -15,18 +15,19 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.money.CurrencyUnit;
-import java.util.Collections;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singleton;
 
 
 /**
@@ -34,17 +35,16 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
  */
 public final class CurrencyUnitFormatter extends AbstractParameterFormatter
 {
-  @NotNull
   @Override
-  public Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data) {
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data) {
     return value == null ? nullText() : noSpaceText(((CurrencyUnit)value).getCurrencyCode());
   }
 
 
-  @NotNull
   @Override
   @Contract(value = "-> new", pure = true)
-  public Set<Class<?>> getFormattableTypes() {
-    return Collections.<Class<?>>singleton(CurrencyUnit.class);
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return singleton(CurrencyUnit.class);
   }
 }

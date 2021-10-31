@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -44,12 +45,13 @@ public final class DateFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
 
-    return noSpaceText(getFormatter(getConfigFormat(format, data, true, null),
+    return noSpaceText(getFormatter(getConfigFormat(messageContext, format, data, true, null),
         parameters.getLocale()).format(value));
   }
 
@@ -61,7 +63,7 @@ public final class DateFormatter extends AbstractParameterFormatter
   }
 
 
-  protected DateFormat getFormatter(String format, Locale locale)
+  private DateFormat getFormatter(String format, Locale locale)
   {
     if ("full".equals(format))
       return getDateInstance(FULL, locale);

@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
@@ -41,25 +42,27 @@ public final class ReferenceFormatter extends AbstractParameterFormatter
 {
   @SuppressWarnings("rawtypes")
   @Override
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
 
     return (value = ((Reference)value).get()) != null
-        ? parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data) : emptyText();
+        ? messageContext.getFormatter(format, value.getClass()).format(messageContext, value, format, parameters, data)
+        : emptyText();
   }
 
 
   @Override
   public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return compareType.match(((Reference<?>)value).get() == null ? 0 : 1) ? TYPELESS_EXACT : null;
+    return compareType.match(size(value)) ? TYPELESS_EXACT : null;
   }
 
 
   @Override
   public int size(@NotNull Object value) {
-    return ((Reference<?>)value).get() != null ? 1 : 0;
+    return ((Reference<?>)value).get() == null ? 0 : 1;
   }
 
 

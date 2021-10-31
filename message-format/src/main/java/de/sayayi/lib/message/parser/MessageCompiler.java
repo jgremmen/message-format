@@ -29,7 +29,7 @@ import de.sayayi.lib.message.internal.TextMessage;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.ParameterPart;
 import de.sayayi.lib.message.internal.part.TextPart;
-import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.BufferedTokenStream;
@@ -39,25 +39,30 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static lombok.AccessLevel.PRIVATE;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@NoArgsConstructor(access = PRIVATE)
-public final class MessageCompiler
+@AllArgsConstructor
+public class MessageCompiler
 {
-  public static Message.WithSpaces compileMessage(String text) {
+  private final @NotNull MessageFactory messageFactory;
+
+
+  @Contract(pure = true)
+  public @NotNull Message.WithSpaces compileMessage(@NotNull String text) {
     return new Parser(text).message().value;
   }
 
@@ -81,7 +86,7 @@ public final class MessageCompiler
 
 
 
-  private static final class Parser extends MessageParser
+  private final class Parser extends MessageParser
   {
     private final String message;
 
@@ -130,8 +135,7 @@ public final class MessageCompiler
       public void exitMessage0(Message0Context ctx)
       {
         final List<MessagePart> parts = ctx.children.stream()
-            .map(pt -> pt instanceof ParameterContext
-                ? ((ParameterContext)pt).value : ((TextPartContext)pt).value)
+            .map(pt -> pt instanceof ParameterContext ? ((ParameterContext)pt).value : ((TextPartContext)pt).value)
             .collect(toList());
         final int partCount = parts.size();
 
@@ -146,7 +150,7 @@ public final class MessageCompiler
 
       @Override
       public void exitTextPart(TextPartContext ctx) {
-        ctx.value = new TextPart(ctx.text().value);
+        ctx.value = messageFactory.getMessagePartNormalizer().normalize(new TextPart(ctx.text().value));
       }
 
 
@@ -194,7 +198,7 @@ public final class MessageCompiler
       public void exitForceQuotedMessage(ForceQuotedMessageContext ctx)
       {
         final QuotedMessageContext quotedMessage = ctx.quotedMessage();
-        ctx.value = quotedMessage != null ? quotedMessage.value : MessageFactory.parse(ctx.string().value);
+        ctx.value = quotedMessage != null ? quotedMessage.value : messageFactory.parse(ctx.string().value);
       }
 
 
@@ -203,11 +207,11 @@ public final class MessageCompiler
       {
         final DataContext data = ctx.data();
 
-        ctx.value = new ParameterPart(ctx.name.getText(),
+        ctx.value = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(ctx.name.getText(),
             ctx.format == null ? null : ctx.format.getText(),
             exitParameter_isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
             exitParameter_isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
-            data == null ? null : data.value);
+            data == null ? null : data.value));
       }
 
 
@@ -288,7 +292,7 @@ public final class MessageCompiler
 
       @Override
       public void exitMapKeyBool(MapKeyBoolContext ctx) {
-        ctx.key = new MapKeyBool(ctx.BOOL().getText());
+        ctx.key = parseBoolean(ctx.BOOL().getText()) ? MapKeyBool.TRUE : MapKeyBool.FALSE;
       }
 
 
@@ -318,13 +322,13 @@ public final class MessageCompiler
 
       @Override
       public void exitMapValueNumber(MapValueNumberContext ctx) {
-        ctx.value = new MapValueNumber(ctx.NUMBER().getText());
+        ctx.value = new MapValueNumber(Long.parseLong(ctx.NUMBER().getText()));
       }
 
 
       @Override
       public void exitMapValueBool(MapValueBoolContext ctx) {
-        ctx.value = new MapValueBool(ctx.BOOL().getText());
+        ctx.value = parseBoolean(ctx.BOOL().getText()) ? MapValueBool.TRUE : MapValueBool.FALSE;
       }
 
 

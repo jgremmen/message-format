@@ -29,14 +29,24 @@ public class DefaultFormatterService extends GenericFormatterService
 {
   private static final FormatterService INSTANCE = new DefaultFormatterService();
 
+  protected final ClassLoader classLoader;
+
 
   public static FormatterService getSharedInstance() {
     return INSTANCE;
   }
 
 
-  @SuppressWarnings("WeakerAccess")
   public DefaultFormatterService() {
+    this(null);
+  }
+
+
+  @SuppressWarnings("WeakerAccess")
+  public DefaultFormatterService(ClassLoader classLoader)
+  {
+    this.classLoader = classLoader == null ? ClassLoader.getSystemClassLoader() : classLoader;
+
     addDefaultFormatters();
   }
 
@@ -50,7 +60,7 @@ public class DefaultFormatterService extends GenericFormatterService
   @SuppressWarnings("java:S108")
   protected void addFormattersFromService()
   {
-    final ServiceLoader<ParameterFormatter> serviceLoader = ServiceLoader.load(ParameterFormatter.class);
+    final ServiceLoader<ParameterFormatter> serviceLoader = ServiceLoader.load(ParameterFormatter.class, classLoader);
     final Iterator<ParameterFormatter> iterator = serviceLoader.iterator();
 
     while(iterator.hasNext())

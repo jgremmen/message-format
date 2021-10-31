@@ -16,7 +16,8 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.DataNumber;
@@ -61,23 +62,25 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Override
-  public @NotNull Text format(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text format(@NotNull MessageContext messageContext, Object value, String format,
+                              @NotNull Parameters parameters, Data data)
   {
     // handle empty, !empty, null and !null first
-    Message.WithSpaces msg = getMessage(value, EMPTY_NULL_TYPE, parameters, data, false);
+    Message.WithSpaces msg = getMessage(messageContext, value, EMPTY_NULL_TYPE, parameters, data, false);
     if (msg != null)
-      return messageToText(msg, parameters);
+      return messageToText(messageContext, msg, parameters);
 
-    Text text = formatValue(value, format, parameters, data);
+    final Text text = formatValue(messageContext, value, format, parameters, data);
 
     // map result against map keys...
-    msg = getMessage(text.getText(), NO_NAME_KEY_TYPES, parameters, data, false);
+    msg = getMessage(messageContext, text.getText(), NO_NAME_KEY_TYPES, parameters, data, false);
 
-    return msg == null ? text : messageToText(msg, parameters);
+    return msg == null ? text : messageToText(messageContext, msg, parameters);
   }
 
 
-  protected abstract @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data);
+  protected abstract @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                               @NotNull Parameters parameters, Data data);
 
 
   public int getPriority() {
@@ -86,11 +89,12 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
-  protected Data getConfigValue(@NotNull String name, @NotNull Parameters parameters, Data data, boolean checkDataValue)
+  protected Data getConfigValue(@NotNull MessageContext messageContext, @NotNull String name,
+                                @NotNull Parameters parameters, Data data, boolean checkDataValue)
   {
     if (data instanceof DataMap)
     {
-      MapValue mapValue = ((DataMap)data).find(name,parameters, NAME_TYPE, null);
+      MapValue mapValue = ((DataMap)data).find(messageContext, name, parameters, NAME_TYPE, null);
       if (mapValue != null)
         return mapValue;
     }
@@ -103,12 +107,15 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
-  protected String getConfigValueString(@NotNull String name, @NotNull Parameters parameters, Data data,
+  protected String getConfigValueString(@NotNull MessageContext messageContext, @NotNull String name,
+                                        @NotNull Parameters parameters, Data data,
                                         boolean checkDataString, String defaultValue)
   {
     if (data instanceof DataMap)
     {
-      MapValueString string = (MapValueString)((DataMap)data).find(name, parameters, NAME_TYPE, MapValue.STRING_TYPE);
+      final MapValueString string = (MapValueString)((DataMap)data).find(messageContext, name, parameters, NAME_TYPE,
+          MapValue.STRING_TYPE);
+
       if (string != null)
         return string.asObject();
     }
@@ -121,12 +128,15 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
-  protected long getConfigValueNumber(@NotNull String name, @NotNull Parameters parameters, Data data,
+  protected long getConfigValueNumber(@NotNull MessageContext messageContext, @NotNull String name,
+                                      @NotNull Parameters parameters, Data data,
                                       boolean checkDataNumber, long defaultValue)
   {
     if (data instanceof DataMap)
     {
-      MapValueNumber number = (MapValueNumber)((DataMap)data).find(name, parameters, NAME_TYPE, MapValue.NUMBER_TYPE);
+      final MapValueNumber number = (MapValueNumber)((DataMap)data).find(messageContext, name, parameters, NAME_TYPE,
+          MapValue.NUMBER_TYPE);
+
       if (number != null)
         return number.asObject();
     }
@@ -139,22 +149,25 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
-  protected boolean getConfigValueBool(@NotNull String name, @NotNull Parameters parameters, Data data,
-                                       boolean defaultValue)
+  protected boolean getConfigValueBool(@NotNull MessageContext messageContext, @NotNull String name,
+                                       @NotNull Parameters parameters, Data data, boolean defaultValue)
   {
     if (!(data instanceof DataMap))
       return defaultValue;
 
-    MapValueBool bool = (MapValueBool)((DataMap)data).find(name, parameters, NAME_TYPE, MapValue.BOOL_TYPE);
+    final MapValueBool bool = (MapValueBool)((DataMap)data).find(messageContext, name, parameters, NAME_TYPE,
+        MapValue.BOOL_TYPE);
+
     return bool == null ? defaultValue :bool.asObject();
   }
 
 
   @Contract(pure = true)
-  protected String getConfigFormat(String format, Data data, boolean checkDataString, String defaultFormat)
+  protected String getConfigFormat(@NotNull MessageContext messageContext, String format, Data data,
+                                   boolean checkDataString, String defaultFormat)
   {
     String configFormat =
-        getConfigValueString("format", Parameters.EMPTY, data, checkDataString, null);
+        getConfigValueString(messageContext, "format", Parameters.EMPTY, data, checkDataString, null);
 
     if (configFormat == null && format != null)
       configFormat = format;
@@ -164,47 +177,52 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
-  protected Message.WithSpaces getMessage(Object value, Set<Type> keyTypes, Parameters parameters, Data data,
-                                          boolean notNull)
+  protected Message.WithSpaces getMessage(@NotNull MessageContext messageContext, Object value, Set<Type> keyTypes,
+                                          Parameters parameters, Data data, boolean notNull)
   {
     Message.WithSpaces message = null;
 
     if (data instanceof DataMap)
-      message = ((DataMap)data).getMessage(value, parameters, keyTypes, false);
+      message = ((DataMap)data).getMessage(messageContext, value, parameters, keyTypes, false);
 
     return message == null && notNull ? EmptyMessage.INSTANCE : message;
   }
 
 
-  @Contract(pure = true)
+  @Contract(value = "null -> null", pure = true)
   protected String getDataString(Data data) {
     return getDataString(data, null);
   }
 
 
-  @Contract(pure = true)
+  @Contract(value = "null, _ -> param2", pure = true)
   protected String getDataString(Data data, String defaultValue) {
-    return (data instanceof DataString) ? ((DataString)data).asObject() : defaultValue;
+    return data instanceof DataString ? ((DataString)data).asObject() : defaultValue;
   }
 
 
   @Contract(pure = true)
-  protected String formatNull(@NotNull Parameters parameters, Data data) {
-    return getMessage(null, EMPTY_NULL_TYPE, parameters, data, true).format(parameters);
-  }
-
-
-  @Contract(pure = true)
-  protected String formatEmpty(@NotNull Parameters parameters, Data data) {
-    return getMessage("", EMPTY_NULL_TYPE, parameters, data, true).format(parameters);
-  }
-
-
-  @Contract(pure = true)
-  protected String formatString(String value, @NotNull Parameters parameters, Data data)
+  protected String formatNull(@NotNull MessageContext messageContext, @NotNull Parameters parameters, Data data)
   {
-    Message msg = getMessage(value, NO_NAME_KEY_TYPES, parameters, data, false);
-    return msg == null ? value : msg.format(parameters);
+    return getMessage(messageContext, null, EMPTY_NULL_TYPE, parameters, data, true)
+        .format(messageContext, parameters);
+  }
+
+
+  @Contract(pure = true)
+  protected String formatEmpty(@NotNull MessageContext messageContext, @NotNull Parameters parameters, Data data)
+  {
+    return getMessage(messageContext, "", EMPTY_NULL_TYPE, parameters, data, true)
+        .format(messageContext, parameters);
+  }
+
+
+  @Contract(pure = true)
+  protected String formatString(@NotNull MessageContext messageContext, String value,
+                                @NotNull Parameters parameters, Data data)
+  {
+    final Message msg = getMessage(messageContext, value, NO_NAME_KEY_TYPES, parameters, data, false);
+    return msg == null ? value : msg.format(messageContext, parameters);
   }
 
 

@@ -16,16 +16,17 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.Set;
+import java.util.SortedSet;
 
-import static java.lang.Character.isSpaceChar;
+import static java.util.Collections.emptySortedSet;
 
 
 /**
@@ -34,7 +35,7 @@ import static java.lang.Character.isSpaceChar;
 @ToString(doNotUseGetters = true)
 public final class TextMessage implements Message.WithSpaces
 {
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 600L;
 
   private final String text;
 
@@ -50,19 +51,8 @@ public final class TextMessage implements Message.WithSpaces
   }
 
 
-  public TextMessage(@NotNull String text)
-  {
-    final boolean empty = text.isEmpty();
-
-    spaceBefore = !empty && isSpaceChar(text.charAt(0));
-    spaceAfter = !empty && isSpaceChar(text.charAt(text.length() - 1));
-
-    this.text = text.trim();
-  }
-
-
   @Override
-  public String format(@NotNull Parameters parameters) {
+  public String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
     return text;
   }
 
@@ -75,7 +65,7 @@ public final class TextMessage implements Message.WithSpaces
 
 
   @Override
-  public @NotNull Set<String> getParameterNames() {
-    return Collections.emptySet();
+  public @NotNull SortedSet<String> getParameterNames() {
+    return emptySortedSet();
   }
 }

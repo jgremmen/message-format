@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
@@ -43,6 +44,7 @@ public interface ParameterFormatter
   /**
    * Formats the parameter value to a string representation.
    *
+   * @param messageContext  message context providing formatting information, never {@code null}
    * @param value       parameter value (can be {@code null})
    * @param format      formatter name used by the parameter or {@code null}. Eg.: {@code %{val,myformat}}
    * @param parameters  parameter values available for formatting the current message. Additionally, this instance
@@ -53,7 +55,8 @@ public interface ParameterFormatter
    * @return  formatted parameter value, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull Text format(Object value, String format, @NotNull Parameters parameters, Data data);
+  @NotNull Text format(@NotNull MessageContext messageContext, Object value, String format,
+                       @NotNull Parameters parameters, Data data);
 
 
   /**
@@ -83,7 +86,7 @@ public interface ParameterFormatter
      * Check whether the given {@code value} is empty as defined by this formatter.
      *
      * @param compareType  comparison type (either {@link CompareType#EQ} or {@link CompareType#NE}), never {@code null}
-     * @param value  object to check for emptyness, never {@code null}
+     * @param value        object to check for emptyness, never {@code null}
      *
      * @return  {@link MatchResult#TYPELESS_EXACT}, {@link MatchResult#TYPELESS_LENIENT} or {@code null}
      */
@@ -96,6 +99,13 @@ public interface ParameterFormatter
 
   interface SizeQueryable
   {
+    /**
+     * Returns the size of the given {@code value}.
+     *
+     * @param value  object to calculate the size of
+     *
+     * @return  value size
+     */
     @Contract(pure = true)
     int size(@NotNull Object value);
   }

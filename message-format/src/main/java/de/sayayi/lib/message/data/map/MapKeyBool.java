@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.data.map;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
@@ -28,21 +29,22 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EQUIVALENT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.LENIENT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
+import static lombok.AccessLevel.PRIVATE;
 
 
 /**
  * @author Jeroen Gremmen
  */
 @ToString(doNotUseGetters = true)
-@AllArgsConstructor
-public final class MapKeyBool implements MapKey
+@AllArgsConstructor(access = PRIVATE)
+public enum MapKeyBool implements MapKey
 {
+  FALSE(false),
+  TRUE(true);
+
+  private static final long serialVersionUID = 600L;
+
   @Getter private final boolean bool;
-
-
-  public MapKeyBool(@NotNull String bool) {
-    this(Boolean.parseBoolean(bool));
-  }
 
 
   @Override
@@ -53,25 +55,26 @@ public final class MapKeyBool implements MapKey
 
   @Override
   @SuppressWarnings({"java:S3776", "java:S5411", "java:S108"})
-  public @NotNull MatchResult match(@NotNull Parameters parameters, Object value)
+  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Parameters parameters,
+                                    Object value)
   {
     if (value != null)
     {
       if (value instanceof Boolean && (Boolean)value == bool)
         return EXACT;
 
-      if ("true".equals(value) && bool)
-        return EQUIVALENT;
-      if ("false".equals(value) && !bool)
-        return EQUIVALENT;
-
       if (value instanceof BigInteger)
         return ((((BigInteger)value).signum() != 0) == bool) ? LENIENT : MISMATCH;
 
       if (value instanceof CharSequence || value instanceof Character)
       {
+        final String string = value.toString();
+
+        if (("true".equalsIgnoreCase(string) && bool) || ("false".equalsIgnoreCase(string) && !bool))
+          return EQUIVALENT;
+
         try {
-          value = new BigDecimal(value.toString());
+          value = new BigDecimal(string);
         } catch(Exception ignore) {
         }
       }

@@ -18,11 +18,11 @@ package de.sayayi.lib.message.parser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.parser.MessageLexer.CH;
 import static de.sayayi.lib.message.parser.MessageLexer.PARAM_START;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**

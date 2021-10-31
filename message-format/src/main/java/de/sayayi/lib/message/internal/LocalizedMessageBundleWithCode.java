@@ -17,18 +17,21 @@ package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.LocaleAware;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import lombok.Synchronized;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
+import static java.util.Collections.emptySortedSet;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 
@@ -40,9 +43,9 @@ import static java.util.Collections.unmodifiableSet;
 @ToString
 public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode implements LocaleAware
 {
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 600L;
 
-  private final Map<Locale,Message> localizedMessages;
+  private final @NotNull Map<Locale,Message> localizedMessages;
 
   private Boolean hasParameter;
 
@@ -57,8 +60,8 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
 
   @Override
   @Contract(pure = true)
-  public String format(@NotNull Parameters parameters) {
-    return findMessageByLocale(parameters.getLocale()).format(parameters);
+  public String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
+    return findMessageByLocale(parameters.getLocale()).format(messageContext, parameters);
   }
 
 
@@ -120,12 +123,12 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
 
 
   @Override
-  public @NotNull Set<String> getParameterNames()
+  public @NotNull SortedSet<String> getParameterNames()
   {
     if (!hasParameters())
-      return Collections.emptySet();
+      return emptySortedSet();
 
-    Set<String> parameterNames = new TreeSet<>();
+    final SortedSet<String> parameterNames = new TreeSet<>();
 
     for(Message message: localizedMessages.values())
       parameterNames.addAll(message.getParameterNames());

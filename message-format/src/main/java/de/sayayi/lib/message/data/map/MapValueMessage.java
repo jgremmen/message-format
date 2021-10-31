@@ -26,21 +26,19 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public final class MapValueMessage implements MapValue
 {
-  private static final long serialVersionUID = 400L;
+  private static final long serialVersionUID = 600L;
 
-  private final Message.WithSpaces message;
+  private final @NotNull Message.WithSpaces message;
 
 
-  @NotNull
   @Override
-  public Type getType() {
+  public @NotNull Type getType() {
     return Type.MESSAGE;
   }
 
 
-  @NotNull
   @Override
-  public Message.WithSpaces asObject() {
+  public @NotNull Message.WithSpaces asObject() {
     return message;
   }
 }

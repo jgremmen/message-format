@@ -15,13 +15,15 @@
  */
 package de.sayayi.lib.message.internal;
 
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
+import java.util.SortedSet;
 
-import static java.util.Collections.emptySet;
+import static java.util.Collections.emptySortedSet;
 
 
 /**
@@ -30,7 +32,7 @@ import static java.util.Collections.emptySet;
 @ToString
 public final class EmptyMessageWithCode extends AbstractMessageWithCode
 {
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 600L;
 
 
   public EmptyMessageWithCode(@NotNull String code) {
@@ -39,8 +41,8 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
 
   @Override
-  @Contract(value = "_ -> null", pure = true)
-  public String format(@NotNull Parameters parameters) {
+  @Contract(value = "_, _ -> null", pure = true)
+  public String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
     return null;
   }
 
@@ -53,7 +55,7 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
 
   @Override
-  public @NotNull Set<String> getParameterNames() {
-    return emptySet();
+  public @NotNull SortedSet<String> getParameterNames() {
+    return emptySortedSet();
   }
 }

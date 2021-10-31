@@ -16,16 +16,18 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.ParameterFactory;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.part.TextPart;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.RetentionPolicy;
 
-import static de.sayayi.lib.message.MessageFactory.parse;
-import static org.junit.Assert.assertEquals;
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -45,11 +47,12 @@ public class StringFormatterTest extends AbstractFormatterTest
   public void testFormat()
   {
     final StringFormatter formatter = new StringFormatter();
-    final Parameters noParameters = ParameterFactory.DEFAULT.noParameters();
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+    final Parameters noParameters = context.noParameters();
 
-    assertEquals(new TextPart("text"), formatter.format(" text ", null, noParameters, null));
-    assertEquals(new TextPart("RUNTIME"), formatter.format(RetentionPolicy.RUNTIME, null, noParameters, null));
-    assertEquals(new TextPart("hello"), formatter.format(new Object() {
+    assertEquals(new TextPart("text"), formatter.format(context, " text ", null, noParameters, null));
+    assertEquals(new TextPart("RUNTIME"), formatter.format(context, RetentionPolicy.RUNTIME, null, noParameters, null));
+    assertEquals(new TextPart("hello"), formatter.format(context, new Object() {
       @Override
       public String toString() {
         return " hello";
@@ -63,37 +66,38 @@ public class StringFormatterTest extends AbstractFormatterTest
   {
     final GenericFormatterService formatterRegistry = new GenericFormatterService();
     formatterRegistry.addFormatter(new StringFormatter());
-    final ParameterFactory factory = ParameterFactory.createFor(formatterRegistry);
+    final MessageContext context = new MessageContext(formatterRegistry, NO_CACHE_INSTANCE);
 
-    final Parameters parameters = factory
+    final Parameters parameters = context.parameters()
         .with("a", " a test ")
         .with("b", null)
         .with("c", Integer.valueOf(1234));
-    final Message msg = parse("This is %{a} %{b} %{c}");
+    final Message msg = context.getMessageFactory().parse("This is %{a} %{b} %{c}");
 
-    assertEquals("This is a test 1234", msg.format(parameters));
+    assertEquals("This is a test 1234", msg.format(context, parameters));
   }
 
 
   @Test
   public void testFormatterWithMap()
   {
+    final MessageFactory messageFactory = NO_CACHE_INSTANCE;
     final GenericFormatterService formatterRegistry = new GenericFormatterService();
-    final ParameterFactory factory = ParameterFactory.createFor(formatterRegistry);
+    final MessageContext context = new MessageContext(formatterRegistry, messageFactory);
 
-    final Parameters parameters = factory
+    final Parameters parameters = context.parameters()
         .with("empty", "")
         .with("null", null)
         .with("spaces", "  ")
         .with("text", "hello  ");
 
-    assertEquals("", parse("%{empty,{!empty:'nok'}}").format(parameters));
-    assertEquals("ok", parse("%{empty,{empty:'ok'}}").format(parameters));
-    assertEquals("ok", parse("%{null,{empty:'nok',null:'ok'}}").format(parameters));
-    assertEquals("ok", parse("%{null,{empty:'ok'}}").format(parameters));
-    assertEquals("ok", parse("%{spaces,{empty:'ok'}}").format(parameters));
-    assertEquals("ok", parse("%{spaces,{!null:'ok'}}").format(parameters));
-    assertEquals("hello!", parse("%{text,{null:'nok',!empty:'%{text}!'}}").format(parameters));
-    assertEquals("hello!", parse("%{text,{!null:'%{text}!'}}").format(parameters));
+    assertEquals("", messageFactory.parse("%{empty,{!empty:'nok'}}").format(context, parameters));
+    assertEquals("ok", messageFactory.parse("%{empty,{empty:'ok'}}").format(context, parameters));
+    assertEquals("ok", messageFactory.parse("%{null,{empty:'nok',null:'ok'}}").format(context, parameters));
+    assertEquals("ok", messageFactory.parse("%{null,{empty:'ok'}}").format(context, parameters));
+    assertEquals("ok", messageFactory.parse("%{spaces,{empty:'ok'}}").format(context, parameters));
+    assertEquals("ok", messageFactory.parse("%{spaces,{!null:'ok'}}").format(context, parameters));
+    assertEquals("hello!", messageFactory.parse("%{text,{null:'nok',!empty:'%{text}!'}}").format(context, parameters));
+    assertEquals("hello!", messageFactory.parse("%{text,{!null:'%{text}!'}}").format(context, parameters));
   }
 }

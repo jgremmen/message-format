@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.data.map;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
@@ -36,7 +37,9 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
 @AllArgsConstructor
 public final class MapKeyNumber implements MapKey
 {
-  private final CompareType compareType;
+  private static final long serialVersionUID = 600L;
+
+  private final @NotNull CompareType compareType;
   @Getter private final long number;
 
 
@@ -53,7 +56,8 @@ public final class MapKeyNumber implements MapKey
 
   @Override
   @SuppressWarnings({"java:S3776", "java:S1119", "java:S108"})
-  public @NotNull MatchResult match(@NotNull Parameters parameters, Object value)
+  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Parameters parameters,
+                                    Object value)
   {
     if (value == null)
       return MISMATCH;

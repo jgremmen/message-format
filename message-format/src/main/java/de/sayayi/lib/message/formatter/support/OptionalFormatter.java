@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
@@ -37,13 +38,13 @@ import static java.util.Collections.singleton;
 /**
  * @author Jeroen Gremmen
  */
-public final class OptionalFormatter extends AbstractParameterFormatter
-    implements EmptyMatcher, SizeQueryable
+public final class OptionalFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
 {
   @SuppressWarnings("squid:S2789")
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
@@ -54,7 +55,8 @@ public final class OptionalFormatter extends AbstractParameterFormatter
 
     value = optional.get();
 
-    return parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data);
+    return messageContext.getFormatter(format, value.getClass())
+        .format(messageContext, value, format, parameters, data);
   }
 
 

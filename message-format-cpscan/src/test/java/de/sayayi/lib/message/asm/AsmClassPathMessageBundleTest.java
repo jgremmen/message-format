@@ -13,35 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message;
+package de.sayayi.lib.message.asm;
 
 import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
-import org.junit.Test;
+import de.sayayi.lib.message.scanner.asm.AsmClassPathMessageBundle;
+import org.junit.jupiter.api.Test;
 
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Collections.singleton;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
  * @author Jeroen Gremmen
  */
+@SuppressWarnings("SimplifiableAnnotation")
 @MessageDefs({
     @MessageDef(code = "CLASS", texts = {
         @Text(locale = "de", text = "Deutsch"),
         @Text("Other language")
     })
 })
-public final class ClassPathMessageBundleTest
+public final class AsmClassPathMessageBundleTest
 {
   @MessageDef(code = "M1", text = "Method message 1")
   @MessageDef(code = "M2", texts = @Text("Method message 2"))
   @Test
-  public void testScan() throws Exception
+  public void testScan()
   {
-    final ClassPathMessageBundle bundle = new ClassPathMessageBundle(
-        singleton(ClassPathMessageBundleTest.class.getPackage().getName()));
+    final AsmClassPathMessageBundle bundle = new AsmClassPathMessageBundle(NO_CACHE_INSTANCE,
+        singleton(AsmClassPathMessageBundleTest.class.getPackage().getName()));
 
     assertTrue(bundle.hasMessageWithCode("CLASS"));
     assertTrue(bundle.hasMessageWithCode("M1"));
@@ -52,6 +55,7 @@ public final class ClassPathMessageBundleTest
 
 
 
+  @SuppressWarnings("unused")
   @MessageDef(code = "INNER", text = "Inner class")
   private static final class InnerClass {
   }

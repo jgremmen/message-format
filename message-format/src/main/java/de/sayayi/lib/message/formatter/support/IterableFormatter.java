@@ -15,18 +15,20 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -34,40 +36,51 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
-import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static java.util.ResourceBundle.getBundle;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class CollectionFormatter extends AbstractParameterFormatter
-    implements EmptyMatcher, SizeQueryable
+public final class IterableFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
 {
   @SuppressWarnings("rawtypes")
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
 
-    final Iterable iterable = (Iterable)value;
-    if (!iterable.iterator().hasNext())
+    final Iterator iterator = ((Iterable)value).iterator();
+    if (!iterator.hasNext())
       return emptyText();
 
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
     final StringBuilder s = new StringBuilder();
 
-    for(Object element: iterable)
+    while(iterator.hasNext())
     {
-      if (s.length() > 0)
-        s.append(", ");
+      final Object element = iterator.next();
+      Text text = null;
 
-      if (element == iterable)
-        s.append(bundle.getString("thisCollection"));
+      if (element == value)
+        text = new TextPart(bundle.getString("thisCollection"));
       else if (element != null)
-        s.append(parameters.getFormatter(format, element.getClass()).format(element, format, parameters, data));
+      {
+        text = messageContext.getFormatter(format, element.getClass())
+            .format(messageContext, element, format, parameters, data);
+      }
+
+      if (text != null && !text.isEmpty())
+      {
+        if (s.length() > 0)
+          s.append(", ");
+
+        s.append(text.getText());
+      }
     }
 
     return noSpaceText(s.toString());
@@ -103,6 +116,6 @@ public final class CollectionFormatter extends AbstractParameterFormatter
   @Override
   @Contract(value = "-> new", pure = true)
   public @NotNull Set<Class<?>> getFormattableTypes() {
-    return new HashSet<>(asList(Collection.class, Iterable.class));
+    return singleton(Iterable.class);
   }
 }

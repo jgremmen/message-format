@@ -16,32 +16,34 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import lombok.AccessLevel;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
+import java.util.SortedSet;
 
-import static java.util.Collections.emptySet;
+import static java.util.Collections.emptySortedSet;
+import static lombok.AccessLevel.PRIVATE;
 
 
 /**
  * @author Jeroen Gremmen
  */
 @ToString
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = PRIVATE)
 public final class EmptyMessage implements Message.WithSpaces
 {
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 600L;
 
   public static final Message.WithSpaces INSTANCE = new EmptyMessage();
 
 
   @Override
-  @Contract(value = "_ -> null", pure = true)
-  public String format(@NotNull Parameters parameters) {
+  @Contract(value = "_, _ -> null", pure = true)
+  public String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
     return null;
   }
 
@@ -54,8 +56,8 @@ public final class EmptyMessage implements Message.WithSpaces
 
 
   @Override
-  public @NotNull Set<String> getParameterNames() {
-    return emptySet();
+  public @NotNull SortedSet<String> getParameterNames() {
+    return emptySortedSet();
   }
 
 

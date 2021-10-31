@@ -15,9 +15,9 @@
  */
 package de.sayayi.lib.message.data.map;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,8 +39,10 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
 @AllArgsConstructor
 public final class MapKeyString implements MapKey
 {
-  private final CompareType compareType;
-  @Getter private final String string;
+  private static final long serialVersionUID = 600L;
+
+  private final @NotNull CompareType compareType;
+  private final @NotNull String string;
 
 
   @Override
@@ -51,7 +53,8 @@ public final class MapKeyString implements MapKey
 
   @Override
   @SuppressWarnings("java:S1119")
-  public @NotNull MatchResult match(@NotNull Parameters parameters, Object value)
+  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Parameters parameters,
+                                    Object value)
   {
     if (value == null)
       return MISMATCH;
@@ -71,6 +74,7 @@ public final class MapKeyString implements MapKey
         if (text.equals(string))
           break doMatch;
 
+        //noinspection DuplicateExpressions
         if (text.toLowerCase(locale).equals(string.toLowerCase(locale)))
         {
           result = LENIENT;
@@ -81,6 +85,7 @@ public final class MapKeyString implements MapKey
         break doMatch;
       }
 
+      //noinspection DuplicateExpressions
       if (compareType == NE && !text.toLowerCase(locale).equals(string.toLowerCase(locale)))
       {
         result = LENIENT;

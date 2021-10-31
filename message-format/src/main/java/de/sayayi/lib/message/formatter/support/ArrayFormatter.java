@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
@@ -36,7 +37,7 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.lang.reflect.Array.get;
 import static java.lang.reflect.Array.getLength;
-import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.ResourceBundle.getBundle;
 
 
@@ -45,8 +46,28 @@ import static java.util.ResourceBundle.getBundle;
  */
 public final class ArrayFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
 {
+  private static final Set<Class<?>> FORMATTABLE_TYPES;
+
+
+  static
+  {
+    final Set<Class<?>> formattableTypes = new HashSet<>();
+
+    formattableTypes.add(Object[].class);
+    formattableTypes.add(short[].class);
+    formattableTypes.add(int[].class);
+    formattableTypes.add(long[].class);
+    formattableTypes.add(float[].class);
+    formattableTypes.add(double[].class);
+    formattableTypes.add(boolean[].class);
+
+    FORMATTABLE_TYPES = unmodifiableSet(formattableTypes);
+  }
+
+
   @Override
-  public @NotNull Text formatValue(Object array, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object array, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     if (array == null)
       return nullText();
@@ -58,7 +79,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
     final StringBuilder s = new StringBuilder();
     final Class<?> arrayType = array.getClass();
     final ParameterFormatter formatter =
-        arrayType.isPrimitive() ? parameters.getFormatter(format, arrayType.getComponentType()) : null;
+        arrayType.isPrimitive() ? messageContext.getFormatter(format, arrayType.getComponentType()) : null;
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
 
     for(int i = 0; i < length; i++)
@@ -69,9 +90,9 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
       if (value == array)
         text = new TextPart(bundle.getString("thisArray"));
       else if (formatter != null)
-        text = formatter.format(value, format, parameters, data);
+        text = formatter.format(messageContext, value, format, parameters, data);
       else if (value != null)
-        text = parameters.getFormatter(format, value.getClass()).format(value, format, parameters, data);
+        text = messageContext.getFormatter(format, value.getClass()).format(messageContext, value, format, parameters, data);
 
       if (text != null && !text.isEmpty())
       {
@@ -99,9 +120,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
 
 
   @Override
-  public @NotNull Set<Class<?>> getFormattableTypes()
-  {
-    return new HashSet<>(asList(
-        Object[].class, short[].class, int[].class, long[].class, float[].class, double[].class, boolean[].class));
+  public @NotNull Set<Class<?>> getFormattableTypes() {
+    return FORMATTABLE_TYPES;
   }
 }

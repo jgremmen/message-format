@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -38,7 +39,7 @@ import java.util.Set;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
-import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableSet;
 
 
 /**
@@ -46,6 +47,7 @@ import static java.util.Arrays.asList;
  */
 public final class JodaDateTimeFormatter extends AbstractParameterFormatter
 {
+  private static final Set<Class<?>> FORMATTABLE_TYPES;
   private static final Map<String,String> STYLE = new HashMap<>();
 
 
@@ -57,18 +59,26 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
     STYLE.put("full", "FF");
     STYLE.put("date", "M-");
     STYLE.put("time", "-M");
+
+    final Set<Class<?>> formattableTypes = new HashSet<>(4);
+
+    formattableTypes.add(BaseLocal.class);
+    formattableTypes.add(ReadableDateTime.class);
+
+    FORMATTABLE_TYPES = unmodifiableSet(formattableTypes);
   }
 
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(Object value, String format, @NotNull Parameters parameters, Data data)
+  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
+                                   @NotNull Parameters parameters, Data data)
   {
     if (value == null)
       return nullText();
 
     if (!STYLE.containsKey(format))
-      format = getConfigValueString("format", parameters, data, true, null);
+      format = getConfigValueString(messageContext, "format", parameters, data, true, null);
 
     final Locale locale = parameters.getLocale();
     final DateTimeFormatter formatter;
@@ -97,8 +107,8 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
+  @Contract(pure = true)
   public @NotNull Set<Class<?>> getFormattableTypes() {
-    return new HashSet<>(asList(BaseLocal.class, ReadableDateTime.class));
+    return FORMATTABLE_TYPES;
   }
 }

@@ -16,12 +16,14 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
 import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
+import java.util.SortedSet;
 
 
 /**
@@ -31,9 +33,9 @@ import java.util.Set;
 @ToString
 public class MessageDelegateWithCode extends AbstractMessageWithCode
 {
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 600L;
 
-  @Getter private final Message message;
+  @Getter private final @NotNull Message message;
 
 
   public MessageDelegateWithCode(@NotNull String code, @NotNull Message message)
@@ -46,8 +48,8 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
 
   @Override
   @Contract(pure = true)
-  public String format(@NotNull Parameters parameters) {
-    return message.format(parameters);
+  public String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
+    return message.format(messageContext, parameters);
   }
 
 
@@ -59,7 +61,7 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
 
 
   @Override
-  public @NotNull Set<String> getParameterNames() {
+  public @NotNull SortedSet<String> getParameterNames() {
     return message.getParameterNames();
   }
 }
