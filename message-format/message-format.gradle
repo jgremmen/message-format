@@ -104,6 +104,12 @@ shadowJar {
   archiveAppendix.set('nodep')
   archiveClassifier.set(null)  // set by shadowJar but interferes with publishing
 
+  dependencies {
+    exclude(dependency('com.ibm.icu::'))
+    exclude(dependency('javax.cache::'))
+    exclude(dependency('org.glassfish::'))
+  }
+
   exclude 'META-INF/maven/**'
   exclude "org/antlr/v4/runtime/atn/ATNSerializer*"
   exclude "org/antlr/v4/runtime/ParserInterpreter*"
@@ -112,6 +118,7 @@ shadowJar {
   exclude "org/antlr/v4/runtime/tree/Trees"
   exclude "org/antlr/v4/runtime/tree/xpath/**"
   exclude "org/antlr/v4/runtime/Unbuffered*"
+  exclude "org/antlr/v4/tool/**"
 
   minimize()
 
