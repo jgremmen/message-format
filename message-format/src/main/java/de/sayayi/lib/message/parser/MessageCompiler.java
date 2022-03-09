@@ -30,14 +30,7 @@ import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.ParameterPart;
 import de.sayayi.lib.message.internal.part.TextPart;
 import lombok.AllArgsConstructor;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.BaseErrorListener;
-import org.antlr.v4.runtime.BufferedTokenStream;
-import org.antlr.v4.runtime.DefaultErrorStrategy;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -134,17 +127,23 @@ public class MessageCompiler
       @Override
       public void exitMessage0(Message0Context ctx)
       {
-        final List<MessagePart> parts = ctx.children.stream()
-            .map(pt -> pt instanceof ParameterContext ? ((ParameterContext)pt).value : ((TextPartContext)pt).value)
-            .collect(toList());
-        final int partCount = parts.size();
-
-        if (partCount == 0)
+        if (ctx.children == null)
           ctx.value = EmptyMessage.INSTANCE;
-        else if (partCount == 1 && parts.get(0) instanceof TextPart)
-          ctx.value = new TextMessage((TextPart)parts.get(0));
         else
-          ctx.value = new ParameterizedMessage(parts);
+        {
+          final List<MessagePart> parts = ctx.children
+              .stream()
+              .map(pt -> pt instanceof ParameterContext ? ((ParameterContext)pt).value : ((TextPartContext)pt).value)
+              .collect(toList());
+          final int partCount = parts.size();
+
+          if (partCount == 0)
+            ctx.value = EmptyMessage.INSTANCE;
+          else if (partCount == 1 && parts.get(0) instanceof TextPart)
+            ctx.value = new TextMessage((TextPart)parts.get(0));
+          else
+            ctx.value = new ParameterizedMessage(parts);
+        }
       }
 
 
