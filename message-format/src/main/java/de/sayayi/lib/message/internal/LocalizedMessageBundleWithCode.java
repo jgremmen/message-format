@@ -24,16 +24,10 @@ import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
-import static java.util.Collections.emptySortedSet;
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Collections.unmodifiableSet;
+import static java.util.Collections.*;
 
 
 /**
@@ -60,7 +54,7 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
 
   @Override
   @Contract(pure = true)
-  public String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
+  public @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
     return findMessageByLocale(parameters.getLocale()).format(messageContext, parameters);
   }
 

@@ -48,7 +48,7 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
 
   @Override
   @Contract(pure = true)
-  public String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
+  public @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
     return message.format(messageContext, parameters);
   }
 

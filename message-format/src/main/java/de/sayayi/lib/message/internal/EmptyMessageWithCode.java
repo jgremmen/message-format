@@ -41,9 +41,9 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
 
   @Override
-  @Contract(value = "_, _ -> null", pure = true)
-  public String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
-    return null;
+  @Contract(pure = true)
+  public @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
+    return "";
   }
 
 
