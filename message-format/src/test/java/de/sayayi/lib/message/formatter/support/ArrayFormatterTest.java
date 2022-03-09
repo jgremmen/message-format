@@ -32,12 +32,7 @@ import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
@@ -80,7 +75,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     DataMap booleanMap = new DataMap(new HashMap<MapKey, MapValue>() {
       {
         put(MapKeyBool.TRUE, new MapValueMessage(new Message.WithSpaces() {
-          @Override public String format(@NotNull MessageContext context, @NotNull MessageContext.Parameters parameters) { return "YES"; }
+          @Override public @NotNull String format(@NotNull MessageContext context, @NotNull MessageContext.Parameters parameters) { return "YES"; }
           @Override public boolean hasParameters() { return false; }
           @NotNull
           @Override public SortedSet<String> getParameterNames() { return emptySortedSet(); }
@@ -89,7 +84,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
         }));
 
         put(MapKeyBool.FALSE, new MapValueMessage(new Message.WithSpaces() {
-          @Override public String format(@NotNull MessageContext context, @NotNull MessageContext.Parameters parameters) { return "NO"; }
+          @Override public @NotNull String format(@NotNull MessageContext context, @NotNull MessageContext.Parameters parameters) { return "NO"; }
           @Override public boolean hasParameters() { return false; }
           @NotNull
           @Override public SortedSet<String> getParameterNames() { return emptySortedSet(); }
@@ -159,7 +154,6 @@ public class ArrayFormatterTest extends AbstractFormatterTest
         return "hex";
       }
 
-      @SuppressWarnings("RedundantCast")
       @Override
       public @NotNull Text format(@NotNull MessageContext context, Object value, String format,
                                   @NotNull MessageContext.Parameters parameters, Data data) {

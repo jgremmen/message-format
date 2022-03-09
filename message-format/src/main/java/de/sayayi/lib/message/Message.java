@@ -49,10 +49,10 @@ public interface Message extends Serializable
    * @param messageContext  message context providing formatting information, never {@code null}
    * @param parameters      message parameters, never {@code null}
    *
-   * @return  formatted message
+   * @return  formatted message, never {@code null}
    */
   @Contract(pure = true)
-  String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters);
+  @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters);
 
 
   /**
@@ -138,7 +138,7 @@ public interface Message extends Serializable
      */
     @Contract(pure = true)
     @Override
-    String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters);
+    @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters);
 
 
     /**

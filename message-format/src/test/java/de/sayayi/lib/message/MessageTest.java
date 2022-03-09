@@ -81,4 +81,14 @@ public class MessageTest
     assertEquals("positive",
         m.format(context, context.parameters().withLocale(UK).with("n", 1234)));
   }
+
+
+  @Test
+  public void testEmptyMessage()
+  {
+    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+    Message m = context.getMessageFactory().parse("");
+
+    assertEquals("", m.format(context, context.noParameters()));
+  }
 }

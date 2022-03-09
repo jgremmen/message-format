@@ -59,7 +59,7 @@ public class ParameterizedMessage implements Message.WithSpaces
   @Override
   @Contract(pure = true)
   @SuppressWarnings("java:S4838")
-  public String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters)
+  public @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters)
   {
     final StringBuilder message = new StringBuilder();
     boolean spaceBefore = false;

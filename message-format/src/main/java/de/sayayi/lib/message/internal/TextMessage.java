@@ -52,8 +52,8 @@ public final class TextMessage implements Message.WithSpaces
 
 
   @Override
-  public String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
-    return text;
+  public @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
+    return text == null ? "" : text;
   }
 
 
