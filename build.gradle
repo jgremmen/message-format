@@ -35,8 +35,8 @@ allprojects {
 
 configure(moduleProjects) {
   ext.lombokVersion = "1.18.22"
-  ext.junitVersion = "5.8.1"
-  ext.jetbrainsAnnotationsVersion = "22.0.0"
+  ext.junitVersion = "5.8.2"
+  ext.jetbrainsAnnotationsVersion = "23.0.0"
 
   apply from: "${rootDir}/gradle/module.gradle"
 }
@@ -45,17 +45,5 @@ configure(moduleProjects) {
 configure(formatterProjects) {
   dependencies {
     implementation project(':message-format')
-  }
-}
-
-
-clean {
-  subprojects.each {
-    it.afterEvaluate {
-      def cleanTask = it.tasks.findByName('clean')
-      if (cleanTask) {
-        dependsOn(cleanTask)
-      }
-    }
   }
 }

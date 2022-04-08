@@ -22,9 +22,9 @@ plugins {
 description = 'Message Format Library (classpath scanner)'
 
 
-def asmVersion = "9.1"
-def classgraphVersion = "4.8.108"
-def springContextVersion = "5.2.15.RELEASE"
+def asmVersion = "9.3"
+def classgraphVersion = "4.8.143"
+def springContextVersion = "5.3.18"
 
 
 dependencies {
