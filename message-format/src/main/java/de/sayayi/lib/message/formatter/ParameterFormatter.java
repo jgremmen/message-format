@@ -107,6 +107,6 @@ public interface ParameterFormatter
      * @return  value size
      */
     @Contract(pure = true)
-    int size(@NotNull Object value);
+    long size(@NotNull Object value);
   }
 }

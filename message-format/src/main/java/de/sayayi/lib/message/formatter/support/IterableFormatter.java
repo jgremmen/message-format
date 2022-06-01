@@ -33,9 +33,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
 import static java.util.Collections.singleton;
 import static java.util.ResourceBundle.getBundle;
 
@@ -99,12 +97,12 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
 
 
   @Override
-  public int size(@NotNull Object value)
+  public long size(@NotNull Object value)
   {
     if (value instanceof Collection)
       return ((Collection<?>)value).size();
 
-    int size = 0;
+    long size = 0;
 
     for(Object ignored: (Iterable<?>)value)
       size++;

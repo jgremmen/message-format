@@ -81,6 +81,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
           @Override public SortedSet<String> getParameterNames() { return emptySortedSet(); }
           @Override public boolean isSpaceBefore() { return false; }
           @Override public boolean isSpaceAfter() { return false; }
+          @Override public @NotNull Message trim() { return this; }
         }));
 
         put(MapKeyBool.FALSE, new MapValueMessage(new Message.WithSpaces() {
@@ -90,6 +91,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
           @Override public SortedSet<String> getParameterNames() { return emptySortedSet(); }
           @Override public boolean isSpaceBefore() { return false; }
           @Override public boolean isSpaceAfter() { return false; }
+          @Override public @NotNull Message trim() { return this; }
         }));
       }
     });
