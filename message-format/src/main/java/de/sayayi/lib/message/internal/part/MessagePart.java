@@ -29,6 +29,9 @@ import java.io.Serializable;
  */
 public interface MessagePart extends SpacesAware, Serializable
 {
+  /**
+   * Message part containing text only.
+   */
   @SuppressWarnings("java:S1214")
   interface Text extends MessagePart
   {
@@ -45,6 +48,11 @@ public interface MessagePart extends SpacesAware, Serializable
     String getText();
 
 
+    /**
+     * Tells if this text message part is empty.
+     *
+     * @return  {@code true} if this message part is empty, {@code false} otherwise
+     */
     @Contract(pure = true)
     boolean isEmpty();
   }
@@ -52,6 +60,9 @@ public interface MessagePart extends SpacesAware, Serializable
 
 
 
+  /**
+   * Message part containing a parameter to be evaluated during formatting.
+   */
   interface Parameter extends MessagePart
   {
     @Contract(pure = true)
