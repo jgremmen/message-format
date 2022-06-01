@@ -21,6 +21,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.EnumSet;
+import java.util.Set;
+
+import static java.util.Collections.unmodifiableSet;
 
 
 /**
@@ -29,10 +32,10 @@ import java.util.EnumSet;
 @SuppressWarnings({"java:S2386", "java:S1214"})
 public interface MapValue extends Data
 {
-  EnumSet<Type> STRING_MESSAGE_TYPE = EnumSet.of(Type.STRING, Type.MESSAGE);
-  EnumSet<Type> STRING_TYPE = EnumSet.of(Type.STRING);
-  EnumSet<Type> BOOL_TYPE = EnumSet.of(Type.BOOL);
-  EnumSet<Type> NUMBER_TYPE = EnumSet.of(Type.NUMBER);
+  Set<Type> STRING_MESSAGE_TYPE = unmodifiableSet(EnumSet.of(Type.STRING, Type.MESSAGE));
+  Set<Type> STRING_TYPE = unmodifiableSet(EnumSet.of(Type.STRING));
+  Set<Type> BOOL_TYPE = unmodifiableSet(EnumSet.of(Type.BOOL));
+  Set<Type> NUMBER_TYPE = unmodifiableSet(EnumSet.of(Type.NUMBER));
 
 
   @Contract(pure = true)
