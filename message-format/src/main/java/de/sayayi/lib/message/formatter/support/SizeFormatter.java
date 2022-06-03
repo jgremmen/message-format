@@ -15,20 +15,22 @@
  */
 package de.sayayi.lib.message.formatter.support;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
-import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.EnumSet;
 import java.util.Set;
 
+import static de.sayayi.lib.message.data.map.MapKey.Type.NUMBER;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.messageToText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static java.util.Collections.emptySet;
 
 
@@ -49,13 +51,21 @@ public final class SizeFormatter extends AbstractParameterFormatter implements N
   public @NotNull Text format(@NotNull MessageContext messageContext, Object value, String format,
                               @NotNull Parameters parameters, Data data)
   {
+    long size = 0;
+
+    if (value != null)
+    {
+      ParameterFormatter formatter = messageContext.getFormatter(value.getClass());
+      if (formatter instanceof SizeQueryable)
+        size = ((SizeQueryable)formatter).size(value);
+    }
+
     if (!(data instanceof DataMap))
-      throw new MessageException("data must be a choice map");
+      return noSpaceText(Long.toString(size));
 
-    final Message.WithSpaces message =
-        ((DataMap)data).getMessage(messageContext, value, parameters, NO_NAME_KEY_TYPES, true);
-
-    return messageToText(messageContext, message, parameters);
+    return messageToText(messageContext,
+        ((DataMap)data).getMessage(messageContext, size, parameters, EnumSet.of(NUMBER), true),
+        parameters);
   }
 
 
