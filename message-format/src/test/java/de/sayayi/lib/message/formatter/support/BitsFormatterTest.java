@@ -20,10 +20,11 @@ import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.DataNumber;
 import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
-import de.sayayi.lib.message.internal.part.TextPart;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -50,15 +51,15 @@ public class BitsFormatterTest
     final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
     Parameters parameters = context.noParameters();
 
-    assertEquals(new TextPart("11111111"), formatter.format(context, (byte)0xff, null, parameters, null));
-    assertEquals(new TextPart("00000000"), formatter.format(context, (byte)0, null, parameters, null));
-    assertEquals(new TextPart("10101010"), formatter.format(context, (byte)0xaa, null, parameters, null));
-    assertEquals(new TextPart("01010101"), formatter.format(context, (byte)0x55, null, parameters, null));
-    assertEquals(new TextPart("10101"), formatter.format(context, (byte)0x15, null, parameters, new DataString("auto")));
-    assertEquals(new TextPart("0"), formatter.format(context, (byte)0, null, parameters, new DataString("auto")));
-    assertEquals(new TextPart("101"), formatter.format(context, (byte)0x15, null, parameters, new DataNumber(3)));
-    assertEquals(TextPart.NULL, formatter.format(context, null, null, parameters, null));
-    assertEquals(TextPart.NULL, formatter.format(context, "hello", null, parameters, null));
+    assertEquals(noSpaceText("11111111"), formatter.format(context, (byte)0xff, null, parameters, null));
+    assertEquals(noSpaceText("00000000"), formatter.format(context, (byte)0, null, parameters, null));
+    assertEquals(noSpaceText("10101010"), formatter.format(context, (byte)0xaa, null, parameters, null));
+    assertEquals(noSpaceText("01010101"), formatter.format(context, (byte)0x55, null, parameters, null));
+    assertEquals(noSpaceText("10101"), formatter.format(context, (byte)0x15, null, parameters, new DataString("auto")));
+    assertEquals(noSpaceText("0"), formatter.format(context, (byte)0, null, parameters, new DataString("auto")));
+    assertEquals(noSpaceText("101"), formatter.format(context, (byte)0x15, null, parameters, new DataNumber(3)));
+    assertEquals(nullText(), formatter.format(context, null, null, parameters, null));
+    assertEquals(nullText(), formatter.format(context, "hello", null, parameters, null));
   }
 
 
@@ -69,12 +70,12 @@ public class BitsFormatterTest
     final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
     Parameters parameters = context.noParameters();
 
-    assertEquals(new TextPart("1111111111111111"), formatter.format(context, (short)0xffff, null, parameters, null));
-    assertEquals(new TextPart("0000000000000000"), formatter.format(context, (short)0, null, parameters, null));
-    assertEquals(new TextPart("1010101010101010"), formatter.format(context, (short)0xaaaa, null, parameters, null));
-    assertEquals(new TextPart("0101010101010101"), formatter.format(context, (short)0x5555, null, parameters, null));
-    assertEquals(new TextPart("101010101"), formatter.format(context, (short)0x155, null, parameters, new DataString("auto")));
-    assertEquals(new TextPart("0"), formatter.format(context, (short)0, null, parameters, new DataString("auto")));
-    assertEquals(new TextPart("010110"), formatter.format(context, (byte)0x456, null, parameters, new DataNumber(6)));
+    assertEquals(noSpaceText("1111111111111111"), formatter.format(context, (short)0xffff, null, parameters, null));
+    assertEquals(noSpaceText("0000000000000000"), formatter.format(context, (short)0, null, parameters, null));
+    assertEquals(noSpaceText("1010101010101010"), formatter.format(context, (short)0xaaaa, null, parameters, null));
+    assertEquals(noSpaceText("0101010101010101"), formatter.format(context, (short)0x5555, null, parameters, null));
+    assertEquals(noSpaceText("101010101"), formatter.format(context, (short)0x155, null, parameters, new DataString("auto")));
+    assertEquals(noSpaceText("0"), formatter.format(context, (short)0, null, parameters, new DataString("auto")));
+    assertEquals(noSpaceText("010110"), formatter.format(context, (byte)0x456, null, parameters, new DataNumber(6)));
   }
 }

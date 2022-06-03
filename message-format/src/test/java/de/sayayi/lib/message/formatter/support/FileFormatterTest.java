@@ -19,13 +19,13 @@ import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
-import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import de.sayayi.lib.message.internal.part.TextPart;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -45,11 +45,11 @@ public class FileFormatterTest
 
     File f = new File("/path1/path2/filename.ext");
 
-    assertEquals(Text.NULL, formatter.format(context, null, null, parameters, null));
-    assertEquals(new TextPart("/path1/path2/filename.ext"), formatter.format(context, f, null, parameters, null));
-    assertEquals(new TextPart("filename.ext"), formatter.format(context, f, "name", parameters, null));
-    assertEquals(new TextPart("/path1/path2"), formatter.format(context, f, "parent", parameters, null));
-    assertEquals(new TextPart("ext"), formatter.format(context, f, "extension", parameters, null));
+    assertEquals(nullText(), formatter.format(context, null, null, parameters, null));
+    assertEquals(noSpaceText("/path1/path2/filename.ext"), formatter.format(context, f, null, parameters, null));
+    assertEquals(noSpaceText("filename.ext"), formatter.format(context, f, "name", parameters, null));
+    assertEquals(noSpaceText("/path1/path2"), formatter.format(context, f, "parent", parameters, null));
+    assertEquals(noSpaceText("ext"), formatter.format(context, f, "extension", parameters, null));
   }
 
 

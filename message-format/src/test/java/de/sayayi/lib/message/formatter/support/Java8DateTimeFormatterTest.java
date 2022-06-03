@@ -30,9 +30,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static java.util.Locale.FRANCE;
-import static java.util.Locale.GERMANY;
-import static java.util.Locale.UK;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -59,13 +59,13 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
     final Parameters noParameters = context.noParameters();
     final LocalDate date = LocalDate.of(1972, 8, 17);
 
-    assertEquals(new TextPart("17.08.72"), formatter.format(context, date, "short", noParameters, null));
-    assertEquals(new TextPart("17.08.1972"), formatter.format(context, date, "medium", noParameters, null));
-    assertEquals(new TextPart("17. August 1972"), formatter.format(context, date, "long", noParameters, null));
-    assertEquals(new TextPart("Donnerstag, 17. August 1972"), formatter.format(context, date, "full", noParameters, null));
-    assertEquals(new TextPart("17.08.1972"), formatter.format(context, date, "date", noParameters, null));
+    assertEquals(noSpaceText("17.08.72"), formatter.format(context, date, "short", noParameters, null));
+    assertEquals(noSpaceText("17.08.1972"), formatter.format(context, date, "medium", noParameters, null));
+    assertEquals(noSpaceText("17. August 1972"), formatter.format(context, date, "long", noParameters, null));
+    assertEquals(noSpaceText("Donnerstag, 17. August 1972"), formatter.format(context, date, "full", noParameters, null));
+    assertEquals(noSpaceText("17.08.1972"), formatter.format(context, date, "date", noParameters, null));
 
-    assertEquals(Text.EMPTY, formatter.format(context, date, "time", noParameters, null));
+    assertEquals(emptyText(), formatter.format(context, date, "time", noParameters, null));
   }
 
 

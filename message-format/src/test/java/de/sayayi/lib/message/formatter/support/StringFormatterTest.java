@@ -21,12 +21,12 @@ import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
-import de.sayayi.lib.message.internal.part.TextPart;
 import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.RetentionPolicy;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -50,9 +50,9 @@ public class StringFormatterTest extends AbstractFormatterTest
     final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
     final Parameters noParameters = context.noParameters();
 
-    assertEquals(new TextPart("text"), formatter.format(context, " text ", null, noParameters, null));
-    assertEquals(new TextPart("RUNTIME"), formatter.format(context, RetentionPolicy.RUNTIME, null, noParameters, null));
-    assertEquals(new TextPart("hello"), formatter.format(context, new Object() {
+    assertEquals(noSpaceText("text"), formatter.format(context, " text ", null, noParameters, null));
+    assertEquals(noSpaceText("RUNTIME"), formatter.format(context, RetentionPolicy.RUNTIME, null, noParameters, null));
+    assertEquals(noSpaceText("hello"), formatter.format(context, new Object() {
       @Override
       public String toString() {
         return " hello";

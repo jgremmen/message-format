@@ -19,13 +19,13 @@ import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
-import de.sayayi.lib.message.internal.part.TextPart;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.LongSupplier;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -46,7 +46,7 @@ public class SupplierFormatterTest
 
     Object value = (BooleanSupplier) () -> true;
 
-    assertEquals(new TextPart("wahr"), registry.getFormatter(null, value.getClass())
+    assertEquals(noSpaceText("wahr"), registry.getFormatter(null, value.getClass())
         .format(context, value, null, noParameters, null));
   }
 
@@ -63,7 +63,7 @@ public class SupplierFormatterTest
 
     Object value = (LongSupplier) () -> 1234567890L;
 
-    assertEquals(new TextPart("1,234,567,890"), registry.getFormatter(null, value.getClass())
+    assertEquals(noSpaceText("1,234,567,890"), registry.getFormatter(null, value.getClass())
         .format(context, value, null, noParameters, new DataString("###,###,###,###")));
   }
 }
