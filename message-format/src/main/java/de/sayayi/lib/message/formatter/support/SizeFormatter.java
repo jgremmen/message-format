@@ -30,7 +30,6 @@ import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.Type.NUMBER;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.messageToText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static java.util.Collections.emptySet;
 
 
@@ -61,7 +60,7 @@ public final class SizeFormatter extends AbstractParameterFormatter implements N
     }
 
     if (!(data instanceof DataMap))
-      return noSpaceText(Long.toString(size));
+      return messageContext.getFormatter(long.class).format(messageContext, size, null, parameters, data);
 
     return messageToText(messageContext,
         ((DataMap)data).getMessage(messageContext, size, parameters, EnumSet.of(NUMBER), true),
