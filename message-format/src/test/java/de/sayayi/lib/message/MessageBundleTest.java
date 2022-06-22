@@ -20,6 +20,8 @@ import de.sayayi.lib.message.annotation.Text;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static java.util.Collections.singleton;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -33,6 +35,8 @@ public class MessageBundleTest
     MessageBundle bundle = new MessageBundle(NO_CACHE_INSTANCE);
     bundle.add(E1.class);
     bundle.add(E2.class);
+
+    assertEquals(singleton("base"), bundle.getCodes());
   }
 
 

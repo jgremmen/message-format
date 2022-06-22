@@ -28,9 +28,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -70,7 +68,7 @@ public class MessageDefAnnotationTest
 
 
   @Test
-  @MessageDef(code="MSG-052", texts={})
+  @MessageDef(code = "MSG-052", texts = {})
   @SuppressWarnings("DefaultAnnotationParam")
   public void testEmptyMessageWithCode()
   {
@@ -82,7 +80,7 @@ public class MessageDefAnnotationTest
 
 
   @Test
-  @MessageDef(code="T3", text="m3")
+  @MessageDef(code = "T3", text = "m3")
   public void testMessageWithoutLocale()
   {
     final WithCode msg = bundle.getByCode("T3");
@@ -97,7 +95,7 @@ public class MessageDefAnnotationTest
 
 
   @Test
-  @MessageDef(code="T2", texts=@Text(locale="nl-NL", text="nl"))
+  @MessageDef(code = "T2", texts = @Text(locale = "nl-NL", text = "nl"))
   public void testSingleMessageWithLocale()
   {
     final WithCode msg = bundle.getByCode("T2");
@@ -112,10 +110,10 @@ public class MessageDefAnnotationTest
 
   @Test
   @MessageDef(code = "T1", texts={
-      @Text(locale="en-US", text="us"),
-      @Text(locale="nl", text="nl"),
-      @Text(locale="en-GB", text="uk"),
-      @Text(locale="de-DE", text="de")
+      @Text(locale = "en-US", text = "us"),
+      @Text(locale = "nl", text = "nl"),
+      @Text(locale = "en-GB", text = "uk"),
+      @Text(locale = "de-DE", text = "de")
   })
   public void testLocaleSelection()
   {
