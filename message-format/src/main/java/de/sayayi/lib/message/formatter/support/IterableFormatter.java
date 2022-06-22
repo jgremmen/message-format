@@ -58,6 +58,10 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
 
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
     final StringBuilder s = new StringBuilder();
+    final String sep =
+        getConfigValueString(messageContext, "sep", parameters, data, false, ", ");
+    final String sepLast =
+        getConfigValueString(messageContext, "sep-last", parameters, data, false, sep);
 
     while(iterator.hasNext())
     {
@@ -75,7 +79,7 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
       if (text != null && !text.isEmpty())
       {
         if (s.length() > 0)
-          s.append(", ");
+          s.append(iterator.hasNext() ? sep : sepLast);
 
         s.append(text.getText());
       }

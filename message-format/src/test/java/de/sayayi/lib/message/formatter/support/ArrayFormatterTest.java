@@ -210,4 +210,22 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     assertEquals("null", message.format(context, context.parameters().with("array", null)));
     assertEquals("empty", message.format(context, context.parameters().with("array", new int[0])));
   }
+
+
+  @Test
+  public void testSeparator()
+  {
+    final GenericFormatterService registry = new GenericFormatterService();
+    registry.addFormatter(new ArrayFormatter());
+
+    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE);
+
+    assertEquals("1, 2, 3, 4 and 5", context.getMessageFactory()
+        .parse("%{c,{sep:', ',sep-last:' and '}}")
+        .format(context, context.parameters().with("c", new int[] { 1, 2, 3, 4, 5})));
+
+    assertEquals("1.2.3.4.5", context.getMessageFactory()
+        .parse("%{c,{sep:'.'}}")
+        .format(context, context.parameters().with("c", new long[] { 1, 2, 3, 4, 5 })));
+  }
 }

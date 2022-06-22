@@ -67,4 +67,22 @@ public class IterableFormatterTest extends AbstractFormatterTest
     assertEquals("null", message.format(context, context.parameters().with("c", null)));
     assertEquals("empty", message.format(context, context.parameters().with("c", emptySet())));
   }
+
+
+  @Test
+  public void testSeparator()
+  {
+    final GenericFormatterService registry = new GenericFormatterService();
+    registry.addFormatter(new IterableFormatter());
+
+    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE);
+
+    assertEquals("1, 2, 3, 4 and 5", context.getMessageFactory()
+        .parse("%{c,{sep:', ',sep-last:' and '}}")
+        .format(context, context.parameters().with("c", Arrays.asList(1, 2, 3, 4, 5))));
+
+    assertEquals("1.2.3.4.5", context.getMessageFactory()
+        .parse("%{c,{sep:'.'}}")
+        .format(context, context.parameters().with("c", Arrays.asList(1, 2, 3, 4, 5))));
+  }
 }

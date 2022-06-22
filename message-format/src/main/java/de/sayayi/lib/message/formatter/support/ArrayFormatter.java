@@ -79,6 +79,10 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
     final ParameterFormatter formatter =
         arrayType.isPrimitive() ? messageContext.getFormatter(format, arrayType.getComponentType()) : null;
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
+    final String sep =
+        getConfigValueString(messageContext, "sep", parameters, data, false, ", ");
+    final String sepLast =
+        getConfigValueString(messageContext, "sep-last", parameters, data, false, sep);
 
     for(int i = 0; i < length; i++)
     {
@@ -95,7 +99,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
       if (text != null && !text.isEmpty())
       {
         if (s.length() > 0)
-          s.append(", ");
+          s.append((i + 1) < length ? sep : sepLast);
 
         s.append(text.getText());
       }
