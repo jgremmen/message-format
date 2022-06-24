@@ -20,6 +20,7 @@ import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -27,12 +28,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.SortedSet;
 
 import static java.util.Collections.emptySortedSet;
+import static lombok.AccessLevel.PRIVATE;
 
 
 /**
  * @author Jeroen Gremmen
  */
 @ToString(doNotUseGetters = true)
+@RequiredArgsConstructor(access = PRIVATE)
 public final class TextMessage implements Message.WithSpaces
 {
   private static final long serialVersionUID = 600L;
@@ -43,11 +46,8 @@ public final class TextMessage implements Message.WithSpaces
   @Getter private final boolean spaceAfter;
 
 
-  public TextMessage(@NotNull Text textPart)
-  {
-    text = textPart.getText();
-    spaceBefore = textPart.isSpaceBefore();
-    spaceAfter = textPart.isSpaceAfter();
+  public TextMessage(@NotNull Text textPart) {
+    this(textPart.getText(), textPart.isSpaceBefore(), textPart.isSpaceAfter());
   }
 
 
@@ -67,5 +67,14 @@ public final class TextMessage implements Message.WithSpaces
   @Override
   public @NotNull SortedSet<String> getParameterNames() {
     return emptySortedSet();
+  }
+
+
+  @Override
+  public @NotNull Message trim()
+  {
+    return text == null || text.isEmpty()
+        ? EmptyMessage.INSTANCE
+        : spaceBefore || spaceAfter ? new TextMessage(text, false, false) : this;
   }
 }

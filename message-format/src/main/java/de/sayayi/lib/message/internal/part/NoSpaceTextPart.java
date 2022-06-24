@@ -22,6 +22,8 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
+ * Text message part without leading and trailing spaces.
+ *
  * @author Jeroen Gremmen
  */
 public final class NoSpaceTextPart implements Text

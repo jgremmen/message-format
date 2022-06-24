@@ -65,7 +65,7 @@ public final class OptionalLongFormatter extends AbstractParameterFormatter impl
 
 
   @Override
-  public int size(@NotNull Object value) {
+  public long size(@NotNull Object value) {
     return ((OptionalLong)value).isPresent() ? 1 : 0;
   }
 

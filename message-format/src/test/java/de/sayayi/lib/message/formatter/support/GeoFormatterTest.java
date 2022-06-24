@@ -21,18 +21,12 @@ import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.formatter.support.GeoFormatter.Format;
-import de.sayayi.lib.message.internal.part.TextPart;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static java.util.Locale.ENGLISH;
-import static java.util.Locale.GERMANY;
-import static java.util.Locale.ROOT;
-import static java.util.Locale.UK;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static java.util.Locale.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -110,21 +104,21 @@ public class GeoFormatterTest extends AbstractFormatterTest
     final GeoFormatter formatter = new GeoFormatter();
 
     // short-longitude
-    assertEquals(new TextPart("4°48'E"), formatter.format(context, dms(4, 48), null,
+    assertEquals(noSpaceText("4°48'E"), formatter.format(context, dms(4, 48), null,
         context.noParameters(), new DataString("short-longitude")));
 
     // longitude
-    assertEquals(new TextPart("19°0'0\"W"),
+    assertEquals(noSpaceText("19°0'0\"W"),
         formatter.format(context, -dms(18, 59, 59, 501), null,
         context.noParameters(), new DataString("longitude")));
 
     // medium-longitude
-    assertEquals(new TextPart("18°59'59,9\"E"),
+    assertEquals(noSpaceText("18°59'59,9\"E"),
         formatter.format(context, dms(18, 59, 59, 891), null,
         context.parameters().withLocale(GERMANY), new DataString("medium-longitude")));
 
     // long-longitude
-    assertEquals(new TextPart("18°59'59.891\"W"),
+    assertEquals(noSpaceText("18°59'59.891\"W"),
         formatter.format(context, -dms(18, 59, 59, 891), null,
             context.parameters().withLocale(UK), new DataString("long-longitude")));
   }

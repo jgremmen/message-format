@@ -71,4 +71,10 @@ public final class EmptyMessage implements Message.WithSpaces
   public boolean isSpaceAfter() {
     return false;
   }
+
+
+  @Override
+  public @NotNull Message trim() {
+    return this;
+  }
 }

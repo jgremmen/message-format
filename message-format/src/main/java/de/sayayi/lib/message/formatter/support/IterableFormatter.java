@@ -33,9 +33,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
 import static java.util.Collections.singleton;
 import static java.util.ResourceBundle.getBundle;
 
@@ -60,6 +58,10 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
 
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
     final StringBuilder s = new StringBuilder();
+    final String sep =
+        getConfigValueString(messageContext, "sep", parameters, data, false, ", ");
+    final String sepLast =
+        getConfigValueString(messageContext, "sep-last", parameters, data, false, sep);
 
     while(iterator.hasNext())
     {
@@ -77,7 +79,7 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
       if (text != null && !text.isEmpty())
       {
         if (s.length() > 0)
-          s.append(", ");
+          s.append(iterator.hasNext() ? sep : sepLast);
 
         s.append(text.getText());
       }
@@ -99,12 +101,12 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
 
 
   @Override
-  public int size(@NotNull Object value)
+  public long size(@NotNull Object value)
   {
     if (value instanceof Collection)
       return ((Collection<?>)value).size();
 
-    int size = 0;
+    long size = 0;
 
     for(Object ignored: (Iterable<?>)value)
       size++;

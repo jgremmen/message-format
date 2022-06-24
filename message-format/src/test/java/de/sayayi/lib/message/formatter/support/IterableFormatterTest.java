@@ -19,13 +19,13 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
-import de.sayayi.lib.message.internal.part.TextPart;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static java.util.Collections.emptySet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -50,7 +50,7 @@ public class IterableFormatterTest extends AbstractFormatterTest
     final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, "de-DE");
     final Parameters noParameters = context.noParameters();
 
-    assertEquals(new TextPart("Test, true, -6"), registry.getFormatter(null, List.class)
+    assertEquals(noSpaceText("Test, true, -6"), registry.getFormatter(null, List.class)
         .format(context, Arrays.asList("Test", true, null, -6), null , noParameters, null));
   }
 
@@ -66,5 +66,23 @@ public class IterableFormatterTest extends AbstractFormatterTest
 
     assertEquals("null", message.format(context, context.parameters().with("c", null)));
     assertEquals("empty", message.format(context, context.parameters().with("c", emptySet())));
+  }
+
+
+  @Test
+  public void testSeparator()
+  {
+    final GenericFormatterService registry = new GenericFormatterService();
+    registry.addFormatter(new IterableFormatter());
+
+    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE);
+
+    assertEquals("1, 2, 3, 4 and 5", context.getMessageFactory()
+        .parse("%{c,{sep:', ',sep-last:' and '}}")
+        .format(context, context.parameters().with("c", Arrays.asList(1, 2, 3, 4, 5))));
+
+    assertEquals("1.2.3.4.5", context.getMessageFactory()
+        .parse("%{c,{sep:'.'}}")
+        .format(context, context.parameters().with("c", Arrays.asList(1, 2, 3, 4, 5))));
   }
 }

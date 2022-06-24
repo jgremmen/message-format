@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Contract;
 
 
 /**
- * This interface denotes that a message is aware of spaces before or after.
+ * This interface denotes that a message is aware of spaces before and/or after.
  *
  * @author Jeroen Gremmen
  */

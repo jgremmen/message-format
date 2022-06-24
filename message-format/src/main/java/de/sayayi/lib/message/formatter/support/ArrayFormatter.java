@@ -32,9 +32,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
 import static java.lang.reflect.Array.get;
 import static java.lang.reflect.Array.getLength;
 import static java.util.Collections.unmodifiableSet;
@@ -81,6 +79,10 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
     final ParameterFormatter formatter =
         arrayType.isPrimitive() ? messageContext.getFormatter(format, arrayType.getComponentType()) : null;
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
+    final String sep =
+        getConfigValueString(messageContext, "sep", parameters, data, false, ", ");
+    final String sepLast =
+        getConfigValueString(messageContext, "sep-last", parameters, data, false, sep);
 
     for(int i = 0; i < length; i++)
     {
@@ -97,7 +99,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
       if (text != null && !text.isEmpty())
       {
         if (s.length() > 0)
-          s.append(", ");
+          s.append((i + 1) < length ? sep : sepLast);
 
         s.append(text.getText());
       }
@@ -114,7 +116,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
 
 
   @Override
-  public int size(@NotNull Object value) {
+  public long size(@NotNull Object value) {
     return getLength(value);
   }
 

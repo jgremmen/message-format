@@ -91,8 +91,15 @@ public final class StringFormatter extends AbstractParameterFormatter
 
 
   @Override
-  public int size(@NotNull Object value) {
-    return value instanceof char[] ? ((char[])value).length : ((CharSequence)value).length();
+  public long size(@NotNull Object value)
+  {
+    if (value instanceof char[])
+      return ((char[])value).length;
+    if (value instanceof CharSequence)
+      return ((CharSequence)value).length();
+
+    // string formatter is the default formatter so value might not be a string.
+    return 0;
   }
 
 

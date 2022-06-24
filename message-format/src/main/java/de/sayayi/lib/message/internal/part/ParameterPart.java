@@ -34,6 +34,8 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.addSpaces;
 
 
 /**
+ * Parameter message part with optional leading and/or trailing spaces.
+ *
  * @author Jeroen Gremmen
  */
 @Getter

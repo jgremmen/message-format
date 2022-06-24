@@ -63,14 +63,17 @@ public final class MessagePartFactory
   }
 
 
+  @Contract(pure = true)
   public static @NotNull Text addSpaces(@NotNull Text text, boolean spaceBefore, boolean spaceAfter)
   {
     final boolean textSpaceBefore = text.isSpaceBefore();
     final boolean textSpaceAfter = text.isSpaceAfter();
 
-    return (textSpaceBefore || spaceBefore) == textSpaceBefore && (textSpaceAfter || spaceAfter) == textSpaceAfter
-        ? text
-        : new TextPart(text.getText(), textSpaceBefore || spaceBefore, textSpaceAfter || spaceAfter);
+    spaceBefore |= textSpaceBefore;
+    spaceAfter |= textSpaceAfter;
+
+    return spaceBefore == textSpaceBefore && spaceAfter == textSpaceAfter
+        ? text : new TextPart(text.getText(), spaceBefore, spaceAfter);
   }
 
 

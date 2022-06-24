@@ -20,10 +20,10 @@ import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
-import de.sayayi.lib.message.internal.part.TextPart;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static java.util.Locale.ENGLISH;
 import static java.util.Locale.GERMAN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,12 +50,12 @@ public class BoolFormatterTest extends AbstractFormatterTest
         "de-DE");
     final Parameters parameters = context.noParameters();
 
-    assertEquals(new TextPart("wahr"), formatter.format(context, Boolean.TRUE, null, parameters, null));
-    assertEquals(new TextPart("falsch"), formatter.format(context, 0.0d, null, parameters, null));
-    assertEquals(new TextPart("wahr"), formatter.format(context, -0.0001f, null, parameters, null));
-    assertEquals(new TextPart("falsch"), formatter.format(context, "FALSE", null, parameters, null));
-    assertEquals(new TextPart("wahr"), formatter.format(context, "TrUe", null, parameters, null));
-    assertEquals(new TextPart("wahr"), formatter.format(context, -4, null, parameters, null));
+    assertEquals(noSpaceText("wahr"), formatter.format(context, Boolean.TRUE, null, parameters, null));
+    assertEquals(noSpaceText("falsch"), formatter.format(context, 0.0d, null, parameters, null));
+    assertEquals(noSpaceText("wahr"), formatter.format(context, -0.0001f, null, parameters, null));
+    assertEquals(noSpaceText("falsch"), formatter.format(context, "FALSE", null, parameters, null));
+    assertEquals(noSpaceText("wahr"), formatter.format(context, "TrUe", null, parameters, null));
+    assertEquals(noSpaceText("wahr"), formatter.format(context, -4, null, parameters, null));
   }
 
 

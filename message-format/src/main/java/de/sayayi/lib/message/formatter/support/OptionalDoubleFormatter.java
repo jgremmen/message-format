@@ -66,7 +66,7 @@ public final class OptionalDoubleFormatter extends AbstractParameterFormatter im
 
 
   @Override
-  public int size(@NotNull Object value) {
+  public long size(@NotNull Object value) {
     return ((OptionalDouble)value).isPresent() ? 1 : 0;
   }
 

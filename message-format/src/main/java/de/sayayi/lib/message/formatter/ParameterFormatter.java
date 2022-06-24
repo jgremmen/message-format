@@ -23,6 +23,7 @@ import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.util.Set;
 
@@ -107,6 +108,7 @@ public interface ParameterFormatter
      * @return  value size
      */
     @Contract(pure = true)
-    int size(@NotNull Object value);
+    @Range(from = 0, to = Long.MAX_VALUE)
+    long size(@NotNull Object value);
   }
 }

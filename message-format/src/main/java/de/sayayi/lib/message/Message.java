@@ -91,7 +91,21 @@ public interface Message extends Serializable
 
 
 
-  interface WithSpaces extends Message, SpacesAware {
+  interface WithSpaces extends Message, SpacesAware
+  {
+    /**
+     * <p>
+     *   Returns this message without leading or trailing space.
+     * </p>
+     * <p>
+     *   The returned message may still implement {@link WithSpaces} but the methods
+     *   {@link WithSpaces#isSpaceBefore()} and {@link WithSpaces#isSpaceAfter()} must return {@code false}.
+     * </p>
+     *
+     * @return  trimmed message, never {@code null}
+     */
+    @Contract(pure = true)
+    @NotNull Message trim();
   }
 
 

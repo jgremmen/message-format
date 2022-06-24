@@ -26,9 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.Set;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
 import static java.util.Collections.singleton;
 
 
@@ -66,10 +64,10 @@ public final class FileFormatter extends AbstractParameterFormatter implements S
 
 
   @Override
-  public int size(@NotNull Object value)
+  public long size(@NotNull Object value)
   {
     final File file = (File)value;
-    return file.isFile() && file.canRead() ? (int)file.length() : -1;
+    return file.isFile() && file.canRead() ? file.length() : -1;
   }
 
 

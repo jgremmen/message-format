@@ -113,13 +113,13 @@ public final class DataMap implements Data
       if (includeDefault)
         mapValue = map.get(null);
 
-      return mapValue == null ? null : (Message.WithSpaces)mapValue.asObject();
+      if (mapValue == null)
+        return null;
     }
 
-    if (mapValue.getType() == Type.STRING)
-      return ((MapValueString)mapValue).asMessage(messageContext.getMessageFactory());
-
-    return (Message.WithSpaces)mapValue.asObject();
+    return mapValue.getType() == Type.STRING
+        ? ((MapValueString)mapValue).asMessage(messageContext.getMessageFactory())
+        : (Message.WithSpaces)mapValue.asObject();
   }
 
 

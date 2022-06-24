@@ -65,7 +65,7 @@ public final class OptionalIntFormatter extends AbstractParameterFormatter imple
 
 
   @Override
-  public int size(@NotNull Object value) {
+  public long size(@NotNull Object value) {
     return ((OptionalInt)value).isPresent() ? 1 : 0;
   }
 

@@ -20,10 +20,10 @@ import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.Map;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static java.util.Collections.singletonMap;
 import static java.util.Locale.UK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -50,13 +50,13 @@ public class MapFormatterTest extends AbstractFormatterTest
     Message message = context.getMessageFactory().parse("%{map1} %{map2,{sep:'   -> '}} %{map3,':  '}");
 
     assertEquals("key=value",
-        message.format(context, context.parameters().with("map1", Collections.singletonMap("key", "value"))));
+        message.format(context, context.parameters().with("map1", singletonMap("key", "value"))));
 
     assertEquals("key -> value",
-        message.format(context, context.parameters().with("map2", Collections.singletonMap("key", "value"))));
+        message.format(context, context.parameters().with("map2", singletonMap("key", "value"))));
 
     assertEquals("key: value",
-        message.format(context, context.parameters().with("map3", Collections.singletonMap("key", "value"))));
+        message.format(context, context.parameters().with("map3", singletonMap("key", "value"))));
   }
 
 
@@ -71,9 +71,9 @@ public class MapFormatterTest extends AbstractFormatterTest
     Message message = context.getMessageFactory().parse("%{map1} %{map2,{null-key:'key',null-value:'value'}}");
 
     assertEquals("(null)=(null)",
-        message.format(context, context.parameters().with("map1", Collections.singletonMap(null, null))));
+        message.format(context, context.parameters().with("map1", singletonMap(null, null))));
 
     assertEquals("key=value",
-        message.format(context, context.parameters().with("map2", Collections.singletonMap(null, null))));
+        message.format(context, context.parameters().with("map2", singletonMap(null, null))));
   }
 }

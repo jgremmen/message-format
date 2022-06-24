@@ -22,6 +22,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.EnumSet;
+import java.util.Set;
+
+import static java.util.Collections.unmodifiableSet;
 
 
 /**
@@ -30,9 +33,9 @@ import java.util.EnumSet;
 @SuppressWarnings({"java:S1214", "java:S2386"})
 public interface MapKey extends Serializable
 {
-  EnumSet<Type> EMPTY_NULL_TYPE = EnumSet.of(Type.EMPTY, Type.NULL);
-  EnumSet<Type> STRING_TYPE = EnumSet.of(Type.STRING);
-  EnumSet<Type> NAME_TYPE = EnumSet.of(Type.NAME);
+  Set<Type> EMPTY_NULL_TYPE = unmodifiableSet(EnumSet.of(Type.EMPTY, Type.NULL));
+  Set<Type> STRING_TYPE = unmodifiableSet(EnumSet.of(Type.STRING));
+  Set<Type> NAME_TYPE = unmodifiableSet(EnumSet.of(Type.NAME));
 
 
   @Contract(pure = true)

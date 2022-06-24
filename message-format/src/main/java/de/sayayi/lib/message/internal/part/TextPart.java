@@ -25,6 +25,8 @@ import static java.lang.Character.isSpaceChar;
 
 
 /**
+ * Text message part with optional leading and/or trailing spaces.
+ *
  * @author Jeroen Gremmen
  */
 @Getter
