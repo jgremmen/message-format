@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import java.util.Iterator;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 
@@ -60,15 +59,11 @@ public class DefaultFormatterService extends GenericFormatterService
   @SuppressWarnings("java:S108")
   protected void addFormattersFromService()
   {
-    final ServiceLoader<ParameterFormatter> serviceLoader = ServiceLoader.load(ParameterFormatter.class, classLoader);
-    final Iterator<ParameterFormatter> iterator = serviceLoader.iterator();
-
-    while(iterator.hasNext())
-    {
+    ServiceLoader.load(ParameterFormatter.class, classLoader).forEach(parameterFormatter -> {
       try {
-        addFormatter(iterator.next());
+        addFormatter(parameterFormatter);
       } catch(ServiceConfigurationError ignore) {
       }
-    }
+    });
   }
 }
