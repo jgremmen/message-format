@@ -48,11 +48,18 @@ public final class TextPart implements Text
 
   public TextPart(String text, boolean spaceBefore, boolean spaceAfter)
   {
-    final boolean empty = SpacesUtil.isEmpty(text);
-
-    this.text = trimSpaces(text);
-    this.spaceBefore = spaceBefore || (!empty && isSpaceChar(text.charAt(0)));
-    this.spaceAfter = spaceAfter || (!empty && isSpaceChar(text.charAt(text.length() - 1)));
+    if (SpacesUtil.isEmpty(text))
+    {
+      this.text = text;
+      this.spaceBefore = spaceBefore;
+      this.spaceAfter = spaceAfter;
+    }
+    else
+    {
+      this.text = trimSpaces(text);
+      this.spaceBefore = spaceBefore || isSpaceChar(text.charAt(0));
+      this.spaceAfter = spaceAfter || isSpaceChar(text.charAt(text.length() - 1));
+    }
   }
 
 
@@ -72,8 +79,9 @@ public final class TextPart implements Text
 
     final Text that = (Text)o;
 
-    return spaceBefore == that.isSpaceBefore() && spaceAfter == that.isSpaceAfter() &&
-        Objects.equals(text, that.getText());
+    return spaceBefore == that.isSpaceBefore() &&
+           spaceAfter == that.isSpaceAfter() &&
+           Objects.equals(text, that.getText());
   }
 
 
