@@ -113,8 +113,8 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   {
     if (data instanceof DataMap)
     {
-      final MapValueString string = (MapValueString)((DataMap)data).find(messageContext, name, parameters, NAME_TYPE,
-          MapValue.STRING_TYPE);
+      final MapValueString string = (MapValueString)((DataMap)data)
+          .find(messageContext, name, parameters, NAME_TYPE, MapValue.STRING_TYPE);
 
       if (string != null)
         return string.asObject();
@@ -134,8 +134,8 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   {
     if (data instanceof DataMap)
     {
-      final MapValueNumber number = (MapValueNumber)((DataMap)data).find(messageContext, name, parameters, NAME_TYPE,
-          MapValue.NUMBER_TYPE);
+      final MapValueNumber number = (MapValueNumber)((DataMap)data)
+          .find(messageContext, name, parameters, NAME_TYPE, MapValue.NUMBER_TYPE);
 
       if (number != null)
         return number.asObject();
@@ -155,8 +155,8 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
     if (!(data instanceof DataMap))
       return defaultValue;
 
-    final MapValueBool bool = (MapValueBool)((DataMap)data).find(messageContext, name, parameters, NAME_TYPE,
-        MapValue.BOOL_TYPE);
+    final MapValueBool bool = (MapValueBool)((DataMap)data)
+        .find(messageContext, name, parameters, NAME_TYPE, MapValue.BOOL_TYPE);
 
     return bool == null ? defaultValue :bool.asObject();
   }
@@ -223,12 +223,6 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   {
     final Message msg = getMessage(messageContext, value, NO_NAME_KEY_TYPES, parameters, data, false);
     return msg == null ? value : msg.format(messageContext, parameters);
-  }
-
-
-  @Contract(pure = true)
-  protected @NotNull String trimNotNull(String s) {
-    return s == null ? "" : s.trim();
   }
 
 

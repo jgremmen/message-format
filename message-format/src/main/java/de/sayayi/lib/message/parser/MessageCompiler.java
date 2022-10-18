@@ -25,6 +25,7 @@ import de.sayayi.lib.message.data.map.*;
 import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.ParameterizedMessage;
+import de.sayayi.lib.message.internal.SpacesUtil;
 import de.sayayi.lib.message.internal.TextMessage;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.ParameterPart;
@@ -40,7 +41,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import static java.lang.Boolean.parseBoolean;
-import static java.lang.Character.isSpaceChar;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -156,26 +156,30 @@ public class MessageCompiler
       @Override
       public void exitText(TextContext ctx)
       {
-        final StringBuilder text = new StringBuilder();
+        final List<TerminalNode> chNodes = ctx.CH();
+        final char[] text = new char[chNodes.size()];
+        int n = 0;
 
-        for(final TerminalNode chNode: ctx.CH())
+        for(final TerminalNode chNode: chNodes)
         {
           final String chText = chNode.getText();
-          final char firstChar = chText.charAt(0);
+          char ch = chText.charAt(0);
 
-          if (isSpaceChar(firstChar))
-            text.append(' ');
-          else if (firstChar == '\\')
+          if (ch == '\\')
           {
             // handle escape characters
-            text.append(chText.length() == 2
-                ? chText.charAt(1) : (char)Integer.parseInt(chText.substring(2), 16));
+            ch = chText.length() == 2
+                ? chText.charAt(1)
+                : (char)Integer.parseInt(chText.substring(2), 16);
           }
-          else
-            text.append(firstChar);
+
+          if (!SpacesUtil.isSpaceChar(ch))
+            text[n++] = ch;
+          else if (n == 0 || !SpacesUtil.isSpaceChar(text[n - 1]))
+            text[n++] = ' ';
         }
 
-        ctx.value = text.toString();
+        ctx.value = new String(text, 0, n);
       }
 
 
@@ -224,7 +228,7 @@ public class MessageCompiler
           if (token.getType() != Token.EOF)
           {
             final String text = token.getText();
-            return text != null && !text.isEmpty() && isSpaceChar(text.charAt(0));
+            return !SpacesUtil.isEmpty(text) && SpacesUtil.isSpaceChar(text.charAt(0));
           }
         }
 

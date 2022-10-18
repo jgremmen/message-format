@@ -20,6 +20,8 @@ import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import static de.sayayi.lib.message.internal.SpacesUtil.trimSpaces;
+
 
 /**
  * Text message part without leading and trailing spaces.
@@ -34,7 +36,7 @@ public final class NoSpaceTextPart implements Text
 
 
   public NoSpaceTextPart(@NotNull String text) {
-    this.text = text.trim();
+    this.text = trimSpaces(text);
   }
 
 

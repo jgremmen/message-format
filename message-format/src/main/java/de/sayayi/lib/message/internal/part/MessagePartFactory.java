@@ -23,6 +23,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import static de.sayayi.lib.message.internal.SpacesUtil.isTrimmedEmpty;
 import static de.sayayi.lib.message.internal.part.MessagePart.Text.EMPTY;
 import static de.sayayi.lib.message.internal.part.MessagePart.Text.NULL;
 import static lombok.AccessLevel.PRIVATE;
@@ -52,7 +53,7 @@ public final class MessagePartFactory
   @Contract(pure = true)
   @SuppressWarnings("java:S3358")
   public static @NotNull Text noSpaceText(String text) {
-    return text == null ? NULL : text.trim().isEmpty() ? EMPTY : new NoSpaceTextPart(text);
+    return text == null ? NULL : isTrimmedEmpty(text) ? EMPTY : new NoSpaceTextPart(text);
   }
 
 
