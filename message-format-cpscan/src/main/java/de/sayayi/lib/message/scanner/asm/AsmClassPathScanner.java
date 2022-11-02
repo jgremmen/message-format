@@ -43,7 +43,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import static org.objectweb.asm.Opcodes.*;
+import static org.objectweb.asm.Opcodes.ACC_SYNTHETIC;
+import static org.objectweb.asm.Opcodes.ASM9;
 import static org.objectweb.asm.Type.getDescriptor;
 
 
@@ -215,10 +216,8 @@ final class AsmClassPathScanner
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
-                                     String[] exceptions)
-    {
-      return (access & (ACC_SYNTHETIC | ACC_BRIDGE)) == (ACC_SYNTHETIC | ACC_BRIDGE)
-          ? null : new MessageMethodVisitor();
+                                     String[] exceptions) {
+      return (access & ACC_SYNTHETIC) == ACC_SYNTHETIC ? null : new MessageMethodVisitor();
     }
 
 
