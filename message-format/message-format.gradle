@@ -33,7 +33,7 @@ configurations {
 
 
 def antlrVersion = "4.9.3"
-def ehcacheVersion = "3.9.7"
+def ehcacheVersion = "3.10.2"
 def javaxCacheApiVersion = "1.1.1"
 
 
