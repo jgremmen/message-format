@@ -32,6 +32,7 @@ import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_LENIENT;
+import static de.sayayi.lib.message.internal.SpacesUtil.isTrimmedEmpty;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Collections.unmodifiableSet;
@@ -71,7 +72,8 @@ public final class StringFormatter extends AbstractParameterFormatter
                                    @NotNull Parameters parameters, Data data)
   {
     return value == null
-        ? nullText() : noSpaceText(value instanceof char[] ? new String((char[])value) : String.valueOf(value));
+        ? nullText()
+        : noSpaceText(value instanceof char[] ? new String((char[])value) : String.valueOf(value));
   }
 
 
@@ -81,7 +83,7 @@ public final class StringFormatter extends AbstractParameterFormatter
   {
     final String s = value instanceof char[] ? new String((char[])value) : String.valueOf(value);
     final boolean empty = s.isEmpty();
-    final boolean lenientEmpty = s.trim().isEmpty();
+    final boolean lenientEmpty = isTrimmedEmpty(s);
 
     if (compareType == CompareType.EQ)
       return empty ? TYPELESS_EXACT : (lenientEmpty ? TYPELESS_LENIENT : null);

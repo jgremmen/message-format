@@ -59,4 +59,26 @@ public final class AsmClassPathMessageBundleTest
   @MessageDef(code = "INNER", text = "Inner class")
   private static final class InnerClass {
   }
+
+
+
+
+  private interface InterfaceA {
+    void syntheticA();
+  }
+
+
+
+  private abstract static class AbstractA implements InterfaceA
+  {
+    @MessageDef(code = "A0", text = "In abstract class")
+    public void syntheticA() {
+    }
+  }
+
+
+
+
+  private static class B extends AbstractA {
+  }
 }

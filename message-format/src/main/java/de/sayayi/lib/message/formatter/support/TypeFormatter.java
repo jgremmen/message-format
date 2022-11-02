@@ -22,11 +22,7 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
+import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -168,7 +164,7 @@ public final class TypeFormatter extends AbstractParameterFormatter
     else
     {
       Type[] upperBounds = wildcardType.getUpperBounds();
-      if (upperBounds.length <= 0 || upperBounds[0].equals(Object.class))
+      if (upperBounds.length == 0 || upperBounds[0].equals(Object.class))
         return "?";
 
       bounds = upperBounds;

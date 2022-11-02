@@ -15,13 +15,15 @@
  */
 package de.sayayi.lib.message.internal.part;
 
+import de.sayayi.lib.message.internal.SpacesUtil;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 
 import java.util.Objects;
 
-import static java.lang.Character.isSpaceChar;
+import static de.sayayi.lib.message.internal.SpacesUtil.isSpaceChar;
+import static de.sayayi.lib.message.internal.SpacesUtil.trimSpaces;
 
 
 /**
@@ -46,17 +48,24 @@ public final class TextPart implements Text
 
   public TextPart(String text, boolean spaceBefore, boolean spaceAfter)
   {
-    final boolean empty = text == null || text.isEmpty();
-
-    this.text = empty ? null : text.trim();
-    this.spaceBefore = spaceBefore || (!empty && isSpaceChar(text.charAt(0)));
-    this.spaceAfter = spaceAfter || (!empty && isSpaceChar(text.charAt(text.length() - 1)));
+    if (SpacesUtil.isEmpty(text))
+    {
+      this.text = text;
+      this.spaceBefore = spaceBefore;
+      this.spaceAfter = spaceAfter;
+    }
+    else
+    {
+      this.text = trimSpaces(text);
+      this.spaceBefore = spaceBefore || isSpaceChar(text.charAt(0));
+      this.spaceAfter = spaceAfter || isSpaceChar(text.charAt(text.length() - 1));
+    }
   }
 
 
   @Override
   public boolean isEmpty() {
-    return text == null || text.isEmpty();
+    return SpacesUtil.isEmpty(text);
   }
 
 
@@ -70,8 +79,9 @@ public final class TextPart implements Text
 
     final Text that = (Text)o;
 
-    return spaceBefore == that.isSpaceBefore() && spaceAfter == that.isSpaceAfter() &&
-        Objects.equals(text, that.getText());
+    return spaceBefore == that.isSpaceBefore() &&
+           spaceAfter == that.isSpaceAfter() &&
+           Objects.equals(text, that.getText());
   }
 
 
