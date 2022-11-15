@@ -17,7 +17,7 @@
 description = 'Message Format Library (joda time formatters)'
 
 
-def jodatimeVersion = "2.10.13"
+def jodatimeVersion = "2.12.1"
 
 
 dependencies {
