@@ -96,9 +96,9 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   @Override
-  protected @NotNull RuntimeException createException(@NotNull Token startToken, @NotNull Token stopToken,
-                                                      @NotNull String formattedMessage,
-                                                      @NotNull String errorMsg, RecognitionException ex) {
+  protected @NotNull MessageParserException createException(
+      @NotNull Token startToken, @NotNull Token stopToken, @NotNull String formattedMessage,
+      @NotNull String errorMsg, RecognitionException ex) {
     return new MessageParserException(formattedMessage, ex);
   }
 

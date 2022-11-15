@@ -15,13 +15,22 @@
  */
 package de.sayayi.lib.message.exception;
 
-import lombok.experimental.StandardException;
+import org.antlr.v4.runtime.RecognitionException;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@StandardException
 @SuppressWarnings("serial")
-public class MessageParserException extends MessageException {
+public class MessageParserException extends MessageException
+{
+  public MessageParserException(String message, RecognitionException cause) {
+    super(message, cause);
+  }
+
+
+  @Override
+  public synchronized RecognitionException getCause() {
+    return (RecognitionException) super.getCause();
+  }
 }
