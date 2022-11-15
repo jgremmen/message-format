@@ -15,27 +15,13 @@
  */
 package de.sayayi.lib.message.exception;
 
-import lombok.Getter;
+import lombok.experimental.StandardException;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@Getter
-@SuppressWarnings({"serial", "java:S110"})
-public class MessageParserException extends MessageException
-{
-  private final String input;
-  private final int startIndex;
-  private final int stopIndex;
-
-
-  public MessageParserException(String input, int startIndex, int stopIndex, String message, Throwable cause)
-  {
-    super(message, cause);
-
-    this.input = input;
-    this.startIndex = startIndex;
-    this.stopIndex = stopIndex;
-  }
+@StandardException
+@SuppressWarnings("serial")
+public class MessageParserException extends MessageException {
 }

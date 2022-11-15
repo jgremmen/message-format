@@ -33,12 +33,15 @@ configurations {
 
 
 def antlrVersion = "4.9.3"
+def antlrExtVersion = "0.3.0"
 def ehcacheVersion = "3.10.2"
 def javaxCacheApiVersion = "1.1.1"
 
 
 dependencies {
-  implementation "org.antlr:antlr4-runtime:${antlrVersion}"
+  implementation("de.sayayi.lib:antlr4-runtime-ext:${antlrExtVersion}") {
+    exclude group: 'org.antlr', module: 'antlr4'
+  }
 
   implementation "javax.cache:cache-api:${javaxCacheApiVersion}", optional
 

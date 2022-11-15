@@ -19,7 +19,7 @@ package de.sayayi.lib.message.exception;
 /**
  * @author Jeroen Gremmen
  */
-@SuppressWarnings({"serial", "java:S110"})
+@SuppressWarnings("serial")
 public class MessageLocaleParseException extends MessageException
 {
   public MessageLocaleParseException(String message) {
