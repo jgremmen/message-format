@@ -1,7 +1,6 @@
 include "message-format"
 include "message-format-cpscan"
 include "message-format-jodatime"
-include "message-format-jsr354"
 
 rootProject.name = 'message-format-projects'
 rootProject.children.each {project ->
