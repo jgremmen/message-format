@@ -17,7 +17,6 @@
 plugins {
   id 'antlr'
   id 'idea'
-  id 'com.github.johnrengelman.shadow' version '6.1.0'
   id 'nebula.optional-base' version '5.0.3'
 }
 
@@ -75,98 +74,11 @@ jar {
 }
 
 
-task javadocShadowJar(type: Jar, group: 'build') {
-  dependsOn javadocJar
-
-  archiveAppendix.set('nodep')
-  archiveClassifier.set('javadoc')
-
-  with javadocJar
-
-  duplicatesStrategy DuplicatesStrategy.EXCLUDE
-}
-
-
-task sourcesShadowJar(type: Jar, group: 'build') {
-  dependsOn sourcesJar
-
-  archiveAppendix.set('nodep')
-  archiveClassifier.set('sources')
-
-  with sourcesJar
-
-  duplicatesStrategy DuplicatesStrategy.EXCLUDE
-}
-
-
-shadowJar {
-  group 'build'
-
-  dependsOn sourcesShadowJar, javadocShadowJar
-
-  archiveAppendix.set('nodep')
-  archiveClassifier.set(null)  // set by shadowJar but interferes with publishing
-
-  dependencies {
-    exclude(dependency('com.ibm.icu::'))
-    exclude(dependency('javax.cache::'))
-    exclude(dependency('org.glassfish::'))
-  }
-
-  exclude 'META-INF/maven/**'
-  exclude "org/antlr/v4/runtime/atn/ATNSerializer*"
-  exclude "org/antlr/v4/runtime/ParserInterpreter*"
-  exclude "org/antlr/v4/runtime/TokenStreamRewriter*"
-  exclude "org/antlr/v4/runtime/tree/pattern/**"
-  exclude "org/antlr/v4/runtime/tree/Trees"
-  exclude "org/antlr/v4/runtime/tree/xpath/**"
-  exclude "org/antlr/v4/runtime/Unbuffered*"
-  exclude "org/antlr/v4/tool/**"
-
-  minimize()
-
-  relocate 'org.antlr.v4.runtime', 'de.sayayi.lib.message.antlr'
-
-  manifest {
-    attributes['Implementation-Title'] = "${project.description} (no dependencies)"
-  }
-}
-
-
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-task testShadowJar(type: ShadowJar) {
-  dependsOn compileTestJava
-
-  archiveAppendix.set('test')
-
-  from sourceSets.test.output
-  configurations = [project.configurations.testRuntimeClasspath]
-
-  relocate 'org.antlr.v4.runtime', 'de.sayayi.lib.message.antlr'
-}
-
-
-task shadowTest(type: Test, group: 'verification') {
-  dependsOn shadowJar, testShadowJar
-
-  doFirst {
-    classpath = shadowJar.outputs.files + testShadowJar.outputs.files + classpath -
-        compileJava.outputs.files - compileTestJava.outputs.files
-  }
-}
-
-
-assemble.dependsOn shadowJar
-build.dependsOn shadowTest
-
-
 publishing {
   publications {
 
-    dep(MavenPublication) {
-      artifact jar
-      artifact javadocJar
-      artifact sourcesJar
+    msgformat(MavenPublication) {
+      from components.java
 
       versionMapping {
         usage('java-runtime') {
@@ -183,61 +95,7 @@ publishing {
         licenses {
           license {
             name = 'Apache License, Version 2.0'
-            url = 'http://www.apache.org/licenses/LICENSE-2.0'
-            distribution = 'repo'
-          }
-        }
-
-        developers {
-          developer {
-            id = 'jgremmen'
-            name = 'Jeroen Gremmen'
-            email = 'jeroen.gremmen@sayayi.de'
-          }
-        }
-
-        scm {
-          connection = 'scm:git:git://github.com/jgremmen/message-format.git'
-          developerConnection = 'scm:git:git://github.com/jgremmen/message-format.git'
-          url = 'https://github.com/jgremmen/message-format'
-        }
-
-        withXml {
-          def dependenciesNode = asNode().appendNode('dependencies')
-
-          configurations.implementation.allDependencies.each {
-            if (it.name == 'antlr4-runtime')
-            {
-              def dependencyNode = dependenciesNode.appendNode('dependency')
-              dependencyNode.appendNode('groupId', it.group)
-              dependencyNode.appendNode('artifactId', it.name)
-              dependencyNode.appendNode('version', it.version)
-            }
-          }
-        }
-      }
-    }
-
-
-    noDep(MavenPublication) { publication ->
-      artifactId 'message-format-nodep'
-
-      alias = true
-
-      from project.shadow.component(publication)
-      artifact javadocShadowJar
-      artifact sourcesShadowJar
-
-      pom {
-        name = 'Java Message Format Library (no dependencies)'
-        description = 'Highly configurable message format library supporting message definition through annotations'
-        url = 'https://github.com/jgremmen/message-format'
-        inceptionYear = '2019'
-
-        licenses {
-          license {
-            name = 'Apache License, Version 2.0'
-            url = 'http://www.apache.org/licenses/LICENSE-2.0'
+            url = 'https://www.apache.org/licenses/LICENSE-2.0'
             distribution = 'repo'
           }
         }
@@ -262,8 +120,7 @@ publishing {
 
 
 signing {
-  sign publishing.publications.dep
-  sign publishing.publications.noDep
+  sign publishing.publications.msgformat
 }
 
 
