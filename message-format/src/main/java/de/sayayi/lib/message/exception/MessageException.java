@@ -15,14 +15,12 @@
  */
 package de.sayayi.lib.message.exception;
 
-import org.antlr.v4.runtime.misc.ParseCancellationException;
-
 
 /**
  * @author Jeroen Gremmen
  */
-@SuppressWarnings({"serial", "java:S110"})
-public class MessageException extends ParseCancellationException
+@SuppressWarnings("serial")
+public class MessageException extends RuntimeException
 {
   public MessageException(String message) {
     super(message);

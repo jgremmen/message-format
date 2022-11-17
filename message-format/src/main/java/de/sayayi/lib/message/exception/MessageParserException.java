@@ -15,27 +15,22 @@
  */
 package de.sayayi.lib.message.exception;
 
-import lombok.Getter;
+import org.antlr.v4.runtime.RecognitionException;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@Getter
-@SuppressWarnings({"serial", "java:S110"})
+@SuppressWarnings("serial")
 public class MessageParserException extends MessageException
 {
-  private final String input;
-  private final int startIndex;
-  private final int stopIndex;
-
-
-  public MessageParserException(String input, int startIndex, int stopIndex, String message, Throwable cause)
-  {
+  public MessageParserException(String message, RecognitionException cause) {
     super(message, cause);
+  }
 
-    this.input = input;
-    this.startIndex = startIndex;
-    this.stopIndex = stopIndex;
+
+  @Override
+  public synchronized RecognitionException getCause() {
+    return (RecognitionException) super.getCause();
   }
 }
