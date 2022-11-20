@@ -77,8 +77,8 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   }
 
 
-  protected abstract @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                               @NotNull Parameters parameters, DataMap data);
+  protected abstract @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value,
+                                               String format, @NotNull Parameters parameters, DataMap data);
 
 
   public int getPriority() {
@@ -87,6 +87,7 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
+  @SuppressWarnings("SameParameterValue")
   protected Data getConfigValue(@NotNull MessageContext messageContext, @NotNull String name,
                                 @NotNull Parameters parameters, DataMap map)
   {
@@ -128,6 +129,7 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
+  @SuppressWarnings("SameParameterValue")
   protected long getConfigValueNumber(@NotNull MessageContext messageContext, @NotNull String name,
                                       @NotNull Parameters parameters, DataMap map, long defaultValue)
   {
@@ -147,6 +149,7 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
+  @SuppressWarnings("SameParameterValue")
   protected boolean getConfigValueBool(@NotNull MessageContext messageContext, @NotNull String name,
                                        @NotNull Parameters parameters, DataMap map) {
     return getConfigValueBool(messageContext, name, parameters, map, false);
@@ -154,6 +157,7 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
+  @SuppressWarnings("SameParameterValue")
   protected boolean getConfigValueBool(@NotNull MessageContext messageContext, @NotNull String name,
                                        @NotNull Parameters parameters, DataMap map, boolean defaultValue)
   {
@@ -173,8 +177,10 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Contract(pure = true)
-  protected Message.WithSpaces getMessage(@NotNull MessageContext messageContext, Object value, Set<Type> keyTypes,
-                                          Parameters parameters, DataMap data, boolean notNull)
+  @SuppressWarnings("SameParameterValue")
+  protected Message.WithSpaces getMessage(@NotNull MessageContext messageContext, Object value,
+                                          @NotNull Set<Type> keyTypes, @NotNull Parameters parameters,
+                                          DataMap data, boolean notNull)
   {
     Message.WithSpaces message = null;
 

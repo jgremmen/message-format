@@ -91,7 +91,7 @@ public final class DataMap implements Data
       if ((keyTypes == null || keyTypes.contains(mapKey.getType()) &&
           (valueTypes == null || valueTypes.contains(mapValue.getType()))))
       {
-        MatchResult matchResult = mapKey.match(messageContext, parameters, key);
+        final MatchResult matchResult = mapKey.match(messageContext, parameters, key);
 
         if (matchResult == EXACT)
           return entry.getValue();
