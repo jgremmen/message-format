@@ -62,7 +62,7 @@ public class IterableFormatterTest extends AbstractFormatterTest
     registry.addFormatter(new IterableFormatter());
 
     final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE);
-    final Message message = context.getMessageFactory().parse("%{c,{null:'null',empty:'empty'}}");
+    final Message message = context.getMessageFactory().parse("%{c,null:'null',empty:'empty'}");
 
     assertEquals("null", message.format(context, context.parameters().with("c", null)));
     assertEquals("empty", message.format(context, context.parameters().with("c", emptySet())));
@@ -78,11 +78,11 @@ public class IterableFormatterTest extends AbstractFormatterTest
     final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE);
 
     assertEquals("1, 2, 3, 4 and 5", context.getMessageFactory()
-        .parse("%{c,{list-sep:', ',list-sep-last:' and '}}")
+        .parse("%{c,list-sep:', ',list-sep-last:' and '}")
         .format(context, context.parameters().with("c", Arrays.asList(1, 2, 3, 4, 5))));
 
     assertEquals("1.2.3.4.5", context.getMessageFactory()
-        .parse("%{c,{list-sep:'.'}}")
+        .parse("%{c,list-sep:'.'}")
         .format(context, context.parameters().with("c", Arrays.asList(1, 2, 3, 4, 5))));
   }
 }

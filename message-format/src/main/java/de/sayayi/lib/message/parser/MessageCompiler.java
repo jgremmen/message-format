@@ -20,9 +20,8 @@ import de.sayayi.lib.antlr4.AbstractVocabulary;
 import de.sayayi.lib.antlr4.syntax.GenericSyntaxErrorFormatter;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.data.DataMap;
-import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.*;
+import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.ParameterizedMessage;
@@ -38,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static de.sayayi.lib.message.parser.MessageLexer.BOOL;
 import static de.sayayi.lib.message.parser.MessageLexer.COLON;
@@ -50,8 +50,6 @@ import static de.sayayi.lib.message.parser.MessageLexer.GT;
 import static de.sayayi.lib.message.parser.MessageLexer.GTE;
 import static de.sayayi.lib.message.parser.MessageLexer.LT;
 import static de.sayayi.lib.message.parser.MessageLexer.LTE;
-import static de.sayayi.lib.message.parser.MessageLexer.MAP_END;
-import static de.sayayi.lib.message.parser.MessageLexer.MAP_START;
 import static de.sayayi.lib.message.parser.MessageLexer.NAME;
 import static de.sayayi.lib.message.parser.MessageLexer.NE;
 import static de.sayayi.lib.message.parser.MessageLexer.NULL;
@@ -233,14 +231,17 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitParameter(ParameterContext ctx)
     {
-      final MapContext map = ctx.map();
+      final Map<MapKey,MapValue> mapElements = ctx.mapElement().stream()
+          .collect(toMap(mec -> mec.key, mec -> mec.value, (a, b) -> b, LinkedHashMap::new));
+      final ForceQuotedMessageContext forceQuotedMessage = ctx.forceQuotedMessage();
+      if (forceQuotedMessage != null)
+        mapElements.put(null, new MapValueMessage(forceQuotedMessage.value));
 
       ctx.value = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(
-          ctx.name.getText(),
-          ctx.format == null ? null : ctx.format.getText(),
+          ctx.name.name, ctx.format == null ? null : ctx.format.name,
           exitParameter_isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           exitParameter_isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
-          map == null ? null : new DataMap(map.value)));
+          mapElements));
     }
 
 
@@ -259,25 +260,6 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       }
 
       return false;
-    }
-
-
-    @Override
-    public void exitMap(MapContext ctx)
-    {
-      ctx.value = ctx.mapElements().value;
-
-      final ForceQuotedMessageContext forceQuotedMessage = ctx.forceQuotedMessage();
-      if (forceQuotedMessage != null)
-        ctx.value.put(null, new MapValueMessage(forceQuotedMessage.value));
-    }
-
-
-    @Override
-    public void exitMapElements(MapElementsContext ctx)
-    {
-      ctx.value = ctx.mapElement().stream()
-          .collect(toMap(mec -> mec.key, mec -> mec.value, (a, b) -> b, LinkedHashMap::new));
     }
 
 
@@ -398,6 +380,12 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitEqualOperator(EqualOperatorContext ctx) {
       ctx.cmp = ctx.EQ() != null ? CompareType.EQ : CompareType.NE;
     }
+
+
+    @Override
+    public void exitNameOrKeyword(NameOrKeywordContext ctx) {
+      ctx.name = ctx.getChild(0).getText();
+    }
   }
 
 
@@ -431,8 +419,6 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       add(GTE, "'>='", "GTE");
       add(LT, "'<'", "LT");
       add(LTE, "'<='", "LTE");
-      add(MAP_END, "'}'", "MAP_END");
-      add(MAP_START, "'{'", "MAP_START");
       add(NAME, "<name>", "NAME");
       add(NE, "'<>' or '!'", "NE");
       add(NULL, "'null'", "NULL");

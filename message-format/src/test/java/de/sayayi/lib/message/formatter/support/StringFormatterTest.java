@@ -91,13 +91,13 @@ public class StringFormatterTest extends AbstractFormatterTest
         .with("spaces", "  ")
         .with("text", "hello  ");
 
-    assertEquals("", messageFactory.parse("%{empty,{!empty:'nok'}}").format(context, parameters));
-    assertEquals("ok", messageFactory.parse("%{empty,{empty:'ok'}}").format(context, parameters));
-    assertEquals("ok", messageFactory.parse("%{null,{empty:'nok',null:'ok'}}").format(context, parameters));
-    assertEquals("ok", messageFactory.parse("%{null,{empty:'ok'}}").format(context, parameters));
-    assertEquals("ok", messageFactory.parse("%{spaces,{empty:'ok'}}").format(context, parameters));
-    assertEquals("ok", messageFactory.parse("%{spaces,{!null:'ok'}}").format(context, parameters));
-    assertEquals("hello!", messageFactory.parse("%{text,{null:'nok',!empty:'%{text}!'}}").format(context, parameters));
-    assertEquals("hello!", messageFactory.parse("%{text,{!null:'%{text}!'}}").format(context, parameters));
+    assertEquals("", messageFactory.parse("%{empty,!empty:'nok'}").format(context, parameters));
+    assertEquals("ok", messageFactory.parse("%{empty,empty:'ok'}").format(context, parameters));
+    assertEquals("ok", messageFactory.parse("%{null,empty:'nok',null:'ok'}").format(context, parameters));
+    assertEquals("ok", messageFactory.parse("%{null,empty:'ok'}").format(context, parameters));
+    assertEquals("ok", messageFactory.parse("%{spaces,empty:'ok'}").format(context, parameters));
+    assertEquals("ok", messageFactory.parse("%{spaces,!null:'ok'}").format(context, parameters));
+    assertEquals("hello!", messageFactory.parse("%{text,null:'nok',!empty:'%{text}!'}").format(context, parameters));
+    assertEquals("hello!", messageFactory.parse("%{text,!null:'%{text}!'}").format(context, parameters));
   }
 }

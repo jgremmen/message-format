@@ -44,7 +44,7 @@ class SizeFormatterTest
 
     final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, Locale.UK);
     final Message message = context.getMessageFactory()
-        .parse("%{c,size} %{c,size,{0:'empty',1:'singleton','multiple'}}");
+        .parse("%{c,size} %{c,size,0:'empty',1:'singleton',:'multiple'}");
 
     assertEquals("0 empty", message.format(context,
         context.parameters().with("c", emptyList())));

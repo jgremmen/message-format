@@ -143,16 +143,16 @@ public class GeoFormatterTest extends AbstractFormatterTest
 
     assertEquals("coordinates 4°48'0\"E, 51°34'9\"N",
         context.getMessageFactory()
-            .parse("coordinates %{lon,geo,{geo:'longitude'}}, %{lat,geo,{geo:'latitude'}}")
+            .parse("coordinates %{lon,geo,geo:'longitude'}, %{lat,geo,geo:'latitude'}")
             .format(context, parameters));
 
     assertEquals("coordinates 4°48.0' E, 51°34'9.000\"N",
         context.getMessageFactory()
-            .parse("coordinates %{lon,geo,{geo:'dM LO'}}, %{lat,geo,{geo:'long-latitude'}}")
+            .parse("coordinates %{lon,geo,geo:'dM LO'}, %{lat,geo,geo:'long-latitude'}")
             .format(context, parameters));
 
     assertEquals("51°34'09\"N", context.getMessageFactory()
-        .parse("%{lat,geo,{geo:'d0m0sLA'}}")
+        .parse("%{lat,geo,geo:'d0m0sLA'}")
         .format(context, parameters));
   }
 

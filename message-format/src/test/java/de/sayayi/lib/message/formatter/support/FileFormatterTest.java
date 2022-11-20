@@ -73,7 +73,7 @@ public class FileFormatterTest
     final MessageContext context = new MessageContext(formatterRegistry, NO_CACHE_INSTANCE, ROOT);
 
     assertEquals("file.jpg = image/jpeg", context.getMessageFactory().
-        parse("%{f,{file:'name'}}  =  %{f,{file:'extension','jpg':'image/jpeg'}}").format(
+        parse("%{f,file:'name'}  =  %{f,file:'extension','jpg':'image/jpeg'}").format(
             context, context.parameters().with("f", new File("/test/file.jpg"))));
   }
 }

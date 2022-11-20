@@ -18,6 +18,8 @@ package de.sayayi.lib.message.internal.part;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.DataMap;
+import de.sayayi.lib.message.data.map.MapKey;
+import de.sayayi.lib.message.data.map.MapValue;
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Parameter;
@@ -26,6 +28,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -43,18 +46,19 @@ public final class ParameterPart implements Parameter
 {
   private static final long serialVersionUID = 500L;
 
-  private final String parameter;
+  private final @NotNull String parameter;
   private final String format;
-  private final DataMap map;
+  private final @NotNull DataMap map;
   private final boolean spaceBefore;
   private final boolean spaceAfter;
 
 
-  public ParameterPart(String parameter, String format, boolean spaceBefore, boolean spaceAfter, DataMap map)
+  public ParameterPart(@NotNull String parameter, String format, boolean spaceBefore, boolean spaceAfter,
+                       @NotNull Map<MapKey,MapValue> map)
   {
     this.parameter = parameter;
     this.format = "".equals(format) ? null : format;
-    this.map = map;
+    this.map = new DataMap(map);
     this.spaceBefore = spaceBefore;
     this.spaceAfter = spaceAfter;
   }
@@ -82,8 +86,7 @@ public final class ParameterPart implements Parameter
     final Set<String> parameterNames = new TreeSet<>();
 
     parameterNames.add(parameter);
-    if (map != null)
-      parameterNames.addAll(map.getParameterNames());
+    parameterNames.addAll(map.getParameterNames());
 
     return parameterNames;
   }
@@ -93,12 +96,12 @@ public final class ParameterPart implements Parameter
   @Contract(pure = true)
   public String toString()
   {
-    final StringBuilder s = new StringBuilder("Parameter(data=").append(parameter);
+    final StringBuilder s = new StringBuilder("Parameter(name=").append(parameter);
 
     if (format != null)
       s.append(", format=").append(format);
-    if (map != null)
-      s.append(", data=").append(map);
+    if (!map.isEmpty())
+      s.append(", map=").append(map);
 
     if (spaceBefore && spaceAfter)
       s.append(", space-around");

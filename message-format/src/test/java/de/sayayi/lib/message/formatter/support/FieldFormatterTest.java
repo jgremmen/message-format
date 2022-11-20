@@ -65,7 +65,7 @@ public class FieldFormatterTest extends AbstractFormatterTest
         .format(context, context.parameters().with("f", v1)));
     assertEquals("private static boolean[] v1", factory.parse("%{f}")
         .format(context, context.parameters().with("f", v1)));
-    assertEquals("boolean[] v1", factory.parse("%{f,{field:''}}")
+    assertEquals("boolean[] v1", factory.parse("%{f,field:''}")
         .format(context, context.parameters().with("f", v1)));
   }
 
@@ -80,9 +80,11 @@ public class FieldFormatterTest extends AbstractFormatterTest
         .format(context, context.parameters().with("f", v2)));
     assertEquals("v2", factory.parse("%{f,name}")
         .format(context, context.parameters().with("f", v2)));
-    assertEquals("public final java.util.Map<String, Integer> v2", factory.parse("%{f,{field:'jM'}}")
+    assertEquals("public final java.util.Map<String, Integer> v2",
+        factory.parse("%{f,field:'jM'}")
         .format(context, context.parameters().with("f", v2)));
-    assertEquals("java.util.Map<java.lang.String, java.lang.Integer> v2", factory.parse("%{f,{field:''}}")
+    assertEquals("java.util.Map<java.lang.String, java.lang.Integer> v2",
+        factory.parse("%{f,field:''}")
         .format(context, context.parameters().with("f", v2)));
   }
 

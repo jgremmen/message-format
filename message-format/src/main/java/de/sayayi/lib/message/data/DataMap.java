@@ -53,6 +53,12 @@ public final class DataMap implements Data
   private final @NotNull Map<MapKey,MapValue> map;
 
 
+  @Contract(pure = true)
+  public boolean isEmpty() {
+    return map.isEmpty();
+  }
+
+
   @Override
   @Contract(pure = true)
   public String toString() {

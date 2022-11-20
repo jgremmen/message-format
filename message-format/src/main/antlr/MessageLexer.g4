@@ -17,10 +17,6 @@ lexer grammar MessageLexer;
 
 
 tokens {
-    BOOL,
-    NUMBER,
-    COMMA,
-    NAME,
     SINGLE_QUOTE_START,
     DOUBLE_QUOTE_START
 }
@@ -83,17 +79,27 @@ mode PARAMETER;
 PARAM_END
         : '}' -> popMode
         ;
-P_COMMA
-        : ',' -> type(COMMA)
+COMMA
+        : ','
         ;
-P_BOOL
-        : BoolLiteral -> type(BOOL)
+COLON
+        : ':'
         ;
-P_NAME
-        : DashedName -> type(NAME)
+BOOL
+        : 'true'
+        | 'false'
         ;
-P_NUMBER
-        : Number -> type(NUMBER)
+NULL
+        : 'null'
+        ;
+EMPTY
+        : 'empty'
+        ;
+NAME
+        : DashedName
+        ;
+NUMBER
+        : Number
         ;
 P_SQ_START
         : '\'' -> pushMode(TEXT1), type(SINGLE_QUOTE_START)
@@ -103,48 +109,6 @@ P_DQ_START
         ;
 P_WS
         : (CtrlChar | ' ')+ -> skip
-        ;
-MAP_START
-        : '{' -> pushMode(MAP)
-        ;
-
-
-
-// ------------------ In map mode ------------------
-mode MAP;
-
-MAP_END
-        : '}' -> popMode
-        ;
-COLON
-        : ':'
-        ;
-M_WS
-        : (CtrlChar | ' ')+ -> skip
-        ;
-M_COMMA
-        : ',' -> type(COMMA)
-        ;
-NULL
-        : 'null'
-        ;
-EMPTY
-        : 'empty'
-        ;
-M_BOOL
-        : BoolLiteral -> type(BOOL)
-        ;
-M_NAME
-        : DashedName -> type(NAME)
-        ;
-M_NUMBER
-        : Number -> type(NUMBER)
-        ;
-M_SQ_START
-        : '\'' -> pushMode(TEXT1), type(SINGLE_QUOTE_START)
-        ;
-M_DQ_START
-        : '"' -> pushMode(TEXT2), type(DOUBLE_QUOTE_START)
         ;
 EQ
         : '='
@@ -171,11 +135,6 @@ GTE
 
 fragment ParamStart
         : '%{'
-        ;
-
-fragment BoolLiteral
-        : 'true'
-        | 'false'
         ;
 
 fragment CtrlChar

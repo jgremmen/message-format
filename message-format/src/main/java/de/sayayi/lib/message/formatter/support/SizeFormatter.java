@@ -58,7 +58,7 @@ public final class SizeFormatter extends AbstractParameterFormatter implements N
         size = ((SizeQueryable)formatter).size(value);
     }
 
-    if (map == null)
+    if (map == null || map.isEmpty())
       return messageContext.getFormatter(long.class).format(messageContext, size, null, parameters, null);
 
     return messageToText(messageContext,

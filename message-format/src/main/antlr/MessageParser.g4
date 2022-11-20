@@ -63,15 +63,11 @@ forceQuotedMessage returns [Message.WithSpaces value]
         ;
 
 parameter returns [ParameterPart value]
-        : PARAM_START name=NAME (COMMA format=NAME)? (COMMA map)? PARAM_END
-        ;
-
-map returns [Map<MapKey,MapValue> value]
-        : MAP_START mapElements (COMMA forceQuotedMessage)? MAP_END
-        ;
-
-mapElements returns [Map<MapKey,MapValue> value]
-        : mapElement (COMMA mapElement)*
+        : PARAM_START
+          name=nameOrKeyword
+          (COMMA format=nameOrKeyword)?
+          (COMMA mapElement)*
+          (COMMA COLON forceQuotedMessage)? PARAM_END
         ;
 
 mapElement returns [MapKey key, MapValue value]
@@ -113,4 +109,11 @@ equalOperatorOptional returns [MapKey.CompareType cmp]
 equalOperator returns [MapKey.CompareType cmp]
         : EQ
         | NE
+        ;
+
+nameOrKeyword returns [String name]
+        : NAME
+        | BOOL
+        | NULL
+        | EMPTY
         ;

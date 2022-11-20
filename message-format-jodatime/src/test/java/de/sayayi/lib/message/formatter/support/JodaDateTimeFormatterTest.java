@@ -150,7 +150,7 @@ public class JodaDateTimeFormatterTest
         .with("c", new DateTime(2019, 2, 19, 14, 23, 1, 9))
         .withLocale("nl");
     final Message msg = context.getMessageFactory()
-        .parse("%{a} %{b,{date:'short'}} %{c,{date:'time'}} %{c,{date:'yyyy-MM-dd MMM'}}");
+        .parse("%{a} %{b,date:'short'} %{c,date:'time'} %{c,date:'yyyy-MM-dd MMM'}");
 
     assertEquals("17-aug-1972 16:45 14:23:01 2019-02-19 feb", msg.format(context, parameters));
   }
@@ -163,15 +163,15 @@ public class JodaDateTimeFormatterTest
     final MessageContext context = new MessageContext(formatterRegistry, NO_CACHE_INSTANCE);
 
     assertEquals("2020", context.getMessageFactory()
-        .parse("%{d,{!null:'%{d,{date:'yyyy'}}'}}")
+        .parse("%{d,!null:'%{d,date:'yyyy'}'}")
         .format(context, context.parameters().with("d", new LocalDate(2020, 1, 1))));
 
     assertEquals("empty", context.getMessageFactory()
-        .parse("%{d,{empty:'empty'}}")
+        .parse("%{d,empty:'empty'}")
         .format(context, context.parameters().with("d", null)));
 
     assertEquals("empty", context.getMessageFactory()
-        .parse("%{d,{date:'time',empty:'empty'}}")
+        .parse("%{d,date:'time',empty:'empty'}")
         .format(context, context.parameters().with("d", LocalDate.now())));
   }
 }

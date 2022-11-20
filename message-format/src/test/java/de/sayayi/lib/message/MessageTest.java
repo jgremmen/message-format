@@ -50,10 +50,10 @@ public class MessageTest
   {
     final Map<Locale,String> texts = new HashMap<>();
 
-    texts.put(UK, "%{n} %{n,choice,{1:'colour', 'colours'}}.");
-    texts.put(new Locale("nl", "NL"), "%{n} %{n,choice,{1 : 'kleur', 'kleuren'}}.");
-    texts.put(Locale.GERMAN, "%{n} %{n,choice,{1: 'Farbe', 'Farben'}}.");
-    texts.put(Locale.US, "%{n} %{n,choice,{1:'color', 'colors'}}.");
+    texts.put(UK, "%{n} %{n,choice,1:'colour', :'colours'}.");
+    texts.put(new Locale("nl", "NL"), "%{n} %{n,choice,1 : 'kleur',: 'kleuren'}.");
+    texts.put(Locale.GERMAN, "%{n} %{n,choice,1: 'Farbe', :'Farben'}.");
+    texts.put(Locale.US, "%{n} %{n,choice,1:'color', :'colors'}.");
 
     final Message m = NO_CACHE_INSTANCE.parse(texts);
     final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
@@ -70,7 +70,7 @@ public class MessageTest
   public void testCompareType()
   {
     final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
-    Message m = context.getMessageFactory().parse("%{n,choice,{<0:'negative',>0:'positive','zero'}}");
+    Message m = context.getMessageFactory().parse("%{n,choice,<0:'negative',>0:'positive',:'zero'}");
 
     assertEquals("negative",
         m.format(context, context.parameters().withLocale(UK).with("n", -1)));
