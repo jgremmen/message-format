@@ -74,8 +74,9 @@ public final class DataMap implements Data
 
 
   @Contract(pure = true)
-  public MapValue find(@NotNull MessageContext messageContext, Object key, Parameters parameters,
-                       Set<MapKey.Type> keyTypes, Set<MapValue.Type> valueTypes)
+  public MapValue find(@NotNull MessageContext messageContext, Object key,
+                       @NotNull Parameters parameters, @NotNull Set<MapKey.Type> keyTypes,
+                       Set<MapValue.Type> valueTypes)
   {
     MatchResult bestMatchResult = MISMATCH;
     MapValue bestMatch = null;
@@ -88,8 +89,8 @@ public final class DataMap implements Data
 
       final MapValue mapValue = entry.getValue();
 
-      if ((keyTypes == null || keyTypes.contains(mapKey.getType()) &&
-          (valueTypes == null || valueTypes.contains(mapValue.getType()))))
+      if (keyTypes.contains(mapKey.getType()) && (valueTypes == null ||
+          valueTypes.contains(mapValue.getType())))
       {
         final MatchResult matchResult = mapKey.match(messageContext, parameters, key);
 
@@ -109,8 +110,9 @@ public final class DataMap implements Data
 
 
   @Contract(pure = true)
-  public Message.WithSpaces getMessage(@NotNull MessageContext messageContext, Object key, Parameters parameters,
-                                       Set<MapKey.Type> keyTypes, boolean includeDefault)
+  public Message.WithSpaces getMessage(@NotNull MessageContext messageContext, Object key,
+                                       @NotNull Parameters parameters, @NotNull Set<MapKey.Type> keyTypes,
+                                       boolean includeDefault)
   {
     MapValue mapValue = find(messageContext, key, parameters, keyTypes, STRING_MESSAGE_TYPE);
 

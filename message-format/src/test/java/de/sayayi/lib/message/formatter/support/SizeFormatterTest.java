@@ -18,6 +18,10 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
+import de.sayayi.lib.message.formatter.runtime.ArrayFormatter;
+import de.sayayi.lib.message.formatter.runtime.BoolFormatter;
+import de.sayayi.lib.message.formatter.runtime.IterableFormatter;
+import de.sayayi.lib.message.formatter.runtime.MapFormatter;
 import org.junit.jupiter.api.Test;
 
 import java.util.Locale;

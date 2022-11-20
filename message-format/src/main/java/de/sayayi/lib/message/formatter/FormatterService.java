@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.formatter;
 
+import de.sayayi.lib.message.formatter.runtime.StringFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +34,7 @@ public interface FormatterService
    * <p>
    *   Implementing classes must make sure that for any combination of {@code format} and {@code type} this function
    *   always returns a formatter. A good choice for a default formatter would be
-   *   {@link de.sayayi.lib.message.formatter.support.StringFormatter} associated with {@link Object}.
+   *   {@link StringFormatter} associated with {@link Object}.
    * </p>
    *
    * @param format  name of the formatter or {@code null}

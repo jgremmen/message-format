@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Jeroen Gremmen
+ * Copyright 2020 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,65 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.formatter.support;
+package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
-import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import de.sayayi.lib.message.internal.part.TextPart;
-import lombok.val;
-import lombok.var;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
-import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
- * @since 0.8.0
  */
-public final class CutOffFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
+public final class ThrowableFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull String getName() {
-    return "cutoff";
-  }
-
-
-  @Override
   protected @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                      @NotNull Parameters parameters, DataMap map)
-  {
-    if (value == null)
-      return nullText();
-
-    val text = messageContext
-        .getFormatter(value.getClass())
-        .format(messageContext, value, null, parameters, map);
-
-    var s = text.getText();
-    if (s == null)
-      return nullText();
-    s = s.trim();
-
-    val maxSize = (int)Math.max(
-        getConfigValueNumber(messageContext, "cut-size", parameters, map, 64),
-        8);
-
-    return s.length() <= maxSize
-        ? text
-        : new TextPart(s.substring(0, maxSize - 3).trim() + "...", text.isSpaceBefore(), text.isSpaceAfter());
+                                      @NotNull Parameters parameters, DataMap map) {
+    return value == null ? nullText() : noSpaceText(((Throwable)value).getLocalizedMessage());
   }
 
 
   @Override
   public @NotNull Set<Class<?>> getFormattableTypes() {
-    return emptySet();
+    return singleton(Throwable.class);
   }
 }
