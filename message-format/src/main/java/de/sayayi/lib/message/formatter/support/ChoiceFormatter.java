@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
@@ -47,13 +46,13 @@ public final class ChoiceFormatter extends AbstractParameterFormatter implements
   @Override
   @Contract(pure = true)
   public @NotNull Text format(@NotNull MessageContext messageContext, Object value, String format,
-                              @NotNull Parameters parameters, Data data)
+                              @NotNull Parameters parameters, DataMap map)
   {
-    if (!(data instanceof DataMap))
+    if (map == null)
       throw new MessageException("data must be a choice map");
 
-    final Message.WithSpaces message = ((DataMap)data)
-        .getMessage(messageContext, value, parameters, NO_NAME_KEY_TYPES, true);
+    final Message.WithSpaces message =
+        map.getMessage(messageContext, value, parameters, NO_NAME_KEY_TYPES, true);
 
     return messageToText(messageContext, message, parameters);
   }
@@ -61,7 +60,7 @@ public final class ChoiceFormatter extends AbstractParameterFormatter implements
 
   @Override
   protected @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                      @NotNull Parameters parameters, Data data) {
+                                      @NotNull Parameters parameters, DataMap map) {
     throw new IllegalStateException();
   }
 

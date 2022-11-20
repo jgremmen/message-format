@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
@@ -48,7 +47,7 @@ public final class SizeFormatter extends AbstractParameterFormatter implements N
   @Override
   @Contract(pure = true)
   public @NotNull Text format(@NotNull MessageContext messageContext, Object value, String format,
-                              @NotNull Parameters parameters, Data data)
+                              @NotNull Parameters parameters, DataMap map)
   {
     long size = 0;
 
@@ -59,18 +58,17 @@ public final class SizeFormatter extends AbstractParameterFormatter implements N
         size = ((SizeQueryable)formatter).size(value);
     }
 
-    if (!(data instanceof DataMap))
-      return messageContext.getFormatter(long.class).format(messageContext, size, null, parameters, data);
+    if (map == null)
+      return messageContext.getFormatter(long.class).format(messageContext, size, null, parameters, null);
 
     return messageToText(messageContext,
-        ((DataMap)data).getMessage(messageContext, size, parameters, EnumSet.of(NUMBER), true),
-        parameters);
+        map.getMessage(messageContext, size, parameters, EnumSet.of(NUMBER), true), parameters);
   }
 
 
   @Override
   protected @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                      @NotNull Parameters parameters, Data data) {
+                                      @NotNull Parameters parameters, DataMap map) {
     throw new IllegalStateException();
   }
 

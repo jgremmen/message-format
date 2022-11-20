@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
@@ -48,27 +48,30 @@ public final class NumberFormatter extends AbstractParameterFormatter
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object v, String format,
-                                   @NotNull Parameters parameters, Data data)
+                                   @NotNull Parameters parameters, DataMap map)
   {
     if (v == null)
       return nullText();
 
     final Number value = (Number)v;
+    final String fmt = getConfigValueString(messageContext, "number", parameters, map);
 
-    if (data == null && (format == null || "integer".equals(format)) &&
-        (value instanceof BigInteger || value instanceof Long || value instanceof Integer || value instanceof Short ||
-         value instanceof Byte || value instanceof AtomicInteger || value instanceof AtomicLong))
+    if (map == null && (fmt == null || "integer".equals(fmt)) &&
+        (value instanceof BigInteger || value instanceof Long || value instanceof Integer ||
+         value instanceof Short || value instanceof Byte || value instanceof AtomicInteger ||
+         value instanceof AtomicLong))
       return new TextPart(value.toString());
 
     // special case: show number as bool
     if ("bool".equals(format))
-      return formatBoolean(messageContext, value, parameters, data);
+      return formatBoolean(messageContext, value, parameters, map);
 
-    return noSpaceText(getFormatter(messageContext, format, parameters, data).format(value));
+    return noSpaceText(getFormatter(messageContext, format, parameters, map).format(value));
   }
 
 
-  private Text formatBoolean(@NotNull MessageContext messageContext, Number value, Parameters parameters, Data data)
+  private Text formatBoolean(@NotNull MessageContext messageContext, Number value, Parameters parameters,
+                             DataMap map)
   {
     ParameterFormatter formatter = messageContext.getFormatter("bool", boolean.class);
     Set<Class<?>> types = formatter.getFormattableTypes();
@@ -77,12 +80,12 @@ public final class NumberFormatter extends AbstractParameterFormatter
     if (!types.contains(Boolean.class) && !types.contains(boolean.class))
       formatter = BOOL_FORMATTER;
 
-    return formatter.format(messageContext, value, "bool", parameters, data);
+    return formatter.format(messageContext, value, "bool", parameters, map);
   }
 
 
   private NumberFormat getFormatter(@NotNull MessageContext messageContext, String format, Parameters parameters,
-                                    Data data)
+                                    DataMap data)
   {
     if ("integer".equals(format))
       return NumberFormat.getIntegerInstance(parameters.getLocale());
@@ -93,7 +96,7 @@ public final class NumberFormatter extends AbstractParameterFormatter
     if ("currency".equals(format))
       return NumberFormat.getCurrencyInstance(parameters.getLocale());
 
-    String customFormat = getConfigValueString(messageContext, "number", parameters, data, true, null);
+    String customFormat = getConfigValueString(messageContext, "number", parameters, data);
     if (customFormat != null)
       return new DecimalFormat(customFormat, new DecimalFormatSymbols(parameters.getLocale()));
 

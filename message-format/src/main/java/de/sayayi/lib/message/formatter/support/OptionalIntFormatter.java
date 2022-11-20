@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
@@ -44,7 +44,7 @@ public final class OptionalIntFormatter extends AbstractParameterFormatter imple
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, Data data)
+                                   @NotNull Parameters parameters, DataMap map)
   {
     if (value == null)
       return nullText();
@@ -54,7 +54,7 @@ public final class OptionalIntFormatter extends AbstractParameterFormatter imple
       return emptyText();
 
     return messageContext.getFormatter(format, int.class)
-        .format(messageContext, optional.getAsInt(), format, parameters, data);
+        .format(messageContext, optional.getAsInt(), format, parameters, map);
   }
 
 

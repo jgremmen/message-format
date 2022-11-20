@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message;
 
+import de.sayayi.lib.message.data.map.*;
 import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import lombok.AllArgsConstructor;
@@ -22,13 +23,8 @@ import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import static java.util.Collections.emptySortedSet;
 import static java.util.Collections.unmodifiableSortedSet;
@@ -43,6 +39,7 @@ public class MessageContext
   private final @NotNull FormatterService formatterService;
   @Getter private final @NotNull MessageFactory messageFactory;
   @Getter private final @NotNull Locale locale;
+  private final @NotNull Map<String,MapValue> defaultDataMapValues = new TreeMap<>();
 
 
   public MessageContext(@NotNull FormatterService formatterService, @NotNull MessageFactory messageFactory,
@@ -53,6 +50,36 @@ public class MessageContext
 
   public MessageContext(@NotNull FormatterService formatterService, @NotNull MessageFactory messageFactory) {
     this(formatterService, messageFactory, Locale.getDefault());
+  }
+
+
+  @Contract(mutates = "this")
+  public void setDefaultData(@NotNull String name, boolean value) {
+    defaultDataMapValues.put(name, value ? MapValueBool.TRUE : MapValueBool.FALSE);
+  }
+
+
+  @Contract(mutates = "this")
+  public void setDefaultData(@NotNull String name, long value) {
+    defaultDataMapValues.put(name, new MapValueNumber(value));
+  }
+
+
+  @Contract(mutates = "this")
+  public void setDefaultData(@NotNull String name, @NotNull String value) {
+    defaultDataMapValues.put(name, new MapValueString(value));
+  }
+
+
+  @Contract(mutates = "this")
+  public void setDefaultData(@NotNull String name, @NotNull Message.WithSpaces value) {
+    defaultDataMapValues.put(name, new MapValueMessage(value));
+  }
+
+
+  @Contract(pure = true)
+  public MapValue getDefaultData(@NotNull String name) {
+    return defaultDataMapValues.get(name);
   }
 
 

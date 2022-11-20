@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -39,13 +39,13 @@ public final class TypeFormatter extends AbstractParameterFormatter
 {
   @Override
   public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, Data data)
+                                   @NotNull Parameters parameters, DataMap map)
   {
     if (value == null)
       return nullText();
 
     return noSpaceText(toString((Type)value,
-        getConfigValueString(messageContext, "type", parameters, data, true, "Cju")));
+        getConfigValueString(messageContext, "type", parameters, map, "Cju")));
   }
 
 
@@ -97,7 +97,8 @@ public final class TypeFormatter extends AbstractParameterFormatter
   }
 
 
-  private static String toString_parameterized(@NotNull ParameterizedType parameterizedType, @NotNull String typeFormat)
+  private static String toString_parameterized(@NotNull ParameterizedType parameterizedType,
+                                               @NotNull String typeFormat)
   {
     final StringBuilder formattedType = new StringBuilder();
     final Type ownerType = parameterizedType.getOwnerType();

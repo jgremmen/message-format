@@ -18,13 +18,8 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
-import de.sayayi.lib.message.data.DataString;
-import de.sayayi.lib.message.data.map.MapKey;
-import de.sayayi.lib.message.data.map.MapKeyBool;
-import de.sayayi.lib.message.data.map.MapValue;
-import de.sayayi.lib.message.data.map.MapValueMessage;
+import de.sayayi.lib.message.data.map.*;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
@@ -37,6 +32,7 @@ import java.util.*;
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Collections.emptySortedSet;
+import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -105,7 +101,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     registry.addFormatter(new NamedParameterFormatter() {
       @Override
       public @NotNull Text format(@NotNull MessageContext context, Object value, String format,
-                                  @NotNull MessageContext.Parameters parameters, Data data) {
+                                  @NotNull MessageContext.Parameters parameters, DataMap map) {
         return value == null ? nullText() : new TextPart((Boolean)value ? "1" : "0");
       }
 
@@ -143,12 +139,14 @@ public class ArrayFormatterTest extends AbstractFormatterTest
         .format(context, new int[] { 12, -7, 99 }, null , noParameters, null));
 
     assertEquals(new TextPart("1, -7, 248"), registry.getFormatter(null, int[].class)
-        .format(context, new int[] { 1, -7, 248 }, null , noParameters, new DataString("##00")));
+        .format(context, new int[] { 1, -7, 248 }, null , noParameters,
+            new DataMap(singletonMap(new MapKeyName("number"), new MapValueString("##00")))));
 
     registry.addFormatter(new NumberFormatter());
 
     assertEquals(new TextPart("01, -07, 248"), registry.getFormatter(null, int[].class)
-        .format(context, new int[] { 1, -7, 248 }, null , noParameters, new DataString("##00")));
+        .format(context, new int[] { 1, -7, 248 }, null , noParameters,
+            new DataMap(singletonMap(new MapKeyName("number"), new MapValueString("##00")))));
 
     registry.addFormatter(new NamedParameterFormatter() {
       @Override
@@ -158,7 +156,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
 
       @Override
       public @NotNull Text format(@NotNull MessageContext context, Object value, String format,
-                                  @NotNull MessageContext.Parameters parameters, Data data) {
+                                  @NotNull MessageContext.Parameters parameters, DataMap map) {
         return value == null ? nullText() : new TextPart(String.format("0x%02x", (Integer)value));
       }
 
@@ -190,10 +188,12 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     Parameters noParameters = context.noParameters();
 
     assertEquals(new TextPart("Test, wahr, -0006"), registry.getFormatter(null, int[].class)
-        .format(context, new Object[] { "Test", true, null, -6 }, null , noParameters, new DataString("0000")));
+        .format(context, new Object[] { "Test", true, null, -6 }, null , noParameters,
+            new DataMap(singletonMap(new MapKeyName("number"), new MapValueString("0000")))));
 
     assertEquals(new TextPart("this, is, a, test"), registry.getFormatter(null, int[].class)
-        .format(context, new Object[] { null, "this", null, "is", null, "a", null, "test" }, null , noParameters, null));
+        .format(context, new Object[] { null, "this", null, "is", null, "a", null, "test" }, null ,
+            noParameters, null));
   }
 
 
@@ -221,11 +221,11 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE);
 
     assertEquals("1, 2, 3, 4 and 5", context.getMessageFactory()
-        .parse("%{c,{sep:', ',sep-last:' and '}}")
+        .parse("%{c,{list-sep:', ',list-sep-last:' and '}}")
         .format(context, context.parameters().with("c", new int[] { 1, 2, 3, 4, 5})));
 
     assertEquals("1.2.3.4.5", context.getMessageFactory()
-        .parse("%{c,{sep:'.'}}")
+        .parse("%{c,{list-sep:'.'}}")
         .format(context, context.parameters().with("c", new long[] { 1, 2, 3, 4, 5 })));
   }
 }

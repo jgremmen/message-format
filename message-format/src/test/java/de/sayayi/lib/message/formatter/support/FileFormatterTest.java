@@ -17,6 +17,9 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.data.DataMap;
+import de.sayayi.lib.message.data.map.MapKeyName;
+import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import org.junit.jupiter.api.Test;
@@ -26,6 +29,7 @@ import java.io.File;
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Collections.singletonMap;
 import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -39,17 +43,25 @@ public class FileFormatterTest
   public void testFormat()
   {
     final FileFormatter formatter = new FileFormatter();
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE,
-        ROOT);
+    final MessageContext context =
+        new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE, ROOT);
     final Parameters parameters = context.noParameters();
 
-    File f = new File("/path1/path2/filename.ext");
+    final File f = new File("/path1/path2/filename.ext");
 
-    assertEquals(nullText(), formatter.format(context, null, null, parameters, null));
-    assertEquals(noSpaceText("/path1/path2/filename.ext"), formatter.format(context, f, null, parameters, null));
-    assertEquals(noSpaceText("filename.ext"), formatter.format(context, f, "name", parameters, null));
-    assertEquals(noSpaceText("/path1/path2"), formatter.format(context, f, "parent", parameters, null));
-    assertEquals(noSpaceText("ext"), formatter.format(context, f, "extension", parameters, null));
+    assertEquals(nullText(),
+        formatter.format(context, null, null, parameters, null));
+    assertEquals(noSpaceText("/path1/path2/filename.ext"),
+        formatter.format(context, f, null, parameters, null));
+    assertEquals(noSpaceText("filename.ext"),
+        formatter.format(context, f, null, parameters,
+            new DataMap(singletonMap(new MapKeyName("file"), new MapValueString("name")))));
+    assertEquals(noSpaceText("/path1/path2"),
+        formatter.format(context, f, null, parameters,
+            new DataMap(singletonMap(new MapKeyName("file"), new MapValueString("parent")))));
+    assertEquals(noSpaceText("ext"),
+        formatter.format(context, f, null, parameters,
+            new DataMap(singletonMap(new MapKeyName("file"), new MapValueString("extension")))));
   }
 
 
@@ -61,7 +73,7 @@ public class FileFormatterTest
     final MessageContext context = new MessageContext(formatterRegistry, NO_CACHE_INSTANCE, ROOT);
 
     assertEquals("file.jpg = image/jpeg", context.getMessageFactory().
-        parse("%{f,name}  =  %{f,extension,{'jpg':'image/jpeg'}}").format(
+        parse("%{f,{file:'name'}}  =  %{f,{file:'extension','jpg':'image/jpeg'}}").format(
             context, context.parameters().with("f", new File("/test/file.jpg"))));
   }
 }

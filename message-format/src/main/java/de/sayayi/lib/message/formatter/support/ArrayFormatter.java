@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
@@ -65,7 +65,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
 
   @Override
   public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object array, String format,
-                                   @NotNull Parameters parameters, Data data)
+                                   @NotNull Parameters parameters, DataMap map)
   {
     if (array == null)
       return nullText();
@@ -79,10 +79,8 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
     final ParameterFormatter formatter =
         arrayType.isPrimitive() ? messageContext.getFormatter(format, arrayType.getComponentType()) : null;
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
-    final String sep =
-        getConfigValueString(messageContext, "sep", parameters, data, false, ", ");
-    final String sepLast =
-        getConfigValueString(messageContext, "sep-last", parameters, data, false, sep);
+    final String sep = getConfigValueString(messageContext, "list-sep", parameters, map,", ");
+    final String sepLast = getConfigValueString(messageContext, "list-sep-last", parameters, map, sep);
 
     for(int i = 0; i < length; i++)
     {
@@ -92,9 +90,9 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
       if (value == array)
         text = new TextPart(bundle.getString("thisArray"));
       else if (formatter != null)
-        text = formatter.format(messageContext, value, format, parameters, data);
+        text = formatter.format(messageContext, value, format, parameters, map);
       else if (value != null)
-        text = messageContext.getFormatter(format, value.getClass()).format(messageContext, value, format, parameters, data);
+        text = messageContext.getFormatter(format, value.getClass()).format(messageContext, value, format, parameters, map);
 
       if (text != null && !text.isEmpty())
       {

@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -30,11 +30,7 @@ import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
-import static java.text.DateFormat.FULL;
-import static java.text.DateFormat.LONG;
-import static java.text.DateFormat.MEDIUM;
-import static java.text.DateFormat.SHORT;
-import static java.text.DateFormat.getDateInstance;
+import static java.text.DateFormat.*;
 import static java.util.Collections.singleton;
 
 
@@ -46,13 +42,13 @@ public final class DateFormatter extends AbstractParameterFormatter
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, Data data)
+                                   @NotNull Parameters parameters, DataMap map)
   {
     if (value == null)
       return nullText();
 
-    return noSpaceText(getFormatter(getConfigFormat(messageContext, format, data, true, null),
-        parameters.getLocale()).format(value));
+    return noSpaceText(getFormatter(
+        getConfigValueString(messageContext, "date", parameters, map), parameters.getLocale()).format(value));
   }
 
 

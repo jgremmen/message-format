@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
@@ -47,7 +47,7 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, Data data)
+                                   @NotNull Parameters parameters, DataMap map)
   {
     if (value == null)
       return nullText();
@@ -58,10 +58,8 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
 
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
     final StringBuilder s = new StringBuilder();
-    final String sep =
-        getConfigValueString(messageContext, "sep", parameters, data, false, ", ");
-    final String sepLast =
-        getConfigValueString(messageContext, "sep-last", parameters, data, false, sep);
+    final String sep = getConfigValueString(messageContext, "list-sep", parameters, map, ", ");
+    final String sepLast = getConfigValueString(messageContext, "list-sep-last", parameters, map, sep);
 
     while(iterator.hasNext())
     {
@@ -73,7 +71,7 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
       else if (element != null)
       {
         text = messageContext.getFormatter(format, element.getClass())
-            .format(messageContext, element, format, parameters, data);
+            .format(messageContext, element, format, parameters, map);
       }
 
       if (text != null && !text.isEmpty())

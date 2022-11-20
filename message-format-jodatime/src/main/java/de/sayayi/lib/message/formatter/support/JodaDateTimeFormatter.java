@@ -17,28 +17,18 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.ReadableDateTime;
-import org.joda.time.ReadableInstant;
-import org.joda.time.ReadablePartial;
+import org.joda.time.*;
 import org.joda.time.base.BaseLocal;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
 import static java.util.Collections.unmodifiableSet;
 
 
@@ -72,13 +62,13 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, Data data)
+                                   @NotNull Parameters parameters, DataMap map)
   {
     if (value == null)
       return nullText();
 
     if (!STYLE.containsKey(format))
-      format = getConfigValueString(messageContext, "format", parameters, data, true, null);
+      format = getConfigValueString(messageContext, "date", parameters, map, null);
 
     final Locale locale = parameters.getLocale();
     final DateTimeFormatter formatter;

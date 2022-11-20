@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.DataNumber;
 import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
@@ -27,9 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigInteger;
 import java.util.Set;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
 import static java.util.Collections.emptySet;
 
 
@@ -46,27 +45,29 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
 
   @Override
   public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, Data data)
+                                   @NotNull Parameters parameters, DataMap map)
   {
     if (!(value instanceof Number))
       return nullText();
 
-    final int bitCount = detectBitCount(messageContext, parameters, data, value);
+    final int bitCount = detectBitCount(messageContext, parameters, map, value);
     return bitCount > 0 ? noSpaceText(format(bitCount, value)) : emptyText();
   }
 
 
-  private int detectBitCount(@NotNull MessageContext messageContext, Parameters parameters, Data data, Object value)
+  private int detectBitCount(@NotNull MessageContext messageContext, @NotNull Parameters parameters,
+                             DataMap map, Object value)
   {
-    Data dataValue = getConfigValue(messageContext, "length", parameters, data, true);
+    final Data dataValue = getConfigValue(messageContext, "length", parameters, map);
+
     if (dataValue instanceof DataString && "auto".equals(dataValue.asObject()))
       return autoDetectBitCount(value);
 
-    if (data instanceof DataNumber)
+    if (dataValue instanceof DataNumber)
     {
-      int bitCount = ((DataNumber)data).asObject().intValue();
-      if (bitCount > 0 && bitCount <= 256)
-        return bitCount;
+      int bits = ((DataNumber)dataValue).asObject().intValue();
+      if (bits > 0 && bits <= 64)
+        return bits;
     }
 
     return detectBitCountByRange(value);

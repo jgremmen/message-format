@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
@@ -51,13 +51,13 @@ public interface ParameterFormatter
    * @param parameters  parameter values available for formatting the current message. Additionally, this instance
    *                    provides access to the formatting registry as well as to the locale. This parameter is never
    *                    {@code null}
-   * @param data        parameter data provided by the parameter definition or {@code null}
+   * @param map         data map provided by the parameter definition or {@code null}
    *
    * @return  formatted parameter value, never {@code null}
    */
   @Contract(pure = true)
   @NotNull Text format(@NotNull MessageContext messageContext, Object value, String format,
-                       @NotNull Parameters parameters, Data data);
+                       @NotNull Parameters parameters, DataMap map);
 
 
   /**

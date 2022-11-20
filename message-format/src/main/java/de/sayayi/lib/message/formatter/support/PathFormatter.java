@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -25,9 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.nio.file.Path;
 import java.util.Set;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
 import static java.util.Collections.singleton;
 
 
@@ -38,13 +36,13 @@ public final class PathFormatter extends AbstractParameterFormatter
 {
   @Override
   public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, Data data)
+                                   @NotNull Parameters parameters, DataMap map)
   {
     if (value == null)
       return nullText();
 
     Path path = (Path)value;
-    format = getConfigFormat(messageContext, format, data, true, null);
+    format = getConfigValueString(messageContext, "path", parameters, map, null);
 
     if ("name".equals(format))
       path = path.getFileName();

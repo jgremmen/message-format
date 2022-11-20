@@ -17,7 +17,9 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataString;
+import de.sayayi.lib.message.data.DataMap;
+import de.sayayi.lib.message.data.map.MapKeyName;
+import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +28,7 @@ import java.util.function.LongSupplier;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -64,6 +67,7 @@ public class SupplierFormatterTest
     Object value = (LongSupplier) () -> 1234567890L;
 
     assertEquals(noSpaceText("1,234,567,890"), registry.getFormatter(null, value.getClass())
-        .format(context, value, null, noParameters, new DataString("###,###,###,###")));
+        .format(context, value, null, noParameters,
+            new DataMap(singletonMap(new MapKeyName("number"), new MapValueString("###,###,###,###")))));
   }
 }

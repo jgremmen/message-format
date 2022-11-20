@@ -17,7 +17,6 @@ package de.sayayi.lib.message.internal.part;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
@@ -46,16 +45,16 @@ public final class ParameterPart implements Parameter
 
   private final String parameter;
   private final String format;
-  private final Data data;
+  private final DataMap map;
   private final boolean spaceBefore;
   private final boolean spaceAfter;
 
 
-  public ParameterPart(String parameter, String format, boolean spaceBefore, boolean spaceAfter, Data data)
+  public ParameterPart(String parameter, String format, boolean spaceBefore, boolean spaceAfter, DataMap map)
   {
     this.parameter = parameter;
     this.format = "".equals(format) ? null : format;
-    this.data = data;
+    this.map = map;
     this.spaceBefore = spaceBefore;
     this.spaceAfter = spaceAfter;
   }
@@ -70,7 +69,7 @@ public final class ParameterPart implements Parameter
     final ParameterFormatter formatter = messageContext.getFormatter(format, type);
 
     try {
-      return addSpaces(formatter.format(messageContext, value, format, parameters, data), spaceBefore, spaceAfter);
+      return addSpaces(formatter.format(messageContext, value, format, parameters, map), spaceBefore, spaceAfter);
     } catch(Exception ex) {
       throw new MessageException("failed to format parameter " + parameter, ex);
     }
@@ -83,9 +82,8 @@ public final class ParameterPart implements Parameter
     final Set<String> parameterNames = new TreeSet<>();
 
     parameterNames.add(parameter);
-
-    if (data instanceof DataMap)
-      parameterNames.addAll(((DataMap)data).getParameterNames());
+    if (map != null)
+      parameterNames.addAll(map.getParameterNames());
 
     return parameterNames;
   }
@@ -99,8 +97,8 @@ public final class ParameterPart implements Parameter
 
     if (format != null)
       s.append(", format=").append(format);
-    if (data != null)
-      s.append(", data=").append(data);
+    if (map != null)
+      s.append(", data=").append(map);
 
     if (spaceBefore && spaceAfter)
       s.append(", space-around");

@@ -18,7 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -32,9 +32,7 @@ import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.EMPTY_NULL_TYPE;
 import static de.sayayi.lib.message.data.map.MapKey.Type.BOOL;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.messageToText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.ResourceBundle.getBundle;
 
@@ -68,9 +66,9 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
   @Override
   @Contract(pure = true)
   public @NotNull Text format(@NotNull MessageContext messageContext, Object value, String format,
-                              @NotNull Parameters parameters, Data data)
+                              @NotNull Parameters parameters, DataMap map)
   {
-    Message.WithSpaces msg = getMessage(messageContext, value, EMPTY_NULL_TYPE, parameters, data, false);
+    Message.WithSpaces msg = getMessage(messageContext, value, EMPTY_NULL_TYPE, parameters, map, false);
     if (msg != null)
       return messageToText(messageContext, msg, parameters);
 
@@ -93,7 +91,7 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
       bool = Boolean.parseBoolean(String.valueOf(value));
 
     // allow custom messages for true/false value?
-    if ((msg = getMessage(messageContext, bool, EnumSet.of(BOOL), parameters, data, false)) != null)
+    if ((msg = getMessage(messageContext, bool, EnumSet.of(BOOL), parameters, map, false)) != null)
       return messageToText(messageContext, msg, parameters);
 
     // get translated boolean value
@@ -103,14 +101,14 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
     } catch(Exception ignore) {
     }
 
-    return (msg = getMessage(messageContext, s, NO_NAME_KEY_TYPES, parameters, data, false)) == null
+    return (msg = getMessage(messageContext, s, NO_NAME_KEY_TYPES, parameters, map, false)) == null
         ? noSpaceText(s) : messageToText(messageContext, msg, parameters);
   }
 
 
   @Override
   protected @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                      @NotNull Parameters parameters, Data data) {
+                                      @NotNull Parameters parameters, DataMap data) {
     throw new IllegalStateException();
   }
 

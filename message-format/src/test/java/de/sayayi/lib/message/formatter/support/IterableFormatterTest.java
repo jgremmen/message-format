@@ -78,11 +78,11 @@ public class IterableFormatterTest extends AbstractFormatterTest
     final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE);
 
     assertEquals("1, 2, 3, 4 and 5", context.getMessageFactory()
-        .parse("%{c,{sep:', ',sep-last:' and '}}")
+        .parse("%{c,{list-sep:', ',list-sep-last:' and '}}")
         .format(context, context.parameters().with("c", Arrays.asList(1, 2, 3, 4, 5))));
 
     assertEquals("1.2.3.4.5", context.getMessageFactory()
-        .parse("%{c,{sep:'.'}}")
+        .parse("%{c,{list-sep:'.'}}")
         .format(context, context.parameters().with("c", Arrays.asList(1, 2, 3, 4, 5))));
   }
 }

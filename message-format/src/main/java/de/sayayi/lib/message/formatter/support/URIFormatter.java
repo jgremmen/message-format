@@ -18,7 +18,7 @@ package de.sayayi.lib.message.formatter.support;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKey.Type;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
@@ -29,9 +29,7 @@ import java.net.URI;
 import java.util.EnumSet;
 import java.util.Set;
 
-import static de.sayayi.lib.message.data.map.MapKey.Type.EMPTY;
-import static de.sayayi.lib.message.data.map.MapKey.Type.NULL;
-import static de.sayayi.lib.message.data.map.MapKey.Type.STRING;
+import static de.sayayi.lib.message.data.map.MapKey.Type.*;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Collections.singleton;
 
@@ -44,7 +42,7 @@ public final class URIFormatter extends AbstractParameterFormatter
   @Override
   @SuppressWarnings({"squid:S3358", "squid:S3776"})
   public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, Data data)
+                                   @NotNull Parameters parameters, DataMap map)
   {
     if (value == null)
       return nullText();
@@ -52,7 +50,7 @@ public final class URIFormatter extends AbstractParameterFormatter
     final URI uri = (URI)value;
 
     if ("authority".equals(format))
-      return messageContext.getFormatter(String.class).format(messageContext, uri.getAuthority(), null, parameters, data);
+      return messageContext.getFormatter(String.class).format(messageContext, uri.getAuthority(), null, parameters, map);
     else if ("fragment".equals(format))
       return new TextPart(uri.getFragment());
     else if ("host".equals(format))
@@ -65,14 +63,13 @@ public final class URIFormatter extends AbstractParameterFormatter
 
       if (port == -1)
       {
-        String undefined = getConfigValueString(messageContext, "undefined", parameters, data,
-            false,null);
+        String undefined = getConfigValueString(messageContext, "undefined", parameters, map);
         if (undefined != null)
           return new TextPart(undefined);
       }
       else if (port >= 0)
       {
-        Message.WithSpaces msg = getMessage(messageContext, port, EnumSet.of(Type.NUMBER), parameters, data,
+        Message.WithSpaces msg = getMessage(messageContext, port, EnumSet.of(Type.NUMBER), parameters, map,
             false);
         if (msg != null)
           return new TextPart(msg.format(messageContext, parameters), msg.isSpaceBefore(), msg.isSpaceAfter());
@@ -86,7 +83,7 @@ public final class URIFormatter extends AbstractParameterFormatter
     {
       final String scheme = uri.getScheme();
       final Message.WithSpaces msg = getMessage(messageContext, scheme, EnumSet.of(STRING, EMPTY, NULL), parameters,
-          data, false);
+          map, false);
 
       return msg != null
           ? new TextPart(msg.format(messageContext, parameters), msg.isSpaceBefore(), msg.isSpaceAfter())

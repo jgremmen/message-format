@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -37,13 +37,13 @@ public final class FileFormatter extends AbstractParameterFormatter implements S
 {
   @Override
   public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, Data data)
+                                   @NotNull Parameters parameters, DataMap map)
   {
     if (value == null)
       return nullText();
 
     final File file = (File)value;
-    format = getConfigFormat(messageContext, format, data, true, null);
+    format = getConfigValueString(messageContext, "file", parameters, map, null);
 
     if ("name".equals(format))
       return noSpaceText(file.getName());

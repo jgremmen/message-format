@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -32,16 +32,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
-import static java.time.format.DateTimeFormatter.ofLocalizedDate;
-import static java.time.format.DateTimeFormatter.ofLocalizedDateTime;
-import static java.time.format.DateTimeFormatter.ofLocalizedTime;
-import static java.time.format.FormatStyle.FULL;
-import static java.time.format.FormatStyle.LONG;
-import static java.time.format.FormatStyle.MEDIUM;
-import static java.time.format.FormatStyle.SHORT;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
+import static java.time.format.DateTimeFormatter.*;
+import static java.time.format.FormatStyle.*;
 import static java.util.Collections.singleton;
 
 
@@ -86,13 +79,13 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, Data data)
+                                   @NotNull Parameters parameters, DataMap map)
   {
     if (value == null)
       return nullText();
 
     if (!STYLE.containsKey(format))
-      format = getConfigValueString(messageContext, "format", parameters, data, true, null);
+      format = getConfigValueString(messageContext, "date", parameters, map);
 
     final DateTimeFormatter formatter;
 

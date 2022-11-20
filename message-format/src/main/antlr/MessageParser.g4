@@ -63,13 +63,7 @@ forceQuotedMessage returns [Message.WithSpaces value]
         ;
 
 parameter returns [ParameterPart value]
-        : PARAM_START name=NAME (COMMA format=NAME)? (COMMA data)? PARAM_END
-        ;
-
-data returns [Data value]
-        : string  #dataString
-        | NUMBER  #dataNumber
-        | map     #dataMap
+        : PARAM_START name=NAME (COMMA format=NAME)? (COMMA map)? PARAM_END
         ;
 
 map returns [Map<MapKey,MapValue> value]

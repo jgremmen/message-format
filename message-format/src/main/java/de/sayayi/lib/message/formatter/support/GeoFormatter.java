@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import lombok.NoArgsConstructor;
@@ -66,12 +66,12 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
   @Override
   @SuppressWarnings("squid:S3776")
   public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, Data data)
+                                   @NotNull Parameters parameters, DataMap map)
   {
     if (value == null)
       return nullText();
 
-    final Format fmt = getFormat(messageContext, format, data);
+    final Format fmt = getFormat(messageContext, parameters, map);
     final StringBuilder s = new StringBuilder();
     final double v = ((Number)value).doubleValue();
     final double[] dms = dmsSplitter(fmt, v);
@@ -109,12 +109,13 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
   }
 
 
-  private Format getFormat(@NotNull MessageContext messageContext, String format, Data data)
+  private @NotNull Format getFormat(@NotNull MessageContext messageContext,
+                                    @NotNull Parameters parameters, DataMap map)
   {
-    String formatString = getConfigFormat(messageContext, format, data, true, "dms");
-    Format fmt = FORMAT.get(formatString);
+    String formatString = getConfigValueString(messageContext, "geo", parameters, map, "dms");
+    Format format = FORMAT.get(formatString);
 
-    return fmt == null ? parseFormatString(formatString) : fmt;
+    return format == null ? parseFormatString(formatString) : format;
   }
 
 

@@ -16,14 +16,18 @@
 package de.sayayi.lib.message.formatter.support;
 
 import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.data.DataMap;
+import de.sayayi.lib.message.data.map.MapKeyName;
+import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.Locale;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -44,11 +48,15 @@ class EnumFormatterTest extends AbstractFormatterTest
     final EnumFormatter formatter = new EnumFormatter();
     final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(),
         NO_CACHE_INSTANCE, Locale.ROOT);
-    final MessageContext.Parameters parameters = context.noParameters();
+    final Parameters parameters = context.noParameters();
 
-    assertEquals(nullText(), formatter.format(context, null, null, parameters, null));
-    assertEquals(noSpaceText("CC"), formatter.format(context, MyEnum.CC, null, parameters, null));
-    assertEquals(noSpaceText("3"), formatter.format(context, MyEnum.DD, "ordinal", parameters, null));
+    //assertEquals(nullText(), formatter.format(context, null, null, parameters, null));
+    //assertEquals(noSpaceText("CC"), formatter.format(context, MyEnum.CC, null, parameters, null));
+    assertEquals(noSpaceText("3"), formatter.format(context, MyEnum.DD, null, parameters,
+        new DataMap(Collections.singletonMap(new MapKeyName("enum"), new MapValueString("ordinal")))));
+
+    context.setDefaultData("enum", "ordinal");
+    assertEquals(noSpaceText("0"), formatter.format(context, MyEnum.AA, null, parameters, null));
   }
 
 

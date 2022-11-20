@@ -21,8 +21,6 @@ import de.sayayi.lib.antlr4.syntax.GenericSyntaxErrorFormatter;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.data.DataMap;
-import de.sayayi.lib.message.data.DataNumber;
-import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.*;
 import de.sayayi.lib.message.exception.MessageParserException;
@@ -235,14 +233,14 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitParameter(ParameterContext ctx)
     {
-      final DataContext data = ctx.data();
+      final MapContext map = ctx.map();
 
       ctx.value = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(
           ctx.name.getText(),
           ctx.format == null ? null : ctx.format.getText(),
           exitParameter_isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           exitParameter_isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
-          data == null ? null : data.value));
+          map == null ? null : new DataMap(map.value)));
     }
 
 
@@ -261,24 +259,6 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       }
 
       return false;
-    }
-
-
-    @Override
-    public void exitDataString(DataStringContext ctx) {
-      ctx.value = new DataString(ctx.string().value);
-    }
-
-
-    @Override
-    public void exitDataNumber(DataNumberContext ctx) {
-      ctx.value = new DataNumber(ctx.NUMBER().getText());
-    }
-
-
-    @Override
-    public void exitDataMap(DataMapContext ctx) {
-      ctx.value = new DataMap(ctx.map().value);
     }
 
 
