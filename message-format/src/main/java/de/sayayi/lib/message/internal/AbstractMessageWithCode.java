@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
  */
 abstract class AbstractMessageWithCode implements Message.WithCode
 {
-  private static final long serialVersionUID = 600L;
+  private static final long serialVersionUID = 800L;
 
   @Getter protected final @NotNull String code;
 

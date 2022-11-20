@@ -24,9 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.data.map.MapKey.CompareType.EQ;
 import static de.sayayi.lib.message.data.map.MapKey.CompareType.NE;
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_LENIENT;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.*;
 
 
 /**
@@ -35,7 +33,7 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_LENIENT
 @ToString(doNotUseGetters = true)
 public final class MapKeyEmpty implements MapKey
 {
-  private static final long serialVersionUID = 600L;
+  private static final long serialVersionUID = 800L;
 
   private final @NotNull CompareType compareType;
 

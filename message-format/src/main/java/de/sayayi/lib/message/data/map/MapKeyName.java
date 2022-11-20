@@ -33,7 +33,7 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
 @AllArgsConstructor
 public final class MapKeyName implements MapKey
 {
-  private static final long serialVersionUID = 600L;
+  private static final long serialVersionUID = 800L;
 
   @Getter private final @NotNull String name;
 

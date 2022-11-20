@@ -25,9 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.LENIENT;
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.*;
 
 
 /**
@@ -37,7 +35,7 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
 @AllArgsConstructor
 public final class MapKeyNumber implements MapKey
 {
-  private static final long serialVersionUID = 600L;
+  private static final long serialVersionUID = 800L;
 
   private final @NotNull CompareType compareType;
   @Getter private final long number;

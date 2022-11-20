@@ -36,7 +36,7 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor(access = PRIVATE)
 public final class EmptyMessage implements Message.WithSpaces
 {
-  private static final long serialVersionUID = 600L;
+  private static final long serialVersionUID = 800L;
 
   public static final Message.WithSpaces INSTANCE = new EmptyMessage();
 

@@ -26,10 +26,7 @@ import java.util.Locale;
 
 import static de.sayayi.lib.message.data.map.MapKey.CompareType.EQ;
 import static de.sayayi.lib.message.data.map.MapKey.CompareType.NE;
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EQUIVALENT;
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.LENIENT;
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.*;
 
 
 /**
@@ -39,7 +36,7 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
 @AllArgsConstructor
 public final class MapKeyString implements MapKey
 {
-  private static final long serialVersionUID = 600L;
+  private static final long serialVersionUID = 800L;
 
   private final @NotNull CompareType compareType;
   private final @NotNull String string;

@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class MapValueNumber extends DataNumber implements MapValue
 {
-  private static final long serialVersionUID = 600L;
+  private static final long serialVersionUID = 800L;
 
 
   public MapValueNumber(long number) {

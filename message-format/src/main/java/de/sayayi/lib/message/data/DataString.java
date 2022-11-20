@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 @EqualsAndHashCode(doNotUseGetters = true)
 public class DataString implements Data
 {
-  private static final long serialVersionUID = 600L;
+  private static final long serialVersionUID = 800L;
 
   private final @NotNull String string;
 

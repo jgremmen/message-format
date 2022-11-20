@@ -25,10 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EQUIVALENT;
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.LENIENT;
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
+import static de.sayayi.lib.message.data.map.MapKey.MatchResult.*;
 import static lombok.AccessLevel.PRIVATE;
 
 
@@ -42,7 +39,7 @@ public enum MapKeyBool implements MapKey
   FALSE(false),
   TRUE(true);
 
-  private static final long serialVersionUID = 600L;
+  private static final long serialVersionUID = 800L;
 
   @Getter private final boolean bool;
 

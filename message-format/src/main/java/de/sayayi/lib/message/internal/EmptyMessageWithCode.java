@@ -32,7 +32,7 @@ import static java.util.Collections.emptySortedSet;
 @ToString
 public final class EmptyMessageWithCode extends AbstractMessageWithCode
 {
-  private static final long serialVersionUID = 600L;
+  private static final long serialVersionUID = 800L;
 
 
   public EmptyMessageWithCode(@NotNull String code) {

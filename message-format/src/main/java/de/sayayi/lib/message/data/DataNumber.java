@@ -28,14 +28,9 @@ import org.jetbrains.annotations.NotNull;
 @EqualsAndHashCode(doNotUseGetters = true)
 public class DataNumber implements Data
 {
-  private static final long serialVersionUID = 600L;
+  private static final long serialVersionUID = 800L;
 
   private final long number;
-
-
-  public DataNumber(@NotNull String number) {
-    this(Long.parseLong(number));
-  }
 
 
   @Override
