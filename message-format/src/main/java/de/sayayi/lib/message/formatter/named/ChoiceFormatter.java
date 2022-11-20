@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.formatter.support;
+package de.sayayi.lib.message.formatter.named;
 
+import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.DataMap;
+import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.EnumSet;
 import java.util.Set;
 
-import static de.sayayi.lib.message.data.map.MapKey.Type.NUMBER;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.messageToText;
 import static java.util.Collections.emptySet;
 
@@ -36,12 +35,12 @@ import static java.util.Collections.emptySet;
 /**
  * @author Jeroen Gremmen
  */
-public final class SizeFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
+public final class ChoiceFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
 {
   @Override
   @Contract(pure = true)
   public @NotNull String getName() {
-    return "size";
+    return "choice";
   }
 
 
@@ -50,20 +49,13 @@ public final class SizeFormatter extends AbstractParameterFormatter implements N
   public @NotNull Text format(@NotNull MessageContext messageContext, Object value, String format,
                               @NotNull Parameters parameters, DataMap map)
   {
-    long size = 0;
+    if (map == null)
+      throw new MessageException("data must be a choice map");
 
-    if (value != null)
-    {
-      ParameterFormatter formatter = messageContext.getFormatter(value.getClass());
-      if (formatter instanceof SizeQueryable)
-        size = ((SizeQueryable)formatter).size(value);
-    }
+    final Message.WithSpaces message =
+        map.getMessage(messageContext, value, parameters, NO_NAME_KEY_TYPES, true);
 
-    if (map == null || map.isEmpty())
-      return messageContext.getFormatter(long.class).format(messageContext, size, null, parameters, null);
-
-    return messageToText(messageContext,
-        map.getMessage(messageContext, size, parameters, EnumSet.of(NUMBER), true), parameters);
+    return messageToText(messageContext, message, parameters);
   }
 
 

@@ -45,6 +45,7 @@ public final class MethodFormatter extends AbstractParameterFormatter
       return nullText();
 
     final Method method = (Method)value;
+    format = getConfigValueString(messageContext, "method", parameters, map);
 
     if ("name".equals(format))
       return noSpaceText(method.getName());

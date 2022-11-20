@@ -1,4 +1,4 @@
-package de.sayayi.lib.message.formatter.support;
+package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;

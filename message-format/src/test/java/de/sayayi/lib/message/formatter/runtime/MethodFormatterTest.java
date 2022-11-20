@@ -47,7 +47,8 @@ public class MethodFormatterTest extends AbstractFormatterTest
     registry.addFormatter(new MethodFormatter());
 
     final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, Locale.UK);
-    final Message message = context.getMessageFactory().parse("%{m} %{m,name} %{m,return-type} %{m,class}");
+    final Message message = context.getMessageFactory()
+        .parse("%{m} %{m,method:'name'} %{m,method:'return-type'} %{m,method:'class'}");
 
     assertEquals("protected static " + Set.class.getName() + " " + MethodFormatterTest.class.getName() +
         ".dummy() dummy " + Set.class.getSimpleName() + "<" + String.class.getSimpleName() + "> " +
