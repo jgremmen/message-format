@@ -29,7 +29,10 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -45,6 +48,8 @@ public final class NumberFormatter extends AbstractParameterFormatter
 {
   private static final BoolFormatter BOOL_FORMATTER = new BoolFormatter();
 
+  private static final Map<Locale,DecimalFormatSymbols> FORMAT_SYMBOLS_CACHE = new ConcurrentHashMap<>();
+
 
   @Override
   @Contract(pure = true)
@@ -55,19 +60,20 @@ public final class NumberFormatter extends AbstractParameterFormatter
       return nullText();
 
     final Number value = (Number)v;
-    final String fmt = getConfigValueString(messageContext, "number", parameters, map);
-
-    if (map == null && (fmt == null || "integer".equals(fmt)) &&
-        (value instanceof BigInteger || value instanceof Long || value instanceof Integer ||
-         value instanceof Short || value instanceof Byte || value instanceof AtomicInteger ||
-         value instanceof AtomicLong))
-      return new TextPart(value.toString());
 
     // special case: show number as bool
     if ("bool".equals(format))
       return formatBoolean(messageContext, value, parameters, map);
 
-    return noSpaceText(getFormatter(messageContext, format, parameters, map).format(value));
+    format = getConfigValueString(messageContext, "number", parameters, map);
+
+    if (map == null && (format == null || "integer".equals(format)) &&
+        (value instanceof BigInteger || value instanceof Long || value instanceof Integer ||
+         value instanceof Short || value instanceof Byte || value instanceof AtomicInteger ||
+         value instanceof AtomicLong))
+      return new TextPart(value.toString());
+
+    return noSpaceText(getFormatter(format, parameters).format(value));
   }
 
 
@@ -81,12 +87,11 @@ public final class NumberFormatter extends AbstractParameterFormatter
     if (!types.contains(Boolean.class) && !types.contains(boolean.class))
       formatter = BOOL_FORMATTER;
 
-    return formatter.format(messageContext, value, "bool", parameters, map);
+    return formatter.format(messageContext, value, null, parameters, map);
   }
 
 
-  private NumberFormat getFormatter(@NotNull MessageContext messageContext, String format, Parameters parameters,
-                                    DataMap data)
+  private NumberFormat getFormatter(String format, Parameters parameters)
   {
     if ("integer".equals(format))
       return NumberFormat.getIntegerInstance(parameters.getLocale());
@@ -97,9 +102,11 @@ public final class NumberFormatter extends AbstractParameterFormatter
     if ("currency".equals(format))
       return NumberFormat.getCurrencyInstance(parameters.getLocale());
 
-    String customFormat = getConfigValueString(messageContext, "number", parameters, data);
-    if (customFormat != null)
-      return new DecimalFormat(customFormat, new DecimalFormatSymbols(parameters.getLocale()));
+    if (format != null && !format.isEmpty())
+    {
+      return new DecimalFormat(format,
+          FORMAT_SYMBOLS_CACHE.computeIfAbsent(parameters.getLocale(), DecimalFormatSymbols::new));
+    }
 
     return NumberFormat.getNumberInstance(parameters.getLocale());
   }
