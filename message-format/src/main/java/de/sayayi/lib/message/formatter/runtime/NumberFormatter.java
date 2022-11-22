@@ -91,24 +91,23 @@ public final class NumberFormatter extends AbstractParameterFormatter
   }
 
 
-  private NumberFormat getFormatter(String format, Parameters parameters)
+  private @NotNull NumberFormat getFormatter(String format, Parameters parameters)
   {
+    final Locale locale = parameters.getLocale();
+
     if ("integer".equals(format))
-      return NumberFormat.getIntegerInstance(parameters.getLocale());
+      return NumberFormat.getIntegerInstance(locale);
 
     if ("percent".equals(format))
-      return NumberFormat.getPercentInstance(parameters.getLocale());
+      return NumberFormat.getPercentInstance(locale);
 
     if ("currency".equals(format))
-      return NumberFormat.getCurrencyInstance(parameters.getLocale());
+      return NumberFormat.getCurrencyInstance(locale);
 
     if (format != null && !format.isEmpty())
-    {
-      return new DecimalFormat(format,
-          FORMAT_SYMBOLS_CACHE.computeIfAbsent(parameters.getLocale(), DecimalFormatSymbols::new));
-    }
+      return new DecimalFormat(format, FORMAT_SYMBOLS_CACHE.computeIfAbsent(locale, DecimalFormatSymbols::new));
 
-    return NumberFormat.getNumberInstance(parameters.getLocale());
+    return NumberFormat.getNumberInstance(locale);
   }
 
 
