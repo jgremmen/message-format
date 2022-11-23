@@ -34,7 +34,7 @@ import java.util.Set;
 import static de.sayayi.lib.message.data.map.MapKey.EMPTY_NULL_TYPE;
 import static de.sayayi.lib.message.data.map.MapKey.Type.BOOL;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
-import static java.util.Collections.unmodifiableSet;
+import static java.util.Arrays.asList;
 import static java.util.ResourceBundle.getBundle;
 
 
@@ -43,20 +43,6 @@ import static java.util.ResourceBundle.getBundle;
  */
 public final class BoolFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
 {
-  private static final Set<Class<?>> FORMATTABLE_TYPES;
-
-
-  static
-  {
-    final Set<Class<?>> formattableTypes = new HashSet<>(4);
-
-    formattableTypes.add(Boolean.class);
-    formattableTypes.add(boolean.class);
-
-    FORMATTABLE_TYPES = unmodifiableSet(formattableTypes);
-  }
-
-
   @Override
   @Contract(pure = true)
   public @NotNull String getName() {
@@ -116,6 +102,6 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
 
   @Override
   public @NotNull Set<Class<?>> getFormattableTypes() {
-    return FORMATTABLE_TYPES;
+    return new HashSet<>(asList(Boolean.class, boolean.class));
   }
 }
