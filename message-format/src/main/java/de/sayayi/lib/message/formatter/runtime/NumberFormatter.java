@@ -21,7 +21,6 @@ import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,6 +34,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
@@ -67,11 +67,11 @@ public final class NumberFormatter extends AbstractParameterFormatter
 
     format = getConfigValueString(messageContext, "number", parameters, map);
 
-    if (map == null && (format == null || "integer".equals(format)) &&
+    if ((format == null || "integer".equals(format)) &&
         (value instanceof BigInteger || value instanceof Long || value instanceof Integer ||
          value instanceof Short || value instanceof Byte || value instanceof AtomicInteger ||
-         value instanceof AtomicLong))
-      return new TextPart(value.toString());
+         value instanceof AtomicLong || value instanceof LongAdder))
+      return noSpaceText(value.toString());
 
     return noSpaceText(getFormatter(format, parameters).format(value));
   }
