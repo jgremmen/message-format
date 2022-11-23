@@ -19,7 +19,6 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.DataMap;
-import de.sayayi.lib.message.data.map.MapKey.Type;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
@@ -31,6 +30,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.Type.*;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Collections.singleton;
 
@@ -49,37 +49,37 @@ public final class URIFormatter extends AbstractParameterFormatter
       return nullText();
 
     final URI uri = (URI)value;
+    format = getConfigValueString(messageContext, "uri", parameters, map);
 
     if ("authority".equals(format))
       return messageContext.getFormatter(String.class).format(messageContext, uri.getAuthority(), null, parameters, map);
     else if ("fragment".equals(format))
-      return new TextPart(uri.getFragment());
+      return noSpaceText(uri.getFragment());
     else if ("host".equals(format))
-      return new TextPart(uri.getHost());
+      return noSpaceText(uri.getHost());
     else if ("path".equals(format))
-      return new TextPart(uri.getPath());
+      return noSpaceText(uri.getPath());
     else if ("port".equals(format))
     {
       final int port = uri.getPort();
 
       if (port == -1)
       {
-        String undefined = getConfigValueString(messageContext, "undefined", parameters, map);
+        String undefined = getConfigValueString(messageContext, "uri-port-undef", parameters, map);
         if (undefined != null)
-          return new TextPart(undefined);
+          return noSpaceText(undefined);
       }
       else if (port >= 0)
       {
-        Message.WithSpaces msg = getMessage(messageContext, port, EnumSet.of(Type.NUMBER), parameters, map,
-            false);
+        Message.WithSpaces msg = getMessage(messageContext, port, EnumSet.of(NUMBER), parameters, map, false);
         if (msg != null)
           return new TextPart(msg.format(messageContext, parameters), msg.isSpaceBefore(), msg.isSpaceAfter());
       }
 
-      return port == -1 ? nullText() : new TextPart(Integer.toString(port));
+      return port == -1 ? nullText() : noSpaceText(Integer.toString(port));
     }
     else if ("query".equals(format))
-      return new TextPart(uri.getQuery());
+      return noSpaceText(uri.getQuery());
     else if ("scheme".equals(format))
     {
       final String scheme = uri.getScheme();
@@ -91,9 +91,9 @@ public final class URIFormatter extends AbstractParameterFormatter
           : new TextPart(scheme);
     }
     else if ("user-info".equals(format))
-      return new TextPart(uri.getUserInfo());
+      return noSpaceText(uri.getUserInfo());
 
-    return new TextPart(uri.toString());
+    return noSpaceText(uri.toString());
   }
 
 
