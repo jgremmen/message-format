@@ -45,6 +45,7 @@ public final class URLFormatter extends AbstractParameterFormatter
       return nullText();
 
     final URL url = (URL)value;
+    format = getConfigValueString(messageContext, "url", parameters, map);
 
     if ("authority".equals(format))
       return noSpaceText(url.getAuthority());
