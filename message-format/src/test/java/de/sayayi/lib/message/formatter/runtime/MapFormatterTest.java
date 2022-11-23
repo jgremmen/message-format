@@ -45,11 +45,12 @@ public class MapFormatterTest extends AbstractFormatterTest
   {
     GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new MapFormatter());
+    registry.addFormatter(new IterableFormatter());
 
     final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, UK);
 
     Message message = context.getMessageFactory()
-        .parse("%{map1} %{map2,map-sep:'   -> '} %{map3,map-sep:':  '}");
+        .parse("%{map1} %{map2,map-kv-sep:'   -> '} %{map3,map-kv-sep:':  '}");
 
     assertEquals("key=value",
         message.format(context, context.parameters().with("map1", singletonMap("key", "value"))));
@@ -67,6 +68,7 @@ public class MapFormatterTest extends AbstractFormatterTest
   {
     GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new MapFormatter());
+    registry.addFormatter(new IterableFormatter());
 
     final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, UK);
 

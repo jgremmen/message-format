@@ -27,15 +27,17 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Collections.singleton;
 import static java.util.ResourceBundle.getBundle;
+import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -56,47 +58,53 @@ public final class MapFormatter extends AbstractParameterFormatter implements Em
 
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
     final String separator = getSeparator(messageContext, parameters, data);
-    final StringBuilder s = new StringBuilder();
     final String nullKey =
         getConfigValueString(messageContext, "map-null-key", parameters, data, "(null)").trim();
     final String nullValue =
         getConfigValueString(messageContext, "map-null-value", parameters, data, "(null)").trim();
 
-    for(Entry<?,?> entry: map.entrySet())
-    {
-      if (s.length() > 0)
-        s.append(", ");
+    final List<String> list = map
+        .entrySet()
+        .stream()
+        .map(entry -> {
+          Object key = entry.getKey();
+          String keyString;
 
-      Object key = entry.getKey();
-      String keyString;
+          if (key == value)
+            keyString = bundle.getString("thisMap");
+          else if (key != null)
+          {
+            keyString = trimNotNull(messageContext.getFormatter(key.getClass())
+                .format(messageContext, key, null, parameters, null));
+          }
+          else
+            keyString = nullKey;
 
-      if (key == value)
-        keyString = bundle.getString("thisMap");
-      else if (key != null)
-        keyString = trimNotNull(messageContext.getFormatter(key.getClass()).format(messageContext, key, null, parameters, null));
-      else
-        keyString = nullKey;
+          Object val = entry.getValue();
+          String valueString;
 
-      Object val = entry.getValue();
-      String valueString;
+          if (val == value)
+            valueString = bundle.getString("thisMap");
+          else if (val != null)
+          {
+            valueString = trimNotNull(messageContext.getFormatter(val.getClass())
+                .format(messageContext, val, null, parameters, null));
+          }
+          else
+            valueString = nullValue;
 
-      if (val == value)
-        valueString = bundle.getString("thisMap");
-      else if (val != null)
-        valueString = trimNotNull(messageContext.getFormatter(val.getClass()).format(messageContext, val, null, parameters, null));
-      else
-        valueString = nullValue;
+          return (keyString + separator + valueString).trim();
+        })
+        .collect(toList());
 
-      s.append((keyString + separator + valueString).trim());
-    }
-
-    return noSpaceText(s.toString());
+    return messageContext.getFormatter(List.class)
+        .format(messageContext, list, null, parameters, data);
   }
 
 
   private String getSeparator(@NotNull MessageContext messageContext, Parameters parameters, DataMap data)
   {
-    String sep = getConfigValueString(messageContext, "map-sep", parameters, data, "=");
+    String sep = getConfigValueString(messageContext, "map-kv-sep", parameters, data, "=");
     if (sep.isEmpty())
       return sep;
 
