@@ -34,7 +34,7 @@ import static de.sayayi.lib.message.internal.SpacesUtil.trimSpaces;
 @Getter
 public final class TextPart implements Text
 {
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 800L;
 
   private final String text;
   private final boolean spaceBefore;

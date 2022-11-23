@@ -30,7 +30,7 @@ import static de.sayayi.lib.message.internal.SpacesUtil.trimSpaces;
  */
 public final class NoSpaceTextPart implements Text
 {
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 800L;
 
   @Getter private final @NotNull String text;
 

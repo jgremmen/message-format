@@ -44,7 +44,7 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.addSpaces;
 @EqualsAndHashCode(doNotUseGetters = true)
 public final class ParameterPart implements Parameter
 {
-  private static final long serialVersionUID = 500L;
+  private static final long serialVersionUID = 800L;
 
   private final @NotNull String parameter;
   private final String format;
