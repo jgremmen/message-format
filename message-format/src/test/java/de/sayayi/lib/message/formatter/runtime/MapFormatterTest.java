@@ -21,9 +21,11 @@ import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static java.util.Locale.UK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,21 +37,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MapFormatterTest extends AbstractFormatterTest
 {
   @Test
-  public void testFormattableTypes() {
+  void testFormattableTypes() {
     assertFormatterForType(new MapFormatter(), Map.class);
   }
 
 
   @Test
-  public void testSeparator()
+  void testSeparator()
   {
-    GenericFormatterService registry = new GenericFormatterService();
+    final GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new MapFormatter());
     registry.addFormatter(new IterableFormatter());
 
     final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, UK);
-
-    Message message = context.getMessageFactory()
+    final Message message = context.getMessageFactory()
         .parse("%{map1} %{map2,map-kv-sep:'   -> '} %{map3,map-kv-sep:':  '}");
 
     assertEquals("key=value",
@@ -64,15 +65,14 @@ public class MapFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testNullKeyValue()
+  void testNullKeyValue()
   {
-    GenericFormatterService registry = new GenericFormatterService();
+    final GenericFormatterService registry = new GenericFormatterService();
     registry.addFormatter(new MapFormatter());
     registry.addFormatter(new IterableFormatter());
 
     final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, UK);
-
-    Message message = context.getMessageFactory()
+    final Message message = context.getMessageFactory()
         .parse("%{map1} %{map2,map-null-key:'key',map-null-value:'value'}");
 
     assertEquals("(null)=(null)",
@@ -80,5 +80,41 @@ public class MapFormatterTest extends AbstractFormatterTest
 
     assertEquals("key=value",
         message.format(context, context.parameters().with("map2", singletonMap(null, null))));
+  }
+
+
+  @Test
+  void testEmpty()
+  {
+    final GenericFormatterService registry = new GenericFormatterService();
+    registry.addFormatter(new MapFormatter());
+    registry.addFormatter(new IterableFormatter());
+
+    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, UK);
+
+    assertEquals("", context.getMessageFactory().parse("%{map}")
+        .format(context, context.parameters().with("map", emptyMap())));
+  }
+
+
+  @Test
+  void testMultiEntry()
+  {
+    final GenericFormatterService registry = new GenericFormatterService();
+    registry.addFormatter(new MapFormatter());
+    registry.addFormatter(new IterableFormatter());
+    registry.addFormatter(new NumberFormatter());
+
+    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, UK);
+    final Message message = context.getMessageFactory()
+        .parse("%{map,map-kv-sep:' -> ',list-sep:', ',list-sep-last:' and ',number:'0000'}");
+
+    final Map<String,Integer> map = new LinkedHashMap<>();
+    map.put("map1", 1);
+    map.put("map2", -1234);
+    map.put("map3", 8);
+
+    assertEquals("map1 -> 0001, map2 -> -1234 and map3 -> 0008",
+        message.format(context, context.parameters().with("map", map)));
   }
 }

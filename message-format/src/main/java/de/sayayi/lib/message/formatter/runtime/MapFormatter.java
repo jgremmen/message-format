@@ -75,7 +75,7 @@ public final class MapFormatter extends AbstractParameterFormatter implements Em
           else if (key != null)
           {
             keyString = trimNotNull(messageContext.getFormatter(key.getClass())
-                .format(messageContext, key, null, parameters, null));
+                .format(messageContext, key, null, parameters, data));
           }
           else
             keyString = nullKey;
@@ -88,7 +88,7 @@ public final class MapFormatter extends AbstractParameterFormatter implements Em
           else if (val != null)
           {
             valueString = trimNotNull(messageContext.getFormatter(val.getClass())
-                .format(messageContext, val, null, parameters, null));
+                .format(messageContext, val, null, parameters, data));
           }
           else
             valueString = nullValue;
