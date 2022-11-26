@@ -108,23 +108,23 @@ public class GeoFormatterTest extends AbstractFormatterTest
     final GeoFormatter formatter = new GeoFormatter();
 
     // short-longitude
-    assertEquals(noSpaceText("4°48'E"), formatter.format(context, dms(4, 48), null,
+    assertEquals(noSpaceText("4\u00b048'E"), formatter.format(context, dms(4, 48), null,
         context.noParameters(),
         new DataMap(singletonMap(new MapKeyName("geo"), new MapValueString("short-longitude")))));
 
     // longitude
-    assertEquals(noSpaceText("19°0'0\"W"),
+    assertEquals(noSpaceText("19\u00b00'0\"W"),
         formatter.format(context, -dms(18, 59, 59, 501), null,
         context.noParameters(), new DataMap(singletonMap(new MapKeyName("geo"), new MapValueString("longitude")))));
 
     // medium-longitude
-    assertEquals(noSpaceText("18°59'59,9\"E"),
+    assertEquals(noSpaceText("18\u00b059'59,9\"E"),
         formatter.format(context, dms(18, 59, 59, 891), null,
             context.parameters().withLocale(GERMANY),
             new DataMap(singletonMap(new MapKeyName("geo"), new MapValueString("medium-longitude")))));
 
     // long-longitude
-    assertEquals(noSpaceText("18°59'59.891\"W"),
+    assertEquals(noSpaceText("18\u00b059'59.891\"W"),
         formatter.format(context, -dms(18, 59, 59, 891), null,
             context.parameters().withLocale(UK),
             new DataMap(singletonMap(new MapKeyName("geo"), new MapValueString("long-longitude")))));
@@ -142,17 +142,17 @@ public class GeoFormatterTest extends AbstractFormatterTest
         .with("lat", dms(51, 34, 9, 0))
         .with("lon", dms(4, 48));
 
-    assertEquals("coordinates 4°48'0\"E, 51°34'9\"N",
+    assertEquals("coordinates 4\u00b048'0\"E, 51\u00b034'9\"N",
         context.getMessageFactory()
             .parse("coordinates %{lon,geo,geo:'longitude'}, %{lat,geo,geo:'latitude'}")
             .format(context, parameters));
 
-    assertEquals("coordinates 4°48.0' E, 51°34'9.000\"N",
+    assertEquals("coordinates 4\u00b048.0' E, 51\u00b034'9.000\"N",
         context.getMessageFactory()
             .parse("coordinates %{lon,geo,geo:'dM LO'}, %{lat,geo,geo:'long-latitude'}")
             .format(context, parameters));
 
-    assertEquals("51°34'09\"N", context.getMessageFactory()
+    assertEquals("51\u00b034'09\"N", context.getMessageFactory()
         .parse("%{lat,geo,geo:'d0m0sLA'}")
         .format(context, parameters));
   }

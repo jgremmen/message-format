@@ -80,7 +80,7 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
     if (v < 0 && !fmt.hasLoLa() && (dms[0] > 0 || dms[1] > 0 || dms[2] > 0))
       s.append('-');
 
-    s.append((int)dms[0]).append('°');
+    s.append((int)dms[0]).append('\u00b0');
     if (fmt.separatorAfterDegree)
       s.append(' ');
 
