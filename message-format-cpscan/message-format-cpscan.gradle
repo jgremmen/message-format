@@ -23,8 +23,7 @@ description = 'Message Format Library (classpath scanner)'
 
 
 def asmVersion = "9.4"
-def classgraphVersion = "4.8.149"
-def springContextVersion = "5.3.23"
+def springContextVersion = "5.3.24"
 
 
 dependencies {
@@ -32,9 +31,6 @@ dependencies {
 
   // ASM
   implementation "org.ow2.asm:asm:${asmVersion}", optional
-
-  // Classgraph
-  implementation "io.github.classgraph:classgraph:${classgraphVersion}", optional
 
   // Spring context
   implementation "org.springframework:spring-context:${springContextVersion}", optional
