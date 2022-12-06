@@ -51,12 +51,12 @@ public class BoolFormatterTest extends AbstractFormatterTest
         "de-DE");
     final Parameters parameters = context.noParameters();
 
-    assertEquals(noSpaceText("wahr"), formatter.format(context, Boolean.TRUE, null, parameters, null));
-    assertEquals(noSpaceText("falsch"), formatter.format(context, 0.0d, null, parameters, null));
-    assertEquals(noSpaceText("wahr"), formatter.format(context, -0.0001f, null, parameters, null));
-    assertEquals(noSpaceText("falsch"), formatter.format(context, "FALSE", null, parameters, null));
-    assertEquals(noSpaceText("wahr"), formatter.format(context, "TrUe", null, parameters, null));
-    assertEquals(noSpaceText("wahr"), formatter.format(context, -4, null, parameters, null));
+    assertEquals(noSpaceText("wahr"), formatter.format(context, Boolean.TRUE, parameters, null));
+    assertEquals(noSpaceText("falsch"), formatter.format(context, 0.0d, parameters, null));
+    assertEquals(noSpaceText("wahr"), formatter.format(context, -0.0001f, parameters, null));
+    assertEquals(noSpaceText("falsch"), formatter.format(context, "FALSE", parameters, null));
+    assertEquals(noSpaceText("wahr"), formatter.format(context, "TrUe", parameters, null));
+    assertEquals(noSpaceText("wahr"), formatter.format(context, -4, parameters, null));
   }
 
 

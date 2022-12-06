@@ -47,10 +47,10 @@ class AtomicBooleanFormatterTest extends AbstractFormatterTest
         NO_CACHE_INSTANCE, "de-DE");
     final MessageContext.Parameters parameters = context.noParameters();
 
-    assertEquals(nullText(), formatter.format(context, null, null, parameters, null));
+    assertEquals(nullText(), formatter.format(context, null, parameters, null));
     assertEquals(noSpaceText("wahr"),
-        formatter.format(context, new AtomicBoolean(true), null, parameters, null));
+        formatter.format(context, new AtomicBoolean(true), parameters, null));
     assertEquals(noSpaceText("falsch"),
-        formatter.format(context, new AtomicBoolean(false), null, parameters, null));
+        formatter.format(context, new AtomicBoolean(false), parameters, null));
   }
 }

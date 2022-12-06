@@ -53,7 +53,7 @@ public final class CutOffFormatter extends AbstractParameterFormatter implements
 
     val text = messageContext
         .getFormatter(value.getClass())
-        .format(messageContext, value, null, parameters, map);
+        .format(messageContext, value, parameters, map);
 
     var s = text.getText();
     if (s == null)

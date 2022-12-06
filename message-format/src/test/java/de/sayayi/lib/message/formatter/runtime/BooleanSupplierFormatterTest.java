@@ -48,10 +48,10 @@ class BooleanSupplierFormatterTest extends AbstractFormatterTest
         NO_CACHE_INSTANCE, Locale.ROOT);
     final MessageContext.Parameters parameters = context.noParameters();
 
-    assertEquals(nullText(), formatter.format(context, null, null, parameters, null));
+    assertEquals(nullText(), formatter.format(context, null, parameters, null));
     assertEquals(noSpaceText("true"),
-        formatter.format(context, (BooleanSupplier)() -> true, null, parameters, null));
+        formatter.format(context, (BooleanSupplier)() -> true, parameters, null));
     assertEquals(noSpaceText("false"),
-        formatter.format(context, (BooleanSupplier)() -> false, null, parameters, null));
+        formatter.format(context, (BooleanSupplier)() -> false, parameters, null));
   }
 }

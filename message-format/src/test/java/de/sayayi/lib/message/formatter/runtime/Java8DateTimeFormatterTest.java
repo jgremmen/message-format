@@ -64,22 +64,22 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
     final LocalDate date = LocalDate.of(1972, 8, 17);
 
     assertEquals(noSpaceText("17.08.72"),
-        formatter.format(context, date, null, noParameters,
+        formatter.format(context, date, noParameters,
             new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("short")))));
     assertEquals(noSpaceText("17.08.1972"),
-        formatter.format(context, date, null, noParameters,
+        formatter.format(context, date, noParameters,
             new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("medium")))));
     assertEquals(noSpaceText("17. August 1972"),
-        formatter.format(context, date, null, noParameters,
+        formatter.format(context, date, noParameters,
             new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("long")))));
     assertEquals(noSpaceText("Donnerstag, 17. August 1972"),
-        formatter.format(context, date, null, noParameters,
+        formatter.format(context, date, noParameters,
             new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("full")))));
     assertEquals(noSpaceText("17.08.1972"),
-        formatter.format(context, date, null, noParameters,
+        formatter.format(context, date, noParameters,
             new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("date")))));
 
-    assertEquals(emptyText(), formatter.format(context, date, null, noParameters,
+    assertEquals(emptyText(), formatter.format(context, date, noParameters,
         new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("time")))));
   }
 
@@ -93,18 +93,18 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
     final Parameters noParameters = context.noParameters();
     final LocalTime time = LocalTime.of(16, 34, 11, 672000000);
 
-    assertEquals(new TextPart("16:34"), formatter.format(context, time, null, noParameters,
+    assertEquals(new TextPart("16:34"), formatter.format(context, time, noParameters,
         new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("short")))));
-    assertEquals(new TextPart("16:34:11"), formatter.format(context, time, null, noParameters,
+    assertEquals(new TextPart("16:34:11"), formatter.format(context, time, noParameters,
         new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("medium")))));
-    assertEquals(new TextPart("16:34:11"), formatter.format(context, time, null, noParameters,
+    assertEquals(new TextPart("16:34:11"), formatter.format(context, time, noParameters,
         new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("long")))));
-    assertEquals(new TextPart("16:34 Uhr"), formatter.format(context, time, null, noParameters,
+    assertEquals(new TextPart("16:34 Uhr"), formatter.format(context, time, noParameters,
         new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("full")))));
-    assertEquals(new TextPart("16:34:11"), formatter.format(context, time, null, noParameters,
+    assertEquals(new TextPart("16:34:11"), formatter.format(context, time, noParameters,
         new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("time")))));
 
-    assertEquals(Text.EMPTY, formatter.format(context, time, null, noParameters,
+    assertEquals(Text.EMPTY, formatter.format(context, time, noParameters,
         new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("date")))));
   }
 
@@ -119,23 +119,23 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
     final LocalDateTime datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
 
     assertEquals(new TextPart("17/08/72 02:40"),
-        formatter.format(context, datetime, null, noParameters,
+        formatter.format(context, datetime, noParameters,
             new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("short")))));
     assertEquals(new TextPart("17-Aug-1972 02:40:23"),
-        formatter.format(context, datetime, null, noParameters,
+        formatter.format(context, datetime, noParameters,
             new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("medium")))));
     assertEquals(new TextPart("17 August 1972 02:40:23 CET"),
-        formatter.format(context, datetime, null, noParameters,
+        formatter.format(context, datetime, noParameters,
             new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("long")))));
     assertEquals(new TextPart("Thursday, 17 August 1972 02:40:23 o'clock CET"),
-        formatter.format(context, datetime, null, noParameters,
+        formatter.format(context, datetime, noParameters,
             new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("full")))));
 
     assertEquals(new TextPart("17-Aug-1972"),
-        formatter.format(context, datetime, null, noParameters,
+        formatter.format(context, datetime, noParameters,
             new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("date")))));
     assertEquals(new TextPart("02:40:23"),
-        formatter.format(context, datetime, null, noParameters,
+        formatter.format(context, datetime, noParameters,
             new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("time")))));
   }
 
@@ -150,13 +150,13 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
     final LocalDateTime datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
 
     assertEquals(new TextPart("17 août"),
-        formatter.format(context, datetime, null, noParameters,
+        formatter.format(context, datetime, noParameters,
             new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("dd MMMM")))));
     assertEquals(new TextPart("jeu. jeudi"),
-        formatter.format(context, datetime, null, noParameters,
+        formatter.format(context, datetime, noParameters,
             new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("EEE EEEE")))));
     assertEquals(new TextPart("02:40:23,833"),
-        formatter.format(context, datetime, null, noParameters,
+        formatter.format(context, datetime, noParameters,
             new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("HH:mm:ss,SSS")))));
   }
 

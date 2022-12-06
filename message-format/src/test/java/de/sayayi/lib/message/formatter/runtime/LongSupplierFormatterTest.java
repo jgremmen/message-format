@@ -50,14 +50,14 @@ class LongSupplierFormatterTest extends AbstractFormatterTest
         NO_CACHE_INSTANCE, Locale.ROOT);
     final MessageContext.Parameters parameters = context.noParameters();
 
-    assertEquals(nullText(), formatter.format(context, null, null, parameters, null));
+    assertEquals(nullText(), formatter.format(context, null, parameters, null));
     assertEquals(noSpaceText("0"),
-        formatter.format(context, (LongSupplier)() -> 0, null, parameters, null));
+        formatter.format(context, (LongSupplier)() -> 0, parameters, null));
     assertEquals(noSpaceText(Long.toString(MAX_VALUE)),
-        formatter.format(context, (LongSupplier)() -> MAX_VALUE, null, parameters, null));
+        formatter.format(context, (LongSupplier)() -> MAX_VALUE, parameters, null));
     assertEquals(noSpaceText(Long.toString(MIN_VALUE)),
-        formatter.format(context, (LongSupplier)() -> MIN_VALUE, null, parameters, null));
+        formatter.format(context, (LongSupplier)() -> MIN_VALUE, parameters, null));
     assertEquals(noSpaceText("123456789"),
-        formatter.format(context, (LongSupplier)() -> 123456789L, null, parameters, null));
+        formatter.format(context, (LongSupplier)() -> 123456789L, parameters, null));
   }
 }

@@ -55,18 +55,18 @@ public class BitsFormatterTest
         new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
     final Parameters parameters = context.noParameters();
 
-    assertEquals(noSpaceText("11111111"), formatter.format(context, (byte)0xff, null, parameters, null));
-    assertEquals(noSpaceText("00000000"), formatter.format(context, (byte)0, null, parameters, null));
-    assertEquals(noSpaceText("10101010"), formatter.format(context, (byte)0xaa, null, parameters, null));
-    assertEquals(noSpaceText("01010101"), formatter.format(context, (byte)0x55, null, parameters, null));
-    assertEquals(noSpaceText("10101"), formatter.format(context, (byte)0x15, null, parameters,
+    assertEquals(noSpaceText("11111111"), formatter.format(context, (byte)0xff, parameters, null));
+    assertEquals(noSpaceText("00000000"), formatter.format(context, (byte)0, parameters, null));
+    assertEquals(noSpaceText("10101010"), formatter.format(context, (byte)0xaa, parameters, null));
+    assertEquals(noSpaceText("01010101"), formatter.format(context, (byte)0x55, parameters, null));
+    assertEquals(noSpaceText("10101"), formatter.format(context, (byte)0x15, parameters,
         new DataMap(singletonMap(new MapKeyName("length"), new MapValueString("auto")))));
-    assertEquals(noSpaceText("0"), formatter.format(context, (byte)0, null, parameters,
+    assertEquals(noSpaceText("0"), formatter.format(context, (byte)0, parameters,
         new DataMap(singletonMap(new MapKeyName("length"), new MapValueString("auto")))));
-    assertEquals(noSpaceText("101"), formatter.format(context, (byte)0x15, null, parameters,
+    assertEquals(noSpaceText("101"), formatter.format(context, (byte)0x15, parameters,
         new DataMap(singletonMap(new MapKeyName("length"), new MapValueNumber(3)))));
-    assertEquals(nullText(), formatter.format(context, null, null, parameters, null));
-    assertEquals(nullText(), formatter.format(context, "hello", null, parameters, null));
+    assertEquals(nullText(), formatter.format(context, null, parameters, null));
+    assertEquals(nullText(), formatter.format(context, "hello", parameters, null));
   }
 
 
@@ -79,18 +79,18 @@ public class BitsFormatterTest
     final Parameters parameters = context.noParameters();
 
     assertEquals(noSpaceText("1111111111111111"),
-        formatter.format(context, (short)0xffff, null, parameters, null));
+        formatter.format(context, (short)0xffff, parameters, null));
     assertEquals(noSpaceText("0000000000000000"),
-        formatter.format(context, (short)0, null, parameters, null));
+        formatter.format(context, (short)0, parameters, null));
     assertEquals(noSpaceText("1010101010101010"),
-        formatter.format(context, (short)0xaaaa, null, parameters, null));
+        formatter.format(context, (short)0xaaaa, parameters, null));
     assertEquals(noSpaceText("0101010101010101"),
-        formatter.format(context, (short)0x5555, null, parameters, null));
-    assertEquals(noSpaceText("101010101"), formatter.format(context, (short)0x155, null, parameters,
+        formatter.format(context, (short)0x5555, parameters, null));
+    assertEquals(noSpaceText("101010101"), formatter.format(context, (short)0x155, parameters,
         new DataMap(singletonMap(new MapKeyName("length"), new MapValueString("auto")))));
-    assertEquals(noSpaceText("0"), formatter.format(context, (short)0, null, parameters,
+    assertEquals(noSpaceText("0"), formatter.format(context, (short)0, parameters,
         new DataMap(singletonMap(new MapKeyName("length"), new MapValueString("auto")))));
-    assertEquals(noSpaceText("010110"), formatter.format(context, (byte)0x456, null, parameters,
+    assertEquals(noSpaceText("010110"), formatter.format(context, (byte)0x456, parameters,
         new DataMap(singletonMap(new MapKeyName("length"), new MapValueNumber(6)))));
   }
 }

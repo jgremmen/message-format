@@ -46,12 +46,33 @@ public interface ParameterFormatter
    * Formats the parameter value to a string representation.
    *
    * @param messageContext  message context providing formatting information, never {@code null}
-   * @param value       parameter value (can be {@code null})
-   * @param format      formatter name used by the parameter or {@code null}. Eg.: {@code %{val,myformat}}
-   * @param parameters  parameter values available for formatting the current message. Additionally, this instance
-   *                    provides access to the formatting registry as well as to the locale. This parameter is never
-   *                    {@code null}
-   * @param map         data map provided by the parameter definition or {@code null}
+   * @param value           parameter value (can be {@code null})
+   * @param parameters      parameter values available for formatting the current message. Additionally,
+   *                        this instance provides access to the formatting registry as well as to the locale.
+   *                        This parameter is never {@code null}
+   * @param map             data map provided by the parameter definition or {@code null}
+   *
+   * @return  formatted parameter value, never {@code null}
+   *
+   * @since 0.8.0
+   */
+  @Contract(pure = true)
+  default @NotNull Text format(@NotNull MessageContext messageContext, Object value,
+                               @NotNull Parameters parameters, DataMap map) {
+    return format(messageContext, value, null, parameters, map);
+  }
+
+
+  /**
+   * Formats the parameter value to a string representation.
+   *
+   * @param messageContext  message context providing formatting information, never {@code null}
+   * @param value           parameter value (can be {@code null})
+   * @param format          formatter name used by the parameter or {@code null}. Eg.: {@code %{val,myformat}}
+   * @param parameters      parameter values available for formatting the current message. Additionally,
+   *                        this instance provides access to the formatting registry as well as to the locale.
+   *                        This parameter is never {@code null}
+   * @param map             data map provided by the parameter definition or {@code null}
    *
    * @return  formatted parameter value, never {@code null}
    */
@@ -65,8 +86,8 @@ public interface ParameterFormatter
    *   Returns a set of java types which are supported by this formatter.
    * </p>
    * <p>
-   *   On registration {@link FormatterService.WithRegistry#addFormatter(ParameterFormatter)} existing types which are
-   *   also supported by this formatter will be overridden.
+   *   On registration {@link FormatterService.WithRegistry#addFormatter(ParameterFormatter)} existing types
+   *   which are also supported by this formatter will be overridden.
    * </p>
    *
    * @return  a set with supported java types for this formatter, not {@code null}
@@ -86,7 +107,8 @@ public interface ParameterFormatter
     /**
      * Check whether the given {@code value} is empty as defined by this formatter.
      *
-     * @param compareType  comparison type (either {@link CompareType#EQ} or {@link CompareType#NE}), never {@code null}
+     * @param compareType  comparison type (either {@link CompareType#EQ} or {@link CompareType#NE}),
+     *                     never {@code null}
      * @param value        object to check for emptyness, never {@code null}
      *
      * @return  {@link MatchResult#TYPELESS_EXACT}, {@link MatchResult#TYPELESS_LENIENT} or {@code null}

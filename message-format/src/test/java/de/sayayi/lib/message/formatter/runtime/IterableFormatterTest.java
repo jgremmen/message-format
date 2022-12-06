@@ -52,7 +52,7 @@ public class IterableFormatterTest extends AbstractFormatterTest
     final Parameters noParameters = context.noParameters();
 
     assertEquals(noSpaceText("Test, true, -6"), registry.getFormatter(null, List.class)
-        .format(context, Arrays.asList("Test", true, null, -6), null , noParameters, null));
+        .format(context, Arrays.asList("Test", true, null, -6), noParameters, null));
   }
 
 

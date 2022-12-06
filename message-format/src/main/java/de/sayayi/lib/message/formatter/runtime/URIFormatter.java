@@ -52,7 +52,7 @@ public final class URIFormatter extends AbstractParameterFormatter
     format = getConfigValueString(messageContext, "uri", parameters, map);
 
     if ("authority".equals(format))
-      return messageContext.getFormatter(String.class).format(messageContext, uri.getAuthority(), null, parameters, map);
+      return messageContext.getFormatter(String.class).format(messageContext, uri.getAuthority(), parameters, map);
     else if ("fragment".equals(format))
       return noSpaceText(uri.getFragment());
     else if ("host".equals(format))

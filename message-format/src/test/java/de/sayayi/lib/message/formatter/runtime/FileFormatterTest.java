@@ -50,17 +50,17 @@ public class FileFormatterTest
     final File f = new File("/path1/path2/filename.ext");
 
     assertEquals(nullText(),
-        formatter.format(context, null, null, parameters, null));
+        formatter.format(context, null, parameters, null));
     assertEquals(noSpaceText("/path1/path2/filename.ext"),
-        formatter.format(context, f, null, parameters, null));
+        formatter.format(context, f, parameters, null));
     assertEquals(noSpaceText("filename.ext"),
-        formatter.format(context, f, null, parameters,
+        formatter.format(context, f, parameters,
             new DataMap(singletonMap(new MapKeyName("file"), new MapValueString("name")))));
     assertEquals(noSpaceText("/path1/path2"),
-        formatter.format(context, f, null, parameters,
+        formatter.format(context, f, parameters,
             new DataMap(singletonMap(new MapKeyName("file"), new MapValueString("parent")))));
     assertEquals(noSpaceText("ext"),
-        formatter.format(context, f, null, parameters,
+        formatter.format(context, f, parameters,
             new DataMap(singletonMap(new MapKeyName("file"), new MapValueString("extension")))));
   }
 

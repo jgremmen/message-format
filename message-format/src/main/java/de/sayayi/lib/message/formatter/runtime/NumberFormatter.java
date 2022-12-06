@@ -87,7 +87,7 @@ public final class NumberFormatter extends AbstractParameterFormatter
     if (!types.contains(Boolean.class) && !types.contains(boolean.class))
       formatter = BOOL_FORMATTER;
 
-    return formatter.format(messageContext, value, null, parameters, map);
+    return formatter.format(messageContext, value, parameters, map);
   }
 
 

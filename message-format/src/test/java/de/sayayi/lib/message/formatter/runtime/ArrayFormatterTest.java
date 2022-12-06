@@ -94,10 +94,10 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     });
 
     assertEquals(new TextPart("NO, YES"), registry.getFormatter(null, boolean[].class)
-        .format(context, new boolean[] { false, true }, null, noParameters, booleanMap));
+        .format(context, new boolean[] { false, true }, noParameters, booleanMap));
 
     assertEquals(TextPart.EMPTY, registry.getFormatter(null, boolean[].class)
-        .format(context, new boolean[0], null, noParameters, null));
+        .format(context, new boolean[0], noParameters, null));
 
     registry.addFormatter(new NamedParameterFormatter() {
       @Override
@@ -137,16 +137,16 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     Parameters noParameters = context.noParameters();
 
     assertEquals(new TextPart("12, -7, 99"), registry.getFormatter(null, int[].class)
-        .format(context, new int[] { 12, -7, 99 }, null , noParameters, null));
+        .format(context, new int[] { 12, -7, 99 }, noParameters, null));
 
     assertEquals(new TextPart("1, -7, 248"), registry.getFormatter(null, int[].class)
-        .format(context, new int[] { 1, -7, 248 }, null , noParameters,
+        .format(context, new int[] { 1, -7, 248 }, noParameters,
             new DataMap(singletonMap(new MapKeyName("number"), new MapValueString("##00")))));
 
     registry.addFormatter(new NumberFormatter());
 
     assertEquals(new TextPart("01, -07, 248"), registry.getFormatter(null, int[].class)
-        .format(context, new int[] { 1, -7, 248 }, null , noParameters,
+        .format(context, new int[] { 1, -7, 248 }, noParameters,
             new DataMap(singletonMap(new MapKeyName("number"), new MapValueString("##00")))));
 
     registry.addFormatter(new NamedParameterFormatter() {
@@ -189,11 +189,11 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     Parameters noParameters = context.noParameters();
 
     assertEquals(new TextPart("Test, wahr, -0006"), registry.getFormatter(null, int[].class)
-        .format(context, new Object[] { "Test", true, null, -6 }, null , noParameters,
+        .format(context, new Object[] { "Test", true, null, -6 }, noParameters,
             new DataMap(singletonMap(new MapKeyName("number"), new MapValueString("0000")))));
 
     assertEquals(new TextPart("this, is, a, test"), registry.getFormatter(null, int[].class)
-        .format(context, new Object[] { null, "this", null, "is", null, "a", null, "test" }, null ,
+        .format(context, new Object[] { null, "this", null, "is", null, "a", null, "test" },
             noParameters, null));
   }
 

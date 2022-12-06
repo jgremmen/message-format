@@ -50,7 +50,7 @@ public class SupplierFormatterTest
     Object value = (BooleanSupplier) () -> true;
 
     assertEquals(noSpaceText("wahr"), registry.getFormatter(null, value.getClass())
-        .format(context, value, null, noParameters, null));
+        .format(context, value, noParameters, null));
   }
 
 
@@ -67,7 +67,7 @@ public class SupplierFormatterTest
     Object value = (LongSupplier) () -> 1234567890L;
 
     assertEquals(noSpaceText("1,234,567,890"), registry.getFormatter(null, value.getClass())
-        .format(context, value, null, noParameters,
+        .format(context, value, noParameters,
             new DataMap(singletonMap(new MapKeyName("number"), new MapValueString("###,###,###,###")))));
   }
 }

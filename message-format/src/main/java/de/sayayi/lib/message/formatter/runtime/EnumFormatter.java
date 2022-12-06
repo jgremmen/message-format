@@ -45,7 +45,7 @@ public final class EnumFormatter extends AbstractParameterFormatter
     final Enum<?> enm = (Enum<?>)value;
 
     return "ordinal".equals(getConfigValueString(messageContext, "enum", parameters, map))
-        ? messageContext.getFormatter(int.class).format(messageContext, enm.ordinal(), null, parameters, map)
+        ? messageContext.getFormatter(int.class).format(messageContext, enm.ordinal(), parameters, map)
         : noSpaceText(enm.name());
   }
 

@@ -108,24 +108,24 @@ public class GeoFormatterTest extends AbstractFormatterTest
     final GeoFormatter formatter = new GeoFormatter();
 
     // short-longitude
-    assertEquals(noSpaceText("4\u00b048'E"), formatter.format(context, dms(4, 48), null,
+    assertEquals(noSpaceText("4\u00b048'E"), formatter.format(context, dms(4, 48),
         context.noParameters(),
         new DataMap(singletonMap(new MapKeyName("geo"), new MapValueString("short-longitude")))));
 
     // longitude
     assertEquals(noSpaceText("19\u00b00'0\"W"),
-        formatter.format(context, -dms(18, 59, 59, 501), null,
+        formatter.format(context, -dms(18, 59, 59, 501),
         context.noParameters(), new DataMap(singletonMap(new MapKeyName("geo"), new MapValueString("longitude")))));
 
     // medium-longitude
     assertEquals(noSpaceText("18\u00b059'59,9\"E"),
-        formatter.format(context, dms(18, 59, 59, 891), null,
+        formatter.format(context, dms(18, 59, 59, 891),
             context.parameters().withLocale(GERMANY),
             new DataMap(singletonMap(new MapKeyName("geo"), new MapValueString("medium-longitude")))));
 
     // long-longitude
     assertEquals(noSpaceText("18\u00b059'59.891\"W"),
-        formatter.format(context, -dms(18, 59, 59, 891), null,
+        formatter.format(context, -dms(18, 59, 59, 891),
             context.parameters().withLocale(UK),
             new DataMap(singletonMap(new MapKeyName("geo"), new MapValueString("long-longitude")))));
   }

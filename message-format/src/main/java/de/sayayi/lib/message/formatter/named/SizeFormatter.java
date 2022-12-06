@@ -60,7 +60,7 @@ public final class SizeFormatter extends AbstractParameterFormatter implements N
     }
 
     if (map == null || map.isEmpty())
-      return messageContext.getFormatter(long.class).format(messageContext, size, null, parameters, null);
+      return messageContext.getFormatter(long.class).format(messageContext, size, parameters, null);
 
     return messageToText(messageContext,
         map.getMessage(messageContext, size, parameters, EnumSet.of(NUMBER), true), parameters);

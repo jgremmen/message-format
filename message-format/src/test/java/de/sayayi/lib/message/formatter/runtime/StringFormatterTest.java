@@ -51,14 +51,14 @@ public class StringFormatterTest extends AbstractFormatterTest
     final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
     final Parameters noParameters = context.noParameters();
 
-    assertEquals(noSpaceText("text"), formatter.format(context, " text ", null, noParameters, null));
-    assertEquals(noSpaceText("RUNTIME"), formatter.format(context, RetentionPolicy.RUNTIME, null, noParameters, null));
+    assertEquals(noSpaceText("text"), formatter.format(context, " text ", noParameters, null));
+    assertEquals(noSpaceText("RUNTIME"), formatter.format(context, RetentionPolicy.RUNTIME, noParameters, null));
     assertEquals(noSpaceText("hello"), formatter.format(context, new Object() {
       @Override
       public String toString() {
         return " hello";
       }
-    }, null, noParameters, null));
+    }, noParameters, null));
   }
 
 

@@ -53,11 +53,11 @@ class EnumFormatterTest extends AbstractFormatterTest
 
     //assertEquals(nullText(), formatter.format(context, null, null, parameters, null));
     //assertEquals(noSpaceText("CC"), formatter.format(context, MyEnum.CC, null, parameters, null));
-    assertEquals(noSpaceText("3"), formatter.format(context, MyEnum.DD, null, parameters,
+    assertEquals(noSpaceText("3"), formatter.format(context, MyEnum.DD, parameters,
         new DataMap(Collections.singletonMap(new MapKeyName("enum"), new MapValueString("ordinal")))));
 
     context.setDefaultData("enum", "ordinal");
-    assertEquals(noSpaceText("0"), formatter.format(context, MyEnum.AA, null, parameters, null));
+    assertEquals(noSpaceText("0"), formatter.format(context, MyEnum.AA, parameters, null));
   }
 
 
