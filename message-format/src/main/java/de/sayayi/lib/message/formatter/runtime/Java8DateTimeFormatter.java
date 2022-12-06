@@ -49,6 +49,7 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
 
   static
   {
+    STYLE.put(null, "MM");
     STYLE.put("short", "SS");
     STYLE.put("medium", "MM");
     STYLE.put("long", "LL");
@@ -85,16 +86,15 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
     if (value == null)
       return nullText();
 
-    if (!STYLE.containsKey(format))
-      format = getConfigValueString(messageContext, "date", parameters, map);
+    format = getConfigValueString(messageContext, "date", parameters, map);
 
     final DateTimeFormatter formatter;
 
-    if (format != null && !STYLE.containsKey(format))
-      formatter = DateTimeFormatter.ofPattern(format);
+    if (!STYLE.containsKey(format))
+      formatter = ofPattern(format);
     else
     {
-      final char[] style = (format == null ? "MM" : STYLE.get(format)).toCharArray();
+      final char[] style = STYLE.get(format).toCharArray();
 
       if (value instanceof LocalDate)
         style[1] = '-';

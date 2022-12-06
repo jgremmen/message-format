@@ -49,7 +49,8 @@ public final class DateFormatter extends AbstractParameterFormatter
       return nullText();
 
     return noSpaceText(getFormatter(
-        getConfigValueString(messageContext, "date", parameters, map), parameters.getLocale()).format(value));
+        getConfigValueString(messageContext, "date", parameters, map),
+        parameters.getLocale()).format(value));
   }
 
 

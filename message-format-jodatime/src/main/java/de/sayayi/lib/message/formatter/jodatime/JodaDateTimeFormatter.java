@@ -42,6 +42,7 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
 
   static
   {
+    STYLE.put(null, "MM");
     STYLE.put("short", "SS");
     STYLE.put("medium", "MM");
     STYLE.put("long", "LL");
@@ -59,17 +60,16 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
     if (value == null)
       return nullText();
 
-    if (!STYLE.containsKey(format))
-      format = getConfigValueString(messageContext, "date", parameters, map, null);
+    format = getConfigValueString(messageContext, "date", parameters, map, null);
 
     final Locale locale = parameters.getLocale();
     final DateTimeFormatter formatter;
 
-    if (format != null && !STYLE.containsKey(format))
+    if (!STYLE.containsKey(format))
       formatter = DateTimeFormat.forPattern(format).withLocale(locale);
     else
     {
-      final char[] style = (format == null ? "MM" : STYLE.get(format)).toCharArray();
+      final char[] style = STYLE.get(format).toCharArray();
 
       if (value instanceof LocalDate)
         style[1] = '-';

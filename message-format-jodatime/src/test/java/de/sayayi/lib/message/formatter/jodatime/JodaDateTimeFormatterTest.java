@@ -51,17 +51,23 @@ public class JodaDateTimeFormatterTest
     final LocalDate date = new LocalDate(1972, 8, 17);
 
     assertEquals(new TextPart("17.08.72"),
-        formatter.format(messageContext, date, "short", context, null));
+        formatter.format(messageContext, date, null, context,
+            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("short")))));
     assertEquals(new TextPart("17.08.1972"),
-        formatter.format(messageContext, date, "medium", context, null));
+        formatter.format(messageContext, date, null, context,
+            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("medium")))));
     assertEquals(new TextPart("17. August 1972"),
-        formatter.format(messageContext, date, "long", context, null));
+        formatter.format(messageContext, date, null, context,
+            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("long")))));
     assertEquals(new TextPart("Donnerstag, 17. August 1972"),
-        formatter.format(messageContext, date, "full", context, null));
+        formatter.format(messageContext, date, null, context,
+            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("full")))));
     assertEquals(new TextPart("17.08.1972"),
-        formatter.format(messageContext, date, "date", context, null));
+        formatter.format(messageContext, date, null, context,
+            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("date")))));
 
-    assertEquals(EMPTY, formatter.format(messageContext, date, "time", context, null));
+    assertEquals(EMPTY, formatter.format(messageContext, date, null, context,
+        new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("time")))));
   }
 
 
@@ -75,17 +81,23 @@ public class JodaDateTimeFormatterTest
     final LocalTime time = new LocalTime(16, 34, 11, 672);
 
     assertEquals(new TextPart("16:34"),
-        formatter.format(context, time, "short", noParameters, null));
+        formatter.format(context, time, null, noParameters,
+            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("short")))));
     assertEquals(new TextPart("16:34:11"),
-        formatter.format(context, time, "medium", noParameters, null));
+        formatter.format(context, time, null, noParameters,
+            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("medium")))));
     assertEquals(new TextPart("16:34:11"),
-        formatter.format(context, time, "long", noParameters, null));
+        formatter.format(context, time, null, noParameters,
+            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("long")))));
     assertEquals(new TextPart("16:34 Uhr"),
-        formatter.format(context, time, "full", noParameters, null));
+        formatter.format(context, time, null, noParameters,
+            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("full")))));
     assertEquals(new TextPart("16:34:11"),
-        formatter.format(context, time, "time", noParameters, null));
+        formatter.format(context, time, "time", noParameters,
+            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("time")))));
 
-    assertEquals(EMPTY, formatter.format(context, time, "date", noParameters, null));
+    assertEquals(EMPTY, formatter.format(context, time, "date", noParameters,
+        new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("date")))));
   }
 
 
@@ -100,18 +112,24 @@ public class JodaDateTimeFormatterTest
         new DateTime(1972, 8, 17, 2, 40, 23, 833);
 
     assertEquals(new TextPart("17/08/72 02:40"),
-        formatter.format(context, datetime, "short", noParameters, null));
+        formatter.format(context, datetime, null, noParameters,
+            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("short")))));
     assertEquals(new TextPart("17-Aug-1972 02:40:23"),
-        formatter.format(context, datetime, "medium", noParameters, null));
+        formatter.format(context, datetime, null, noParameters,
+            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("medium")))));
     assertEquals(new TextPart("17 August 1972 02:40:23 CET"),
-        formatter.format(context, datetime, "long", noParameters, null));
+        formatter.format(context, datetime, null, noParameters,
+            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("long")))));
     assertEquals(new TextPart("Thursday, 17 August 1972 02:40:23 o'clock CET"),
-        formatter.format(context, datetime, "full", noParameters, null));
+        formatter.format(context, datetime, null, noParameters,
+            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("full")))));
 
     assertEquals(new TextPart("17-Aug-1972"),
-        formatter.format(context, datetime, "date", noParameters, null));
+        formatter.format(context, datetime, null, noParameters,
+            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("date")))));
     assertEquals(new TextPart("02:40:23"),
-        formatter.format(context, datetime, "time", noParameters, null));
+        formatter.format(context, datetime, "time", noParameters,
+            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("time")))));
   }
 
 
