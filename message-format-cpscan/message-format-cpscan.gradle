@@ -15,7 +15,7 @@
  */
 
 plugins {
-  id 'nebula.optional-base' version '5.0.3'
+  id 'nebula.optional-base' version '7.0.0'
 }
 
 
@@ -23,7 +23,7 @@ description = 'Message Format Library (classpath scanner)'
 
 
 def asmVersion = "9.4"
-def springContextVersion = "5.3.24"
+def springContextVersion = "5.3.25"
 
 
 dependencies {
