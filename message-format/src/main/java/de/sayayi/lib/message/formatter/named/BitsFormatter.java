@@ -22,6 +22,7 @@ import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.DataNumber;
 import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
@@ -150,7 +151,7 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
 
 
   @Override
-  public @NotNull Set<Class<?>> getFormattableTypes() {
+  public @NotNull Set<FormattableType> getFormattableTypes() {
     return emptySet();
   }
 }

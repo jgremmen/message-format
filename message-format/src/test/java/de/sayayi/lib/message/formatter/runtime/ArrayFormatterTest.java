@@ -21,6 +21,7 @@ import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.*;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
+import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
@@ -112,8 +113,11 @@ public class ArrayFormatterTest extends AbstractFormatterTest
       }
 
       @Override
-      public @NotNull Set<Class<?>> getFormattableTypes() {
-        return new HashSet<>(Arrays.asList(Boolean.class, boolean.class));
+      public @NotNull Set<FormattableType> getFormattableTypes()
+      {
+        return new HashSet<>(Arrays.asList(
+            new FormattableType(Boolean.class),
+            new FormattableType(boolean.class)));
       }
 
       @Override
@@ -162,8 +166,8 @@ public class ArrayFormatterTest extends AbstractFormatterTest
       }
 
       @Override
-      public @NotNull Set<Class<?>> getFormattableTypes() {
-        return Collections.singleton(Integer.class);
+      public @NotNull Set<FormattableType> getFormattableTypes() {
+        return Collections.singleton(new FormattableType(Integer.class));
       }
 
       @Override

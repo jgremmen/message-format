@@ -93,7 +93,7 @@ public interface ParameterFormatter
    * @return  a set with supported java types for this formatter, not {@code null}
    */
   @Contract(pure = true)
-  @NotNull Set<Class<?>> getFormattableTypes();
+  @NotNull Set<FormattableType> getFormattableTypes();
 
 
   @Contract(pure = true)

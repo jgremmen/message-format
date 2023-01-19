@@ -19,6 +19,7 @@ import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -90,7 +91,10 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Set<Class<?>> getFormattableTypes() {
-    return new HashSet<>(Arrays.asList(BaseLocal.class, ReadableDateTime.class));
+  public @NotNull Set<FormattableType> getFormattableTypes()
+  {
+    return new HashSet<>(Arrays.asList(
+        new FormattableType(BaseLocal.class),
+        new FormattableType(ReadableDateTime.class)));
   }
 }

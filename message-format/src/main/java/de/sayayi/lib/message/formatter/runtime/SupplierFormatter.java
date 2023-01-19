@@ -19,6 +19,7 @@ import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +51,7 @@ public final class SupplierFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(value = "-> new", pure = true)
-  public @NotNull Set<Class<?>> getFormattableTypes() {
-    return singleton(Supplier.class);
+  public @NotNull Set<FormattableType> getFormattableTypes() {
+    return singleton(new FormattableType(Supplier.class));
   }
 }

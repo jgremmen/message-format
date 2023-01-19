@@ -20,6 +20,7 @@ import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -101,7 +102,10 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
 
 
   @Override
-  public @NotNull Set<Class<?>> getFormattableTypes() {
-    return new HashSet<>(asList(Boolean.class, boolean.class));
+  public @NotNull Set<FormattableType> getFormattableTypes()
+  {
+    return new HashSet<>(asList(
+        new FormattableType(Boolean.class),
+        new FormattableType(boolean.class, 125)));
   }
 }

@@ -34,6 +34,7 @@ import static java.util.Collections.unmodifiableSortedSet;
  * @author Jeroen Gremmen
  */
 @AllArgsConstructor
+@SuppressWarnings("UnstableApiUsage")
 public class MessageContext
 {
   private final @NotNull FormatterService formatterService;
@@ -210,6 +211,7 @@ public class MessageContext
 
 
 
+  @SuppressWarnings("UnstableApiUsage")
   public interface ParameterBuilder extends Parameters
   {
     @Contract(value = "_, _ -> this", mutates = "this")

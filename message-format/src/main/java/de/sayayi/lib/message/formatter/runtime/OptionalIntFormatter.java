@@ -21,6 +21,7 @@ import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
@@ -73,7 +74,7 @@ public final class OptionalIntFormatter extends AbstractParameterFormatter imple
 
   @Override
   @Contract(value = "-> new", pure = true)
-  public @NotNull Set<Class<?>> getFormattableTypes() {
-    return singleton(OptionalInt.class);
+  public @NotNull Set<FormattableType> getFormattableTypes() {
+    return singleton(new FormattableType(OptionalInt.class));
   }
 }

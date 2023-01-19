@@ -35,6 +35,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   private static final Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
 
   private final Map<String,NamedParameterFormatter> namedFormatters = new ConcurrentHashMap<>();
+  private final Map<Class<?>,Integer> typeOrderMap = new ConcurrentHashMap<>();
   private final Map<Class<?>,ParameterFormatter> typeFormatters = new ConcurrentHashMap<>();
   private final Map<Class<?>,ParameterFormatter> cachedFormatters =
       synchronizedMap(new FixedSizeCacheMap<>(CLASS_SORTER, 128));
@@ -57,17 +58,19 @@ public class GenericFormatterService implements FormatterService.WithRegistry
     final StringFormatter stringFormatter = new StringFormatter();
 
     addFormatter(stringFormatter);
-    addFormatterForType(Object.class, stringFormatter);
+    addFormatterForType(new FormattableType(Object.class, 127), stringFormatter);
   }
 
 
   @Override
-  public void addFormatterForType(@NotNull Class<?> type, @NotNull ParameterFormatter formatter)
+  public void addFormatterForType(@NotNull FormattableType formattableType, @NotNull ParameterFormatter formatter)
   {
+    final Class<?> type = formattableType.getType();
     final ParameterFormatter currentFormatter = typeFormatters.get(type);
 
     if (currentFormatter == null || currentFormatter.getPriority() < formatter.getPriority())
     {
+      typeOrderMap.put(type, formattableType.getOrder());
       typeFormatters.put(type, formatter);
       cachedFormatters.clear();
     }
@@ -88,8 +91,22 @@ public class GenericFormatterService implements FormatterService.WithRegistry
         namedFormatters.put(format, (NamedParameterFormatter)formatter);
     }
 
-    for(final Class<?> type: formatter.getFormattableTypes())
-      addFormatterForType(type, formatter);
+    for(final FormattableType formattableType: formatter.getFormattableTypes())
+      addFormatterForType(formattableType, formatter);
+  }
+
+
+  @Override
+  public void setFormattableTypeOrder(@NotNull Class<?> type, int order)
+  {
+    final ParameterFormatter parameterFormatter = typeFormatters.get(type);
+
+    if (parameterFormatter != null)
+    {
+      typeOrderMap.put(type, order);
+      typeFormatters.put(type, parameterFormatter);
+      cachedFormatters.clear();
+    }
   }
 
 
@@ -108,24 +125,35 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   @SuppressWarnings("java:S1119")
   private @NotNull ParameterFormatter resolveFormatterForType(@NotNull Class<?> type)
   {
-    ParameterFormatter formatter = null;
-
-    if (type.isPrimitive() && (formatter = typeFormatters.get(type)) == null)
+    // substitute wrapper type for primitive type if necessary
+    if (type.isPrimitive() && !typeOrderMap.containsKey(type))
       type = WRAPPER_CLASS_MAP.get(type);
 
-    resolve:{
-      while(formatter == null && type != null)
-        if ((formatter = typeFormatters.get(type)) == null)
-        {
-          for(final Class<?> interfaceType: getInterfaceTypes(type))
-            if ((formatter = typeFormatters.get(interfaceType)) != null)
-              break resolve;
+    final Set<Class<?>> types = new HashSet<>();
+    if (type.isInterface())
+      types.add(Object.class);
 
-          type = type.getSuperclass();
-        }
+    while(type != null)
+    {
+      types.add(type);
+      types.addAll(getInterfaceTypes(type));
+
+      type = type.getSuperclass();
     }
 
-    return formatter == null ? typeFormatters.get(Object.class) : formatter;
+    type = types
+        .stream()
+        .map(t -> {
+          final Integer order = typeOrderMap.get(t);
+          return order == null ? null : new FormattableType(t, order);
+        })
+        .filter(Objects::nonNull)
+        .sorted()
+        .findFirst()
+        .map(FormattableType::getType)
+        .orElse(null);
+
+    return typeFormatters.get(type == null ? Object.class : type);
   }
 
 

@@ -25,8 +25,8 @@ public abstract class AbstractFormatterTest
 {
   protected void assertFormatterForType(ParameterFormatter formatter, Class<?> type)
   {
-    for(Class<?> formattableType: formatter.getFormattableTypes())
-      if (formattableType.isAssignableFrom(type))
+    for(FormattableType formattableType: formatter.getFormattableTypes())
+      if (formattableType.getType().isAssignableFrom(type))
         return;
 
     fail();

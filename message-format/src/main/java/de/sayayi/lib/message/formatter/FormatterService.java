@@ -53,10 +53,11 @@ public interface FormatterService
   /**
    * Add registry functionality to a formatter service.
    */
+  @SuppressWarnings("UnstableApiUsage")
   interface WithRegistry extends FormatterService
   {
     @Contract(mutates = "this")
-    void addFormatterForType(@NotNull Class<?> type, @NotNull ParameterFormatter formatter);
+    void addFormatterForType(@NotNull FormattableType formattableType, @NotNull ParameterFormatter formatter);
 
 
     /**
@@ -66,5 +67,9 @@ public interface FormatterService
      */
     @Contract(mutates = "this")
     void addFormatter(@NotNull ParameterFormatter formatter);
+
+
+    @Contract(mutates = "this")
+    void setFormattableTypeOrder(@NotNull Class<?> type, int order);
   }
 }

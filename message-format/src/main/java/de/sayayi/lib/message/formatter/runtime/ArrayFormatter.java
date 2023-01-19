@@ -21,6 +21,7 @@ import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
@@ -45,20 +46,20 @@ import static java.util.ResourceBundle.getBundle;
  */
 public final class ArrayFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
 {
-  private static final Set<Class<?>> FORMATTABLE_TYPES;
+  private static final Set<FormattableType> FORMATTABLE_TYPES;
 
 
   static
   {
-    final Set<Class<?>> formattableTypes = new HashSet<>();
+    final Set<FormattableType> formattableTypes = new HashSet<>();
 
-    formattableTypes.add(Object[].class);
-    formattableTypes.add(short[].class);
-    formattableTypes.add(int[].class);
-    formattableTypes.add(long[].class);
-    formattableTypes.add(float[].class);
-    formattableTypes.add(double[].class);
-    formattableTypes.add(boolean[].class);
+    formattableTypes.add(new FormattableType(Object[].class, 125));
+    formattableTypes.add(new FormattableType(short[].class, 125));
+    formattableTypes.add(new FormattableType(int[].class, 125));
+    formattableTypes.add(new FormattableType(long[].class, 125));
+    formattableTypes.add(new FormattableType(float[].class, 125));
+    formattableTypes.add(new FormattableType(double[].class, 125));
+    formattableTypes.add(new FormattableType(boolean[].class, 125));
 
     FORMATTABLE_TYPES = unmodifiableSet(formattableTypes);
   }
@@ -121,7 +122,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
 
 
   @Override
-  public @NotNull Set<Class<?>> getFormattableTypes() {
+  public @NotNull Set<FormattableType> getFormattableTypes() {
     return FORMATTABLE_TYPES;
   }
 }

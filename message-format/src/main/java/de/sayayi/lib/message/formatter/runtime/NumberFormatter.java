@@ -19,6 +19,7 @@ import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -81,10 +82,11 @@ public final class NumberFormatter extends AbstractParameterFormatter
                              DataMap map)
   {
     ParameterFormatter formatter = messageContext.getFormatter("bool", boolean.class);
-    Set<Class<?>> types = formatter.getFormattableTypes();
+    Set<FormattableType> types = formatter.getFormattableTypes();
 
     // if we got some default formatter, use a specific one instead
-    if (!types.contains(Boolean.class) && !types.contains(boolean.class))
+    if (!types.contains(new FormattableType(Boolean.class)) &&
+        !types.contains(new FormattableType(boolean.class)))
       formatter = BOOL_FORMATTER;
 
     return formatter.format(messageContext, value, parameters, map);
@@ -113,7 +115,7 @@ public final class NumberFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(value = "-> new", pure = true)
-  public @NotNull Set<Class<?>> getFormattableTypes() {
-    return singleton(Number.class);
+  public @NotNull Set<FormattableType> getFormattableTypes() {
+    return singleton(new FormattableType(Number.class));
   }
 }

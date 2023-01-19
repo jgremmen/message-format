@@ -19,6 +19,7 @@ import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
@@ -75,7 +76,7 @@ public final class SizeFormatter extends AbstractParameterFormatter implements N
 
 
   @Override
-  public @NotNull Set<Class<?>> getFormattableTypes() {
+  public @NotNull Set<FormattableType> getFormattableTypes() {
     return emptySet();
   }
 }

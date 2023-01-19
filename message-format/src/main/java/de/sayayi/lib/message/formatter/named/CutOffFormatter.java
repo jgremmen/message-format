@@ -19,6 +19,7 @@ import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
@@ -71,7 +72,7 @@ public final class CutOffFormatter extends AbstractParameterFormatter implements
 
 
   @Override
-  public @NotNull Set<Class<?>> getFormattableTypes() {
+  public @NotNull Set<FormattableType> getFormattableTypes() {
     return emptySet();
   }
 }
