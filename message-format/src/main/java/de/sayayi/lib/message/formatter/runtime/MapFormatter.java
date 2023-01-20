@@ -56,32 +56,24 @@ public final class MapFormatter extends AbstractParameterFormatter implements Em
 
     final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, formatterContext.getLocale());
     final String separator = getSeparator(formatterContext);
-    final String nullKey = formatterContext.getConfigValueString("map-null-key").orElse("(null)").trim();
-    final String nullValue = formatterContext.getConfigValueString("map-null-value").orElse("(null)").trim();
+    final String nullKey =
+        formatterContext.getConfigValueString("map-null-key").orElse("(null)").trim();
+    final String nullValue =
+        formatterContext.getConfigValueString("map-null-value").orElse("(null)").trim();
 
     final List<String> list = map
         .entrySet()
         .stream()
         .map(entry -> {
-          Object key = entry.getKey();
-          String keyString;
+          final Object key = entry.getKey();
+          final String keyString = key == value
+              ? bundle.getString("thisMap")
+              : key != null ? trimNotNull(formatterContext.format(key)) : nullKey;
 
-          if (key == value)
-            keyString = bundle.getString("thisMap");
-          else if (key != null)
-            keyString = trimNotNull(formatterContext.format(key));
-          else
-            keyString = nullKey;
-
-          Object val = entry.getValue();
-          String valueString;
-
-          if (val == value)
-            valueString = bundle.getString("thisMap");
-          else if (val != null)
-            valueString = trimNotNull(formatterContext.format(val));
-          else
-            valueString = nullValue;
+          final Object val = entry.getValue();
+          final String valueString = val == value
+              ? bundle.getString("thisMap")
+              : val != null ? trimNotNull(formatterContext.format(val)) : nullValue;
 
           return (keyString + separator + valueString).trim();
         })
@@ -91,13 +83,13 @@ public final class MapFormatter extends AbstractParameterFormatter implements Em
   }
 
 
-  private String getSeparator(@NotNull FormatterContext formatterContext)
+  private @NotNull String getSeparator(@NotNull FormatterContext formatterContext)
   {
-    String sep = formatterContext.getConfigValueString("map-kv-sep").orElse("=");
+    final String sep = formatterContext.getConfigValueString("map-kv-sep").orElse("=");
     if (sep.isEmpty())
       return sep;
 
-    StringBuilder separator = new StringBuilder(sep.trim());
+    final StringBuilder separator = new StringBuilder(sep.trim());
 
     if (Character.isSpaceChar(sep.charAt(0)))
       separator.insert(0, ' ');

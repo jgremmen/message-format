@@ -46,20 +46,18 @@ public final class DateFormatter extends AbstractParameterFormatter
     if (value == null)
       return nullText();
 
-    return noSpaceText(getFormatter(
-        formatterContext.getConfigValueString("date").orElse(null),
-        formatterContext.getLocale()).format(value));
+    try {
+      return noSpaceText(getFormatter(
+          formatterContext.getConfigValueString("date").orElse(null),
+          formatterContext.getLocale()).format(value));
+    } catch(IllegalArgumentException ex) {
+      return formatterContext.delegateToNextFormatter();
+    }
   }
 
 
-  @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(Date.class));
-  }
-
-
-  private DateFormat getFormatter(String format, Locale locale)
+  @Contract(pure = true)
+  private @NotNull DateFormat getFormatter(String format, @NotNull Locale locale)
   {
     if ("full".equals(format))
       return getDateInstance(FULL, locale);
@@ -74,5 +72,12 @@ public final class DateFormatter extends AbstractParameterFormatter
       return getDateInstance(SHORT, locale);
 
     return new SimpleDateFormat(format, locale);
+  }
+
+
+  @Override
+  @Contract(value = "-> new", pure = true)
+  public @NotNull Set<FormattableType> getFormattableTypes() {
+    return singleton(new FormattableType(Date.class));
   }
 }
