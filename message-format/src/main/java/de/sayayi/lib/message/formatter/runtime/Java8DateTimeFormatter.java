@@ -23,19 +23,16 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.OffsetTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
 import static java.time.format.DateTimeFormatter.*;
 import static java.time.format.FormatStyle.*;
-import static java.util.Collections.singleton;
 import static java.util.Objects.requireNonNull;
 
 
@@ -96,7 +93,7 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
 
       if (value instanceof LocalDate)
         style[1] = '-';
-      else if (value instanceof LocalTime || value instanceof OffsetTime)
+      else if (value instanceof LocalTime)
         style[0] = '-';
 
       if ((formatter = FORMATTER.get(new String(style))) == null)
@@ -122,7 +119,11 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(Temporal.class));
+  public @NotNull Set<FormattableType> getFormattableTypes()
+  {
+    return new HashSet<>(Arrays.asList(
+        new FormattableType(LocalDate.class),
+        new FormattableType(LocalTime.class),
+        new FormattableType(LocalDateTime.class)));
   }
 }
