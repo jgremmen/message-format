@@ -60,11 +60,14 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
       return nullText();
 
     final String format = formatterContext.getConfigValueString("date").orElse(null);
-    final Locale locale = formatterContext.getLocale();
     final DateTimeFormatter formatter;
 
     if (!STYLE.containsKey(format))
-      formatter = DateTimeFormat.forPattern(requireNonNull(format)).withLocale(locale);
+    {
+      formatter = DateTimeFormat
+          .forPattern(requireNonNull(format))
+          .withLocale(formatterContext.getLocale());
+    }
     else
     {
       final char[] style = STYLE.get(format).toCharArray();
@@ -77,7 +80,9 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
       if (style[0] == '-' && style[1] == '-')
         return emptyText();
 
-      formatter = DateTimeFormat.forStyle(new String(style)).withLocale(locale);
+      formatter = DateTimeFormat
+          .forStyle(new String(style))
+          .withLocale(formatterContext.getLocale());
     }
 
     return noSpaceText(value instanceof ReadablePartial
