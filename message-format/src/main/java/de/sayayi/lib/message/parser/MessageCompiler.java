@@ -308,8 +308,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitMapValueString(MapValueStringContext ctx) {
-      ctx.value = new MapValueString(ctx.string().value);
+    public void exitMapValueString(MapValueStringContext ctx)
+    {
+      final StringContext stringContext = ctx.string();
+
+      ctx.value = new MapValueString(stringContext != null ? stringContext.value : ctx.nameOrKeyword().name);
     }
 
 

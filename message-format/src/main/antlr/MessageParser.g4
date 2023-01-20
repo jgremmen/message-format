@@ -85,6 +85,7 @@ mapKey returns [MapKey key]
 
 mapValue returns [MapValue value]
         : string         #mapValueString
+        | nameOrKeyword  #mapValueString
         | NUMBER         #mapValueNumber
         | BOOL           #mapValueBool
         | quotedMessage  #mapValueMessage
