@@ -30,7 +30,6 @@ import static java.util.Collections.unmodifiableSet;
 /**
  * @author Jeroen Gremmen
  */
-@SuppressWarnings({"java:S1214", "java:S2386"})
 public interface MapKey extends Serializable
 {
   Set<Type> EMPTY_NULL_TYPE = unmodifiableSet(EnumSet.of(Type.EMPTY, Type.NULL));

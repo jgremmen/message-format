@@ -29,7 +29,6 @@ import static java.util.Collections.unmodifiableSet;
 /**
  * @author Jeroen Gremmen
  */
-@SuppressWarnings({"java:S2386", "java:S1214"})
 public interface MapValue extends Data
 {
   Set<Type> STRING_MESSAGE_TYPE = unmodifiableSet(EnumSet.of(Type.STRING, Type.MESSAGE));

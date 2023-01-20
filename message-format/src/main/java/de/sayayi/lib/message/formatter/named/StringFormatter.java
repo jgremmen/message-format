@@ -67,7 +67,6 @@ public final class StringFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  @SuppressWarnings({"squid:S3358", "squid:S3776"})
   public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
     return value == null
@@ -77,7 +76,6 @@ public final class StringFormatter extends AbstractParameterFormatter
 
 
   @Override
-  @SuppressWarnings("java:S3358")
   public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value)
   {
     final String s = value instanceof char[] ? new String((char[])value) : String.valueOf(value);

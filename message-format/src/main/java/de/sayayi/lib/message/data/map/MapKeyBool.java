@@ -51,7 +51,6 @@ public enum MapKeyBool implements MapKey
 
 
   @Override
-  @SuppressWarnings({"java:S3776", "java:S5411", "java:S108"})
   public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Parameters parameters,
                                     Object value)
   {

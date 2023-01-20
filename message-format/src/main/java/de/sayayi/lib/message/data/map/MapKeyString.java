@@ -49,7 +49,6 @@ public final class MapKeyString implements MapKey
 
 
   @Override
-  @SuppressWarnings("java:S1119")
   public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Parameters parameters,
                                     Object value)
   {

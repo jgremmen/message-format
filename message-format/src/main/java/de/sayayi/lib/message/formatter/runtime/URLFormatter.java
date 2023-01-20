@@ -36,7 +36,6 @@ import static java.util.Collections.singleton;
 public final class URLFormatter extends AbstractParameterFormatter
 {
   @Override
-  @SuppressWarnings({"squid:S3358", "squid:S3776"})
   public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
     if (value == null)

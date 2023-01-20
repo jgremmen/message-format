@@ -38,6 +38,7 @@ import static java.util.Collections.emptySet;
 /**
  * @author Jeroen Gremmen
  */
+@SuppressWarnings("UnnecessaryUnicodeEscape")
 public class GeoFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
 {
   private static final Map<String,Format> FORMAT = new HashMap<>();
@@ -70,7 +71,6 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
 
 
   @Override
-  @SuppressWarnings("squid:S3776")
   public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
     if (value == null)
@@ -158,7 +158,6 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
   }
 
 
-  @SuppressWarnings("squid:S3457")
   private String formatMinOrSec(Locale locale, double d, int digits, boolean zeropad)
   {
     String s = String.format(locale, "%." + digits + 'f', d);

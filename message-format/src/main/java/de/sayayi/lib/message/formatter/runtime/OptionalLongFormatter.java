@@ -40,7 +40,6 @@ import static java.util.Collections.singleton;
  */
 public final class OptionalLongFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
 {
-  @SuppressWarnings("squid:S2789")
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)

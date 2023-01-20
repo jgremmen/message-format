@@ -53,7 +53,6 @@ public final class MapKeyNumber implements MapKey
 
 
   @Override
-  @SuppressWarnings({"java:S3776", "java:S1119", "java:S108"})
   public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Parameters parameters,
                                     Object value)
   {

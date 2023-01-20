@@ -79,8 +79,9 @@ public final class FileSizeFormatter extends AbstractParameterFormatter implemen
         formatterContext.getConfigValueBool("space").orElse(false))
       s.append(' ');
 
-    return noSpaceText(s.append(unitMessage == null
-        ? unit : unitMessage.format(formatterContext.getMessageContext(), formatterContext)).toString());
+    return noSpaceText(s
+        .append(unitMessage == null ? unit : formatterContext.format(unitMessage).getText())
+        .toString());
   }
 
 

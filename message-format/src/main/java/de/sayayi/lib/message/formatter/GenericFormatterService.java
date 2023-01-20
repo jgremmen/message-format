@@ -119,7 +119,6 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
-  @SuppressWarnings("java:S1119")
   private @NotNull List<ParameterFormatter> resolveFormattersForType(@NotNull Class<?> type)
   {
     // substitute wrapper type for primitive type if necessary

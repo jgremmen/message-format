@@ -245,7 +245,6 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    @SuppressWarnings("java:S100")
     private boolean exitParameter_isSpaceAtTokenIndex(int i)
     {
       if (i >= 0)

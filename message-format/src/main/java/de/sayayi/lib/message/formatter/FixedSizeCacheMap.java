@@ -30,7 +30,6 @@ import java.util.*;
 /**
  * @author Jeroen Gremmen
  */
-@SuppressWarnings("squid:S2160")
 public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneable, Serializable
 {
   private static final long serialVersionUID = 8127450864651796228L;
@@ -72,7 +71,6 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   }
 
 
-  @SuppressWarnings("squid:S3776")
   @Override
   public V put(@NotNull K key, V value)
   {
@@ -303,12 +301,11 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
 
 
   @Contract("-> new")
-  @SuppressWarnings({"unchecked", "java:S2975"})
-  public FixedSizeCacheMap<K,V> clone()
+  @SuppressWarnings("unchecked")
+  public @NotNull FixedSizeCacheMap<K,V> clone()
   {
     try {
-      @SuppressWarnings("unchecked")
-      FixedSizeCacheMap<K,V> m = (FixedSizeCacheMap<K,V>)super.clone();
+      final FixedSizeCacheMap<K,V> m = (FixedSizeCacheMap<K,V>)super.clone();
 
       m.modCount = 0;
       m.meru = new Link<>(null);
@@ -342,7 +339,6 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   }
 
 
-  @SuppressWarnings("java:S2583")
   private void writeObject(ObjectOutputStream s) throws IOException
   {
     final int expectedModCount = modCount;
@@ -504,7 +500,6 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
 
   final class EntryIterator extends BaseIterator implements Iterator<Entry<K,V>>
   {
-    @SuppressWarnings("squid:S2272")
     public Entry<K,V> next() {
       return nextNode();
     }
@@ -515,7 +510,6 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
 
   final class KeyIterator extends BaseIterator implements Iterator<K>
   {
-    @SuppressWarnings("squid:S2272")
     public K next() {
       return nextNode().key;
     }
@@ -526,7 +520,6 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
 
   final class ValueIterator extends BaseIterator implements Iterator<V>
   {
-    @SuppressWarnings("squid:S2272")
     public V next() {
       return nextNode().value;
     }

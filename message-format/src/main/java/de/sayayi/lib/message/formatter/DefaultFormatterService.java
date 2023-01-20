@@ -56,7 +56,6 @@ public class DefaultFormatterService extends GenericFormatterService
   }
 
 
-  @SuppressWarnings("java:S108")
   protected void addFormattersFromService()
   {
     ServiceLoader.load(ParameterFormatter.class, classLoader).forEach(parameterFormatter -> {
