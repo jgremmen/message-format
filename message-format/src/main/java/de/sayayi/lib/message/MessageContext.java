@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -92,14 +93,15 @@ public class MessageContext
    * @return  formatter for the given {@code type}, never {@code null}
    */
   @Contract(pure = true)
-  public @NotNull ParameterFormatter getFormatter(@NotNull Class<?> type) {
-    return formatterService.getFormatter(null, type);
+  @Unmodifiable
+  public @NotNull List<ParameterFormatter> getFormatters(@NotNull Class<?> type) {
+    return formatterService.getFormatters(null, type);
   }
 
 
   /**
    * <p>
-   *   Returns the best matching formatter for the given {@code format} and {@code type}
+   *   Returns a prioritized list of matching formatter for the given {@code format} and {@code type}
    * </p>
    * <p>
    *   If {@code format} matches a named formatter it always takes precedence over {@code type}.
@@ -108,11 +110,12 @@ public class MessageContext
    * @param format  formatter name
    * @param type    type, never {@code null}
    *
-   * @return  formatter for the given {@code format} and {@code type}, never {@code null}
+   * @return  prioritized list of formatters for the given {@code format} and {@code type}, never {@code null}
    */
   @Contract(pure = true)
-  public @NotNull ParameterFormatter getFormatter(String format, @NotNull Class<?> type) {
-    return formatterService.getFormatter(format, type);
+  @Unmodifiable
+  public @NotNull List<ParameterFormatter> getFormatters(String format, @NotNull Class<?> type) {
+    return formatterService.getFormatters(format, type);
   }
 
 

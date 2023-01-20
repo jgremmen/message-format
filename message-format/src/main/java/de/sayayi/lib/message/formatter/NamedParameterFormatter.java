@@ -31,4 +31,20 @@ public interface NamedParameterFormatter extends ParameterFormatter
    */
   @Contract(pure = true)
   @NotNull String getName();
+
+
+  /**
+   * Tells whether this formatter is capable of formatting values of {@code type}.
+   *
+   * @param type  type to check, not {@code null}
+   *
+   * @return  {@code true} if this formatter is capable of formatting values of {@code type},
+   *          {@code false} otherwise
+   *
+   * @since 0.8.0
+   */
+  @Contract(pure = true)
+  default boolean canFormat(@NotNull Class<?> type) {
+    return true;
+  }
 }

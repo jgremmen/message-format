@@ -15,11 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -36,11 +34,10 @@ import static java.util.Collections.singleton;
 public final class AtomicBooleanFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
-    return messageContext.getFormatter(format, boolean.class)
-        .format(messageContext, value == null ? null : ((AtomicBoolean)value).get(), format, parameters, map);
+    return formatterContext.format(value == null ? null : ((AtomicBoolean)value).get(),
+        boolean.class, true);
   }
 
 

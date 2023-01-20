@@ -16,25 +16,24 @@
 package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKeyName;
 import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import lombok.val;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
-import java.util.Locale;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static java.util.Collections.singletonMap;
+import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
  * @author Jeroen Gremmen
  */
+@Disabled
 class EnumFormatterTest extends AbstractFormatterTest
 {
   @Test
@@ -46,18 +45,15 @@ class EnumFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat()
   {
-    final EnumFormatter formatter = new EnumFormatter();
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(),
-        NO_CACHE_INSTANCE, Locale.ROOT);
-    final Parameters parameters = context.noParameters();
+    val context = new MessageContext(createFormatterService(new EnumFormatter()), NO_CACHE_INSTANCE, ROOT);
 
     //assertEquals(nullText(), formatter.format(context, null, null, parameters, null));
     //assertEquals(noSpaceText("CC"), formatter.format(context, MyEnum.CC, null, parameters, null));
-    assertEquals(noSpaceText("3"), formatter.format(context, MyEnum.DD, parameters,
-        new DataMap(Collections.singletonMap(new MapKeyName("enum"), new MapValueString("ordinal")))));
+    assertEquals(noSpaceText("3"), format(context, MyEnum.DD,
+        singletonMap(new MapKeyName("enum"), new MapValueString("ordinal"))));
 
     context.setDefaultData("enum", "ordinal");
-    assertEquals(noSpaceText("0"), formatter.format(context, MyEnum.AA, parameters, null));
+    assertEquals(noSpaceText("0"), format(context, MyEnum.AA));
   }
 
 

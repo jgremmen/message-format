@@ -15,11 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -37,21 +35,33 @@ import static java.util.Collections.singleton;
 public final class PathFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
     if (value == null)
       return nullText();
 
     Path path = (Path)value;
-    format = getConfigValueString(messageContext, "path", parameters, map, null);
 
-    if ("name".equals(format))
-      path = path.getFileName();
-    else if ("parent".equals(format))
-      path = path.getParent();
-    else if ("root".equals(format))
-      path = path.getRoot();
+    switch(formatterContext.getConfigValueString("path").orElse("default"))
+    {
+      case "name":
+        path = path.getFileName();
+        break;
+
+      case "parent":
+        path = path.getParent();
+        break;
+
+      case "root":
+        path = path.getRoot();
+        break;
+
+      case "default":
+        break;
+
+      default:
+        return formatterContext.delegateToNextFormatter();
+    }
 
     return path == null ? emptyText() : noSpaceText(path.toString());
   }

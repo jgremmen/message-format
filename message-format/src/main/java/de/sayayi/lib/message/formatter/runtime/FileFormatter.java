@@ -15,11 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -38,30 +36,36 @@ import static java.util.Collections.singleton;
 public final class FileFormatter extends AbstractParameterFormatter implements SizeQueryable
 {
   @Override
-  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
     if (value == null)
       return nullText();
 
     final File file = (File)value;
-    format = getConfigValueString(messageContext, "file", parameters, map, null);
 
-    if ("name".equals(format))
-      return noSpaceText(file.getName());
-    else if ("path".equals(format))
-      return noSpaceText(file.getPath());
-    else if ("parent".equals(format))
-      return noSpaceText(file.getParent());
-    else if ("extension".equals(format))
+    switch(formatterContext.getConfigValueString("file").orElse("absolute-path"))
     {
-      String name = file.getName();
-      int dotidx = name.lastIndexOf('.');
+      case "name":
+        return noSpaceText(file.getName());
 
-      return dotidx == -1 ? emptyText() : noSpaceText(name.substring(dotidx + 1));
+      case "path":
+        return noSpaceText(file.getPath());
+
+      case "parent":
+        return noSpaceText(file.getParent());
+
+      case "extension":
+        String name = file.getName();
+        int dotidx = name.lastIndexOf('.');
+
+        //TODO map extension to message
+        return dotidx == -1 ? emptyText() : noSpaceText(name.substring(dotidx + 1));
+
+      case "absolute-path":
+        return noSpaceText(file.getAbsolutePath());
     }
 
-    return noSpaceText(file.getAbsolutePath());
+    return formatterContext.delegateToNextFormatter();
   }
 
 

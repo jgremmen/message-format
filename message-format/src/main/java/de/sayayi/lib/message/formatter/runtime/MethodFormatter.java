@@ -15,11 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -39,23 +37,29 @@ public final class MethodFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
     if (value == null)
       return nullText();
 
     final Method method = (Method)value;
-    format = getConfigValueString(messageContext, "method", parameters, map);
 
-    if ("name".equals(format))
-      return noSpaceText(method.getName());
-    if ("class".equals(format))
-      return noSpaceText(TypeFormatter.toString(method.getDeclaringClass(), "Cju"));
-    if ("return-type".equals(format))
-      return noSpaceText(TypeFormatter.toString(method.getGenericReturnType(), "Cju"));
+    switch(formatterContext.getConfigValueString("method").orElse("default"))
+    {
+      case "name":
+        return noSpaceText(method.getName());
 
-    return noSpaceText(method.toString());
+      case "class":
+        return noSpaceText(TypeFormatter.toString(method.getDeclaringClass(), "Cju"));
+
+      case "return-type":
+        return noSpaceText(TypeFormatter.toString(method.getGenericReturnType(), "Cju"));
+
+      case "default":
+        return noSpaceText(method.toString());
+    }
+
+    return formatterContext.delegateToNextFormatter();
   }
 
 

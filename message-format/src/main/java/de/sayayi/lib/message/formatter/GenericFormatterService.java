@@ -15,13 +15,14 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.formatter.runtime.StringFormatter;
+import de.sayayi.lib.message.formatter.named.StringFormatter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static java.util.Collections.synchronizedMap;
+import static java.util.Collections.*;
+import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -37,7 +38,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   private final Map<String,NamedParameterFormatter> namedFormatters = new ConcurrentHashMap<>();
   private final Map<Class<?>,Integer> typeOrderMap = new ConcurrentHashMap<>();
   private final Map<Class<?>,ParameterFormatter> typeFormatters = new ConcurrentHashMap<>();
-  private final Map<Class<?>,ParameterFormatter> cachedFormatters =
+  private final Map<Class<?>,List<ParameterFormatter>> cachedFormatters =
       synchronizedMap(new FixedSizeCacheMap<>(CLASS_SORTER, 128));
 
 
@@ -66,14 +67,10 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   public void addFormatterForType(@NotNull FormattableType formattableType, @NotNull ParameterFormatter formatter)
   {
     final Class<?> type = formattableType.getType();
-    final ParameterFormatter currentFormatter = typeFormatters.get(type);
 
-    if (currentFormatter == null || currentFormatter.getPriority() < formatter.getPriority())
-    {
-      typeOrderMap.put(type, formattableType.getOrder());
-      typeFormatters.put(type, formatter);
-      cachedFormatters.clear();
-    }
+    typeOrderMap.put(type, formattableType.getOrder());
+    typeFormatters.put(type, formatter);
+    cachedFormatters.clear();
   }
 
 
@@ -86,9 +83,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       if (format.isEmpty())
         throw new IllegalArgumentException("formatter name must not be empty");
 
-      ParameterFormatter currentFormatter = namedFormatters.get(format);
-      if (currentFormatter == null || currentFormatter.getPriority() < formatter.getPriority())
-        namedFormatters.put(format, (NamedParameterFormatter)formatter);
+      namedFormatters.put(format, (NamedParameterFormatter)formatter);
     }
 
     for(final FormattableType formattableType: formatter.getFormattableTypes())
@@ -111,26 +106,28 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   @Override
-  public @NotNull ParameterFormatter getFormatter(String format, @NotNull Class<?> type)
+  public @NotNull List<ParameterFormatter> getFormatters(String format, @NotNull Class<?> type)
   {
-    ParameterFormatter formatter = format == null ? null : namedFormatters.get(format);
+    if (format != null)
+    {
+      final NamedParameterFormatter namedFormatter = namedFormatters.get(format);
+      if (namedFormatter != null && namedFormatter.canFormat(type))
+        return singletonList(namedFormatter);
+    }
 
-    if (formatter == null && (formatter = cachedFormatters.get(type)) == null)
-      cachedFormatters.put(type, formatter = resolveFormatterForType(type));
-
-    return formatter;
+    return cachedFormatters.computeIfAbsent(type, this::resolveFormattersForType);
   }
 
 
   @SuppressWarnings("java:S1119")
-  private @NotNull ParameterFormatter resolveFormatterForType(@NotNull Class<?> type)
+  private @NotNull List<ParameterFormatter> resolveFormattersForType(@NotNull Class<?> type)
   {
     // substitute wrapper type for primitive type if necessary
     if (type.isPrimitive() && !typeOrderMap.containsKey(type))
       type = WRAPPER_CLASS_MAP.get(type);
 
     final Set<Class<?>> types = new HashSet<>();
-    if (type.isInterface())
+    if (type.isInterface() || type.isPrimitive())
       types.add(Object.class);
 
     while(type != null)
@@ -141,7 +138,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       type = type.getSuperclass();
     }
 
-    type = types
+    return unmodifiableList(types
         .stream()
         .map(t -> {
           final Integer order = typeOrderMap.get(t);
@@ -149,11 +146,9 @@ public class GenericFormatterService implements FormatterService.WithRegistry
         })
         .filter(Objects::nonNull)
         .sorted()
-        .findFirst()
-        .map(FormattableType::getType)
-        .orElse(null);
-
-    return typeFormatters.get(type == null ? Object.class : type);
+        .map(ft -> typeFormatters.get(ft.getType()))
+        .filter(Objects::nonNull)
+        .collect(toList()));
   }
 
 

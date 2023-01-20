@@ -16,16 +16,7 @@
 package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKey.Type;
-import de.sayayi.lib.message.data.map.MapValue;
-import de.sayayi.lib.message.data.map.MapValueBool;
-import de.sayayi.lib.message.data.map.MapValueNumber;
-import de.sayayi.lib.message.data.map.MapValueString;
-import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -34,8 +25,6 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.EMPTY_NULL_TYPE;
-import static de.sayayi.lib.message.data.map.MapKey.NAME_TYPE;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.messageToText;
 
 
 /**
@@ -59,134 +48,27 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Override
-  public @NotNull Text format(@NotNull MessageContext messageContext, Object value, String format,
-                              @NotNull Parameters parameters, DataMap data)
+  public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value)
   {
     // handle empty, !empty, null and !null first
-    Message.WithSpaces msg = getMessage(messageContext, value, EMPTY_NULL_TYPE, parameters, data, false);
+    Message.WithSpaces msg = formatterContext.getMapMessage(value, EMPTY_NULL_TYPE).orElse(null);
     if (msg != null)
-      return messageToText(messageContext, msg, parameters);
+      return formatterContext.format(msg);
 
-    final Text text = formatValue(messageContext, value, format, parameters, data);
+    final Text text = formatValue(formatterContext, value);
 
     // map result against map keys...
-    msg = getMessage(messageContext, text.getText(), NO_NAME_KEY_TYPES, parameters, data, false);
+    msg = formatterContext.getMapMessage(text.getText(), NO_NAME_KEY_TYPES).orElse(null);
 
-    return msg == null ? text : messageToText(messageContext, msg, parameters);
+    return msg == null ? text : formatterContext.format(msg);
   }
 
 
-  protected abstract @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value,
-                                               String format, @NotNull Parameters parameters, DataMap data);
+  protected abstract @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value);
 
 
   public int getPriority() {
     return 0;
-  }
-
-
-  @Contract(pure = true)
-  @SuppressWarnings("SameParameterValue")
-  protected Data getConfigValue(@NotNull MessageContext messageContext, @NotNull String name,
-                                @NotNull Parameters parameters, DataMap map)
-  {
-    if (map != null)
-    {
-      MapValue mapValue = map.find(messageContext, name, parameters, NAME_TYPE, null);
-      if (mapValue != null)
-        return mapValue;
-    }
-
-    return messageContext.getDefaultData(name);
-  }
-
-
-  @Contract(pure = true)
-  protected String getConfigValueString(@NotNull MessageContext messageContext, @NotNull String name,
-                                        @NotNull Parameters parameters, DataMap map) {
-    return getConfigValueString(messageContext, name, parameters, map, null);
-  }
-
-
-  @Contract(pure = true)
-  protected String getConfigValueString(@NotNull MessageContext messageContext, @NotNull String name,
-                                        @NotNull Parameters parameters, DataMap map, String defaultValue)
-  {
-    if (map != null)
-    {
-      final MapValueString string =
-          (MapValueString)map.find(messageContext, name, parameters, NAME_TYPE, MapValue.STRING_TYPE);
-
-      if (string != null)
-        return string.asObject();
-    }
-
-    final MapValue mapValue = messageContext.getDefaultData(name);
-
-    return mapValue instanceof MapValueString ? ((MapValueString)mapValue).asObject() : defaultValue;
-  }
-
-
-  @Contract(pure = true)
-  @SuppressWarnings("SameParameterValue")
-  protected long getConfigValueNumber(@NotNull MessageContext messageContext, @NotNull String name,
-                                      @NotNull Parameters parameters, DataMap map, long defaultValue)
-  {
-    if (map != null)
-    {
-      final MapValueNumber number =
-          (MapValueNumber)map.find(messageContext, name, parameters, NAME_TYPE, MapValue.NUMBER_TYPE);
-
-      if (number != null)
-        return number.asObject();
-    }
-
-    final MapValue mapValue = messageContext.getDefaultData(name);
-
-    return mapValue instanceof MapValueNumber ? ((MapValueNumber)mapValue).asObject() : defaultValue;
-  }
-
-
-  @Contract(pure = true)
-  @SuppressWarnings("SameParameterValue")
-  protected boolean getConfigValueBool(@NotNull MessageContext messageContext, @NotNull String name,
-                                       @NotNull Parameters parameters, DataMap map) {
-    return getConfigValueBool(messageContext, name, parameters, map, false);
-  }
-
-
-  @Contract(pure = true)
-  @SuppressWarnings("SameParameterValue")
-  protected boolean getConfigValueBool(@NotNull MessageContext messageContext, @NotNull String name,
-                                       @NotNull Parameters parameters, DataMap map, boolean defaultValue)
-  {
-    if (map == null)
-      return defaultValue;
-
-    final MapValueBool bool =
-        (MapValueBool)map.find(messageContext, name, parameters, NAME_TYPE, MapValue.BOOL_TYPE);
-
-    if (bool != null)
-      return bool.asObject();
-
-    final MapValue mapValue = messageContext.getDefaultData(name);
-
-    return mapValue instanceof MapValueBool ? ((MapValueBool)mapValue).asObject() : defaultValue;
-  }
-
-
-  @Contract(pure = true)
-  @SuppressWarnings("SameParameterValue")
-  protected Message.WithSpaces getMessage(@NotNull MessageContext messageContext, Object value,
-                                          @NotNull Set<Type> keyTypes, @NotNull Parameters parameters,
-                                          DataMap data, boolean notNull)
-  {
-    Message.WithSpaces message = null;
-
-    if (data != null)
-      message = data.getMessage(messageContext, value, parameters, keyTypes, false);
-
-    return message == null && notNull ? EmptyMessage.INSTANCE : message;
   }
 
 

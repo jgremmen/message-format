@@ -16,11 +16,9 @@
 package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -34,7 +32,8 @@ import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.EMPTY_NULL_TYPE;
 import static de.sayayi.lib.message.data.map.MapKey.Type.BOOL;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Arrays.asList;
 import static java.util.ResourceBundle.getBundle;
 
@@ -53,12 +52,11 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text format(@NotNull MessageContext messageContext, Object value, String format,
-                              @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value)
   {
-    Message.WithSpaces msg = getMessage(messageContext, value, EMPTY_NULL_TYPE, parameters, map, false);
+    Message.WithSpaces msg = formatterContext.getMapMessage(value, EMPTY_NULL_TYPE).orElse(null);
     if (msg != null)
-      return messageToText(messageContext, msg, parameters);
+      return formatterContext.format(msg);
 
     if (value == null)
       return nullText();
@@ -79,24 +77,23 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
       bool = Boolean.parseBoolean(String.valueOf(value));
 
     // allow custom messages for true/false value?
-    if ((msg = getMessage(messageContext, bool, EnumSet.of(BOOL), parameters, map, false)) != null)
-      return messageToText(messageContext, msg, parameters);
+    if ((msg = formatterContext.getMapMessage(bool, EnumSet.of(BOOL)).orElse(null)) != null)
+      return formatterContext.format(msg);
 
     // get translated boolean value
     String s = Boolean.toString(bool);
     try {
-      s = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale()).getString(s);
+      s = getBundle(FORMATTER_BUNDLE_NAME, formatterContext.getLocale()).getString(s);
     } catch(Exception ignore) {
     }
 
-    return (msg = getMessage(messageContext, s, NO_NAME_KEY_TYPES, parameters, map, false)) == null
-        ? noSpaceText(s) : messageToText(messageContext, msg, parameters);
+    return (msg = formatterContext.getMapMessage(s, NO_NAME_KEY_TYPES).orElse(null)) == null
+        ? noSpaceText(s) : formatterContext.format(msg);
   }
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                      @NotNull Parameters parameters, DataMap data) {
+  protected @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value) {
     throw new IllegalStateException();
   }
 

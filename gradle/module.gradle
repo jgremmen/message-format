@@ -28,6 +28,8 @@ dependencies {
 
   testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+  testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+  testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
   testCompileOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
 }
 

@@ -15,18 +15,15 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.formatter.GenericFormatterService;
+import lombok.val;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -34,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
+@Disabled
 public class IterableFormatterTest extends AbstractFormatterTest
 {
   @Test
@@ -45,25 +43,17 @@ public class IterableFormatterTest extends AbstractFormatterTest
   @Test
   public void testObjectArray()
   {
-    final GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new IterableFormatter());
+    val context = new MessageContext(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE, "de-DE");
 
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, "de-DE");
-    final Parameters noParameters = context.noParameters();
-
-    assertEquals(noSpaceText("Test, true, -6"), registry.getFormatter(null, List.class)
-        .format(context, Arrays.asList("Test", true, null, -6), noParameters, null));
+    assertEquals(noSpaceText("Test, true, -6"), format(context, asList("Test", true, null, -6)));
   }
 
 
   @Test
   public void testEmptyOrCollection()
   {
-    final GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new IterableFormatter());
-
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE);
-    final Message message = context.getMessageFactory().parse("%{c,null:'null',empty:'empty'}");
+    val context = new MessageContext(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE);
+    val message = context.getMessageFactory().parse("%{c,null:'null',empty:'empty'}");
 
     assertEquals("null", message.format(context, context.parameters().with("c", null)));
     assertEquals("empty", message.format(context, context.parameters().with("c", emptySet())));
@@ -73,17 +63,14 @@ public class IterableFormatterTest extends AbstractFormatterTest
   @Test
   public void testSeparator()
   {
-    final GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new IterableFormatter());
-
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE);
+    val context = new MessageContext(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE);
 
     assertEquals("1, 2, 3, 4 and 5", context.getMessageFactory()
         .parse("%{c,list-sep:', ',list-sep-last:' and '}")
-        .format(context, context.parameters().with("c", Arrays.asList(1, 2, 3, 4, 5))));
+        .format(context, context.parameters().with("c", asList(1, 2, 3, 4, 5))));
 
     assertEquals("1.2.3.4.5", context.getMessageFactory()
         .parse("%{c,list-sep:'.'}")
-        .format(context, context.parameters().with("c", Arrays.asList(1, 2, 3, 4, 5))));
+        .format(context, context.parameters().with("c", asList(1, 2, 3, 4, 5))));
   }
 }

@@ -15,9 +15,13 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.formatter.runtime.StringFormatter;
+import de.sayayi.lib.message.formatter.named.StringFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
+import org.jetbrains.annotations.Unmodifiable;
+
+import java.util.List;
 
 
 /**
@@ -29,23 +33,24 @@ public interface FormatterService
 {
   /**
    * <p>
-   *   Returns a data formatter for the given {@code format} and {@code type}.
+   *   Returns a list of data formatters for the given {@code format} and {@code type}.
    * </p>
    * <p>
    *   Implementing classes must make sure that for any combination of {@code format} and {@code type} this function
-   *   always returns a formatter. A good choice for a default formatter would be
+   *   always returns at least 1 formatter. A good choice for a default formatter would be
    *   {@link StringFormatter} associated with {@link Object}.
    * </p>
    *
    * @param format  name of the formatter or {@code null}
    * @param type    type of the value to format
    *
-   * @return  data formatter, never {@code null}
+   * @return  list of prioritized data formatters, never {@code null}
    *
    * @see GenericFormatterService
    */
   @Contract(pure = true)
-  @NotNull ParameterFormatter getFormatter(String format, @NotNull Class<?> type);
+  @Unmodifiable
+  @NotNull List<ParameterFormatter> getFormatters(String format, @NotNull Class<?> type);
 
 
 
@@ -69,7 +74,13 @@ public interface FormatterService
     void addFormatter(@NotNull ParameterFormatter formatter);
 
 
+    /**
+     * @param type   registered type to change the order for, not {@code null}
+     * @param order  new order for the specified type in range 0..127
+     *
+     * @since 0.8.0
+     */
     @Contract(mutates = "this")
-    void setFormattableTypeOrder(@NotNull Class<?> type, int order);
+    void setFormattableTypeOrder(@NotNull Class<?> type, @Range(from = 0, to = 127) int order);
   }
 }

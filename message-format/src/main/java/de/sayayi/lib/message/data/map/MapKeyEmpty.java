@@ -60,15 +60,15 @@ public final class MapKeyEmpty implements MapKey
     if (value == null)
       return compareType == EQ ? TYPELESS_LENIENT : MISMATCH;
 
-    final ParameterFormatter formatter = messageContext.getFormatter(value.getClass());
-    if (formatter instanceof EmptyMatcher)
-    {
-      final MatchResult result = ((EmptyMatcher)formatter).matchEmpty(compareType, value);
-      assert result == TYPELESS_LENIENT || result == TYPELESS_EXACT || result == null;
+    for(ParameterFormatter formatter: messageContext.getFormatters(value.getClass()))
+      if (formatter instanceof EmptyMatcher)
+      {
+        final MatchResult result = ((EmptyMatcher)formatter).matchEmpty(compareType, value);
+        assert result == TYPELESS_LENIENT || result == TYPELESS_EXACT || result == null;
 
-      if (result != null)
-        return result;
-    }
+        if (result != null)
+          return result;
+      }
 
     return MISMATCH;
   }

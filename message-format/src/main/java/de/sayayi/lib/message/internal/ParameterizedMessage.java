@@ -41,7 +41,6 @@ public class ParameterizedMessage implements Message.WithSpaces
   private final MessagePart[] parts;
 
 
-  @SuppressWarnings("java:S1119")
   public ParameterizedMessage(@NotNull List<MessagePart> parts)
   {
     findParameter: {
@@ -58,7 +57,6 @@ public class ParameterizedMessage implements Message.WithSpaces
 
   @Override
   @Contract(pure = true)
-  @SuppressWarnings("java:S4838")
   public @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters)
   {
     final StringBuilder message = new StringBuilder();
@@ -92,7 +90,6 @@ public class ParameterizedMessage implements Message.WithSpaces
 
 
   @Override
-  @SuppressWarnings("java:S4838")
   public @NotNull SortedSet<String> getParameterNames()
   {
     final SortedSet<String> parameterNames = new TreeSet<>();

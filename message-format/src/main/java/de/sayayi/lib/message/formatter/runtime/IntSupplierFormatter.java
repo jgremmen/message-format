@@ -15,11 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -38,15 +36,11 @@ public final class IntSupplierFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
-    final IntSupplier supplier = (IntSupplier)value;
-    if (supplier == null)
-      return nullText();
-
-    return messageContext.getFormatter(format, int.class)
-        .format(messageContext, supplier.getAsInt(), format, parameters, map);
+    return value == null
+        ? nullText()
+        : formatterContext.format(((IntSupplier)value).getAsInt(), int.class, true);
   }
 
 

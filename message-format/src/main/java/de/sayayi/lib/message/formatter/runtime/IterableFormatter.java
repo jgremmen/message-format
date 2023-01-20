@@ -15,13 +15,11 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
@@ -48,8 +46,7 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
   @SuppressWarnings("rawtypes")
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
     if (value == null)
       return nullText();
@@ -58,10 +55,10 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
     if (!iterator.hasNext())
       return emptyText();
 
-    final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
+    final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, formatterContext.getLocale());
     final StringBuilder s = new StringBuilder();
-    final String sep = getConfigValueString(messageContext, "list-sep", parameters, map, ", ");
-    final String sepLast = getConfigValueString(messageContext, "list-sep-last", parameters, map, sep);
+    final String sep = formatterContext.getConfigValueString("list-sep").orElse(", ");
+    final String sepLast = formatterContext.getConfigValueString("list-sep-last").orElse(sep);
 
     while(iterator.hasNext())
     {
@@ -71,10 +68,7 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
       if (element == value)
         text = new TextPart(bundle.getString("thisCollection"));
       else if (element != null)
-      {
-        text = messageContext.getFormatter(format, element.getClass())
-            .format(messageContext, element, format, parameters, map);
-      }
+        text = formatterContext.format(element, true);
 
       if (text != null && !text.isEmpty())
       {

@@ -15,25 +15,28 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.*;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.FormattableType;
-import de.sayayi.lib.message.formatter.GenericFormatterService;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import de.sayayi.lib.message.internal.TextMessage;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.MessagePartFactory;
 import de.sayayi.lib.message.internal.part.TextPart;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
-import static java.util.Collections.emptySortedSet;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -60,51 +63,30 @@ public class ArrayFormatterTest extends AbstractFormatterTest
   @SuppressWarnings("serial")
   public void testBooleanArray()
   {
-    GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new ArrayFormatter());
-    registry.addFormatter(new BoolFormatter());
+    val formatterService = createFormatterService(new ArrayFormatter(), new BoolFormatter());
+    val context = new MessageContext(formatterService, NO_CACHE_INSTANCE, "de-DE");
 
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, "de-DE");
-    Parameters noParameters = context.noParameters();
+    assertEquals(new TextPart("wahr, falsch, wahr"), format(context, new boolean[] { true, false, true }));
 
-    assertEquals(new TextPart("wahr, falsch, wahr"), registry.getFormatter(null, boolean[].class)
-        .format(context, new boolean[] { true, false, true }, "bool", noParameters, null));
-
-    DataMap booleanMap = new DataMap(new HashMap<MapKey, MapValue>() {
+    val booleanMap = new HashMap<MapKey, MapValue>() {
       {
-        put(MapKeyBool.TRUE, new MapValueMessage(new Message.WithSpaces() {
-          @Override public @NotNull String format(@NotNull MessageContext context, @NotNull MessageContext.Parameters parameters) { return "YES"; }
-          @Override public boolean hasParameters() { return false; }
-          @NotNull
-          @Override public SortedSet<String> getParameterNames() { return emptySortedSet(); }
-          @Override public boolean isSpaceBefore() { return false; }
-          @Override public boolean isSpaceAfter() { return false; }
-          @Override public @NotNull Message trim() { return this; }
-        }));
-
-        put(MapKeyBool.FALSE, new MapValueMessage(new Message.WithSpaces() {
-          @Override public @NotNull String format(@NotNull MessageContext context, @NotNull MessageContext.Parameters parameters) { return "NO"; }
-          @Override public boolean hasParameters() { return false; }
-          @NotNull
-          @Override public SortedSet<String> getParameterNames() { return emptySortedSet(); }
-          @Override public boolean isSpaceBefore() { return false; }
-          @Override public boolean isSpaceAfter() { return false; }
-          @Override public @NotNull Message trim() { return this; }
-        }));
+        put(MapKeyBool.TRUE, new MapValueMessage(new TextMessage(MessagePartFactory.noSpaceText("YES"))));
+        put(MapKeyBool.FALSE, new MapValueMessage(new TextMessage(MessagePartFactory.noSpaceText("NO"))));
       }
-    });
+    };
 
-    assertEquals(new TextPart("NO, YES"), registry.getFormatter(null, boolean[].class)
-        .format(context, new boolean[] { false, true }, noParameters, booleanMap));
+    assertEquals(new TextPart("NO, YES"), format(context, new boolean[] { false, true }, booleanMap));
+    assertEquals(TextPart.EMPTY, format(context, new boolean[0]));
 
-    assertEquals(TextPart.EMPTY, registry.getFormatter(null, boolean[].class)
-        .format(context, new boolean[0], noParameters, null));
-
-    registry.addFormatter(new NamedParameterFormatter() {
+    formatterService.addFormatter(new NamedParameterFormatter() {
       @Override
-      public @NotNull Text format(@NotNull MessageContext context, Object value, String format,
-                                  @NotNull MessageContext.Parameters parameters, DataMap map) {
+      public @NotNull Text format(@NotNull FormatterContext context, Object value) {
         return value == null ? nullText() : new TextPart((Boolean)value ? "1" : "0");
+      }
+
+      @Override
+      public boolean canFormat(@NotNull Class<?> type) {
+        return Boolean.class.isAssignableFrom(type) || boolean.class.isAssignableFrom(type);
       }
 
       @Override
@@ -116,101 +98,77 @@ public class ArrayFormatterTest extends AbstractFormatterTest
       public @NotNull Set<FormattableType> getFormattableTypes()
       {
         return new HashSet<>(Arrays.asList(
-            new FormattableType(Boolean.class),
-            new FormattableType(boolean.class)));
-      }
-
-      @Override
-      public int getPriority() {
-        return 1;
+            new FormattableType(Boolean.class, 10),
+            new FormattableType(boolean.class, 10)));
       }
     });
 
-    assertEquals(new TextPart("1, 1, 0, 1, 0, 0, 0"), registry.getFormatter(null, boolean[].class)
-        .format(context, new boolean[] { true, true, false, true, false, false, false }, "bool", noParameters, null));
+    assertEquals(new TextPart("1, 1, 0, 1, 0, 0, 0"), format(context,
+        new boolean[] { true, true, false, true, false, false, false }, "bool"));
   }
 
 
   @Test
   public void testIntegerArray()
   {
-    GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new ArrayFormatter());
+    val formatterService = createFormatterService(new ArrayFormatter());
+    val context = new MessageContext(formatterService, NO_CACHE_INSTANCE, "de-DE");
 
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, "de-DE");
-    Parameters noParameters = context.noParameters();
+    assertEquals(new TextPart("12, -7, 99"), format(context, new int[] { 12, -7, 99 }));
 
-    assertEquals(new TextPart("12, -7, 99"), registry.getFormatter(null, int[].class)
-        .format(context, new int[] { 12, -7, 99 }, noParameters, null));
+    assertEquals(new TextPart("1, -7, 248"), format(context, new int[] { 1, -7, 248 },
+        singletonMap(new MapKeyName("number"), new MapValueString("##00"))));
 
-    assertEquals(new TextPart("1, -7, 248"), registry.getFormatter(null, int[].class)
-        .format(context, new int[] { 1, -7, 248 }, noParameters,
-            new DataMap(singletonMap(new MapKeyName("number"), new MapValueString("##00")))));
+    formatterService.addFormatter(new NumberFormatter());
 
-    registry.addFormatter(new NumberFormatter());
+    assertEquals(new TextPart("01, -07, 248"), format(context, new int[] { 1, -7, 248 },
+        singletonMap(new MapKeyName("number"), new MapValueString("##00"))));
 
-    assertEquals(new TextPart("01, -07, 248"), registry.getFormatter(null, int[].class)
-        .format(context, new int[] { 1, -7, 248 }, noParameters,
-            new DataMap(singletonMap(new MapKeyName("number"), new MapValueString("##00")))));
-
-    registry.addFormatter(new NamedParameterFormatter() {
+    formatterService.addFormatter(new NamedParameterFormatter() {
       @Override
       public @NotNull String getName() {
         return "hex";
       }
 
       @Override
-      public @NotNull Text format(@NotNull MessageContext context, Object value, String format,
-                                  @NotNull MessageContext.Parameters parameters, DataMap map) {
+      public boolean canFormat(@NotNull Class<?> type) {
+        return Integer.class.isAssignableFrom(type);
+      }
+
+      @Override
+      public @NotNull Text format(@NotNull FormatterContext context, Object value) {
         return value == null ? nullText() : new TextPart(String.format("0x%02x", (Integer)value));
       }
 
       @Override
       public @NotNull Set<FormattableType> getFormattableTypes() {
-        return Collections.singleton(new FormattableType(Integer.class));
-      }
-
-      @Override
-      public int getPriority() {
-        return 0;
+        return singleton(new FormattableType(Integer.class));
       }
     });
 
-    assertEquals(new TextPart("0x40, 0xda, 0x2e"), registry.getFormatter(null, int[].class)
-        .format(context, new int[] { 64, 218, 46 }, "hex" , noParameters, null));
+    assertEquals(new TextPart("0x40, 0xda, 0x2e"), format(context, new int[] { 64, 218, 46 }, "hex"));
   }
 
 
   @Test
   public void testObjectArray()
   {
-    GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new ArrayFormatter());
-    registry.addFormatter(new BoolFormatter());
-    registry.addFormatter(new NumberFormatter());
+    val registry = createFormatterService(new ArrayFormatter(), new BoolFormatter(), new NumberFormatter());
+    val context = new MessageContext(registry, NO_CACHE_INSTANCE, "de-DE");
 
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, "de-DE");
-    Parameters noParameters = context.noParameters();
+    assertEquals(new TextPart("Test, wahr, -0006"), format(context, new Object[] { "Test", true, null, -6 },
+        singletonMap(new MapKeyName("number"), new MapValueString("0000"))));
 
-    assertEquals(new TextPart("Test, wahr, -0006"), registry.getFormatter(null, int[].class)
-        .format(context, new Object[] { "Test", true, null, -6 }, noParameters,
-            new DataMap(singletonMap(new MapKeyName("number"), new MapValueString("0000")))));
-
-    assertEquals(new TextPart("this, is, a, test"), registry.getFormatter(null, int[].class)
-        .format(context, new Object[] { null, "this", null, "is", null, "a", null, "test" },
-            noParameters, null));
+    assertEquals(new TextPart("this, is, a, test"), format(context,
+        new Object[] { null, "this", null, "is", null, "a", null, "test" }));
   }
 
 
   @Test
   public void testEmptyOrNullArray()
   {
-    GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new ArrayFormatter());
-
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE);
-
-    Message message = context.getMessageFactory().parse("%{array,null:'null',empty:'empty'}");
+    val context = new MessageContext(createFormatterService(new ArrayFormatter()), NO_CACHE_INSTANCE);
+    val message = context.getMessageFactory().parse("%{array,null:null,empty:empty}");
 
     assertEquals("null", message.format(context, context.parameters().with("array", null)));
     assertEquals("empty", message.format(context, context.parameters().with("array", new int[0])));
@@ -220,10 +178,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
   @Test
   public void testSeparator()
   {
-    final GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new ArrayFormatter());
-
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE);
+    val context = new MessageContext(createFormatterService(new ArrayFormatter()), NO_CACHE_INSTANCE);
 
     assertEquals("1, 2, 3, 4 and 5", context.getMessageFactory()
         .parse("%{c,list-sep:', ',list-sep-last:' and '}")

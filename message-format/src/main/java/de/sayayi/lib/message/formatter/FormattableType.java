@@ -19,6 +19,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.io.Serializable;
 
@@ -44,11 +45,12 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
   private final byte order;
 
 
-  public FormattableType(@NotNull Class<?> type, int order)
+  public FormattableType(@NotNull Class<?> type, @Range(from = 0, to = 127) int order)
   {
     this.type = requireNonNull(type);
     this.order = (byte)order;
 
+    //noinspection ConstantValue
     if (order < 0 || order > 127)
       throw new IllegalArgumentException("order must be in range 0..127");
   }
@@ -66,7 +68,7 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
 
 
   @Contract(pure = true)
-  public int getOrder() {
+  public @Range(from = 0, to = 127) int getOrder() {
     return order;
   }
 

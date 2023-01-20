@@ -15,11 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.jodatime;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +29,7 @@ import org.joda.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -55,19 +54,17 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
     if (value == null)
       return nullText();
 
-    format = getConfigValueString(messageContext, "date", parameters, map, null);
-
-    final Locale locale = parameters.getLocale();
+    final String format = formatterContext.getConfigValueString("date").orElse(null);
+    final Locale locale = formatterContext.getLocale();
     final DateTimeFormatter formatter;
 
     if (!STYLE.containsKey(format))
-      formatter = DateTimeFormat.forPattern(format).withLocale(locale);
+      formatter = DateTimeFormat.forPattern(requireNonNull(format)).withLocale(locale);
     else
     {
       final char[] style = STYLE.get(format).toCharArray();

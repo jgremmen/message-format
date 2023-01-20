@@ -15,39 +15,33 @@
  */
 package de.sayayi.lib.message.formatter.named;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.formatter.GenericFormatterService;
+import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.runtime.ArrayFormatter;
 import de.sayayi.lib.message.formatter.runtime.BoolFormatter;
 import de.sayayi.lib.message.formatter.runtime.IterableFormatter;
 import de.sayayi.lib.message.formatter.runtime.MapFormatter;
+import lombok.val;
 import org.junit.jupiter.api.Test;
-
-import java.util.Locale;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
+import static java.util.Locale.UK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
  * @author Jeroen Gremmen
  */
-class SizeFormatterTest
+class SizeFormatterTest extends AbstractFormatterTest
 {
   @Test
   public void testFormat()
   {
-    final GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new SizeFormatter());
-    registry.addFormatter(new IterableFormatter());
-    registry.addFormatter(new ArrayFormatter());
-    registry.addFormatter(new MapFormatter());
-
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, Locale.UK);
-    final Message message = context.getMessageFactory()
+    val context = new MessageContext(createFormatterService(new SizeFormatter(), new IterableFormatter(),
+        new ArrayFormatter(), new MapFormatter()), NO_CACHE_INSTANCE, UK);
+    val message = context.getMessageFactory()
         .parse("%{c,size} %{c,size,0:'empty',1:'singleton',:'multiple'}");
 
     assertEquals("0 empty", message.format(context,
@@ -64,26 +58,19 @@ class SizeFormatterTest
   @Test
   public void testFormatNoSizeQueryable()
   {
-    final GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new SizeFormatter());
-    registry.addFormatter(new BoolFormatter());
+    val context = new MessageContext(createFormatterService(new SizeFormatter(), new BoolFormatter()),
+        NO_CACHE_INSTANCE, UK);
+    val message = context.getMessageFactory().parse("%{c,size}");
 
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, Locale.UK);
-    final Message message = context.getMessageFactory().parse("%{c,size}");
-
-    assertEquals("0", message.format(context,
-        context.parameters().with("c", true)));
+    assertEquals("0", message.format(context, context.parameters().with("c", true)));
   }
 
 
   @Test
   public void testFormatDefaultFormatter()
   {
-    final GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new SizeFormatter());
-
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, Locale.UK);
-    final Message message = context.getMessageFactory().parse("%{c,size}");
+    val context = new MessageContext(createFormatterService(new SizeFormatter()), NO_CACHE_INSTANCE, UK);
+    val message = context.getMessageFactory().parse("%{c,size}");
 
     assertEquals("0", message.format(context,
         context.parameters().with("c", new byte[] { 'a', 'b' })));

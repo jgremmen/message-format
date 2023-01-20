@@ -15,13 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.named;
 
-import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
-import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -29,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.messageToText;
 import static java.util.Collections.emptySet;
 
 
@@ -47,22 +42,13 @@ public final class ChoiceFormatter extends AbstractParameterFormatter implements
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text format(@NotNull MessageContext messageContext, Object value, String format,
-                              @NotNull Parameters parameters, DataMap map)
-  {
-    if (map == null)
-      throw new MessageException("data must be a choice map");
-
-    final Message.WithSpaces message =
-        map.getMessage(messageContext, value, parameters, NO_NAME_KEY_TYPES, true);
-
-    return messageToText(messageContext, message, parameters);
+  public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value) {
+    return formatterContext.format(formatterContext.getMapMessageOrEmpty(value, NO_NAME_KEY_TYPES, true));
   }
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                      @NotNull Parameters parameters, DataMap map) {
+  protected @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value) {
     throw new IllegalStateException();
   }
 

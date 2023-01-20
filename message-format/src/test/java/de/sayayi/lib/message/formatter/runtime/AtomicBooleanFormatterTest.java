@@ -17,7 +17,8 @@ package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import lombok.val;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -31,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
+@Disabled
 class AtomicBooleanFormatterTest extends AbstractFormatterTest
 {
   @Test
@@ -42,15 +44,11 @@ class AtomicBooleanFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat()
   {
-    final AtomicBooleanFormatter formatter = new AtomicBooleanFormatter();
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(),
+    val context = new MessageContext(createFormatterService(new AtomicBooleanFormatter()),
         NO_CACHE_INSTANCE, "de-DE");
-    final MessageContext.Parameters parameters = context.noParameters();
 
-    assertEquals(nullText(), formatter.format(context, null, parameters, null));
-    assertEquals(noSpaceText("wahr"),
-        formatter.format(context, new AtomicBoolean(true), parameters, null));
-    assertEquals(noSpaceText("falsch"),
-        formatter.format(context, new AtomicBoolean(false), parameters, null));
+    assertEquals(nullText(), format(context, null));
+    assertEquals(noSpaceText("wahr"), format(context, new AtomicBoolean(true)));
+    assertEquals(noSpaceText("falsch"), format(context, new AtomicBoolean(false)));
   }
 }

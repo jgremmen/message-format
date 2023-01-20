@@ -15,12 +15,10 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -54,19 +52,17 @@ public final class NumberFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object v, String format,
-                                   @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object v)
   {
     if (v == null)
       return nullText();
 
     final Number value = (Number)v;
+    final String format = formatterContext.getConfigValueString("number").orElse(null);
 
     // special case: show number as bool
     if ("bool".equals(format))
-      return formatBoolean(messageContext, value, parameters, map);
-
-    format = getConfigValueString(messageContext, "number", parameters, map);
+      return formatterContext.format(value, boolean.class);
 
     if ((format == null || "integer".equals(format)) &&
         (value instanceof BigInteger || value instanceof Long || value instanceof Integer ||
@@ -74,22 +70,7 @@ public final class NumberFormatter extends AbstractParameterFormatter
          value instanceof AtomicLong || value instanceof LongAdder))
       return noSpaceText(value.toString());
 
-    return noSpaceText(getFormatter(format, parameters).format(value));
-  }
-
-
-  private Text formatBoolean(@NotNull MessageContext messageContext, Number value, Parameters parameters,
-                             DataMap map)
-  {
-    ParameterFormatter formatter = messageContext.getFormatter("bool", boolean.class);
-    Set<FormattableType> types = formatter.getFormattableTypes();
-
-    // if we got some default formatter, use a specific one instead
-    if (!types.contains(new FormattableType(Boolean.class)) &&
-        !types.contains(new FormattableType(boolean.class)))
-      formatter = BOOL_FORMATTER;
-
-    return formatter.format(messageContext, value, parameters, map);
+    return noSpaceText(getFormatter(format, formatterContext).format(value));
   }
 
 

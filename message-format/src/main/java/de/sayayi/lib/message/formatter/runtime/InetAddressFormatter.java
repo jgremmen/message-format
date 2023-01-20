@@ -15,11 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,6 +25,7 @@ import java.net.InetAddress;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Collections.singleton;
 
 
@@ -36,25 +35,26 @@ import static java.util.Collections.singleton;
 public final class InetAddressFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
-    String s = null;
+    if (value == null)
+      return nullText();
 
-    if (value != null)
+    final InetAddress inetAddress = (InetAddress)value;
+
+    switch(formatterContext.getConfigValueString("inet").orElse("ip"))
     {
-      final InetAddress inetAddress = (InetAddress)value;
-      format = getConfigValueString(messageContext, "inet", parameters, map, null);
+      case "name":
+        return noSpaceText(inetAddress.getHostName());
 
-      if ("name".equals(format))
-        s = inetAddress.getHostName();
-      else if ("canonical".equals(format) || "fqdn".equals(format))
-        s = inetAddress.getCanonicalHostName();
-      else
-        s = inetAddress.getHostAddress();
+      case "fqdn":
+        return noSpaceText(inetAddress.getCanonicalHostName());
+
+      case "ip":
+        return noSpaceText(inetAddress.getHostAddress());
     }
 
-    return noSpaceText(s);
+    return formatterContext.delegateToNextFormatter();
   }
 
 

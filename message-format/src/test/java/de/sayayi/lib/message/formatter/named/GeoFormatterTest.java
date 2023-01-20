@@ -16,14 +16,11 @@
 package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKeyName;
 import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
-import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.formatter.named.GeoFormatter.Format;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
@@ -36,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Jeroen Gremmen
  */
+@SuppressWarnings("UnnecessaryUnicodeEscape")
 public class GeoFormatterTest extends AbstractFormatterTest
 {
   private static double dms(int degree, int minutes) {
@@ -103,54 +101,43 @@ public class GeoFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatLongitude()
   {
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE,
-        ROOT);
-    final GeoFormatter formatter = new GeoFormatter();
+    val context = new MessageContext(createFormatterService(new GeoFormatter()), NO_CACHE_INSTANCE, ROOT);
 
     // short-longitude
-    assertEquals(noSpaceText("4\u00b048'E"), formatter.format(context, dms(4, 48),
-        context.noParameters(),
-        new DataMap(singletonMap(new MapKeyName("geo"), new MapValueString("short-longitude")))));
+    assertEquals(noSpaceText("4\u00b048'E"), format(context, dms(4, 48),
+        singletonMap(new MapKeyName("geo"), new MapValueString("short-longitude")), "geo"));
 
     // longitude
-    assertEquals(noSpaceText("19\u00b00'0\"W"),
-        formatter.format(context, -dms(18, 59, 59, 501),
-        context.noParameters(), new DataMap(singletonMap(new MapKeyName("geo"), new MapValueString("longitude")))));
+    assertEquals(noSpaceText("19\u00b00'0\"W"), format(context, -dms(18, 59, 59, 501),
+        singletonMap(new MapKeyName("geo"), new MapValueString("longitude")), "geo"));
 
     // medium-longitude
-    assertEquals(noSpaceText("18\u00b059'59,9\"E"),
-        formatter.format(context, dms(18, 59, 59, 891),
-            context.parameters().withLocale(GERMANY),
-            new DataMap(singletonMap(new MapKeyName("geo"), new MapValueString("medium-longitude")))));
+    assertEquals(noSpaceText("18\u00b059'59,9\"E"), format(context, context.parameters().withLocale(GERMANY),
+        dms(18, 59, 59, 891),
+        singletonMap(new MapKeyName("geo"), new MapValueString("medium-longitude")), "geo"));
 
     // long-longitude
-    assertEquals(noSpaceText("18\u00b059'59.891\"W"),
-        formatter.format(context, -dms(18, 59, 59, 891),
-            context.parameters().withLocale(UK),
-            new DataMap(singletonMap(new MapKeyName("geo"), new MapValueString("long-longitude")))));
+    assertEquals(noSpaceText("18\u00b059'59.891\"W"), format(context, context.parameters().withLocale(UK),
+        -dms(18, 59, 59, 891),
+        singletonMap(new MapKeyName("geo"), new MapValueString("long-longitude")), "geo"));
   }
 
 
   @Test
   public void testFormatter()
   {
-    final GenericFormatterService formatterRegistry = new GenericFormatterService();
-    formatterRegistry.addFormatter(new GeoFormatter());
-    final MessageContext context = new MessageContext(formatterRegistry, NO_CACHE_INSTANCE, ENGLISH);
-
-    final Parameters parameters = context.parameters()
+    val context = new MessageContext(createFormatterService(new GeoFormatter()), NO_CACHE_INSTANCE, ENGLISH);
+    val parameters = context.parameters()
         .with("lat", dms(51, 34, 9, 0))
         .with("lon", dms(4, 48));
 
-    assertEquals("coordinates 4\u00b048'0\"E, 51\u00b034'9\"N",
-        context.getMessageFactory()
-            .parse("coordinates %{lon,geo,geo:'longitude'}, %{lat,geo,geo:'latitude'}")
-            .format(context, parameters));
+    assertEquals("coordinates 4\u00b048'0\"E, 51\u00b034'9\"N", context.getMessageFactory()
+        .parse("coordinates %{lon,geo,geo:longitude}, %{lat,geo,geo:latitude}")
+        .format(context, parameters));
 
-    assertEquals("coordinates 4\u00b048.0' E, 51\u00b034'9.000\"N",
-        context.getMessageFactory()
-            .parse("coordinates %{lon,geo,geo:'dM LO'}, %{lat,geo,geo:'long-latitude'}")
-            .format(context, parameters));
+    assertEquals("coordinates 4\u00b048.0' E, 51\u00b034'9.000\"N", context.getMessageFactory()
+        .parse("coordinates %{lon,geo,geo:'dM LO'}, %{lat,geo,geo:long-latitude}")
+        .format(context, parameters));
 
     assertEquals("51\u00b034'09\"N", context.getMessageFactory()
         .parse("%{lat,geo,geo:'d0m0sLA'}")

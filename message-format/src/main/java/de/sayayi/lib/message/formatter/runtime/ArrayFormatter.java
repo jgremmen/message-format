@@ -15,14 +15,11 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
@@ -66,8 +63,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
 
 
   @Override
-  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object array, String format,
-                                   @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object array)
   {
     if (array == null)
       return nullText();
@@ -78,11 +74,10 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
 
     final StringBuilder s = new StringBuilder();
     final Class<?> arrayType = array.getClass();
-    final ParameterFormatter formatter =
-        arrayType.isPrimitive() ? messageContext.getFormatter(format, arrayType.getComponentType()) : null;
-    final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, parameters.getLocale());
-    final String sep = getConfigValueString(messageContext, "list-sep", parameters, map,", ");
-    final String sepLast = getConfigValueString(messageContext, "list-sep-last", parameters, map, sep);
+    final Class<?> arrayElementType = arrayType.isPrimitive() ? arrayType.getComponentType() : null;
+    final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, formatterContext.getLocale());
+    final String sep = formatterContext.getConfigValueString("list-sep").orElse(", ");
+    final String sepLast = formatterContext.getConfigValueString("list-sep-last").orElse(sep);
 
     for(int i = 0; i < length; i++)
     {
@@ -91,10 +86,8 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
 
       if (value == array)
         text = new TextPart(bundle.getString("thisArray"));
-      else if (formatter != null)
-        text = formatter.format(messageContext, value, format, parameters, map);
       else if (value != null)
-        text = messageContext.getFormatter(format, value.getClass()).format(messageContext, value, format, parameters, map);
+        text = formatterContext.format(value, arrayElementType, true);
 
       if (text != null && !text.isEmpty())
       {

@@ -24,11 +24,7 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
@@ -37,6 +33,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * @author Jeroen Gremmen
  */
+@SuppressWarnings("UnstableApiUsage")
 public class MessageBundle
 {
   @Getter private final @NotNull MessageFactory messageFactory;
@@ -98,7 +95,7 @@ public class MessageBundle
 
 
   @Contract(mutates = "this")
-  @SuppressWarnings({"WeakerAccess", "squid:S2583"})
+  @SuppressWarnings("WeakerAccess")
   public void add(@NotNull Message.WithCode message)
   {
     final String code = requireNonNull(message, "message must not be null").getCode();

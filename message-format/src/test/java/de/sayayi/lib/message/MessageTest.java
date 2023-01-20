@@ -16,11 +16,11 @@
 package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.UK;
@@ -48,20 +48,20 @@ public class MessageTest
   @Test
   public void testParseMultiLocale()
   {
-    final Map<Locale,String> texts = new HashMap<>();
+    val texts = new HashMap<Locale,String>();
 
     texts.put(UK, "%{n} %{n,choice,1:'colour', :'colours'}.");
     texts.put(new Locale("nl", "NL"), "%{n} %{n,choice,1 : 'kleur',: 'kleuren'}.");
     texts.put(Locale.GERMAN, "%{n} %{n,choice,1: 'Farbe', :'Farben'}.");
     texts.put(Locale.US, "%{n} %{n,choice,1:'color', :'colors'}.");
 
-    final Message m = NO_CACHE_INSTANCE.parse(texts);
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+    val msg = NO_CACHE_INSTANCE.parse(texts);
+    val context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
-    final String nl = m.format(context, context.parameters().withLocale("nl-NL").with("n", 1));
+    val nl = msg.format(context, context.parameters().withLocale("nl-NL").with("n", 1));
     assertEquals("1 kleur.", nl);
 
-    final String uk = m.format(context, context.parameters().withLocale(UK).with("n", 4));
+    val uk = msg.format(context, context.parameters().withLocale(UK).with("n", 4));
     assertEquals("4 colours.", uk);
   }
 

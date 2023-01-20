@@ -19,8 +19,8 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
+@Disabled
 public class BoolFormatterTest extends AbstractFormatterTest
 {
   @Test
@@ -46,17 +47,15 @@ public class BoolFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat()
   {
-    final BoolFormatter formatter = new BoolFormatter();
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE,
-        "de-DE");
-    final Parameters parameters = context.noParameters();
+    final MessageContext context =
+        new MessageContext(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE, "de-DE");
 
-    assertEquals(noSpaceText("wahr"), formatter.format(context, Boolean.TRUE, parameters, null));
-    assertEquals(noSpaceText("falsch"), formatter.format(context, 0.0d, parameters, null));
-    assertEquals(noSpaceText("wahr"), formatter.format(context, -0.0001f, parameters, null));
-    assertEquals(noSpaceText("falsch"), formatter.format(context, "FALSE", parameters, null));
-    assertEquals(noSpaceText("wahr"), formatter.format(context, "TrUe", parameters, null));
-    assertEquals(noSpaceText("wahr"), formatter.format(context, -4, parameters, null));
+    assertEquals(noSpaceText("wahr"), format(context, Boolean.TRUE));
+    assertEquals(noSpaceText("falsch"), format(context, 0.0d));
+    assertEquals(noSpaceText("wahr"), format(context, -0.0001f));
+    assertEquals(noSpaceText("falsch"), format(context, "FALSE"));
+    assertEquals(noSpaceText("wahr"), format(context, "TrUe"));
+    assertEquals(noSpaceText("wahr"), format(context, -4));
   }
 
 

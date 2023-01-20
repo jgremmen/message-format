@@ -15,11 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.named;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import lombok.NoArgsConstructor;
@@ -66,14 +64,19 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
 
 
   @Override
+  public boolean canFormat(@NotNull Class<?> type) {
+    return Number.class.isAssignableFrom(type);
+  }
+
+
+  @Override
   @SuppressWarnings("squid:S3776")
-  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
     if (value == null)
       return nullText();
 
-    final Format fmt = getFormat(messageContext, parameters, map);
+    final Format fmt = getFormat(formatterContext);
     final StringBuilder s = new StringBuilder();
     final double v = ((Number)value).doubleValue();
     final double[] dms = dmsSplitter(fmt, v);
@@ -87,13 +90,13 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
 
     if (fmt.hasMinutes())
     {
-      s.append(formatMinOrSec(parameters.getLocale(), dms[1], fmt.minuteDigits, fmt.zeroPadMinutes)).append('\'');
+      s.append(formatMinOrSec(formatterContext.getLocale(), dms[1], fmt.minuteDigits, fmt.zeroPadMinutes)).append('\'');
       if (fmt.separatorAfterMinute)
         s.append(' ');
 
       if (fmt.hasSeconds())
       {
-        s.append(formatMinOrSec(parameters.getLocale(), dms[2], fmt.secondDigits, fmt.zeroPadSeconds)).append('"');
+        s.append(formatMinOrSec(formatterContext.getLocale(), dms[2], fmt.secondDigits, fmt.zeroPadSeconds)).append('"');
         if (fmt.separatorAfterSecond)
           s.append(' ');
       }
@@ -111,10 +114,9 @@ public class GeoFormatter extends AbstractParameterFormatter implements NamedPar
   }
 
 
-  private @NotNull Format getFormat(@NotNull MessageContext messageContext,
-                                    @NotNull Parameters parameters, DataMap map)
+  private @NotNull Format getFormat(@NotNull FormatterContext formatterContext)
   {
-    String formatString = getConfigValueString(messageContext, "geo", parameters, map, "dms");
+    String formatString = formatterContext.getConfigValueString("geo").orElse("dms");
     Format format = FORMAT.get(formatString);
 
     return format == null ? parseFormatString(formatString) : format;

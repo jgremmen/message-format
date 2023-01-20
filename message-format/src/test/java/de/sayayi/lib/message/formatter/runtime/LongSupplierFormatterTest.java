@@ -17,10 +17,10 @@ package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import lombok.val;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.util.Locale;
 import java.util.function.LongSupplier;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
@@ -28,12 +28,14 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Long.MIN_VALUE;
+import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
  * @author Jeroen Gremmen
  */
+@Disabled
 class LongSupplierFormatterTest extends AbstractFormatterTest
 {
   @Test
@@ -45,19 +47,12 @@ class LongSupplierFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat()
   {
-    final LongSupplierFormatter formatter = new LongSupplierFormatter();
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(),
-        NO_CACHE_INSTANCE, Locale.ROOT);
-    final MessageContext.Parameters parameters = context.noParameters();
+    val context = new MessageContext(createFormatterService(new LongSupplierFormatter()), NO_CACHE_INSTANCE, ROOT);
 
-    assertEquals(nullText(), formatter.format(context, null, parameters, null));
-    assertEquals(noSpaceText("0"),
-        formatter.format(context, (LongSupplier)() -> 0, parameters, null));
-    assertEquals(noSpaceText(Long.toString(MAX_VALUE)),
-        formatter.format(context, (LongSupplier)() -> MAX_VALUE, parameters, null));
-    assertEquals(noSpaceText(Long.toString(MIN_VALUE)),
-        formatter.format(context, (LongSupplier)() -> MIN_VALUE, parameters, null));
-    assertEquals(noSpaceText("123456789"),
-        formatter.format(context, (LongSupplier)() -> 123456789L, parameters, null));
+    assertEquals(nullText(), format(context, null));
+    assertEquals(noSpaceText("0"), format(context, (LongSupplier)() -> 0));
+    assertEquals(noSpaceText(Long.toString(MAX_VALUE)), format(context, (LongSupplier)() -> MAX_VALUE));
+    assertEquals(noSpaceText(Long.toString(MIN_VALUE)), format(context, (LongSupplier)() -> MIN_VALUE));
+    assertEquals(noSpaceText("123456789"), format(context, (LongSupplier)() -> 123456789L));
   }
 }

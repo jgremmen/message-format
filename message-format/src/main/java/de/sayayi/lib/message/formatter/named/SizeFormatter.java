@@ -15,22 +15,16 @@
  */
 package de.sayayi.lib.message.formatter.named;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
-import de.sayayi.lib.message.formatter.FormattableType;
-import de.sayayi.lib.message.formatter.NamedParameterFormatter;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.formatter.*;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Set;
 
-import static de.sayayi.lib.message.data.map.MapKey.Type.NUMBER;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.messageToText;
+import static de.sayayi.lib.message.data.map.MapKey.NUMBER_TYPE;
 import static java.util.Collections.emptySet;
 
 
@@ -48,29 +42,29 @@ public final class SizeFormatter extends AbstractParameterFormatter implements N
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text format(@NotNull MessageContext messageContext, Object value, String format,
-                              @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value)
   {
     long size = 0;
 
     if (value != null)
-    {
-      ParameterFormatter formatter = messageContext.getFormatter(value.getClass());
-      if (formatter instanceof SizeQueryable)
-        size = ((SizeQueryable)formatter).size(value);
-    }
+      for(ParameterFormatter formatter: formatterContext.getMessageContext().getFormatters(value.getClass()))
+        if (formatter instanceof SizeQueryable)
+        {
+          size = ((SizeQueryable)formatter).size(value);
+          break;
+        }
 
-    if (map == null || map.isEmpty())
-      return messageContext.getFormatter(long.class).format(messageContext, size, parameters, null);
+    final Optional<Message.WithSpaces> mappedMessage =
+        formatterContext.getMapMessage(size, NUMBER_TYPE, true);
 
-    return messageToText(messageContext,
-        map.getMessage(messageContext, size, parameters, EnumSet.of(NUMBER), true), parameters);
+    return mappedMessage.isPresent()
+        ? formatterContext.format(mappedMessage.get())
+        : formatterContext.format(size, long.class);
   }
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                      @NotNull Parameters parameters, DataMap map) {
+  protected @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value) {
     throw new IllegalStateException();
   }
 

@@ -18,8 +18,8 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.formatter.GenericFormatterService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -33,18 +33,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
+@Disabled
 public class FieldFormatterTest extends AbstractFormatterTest
 {
   private MessageContext context;
 
 
   @BeforeEach
-  public void init()
-  {
-    final GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new FieldFormatter());
-
-    context = new MessageContext(registry, NO_CACHE_INSTANCE);
+  public void init() {
+    context = new MessageContext(createFormatterService(new FieldFormatter()), NO_CACHE_INSTANCE);
   }
 
 

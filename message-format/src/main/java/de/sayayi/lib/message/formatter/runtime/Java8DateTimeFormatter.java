@@ -15,11 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +36,7 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
 import static java.time.format.DateTimeFormatter.*;
 import static java.time.format.FormatStyle.*;
 import static java.util.Collections.singleton;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -81,18 +80,16 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
     if (value == null)
       return nullText();
 
-    format = getConfigValueString(messageContext, "date", parameters, map);
-
+    final String format = formatterContext.getConfigValueString("date").orElse(null);
     final DateTimeFormatter formatter;
 
     if (!STYLE.containsKey(format))
-      formatter = ofPattern(format);
+      formatter = ofPattern(requireNonNull(format));
     else
     {
       final char[] style = STYLE.get(format).toCharArray();
@@ -108,7 +105,7 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
 
     String text = formatter
         .withZone(ZoneId.systemDefault())
-        .withLocale(parameters.getLocale())
+        .withLocale(formatterContext.getLocale())
         .format((Temporal)value).trim();
 
     // strip trailing timezone for local time

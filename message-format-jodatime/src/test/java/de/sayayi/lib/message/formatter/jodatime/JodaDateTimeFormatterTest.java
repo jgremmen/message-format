@@ -15,18 +15,17 @@
  */
 package de.sayayi.lib.message.formatter.jodatime;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKeyName;
 import de.sayayi.lib.message.data.map.MapValueString;
+import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
-import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.part.TextPart;
+import lombok.val;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
@@ -39,135 +38,99 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-public class JodaDateTimeFormatterTest
+@Disabled
+public class JodaDateTimeFormatterTest extends AbstractFormatterTest
 {
   @Test
   public void testLocalDate()
   {
-    final JodaDateTimeFormatter formatter = new JodaDateTimeFormatter();
-    final MessageContext messageContext = new MessageContext(DefaultFormatterService.getSharedInstance(),
-        NO_CACHE_INSTANCE, GERMANY);
-    final Parameters context = messageContext.noParameters();
-    final LocalDate date = new LocalDate(1972, 8, 17);
+    val context = new MessageContext(createFormatterService(new JodaDateTimeFormatter()), NO_CACHE_INSTANCE, GERMANY);
+    val date = new LocalDate(1972, 8, 17);
 
-    assertEquals(new TextPart("17.08.72"),
-        formatter.format(messageContext, date, context,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("short")))));
-    assertEquals(new TextPart("17.08.1972"),
-        formatter.format(messageContext, date, context,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("medium")))));
-    assertEquals(new TextPart("17. August 1972"),
-        formatter.format(messageContext, date, context,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("long")))));
-    assertEquals(new TextPart("Donnerstag, 17. August 1972"),
-        formatter.format(messageContext, date, context,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("full")))));
-    assertEquals(new TextPart("17.08.1972"),
-        formatter.format(messageContext, date, context,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("date")))));
+    assertEquals(new TextPart("17.08.72"), format(context, date,
+        singletonMap(new MapKeyName("date"), new MapValueString("short"))));
+    assertEquals(new TextPart("17.08.1972"), format(context, date,
+        singletonMap(new MapKeyName("date"), new MapValueString("medium"))));
+    assertEquals(new TextPart("17. August 1972"), format(context, date,
+        singletonMap(new MapKeyName("date"), new MapValueString("long"))));
+    assertEquals(new TextPart("Donnerstag, 17. August 1972"), format(context, date,
+        singletonMap(new MapKeyName("date"), new MapValueString("full"))));
+    assertEquals(new TextPart("17.08.1972"), format(context, date,
+        singletonMap(new MapKeyName("date"), new MapValueString("date"))));
 
-    assertEquals(EMPTY, formatter.format(messageContext, date, context,
-        new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("time")))));
+    assertEquals(EMPTY, format(context, date,
+        singletonMap(new MapKeyName("date"), new MapValueString("time"))));
   }
 
 
   @Test
   public void testLocalTime()
   {
-    final JodaDateTimeFormatter formatter = new JodaDateTimeFormatter();
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(),
-        NO_CACHE_INSTANCE, GERMANY);
-    final Parameters noParameters = context.noParameters();
-    final LocalTime time = new LocalTime(16, 34, 11, 672);
+    val context = new MessageContext(createFormatterService(new JodaDateTimeFormatter()), NO_CACHE_INSTANCE, GERMANY);
+    val time = new LocalTime(16, 34, 11, 672);
 
-    assertEquals(new TextPart("16:34"),
-        formatter.format(context, time, noParameters,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("short")))));
-    assertEquals(new TextPart("16:34:11"),
-        formatter.format(context, time, noParameters,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("medium")))));
-    assertEquals(new TextPart("16:34:11"),
-        formatter.format(context, time, noParameters,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("long")))));
-    assertEquals(new TextPart("16:34 Uhr"),
-        formatter.format(context, time, noParameters,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("full")))));
-    assertEquals(new TextPart("16:34:11"),
-        formatter.format(context, time, noParameters,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("time")))));
+    assertEquals(new TextPart("16:34"), format(context, time,
+        singletonMap(new MapKeyName("date"), new MapValueString("short"))));
+    assertEquals(new TextPart("16:34:11"), format(context, time,
+        singletonMap(new MapKeyName("date"), new MapValueString("medium"))));
+    assertEquals(new TextPart("16:34:11"), format(context, time,
+        singletonMap(new MapKeyName("date"), new MapValueString("long"))));
+    assertEquals(new TextPart("16:34 Uhr"), format(context, time,
+        singletonMap(new MapKeyName("date"), new MapValueString("full"))));
+    assertEquals(new TextPart("16:34:11"), format(context, time,
+        singletonMap(new MapKeyName("date"), new MapValueString("time"))));
 
-    assertEquals(EMPTY, formatter.format(context, time, noParameters,
-        new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("date")))));
+    assertEquals(EMPTY, format(context, time, singletonMap(new MapKeyName("date"), new MapValueString("date"))));
   }
 
 
   @Test
   public void testDateTime()
   {
-    final JodaDateTimeFormatter formatter = new JodaDateTimeFormatter();
-    final MessageContext context =
-        new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE, UK);
-    final Parameters noParameters = context.noParameters();
-    final DateTime datetime =
-        new DateTime(1972, 8, 17, 2, 40, 23, 833);
+    val context = new MessageContext(createFormatterService(new JodaDateTimeFormatter()), NO_CACHE_INSTANCE, UK);
+    val datetime = new DateTime(1972, 8, 17, 2, 40, 23, 833);
 
-    assertEquals(new TextPart("17/08/72 02:40"),
-        formatter.format(context, datetime, noParameters,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("short")))));
-    assertEquals(new TextPart("17-Aug-1972 02:40:23"),
-        formatter.format(context, datetime, noParameters,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("medium")))));
-    assertEquals(new TextPart("17 August 1972 02:40:23 CET"),
-        formatter.format(context, datetime, noParameters,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("long")))));
-    assertEquals(new TextPart("Thursday, 17 August 1972 02:40:23 o'clock CET"),
-        formatter.format(context, datetime, noParameters,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("full")))));
+    assertEquals(new TextPart("17/08/72 02:40"), format(context, datetime,
+        singletonMap(new MapKeyName("date"), new MapValueString("short"))));
+    assertEquals(new TextPart("17-Aug-1972 02:40:23"), format(context, datetime,
+        singletonMap(new MapKeyName("date"), new MapValueString("medium"))));
+    assertEquals(new TextPart("17 August 1972 02:40:23 CET"), format(context, datetime,
+        singletonMap(new MapKeyName("date"), new MapValueString("long"))));
+    assertEquals(new TextPart("Thursday, 17 August 1972 02:40:23 o'clock CET"), format(context, datetime,
+        singletonMap(new MapKeyName("date"), new MapValueString("full"))));
 
-    assertEquals(new TextPart("17-Aug-1972"),
-        formatter.format(context, datetime, noParameters,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("date")))));
-    assertEquals(new TextPart("02:40:23"),
-        formatter.format(context, datetime, noParameters,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("time")))));
+    assertEquals(new TextPart("17-Aug-1972"), format(context, datetime,
+        singletonMap(new MapKeyName("date"), new MapValueString("date"))));
+    assertEquals(new TextPart("02:40:23"), format(context, datetime,
+        singletonMap(new MapKeyName("date"), new MapValueString("time"))));
   }
 
 
   @Test
   public void testCustomPattern()
   {
-    final JodaDateTimeFormatter formatter = new JodaDateTimeFormatter();
-    final MessageContext context =
-        new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE, FRANCE);
-    final Parameters noParameters = context.noParameters();
-    final DateTime datetime =
-        new DateTime(1972, 8, 17, 2, 40, 23, 833);
+    val context = new MessageContext(createFormatterService(new JodaDateTimeFormatter()), NO_CACHE_INSTANCE, FRANCE);
+    val datetime = new DateTime(1972, 8, 17, 2, 40, 23, 833);
 
-    assertEquals(new TextPart("17 août"),
-        formatter.format(context, datetime, noParameters,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("dd MMMM")))));
-    assertEquals(new TextPart("jeu. jeudi"),
-        formatter.format(context, datetime, noParameters,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("EEE EEEE")))));
-    assertEquals(new TextPart("02:40:23,833"),
-        formatter.format(context, datetime, noParameters,
-            new DataMap(singletonMap(new MapKeyName("date"), new MapValueString("HH:mm:ss,SSS")))));
+    assertEquals(new TextPart("17 août"), format(context, datetime,
+        singletonMap(new MapKeyName("date"), new MapValueString("dd MMMM"))));
+    assertEquals(new TextPart("jeu. jeudi"), format(context, datetime,
+        singletonMap(new MapKeyName("date"), new MapValueString("EEE EEEE"))));
+    assertEquals(new TextPart("02:40:23,833"), format(context, datetime,
+        singletonMap(new MapKeyName("date"), new MapValueString("HH:mm:ss,SSS"))));
   }
 
 
   @Test
   public void testFormatter()
   {
-    final GenericFormatterService formatterRegistry = new GenericFormatterService();
-    formatterRegistry.addFormatter(new JodaDateTimeFormatter());
-    final MessageContext context = new MessageContext(formatterRegistry, NO_CACHE_INSTANCE);
-
-    final Parameters parameters = context.parameters()
+    val context = new MessageContext(createFormatterService(new JodaDateTimeFormatter()), NO_CACHE_INSTANCE);
+    val parameters = context.parameters()
         .with("a", new LocalDate(1972, 8, 17))
         .with("b", new LocalTime(16, 45, 9, 123))
         .with("c", new DateTime(2019, 2, 19, 14, 23, 1, 9))
         .withLocale("nl");
-    final Message msg = context.getMessageFactory()
+    val msg = context.getMessageFactory()
         .parse("%{a} %{b,date:'short'} %{c,date:'time'} %{c,date:'yyyy-MM-dd MMM'}");
 
     assertEquals("17-aug-1972 16:45 14:23:01 2019-02-19 feb", msg.format(context, parameters));

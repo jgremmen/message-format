@@ -15,11 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -40,34 +38,30 @@ public final class FieldFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
     if (value == null)
       return nullText();
 
     final Field field = (Field)value;
     final StringBuilder formattedField = new StringBuilder();
-    final String fieldFormat =
-        getConfigValueString(messageContext, "field", parameters, map, "juM");
+    final String format = formatterContext.getConfigValueString("field").orElse("juMTN");
 
-    if ("type".equals(format))
-      return noSpaceText(TypeFormatter.toString(field.getGenericType(), fieldFormat));
+    // c = short class
+    // j = no java.lang. prefix
+    // u = no java.util. prefix
+    // M = with modifiers
+    // T = field type
+    // N = field name
 
-    if (!"name".equals(format))
-    {
-      // c = short class
-      // j = no java.lang. prefix
-      // u = no java.util. prefix
-      // M = with modifiers
+    if (format.indexOf('M') >= 0)
+      formattedField.append(Modifier.toString(field.getModifiers())).append(' ');
 
-      if (fieldFormat.indexOf('M') >= 0)
-        formattedField.append(Modifier.toString(field.getModifiers())).append(' ');
+    if (format.indexOf('T') >= 0)
+      formattedField.append(TypeFormatter.toString(field.getGenericType(), format)).append(' ');
 
-      formattedField.append(TypeFormatter.toString(field.getGenericType(), fieldFormat)).append(' ');
-    }
-
-    formattedField.append(field.getName());
+    if (format.indexOf('N') >= 0)
+      formattedField.append(field.getName());
 
     return noSpaceText(formattedField.toString());
   }

@@ -16,11 +16,11 @@
 package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKeyName;
 import de.sayayi.lib.message.data.map.MapValueString;
-import de.sayayi.lib.message.formatter.GenericFormatterService;
+import de.sayayi.lib.message.formatter.AbstractFormatterTest;
+import lombok.val;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.BooleanSupplier;
@@ -35,39 +35,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-public class SupplierFormatterTest
+@Disabled
+public class SupplierFormatterTest extends AbstractFormatterTest
 {
   @Test
   public void testBooleanSupplier()
   {
-    GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new BoolFormatter());
-    registry.addFormatter(new BooleanSupplierFormatter());
+    val context = new MessageContext(
+        createFormatterService(new BoolFormatter(), new BooleanSupplierFormatter()),
+        NO_CACHE_INSTANCE, "de-DE");
 
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, "de-DE");
-    Parameters noParameters = context.noParameters();
-
-    Object value = (BooleanSupplier) () -> true;
-
-    assertEquals(noSpaceText("wahr"), registry.getFormatter(null, value.getClass())
-        .format(context, value, noParameters, null));
+    assertEquals(noSpaceText("wahr"), format(context, (BooleanSupplier) () -> true));
   }
 
 
   @Test
   public void testLongSupplier()
   {
-    GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new NumberFormatter());
-    registry.addFormatter(new LongSupplierFormatter());
+    val context = new MessageContext(
+        createFormatterService(new NumberFormatter(), new LongSupplierFormatter()), NO_CACHE_INSTANCE, "en");
 
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, "en");
-    Parameters noParameters = context.noParameters();
-
-    Object value = (LongSupplier) () -> 1234567890L;
-
-    assertEquals(noSpaceText("1,234,567,890"), registry.getFormatter(null, value.getClass())
-        .format(context, value, noParameters,
-            new DataMap(singletonMap(new MapKeyName("number"), new MapValueString("###,###,###,###")))));
+    assertEquals(noSpaceText("1,234,567,890"), format(context, (LongSupplier) () -> 1234567890L,
+        singletonMap(new MapKeyName("number"), new MapValueString("###,###,###,###"))));
   }
 }

@@ -15,9 +15,6 @@
  */
 package de.sayayi.lib.message.internal.part;
 
-import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Contract;
@@ -34,7 +31,6 @@ import static lombok.AccessLevel.PRIVATE;
  *
  * @author Jeroen Gremmen
  */
-@SuppressWarnings("java:S1118")
 @NoArgsConstructor(access = PRIVATE)
 public final class MessagePartFactory
 {
@@ -51,14 +47,12 @@ public final class MessagePartFactory
 
 
   @Contract(pure = true)
-  @SuppressWarnings("java:S3358")
   public static @NotNull Text noSpaceText(String text) {
     return text == null ? NULL : isTrimmedEmpty(text) ? EMPTY : new NoSpaceTextPart(text);
   }
 
 
   @Contract(pure = true)
-  @SuppressWarnings("java:S3358")
   public static @NotNull Text spacedText(String text) {
     return text == null ? NULL : text.isEmpty() ? EMPTY : new TextPart(text);
   }
@@ -75,15 +69,5 @@ public final class MessagePartFactory
 
     return spaceBefore == textSpaceBefore && spaceAfter == textSpaceAfter
         ? text : new TextPart(text.getText(), spaceBefore, spaceAfter);
-  }
-
-
-  @Contract(pure = true)
-  public static @NotNull Text messageToText(@NotNull MessageContext messageContext, Message.WithSpaces message,
-                                            @NotNull Parameters parameters)
-  {
-    return message == null
-        ? NULL
-        : new TextPart(message.format(messageContext, parameters), message.isSpaceBefore(), message.isSpaceAfter());
   }
 }

@@ -15,11 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -40,18 +38,16 @@ import static java.util.stream.Collectors.joining;
 public final class TypeFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
-    if (value == null)
-      return nullText();
-
-    return noSpaceText(toString((Type)value,
-        getConfigValueString(messageContext, "type", parameters, map, "Cju")));
+    return value == null
+        ? nullText()
+        : noSpaceText(toString((Type) value, formatterContext.getConfigValueString("type").orElse("ju")));
   }
 
 
-  public static String toString(@NotNull Type type, @NotNull String typeFormat)
+  @Contract(pure = true)
+  public static @NotNull String toString(@NotNull Type type, @NotNull String typeFormat)
   {
     // c = short class
     // j = no java.lang. prefix
@@ -136,7 +132,7 @@ public final class TypeFormatter extends AbstractParameterFormatter
 
   private static String toString_typeVariable(@NotNull TypeVariable<?> typeVariable, @NotNull String typeFormat)
   {
-    if (typeFormat.indexOf('T') < 0)
+    if (typeFormat.indexOf('v') < 0)
       return typeVariable.getName();
 
     final StringBuilder formattedTypeVariable = new StringBuilder();

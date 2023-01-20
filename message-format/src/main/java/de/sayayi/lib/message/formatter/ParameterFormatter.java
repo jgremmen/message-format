@@ -15,9 +15,6 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
@@ -45,40 +42,13 @@ public interface ParameterFormatter
   /**
    * Formats the parameter value to a string representation.
    *
-   * @param messageContext  message context providing formatting information, never {@code null}
-   * @param value           parameter value (can be {@code null})
-   * @param parameters      parameter values available for formatting the current message. Additionally,
-   *                        this instance provides access to the formatting registry as well as to the locale.
-   *                        This parameter is never {@code null}
-   * @param map             data map provided by the parameter definition or {@code null}
-   *
-   * @return  formatted parameter value, never {@code null}
-   *
-   * @since 0.8.0
-   */
-  @Contract(pure = true)
-  default @NotNull Text format(@NotNull MessageContext messageContext, Object value,
-                               @NotNull Parameters parameters, DataMap map) {
-    return format(messageContext, value, null, parameters, map);
-  }
-
-
-  /**
-   * Formats the parameter value to a string representation.
-   *
-   * @param messageContext  message context providing formatting information, never {@code null}
-   * @param value           parameter value (can be {@code null})
-   * @param format          formatter name used by the parameter or {@code null}. Eg.: {@code %{val,myformat}}
-   * @param parameters      parameter values available for formatting the current message. Additionally,
-   *                        this instance provides access to the formatting registry as well as to the locale.
-   *                        This parameter is never {@code null}
-   * @param map             data map provided by the parameter definition or {@code null}
+   * @param formatterContext  message context providing formatting information, never {@code null}
+   * @param value             parameter value (can be {@code null})
    *
    * @return  formatted parameter value, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull Text format(@NotNull MessageContext messageContext, Object value, String format,
-                       @NotNull Parameters parameters, DataMap map);
+  @NotNull Text format(@NotNull FormatterContext formatterContext, Object value);
 
 
   /**
@@ -94,10 +64,6 @@ public interface ParameterFormatter
    */
   @Contract(pure = true)
   @NotNull Set<FormattableType> getFormattableTypes();
-
-
-  @Contract(pure = true)
-  int getPriority();
 
 
 

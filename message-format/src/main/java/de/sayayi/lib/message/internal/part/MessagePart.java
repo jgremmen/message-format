@@ -32,7 +32,6 @@ public interface MessagePart extends SpacesAware, Serializable
   /**
    * Message part containing text only.
    */
-  @SuppressWarnings("java:S1214")
   interface Text extends MessagePart
   {
     Text EMPTY = new NoSpaceTextPart("");

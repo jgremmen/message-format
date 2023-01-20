@@ -1,10 +1,8 @@
 package de.sayayi.lib.message.formatter.named;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import lombok.val;
@@ -44,14 +42,19 @@ public final class FileSizeFormatter extends AbstractParameterFormatter implemen
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                      @NotNull Parameters parameters, DataMap map)
+  public boolean canFormat(@NotNull Class<?> type) {
+    return Number.class.isAssignableFrom(type);
+  }
+
+
+  @Override
+  protected @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
     if (!(value instanceof Number))
       return nullText();
 
     val size = ((Number)value).longValue();
-    var scale = normalizeScale(getConfigValueNumber(messageContext, "scale", parameters, map, 1));
+    var scale = normalizeScale(formatterContext.getConfigValueNumber("scale").orElse(1));
     val s = new StringBuilder();
     final int unitIndex;
 
@@ -65,18 +68,19 @@ public final class FileSizeFormatter extends AbstractParameterFormatter implemen
       if ((unitIndex = calculateUnitIndex(size, scale)) == 0)
         scale = 0;
 
-      s.append(new DecimalFormat(FORMAT[scale], DecimalFormatSymbols.getInstance(parameters.getLocale()))
+      s.append(new DecimalFormat(FORMAT[scale], DecimalFormatSymbols.getInstance(formatterContext.getLocale()))
           .format((double)size / POW10[unitIndex * 3]));
     }
 
     val unit = UNITS[unitIndex];
-    val unitMessage = getMessage(messageContext, unit, EnumSet.of(STRING), parameters, map, false);
+    val unitMessage = formatterContext.getMapMessage(unit, EnumSet.of(STRING)).orElse(null);
 
     if ((unitMessage != null && unitMessage.isSpaceBefore()) ||
-        getConfigValueBool(messageContext, "space", parameters, map))
+        formatterContext.getConfigValueBool("space").orElse(false))
       s.append(' ');
 
-    return noSpaceText(s.append(unitMessage == null ? unit : unitMessage.format(messageContext, parameters)).toString());
+    return noSpaceText(s.append(unitMessage == null
+        ? unit : unitMessage.format(formatterContext.getMessageContext(), formatterContext)).toString());
   }
 
 

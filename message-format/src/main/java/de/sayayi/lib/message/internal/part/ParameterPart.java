@@ -21,7 +21,8 @@ import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKey;
 import de.sayayi.lib.message.data.map.MapValue;
 import de.sayayi.lib.message.exception.MessageException;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
+import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.internal.FormatterContextImpl;
 import de.sayayi.lib.message.internal.part.MessagePart.Parameter;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -68,12 +69,11 @@ public final class ParameterPart implements Parameter
   @Contract(pure = true)
   public @NotNull Text getText(@NotNull MessageContext messageContext, @NotNull Parameters parameters)
   {
-    final Object value = parameters.getParameterValue(parameter);
-    final Class<?> type = value != null ? value.getClass() : String.class;
-    final ParameterFormatter formatter = messageContext.getFormatter(format, type);
+    final FormatterContext formatterContext = new FormatterContextImpl(messageContext, parameters,
+        parameters.getParameterValue(parameter), null, format, map);
 
     try {
-      return addSpaces(formatter.format(messageContext, value, format, parameters, map), spaceBefore, spaceAfter);
+      return addSpaces(formatterContext.delegateToNextFormatter(), spaceBefore, spaceAfter);
     } catch(Exception ex) {
       throw new MessageException("failed to format parameter " + parameter, ex);
     }

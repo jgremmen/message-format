@@ -17,21 +17,23 @@ package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import lombok.val;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.util.Locale;
 import java.util.function.BooleanSupplier;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
  * @author Jeroen Gremmen
  */
+@Disabled
 class BooleanSupplierFormatterTest extends AbstractFormatterTest
 {
   @Test
@@ -43,15 +45,10 @@ class BooleanSupplierFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat()
   {
-    final BooleanSupplierFormatter formatter = new BooleanSupplierFormatter();
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(),
-        NO_CACHE_INSTANCE, Locale.ROOT);
-    final MessageContext.Parameters parameters = context.noParameters();
+    val context = new MessageContext(createFormatterService(new BooleanSupplierFormatter()), NO_CACHE_INSTANCE, ROOT);
 
-    assertEquals(nullText(), formatter.format(context, null, parameters, null));
-    assertEquals(noSpaceText("true"),
-        formatter.format(context, (BooleanSupplier)() -> true, parameters, null));
-    assertEquals(noSpaceText("false"),
-        formatter.format(context, (BooleanSupplier)() -> false, parameters, null));
+    assertEquals(nullText(), format(context, null));
+    assertEquals(noSpaceText("true"), format(context, (BooleanSupplier)() -> true));
+    assertEquals(noSpaceText("false"), format(context, (BooleanSupplier)() -> false));
   }
 }

@@ -33,7 +33,6 @@ import static java.util.Collections.*;
 /**
  * @author Jeroen Gremmen
  */
-@SuppressWarnings("squid:S2160")
 @ToString
 public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode implements LocaleAware
 {

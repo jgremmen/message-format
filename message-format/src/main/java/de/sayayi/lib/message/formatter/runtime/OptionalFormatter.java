@@ -15,16 +15,15 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.MessagePartFactory;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +31,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Collections.singleton;
 
@@ -42,23 +40,16 @@ import static java.util.Collections.singleton;
  */
 public final class OptionalFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
 {
-  @SuppressWarnings("squid:S2789")
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
     if (value == null)
       return nullText();
 
-    final Optional<?> optional = (Optional<?>)value;
-    if (!optional.isPresent())
-      return emptyText();
-
-    value = optional.get();
-
-    return messageContext.getFormatter(format, value.getClass())
-        .format(messageContext, value, format, parameters, map);
+    return ((Optional<?>)value)
+        .map(o -> formatterContext.format(o, null, true))
+        .orElseGet(MessagePartFactory::emptyText);
   }
 
 

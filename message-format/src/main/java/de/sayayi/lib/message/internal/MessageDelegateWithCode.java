@@ -29,7 +29,6 @@ import java.util.SortedSet;
 /**
  * @author Jeroen Gremmen
  */
-@SuppressWarnings("squid:S2160")
 @ToString
 public class MessageDelegateWithCode extends AbstractMessageWithCode
 {

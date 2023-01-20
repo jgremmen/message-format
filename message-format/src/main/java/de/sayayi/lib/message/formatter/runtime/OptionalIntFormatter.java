@@ -15,13 +15,11 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
 import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.data.map.MapKey.MatchResult;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
@@ -45,18 +43,16 @@ public final class OptionalIntFormatter extends AbstractParameterFormatter imple
   @SuppressWarnings("squid:S2789")
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull MessageContext messageContext, Object value, String format,
-                                   @NotNull Parameters parameters, DataMap map)
+  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
     if (value == null)
       return nullText();
 
     final OptionalInt optional = (OptionalInt)value;
-    if (!optional.isPresent())
-      return emptyText();
 
-    return messageContext.getFormatter(format, int.class)
-        .format(messageContext, optional.getAsInt(), format, parameters, map);
+    return !optional.isPresent()
+        ? emptyText()
+        : formatterContext.format(optional.getAsInt(), int.class, true);
   }
 
 

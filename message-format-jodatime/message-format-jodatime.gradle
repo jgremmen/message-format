@@ -22,6 +22,8 @@ def jodatimeVersion = "2.12.2"
 
 dependencies {
   implementation "joda-time:joda-time:${jodatimeVersion}"
+
+  testImplementation project(':message-format').sourceSets.test.output
 }
 
 
