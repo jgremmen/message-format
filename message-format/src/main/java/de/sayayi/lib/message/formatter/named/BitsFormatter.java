@@ -44,12 +44,6 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
 
 
   @Override
-  public boolean canFormat(@NotNull Class<?> type) {
-    return Number.class.isAssignableFrom(type);
-  }
-
-
-  @Override
   public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
     if (!(value instanceof Number))
@@ -60,9 +54,9 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
   }
 
 
-  private int detectBitCount(@NotNull FormatterContext formatterContext, Object value)
+  private int detectBitCount(@NotNull FormatterContext formatterContext, @NotNull Object value)
   {
-    final Data dataValue = formatterContext.getConfigValueData("length").orElse(null);
+    final Data dataValue = formatterContext.getConfigValueData("bits").orElse(null);
 
     if (dataValue instanceof DataString && "auto".equals(dataValue.asObject()))
       return autoDetectBitCount(value);
@@ -83,7 +77,7 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
     // auto detect for big integer in range 0..Long.MAX_VALUE
     if (value instanceof BigInteger)
     {
-      BigInteger i = (BigInteger)value;
+      final BigInteger i = (BigInteger)value;
 
       if (BigInteger.ZERO.equals(i))
         return 1;
@@ -94,7 +88,7 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
     // auto detect for numbers of type byte, short, integer or long
     if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long)
     {
-      long l = ((Number)value).longValue();
+      final long l = ((Number)value).longValue();
 
       if (l == 0L)
         return 1;

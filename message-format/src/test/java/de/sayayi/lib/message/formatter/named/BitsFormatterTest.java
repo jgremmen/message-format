@@ -56,13 +56,13 @@ public class BitsFormatterTest extends AbstractFormatterTest
     assertEquals(noSpaceText("10101010"), format(context, (byte)0xaa, "bits"));
     assertEquals(noSpaceText("01010101"), format(context, (byte)0x55, "bits"));
     assertEquals(noSpaceText("10101"), format(context, (byte)0x15,
-        singletonMap(new MapKeyName("length"), new MapValueString("auto")), "bits"));
+        singletonMap(new MapKeyName("bits"), new MapValueString("auto")), "bits"));
     assertEquals(noSpaceText("0"), format(context, (byte)0,
-        singletonMap(new MapKeyName("length"), new MapValueString("auto")), "bits"));
+        singletonMap(new MapKeyName("bits"), new MapValueString("auto")), "bits"));
     assertEquals(noSpaceText("101"), format(context, (byte)0x15,
-        singletonMap(new MapKeyName("length"), new MapValueNumber(3)), "bits"));
+        singletonMap(new MapKeyName("bits"), new MapValueNumber(3)), "bits"));
     assertEquals(nullText(), format(context, (Object)null, "bits"));
-    assertEquals(noSpaceText("hello"), format(context, "hello", "bits"));
+    assertEquals(nullText(), format(context, "hello", "bits"));
   }
 
 
@@ -76,10 +76,10 @@ public class BitsFormatterTest extends AbstractFormatterTest
     assertEquals(noSpaceText("1010101010101010"), format(context, (short)0xaaaa, "bits"));
     assertEquals(noSpaceText("0101010101010101"), format(context, (short)0x5555, "bits"));
     assertEquals(noSpaceText("101010101"), format(context, (short)0x155,
-        singletonMap(new MapKeyName("length"), new MapValueString("auto")), "bits"));
+        singletonMap(new MapKeyName("bits"), new MapValueString("auto")), "bits"));
     assertEquals(noSpaceText("0"), format(context, (short)0,
-        singletonMap(new MapKeyName("length"), new MapValueString("auto")), "bits"));
+        singletonMap(new MapKeyName("bits"), new MapValueString("auto")), "bits"));
     assertEquals(noSpaceText("010110"), format(context, (byte)0x456,
-        singletonMap(new MapKeyName("length"), new MapValueNumber(6)), "bits"));
+        singletonMap(new MapKeyName("bits"), new MapValueNumber(6)), "bits"));
   }
 }
