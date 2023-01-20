@@ -74,7 +74,13 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
 
 
   @Override
-  public int compareTo(@NotNull FormattableType o) {
-    return Byte.compare(order, o.order);
+  public int compareTo(@NotNull FormattableType o)
+  {
+    int cmp = Byte.compare(order, o.order);
+    if (cmp == 0)
+      if ((cmp = type.getSimpleName().compareTo(o.type.getSimpleName())) == 0)
+        cmp = type.getName().compareTo(o.type.getName());
+
+    return cmp;
   }
 }
