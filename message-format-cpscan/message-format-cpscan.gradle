@@ -27,8 +27,6 @@ def springContextVersion = "5.3.25"
 
 
 dependencies {
-  api project(':message-format')
-
   // ASM
   implementation "org.ow2.asm:asm:${asmVersion}", optional
 
