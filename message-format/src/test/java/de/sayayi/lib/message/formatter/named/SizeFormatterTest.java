@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter.named;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.runtime.ArrayFormatter;
-import de.sayayi.lib.message.formatter.runtime.BoolFormatter;
 import de.sayayi.lib.message.formatter.runtime.IterableFormatter;
 import de.sayayi.lib.message.formatter.runtime.MapFormatter;
 import lombok.val;

@@ -45,8 +45,6 @@ import static java.util.Collections.singleton;
  */
 public final class NumberFormatter extends AbstractParameterFormatter
 {
-  private static final BoolFormatter BOOL_FORMATTER = new BoolFormatter();
-
   private static final Map<Locale,DecimalFormatSymbols> FORMAT_SYMBOLS_CACHE = new ConcurrentHashMap<>();
 
 
