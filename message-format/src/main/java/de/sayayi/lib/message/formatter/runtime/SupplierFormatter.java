@@ -38,10 +38,8 @@ public final class SupplierFormatter extends AbstractParameterFormatter
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
-    if (value == null || (value = ((Supplier<?>)value).get()) == null)
-      return nullText();
-
-    return formatterContext.format(value, value.getClass(), true);
+    return value == null || (value = ((Supplier<?>)value).get()) == null
+        ? nullText() : formatterContext.format(value, value.getClass(), true);
   }
 
 

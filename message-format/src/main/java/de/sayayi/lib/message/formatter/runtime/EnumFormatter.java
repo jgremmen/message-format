@@ -45,6 +45,7 @@ public final class EnumFormatter extends AbstractParameterFormatter
     switch(formatterContext.getConfigValueString("enum").orElse("name"))
     {
       case "ordinal":
+      case "ord":
         return formatterContext.format(enumValue.ordinal(), int.class);
 
       case "name":
