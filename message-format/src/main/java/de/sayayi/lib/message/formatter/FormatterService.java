@@ -37,14 +37,13 @@ public interface FormatterService
    * </p>
    * <p>
    *   Implementing classes must make sure that for any combination of {@code format} and {@code type} this function
-   *   always returns at least 1 formatter. A good choice for a default formatter would be
-   *   {@link StringFormatter} associated with {@link Object}.
+   *   always returns at least 1 formatter. A good choice for a default formatter would be {@link StringFormatter}.
    * </p>
    *
    * @param format  name of the formatter or {@code null}
    * @param type    type of the value to format
    *
-   * @return  list of prioritized data formatters, never {@code null}
+   * @return  list of prioritized data formatters, never {@code null} and never empty
    *
    * @see GenericFormatterService
    */

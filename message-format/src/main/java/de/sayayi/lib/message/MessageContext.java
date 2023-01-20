@@ -157,7 +157,6 @@ public class MessageContext
 
 
 
-  @SuppressWarnings("java:S1214")
   public interface Parameters
   {
     Parameters EMPTY = new Parameters() {

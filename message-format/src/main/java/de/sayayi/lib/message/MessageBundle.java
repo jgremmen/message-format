@@ -38,8 +38,8 @@ public class MessageBundle
 {
   @Getter private final @NotNull MessageFactory messageFactory;
 
-  private final Map<String,Message.WithCode> messages;
-  private final Set<Class<?>> indexedClasses;
+  private final @NotNull Map<String,Message.WithCode> messages;
+  private final @NotNull Set<Class<?>> indexedClasses;
 
 
   @SuppressWarnings("WeakerAccess")

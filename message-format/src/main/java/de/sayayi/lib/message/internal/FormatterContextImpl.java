@@ -84,12 +84,6 @@ public final class FormatterContextImpl implements FormatterContext
 
 
   @Override
-  public boolean hasMap() {
-    return !map.isEmpty();
-  }
-
-
-  @Override
   public @NotNull Optional<MapValue> getMapValue(Object key, @NotNull Set<MapKey.Type> keyTypes,
                                                  Set<MapValue.Type> valueTypes) {
     return Optional.ofNullable(map.find(messageContext, key, parameters, keyTypes, valueTypes));
@@ -170,11 +164,10 @@ public final class FormatterContextImpl implements FormatterContext
   @Override
   public @NotNull Text format(Object value, Class<?> type, boolean propagateFormat)
   {
-    final FormatterContext ctx =
-        new FormatterContextImpl(messageContext, parameters, value, type, propagateFormat ? format : null, map);
-
-    return ctx.delegateToNextFormatter();
+    return new FormatterContextImpl(messageContext, parameters, value, type, propagateFormat ? format : null, map)
+        .delegateToNextFormatter();
   }
+
 
   @Override
   public @NotNull Text format(Message.WithSpaces message)

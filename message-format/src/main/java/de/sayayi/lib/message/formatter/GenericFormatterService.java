@@ -33,12 +33,12 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   private static final Comparator<Class<?>> CLASS_SORTER =
       (o1, o2) -> o1 == o2 ? 0 : o1.getName().compareTo(o2.getName());
 
-  private static final Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
+  private static final @NotNull Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
 
-  private final Map<String,NamedParameterFormatter> namedFormatters = new ConcurrentHashMap<>();
-  private final Map<Class<?>,Integer> typeOrderMap = new ConcurrentHashMap<>();
-  private final Map<Class<?>,ParameterFormatter> typeFormatters = new ConcurrentHashMap<>();
-  private final Map<Class<?>,List<ParameterFormatter>> cachedFormatters =
+  private final @NotNull Map<String,NamedParameterFormatter> namedFormatters = new ConcurrentHashMap<>();
+  private final @NotNull Map<Class<?>,Integer> typeOrderMap = new ConcurrentHashMap<>();
+  private final @NotNull Map<Class<?>,ParameterFormatter> typeFormatters = new ConcurrentHashMap<>();
+  private final @NotNull Map<Class<?>,List<ParameterFormatter>> cachedFormatters =
       synchronizedMap(new FixedSizeCacheMap<>(CLASS_SORTER, 128));
 
 
@@ -127,8 +127,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       type = WRAPPER_CLASS_MAP.get(type);
 
     final Set<Class<?>> types = new HashSet<>();
-    if (type.isInterface() || type.isPrimitive())
-      types.add(Object.class);
+    types.add(Object.class);
 
     while(type != null)
     {

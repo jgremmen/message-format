@@ -18,6 +18,7 @@ package de.sayayi.lib.message;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -161,10 +162,12 @@ public interface Message extends Serializable
      * @return  all available locales, never {@code null}
      */
     @Contract(pure = true)
+    @Unmodifiable
     @NotNull Set<Locale> getLocales();
 
 
     @Contract(pure = true)
+    @Unmodifiable
     @NotNull Map<Locale,Message> getLocalizedMessages();
   }
 }

@@ -43,10 +43,6 @@ public interface FormatterContext extends Parameters
 
 
   @Contract(pure = true)
-  boolean hasMap();
-
-
-  @Contract(pure = true)
   @NotNull Optional<MapValue> getMapValue(Object key, @NotNull Set<MapKey.Type> keyTypes,
                                           Set<MapValue.Type> valueTypes);
 

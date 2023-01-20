@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.exception.MessageException;
 import lombok.Synchronized;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
@@ -28,6 +29,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import static java.util.Collections.*;
+import static java.util.Locale.ROOT;
 
 
 /**
@@ -58,8 +60,12 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
   }
 
 
-  private Message findMessageByLocale(Locale locale)
+  @Contract(pure = true)
+  private @NotNull Message findMessageByLocale(@NotNull Locale locale)
   {
+    if (localizedMessages.isEmpty())
+      throw new MessageException("message bundle with code " + getCode() + " contains no messages");
+
     final String searchLanguage = locale.getLanguage();
     final String searchCountry = locale.getCountry();
 
@@ -73,7 +79,7 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
       if (message == null)
         message = entry.getValue();
 
-      if (match == -1 && (keyLocale == null || Locale.ROOT.equals(keyLocale)))
+      if (match == -1 && (keyLocale == null || ROOT.equals(keyLocale)))
       {
         message = entry.getValue();
         match = 0;
@@ -123,7 +129,7 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
 
     final SortedSet<String> parameterNames = new TreeSet<>();
 
-    for(Message message: localizedMessages.values())
+    for(final Message message: localizedMessages.values())
       parameterNames.addAll(message.getParameterNames());
 
     return parameterNames;
