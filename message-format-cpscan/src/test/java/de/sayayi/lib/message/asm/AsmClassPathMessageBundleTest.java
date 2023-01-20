@@ -19,6 +19,7 @@ import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.scanner.asm.AsmClassPathMessageBundle;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
@@ -43,7 +44,7 @@ public final class AsmClassPathMessageBundleTest
   @Test
   public void testScan()
   {
-    final AsmClassPathMessageBundle bundle = new AsmClassPathMessageBundle(NO_CACHE_INSTANCE,
+    val bundle = new AsmClassPathMessageBundle(NO_CACHE_INSTANCE,
         singleton(AsmClassPathMessageBundleTest.class.getPackage().getName()));
 
     assertTrue(bundle.hasMessageWithCode("CLASS"));

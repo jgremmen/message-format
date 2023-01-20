@@ -20,7 +20,6 @@ import de.sayayi.lib.message.data.map.MapKeyName;
 import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import lombok.val;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
@@ -33,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-@Disabled
 class EnumFormatterTest extends AbstractFormatterTest
 {
   @Test

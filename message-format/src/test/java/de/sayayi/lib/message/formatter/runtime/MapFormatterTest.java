@@ -15,11 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.formatter.GenericFormatterService;
-import org.junit.jupiter.api.Disabled;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashMap;
@@ -35,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-@Disabled
 public class MapFormatterTest extends AbstractFormatterTest
 {
   @Test
@@ -47,12 +44,9 @@ public class MapFormatterTest extends AbstractFormatterTest
   @Test
   void testSeparator()
   {
-    final GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new MapFormatter());
-    registry.addFormatter(new IterableFormatter());
-
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, UK);
-    final Message message = context.getMessageFactory()
+    val context = new MessageContext(createFormatterService(new MapFormatter(), new IterableFormatter()),
+        NO_CACHE_INSTANCE, UK);
+    val message = context.getMessageFactory()
         .parse("%{map1} %{map2,map-kv-sep:'   -> '} %{map3,map-kv-sep:':  '}");
 
     assertEquals("key=value",
@@ -69,12 +63,9 @@ public class MapFormatterTest extends AbstractFormatterTest
   @Test
   void testNullKeyValue()
   {
-    final GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new MapFormatter());
-    registry.addFormatter(new IterableFormatter());
-
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, UK);
-    final Message message = context.getMessageFactory()
+    val context = new MessageContext(createFormatterService(new MapFormatter(), new IterableFormatter()),
+        NO_CACHE_INSTANCE, UK);
+    val message = context.getMessageFactory()
         .parse("%{map1} %{map2,map-null-key:'key',map-null-value:'value'}");
 
     assertEquals("(null)=(null)",
@@ -88,11 +79,8 @@ public class MapFormatterTest extends AbstractFormatterTest
   @Test
   void testEmpty()
   {
-    final GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new MapFormatter());
-    registry.addFormatter(new IterableFormatter());
-
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, UK);
+    val context = new MessageContext(createFormatterService(new MapFormatter(), new IterableFormatter()),
+        NO_CACHE_INSTANCE, UK);
 
     assertEquals("", context.getMessageFactory().parse("%{map}")
         .format(context, context.parameters().with("map", emptyMap())));
@@ -102,16 +90,13 @@ public class MapFormatterTest extends AbstractFormatterTest
   @Test
   void testMultiEntry()
   {
-    final GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new MapFormatter());
-    registry.addFormatter(new IterableFormatter());
-    registry.addFormatter(new NumberFormatter());
-
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, UK);
-    final Message message = context.getMessageFactory()
+    val context = new MessageContext(
+        createFormatterService(new MapFormatter(), new IterableFormatter(), new NumberFormatter()),
+        NO_CACHE_INSTANCE, UK);
+    val message = context.getMessageFactory()
         .parse("%{map,map-kv-sep:' -> ',list-sep:', ',list-sep-last:' and ',number:'0000'}");
 
-    final Map<String,Integer> map = new LinkedHashMap<>();
+    val map = new LinkedHashMap<String,Integer>();
     map.put("map1", 1);
     map.put("map2", -1234);
     map.put("map3", 8);

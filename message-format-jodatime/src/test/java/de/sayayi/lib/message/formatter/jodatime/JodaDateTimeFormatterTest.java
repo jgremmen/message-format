@@ -25,7 +25,6 @@ import lombok.val;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
@@ -38,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-@Disabled
 public class JodaDateTimeFormatterTest extends AbstractFormatterTest
 {
   @Test
@@ -140,8 +138,7 @@ public class JodaDateTimeFormatterTest extends AbstractFormatterTest
   @Test
   public void testMap()
   {
-    final DefaultFormatterService formatterRegistry = new DefaultFormatterService();
-    final MessageContext context = new MessageContext(formatterRegistry, NO_CACHE_INSTANCE);
+    val context = new MessageContext(new DefaultFormatterService(), NO_CACHE_INSTANCE);
 
     assertEquals("2020", context.getMessageFactory()
         .parse("%{d,!null:'%{d,date:'yyyy'}'}")

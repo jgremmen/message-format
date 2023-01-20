@@ -16,10 +16,9 @@
 package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
+import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -33,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-@Disabled
 public class FieldFormatterTest extends AbstractFormatterTest
 {
   private MessageContext context;
@@ -54,16 +52,16 @@ public class FieldFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatV1() throws Exception
   {
-    final Field v1 = Dummy.class.getDeclaredField("v1");
-    final MessageFactory factory = context.getMessageFactory();
+    val v1 = Dummy.class.getDeclaredField("v1");
+    val factory = context.getMessageFactory();
 
-    assertEquals("boolean[]", factory.parse("%{f,type}")
+    assertEquals("boolean[]", factory.parse("%{f,field:T}")
         .format(context, context.parameters().with("f", v1)));
-    assertEquals("v1", factory.parse("%{f,name}")
+    assertEquals("v1", factory.parse("%{f,field:N}")
         .format(context, context.parameters().with("f", v1)));
     assertEquals("private static boolean[] v1", factory.parse("%{f}")
         .format(context, context.parameters().with("f", v1)));
-    assertEquals("boolean[] v1", factory.parse("%{f,field:''}")
+    assertEquals("boolean[] v1", factory.parse("%{f,field:TN}")
         .format(context, context.parameters().with("f", v1)));
   }
 
@@ -71,18 +69,18 @@ public class FieldFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatV2() throws Exception
   {
-    final Field v2 = Dummy.class.getDeclaredField("v2");
-    final MessageFactory factory = context.getMessageFactory();
+    val v2 = Dummy.class.getDeclaredField("v2");
+    val factory = context.getMessageFactory();
 
-    assertEquals("Map<String, Integer>", factory.parse("%{f,type}")
+    assertEquals("Map<String, Integer>", factory.parse("%{f,field:Tju}")
         .format(context, context.parameters().with("f", v2)));
-    assertEquals("v2", factory.parse("%{f,name}")
+    assertEquals("v2", factory.parse("%{f,field:N}")
         .format(context, context.parameters().with("f", v2)));
     assertEquals("public final java.util.Map<String, Integer> v2",
-        factory.parse("%{f,field:'jM'}")
+        factory.parse("%{f,field:'jTMN'}")
         .format(context, context.parameters().with("f", v2)));
     assertEquals("java.util.Map<java.lang.String, java.lang.Integer> v2",
-        factory.parse("%{f,field:''}")
+        factory.parse("%{f,field:TN}")
         .format(context, context.parameters().with("f", v2)));
   }
 

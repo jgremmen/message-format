@@ -15,12 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.formatter.GenericFormatterService;
-import org.junit.jupiter.api.Disabled;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
@@ -33,7 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-@Disabled
 public class BoolFormatterTest extends AbstractFormatterTest
 {
   @Test
@@ -47,32 +43,28 @@ public class BoolFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat()
   {
-    final MessageContext context =
-        new MessageContext(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE, "de-DE");
+    val context = new MessageContext(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE, "de-DE");
 
     assertEquals(noSpaceText("wahr"), format(context, Boolean.TRUE));
-    assertEquals(noSpaceText("falsch"), format(context, 0.0d));
-    assertEquals(noSpaceText("wahr"), format(context, -0.0001f));
-    assertEquals(noSpaceText("falsch"), format(context, "FALSE"));
-    assertEquals(noSpaceText("wahr"), format(context, "TrUe"));
-    assertEquals(noSpaceText("wahr"), format(context, -4));
+    assertEquals(noSpaceText("falsch"), format(context, 0.0d, "bool"));
+    assertEquals(noSpaceText("wahr"), format(context, -0.0001f, "bool"));
+    assertEquals(noSpaceText("falsch"), format(context, "FALSE", "bool"));
+    assertEquals(noSpaceText("wahr"), format(context, "TrUe", "bool"));
+    assertEquals(noSpaceText("wahr"), format(context, -4, "bool"));
   }
 
 
   @Test
   public void testFormatter()
   {
-    final GenericFormatterService formatterRegistry = new GenericFormatterService();
-    formatterRegistry.addFormatter(new BoolFormatter());
-    final MessageContext context = new MessageContext(formatterRegistry, NO_CACHE_INSTANCE, ENGLISH);
-
-    final Parameters parameters = context.parameters()
+    val context = new MessageContext(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE, ENGLISH);
+    val parameters = context.parameters()
         .with("a", Boolean.FALSE)
         .with("b", Boolean.TRUE)
         .with("c", Integer.valueOf(1234))
         .with("d", Integer.valueOf(0))
         .with("e", Double.valueOf(3.14d));
-    final Message msg = context.getMessageFactory()
+    val msg = context.getMessageFactory()
         .parse("%{a} %{b} %{c} %{c,bool} %{d,bool,true:'yes',false:'no'} %{e}");
 
     assertEquals("false true 1234 true no 3.14", msg.format(context, parameters));
@@ -82,12 +74,8 @@ public class BoolFormatterTest extends AbstractFormatterTest
   @Test
   public void testNamedFormatter()
   {
-    final GenericFormatterService formatterRegistry = new GenericFormatterService();
-    formatterRegistry.addFormatter(new BoolFormatter());
-    final MessageContext context = new MessageContext(formatterRegistry, NO_CACHE_INSTANCE, GERMAN);
-
-    final Message msg = context.getMessageFactory()
-        .parse("%{b,bool,null:'<unknown>',true:'yes',false:'no'}");
+    val context = new MessageContext(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE, GERMAN);
+    val msg = context.getMessageFactory().parse("%{b,bool,null:'<unknown>',true:'yes',false:'no'}");
 
     assertEquals("<unknown>", msg.format(context, context.parameters().with("b", null)));
     assertEquals("yes", msg.format(context, context.parameters().with("b", true)));

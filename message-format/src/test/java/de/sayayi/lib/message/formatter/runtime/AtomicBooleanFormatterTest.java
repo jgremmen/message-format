@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import lombok.val;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -32,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-@Disabled
 class AtomicBooleanFormatterTest extends AbstractFormatterTest
 {
   @Test
@@ -44,7 +42,8 @@ class AtomicBooleanFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat()
   {
-    val context = new MessageContext(createFormatterService(new AtomicBooleanFormatter()),
+    val context = new MessageContext(
+        createFormatterService(new AtomicBooleanFormatter(), new BoolFormatter()),
         NO_CACHE_INSTANCE, "de-DE");
 
     assertEquals(nullText(), format(context, null));

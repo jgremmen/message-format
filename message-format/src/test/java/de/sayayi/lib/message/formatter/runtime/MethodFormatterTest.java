@@ -15,25 +15,22 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.formatter.GenericFormatterService;
-import org.junit.jupiter.api.Disabled;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Locale;
 import java.util.Set;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static java.util.Locale.UK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@Disabled
 public class MethodFormatterTest extends AbstractFormatterTest
 {
   @Test
@@ -45,11 +42,8 @@ public class MethodFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat() throws Exception
   {
-    final GenericFormatterService registry = new GenericFormatterService();
-    registry.addFormatter(new MethodFormatter());
-
-    final MessageContext context = new MessageContext(registry, NO_CACHE_INSTANCE, Locale.UK);
-    final Message message = context.getMessageFactory()
+    val context = new MessageContext(createFormatterService(new MethodFormatter()), NO_CACHE_INSTANCE, UK);
+    val message = context.getMessageFactory()
         .parse("%{m} %{m,method:'name'} %{m,method:'return-type'} %{m,method:'class'}");
 
     assertEquals("protected static " + Set.class.getName() + " " + MethodFormatterTest.class.getName() +

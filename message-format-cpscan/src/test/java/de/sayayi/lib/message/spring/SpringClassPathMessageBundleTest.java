@@ -15,13 +15,13 @@
  */
 package de.sayayi.lib.message.spring;
 
-import de.sayayi.lib.message.MessageBundle;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.parser.normalizer.LRUMessagePartNormalizer;
 import de.sayayi.lib.message.scanner.spring.SpringClassPathMessageBundle;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.DefaultResourceLoader;
 
@@ -46,8 +46,8 @@ public final class SpringClassPathMessageBundleTest
   @Test
   public void testScan()
   {
-    final MessageFactory messageFactory = new MessageFactory(new LRUMessagePartNormalizer(10));
-    final MessageBundle bundle = new SpringClassPathMessageBundle(messageFactory,
+    val messageFactory = new MessageFactory(new LRUMessagePartNormalizer(10));
+    val bundle = new SpringClassPathMessageBundle(messageFactory,
         singleton(SpringClassPathMessageBundleTest.class.getPackage().getName()),
         new DefaultResourceLoader());
 

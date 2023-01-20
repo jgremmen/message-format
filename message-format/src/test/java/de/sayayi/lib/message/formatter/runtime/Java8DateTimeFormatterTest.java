@@ -22,7 +22,6 @@ import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
 import lombok.val;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -40,7 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-@Disabled
 public class Java8DateTimeFormatterTest extends AbstractFormatterTest
 {
   @Test

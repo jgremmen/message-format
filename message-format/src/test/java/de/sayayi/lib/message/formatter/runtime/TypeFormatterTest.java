@@ -15,28 +15,26 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
+import lombok.val;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.platform.commons.util.ReflectionUtils.findMethod;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@Disabled
 class TypeFormatterTest
 {
   @Test
   void testToStringNative()
   {
-    Assertions.assertEquals("boolean", TypeFormatter.toString(boolean.class, ""));
+    assertEquals("boolean", TypeFormatter.toString(boolean.class, ""));
     assertEquals("byte", TypeFormatter.toString(byte.class, ""));
     assertEquals("char", TypeFormatter.toString(char.class, ""));
     assertEquals("short", TypeFormatter.toString(short.class, ""));
@@ -96,7 +94,7 @@ class TypeFormatterTest
   void testToStringParameterized()
   {
     //noinspection OptionalGetWithoutIsPresent
-    final Method method = ReflectionUtils.findMethod(Collections.class, "unmodifiableMap", Map.class).get();
+    val method = findMethod(Collections.class, "unmodifiableMap", Map.class).get();
 
     assertEquals("java.util.Map<K, V>", TypeFormatter.toString(method.getGenericReturnType(), ""));
     assertEquals("Map<K, V>", TypeFormatter.toString(method.getGenericReturnType(), "u"));
@@ -113,13 +111,13 @@ class TypeFormatterTest
   void testToStringTypeVariable()
   {
     //noinspection OptionalGetWithoutIsPresent
-    final Method method = ReflectionUtils.findMethod(TypeFormatterTest.class, "internalMethod2", Iterable.class).get();
-    final Type type = method.getGenericParameterTypes()[0];
+    val method = findMethod(TypeFormatterTest.class, "internalMethod2", Iterable.class).get();
+    val type = method.getGenericParameterTypes()[0];
 
     assertEquals("T", TypeFormatter.toString(type, ""));
 
     assertEquals("<T extends Iterable<String> & Enumeration<String>>",
-        TypeFormatter.toString(type, "Tju"));
+        TypeFormatter.toString(type, "juv"));
   }
 
 
@@ -127,17 +125,17 @@ class TypeFormatterTest
   void testToStringWildcard()
   {
     //noinspection OptionalGetWithoutIsPresent
-    final Method method1 = ReflectionUtils.findMethod(Collections.class, "copy", List.class, List.class).get();
+    val method1 = findMethod(Collections.class, "copy", List.class, List.class).get();
 
-    final Type m1arg0 = method1.getGenericParameterTypes()[0];
+    val m1arg0 = method1.getGenericParameterTypes()[0];
     assertEquals("java.util.List<? super T>", TypeFormatter.toString(m1arg0, ""));
     assertEquals("List<? super T>", TypeFormatter.toString(m1arg0, "u"));
     assertEquals("List<? super T>", TypeFormatter.toString(m1arg0, "c"));
 
     //noinspection OptionalGetWithoutIsPresent
-    final Method method2 = ReflectionUtils.findMethod(Collections.class, "shuffle", List.class).get();
+    val method2 = findMethod(Collections.class, "shuffle", List.class).get();
 
-    final Type m2arg0 = method2.getGenericParameterTypes()[0];
+    val m2arg0 = method2.getGenericParameterTypes()[0];
     assertEquals("java.util.List<?>", TypeFormatter.toString(m2arg0, ""));
     assertEquals("List<?>", TypeFormatter.toString(m2arg0, "u"));
     assertEquals("List<?>", TypeFormatter.toString(m2arg0, "c"));
@@ -148,8 +146,8 @@ class TypeFormatterTest
   void testToStringGenericArray()
   {
     //noinspection OptionalGetWithoutIsPresent
-    final Method method = ReflectionUtils.findMethod(TypeFormatterTest.class, "internalMethod1").get();
-    final Type type = method.getGenericReturnType();
+    val method = findMethod(TypeFormatterTest.class, "internalMethod1").get();
+    val type = method.getGenericReturnType();
 
     assertEquals("java.util.Optional<? extends java.lang.Number>[]", TypeFormatter.toString(type, ""));
     assertEquals("java.util.Optional<? extends Number>[]", TypeFormatter.toString(type, "j"));

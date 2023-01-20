@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import lombok.val;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.BooleanSupplier;
@@ -33,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-@Disabled
 class BooleanSupplierFormatterTest extends AbstractFormatterTest
 {
   @Test

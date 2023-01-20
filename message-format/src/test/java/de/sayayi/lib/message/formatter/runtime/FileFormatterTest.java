@@ -20,7 +20,6 @@ import de.sayayi.lib.message.data.map.MapKeyName;
 import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import lombok.val;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -36,7 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-@Disabled
 public class FileFormatterTest extends AbstractFormatterTest
 {
   @Test
