@@ -26,6 +26,7 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -34,7 +35,6 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
 import static java.lang.reflect.Array.get;
 import static java.lang.reflect.Array.getLength;
-import static java.util.Collections.unmodifiableSet;
 import static java.util.ResourceBundle.getBundle;
 
 
@@ -43,25 +43,6 @@ import static java.util.ResourceBundle.getBundle;
  */
 public final class ArrayFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
 {
-  private static final Set<FormattableType> FORMATTABLE_TYPES;
-
-
-  static
-  {
-    final Set<FormattableType> formattableTypes = new HashSet<>();
-
-    formattableTypes.add(new FormattableType(Object[].class, 125));
-    formattableTypes.add(new FormattableType(short[].class, 125));
-    formattableTypes.add(new FormattableType(int[].class, 125));
-    formattableTypes.add(new FormattableType(long[].class, 125));
-    formattableTypes.add(new FormattableType(float[].class, 125));
-    formattableTypes.add(new FormattableType(double[].class, 125));
-    formattableTypes.add(new FormattableType(boolean[].class, 125));
-
-    FORMATTABLE_TYPES = unmodifiableSet(formattableTypes);
-  }
-
-
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object array)
   {
@@ -115,7 +96,16 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
 
 
   @Override
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return FORMATTABLE_TYPES;
+  public @NotNull Set<FormattableType> getFormattableTypes()
+  {
+    return new HashSet<>(Arrays.asList(
+        new FormattableType(Object[].class, 125),
+        new FormattableType(short[].class, 125),
+        new FormattableType(int[].class, 125),
+        new FormattableType(long[].class, 125),
+        new FormattableType(float[].class, 125),
+        new FormattableType(double[].class, 125),
+        new FormattableType(boolean[].class, 125)
+    ));
   }
 }
