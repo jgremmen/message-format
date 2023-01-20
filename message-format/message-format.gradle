@@ -24,13 +24,6 @@ plugins {
 description = 'Message Format Library'
 
 
-configurations {
-  compile {
-    extendsFrom = extendsFrom.findAll { it != configurations.antlr }
-  }
-}
-
-
 def antlrVersion = "4.9.3"
 def antlrExtVersion = "0.3.0"
 def ehcacheVersion = "3.10.8"

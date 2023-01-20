@@ -58,6 +58,9 @@ test {
 }
 
 
+jar.dependsOn test
+
+
 tasks.withType(Jar) {
   includeEmptyDirs = false
   preserveFileTimestamps = true
