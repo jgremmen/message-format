@@ -23,6 +23,8 @@ import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigInteger;
+
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
@@ -81,5 +83,22 @@ public class BitsFormatterTest extends AbstractFormatterTest
         singletonMap(new MapKeyName("bits"), new MapValueString("auto")), "bits"));
     assertEquals(noSpaceText("010110"), format(context, (byte)0x456,
         singletonMap(new MapKeyName("bits"), new MapValueNumber(6)), "bits"));
+  }
+
+
+  @Test
+  public void testBitInteger()
+  {
+    val context = new MessageContext(createFormatterService(new BitsFormatter()), NO_CACHE_INSTANCE);
+
+    assertEquals(noSpaceText("101111000110000101001110"), format(context, new BigInteger("12345678"),
+        singletonMap(new MapKeyName("bits"), new MapValueString("auto")), "bits"));
+    assertEquals(noSpaceText("0"), format(context, BigInteger.ZERO,
+        singletonMap(new MapKeyName("bits"), new MapValueString("auto")), "bits"));
+    assertEquals(noSpaceText("01001110"), format(context, new BigInteger("12345678"),
+        singletonMap(new MapKeyName("bits"), new MapValueNumber(8)), "bits"));
+    assertEquals(noSpaceText("1010110101000111000101000100111010000000100001000101111000111101100"),
+        format(context, new BigInteger("99887766554433221100"),
+            singletonMap(new MapKeyName("bits"), new MapValueNumber(67)), "bits"));
   }
 }

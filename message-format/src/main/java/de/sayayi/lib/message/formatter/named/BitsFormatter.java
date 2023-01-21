@@ -64,7 +64,7 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
     if (dataValue instanceof DataNumber)
     {
       int bits = ((DataNumber)dataValue).asObject().intValue();
-      if (bits > 0 && bits <= 64)
+      if (bits > 0 && bits <= 1024)
         return bits;
     }
 
