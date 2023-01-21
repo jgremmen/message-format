@@ -142,6 +142,10 @@ public class GeoFormatterTest extends AbstractFormatterTest
     assertEquals("51\u00b034'09\"N", context.getMessageFactory()
         .parse("%{lat,geo,geo:'d0m0sLA'}")
         .format(context, parameters));
+
+    assertEquals("", context.getMessageFactory()
+        .parse("%{test,geo,geo:'d0m0sLA'}")
+        .format(context, parameters));
   }
 
 
