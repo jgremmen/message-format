@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.formatter.runtime;
+package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.formatter.named.BoolFormatter;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Locale.ENGLISH;
 import static java.util.Locale.GERMAN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,6 +52,7 @@ public class BoolFormatterTest extends AbstractFormatterTest
     assertEquals(noSpaceText("falsch"), format(context, "FALSE", "bool"));
     assertEquals(noSpaceText("wahr"), format(context, "TrUe", "bool"));
     assertEquals(noSpaceText("wahr"), format(context, -4, "bool"));
+    assertEquals(nullText(), format(context, (Object)null, "bool"));
   }
 
 
