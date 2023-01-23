@@ -67,11 +67,6 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   protected abstract @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value);
 
 
-  public int getPriority() {
-    return 0;
-  }
-
-
   @Contract(pure = true)
   protected @NotNull String trimNotNull(Text text)
   {
