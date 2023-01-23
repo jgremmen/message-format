@@ -42,8 +42,13 @@ public final class FileSizeFormatter extends AbstractParameterFormatter implemen
 
 
   @Override
-  public boolean canFormat(@NotNull Class<?> type) {
-    return Number.class.isAssignableFrom(type);
+  public boolean canFormat(@NotNull Class<?> type)
+  {
+    return
+        Number.class.isAssignableFrom(type) ||
+        type == long.class ||
+        type == int.class ||
+        type == short.class;
   }
 
 

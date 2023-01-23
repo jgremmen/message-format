@@ -64,8 +64,12 @@ public final class GeoFormatter extends AbstractParameterFormatter implements Na
 
 
   @Override
-  public boolean canFormat(@NotNull Class<?> type) {
-    return Number.class.isAssignableFrom(type);
+  public boolean canFormat(@NotNull Class<?> type)
+  {
+    return
+        Number.class.isAssignableFrom(type) ||
+        type == double.class ||
+        type == float.class;
   }
 
 

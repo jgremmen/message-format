@@ -44,6 +44,19 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
 
 
   @Override
+  public boolean canFormat(@NotNull Class<?> type)
+  {
+    return
+        Number.class.isAssignableFrom(type) ||
+        type == long.class ||
+        type == int.class ||
+        type == short.class ||
+        type == byte.class ||
+        type == char.class;
+  }
+
+
+  @Override
   public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
     if (!(value instanceof Number))

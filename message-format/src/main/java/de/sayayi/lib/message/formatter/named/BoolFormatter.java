@@ -51,6 +51,20 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
 
 
   @Override
+  public boolean canFormat(@NotNull Class<?> type)
+  {
+    return
+        type == Boolean.class || type == boolean.class ||
+        Number.class.isAssignableFrom(type) ||
+        type == long.class ||
+        type == int.class ||
+        type == short.class ||
+        type == byte.class ||
+        type == String.class;
+  }
+
+
+  @Override
   @Contract(pure = true)
   public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value)
   {
