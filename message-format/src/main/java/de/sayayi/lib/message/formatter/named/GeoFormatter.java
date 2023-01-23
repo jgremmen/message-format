@@ -31,6 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Collections.emptySet;
 
 
@@ -69,13 +70,17 @@ public final class GeoFormatter extends AbstractParameterFormatter implements Na
     return
         Number.class.isAssignableFrom(type) ||
         type == double.class ||
-        type == float.class;
+        type == float.class ||
+        type == NULL_TYPE;
   }
 
 
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
+    if (value == null)
+      return nullText();
+
     final Format fmt = getFormat(formatterContext);
     final StringBuilder s = new StringBuilder();
     final double v = ((Number)value).doubleValue();

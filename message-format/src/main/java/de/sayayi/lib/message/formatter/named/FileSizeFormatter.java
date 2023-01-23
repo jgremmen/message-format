@@ -48,14 +48,15 @@ public final class FileSizeFormatter extends AbstractParameterFormatter implemen
         Number.class.isAssignableFrom(type) ||
         type == long.class ||
         type == int.class ||
-        type == short.class;
+        type == short.class ||
+        type == NULL_TYPE;
   }
 
 
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
-    if (!(value instanceof Number))
+    if (value == null)
       return nullText();
 
     val size = ((Number)value).longValue();
