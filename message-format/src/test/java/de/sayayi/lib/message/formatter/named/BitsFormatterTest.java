@@ -30,8 +30,7 @@ import java.util.OptionalInt;
 import java.util.function.LongSupplier;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
 import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -117,5 +116,7 @@ public class BitsFormatterTest extends AbstractFormatterTest
         singletonMap(new MapKeyName("bits"), new MapValueString("auto")), "bits"));
     assertEquals(noSpaceText("01001110"), format(context, OptionalInt.of(12345678),
         singletonMap(new MapKeyName("bits"), new MapValueNumber(8)), "bits"));
+    assertEquals(nullText(), format(context, (Object)null, "bits"));
+    assertEquals(emptyText(), format(context, OptionalInt.empty(), "bits"));
   }
 }

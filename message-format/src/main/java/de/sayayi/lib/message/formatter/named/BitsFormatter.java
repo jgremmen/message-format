@@ -52,14 +52,15 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
         type == int.class ||
         type == short.class ||
         type == byte.class ||
-        type == char.class;
+        type == char.class ||
+        type == NULL_TYPE;
   }
 
 
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
   {
-    if (!(value instanceof Number))
+    if (value == null)
       return nullText();
 
     final int bitCount = detectBitCount(formatterContext, value);

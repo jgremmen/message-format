@@ -40,6 +40,14 @@ import java.util.Set;
 public interface ParameterFormatter
 {
   /**
+   * This type represents the type for a {@code null} value.
+   * 
+   * @see NamedParameterFormatter#canFormat(Class) 
+   */
+  Class<?> NULL_TYPE = new Object() {}.getClass();
+
+
+  /**
    * Formats the parameter value to a string representation.
    *
    * @param formatterContext  message context providing formatting information, never {@code null}

@@ -60,7 +60,8 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
         type == int.class ||
         type == short.class ||
         type == byte.class ||
-        type == String.class;
+        type == String.class ||
+        type == NULL_TYPE;
   }
 
 

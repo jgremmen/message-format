@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 import static de.sayayi.lib.message.data.map.MapKey.NAME_TYPE;
+import static de.sayayi.lib.message.formatter.ParameterFormatter.NULL_TYPE;
 import static de.sayayi.lib.message.internal.part.MessagePart.Text.NULL;
 
 
@@ -59,7 +60,7 @@ public final class FormatterContextImpl implements FormatterContext
     this.map = map;
 
     if (type == null)
-      type = value == null ? String.class : value.getClass();
+      type = value == null ? NULL_TYPE : value.getClass();
 
     parameterFormatters = new ArrayDeque<>(messageContext.getFormatters(format, type));
   }
