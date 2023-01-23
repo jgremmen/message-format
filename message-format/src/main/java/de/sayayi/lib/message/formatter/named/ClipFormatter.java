@@ -35,11 +35,11 @@ import static java.util.Collections.emptySet;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class CutOffFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
+public final class ClipFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
 {
   @Override
   public @NotNull String getName() {
-    return "cutoff";
+    return "clip";
   }
 
 
@@ -56,7 +56,7 @@ public final class CutOffFormatter extends AbstractParameterFormatter implements
       return nullText();
     s = s.trim();
 
-    val maxSize = (int)Math.max(formatterContext.getConfigValueNumber("cut-size").orElse(64), 8);
+    val maxSize = (int)Math.max(formatterContext.getConfigValueNumber("clip-size").orElse(64), 8);
 
     return s.length() <= maxSize
         ? text
