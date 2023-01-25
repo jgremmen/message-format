@@ -33,12 +33,17 @@ asciidoctor {
 
   sources {
     include 'reference-guide.adoc'
+    include 'release-notes.adoc'
+    include 'migration/*.adoc'
   }
 
   attributes \
-    'build-gradle': file('build.gradle'),
-    toc: 'left',
+    backend: 'xhtml5',
     icons: 'font',
-    setanchors: 'true',
-    'endpoint-url': 'https://lib.sayayi.de/message-format/'
+    fullVersion: rootProject.version,
+    revdate: '2023-01-25',
+    author: 'Jeroen Gremmen',
+    'source-highlighter': 'coderay'
+
+  options logDocuments: true
 }
