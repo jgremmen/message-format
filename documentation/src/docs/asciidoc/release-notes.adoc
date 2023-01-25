@@ -1,0 +1,26 @@
+= Release Notes
+:!revnumber:
+
+[[release-0.8.0]]
+== 0.8.0 &nbsp;&nbsp; [.small]#(2023-01-25)#
+
+====== New
+
+* Add named formatter `clip`
+* Introduce `FormatterContext` for `ParameterFormatter#format(...)` method
+* A parameter formatter can delegate formatting to the next (based on formattable type priority) formatter
+
+====== Change
+
+* Flatten parameter data map, eg. `%{n,choice,1:'color',:'colors'}`
+* Consolidate formatter formatting options
+
+====== Bugfix
+
+* Improve formatter selection based on parameter format designator and value class type
+* Parameter format designator is used for selecting a named parameter formatter only
+
+:important-caption:
+[IMPORTANT]
+This version generally breaks backward compatibility. Please refer to the migration guide for more
+detailed information
