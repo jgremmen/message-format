@@ -16,16 +16,17 @@
 package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.formatter.*;
+import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
-import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.NUMBER_TYPE;
-import static java.util.Collections.emptySet;
 
 
 /**
@@ -66,11 +67,5 @@ public final class SizeFormatter extends AbstractParameterFormatter implements N
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value) {
     throw new IllegalStateException();
-  }
-
-
-  @Override
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return emptySet();
   }
 }

@@ -1,7 +1,6 @@
 package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
-import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
@@ -12,12 +11,10 @@ import org.jetbrains.annotations.NotNull;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.EnumSet;
-import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.Type.STRING;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
-import static java.util.Collections.emptySet;
 
 
 /**
@@ -88,12 +85,6 @@ public final class FileSizeFormatter extends AbstractParameterFormatter implemen
     return noSpaceText(s
         .append(unitMessage == null ? unit : formatterContext.format(unitMessage).getText())
         .toString());
-  }
-
-
-  @Override
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return emptySet();
   }
 
 

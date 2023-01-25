@@ -19,17 +19,14 @@ import de.sayayi.lib.message.data.Data;
 import de.sayayi.lib.message.data.DataNumber;
 import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
-import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
-import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
-import static java.util.Collections.emptySet;
 
 
 /**
@@ -157,11 +154,5 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
   {
     for(int n = bits.length; --n >= 0; value = value.shiftRight(1))
       bits[n] = value.testBit(0) ? '1' : '0';
-  }
-
-
-  @Override
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return emptySet();
   }
 }

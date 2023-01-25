@@ -16,16 +16,11 @@
 package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
-import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Set;
-
-import static java.util.Collections.emptySet;
 
 
 /**
@@ -50,11 +45,5 @@ public final class ChoiceFormatter extends AbstractParameterFormatter implements
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value) {
     throw new IllegalStateException();
-  }
-
-
-  @Override
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return emptySet();
   }
 }

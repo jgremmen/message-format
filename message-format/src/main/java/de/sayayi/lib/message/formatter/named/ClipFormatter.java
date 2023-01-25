@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
-import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
@@ -25,10 +24,7 @@ import lombok.val;
 import lombok.var;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
-
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
-import static java.util.Collections.emptySet;
 
 
 /**
@@ -61,11 +57,5 @@ public final class ClipFormatter extends AbstractParameterFormatter implements N
     return s.length() <= maxSize
         ? text
         : new TextPart(s.substring(0, maxSize - 3).trim() + "...", text.isSpaceBefore(), text.isSpaceAfter());
-  }
-
-
-  @Override
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return emptySet();
   }
 }
