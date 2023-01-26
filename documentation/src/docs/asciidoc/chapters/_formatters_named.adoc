@@ -24,7 +24,7 @@ In order to control the number of bits generated, the `bits` configuration key c
 |===
 |Value|Result
 
-|auto
+|`auto`
 |the number of bits is derived from the actual value. `3` would be formatted as `11` and `34` as `10010`.
 
 |<n> (1..1024)
@@ -99,4 +99,16 @@ TODO
 
 ==== String (string)
 
-TODO
+The `string` formatter is both a named and typed formatter. It will be automatically selected for character
+sequences (`char[]` or `java.lang.CharSequence`) but can be selected by name as well.
+
+The formatter is capable of formatting values regardless of their types and has no formatting configuration
+options.
+
+.Basic string example
+====
+[source]
+----
+%{o,string}
+----
+====

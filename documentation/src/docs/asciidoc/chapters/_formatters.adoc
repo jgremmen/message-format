@@ -11,7 +11,7 @@ There are 2 types of parameter formatters:
   of the value to be formatted
 
 How formatters are selected based on the value to be formatted and the optional formatter name is explained
-in a separate chapter.
+in a separate link:#formatter-selection[chapter].
 
 include::_formatters_named.adoc[]
 
