@@ -1,0 +1,14 @@
+[[Preface]]
+== Preface
+This is the reference documentation of Message Format, a highly configurable library for generating
+user readable messages. This guide covers all the functionality provided by Message Format.
+
+Did you find a typo or other error in this guide? Please let me know by opening an issue in the
+https://github.com/jgremmen/message-format[Message Format GitHub repository,window=_blank].
+
+This project is licensed under
+https://www.apache.org/licenses/LICENSE-2.0[Apache License Version 2.0,window=_blank].
+
+== System Requirements
+
+Message Format {fullVersion} requires at least Java 8.

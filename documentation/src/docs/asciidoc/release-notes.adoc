@@ -1,8 +1,17 @@
 = Release Notes
 :!revnumber:
+:toc: left
+:toclevels: 1
+:sectanchors:
+
+image:https://img.shields.io/github/v/tag/jgremmen/message-format?label=release[GitHub tag (latest SemVer)]
+image:https://img.shields.io/github/languages/code-size/jgremmen/message-format[GitHub code size in bytes]
+image:https://img.shields.io/github/last-commit/jgremmen/message-format[GitHub last commit]
+image:https://img.shields.io/github/license/jgremmen/message-format[GitHub]
 
 [[release-0.8.0]]
-== 0.8.0 &nbsp;&nbsp; [.small]#(2023-01-25)#
+== 0.8.0
+_Release date: t.b.d._
 
 ====== New
 
@@ -22,5 +31,5 @@
 
 :important-caption:
 [IMPORTANT]
-This version generally breaks backward compatibility. Please refer to the migration guide for more
-detailed information
+This version generally breaks backward compatibility. Please refer to the
+xref:migration-guide.adoc#migrate-to-0.8.0[migration guide] for more detailed information.

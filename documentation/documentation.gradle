@@ -31,9 +31,9 @@ asciidoctor {
   baseDirFollowsSourceFile()
 
   sources {
-    include 'reference-guide.adoc'
     include 'release-notes.adoc'
-    include 'migration/*.adoc'
+    include 'migration-guide.adoc'
+    include 'reference-guide.adoc'
   }
 
   attributes \

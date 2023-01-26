@@ -1,14 +1,13 @@
 = Message Format {fullVersion} Reference Guide
 :!revnumber:
 :toc: left
-:toc2:
 :toclevels: 3
 :sectanchors:
 
 
-include::preface.adoc[]
+include::_preface.adoc[]
 
 :numbered:
 
-include::chapters/introduction.adoc[]
-include::chapters/set-up.adoc[]
+include::chapters/_introduction.adoc[]
+include::chapters/_set-up.adoc[]
