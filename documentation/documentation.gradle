@@ -46,3 +46,36 @@ asciidoctor {
 
   options logDocuments: true
 }
+
+
+tasks.register('websiteZip', Zip) {
+  description 'Creates a documentation website archive'
+  group 'build'
+
+  archiveFileName = "document-${project.version}.zip"
+  destinationDirectory = layout.buildDirectory.dir('archives')
+
+  reproducibleFileOrder = true
+  duplicatesStrategy = DuplicatesStrategy.FAIL
+
+  from(asciidoctor) {
+    include 'reference-guide.html'
+    into project.version
+  }
+
+  from(asciidoctor) {
+    exclude 'reference-guide.html'
+  }
+
+  from(project(':message-format').javadoc) {
+    into project.version + "/javadoc"
+  }
+
+  from(project(':message-format-cpscan').javadoc) {
+    into project.version + "/javadoc-cpscan"
+  }
+
+  from(project(':message-format-jodatime').javadoc) {
+    into project.version + "/javadoc-jodatime"
+  }
+}
