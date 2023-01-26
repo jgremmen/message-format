@@ -15,6 +15,8 @@ Escape code::
   * `\"` inserts a `"`
   * `\'` inserts a `'`
   * `\%` inserts a `%`
+  * `\\` inserts a `\`
+  * `\{` inserts a `{`
   * `\u<nnnn>` inserts a unicode character (eg. `\u0031` = `1`)
 
 Parameter::
