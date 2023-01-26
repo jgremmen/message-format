@@ -1,0 +1,102 @@
+=== Named Formatters
+
+Named formatters are selected by providing the formatter name in the message parameter. The following
+example `%{n,bool}` would select the `bool` formatter and format the value associated with `n`.
+
+Please keep in mind that under certain conditions the `bool` formatter will not be selected and instead
+the type based formatter selection will be performed. For the moment we'll assume that the named formatter
+is found and is capable of formatting the parameter value.
+
+
+==== Binary Representation (bits)
+
+The `bits` formatter converts a number into a binary sequence of `0` and `1` characters.
+
+The formatter is capable of formatting values with the following types: `java.lang.Number`, `long`,
+`int`, `short`, `byte` and `char`.
+
+By default, the formatter will detect the number of bits by looking at the value type. A `short` value will
+be formatted with a 16 bit representation whereas a `char` value will be formatted with a 8 bit representation.
+
+In order to control the number of bits generated, the `bits` configuration key can be used:
+
+[cols="1,4"]
+|===
+|Value|Result
+
+|auto
+|the number of bits is derived from the actual value. `3` would be formatted as `11` and `34` as `10010`.
+
+|<n> (1..1024)
+|the value will be formatted with exactly `n` bits. If the value is larger then the higher bits are not
+ formatted.
+|===
+
+.Autodetect example
+====
+[source]
+----
+%{n,bits,bits:auto}
+----
+====
+
+.Fixed bit length example
+====
+[source]
+----
+%{n,bits,bits:6}
+----
+====
+
+
+==== Boolean (bool)
+
+The `bool` formatter is both a named and typed formatter. It will be automatically selected for boolean
+values (`boolean` or `java.lang.Boolean`) but can be selected by name as well.
+
+The formatter is capable of formatting values with the following types: `java.lang.Boolean`, `java.lang.Number`, `java.lang.String`,
+`long`, `int`, `short`, `byte` and `boolean`.
+
+Depending on the locale used the true/false value will be translated using a property resource bundle.
+In case that's not sufficient, there's a way to customize the true and false values as follows.
+
+.Basic bool example
+====
+[source]
+----
+%{b,bool}
+----
+====
+
+.Customized bool example
+====
+[source]
+----
+%{b,bool,true:'aye!',false:'nope'}
+----
+====
+
+
+==== Choose Map Value (choice)
+
+TODO
+
+==== Clip Length (clip)
+
+TODO
+
+==== File Size (filesize)
+
+TODO
+
+==== Longitude/Latitude (geo)
+
+TODO
+
+==== Size (size)
+
+TODO
+
+==== String (string)
+
+TODO

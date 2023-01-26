@@ -7,109 +7,14 @@ In this section you'll learn how to use and configure each formatter to meet you
 There are 2 types of parameter formatters:
 
 * named formatters are selected by providing the formatter name
-* typed formatters are selected by by selecting the appropriate formatter based on the types it is capable
-  of formatting and the type hierarchy of the value to be formatted
+* typed formatters are selected based on the types they are capable of formatting and the type hierarchy
+  of the value to be formatted
 
 How formatters are selected based on the value to be formatted and the optional formatter name is explained
 in a separate chapter.
 
-=== Named Formatters
+include::_formatters_named.adoc[]
 
-Named formatters are selected by providing the formatter name in the message parameter. The following
-example `%{n,bool}` would select the `bool` formatter and format the value associated with `n`.
+include::_formatters_typed.adoc[]
 
-Please keep in mind that under certain conditions the `bool` formatter will not be selected and instead
-the type based formatter selection will be performed. For the moment we'll assume that the named formatter
-is found and is capable of formatting the parameter value.
-
-==== Binary Representation (bits)
-
-TODO
-
-==== Boolean (bool)
-
-The boolean formatter is both a named and typed formatter. It will be automatically selected for boolean
-values (`boolean` or `java.lang.Boolean`) but can be selected by name as well.
-
-The formatter is capable of formatting values with the following types: `java.lang.Boolean`, `java.lang.Number`, `java.lang.String`,
-`long`, `int`, `short`, `byte` and `boolean`.
-
-Depending on the locale used the true/false value will be translated using a property resource bundle.
-In case that's not sufficient, there's a way to customize the true and false value:
-
-.Basic bool example
-====
-[source]
-----
-%{b,bool}
-----
-====
-
-.Customized bool example
-====
-[source]
-----
-%{b,bool,true:'aye!',false:'nope'}
-----
-====
-
-
-==== Choose Map Value (choice)
-
-TODO
-
-==== Clip Length (clip)
-
-TODO
-
-==== File Size (filesize)
-
-TODO
-
-==== Longitude/Latitude (geo)
-
-TODO
-
-==== Size (size)
-
-TODO
-
-==== String (string)
-
-TODO
-
-=== Typed Formatters
-
-TODO
-
-==== Array
-
-TODO
-
-==== Date
-
-TODO
-
-==== Enum
-
-TODO
-
-==== Iterable
-
-TODO
-
-==== Map
-
-TODO
-
-==== Number
-
-TODO
-
-==== Optional
-
-TODO
-
-==== Supplier
-
-TODO
+include::_formatters_selection.adoc[]

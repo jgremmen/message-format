@@ -24,6 +24,7 @@ Parameter::
 
 Let's take a look at some examples:
 
+[cols="3,2"]
 |===
 |Message|Possible output
 
