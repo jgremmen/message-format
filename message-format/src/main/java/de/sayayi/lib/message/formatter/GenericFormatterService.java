@@ -17,6 +17,7 @@ package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.formatter.named.StringFormatter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -92,14 +93,11 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   @Override
-  public void setFormattableTypeOrder(@NotNull Class<?> type, int order)
+  public void setFormattableTypeOrder(@NotNull Class<?> type, @Range(from = 0, to = 127) int order)
   {
-    final ParameterFormatter parameterFormatter = typeFormatters.get(type);
-
-    if (parameterFormatter != null)
+    if (typeFormatters.containsKey(type))
     {
       typeOrderMap.put(type, order);
-      typeFormatters.put(type, parameterFormatter);
       cachedFormatters.clear();
     }
   }
