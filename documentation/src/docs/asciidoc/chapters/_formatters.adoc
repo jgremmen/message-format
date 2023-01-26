@@ -1,0 +1,74 @@
+[[formatters]]
+== Formatters
+
+=== Named Formatters
+
+TODO
+
+==== bits
+
+TODO
+
+==== bool
+
+TODO
+
+==== choice
+
+TODO
+
+==== clip
+
+TODO
+
+==== filesize
+
+TODO
+
+==== geo
+
+TODO
+
+==== size
+
+TODO
+
+==== string
+
+TODO
+
+=== Typed Formatters
+
+TODO
+
+==== Array
+
+TODO
+
+==== Date
+
+TODO
+
+==== Enum
+
+TODO
+
+==== Iterable
+
+TODO
+
+==== Map
+
+TODO
+
+==== Number
+
+TODO
+
+==== Optional
+
+TODO
+
+==== Supplier
+
+TODO

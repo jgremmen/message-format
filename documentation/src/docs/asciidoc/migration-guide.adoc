@@ -44,9 +44,8 @@ and thus reduces the number of method arguments passed to `ParameterFormatter#fo
 @Override
 public @NotNull Text format(@NotNull MessageContext messageContext,
                             Object value, String format,
-                            @NotNull Parameters parameters, DataMap map)
-{
-...
+                            @NotNull Parameters parameters, DataMap map) {
+  ...
 }
 ----
 
@@ -54,9 +53,8 @@ public @NotNull Text format(@NotNull MessageContext messageContext,
 [source,java]
 ----
 @Override
-public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value)
-{
-...
+public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value) {
+  ...
 }
 ----
 

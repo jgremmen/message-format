@@ -1,0 +1,41 @@
+[[message-syntax]]
+== Message Syntax
+
+A message is a sequence of characters, escape codes and parameters. Let's take a look at these 3 components.
+
+Characters::
+  * Each character in this sequence must be from the visible spectrum. This means that no control characters
+    are accepted. The general purpose of this library is to produce human readable messages/sentences.
+  * Blanks are collapsed if multiple consecutive blanks are found.
+  * A message may start and/or end with one or more blanks. The blanks are taken into account if they're
+    the result of a parameter being formatted. The formatted message however will neither have a leading
+    nor trailing blank.
+
+Escape code::
+  * `\"` inserts a `"`
+  * `\'` inserts a `'`
+  * `\%` inserts a `%`
+  * `\u<nnnn>` inserts a unicode character (eg. `\u0031` = `1`)
+
+Parameter::
+  A parameter starts with the character sequence `%{` and ends with `}`. It is a placeholder with optional
+  formatting details (eg. `%{d,date:medium}` or `%{n}`). The parameter format is explained in more detail
+  in its own xref:_message-parameter.adoc[chapter].
+
+Let's take a look at some examples:
+
+|===
+|Message|Possible output
+
+|`The&nbsp;&nbsp;&nbsp;quick brown&nbsp;&nbsp;fox`
+|`The quick brown fox`
+
+|`I see a %{color} ball.`
+|`I see a red ball.`
+
+|`I ate %{n,0:'no cookies',1:cookie,:'%{n} cookies'}`
+|`I ate 12 cookies`
+
+|`The numbers are: %{numbers,list-sep-last:' and '}`
+|`The numbers are: 2, 56, 7 and 99`
+|===

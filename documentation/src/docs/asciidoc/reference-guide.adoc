@@ -11,3 +11,6 @@ include::_preface.adoc[]
 
 include::chapters/_introduction.adoc[]
 include::chapters/_set-up.adoc[]
+include::chapters/_message-syntax.adoc[]
+include::chapters/_message-parameter.adoc[]
+include::chapters/_formatters.adoc[]
