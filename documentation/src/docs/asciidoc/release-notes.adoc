@@ -2,7 +2,11 @@
 :!revnumber:
 :toc: left
 :toclevels: 1
+:toc-title: Release Notes
 :sectanchors:
+:author: Jeroen Gremmen
+:revdate: 2023-01-30
+:nofooter:
 
 image:https://img.shields.io/github/v/tag/jgremmen/message-format?label=release[GitHub tag (latest SemVer)]
 image:https://img.shields.io/github/languages/code-size/jgremmen/message-format[GitHub code size in bytes]

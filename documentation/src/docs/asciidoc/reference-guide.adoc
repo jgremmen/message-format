@@ -3,6 +3,9 @@
 :toc: left
 :toclevels: 3
 :sectanchors:
+:author: Jeroen Gremmen
+:revdate: 2023-01-30
+:nofooter:
 
 
 include::_preface.adoc[]

@@ -1,0 +1,16 @@
+= Message Format Documentation
+:!revnumber:
+:toc: left
+:toclevels: 1
+:toc-title: Documentation
+:sectanchors:
+:nofooter:
+
+== 0.8.0 (2023-01-31)
+
+* Reference guide: xref:0.8.0/reference-guide.adoc[HTML]
+* JavaDoc API documentation:
+  xref:0.8.0/javadoc/index.html[main]
+  xref:0.8.0/javadoc-cpscan/index.html[cpscan]
+  xref:0.8.0/javadoc-jodatime/index.html[jodatime]
+* xref:migration-guide.adoc#migrate-to-0.8.0[Migration guide]

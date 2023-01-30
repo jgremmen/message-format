@@ -2,7 +2,9 @@
 :!revnumber:
 :toc: left
 :toclevels: 1
+:toc-title: Migration Guide
 :sectanchors:
+:nofooter:
 
 [[migrate-to-0.8.0]]
 == Version 0.7.x to 0.8.0
