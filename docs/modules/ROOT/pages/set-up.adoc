@@ -1,5 +1,5 @@
-[[setup]]
-== Set up
+= Set Up
+:navtitle: Set Up
 
 Message Format comprises the following artifacts:
 
@@ -9,7 +9,7 @@ Message Format comprises the following artifacts:
 * _de.sayayi.lib:message-format-jodatime_: contains a ParameterFormatter for the date and time classes
   of the jodatime library
 
-=== Gradle
+== Gradle
 
 Add the following to your Gradle build file in order to use Message Format:
 

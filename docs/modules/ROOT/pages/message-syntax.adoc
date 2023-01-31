@@ -1,5 +1,5 @@
-[[message-syntax]]
-== Message Syntax
+= Message Syntax
+:navtitle: Message Syntax
 
 A message is a sequence of characters, escape codes and parameters. Let's take a look at these 3 components.
 

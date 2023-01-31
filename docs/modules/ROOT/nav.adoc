@@ -1,1 +1,3 @@
-* xref:introduction.adoc
+* xref:introduction.adoc[]
+* xref:set-up.adoc[]
+* xref:message-syntax.adoc[]
