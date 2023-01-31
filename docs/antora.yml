@@ -1,0 +1,5 @@
+name: message-format
+title: Message Format
+version: 0.8.0
+nav:
+  - modules/ROOT/nav.adoc
