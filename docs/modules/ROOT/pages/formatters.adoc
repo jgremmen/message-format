@@ -1,5 +1,6 @@
 [[formatters]]
-== Formatters
+= Formatters
+:navtitle: Formatters
 
 The message format library comes with a large number of pre-defined parameter formatters.
 In this section you'll learn how to use and configure each formatter to meet your individual needs.
@@ -11,10 +12,4 @@ There are 2 types of parameter formatters:
   of the value to be formatted
 
 How formatters are selected based on the value to be formatted and the optional formatter name is explained
-in a separate link:#formatter-selection[chapter].
-
-include::_formatters_named.adoc[]
-
-include::_formatters_typed.adoc[]
-
-include::_formatters_selection.adoc[]
+in a separate xref:formatters_selection.adoc[chapter].

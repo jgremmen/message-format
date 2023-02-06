@@ -1,4 +1,0 @@
-[[message-parameter]]
-== Message Parameter
-
-TODO

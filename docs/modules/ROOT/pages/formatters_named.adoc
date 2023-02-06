@@ -1,4 +1,4 @@
-=== Named Formatters
+= Named Formatters
 
 Named formatters are selected by providing the formatter name in the message parameter. The following
 example `%{n,bool}` would select the `bool` formatter and format the value associated with `n`.
@@ -8,7 +8,7 @@ the type based formatter selection will be performed. For the moment we'll assum
 is found and is capable of formatting the parameter value.
 
 
-==== Binary Representation (bits)
+== Binary Representation (bits)
 
 The `bits` formatter converts a number into a binary sequence of `0` and `1` characters.
 
@@ -49,7 +49,7 @@ In order to control the number of bits generated, the `bits` configuration key c
 ====
 
 
-==== Boolean (bool)
+== Boolean (bool)
 
 The `bool` formatter is both a named and typed formatter. It will be automatically selected for boolean
 values (`boolean` or `java.lang.Boolean`) but can be selected by name as well.
@@ -77,27 +77,27 @@ In case that's not sufficient, there's a way to customize the true and false val
 ====
 
 
-==== Choose Map Value (choice)
+== Choose Map Value (choice)
 
 TODO
 
-==== Clip Length (clip)
+== Clip Length (clip)
 
 TODO
 
-==== File Size (filesize)
+== File Size (filesize)
 
 TODO
 
-==== Longitude/Latitude (geo)
+== Longitude/Latitude (geo)
 
 TODO
 
-==== Size (size)
+== Size (size)
 
 TODO
 
-==== String (string)
+== String (string)
 
 The `string` formatter is both a named and typed formatter. It will be automatically selected for character
 sequences (`char[]` or `java.lang.CharSequence`) but can be selected by name as well.

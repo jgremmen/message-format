@@ -22,7 +22,7 @@ Escape code::
 Parameter::
   A parameter starts with the character sequence `%{` and ends with `}`. It is a placeholder with optional
   formatting details (eg. `%{d,date:medium}` or `%{n}`). The parameter format is explained in more detail
-  in its own xref:_message-parameter.adoc[chapter].
+  in its own xref:message-parameter.adoc[chapter].
 
 Let's take a look at some examples:
 

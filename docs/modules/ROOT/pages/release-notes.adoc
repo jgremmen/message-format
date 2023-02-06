@@ -1,12 +1,5 @@
 = Release Notes
-:!revnumber:
-:toc: left
-:toclevels: 1
-:toc-title: Release Notes
-:sectanchors:
-:author: Jeroen Gremmen
-:revdate: 2023-01-30
-:nofooter:
+:navtitle: Release Notes
 
 image:https://img.shields.io/github/v/tag/jgremmen/message-format?label=release[GitHub tag (latest SemVer)]
 image:https://img.shields.io/github/languages/code-size/jgremmen/message-format[GitHub code size in bytes]
@@ -17,23 +10,24 @@ image:https://img.shields.io/github/license/jgremmen/message-format[GitHub]
 == 0.8.0
 _Release date: t.b.d._
 
-====== New
+===== New
 
 * Add named formatter `clip`
 * Introduce `FormatterContext` for `ParameterFormatter#format(...)` method
 * A parameter formatter can delegate formatting to the next (based on formattable type priority) formatter
 
-====== Change
+===== Change
 
 * Flatten parameter data map, eg. `%{n,choice,1:'color',:'colors'}`
 * Consolidate formatter formatting options
 
-====== Bugfix
+===== Bugfix
 
 * Improve formatter selection based on parameter format designator and value class type
 * Parameter format designator is used for selecting a named parameter formatter only
 
-:important-caption:
 [IMPORTANT]
+====
 This version generally breaks backward compatibility. Please refer to the
-xref:migration-guide.adoc#migrate-to-0.8.0[migration guide] for more detailed information.
+xref:migration-0.7.x-to-0.8.0.adoc[migration guide] for more detailed information.
+====

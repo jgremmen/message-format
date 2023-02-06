@@ -1,3 +1,16 @@
-* xref:introduction.adoc[]
+* xref:index.adoc[]
 * xref:set-up.adoc[]
-* xref:message-syntax.adoc[]
+
+* Message
+ ** xref:message-syntax.adoc[Syntax]
+ ** xref:message-parameter.adoc[Parameter]
+
+* xref:formatters.adoc[]
+ ** xref:formatters_named.adoc[Named]
+ ** xref:formatters_typed.adoc[Typed]
+ ** xref:formatters_selection.adoc[Selection]
+
+* Migration Guides
+ ** xref:migration-0.7.x-to-0.8.0.adoc[]
+
+* xref:release-notes.adoc[]
