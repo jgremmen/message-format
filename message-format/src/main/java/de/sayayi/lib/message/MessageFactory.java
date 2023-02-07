@@ -32,16 +32,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.AnnotatedElement;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Collections.singletonMap;
@@ -184,9 +176,6 @@ public class MessageFactory
   @Contract(pure = true)
   public @NotNull Message.WithCode withCode(@NotNull String code, @NotNull Message message)
   {
-    if (message instanceof MessageDelegateWithCode)
-      return new MessageDelegateWithCode(code, ((MessageDelegateWithCode)message).getMessage());
-
     if (message instanceof Message.WithCode)
     {
       final Message.WithCode messageWithCode = (Message.WithCode)message;
@@ -194,6 +183,9 @@ public class MessageFactory
       if (code.equals(messageWithCode.getCode()))
         return messageWithCode;
     }
+
+    if (message instanceof MessageDelegateWithCode)
+      return new MessageDelegateWithCode(code, ((MessageDelegateWithCode)message).getMessage());
 
     if (message instanceof EmptyMessage || message instanceof EmptyMessageWithCode)
       return new EmptyMessageWithCode(code);
