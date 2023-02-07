@@ -49,6 +49,7 @@ In order to control the number of bits generated, the `bits` configuration key c
 ====
 
 
+[[bool]]
 == Boolean (bool)
 
 The `bool` formatter is both a named and typed formatter. It will be automatically selected for boolean
@@ -77,6 +78,7 @@ In case that's not sufficient, there's a way to customize the true and false val
 ====
 
 
+[[choice]]
 == Choose Map Value (choice)
 
 TODO

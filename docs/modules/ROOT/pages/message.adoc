@@ -147,7 +147,7 @@ Configuration key empty::
     Eg. `%{list,empty:'no elements'}`
 
 Configuration key string and number::
-    These keys are used by certain formatters (eg. `choice` formatter) as way of translating the parameter value into
+    These keys are used by certain formatters (eg. xref:formatters_named.adoc#choice[`choice`] formatter) as way of translating the parameter value into
     a string representation. +
     Eg. `%{n,choice,0:'no cookies',1:'a cookie',:'%\{n} cookies'}`
 
