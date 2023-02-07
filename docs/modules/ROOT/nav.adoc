@@ -1,9 +1,9 @@
 * xref:index.adoc[]
 * xref:set-up.adoc[]
 
-* Message
- ** xref:message-syntax.adoc[Syntax]
- ** xref:message-parameter.adoc[Parameter]
+* xref:message.adoc[]
+ ** xref:message.adoc#message-syntax[Message Syntax]
+ ** xref:message.adoc#parameter-syntax[Parameter Syntax]
 
 * xref:formatters.adoc[]
  ** xref:formatters_named.adoc[Named]
