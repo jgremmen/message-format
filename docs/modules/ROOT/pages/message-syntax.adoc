@@ -1,6 +1,34 @@
 = Message Syntax
 :navtitle: Message Syntax
 
+[plantuml,message,svg,align=left]
+....
+@startebnf
+message = { message-part };
+@endebnf
+....
+
+[plantuml,message-part,svg,align=left]
+....
+@startebnf
+message-part = ({ character }- | parameter (* discussed in a separate chapter *));
+@endebnf
+....
+
+[plantuml,parameter-character,svg,align=left]
+....
+@startebnf
+character = ('\u', hex-digit, hex-digit, hex-digit, hex-digit | '\', ('"' | "'" | '%' | '{' | '\') | ? \u0020-\uffff ? (* unicode description of character range *) );
+@endebnf
+....
+
+[plantuml,parameter-hex-digit,svg,align=left]
+....
+@startebnf
+hex-digit = (? 0-9 ? | ? a-f ? | ? A-F ?);
+@endebnf
+....
+
 A message is a sequence of characters, escape codes and parameters. Let's take a look at these 3 components.
 
 Characters::
@@ -15,8 +43,8 @@ Escape code::
   * `\"` inserts a `"`
   * `\'` inserts a `'`
   * `\%` inserts a `%`
-  * `\\` inserts a `\`
   * `\{` inserts a `{`
+  * `\\` inserts a `\`
   * `\u<nnnn>` inserts a unicode character (eg. `\u0031` = `1`)
 
 Parameter::
