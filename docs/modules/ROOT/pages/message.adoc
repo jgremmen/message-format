@@ -1,12 +1,18 @@
 = Message
 :navtitle: Message
 
+This chapter describes the message format - or better said - it's syntactical structure in more detail.
+
+
+
+
 [[message-syntax]]
 == Message Syntax
 
 A message is an alternating sequence of text and parameter parts. The parameter parts are placeholders for
-parameter values which are provided during runtime. The remaining text parts are formatted
-as-is with the exception of escaped characters.
+parameter values which are provided during runtime and rendered based on the value type, optional format
+designator and parameter configuration. The remaining text parts are formatted as-is with the exception of
+escaped characters.
 
 [plantuml,message,svg,align=left]
 ....
@@ -15,48 +21,48 @@ message = [text], { parameter, [text] };
 @endebnf
 ....
 
-Text parts are just a chain of characters. The parameter parts on the other hand have a more complex structure,
-which is discussed in the xref:message.adoc#parameter-syntax[parameter syntax] chapter.
+Text parts are merely a chain of visible/printable characters and escape sequences.
+The parameter parts on the other hand have a more complex structure, which is discussed in the
+xref:message.adoc#parameter-syntax[parameter syntax] chapter.
 
 [plantuml,text,svg,align=left]
 ....
 @startebnf
 text = { character }-;
-@endebnf
-....
 
-A character is either a single regular character or an escape sequence.
-
-[plantuml,character,svg,align=left]
-....
-@startebnf
 character = ('\u', hex-digit, hex-digit, hex-digit, hex-digit | '\', ('"' | "'" | '%' | '{' | '\') | ? \u0020-\uffff ? (* visible characters only (no control characters) *) );
-@endebnf
-....
 
-[plantuml,hex-digit,svg,align=left]
-....
-@startebnf
 hex-digit = (? 0-9 ? | ? a-f or A-F ?);
 @endebnf
 ....
 
-Let's take a look at some examples:
-[cols="1,1",width=40%]
+Let's take a look at some text part examples:
+[cols="3,2"]
 |===
-|Escape|Output
+|Message|Possible output
 
-|`\{`
-|`{`
+|`The&nbsp;&nbsp;&nbsp;quick brown&nbsp;&nbsp;fox`
+|`The quick brown fox`
 
-|`\"`
-|`"`
+|`temperature = 10\u00b0C`
+|`temperature = 10°C`
 
-|`\u0021`
-|`!`
+|`/\\`
+|`/\`
 
-|`\u003f`
-|`?`
+|`&nbsp;whitespace&nbsp;`
+|`whitespace` footnote:[
+    leading and trailing spaces are preserved during formatting and removed from the final output. For more detail
+    see the chapter on xref:message.adoc#whitespace-handling[whitespace handling].]
+
+|`I see a %{color} ball.`
+|`I see a red ball.`
+
+|`I ate %{n,choice,1:cookie,:'%{n} cookies'}`
+|`I ate 12 cookies`
+
+|`The numbers are: %{numbers,list-sep-last:' and '}`
+|`The numbers are: 2, 56, 7 and 99`
 
 |`\q`
 |`\q`
