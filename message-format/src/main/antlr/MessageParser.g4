@@ -84,10 +84,10 @@ mapKey returns [MapKey key]
         ;
 
 mapValue returns [MapValue value]
-        : string         #mapValueString
-        | nameOrKeyword  #mapValueString
+        : BOOL           #mapValueBool
         | NUMBER         #mapValueNumber
-        | BOOL           #mapValueBool
+        | string         #mapValueString
+        | nameOrKeyword  #mapValueString
         | quotedMessage  #mapValueMessage
         ;
 
