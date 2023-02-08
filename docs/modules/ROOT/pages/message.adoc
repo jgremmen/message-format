@@ -3,6 +3,35 @@
 
 This chapter describes the message format - or better said - it's syntactical structure in more detail.
 
+Essentially, a message is a description for generating human readable text. Nobody wants to present the user
+with a message like `the search found 1 results`. Yet, generated messages often lack grammatical consistency.
+This is especially true for some languages where the grammar is more complex.
+
+An message could read `I give the man/woman a book`. So man and woman are exchangeable and the sentence is
+still grammatically correct. For a language like german, it would be `Ich gebe dem Mann/der Frau ein Buch`.
+Here `the man` translates to `dem Mann` and `the woman` translates to `der Frau`.
+
+Let's assume the parameter to format is a character (`M` = man, `F` = woman) which represents the gender.
+The messages for the english, german and italian language would be:
+
+[cols="1,6"]
+|===
+|Language|Message
+
+|english
+|`"I give the %{gender,choice,'M':man,'F':woman} a book"`
+
+|german
+|`"Ich gebe %{gender,choice,'M':'dem Mann','F':'der Frau'} ein Buch"`
+
+|italian
+|`"Do %{gender,choice,'M':'all\u0027uomo un libro','F':'un libro alla donna'}"`
+|===
+
+Using an appropriate `MessageBundle` message formats can be defined for each language the application has to
+be able to present. Just provide the message code, locale and parameters and let the message format library
+do the formatting.
+
 
 
 
@@ -179,7 +208,7 @@ Configuration key operation::
 
 |`!` or `<>`
 |Check for inequality. +
- Eg. `Error %{msg,!empty:': %\{msg}}`
+ Eg. `"Error %{msg,!empty:': %\{msg}}"`
 
 |`>`
 |Check whether the parameter value is larger than the configuration key. +
@@ -199,14 +228,22 @@ Eg. `%{s,\<='ZZ':'less than or equal to ZZ'}`
 |===
 --
 
+Configuration value::
+    There are 4 configuration value types (bool, number, string, message). Keywords are considered string values and
+    provide a way to specify strings without quotes.
 
 [plantuml,config-value,svg,align=left]
 ....
 @startebnf
 config-value = (bool | number | quoted-message | string | name | 'null' | 'empty');
-(* name, null and empty are automatically converted to strings *)
+(* name, null and empty represent a string value (without quotes) *)
 @endebnf
 ....
+
+Configuration value quoted-message::
+    A quoted message is a message as described in the xref::message.adoc#message-syntax[message syntax] chapter.
+    It can contain message parameter parts which allows for complex message formatting. +
+    Eg. `"An error has occurred%{ex,!empty: #': %\{ex}'#}"`
 
 [plantuml,quoted-message,svg,align=left]
 ....

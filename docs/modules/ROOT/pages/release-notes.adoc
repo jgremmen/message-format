@@ -10,18 +10,19 @@ image:https://img.shields.io/github/license/jgremmen/message-format[GitHub]
 == 0.8.0
 _Release date: t.b.d._
 
-===== New
+==== New
 
-* Add named formatter `clip`
+* Add named formatter xref:formatters_named.adoc#clip[`clip`]
 * Introduce `FormatterContext` for `ParameterFormatter#format(...)` method
 * A parameter formatter can delegate formatting to the next (based on formattable type priority) formatter
+* Documentation
 
-===== Change
+==== Change
 
 * Flatten parameter data map, eg. `%{n,choice,1:'color',:'colors'}`
 * Consolidate formatter formatting options
 
-===== Bugfix
+==== Bugfix
 
 * Improve formatter selection based on parameter format designator and value class type
 * Parameter format designator is used for selecting a named parameter formatter only

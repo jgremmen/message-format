@@ -11,6 +11,6 @@
  ** xref:formatters_selection.adoc[Selection]
 
 * Migration Guides
- ** xref:migration-0.7.x-to-0.8.0.adoc[]
+ ** xref:migration-0.7.x-to-0.8.0.adoc[0.7.x -> 0.8.0]
 
 * xref:release-notes.adoc[]

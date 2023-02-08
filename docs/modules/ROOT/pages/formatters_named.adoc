@@ -8,6 +8,7 @@ the type based formatter selection will be performed. For the moment we'll assum
 is found and is capable of formatting the parameter value.
 
 
+[[bits]]
 == Binary Representation (bits)
 
 The `bits` formatter converts a number into a binary sequence of `0` and `1` characters.
@@ -83,22 +84,27 @@ In case that's not sufficient, there's a way to customize the true and false val
 
 TODO
 
+[[clip]]
 == Clip Length (clip)
 
 TODO
 
+[[filesize]]
 == File Size (filesize)
 
 TODO
 
+[[geo]]
 == Longitude/Latitude (geo)
 
 TODO
 
+[[size]]
 == Size (size)
 
 TODO
 
+[[string]]
 == String (string)
 
 The `string` formatter is both a named and typed formatter. It will be automatically selected for character

@@ -1,4 +1,4 @@
 [[formatter-selection]]
-=== Formatter Selection
+= Formatter Selection
 
 TODO
