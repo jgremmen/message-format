@@ -14,7 +14,7 @@ Here `the man` translates to `dem Mann` and `the woman` translates to `der Frau`
 Let's assume the parameter to format is a character (`M` = man, `F` = woman) which represents the gender.
 The messages for the english, german and italian language would be:
 
-[cols="1,6"]
+[cols="12,88"]
 |===
 |Language|Message
 
@@ -29,8 +29,8 @@ The messages for the english, german and italian language would be:
 |===
 
 Using an appropriate `MessageBundle` message formats can be defined for each language the application has to
-be able to present. Just provide the message code, locale and parameters and let the message format library
-do the formatting.
+be able to present. Just provide the message code, locale and parameters in your code and let the message format
+library do the formatting.
 
 
 
@@ -251,6 +251,9 @@ Configuration value quoted-message::
 quoted-message = ('"', [message], '"' | "'", [message], "'");
 @endebnf
 ....
+
+
+
 
 [[whitespace-handling]]
 == Whitespace Handling
