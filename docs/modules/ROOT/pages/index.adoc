@@ -4,9 +4,6 @@
 This is the reference documentation of Message Format, a highly configurable library for generating
 user readable messages. This guide covers all the functionality provided by Message Format.
 
-This project is licensed under
-https://www.apache.org/licenses/LICENSE-2.0[Apache License Version 2.0,window=_blank].
-
 == System Requirements
 
 Message Format {fullVersion} requires at least Java 8.

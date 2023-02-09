@@ -4,6 +4,7 @@
 * xref:message.adoc[]
  ** xref:message.adoc#message-syntax[Message Syntax]
  ** xref:message.adoc#parameter-syntax[Parameter Syntax]
+ ** xref:message.adoc#whitespace-handling[Whitespace Handling]
 
 * xref:formatters.adoc[]
  ** xref:formatters_named.adoc[Named]
@@ -14,3 +15,8 @@
  ** xref:migration-0.7.x-to-0.8.0.adoc[0.7.x -> 0.8.0]
 
 * xref:release-notes.adoc[]
+
+* xref:project.adoc[About this Project]
+ ** xref:project.adoc#javadoc[API JavaDoc]
+ ** xref:project.adoc#github[GitHub Project]
+ ** xref:project.adoc#github[License]

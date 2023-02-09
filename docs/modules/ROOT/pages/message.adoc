@@ -258,4 +258,55 @@ quoted-message = ('"', [message], '"' | "'", [message], "'");
 [[whitespace-handling]]
 == Whitespace Handling
 
-Multiple consecutive whitespace characters are collapsed into 1 single whitespace.
+When a message is formatted multiple consecutive whitespace characters are collapsed into 1 single whitespace.
+
+The message format library keeps track of leading and trailing spaces for both text and parameter parts.
+
+Let's take a look at an example message with 5 message parts: +
+Eg. `&nbsp;text1%\{p1} %\{p2} text2%\{p3}`
+
+[cols="1,1,1",width=50%]
+|===
+|Part|Leading Space|Trailing Space
+
+|`text1`
+|true
+|false
+
+|`%\{p1}`
+|false
+|true
+
+|`%\{p2}`
+|true
+|true
+
+|`text2`
+|true
+|false
+
+|`%\{p3}`
+|false
+|false
+|===
+
+The following piece of pseudo-code shows how these parts are processed:
+
+[source]
+----
+message := ""
+spaceBefore := false
+
+for each part do
+  textPart := format(part)
+
+  if not textPart.empty then
+    if (spaceBefore or textPart.leadingSpace) and message <> "" then
+      message := message + ' '
+    end if
+
+    message := message + textPart.trim
+    spaceBefore := textPart.trailingSpace
+  end if
+done
+----

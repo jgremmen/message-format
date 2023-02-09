@@ -1,0 +1,22 @@
+= Project
+:navtitle: Project
+
+
+[[javadoc]]
+== API JavaDoc
+
+Message Format Library API JavaDoc can be found here.
+
+[[github]]
+== GitHub Project
+
+The https://github.com/jgremmen/message-format[GitHub project,window=_blank] has the source code, tests and
+documentation.
+
+Star and/or fork this project on GitHub if you like it.
+
+[[license]]
+== License
+
+Message Format Library is licensed under the
+https://www.apache.org/licenses/LICENSE-2.0[Apache License Version 2.0,window=_blank].
