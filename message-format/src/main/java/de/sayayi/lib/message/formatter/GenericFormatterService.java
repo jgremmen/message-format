@@ -16,14 +16,20 @@
 package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.formatter.named.StringFormatter;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 
 import static java.util.Collections.*;
-import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -40,7 +46,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   private final @NotNull Map<Class<?>,Integer> typeOrderMap = new ConcurrentHashMap<>();
   private final @NotNull Map<Class<?>,ParameterFormatter> typeFormatters = new ConcurrentHashMap<>();
   private final @NotNull Map<Class<?>,List<ParameterFormatter>> cachedFormatters =
-      synchronizedMap(new FixedSizeCacheMap<>(CLASS_SORTER, 128));
+      synchronizedMap(new FixedSizeCacheMap<>(CLASS_SORTER, 256));
 
 
   static
@@ -59,12 +65,13 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   {
     final StringFormatter stringFormatter = new StringFormatter();
 
-    addFormatter(stringFormatter);
-    addFormatterForType(new FormattableType(Object.class, 127), stringFormatter);
+    namedFormatters.put(stringFormatter.getName(), stringFormatter);
+    addFormatterForType(new FormattableType(Object.class), stringFormatter);
   }
 
 
   @Override
+  @MustBeInvokedByOverriders
   public void addFormatterForType(@NotNull FormattableType formattableType, @NotNull ParameterFormatter formatter)
   {
     final Class<?> type = formattableType.getType();
@@ -76,6 +83,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   @Override
+  @MustBeInvokedByOverriders
   public void addFormatter(@NotNull ParameterFormatter formatter)
   {
     if (formatter instanceof NamedParameterFormatter)
@@ -87,14 +95,18 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       namedFormatters.put(format, (NamedParameterFormatter)formatter);
     }
 
-    for(final FormattableType formattableType: formatter.getFormattableTypes())
-      addFormatterForType(formattableType, formatter);
+    formatter.getFormattableTypes()
+        .forEach(formattableType -> addFormatterForType(formattableType, formatter));
   }
 
 
   @Override
+  @MustBeInvokedByOverriders
   public void setFormattableTypeOrder(@NotNull Class<?> type, @Range(from = 0, to = 127) int order)
   {
+    if (type == Object.class && order != 127)
+      throw new IllegalArgumentException("Object type order must be 127");
+
     if (typeFormatters.containsKey(type))
     {
       typeOrderMap.put(type, order);
@@ -134,17 +146,28 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       type = type.getSuperclass();
     }
 
-    return unmodifiableList(types
+    return types
         .stream()
-        .map(t -> {
-          final Integer order = typeOrderMap.get(t);
-          return order == null ? null : new FormattableType(t, order);
-        })
+        .map(this::convertToFormattableType)
         .filter(Objects::nonNull)
         .sorted()
-        .map(ft -> typeFormatters.get(ft.getType()))
-        .filter(Objects::nonNull)
-        .collect(toList()));
+        .map(this::convertToParameterFormatter)
+        .collect(ParameterFormatterCollector.INSTANCE);
+  }
+
+
+  @Contract(pure = true)
+  private FormattableType convertToFormattableType(@NotNull Class<?> type)
+  {
+    final Integer order = typeOrderMap.get(type);
+
+    return order == null ? null : new FormattableType(type, order);
+  }
+
+
+  @Contract(pure = true)
+  private ParameterFormatter convertToParameterFormatter(@NotNull FormattableType formattableType) {
+    return typeFormatters.get(formattableType.getType());
   }
 
 
@@ -160,5 +183,53 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       }
 
     return interfaceTypes;
+  }
+
+
+
+
+  private enum ParameterFormatterCollector
+      implements Collector<ParameterFormatter,ArrayList<ParameterFormatter>,List<ParameterFormatter>>
+  {
+    INSTANCE;
+
+
+    @Override
+    public Supplier<ArrayList<ParameterFormatter>> supplier() {
+      return () -> new ArrayList<>(8);
+    }
+
+
+    @Override
+    public BiConsumer<ArrayList<ParameterFormatter>,ParameterFormatter> accumulator() {
+      return List::add;
+    }
+
+
+    @Override
+    public BinaryOperator<ArrayList<ParameterFormatter>> combiner() {
+      return (list1, list2) -> { list1.addAll(list2); return list1; };
+    }
+
+
+    @Override
+    public Function<ArrayList<ParameterFormatter>,List<ParameterFormatter>> finisher()
+    {
+      return list -> {
+        if (list.size() == 1)
+          return singletonList(list.get(0));
+
+        // expected size < 8; reduce memory footprint
+        list.trimToSize();
+
+        return unmodifiableList(list);
+      };
+    }
+
+
+    @Override
+    public Set<Characteristics> characteristics() {
+      return emptySet();
+    }
   }
 }
