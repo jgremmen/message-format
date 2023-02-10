@@ -67,7 +67,8 @@ parameter returns [ParameterPart value]
           name=nameOrKeyword
           (COMMA format=nameOrKeyword)?
           (COMMA mapElement)*
-          (COMMA COLON forceQuotedMessage)? PARAM_END
+          (COMMA COLON forceQuotedMessage)?
+          PARAM_END
         ;
 
 mapElement returns [MapKey key, MapValue value]
