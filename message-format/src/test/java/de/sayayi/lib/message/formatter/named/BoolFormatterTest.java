@@ -16,9 +16,15 @@
 package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.data.map.MapKey;
+import de.sayayi.lib.message.data.map.MapKeyBool;
+import de.sayayi.lib.message.data.map.MapValue;
+import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
@@ -45,14 +51,17 @@ public class BoolFormatterTest extends AbstractFormatterTest
   public void testFormat()
   {
     val context = new MessageContext(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE, "de-DE");
+    val map = new HashMap<MapKey,MapValue>();
+    map.put(MapKeyBool.TRUE, new MapValueString("wahr"));
+    map.put(MapKeyBool.FALSE, new MapValueString("falsch"));
 
-    assertEquals(noSpaceText("wahr"), format(context, Boolean.TRUE));
-    assertEquals(noSpaceText("falsch"), format(context, 0.0d, "bool"));
-    assertEquals(noSpaceText("wahr"), format(context, -0.0001f, "bool"));
-    assertEquals(noSpaceText("falsch"), format(context, "FALSE", "bool"));
-    assertEquals(noSpaceText("wahr"), format(context, "TrUe", "bool"));
-    assertEquals(noSpaceText("wahr"), format(context, -4, "bool"));
-    assertEquals(nullText(), format(context, (Object)null, "bool"));
+    assertEquals(noSpaceText("wahr"), format(context, Boolean.TRUE, map));
+    assertEquals(noSpaceText("falsch"), format(context, 0.0d, map, "bool"));
+    assertEquals(noSpaceText("wahr"), format(context, -0.0001f, map, "bool"));
+    assertEquals(noSpaceText("falsch"), format(context, "FALSE", map, "bool"));
+    assertEquals(noSpaceText("wahr"), format(context, "TrUe", map, "bool"));
+    assertEquals(noSpaceText("wahr"), format(context, -4, map, "bool"));
+    assertEquals(nullText(), format(context, (Object)null, map, "bool"));
   }
 
 

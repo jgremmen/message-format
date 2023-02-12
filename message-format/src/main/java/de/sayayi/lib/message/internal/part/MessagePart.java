@@ -48,6 +48,17 @@ public interface MessagePart extends SpacesAware, Serializable
 
 
     /**
+     * Returns the text for this message part decorated with spaces, if available.
+     *
+     * @return  text or {@code null}
+     */
+    @Contract(pure = true)
+    default String getTextWithSpaces() {
+      return getText();
+    }
+
+
+    /**
      * Tells if this text message part is empty.
      *
      * @return  {@code true} if this message part is empty, {@code false} otherwise

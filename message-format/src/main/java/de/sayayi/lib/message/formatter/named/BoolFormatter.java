@@ -35,7 +35,6 @@ import static de.sayayi.lib.message.data.map.MapKey.Type.BOOL;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Arrays.asList;
-import static java.util.ResourceBundle.getBundle;
 
 
 /**
@@ -95,15 +94,7 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
     if ((msg = formatterContext.getMapMessage(bool, EnumSet.of(BOOL)).orElse(null)) != null)
       return formatterContext.format(msg);
 
-    // get translated boolean value
-    String s = Boolean.toString(bool);
-    try {
-      s = getBundle(FORMATTER_BUNDLE_NAME, formatterContext.getLocale()).getString(s);
-    } catch(Exception ignore) {
-    }
-
-    return (msg = formatterContext.getMapMessage(s, NO_NAME_KEY_TYPES).orElse(null)) == null
-        ? noSpaceText(s) : formatterContext.format(msg);
+    return noSpaceText(Boolean.toString(bool));
   }
 
 

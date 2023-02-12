@@ -34,24 +34,48 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor(access = PRIVATE)
 public final class MessagePartFactory
 {
+  /**
+   * Text part which represents a {@code null} text.
+   *
+   * @return  null text part, never {@code null}
+   */
   @Contract(pure = true)
   public static @NotNull Text nullText() {
     return NULL;
   }
 
 
+  /**
+   * Text part which represents empty text.
+   *
+   * @return  empty text part, never {@code null}
+   */
   @Contract(pure = true)
   public static @NotNull Text emptyText() {
     return EMPTY;
   }
 
 
+  /**
+   * Converts the given {@code text} in a text part without leading/trailing space.
+   *
+   * @param text  text, or {@code null}
+   *
+   * @return  text part representing the given {@code text} without leading/trailing space, never {@code null}
+   */
   @Contract(pure = true)
   public static @NotNull Text noSpaceText(String text) {
     return text == null ? NULL : isTrimmedEmpty(text) ? EMPTY : new NoSpaceTextPart(text);
   }
 
 
+  /**
+   * Converts the given {@code text} in a text part preserving leading/trailing spaces.
+   *
+   * @param text  text, or {@code null}
+   *
+   * @return  text part representing the given {@code text} preserving leading/trailing space, never {@code null}
+   */
   @Contract(pure = true)
   public static @NotNull Text spacedText(String text) {
     return text == null ? NULL : text.isEmpty() ? EMPTY : new TextPart(text);

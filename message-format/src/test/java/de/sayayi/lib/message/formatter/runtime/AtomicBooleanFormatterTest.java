@@ -48,7 +48,7 @@ class AtomicBooleanFormatterTest extends AbstractFormatterTest
         NO_CACHE_INSTANCE, "de-DE");
 
     assertEquals(nullText(), format(context, null));
-    assertEquals(noSpaceText("wahr"), format(context, new AtomicBoolean(true)));
-    assertEquals(noSpaceText("falsch"), format(context, new AtomicBoolean(false)));
+    assertEquals(noSpaceText("true"), format(context, new AtomicBoolean(true)));
+    assertEquals(noSpaceText("false"), format(context, new AtomicBoolean(false)));
   }
 }

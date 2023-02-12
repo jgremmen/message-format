@@ -64,6 +64,16 @@ public final class TextPart implements Text
 
 
   @Override
+  public String getTextWithSpaces()
+  {
+    if (text == null || text.isEmpty())
+      return spaceBefore || spaceAfter ? " " : text;
+
+    return spaceBefore ? !spaceAfter ? ' ' + text : ' ' + text + ' ' : spaceAfter ? text + ' ' : text;
+  }
+
+
+  @Override
   public boolean isEmpty() {
     return SpacesUtil.isEmpty(text);
   }

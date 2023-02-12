@@ -41,10 +41,9 @@ public class SupplierFormatterTest extends AbstractFormatterTest
   public void testBooleanSupplier()
   {
     val context = new MessageContext(
-        createFormatterService(new BoolFormatter(), new BooleanSupplierFormatter()),
-        NO_CACHE_INSTANCE, "de-DE");
+        createFormatterService(new BoolFormatter(), new BooleanSupplierFormatter()), NO_CACHE_INSTANCE);
 
-    assertEquals(noSpaceText("wahr"), format(context, (BooleanSupplier) () -> true));
+    assertEquals(noSpaceText("true"), format(context, (BooleanSupplier) () -> true));
   }
 
 
