@@ -16,11 +16,12 @@
 package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Locale;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
@@ -45,8 +46,7 @@ public final class MapKeyName implements MapKey
 
 
   @Override
-  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Parameters parameters,
-                                    Object value)
+  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Locale locale, Object value)
   {
     return (value instanceof CharSequence || value instanceof Character) && value.toString().equals(name)
         ? EXACT : MISMATCH;

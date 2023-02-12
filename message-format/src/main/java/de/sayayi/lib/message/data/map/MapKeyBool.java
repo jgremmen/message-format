@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
@@ -24,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Locale;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.*;
 import static lombok.AccessLevel.PRIVATE;
@@ -51,8 +51,7 @@ public enum MapKeyBool implements MapKey
 
 
   @Override
-  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Parameters parameters,
-                                    Object value)
+  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Locale locale, Object value)
   {
     if (value != null)
     {

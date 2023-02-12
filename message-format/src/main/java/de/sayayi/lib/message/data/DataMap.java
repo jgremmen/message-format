@@ -29,6 +29,7 @@ import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -78,32 +79,31 @@ public final class DataMap implements Data
                        @NotNull Parameters parameters, @NotNull Set<MapKey.Type> keyTypes,
                        Set<MapValue.Type> valueTypes)
   {
+    final Locale locale = parameters.getLocale();
     MatchResult bestMatchResult = MISMATCH;
+    MapKey mapKey;
     MapValue bestMatch = null;
 
     for(Entry<MapKey,MapValue> entry: map.entrySet())
-    {
-      final MapKey mapKey = entry.getKey();
-      if (mapKey == null)
-        continue;
-
-      final MapValue mapValue = entry.getValue();
-
-      if (keyTypes.contains(mapKey.getType()) && (valueTypes == null ||
-          valueTypes.contains(mapValue.getType())))
+      if ((mapKey = entry.getKey()) != null)
       {
-        final MatchResult matchResult = mapKey.match(messageContext, parameters, key);
+        final MapValue mapValue = entry.getValue();
 
-        if (matchResult == EXACT)
-          return entry.getValue();
-
-        if (matchResult.compareTo(bestMatchResult) > 0)
+        if (keyTypes.contains(mapKey.getType()) &&
+            (valueTypes == null || valueTypes.contains(mapValue.getType())))
         {
-          bestMatchResult = matchResult;
-          bestMatch = entry.getValue();
+          final MatchResult matchResult = mapKey.match(messageContext, locale, key);
+
+          if (matchResult == EXACT)
+            return mapValue;
+
+          if (matchResult.compareTo(bestMatchResult) > 0)
+          {
+            bestMatchResult = matchResult;
+            bestMatch = mapValue;
+          }
         }
       }
-    }
 
     return bestMatch;
   }

@@ -16,12 +16,12 @@
 package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.EnumSet;
+import java.util.Locale;
 import java.util.Set;
 
 import static java.util.Collections.unmodifiableSet;
@@ -38,12 +38,26 @@ public interface MapKey extends Serializable
   Set<Type> NAME_TYPE = unmodifiableSet(EnumSet.of(Type.NAME));
 
 
+  /**
+   * Return the type for this key.
+   *
+   * @return  key type, never {@code null}
+   */
   @Contract(pure = true)
   @NotNull Type getType();
 
 
+  /**
+   * Calculates a match result for the given {@code value} with respect to this key.
+   *
+   * @param messageContext  message context instance, neot {@code null}
+   * @param locale          formatting locale, not {@code null}
+   * @param value           value to compare with this key
+   *
+   * @return  matching result, never {@code null}
+   */
   @Contract(pure = true)
-  @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Parameters parameters, Object value);
+  @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Locale locale, Object value);
 
 
 

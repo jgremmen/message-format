@@ -166,6 +166,11 @@ public interface Message extends Serializable
     @NotNull Set<Locale> getLocales();
 
 
+    /**
+     * Returns a map of all messages keyed by locale.
+     *
+     * @return  map of all messages keyed by locale, never {@code null}
+     */
     @Contract(pure = true)
     @Unmodifiable
     @NotNull Map<Locale,Message> getLocalizedMessages();

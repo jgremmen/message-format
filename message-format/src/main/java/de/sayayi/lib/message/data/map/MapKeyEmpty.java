@@ -16,11 +16,12 @@
 package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Locale;
 
 import static de.sayayi.lib.message.data.map.MapKey.CompareType.EQ;
 import static de.sayayi.lib.message.data.map.MapKey.CompareType.NE;
@@ -54,8 +55,7 @@ public final class MapKeyEmpty implements MapKey
 
 
   @Override
-  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Parameters parameters,
-                                    Object value)
+  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Locale locale, Object value)
   {
     if (value == null)
       return compareType == EQ ? TYPELESS_LENIENT : MISMATCH;

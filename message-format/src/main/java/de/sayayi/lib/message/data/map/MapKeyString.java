@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
@@ -49,14 +48,12 @@ public final class MapKeyString implements MapKey
 
 
   @Override
-  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Parameters parameters,
-                                    Object value)
+  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Locale locale, Object value)
   {
     if (value == null)
       return MISMATCH;
 
     MatchResult result = EXACT;
-    Locale locale = parameters.getLocale();
     int cmp = 0;
 
     doMatch: {

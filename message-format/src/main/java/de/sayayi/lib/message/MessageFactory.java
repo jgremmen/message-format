@@ -112,11 +112,11 @@ public class MessageFactory
     if (message != null && localizedTexts.size() == 1)
       return new MessageDelegateWithCode(code, parse(message));
 
-    final Map<Locale,Message> localizedParts = new LinkedHashMap<>();
+    final Map<Locale,Message> localizedMessages = new LinkedHashMap<>();
 
-    localizedTexts.forEach((locale,text) -> localizedParts.put(locale, parse(text)));
+    localizedTexts.forEach((locale,text) -> localizedMessages.put(locale, parse(text)));
 
-    return new LocalizedMessageBundleWithCode(code, localizedParts);
+    return new LocalizedMessageBundleWithCode(code, localizedMessages);
   }
 
 
