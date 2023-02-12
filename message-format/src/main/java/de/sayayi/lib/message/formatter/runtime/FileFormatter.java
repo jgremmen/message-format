@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
+import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.Set;
 
+import static de.sayayi.lib.message.data.map.MapKey.STRING_EMPTY_TYPE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
 import static java.util.Collections.singleton;
 
@@ -54,12 +56,17 @@ public final class FileFormatter extends AbstractParameterFormatter implements S
       case "parent":
         return noSpaceText(file.getParent());
 
-      case "extension":
-        String name = file.getName();
-        int dotidx = name.lastIndexOf('.');
+      case "extension": {
+        final String name = file.getName();
+        final int dotidx = name.lastIndexOf('.');
+        if (dotidx == -1)
+          return emptyText();
 
-        //TODO map extension to message
-        return dotidx == -1 ? emptyText() : noSpaceText(name.substring(dotidx + 1));
+        final String extension = name.substring(dotidx + 1);
+        final Message.WithSpaces msg = formatterContext.getMapMessage(extension, STRING_EMPTY_TYPE).orElse(null);
+
+        return msg != null ? formatterContext.format(msg) : noSpaceText(extension);
+      }
 
       case "absolute-path":
         return noSpaceText(file.getAbsolutePath());

@@ -34,6 +34,7 @@ public interface MapKey extends Serializable
 {
   Set<Type> EMPTY_NULL_TYPE = unmodifiableSet(EnumSet.of(Type.EMPTY, Type.NULL));
   Set<Type> STRING_TYPE = unmodifiableSet(EnumSet.of(Type.STRING));
+  Set<Type> STRING_EMPTY_TYPE = unmodifiableSet(EnumSet.of(Type.STRING, Type.EMPTY));
   Set<Type> NUMBER_TYPE = unmodifiableSet(EnumSet.of(Type.NUMBER));
   Set<Type> NAME_TYPE = unmodifiableSet(EnumSet.of(Type.NAME));
 
