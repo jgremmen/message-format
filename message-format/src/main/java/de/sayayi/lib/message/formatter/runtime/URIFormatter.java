@@ -25,10 +25,11 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
-import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Set;
 
-import static de.sayayi.lib.message.data.map.MapKey.Type.*;
+import static de.sayayi.lib.message.data.map.MapKey.NUMBER_TYPE;
+import static de.sayayi.lib.message.data.map.MapKey.STRING_EMPTY_TYPE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Collections.singleton;
@@ -46,50 +47,58 @@ public final class URIFormatter extends AbstractParameterFormatter
       return nullText();
 
     final URI uri = (URI)value;
-    String format = formatterContext.getConfigValueString("uri").orElse("default");
 
-    if ("authority".equals(format))
-      return noSpaceText(uri.getAuthority());
-    else if ("fragment".equals(format))
-      return noSpaceText(uri.getFragment());
-    else if ("host".equals(format))
-      return noSpaceText(uri.getHost());
-    else if ("path".equals(format))
-      return noSpaceText(uri.getPath());
-    else if ("port".equals(format))
+    switch(formatterContext.getConfigValueString("uri").orElse("default"))
     {
-      final int port = uri.getPort();
+      case "default":
+        return noSpaceText(uri.toString());
 
-      if (port == -1)
-      {
-        String undefined = formatterContext.getConfigValueString("uri-port-undef").orElse(null);
-        if (undefined != null)
-          return noSpaceText(undefined);
+      case "authority":
+        return noSpaceText(uri.getAuthority());
+
+      case "fragment":
+        return noSpaceText(uri.getFragment());
+
+      case "host":
+        return noSpaceText(uri.getHost());
+
+      case "path":
+        return noSpaceText(uri.getPath());
+
+      case "port": {
+        final int port = uri.getPort();
+        if (port == -1)
+        {
+          final Optional<String> portUndef = formatterContext.getConfigValueString("uri-port-undef");
+          if (portUndef.isPresent())
+            return noSpaceText(portUndef.get());
+        }
+
+        final Message.WithSpaces msg = formatterContext.getMapMessage(port, NUMBER_TYPE).orElse(null);
+        return msg != null
+            ? new TextPart(msg.format(formatterContext.getMessageContext(), formatterContext),
+                msg.isSpaceBefore(), msg.isSpaceAfter())
+            : port == -1 ? nullText() : noSpaceText(Integer.toString(port));
       }
-      else if (port >= 0)
-      {
-        Message.WithSpaces msg = formatterContext.getMapMessage(port, EnumSet.of(NUMBER)).orElse(null);
-        if (msg != null)
-          return new TextPart(msg.format(formatterContext.getMessageContext(), formatterContext), msg.isSpaceBefore(), msg.isSpaceAfter());
+
+      case "query":
+        return noSpaceText(uri.getQuery());
+
+      case "scheme": {
+        final String scheme = uri.getScheme();
+        final Message.WithSpaces msg = formatterContext.getMapMessage(scheme, STRING_EMPTY_TYPE).orElse(null);
+
+        return msg != null
+            ? new TextPart(msg.format(formatterContext.getMessageContext(), formatterContext),
+                msg.isSpaceBefore(), msg.isSpaceAfter())
+            : new TextPart(scheme);
       }
 
-      return port == -1 ? nullText() : noSpaceText(Integer.toString(port));
+      case "user-info":
+        return noSpaceText(uri.getUserInfo());
     }
-    else if ("query".equals(format))
-      return noSpaceText(uri.getQuery());
-    else if ("scheme".equals(format))
-    {
-      final String scheme = uri.getScheme();
-      final Message.WithSpaces msg = formatterContext.getMapMessage(scheme, EnumSet.of(STRING, EMPTY, NULL)).orElse(null);
 
-      return msg != null
-          ? new TextPart(msg.format(formatterContext.getMessageContext(), formatterContext), msg.isSpaceBefore(), msg.isSpaceAfter())
-          : new TextPart(scheme);
-    }
-    else if ("user-info".equals(format))
-      return noSpaceText(uri.getUserInfo());
-
-    return noSpaceText(uri.toString());
+    return formatterContext.delegateToNextFormatter();
   }
 
 

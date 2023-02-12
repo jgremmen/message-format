@@ -15,16 +15,20 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
+import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.Set;
 
+import static de.sayayi.lib.message.data.map.MapKey.NUMBER_TYPE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Collections.singleton;
@@ -42,31 +46,54 @@ public final class URLFormatter extends AbstractParameterFormatter
       return nullText();
 
     final URL url = (URL)value;
-    String format = formatterContext.getConfigValueString("url").orElse("default");
 
-    if ("authority".equals(format))
-      return noSpaceText(url.getAuthority());
-    else if ("file".equals(format))
-      return noSpaceText(url.getFile());
-    else if ("host".equals(format))
-      return noSpaceText(url.getHost());
-    else if ("path".equals(format))
-      return noSpaceText(url.getPath());
-    else if ("port".equals(format))
+    switch(formatterContext.getConfigValueString("url").orElse("external"))
     {
-      int port = url.getPort();
-      return noSpaceText(Integer.toString(port == -1 ? url.getDefaultPort() : port));
-    }
-    else if ("query".equals(format))
-      return noSpaceText(url.getQuery());
-    else if ("protocol".equals(format))
-      return noSpaceText(url.getProtocol());
-    else if ("user-info".equals(format))
-      return noSpaceText(url.getUserInfo());
-    else if ("ref".equals(format))
-      return noSpaceText(url.getRef());
+      case "authority":
+        return noSpaceText(url.getAuthority());
 
-    return noSpaceText(url.toExternalForm());
+      case "external":
+        return noSpaceText(url.toExternalForm());
+
+      case "file":
+        return noSpaceText(url.getFile());
+
+      case "host":
+        return noSpaceText(url.getHost());
+
+      case "path":
+        return noSpaceText(url.getPath());
+
+      case "port": {
+        final int port = url.getPort();
+        if (port == -1)
+        {
+          final Optional<String> portUndef = formatterContext.getConfigValueString("uri-port-undef");
+          if (portUndef.isPresent())
+            return noSpaceText(portUndef.get());
+        }
+
+        final Message.WithSpaces msg = formatterContext.getMapMessage(port, NUMBER_TYPE).orElse(null);
+        return msg != null
+            ? new TextPart(msg.format(formatterContext.getMessageContext(), formatterContext),
+                msg.isSpaceBefore(), msg.isSpaceAfter())
+            : port == -1 ? nullText() : noSpaceText(Integer.toString(port));
+      }
+
+      case "query":
+        return noSpaceText(url.getQuery());
+
+      case "protocol":
+        return noSpaceText(url.getProtocol());
+
+      case "user-info":
+        return noSpaceText(url.getUserInfo());
+
+      case "ref":
+        return noSpaceText(url.getRef());
+    }
+
+    return formatterContext.delegateToNextFormatter();
   }
 
 
