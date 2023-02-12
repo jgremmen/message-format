@@ -19,6 +19,8 @@ import de.sayayi.lib.message.Message;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import static java.util.Objects.requireNonNull;
+
 
 /**
  * @author Jeroen Gremmen
@@ -32,8 +34,7 @@ abstract class AbstractMessageWithCode implements Message.WithCode
 
   AbstractMessageWithCode(@NotNull String code)
   {
-    //noinspection ConstantConditions
-    if (code == null || code.isEmpty())
+    if (requireNonNull(code).isEmpty())
       throw new IllegalArgumentException("message code must not be empty");
 
     this.code = code;
