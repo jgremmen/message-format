@@ -23,19 +23,16 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
 import static java.lang.reflect.Array.get;
 import static java.lang.reflect.Array.getLength;
-import static java.util.ResourceBundle.getBundle;
 
 
 /**
@@ -44,7 +41,7 @@ import static java.util.ResourceBundle.getBundle;
 public final class ArrayFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object array)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object array)
   {
     if (array == null)
       return nullText();
@@ -56,9 +53,9 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
     final StringBuilder s = new StringBuilder();
     final Class<?> arrayType = array.getClass();
     final Class<?> arrayElementType = arrayType.isPrimitive() ? arrayType.getComponentType() : null;
-    final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, formatterContext.getLocale());
-    final String sep = formatterContext.getConfigValueString("list-sep").orElse(", ");
-    final String sepLast = formatterContext.getConfigValueString("list-sep-last").orElse(sep);
+    final String sep = context.getConfigValueString("list-sep").orElse(", ");
+    final String sepLast = context.getConfigValueString("list-sep-last").orElse(sep);
+    final String thisObject = context.getConfigValueString("list-this").orElse("(this array)");
 
     for(int i = 0; i < length; i++)
     {
@@ -66,9 +63,9 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
       Text text = null;
 
       if (value == array)
-        text = new TextPart(bundle.getString("thisArray"));
+        text = noSpaceText(thisObject);
       else if (value != null)
-        text = formatterContext.format(value, arrayElementType, true);
+        text = context.format(value, arrayElementType, true);
 
       if (text != null && !text.isEmpty())
       {

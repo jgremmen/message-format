@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.EMPTY_NULL_TYPE;
@@ -34,13 +35,6 @@ import static de.sayayi.lib.message.data.map.MapKey.EMPTY_NULL_TYPE;
 public abstract class AbstractParameterFormatter implements ParameterFormatter
 {
   /**
-   * Name of the formatter resource bundle.
-   */
-  public static final String FORMATTER_BUNDLE_NAME =
-      AbstractParameterFormatter.class.getPackage().getName() + ".Formatter";
-
-
-  /**
    * A set containing all data map key types, except for {@link Type#NAME}.
    */
   protected static final Set<Type> NO_NAME_KEY_TYPES =
@@ -51,20 +45,22 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value)
   {
     // handle empty, !empty, null and !null first
-    Message.WithSpaces msg = formatterContext.getMapMessage(value, EMPTY_NULL_TYPE).orElse(null);
-    if (msg != null)
-      return formatterContext.format(msg);
-
-    final Text text = formatValue(formatterContext, value);
-
-    // map result against map keys...
-    msg = formatterContext.getMapMessage(text.getText(), NO_NAME_KEY_TYPES).orElse(null);
-
-    return msg == null ? text : formatterContext.format(msg);
+    final Message.WithSpaces msg = formatterContext.getMapMessage(value, EMPTY_NULL_TYPE).orElse(null);
+    return msg != null ? formatterContext.format(msg) : formatValue(formatterContext, value);
   }
 
 
   protected abstract @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value);
+
+
+  @Contract(pure = true)
+  protected @NotNull Optional<Text> translate(@NotNull FormatterContext formatterContext, String value)
+  {
+    final Message.WithSpaces msg = formatterContext.getMapMessage(value,
+        EnumSet.of(Type.STRING, Type.EMPTY)).orElse(null);
+    return msg != null ? Optional.of(formatterContext.format(msg)) : Optional.empty();
+
+  }
 
 
   @Contract(pure = true)

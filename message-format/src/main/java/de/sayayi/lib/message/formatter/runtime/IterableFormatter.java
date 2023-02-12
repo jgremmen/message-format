@@ -23,19 +23,16 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
 import static java.util.Collections.singleton;
-import static java.util.ResourceBundle.getBundle;
 
 
 /**
@@ -46,7 +43,7 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
   @SuppressWarnings("rawtypes")
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
@@ -55,10 +52,12 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
     if (!iterator.hasNext())
       return emptyText();
 
-    final ResourceBundle bundle = getBundle(FORMATTER_BUNDLE_NAME, formatterContext.getLocale());
     final StringBuilder s = new StringBuilder();
-    final String sep = formatterContext.getConfigValueString("list-sep").orElse(", ");
-    final String sepLast = formatterContext.getConfigValueString("list-sep-last").orElse(sep);
+    final String sep =
+        spacedText(context.getConfigValueString("list-sep").orElse(", ")).getTextWithSpaces();
+    final String sepLast =
+        spacedText(context.getConfigValueString("list-sep-last").orElse(sep)).getTextWithSpaces();
+    final String thisObject = context.getConfigValueString("list-this").orElse("(this collection)");
 
     while(iterator.hasNext())
     {
@@ -66,9 +65,9 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
       Text text = null;
 
       if (element == value)
-        text = new TextPart(bundle.getString("thisCollection"));
+        text = noSpaceText(thisObject);
       else if (element != null)
-        text = formatterContext.format(element, true);
+        text = context.format(element, true);
 
       if (text != null && !text.isEmpty())
       {

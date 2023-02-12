@@ -66,8 +66,11 @@ public class ArrayFormatterTest extends AbstractFormatterTest
   {
     val formatterService = createFormatterService(new ArrayFormatter(), new BoolFormatter());
     val context = new MessageContext(formatterService, NO_CACHE_INSTANCE, "de-DE");
+    val map = new HashMap<MapKey,MapValue>();
+    map.put(MapKeyBool.TRUE, new MapValueString("wahr"));
+    map.put(MapKeyBool.FALSE, new MapValueString("falsch"));
 
-    assertEquals(new TextPart("wahr, falsch, wahr"), format(context, new boolean[] { true, false, true }));
+    assertEquals(new TextPart("wahr, falsch, wahr"), format(context, new boolean[] { true, false, true }, map));
 
     val booleanMap = new HashMap<MapKey, MapValue>() {
       {
@@ -156,10 +159,12 @@ public class ArrayFormatterTest extends AbstractFormatterTest
   {
     val registry = createFormatterService(new ArrayFormatter(), new BoolFormatter(), new NumberFormatter());
     val context = new MessageContext(registry, NO_CACHE_INSTANCE, "de-DE");
+    val map = new HashMap<MapKey,MapValue>();
+    map.put(new MapKeyName("number"), new MapValueString("0000"));
+    map.put(MapKeyBool.TRUE, new MapValueString("wahr"));
+    map.put(MapKeyBool.FALSE, new MapValueString("falsch"));
 
-    assertEquals(new TextPart("Test, wahr, -0006"), format(context, new Object[] { "Test", true, null, -6 },
-        singletonMap(new MapKeyName("number"), new MapValueString("0000"))));
-
+    assertEquals(new TextPart("Test, wahr, -0006"), format(context, new Object[] { "Test", true, null, -6 }, map));
     assertEquals(new TextPart("this, is, a, test"), format(context,
         new Object[] { null, "this", null, "is", null, "a", null, "test" }));
   }
