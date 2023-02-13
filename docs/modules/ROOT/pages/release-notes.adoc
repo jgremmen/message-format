@@ -21,11 +21,12 @@ _Release date: t.b.d._
 
 * Flatten parameter data map, eg. `%{n,choice,1:'color',:'colors'}`
 * Consolidate formatter formatting options
+* Remove named formatters `bits` and `geo` from automatic formatter registration
 
 ==== Bugfix
 
 * Improve formatter selection based on parameter format designator and value class type
-* Parameter format designator is used for selecting a named parameter formatter only
+* Use parameter format designator for selecting a named parameter formatter only
 
 [IMPORTANT]
 ====

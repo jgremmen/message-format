@@ -2,33 +2,51 @@
 
 TODO
 
+
 == Array
 
 TODO
+
 
 == Date
 
 TODO
 
+
 == Enum
 
 TODO
+
 
 == Iterable
 
 TODO
 
+
 == Map
 
 TODO
+
 
 == Number
 
 TODO
 
+
 == Optional
 
 TODO
+
+
+[[string]]
+== String
+
+This formatter will be automatically selected for character
+sequences (`char[]` or `java.lang.CharSequence`). In addition to that it is also the default formatter
+associated with `java.lang.Object`.
+
+The formatter has no formatting configuration options.
+
 
 == Supplier
 

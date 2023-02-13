@@ -103,20 +103,3 @@ TODO
 == Size (size)
 
 TODO
-
-[[string]]
-== String (string)
-
-The `string` formatter is both a named and typed formatter. It will be automatically selected for character
-sequences (`char[]` or `java.lang.CharSequence`) but can be selected by name as well.
-
-The formatter is capable of formatting values regardless of their types and has no formatting configuration
-options.
-
-.Basic string example
-====
-[source]
-----
-%{o,string}
-----
-====

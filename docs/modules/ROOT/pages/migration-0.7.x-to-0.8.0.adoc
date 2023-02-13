@@ -54,3 +54,9 @@ public @NotNull Text format(@NotNull FormatterContext formatterContext,
 ----
 
 Various helper methods from `AbstractParameterFormatter` have been moved to `FormatterContext`.
+
+
+== Named Formatters "bits" and "geo"
+
+The named formatters `bits` and `geo` are not registered automatically anymore and must be explicitly registered
+with the `FormatterRegistry`.
