@@ -50,11 +50,13 @@ public interface MessagePart extends SpacesAware, Serializable
     /**
      * Returns the text for this message part decorated with spaces, if available.
      *
-     * @return  text or {@code null}
+     * @return  text, never {@code null}
      */
     @Contract(pure = true)
-    default String getTextWithSpaces() {
-      return getText();
+    default @NotNull String getTextWithSpaces()
+    {
+      String text = getText();
+      return text != null ? text : "";
     }
 
 

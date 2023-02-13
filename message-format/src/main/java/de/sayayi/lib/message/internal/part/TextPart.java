@@ -19,6 +19,7 @@ import de.sayayi.lib.message.internal.SpacesUtil;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -64,10 +65,10 @@ public final class TextPart implements Text
 
 
   @Override
-  public String getTextWithSpaces()
+  public @NotNull String getTextWithSpaces()
   {
     if (text == null || text.isEmpty())
-      return spaceBefore || spaceAfter ? " " : text;
+      return spaceBefore || spaceAfter ? " " : "";
 
     return spaceBefore ? !spaceAfter ? ' ' + text : ' ' + text + ' ' : spaceAfter ? text + ' ' : text;
   }
