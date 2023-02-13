@@ -43,6 +43,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import static java.lang.ClassLoader.getSystemClassLoader;
+import static java.util.Arrays.asList;
 import static org.objectweb.asm.Opcodes.ACC_SYNTHETIC;
 import static org.objectweb.asm.Opcodes.ASM9;
 import static org.objectweb.asm.Type.getDescriptor;
@@ -57,7 +59,7 @@ final class AsmClassPathScanner
   private static final String MESSAGE_DEF_DESCRIPTOR = getDescriptor(MessageDef.class);
   private static final String TEXT_DESCRIPTOR = getDescriptor(Text.class);
 
-  private static final Set<String> ZIP_PROTOCOLS = new HashSet<>(Arrays.asList("zip", "jar", "war"));
+  private static final Set<String> ZIP_PROTOCOLS = new HashSet<>(asList("zip", "jar", "war"));
 
   private final MessageBundle messageBundle;
   private final ClassLoader classLoader;
@@ -69,7 +71,7 @@ final class AsmClassPathScanner
                              ClassLoader classLoader)
   {
     this.messageBundle = messageBundle;
-    this.classLoader = classLoader == null ? ClassLoader.getSystemClassLoader() : classLoader;
+    this.classLoader = classLoader == null ? getSystemClassLoader() : classLoader;
     this.packageNames = packageNames;
 
     visitedClasses = new HashSet<>();
