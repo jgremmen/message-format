@@ -82,8 +82,9 @@ public final class GeoFormatter extends AbstractParameterFormatter implements Na
     final StringBuilder s = new StringBuilder();
     final double v = ((Number)value).doubleValue();
     final double[] dms = dmsSplitter(fmt, v);
+    final boolean negative = v < 0.0;
 
-    if (v < 0 && !fmt.hasLoLa() && (dms[0] > 0 || dms[1] > 0 || dms[2] > 0))
+    if (negative && !fmt.hasLoLa() && (dms[0] > 0 || dms[1] > 0 || dms[2] > 0))
       s.append('-');
 
     s.append((int)dms[0]).append('\u00b0');
@@ -92,13 +93,15 @@ public final class GeoFormatter extends AbstractParameterFormatter implements Na
 
     if (fmt.hasMinutes())
     {
-      s.append(formatMinOrSec(formatterContext.getLocale(), dms[1], fmt.minuteDigits, fmt.zeroPadMinutes)).append('\'');
+      final Locale locale = formatterContext.getLocale();
+
+      s.append(formatMinOrSec(locale, dms[1], fmt.minuteDigits, fmt.zeroPadMinutes)).append('\'');
       if (fmt.separatorAfterMinute)
         s.append(' ');
 
       if (fmt.hasSeconds())
       {
-        s.append(formatMinOrSec(formatterContext.getLocale(), dms[2], fmt.secondDigits, fmt.zeroPadSeconds)).append('"');
+        s.append(formatMinOrSec(locale, dms[2], fmt.secondDigits, fmt.zeroPadSeconds)).append('"');
         if (fmt.separatorAfterSecond)
           s.append(' ');
       }
@@ -107,9 +110,17 @@ public final class GeoFormatter extends AbstractParameterFormatter implements Na
     if (fmt.hasLoLa())
     {
       if (fmt.longitude)
-        s.append(v < 0 ? 'W' : 'E');
+      {
+        s.append(negative
+            ? formatterContext.getConfigValueString("geo-w").orElse("W")
+            : formatterContext.getConfigValueString("geo-e").orElse("E"));
+      }
       else
-        s.append(v < 0 ? 'S' : 'N');
+      {
+        s.append(negative
+            ? formatterContext.getConfigValueString("geo-s").orElse("S")
+            : formatterContext.getConfigValueString("geo-n").orElse("N"));
+      }
     }
 
     return noSpaceText(s.toString());
