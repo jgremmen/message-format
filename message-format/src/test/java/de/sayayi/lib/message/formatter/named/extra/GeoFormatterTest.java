@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.formatter.named;
+package de.sayayi.lib.message.formatter.named.extra;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.data.map.MapKeyName;
 import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.formatter.named.GeoFormatter.Format;
+import de.sayayi.lib.message.formatter.named.extra.GeoFormatter.Format;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
