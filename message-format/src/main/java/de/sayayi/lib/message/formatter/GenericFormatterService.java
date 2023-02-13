@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.formatter.named.StringFormatter;
+import de.sayayi.lib.message.formatter.runtime.StringFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
@@ -61,12 +61,8 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
-  public GenericFormatterService()
-  {
-    final StringFormatter stringFormatter = new StringFormatter();
-
-    namedFormatters.put(stringFormatter.getName(), stringFormatter);
-    addFormatterForType(new FormattableType(Object.class), stringFormatter);
+  public GenericFormatterService() {
+    addFormatterForType(new FormattableType(Object.class), new StringFormatter());
   }
 
 
