@@ -56,6 +56,7 @@ public final class FileFormatter extends AbstractParameterFormatter implements S
       case "parent":
         return noSpaceText(file.getParent());
 
+      case "ext":
       case "extension": {
         final String name = file.getName();
         final int dotidx = name.lastIndexOf('.');

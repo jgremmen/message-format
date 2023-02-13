@@ -61,6 +61,7 @@ public final class PathFormatter extends AbstractParameterFormatter
         path = path.getRoot();
         break;
 
+      case "ext":
       case "extension": {
         path = path.getFileName();
         if (path == null)
