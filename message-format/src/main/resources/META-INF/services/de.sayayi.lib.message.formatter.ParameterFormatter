@@ -15,6 +15,7 @@ de.sayayi.lib.message.formatter.runtime.InetAddressFormatter
 de.sayayi.lib.message.formatter.runtime.IntSupplierFormatter
 de.sayayi.lib.message.formatter.runtime.IterableFormatter
 de.sayayi.lib.message.formatter.runtime.Java8DateTimeFormatter
+de.sayayi.lib.message.formatter.runtime.KeyFormatter
 de.sayayi.lib.message.formatter.runtime.LongSupplierFormatter
 de.sayayi.lib.message.formatter.runtime.MapFormatter
 de.sayayi.lib.message.formatter.runtime.MethodFormatter
