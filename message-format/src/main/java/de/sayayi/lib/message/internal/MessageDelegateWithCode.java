@@ -37,6 +37,8 @@ import java.util.SortedSet;
 @ToString
 public class MessageDelegateWithCode extends AbstractMessageWithCode
 {
+  public static final byte PACK_ID = 4;
+
   private static final long serialVersionUID = 800L;
 
   @Getter private final @NotNull Message message;
@@ -79,7 +81,7 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
    */
   public void pack(@NotNull DataOutput dataOutput) throws IOException
   {
-    dataOutput.writeByte(4);
+    dataOutput.writeByte(PACK_ID);
     dataOutput.writeUTF(getCode());
     Pack.pack(message, dataOutput);
   }

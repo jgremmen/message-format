@@ -38,6 +38,8 @@ import static de.sayayi.lib.message.internal.SpacesUtil.trimSpaces;
 @Getter
 public final class TextPart implements Text
 {
+  public static final byte PACK_ID = 3;
+
   private static final long serialVersionUID = 800L;
 
   private final String text;
@@ -131,7 +133,7 @@ public final class TextPart implements Text
    */
   public void pack(@NotNull DataOutput dataOutput) throws IOException
   {
-    dataOutput.writeByte(3);
+    dataOutput.writeByte(PACK_ID);
     dataOutput.writeByte((text != null ? 4 : 0) + (spaceBefore ? 2 : 0) + (spaceAfter ? 1 : 0));
     if (text != null)
       dataOutput.writeUTF(text);

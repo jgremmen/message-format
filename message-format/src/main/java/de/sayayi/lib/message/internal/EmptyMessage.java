@@ -38,6 +38,8 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor(access = PRIVATE)
 public final class EmptyMessage implements Message.WithSpaces
 {
+  public static final byte PACK_ID = 1;
+
   private static final long serialVersionUID = 800L;
 
   public static final Message.WithSpaces INSTANCE = new EmptyMessage();
@@ -95,7 +97,7 @@ public final class EmptyMessage implements Message.WithSpaces
    * @since 0.8.0
    */
   public void pack(@NotNull DataOutput dataOutput) throws IOException {
-    dataOutput.writeByte(1);
+    dataOutput.writeByte(PACK_ID);
   }
 
 

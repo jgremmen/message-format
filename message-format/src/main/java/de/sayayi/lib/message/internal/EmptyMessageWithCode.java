@@ -36,6 +36,8 @@ import static java.util.Collections.emptySortedSet;
 @ToString
 public final class EmptyMessageWithCode extends AbstractMessageWithCode
 {
+  public static final byte PACK_ID = 2;
+
   private static final long serialVersionUID = 800L;
 
 
@@ -73,7 +75,7 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
    */
   public void pack(@NotNull DataOutput dataOutput) throws IOException
   {
-    dataOutput.writeByte(2);
+    dataOutput.writeByte(PACK_ID);
     dataOutput.writeUTF(getCode());
   }
 

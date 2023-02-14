@@ -42,6 +42,9 @@ public enum MapKeyBool implements MapKey
   FALSE(false),
   TRUE(true);
 
+
+  public static final byte PACK_ID = 1;
+
   private static final long serialVersionUID = 800L;
 
   @Getter private final boolean bool;
@@ -97,7 +100,7 @@ public enum MapKeyBool implements MapKey
    */
   public void pack(@NotNull DataOutput dataOutput) throws IOException
   {
-    dataOutput.writeByte(1);
+    dataOutput.writeByte(PACK_ID);
     dataOutput.writeBoolean(bool);
   }
 

@@ -30,6 +30,8 @@ import java.io.IOException;
  */
 public final class MapValueString extends DataString implements MapValue
 {
+  public static final byte PACK_ID = 4;
+
   private static final long serialVersionUID = 800L;
 
   private Message.WithSpaces message;
@@ -65,7 +67,7 @@ public final class MapValueString extends DataString implements MapValue
    */
   public void pack(@NotNull DataOutput dataOutput) throws IOException
   {
-    dataOutput.writeByte(4);
+    dataOutput.writeByte(PACK_ID);
     dataOutput.writeUTF(asObject());
   }
 

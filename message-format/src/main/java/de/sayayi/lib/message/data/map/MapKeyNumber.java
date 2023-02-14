@@ -40,6 +40,8 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.*;
 @AllArgsConstructor
 public final class MapKeyNumber implements MapKey
 {
+  public static final byte PACK_ID = 5;
+
   private static final long serialVersionUID = 800L;
 
   private final @NotNull CompareType compareType;
@@ -122,7 +124,7 @@ public final class MapKeyNumber implements MapKey
    */
   public void pack(@NotNull DataOutput dataOutput) throws IOException
   {
-    dataOutput.writeByte(5);
+    dataOutput.writeByte(PACK_ID);
     dataOutput.writeByte(compareType.ordinal());
     dataOutput.writeLong(number);
   }

@@ -30,6 +30,8 @@ import java.io.IOException;
 @EqualsAndHashCode(doNotUseGetters = true, callSuper = true)
 public final class MapValueNumber extends DataNumber implements MapValue
 {
+  public static final byte PACK_ID = 3;
+
   private static final long serialVersionUID = 800L;
 
 
@@ -53,7 +55,7 @@ public final class MapValueNumber extends DataNumber implements MapValue
    */
   public void pack(@NotNull DataOutput dataOutput) throws IOException
   {
-    dataOutput.writeByte(3);
+    dataOutput.writeByte(PACK_ID);
     dataOutput.writeLong(asObject());
   }
 

@@ -52,12 +52,29 @@ public final class Unpack
 
     switch(dataInput.readUnsignedByte())
     {
-      case 1: mapKey = MapKeyBool.unpack(dataInput); break;
-      case 2: mapKey = MapKeyEmpty.unpack(dataInput); break;
-      case 3: mapKey = MapKeyName.unpack(dataInput); break;
-      case 4: mapKey = MapKeyNull.unpack(dataInput); break;
-      case 5: mapKey = MapKeyNumber.unpack(dataInput); break;
-      case 6: mapKey = MapKeyString.unpack(dataInput); break;
+      case MapKeyBool.PACK_ID:
+        mapKey = MapKeyBool.unpack(dataInput);
+        break;
+
+      case MapKeyEmpty.PACK_ID:
+        mapKey = MapKeyEmpty.unpack(dataInput);
+        break;
+
+      case MapKeyName.PACK_ID:
+        mapKey = MapKeyName.unpack(dataInput);
+        break;
+
+      case MapKeyNull.PACK_ID:
+        mapKey = MapKeyNull.unpack(dataInput);
+        break;
+
+      case MapKeyNumber.PACK_ID:
+        mapKey = MapKeyNumber.unpack(dataInput);
+        break;
+
+      case MapKeyString.PACK_ID:
+        mapKey = MapKeyString.unpack(dataInput);
+        break;
 
       default:
         throw new IllegalStateException();
@@ -73,10 +90,21 @@ public final class Unpack
 
     switch(dataInput.readUnsignedByte())
     {
-      case 1: mapValue = MapValueBool.unpack(dataInput); break;
-      case 2: mapValue = MapValueMessage.unpack(this, dataInput); break;
-      case 3: mapValue = MapValueNumber.unpack(dataInput); break;
-      case 4: mapValue = MapValueString.unpack(dataInput); break;
+      case MapValueBool.PACK_ID:
+        mapValue = MapValueBool.unpack(dataInput);
+        break;
+
+      case MapValueMessage.PACK_ID:
+        mapValue = MapValueMessage.unpack(this, dataInput);
+        break;
+
+      case MapValueNumber.PACK_ID:
+        mapValue = MapValueNumber.unpack(dataInput);
+        break;
+
+      case MapValueString.PACK_ID:
+        mapValue = MapValueString.unpack(dataInput);
+        break;
 
       default:
         throw new IllegalStateException();
@@ -92,9 +120,17 @@ public final class Unpack
 
     switch(dataInput.readUnsignedByte())
     {
-      case 1: messagePart = NoSpaceTextPart.unpack(dataInput); break;
-      case 2: messagePart = ParameterPart.unpack(this, dataInput); break;
-      case 3: messagePart = TextPart.unpack(dataInput); break;
+      case NoSpaceTextPart.PACK_ID:
+        messagePart = NoSpaceTextPart.unpack(dataInput);
+        break;
+
+      case ParameterPart.PACK_ID:
+        messagePart = ParameterPart.unpack(this, dataInput);
+        break;
+
+      case TextPart.PACK_ID:
+        messagePart = TextPart.unpack(dataInput);
+        break;
 
       default:
         throw new IllegalStateException();
@@ -110,9 +146,17 @@ public final class Unpack
 
     switch(dataInput.readUnsignedByte())
     {
-      case 1: message = EmptyMessage.unpack(); break;
-      case 5: message = ParameterizedMessage.unpack(this, dataInput); break;
-      case 6: message = TextMessage.unpack(dataInput); break;
+      case EmptyMessage.PACK_ID:
+        message = EmptyMessage.unpack();
+        break;
+
+      case ParameterizedMessage.PACK_ID:
+        message = ParameterizedMessage.unpack(this, dataInput);
+        break;
+
+      case TextMessage.PACK_ID:
+        message = TextMessage.unpack(dataInput);
+        break;
 
       default:
         throw new IllegalStateException();
@@ -126,9 +170,14 @@ public final class Unpack
   {
     switch(dataInput.readUnsignedByte())
     {
-      case 2: return EmptyMessageWithCode.unpack(dataInput);
-      case 3: return LocalizedMessageBundleWithCode.unpack(this, dataInput);
-      case 4: return MessageDelegateWithCode.unpack(this, dataInput);
+      case EmptyMessageWithCode.PACK_ID:
+        return EmptyMessageWithCode.unpack(dataInput);
+
+      case LocalizedMessageBundleWithCode.PACK_ID:
+        return LocalizedMessageBundleWithCode.unpack(this, dataInput);
+
+      case MessageDelegateWithCode.PACK_ID:
+        return MessageDelegateWithCode.unpack(this, dataInput);
     }
 
     throw new IllegalStateException();
@@ -141,12 +190,26 @@ public final class Unpack
 
     switch(dataInput.readUnsignedByte())
     {
-      case 1: message = EmptyMessage.unpack(); break;
-      case 2: return EmptyMessageWithCode.unpack(dataInput);
-      case 3: return LocalizedMessageBundleWithCode.unpack(this, dataInput);
-      case 4: return MessageDelegateWithCode.unpack(this, dataInput);
-      case 5: message = ParameterizedMessage.unpack(this, dataInput); break;
-      case 6: message = TextMessage.unpack(dataInput); break;
+      case EmptyMessage.PACK_ID:
+        message = EmptyMessage.unpack();
+        break;
+
+      case EmptyMessageWithCode.PACK_ID:
+        return EmptyMessageWithCode.unpack(dataInput);
+
+      case LocalizedMessageBundleWithCode.PACK_ID:
+        return LocalizedMessageBundleWithCode.unpack(this, dataInput);
+
+      case MessageDelegateWithCode.PACK_ID:
+        return MessageDelegateWithCode.unpack(this, dataInput);
+
+      case ParameterizedMessage.PACK_ID:
+        message = ParameterizedMessage.unpack(this, dataInput);
+        break;
+
+      case TextMessage.PACK_ID:
+        message = TextMessage.unpack(dataInput);
+        break;
 
       default:
         throw new IllegalStateException();

@@ -34,6 +34,8 @@ import static de.sayayi.lib.message.internal.SpacesUtil.trimSpaces;
  */
 public final class NoSpaceTextPart implements Text
 {
+  public static final byte PACK_ID = 1;
+
   private static final long serialVersionUID = 800L;
 
   @Getter private final @NotNull String text;
@@ -98,7 +100,7 @@ public final class NoSpaceTextPart implements Text
    */
   public void pack(@NotNull DataOutput dataOutput) throws IOException
   {
-    dataOutput.writeByte(1);
+    dataOutput.writeByte(PACK_ID);
     dataOutput.writeUTF(text);
   }
 

@@ -47,6 +47,8 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.addSpaces;
 @Getter
 public final class ParameterPart implements Parameter
 {
+  public static final byte PACK_ID = 2;
+
   private static final long serialVersionUID = 800L;
 
   private final @NotNull String parameter;
@@ -149,7 +151,7 @@ public final class ParameterPart implements Parameter
    */
   public void pack(@NotNull DataOutput dataOutput) throws IOException
   {
-    dataOutput.writeByte(2);
+    dataOutput.writeByte(PACK_ID);
     dataOutput.writeByte((format != null ? 4 : 0) + (spaceBefore ? 2 : 0) + (spaceAfter ? 1 : 0));
     dataOutput.writeUTF(parameter);
     if (format != null)

@@ -34,6 +34,8 @@ public enum MapValueBool implements MapValue
   FALSE(false),
   TRUE(true);
 
+  public static final byte PACK_ID = 1;
+
   private static final long serialVersionUID = 800L;
 
   private final boolean bool;
@@ -66,7 +68,7 @@ public enum MapValueBool implements MapValue
    */
   public void pack(@NotNull DataOutput dataOutput) throws IOException
   {
-    dataOutput.writeByte(1);
+    dataOutput.writeByte(PACK_ID);
     dataOutput.writeBoolean(bool);
   }
 

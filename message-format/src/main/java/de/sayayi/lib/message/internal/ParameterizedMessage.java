@@ -44,6 +44,8 @@ import java.util.TreeSet;
 @EqualsAndHashCode(doNotUseGetters = true)
 public class ParameterizedMessage implements Message.WithSpaces
 {
+  public static final byte PACK_ID = 5;
+
   private static final long serialVersionUID = 800L;
 
   private final MessagePart[] parts;
@@ -131,7 +133,7 @@ public class ParameterizedMessage implements Message.WithSpaces
    */
   public void pack(@NotNull DataOutput dataOutput) throws IOException
   {
-    dataOutput.writeByte(5);
+    dataOutput.writeByte(PACK_ID);
     dataOutput.writeByte(parts.length);
 
     for(final MessagePart part: parts)

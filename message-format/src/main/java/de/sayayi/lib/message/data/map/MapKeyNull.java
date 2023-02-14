@@ -37,6 +37,8 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 @EqualsAndHashCode(doNotUseGetters = true)
 public final class MapKeyNull implements MapKey
 {
+  public static final byte PACK_ID = 4;
+
   private static final long serialVersionUID = 800L;
 
   private final @NotNull CompareType compareType;
@@ -78,7 +80,7 @@ public final class MapKeyNull implements MapKey
    */
   public void pack(@NotNull DataOutput dataOutput) throws IOException
   {
-    dataOutput.writeByte(4);
+    dataOutput.writeByte(PACK_ID);
     dataOutput.writeByte(compareType.ordinal());
   }
 

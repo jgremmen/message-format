@@ -43,6 +43,8 @@ import static java.util.Locale.ROOT;
 @ToString
 public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode implements LocaleAware
 {
+  public static final byte PACK_ID = 3;
+
   private static final long serialVersionUID = 800L;
 
   private final @NotNull Map<Locale,Message> localizedMessages;
@@ -163,7 +165,7 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
    */
   public void pack(@NotNull DataOutput dataOutput) throws IOException
   {
-    dataOutput.writeByte(3);
+    dataOutput.writeByte(PACK_ID);
     dataOutput.writeUTF(getCode());
     dataOutput.writeByte(localizedMessages.size());
 
