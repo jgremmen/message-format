@@ -120,30 +120,6 @@ public class ParameterizedMessage implements Message.WithSpaces
   }
 
 
-  @Override
-  public @NotNull Message trim()
-  {
-    return new Message() {
-      private static final long serialVersionUID = ParameterizedMessage.serialVersionUID;
-
-      @Override
-      public @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
-        return ParameterizedMessage.this.format(messageContext, parameters);
-      }
-
-      @Override
-      public boolean hasParameters() {
-        return true;
-      }
-
-      @Override
-      public @NotNull SortedSet<String> getParameterNames() {
-        return ParameterizedMessage.this.getParameterNames();
-      }
-    };
-  }
-
-
   /**
    * @param dataOutput  data output pack target
    *

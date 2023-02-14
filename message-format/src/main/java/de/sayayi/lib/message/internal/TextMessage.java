@@ -73,15 +73,6 @@ public final class TextMessage implements Message.WithSpaces
   }
 
 
-  @Override
-  public @NotNull Message trim()
-  {
-    return SpacesUtil.isEmpty(text)
-        ? EmptyMessage.INSTANCE
-        : spaceBefore || spaceAfter ? new TextMessage(text, false, false) : this;
-  }
-
-
   /**
    * @param dataOutput  data output pack target
    *

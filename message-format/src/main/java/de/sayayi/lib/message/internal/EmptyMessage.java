@@ -75,12 +75,6 @@ public final class EmptyMessage implements Message.WithSpaces
   }
 
 
-  @Override
-  public @NotNull Message trim() {
-    return this;
-  }
-
-
   /**
    * @param dataOutput  data output pack target
    *
