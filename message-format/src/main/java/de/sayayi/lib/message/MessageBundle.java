@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.io.*;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -56,23 +57,6 @@ public class MessageBundle
 
     messages = new HashMap<>();
     indexedClasses = new HashSet<>();
-  }
-
-
-  public MessageBundle(@NotNull MessageFactory messageFactory, @NotNull InputStream packStream) throws IOException
-  {
-    this(messageFactory);
-
-    final byte[] signature = new byte[PACK_MAGIC.length];
-    if (packStream.read(signature) != PACK_MAGIC.length || !Arrays.equals(signature, PACK_MAGIC))
-      throw new IOException("pack stream has wrong signature");
-
-    final Unpack unpack = new Unpack();
-
-    try(final DataInputStream dataStream = new DataInputStream(new GZIPInputStream(packStream))) {
-      for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
-        add(unpack.loadMessageWithCode(dataStream));
-    }
   }
 
 
@@ -115,6 +99,80 @@ public class MessageBundle
   @Contract(value = "null -> false", pure = true)
   public boolean hasMessageWithCode(String code) {
     return code != null && messages.containsKey(code);
+  }
+
+
+  /**
+   * Convenience method for adding multiple pack resources.
+   *
+   * @param packResources  enumeration of pack resources, not {@code null}
+   *
+   * @throws IOException  if an I/O error occurs
+   *
+   * @since 0.8.0
+   *
+   * @see #add(InputStream...)
+   */
+  @Contract(mutates = "this")
+  public void add(@NotNull Enumeration<URL> packResources) throws IOException
+  {
+    final List<InputStream> packStreams = new ArrayList<>();
+
+    while(packResources.hasMoreElements())
+      packStreams.add(packResources.nextElement().openStream());
+
+    add(packStreams.toArray(new InputStream[0]));
+  }
+
+
+  /**
+   * Convenience method for adding a single pack.
+   *
+   * @param packStream  pack stream, not {@code null}
+   *
+   * @throws IOException  if an I/O error occurs
+   *
+   * @see #add(InputStream...)
+   *
+   * @since 0.8.0
+   */
+  @Contract(mutates = "this")
+  public void add(@NotNull InputStream packStream) throws IOException {
+    add(new InputStream[]{ packStream });
+  }
+
+
+  /**
+   * <p>
+   *   Add multiple packs to this message bundle.
+   * </p>
+   * <p>
+   *   When adding multiple packs, this method is preferred as it shares map key/values, message parts
+   *   and messages for all packs.
+   * </p>
+   *
+   * @param packStreams  array of pack streams, not {@code null}
+   *
+   * @throws IOException  if an I/O error occurs
+   *
+   * @since 0.8.0
+   */
+  @Contract(mutates = "this")
+  public void add(@NotNull InputStream... packStreams) throws IOException
+  {
+    final Unpack unpack = new Unpack();
+
+    for(final InputStream packStream: packStreams)
+    {
+      final byte[] signature = new byte[PACK_MAGIC.length];
+      if (packStream.read(signature) != PACK_MAGIC.length || !Arrays.equals(signature, PACK_MAGIC))
+        throw new IOException("pack stream has wrong signature");
+
+      try(final DataInputStream dataStream = new DataInputStream(new GZIPInputStream(packStream))) {
+        for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
+          add(unpack.loadMessageWithCode(dataStream));
+      }
+    }
   }
 
 

@@ -52,6 +52,7 @@ public class MessageDefAnnotationTest
 
 
   @Test
+  @DisplayName("Multiple message def annotations on same method")
   @MessageDef(code = "T4", texts = @Text(locale = "en", text = "Message %{p1}"))
   @MessageDef(code = "T5", texts = {
       @Text(locale = "en", text = "English message"),
@@ -74,6 +75,7 @@ public class MessageDefAnnotationTest
 
 
   @Test
+  @DisplayName("Empty message with code")
   @MessageDef(code = "MSG-052", texts = {})
   @SuppressWarnings("DefaultAnnotationParam")
   public void testEmptyMessageWithCode()
@@ -86,6 +88,7 @@ public class MessageDefAnnotationTest
 
 
   @Test
+  @DisplayName("Message without locale for context with locale")
   @MessageDef(code = "T3", text = "m3")
   public void testMessageWithoutLocale()
   {
@@ -101,6 +104,7 @@ public class MessageDefAnnotationTest
 
 
   @Test
+  @DisplayName("Single message selection for context with exact and lenient locales")
   @MessageDef(code = "T2", texts = @Text(locale = "nl-NL", text = "nl"))
   public void testSingleMessageWithLocale()
   {
@@ -115,6 +119,7 @@ public class MessageDefAnnotationTest
 
 
   @Test
+  @DisplayName("Message selection for context with exact and lenient locales")
   @MessageDef(code = "T1", texts={
       @Text(locale = "en-US", text = "us"),
       @Text(locale = "nl", text = "nl"),
@@ -135,6 +140,7 @@ public class MessageDefAnnotationTest
 
 
   @Test
+  @DisplayName("All message codes present")
   public void testCodes()
   {
     val codes = bundle.getCodes();
@@ -158,7 +164,9 @@ public class MessageDefAnnotationTest
     val packed = packStream.toByteArray();
     assertArrayEquals(PACK_MAGIC, copyOf(packed, PACK_MAGIC.length));
 
-    val newBundle = new MessageBundle(NO_CACHE_INSTANCE, new ByteArrayInputStream(packed));
+    val newBundle = new MessageBundle(NO_CACHE_INSTANCE);
+    newBundle.add(new ByteArrayInputStream(packed));
+
     val codes = newBundle.getCodes();
 
     assertTrue(codes.contains("T1"));
