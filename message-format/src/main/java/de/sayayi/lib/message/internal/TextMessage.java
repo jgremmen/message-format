@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,8 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.pack.PackInputStream;
+import de.sayayi.lib.message.pack.PackOutputStream;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +28,6 @@ import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.util.SortedSet;
 
@@ -43,7 +43,7 @@ import static lombok.AccessLevel.PRIVATE;
 @RequiredArgsConstructor(access = PRIVATE)
 public final class TextMessage implements Message.WithSpaces
 {
-  public static final byte PACK_ID = 6;
+  public static final int PACK_ID = 6;
 
   private static final long serialVersionUID = 800L;
 
@@ -78,22 +78,23 @@ public final class TextMessage implements Message.WithSpaces
 
 
   /**
-   * @param dataOutput  data output pack target
+   * @param packStream  data output pack target
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
-  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    dataOutput.writeByte(PACK_ID);
-    dataOutput.writeByte((spaceBefore ? 2 : 0) + (spaceAfter ? 1 : 0));
-    dataOutput.writeUTF(text);
+    packStream.write(PACK_ID, 3);
+    packStream.writeBoolean(spaceBefore);
+    packStream.writeBoolean(spaceAfter);
+    packStream.writeString(text);
   }
 
 
   /**
-   * @param dataInput  source data input, not {@code null}
+   * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked text message, never {@code null}
    *
@@ -101,10 +102,11 @@ public final class TextMessage implements Message.WithSpaces
    *
    * @since 0.8.0
    */
-  public static @NotNull Message.WithSpaces unpack(@NotNull DataInput dataInput) throws IOException
+  public static @NotNull Message.WithSpaces unpack(@NotNull PackInputStream packStream) throws IOException
   {
-    final byte flags = dataInput.readByte();
+    final boolean spaceBefore = packStream.readBoolean();
+    final boolean spaceAfter = packStream.readBoolean();
 
-    return new TextMessage(dataInput.readUTF(), (flags & 2) != 0, (flags & 1) != 0);
+    return new TextMessage(packStream.readString(), spaceBefore, spaceAfter);
   }
 }

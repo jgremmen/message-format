@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,12 +17,12 @@ package de.sayayi.lib.message.internal.part;
 
 import de.sayayi.lib.message.internal.SpacesUtil;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.pack.PackInputStream;
+import de.sayayi.lib.message.pack.PackOutputStream;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -38,7 +38,7 @@ import static de.sayayi.lib.message.internal.SpacesUtil.trimSpaces;
 @Getter
 public final class TextPart implements Text
 {
-  public static final byte PACK_ID = 3;
+  public static final int PACK_ID = 2;
 
   private static final long serialVersionUID = 800L;
 
@@ -125,23 +125,23 @@ public final class TextPart implements Text
 
 
   /**
-   * @param dataOutput  data output pack target
+   * @param packStream  data output pack target
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
-  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    dataOutput.writeByte(PACK_ID);
-    dataOutput.writeByte((text != null ? 4 : 0) + (spaceBefore ? 2 : 0) + (spaceAfter ? 1 : 0));
-    if (text != null)
-      dataOutput.writeUTF(text);
+    packStream.write(PACK_ID, 2);
+    packStream.writeBoolean(spaceBefore);
+    packStream.writeBoolean(spaceAfter);
+    packStream.writeString(text);
   }
 
 
   /**
-   * @param dataInput  source data input, not {@code null}
+   * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked text part, never {@code null}
    *
@@ -149,14 +149,14 @@ public final class TextPart implements Text
    *
    * @since 0.8.0
    */
-  public static @NotNull Text unpack(@NotNull DataInput dataInput) throws IOException
+  public static @NotNull Text unpack(@NotNull PackInputStream packStream) throws IOException
   {
-    final byte flags = dataInput.readByte();
+    final boolean spaceBefore = packStream.readBoolean();
+    final boolean spaceAfter = packStream.readBoolean();
+    final String text = packStream.readString();
 
-    if (flags == 0)
-      return Text.NULL;
-
-    return new TextPart((flags & 4) != 0 ? dataInput.readUTF() : null,
-        (flags & 2) != 0, (flags & 1) != 0);
+    return text == null && !spaceBefore && !spaceAfter
+        ? Text.NULL
+        : new TextPart(text, spaceBefore, spaceAfter);
   }
 }

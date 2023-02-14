@@ -1,0 +1,49 @@
+package de.sayayi.lib.message.pack;
+
+import de.sayayi.lib.message.data.map.MapKey.CompareType;
+import lombok.val;
+import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+
+class PackOutputStreamTest
+{
+  @Test
+  void writeAndRead() throws IOException
+  {
+    val byteStream = new ByteArrayOutputStream();
+
+    try(val packStream = new PackOutputStream(byteStream, false)) {
+      packStream.write(5, 3);
+      packStream.writeBoolean(true);
+      packStream.writeEnum(CompareType.GT);
+      packStream.writeByte((byte)9);
+      packStream.writeShort((short)11234);
+      packStream.writeString(null);
+      packStream.writeInt(Integer.MIN_VALUE);
+      packStream.writeString("Schön ist es hier ÄÖß§");
+      packStream.writeEnum(CompareType.LTE);
+      packStream.writeLong(Long.MIN_VALUE);
+    }
+
+    val packed = byteStream.toByteArray();
+
+    try(val packStream = new PackInputStream(new ByteArrayInputStream(packed))) {
+      assertEquals(5, packStream.read(3));
+      assertTrue(packStream.readBoolean());
+      assertEquals(CompareType.GT, packStream.readEnum(CompareType.class));
+      assertEquals((byte)9, packStream.readByte());
+      assertEquals((short)11234, packStream.readShort());
+      assertNull(packStream.readString());
+      assertEquals(Integer.MIN_VALUE, packStream.readInt());
+      assertEquals("Schön ist es hier ÄÖß§", packStream.readString());
+      assertEquals(CompareType.LTE, packStream.readEnum(CompareType.class));
+      assertEquals(Long.MIN_VALUE, packStream.readLong());
+    }
+  }
+}

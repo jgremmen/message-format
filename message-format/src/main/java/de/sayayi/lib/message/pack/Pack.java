@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,7 +25,6 @@ import de.sayayi.lib.message.internal.part.TextPart;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.DataOutput;
 import java.io.IOException;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -38,67 +37,67 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor(access = PRIVATE)
 public final class Pack
 {
-  public static void pack(@NotNull Message message, @NotNull DataOutput dataOutput) throws IOException
+  public static void pack(@NotNull Message message, @NotNull PackOutputStream packStream) throws IOException
   {
     if (message instanceof EmptyMessage)
-      ((EmptyMessage)message).pack(dataOutput);
+      ((EmptyMessage)message).pack(packStream);
     else if (message instanceof EmptyMessageWithCode)
-      ((EmptyMessageWithCode)message).pack(dataOutput);
+      ((EmptyMessageWithCode)message).pack(packStream);
     else if (message instanceof LocalizedMessageBundleWithCode)
-      ((LocalizedMessageBundleWithCode)message).pack(dataOutput);
+      ((LocalizedMessageBundleWithCode)message).pack(packStream);
     else if (message instanceof MessageDelegateWithCode)
-      ((MessageDelegateWithCode)message).pack(dataOutput);
+      ((MessageDelegateWithCode)message).pack(packStream);
     else if (message instanceof ParameterizedMessage)
-      ((ParameterizedMessage)message).pack(dataOutput);
+      ((ParameterizedMessage)message).pack(packStream);
     else if (message instanceof TextMessage)
-      ((TextMessage)message).pack(dataOutput);
+      ((TextMessage)message).pack(packStream);
     else
       throw new IllegalArgumentException();
   }
 
 
-  public static void pack(@NotNull MessagePart messagePart, @NotNull DataOutput dataOutput) throws IOException
+  public static void pack(@NotNull MessagePart messagePart, @NotNull PackOutputStream packStream) throws IOException
   {
     if (messagePart instanceof ParameterPart)
-      ((ParameterPart)messagePart).pack(dataOutput);
+      ((ParameterPart)messagePart).pack(packStream);
     else if (messagePart instanceof NoSpaceTextPart)
-      ((NoSpaceTextPart)messagePart).pack(dataOutput);
+      ((NoSpaceTextPart)messagePart).pack(packStream);
     else if (messagePart instanceof TextPart)
-      ((TextPart)messagePart).pack(dataOutput);
+      ((TextPart)messagePart).pack(packStream);
     else
       throw new IllegalArgumentException();
   }
 
 
-  public static void pack(@NotNull MapKey mapKey, @NotNull DataOutput dataOutput) throws IOException
+  public static void pack(@NotNull MapKey mapKey, @NotNull PackOutputStream packStream) throws IOException
   {
     if (mapKey instanceof MapKeyBool)
-      ((MapKeyBool)mapKey).pack(dataOutput);
+      ((MapKeyBool)mapKey).pack(packStream);
     if (mapKey instanceof MapKeyEmpty)
-      ((MapKeyEmpty)mapKey).pack(dataOutput);
+      ((MapKeyEmpty)mapKey).pack(packStream);
     else if (mapKey instanceof MapKeyName)
-      ((MapKeyName)mapKey).pack(dataOutput);
+      ((MapKeyName)mapKey).pack(packStream);
     else if (mapKey instanceof MapKeyNull)
-      ((MapKeyNull)mapKey).pack(dataOutput);
+      ((MapKeyNull)mapKey).pack(packStream);
     else if (mapKey instanceof MapKeyNumber)
-      ((MapKeyNumber)mapKey).pack(dataOutput);
+      ((MapKeyNumber)mapKey).pack(packStream);
     else if (mapKey instanceof MapKeyString)
-      ((MapKeyString)mapKey).pack(dataOutput);
+      ((MapKeyString)mapKey).pack(packStream);
     else
       throw new IllegalArgumentException();
   }
 
 
-  public static void pack(@NotNull MapValue mapValue, @NotNull DataOutput dataOutput) throws IOException
+  public static void pack(@NotNull MapValue mapValue, @NotNull PackOutputStream packStream) throws IOException
   {
     if (mapValue instanceof MapValueBool)
-      ((MapValueBool)mapValue).pack(dataOutput);
+      ((MapValueBool)mapValue).pack(packStream);
     if (mapValue instanceof MapValueMessage)
-      ((MapValueMessage)mapValue).pack(dataOutput);
+      ((MapValueMessage)mapValue).pack(packStream);
     else if (mapValue instanceof MapValueNumber)
-      ((MapValueNumber)mapValue).pack(dataOutput);
+      ((MapValueNumber)mapValue).pack(packStream);
     else if (mapValue instanceof MapValueString)
-      ((MapValueString)mapValue).pack(dataOutput);
+      ((MapValueString)mapValue).pack(packStream);
     else
       throw new IllegalArgumentException();
   }

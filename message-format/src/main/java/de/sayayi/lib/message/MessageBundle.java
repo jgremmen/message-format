@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,22 +18,23 @@ package de.sayayi.lib.message;
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.pack.Pack;
+import de.sayayi.lib.message.pack.PackInputStream;
+import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.pack.Unpack;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
-import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 
@@ -44,8 +45,6 @@ import static java.util.Objects.requireNonNull;
 @SuppressWarnings("UnstableApiUsage")
 public class MessageBundle
 {
-  static final byte[] PACK_MAGIC = "MSGB\u0000\u0008".getBytes(US_ASCII);
-
   @Getter private final @NotNull MessageFactory messageFactory;
 
   private final @NotNull Map<String,Message.WithCode> messages;
@@ -165,13 +164,8 @@ public class MessageBundle
 
     for(final InputStream packStream: packStreams)
     {
-      final byte[] signature = new byte[PACK_MAGIC.length];
-      if (packStream.read(signature) != PACK_MAGIC.length || !Arrays.equals(signature, PACK_MAGIC))
-        throw new IOException("pack stream has wrong signature");
-
-      try(final DataInputStream dataStream = new DataInputStream(
-          packStream.read() != 0 ? new GZIPInputStream(packStream) : packStream)) {
-        for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
+      try(final PackInputStream dataStream = new PackInputStream(packStream)) {
+        for(int n = 0, size = dataStream.readShort(); n < size; n++)
           add(unpack.loadMessageWithCode(dataStream));
       }
     }
@@ -230,27 +224,23 @@ public class MessageBundle
 
   /**
    *
-   * @param packStream  pack output stream, not {@code null}
-   * @param compress    {@code true} compress pack, {@code false} do not compress pack
-   * @param codeFilter  optional predicate for selecting message codes
+   * @param packStream         pack output stream, not {@code null}
+   * @param compress           {@code true} compress pack, {@code false} do not compress pack
+   * @param messageCodeFilter  optional predicate for selecting message codes
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
-  public void pack(@NotNull OutputStream packStream, boolean compress, Predicate<String> codeFilter)
+  public void pack(@NotNull OutputStream packStream, boolean compress, Predicate<String> messageCodeFilter)
       throws IOException
   {
-    packStream.write(PACK_MAGIC);
-    packStream.write(compress ? 1 : 0);
-
-    try(final DataOutputStream dataStream = new DataOutputStream(
-        compress ? new GZIPOutputStream(packStream) : packStream)) {
-      dataStream.writeShort(codeFilter == null
-          ? messages.size() : (int)messages.keySet().stream().filter(codeFilter).count());
+    try(final PackOutputStream dataStream = new PackOutputStream(packStream, compress)) {
+      dataStream.writeShort(messageCodeFilter == null
+          ? (short)messages.size() : (short)messages.keySet().stream().filter(messageCodeFilter).count());
 
       for(final Message.WithCode message: messages.values())
-        if (codeFilter == null || codeFilter.test(message.getCode()))
+        if (messageCodeFilter == null || messageCodeFilter.test(message.getCode()))
           Pack.pack(message, dataStream);
     }
   }

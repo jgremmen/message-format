@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,9 +31,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Locale;
 
-import static de.sayayi.lib.message.MessageBundle.PACK_MAGIC;
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static java.util.Arrays.copyOf;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -161,11 +159,8 @@ public class MessageDefAnnotationTest
     val packStream = new ByteArrayOutputStream();
     bundle.pack(packStream, true, code -> code.startsWith("T"));
 
-    val packed = packStream.toByteArray();
-    assertArrayEquals(PACK_MAGIC, copyOf(packed, PACK_MAGIC.length));
-
     val newBundle = new MessageBundle(NO_CACHE_INSTANCE);
-    newBundle.add(new ByteArrayInputStream(packed));
+    newBundle.add(new ByteArrayInputStream(packStream.toByteArray()));
 
     val codes = newBundle.getCodes();
 

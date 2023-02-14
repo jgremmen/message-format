@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,14 +22,14 @@ import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.ParameterPart;
 import de.sayayi.lib.message.pack.Pack;
+import de.sayayi.lib.message.pack.PackInputStream;
+import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.pack.Unpack;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ import java.util.TreeSet;
 @EqualsAndHashCode(doNotUseGetters = true)
 public class ParameterizedMessage implements Message.WithSpaces
 {
-  public static final byte PACK_ID = 5;
+  public static final int PACK_ID = 5;
 
   private static final long serialVersionUID = 800L;
 
@@ -125,25 +125,25 @@ public class ParameterizedMessage implements Message.WithSpaces
 
 
   /**
-   * @param dataOutput  data output pack target
+   * @param packStream  data output pack target
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
-  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    dataOutput.writeByte(PACK_ID);
-    dataOutput.writeByte(parts.length);
+    packStream.write(PACK_ID, 3);
+    packStream.write(parts.length, 7);
 
     for(final MessagePart part: parts)
-      Pack.pack(part, dataOutput);
+      Pack.pack(part, packStream);
   }
 
 
   /**
    * @param unpack     unpacker instance, not {@code null}
-   * @param dataInput  source data input, not {@code null}
+   * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked parameterized message, never {@code null}
    *
@@ -151,13 +151,13 @@ public class ParameterizedMessage implements Message.WithSpaces
    *
    * @since 0.8.0
    */
-  public static @NotNull Message.WithSpaces unpack(@NotNull Unpack unpack, @NotNull DataInput dataInput)
+  public static @NotNull Message.WithSpaces unpack(@NotNull Unpack unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
     final List<MessagePart> parts = new ArrayList<>();
 
-    for(int n = 0, l = dataInput.readUnsignedByte(); n < l; n++)
-      parts.add(unpack.loadMessagePart(dataInput));
+    for(int n = 0, l = (int)packStream.read(7); n < l; n++)
+      parts.add(unpack.loadMessagePart(packStream));
 
     return new ParameterizedMessage(parts);
   }

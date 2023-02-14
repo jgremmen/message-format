@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,14 +16,14 @@
 package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.pack.PackInputStream;
+import de.sayayi.lib.message.pack.PackOutputStream;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Locale;
 
@@ -61,21 +61,21 @@ public final class MapKeyName implements MapKey
 
 
   /**
-   * @param dataOutput  data output pack target
+   * @param packStream  data output pack target
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
-  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    dataOutput.writeByte(PACK_ID);
-    dataOutput.writeUTF(name);
+    packStream.write(PACK_ID, 3);
+    packStream.writeString(name);
   }
 
 
   /**
-   * @param dataInput  source data input, not {@code null}
+   * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked name map key, never {@code null}
    *
@@ -83,7 +83,7 @@ public final class MapKeyName implements MapKey
    *
    * @since 0.8.0
    */
-  public static @NotNull MapKeyName unpack(@NotNull DataInput dataInput) throws IOException {
-    return new MapKeyName(dataInput.readUTF());
+  public static @NotNull MapKeyName unpack(@NotNull PackInputStream packStream) throws IOException {
+    return new MapKeyName(packStream.readString());
   }
 }
