@@ -159,7 +159,7 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
   /**
    * @param dataOutput  data output pack target
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
@@ -183,7 +183,7 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
    *
    * @return  unpacked localized message bundle with code, never {@code null}
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */

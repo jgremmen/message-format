@@ -103,7 +103,7 @@ public final class MapKeyString implements MapKey
   /**
    * @param dataOutput  data output pack target
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
@@ -120,7 +120,7 @@ public final class MapKeyString implements MapKey
    *
    * @return  unpacked string map key, never {@code null}
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */

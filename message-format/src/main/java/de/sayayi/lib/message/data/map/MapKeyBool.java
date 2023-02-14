@@ -94,7 +94,7 @@ public enum MapKeyBool implements MapKey
   /**
    * @param dataOutput  data output pack target
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
@@ -110,7 +110,7 @@ public enum MapKeyBool implements MapKey
    *
    * @return  unpacked boolean map key, never {@code null}
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */

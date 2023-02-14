@@ -127,7 +127,7 @@ public class ParameterizedMessage implements Message.WithSpaces
   /**
    * @param dataOutput  data output pack target
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
@@ -147,7 +147,7 @@ public class ParameterizedMessage implements Message.WithSpaces
    *
    * @return  unpacked parameterized message, never {@code null}
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */

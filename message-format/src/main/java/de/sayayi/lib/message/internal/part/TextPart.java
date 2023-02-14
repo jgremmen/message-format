@@ -127,7 +127,7 @@ public final class TextPart implements Text
   /**
    * @param dataOutput  data output pack target
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
@@ -145,7 +145,7 @@ public final class TextPart implements Text
    *
    * @return  unpacked text part, never {@code null}
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */

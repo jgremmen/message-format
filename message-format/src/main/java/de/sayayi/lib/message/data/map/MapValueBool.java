@@ -62,7 +62,7 @@ public enum MapValueBool implements MapValue
   /**
    * @param dataOutput  data output pack target
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
@@ -78,7 +78,7 @@ public enum MapValueBool implements MapValue
    *
    * @return  unpacked boolean map value, never {@code null}
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */

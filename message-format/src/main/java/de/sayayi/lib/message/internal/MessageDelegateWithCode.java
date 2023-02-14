@@ -75,7 +75,7 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
   /**
    * @param dataOutput  data output pack target
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
@@ -93,7 +93,7 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
    *
    * @return  unpacked message delegate with code, never {@code null}
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */

@@ -49,7 +49,7 @@ public final class MapValueNumber extends DataNumber implements MapValue
   /**
    * @param dataOutput  data output pack target
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
@@ -65,7 +65,7 @@ public final class MapValueNumber extends DataNumber implements MapValue
    *
    * @return  unpacked number map value, never {@code null}
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */

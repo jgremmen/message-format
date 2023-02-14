@@ -69,7 +69,7 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
   /**
    * @param dataOutput  data output pack target
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
@@ -85,7 +85,7 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
    *
    * @return  unpacked empty message with code, never {@code null}
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */

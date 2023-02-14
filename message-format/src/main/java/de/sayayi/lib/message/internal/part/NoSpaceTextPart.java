@@ -94,7 +94,7 @@ public final class NoSpaceTextPart implements Text
   /**
    * @param dataOutput  data output pack target
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
@@ -110,7 +110,7 @@ public final class NoSpaceTextPart implements Text
    *
    * @return  unpacked no-space text part, never {@code null}
    *
-   * @throws IOException  if an I/O error occurs.
+   * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
