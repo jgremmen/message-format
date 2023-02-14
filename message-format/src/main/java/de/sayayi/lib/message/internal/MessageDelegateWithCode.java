@@ -86,6 +86,7 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
 
 
   /**
+   * @param unpack     unpacker instance, not {@code null}
    * @param dataInput  source data input, not {@code null}
    *
    * @return  unpacked message delegate with code, never {@code null}
@@ -94,9 +95,10 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
    *
    * @since 0.8.0
    */
-  public static @NotNull Message.WithCode unpack(@NotNull DataInput dataInput) throws IOException
+  public static @NotNull Message.WithCode unpack(@NotNull Unpack unpack, @NotNull DataInput dataInput)
+      throws IOException
   {
     final String code = dataInput.readUTF();
-    return new MessageDelegateWithCode(code, Unpack.loadMessage(dataInput));
+    return new MessageDelegateWithCode(code, unpack.loadMessage(dataInput));
   }
 }

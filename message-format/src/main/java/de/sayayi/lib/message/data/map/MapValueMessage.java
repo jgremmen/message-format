@@ -64,6 +64,7 @@ public final class MapValueMessage implements MapValue
 
 
   /**
+   * @param unpack     unpacker instance, not {@code null}
    * @param dataInput  source data input, not {@code null}
    *
    * @return  unpacked message map value, never {@code null}
@@ -72,7 +73,8 @@ public final class MapValueMessage implements MapValue
    *
    * @since 0.8.0
    */
-  public static @NotNull MapValueMessage unpack(@NotNull DataInput dataInput) throws IOException {
-    return new MapValueMessage(Unpack.loadMessageWithSpaces(dataInput));
+  public static @NotNull MapValueMessage unpack(@NotNull Unpack unpack, @NotNull DataInput dataInput)
+      throws IOException {
+    return new MapValueMessage(unpack.loadMessageWithSpaces(dataInput));
   }
 }

@@ -22,16 +22,20 @@ import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.NoSpaceTextPart;
 import de.sayayi.lib.message.internal.part.ParameterPart;
 import de.sayayi.lib.message.internal.part.TextPart;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
 import java.io.IOException;
+
+import static lombok.AccessLevel.PRIVATE;
 
 
 /**
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
+@NoArgsConstructor(access = PRIVATE)
 public final class Pack
 {
   public static void pack(@NotNull Message message, @NotNull DataOutput dataOutput) throws IOException

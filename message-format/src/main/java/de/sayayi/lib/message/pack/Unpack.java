@@ -22,99 +22,136 @@ import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.NoSpaceTextPart;
 import de.sayayi.lib.message.internal.part.ParameterPart;
 import de.sayayi.lib.message.internal.part.TextPart;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.util.function.Function.identity;
 
 
 /**
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
+@NoArgsConstructor
 public final class Unpack
 {
-  public static @NotNull MapKey loadMapKey(@NotNull DataInput dataInput) throws IOException
+  private final Map<MapKey,MapKey> mapKeys = new HashMap<>();
+  private final Map<MapValue,MapValue> mapValues = new HashMap<>();
+  private final Map<MessagePart,MessagePart> messageParts = new HashMap<>();
+  private final Map<Message.WithSpaces,Message.WithSpaces> messagesWithSpaces = new HashMap<>();
+
+
+  public @NotNull MapKey loadMapKey(@NotNull DataInput dataInput) throws IOException
   {
+    final MapKey mapKey;
+
     switch((int)dataInput.readByte() & 0xff)
     {
-      case 1: return MapKeyBool.unpack(dataInput);
-      case 2: return MapKeyEmpty.unpack(dataInput);
-      case 3: return MapKeyName.unpack(dataInput);
-      case 4: return MapKeyNull.unpack(dataInput);
-      case 5: return MapKeyNumber.unpack(dataInput);
-      case 6: return MapKeyString.unpack(dataInput);
+      case 1: mapKey = MapKeyBool.unpack(dataInput); break;
+      case 2: mapKey = MapKeyEmpty.unpack(dataInput); break;
+      case 3: mapKey = MapKeyName.unpack(dataInput); break;
+      case 4: mapKey = MapKeyNull.unpack(dataInput); break;
+      case 5: mapKey = MapKeyNumber.unpack(dataInput); break;
+      case 6: mapKey = MapKeyString.unpack(dataInput); break;
+
+      default:
+        throw new IllegalStateException();
     }
 
-    throw new IllegalStateException();
+    return mapKeys.computeIfAbsent(mapKey, identity());
   }
 
 
-  public static @NotNull MapValue loadMapValue(@NotNull DataInput dataInput) throws IOException
+  public @NotNull MapValue loadMapValue(@NotNull DataInput dataInput) throws IOException
   {
+    final MapValue mapValue;
+
     switch((int)dataInput.readByte() & 0xff)
     {
-      case 1: return MapValueBool.unpack(dataInput);
-      case 2: return MapValueMessage.unpack(dataInput);
-      case 3: return MapValueNumber.unpack(dataInput);
-      case 4: return MapValueString.unpack(dataInput);
+      case 1: mapValue = MapValueBool.unpack(dataInput); break;
+      case 2: mapValue = MapValueMessage.unpack(this, dataInput); break;
+      case 3: mapValue = MapValueNumber.unpack(dataInput); break;
+      case 4: mapValue = MapValueString.unpack(dataInput); break;
+
+      default:
+        throw new IllegalStateException();
     }
 
-    throw new IllegalStateException();
+    return mapValues.computeIfAbsent(mapValue, identity());
   }
 
 
-  public static @NotNull MessagePart loadMessagePart(@NotNull DataInput dataInput) throws IOException
+  public @NotNull MessagePart loadMessagePart(@NotNull DataInput dataInput) throws IOException
   {
+    final MessagePart messagePart;
+
     switch((int)dataInput.readByte() & 0xff)
     {
-      case 1: return NoSpaceTextPart.unpack(dataInput);
-      case 2: return ParameterPart.unpack(dataInput);
-      case 3: return TextPart.unpack(dataInput);
+      case 1: messagePart = NoSpaceTextPart.unpack(dataInput); break;
+      case 2: messagePart = ParameterPart.unpack(this, dataInput); break;
+      case 3: messagePart = TextPart.unpack(dataInput); break;
+
+      default:
+        throw new IllegalStateException();
     }
 
-    throw new IllegalStateException();
+    return messageParts.computeIfAbsent(messagePart, identity());
   }
 
 
-  public static @NotNull Message.WithSpaces loadMessageWithSpaces(@NotNull DataInput dataInput) throws IOException
+  public @NotNull Message.WithSpaces loadMessageWithSpaces(@NotNull DataInput dataInput) throws IOException
   {
+    final Message.WithSpaces message;
+
     switch((int)dataInput.readByte() & 0xff)
     {
-      case 1: return EmptyMessage.unpack();
-      case 5: return ParameterizedMessage.unpack(dataInput);
-      case 6: return TextMessage.unpack(dataInput);
+      case 1: message = EmptyMessage.unpack(); break;
+      case 5: message = ParameterizedMessage.unpack(this, dataInput); break;
+      case 6: message = TextMessage.unpack(dataInput); break;
+
+      default:
+        throw new IllegalStateException();
     }
 
-    throw new IllegalStateException();
+    return messagesWithSpaces.computeIfAbsent(message, identity());
   }
 
 
-  public static @NotNull Message.WithCode loadMessageWithCode(@NotNull DataInput dataInput) throws IOException
+  public @NotNull Message.WithCode loadMessageWithCode(@NotNull DataInput dataInput) throws IOException
   {
     switch((int)dataInput.readByte() & 0xff)
     {
       case 2: return EmptyMessageWithCode.unpack(dataInput);
-      case 3: return LocalizedMessageBundleWithCode.unpack(dataInput);
-      case 4: return MessageDelegateWithCode.unpack(dataInput);
+      case 3: return LocalizedMessageBundleWithCode.unpack(this, dataInput);
+      case 4: return MessageDelegateWithCode.unpack(this, dataInput);
     }
 
     throw new IllegalStateException();
   }
 
 
-  public static @NotNull Message loadMessage(@NotNull DataInput dataInput) throws IOException
+  public @NotNull Message loadMessage(@NotNull DataInput dataInput) throws IOException
   {
+    final Message.WithSpaces message;
+
     switch((int)dataInput.readByte() & 0xff)
     {
-      case 1: return EmptyMessage.unpack();
+      case 1: message = EmptyMessage.unpack(); break;
       case 2: return EmptyMessageWithCode.unpack(dataInput);
-      case 3: return LocalizedMessageBundleWithCode.unpack(dataInput);
-      case 4: return MessageDelegateWithCode.unpack(dataInput);
-      case 5: return ParameterizedMessage.unpack(dataInput);
-      case 6: return TextMessage.unpack(dataInput);
+      case 3: return LocalizedMessageBundleWithCode.unpack(this, dataInput);
+      case 4: return MessageDelegateWithCode.unpack(this, dataInput);
+      case 5: message = ParameterizedMessage.unpack(this, dataInput); break;
+      case 6: message = TextMessage.unpack(dataInput); break;
+
+      default:
+        throw new IllegalStateException();
     }
 
-    throw new IllegalStateException();
+    return messagesWithSpaces.computeIfAbsent(message, identity());
   }
 }

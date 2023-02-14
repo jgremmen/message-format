@@ -179,6 +179,7 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
 
 
   /**
+   * @param unpack     unpacker instance, not {@code null}
    * @param dataInput  source data input, not {@code null}
    *
    * @return  unpacked localized message bundle with code, never {@code null}
@@ -187,7 +188,8 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
    *
    * @since 0.8.0
    */
-  public static @NotNull Message.WithCode unpack(@NotNull DataInput dataInput) throws IOException
+  public static @NotNull Message.WithCode unpack(@NotNull Unpack unpack, @NotNull DataInput dataInput)
+      throws IOException
   {
     final int size = dataInput.readUnsignedByte();
     final String code = dataInput.readUTF();
@@ -196,7 +198,7 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
     for(int n = 0; n < size; n++)
     {
       String languageTag = dataInput.readUTF();
-      messages.put(Locale.forLanguageTag(languageTag), Unpack.loadMessageWithCode(dataInput));
+      messages.put(Locale.forLanguageTag(languageTag), unpack.loadMessageWithCode(dataInput));
     }
 
     return new LocalizedMessageBundleWithCode(code, messages);

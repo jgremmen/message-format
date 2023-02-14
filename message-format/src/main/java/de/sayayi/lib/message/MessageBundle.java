@@ -18,18 +18,17 @@ package de.sayayi.lib.message;
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.pack.Pack;
+import de.sayayi.lib.message.pack.Unpack;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
@@ -43,19 +42,37 @@ import static java.util.Objects.requireNonNull;
 @SuppressWarnings("UnstableApiUsage")
 public class MessageBundle
 {
+  private static final byte[] PACK_MAGIC = "MSGB\u0000\u0008".getBytes(US_ASCII);
+
   @Getter private final @NotNull MessageFactory messageFactory;
 
   private final @NotNull Map<String,Message.WithCode> messages;
   private final @NotNull Set<Class<?>> indexedClasses;
 
 
-  @SuppressWarnings("WeakerAccess")
   public MessageBundle(@NotNull MessageFactory messageFactory)
   {
     this.messageFactory = messageFactory;
 
     messages = new HashMap<>();
     indexedClasses = new HashSet<>();
+  }
+
+
+  public MessageBundle(@NotNull MessageFactory messageFactory, @NotNull InputStream packStream) throws IOException
+  {
+    this(messageFactory);
+
+    final byte[] signature = new byte[PACK_MAGIC.length];
+    if (packStream.read(signature) != PACK_MAGIC.length || !Arrays.equals(signature, PACK_MAGIC))
+      throw new IOException("pack stream has wrong signature");
+
+    final Unpack unpack = new Unpack();
+
+    try(final DataInputStream dataStream = new DataInputStream(new GZIPInputStream(packStream))) {
+      for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
+        add(unpack.loadMessageWithCode(dataStream));
+    }
   }
 
 
@@ -140,17 +157,14 @@ public class MessageBundle
 
   public void pack(@NotNull OutputStream packStream) throws IOException
   {
-    // write signature + version (0.8) -> 6 bytes
-    packStream.write("MSGB\u0000\u0008".getBytes(US_ASCII));
+    // write signature
+    packStream.write(PACK_MAGIC);
 
     try(final DataOutputStream dataStream = new DataOutputStream(new GZIPOutputStream(packStream))) {
       dataStream.writeShort(messages.size());
 
-      for(final Entry<String,Message.WithCode> messageEntry: messages.entrySet())
-      {
-        dataStream.writeUTF(messageEntry.getKey());
-        Pack.pack(messageEntry.getValue(), dataStream);
-      }
+      for(final Message.WithCode message: messages.values())
+        Pack.pack(message, dataStream);
     }
   }
 }

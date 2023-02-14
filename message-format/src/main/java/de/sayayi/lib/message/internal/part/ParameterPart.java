@@ -169,6 +169,7 @@ public final class ParameterPart implements Parameter
 
 
   /**
+   * @param unpack     unpacker instance, not {@code null}
    * @param dataInput  source data input, not {@code null}
    *
    * @return  unpacked parameter part, never {@code null}
@@ -177,7 +178,7 @@ public final class ParameterPart implements Parameter
    *
    * @since 0.8.0
    */
-  public static @NotNull ParameterPart unpack(@NotNull DataInput dataInput) throws IOException
+  public static @NotNull ParameterPart unpack(@NotNull Unpack unpack, @NotNull DataInput dataInput) throws IOException
   {
     final byte flags = dataInput.readByte();
     final String parameter = dataInput.readUTF();
@@ -187,8 +188,8 @@ public final class ParameterPart implements Parameter
 
     for(int n = 0; n < size; n++)
     {
-      final MapKey key = Unpack.loadMapKey(dataInput);
-      final MapValue value = Unpack.loadMapValue(dataInput);
+      final MapKey key = unpack.loadMapKey(dataInput);
+      final MapValue value = unpack.loadMapValue(dataInput);
 
       map.put(key, value);
     }

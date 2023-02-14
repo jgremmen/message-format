@@ -138,6 +138,7 @@ public class ParameterizedMessage implements Message.WithSpaces
 
 
   /**
+   * @param unpack     unpacker instance, not {@code null}
    * @param dataInput  source data input, not {@code null}
    *
    * @return  unpacked parameterized message, never {@code null}
@@ -146,13 +147,14 @@ public class ParameterizedMessage implements Message.WithSpaces
    *
    * @since 0.8.0
    */
-  public static @NotNull Message.WithSpaces unpack(@NotNull DataInput dataInput) throws IOException
+  public static @NotNull Message.WithSpaces unpack(@NotNull Unpack unpack, @NotNull DataInput dataInput)
+      throws IOException
   {
     final int partCount = dataInput.readUnsignedByte();
     final List<MessagePart> parts = new ArrayList<>(partCount);
 
     for(int n = 0; n < partCount; n++)
-      parts.add(Unpack.loadMessagePart(dataInput));
+      parts.add(unpack.loadMessagePart(dataInput));
 
     return new ParameterizedMessage(parts);
   }
