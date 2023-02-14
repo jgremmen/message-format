@@ -26,6 +26,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * @author Jeroen Gremmen
  */
+@SuppressWarnings("UnstableApiUsage")
 public abstract class AbstractScannedMessageBundle extends MessageBundle
 {
   protected AbstractScannedMessageBundle(@NotNull MessageFactory messageFactory, @NotNull Set<String> packageNames) {

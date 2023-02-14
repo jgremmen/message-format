@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.scanner;
+package de.sayayi.lib.message.scanner.annotation;
 
+import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.Text;
 import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 
 
 /**
@@ -26,16 +29,22 @@ import java.lang.annotation.Annotation;
  */
 @AllArgsConstructor
 @SuppressWarnings("ClassExplicitlyAnnotation")
-public class TextImpl implements Text
+public class MessageDefImpl implements MessageDef
 {
-  private final String locale;
+  private final String code;
   private final String text;
-  private final String value;
+  private final @NotNull Text[] texts;
 
 
   @Override
-  public String locale() {
-    return locale == null ? "" : locale;
+  public String code() {
+    return code == null ? "" : code;
+  }
+
+
+  @Override
+  public Text[] texts() {
+    return texts;
   }
 
 
@@ -46,19 +55,13 @@ public class TextImpl implements Text
 
 
   @Override
-  public String value() {
-    return value == null ? "" : value;
-  }
-
-
-  @Override
   public Class<? extends Annotation> annotationType() {
-    return Text.class;
+    return MessageDef.class;
   }
 
 
   @Override
   public String toString() {
-    return "Text[locale=" + locale() + ",text=" + text() + ",value=" + value() + ']';
+    return "MessageDef[code=" + code() + ",text=" + text() + ",texts=" + Arrays.toString(texts) + ']';
   }
 }
