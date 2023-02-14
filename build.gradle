@@ -34,7 +34,7 @@ allprojects {
 
 
 configure(moduleProjects) {
-  ext.lombokVersion = "1.18.24"
+  ext.lombokVersion = "1.18.26"
   ext.junitVersion = "5.9.2"
   ext.jetbrainsAnnotationsVersion = "24.0.0"
 
