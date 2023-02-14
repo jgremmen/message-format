@@ -42,7 +42,7 @@ import static java.util.Objects.requireNonNull;
 @SuppressWarnings("UnstableApiUsage")
 public class MessageBundle
 {
-  private static final byte[] PACK_MAGIC = "MSGB\u0000\u0008".getBytes(US_ASCII);
+  static final byte[] PACK_MAGIC = "MSGB\u0000\u0008".getBytes(US_ASCII);
 
   @Getter private final @NotNull MessageFactory messageFactory;
 

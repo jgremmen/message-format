@@ -21,13 +21,18 @@ import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
+import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Locale;
-import java.util.Set;
 
+import static de.sayayi.lib.message.MessageBundle.PACK_MAGIC;
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static java.util.Arrays.copyOf;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -72,7 +77,7 @@ public class MessageDefAnnotationTest
   @SuppressWarnings("DefaultAnnotationParam")
   public void testEmptyMessageWithCode()
   {
-    final WithCode msg = bundle.getByCode("MSG-052");
+    val msg = bundle.getByCode("MSG-052");
 
     assertTrue(msg instanceof EmptyMessageWithCode);
     assertEquals("MSG-052", msg.getCode());
@@ -83,8 +88,8 @@ public class MessageDefAnnotationTest
   @MessageDef(code = "T3", text = "m3")
   public void testMessageWithoutLocale()
   {
-    final WithCode msg = bundle.getByCode("T3");
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+    val msg = bundle.getByCode("T3");
+    val context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
     assertEquals("m3", msg.format(context, context.noParameters()));
     assertEquals("m3", msg.format(context, context.parameters().withLocale(Locale.ROOT)));
@@ -98,8 +103,8 @@ public class MessageDefAnnotationTest
   @MessageDef(code = "T2", texts = @Text(locale = "nl-NL", text = "nl"))
   public void testSingleMessageWithLocale()
   {
-    final WithCode msg = bundle.getByCode("T2");
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+    val msg = bundle.getByCode("T2");
+    val context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
     assertEquals("nl", msg.format(context, context.noParameters()));
     assertEquals("nl", msg.format(context, context.parameters().withLocale(Locale.ROOT)));
@@ -117,8 +122,8 @@ public class MessageDefAnnotationTest
   })
   public void testLocaleSelection()
   {
-    final WithCode msg = bundle.getByCode("T1");
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+    val msg = bundle.getByCode("T1");
+    val context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
     assertEquals("us", msg.format(context, context.parameters().withLocale(Locale.ROOT)));
     assertEquals("uk", msg.format(context, context.parameters().withLocale(Locale.UK)));
@@ -131,7 +136,28 @@ public class MessageDefAnnotationTest
   @Test
   public void testCodes()
   {
-    Set<String> codes = bundle.getCodes();
+    val codes = bundle.getCodes();
+
+    assertTrue(codes.contains("T1"));
+    assertTrue(codes.contains("T2"));
+    assertTrue(codes.contains("T3"));
+    assertTrue(codes.contains("T4"));
+    assertTrue(codes.contains("T5"));
+    assertTrue(codes.contains("MSG-052"));
+  }
+
+
+  @Test
+  public void testPackUnpack() throws IOException
+  {
+    val packStream = new ByteArrayOutputStream();
+    bundle.pack(packStream);
+
+    val packed = packStream.toByteArray();
+    assertArrayEquals(PACK_MAGIC, copyOf(packed, PACK_MAGIC.length));
+
+    val newBundle = new MessageBundle(NO_CACHE_INSTANCE, new ByteArrayInputStream(packed));
+    val codes = newBundle.getCodes();
 
     assertTrue(codes.contains("T1"));
     assertTrue(codes.contains("T2"));

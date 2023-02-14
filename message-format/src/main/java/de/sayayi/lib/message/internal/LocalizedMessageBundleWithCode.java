@@ -24,7 +24,6 @@ import de.sayayi.lib.message.pack.Pack;
 import de.sayayi.lib.message.pack.Unpack;
 import lombok.Synchronized;
 import lombok.ToString;
-import lombok.val;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -166,11 +165,9 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
   {
     dataOutput.writeByte(3);
     dataOutput.writeUTF(getCode());
+    dataOutput.writeByte(localizedMessages.size());
 
-    val size = localizedMessages.size();
-    dataOutput.writeByte(size);
-
-    for(Entry<Locale,Message> entry: localizedMessages.entrySet())
+    for(final Entry<Locale,Message> entry: localizedMessages.entrySet())
     {
       dataOutput.writeUTF(entry.getKey().toLanguageTag());
       Pack.pack(entry.getValue(), dataOutput);
@@ -191,15 +188,11 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
   public static @NotNull Message.WithCode unpack(@NotNull Unpack unpack, @NotNull DataInput dataInput)
       throws IOException
   {
-    final int size = dataInput.readUnsignedByte();
     final String code = dataInput.readUTF();
     final Map<Locale,Message> messages = new HashMap<>();
 
-    for(int n = 0; n < size; n++)
-    {
-      String languageTag = dataInput.readUTF();
-      messages.put(Locale.forLanguageTag(languageTag), unpack.loadMessageWithCode(dataInput));
-    }
+    for(int n = 0, l = dataInput.readUnsignedByte(); n < l; n++)
+      messages.put(Locale.forLanguageTag(dataInput.readUTF()), unpack.loadMessage(dataInput));
 
     return new LocalizedMessageBundleWithCode(code, messages);
   }

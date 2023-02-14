@@ -50,7 +50,7 @@ public final class Unpack
   {
     final MapKey mapKey;
 
-    switch((int)dataInput.readByte() & 0xff)
+    switch(dataInput.readUnsignedByte())
     {
       case 1: mapKey = MapKeyBool.unpack(dataInput); break;
       case 2: mapKey = MapKeyEmpty.unpack(dataInput); break;
@@ -71,7 +71,7 @@ public final class Unpack
   {
     final MapValue mapValue;
 
-    switch((int)dataInput.readByte() & 0xff)
+    switch(dataInput.readUnsignedByte())
     {
       case 1: mapValue = MapValueBool.unpack(dataInput); break;
       case 2: mapValue = MapValueMessage.unpack(this, dataInput); break;
@@ -90,7 +90,7 @@ public final class Unpack
   {
     final MessagePart messagePart;
 
-    switch((int)dataInput.readByte() & 0xff)
+    switch(dataInput.readUnsignedByte())
     {
       case 1: messagePart = NoSpaceTextPart.unpack(dataInput); break;
       case 2: messagePart = ParameterPart.unpack(this, dataInput); break;
@@ -108,7 +108,7 @@ public final class Unpack
   {
     final Message.WithSpaces message;
 
-    switch((int)dataInput.readByte() & 0xff)
+    switch(dataInput.readUnsignedByte())
     {
       case 1: message = EmptyMessage.unpack(); break;
       case 5: message = ParameterizedMessage.unpack(this, dataInput); break;
@@ -124,7 +124,7 @@ public final class Unpack
 
   public @NotNull Message.WithCode loadMessageWithCode(@NotNull DataInput dataInput) throws IOException
   {
-    switch((int)dataInput.readByte() & 0xff)
+    switch(dataInput.readUnsignedByte())
     {
       case 2: return EmptyMessageWithCode.unpack(dataInput);
       case 3: return LocalizedMessageBundleWithCode.unpack(this, dataInput);
@@ -139,7 +139,7 @@ public final class Unpack
   {
     final Message.WithSpaces message;
 
-    switch((int)dataInput.readByte() & 0xff)
+    switch(dataInput.readUnsignedByte())
     {
       case 1: message = EmptyMessage.unpack(); break;
       case 2: return EmptyMessageWithCode.unpack(dataInput);

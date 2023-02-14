@@ -75,6 +75,18 @@ public final class EmptyMessage implements Message.WithSpaces
   }
 
 
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof EmptyMessage;
+  }
+
+
+  @Override
+  public int hashCode() {
+    return EmptyMessage.class.hashCode();
+  }
+
+
   /**
    * @param dataOutput  data output pack target
    *

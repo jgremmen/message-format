@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -38,6 +39,7 @@ import static lombok.AccessLevel.PRIVATE;
  * @author Jeroen Gremmen
  */
 @ToString(doNotUseGetters = true)
+@EqualsAndHashCode(doNotUseGetters = true)
 @RequiredArgsConstructor(access = PRIVATE)
 public final class TextMessage implements Message.WithSpaces
 {
