@@ -18,11 +18,16 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.pack.Pack;
+import de.sayayi.lib.message.pack.Unpack;
 import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.SortedSet;
 
 
@@ -62,5 +67,36 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
   @Override
   public @NotNull SortedSet<String> getParameterNames() {
     return message.getParameterNames();
+  }
+
+
+  /**
+   * @param dataOutput  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  {
+    dataOutput.writeByte(4);
+    dataOutput.writeUTF(getCode());
+    Pack.pack(message, dataOutput);
+  }
+
+
+  /**
+   * @param dataInput  source data input, not {@code null}
+   *
+   * @return  unpacked message delegate with code, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull Message.WithCode unpack(@NotNull DataInput dataInput) throws IOException
+  {
+    final String code = dataInput.readUTF();
+    return new MessageDelegateWithCode(code, Unpack.loadMessage(dataInput));
   }
 }

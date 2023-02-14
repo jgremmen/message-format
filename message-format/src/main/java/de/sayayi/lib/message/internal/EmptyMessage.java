@@ -23,6 +23,8 @@ import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.SortedSet;
 
 import static java.util.Collections.emptySortedSet;
@@ -76,5 +78,27 @@ public final class EmptyMessage implements Message.WithSpaces
   @Override
   public @NotNull Message trim() {
     return this;
+  }
+
+
+  /**
+   * @param dataOutput  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull DataOutput dataOutput) throws IOException {
+    dataOutput.writeByte(1);
+  }
+
+
+  /**
+   * @return  unpacked empty message, never {@code null}
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull Message.WithSpaces unpack() {
+    return INSTANCE;
   }
 }

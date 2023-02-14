@@ -20,11 +20,17 @@ import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.exception.MessageException;
+import de.sayayi.lib.message.pack.Pack;
+import de.sayayi.lib.message.pack.Unpack;
 import lombok.Synchronized;
 import lombok.ToString;
+import lombok.val;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -146,5 +152,53 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
   @Override
   public @NotNull Map<Locale,Message> getLocalizedMessages() {
     return unmodifiableMap(localizedMessages);
+  }
+
+
+  /**
+   * @param dataOutput  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  {
+    dataOutput.writeByte(3);
+    dataOutput.writeUTF(getCode());
+
+    val size = localizedMessages.size();
+    dataOutput.writeByte(size);
+
+    for(Entry<Locale,Message> entry: localizedMessages.entrySet())
+    {
+      dataOutput.writeUTF(entry.getKey().toLanguageTag());
+      Pack.pack(entry.getValue(), dataOutput);
+    }
+  }
+
+
+  /**
+   * @param dataInput  source data input, not {@code null}
+   *
+   * @return  unpacked localized message bundle with code, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull Message.WithCode unpack(@NotNull DataInput dataInput) throws IOException
+  {
+    final int size = dataInput.readUnsignedByte();
+    final String code = dataInput.readUTF();
+    final Map<Locale,Message> messages = new HashMap<>();
+
+    for(int n = 0; n < size; n++)
+    {
+      String languageTag = dataInput.readUTF();
+      messages.put(Locale.forLanguageTag(languageTag), Unpack.loadMessageWithCode(dataInput));
+    }
+
+    return new LocalizedMessageBundleWithCode(code, messages);
   }
 }

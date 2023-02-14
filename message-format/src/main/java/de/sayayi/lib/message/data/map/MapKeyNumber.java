@@ -17,10 +17,14 @@ package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.MessageContext;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Locale;
@@ -32,6 +36,7 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.*;
  * @author Jeroen Gremmen
  */
 @ToString(doNotUseGetters = true)
+@EqualsAndHashCode(doNotUseGetters = true)
 @AllArgsConstructor
 public final class MapKeyNumber implements MapKey
 {
@@ -105,5 +110,37 @@ public final class MapKeyNumber implements MapKey
     }
 
     return compareType.match(cmp) ? result : MISMATCH;
+  }
+
+
+  /**
+   * @param dataOutput  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  {
+    dataOutput.writeByte(5);
+    dataOutput.writeByte(compareType.ordinal());
+    dataOutput.writeLong(number);
+  }
+
+
+  /**
+   * @param dataInput  source data input, not {@code null}
+   *
+   * @return  unpacked number map key, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull MapKeyNumber unpack(@NotNull DataInput dataInput) throws IOException
+  {
+    final CompareType compareType = CompareType.values()[dataInput.readByte() & 0xf];
+
+    return new MapKeyNumber(compareType, dataInput.readLong());
   }
 }

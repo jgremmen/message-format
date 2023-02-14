@@ -21,6 +21,9 @@ import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Objects;
 
 import static de.sayayi.lib.message.internal.SpacesUtil.isSpaceChar;
@@ -116,5 +119,42 @@ public final class TextPart implements Text
       s.append(", space-after");
 
     return s.append(')').toString();
+  }
+
+
+  /**
+   * @param dataOutput  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  {
+    dataOutput.writeByte(3);
+    dataOutput.writeByte((text != null ? 4 : 0) + (spaceBefore ? 2 : 0) + (spaceAfter ? 1 : 0));
+    if (text != null)
+      dataOutput.writeUTF(text);
+  }
+
+
+  /**
+   * @param dataInput  source data input, not {@code null}
+   *
+   * @return  unpacked text part, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull Text unpack(@NotNull DataInput dataInput) throws IOException
+  {
+    final byte flags = dataInput.readByte();
+
+    if (flags == 0)
+      return Text.NULL;
+
+    return new TextPart((flags & 4) != 0 ? dataInput.readUTF() : null,
+        (flags & 2) != 0, (flags & 1) != 0);
   }
 }

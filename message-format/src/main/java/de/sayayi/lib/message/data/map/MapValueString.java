@@ -20,6 +20,10 @@ import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.data.DataString;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 
 /**
  * @author Jeroen Gremmen
@@ -49,5 +53,33 @@ public final class MapValueString extends DataString implements MapValue
       message = messageFactory.parse(asObject());
 
     return message;
+  }
+
+
+  /**
+   * @param dataOutput  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  {
+    dataOutput.writeByte(4);
+    dataOutput.writeUTF(asObject());
+  }
+
+
+  /**
+   * @param dataInput  source data input, not {@code null}
+   *
+   * @return  unpacked string map value, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull MapValueString unpack(@NotNull DataInput dataInput) throws IOException {
+    return new MapValueString(dataInput.readUTF());
   }
 }

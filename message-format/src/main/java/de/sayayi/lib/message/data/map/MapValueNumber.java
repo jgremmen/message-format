@@ -16,12 +16,18 @@
 package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.data.DataNumber;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 
 /**
  * @author Jeroen Gremmen
  */
+@EqualsAndHashCode(doNotUseGetters = true, callSuper = true)
 public final class MapValueNumber extends DataNumber implements MapValue
 {
   private static final long serialVersionUID = 800L;
@@ -35,5 +41,33 @@ public final class MapValueNumber extends DataNumber implements MapValue
   @Override
   public @NotNull Type getType() {
     return Type.NUMBER;
+  }
+
+
+  /**
+   * @param dataOutput  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  {
+    dataOutput.writeByte(3);
+    dataOutput.writeLong(asObject());
+  }
+
+
+  /**
+   * @param dataInput  source data input, not {@code null}
+   *
+   * @return  unpacked number map value, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull MapValueNumber unpack(@NotNull DataInput dataInput) throws IOException {
+    return new MapValueNumber(dataInput.readLong());
   }
 }

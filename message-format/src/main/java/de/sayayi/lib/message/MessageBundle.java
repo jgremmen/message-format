@@ -17,15 +17,22 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
+import de.sayayi.lib.message.pack.Pack;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.Map.Entry;
+import java.util.zip.GZIPOutputStream;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 
@@ -128,5 +135,22 @@ public class MessageBundle
 
   private void add0(@NotNull AnnotatedElement annotatedElement) {
     messageFactory.parseAnnotations(annotatedElement).forEach(this::add);
+  }
+
+
+  public void pack(@NotNull OutputStream packStream) throws IOException
+  {
+    // write signature + version (0.8) -> 6 bytes
+    packStream.write("MSGB\u0000\u0008".getBytes(US_ASCII));
+
+    try(final DataOutputStream dataStream = new DataOutputStream(new GZIPOutputStream(packStream))) {
+      dataStream.writeShort(messages.size());
+
+      for(final Entry<String,Message.WithCode> messageEntry: messages.entrySet())
+      {
+        dataStream.writeUTF(messageEntry.getKey());
+        Pack.pack(messageEntry.getValue(), dataStream);
+      }
+    }
   }
 }

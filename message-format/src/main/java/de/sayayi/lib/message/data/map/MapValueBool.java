@@ -18,6 +18,10 @@ package de.sayayi.lib.message.data.map;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 import static lombok.AccessLevel.PRIVATE;
 
 
@@ -50,5 +54,33 @@ public enum MapValueBool implements MapValue
   @Override
   public String toString() {
     return Boolean.toString(bool);
+  }
+
+
+  /**
+   * @param dataOutput  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  {
+    dataOutput.writeByte(1);
+    dataOutput.writeBoolean(bool);
+  }
+
+
+  /**
+   * @param dataInput  source data input, not {@code null}
+   *
+   * @return  unpacked boolean map value, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull MapValueBool unpack(@NotNull DataInput dataInput) throws IOException {
+    return dataInput.readBoolean() ? TRUE : FALSE;
   }
 }

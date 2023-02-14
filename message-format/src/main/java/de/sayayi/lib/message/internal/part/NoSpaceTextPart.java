@@ -20,6 +20,10 @@ import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 import static de.sayayi.lib.message.internal.SpacesUtil.trimSpaces;
 
 
@@ -82,5 +86,35 @@ public final class NoSpaceTextPart implements Text
   @Contract(pure = true)
   public String toString() {
     return "Text(text=" + text + ')';
+  }
+
+
+  /**
+   * @param dataOutput  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  {
+    dataOutput.writeByte(1);
+    dataOutput.writeUTF(text);
+  }
+
+
+  /**
+   * @param dataInput  source data input, not {@code null}
+   *
+   * @return  unpacked no-space text part, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull Text unpack(@NotNull DataInput dataInput) throws IOException
+  {
+    final String text = dataInput.readUTF();
+    return text.isEmpty() ? Text.EMPTY : new NoSpaceTextPart(text);
   }
 }

@@ -24,14 +24,17 @@ import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.FormatterContextImpl;
 import de.sayayi.lib.message.internal.part.MessagePart.Parameter;
-import lombok.EqualsAndHashCode;
+import de.sayayi.lib.message.pack.Pack;
+import de.sayayi.lib.message.pack.Unpack;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.addSpaces;
 
@@ -42,7 +45,6 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.addSpaces;
  * @author Jeroen Gremmen
  */
 @Getter
-@EqualsAndHashCode(doNotUseGetters = true)
 public final class ParameterPart implements Parameter
 {
   private static final long serialVersionUID = 800L;
@@ -91,6 +93,30 @@ public final class ParameterPart implements Parameter
     return parameterNames;
   }
 
+  @Override
+  public boolean equals(Object o)
+  {
+    if (this == o)
+      return true;
+    if (!(o instanceof ParameterPart))
+      return false;
+
+    final ParameterPart that = (ParameterPart)o;
+
+    return
+        parameter.equals(that.parameter) &&
+        Objects.equals(format, that.format) &&
+        spaceBefore == that.spaceBefore &&
+        spaceAfter == that.spaceAfter &&
+        map.equals(that.map);
+  }
+
+
+  @Override
+  public int hashCode() {
+    return parameter.hashCode() * 11 + (spaceBefore ? 8 : 0) + (spaceAfter ? 2 : 0);
+  }
+
 
   @Override
   @Contract(pure = true)
@@ -111,5 +137,62 @@ public final class ParameterPart implements Parameter
       s.append(", space-after");
 
     return s.append(')').toString();
+  }
+
+
+  /**
+   * @param dataOutput  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  {
+    dataOutput.writeByte(2);
+    dataOutput.writeByte((format != null ? 4 : 0) + (spaceBefore ? 2 : 0) + (spaceAfter ? 1 : 0));
+    dataOutput.writeUTF(parameter);
+    if (format != null)
+      dataOutput.writeUTF(format);
+
+    final Map<MapKey,MapValue> map = this.map.asObject();
+    final int size = map.size();
+
+    dataOutput.writeByte(size);
+
+    for(Entry<MapKey,MapValue> mapEntry: map.entrySet())
+    {
+      Pack.pack(mapEntry.getKey(), dataOutput);
+      Pack.pack(mapEntry.getValue(), dataOutput);
+    }
+  }
+
+
+  /**
+   * @param dataInput  source data input, not {@code null}
+   *
+   * @return  unpacked parameter part, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull ParameterPart unpack(@NotNull DataInput dataInput) throws IOException
+  {
+    final byte flags = dataInput.readByte();
+    final String parameter = dataInput.readUTF();
+    final String format = (flags & 4) == 0 ? null : dataInput.readUTF();
+    final int size = dataInput.readUnsignedByte();
+    final Map<MapKey,MapValue> map = new HashMap<>();
+
+    for(int n = 0; n < size; n++)
+    {
+      final MapKey key = Unpack.loadMapKey(dataInput);
+      final MapValue value = Unpack.loadMapValue(dataInput);
+
+      map.put(key, value);
+    }
+
+    return new ParameterPart(parameter, format, (flags & 2) != 0, (flags & 1) != 0, map);
   }
 }

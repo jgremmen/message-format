@@ -25,6 +25,9 @@ import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.SortedSet;
 
 import static java.util.Collections.emptySortedSet;
@@ -76,5 +79,37 @@ public final class TextMessage implements Message.WithSpaces
     return SpacesUtil.isEmpty(text)
         ? EmptyMessage.INSTANCE
         : spaceBefore || spaceAfter ? new TextMessage(text, false, false) : this;
+  }
+
+
+  /**
+   * @param dataOutput  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  {
+    dataOutput.writeByte(6);
+    dataOutput.writeByte((spaceBefore ? 2 : 0) + (spaceAfter ? 1 : 0));
+    dataOutput.writeUTF(text);
+  }
+
+
+  /**
+   * @param dataInput  source data input, not {@code null}
+   *
+   * @return  unpacked text message, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull Message.WithSpaces unpack(@NotNull DataInput dataInput) throws IOException
+  {
+    final byte flags = dataInput.readByte();
+
+    return new TextMessage(dataInput.readUTF(), (flags & 2) != 0, (flags & 1) != 0);
   }
 }

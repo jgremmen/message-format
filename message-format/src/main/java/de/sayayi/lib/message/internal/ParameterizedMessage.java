@@ -21,10 +21,16 @@ import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.ParameterPart;
+import de.sayayi.lib.message.pack.Pack;
+import de.sayayi.lib.message.pack.Unpack;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -135,5 +141,43 @@ public class ParameterizedMessage implements Message.WithSpaces
         return ParameterizedMessage.this.getParameterNames();
       }
     };
+  }
+
+
+  /**
+   * @param dataOutput  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  {
+    dataOutput.writeByte(5);
+    dataOutput.writeByte(parts.length);
+
+    for(MessagePart part: parts)
+      Pack.pack(part, dataOutput);
+  }
+
+
+  /**
+   * @param dataInput  source data input, not {@code null}
+   *
+   * @return  unpacked parameterized message, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull Message.WithSpaces unpack(@NotNull DataInput dataInput) throws IOException
+  {
+    final int partCount = dataInput.readUnsignedByte();
+    final List<MessagePart> parts = new ArrayList<>(partCount);
+
+    for(int n = 0; n < partCount; n++)
+      parts.add(Unpack.loadMessagePart(dataInput));
+
+    return new ParameterizedMessage(parts);
   }
 }

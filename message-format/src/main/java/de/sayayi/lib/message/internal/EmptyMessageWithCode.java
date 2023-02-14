@@ -15,12 +15,16 @@
  */
 package de.sayayi.lib.message.internal;
 
+import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.SortedSet;
 
 import static java.util.Collections.emptySortedSet;
@@ -57,5 +61,33 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
   @Override
   public @NotNull SortedSet<String> getParameterNames() {
     return emptySortedSet();
+  }
+
+
+  /**
+   * @param dataOutput  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  {
+    dataOutput.writeByte(2);
+    dataOutput.writeUTF(getCode());
+  }
+
+
+  /**
+   * @param dataInput  source data input, not {@code null}
+   *
+   * @return  unpacked empty message with code, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull Message.WithCode unpack(@NotNull DataInput dataInput) throws IOException {
+    return new EmptyMessageWithCode(dataInput.readUTF());
   }
 }

@@ -18,9 +18,13 @@ package de.sayayi.lib.message.data.map;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Locale;
 
 import static de.sayayi.lib.message.data.map.MapKey.CompareType.EQ;
@@ -32,6 +36,7 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.*;
  * @author Jeroen Gremmen
  */
 @ToString(doNotUseGetters = true)
+@EqualsAndHashCode(doNotUseGetters = true)
 public final class MapKeyEmpty implements MapKey
 {
   private static final long serialVersionUID = 800L;
@@ -71,5 +76,33 @@ public final class MapKeyEmpty implements MapKey
       }
 
     return MISMATCH;
+  }
+
+
+  /**
+   * @param dataOutput  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  {
+    dataOutput.writeByte(2);
+    dataOutput.writeByte(compareType.ordinal());
+  }
+
+
+  /**
+   * @param dataInput  source data input, not {@code null}
+   *
+   * @return  unpacked empty map key, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull MapKeyEmpty unpack(@NotNull DataInput dataInput) throws IOException {
+    return new MapKeyEmpty(CompareType.values()[dataInput.readByte() & 0xf]);
   }
 }

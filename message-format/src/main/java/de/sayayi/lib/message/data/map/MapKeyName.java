@@ -17,10 +17,14 @@ package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.MessageContext;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Locale;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
@@ -31,6 +35,7 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
  * @author Jeroen Gremmen
  */
 @ToString(doNotUseGetters = true)
+@EqualsAndHashCode(doNotUseGetters = true)
 @AllArgsConstructor
 public final class MapKeyName implements MapKey
 {
@@ -50,5 +55,33 @@ public final class MapKeyName implements MapKey
   {
     return (value instanceof CharSequence || value instanceof Character) && value.toString().equals(name)
         ? EXACT : MISMATCH;
+  }
+
+
+  /**
+   * @param dataOutput  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  {
+    dataOutput.writeByte(3);
+    dataOutput.writeUTF(name);
+  }
+
+
+  /**
+   * @param dataInput  source data input, not {@code null}
+   *
+   * @return  unpacked name map key, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull MapKeyName unpack(@NotNull DataInput dataInput) throws IOException {
+    return new MapKeyName(dataInput.readUTF());
   }
 }

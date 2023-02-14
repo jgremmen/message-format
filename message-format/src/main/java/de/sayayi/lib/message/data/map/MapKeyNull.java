@@ -16,9 +16,13 @@
 package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.MessageContext;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Locale;
 
 import static de.sayayi.lib.message.data.map.MapKey.CompareType.EQ;
@@ -30,6 +34,7 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
  * @author Jeroen Gremmen
  */
 @ToString(doNotUseGetters = true)
+@EqualsAndHashCode(doNotUseGetters = true)
 public final class MapKeyNull implements MapKey
 {
   private static final long serialVersionUID = 800L;
@@ -61,5 +66,33 @@ public final class MapKeyNull implements MapKey
       return TYPELESS_EXACT;
 
     return MatchResult.MISMATCH;
+  }
+
+
+  /**
+   * @param dataOutput  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull DataOutput dataOutput) throws IOException
+  {
+    dataOutput.writeByte(4);
+    dataOutput.writeByte(compareType.ordinal());
+  }
+
+
+  /**
+   * @param dataInput  source data input, not {@code null}
+   *
+   * @return  unpacked null map key, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs.
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull MapKeyNull unpack(@NotNull DataInput dataInput) throws IOException {
+    return new MapKeyNull(CompareType.values()[dataInput.readByte() & 0xf]);
   }
 }
