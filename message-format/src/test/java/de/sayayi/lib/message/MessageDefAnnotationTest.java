@@ -159,7 +159,7 @@ public class MessageDefAnnotationTest
   public void testPackUnpack() throws IOException
   {
     val packStream = new ByteArrayOutputStream();
-    bundle.pack(packStream);
+    bundle.pack(packStream, true, code -> code.startsWith("T"));
 
     val packed = packStream.toByteArray();
     assertArrayEquals(PACK_MAGIC, copyOf(packed, PACK_MAGIC.length));
@@ -174,6 +174,6 @@ public class MessageDefAnnotationTest
     assertTrue(codes.contains("T3"));
     assertTrue(codes.contains("T4"));
     assertTrue(codes.contains("T5"));
-    assertTrue(codes.contains("MSG-052"));
+    assertFalse(codes.contains("MSG-052"));
   }
 }

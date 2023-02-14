@@ -29,6 +29,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -168,7 +169,8 @@ public class MessageBundle
       if (packStream.read(signature) != PACK_MAGIC.length || !Arrays.equals(signature, PACK_MAGIC))
         throw new IOException("pack stream has wrong signature");
 
-      try(final DataInputStream dataStream = new DataInputStream(new GZIPInputStream(packStream))) {
+      try(final DataInputStream dataStream = new DataInputStream(
+          packStream.read() != 0 ? new GZIPInputStream(packStream) : packStream)) {
         for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
           add(unpack.loadMessageWithCode(dataStream));
       }
@@ -213,16 +215,43 @@ public class MessageBundle
   }
 
 
-  public void pack(@NotNull OutputStream packStream) throws IOException
-  {
-    // write signature
-    packStream.write(PACK_MAGIC);
+  /**
+   *
+   * @param packStream  pack output stream, not {@code null}
+   *
+   * @throws IOException  if an I/O error occurs
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull OutputStream packStream) throws IOException {
+    pack(packStream, true, null);
+  }
 
-    try(final DataOutputStream dataStream = new DataOutputStream(new GZIPOutputStream(packStream))) {
-      dataStream.writeShort(messages.size());
+
+  /**
+   *
+   * @param packStream  pack output stream, not {@code null}
+   * @param compress    {@code true} compress pack, {@code false} do not compress pack
+   * @param codeFilter  optional predicate for selecting message codes
+   *
+   * @throws IOException  if an I/O error occurs
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull OutputStream packStream, boolean compress, Predicate<String> codeFilter)
+      throws IOException
+  {
+    packStream.write(PACK_MAGIC);
+    packStream.write(compress ? 1 : 0);
+
+    try(final DataOutputStream dataStream = new DataOutputStream(
+        compress ? new GZIPOutputStream(packStream) : packStream)) {
+      dataStream.writeShort(codeFilter == null
+          ? messages.size() : (int)messages.keySet().stream().filter(codeFilter).count());
 
       for(final Message.WithCode message: messages.values())
-        Pack.pack(message, dataStream);
+        if (codeFilter == null || codeFilter.test(message.getCode()))
+          Pack.pack(message, dataStream);
     }
   }
 }
