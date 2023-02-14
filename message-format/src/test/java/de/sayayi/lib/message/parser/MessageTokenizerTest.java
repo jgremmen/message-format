@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.parser;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.junit.jupiter.api.Test;
@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MessageTokenizerTest
 {
   @Test
+  @SuppressWarnings("UnnecessaryUnicodeEscape")
   public void testDefaultMode()
   {
     Lexer lexer = createFor("hi  \\u0021%{");
@@ -65,8 +66,8 @@ public class MessageTokenizerTest
   }
 
 
-  @SuppressWarnings({ "SameParameterValue", "deprecation" })
+  @SuppressWarnings("SameParameterValue")
   private MessageLexer createFor(String msg) {
-    return new MessageLexer(new ANTLRInputStream(msg));
+    return new MessageLexer(CharStreams.fromString(msg));
   }
 }

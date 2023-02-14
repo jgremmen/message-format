@@ -23,6 +23,7 @@ import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -148,6 +149,7 @@ public class MessageDefAnnotationTest
 
 
   @Test
+  @DisplayName("Pack message bundle and unpack it to a new bundle")
   public void testPackUnpack() throws IOException
   {
     val packStream = new ByteArrayOutputStream();
