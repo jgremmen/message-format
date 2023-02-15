@@ -24,7 +24,6 @@ class PackOutputStreamTest
       packStream.writeEnum(CompareType.GT);
       packStream.writeUnsignedShort(11234);
       packStream.writeString(null);
-      packStream.writeInt(Integer.MIN_VALUE);
       packStream.writeString("Schön ist es hier ÄÖß§");
       packStream.writeEnum(CompareType.LTE);
       packStream.writeLong(Long.MIN_VALUE);
@@ -38,7 +37,6 @@ class PackOutputStreamTest
       assertEquals(CompareType.GT, packStream.readEnum(CompareType.class));
       assertEquals(11234, packStream.readUnsignedShort());
       assertNull(packStream.readString());
-      assertEquals(Integer.MIN_VALUE, packStream.readInt());
       assertEquals("Schön ist es hier ÄÖß§", packStream.readString());
       assertEquals(CompareType.LTE, packStream.readEnum(CompareType.class));
       assertEquals(Long.MIN_VALUE, packStream.readLong());

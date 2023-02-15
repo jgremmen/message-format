@@ -37,6 +37,7 @@ import java.util.function.Predicate;
 
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -235,13 +236,15 @@ public class MessageBundle
   public void pack(@NotNull OutputStream packStream, boolean compress, Predicate<String> messageCodeFilter)
       throws IOException
   {
-    try(final PackOutputStream dataStream = new PackOutputStream(packStream, compress)) {
-      dataStream.writeUnsignedShort(messageCodeFilter == null
-          ? messages.size() : (int)messages.keySet().stream().filter(messageCodeFilter).count());
+    if (messageCodeFilter == null)
+      messageCodeFilter = c -> true;
 
-      for(final Message.WithCode message: messages.values())
-        if (messageCodeFilter == null || messageCodeFilter.test(message.getCode()))
-          Pack.pack(message, dataStream);
+    try(final PackOutputStream dataStream = new PackOutputStream(packStream, compress)) {
+      final List<String> codes = messages.keySet().stream().filter(messageCodeFilter).sorted().collect(toList());
+
+      dataStream.writeUnsignedShort(codes.size());
+      for(final String code: codes)
+        Pack.pack(messages.get(code), dataStream);
     }
   }
 }

@@ -69,7 +69,6 @@ public final class PackOutputStream implements Closeable
     n |= n >> 1;
     n |= n >> 2;
     n |= n >> 4;
-    n |= n >> 8;
 
     writeSmall(value.ordinal(), bitCount(n));
   }
@@ -77,11 +76,6 @@ public final class PackOutputStream implements Closeable
 
   public void writeUnsignedShort(int value) throws IOException {
     write(value, 16);
-  }
-
-
-  public void writeInt(int value) throws IOException {
-    write(value, 32);
   }
 
 
@@ -168,7 +162,7 @@ public final class PackOutputStream implements Closeable
       b = 0;
       bit = 7;
     }
-    else  // bitsLeft < 0
+    else  // bitsRemaining < 0
     {
       stream.write(b | (byte)(value >>> -bitsRemaining) & ((1 << (bit + 1)) - 1));
       b = (byte)((value << (8 + bitsRemaining)) & 0xff);

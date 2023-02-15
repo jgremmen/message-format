@@ -63,7 +63,6 @@ public final class PackInputStream implements Closeable
     n |= n >> 1;
     n |= n >> 2;
     n |= n >> 4;
-    n |= n >> 8;
 
     return enums[(int)read(bitCount(n))];
   }
@@ -71,11 +70,6 @@ public final class PackInputStream implements Closeable
 
   public int readUnsignedShort() throws IOException {
     return (int)read(16);
-  }
-
-
-  public int readInt() throws IOException {
-    return (int)read(32);
   }
 
 
@@ -203,7 +197,7 @@ public final class PackInputStream implements Closeable
       bit = -1;
       return b & ((1 << bitWidth) - 1);
     }
-    else
+    else  // bitsRemaining < 0
     {
       int value = (b & ((1 << (bit + 1)) - 1)) << -bitsRemaining;
 
