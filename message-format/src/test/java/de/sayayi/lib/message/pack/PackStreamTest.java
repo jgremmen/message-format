@@ -16,6 +16,7 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.function.Function;
 
+import static java.lang.System.currentTimeMillis;
 import static java.util.stream.Collectors.toMap;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,6 +36,7 @@ class PackStreamTest
       packStream.writeEnum(CompareType.GT);
       packStream.writeUnsignedShort(11234);
       packStream.writeString(null);
+      packStream.writeSmallVar(13);
       packStream.writeString("Schön ist es hier ÄÖß§");
       packStream.writeEnum(CompareType.LTE);
       packStream.writeLong(Long.MIN_VALUE);
@@ -48,6 +50,7 @@ class PackStreamTest
       assertEquals(CompareType.GT, packStream.readEnum(CompareType.class));
       assertEquals(11234, packStream.readUnsignedShort());
       assertNull(packStream.readString());
+      assertEquals(13, packStream.readSmallVar());
       assertEquals("Schön ist es hier ÄÖß§", packStream.readString());
       assertEquals(CompareType.LTE, packStream.readEnum(CompareType.class));
       assertEquals(Long.MIN_VALUE, packStream.readLong());
@@ -56,7 +59,7 @@ class PackStreamTest
 
 
   @Test
-  @DisplayName("Pack/unpack small value with variable bit width")
+  @DisplayName("Pack/unpack small value 0..255 with variable bit width")
   void packSmallVar() throws IOException
   {
     val byteStream = new ByteArrayOutputStream();
@@ -76,7 +79,7 @@ class PackStreamTest
 
 
   @Test
-  @DisplayName("Pack/unpack small value with fix bit width")
+  @DisplayName("Pack/unpack small value 0..255 with fix bit widths")
   void packSmall() throws IOException
   {
     val byteStream = new ByteArrayOutputStream();
@@ -98,18 +101,18 @@ class PackStreamTest
 
 
   @Test
-  @DisplayName("Pack/unpack large value with fix bit width")
+  @DisplayName("Pack/unpack large values with fix bit widths")
   void packLarge() throws IOException
   {
-    val random = new Random(System.currentTimeMillis());
+    val random = new Random(currentTimeMillis());
     final Map<Integer,long[]> valueMap = Arrays
         .stream(new int[] { 9, 16, 17, 29, 32, 43, 48, 57, 64 })
         .boxed()
         .collect(toMap(Function.identity(), bitWidth -> {
-          val values = new long[100];
+          val values = new long[1000];
           long mask = bitWidth == 64 ? -1L : ((1L << bitWidth) - 1);
 
-          for(int n = 0; n < 100; n++)
+          for(int n = 0; n < values.length; n++)
             values[n] = random.nextLong() & mask;
 
           return values;
@@ -117,7 +120,7 @@ class PackStreamTest
 
     val byteStream = new ByteArrayOutputStream();
 
-    try(val packStream = new PackOutputStream(byteStream, false)) {
+    try(val packStream = new PackOutputStream(byteStream, true)) {
       valueMap.forEach((Integer bitWidth, long[] values) -> {
         try {
           for(long value: values)
