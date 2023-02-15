@@ -29,6 +29,7 @@ import java.util.Locale;
 
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -80,6 +81,6 @@ public final class MapKeyName implements MapKey
    * @since 0.8.0
    */
   public static @NotNull MapKeyName unpack(@NotNull PackInputStream packStream) throws IOException {
-    return new MapKeyName(packStream.readString());
+    return new MapKeyName(requireNonNull(packStream.readString()));
   }
 }

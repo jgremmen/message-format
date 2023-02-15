@@ -83,14 +83,4 @@ public final class EmptyMessage implements Message.WithSpaces
   public int hashCode() {
     return EmptyMessage.class.hashCode();
   }
-
-
-  /**
-   * @return  unpacked empty message, never {@code null}
-   *
-   * @since 0.8.0
-   */
-  public static @NotNull Message.WithSpaces unpack() {
-    return INSTANCE;
-  }
 }

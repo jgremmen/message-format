@@ -113,8 +113,7 @@ public final class PackHelper
     switch(packStream.readSmall(3))
     {
       case MESSAGE_EMPTY:
-        message = EmptyMessage.unpack();
-        break;
+        return EmptyMessage.INSTANCE;
 
       case MESSAGE_PARAMETERIZED:
         message = ParameterizedMessage.unpack(this, packStream);
@@ -158,8 +157,7 @@ public final class PackHelper
     switch(packStream.readSmall(3))
     {
       case MESSAGE_EMPTY:
-        message = EmptyMessage.unpack();
-        break;
+        return EmptyMessage.INSTANCE;
 
       case MESSAGE_EMPTY_WITH_CODE:
         return EmptyMessageWithCode.unpack(packStream);
