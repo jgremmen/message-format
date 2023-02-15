@@ -97,7 +97,7 @@ public final class EmptyMessage implements Message.WithSpaces
    * @since 0.8.0
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.write(PACK_ID, 3);
+    packStream.writeSmall(PACK_ID, 3);
   }
 
 

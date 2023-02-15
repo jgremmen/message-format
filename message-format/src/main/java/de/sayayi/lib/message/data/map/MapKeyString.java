@@ -109,7 +109,7 @@ public final class MapKeyString implements MapKey
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.write(PACK_ID, 3);
+    packStream.writeSmall(PACK_ID, 3);
     packStream.writeEnum(compareType);
     packStream.writeString(string);
   }

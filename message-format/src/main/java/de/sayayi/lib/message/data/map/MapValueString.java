@@ -67,7 +67,7 @@ public final class MapValueString extends DataString implements MapValue
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.write(PACK_ID, 2);
+    packStream.writeSmall(PACK_ID, 2);
     packStream.writeString(asObject());
   }
 

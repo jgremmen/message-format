@@ -35,6 +35,8 @@ import java.util.Map.Entry;
 
 import static java.util.Collections.*;
 import static java.util.Locale.ROOT;
+import static java.util.Locale.forLanguageTag;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -165,7 +167,7 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.write(PACK_ID, 3);
+    packStream.writeSmall(PACK_ID, 3);
     packStream.writeString(getCode());
     packStream.write(localizedMessages.size(), 6);
 
@@ -190,11 +192,11 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
   public static @NotNull Message.WithCode unpack(@NotNull Unpack unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
-    final String code = packStream.readString();
+    final String code = requireNonNull(packStream.readString());
     final Map<Locale,Message> messages = new HashMap<>();
 
-    for(int n = 0, l = (int)packStream.read(6); n < l; n++)
-      messages.put(Locale.forLanguageTag(packStream.readString()), unpack.loadMessage(packStream));
+    for(int n = 0, l = packStream.readSmall(6); n < l; n++)
+      messages.put(forLanguageTag(requireNonNull(packStream.readString())), unpack.loadMessage(packStream));
 
     return new LocalizedMessageBundleWithCode(code, messages);
   }

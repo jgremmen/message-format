@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 import static de.sayayi.lib.message.internal.SpacesUtil.trimSpaces;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -100,7 +101,7 @@ public final class NoSpaceTextPart implements Text
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.write(PACK_ID, 2);
+    packStream.writeSmall(PACK_ID, 2);
     packStream.writeString(text);
   }
 
@@ -116,7 +117,7 @@ public final class NoSpaceTextPart implements Text
    */
   public static @NotNull Text unpack(@NotNull PackInputStream packStream) throws IOException
   {
-    final String text = packStream.readString();
+    final String text = requireNonNull(packStream.readString());
     return text.isEmpty() ? Text.EMPTY : new NoSpaceTextPart(text);
   }
 }

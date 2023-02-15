@@ -55,7 +55,7 @@ public final class MapValueNumber extends DataNumber implements MapValue
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.write(PACK_ID, 2);
+    packStream.writeSmall(PACK_ID, 2);
     packStream.writeLong(asObject());
   }
 

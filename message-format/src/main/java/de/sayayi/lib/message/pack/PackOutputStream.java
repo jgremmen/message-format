@@ -16,12 +16,14 @@
 package de.sayayi.lib.message.pack;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.GZIPOutputStream;
 
+import static java.lang.Integer.bitCount;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
 
@@ -35,7 +37,7 @@ public final class PackOutputStream implements Closeable
 
   private final @NotNull OutputStream stream;
   private int bit = 7;
-  private byte b = 0;
+  private byte b;
 
 
   public PackOutputStream(@NotNull OutputStream stream, boolean compress) throws IOException
@@ -69,16 +71,11 @@ public final class PackOutputStream implements Closeable
     n |= n >> 4;
     n |= n >> 8;
 
-    write(value.ordinal(), Integer.bitCount(n));
+    writeSmall(value.ordinal(), bitCount(n));
   }
 
 
-  public void writeByte(byte value) throws IOException {
-    write(value, 8);
-  }
-
-
-  public void writeShort(short value) throws IOException {
+  public void writeUnsignedShort(int value) throws IOException {
     write(value, 16);
   }
 
@@ -97,7 +94,7 @@ public final class PackOutputStream implements Closeable
   {
     if (str == null)
     {
-      write(0, 2);
+      writeSmall(0, 2);
       return;
     }
 
@@ -117,12 +114,12 @@ public final class PackOutputStream implements Closeable
     }
 
     if (utflen < 16)
-      write(0x10 + utflen, 6);
+      writeSmall(0x10 + utflen, 6);
     else if (utflen < 256)
       write(0x200 + utflen, 10);
     else
     {
-      write(3, 2);
+      writeSmall(3, 2);
       write(utflen, 16);
     }
 
@@ -156,12 +153,35 @@ public final class PackOutputStream implements Closeable
   }
 
 
+  public void writeSmall(int value, @Range(from = 1, to = 8) int bitWidth) throws IOException
+  {
+    final int bitsRemaining = bit + 1 - bitWidth;
+
+    if (bitsRemaining > 0)
+    {
+      b |= (value & ((1 << bitWidth) - 1)) << bitsRemaining;
+      bit -= bitWidth;
+    }
+    else if (bitsRemaining == 0)
+    {
+      stream.write(b | (value & ((1 << bitWidth) - 1)));
+      b = 0;
+      bit = 7;
+    }
+    else  // bitsLeft < 0
+    {
+      stream.write(b | (byte)(value >>> -bitsRemaining) & ((1 << (bit + 1)) - 1));
+      b = (byte)((value << (8 + bitsRemaining)) & 0xff);
+      bit = 7 + bitsRemaining;
+    }
+  }
+
+
   public void write(long value, int bitWidth) throws IOException
   {
     if (bitWidth > 0 && bit < 7)
     {
       int bitsLeft = bit + 1 - bitWidth;
-
       if (bitsLeft == 0)
       {
         b |= value & ((1L << bitWidth) - 1);
@@ -199,7 +219,7 @@ public final class PackOutputStream implements Closeable
   }
 
 
-  protected void forceByteAlignment() throws IOException
+  private void forceByteAlignment() throws IOException
   {
     if (bit != 7)
     {

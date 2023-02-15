@@ -69,7 +69,7 @@ public final class MapKeyName implements MapKey
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.write(PACK_ID, 3);
+    packStream.writeSmall(PACK_ID, 3);
     packStream.writeString(name);
   }
 

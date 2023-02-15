@@ -19,11 +19,10 @@ class PackOutputStreamTest
     val byteStream = new ByteArrayOutputStream();
 
     try(val packStream = new PackOutputStream(byteStream, false)) {
-      packStream.write(5, 3);
+      packStream.writeSmall(5, 3);
       packStream.writeBoolean(true);
       packStream.writeEnum(CompareType.GT);
-      packStream.writeByte((byte)9);
-      packStream.writeShort((short)11234);
+      packStream.writeUnsignedShort(11234);
       packStream.writeString(null);
       packStream.writeInt(Integer.MIN_VALUE);
       packStream.writeString("Schön ist es hier ÄÖß§");
@@ -34,11 +33,10 @@ class PackOutputStreamTest
     val packed = byteStream.toByteArray();
 
     try(val packStream = new PackInputStream(new ByteArrayInputStream(packed))) {
-      assertEquals(5, packStream.read(3));
+      assertEquals(5, packStream.readSmall(3));
       assertTrue(packStream.readBoolean());
       assertEquals(CompareType.GT, packStream.readEnum(CompareType.class));
-      assertEquals((byte)9, packStream.readByte());
-      assertEquals((short)11234, packStream.readShort());
+      assertEquals(11234, packStream.readUnsignedShort());
       assertNull(packStream.readString());
       assertEquals(Integer.MIN_VALUE, packStream.readInt());
       assertEquals("Schön ist es hier ÄÖß§", packStream.readString());

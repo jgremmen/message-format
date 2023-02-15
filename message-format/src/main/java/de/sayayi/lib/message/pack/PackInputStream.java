@@ -16,12 +16,14 @@
 package de.sayayi.lib.message.pack;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.io.*;
 import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 
 import static de.sayayi.lib.message.pack.PackOutputStream.PACK_MAGIC;
+import static java.lang.Integer.bitCount;
 
 
 /**
@@ -32,7 +34,7 @@ public final class PackInputStream implements Closeable
 {
   private final @NotNull InputStream stream;
   private int bit = -1;
-  private byte b = 0;
+  private byte b;
 
 
   public PackInputStream(@NotNull InputStream stream) throws IOException
@@ -63,17 +65,12 @@ public final class PackInputStream implements Closeable
     n |= n >> 4;
     n |= n >> 8;
 
-    return enums[(int)read(Integer.bitCount(n))];
+    return enums[(int)read(bitCount(n))];
   }
 
 
-  public byte readByte() throws IOException {
-    return (byte)read(8);
-  }
-
-
-  public short readShort() throws IOException {
-    return (short)read(16);
+  public int readUnsignedShort() throws IOException {
+    return (int)read(16);
   }
 
 
@@ -91,18 +88,18 @@ public final class PackInputStream implements Closeable
   {
     int utflen = 0;
 
-    switch((int)read(2))
+    switch(readSmall(2))
     {
       case 0:
         return null;
 
       case 1:
-        if ((utflen = (int)read(4)) == 0)
+        if ((utflen = readSmall(4)) == 0)
           return "";
         break;
 
       case 2:
-        utflen = (int)read(8);
+        utflen = readSmall(8);
         break;
 
       case 3:
@@ -176,7 +173,7 @@ public final class PackInputStream implements Closeable
   }
 
 
-  protected void assertData() throws IOException
+  private void assertData() throws IOException
   {
     if (bit < 0)
     {
@@ -186,6 +183,36 @@ public final class PackInputStream implements Closeable
         throw new EOFException();
 
       b = (byte)c;
+    }
+  }
+
+
+  public int readSmall(@Range(from = 1, to = 8) int bitWidth) throws IOException
+  {
+    assertData();
+
+    final int bitsRemaining = bit + 1 - bitWidth;
+
+    if (bitsRemaining > 0)
+    {
+      bit = bitsRemaining - 1;
+      return (b >> bitsRemaining) & ((1 << bitWidth) - 1);
+    }
+    else if (bitsRemaining == 0)
+    {
+      bit = -1;
+      return b & ((1 << bitWidth) - 1);
+    }
+    else
+    {
+      int value = (b & ((1 << (bit + 1)) - 1)) << -bitsRemaining;
+
+      bit = -1;
+      assertData();
+
+      value |= (b >> (8 + bitsRemaining)) & ((1 << -bitsRemaining) - 1);
+      bit = 7 + bitsRemaining;
+      return value;
     }
   }
 
@@ -242,7 +269,7 @@ public final class PackInputStream implements Closeable
   }
 
 
-  protected void forceByteAlignment()
+  private void forceByteAlignment()
   {
     if (bit >= 0)
       bit = -1;

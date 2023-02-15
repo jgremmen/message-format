@@ -165,7 +165,7 @@ public class MessageBundle
     for(final InputStream packStream: packStreams)
     {
       try(final PackInputStream dataStream = new PackInputStream(packStream)) {
-        for(int n = 0, size = dataStream.readShort(); n < size; n++)
+        for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
           add(unpack.loadMessageWithCode(dataStream));
       }
     }
@@ -236,8 +236,8 @@ public class MessageBundle
       throws IOException
   {
     try(final PackOutputStream dataStream = new PackOutputStream(packStream, compress)) {
-      dataStream.writeShort(messageCodeFilter == null
-          ? (short)messages.size() : (short)messages.keySet().stream().filter(messageCodeFilter).count());
+      dataStream.writeUnsignedShort(messageCodeFilter == null
+          ? messages.size() : (int)messages.keySet().stream().filter(messageCodeFilter).count());
 
       for(final Message.WithCode message: messages.values())
         if (messageCodeFilter == null || messageCodeFilter.test(message.getCode()))

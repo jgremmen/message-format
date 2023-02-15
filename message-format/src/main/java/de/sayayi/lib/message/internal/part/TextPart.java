@@ -133,7 +133,7 @@ public final class TextPart implements Text
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.write(PACK_ID, 2);
+    packStream.writeSmall(PACK_ID, 2);
     packStream.writeBoolean(spaceBefore);
     packStream.writeBoolean(spaceAfter);
     packStream.writeString(text);

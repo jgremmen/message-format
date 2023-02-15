@@ -100,7 +100,7 @@ public enum MapKeyBool implements MapKey
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.write(PACK_ID, 3);
+    packStream.writeSmall(PACK_ID, 3);
     packStream.writeBoolean(bool);
   }
 

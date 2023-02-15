@@ -30,6 +30,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.SortedSet;
 
+import static java.util.Objects.requireNonNull;
+
 
 /**
  * @author Jeroen Gremmen
@@ -81,7 +83,7 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.write(PACK_ID, 3);
+    packStream.writeSmall(PACK_ID, 3);
     packStream.writeString(getCode());
     Pack.pack(message, packStream);
   }
@@ -99,6 +101,6 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
    */
   public static @NotNull Message.WithCode unpack(@NotNull Unpack unpack, @NotNull PackInputStream packStream)
       throws IOException {
-    return new MessageDelegateWithCode(packStream.readString(), unpack.loadMessage(packStream));
+    return new MessageDelegateWithCode(requireNonNull(packStream.readString()), unpack.loadMessage(packStream));
   }
 }

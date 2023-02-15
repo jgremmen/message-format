@@ -49,7 +49,7 @@ public final class Unpack
   {
     final MapKey mapKey;
 
-    switch((int)packStream.read(3))
+    switch(packStream.readSmall(3))
     {
       case MapKeyBool.PACK_ID:
         mapKey = MapKeyBool.unpack(packStream);
@@ -87,7 +87,7 @@ public final class Unpack
   {
     final MapValue mapValue;
 
-    switch((int)packStream.read(2))
+    switch(packStream.readSmall(2))
     {
       case MapValueBool.PACK_ID:
         mapValue = MapValueBool.unpack(packStream);
@@ -117,7 +117,7 @@ public final class Unpack
   {
     final MessagePart messagePart;
 
-    switch((int)packStream.read(2))
+    switch(packStream.readSmall(2))
     {
       case NoSpaceTextPart.PACK_ID:
         messagePart = NoSpaceTextPart.unpack(packStream);
@@ -143,7 +143,7 @@ public final class Unpack
   {
     final Message.WithSpaces message;
 
-    switch((int)packStream.read(3))
+    switch(packStream.readSmall(3))
     {
       case EmptyMessage.PACK_ID:
         message = EmptyMessage.unpack();
@@ -167,7 +167,7 @@ public final class Unpack
 
   public @NotNull Message.WithCode loadMessageWithCode(@NotNull PackInputStream packStream) throws IOException
   {
-    switch((int)packStream.read(3))
+    switch(packStream.readSmall(3))
     {
       case EmptyMessageWithCode.PACK_ID:
         return EmptyMessageWithCode.unpack(packStream);
@@ -187,7 +187,7 @@ public final class Unpack
   {
     final Message.WithSpaces message;
 
-    switch((int)packStream.read(3))
+    switch(packStream.readSmall(3))
     {
       case EmptyMessage.PACK_ID:
         message = EmptyMessage.unpack();

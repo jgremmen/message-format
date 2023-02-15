@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.SortedSet;
 
 import static java.util.Collections.emptySortedSet;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -75,7 +76,7 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.write(PACK_ID, 3);
+    packStream.writeSmall(PACK_ID, 3);
     packStream.writeString(getCode());
   }
 
@@ -90,6 +91,6 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
    * @since 0.8.0
    */
   public static @NotNull Message.WithCode unpack(@NotNull PackInputStream packStream) throws IOException {
-    return new EmptyMessageWithCode(packStream.readString());
+    return new EmptyMessageWithCode(requireNonNull(packStream.readString()));
   }
 }
