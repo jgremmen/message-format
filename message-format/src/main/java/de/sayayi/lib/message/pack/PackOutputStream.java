@@ -75,12 +75,12 @@ public final class PackOutputStream implements Closeable
 
 
   public void writeUnsignedShort(int value) throws IOException {
-    write(value, 16);
+    writeLarge(value, 16);
   }
 
 
   public void writeLong(long value) throws IOException {
-    write(value, 64);
+    writeLarge(value, 64);
   }
 
 
@@ -110,11 +110,11 @@ public final class PackOutputStream implements Closeable
     if (utflen < 16)
       writeSmall(0x10 + utflen, 6);
     else if (utflen < 256)
-      write(0x200 + utflen, 10);
+      writeLarge(0x200 + utflen, 10);
     else
     {
       writeSmall(3, 2);
-      write(utflen, 16);
+      writeLarge(utflen, 16);
     }
 
     if (utflen > 0)
@@ -149,6 +149,9 @@ public final class PackOutputStream implements Closeable
 
   public void writeSmall(int value, @Range(from = 1, to = 8) int bitWidth) throws IOException
   {
+    if (value >= (1 << bitWidth))
+      throw new IllegalArgumentException("value " + value + " occupies more than " + bitWidth + " bits");
+
     final int bitsRemaining = bit + 1 - bitWidth;
 
     if (bitsRemaining > 0)
@@ -171,28 +174,11 @@ public final class PackOutputStream implements Closeable
   }
 
 
-  public void write(long value, int bitWidth) throws IOException
+  public void writeLarge(long value, @Range(from = 9, to = 64) int bitWidth) throws IOException
   {
-    if (bitWidth > 0 && bit < 7)
+    if (bit < 7)
     {
-      int bitsLeft = bit + 1 - bitWidth;
-      if (bitsLeft == 0)
-      {
-        b |= value & ((1L << bitWidth) - 1);
-        stream.write(b);
-        bit = 7;
-        b = 0;
-
-        return;
-      }
-
-      if (bitsLeft > 0)
-      {
-        b |= (value & ((1L << bitWidth) - 1)) << bitsLeft;
-        bit -= bitWidth;
-
-        return;
-      }
+      final int bitsLeft = bit + 1 - bitWidth;
 
       b |= (byte)(value >>> -bitsLeft) & ((1 << (bit + 1)) - 1);
       stream.write(b);

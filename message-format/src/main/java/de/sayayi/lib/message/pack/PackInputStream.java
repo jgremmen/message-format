@@ -64,17 +64,17 @@ public final class PackInputStream implements Closeable
     n |= n >> 2;
     n |= n >> 4;
 
-    return enums[(int)read(bitCount(n))];
+    return enums[readSmall(bitCount(n))];
   }
 
 
   public int readUnsignedShort() throws IOException {
-    return (int)read(16);
+    return (int)readLarge(16);
   }
 
 
   public long readLong() throws IOException {
-    return read(64);
+    return readLarge(64);
   }
 
 
@@ -97,7 +97,7 @@ public final class PackInputStream implements Closeable
         break;
 
       case 3:
-        utflen = (int)read(16);
+        utflen = (int)readLarge(16);
         break;
     }
 
@@ -211,37 +211,13 @@ public final class PackInputStream implements Closeable
   }
 
 
-  public long read(int bitWidth) throws IOException
+  public long readLarge(@Range(from = 9, to = 64) int bitWidth) throws IOException
   {
-    if (bitWidth == 0)
-      return 0;
-
     assertData();
 
-    long value = 0;
+    long value = b & ((1L << (bit + 1)) - 1);
 
-    int bitsLeft = bit + 1 - bitWidth;
-    if (bitsLeft == 0)
-    {
-      value = b & ((1L << bitWidth) - 1);
-      bit = -1;
-
-      return value;
-    }
-
-    if (bitsLeft > 0)
-    {
-      value = (b >> bitsLeft) & ((1L << bitWidth) - 1);
-      bit = bitsLeft - 1;
-
-      return value;
-    }
-
-    bitWidth -= bit + 1;
-    value = b & ((1L << (bit + 1)) - 1);
-    bit = -1;
-
-    for(; bitWidth >= 8; bitWidth -= 8)
+    for(bitWidth -= bit + 1; bitWidth >= 8; bitWidth -= 8)
     {
       int c = stream.read();
       if (c < 0)
@@ -249,6 +225,8 @@ public final class PackInputStream implements Closeable
 
       value = (value << 8) | c;
     }
+
+    bit = -1;
 
     if (bitWidth > 0)
     {

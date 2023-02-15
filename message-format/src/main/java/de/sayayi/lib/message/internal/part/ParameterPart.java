@@ -152,15 +152,14 @@ public final class ParameterPart implements Parameter
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
+    final Map<MapKey,MapValue> map = this.map.asObject();
+
     packStream.writeSmall(PACK_ID, 2);
     packStream.writeBoolean(spaceBefore);
     packStream.writeBoolean(spaceAfter);
+    packStream.writeSmall(map.size(), 6);
     packStream.writeString(format);
     packStream.writeString(parameter);
-
-    final Map<MapKey,MapValue> map = this.map.asObject();
-
-    packStream.writeSmall(map.size(), 6);
 
     for(Entry<MapKey,MapValue> mapEntry: map.entrySet())
     {
@@ -185,9 +184,9 @@ public final class ParameterPart implements Parameter
   {
     final boolean spaceBefore = packStream.readBoolean();
     final boolean spaceAfter = packStream.readBoolean();
+    final int size = packStream.readSmall(6);
     final String format = packStream.readString();
     final String parameter = requireNonNull(packStream.readString());
-    final int size = packStream.readSmall(6);
     final Map<MapKey,MapValue> map = new HashMap<>();
 
     for(int n = 0; n < size; n++)
