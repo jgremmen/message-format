@@ -16,7 +16,9 @@
 package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.exception.MessageException;
+import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
+import de.sayayi.lib.message.internal.MessageDelegateWithCode;
 import de.sayayi.lib.message.pack.Pack;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
@@ -61,21 +63,27 @@ public class MessageBundle
   }
 
 
-  public MessageBundle(@NotNull MessageFactory messageFactory, @NotNull Class<?> classWithMessages)
-  {
-    this(messageFactory);
-
-    add(classWithMessages);
-  }
-
-
   MessageBundle(@NotNull MessageFactory messageFactory,
                 @NotNull Map<String,Map<Locale,Message>> localizedMessagesByCode)
   {
     this(messageFactory);
 
-    localizedMessagesByCode.forEach(
-        (code,localizedMessages) -> add(new LocalizedMessageBundleWithCode(code, localizedMessages)));
+    localizedMessagesByCode.forEach((code,localizedMessages) -> {
+      switch(localizedMessages.size())
+      {
+        case 0:
+          add(new EmptyMessageWithCode(code));
+          break;
+
+        case 1:
+          add(new MessageDelegateWithCode(code, localizedMessages.values().iterator().next()));
+          break;
+
+        default:
+          add(new LocalizedMessageBundleWithCode(code, localizedMessages));
+          break;
+      }
+    });
   }
 
 
@@ -83,6 +91,8 @@ public class MessageBundle
    * Returns all codes contained in this message bundle.
    *
    * @return  set with all message codes, never {@code null}
+   *
+   * @see #getByCode(String)
    */
   @Contract(value = "-> new", pure = true)
   @Unmodifiable
@@ -91,12 +101,29 @@ public class MessageBundle
   }
 
 
+  /**
+   * Returns a message identified by the given {@code code}.
+   *
+   * @param code  message code to get, not {@code null}
+   *
+   * @return  message for the given {@code code} or {@code null} if this bundle contains no such message
+   *
+   * @see #hasMessageWithCode(String)
+   */
   @Contract(pure = true)
   public Message.WithCode getByCode(@NotNull String code) {
     return messages.get(code);
   }
 
 
+  /**
+   * Tells if this bundle contains a message with {@code code}.
+   *
+   * @param code  message code to check, or {@code null}
+   *
+   * @return  {@code true} if {@code code} is not {@code null} and the bundle contains a message with this code,
+   *          {@code false} otherwise
+   */
   @Contract(value = "null -> false", pure = true)
   public boolean hasMessageWithCode(String code) {
     return code != null && messages.containsKey(code);
@@ -173,6 +200,25 @@ public class MessageBundle
   }
 
 
+  /**
+   * Add all messages (optionally filtering them using a {@code messageCodeFilter} from {@code messageBundle}
+   * to this bundle.
+   *
+   * @param messageBundle      message bundle from which messages are added, not {@code null}
+   * @param messageCodeFilter  optional predicate for selecting message codes. If {@code null} all messages from
+   *                           the given {@code messageBundle} will be selected
+   *
+   * @since 0.8.0
+   */
+  public void add(@NotNull MessageBundle messageBundle, Predicate<String> messageCodeFilter)
+  {
+    messageBundle.messages.values()
+        .stream()
+        .filter(m -> messageCodeFilter == null || messageCodeFilter.test(m.getCode()))
+        .forEach(this::add);
+  }
+
+
   @Contract(mutates = "this")
   @SuppressWarnings("WeakerAccess")
   public void add(@NotNull Message.WithCode message)
@@ -211,35 +257,52 @@ public class MessageBundle
 
 
   /**
+   * <p>
+   *   Pack all messages from this bundle into a compact binary representation. This way message bundles can
+   *   be prepared once and loaded very quickly by adding the packed messages to another message bundle at runtime.
+   * </p>
    *
-   * @param packStream  pack output stream, not {@code null}
+   * @param stream  pack output stream, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
+   *
+   * @see #add(InputStream...)
+   * @see #add(Enumeration)
    */
-  public void pack(@NotNull OutputStream packStream) throws IOException {
-    pack(packStream, true, null);
+  public void pack(@NotNull OutputStream stream) throws IOException {
+    pack(stream, true, null);
   }
 
 
   /**
+   * <p>
+   *   Pack all messages (optionally filtering them using a {@code messageCodeFilter} from this bundle into a
+   *   compact binary representation. This way message bundles can be prepared once and loaded very quickly
+   *   by adding the packed messages to another message bundle at runtime.
+   * </p>
+   * <p>
+   *   Parameter {@code compress} switches GZip on/off, reducing the packed size even more. For smaller bundles
+   *   the compression may not be substantial as the binary representation does some extensive bit-packing already.
+   * </p>
    *
-   * @param packStream         pack output stream, not {@code null}
+   * @param stream             pack output stream, not {@code null}
    * @param compress           {@code true} compress pack, {@code false} do not compress pack
-   * @param messageCodeFilter  optional predicate for selecting message codes
+   * @param messageCodeFilter  optional predicate for selecting message codes. If {@code null} all messages from
+   *                           this bundle will be selected
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
-  public void pack(@NotNull OutputStream packStream, boolean compress, Predicate<String> messageCodeFilter)
+  public void pack(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
       throws IOException
   {
     if (messageCodeFilter == null)
       messageCodeFilter = c -> true;
 
-    try(final PackOutputStream dataStream = new PackOutputStream(packStream, compress)) {
+    try(final PackOutputStream dataStream = new PackOutputStream(stream, compress)) {
       final List<String> codes = messages.keySet().stream().filter(messageCodeFilter).sorted().collect(toList());
 
       dataStream.writeUnsignedShort(codes.size());
