@@ -104,18 +104,18 @@ class PackStreamTest
         .of(9, 16, 17, 29, 32, 43, 48, 57, 64)
         .collect(toMap(bitWidth -> bitWidth, bitWidth -> {
           val values = new long[100];
-          val mask = bitWidth == 64 ? -1L : ((1L << bitWidth) - 1);
+          long mask = bitWidth == 64 ? -1L : ((1L << bitWidth) - 1);
 
           for(int n = 0; n < 100; n++)
             values[n] = random.nextLong() & mask;
 
           return values;
-        }, (l1,l2) -> l1, TreeMap::new));
+        }, (l1,l2) -> l1, TreeMap<Integer,long[]>::new));
 
     val byteStream = new ByteArrayOutputStream();
 
     try(val packStream = new PackOutputStream(byteStream, false)) {
-      valueMap.forEach((bitWidth, values) -> {
+      valueMap.forEach((Integer bitWidth, long[] values) -> {
         try {
           for(long value: values)
             packStream.writeLarge(value, bitWidth);
@@ -128,7 +128,7 @@ class PackStreamTest
     val packed = byteStream.toByteArray();
 
     try(val packStream = new PackInputStream(new ByteArrayInputStream(packed))) {
-      valueMap.forEach((bitWidth, values) -> {
+      valueMap.forEach((Integer bitWidth, long[] values) -> {
         try {
           for(long value: values)
             assertEquals(value, packStream.readLarge(bitWidth));
