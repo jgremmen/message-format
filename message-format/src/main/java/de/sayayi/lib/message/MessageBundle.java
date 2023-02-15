@@ -19,10 +19,9 @@ import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.internal.MessageDelegateWithCode;
-import de.sayayi.lib.message.pack.Pack;
+import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import de.sayayi.lib.message.pack.Unpack;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -188,13 +187,13 @@ public class MessageBundle
   @Contract(mutates = "this")
   public void add(@NotNull InputStream... packStreams) throws IOException
   {
-    final Unpack unpack = new Unpack();
+    final PackHelper packHelper = new PackHelper();
 
     for(final InputStream packStream: packStreams)
     {
       try(final PackInputStream dataStream = new PackInputStream(packStream)) {
         for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
-          add(unpack.loadMessageWithCode(dataStream));
+          add(packHelper.unpackMessageWithCode(dataStream));
       }
     }
   }
@@ -307,7 +306,7 @@ public class MessageBundle
 
       dataStream.writeUnsignedShort(codes.size());
       for(final String code: codes)
-        Pack.pack(messages.get(code), dataStream);
+        PackHelper.pack(messages.get(code), dataStream);
     }
   }
 }

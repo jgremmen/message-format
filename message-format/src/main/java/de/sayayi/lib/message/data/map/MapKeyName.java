@@ -39,8 +39,6 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
 @AllArgsConstructor
 public final class MapKeyName implements MapKey
 {
-  public static final byte PACK_ID = 3;
-
   private static final long serialVersionUID = 800L;
 
   @Getter private final @NotNull String name;
@@ -67,9 +65,7 @@ public final class MapKeyName implements MapKey
    *
    * @since 0.8.0
    */
-  public void pack(@NotNull PackOutputStream packStream) throws IOException
-  {
-    packStream.writeSmall(PACK_ID, 3);
+  public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeString(name);
   }
 

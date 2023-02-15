@@ -37,8 +37,6 @@ import static java.util.Objects.requireNonNull;
 @ToString
 public final class EmptyMessageWithCode extends AbstractMessageWithCode
 {
-  public static final int PACK_ID = 2;
-
   private static final long serialVersionUID = 800L;
 
 
@@ -74,9 +72,7 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
    *
    * @since 0.8.0
    */
-  public void pack(@NotNull PackOutputStream packStream) throws IOException
-  {
-    packStream.writeSmall(PACK_ID, 3);
+  public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeString(getCode());
   }
 

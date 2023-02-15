@@ -21,10 +21,9 @@ import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.ParameterPart;
-import de.sayayi.lib.message.pack.Pack;
+import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import de.sayayi.lib.message.pack.Unpack;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
@@ -44,8 +43,6 @@ import java.util.TreeSet;
 @EqualsAndHashCode(doNotUseGetters = true)
 public class ParameterizedMessage implements Message.WithSpaces
 {
-  public static final int PACK_ID = 5;
-
   private static final long serialVersionUID = 800L;
 
   private final MessagePart[] parts;
@@ -133,11 +130,10 @@ public class ParameterizedMessage implements Message.WithSpaces
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.writeSmall(PACK_ID, 3);
     packStream.writeSmall(parts.length, 6);  // 63 should be enough
 
     for(final MessagePart part: parts)
-      Pack.pack(part, packStream);
+      PackHelper.pack(part, packStream);
   }
 
 
@@ -151,13 +147,14 @@ public class ParameterizedMessage implements Message.WithSpaces
    *
    * @since 0.8.0
    */
-  public static @NotNull Message.WithSpaces unpack(@NotNull Unpack unpack, @NotNull PackInputStream packStream)
+  public static @NotNull Message.WithSpaces unpack(@NotNull PackHelper unpack,
+                                                   @NotNull PackInputStream packStream)
       throws IOException
   {
     final List<MessagePart> parts = new ArrayList<>();
 
     for(int n = 0, l = packStream.readSmall(6); n < l; n++)
-      parts.add(unpack.loadMessagePart(packStream));
+      parts.add(unpack.unpackMessagePart(packStream));
 
     return new ParameterizedMessage(parts);
   }

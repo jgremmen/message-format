@@ -37,8 +37,6 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
 @EqualsAndHashCode(doNotUseGetters = true)
 public final class MapKeyNull implements MapKey
 {
-  public static final byte PACK_ID = 4;
-
   private static final long serialVersionUID = 800L;
 
   private final @NotNull CompareType compareType;
@@ -78,9 +76,7 @@ public final class MapKeyNull implements MapKey
    *
    * @since 0.8.0
    */
-  public void pack(@NotNull PackOutputStream packStream) throws IOException
-  {
-    packStream.writeSmall(PACK_ID, 3);
+  public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeEnum(compareType);
   }
 

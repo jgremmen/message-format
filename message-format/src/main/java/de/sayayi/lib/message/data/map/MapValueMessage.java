@@ -16,10 +16,9 @@
 package de.sayayi.lib.message.data.map;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.pack.Pack;
+import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import de.sayayi.lib.message.pack.Unpack;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,8 +31,6 @@ import java.io.IOException;
 @AllArgsConstructor
 public final class MapValueMessage implements MapValue
 {
-  public static final byte PACK_ID = 1;
-
   private static final long serialVersionUID = 800L;
 
   private final @NotNull Message.WithSpaces message;
@@ -58,10 +55,8 @@ public final class MapValueMessage implements MapValue
    *
    * @since 0.8.0
    */
-  public void pack(@NotNull PackOutputStream packStream) throws IOException
-  {
-    packStream.writeSmall(PACK_ID, 2);
-    Pack.pack(message, packStream);
+  public void pack(@NotNull PackOutputStream packStream) throws IOException {
+    PackHelper.pack(message, packStream);
   }
 
 
@@ -75,8 +70,9 @@ public final class MapValueMessage implements MapValue
    *
    * @since 0.8.0
    */
-  public static @NotNull MapValueMessage unpack(@NotNull Unpack unpack, @NotNull PackInputStream packStream)
+  public static @NotNull MapValueMessage unpack(@NotNull PackHelper unpack,
+                                                @NotNull PackInputStream packStream)
       throws IOException {
-    return new MapValueMessage(unpack.loadMessageWithSpaces(packStream));
+    return new MapValueMessage(unpack.unpackMessageWithSpaces(packStream));
   }
 }

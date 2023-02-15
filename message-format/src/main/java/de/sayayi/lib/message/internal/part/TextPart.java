@@ -38,8 +38,6 @@ import static de.sayayi.lib.message.internal.SpacesUtil.trimSpaces;
 @Getter
 public final class TextPart implements Text
 {
-  public static final int PACK_ID = 2;
-
   private static final long serialVersionUID = 800L;
 
   private final String text;
@@ -133,7 +131,6 @@ public final class TextPart implements Text
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.writeSmall(PACK_ID, 2);
     packStream.writeBoolean(spaceBefore);
     packStream.writeBoolean(spaceAfter);
     packStream.writeString(text);

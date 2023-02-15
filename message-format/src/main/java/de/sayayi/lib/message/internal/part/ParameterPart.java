@@ -24,10 +24,9 @@ import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.FormatterContextImpl;
 import de.sayayi.lib.message.internal.part.MessagePart.Parameter;
-import de.sayayi.lib.message.pack.Pack;
+import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import de.sayayi.lib.message.pack.Unpack;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -48,8 +47,6 @@ import static java.util.Objects.requireNonNull;
 @Getter
 public final class ParameterPart implements Parameter
 {
-  public static final int PACK_ID = 1;
-
   private static final long serialVersionUID = 800L;
 
   private final @NotNull String parameter;
@@ -154,7 +151,6 @@ public final class ParameterPart implements Parameter
   {
     final Map<MapKey,MapValue> map = this.map.asObject();
 
-    packStream.writeSmall(PACK_ID, 2);
     packStream.writeBoolean(spaceBefore);
     packStream.writeBoolean(spaceAfter);
     packStream.writeSmall(map.size(), 6);
@@ -163,8 +159,8 @@ public final class ParameterPart implements Parameter
 
     for(Entry<MapKey,MapValue> mapEntry: map.entrySet())
     {
-      Pack.pack(mapEntry.getKey(), packStream);
-      Pack.pack(mapEntry.getValue(), packStream);
+      PackHelper.pack(mapEntry.getKey(), packStream);
+      PackHelper.pack(mapEntry.getValue(), packStream);
     }
   }
 
@@ -179,7 +175,8 @@ public final class ParameterPart implements Parameter
    *
    * @since 0.8.0
    */
-  public static @NotNull ParameterPart unpack(@NotNull Unpack unpack, @NotNull PackInputStream packStream)
+  public static @NotNull ParameterPart unpack(@NotNull PackHelper unpack,
+                                              @NotNull PackInputStream packStream)
       throws IOException
   {
     final boolean spaceBefore = packStream.readBoolean();
@@ -191,8 +188,8 @@ public final class ParameterPart implements Parameter
 
     for(int n = 0; n < size; n++)
     {
-      final MapKey key = unpack.loadMapKey(packStream);
-      final MapValue value = unpack.loadMapValue(packStream);
+      final MapKey key = unpack.unpackMapKey(packStream);
+      final MapValue value = unpack.unpackMapValue(packStream);
 
       map.put(key, value);
     }

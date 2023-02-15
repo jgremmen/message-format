@@ -43,8 +43,6 @@ import static lombok.AccessLevel.PRIVATE;
 @RequiredArgsConstructor(access = PRIVATE)
 public final class TextMessage implements Message.WithSpaces
 {
-  public static final int PACK_ID = 6;
-
   private static final long serialVersionUID = 800L;
 
   private final String text;
@@ -86,7 +84,6 @@ public final class TextMessage implements Message.WithSpaces
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.writeSmall(PACK_ID, 3);
     packStream.writeBoolean(spaceBefore);
     packStream.writeBoolean(spaceAfter);
     packStream.writeString(text);

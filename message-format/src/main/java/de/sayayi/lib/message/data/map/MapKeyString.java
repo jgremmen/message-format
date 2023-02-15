@@ -30,6 +30,7 @@ import java.util.Locale;
 import static de.sayayi.lib.message.data.map.MapKey.CompareType.EQ;
 import static de.sayayi.lib.message.data.map.MapKey.CompareType.NE;
 import static de.sayayi.lib.message.data.map.MapKey.MatchResult.*;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -40,8 +41,6 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.*;
 @AllArgsConstructor
 public final class MapKeyString implements MapKey
 {
-  public static final byte PACK_ID = 6;
-
   private static final long serialVersionUID = 800L;
 
   private final @NotNull CompareType compareType;
@@ -109,7 +108,6 @@ public final class MapKeyString implements MapKey
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.writeSmall(PACK_ID, 3);
     packStream.writeEnum(compareType);
     packStream.writeString(string);
   }
@@ -125,6 +123,6 @@ public final class MapKeyString implements MapKey
    * @since 0.8.0
    */
   public static @NotNull MapKeyNumber unpack(@NotNull PackInputStream packStream) throws IOException {
-    return new MapKeyNumber(packStream.readEnum(CompareType.class), packStream.readString());
+    return new MapKeyNumber(packStream.readEnum(CompareType.class), requireNonNull(packStream.readString()));
   }
 }

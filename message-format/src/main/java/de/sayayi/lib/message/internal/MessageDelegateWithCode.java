@@ -18,10 +18,9 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.pack.Pack;
+import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import de.sayayi.lib.message.pack.Unpack;
 import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
@@ -39,8 +38,6 @@ import static java.util.Objects.requireNonNull;
 @ToString
 public class MessageDelegateWithCode extends AbstractMessageWithCode
 {
-  public static final int PACK_ID = 4;
-
   private static final long serialVersionUID = 800L;
 
   @Getter private final @NotNull Message message;
@@ -83,9 +80,8 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.writeSmall(PACK_ID, 3);
     packStream.writeString(getCode());
-    Pack.pack(message, packStream);
+    PackHelper.pack(message, packStream);
   }
 
 
@@ -99,8 +95,9 @@ public class MessageDelegateWithCode extends AbstractMessageWithCode
    *
    * @since 0.8.0
    */
-  public static @NotNull Message.WithCode unpack(@NotNull Unpack unpack, @NotNull PackInputStream packStream)
+  public static @NotNull Message.WithCode unpack(@NotNull PackHelper unpack,
+                                                 @NotNull PackInputStream packStream)
       throws IOException {
-    return new MessageDelegateWithCode(requireNonNull(packStream.readString()), unpack.loadMessage(packStream));
+    return new MessageDelegateWithCode(requireNonNull(packStream.readString()), unpack.unpackMessage(packStream));
   }
 }

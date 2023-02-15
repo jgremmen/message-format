@@ -18,13 +18,11 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.pack.PackOutputStream;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.SortedSet;
 
 import static java.util.Collections.emptySortedSet;
@@ -38,8 +36,6 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor(access = PRIVATE)
 public final class EmptyMessage implements Message.WithSpaces
 {
-  public static final int PACK_ID = 1;
-
   private static final long serialVersionUID = 800L;
 
   public static final Message.WithSpaces INSTANCE = new EmptyMessage();
@@ -86,18 +82,6 @@ public final class EmptyMessage implements Message.WithSpaces
   @Override
   public int hashCode() {
     return EmptyMessage.class.hashCode();
-  }
-
-
-  /**
-   * @param packStream  data output pack target
-   *
-   * @throws IOException  if an I/O error occurs
-   *
-   * @since 0.8.0
-   */
-  public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeSmall(PACK_ID, 3);
   }
 
 

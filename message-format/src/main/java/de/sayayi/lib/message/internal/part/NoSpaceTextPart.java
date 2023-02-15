@@ -35,8 +35,6 @@ import static java.util.Objects.requireNonNull;
  */
 public final class NoSpaceTextPart implements Text
 {
-  public static final int PACK_ID = 0;
-
   private static final long serialVersionUID = 800L;
 
   @Getter private final @NotNull String text;
@@ -99,9 +97,7 @@ public final class NoSpaceTextPart implements Text
    *
    * @since 0.8.0
    */
-  public void pack(@NotNull PackOutputStream packStream) throws IOException
-  {
-    packStream.writeSmall(PACK_ID, 2);
+  public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeString(text);
   }
 

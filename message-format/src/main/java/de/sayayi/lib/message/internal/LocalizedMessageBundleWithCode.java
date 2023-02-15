@@ -20,10 +20,9 @@ import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.exception.MessageException;
-import de.sayayi.lib.message.pack.Pack;
+import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import de.sayayi.lib.message.pack.Unpack;
 import lombok.Synchronized;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
@@ -45,8 +44,6 @@ import static java.util.Objects.requireNonNull;
 @ToString
 public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode implements LocaleAware
 {
-  public static final int PACK_ID = 3;
-
   private static final long serialVersionUID = 800L;
 
   private final @NotNull Map<Locale,Message> localizedMessages;
@@ -167,14 +164,13 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.writeSmall(PACK_ID, 3);
     packStream.writeSmall(localizedMessages.size(), 6);  // < 64 localized messages
     packStream.writeString(getCode());
 
     for(final Entry<Locale,Message> entry: localizedMessages.entrySet())
     {
       packStream.writeString(entry.getKey().toLanguageTag());
-      Pack.pack(entry.getValue(), packStream);
+      PackHelper.pack(entry.getValue(), packStream);
     }
   }
 
@@ -189,7 +185,8 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
    *
    * @since 0.8.0
    */
-  public static @NotNull Message.WithCode unpack(@NotNull Unpack unpack, @NotNull PackInputStream packStream)
+  public static @NotNull Message.WithCode unpack(@NotNull PackHelper unpack,
+                                                 @NotNull PackInputStream packStream)
       throws IOException
   {
     final int messageCount = packStream.readSmall(6);
@@ -197,7 +194,7 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
     final Map<Locale,Message> messages = new HashMap<>();
 
     for(int n = 0; n < messageCount; n++)
-      messages.put(forLanguageTag(requireNonNull(packStream.readString())), unpack.loadMessage(packStream));
+      messages.put(forLanguageTag(requireNonNull(packStream.readString())), unpack.unpackMessage(packStream));
 
     return new LocalizedMessageBundleWithCode(code, messages);
   }

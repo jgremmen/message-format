@@ -32,8 +32,6 @@ import static java.util.Objects.requireNonNull;
  */
 public final class MapValueString extends DataString implements MapValue
 {
-  public static final byte PACK_ID = 3;
-
   private static final long serialVersionUID = 800L;
 
   private Message.WithSpaces message;
@@ -67,9 +65,7 @@ public final class MapValueString extends DataString implements MapValue
    *
    * @since 0.8.0
    */
-  public void pack(@NotNull PackOutputStream packStream) throws IOException
-  {
-    packStream.writeSmall(PACK_ID, 2);
+  public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeString(asObject());
   }
 
