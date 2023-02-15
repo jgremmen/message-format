@@ -25,7 +25,6 @@ import java.util.zip.GZIPInputStream;
 
 import static de.sayayi.lib.message.pack.PackOutputStream.PACK_HEADER;
 import static java.lang.Integer.bitCount;
-import static java.nio.charset.StandardCharsets.US_ASCII;
 
 
 /**
@@ -42,9 +41,8 @@ public final class PackInputStream implements Closeable
 
   public PackInputStream(@NotNull InputStream stream) throws IOException
   {
-    final byte[] header = new byte[PACK_HEADER.length()];
-    if (stream.read(header) != header.length ||
-        !Arrays.equals(header, PACK_HEADER.getBytes(US_ASCII)))
+    final byte[] header = new byte[PACK_HEADER.length];
+    if (stream.read(header) != header.length || !Arrays.equals(header, PACK_HEADER))
       throw new IOException("pack stream has wrong header; possibly not a message pack");
 
     final int zv = stream.read();
@@ -139,7 +137,7 @@ public final class PackInputStream implements Closeable
         case 5:
         case 6:
         case 7:
-          /* 0xxxxxxx*/
+          /* 0xxx xxxx*/
           count++;
           chars[charIdx++] = (char)c;
           break;
@@ -186,12 +184,12 @@ public final class PackInputStream implements Closeable
   {
     if (bit < 0)
     {
-      bit = 7;
       int c = stream.read();
       if (c < 0)
         throw new EOFException("unexpected end of pack stream");
 
       b = (byte)c;
+      bit = 7;
     }
   }
 

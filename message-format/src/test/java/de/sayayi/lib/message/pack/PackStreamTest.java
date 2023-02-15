@@ -10,10 +10,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Function;
 
 import static java.lang.System.currentTimeMillis;
@@ -142,6 +139,32 @@ class PackStreamTest
           fail(ex);
         }
       });
+    }
+  }
+
+
+  @Test
+  @DisplayName("Pack/unpack booleans")
+  void packBoolean() throws IOException
+  {
+    val random = new Random(currentTimeMillis());
+    val longs = new long[100];
+    for(int n = 0; n < longs.length; n++)
+      longs[n] = random.nextLong();
+    val bits = BitSet.valueOf(longs);
+
+    val byteStream = new ByteArrayOutputStream();
+
+    try(val packStream = new PackOutputStream(byteStream, false)) {
+      for(int n = 0; n < bits.length(); n++)
+        packStream.writeBoolean(bits.get(n));
+    }
+
+    val packed = byteStream.toByteArray();
+
+    try(val packStream = new PackInputStream(new ByteArrayInputStream(packed))) {
+      for(int n = 0; n < bits.length(); n++)
+        assertEquals(bits.get(n), packStream.readBoolean());
     }
   }
 }

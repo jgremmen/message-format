@@ -36,7 +36,7 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 public final class PackOutputStream implements Closeable
 {
   public static final int PACK_VERSION = 1;
-  public static final String PACK_HEADER = "%{msg}";
+  static final byte[] PACK_HEADER = "%{msg}".getBytes(US_ASCII);
 
   private final @NotNull OutputStream stream;
   private int bit = 7;
@@ -45,7 +45,7 @@ public final class PackOutputStream implements Closeable
 
   public PackOutputStream(@NotNull OutputStream stream, boolean compress) throws IOException
   {
-    stream.write(PACK_HEADER.getBytes(US_ASCII));
+    stream.write(PACK_HEADER);
     stream.write((compress ? 0xC0 : 0x40) + (PACK_VERSION & 0x3f));
 
     this.stream = compress ? new GZIPOutputStream(stream) : stream;
