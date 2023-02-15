@@ -33,6 +33,8 @@ import static java.util.function.Function.identity;
 
 
 /**
+ * This class provides methods for packing and unpacking message (and related) objects.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
@@ -99,7 +101,7 @@ public final class PackHelper
       ((TextMessage)message).pack(packStream);
     }
     else
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("unknown message type " + message.getClass().getSimpleName());
   }
 
 
@@ -123,7 +125,7 @@ public final class PackHelper
         break;
 
       default:
-        throw new IllegalStateException();
+        throw new IllegalStateException("message with spaces expected");
     }
 
     return messagesWithSpaces.computeIfAbsent(message, identity());
@@ -145,7 +147,7 @@ public final class PackHelper
         return MessageDelegateWithCode.unpack(this, packStream);
     }
 
-    throw new IllegalStateException();
+    throw new IllegalStateException("message with code expected");
   }
 
 
@@ -177,7 +179,7 @@ public final class PackHelper
         break;
 
       default:
-        throw new IllegalStateException();
+        throw new IllegalStateException("message expected");
     }
 
     return messagesWithSpaces.computeIfAbsent(message, identity());
@@ -203,7 +205,7 @@ public final class PackHelper
       ((TextPart)messagePart).pack(packStream);
     }
     else
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("unknown message part type " + messagePart.getClass().getSimpleName());
   }
 
 
@@ -226,7 +228,7 @@ public final class PackHelper
         break;
 
       default:
-        throw new IllegalStateException();
+        throw new IllegalStateException("message part expected");
     }
 
     return messageParts.computeIfAbsent(messagePart, identity());
@@ -266,7 +268,7 @@ public final class PackHelper
       ((MapKeyString)mapKey).pack(packStream);
     }
     else
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("unknown map key type " + mapKey.getClass().getSimpleName());
   }
 
 
@@ -301,7 +303,7 @@ public final class PackHelper
         break;
 
       default:
-        throw new IllegalStateException();
+        throw new IllegalStateException("map key expected");
     }
 
     return mapKeys.computeIfAbsent(mapKey, identity());
@@ -331,7 +333,7 @@ public final class PackHelper
       ((MapValueString)mapValue).pack(packStream);
     }
     else
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("unknown map value type " + mapValue.getClass().getSimpleName());
   }
 
 
@@ -358,7 +360,7 @@ public final class PackHelper
         break;
 
       default:
-        throw new IllegalStateException();
+        throw new IllegalStateException("map value expected");
     }
 
     return mapValues.computeIfAbsent(mapValue, identity());
