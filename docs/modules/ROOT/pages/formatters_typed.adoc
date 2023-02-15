@@ -51,3 +51,8 @@ The formatter has no formatting configuration options.
 == Supplier
 
 TODO
+
+
+== Throwable
+
+TODO

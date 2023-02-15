@@ -6,30 +6,52 @@ image:https://img.shields.io/github/languages/code-size/jgremmen/message-format[
 image:https://img.shields.io/github/last-commit/jgremmen/message-format[GitHub last commit]
 image:https://img.shields.io/github/license/jgremmen/message-format[GitHub]
 
+
 [[release-0.8.0]]
 == 0.8.0
 _Release date: t.b.d._
 
-==== New
+
+==== New Features
 
 * Add named formatter xref:formatters_named.adoc#clip[`clip`]
+* Make longitude/latitude text configurable (xref:formatters_named.adoc#geo[`geo`] formatter)
 * Introduce `FormatterContext` for `ParameterFormatter#format(...)` method
+* Add order support for Formattable types so formatters can be prioritized if a parameter value has
+  multiple formatter matches
 * A parameter formatter can delegate formatting to the next (based on formattable type priority) formatter
+* Add pack support for exporting and importing message bundles
 * Documentation
 
-==== Change
 
-* Flatten parameter data map, eg. `%{n,choice,1:'color',:'colors'}`
+==== Changes
+
+* Flatten parameter data map, eg.: +
+  `%{n,choice,1:'color',:'colors'}` +
+  instead of +
+  `%{n,choice,{1:'color','colors'}}`
 * Consolidate formatter formatting options
-* Remove named formatters `bits` and `geo` from automatic formatter registration
+* Remove named formatters xref:formatters_named.adoc#bits[`bits`] and xref:formatters_named.adoc#geo[`geo`]
+  from automatic formatter registration
+* Remove `Message.WithSpaces#trim()`
+* Drop UTF-16 support for parameter name, format and map key
 
-==== Bugfix
+
+==== Bug Fixes
 
 * Improve formatter selection based on parameter format designator and value class type
 * Use parameter format designator for selecting a named parameter formatter only
 
+
+==== Dependency Upgrades
+
+* Upgrade to EhCache 3.10.8 (optional)
+* Upgrade to Spring Context 5.3.24 (optional for `message-format-cpscan`)
+* Upgrade to Joda-Time 2.12.2 (required for `message-format-jodatime`)
+
+
 [IMPORTANT]
 ====
-This version generally breaks backward compatibility. Please refer to the
-xref:migration-0.7.x-to-0.8.0.adoc[migration guide] for more detailed information.
+Due to a major change in the message parameter syntax, this version generally breaks backward compatibility.
+Please refer to the xref:migration-0.7.x-to-0.8.0.adoc[migration guide] for more detailed information.
 ====

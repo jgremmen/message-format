@@ -56,11 +56,11 @@ In order to control the number of bits generated, the `bits` configuration key c
 The `bool` formatter is both a named and typed formatter. It will be automatically selected for boolean
 values (`boolean` or `java.lang.Boolean`) but can be selected by name as well.
 
-The formatter is capable of formatting values with the following types: `java.lang.Boolean`, `java.lang.Number`, `java.lang.String`,
-`long`, `int`, `short`, `byte` and `boolean`.
+The formatter is capable of formatting values with the following types: +
+`Boolean`, `Number`, `String`, `long`, `int`, `short`, `byte` and `boolean`.
 
-Depending on the locale used the true/false value will be translated using a property resource bundle.
-In case that's not sufficient, there's a way to customize the true and false values as follows.
+The default text for a boolean is either `true` or `false`. In case that's not sufficient, there's a way to
+customize the true and false values by as follows.
 
 .Basic bool example
 ====
@@ -74,7 +74,7 @@ In case that's not sufficient, there's a way to customize the true and false val
 ====
 [source]
 ----
-%{b,bool,true:'aye!',false:'nope'}
+%{b,bool,true:'aye!',false:nope}
 ----
 ====
 

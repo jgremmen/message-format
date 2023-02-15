@@ -58,5 +58,11 @@ Various helper methods from `AbstractParameterFormatter` have been moved to `For
 
 == Named Formatters "bits" and "geo"
 
-The named formatters `bits` and `geo` are not registered automatically anymore and must be explicitly registered
-with the `FormatterRegistry`.
+The named formatters `bits` and `geo` are not automatically registered by the `DefaultFormatterService` anymore
+and must be explicitly added. Eg.:
+[source,java]
+----
+DefaultFormatterService
+    .getSharedInstance()
+    .addFormatter(new GeoFormatter());
+----
