@@ -44,8 +44,10 @@ public class MessageDefAnnotationTest
 
 
   @BeforeAll
-  static void initialize() {
-    bundle = new MessageBundle(NO_CACHE_INSTANCE, MessageDefAnnotationTest.class);
+  static void initialize()
+  {
+    bundle = new MessageBundle(NO_CACHE_INSTANCE);
+    bundle.add(MessageDefAnnotationTest.class);
   }
 
 
