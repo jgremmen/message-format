@@ -33,7 +33,7 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
  */
 public final class PackOutputStream implements Closeable
 {
-  static final byte[] PACK_MAGIC = "MSGB\u0000\u0008".getBytes(US_ASCII);
+  static final byte[] PACK_MAGIC = "MBPCK\u0000\u0008".getBytes(US_ASCII);
 
   private final @NotNull OutputStream stream;
   private int bit = 7;
