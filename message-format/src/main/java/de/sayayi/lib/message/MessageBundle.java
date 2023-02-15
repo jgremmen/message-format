@@ -57,7 +57,7 @@ public class MessageBundle
   {
     this.messageFactory = messageFactory;
 
-    messages = new HashMap<>();
+    messages = new TreeMap<>();
     indexedClasses = new HashSet<>();
   }
 

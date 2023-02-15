@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.pack;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
@@ -22,8 +23,9 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 
-import static de.sayayi.lib.message.pack.PackOutputStream.PACK_MAGIC;
+import static de.sayayi.lib.message.pack.PackOutputStream.PACK_HEADER;
 import static java.lang.Integer.bitCount;
+import static java.nio.charset.StandardCharsets.US_ASCII;
 
 
 /**
@@ -33,17 +35,29 @@ import static java.lang.Integer.bitCount;
 public final class PackInputStream implements Closeable
 {
   private final @NotNull InputStream stream;
+  private final int version;
   private int bit = -1;
   private byte b;
 
 
   public PackInputStream(@NotNull InputStream stream) throws IOException
   {
-    final byte[] signature = new byte[PACK_MAGIC.length];
-    if (stream.read(signature) != PACK_MAGIC.length || !Arrays.equals(signature, PACK_MAGIC))
-      throw new IOException("pack stream has wrong signature");
+    final byte[] header = new byte[PACK_HEADER.length()];
+    if (stream.read(header) != header.length || !Arrays.equals(header, PACK_HEADER.getBytes(US_ASCII)))
+      throw new IOException("pack stream has wrong header");
 
-    this.stream = stream.read() != 0 ? new GZIPInputStream(stream) : stream;
+    final int c = stream.read();
+    if ((c & 0x40) == 0)
+      throw new IOException("unknown pack version format");
+
+    this.stream = (c & 0x80) != 0 ? new GZIPInputStream(stream) : stream;
+    version = c & 0x3f;
+  }
+
+
+  @Contract(pure = true)
+  public int getVersion() {
+    return version;
   }
 
 
