@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
+import static java.util.Objects.requireNonNull;
+
 
 /**
  * @author Jeroen Gremmen
@@ -82,6 +84,6 @@ public final class MapValueString extends DataString implements MapValue
    * @since 0.8.0
    */
   public static @NotNull MapValueString unpack(@NotNull PackInputStream packStream) throws IOException {
-    return new MapValueString(packStream.readString());
+    return new MapValueString(requireNonNull(packStream.readString()));
   }
 }
