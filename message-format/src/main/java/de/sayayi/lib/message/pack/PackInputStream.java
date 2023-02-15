@@ -205,16 +205,14 @@ public final class PackInputStream implements Closeable
    */
   public @Range(from = 0, to = 255) int readSmallVar() throws IOException
   {
-    switch(readSmall(2))
-    {
-      case 0b00: return readSmall(2);  // 0..3
-      case 0b01: return 0b100 | readSmall(2);  // 4..7
-      case 0b10: return readSmall(3) + 8;  // 8..15
-      case 0b11: return readSmall(8);  // 16..255
+    final int v4 = readSmall(4);
 
-      default:
-        throw new IOException();
-    }
+    if ((v4 & 0b1000) == 0)  // 0vvv
+      return v4;
+    else if ((v4 & 0b0100) == 0)  // 10vv_v (-> 1vvv)
+      return ((v4 - 0b100) << 1) | (readBoolean() ? 1 : 0);
+    else  // 11vv_vvvvvv
+      return ((v4 & 0b11) << 6) | readSmall(6);
   }
 
 
