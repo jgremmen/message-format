@@ -164,7 +164,7 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.writeSmall(localizedMessages.size(), 6);  // < 64 localized messages
+    packStream.writeSmallVar(localizedMessages.size());
     packStream.writeString(getCode());
 
     for(final Entry<Locale,Message> entry: localizedMessages.entrySet())
@@ -189,7 +189,7 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
                                                  @NotNull PackInputStream packStream)
       throws IOException
   {
-    final int messageCount = packStream.readSmall(6);
+    final int messageCount = packStream.readSmallVar();
     final String code = requireNonNull(packStream.readString());
     final Map<Locale,Message> messages = new HashMap<>();
 

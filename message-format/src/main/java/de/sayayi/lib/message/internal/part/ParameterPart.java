@@ -153,7 +153,7 @@ public final class ParameterPart implements Parameter
 
     packStream.writeBoolean(spaceBefore);
     packStream.writeBoolean(spaceAfter);
-    packStream.writeSmall(map.size(), 6);
+    packStream.writeSmallVar(map.size());
     packStream.writeString(format);
     packStream.writeString(parameter);
 
@@ -181,7 +181,7 @@ public final class ParameterPart implements Parameter
   {
     final boolean spaceBefore = packStream.readBoolean();
     final boolean spaceAfter = packStream.readBoolean();
-    final int size = packStream.readSmall(6);
+    final int size = packStream.readSmallVar();
     final String format = packStream.readString();
     final String parameter = requireNonNull(packStream.readString());
     final Map<MapKey,MapValue> map = new HashMap<>();

@@ -43,15 +43,16 @@ public final class PackInputStream implements Closeable
   public PackInputStream(@NotNull InputStream stream) throws IOException
   {
     final byte[] header = new byte[PACK_HEADER.length()];
-    if (stream.read(header) != header.length || !Arrays.equals(header, PACK_HEADER.getBytes(US_ASCII)))
-      throw new IOException("pack stream has wrong header");
+    if (stream.read(header) != header.length ||
+        !Arrays.equals(header, PACK_HEADER.getBytes(US_ASCII)))
+      throw new IOException("pack stream has wrong header; possibly not a message pack");
 
-    final int c = stream.read();
-    if ((c & 0x40) == 0)
-      throw new IOException("unknown pack version format");
+    final int zv = stream.read();
+    if ((zv & 0x40) == 0)
+      throw new IOException("malformed message pack version");
 
-    this.stream = (c & 0x80) != 0 ? new GZIPInputStream(stream) : stream;
-    version = c & 0x3f;
+    this.stream = (zv & 0x80) != 0 ? new GZIPInputStream(stream) : stream;
+    version = zv & 0x3f;
   }
 
 
@@ -82,7 +83,7 @@ public final class PackInputStream implements Closeable
   }
 
 
-  public int readUnsignedShort() throws IOException {
+  public @Range(from = 0, to = 65535) int readUnsignedShort() throws IOException {
     return (int)readLarge(16);
   }
 
@@ -119,7 +120,7 @@ public final class PackInputStream implements Closeable
 
     final byte[] bytes = new byte[utflen];
     if (stream.read(bytes) != utflen)
-      throw new EOFException();
+      throw new EOFException("unexpected end of pack stream while reading utf string");
 
     final char[] chars = new char[utflen];
     int charIdx = 0;
@@ -188,14 +189,36 @@ public final class PackInputStream implements Closeable
       bit = 7;
       int c = stream.read();
       if (c < 0)
-        throw new EOFException();
+        throw new EOFException("unexpected end of pack stream");
 
       b = (byte)c;
     }
   }
 
 
-  public int readSmall(@Range(from = 1, to = 8) int bitWidth) throws IOException
+  /**
+   * Ranges: 0..7 (4 bit), 8..15 (5 bit), 16..255 (10 bit)
+   *
+   * @return  value in range 0..255
+   *
+   * @throws IOException  if an I/O error occurs
+   */
+  public @Range(from = 0, to = 255) int readSmallVar() throws IOException
+  {
+    switch(readSmall(2))
+    {
+      case 0b00: return readSmall(2);  // 0..3
+      case 0b01: return 0b100 | readSmall(2);  // 4..7
+      case 0b10: return readSmall(3) + 8;  // 8..15
+      case 0b11: return readSmall(8);  // 16..255
+
+      default:
+        throw new IOException();
+    }
+  }
+
+
+  public @Range(from = 0, to = 255) int readSmall(@Range(from = 1, to = 8) int bitWidth) throws IOException
   {
     assertData();
 

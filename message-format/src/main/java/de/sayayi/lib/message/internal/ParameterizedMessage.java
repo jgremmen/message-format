@@ -130,7 +130,7 @@ public class ParameterizedMessage implements Message.WithSpaces
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.writeSmall(parts.length, 6);  // 63 should be enough
+    packStream.writeSmallVar(parts.length);
 
     for(final MessagePart part: parts)
       PackHelper.pack(part, packStream);
@@ -153,7 +153,7 @@ public class ParameterizedMessage implements Message.WithSpaces
   {
     final List<MessagePart> parts = new ArrayList<>();
 
-    for(int n = 0, l = packStream.readSmall(6); n < l; n++)
+    for(int n = 0, l = packStream.readSmallVar(); n < l; n++)
       parts.add(unpack.unpackMessagePart(packStream));
 
     return new ParameterizedMessage(parts);

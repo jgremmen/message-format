@@ -77,7 +77,7 @@ public final class PackOutputStream implements Closeable
   }
 
 
-  public void writeUnsignedShort(int value) throws IOException {
+  public void writeUnsignedShort(@Range(from = 0, to = 65535)int value) throws IOException {
     writeLarge(value, 16);
   }
 
@@ -147,6 +147,24 @@ public final class PackOutputStream implements Closeable
 
       stream.write(bytes);
     }
+  }
+
+
+  /**
+   * Ranges: 0..7 (4 bit), 8..15 (5 bit), 16..255 (10 bit)
+   *
+   * @param value  unsigned value (0..255)
+   *
+   * @throws IOException  if an I/O error occurs
+   */
+  public void writeSmallVar(@Range(from = 0, to = 255) int value) throws IOException
+  {
+    if (value <= 7)
+      writeSmall(value, 4);  // 0vvv
+    else if (value <= 15)
+      writeSmall(0b10000 | (value - 8), 5);  // 10vvv (vvv + 8)
+    else
+      writeLarge(0b1100000000 | value, 10);  // 11vvvvvvvv
   }
 
 
