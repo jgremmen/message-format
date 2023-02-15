@@ -10,9 +10,11 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
-import java.util.stream.Stream;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.toMap;
 import static org.junit.jupiter.api.Assertions.*;
@@ -100,9 +102,10 @@ class PackStreamTest
   void packLarge() throws IOException
   {
     val random = new Random(System.currentTimeMillis());
-    val valueMap = Stream
-        .of(9, 16, 17, 29, 32, 43, 48, 57, 64)
-        .collect(toMap(bitWidth -> bitWidth, bitWidth -> {
+    final Map<Integer,long[]> valueMap = Arrays
+        .stream(new int[] { 9, 16, 17, 29, 32, 43, 48, 57, 64 })
+        .boxed()
+        .collect(toMap(Function.identity(), bitWidth -> {
           val values = new long[100];
           long mask = bitWidth == 64 ? -1L : ((1L << bitWidth) - 1);
 
@@ -110,7 +113,7 @@ class PackStreamTest
             values[n] = random.nextLong() & mask;
 
           return values;
-        }, (l1,l2) -> l1, TreeMap<Integer,long[]>::new));
+        }, (l1,l2) -> l1, TreeMap::new));
 
     val byteStream = new ByteArrayOutputStream();
 
