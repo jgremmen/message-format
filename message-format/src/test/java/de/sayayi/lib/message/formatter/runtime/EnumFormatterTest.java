@@ -54,16 +54,25 @@ class EnumFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testMap()
+  void testMapWithoutDefault()
   {
-    val messageFactory = NO_CACHE_INSTANCE;
-    val context = new MessageContext(createFormatterService(new EnumFormatter()), messageFactory);
+    val context = new MessageContext(createFormatterService(new EnumFormatter()), NO_CACHE_INSTANCE);
 
-    assertEquals("upper", messageFactory.parse("%{e,>'C':upper,<'C':lower}")
+    assertEquals("upper", NO_CACHE_INSTANCE.parse("%{e,>'C':upper,<'C':lower}")
         .format(context, context.parameters().with("e", MyEnum.CC)));
 
-    assertEquals("AA", messageFactory.parse("%{e,>'C':upper}")
+    assertEquals("AA", NO_CACHE_INSTANCE.parse("%{e,>'C':upper}")
         .format(context, context.parameters().with("e", MyEnum.AA)));
+  }
+
+
+  @Test
+  void testMapWithDefault()
+  {
+    val context = new MessageContext(createFormatterService(new EnumFormatter()), NO_CACHE_INSTANCE);
+
+    assertEquals("C or D", NO_CACHE_INSTANCE.parse("%{e,'AA':A,'BB':B,:'C or D'}")
+        .format(context, context.parameters().with("e", MyEnum.CC)));
   }
 
 

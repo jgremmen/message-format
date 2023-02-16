@@ -118,7 +118,8 @@ public final class DataMap implements Data
 
     if (mapValue == null)
     {
-      if (includeDefault)
+      if (includeDefault &&
+          map.keySet().stream().anyMatch(mk -> mk != null && keyTypes.contains(mk.getType())))
         mapValue = map.get(null);
 
       if (mapValue == null)
