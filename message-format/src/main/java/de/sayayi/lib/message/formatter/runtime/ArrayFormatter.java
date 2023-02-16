@@ -50,24 +50,23 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
     if (length == 0)
       return emptyText();
 
-    final StringBuilder s = new StringBuilder();
     final Class<?> arrayType = array.getClass();
     final Class<?> arrayElementType = arrayType.isPrimitive() ? arrayType.getComponentType() : null;
-    final String sep = context.getConfigValueString("list-sep").orElse(", ");
-    final String sepLast = context.getConfigValueString("list-sep-last").orElse(sep);
-    final String thisObject = context.getConfigValueString("list-this").orElse("(this array)");
+    final String sep =
+        spacedText(context.getConfigValueString("list-sep").orElse(", ")).getTextWithSpaces();
+    final String sepLast =
+        spacedText(context.getConfigValueString("list-sep-last").orElse(sep)).getTextWithSpaces();
+    final Text nullText = noSpaceText(context.getConfigValueString("list-null").orElse(""));
+    final Text thisText = noSpaceText(context.getConfigValueString("list-this").orElse("(this array)"));
+    final StringBuilder s = new StringBuilder();
 
     for(int i = 0; i < length; i++)
     {
       final Object value = get(array, i);
-      Text text = null;
+      final Text text = value == array
+          ? thisText : value == null ? nullText : context.format(value, arrayElementType, true);
 
-      if (value == array)
-        text = noSpaceText(thisObject);
-      else if (value != null)
-        text = context.format(value, arrayElementType, true);
-
-      if (text != null && !text.isEmpty())
+      if (!text.isEmpty())
       {
         if (s.length() > 0)
           s.append((i + 1) < length ? sep : sepLast);
