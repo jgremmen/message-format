@@ -204,7 +204,7 @@ Configuration key operation::
 
 |`=`
 |Check for equality. This is the default if no operation is specified. +
- Eg. `%{n,=1:'exactly one'}`
+ Eg. `%{n,choice,=1:'exactly one'}`
 
 |`!` or `<>`
 |Check for inequality. +
@@ -212,19 +212,19 @@ Configuration key operation::
 
 |`>`
 |Check whether the parameter value is larger than the configuration key. +
- Eg. `%{s,>'AA':'larger than AA'}`
+ Eg. `%{s,choice,>'AA':'larger than AA'}`
 
 |`>=`
 |Check whether the parameter value is larger than or equal to the configuration key. +
- Eg. `%{n,>=10:'at least 2 digits'}`
+ Eg. `%{n,choice,>=10:'at least 2 digits'}`
 
 |`<`
 |Check whether the parameter value is less than the configuration key. +
- Eg. `%{n,<0:negative,>0:positive}`
+ Eg. `%{n,choice,<0:negative,>0:positive}`
 
 |`\<=`
 |Check whether the parameter value is less than or equal to the configuration key. +
-Eg. `%{s,\<='ZZ':'less than or equal to ZZ'}`
+Eg. `%{s,choice,\<='ZZ':'less than or equal to ZZ'}`
 |===
 --
 
