@@ -56,10 +56,10 @@ public @NotNull Text format(@NotNull FormatterContext formatterContext,
 Various helper methods from `AbstractParameterFormatter` have been moved to `FormatterContext`.
 
 
-== Named Formatters "bits" and "geo"
+== Named Formatters "bits", "filesize" and "geo"
 
-The named formatters `bits` and `geo` are not automatically registered by the `DefaultFormatterService` anymore
-and must be explicitly added. Eg.:
+The named formatters `bits`, `filesize` and `geo` are not automatically registered by the `DefaultFormatterService`
+anymore and must be explicitly added. Eg.:
 [source,java]
 ----
 DefaultFormatterService

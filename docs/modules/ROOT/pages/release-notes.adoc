@@ -31,8 +31,8 @@ _Release date: t.b.d._
   instead of +
   `%{n,choice,{1:'color','colors'}}`
 * Consolidate formatter formatting options
-* Remove named formatters xref:formatters_named.adoc#bits[`bits`] and xref:formatters_named.adoc#geo[`geo`]
-  from automatic formatter registration
+* Remove named formatters xref:formatters_named.adoc#bits[`bits`], xref:formatters_named.adoc#bits[`filesize`] and
+  xref:formatters_named.adoc#geo[`geo`] from automatic formatter registration
 * Remove `Message.WithSpaces#trim()`
 * Drop UTF-16 support for parameter name, format and map key
 
