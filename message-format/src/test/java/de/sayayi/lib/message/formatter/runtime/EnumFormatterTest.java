@@ -41,17 +41,29 @@ class EnumFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testFormat()
+  void testFormat()
   {
     val context = new MessageContext(createFormatterService(new EnumFormatter()), NO_CACHE_INSTANCE, ROOT);
 
-    //assertEquals(nullText(), formatter.format(context, null, null, parameters, null));
-    //assertEquals(noSpaceText("CC"), formatter.format(context, MyEnum.CC, null, parameters, null));
     assertEquals(noSpaceText("3"), format(context, MyEnum.DD,
         singletonMap(new MapKeyName("enum"), new MapValueString("ordinal"))));
 
     context.setDefaultData("enum", "ordinal");
     assertEquals(noSpaceText("0"), format(context, MyEnum.AA));
+  }
+
+
+  @Test
+  void testMap()
+  {
+    val messageFactory = NO_CACHE_INSTANCE;
+    val context = new MessageContext(createFormatterService(new EnumFormatter()), messageFactory);
+
+    assertEquals("upper", messageFactory.parse("%{e,>'C':upper,<'C':lower}")
+        .format(context, context.parameters().with("e", MyEnum.CC)));
+
+    assertEquals("AA", messageFactory.parse("%{e,>'C':upper}")
+        .format(context, context.parameters().with("e", MyEnum.AA)));
   }
 
 

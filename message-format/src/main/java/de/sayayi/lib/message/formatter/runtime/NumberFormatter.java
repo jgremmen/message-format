@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
+import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext.Parameters;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
@@ -35,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
 
+import static de.sayayi.lib.message.data.map.MapKey.NUMBER_TYPE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Collections.singleton;
@@ -56,6 +58,12 @@ public final class NumberFormatter extends AbstractParameterFormatter
       return nullText();
 
     final Number value = (Number)v;
+
+    // check configuration map for match
+    final Message.WithSpaces msg = formatterContext.getMapMessage(value, NUMBER_TYPE).orElse(null);
+    if (msg != null)
+      return formatterContext.format(msg);
+
     final String format = formatterContext.getConfigValueString("number").orElse(null);
 
     // special case: show number as bool

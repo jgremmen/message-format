@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
+import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
@@ -24,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
+import static de.sayayi.lib.message.data.map.MapKey.STRING_TYPE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static java.util.Collections.singleton;
@@ -35,24 +37,28 @@ import static java.util.Collections.singleton;
 public final class EnumFormatter extends AbstractParameterFormatter
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
     final Enum<?> enumValue = (Enum<?>)value;
 
-    switch(formatterContext.getConfigValueString("enum").orElse("name"))
+    switch(context.getConfigValueString("enum").orElse("name"))
     {
       case "ordinal":
       case "ord":
-        return formatterContext.format(enumValue.ordinal(), int.class);
+        return context.format(enumValue.ordinal(), int.class);
 
-      case "name":
-        return noSpaceText(enumValue.name());
+      case "name": {
+        final String name = enumValue.name();
+        final Message.WithSpaces msg = context.getMapMessage(name, STRING_TYPE).orElse(null);
+
+        return msg != null ? context.format(msg) : noSpaceText(name);
+      }
 
       default:
-        return formatterContext.delegateToNextFormatter();
+        return context.delegateToNextFormatter();
     }
   }
 
