@@ -53,29 +53,32 @@ public final class MapFormatter extends AbstractParameterFormatter implements Em
 
     final String separator =
         spacedText(context.getConfigValueString("map-kv-sep").orElse("=")).getTextWithSpaces();
-    final String nullKey =
-        context.getConfigValueString("map-null-key").orElse("(null)").trim();
-    final String nullValue =
-        context.getConfigValueString("map-null-value").orElse("(null)").trim();
-    final String thisObject = context.getConfigValueString("list-this").orElse("(this map)").trim();
+    final String keyNull = context.getConfigValueString("map-k-null").orElse("(null)").trim();
+    final String keyFormat = context.getConfigValueString("map-k-fmt").orElse(null);
+    final String valueNull = context.getConfigValueString("map-v-null").orElse("(null)").trim();
+    final String valueFormat = context.getConfigValueString("map-v-fmt").orElse(null);
+    final String thisString = context.getConfigValueString("map-this").orElse("(this map)").trim();
 
-    final List<String> list = map
+    return context.format(map
         .entrySet()
         .stream()
-        .map(entry -> {
-          final Object key = entry.getKey();
-          final String keyString = key == value
-              ? thisObject : key != null ? trimNotNull(context.format(key)) : nullKey;
+        .map(entry -> (
+            formatValue(context, entry.getKey(), thisString, map, keyFormat, keyNull) +
+            separator +
+            formatValue(context, entry.getValue(), thisString, map, valueFormat, valueNull)).trim())
+        .collect(toList()), List.class);
+  }
 
-          final Object val = entry.getValue();
-          final String valueString = val == value
-              ? thisObject : val != null ? trimNotNull(context.format(val)) : nullValue;
 
-          return (keyString + separator + valueString).trim();
-        })
-        .collect(toList());
-
-    return context.format(list, List.class);
+  @Contract(pure = true)
+  private @NotNull String formatValue(@NotNull FormatterContext context, Object mapValue, @NotNull String thisString,
+                                      @NotNull Map<?,?> map, String valueFormat, @NotNull String valueNull)
+  {
+    return mapValue == map
+        ? thisString
+        : mapValue != null
+            ? trimNotNull(context.format(mapValue, null, valueFormat))
+            : valueNull;
   }
 
 

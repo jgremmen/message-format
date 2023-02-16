@@ -171,6 +171,12 @@ public final class FormatterContextImpl implements FormatterContext
 
 
   @Override
+  public @NotNull Text format(Object value, Class<?> type, String format) {
+    return new FormatterContextImpl(messageContext, parameters, value, type, format, map).delegateToNextFormatter();
+  }
+
+
+  @Override
   public @NotNull Text format(Message.WithSpaces message)
   {
     return message == null

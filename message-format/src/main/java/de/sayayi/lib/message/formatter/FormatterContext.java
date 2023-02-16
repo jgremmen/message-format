@@ -170,6 +170,19 @@ public interface FormatterContext extends Parameters
 
 
   /**
+   * Format the given {@code value} using {@code type} and {@code format}.
+   *
+   * @param value   value to format
+   * @param type    value type or {@code null}
+   * @param format  formatter name
+   *
+   * @return  formatted text, never {@code null}
+   */
+  @Contract(pure = true)
+  @NotNull Text format(Object value, Class<?> type, String format);
+
+
+  /**
    * Format the given {@code message}.
    *
    * @param message  message, or {@code null}
