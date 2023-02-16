@@ -52,24 +52,22 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
     if (!iterator.hasNext())
       return emptyText();
 
-    final StringBuilder s = new StringBuilder();
     final String sep =
         spacedText(context.getConfigValueString("list-sep").orElse(", ")).getTextWithSpaces();
     final String sepLast =
         spacedText(context.getConfigValueString("list-sep-last").orElse(sep)).getTextWithSpaces();
-    final String thisObject = context.getConfigValueString("list-this").orElse("(this collection)");
+    final Text nullText = noSpaceText(context.getConfigValueString("list-null").orElse(""));
+    final Text thisText =
+        noSpaceText(context.getConfigValueString("list-this").orElse("(this collection)"));
+    final StringBuilder s = new StringBuilder();
 
     while(iterator.hasNext())
     {
       final Object element = iterator.next();
-      Text text = null;
+      final Text text = element == value
+          ? thisText : element == null ? nullText : context.format(element, true);
 
-      if (element == value)
-        text = noSpaceText(thisObject);
-      else if (element != null)
-        text = context.format(element, true);
-
-      if (text != null && !text.isEmpty())
+      if (!text.isEmpty())
       {
         if (s.length() > 0)
           s.append(iterator.hasNext() ? sep : sepLast);

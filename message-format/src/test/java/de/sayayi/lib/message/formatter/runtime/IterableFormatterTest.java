@@ -41,17 +41,18 @@ public class IterableFormatterTest extends AbstractFormatterTest
   @Test
   public void testObjectArray()
   {
-    val context = new MessageContext(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE, "de-DE");
+    val context = new MessageContext(
+        createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE, "de-DE");
 
     assertEquals(noSpaceText("Test, true, -6"), format(context, asList("Test", true, null, -6)));
   }
 
 
   @Test
-  public void testEmptyOrCollection()
+  public void testEmptyOrNullCollection()
   {
     val context = new MessageContext(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE);
-    val message = context.getMessageFactory().parse("%{c,null:'null',empty:'empty'}");
+    val message = context.getMessageFactory().parse("%{c,null:null,empty:empty}");
 
     assertEquals("null", message.format(context, context.parameters().with("c", null)));
     assertEquals("empty", message.format(context, context.parameters().with("c", emptySet())));
