@@ -34,20 +34,16 @@ In order to control the number of bits generated, the `bits` configuration key c
 |===
 
 .Autodetect example
-====
 [source]
 ----
 %{n,bits,bits:auto}
 ----
-====
 
 .Fixed bit length example
-====
 [source]
 ----
 %{n,bits,bits:6}
 ----
-====
 
 
 [[bool]]
@@ -63,20 +59,16 @@ The default text for a boolean is either `true` or `false`. In case that's not s
 customize the true and false values by as follows.
 
 .Basic bool example
-====
 [source]
 ----
 %{b,bool}
 ----
-====
 
 .Customized bool example
-====
 [source]
 ----
 %{b,bool,true:'aye!',false:nope}
 ----
-====
 
 
 [[choice]]

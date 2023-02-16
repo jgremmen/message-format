@@ -3,37 +3,74 @@
 TODO
 
 
+[[array]]
 == Array
 
 TODO
 
 
+[[date]]
 == Date
 
 TODO
 
 
+[[enum]]
 == Enum
 
 TODO
 
 
+[[field]]
+== Field
+
+TODO
+
+
+[[file]]
+== File
+
+TODO
+
+
+[[inet]]
+== Inet
+
+TODO
+
+
+[[iterable]]
 == Iterable
 
 TODO
 
 
+[[map]]
 == Map
 
 TODO
 
 
+[[method]]
+== Method
+
+TODO
+
+
+[[number]]
 == Number
 
 TODO
 
 
+[[optional]]
 == Optional
+
+TODO
+
+
+[[path]]
+== Path
 
 TODO
 
@@ -48,11 +85,25 @@ associated with `java.lang.Object`.
 The formatter has no formatting configuration options.
 
 
+[[supplier]]
 == Supplier
 
 TODO
 
 
+[[throwable]]
 == Throwable
+
+TODO
+
+
+[[uri]]
+== URI
+
+TODO
+
+
+[[url]]
+== URL
 
 TODO

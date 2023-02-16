@@ -56,7 +56,7 @@ public @NotNull Text format(@NotNull FormatterContext formatterContext,
 Various helper methods from `AbstractParameterFormatter` have been moved to `FormatterContext`.
 
 
-== Named Formatters "bits", "filesize" and "geo"
+== Named Formatters _bits_, _filesize_ and _geo_
 
 The named formatters `bits`, `filesize` and `geo` are not automatically registered by the `DefaultFormatterService`
 anymore and must be explicitly added. Eg.:
@@ -66,3 +66,154 @@ DefaultFormatterService
     .getSharedInstance()
     .addFormatter(new GeoFormatter());
 ----
+
+
+== Formatter Configuration Keys
+:table-caption!:
+
+.xref:formatters_typed.adoc#_array[Array Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|`sep`
+|`list-sep`
+
+|`sep-last`
+|`list-sep-last`
+|===
+
+.xref:formatters_named.adoc#bits[Bits Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|`length`
+|`bits`
+|===
+
+.xref:formatters_typed.adoc#_date[Date Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`date`
+
+|`format`
+|`date`
+|===
+
+.xref:formatters_typed.adoc#enum[Enum Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`enum`
+|===
+
+.xref:formatters_typed.adoc#field[Field Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`field`
+|===
+
+.xref:formatters_typed.adoc#file[File Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`file`
+|===
+
+.xref:formatters_named.adoc#geo[Geo Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`geo`
+|===
+
+.xref:formatters_typed.adoc#inet[Inet Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`inet`
+|===
+
+.xref:formatters_typed.adoc#iterable[Iterable Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|`sep`
+|`list-sep`
+
+|`sep-last`
+|`list-sep-last`
+|===
+
+.xref:formatters_typed.adoc#map[Map Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|`null-key`
+|`map-k-null`
+
+|`null-value`
+|`map-v-null`
+|===
+
+.xref:formatters_typed.adoc#method[Method Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`method`
+|===
+
+.xref:formatters_typed.adoc#number[Number Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`number`
+|===
+
+.xref:formatters_typed.adoc#path[Path Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`path`
+|===
+
+.xref:formatters_typed.adoc#uri[URI Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`uri`
+|===
+
+.xref:formatters_typed.adoc#url[URL Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`url`
+|===

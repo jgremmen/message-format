@@ -15,10 +15,10 @@ _Release date: t.b.d._
 ==== New Features
 
 * Add named formatter xref:formatters_named.adoc#clip[`clip`]
-* Make longitude/latitude text configurable (xref:formatters_named.adoc#geo[`geo`] formatter)
+* More detailed formatter configuration keys
 * Introduce `FormatterContext` for `ParameterFormatter#format(...)` method
-* Add order support for Formattable types so formatters can be prioritized if a parameter value has
-  multiple formatter matches
+* Add order support for Formattable types so formatters can be prioritized if a parameter value matches
+  multiple formatters
 * A parameter formatter can delegate formatting to the next (based on formattable type priority) formatter
 * Add pack support for exporting and importing message bundles
 * Documentation
@@ -30,9 +30,9 @@ _Release date: t.b.d._
   `%{n,choice,1:'color',:'colors'}` +
   instead of +
   `%{n,choice,{1:'color','colors'}}`
-* Consolidate formatter formatting options
+* Rename formatter configuration keys
 * Remove named formatters xref:formatters_named.adoc#bits[`bits`], xref:formatters_named.adoc#bits[`filesize`] and
-  xref:formatters_named.adoc#geo[`geo`] from automatic formatter registration
+  xref:formatters_named.adoc#geo[`geo`] from default formatter registration
 * Remove `Message.WithSpaces#trim()`
 * Drop UTF-16 support for parameter name, format and map key
 

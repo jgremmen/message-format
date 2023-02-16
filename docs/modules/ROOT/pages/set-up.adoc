@@ -14,7 +14,7 @@ Message Format comprises the following artifacts:
 Add the following to your Gradle build file in order to use Message Format:
 
 .Gradle configuration
-====
+
 [source, groovy, linenums]
 [subs="verbatim,attributes"]
 ----
@@ -26,4 +26,3 @@ dependencies {
 }
 ...
 ----
-====

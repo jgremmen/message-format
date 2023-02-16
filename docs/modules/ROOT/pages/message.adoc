@@ -46,6 +46,7 @@ escaped characters.
 [plantuml,message,svg,align=left]
 ....
 @startebnf
+skinparam backgroundColor transparent
 message = [text], { parameter, [text] };
 @endebnf
 ....
@@ -57,6 +58,8 @@ xref:message.adoc#parameter-syntax[parameter syntax] chapter.
 [plantuml,text,svg,align=left]
 ....
 @startebnf
+skinparam backgroundColor transparent
+skinparam noteBackgroundColor PapayaWhip
 text = { character }-;
 
 character = ('\u', hex-digit, hex-digit, hex-digit, hex-digit | '\', ('"' | "'" | '%' | '{' | '\') | ? \u0020-\uffff ? (* visible characters only (no control characters) *) );
@@ -110,6 +113,8 @@ configuring the formatter.
 [plantuml,parameter,svg,align=left]
 ....
 @startebnf
+skinparam backgroundColor transparent
+skinparam noteBackgroundColor PapayaWhip
 parameter = '%{', name, [',', format], {',', config}, [',', ':', quoted-message], '}';
 (* name / format = name or keyword (true, false, null, empty) *)
 @endebnf
@@ -122,6 +127,7 @@ Parameter name::
 [plantuml,name,svg,align=left]
 ....
 @startebnf
+skinparam backgroundColor transparent
 name = ( ? a-z ? | ? A-Z ? ), { ? a-z ? | ? A-Z ? | ? 0-9 ? | '_' };
 @endebnf
 ....
@@ -139,6 +145,7 @@ Parameter config::
 [plantuml,config,svg,align=left]
 ....
 @startebnf
+skinparam backgroundColor transparent
 config = config-key, ':', config-value;
 @endebnf
 ....
@@ -146,6 +153,7 @@ config = config-key, ':', config-value;
 [plantuml,config-key,svg,align=left]
 ....
 @startebnf
+skinparam backgroundColor transparent
 config-key = (bool | name | [('=' | '!' | '<>' | '<' | '<=' | '>' | '>=')], (string | number) | ('=' | '!' | '<>'), ('null' | 'empty'));
 @endebnf
 ....
@@ -158,6 +166,7 @@ Configuration key bool::
 [plantuml,bool,svg,align=left]
 ....
 @startebnf
+skinparam backgroundColor transparent
 bool = ('true' | 'false');
 @endebnf
 ....
@@ -183,6 +192,7 @@ Configuration key string and number::
 [plantuml,string,svg,align=left]
 ....
 @startebnf
+skinparam backgroundColor transparent
 string = ('"', [text], '"' | "'", [text], "'");
 @endebnf
 ....
@@ -190,6 +200,7 @@ string = ('"', [text], '"' | "'", [text], "'");
 [plantuml,number,svg,align=left]
 ....
 @startebnf
+skinparam backgroundColor transparent
 number = ['-'], { ? 0-9 ?}-;
 @endebnf
 ....
@@ -235,6 +246,8 @@ Configuration value::
 [plantuml,config-value,svg,align=left]
 ....
 @startebnf
+skinparam backgroundColor transparent
+skinparam noteBackgroundColor PapayaWhip
 config-value = (bool | number | quoted-message | string | name | 'null' | 'empty');
 (* name, null and empty represent a string value (without quotes) *)
 @endebnf
@@ -248,6 +261,7 @@ Configuration value quoted-message::
 [plantuml,quoted-message,svg,align=left]
 ....
 @startebnf
+skinparam backgroundColor transparent
 quoted-message = ('"', [message], '"' | "'", [message], "'");
 @endebnf
 ....
