@@ -25,7 +25,6 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
-import de.sayayi.lib.message.util.OptionalBoolean;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -141,18 +140,18 @@ public final class FormatterContextImpl implements FormatterContext
 
 
   @Override
-  public @NotNull OptionalBoolean getConfigValueBool(@NotNull String name)
+  public @NotNull Optional<Boolean> getConfigValueBool(@NotNull String name)
   {
     final MapValueBool bool = (MapValueBool)map.find(messageContext, name, parameters, NAME_TYPE, MapValue.BOOL_TYPE);
 
     if (bool != null)
-      return OptionalBoolean.of(bool.asObject());
+      return Optional.of(bool.asObject());
 
     final MapValue mapValue = messageContext.getDefaultData(name);
 
     return mapValue instanceof MapValueBool
-        ? OptionalBoolean.of(((MapValueBool)mapValue).asObject())
-        : OptionalBoolean.empty();
+        ? Optional.of(((MapValueBool)mapValue).asObject())
+        : Optional.empty();
   }
 
 

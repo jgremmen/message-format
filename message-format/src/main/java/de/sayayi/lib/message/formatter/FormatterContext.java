@@ -23,7 +23,6 @@ import de.sayayi.lib.message.data.map.MapKey;
 import de.sayayi.lib.message.data.map.MapValue;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import de.sayayi.lib.message.util.OptionalBoolean;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -84,7 +83,7 @@ public interface FormatterContext extends Parameters
 
 
   @Contract(pure = true)
-  @NotNull OptionalBoolean getConfigValueBool(@NotNull String name);
+  @NotNull Optional<Boolean> getConfigValueBool(@NotNull String name);
 
 
   /**

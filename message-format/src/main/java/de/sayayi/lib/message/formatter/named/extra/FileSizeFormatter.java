@@ -30,6 +30,7 @@ import java.util.EnumSet;
 import static de.sayayi.lib.message.data.map.MapKey.Type.STRING;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static java.lang.Boolean.FALSE;
 
 
 /**
@@ -94,7 +95,7 @@ public final class FileSizeFormatter extends AbstractParameterFormatter implemen
     val unitMessage = formatterContext.getMapMessage(unit, EnumSet.of(STRING)).orElse(null);
 
     if ((unitMessage != null && unitMessage.isSpaceBefore()) ||
-        formatterContext.getConfigValueBool("space").orElse(false))
+        formatterContext.getConfigValueBool("space").orElse(FALSE))
       s.append(' ');
 
     return noSpaceText(s
