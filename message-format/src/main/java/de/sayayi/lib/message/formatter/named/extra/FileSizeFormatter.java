@@ -20,7 +20,6 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import lombok.val;
-import lombok.var;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
@@ -73,7 +72,7 @@ public final class FileSizeFormatter extends AbstractParameterFormatter implemen
       return nullText();
 
     val size = ((Number)value).longValue();
-    var scale = normalizeScale(formatterContext.getConfigValueNumber("scale").orElse(1));
+    int scale = normalizeScale(formatterContext.getConfigValueNumber("scale").orElse(1));
     val s = new StringBuilder();
     final int unitIndex;
 

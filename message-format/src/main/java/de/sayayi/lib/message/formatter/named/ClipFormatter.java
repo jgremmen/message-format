@@ -21,7 +21,6 @@ import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
 import lombok.val;
-import lombok.var;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
@@ -47,7 +46,7 @@ public final class ClipFormatter extends AbstractParameterFormatter implements N
 
     val text = formatterContext.format(value, false);
 
-    var s = text.getText();
+    String s = text.getText();
     if (s == null)
       return nullText();
     s = s.trim();
