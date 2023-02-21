@@ -20,6 +20,12 @@ apply plugin: "jacoco"
 apply plugin: "signing"
 
 
+configurations {
+  testAnnotationProcessor.extendsFrom annotationProcessor
+  testCompileOnly.extendsFrom compileOnly
+}
+
+
 dependencies {
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
@@ -28,26 +34,15 @@ dependencies {
 
   testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-  testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-  testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
-  testCompileOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
 }
 
 
 repositories {
   mavenCentral()
-  maven {
-    url "http://artifactory.sayayi.de/artifactory/maven/"
-    allowInsecureProtocol = true
-  }
 }
 
 
 java {
-  toolchain {
-    languageVersion = JavaLanguageVersion.of(8)
-  }
-
   withJavadocJar()
   withSourcesJar()
 }
@@ -81,6 +76,20 @@ tasks.withType(Jar) {
     include "LICENSE"
     into "META-INF"
     expand(copyright: new Date().format("yyyy"), version: project.version)
+  }
+}
+
+
+tasks.withType(JavaCompile).configureEach {
+  javaCompiler = javaToolchains.compilerFor {
+    languageVersion = JavaLanguageVersion.of(8)
+  }
+}
+
+
+tasks.withType(Test).configureEach {
+  javaLauncher = javaToolchains.launcherFor {
+    languageVersion = JavaLanguageVersion.of(8)
   }
 }
 
