@@ -6,7 +6,26 @@ TODO
 [[array]]
 == Array
 
-TODO
+[frame=none,grid=rows,cols="2,3,5",width=100%]
+|===
+|Key |Default |Description
+
+|`list-null`
+|(empty)
+|Replacement text for `null` elements
+
+|`list-this`
+|`(this array)`
+|Replacement text for an element which references this array
+
+|`list-sep`
+|`, `
+|Separartor text between elements
+
+|`list-sep-last`
+|(same as `list-sep`)
+|Separator text between the last 2 elements
+|===
 
 
 [[date]]
