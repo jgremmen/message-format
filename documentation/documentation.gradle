@@ -15,7 +15,6 @@
  */
 
 plugins {
-  id 'java-library'
   id 'de.sayayi.plugin.gradle.libdocs' version "1.0-SNAPSHOT"
 }
 
@@ -28,5 +27,22 @@ repositories {
 }
 
 
-libDocumentation {
+dependencies {
+  runtimeOnly project(":message-format")
+  runtimeOnly project(":message-format-cpscan")
+
+  runtimeOnly "org.projectlombok:lombok:${lombokVersion}"
+  runtimeOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
+}
+
+
+libdocs {
+  title = 'Message Format Library'
+
+  javadocs {
+    exclude '**/parser/Message*.java'
+    exclude '**/pack/*.java'
+    exclude '**/*Impl.java'
+    exclude '**/FixedSizeCacheMap.java'
+  }
 }
