@@ -46,11 +46,11 @@ public final class PackInputStream implements Closeable
       throw new IOException("pack stream has wrong header; possibly not a message pack");
 
     final int zv = stream.read();
-    if ((zv & 0x40) == 0)
+    if ((zv & 0b0100_0000) == 0)
       throw new IOException("malformed message pack version");
 
-    this.stream = (zv & 0x80) != 0 ? new GZIPInputStream(stream) : stream;
-    version = zv & 0x3f;
+    this.stream = (zv & 0b1000_0000) != 0 ? new GZIPInputStream(stream) : stream;
+    version = zv & 0b0011_1111;
   }
 
 
@@ -97,19 +97,19 @@ public final class PackInputStream implements Closeable
 
     switch(readSmall(2))
     {
-      case 0:
+      case 0b00:
         return null;
 
-      case 1:
+      case 0b01:
         if ((utflen = readSmall(4)) == 0)
           return "";
         break;
 
-      case 2:
+      case 0b10:
         utflen = readSmall(8);
         break;
 
-      case 3:
+      case 0b11:
         utflen = (int)readLarge(16);
         break;
     }
@@ -129,44 +129,44 @@ public final class PackInputStream implements Closeable
 
       switch(c >> 4)
       {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 7:
+        case 0b0_000:
+        case 0b0_001:
+        case 0b0_010:
+        case 0b0_011:
+        case 0b0_100:
+        case 0b0_101:
+        case 0b0_110:
+        case 0b0_111:
           /* 0xxx xxxx*/
           count++;
           chars[charIdx++] = (char)c;
           break;
 
-        case 12:
-        case 13: {
+        case 0b110_0:
+        case 0b110_1: {
           /* 110x xxxx   10xx xxxx*/
           if ((count += 2) > utflen)
             throw new UTFDataFormatException("malformed input: partial character at end");
 
           final int char2 = bytes[count - 1];
-          if ((char2 & 0xC0) != 0x80)
+          if ((char2 & 0b1100_0000) != 0b1000_0000)
             throw new UTFDataFormatException("malformed input around byte " + count);
 
-          chars[charIdx++] = (char)((c & 0x1F) << 6 | (char2 & 0x3F));
+          chars[charIdx++] = (char)((c & 0b0001_1111) << 6 | (char2 & 0b0011_1111));
           break;
         }
 
-        case 14: {
+        case 0b1110: {
           /* 1110 xxxx  10xx xxxx  10xx xxxx */
           if ((count += 3) > utflen)
             throw new UTFDataFormatException("malformed input: partial character at end");
 
           final int char2 = bytes[count - 2];
           final int char3 = bytes[count - 1];
-          if ((char2 & 0xC0) != 0x80 || (char3 & 0xC0) != 0x80)
+          if ((char2 & 0b1100_0000) != 0b1000_0000 || (char3 & 0b1100_0000) != 0b1000_0000)
             throw new UTFDataFormatException("malformed input around byte " + (count - 1));
 
-          chars[charIdx++] = (char)(((c & 0x0F) << 12) | ((char2 & 0x3F) << 6) | (char3 & 0x3F));
+          chars[charIdx++] = (char)(((c & 0b0000_1111) << 12) | ((char2 & 0b0011_1111) << 6) | (char3 & 0b0011_1111));
           break;
         }
 
@@ -208,9 +208,9 @@ public final class PackInputStream implements Closeable
     if ((v4 & 0b1000) == 0)  // 0vvv
       return v4;
     else if ((v4 & 0b0100) == 0)  // 10vv_v (-> 1vvv)
-      return ((v4 - 0b100) << 1) | (readBoolean() ? 1 : 0);
+      return ((v4 - 0b0100) << 1) | (readBoolean() ? 1 : 0);
     else  // 11vv_vvvvvv
-      return ((v4 & 0b11) << 6) | readSmall(6);
+      return ((v4 & 0b0011) << 6) | readSmall(6);
   }
 
 

@@ -42,7 +42,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  */
 @ToString
-public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode implements LocaleAware
+public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCode implements LocaleAware
 {
   private static final long serialVersionUID = 800L;
 

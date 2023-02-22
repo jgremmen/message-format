@@ -46,7 +46,7 @@ public final class PackOutputStream implements Closeable
   public PackOutputStream(@NotNull OutputStream stream, boolean compress) throws IOException
   {
     stream.write(PACK_HEADER);
-    stream.write((compress ? 0xC0 : 0x40) + (PACK_VERSION & 0x3f));
+    stream.write((compress ? 0b1100_0000 : 0b0100_0000) + (PACK_VERSION & 0b0011_1111));
 
     this.stream = compress ? new GZIPOutputStream(stream) : stream;
   }
@@ -77,7 +77,7 @@ public final class PackOutputStream implements Closeable
   }
 
 
-  public void writeUnsignedShort(@Range(from = 0, to = 65535)int value) throws IOException {
+  public void writeUnsignedShort(@Range(from = 0, to = 65535) int value) throws IOException {
     writeLarge(value, 16);
   }
 
@@ -111,12 +111,12 @@ public final class PackOutputStream implements Closeable
     }
 
     if (utflen < 16)
-      writeSmall(0x10 + utflen, 6);
+      writeSmall(0b01_0000 | utflen, 6);
     else if (utflen < 256)
-      writeLarge(0x200 + utflen, 10);
+      writeLarge(0b10_0000_0000 | utflen, 10);
     else
     {
-      writeSmall(3, 2);
+      writeSmall(0b11, 2);
       writeLarge(utflen, 16);
     }
 
@@ -162,9 +162,9 @@ public final class PackOutputStream implements Closeable
     if (value <= 7)
       writeSmall(value, 4);  // 0vvv
     else if (value <= 15)
-      writeSmall(0b10000 | (value - 8), 5);  // 10vvv (vvv + 8)
+      writeSmall(0b10_000 | (value - 8), 5);  // 10vvv (vvv + 8)
     else
-      writeLarge(0b1100000000 | value, 10);  // 11vvvvvvvv
+      writeLarge(0b11_00000000 | value, 10);  // 11vvvvvvvv
   }
 
 

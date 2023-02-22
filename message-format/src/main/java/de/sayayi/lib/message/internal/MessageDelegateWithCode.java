@@ -36,7 +36,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  */
 @ToString
-public class MessageDelegateWithCode extends AbstractMessageWithCode
+public final class MessageDelegateWithCode extends AbstractMessageWithCode
 {
   private static final long serialVersionUID = 800L;
 
