@@ -17,7 +17,7 @@
 plugins {
   id 'antlr'
   id 'idea'
-  id 'nebula.optional-base' version '7.0.0'
+  id 'com.netflix.nebula.optional-base' version '9.0.0'
   id 'de.sayayi.plugin.gradle.libapi' version "1.0-SNAPSHOT"
 }
 
