@@ -28,6 +28,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Locale;
 import java.util.Map;
@@ -67,8 +68,14 @@ public final class DataMap implements Data
   }
 
 
+  /**
+   * Returns the data map.
+   *
+   * @return  data map, never {@code null}
+   */
   @Override
   @Contract(pure = true)
+  @Unmodifiable
   public @NotNull Map<MapKey,MapValue> asObject() {
     return unmodifiableMap(map);
   }

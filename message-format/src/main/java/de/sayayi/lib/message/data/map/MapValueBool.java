@@ -46,6 +46,11 @@ public enum MapValueBool implements MapValue
   }
 
 
+  /**
+   * Returns the boolean value.
+   *
+   * @return  boolean, never {@code null}
+   */
   @Override
   public @NotNull Boolean asObject() {
     return bool;

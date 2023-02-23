@@ -40,6 +40,11 @@ public class DataNumber implements Data
   }
 
 
+  /**
+   * Returns the number value.
+   *
+   * @return  number, never {@code null}
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Long asObject() {

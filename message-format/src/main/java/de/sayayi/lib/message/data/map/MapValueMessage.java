@@ -42,6 +42,11 @@ public final class MapValueMessage implements MapValue
   }
 
 
+  /**
+   * Returns the message with spaces.
+   *
+   * @return  message with spaces, never {@code null}
+   */
   @Override
   public @NotNull Message.WithSpaces asObject() {
     return message;

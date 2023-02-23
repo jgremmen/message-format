@@ -31,9 +31,16 @@ import static java.util.Collections.unmodifiableSet;
  */
 public interface MapValue extends Data
 {
+  /** Map value types {@code string} and {@code message}. */
   Set<Type> STRING_MESSAGE_TYPE = unmodifiableSet(EnumSet.of(Type.STRING, Type.MESSAGE));
+
+  /** Map value type {@code string}. */
   Set<Type> STRING_TYPE = unmodifiableSet(EnumSet.of(Type.STRING));
+
+  /** Map value type {@code bool}. */
   Set<Type> BOOL_TYPE = unmodifiableSet(EnumSet.of(Type.BOOL));
+
+  /** Map value type {@code number}. */
   Set<Type> NUMBER_TYPE = unmodifiableSet(EnumSet.of(Type.NUMBER));
 
 
@@ -41,6 +48,9 @@ public interface MapValue extends Data
   @NotNull Type getType();
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Contract(pure = true)
   @NotNull Serializable asObject();
 

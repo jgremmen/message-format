@@ -32,10 +32,19 @@ import static java.util.Collections.unmodifiableSet;
  */
 public interface MapKey extends Serializable
 {
+  /** Map key types {@code empty} and {@code null}. */
   Set<Type> EMPTY_NULL_TYPE = unmodifiableSet(EnumSet.of(Type.EMPTY, Type.NULL));
+
+  /** Map key type {@code string}. */
   Set<Type> STRING_TYPE = unmodifiableSet(EnumSet.of(Type.STRING));
+
+  /** Map key types {@code string} and {@code empty}. */
   Set<Type> STRING_EMPTY_TYPE = unmodifiableSet(EnumSet.of(Type.STRING, Type.EMPTY));
+
+  /** Map key type {@code number}. */
   Set<Type> NUMBER_TYPE = unmodifiableSet(EnumSet.of(Type.NUMBER));
+
+  /** Map key type {@code name}. */
   Set<Type> NAME_TYPE = unmodifiableSet(EnumSet.of(Type.NAME));
 
 

@@ -40,6 +40,11 @@ public class DataString implements Data
   }
 
 
+  /**
+   * Returns the string value.
+   *
+   * @return  string, never {@code null}
+   */
   @Override
   @Contract(pure = true)
   public @NotNull String asObject() {
