@@ -18,11 +18,10 @@ package de.sayayi.lib.message.formatter;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.data.map.MapKey;
-import de.sayayi.lib.message.data.map.MapValue;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.parameter.key.ConfigKey;
+import de.sayayi.lib.message.parameter.value.ConfigValue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,30 +47,30 @@ public interface FormatterContext extends Parameters
 
 
   @Contract(pure = true)
-  @NotNull Optional<MapValue> getMapValue(Object key, @NotNull Set<MapKey.Type> keyTypes,
-                                          Set<MapValue.Type> valueTypes);
+  @NotNull Optional<ConfigValue> getMapValue(Object key, @NotNull Set<ConfigKey.Type> keyTypes,
+                                             Set<ConfigValue.Type> valueTypes);
 
 
   @Contract(pure = true)
-  default @NotNull Optional<Message.WithSpaces> getMapMessage(Object key, @NotNull Set<MapKey.Type> keyTypes) {
+  default @NotNull Optional<Message.WithSpaces> getMapMessage(Object key, @NotNull Set<ConfigKey.Type> keyTypes) {
     return getMapMessage(key, keyTypes, false);
   }
 
 
   @Contract(pure = true)
-  @NotNull Optional<Message.WithSpaces> getMapMessage(Object key, @NotNull Set<MapKey.Type> keyTypes,
+  @NotNull Optional<Message.WithSpaces> getMapMessage(Object key, @NotNull Set<ConfigKey.Type> keyTypes,
                                                       boolean includeDefault);
 
 
   @Contract(pure = true)
-  default @NotNull Message.WithSpaces getMapMessageOrEmpty(Object key, @NotNull Set<MapKey.Type> keyTypes,
+  default @NotNull Message.WithSpaces getMapMessageOrEmpty(Object key, @NotNull Set<ConfigKey.Type> keyTypes,
                                                            boolean includeDefault) {
     return getMapMessage(key, keyTypes, includeDefault).orElse(EmptyMessage.INSTANCE);
   }
 
 
   @Contract(pure = true)
-  @NotNull Optional<Data> getConfigValueData(@NotNull String name);
+  @NotNull Optional<ConfigValue> getConfigValue(@NotNull String name);
 
 
   @Contract(pure = true)

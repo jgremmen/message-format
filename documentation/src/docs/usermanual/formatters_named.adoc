@@ -59,13 +59,13 @@ The default text for a boolean is either `true` or `false`. In case that's not s
 customize the true and false values by as follows.
 
 .Basic bool example
-[source]
+[source,msg]
 ----
 %{b,bool}
 ----
 
 .Customized bool example
-[source]
+[source,msg]
 ----
 %{b,bool,true:'aye!',false:nope}
 ----

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.data.map;
+package de.sayayi.lib.message.parameter.value;
 
-import de.sayayi.lib.message.data.Data;
+import de.sayayi.lib.message.parameter.ParamConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,29 +27,40 @@ import static java.util.Collections.unmodifiableSet;
 
 
 /**
+ * Interface representing a typed value in a data map.
+ *
  * @author Jeroen Gremmen
+ *
+ * @see ParamConfig
  */
-public interface MapValue extends Data
+public interface ConfigValue extends Serializable
 {
-  /** Map value types {@code string} and {@code message}. */
+  /** Config value types {@code string} and {@code message}. */
   Set<Type> STRING_MESSAGE_TYPE = unmodifiableSet(EnumSet.of(Type.STRING, Type.MESSAGE));
 
-  /** Map value type {@code string}. */
+  /** Config value type {@code string}. */
   Set<Type> STRING_TYPE = unmodifiableSet(EnumSet.of(Type.STRING));
 
-  /** Map value type {@code bool}. */
+  /** Config value type {@code bool}. */
   Set<Type> BOOL_TYPE = unmodifiableSet(EnumSet.of(Type.BOOL));
 
-  /** Map value type {@code number}. */
+  /** Config value type {@code number}. */
   Set<Type> NUMBER_TYPE = unmodifiableSet(EnumSet.of(Type.NUMBER));
 
 
+  /**
+   * Return the config value type.
+   *
+   * @return  config value type, never {@code null}
+   */
   @Contract(pure = true)
   @NotNull Type getType();
 
 
   /**
-   * {@inheritDoc}
+   * Returns the underlying raw data object.
+   *
+   * @return  raw data object, never {@code null}
    */
   @Contract(pure = true)
   @NotNull Serializable asObject();
@@ -57,6 +68,9 @@ public interface MapValue extends Data
 
 
 
+  /**
+   * Type constants for map values.
+   */
   enum Type {
     STRING, NUMBER, BOOL, MESSAGE
   }

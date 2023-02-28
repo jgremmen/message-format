@@ -26,9 +26,9 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.EnumSet;
 
-import static de.sayayi.lib.message.data.map.MapKey.Type.STRING;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.Type.STRING;
 import static java.lang.Boolean.FALSE;
 
 

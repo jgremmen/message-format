@@ -16,12 +16,13 @@
 package de.sayayi.lib.message.pack;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.data.map.*;
 import de.sayayi.lib.message.internal.*;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.NoSpaceTextPart;
 import de.sayayi.lib.message.internal.part.ParameterPart;
 import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.parameter.key.*;
+import de.sayayi.lib.message.parameter.value.*;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -65,8 +66,8 @@ public final class PackHelper
   private static final int MESSAGE_TEXT = 5;
 
 
-  private final Map<MapKey,MapKey> mapKeys = new HashMap<>();
-  private final Map<MapValue,MapValue> mapValues = new HashMap<>();
+  private final Map<ConfigKey,ConfigKey> mapKeys = new HashMap<>();
+  private final Map<ConfigValue,ConfigValue> mapValues = new HashMap<>();
   private final Map<MessagePart,MessagePart> messageParts = new HashMap<>();
   private final Map<Message.WithSpaces,Message.WithSpaces> messagesWithSpaces = new HashMap<>();
 
@@ -233,134 +234,134 @@ public final class PackHelper
   }
 
 
-  public static void pack(@NotNull MapKey mapKey, @NotNull PackOutputStream packStream) throws IOException
+  public static void pack(@NotNull ConfigKey configKey, @NotNull PackOutputStream packStream) throws IOException
   {
-    if (mapKey instanceof MapKeyBool)
+    if (configKey instanceof ConfigKeyBool)
     {
       packStream.writeSmall(MAP_KEY_BOOL_ID, 3);
-      ((MapKeyBool)mapKey).pack(packStream);
+      ((ConfigKeyBool)configKey).pack(packStream);
     }
-    if (mapKey instanceof MapKeyEmpty)
+    if (configKey instanceof ConfigKeyEmpty)
     {
       packStream.writeSmall(MAP_KEY_EMPTY_ID, 3);
-      ((MapKeyEmpty)mapKey).pack(packStream);
+      ((ConfigKeyEmpty)configKey).pack(packStream);
     }
-    else if (mapKey instanceof MapKeyName)
+    else if (configKey instanceof ConfigKeyName)
     {
       packStream.writeSmall(MAP_KEY_NAME_ID, 3);
-      ((MapKeyName)mapKey).pack(packStream);
+      ((ConfigKeyName)configKey).pack(packStream);
     }
-    else if (mapKey instanceof MapKeyNull)
+    else if (configKey instanceof ConfigKeyNull)
     {
       packStream.writeSmall(MAP_KEY_NULL_ID, 3);
-      ((MapKeyNull)mapKey).pack(packStream);
+      ((ConfigKeyNull)configKey).pack(packStream);
     }
-    else if (mapKey instanceof MapKeyNumber)
+    else if (configKey instanceof ConfigKeyNumber)
     {
       packStream.writeSmall(MAP_KEY_NUMBER_ID, 3);
-      ((MapKeyNumber)mapKey).pack(packStream);
+      ((ConfigKeyNumber)configKey).pack(packStream);
     }
-    else if (mapKey instanceof MapKeyString)
+    else if (configKey instanceof ConfigKeyString)
     {
       packStream.writeSmall(MAP_KEY_STRING_ID, 3);
-      ((MapKeyString)mapKey).pack(packStream);
+      ((ConfigKeyString)configKey).pack(packStream);
     }
     else
-      throw new IllegalArgumentException("unknown map key type " + mapKey.getClass().getSimpleName());
+      throw new IllegalArgumentException("unknown map key type " + configKey.getClass().getSimpleName());
   }
 
 
-  public @NotNull MapKey unpackMapKey(@NotNull PackInputStream packStream) throws IOException
+  public @NotNull ConfigKey unpackMapKey(@NotNull PackInputStream packStream) throws IOException
   {
-    final MapKey mapKey;
+    final ConfigKey configKey;
 
     switch(packStream.readSmall(3))
     {
       case MAP_KEY_BOOL_ID:
-        mapKey = MapKeyBool.unpack(packStream);
+        configKey = ConfigKeyBool.unpack(packStream);
         break;
 
       case MAP_KEY_EMPTY_ID:
-        mapKey = MapKeyEmpty.unpack(packStream);
+        configKey = ConfigKeyEmpty.unpack(packStream);
         break;
 
       case MAP_KEY_NAME_ID:
-        mapKey = MapKeyName.unpack(packStream);
+        configKey = ConfigKeyName.unpack(packStream);
         break;
 
       case MAP_KEY_NULL_ID:
-        mapKey = MapKeyNull.unpack(packStream);
+        configKey = ConfigKeyNull.unpack(packStream);
         break;
 
       case MAP_KEY_NUMBER_ID:
-        mapKey = MapKeyNumber.unpack(packStream);
+        configKey = ConfigKeyNumber.unpack(packStream);
         break;
 
       case MAP_KEY_STRING_ID:
-        mapKey = MapKeyString.unpack(packStream);
+        configKey = ConfigKeyString.unpack(packStream);
         break;
 
       default:
         throw new IllegalStateException("map key expected");
     }
 
-    return mapKeys.computeIfAbsent(mapKey, identity());
+    return mapKeys.computeIfAbsent(configKey, identity());
   }
 
 
-  public static void pack(@NotNull MapValue mapValue, @NotNull PackOutputStream packStream) throws IOException
+  public static void pack(@NotNull ConfigValue configValue, @NotNull PackOutputStream packStream) throws IOException
   {
-    if (mapValue instanceof MapValueBool)
+    if (configValue instanceof ConfigValueBool)
     {
       packStream.writeSmall(MAP_VALUE_BOOL_ID, 2);
-      ((MapValueBool)mapValue).pack(packStream);
+      ((ConfigValueBool)configValue).pack(packStream);
     }
-    if (mapValue instanceof MapValueMessage)
+    if (configValue instanceof ConfigValueMessage)
     {
       packStream.writeSmall(MAP_VALUE_MESSAGE_ID, 2);
-      ((MapValueMessage)mapValue).pack(packStream);
+      ((ConfigValueMessage)configValue).pack(packStream);
     }
-    else if (mapValue instanceof MapValueNumber)
+    else if (configValue instanceof ConfigValueNumber)
     {
       packStream.writeSmall(MAP_VALUE_NUMBER_ID, 2);
-      ((MapValueNumber)mapValue).pack(packStream);
+      ((ConfigValueNumber)configValue).pack(packStream);
     }
-    else if (mapValue instanceof MapValueString)
+    else if (configValue instanceof ConfigValueString)
     {
       packStream.writeSmall(MAP_VALUE_STRING_ID, 2);
-      ((MapValueString)mapValue).pack(packStream);
+      ((ConfigValueString)configValue).pack(packStream);
     }
     else
-      throw new IllegalArgumentException("unknown map value type " + mapValue.getClass().getSimpleName());
+      throw new IllegalArgumentException("unknown map value type " + configValue.getClass().getSimpleName());
   }
 
 
-  public @NotNull MapValue unpackMapValue(@NotNull PackInputStream packStream) throws IOException
+  public @NotNull ConfigValue unpackMapValue(@NotNull PackInputStream packStream) throws IOException
   {
-    final MapValue mapValue;
+    final ConfigValue configValue;
 
     switch(packStream.readSmall(2))
     {
       case MAP_VALUE_BOOL_ID:
-        mapValue = MapValueBool.unpack(packStream);
+        configValue = ConfigValueBool.unpack(packStream);
         break;
 
       case MAP_VALUE_MESSAGE_ID:
-        mapValue = MapValueMessage.unpack(this, packStream);
+        configValue = ConfigValueMessage.unpack(this, packStream);
         break;
 
       case MAP_VALUE_NUMBER_ID:
-        mapValue = MapValueNumber.unpack(packStream);
+        configValue = ConfigValueNumber.unpack(packStream);
         break;
 
       case MAP_VALUE_STRING_ID:
-        mapValue = MapValueString.unpack(packStream);
+        configValue = ConfigValueString.unpack(packStream);
         break;
 
       default:
         throw new IllegalStateException("map value expected");
     }
 
-    return mapValues.computeIfAbsent(mapValue, identity());
+    return mapValues.computeIfAbsent(configValue, identity());
   }
 }

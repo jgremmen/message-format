@@ -13,23 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.data.map;
+package de.sayayi.lib.message.parameter.key;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.text.Collator;
 import java.util.Locale;
 
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.*;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.CompareType.EQ;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.CompareType.NE;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.*;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -38,22 +39,17 @@ import static de.sayayi.lib.message.data.map.MapKey.MatchResult.*;
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
 @AllArgsConstructor
-public final class MapKeyNumber implements MapKey
+public final class ConfigKeyString implements ConfigKey
 {
   private static final long serialVersionUID = 800L;
 
   private final @NotNull CompareType compareType;
-  @Getter private final long number;
-
-
-  public MapKeyNumber(@NotNull CompareType compareType, @NotNull String number) {
-    this(compareType, Long.parseLong(number));
-  }
+  private final @NotNull String string;
 
 
   @Override
   public @NotNull Type getType() {
-    return Type.NUMBER;
+    return Type.STRING;
   }
 
 
@@ -64,49 +60,39 @@ public final class MapKeyNumber implements MapKey
       return MISMATCH;
 
     MatchResult result = EXACT;
-    int cmp;
+    int cmp = 0;
 
     doMatch: {
-      if (value instanceof Long || value instanceof Integer || value instanceof Short || value instanceof Byte)
-      {
-        cmp = Long.signum(((Number)value).longValue() - number);
-        break doMatch;
-      }
+      if (!(value instanceof CharSequence || value instanceof Character))
+        result = EQUIVALENT;
 
-      if (value instanceof BigInteger)
-      {
-        cmp = ((BigInteger)value).compareTo(BigInteger.valueOf(number));
-        break doMatch;
-      }
+      final String text = value.toString();
 
-      if (value instanceof CharSequence || value instanceof Character)
+      if (compareType == EQ)
       {
-        try {
-          value = new BigDecimal(value.toString());
+        if (text.equals(string))
+          break doMatch;
+
+        //noinspection DuplicateExpressions
+        if (text.toLowerCase(locale).equals(string.toLowerCase(locale)))
+        {
           result = LENIENT;
-        } catch(Exception ignore) {
+          break doMatch;
         }
-      }
 
-      if (value instanceof BigDecimal)
-      {
-        cmp = ((BigDecimal)value).compareTo(BigDecimal.valueOf(number));
+        cmp = 1;
         break doMatch;
       }
 
-      if (value instanceof Float)
+      //noinspection DuplicateExpressions
+      if (compareType == NE && !text.toLowerCase(locale).equals(string.toLowerCase(locale)))
       {
-        cmp = Float.compare((Float)value, number);
+        result = LENIENT;
+        cmp = 1;
         break doMatch;
       }
 
-      if (value instanceof Number)
-      {
-        cmp = Double.compare(((Number)value).doubleValue(), number);
-        break doMatch;
-      }
-
-      return MISMATCH;
+      cmp = Collator.getInstance(locale).compare(text, string);
     }
 
     return compareType.match(cmp) ? result : MISMATCH;
@@ -123,20 +109,20 @@ public final class MapKeyNumber implements MapKey
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeEnum(compareType);
-    packStream.writeLong(number);
+    packStream.writeString(string);
   }
 
 
   /**
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked number map key, never {@code null}
+   * @return  unpacked string map key, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
-  public static @NotNull MapKeyNumber unpack(@NotNull PackInputStream packStream) throws IOException {
-    return new MapKeyNumber(packStream.readEnum(CompareType.class), packStream.readLong());
+  public static @NotNull ConfigKeyNumber unpack(@NotNull PackInputStream packStream) throws IOException {
+    return new ConfigKeyNumber(packStream.readEnum(CompareType.class), requireNonNull(packStream.readString()));
   }
 }

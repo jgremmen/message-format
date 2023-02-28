@@ -16,10 +16,10 @@
 package de.sayayi.lib.message.formatter.named.extra;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.data.map.MapKeyName;
-import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.named.extra.GeoFormatter.Format;
+import de.sayayi.lib.message.parameter.key.ConfigKeyName;
+import de.sayayi.lib.message.parameter.value.ConfigValueString;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -105,21 +105,21 @@ public class GeoFormatterTest extends AbstractFormatterTest
 
     // short-longitude
     assertEquals(noSpaceText("4\u00b048'E"), format(context, dms(4, 48),
-        singletonMap(new MapKeyName("geo"), new MapValueString("short-longitude")), "geo"));
+        singletonMap(new ConfigKeyName("geo"), new ConfigValueString("short-longitude")), "geo"));
 
     // longitude
     assertEquals(noSpaceText("19\u00b00'0\"W"), format(context, -dms(18, 59, 59, 501),
-        singletonMap(new MapKeyName("geo"), new MapValueString("longitude")), "geo"));
+        singletonMap(new ConfigKeyName("geo"), new ConfigValueString("longitude")), "geo"));
 
     // medium-longitude
     assertEquals(noSpaceText("18\u00b059'59,9\"E"), format(context, context.parameters().withLocale(GERMANY),
         dms(18, 59, 59, 891),
-        singletonMap(new MapKeyName("geo"), new MapValueString("medium-longitude")), "geo"));
+        singletonMap(new ConfigKeyName("geo"), new ConfigValueString("medium-longitude")), "geo"));
 
     // long-longitude
     assertEquals(noSpaceText("18\u00b059'59.891\"W"), format(context, context.parameters().withLocale(UK),
         -dms(18, 59, 59, 891),
-        singletonMap(new MapKeyName("geo"), new MapValueString("long-longitude")), "geo"));
+        singletonMap(new ConfigKeyName("geo"), new ConfigValueString("long-longitude")), "geo"));
   }
 
 

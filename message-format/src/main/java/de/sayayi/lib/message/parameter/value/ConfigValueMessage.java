@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.data.map;
+package de.sayayi.lib.message.parameter.value;
 
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import lombok.AllArgsConstructor;
@@ -22,44 +24,32 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static lombok.AccessLevel.PRIVATE;
-
 
 /**
  * @author Jeroen Gremmen
  */
-@AllArgsConstructor(access = PRIVATE)
-public enum MapValueBool implements MapValue
+@AllArgsConstructor
+public final class ConfigValueMessage implements ConfigValue
 {
-  FALSE(false),
-  TRUE(true);
-
-
   private static final long serialVersionUID = 800L;
 
-  private final boolean bool;
+  private final @NotNull Message.WithSpaces message;
 
 
   @Override
   public @NotNull Type getType() {
-    return Type.BOOL;
+    return Type.MESSAGE;
   }
 
 
   /**
-   * Returns the boolean value.
+   * Returns the message with spaces.
    *
-   * @return  boolean, never {@code null}
+   * @return  message with spaces, never {@code null}
    */
   @Override
-  public @NotNull Boolean asObject() {
-    return bool;
-  }
-
-
-  @Override
-  public String toString() {
-    return Boolean.toString(bool);
+  public @NotNull Message.WithSpaces asObject() {
+    return message;
   }
 
 
@@ -71,20 +61,23 @@ public enum MapValueBool implements MapValue
    * @since 0.8.0
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeBoolean(bool);
+    PackHelper.pack(message, packStream);
   }
 
 
   /**
+   * @param unpack      unpacker instance, not {@code null}
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked boolean map value, never {@code null}
+   * @return  unpacked message map value, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
-  public static @NotNull MapValueBool unpack(@NotNull PackInputStream packStream) throws IOException {
-    return packStream.readBoolean() ? TRUE : FALSE;
+  public static @NotNull ConfigValueMessage unpack(@NotNull PackHelper unpack,
+                                                   @NotNull PackInputStream packStream)
+      throws IOException {
+    return new ConfigValueMessage(unpack.unpackMessageWithSpaces(packStream));
   }
 }

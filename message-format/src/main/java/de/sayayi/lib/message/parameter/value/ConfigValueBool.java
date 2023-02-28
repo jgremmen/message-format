@@ -13,48 +13,67 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.data.map;
+package de.sayayi.lib.message.parameter.value;
 
-import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
+import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static java.util.Objects.requireNonNull;
+import static lombok.AccessLevel.PRIVATE;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class MapValueString extends DataString implements MapValue
+@AllArgsConstructor(access = PRIVATE)
+public enum ConfigValueBool implements ConfigValue
 {
+  FALSE(false),
+  TRUE(true);
+
+
   private static final long serialVersionUID = 800L;
 
-  private Message.WithSpaces message;
-
-
-  public MapValueString(@NotNull String string) {
-    super(string);
-  }
+  private final boolean bool;
 
 
   @Override
   public @NotNull Type getType() {
-    return Type.STRING;
+    return Type.BOOL;
   }
 
 
-  @NotNull
-  public synchronized Message.WithSpaces asMessage(@NotNull MessageFactory messageFactory)
-  {
-    if (message == null)
-      message = messageFactory.parse(asObject());
+  /**
+   * Return the number as boolean.
+   *
+   * @return  number as boolean
+   *
+   * @since 0.8.0
+   */
+  @Contract(pure = true)
+  public boolean booleanValue() {
+    return bool;
+  }
 
-    return message;
+
+  /**
+   * Returns the boolean value.
+   *
+   * @return  boolean, never {@code null}
+   */
+  @Override
+  public @NotNull Boolean asObject() {
+    return bool;
+  }
+
+
+  @Override
+  public String toString() {
+    return Boolean.toString(bool);
   }
 
 
@@ -66,20 +85,20 @@ public final class MapValueString extends DataString implements MapValue
    * @since 0.8.0
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeString(asObject());
+    packStream.writeBoolean(bool);
   }
 
 
   /**
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked string map value, never {@code null}
+   * @return  unpacked boolean map value, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
-  public static @NotNull MapValueString unpack(@NotNull PackInputStream packStream) throws IOException {
-    return new MapValueString(requireNonNull(packStream.readString()));
+  public static @NotNull ConfigValueBool unpack(@NotNull PackInputStream packStream) throws IOException {
+    return packStream.readBoolean() ? TRUE : FALSE;
   }
 }

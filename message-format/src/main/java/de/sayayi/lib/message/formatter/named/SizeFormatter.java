@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-import static de.sayayi.lib.message.data.map.MapKey.NUMBER_TYPE;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.NUMBER_TYPE;
 
 
 /**

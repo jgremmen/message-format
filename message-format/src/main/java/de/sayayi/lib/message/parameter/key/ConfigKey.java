@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.data.map;
+package de.sayayi.lib.message.parameter.key;
 
 import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.parameter.ParamConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,9 +29,13 @@ import static java.util.Collections.unmodifiableSet;
 
 
 /**
+ * Interface representing a typed key in a data map.
+ *
  * @author Jeroen Gremmen
+ *
+ * @see ParamConfig
  */
-public interface MapKey extends Serializable
+public interface ConfigKey extends Serializable
 {
   /** Map key types {@code empty} and {@code null}. */
   Set<Type> EMPTY_NULL_TYPE = unmodifiableSet(EnumSet.of(Type.EMPTY, Type.NULL));
@@ -72,6 +77,9 @@ public interface MapKey extends Serializable
 
 
 
+  /**
+   * Type constants for map keys.
+   */
   enum Type {
     STRING, NUMBER, BOOL, NULL, EMPTY, NAME
   }

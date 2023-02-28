@@ -16,11 +16,11 @@
 package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.data.map.MapKeyName;
-import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.parameter.key.ConfigKeyName;
+import de.sayayi.lib.message.parameter.value.ConfigValueString;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -57,17 +57,17 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
     val date = LocalDate.of(1972, 8, 17);
 
     assertEquals(noSpaceText("17.08.72"),
-        format(context, date, singletonMap(new MapKeyName("date"), new MapValueString("short"))));
+        format(context, date, singletonMap(new ConfigKeyName("date"), new ConfigValueString("short"))));
     assertEquals(noSpaceText("17.08.1972"),
-        format(context, date, singletonMap(new MapKeyName("date"), new MapValueString("medium"))));
+        format(context, date, singletonMap(new ConfigKeyName("date"), new ConfigValueString("medium"))));
     assertEquals(noSpaceText("17. August 1972"),
-        format(context, date, singletonMap(new MapKeyName("date"), new MapValueString("long"))));
+        format(context, date, singletonMap(new ConfigKeyName("date"), new ConfigValueString("long"))));
     assertEquals(noSpaceText("Donnerstag, 17. August 1972"),
-        format(context, date, singletonMap(new MapKeyName("date"), new MapValueString("full"))));
+        format(context, date, singletonMap(new ConfigKeyName("date"), new ConfigValueString("full"))));
     assertEquals(noSpaceText("17.08.1972"),
-        format(context, date, singletonMap(new MapKeyName("date"), new MapValueString("date"))));
+        format(context, date, singletonMap(new ConfigKeyName("date"), new ConfigValueString("date"))));
 
-    assertEquals(emptyText(), format(context, date, singletonMap(new MapKeyName("date"), new MapValueString("time"))));
+    assertEquals(emptyText(), format(context, date, singletonMap(new ConfigKeyName("date"), new ConfigValueString("time"))));
   }
 
 
@@ -78,17 +78,17 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
     val time = LocalTime.of(16, 34, 11, 672000000);
 
     assertEquals(new TextPart("16:34"), format(context, time,
-        singletonMap(new MapKeyName("date"), new MapValueString("short"))));
+        singletonMap(new ConfigKeyName("date"), new ConfigValueString("short"))));
     assertEquals(new TextPart("16:34:11"), format(context, time,
-        singletonMap(new MapKeyName("date"), new MapValueString("medium"))));
+        singletonMap(new ConfigKeyName("date"), new ConfigValueString("medium"))));
     assertEquals(new TextPart("16:34:11"), format(context, time,
-        singletonMap(new MapKeyName("date"), new MapValueString("long"))));
+        singletonMap(new ConfigKeyName("date"), new ConfigValueString("long"))));
     assertEquals(new TextPart("16:34 Uhr"), format(context, time,
-        singletonMap(new MapKeyName("date"), new MapValueString("full"))));
+        singletonMap(new ConfigKeyName("date"), new ConfigValueString("full"))));
     assertEquals(new TextPart("16:34:11"), format(context, time,
-        singletonMap(new MapKeyName("date"), new MapValueString("time"))));
+        singletonMap(new ConfigKeyName("date"), new ConfigValueString("time"))));
 
-    assertEquals(Text.EMPTY, format(context, time, singletonMap(new MapKeyName("date"), new MapValueString("date"))));
+    assertEquals(Text.EMPTY, format(context, time, singletonMap(new ConfigKeyName("date"), new ConfigValueString("date"))));
   }
 
 
@@ -99,18 +99,18 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
     val datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
 
     assertEquals(new TextPart("17/08/72 02:40"),
-        format(context, datetime, singletonMap(new MapKeyName("date"), new MapValueString("short"))));
+        format(context, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("short"))));
     assertEquals(new TextPart("17-Aug-1972 02:40:23"),
-        format(context, datetime, singletonMap(new MapKeyName("date"), new MapValueString("medium"))));
+        format(context, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("medium"))));
     assertEquals(new TextPart("17 August 1972 02:40:23 CET"),
-        format(context, datetime, singletonMap(new MapKeyName("date"), new MapValueString("long"))));
+        format(context, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("long"))));
     assertEquals(new TextPart("Thursday, 17 August 1972 02:40:23 o'clock CET"),
-        format(context, datetime, singletonMap(new MapKeyName("date"), new MapValueString("full"))));
+        format(context, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("full"))));
 
     assertEquals(new TextPart("17-Aug-1972"),
-        format(context, datetime, singletonMap(new MapKeyName("date"), new MapValueString("date"))));
+        format(context, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("date"))));
     assertEquals(new TextPart("02:40:23"),
-        format(context, datetime, singletonMap(new MapKeyName("date"), new MapValueString("time"))));
+        format(context, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("time"))));
   }
 
 
@@ -121,11 +121,11 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
     val datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
 
     assertEquals(new TextPart("17 août"),
-        format(context, datetime, singletonMap(new MapKeyName("date"), new MapValueString("dd MMMM"))));
+        format(context, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("dd MMMM"))));
     assertEquals(new TextPart("jeu. jeudi"),
-        format(context, datetime, singletonMap(new MapKeyName("date"), new MapValueString("EEE EEEE"))));
+        format(context, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("EEE EEEE"))));
     assertEquals(new TextPart("02:40:23,833"),
-        format(context, datetime, singletonMap(new MapKeyName("date"), new MapValueString("HH:mm:ss,SSS"))));
+        format(context, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("HH:mm:ss,SSS"))));
   }
 
 

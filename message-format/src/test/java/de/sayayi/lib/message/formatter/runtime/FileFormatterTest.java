@@ -16,9 +16,9 @@
 package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.data.map.MapKeyName;
-import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
+import de.sayayi.lib.message.parameter.key.ConfigKeyName;
+import de.sayayi.lib.message.parameter.value.ConfigValueString;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -46,11 +46,11 @@ public class FileFormatterTest extends AbstractFormatterTest
     assertEquals(nullText(), format(context, null));
     assertEquals(noSpaceText("/path1/path2/filename.ext"), format(context, f));
     assertEquals(noSpaceText("filename.ext"), format(context, f,
-        singletonMap(new MapKeyName("file"), new MapValueString("name"))));
+        singletonMap(new ConfigKeyName("file"), new ConfigValueString("name"))));
     assertEquals(noSpaceText("/path1/path2"), format(context, f,
-        singletonMap(new MapKeyName("file"), new MapValueString("parent"))));
+        singletonMap(new ConfigKeyName("file"), new ConfigValueString("parent"))));
     assertEquals(noSpaceText("ext"), format(context, f,
-        singletonMap(new MapKeyName("file"), new MapValueString("extension"))));
+        singletonMap(new ConfigKeyName("file"), new ConfigValueString("extension"))));
   }
 
 

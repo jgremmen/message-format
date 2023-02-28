@@ -17,9 +17,6 @@ package de.sayayi.lib.message.internal.part;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
-import de.sayayi.lib.message.data.map.MapKey;
-import de.sayayi.lib.message.data.map.MapValue;
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.FormatterContextImpl;
@@ -27,6 +24,9 @@ import de.sayayi.lib.message.internal.part.MessagePart.Parameter;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
+import de.sayayi.lib.message.parameter.ParamConfig;
+import de.sayayi.lib.message.parameter.key.ConfigKey;
+import de.sayayi.lib.message.parameter.value.ConfigValue;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -51,17 +51,17 @@ public final class ParameterPart implements Parameter
 
   private final @NotNull String parameter;
   private final String format;
-  private final @NotNull DataMap map;
+  private final @NotNull ParamConfig map;
   private final boolean spaceBefore;
   private final boolean spaceAfter;
 
 
   public ParameterPart(@NotNull String parameter, String format, boolean spaceBefore, boolean spaceAfter,
-                       @NotNull Map<MapKey,MapValue> map)
+                       @NotNull Map<ConfigKey, ConfigValue> map)
   {
     this.parameter = parameter;
     this.format = "".equals(format) ? null : format;
-    this.map = new DataMap(map);
+    this.map = new ParamConfig(map);
     this.spaceBefore = spaceBefore;
     this.spaceAfter = spaceAfter;
   }
@@ -149,7 +149,7 @@ public final class ParameterPart implements Parameter
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    final Map<MapKey,MapValue> map = this.map.asObject();
+    final Map<ConfigKey, ConfigValue> map = this.map.getMap();
 
     packStream.writeBoolean(spaceBefore);
     packStream.writeBoolean(spaceAfter);
@@ -157,7 +157,7 @@ public final class ParameterPart implements Parameter
     packStream.writeString(format);
     packStream.writeString(parameter);
 
-    for(Entry<MapKey,MapValue> mapEntry: map.entrySet())
+    for(Entry<ConfigKey, ConfigValue> mapEntry: map.entrySet())
     {
       PackHelper.pack(mapEntry.getKey(), packStream);
       PackHelper.pack(mapEntry.getValue(), packStream);
@@ -184,12 +184,12 @@ public final class ParameterPart implements Parameter
     final int size = packStream.readSmallVar();
     final String format = packStream.readString();
     final String parameter = requireNonNull(packStream.readString());
-    final Map<MapKey,MapValue> map = new HashMap<>();
+    final Map<ConfigKey, ConfigValue> map = new HashMap<>();
 
     for(int n = 0; n < size; n++)
     {
-      final MapKey key = unpack.unpackMapKey(packStream);
-      final MapValue value = unpack.unpackMapValue(packStream);
+      final ConfigKey key = unpack.unpackMapKey(packStream);
+      final ConfigValue value = unpack.unpackMapValue(packStream);
 
       map.put(key, value);
     }

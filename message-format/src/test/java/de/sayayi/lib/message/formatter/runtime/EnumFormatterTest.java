@@ -16,9 +16,9 @@
 package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.data.map.MapKeyName;
-import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
+import de.sayayi.lib.message.parameter.key.ConfigKeyName;
+import de.sayayi.lib.message.parameter.value.ConfigValueString;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -46,9 +46,9 @@ class EnumFormatterTest extends AbstractFormatterTest
     val context = new MessageContext(createFormatterService(new EnumFormatter()), NO_CACHE_INSTANCE, ROOT);
 
     assertEquals(noSpaceText("3"), format(context, MyEnum.DD,
-        singletonMap(new MapKeyName("enum"), new MapValueString("ordinal"))));
+        singletonMap(new ConfigKeyName("enum"), new ConfigValueString("ordinal"))));
 
-    context.setDefaultData("enum", "ordinal");
+    context.setDefaultParameterConfig("enum", "ordinal");
     assertEquals(noSpaceText("0"), format(context, MyEnum.AA));
   }
 
