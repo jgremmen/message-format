@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.pack;
 
-import de.sayayi.lib.message.data.map.MapKey.CompareType;
+import de.sayayi.lib.message.parameter.key.ConfigKey.CompareType;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;

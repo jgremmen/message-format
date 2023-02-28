@@ -15,7 +15,7 @@ Add the following to your Gradle build file in order to use Message Format:
 
 .Gradle configuration
 
-[source, groovy, linenums]
+[source, groovy]
 [subs="verbatim,attributes"]
 ----
 ...

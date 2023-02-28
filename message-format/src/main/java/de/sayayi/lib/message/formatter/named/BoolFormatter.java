@@ -30,10 +30,10 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
-import static de.sayayi.lib.message.data.map.MapKey.EMPTY_NULL_TYPE;
-import static de.sayayi.lib.message.data.map.MapKey.Type.BOOL;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.EMPTY_NULL_TYPE;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.Type.BOOL;
 import static java.util.Arrays.asList;
 
 

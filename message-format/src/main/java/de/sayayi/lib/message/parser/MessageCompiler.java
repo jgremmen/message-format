@@ -20,8 +20,6 @@ import de.sayayi.lib.antlr4.AbstractVocabulary;
 import de.sayayi.lib.antlr4.syntax.GenericSyntaxErrorFormatter;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.data.map.*;
-import de.sayayi.lib.message.data.map.MapKey.CompareType;
 import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.ParameterizedMessage;
@@ -30,6 +28,9 @@ import de.sayayi.lib.message.internal.TextMessage;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.ParameterPart;
 import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.parameter.key.*;
+import de.sayayi.lib.message.parameter.key.ConfigKey.CompareType;
+import de.sayayi.lib.message.parameter.value.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jetbrains.annotations.Contract;
@@ -233,11 +234,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitParameter(ParameterContext ctx)
     {
-      final Map<MapKey,MapValue> mapElements = ctx.mapElement().stream()
+      final Map<ConfigKey,ConfigValue> mapElements = ctx.configElement().stream()
           .collect(toMap(mec -> mec.key, mec -> mec.value, (a, b) -> b, LinkedHashMap::new));
       final ForceQuotedMessageContext forceQuotedMessage = ctx.forceQuotedMessage();
       if (forceQuotedMessage != null)
-        mapElements.put(null, new MapValueMessage(forceQuotedMessage.value));
+        mapElements.put(null, new ConfigValueMessage(forceQuotedMessage.value));
 
       ctx.value = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(
           ctx.name.name, ctx.format == null ? null : ctx.format.name,
@@ -265,73 +266,73 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitMapElement(MapElementContext ctx)
+    public void exitConfigElement(ConfigElementContext ctx)
     {
-      ctx.key = ctx.mapKey().key;
-      ctx.value = ctx.mapValue().value;
+      ctx.key = ctx.configKey().key;
+      ctx.value = ctx.configValue().value;
     }
 
 
     @Override
-    public void exitMapKeyString(MapKeyStringContext ctx) {
-      ctx.key = new MapKeyString(ctx.relationalOperatorOptional().cmp, ctx.string().value);
+    public void exitConfigKeyString(ConfigKeyStringContext ctx) {
+      ctx.key = new ConfigKeyString(ctx.relationalOperatorOptional().cmp, ctx.string().value);
     }
 
 
     @Override
-    public void exitMapKeyNumber(MapKeyNumberContext ctx) {
-      ctx.key = new MapKeyNumber(ctx.relationalOperatorOptional().cmp, ctx.NUMBER().getText());
+    public void exitConfigKeyNumber(ConfigKeyNumberContext ctx) {
+      ctx.key = new ConfigKeyNumber(ctx.relationalOperatorOptional().cmp, ctx.NUMBER().getText());
     }
 
 
     @Override
-    public void exitMapKeyBool(MapKeyBoolContext ctx) {
-      ctx.key = parseBoolean(ctx.BOOL().getText()) ? MapKeyBool.TRUE : MapKeyBool.FALSE;
+    public void exitConfigKeyBool(ConfigKeyBoolContext ctx) {
+      ctx.key = parseBoolean(ctx.BOOL().getText()) ? ConfigKeyBool.TRUE : ConfigKeyBool.FALSE;
     }
 
 
     @Override
-    public void exitMapKeyNull(MapKeyNullContext ctx) {
-      ctx.key = new MapKeyNull(ctx.equalOperatorOptional().cmp);
+    public void exitConfigKeyNull(ConfigKeyNullContext ctx) {
+      ctx.key = new ConfigKeyNull(ctx.equalOperatorOptional().cmp);
     }
 
 
     @Override
-    public void exitMapKeyEmpty(MapKeyEmptyContext ctx) {
-      ctx.key = new MapKeyEmpty(ctx.equalOperatorOptional().cmp);
+    public void exitConfigKeyEmpty(ConfigKeyEmptyContext ctx) {
+      ctx.key = new ConfigKeyEmpty(ctx.equalOperatorOptional().cmp);
     }
 
 
     @Override
-    public void exitMapKeyName(MapKeyNameContext ctx) {
-      ctx.key = new MapKeyName(ctx.NAME().getText());
+    public void exitConfigKeyName(ConfigKeyNameContext ctx) {
+      ctx.key = new ConfigKeyName(ctx.NAME().getText());
     }
 
 
     @Override
-    public void exitMapValueString(MapValueStringContext ctx)
+    public void exitConfigValueString(ConfigValueStringContext ctx)
     {
       final StringContext stringContext = ctx.string();
 
-      ctx.value = new MapValueString(stringContext != null ? stringContext.value : ctx.nameOrKeyword().name);
+      ctx.value = new ConfigValueString(stringContext != null ? stringContext.value : ctx.nameOrKeyword().name);
     }
 
 
     @Override
-    public void exitMapValueNumber(MapValueNumberContext ctx) {
-      ctx.value = new MapValueNumber(Long.parseLong(ctx.NUMBER().getText()));
+    public void exitConfigValueNumber(ConfigValueNumberContext ctx) {
+      ctx.value = new ConfigValueNumber(Long.parseLong(ctx.NUMBER().getText()));
     }
 
 
     @Override
-    public void exitMapValueBool(MapValueBoolContext ctx) {
-      ctx.value = parseBoolean(ctx.BOOL().getText()) ? MapValueBool.TRUE : MapValueBool.FALSE;
+    public void exitConfigValueBool(ConfigValueBoolContext ctx) {
+      ctx.value = parseBoolean(ctx.BOOL().getText()) ? ConfigValueBool.TRUE : ConfigValueBool.FALSE;
     }
 
 
     @Override
-    public void exitMapValueMessage(MapValueMessageContext ctx) {
-      ctx.value = new MapValueMessage(ctx.quotedMessage().value);
+    public void exitConfigValueMessage(ConfigValueMessageContext ctx) {
+      ctx.value = new ConfigValueMessage(ctx.quotedMessage().value);
     }
 
 

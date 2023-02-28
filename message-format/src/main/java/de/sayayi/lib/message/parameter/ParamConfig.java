@@ -13,46 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.data;
+package de.sayayi.lib.message.parameter;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.map.MapKey;
-import de.sayayi.lib.message.data.map.MapKey.MatchResult;
-import de.sayayi.lib.message.data.map.MapValue;
-import de.sayayi.lib.message.data.map.MapValue.Type;
-import de.sayayi.lib.message.data.map.MapValueMessage;
-import de.sayayi.lib.message.data.map.MapValueString;
+import de.sayayi.lib.message.parameter.key.ConfigKey;
+import de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult;
+import de.sayayi.lib.message.parameter.value.ConfigValue;
+import de.sayayi.lib.message.parameter.value.ConfigValue.Type;
+import de.sayayi.lib.message.parameter.value.ConfigValueMessage;
+import de.sayayi.lib.message.parameter.value.ConfigValueString;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.io.Serializable;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.EXACT;
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.MISMATCH;
-import static de.sayayi.lib.message.data.map.MapValue.STRING_MESSAGE_TYPE;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.EXACT;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.MISMATCH;
+import static de.sayayi.lib.message.parameter.value.ConfigValue.STRING_MESSAGE_TYPE;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.toCollection;
 
 
 /**
+ * This class represents the message parameter configuration map.
+ *
  * @author Jeroen Gremmen
  */
 @AllArgsConstructor
 @EqualsAndHashCode(doNotUseGetters = true)
-public final class DataMap implements Data
+public final class ParamConfig implements Serializable
 {
   private static final long serialVersionUID = 800L;
 
-  private final @NotNull Map<MapKey,MapValue> map;
+  private final @NotNull Map<ConfigKey, ConfigValue> map;
 
 
   @Contract(pure = true)
@@ -69,45 +72,44 @@ public final class DataMap implements Data
 
 
   /**
-   * Returns the data map.
+   * Returns the parameter configuration as a map.
    *
-   * @return  data map, never {@code null}
+   * @return  map, never {@code null}
    */
-  @Override
   @Contract(pure = true)
   @Unmodifiable
-  public @NotNull Map<MapKey,MapValue> asObject() {
+  public @NotNull Map<ConfigKey,ConfigValue> getMap() {
     return unmodifiableMap(map);
   }
 
 
   @Contract(pure = true)
-  public MapValue find(@NotNull MessageContext messageContext, Object key,
-                       @NotNull Parameters parameters, @NotNull Set<MapKey.Type> keyTypes,
-                       Set<MapValue.Type> valueTypes)
+  public ConfigValue find(@NotNull MessageContext messageContext, Object key,
+                          @NotNull Parameters parameters, @NotNull Set<ConfigKey.Type> keyTypes,
+                          Set<ConfigValue.Type> valueTypes)
   {
     final Locale locale = parameters.getLocale();
     MatchResult bestMatchResult = MISMATCH;
-    MapKey mapKey;
-    MapValue bestMatch = null;
+    ConfigKey configKey;
+    ConfigValue bestMatch = null;
 
-    for(Entry<MapKey,MapValue> entry: map.entrySet())
-      if ((mapKey = entry.getKey()) != null)
+    for(Entry<ConfigKey,ConfigValue> entry: map.entrySet())
+      if ((configKey = entry.getKey()) != null)
       {
-        final MapValue mapValue = entry.getValue();
+        final ConfigValue configValue = entry.getValue();
 
-        if (keyTypes.contains(mapKey.getType()) &&
-            (valueTypes == null || valueTypes.contains(mapValue.getType())))
+        if (keyTypes.contains(configKey.getType()) &&
+            (valueTypes == null || valueTypes.contains(configValue.getType())))
         {
-          final MatchResult matchResult = mapKey.match(messageContext, locale, key);
+          final MatchResult matchResult = configKey.match(messageContext, locale, key);
 
           if (matchResult == EXACT)
-            return mapValue;
+            return configValue;
 
           if (matchResult.compareTo(bestMatchResult) > 0)
           {
             bestMatchResult = matchResult;
-            bestMatch = mapValue;
+            bestMatch = configValue;
           }
         }
       }
@@ -118,24 +120,24 @@ public final class DataMap implements Data
 
   @Contract(pure = true)
   public Message.WithSpaces getMessage(@NotNull MessageContext messageContext, Object key,
-                                       @NotNull Parameters parameters, @NotNull Set<MapKey.Type> keyTypes,
+                                       @NotNull Parameters parameters, @NotNull Set<ConfigKey.Type> keyTypes,
                                        boolean includeDefault)
   {
-    MapValue mapValue = find(messageContext, key, parameters, keyTypes, STRING_MESSAGE_TYPE);
+    ConfigValue configValue = find(messageContext, key, parameters, keyTypes, STRING_MESSAGE_TYPE);
 
-    if (mapValue == null)
+    if (configValue == null)
     {
       if (includeDefault &&
           map.keySet().stream().anyMatch(mk -> mk != null && keyTypes.contains(mk.getType())))
-        mapValue = map.get(null);
+        configValue = map.get(null);
 
-      if (mapValue == null)
+      if (configValue == null)
         return null;
     }
 
-    return mapValue.getType() == Type.STRING
-        ? ((MapValueString)mapValue).asMessage(messageContext.getMessageFactory())
-        : (Message.WithSpaces)mapValue.asObject();
+    return configValue.getType() == Type.STRING
+        ? ((ConfigValueString)configValue).asMessage(messageContext.getMessageFactory())
+        : (Message.WithSpaces)configValue.asObject();
   }
 
 
@@ -148,8 +150,8 @@ public final class DataMap implements Data
   public @NotNull Set<String> getParameterNames()
   {
     return map.values().stream()
-        .filter(mapValue -> mapValue instanceof MapValueMessage)
-        .flatMap(mapValue -> ((MapValueMessage)mapValue).asObject().getParameterNames().stream())
+        .filter(mapValue -> mapValue instanceof ConfigValueMessage)
+        .flatMap(mapValue -> ((ConfigValueMessage)mapValue).asObject().getParameterNames().stream())
         .collect(toCollection(TreeSet::new));
   }
 }

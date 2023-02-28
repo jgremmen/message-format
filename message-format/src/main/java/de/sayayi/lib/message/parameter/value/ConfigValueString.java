@@ -13,59 +13,82 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.data.map;
+package de.sayayi.lib.message.parameter.value;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Locale;
 
-import static de.sayayi.lib.message.data.map.MapKey.CompareType.EQ;
-import static de.sayayi.lib.message.data.map.MapKey.CompareType.NE;
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.TYPELESS_EXACT;
+import static java.util.Objects.requireNonNull;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
-public final class MapKeyNull implements MapKey
+public final class ConfigValueString implements ConfigValue
 {
   private static final long serialVersionUID = 800L;
 
-  private final @NotNull CompareType compareType;
+  private final String string;
+  private Message.WithSpaces message;
 
 
-  public MapKeyNull(@NotNull CompareType compareType)
-  {
-    if (compareType != EQ && compareType != NE)
-      throw new IllegalArgumentException("compareType must be EQ or NE");
-
-    this.compareType = compareType;
+  public ConfigValueString(@NotNull String string) {
+    this.string = string;
   }
 
 
   @Override
   public @NotNull Type getType() {
-    return Type.NULL;
+    return Type.STRING;
+  }
+
+
+  /**
+   * Return the string value.
+   *
+   * @return  string, never {@code null}
+   *
+   * @since 0.8.0
+   */
+  public @NotNull String stringValue() {
+    return string;
+  }
+
+
+  /**
+   * Returns the string value.
+   *
+   * @return  string, never {@code null}
+   */
+  @Override
+  @Contract(pure = true)
+  public @NotNull String asObject() {
+    return string;
+  }
+
+
+  @NotNull
+  public synchronized Message.WithSpaces asMessage(@NotNull MessageFactory messageFactory)
+  {
+    if (message == null)
+      message = messageFactory.parse(string);
+
+    return message;
   }
 
 
   @Override
-  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Locale locale, Object value)
-  {
-    if (value == null && compareType == EQ)
-      return TYPELESS_EXACT;
-    if (value != null && compareType == NE)
-      return TYPELESS_EXACT;
-
-    return MatchResult.MISMATCH;
+  @Contract(pure = true)
+  public @NotNull String toString() {
+    return string;
   }
 
 
@@ -77,20 +100,20 @@ public final class MapKeyNull implements MapKey
    * @since 0.8.0
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeEnum(compareType);
+    packStream.writeString(asObject());
   }
 
 
   /**
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked null map key, never {@code null}
+   * @return  unpacked string map value, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
-  public static @NotNull MapKeyNull unpack(@NotNull PackInputStream packStream) throws IOException {
-    return new MapKeyNull(packStream.readEnum(CompareType.class));
+  public static @NotNull ConfigValueString unpack(@NotNull PackInputStream packStream) throws IOException {
+    return new ConfigValueString(requireNonNull(packStream.readString()));
   }
 }

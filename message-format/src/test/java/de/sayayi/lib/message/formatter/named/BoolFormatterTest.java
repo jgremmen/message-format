@@ -16,11 +16,11 @@
 package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.data.map.MapKey;
-import de.sayayi.lib.message.data.map.MapKeyBool;
-import de.sayayi.lib.message.data.map.MapValue;
-import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
+import de.sayayi.lib.message.parameter.key.ConfigKey;
+import de.sayayi.lib.message.parameter.key.ConfigKeyBool;
+import de.sayayi.lib.message.parameter.value.ConfigValue;
+import de.sayayi.lib.message.parameter.value.ConfigValueString;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -51,9 +51,9 @@ public class BoolFormatterTest extends AbstractFormatterTest
   public void testFormat()
   {
     val context = new MessageContext(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE, "de-DE");
-    val map = new HashMap<MapKey,MapValue>();
-    map.put(MapKeyBool.TRUE, new MapValueString("wahr"));
-    map.put(MapKeyBool.FALSE, new MapValueString("falsch"));
+    val map = new HashMap<ConfigKey, ConfigValue>();
+    map.put(ConfigKeyBool.TRUE, new ConfigValueString("wahr"));
+    map.put(ConfigKeyBool.FALSE, new ConfigValueString("falsch"));
 
     assertEquals(noSpaceText("wahr"), format(context, Boolean.TRUE, map));
     assertEquals(noSpaceText("falsch"), format(context, 0.0d, map, "bool"));

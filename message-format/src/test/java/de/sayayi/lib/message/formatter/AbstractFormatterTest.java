@@ -17,11 +17,11 @@ package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.DataMap;
-import de.sayayi.lib.message.data.map.MapKey;
-import de.sayayi.lib.message.data.map.MapValue;
 import de.sayayi.lib.message.internal.FormatterContextImpl;
 import de.sayayi.lib.message.internal.part.MessagePart;
+import de.sayayi.lib.message.parameter.ParamConfig;
+import de.sayayi.lib.message.parameter.key.ConfigKey;
+import de.sayayi.lib.message.parameter.value.ConfigValue;
 import lombok.val;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -69,14 +69,14 @@ public abstract class AbstractFormatterTest
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageContext messageContext, Object value,
-                                        @NotNull Map<MapKey,MapValue> map) {
+                                        @NotNull Map<ConfigKey, ConfigValue> map) {
     return format(messageContext, messageContext.noParameters(), value, map, null);
   }
 
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageContext messageContext, Object value,
-                                        @NotNull Map<MapKey,MapValue> map, @NotNull String format) {
+                                        @NotNull Map<ConfigKey, ConfigValue> map, @NotNull String format) {
     return format(messageContext, messageContext.noParameters(), value, map, format);
   }
 
@@ -84,10 +84,10 @@ public abstract class AbstractFormatterTest
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageContext messageContext,
                                         @NotNull Parameters parameters, Object value,
-                                        @NotNull Map<MapKey,MapValue> map,
+                                        @NotNull Map<ConfigKey, ConfigValue> map,
                                         String format)
   {
-    return new FormatterContextImpl(messageContext, parameters, value, null, format, new DataMap(map))
+    return new FormatterContextImpl(messageContext, parameters, value, null, format, new ParamConfig(map))
         .delegateToNextFormatter();
   }
 

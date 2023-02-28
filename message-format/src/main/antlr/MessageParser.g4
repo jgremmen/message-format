@@ -25,8 +25,9 @@ options {
 @header {
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.internal.part.*;
-import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.data.map.*;
+import de.sayayi.lib.message.parameter.ParamConfig;
+import de.sayayi.lib.message.parameter.key.*;
+import de.sayayi.lib.message.parameter.value.*;
 import java.util.Map;
 }
 
@@ -66,37 +67,37 @@ parameter returns [ParameterPart value]
         : PARAM_START
           name=nameOrKeyword
           (COMMA format=nameOrKeyword)?
-          (COMMA mapElement)*
+          (COMMA configElement)*
           (COMMA COLON forceQuotedMessage)?
           PARAM_END
         ;
 
-mapElement returns [MapKey key, MapValue value]
-        : mapKey COLON mapValue
+configElement returns [ConfigKey key, ConfigValue value]
+        : configKey COLON configValue
         ;
 
-mapKey returns [MapKey key]
-        : relationalOperatorOptional string  #mapKeyString
-        | relationalOperatorOptional NUMBER  #mapKeyNumber
-        | BOOL                               #mapKeyBool
-        | equalOperatorOptional NULL         #mapKeyNull
-        | equalOperatorOptional EMPTY        #mapKeyEmpty
-        | NAME                               #mapKeyName
+configKey returns [ConfigKey key]
+        : relationalOperatorOptional string  #configKeyString
+        | relationalOperatorOptional NUMBER  #configKeyNumber
+        | BOOL                               #configKeyBool
+        | equalOperatorOptional NULL         #configKeyNull
+        | equalOperatorOptional EMPTY        #configKeyEmpty
+        | NAME                               #configKeyName
         ;
 
-mapValue returns [MapValue value]
-        : BOOL           #mapValueBool
-        | NUMBER         #mapValueNumber
-        | string         #mapValueString
-        | nameOrKeyword  #mapValueString
-        | quotedMessage  #mapValueMessage
+configValue returns [ConfigValue value]
+        : BOOL           #configValueBool
+        | NUMBER         #configValueNumber
+        | string         #configValueString
+        | nameOrKeyword  #configValueString
+        | quotedMessage  #configValueMessage
         ;
 
-relationalOperatorOptional returns [MapKey.CompareType cmp]
+relationalOperatorOptional returns [ConfigKey.CompareType cmp]
         : relationalOperator?
         ;
 
-relationalOperator returns [MapKey.CompareType cmp]
+relationalOperator returns [ConfigKey.CompareType cmp]
         : equalOperator
         | LTE
         | LT
@@ -104,11 +105,11 @@ relationalOperator returns [MapKey.CompareType cmp]
         | GTE
         ;
 
-equalOperatorOptional returns [MapKey.CompareType cmp]
+equalOperatorOptional returns [ConfigKey.CompareType cmp]
         : equalOperator?
         ;
 
-equalOperator returns [MapKey.CompareType cmp]
+equalOperator returns [ConfigKey.CompareType cmp]
         : EQ
         | NE
         ;

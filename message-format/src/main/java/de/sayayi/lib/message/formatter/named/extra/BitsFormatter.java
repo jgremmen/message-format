@@ -15,13 +15,13 @@
  */
 package de.sayayi.lib.message.formatter.named.extra;
 
-import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.data.DataNumber;
-import de.sayayi.lib.message.data.DataString;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.parameter.value.ConfigValue;
+import de.sayayi.lib.message.parameter.value.ConfigValueNumber;
+import de.sayayi.lib.message.parameter.value.ConfigValueString;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
@@ -67,14 +67,14 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
 
   private int detectBitCount(@NotNull FormatterContext formatterContext, @NotNull Object value)
   {
-    final Data dataValue = formatterContext.getConfigValueData("bits").orElse(null);
+    final ConfigValue configValue = formatterContext.getConfigValue("bits").orElse(null);
 
-    if (dataValue instanceof DataString && "auto".equals(dataValue.asObject()))
+    if (configValue instanceof ConfigValueString && "auto".equals(configValue.asObject()))
       return autoDetectBitCount(value);
 
-    if (dataValue instanceof DataNumber)
+    if (configValue instanceof ConfigValueNumber)
     {
-      int bits = ((DataNumber)dataValue).asObject().intValue();
+      int bits = ((ConfigValueNumber)configValue).intValue();
       if (bits > 0 && bits <= 1024)
         return bits;
     }

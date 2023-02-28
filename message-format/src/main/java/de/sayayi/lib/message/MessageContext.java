@@ -15,9 +15,9 @@
  */
 package de.sayayi.lib.message;
 
-import de.sayayi.lib.message.data.map.*;
 import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import de.sayayi.lib.message.parameter.value.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
@@ -41,7 +41,7 @@ public class MessageContext
   private final @NotNull FormatterService formatterService;
   @Getter private final @NotNull MessageFactory messageFactory;
   @Getter private final @NotNull Locale locale;
-  private final @NotNull Map<String,MapValue> defaultDataMapValues = new TreeMap<>();
+  private final @NotNull Map<String,ConfigValue> defaultParameterConfig = new TreeMap<>();
 
 
   public MessageContext(@NotNull FormatterService formatterService, @NotNull MessageFactory messageFactory,
@@ -56,32 +56,32 @@ public class MessageContext
 
 
   @Contract(mutates = "this")
-  public void setDefaultData(@NotNull String name, boolean value) {
-    defaultDataMapValues.put(name, value ? MapValueBool.TRUE : MapValueBool.FALSE);
+  public void setDefaultParameterConfig(@NotNull String name, boolean value) {
+    defaultParameterConfig.put(name, value ? ConfigValueBool.TRUE : ConfigValueBool.FALSE);
   }
 
 
   @Contract(mutates = "this")
-  public void setDefaultData(@NotNull String name, long value) {
-    defaultDataMapValues.put(name, new MapValueNumber(value));
+  public void setDefaultParameterConfig(@NotNull String name, long value) {
+    defaultParameterConfig.put(name, new ConfigValueNumber(value));
   }
 
 
   @Contract(mutates = "this")
-  public void setDefaultData(@NotNull String name, @NotNull String value) {
-    defaultDataMapValues.put(name, new MapValueString(value));
+  public void setDefaultParameterConfig(@NotNull String name, @NotNull String value) {
+    defaultParameterConfig.put(name, new ConfigValueString(value));
   }
 
 
   @Contract(mutates = "this")
-  public void setDefaultData(@NotNull String name, @NotNull Message.WithSpaces value) {
-    defaultDataMapValues.put(name, new MapValueMessage(value));
+  public void setDefaultParameterConfig(@NotNull String name, @NotNull Message.WithSpaces value) {
+    defaultParameterConfig.put(name, new ConfigValueMessage(value));
   }
 
 
   @Contract(pure = true)
-  public MapValue getDefaultData(@NotNull String name) {
-    return defaultDataMapValues.get(name);
+  public ConfigValue getDefaultParameterConfig(@NotNull String name) {
+    return defaultParameterConfig.get(name);
   }
 
 

@@ -13,79 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.data.map;
+package de.sayayi.lib.message.parameter.key;
 
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Locale;
 
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.*;
-import static lombok.AccessLevel.PRIVATE;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.EXACT;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.MISMATCH;
+import static java.util.Objects.requireNonNull;
 
 
 /**
  * @author Jeroen Gremmen
  */
 @ToString(doNotUseGetters = true)
-@AllArgsConstructor(access = PRIVATE)
-public enum MapKeyBool implements MapKey
+@EqualsAndHashCode(doNotUseGetters = true)
+@AllArgsConstructor
+public final class ConfigKeyName implements ConfigKey
 {
-  FALSE(false),
-  TRUE(true);
-
-
   private static final long serialVersionUID = 800L;
 
-  @Getter private final boolean bool;
+  @Getter private final @NotNull String name;
 
 
   @Override
   public @NotNull Type getType() {
-    return Type.BOOL;
+    return Type.NAME;
   }
 
 
   @Override
   public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Locale locale, Object value)
   {
-    if (value != null)
-    {
-      if (value instanceof Boolean && (Boolean)value == bool)
-        return EXACT;
-
-      if (value instanceof BigInteger)
-        return ((((BigInteger)value).signum() != 0) == bool) ? LENIENT : MISMATCH;
-
-      if (value instanceof CharSequence || value instanceof Character)
-      {
-        final String string = value.toString();
-
-        if (("true".equalsIgnoreCase(string) && bool) || ("false".equalsIgnoreCase(string) && !bool))
-          return EQUIVALENT;
-
-        try {
-          value = new BigDecimal(string);
-        } catch(Exception ignore) {
-        }
-      }
-
-      if (value instanceof BigDecimal)
-       return ((((BigDecimal)value).signum() != 0) == bool) ? LENIENT : MISMATCH;
-
-      if (value instanceof Number && (((Number)value).longValue() != 0) == bool)
-        return LENIENT;
-    }
-
-    return MISMATCH;
+    return (value instanceof CharSequence || value instanceof Character) && value.toString().equals(name)
+        ? EXACT : MISMATCH;
   }
 
 
@@ -97,20 +67,20 @@ public enum MapKeyBool implements MapKey
    * @since 0.8.0
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeBoolean(bool);
+    packStream.writeString(name);
   }
 
 
   /**
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked boolean map key, never {@code null}
+   * @return  unpacked name map key, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
-  public static @NotNull MapKeyBool unpack(@NotNull PackInputStream packStream) throws IOException {
-    return packStream.readBoolean() ? TRUE : FALSE;
+  public static @NotNull ConfigKeyName unpack(@NotNull PackInputStream packStream) throws IOException {
+    return new ConfigKeyName(requireNonNull(packStream.readString()));
   }
 }

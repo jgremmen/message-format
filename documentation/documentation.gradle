@@ -19,9 +19,6 @@ plugins {
 }
 
 
-description = 'Documentation'
-
-
 repositories {
   mavenCentral()
 }
@@ -36,13 +33,27 @@ dependencies {
 }
 
 
+asciidoctorj {
+  requires './src/docs/ruby/rouge-adapter.rb'
+}
+
+
 libdocs {
   title = 'Message Format Library'
+  email = 'message-format@reg.sayayi.de'
+
+  gitHubUrl = uri('https://github.com/jgremmen/message-format/')
 
   javadocs {
+    useDefaultCss = true
+
     exclude '**/parser/Message*.java'
     exclude '**/pack/*.java'
     exclude '**/*Impl.java'
     exclude '**/FixedSizeCacheMap.java'
+  }
+
+  userManual {
+    highlighter = 'rouge'
   }
 }

@@ -18,21 +18,24 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageContext;
 import de.sayayi.lib.message.MessageContext.Parameters;
-import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.data.DataMap;
-import de.sayayi.lib.message.data.map.*;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.parameter.ParamConfig;
+import de.sayayi.lib.message.parameter.key.ConfigKey;
+import de.sayayi.lib.message.parameter.value.ConfigValue;
+import de.sayayi.lib.message.parameter.value.ConfigValueBool;
+import de.sayayi.lib.message.parameter.value.ConfigValueNumber;
+import de.sayayi.lib.message.parameter.value.ConfigValueString;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-import static de.sayayi.lib.message.data.map.MapKey.NAME_TYPE;
 import static de.sayayi.lib.message.formatter.ParameterFormatter.NULL_TYPE;
 import static de.sayayi.lib.message.internal.part.MessagePart.Text.NULL;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.NAME_TYPE;
 
 
 /**
@@ -45,12 +48,12 @@ public final class FormatterContextImpl implements FormatterContext
   private final @NotNull Parameters parameters;
   private final Object value;
   private final String format;
-  private final @NotNull DataMap map;
+  private final @NotNull ParamConfig map;
   private final @NotNull Deque<ParameterFormatter> parameterFormatters;
 
 
   public FormatterContextImpl(@NotNull MessageContext messageContext, @NotNull Parameters parameters,
-                              Object value, Class<?> type, String format, @NotNull DataMap map)
+                              Object value, Class<?> type, String format, @NotNull ParamConfig map)
   {
     this.messageContext = messageContext;
     this.parameters = parameters;
@@ -84,40 +87,43 @@ public final class FormatterContextImpl implements FormatterContext
 
 
   @Override
-  public @NotNull Optional<MapValue> getMapValue(Object key, @NotNull Set<MapKey.Type> keyTypes,
-                                                 Set<MapValue.Type> valueTypes) {
+  public @NotNull Optional<ConfigValue> getMapValue(Object key, @NotNull Set<ConfigKey.Type> keyTypes,
+                                                    Set<ConfigValue.Type> valueTypes) {
     return Optional.ofNullable(map.find(messageContext, key, parameters, keyTypes, valueTypes));
   }
 
 
   @Override
-  public @NotNull Optional<Message.WithSpaces> getMapMessage(Object key, @NotNull Set<MapKey.Type> keyTypes,
+  public @NotNull Optional<Message.WithSpaces> getMapMessage(Object key, @NotNull Set<ConfigKey.Type> keyTypes,
                                                              boolean includeDefault) {
     return Optional.ofNullable(map.getMessage(messageContext, key, parameters, keyTypes, includeDefault));
   }
 
 
   @Override
-  public @NotNull Optional<Data> getConfigValueData(@NotNull String name)
+  public @NotNull Optional<ConfigValue> getConfigValue(@NotNull String name)
   {
-    final MapValue mapValue = map.find(messageContext, name, parameters, NAME_TYPE, null);
-    return mapValue != null ? Optional.of(mapValue) : Optional.ofNullable(messageContext.getDefaultData(name));
+    final ConfigValue configValue = map.find(messageContext, name, parameters, NAME_TYPE, null);
+
+    return configValue != null
+        ? Optional.of(configValue)
+        : Optional.ofNullable(messageContext.getDefaultParameterConfig(name));
   }
 
 
   @Override
   public @NotNull Optional<String> getConfigValueString(@NotNull String name)
   {
-    final MapValueString string =
-        (MapValueString)map.find(messageContext, name, parameters, NAME_TYPE, MapValue.STRING_TYPE);
+    final ConfigValueString string =
+        (ConfigValueString)map.find(messageContext, name, parameters, NAME_TYPE, ConfigValue.STRING_TYPE);
 
     if (string != null)
       return Optional.of(string.asObject());
 
-    final MapValue mapValue = messageContext.getDefaultData(name);
+    final ConfigValue configValue = messageContext.getDefaultParameterConfig(name);
 
-    return mapValue instanceof MapValueString
-        ? Optional.of(((MapValueString)mapValue).asObject())
+    return configValue instanceof ConfigValueString
+        ? Optional.of(((ConfigValueString)configValue).asObject())
         : Optional.empty();
   }
 
@@ -125,16 +131,16 @@ public final class FormatterContextImpl implements FormatterContext
   @Override
   public @NotNull OptionalLong getConfigValueNumber(@NotNull String name)
   {
-    final MapValueNumber number =
-        (MapValueNumber)map.find(messageContext, name, parameters, NAME_TYPE, MapValue.NUMBER_TYPE);
+    final ConfigValueNumber number =
+        (ConfigValueNumber)map.find(messageContext, name, parameters, NAME_TYPE, ConfigValue.NUMBER_TYPE);
 
     if (number != null)
       return OptionalLong.of(number.asObject());
 
-    final MapValue mapValue = messageContext.getDefaultData(name);
+    final ConfigValue configValue = messageContext.getDefaultParameterConfig(name);
 
-    return mapValue instanceof MapValueNumber
-        ? OptionalLong.of(((MapValueNumber)mapValue).asObject())
+    return configValue instanceof ConfigValueNumber
+        ? OptionalLong.of(((ConfigValueNumber)configValue).asObject())
         : OptionalLong.empty();
   }
 
@@ -142,15 +148,16 @@ public final class FormatterContextImpl implements FormatterContext
   @Override
   public @NotNull Optional<Boolean> getConfigValueBool(@NotNull String name)
   {
-    final MapValueBool bool = (MapValueBool)map.find(messageContext, name, parameters, NAME_TYPE, MapValue.BOOL_TYPE);
+    final ConfigValueBool bool =
+        (ConfigValueBool)map.find(messageContext, name, parameters, NAME_TYPE, ConfigValue.BOOL_TYPE);
 
     if (bool != null)
       return Optional.of(bool.asObject());
 
-    final MapValue mapValue = messageContext.getDefaultData(name);
+    final ConfigValue configValue = messageContext.getDefaultParameterConfig(name);
 
-    return mapValue instanceof MapValueBool
-        ? Optional.of(((MapValueBool)mapValue).asObject())
+    return configValue instanceof ConfigValueBool
+        ? Optional.of(((ConfigValueBool)configValue).asObject())
         : Optional.empty();
   }
 

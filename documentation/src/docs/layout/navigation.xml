@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation>
+
+  <group title="Quick Start">
+    <item name="What is Message Format?" link="../usermanual/what-is.html"/>
+    <item name="Set Up" link="../usermanual/set-up.html"/>
+    <item name="Samples" link="../usermanual/sample.html"/>
+  </group>
+
+  <group title="Message Structure">
+    <item name="Message Syntax" link="../usermanual/message-syntax.html"/>
+    <item name="Parameter Syntax" link="../usermanual/parameter-syntax.html"/>
+    <item name="Whitespace Handling" link="../usermanual/message-whitespace.html"/>
+  </group>
+
+  <group title="Formatters">
+    <item name="Named Formatters">
+      <item name="Boolean" link="../usermanual/fmt-boolean.html"/>
+      <item name="Choice" link="../usermanual/fmt-choice.html"/>
+      <item name="Clip" link="../usermanual/fmt-clip.html"/>
+      <item name="Size" link="../usermanual/fmt-size.html"/>
+    </item>
+    <item name="Typed Formatters">
+      <item name="Array" link="../usermanual/fmt-array.html"/>
+      <item name="Date" link="../usermanual/fmt-date.html"/>
+      <item name="Date (joda-time)" link="../usermanual/fmt-date-joda-time.html"/>
+    </item>
+  </group>
+
+</navigation>

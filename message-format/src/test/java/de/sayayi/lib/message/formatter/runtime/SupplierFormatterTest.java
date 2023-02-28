@@ -16,10 +16,10 @@
 package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.data.map.MapKeyName;
-import de.sayayi.lib.message.data.map.MapValueString;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.named.BoolFormatter;
+import de.sayayi.lib.message.parameter.key.ConfigKeyName;
+import de.sayayi.lib.message.parameter.value.ConfigValueString;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -54,6 +54,6 @@ public class SupplierFormatterTest extends AbstractFormatterTest
         createFormatterService(new NumberFormatter(), new LongSupplierFormatter()), NO_CACHE_INSTANCE, "en");
 
     assertEquals(noSpaceText("1,234,567,890"), format(context, (LongSupplier) () -> 1234567890L,
-        singletonMap(new MapKeyName("number"), new MapValueString("###,###,###,###"))));
+        singletonMap(new ConfigKeyName("number"), new ConfigValueString("###,###,###,###"))));
   }
 }

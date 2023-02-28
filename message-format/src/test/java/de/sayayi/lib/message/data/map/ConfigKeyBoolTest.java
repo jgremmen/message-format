@@ -22,16 +22,16 @@ import org.junit.jupiter.api.Test;
 import java.util.Locale;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static de.sayayi.lib.message.data.map.MapKey.MatchResult.*;
-import static de.sayayi.lib.message.data.map.MapKeyBool.FALSE;
-import static de.sayayi.lib.message.data.map.MapKeyBool.TRUE;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.*;
+import static de.sayayi.lib.message.parameter.key.ConfigKeyBool.FALSE;
+import static de.sayayi.lib.message.parameter.key.ConfigKeyBool.TRUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public class MapKeyBoolTest
+public class ConfigKeyBoolTest
 {
   @Test
   public void testMatchNull()

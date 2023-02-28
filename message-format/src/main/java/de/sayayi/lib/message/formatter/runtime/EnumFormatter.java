@@ -25,9 +25,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-import static de.sayayi.lib.message.data.map.MapKey.STRING_TYPE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.STRING_TYPE;
 import static java.util.Collections.singleton;
 
 

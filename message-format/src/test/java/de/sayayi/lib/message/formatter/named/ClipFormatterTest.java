@@ -16,10 +16,10 @@
 package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.data.map.MapKeyName;
-import de.sayayi.lib.message.data.map.MapValueNumber;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.runtime.DoubleSupplierFormatter;
+import de.sayayi.lib.message.parameter.key.ConfigKeyName;
+import de.sayayi.lib.message.parameter.value.ConfigValueNumber;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -66,10 +66,10 @@ public class ClipFormatterTest extends AbstractFormatterTest
 
     assertEquals(noSpaceText("This is a very..."),
         format(context, "This is a very long text which is clipped at a length of 64 characters",
-            singletonMap(new MapKeyName("clip-size"), new MapValueNumber(18)), "clip"));
+            singletonMap(new ConfigKeyName("clip-size"), new ConfigValueNumber(18)), "clip"));
     assertEquals(noSpaceText("This..."),
         format(context, "This is a very long text",
-            singletonMap(new MapKeyName("clip-size"), new MapValueNumber(2)), "clip"));
+            singletonMap(new ConfigKeyName("clip-size"), new ConfigValueNumber(2)), "clip"));
   }
 
 
@@ -81,7 +81,7 @@ public class ClipFormatterTest extends AbstractFormatterTest
 
     assertEquals(noSpaceText("3.1415926..."),
         format(context, (DoubleSupplier)() -> Math.PI,
-            singletonMap(new MapKeyName("clip-size"), new MapValueNumber(12)), "clip"));
+            singletonMap(new ConfigKeyName("clip-size"), new ConfigValueNumber(12)), "clip"));
   }
 
 

@@ -28,10 +28,10 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.Set;
 
-import static de.sayayi.lib.message.data.map.MapKey.NUMBER_TYPE;
-import static de.sayayi.lib.message.data.map.MapKey.STRING_EMPTY_TYPE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.NUMBER_TYPE;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.STRING_EMPTY_TYPE;
 import static java.util.Collections.singleton;
 
 

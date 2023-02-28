@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.data.map.*;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
@@ -26,6 +25,12 @@ import de.sayayi.lib.message.internal.TextMessage;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.MessagePartFactory;
 import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.parameter.key.ConfigKey;
+import de.sayayi.lib.message.parameter.key.ConfigKeyBool;
+import de.sayayi.lib.message.parameter.key.ConfigKeyName;
+import de.sayayi.lib.message.parameter.value.ConfigValue;
+import de.sayayi.lib.message.parameter.value.ConfigValueMessage;
+import de.sayayi.lib.message.parameter.value.ConfigValueString;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -66,16 +71,16 @@ public class ArrayFormatterTest extends AbstractFormatterTest
   {
     val formatterService = createFormatterService(new ArrayFormatter(), new BoolFormatter());
     val context = new MessageContext(formatterService, NO_CACHE_INSTANCE, "de-DE");
-    val map = new HashMap<MapKey,MapValue>();
-    map.put(MapKeyBool.TRUE, new MapValueString("wahr"));
-    map.put(MapKeyBool.FALSE, new MapValueString("falsch"));
+    val map = new HashMap<ConfigKey, ConfigValue>();
+    map.put(ConfigKeyBool.TRUE, new ConfigValueString("wahr"));
+    map.put(ConfigKeyBool.FALSE, new ConfigValueString("falsch"));
 
     assertEquals(new TextPart("wahr, falsch, wahr"), format(context, new boolean[] { true, false, true }, map));
 
-    val booleanMap = new HashMap<MapKey, MapValue>() {
+    val booleanMap = new HashMap<ConfigKey, ConfigValue>() {
       {
-        put(MapKeyBool.TRUE, new MapValueMessage(new TextMessage(MessagePartFactory.noSpaceText("YES"))));
-        put(MapKeyBool.FALSE, new MapValueMessage(new TextMessage(MessagePartFactory.noSpaceText("NO"))));
+        put(ConfigKeyBool.TRUE, new ConfigValueMessage(new TextMessage(MessagePartFactory.noSpaceText("YES"))));
+        put(ConfigKeyBool.FALSE, new ConfigValueMessage(new TextMessage(MessagePartFactory.noSpaceText("NO"))));
       }
     };
 
@@ -121,12 +126,12 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     assertEquals(new TextPart("12, -7, 99"), format(context, new int[] { 12, -7, 99 }));
 
     assertEquals(new TextPart("1, -7, 248"), format(context, new int[] { 1, -7, 248 },
-        singletonMap(new MapKeyName("number"), new MapValueString("##00"))));
+        singletonMap(new ConfigKeyName("number"), new ConfigValueString("##00"))));
 
     formatterService.addFormatter(new NumberFormatter());
 
     assertEquals(new TextPart("01, -07, 248"), format(context, new int[] { 1, -7, 248 },
-        singletonMap(new MapKeyName("number"), new MapValueString("##00"))));
+        singletonMap(new ConfigKeyName("number"), new ConfigValueString("##00"))));
 
     formatterService.addFormatter(new NamedParameterFormatter() {
       @Override
@@ -159,10 +164,10 @@ public class ArrayFormatterTest extends AbstractFormatterTest
   {
     val registry = createFormatterService(new ArrayFormatter(), new BoolFormatter(), new NumberFormatter());
     val context = new MessageContext(registry, NO_CACHE_INSTANCE, "de-DE");
-    val map = new HashMap<MapKey,MapValue>();
-    map.put(new MapKeyName("number"), new MapValueString("0000"));
-    map.put(MapKeyBool.TRUE, new MapValueString("wahr"));
-    map.put(MapKeyBool.FALSE, new MapValueString("falsch"));
+    val map = new HashMap<ConfigKey, ConfigValue>();
+    map.put(new ConfigKeyName("number"), new ConfigValueString("0000"));
+    map.put(ConfigKeyBool.TRUE, new ConfigValueString("wahr"));
+    map.put(ConfigKeyBool.FALSE, new ConfigValueString("falsch"));
 
     assertEquals(new TextPart("Test, wahr, -0006"), format(context, new Object[] { "Test", true, null, -6 }, map));
     assertEquals(new TextPart("this, is, a, test"), format(context,
