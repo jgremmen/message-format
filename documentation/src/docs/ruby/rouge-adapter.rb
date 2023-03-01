@@ -7,4 +7,8 @@ class MyRougeAdapter < (Asciidoctor::SyntaxHighlighter.for 'rouge')
     require './src/docs/ruby/message.rb'
     :loaded
   end
+
+#  def docinfo? location
+#    false
+#  end
 end

@@ -14,46 +14,48 @@ module Rouge
       operator = /<>|<=|<|>=|>|!|=/
 
       state :root do
-        rule %r/%{/, Keyword::Variable, :parameter
         mixin :string
+        mixin :parameterStart
+        rule %r/['"%]/, Text
+      end
+
+      # string matching stops at ', " or %
+      state :string do
+        rule %r/[^'"\\%]+/, Text
+        rule %r/\\u[0-9a-fA-F]{4,4}/, Str::Escape
+        rule %r/\\["'%{\\]/, Str::Escape
+        rule %r/\\/, Text
+      end
+
+      state :sq_string do
+        mixin :string
+        rule %r/'/, Str::Single, :pop!
+        rule %r/["%]/, Text
+      end
+
+      state :dq_string do
+        mixin :string
+        rule %r/"/, Str::Double, :pop!
+        rule %r/['%]/, Text
       end
 
       state :whitespace do
         rule %r/\s+/, Text::Whitespace
       end
 
-      state :string do
-        rule %r/\\u[0-9a-fA-F]{4,4}/, Str::Escape
-        rule %r/\\["'%{\\]/, Str::Escape
-        rule %r/[^'"]+/, Text
-      end
-
-      state :sq_string do
-        rule %r/'/, Str::Single, :pop!
-        mixin :string
-        rule %r/"/, Text
-      end
-
-      state :dq_string do
-        rule %r/"/, Str::Double, :pop!
-        mixin :string
-        rule %r/'/, Text
-      end
-
       state :parameter do
         mixin :whitespace
         rule %r/#{dashedName}/ do
           token Name::Variable
-          pop!
-          push :parameterFormat
+          goto :parameterFormat
         end
       end
 
       state :parameterFormat do
+        mixin :whitespace
         rule %r/(,)(\s*)(#{dashedName})/ do
           groups Punctuation, Text::Whitespace, Name::Namespace
-          pop!
-          push :parameterConfigKey
+          goto :parameterConfigKey
         end
         mixin :parameterConfigKey
       end
@@ -61,42 +63,37 @@ module Rouge
       state :parameterConfigKey do
         mixin :parameterEnd
         rule %r/(,)(\s*)(#{operator}?)(true|false|null|empty)(\s*)(:)/ do
-          groups Punctuation, Text::Whitespace, Operator, Keyword::Constant, Text::Whitespace, Punctuation
-          pop!
-          push :parameterConfigValue
+          groups Punctuation, Text::Whitespace, Operator, Keyword::Constant,
+                 Text::Whitespace, Punctuation
+          goto :parameterConfigValue
         end
         rule %r/(,)(\s*)(#{dashedName})(\s*)(:)/ do
           groups Punctuation, Text::Whitespace, Name::Label, Text::Whitespace, Punctuation
-          pop!
-          push :parameterConfigValue
+          goto :parameterConfigValue
         end
-        rule %r/(,)(\s*)(#{number})(\s*)(:)/ do
-          groups Punctuation, Text::Whitespace, Literal::Number, Text::Whitespace, Punctuation
-          pop!
-          push :parameterConfigValue
+        rule %r/(,)(\s*)(#{operator}?)(\s*)(#{number})(\s*)(:)/ do
+          groups Punctuation, Text::Whitespace, Operator, Text::Whitespace,
+                 Literal::Number, Text::Whitespace, Punctuation
+          goto :parameterConfigValue
         end
-        rule %r/(,)(\s*)(')/ do
-          groups Punctuation, Text::Whitespace, Str::Single
-          pop!
-          push :parameterConfigValue
+        rule %r/(,)(\s*)(#{operator}?)(\s*)(')/ do
+          groups Punctuation, Text::Whitespace, Operator, Text::Whitespace, Str::Single
+          goto :parameterConfigValue
           push :sq_string
         end
-        rule %r/(,)(\s*)(")/ do
-          groups Punctuation, Text::Whitespace, Str::Double
-          pop!
-          push :parameterConfigValue
+        rule %r/(,)(\s*)(#{operator}?)(\s*)(")/ do
+          groups Punctuation, Text::Whitespace, Operator, Text::Whitespace, Str::Double
+          goto :parameterConfigValue
           push :dq_string
         end
         rule %r/(,)(\s*)(:)(\s)*(')/ do
           groups Punctuation, Text::Whitespace, Punctuation, Text::Whitespace, Str::Single
-          pop!
-          push :parameterConfigKey
+          goto :parameterConfigKey
           push :sq_message
         end
         rule %r/(,)(\s*)(:)(\s)*(")/ do
           groups Punctuation, Text::Whitespace, Punctuation, Text::Whitespace, Str::Double
-          pop!
-          push :parameterConfigKey
+          goto :parameterConfigKey
           push :dq_message
         end
       end
@@ -105,48 +102,49 @@ module Rouge
         mixin :parameterEnd
         rule %r/true|false/ do
           token Keyword::Constant
-          pop!
-          push :parameterConfigKey
+          goto :parameterConfigKey
         end
         rule %r/#{number}/ do
           token Number
-          pop!
-          push :parameterConfigKey
+          goto :parameterConfigKey
         end
         rule %r/#{dashedName}/ do
           token Str
-          pop!
-          push :parameterConfigKey
+          goto :parameterConfigKey
         end
         rule %r/'/ do
           token Str::Single
-          pop!
-          push :parameterConfigKey
+          goto :parameterConfigKey
           push :sq_message
         end
         rule %r/"/ do
           token Str::Double
-          pop!
-          push :parameterConfigKey
+          goto :parameterConfigKey
           push :dq_message
         end
       end
 
+      state :parameterStart do
+        rule %r/%{/, Keyword::Variable, :parameter
+      end
+
       state :parameterEnd do
         mixin :whitespace
-        rule %r/}/, Keyword, :pop!
+        rule %r/}/, Keyword::Variable, :pop!
       end
 
       state :sq_message do
-        rule %r/%{/, Keyword::Variable, :parameter
         mixin :string
+        mixin :parameterStart
         rule %r/'/, Str::Single, :pop!
+        rule %r/["%]/, Text
       end
 
       state :dq_message do
-        rule %r/%{/, Keyword::Variable, :parameter
         mixin :string
+        mixin :parameterStart
         rule %r/"/, Str::Double, :pop!
+        rule %r/['%]/, Text
       end
     end
   end
