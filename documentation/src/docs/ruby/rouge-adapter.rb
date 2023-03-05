@@ -8,16 +8,7 @@ class MyRougeAdapter < (Asciidoctor::SyntaxHighlighter.for 'rouge')
     :loaded
   end
 
-  def docinfo location, doc, opts
-    stylesheet = doc.attr 'rouge-stylesheet', './src/docs/css/rouge.css'
-    if opts[:linkcss]
-      slash = opts[:self_closing_tag_slash]
-      %(<link rel="stylesheet" href="#{stylesheet}"#{slash}>)
-    else
-      stylesheet = doc.normalize_system_path stylesheet
-      %(<style>
-#{doc.read_asset stylesheet, label: 'stylesheet', normalize: true}
-</style>)
-    end
+  def docinfo? location
+    false
   end
 end

@@ -45,7 +45,7 @@ libdocs {
   gitHubUrl = uri('https://github.com/jgremmen/message-format/')
 
   javadocs {
-    useDefaultCss = true
+    //useDefaultCss = true
 
     exclude '**/parser/Message*.java'
     exclude '**/pack/*.java'
