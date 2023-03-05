@@ -16,27 +16,27 @@ module Rouge
       state :root do
         mixin :string
         mixin :parameterStart
-        rule %r/['"%]/, Text
+        rule %r/['"%]/, Str
       end
 
       # string matching stops at ', " or %
       state :string do
-        rule %r/[^'"\\%]+/, Text
+        rule %r/[^'"\\%]+/, Str
         rule %r/\\u[0-9a-fA-F]{4,4}/, Str::Escape
         rule %r/\\["'%{\\]/, Str::Escape
-        rule %r/\\/, Text
+        rule %r/\\/, Str
       end
 
       state :sq_string do
         mixin :string
         rule %r/'/, Str::Single, :pop!
-        rule %r/["%]/, Text
+        rule %r/["%]/, Str
       end
 
       state :dq_string do
         mixin :string
         rule %r/"/, Str::Double, :pop!
-        rule %r/['%]/, Text
+        rule %r/['%]/, Str
       end
 
       state :whitespace do
@@ -137,14 +137,14 @@ module Rouge
         mixin :string
         mixin :parameterStart
         rule %r/'/, Str::Single, :pop!
-        rule %r/["%]/, Text
+        rule %r/["%]/, Str
       end
 
       state :dq_message do
         mixin :string
         mixin :parameterStart
         rule %r/"/, Str::Double, :pop!
-        rule %r/['%]/, Text
+        rule %r/['%]/, Str
       end
     end
   end

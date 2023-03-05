@@ -15,6 +15,7 @@ pre.rouge code[data-lang="msg"] .nn { color: #086010; text-decoration: underline
 pre.rouge code[data-lang="msg"] .nv { color: #066; font-weight: bold; }
 pre.rouge code[data-lang="msg"] .o { color: #606; }
 pre.rouge code[data-lang="msg"] .p { color: #660; }
+pre.rouge code[data-lang="msg"] .s { color: #111; }
 pre.rouge code[data-lang="msg"] .s1 { color: #d14; }
 pre.rouge code[data-lang="msg"] .s2 { color: #d14; }
 pre.rouge code[data-lang="msg"] .se { color: #777; }
