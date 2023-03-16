@@ -1,5 +1,5 @@
 # CI script
-image: java:8-jdk
+image: java:17-jdk
 
 stages:
   - build
@@ -22,6 +22,5 @@ build:
     name: "message-format-artifacts"
     paths:
       - message-format/.build/libs/*.jar
-      - message-format-cpscan/.build/libs/*.jar
       - message-format-jodatime/.build/libs/*.jar
     expire_in: 2 weeks
