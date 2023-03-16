@@ -15,13 +15,14 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.RetentionPolicy;
+import java.util.HashMap;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
@@ -44,11 +45,13 @@ public class StringFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat()
   {
-    val context = new MessageContext(new GenericFormatterService(), NO_CACHE_INSTANCE);
+    val accessor = MessageSupportFactory
+        .create(new GenericFormatterService(), NO_CACHE_INSTANCE)
+        .getAccessor();
 
-    assertEquals(noSpaceText("text"), format(context, " text "));
-    assertEquals(noSpaceText("RUNTIME"), format(context, RetentionPolicy.RUNTIME));
-    assertEquals(noSpaceText("hello"), format(context, new Object() {
+    assertEquals(noSpaceText("text"), format(accessor, " text "));
+    assertEquals(noSpaceText("RUNTIME"), format(accessor, RetentionPolicy.RUNTIME));
+    assertEquals(noSpaceText("hello"), format(accessor, new Object() {
       @Override
       public String toString() {
         return " hello";
@@ -60,37 +63,36 @@ public class StringFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatter()
   {
-    val context = new MessageContext(new GenericFormatterService(), NO_CACHE_INSTANCE);
-    val parameters = context.parameters()
+    val messageSupport = MessageSupportFactory.create(new GenericFormatterService(), NO_CACHE_INSTANCE);
+
+    assertEquals("This is a test 1234", messageSupport
+        .message("This is %{a} %{b} %{c}")
         .with("a", " a test ")
         .with("b", null)
-        .with("c", 1234);
-    val msg = context.getMessageFactory().parse("This is %{a} %{b} %{c}");
-
-    assertEquals("This is a test 1234", msg.format(context, parameters));
+        .with("c", 1234)
+        .format());
   }
 
 
   @Test
   public void testFormatterWithMap()
   {
-    val messageFactory = NO_CACHE_INSTANCE;
-    val context = new MessageContext(new GenericFormatterService(), messageFactory);
+    val messageSupport = MessageSupportFactory.create(new GenericFormatterService(), NO_CACHE_INSTANCE);
+    val parameters = new HashMap<String,Object>();
 
-    val parameters = context.parameters()
-        .with("empty", "")
-        .with("null", null)
-        .with("spaces", "  ")
-        .with("text", "hello  ");
+    parameters.put("empty", "");
+    parameters.put("null", null);
+    parameters.put("spaces", "  ");
+    parameters.put("text", "hello  ");
 
-    assertEquals("", messageFactory.parse("%{empty,!empty:nok}").format(context, parameters));
-    assertEquals("ok", messageFactory.parse("%{empty,empty:ok}").format(context, parameters));
-    assertEquals("ok", messageFactory.parse("%{null,empty:nok,null:ok}").format(context, parameters));
-    assertEquals("ok", messageFactory.parse("%{null,empty:ok}").format(context, parameters));
-    assertEquals("ok", messageFactory.parse("%{spaces,empty:ok}").format(context, parameters));
-    assertEquals("ok", messageFactory.parse("%{spaces,!null:ok}").format(context, parameters));
-    assertEquals("hello!", messageFactory.parse("%{text,null:nok,!empty:'%{text}!'}")
-        .format(context, parameters));
-    assertEquals("hello!", messageFactory.parse("%{text,!null:'%{text}!'}").format(context, parameters));
+    assertEquals("", messageSupport.message("%{empty,!empty:nok}").with(parameters).format());
+    assertEquals("ok", messageSupport.message("%{empty,empty:ok}").with(parameters).format());
+    assertEquals("ok", messageSupport.message("%{null,empty:nok,null:ok}").with(parameters).format());
+    assertEquals("ok", messageSupport.message("%{null,empty:ok}").with(parameters).format());
+    assertEquals("ok", messageSupport.message("%{spaces,empty:ok}").with(parameters).format());
+    assertEquals("ok", messageSupport.message("%{spaces,!null:ok}").with(parameters).format());
+    assertEquals("hello!", messageSupport.message("%{text,null:nok,!empty:'%{text}!'}")
+        .with(parameters).format());
+    assertEquals("hello!", messageSupport.message("%{text,!null:'%{text}!'}").with(parameters).format());
   }
 }

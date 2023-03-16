@@ -28,6 +28,14 @@ been flattened. It improves parameter readability as there are less braces.
 %{n,choice,0:'no color',1:'1 color',:'%{n} colors'}
 ----
 
+.Test
+[source,msg]
+----
+This is\u0026 %{n,choice , true:'yes', <=0:'no color',1:'1% color', empty:"empty" , :'%{n} colors'}', you see!
+----
+
+
+
 == FormatterContext
 
 A formatter context provides a parameter formatter with all information it requires to format an object

@@ -19,7 +19,6 @@ import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -231,7 +230,6 @@ public final class GeoFormatter extends AbstractParameterFormatter implements Na
 
 
 
-  @NoArgsConstructor
   static final class Format
   {
     Boolean longitude;
@@ -242,6 +240,10 @@ public final class GeoFormatter extends AbstractParameterFormatter implements Na
     boolean zeroPadSeconds;
     int minuteDigits = -1;
     int secondDigits = -1;
+
+
+    Format() {
+    }
 
 
     Format(Boolean longitude, int minuteDigits, int secondDigits)

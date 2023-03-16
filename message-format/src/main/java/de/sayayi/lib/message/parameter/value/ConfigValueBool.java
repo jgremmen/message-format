@@ -17,19 +17,15 @@ package de.sayayi.lib.message.parameter.value;
 
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static lombok.AccessLevel.PRIVATE;
-
 
 /**
  * @author Jeroen Gremmen
  */
-@AllArgsConstructor(access = PRIVATE)
 public enum ConfigValueBool implements ConfigValue
 {
   FALSE(false),
@@ -39,6 +35,11 @@ public enum ConfigValueBool implements ConfigValue
   private static final long serialVersionUID = 800L;
 
   private final boolean bool;
+
+
+  ConfigValueBool(boolean bool) {
+    this.bool = bool;
+  }
 
 
   @Override

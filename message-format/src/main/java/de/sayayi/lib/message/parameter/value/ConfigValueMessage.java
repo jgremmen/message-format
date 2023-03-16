@@ -19,7 +19,6 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -28,12 +27,16 @@ import java.io.IOException;
 /**
  * @author Jeroen Gremmen
  */
-@AllArgsConstructor
 public final class ConfigValueMessage implements ConfigValue
 {
   private static final long serialVersionUID = 800L;
 
   private final @NotNull Message.WithSpaces message;
+
+
+  public ConfigValueMessage(@NotNull Message.WithSpaces message) {
+    this.message = message;
+  }
 
 
   @Override

@@ -14,7 +14,6 @@ pluginManagement {
 
 
 include "message-format"
-include "message-format-cpscan"
 include "message-format-jodatime"
 include "documentation"
 

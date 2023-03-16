@@ -17,13 +17,9 @@ package de.sayayi.lib.message.pack;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.internal.*;
-import de.sayayi.lib.message.internal.part.MessagePart;
-import de.sayayi.lib.message.internal.part.NoSpaceTextPart;
-import de.sayayi.lib.message.internal.part.ParameterPart;
-import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.internal.part.*;
 import de.sayayi.lib.message.parameter.key.*;
 import de.sayayi.lib.message.parameter.value.*;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -39,7 +35,6 @@ import static java.util.function.Function.identity;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-@NoArgsConstructor
 public final class PackHelper
 {
   private static final int MAP_KEY_BOOL_ID = 0;
@@ -57,6 +52,7 @@ public final class PackHelper
   private static final int PART_NO_SPACE_TEXT_ID = 0;
   private static final int PART_PARAMETER_ID = 1;
   private static final int PART_TEXT_ID = 2;
+  private static final int PART_TEMPLATE_ID = 3;
 
   private static final int MESSAGE_EMPTY = 0;
   private static final int MESSAGE_EMPTY_WITH_CODE = 1;
@@ -203,6 +199,11 @@ public final class PackHelper
       packStream.writeSmall(PART_TEXT_ID, 2);
       ((TextPart)messagePart).pack(packStream);
     }
+    else if (messagePart instanceof TemplatePart)
+    {
+      packStream.writeSmall(PART_TEMPLATE_ID, 2);
+      ((TemplatePart)messagePart).pack(packStream);
+    }
     else
       throw new IllegalArgumentException("unknown message part type " + messagePart.getClass().getSimpleName());
   }
@@ -224,6 +225,10 @@ public final class PackHelper
 
       case PART_TEXT_ID:
         messagePart = TextPart.unpack(packStream);
+        break;
+
+      case PART_TEMPLATE_ID:
+        messagePart = TemplatePart.unpack(packStream);
         break;
 
       default:

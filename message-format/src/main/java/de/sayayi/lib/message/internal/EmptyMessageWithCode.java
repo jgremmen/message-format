@@ -16,8 +16,7 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import lombok.ToString;
@@ -25,9 +24,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.SortedSet;
+import java.util.Collections;
+import java.util.Set;
 
-import static java.util.Collections.emptySortedSet;
 import static java.util.Objects.requireNonNull;
 
 
@@ -47,21 +46,14 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
   @Override
   @Contract(pure = true)
-  public @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
+  public @NotNull String format(@NotNull MessageSupportAccessor messageSupport, @NotNull Parameters parameters) {
     return "";
   }
 
 
   @Override
-  @Contract(value = "-> false", pure = true)
-  public boolean hasParameters() {
-    return false;
-  }
-
-
-  @Override
-  public @NotNull SortedSet<String> getParameterNames() {
-    return emptySortedSet();
+  public @NotNull Set<String> getTemplateNames() {
+    return Collections.emptySet();
   }
 
 

@@ -79,7 +79,7 @@ public final class ConfigValueString implements ConfigValue
   public synchronized Message.WithSpaces asMessage(@NotNull MessageFactory messageFactory)
   {
     if (message == null)
-      message = messageFactory.parse(string);
+      message = messageFactory.parseMessage(string);
 
     return message;
   }

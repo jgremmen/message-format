@@ -21,7 +21,6 @@ import org.antlr.v4.runtime.RecognitionException;
 /**
  * @author Jeroen Gremmen
  */
-@SuppressWarnings("serial")
 public class MessageParserException extends MessageException
 {
   public MessageParserException(String message, RecognitionException cause) {

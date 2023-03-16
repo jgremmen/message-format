@@ -16,18 +16,16 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.SortedSet;
+import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
@@ -40,7 +38,7 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
 {
   private static final long serialVersionUID = 800L;
 
-  @Getter private final @NotNull Message message;
+  private final @NotNull Message message;
 
 
   public MessageDelegateWithCode(@NotNull String code, @NotNull Message message)
@@ -51,23 +49,28 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
   }
 
 
-  @Override
+  /**
+   * Returns the underlying message requests are delegated to.
+   *
+   * @return  underlying message, never {@code null}
+   */
   @Contract(pure = true)
-  public @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
-    return message.format(messageContext, parameters);
+  public @NotNull Message getMessage() {
+    return message;
   }
 
 
   @Override
   @Contract(pure = true)
-  public boolean hasParameters() {
-    return message.hasParameters();
+  public @NotNull String format(@NotNull MessageSupportAccessor messageSupport,
+                                @NotNull Parameters parameters) {
+    return message.format(messageSupport, parameters);
   }
 
 
   @Override
-  public @NotNull SortedSet<String> getParameterNames() {
-    return message.getParameterNames();
+  public @NotNull Set<String> getTemplateNames() {
+    return message.getTemplateNames();
   }
 
 

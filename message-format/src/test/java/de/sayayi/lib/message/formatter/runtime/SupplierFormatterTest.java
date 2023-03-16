@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.named.BoolFormatter;
 import de.sayayi.lib.message.parameter.key.ConfigKeyName;
@@ -40,20 +40,23 @@ public class SupplierFormatterTest extends AbstractFormatterTest
   @Test
   public void testBooleanSupplier()
   {
-    val context = new MessageContext(
-        createFormatterService(new BoolFormatter(), new BooleanSupplierFormatter()), NO_CACHE_INSTANCE);
+    val accessor = MessageSupportFactory
+        .create(createFormatterService(new BoolFormatter(), new BooleanSupplierFormatter()), NO_CACHE_INSTANCE)
+        .getAccessor();
 
-    assertEquals(noSpaceText("true"), format(context, (BooleanSupplier) () -> true));
+    assertEquals(noSpaceText("true"), format(accessor, (BooleanSupplier) () -> true));
   }
 
 
   @Test
   public void testLongSupplier()
   {
-    val context = new MessageContext(
-        createFormatterService(new NumberFormatter(), new LongSupplierFormatter()), NO_CACHE_INSTANCE, "en");
+    val accessor = MessageSupportFactory
+        .create(createFormatterService(new NumberFormatter(), new LongSupplierFormatter()), NO_CACHE_INSTANCE)
+        .setLocale("en")
+        .getAccessor();
 
-    assertEquals(noSpaceText("1,234,567,890"), format(context, (LongSupplier) () -> 1234567890L,
+    assertEquals(noSpaceText("1,234,567,890"), format(accessor, (LongSupplier) () -> 1234567890L,
         singletonMap(new ConfigKeyName("number"), new ConfigValueString("###,###,###,###"))));
   }
 }

@@ -41,8 +41,6 @@ public @interface MessageDef
    * </p>
    *
    * @return  unique message code, not empty
-   *
-   * @see de.sayayi.lib.message.MessageBundle
    */
   String code();
 

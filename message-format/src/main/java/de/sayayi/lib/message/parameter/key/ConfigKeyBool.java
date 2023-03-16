@@ -15,12 +15,11 @@
  */
 package de.sayayi.lib.message.parameter.key;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.ToString;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -29,14 +28,12 @@ import java.math.BigInteger;
 import java.util.Locale;
 
 import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.*;
-import static lombok.AccessLevel.PRIVATE;
 
 
 /**
  * @author Jeroen Gremmen
  */
 @ToString(doNotUseGetters = true)
-@AllArgsConstructor(access = PRIVATE)
 public enum ConfigKeyBool implements ConfigKey
 {
   FALSE(false),
@@ -45,7 +42,23 @@ public enum ConfigKeyBool implements ConfigKey
 
   private static final long serialVersionUID = 800L;
 
-  @Getter private final boolean bool;
+  private final boolean bool;
+
+
+  ConfigKeyBool(boolean bool) {
+    this.bool = bool;
+  }
+
+
+  /**
+   * Returns the config key boolean value.
+   *
+   * @return  config key boolean value
+   */
+  @Contract(pure = true)
+  public boolean isBool() {
+    return bool;
+  }
 
 
   @Override
@@ -55,7 +68,8 @@ public enum ConfigKeyBool implements ConfigKey
 
 
   @Override
-  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Locale locale, Object value)
+  public @NotNull MatchResult match(@NotNull MessageSupportAccessor messageSupportAccessor,
+                                    @NotNull Locale locale, Object value)
   {
     if (value != null)
     {

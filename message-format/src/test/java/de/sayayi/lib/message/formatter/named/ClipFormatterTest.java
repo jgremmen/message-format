@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.named;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.runtime.DoubleSupplierFormatter;
 import de.sayayi.lib.message.parameter.key.ConfigKeyName;
@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ClipFormatterTest extends AbstractFormatterTest
 {
   @Test
-  public void testFormatterConfig()
+  void testFormatterConfig()
   {
     val formatter = new ClipFormatter();
 
@@ -49,47 +49,54 @@ public class ClipFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testDefault()
+  void testDefault()
   {
-    val context = new MessageContext(createFormatterService(new ClipFormatter()), NO_CACHE_INSTANCE);
+    val accessor = MessageSupportFactory
+        .create(createFormatterService(new ClipFormatter()), NO_CACHE_INSTANCE)
+        .getAccessor();
 
     assertEquals(noSpaceText("This is a very long text which is clipped at a length of 64 c..."),
-        format(context, "This is a very long text which is clipped at a length of 64 characters",
+        format(accessor, "This is a very long text which is clipped at a length of 64 characters",
             "clip"));
   }
 
 
   @Test
-  public void testSize()
+  void testSize()
   {
-    val context = new MessageContext(createFormatterService(new ClipFormatter()), NO_CACHE_INSTANCE);
+    val accessor = MessageSupportFactory
+        .create(createFormatterService(new ClipFormatter()), NO_CACHE_INSTANCE)
+        .getAccessor();
 
     assertEquals(noSpaceText("This is a very..."),
-        format(context, "This is a very long text which is clipped at a length of 64 characters",
+        format(accessor, "This is a very long text which is clipped at a length of 64 characters",
             singletonMap(new ConfigKeyName("clip-size"), new ConfigValueNumber(18)), "clip"));
     assertEquals(noSpaceText("This..."),
-        format(context, "This is a very long text",
+        format(accessor, "This is a very long text",
             singletonMap(new ConfigKeyName("clip-size"), new ConfigValueNumber(2)), "clip"));
   }
 
 
   @Test
-  public void testWrapper()
+  void testWrapper()
   {
-    val context = new MessageContext(createFormatterService(
-        new ClipFormatter(), new DoubleSupplierFormatter()), NO_CACHE_INSTANCE);
+    val accessor = MessageSupportFactory
+        .create(createFormatterService(new ClipFormatter(), new DoubleSupplierFormatter()), NO_CACHE_INSTANCE)
+        .getAccessor();
 
     assertEquals(noSpaceText("3.1415926..."),
-        format(context, (DoubleSupplier)() -> Math.PI,
+        format(accessor, (DoubleSupplier)() -> Math.PI,
             singletonMap(new ConfigKeyName("clip-size"), new ConfigValueNumber(12)), "clip"));
   }
 
 
   @Test
-  public void testNull()
+  void testNull()
   {
-    val context = new MessageContext(createFormatterService(new ClipFormatter()), NO_CACHE_INSTANCE);
+    val accessor = MessageSupportFactory
+        .create(createFormatterService(new ClipFormatter(), new DoubleSupplierFormatter()), NO_CACHE_INSTANCE)
+        .getAccessor();
 
-    assertEquals(nullText(), format(context, (Object)null, "clip"));
+    assertEquals(nullText(), format(accessor, (Object)null, "clip"));
   }
 }

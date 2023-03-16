@@ -26,7 +26,6 @@ repositories {
 
 dependencies {
   runtimeOnly project(":message-format")
-  runtimeOnly project(":message-format-cpscan")
 
   runtimeOnly "org.projectlombok:lombok:${lombokVersion}"
   runtimeOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"

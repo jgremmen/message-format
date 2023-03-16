@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
@@ -53,7 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ArrayFormatterTest extends AbstractFormatterTest
 {
   @Test
-  public void testFormattableTypes()
+  void testFormattableTypes()
   {
     assertFormatterForType(new ArrayFormatter(), boolean[].class);
     assertFormatterForType(new ArrayFormatter(), short[].class);
@@ -66,16 +66,18 @@ public class ArrayFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  @SuppressWarnings("serial")
-  public void testBooleanArray()
+  void testBooleanArray()
   {
     val formatterService = createFormatterService(new ArrayFormatter(), new BoolFormatter());
-    val context = new MessageContext(formatterService, NO_CACHE_INSTANCE, "de-DE");
-    val map = new HashMap<ConfigKey, ConfigValue>();
+    val accessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
+        .setLocale("de-DE")
+        .getAccessor();
+
+    val map = new HashMap<ConfigKey,ConfigValue>();
     map.put(ConfigKeyBool.TRUE, new ConfigValueString("wahr"));
     map.put(ConfigKeyBool.FALSE, new ConfigValueString("falsch"));
 
-    assertEquals(new TextPart("wahr, falsch, wahr"), format(context, new boolean[] { true, false, true }, map));
+    assertEquals(new TextPart("wahr, falsch, wahr"), format(accessor, new boolean[] { true, false, true }, map));
 
     val booleanMap = new HashMap<ConfigKey, ConfigValue>() {
       {
@@ -84,8 +86,8 @@ public class ArrayFormatterTest extends AbstractFormatterTest
       }
     };
 
-    assertEquals(new TextPart("NO, YES"), format(context, new boolean[] { false, true }, booleanMap));
-    assertEquals(TextPart.EMPTY, format(context, new boolean[0]));
+    assertEquals(new TextPart("NO, YES"), format(accessor, new boolean[] { false, true }, booleanMap));
+    assertEquals(TextPart.EMPTY, format(accessor, new boolean[0]));
 
     formatterService.addFormatter(new NamedParameterFormatter() {
       @Override
@@ -112,25 +114,27 @@ public class ArrayFormatterTest extends AbstractFormatterTest
       }
     });
 
-    assertEquals(new TextPart("1, 1, 0, 1, 0, 0, 0"), format(context,
+    assertEquals(new TextPart("1, 1, 0, 1, 0, 0, 0"), format(accessor,
         new boolean[] { true, true, false, true, false, false, false }, "bool"));
   }
 
 
   @Test
-  public void testIntegerArray()
+  void testIntegerArray()
   {
     val formatterService = createFormatterService(new ArrayFormatter());
-    val context = new MessageContext(formatterService, NO_CACHE_INSTANCE, "de-DE");
+    val accessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
+        .setLocale("de-DE")
+        .getAccessor();
 
-    assertEquals(new TextPart("12, -7, 99"), format(context, new int[] { 12, -7, 99 }));
+    assertEquals(new TextPart("12, -7, 99"), format(accessor, new int[] { 12, -7, 99 }));
 
-    assertEquals(new TextPart("1, -7, 248"), format(context, new int[] { 1, -7, 248 },
+    assertEquals(new TextPart("1, -7, 248"), format(accessor, new int[] { 1, -7, 248 },
         singletonMap(new ConfigKeyName("number"), new ConfigValueString("##00"))));
 
     formatterService.addFormatter(new NumberFormatter());
 
-    assertEquals(new TextPart("01, -07, 248"), format(context, new int[] { 1, -7, 248 },
+    assertEquals(new TextPart("01, -07, 248"), format(accessor, new int[] { 1, -7, 248 },
         singletonMap(new ConfigKeyName("number"), new ConfigValueString("##00"))));
 
     formatterService.addFormatter(new NamedParameterFormatter() {
@@ -155,48 +159,53 @@ public class ArrayFormatterTest extends AbstractFormatterTest
       }
     });
 
-    assertEquals(new TextPart("0x40, 0xda, 0x2e"), format(context, new int[] { 64, 218, 46 }, "hex"));
+    assertEquals(new TextPart("0x40, 0xda, 0x2e"), format(accessor, new int[] { 64, 218, 46 }, "hex"));
   }
 
 
   @Test
-  public void testObjectArray()
+  void testObjectArray()
   {
     val registry = createFormatterService(new ArrayFormatter(), new BoolFormatter(), new NumberFormatter());
-    val context = new MessageContext(registry, NO_CACHE_INSTANCE, "de-DE");
+    val accessor = MessageSupportFactory.create(registry, NO_CACHE_INSTANCE)
+        .setLocale("de-DE")
+        .getAccessor();
+
     val map = new HashMap<ConfigKey, ConfigValue>();
     map.put(new ConfigKeyName("number"), new ConfigValueString("0000"));
     map.put(ConfigKeyBool.TRUE, new ConfigValueString("wahr"));
     map.put(ConfigKeyBool.FALSE, new ConfigValueString("falsch"));
 
-    assertEquals(new TextPart("Test, wahr, -0006"), format(context, new Object[] { "Test", true, null, -6 }, map));
-    assertEquals(new TextPart("this, is, a, test"), format(context,
+    assertEquals(new TextPart("Test, wahr, -0006"), format(accessor, new Object[] { "Test", true, null, -6 }, map));
+    assertEquals(new TextPart("this, is, a, test"), format(accessor,
         new Object[] { null, "this", null, "is", null, "a", null, "test" }));
   }
 
 
   @Test
-  public void testEmptyOrNullArray()
+  void testEmptyOrNullArray()
   {
-    val context = new MessageContext(createFormatterService(new ArrayFormatter()), NO_CACHE_INSTANCE);
-    val message = context.getMessageFactory().parse("%{array,null:null,empty:empty}");
+    val messageSupport = MessageSupportFactory.create(createFormatterService(new ArrayFormatter()), NO_CACHE_INSTANCE);
+    val message = messageSupport.message("%{array,null:null,empty:empty}").getMessage();
 
-    assertEquals("null", message.format(context, context.parameters().with("array", null)));
-    assertEquals("empty", message.format(context, context.parameters().with("array", new int[0])));
+    assertEquals("null", messageSupport.message(message).with("array", null).format());
+    assertEquals("empty", messageSupport.message(message).with("array", new int[0]).format());
   }
 
 
   @Test
-  public void testSeparator()
+  void testSeparator()
   {
-    val context = new MessageContext(createFormatterService(new ArrayFormatter()), NO_CACHE_INSTANCE);
+    val messageSupport = MessageSupportFactory.create(createFormatterService(new ArrayFormatter()), NO_CACHE_INSTANCE);
 
-    assertEquals("1, 2, 3, 4 and 5", context.getMessageFactory()
-        .parse("%{c,list-sep:', ',list-sep-last:' and '}")
-        .format(context, context.parameters().with("c", new int[] { 1, 2, 3, 4, 5})));
+    assertEquals("1, 2, 3, 4 and 5", messageSupport
+        .message("%{c,list-sep:', ',list-sep-last:' and '}")
+        .with("c", new int[] { 1, 2, 3, 4, 5})
+        .format());
 
-    assertEquals("1.2.3.4.5", context.getMessageFactory()
-        .parse("%{c,list-sep:'.'}")
-        .format(context, context.parameters().with("c", new long[] { 1, 2, 3, 4, 5 })));
+    assertEquals("1.2.3.4.5", messageSupport
+        .message("%{c,list-sep:'.'}")
+        .with("c", new long[] { 1, 2, 3, 4, 5 })
+        .format());
   }
 }

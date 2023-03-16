@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.named;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.runtime.ArrayFormatter;
 import de.sayayi.lib.message.formatter.runtime.IterableFormatter;
@@ -36,42 +36,44 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class SizeFormatterTest extends AbstractFormatterTest
 {
   @Test
-  public void testFormat()
+  void testFormat()
   {
-    val context = new MessageContext(createFormatterService(new SizeFormatter(), new IterableFormatter(),
-        new ArrayFormatter(), new MapFormatter()), NO_CACHE_INSTANCE, UK);
-    val message = context.getMessageFactory()
-        .parse("%{c,size} %{c,size,0:'empty',1:'singleton',:'multiple'}");
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new SizeFormatter(), new IterableFormatter(),
+            new ArrayFormatter(), new MapFormatter()), NO_CACHE_INSTANCE)
+        .setLocale(UK);
+    val message = messageSupport
+        .message("%{c,size} %{c,size,0:'empty',1:'singleton',:'multiple'}").getMessage();
 
-    assertEquals("0 empty", message.format(context,
-        context.parameters().with("c", emptyList())));
+    assertEquals("0 empty", messageSupport.message(message)
+        .with("c", emptyList()).format());
 
-    assertEquals("1 singleton", message.format(context,
-        context.parameters().with("c", singletonMap("a", "b"))));
+    assertEquals("1 singleton", messageSupport.message(message)
+        .with("c", singletonMap("a", "b")).format());
 
-    assertEquals("4 multiple", message.format(context,
-        context.parameters().with("c", new int[] { 4, -45, 8, 1 })));
+    assertEquals("4 multiple", messageSupport.message(message)
+        .with("c", new int[] { 4, -45, 8, 1 }).format());
   }
 
 
   @Test
-  public void testFormatNoSizeQueryable()
+  void testFormatNoSizeQueryable()
   {
-    val context = new MessageContext(createFormatterService(new SizeFormatter(), new BoolFormatter()),
-        NO_CACHE_INSTANCE, UK);
-    val message = context.getMessageFactory().parse("%{c,size}");
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new SizeFormatter()), NO_CACHE_INSTANCE)
+        .setLocale(UK);
 
-    assertEquals("0", message.format(context, context.parameters().with("c", true)));
+    assertEquals("0", messageSupport.message("%{c,size}").with("c", true).format());
   }
 
 
   @Test
-  public void testFormatDefaultFormatter()
+  void testFormatDefaultFormatter()
   {
-    val context = new MessageContext(createFormatterService(new SizeFormatter()), NO_CACHE_INSTANCE, UK);
-    val message = context.getMessageFactory().parse("%{c,size}");
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new SizeFormatter()), NO_CACHE_INSTANCE);
 
-    assertEquals("0", message.format(context,
-        context.parameters().with("c", new byte[] { 'a', 'b' })));
+    assertEquals("0", messageSupport.message("%{c,size}")
+        .with("c", new byte[] { 'a', 'b' }).format());
   }
 }

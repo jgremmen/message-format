@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.parameter.value.ConfigValueString;
@@ -40,16 +40,19 @@ public class FileFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat()
   {
-    val context = new MessageContext(createFormatterService(new FileFormatter()), NO_CACHE_INSTANCE, ROOT);
+    val accessor = MessageSupportFactory
+        .create(createFormatterService(new FileFormatter()), NO_CACHE_INSTANCE)
+        .setLocale(ROOT)
+        .getAccessor();
     val f = new File("/path1/path2/filename.ext");
 
-    assertEquals(nullText(), format(context, null));
-    assertEquals(noSpaceText("/path1/path2/filename.ext"), format(context, f));
-    assertEquals(noSpaceText("filename.ext"), format(context, f,
+    assertEquals(nullText(), format(accessor, null));
+    assertEquals(noSpaceText("/path1/path2/filename.ext"), format(accessor, f));
+    assertEquals(noSpaceText("filename.ext"), format(accessor, f,
         singletonMap(new ConfigKeyName("file"), new ConfigValueString("name"))));
-    assertEquals(noSpaceText("/path1/path2"), format(context, f,
+    assertEquals(noSpaceText("/path1/path2"), format(accessor, f,
         singletonMap(new ConfigKeyName("file"), new ConfigValueString("parent"))));
-    assertEquals(noSpaceText("ext"), format(context, f,
+    assertEquals(noSpaceText("ext"), format(accessor, f,
         singletonMap(new ConfigKeyName("file"), new ConfigValueString("extension"))));
   }
 
@@ -57,10 +60,13 @@ public class FileFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatter()
   {
-    val context = new MessageContext(createFormatterService(new FileFormatter()), NO_CACHE_INSTANCE, ROOT);
+    val context = MessageSupportFactory
+        .create(createFormatterService(new FileFormatter()), NO_CACHE_INSTANCE)
+        .setLocale(ROOT);
 
-    assertEquals("file.jpg = image/jpeg", context.getMessageFactory().
-        parse("%{f,file:name}  =  %{f,file:extension,'jpg':'image/jpeg'}").format(
-            context, context.parameters().with("f", new File("/test/file.jpg"))));
+    assertEquals("file.jpg = image/jpeg", context
+        .message("%{f,file:name}  =  %{f,file:extension,'jpg':'image/jpeg'}")
+        .with("f", new File("/test/file.jpg"))
+        .format());
   }
 }

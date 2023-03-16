@@ -27,15 +27,18 @@ import de.sayayi.lib.message.internal.SpacesUtil;
 import de.sayayi.lib.message.internal.TextMessage;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.ParameterPart;
+import de.sayayi.lib.message.internal.part.TemplatePart;
 import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.parameter.key.*;
 import de.sayayi.lib.message.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.parameter.value.*;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +64,6 @@ import static de.sayayi.lib.message.parser.MessageLexer.SINGLE_QUOTE_END;
 import static de.sayayi.lib.message.parser.MessageLexer.SINGLE_QUOTE_START;
 import static de.sayayi.lib.message.parser.MessageParser.*;
 import static java.lang.Boolean.parseBoolean;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 
@@ -82,9 +84,21 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   @Contract(pure = true)
-  public @NotNull Message.WithSpaces compileMessage(@NotNull String text)
+  public @NotNull Message.WithSpaces compileMessage(@NotNull String text) {
+    return compileMessage(text, false);
+  }
+
+
+  @Contract(pure = true)
+  public @NotNull Message.WithSpaces compileTemplate(@NotNull String text) {
+    return compileMessage(text, true);
+  }
+
+
+  @Contract(pure = true)
+  private @NotNull Message.WithSpaces compileMessage(@NotNull String text, boolean template)
   {
-    final Listener listener = new Listener();
+    final Listener listener = new Listener(template);
 
     return parse(new Lexer(text),
         lexer -> new Parser(listener.tokenStream = new BufferedTokenStream(lexer)),
@@ -136,7 +150,13 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
   private final class Listener extends MessageParserBaseListener
   {
+    private final boolean template;
     private TokenStream tokenStream;
+
+
+    private Listener(boolean template) {
+      this.template = template;
+    }
 
 
     @Override
@@ -152,12 +172,23 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         ctx.value = EmptyMessage.INSTANCE;
       else
       {
-        final List<MessagePart> parts = ctx.children
-            .stream()
-            .map(pt -> pt instanceof ParameterContext
-                ? ((ParameterContext)pt).value
-                : ((TextPartContext)pt).value)
-            .collect(toList());
+        final List<MessagePart> parts = new ArrayList<>();
+
+        for(final ParseTree part: ctx.children)
+        {
+          if (part instanceof ParameterPartContext)
+            parts.add(((ParameterPartContext)part).value);
+          else if (part instanceof TextPartContext)
+            parts.add(((TextPartContext)part).value);
+          else
+          {
+            if (template)
+              syntaxError((TemplatePartContext)part, "no nested template allowed");
+
+            parts.add(((TemplatePartContext)part).value);
+          }
+        }
+
         final int partCount = parts.size();
 
         if (partCount == 0)
@@ -227,12 +258,12 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
       ctx.value = quotedMessage != null
           ? quotedMessage.value
-          : messageFactory.parse(ctx.string().value);
+          : messageFactory.parseMessage(ctx.string().value);
     }
 
 
     @Override
-    public void exitParameter(ParameterContext ctx)
+    public void exitParameterPart(ParameterPartContext ctx)
     {
       final Map<ConfigKey,ConfigValue> mapElements = ctx.configElement().stream()
           .collect(toMap(mec -> mec.key, mec -> mec.value, (a, b) -> b, LinkedHashMap::new));
@@ -242,26 +273,18 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
       ctx.value = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(
           ctx.name.name, ctx.format == null ? null : ctx.format.name,
-          exitParameter_isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
-          exitParameter_isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
+          isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
+          isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
           mapElements));
     }
 
 
-    private boolean exitParameter_isSpaceAtTokenIndex(int i)
+    @Override
+    public void exitTemplatePart(TemplatePartContext ctx)
     {
-      if (i >= 0)
-      {
-        final Token token = tokenStream.get(i);
-
-        if (token.getType() != Token.EOF)
-        {
-          final String text = token.getText();
-          return !SpacesUtil.isEmpty(text) && SpacesUtil.isSpaceChar(text.charAt(0));
-        }
-      }
-
-      return false;
+      ctx.value = new TemplatePart(ctx.nameOrKeyword().name,
+          isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
+          isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1));
     }
 
 
@@ -390,6 +413,23 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitNameOrKeyword(NameOrKeywordContext ctx) {
       ctx.name = ctx.getChild(0).getText();
+    }
+
+
+    private boolean isSpaceAtTokenIndex(int i)
+    {
+      if (i >= 0)
+      {
+        final Token token = tokenStream.get(i);
+
+        if (token.getType() != Token.EOF)
+        {
+          final String text = token.getText();
+          return !SpacesUtil.isEmpty(text) && SpacesUtil.isSpaceChar(text.charAt(0));
+        }
+      }
+
+      return false;
     }
   }
 

@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -41,35 +41,37 @@ public class IterableFormatterTest extends AbstractFormatterTest
   @Test
   public void testObjectArray()
   {
-    val context = new MessageContext(
-        createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE, "de-DE");
+    val accessor = MessageSupportFactory
+        .create(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE)
+        .setLocale("de-DE")
+        .getAccessor();
 
-    assertEquals(noSpaceText("Test, true, -6"), format(context, asList("Test", true, null, -6)));
+    assertEquals(noSpaceText("Test, true, -6"), format(accessor, asList("Test", true, null, -6)));
   }
 
 
   @Test
   public void testEmptyOrNullCollection()
   {
-    val context = new MessageContext(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE);
-    val message = context.getMessageFactory().parse("%{c,null:null,empty:empty}");
+    val message = MessageSupportFactory
+        .create(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE)
+        .message("%{c,null:null,empty:empty}");
 
-    assertEquals("null", message.format(context, context.parameters().with("c", null)));
-    assertEquals("empty", message.format(context, context.parameters().with("c", emptySet())));
+    assertEquals("null", message.with("c", null).format());
+    assertEquals("empty", message.with("c", emptySet()).format());
   }
 
 
   @Test
   public void testSeparator()
   {
-    val context = new MessageContext(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE);
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE);
 
-    assertEquals("1, 2, 3, 4 and 5", context.getMessageFactory()
-        .parse("%{c,list-sep:', ',list-sep-last:' and '}")
-        .format(context, context.parameters().with("c", asList(1, 2, 3, 4, 5))));
+    assertEquals("1, 2, 3, 4 and 5", messageSupport
+        .message("%{c,list-sep:', ',list-sep-last:' and '}").with("c", asList(1, 2, 3, 4, 5)).format());
 
-    assertEquals("1.2.3.4.5", context.getMessageFactory()
-        .parse("%{c,list-sep:'.'}")
-        .format(context, context.parameters().with("c", asList(1, 2, 3, 4, 5))));
+    assertEquals("1.2.3.4.5", messageSupport
+        .message("%{c,list-sep:'.'}").with("c", asList(1, 2, 3, 4, 5)).format());
   }
 }

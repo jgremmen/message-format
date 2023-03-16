@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -43,10 +43,13 @@ class BooleanSupplierFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat()
   {
-    val context = new MessageContext(createFormatterService(new BooleanSupplierFormatter()), NO_CACHE_INSTANCE, ROOT);
+    val accessor = MessageSupportFactory
+        .create(createFormatterService(new BooleanSupplierFormatter()), NO_CACHE_INSTANCE)
+        .setLocale(ROOT)
+        .getAccessor();
 
-    assertEquals(nullText(), format(context, null));
-    assertEquals(noSpaceText("true"), format(context, (BooleanSupplier)() -> true));
-    assertEquals(noSpaceText("false"), format(context, (BooleanSupplier)() -> false));
+    assertEquals(nullText(), format(accessor, null));
+    assertEquals(noSpaceText("true"), format(accessor, (BooleanSupplier)() -> true));
+    assertEquals(noSpaceText("false"), format(accessor, (BooleanSupplier)() -> false));
   }
 }

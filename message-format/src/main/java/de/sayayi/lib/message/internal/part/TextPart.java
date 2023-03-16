@@ -19,7 +19,6 @@ import de.sayayi.lib.message.internal.SpacesUtil;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +34,6 @@ import static de.sayayi.lib.message.internal.SpacesUtil.trimSpaces;
  *
  * @author Jeroen Gremmen
  */
-@Getter
 public final class TextPart implements Text
 {
   private static final long serialVersionUID = 800L;
@@ -64,6 +62,24 @@ public final class TextPart implements Text
       this.spaceBefore = spaceBefore || isSpaceChar(text.charAt(0));
       this.spaceAfter = spaceAfter || isSpaceChar(text.charAt(text.length() - 1));
     }
+  }
+
+
+  @Override
+  public String getText() {
+    return text;
+  }
+
+
+  @Override
+  public boolean isSpaceBefore() {
+    return spaceBefore;
+  }
+
+
+  @Override
+  public boolean isSpaceAfter() {
+    return spaceAfter;
   }
 
 
@@ -112,11 +128,11 @@ public final class TextPart implements Text
     final StringBuilder s = new StringBuilder("Text(text=").append(text);
 
     if (spaceBefore && spaceAfter)
-      s.append(", space-around");
+      s.append(",space-around");
     else if (spaceBefore)
-      s.append(", space-before");
+      s.append(",space-before");
     else if (spaceAfter)
-      s.append(", space-after");
+      s.append(",space-after");
 
     return s.append(')').toString();
   }
