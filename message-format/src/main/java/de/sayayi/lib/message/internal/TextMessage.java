@@ -16,23 +16,18 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.SortedSet;
+import java.util.Set;
 
-import static java.util.Collections.emptySortedSet;
-import static lombok.AccessLevel.PRIVATE;
+import static java.util.Collections.emptySet;
 
 
 /**
@@ -40,15 +35,14 @@ import static lombok.AccessLevel.PRIVATE;
  */
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
-@RequiredArgsConstructor(access = PRIVATE)
 public final class TextMessage implements Message.WithSpaces
 {
   private static final long serialVersionUID = 800L;
 
   private final String text;
 
-  @Getter private final boolean spaceBefore;
-  @Getter private final boolean spaceAfter;
+  private final boolean spaceBefore;
+  private final boolean spaceAfter;
 
 
   public TextMessage(@NotNull Text textPart) {
@@ -56,22 +50,35 @@ public final class TextMessage implements Message.WithSpaces
   }
 
 
+  private TextMessage(String text, boolean spaceBefore, boolean spaceAfter)
+  {
+    this.text = text;
+    this.spaceBefore = spaceBefore;
+    this.spaceAfter = spaceAfter;
+  }
+
+
   @Override
-  public @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
+  public boolean isSpaceBefore() {
+    return spaceBefore;
+  }
+
+
+  @Override
+  public boolean isSpaceAfter() {
+    return spaceAfter;
+  }
+
+
+  @Override
+  public @NotNull String format(@NotNull MessageSupportAccessor messageSupport, @NotNull Parameters parameters) {
     return text == null ? "" : text;
   }
 
 
   @Override
-  @Contract(value = "-> false", pure = true)
-  public boolean hasParameters() {
-    return false;
-  }
-
-
-  @Override
-  public @NotNull SortedSet<String> getParameterNames() {
-    return emptySortedSet();
+  public @NotNull Set<String> getTemplateNames() {
+    return emptySet();
   }
 
 

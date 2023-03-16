@@ -18,7 +18,6 @@ package de.sayayi.lib.message.internal.part;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,11 +36,17 @@ public final class NoSpaceTextPart implements Text
 {
   private static final long serialVersionUID = 800L;
 
-  @Getter private final @NotNull String text;
+  private final @NotNull String text;
 
 
   public NoSpaceTextPart(@NotNull String text) {
     this.text = trimSpaces(text);
+  }
+
+
+  @Override
+  public @NotNull String getText() {
+    return text;
   }
 
 

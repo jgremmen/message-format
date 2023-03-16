@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageSupport;
+import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,12 +35,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class FieldFormatterTest extends AbstractFormatterTest
 {
-  private MessageContext context;
+  private MessageSupport context;
 
 
   @BeforeEach
   public void init() {
-    context = new MessageContext(createFormatterService(new FieldFormatter()), NO_CACHE_INSTANCE);
+    context = MessageSupportFactory.create(createFormatterService(new FieldFormatter()), NO_CACHE_INSTANCE);
   }
 
 
@@ -53,16 +54,11 @@ public class FieldFormatterTest extends AbstractFormatterTest
   public void testFormatV1() throws Exception
   {
     val v1 = Dummy.class.getDeclaredField("v1");
-    val factory = context.getMessageFactory();
 
-    assertEquals("boolean[]", factory.parse("%{f,field:T}")
-        .format(context, context.parameters().with("f", v1)));
-    assertEquals("v1", factory.parse("%{f,field:N}")
-        .format(context, context.parameters().with("f", v1)));
-    assertEquals("private static boolean[] v1", factory.parse("%{f}")
-        .format(context, context.parameters().with("f", v1)));
-    assertEquals("boolean[] v1", factory.parse("%{f,field:TN}")
-        .format(context, context.parameters().with("f", v1)));
+    assertEquals("boolean[]", context.message("%{f,field:T}").with("f", v1).format());
+    assertEquals("v1", context.message("%{f,field:N}").with("f", v1).format());
+    assertEquals("private static boolean[] v1", context.message("%{f}").with("f", v1).format());
+    assertEquals("boolean[] v1", context.message("%{f,field:TN}").with("f", v1).format());
   }
 
 
@@ -70,18 +66,13 @@ public class FieldFormatterTest extends AbstractFormatterTest
   public void testFormatV2() throws Exception
   {
     val v2 = Dummy.class.getDeclaredField("v2");
-    val factory = context.getMessageFactory();
 
-    assertEquals("Map<String, Integer>", factory.parse("%{f,field:Tju}")
-        .format(context, context.parameters().with("f", v2)));
-    assertEquals("v2", factory.parse("%{f,field:N}")
-        .format(context, context.parameters().with("f", v2)));
+    assertEquals("Map<String, Integer>", context.message("%{f,field:Tju}").with("f", v2).format());
+    assertEquals("v2", context.message("%{f,field:N}").with("f", v2).format());
     assertEquals("public final java.util.Map<String, Integer> v2",
-        factory.parse("%{f,field:'jTMN'}")
-        .format(context, context.parameters().with("f", v2)));
+        context.message("%{f,field:'jTMN'}").with("f", v2).format());
     assertEquals("java.util.Map<java.lang.String, java.lang.Integer> v2",
-        factory.parse("%{f,field:TN}")
-        .format(context, context.parameters().with("f", v2)));
+        context.message("%{f,field:TN}").with("f", v2).format());
   }
 
 

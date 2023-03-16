@@ -48,7 +48,7 @@ public final class SizeFormatter extends AbstractParameterFormatter implements N
     long size = 0;
 
     if (value != null)
-      for(ParameterFormatter formatter: formatterContext.getMessageContext().getFormatters(value.getClass()))
+      for(ParameterFormatter formatter: formatterContext.getMessageSupport().getFormatters(value.getClass()))
         if (formatter instanceof SizeQueryable)
         {
           size = ((SizeQueryable)formatter).size(value);

@@ -15,13 +15,12 @@
  */
 package de.sayayi.lib.message.parameter.key;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -37,17 +36,34 @@ import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.*;
  */
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
-@AllArgsConstructor
 public final class ConfigKeyNumber implements ConfigKey
 {
   private static final long serialVersionUID = 800L;
 
   private final @NotNull CompareType compareType;
-  @Getter private final long number;
+  private final long number;
 
 
   public ConfigKeyNumber(@NotNull CompareType compareType, @NotNull String number) {
     this(compareType, Long.parseLong(number));
+  }
+
+
+  private ConfigKeyNumber(@NotNull CompareType compareType, long number)
+  {
+    this.compareType = compareType;
+    this.number = number;
+  }
+
+
+  /**
+   * Returns the config key number value.
+   *
+   * @return  config key number value
+   */
+  @Contract(pure = true)
+  public long getNumber() {
+    return number;
   }
 
 
@@ -58,7 +74,8 @@ public final class ConfigKeyNumber implements ConfigKey
 
 
   @Override
-  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Locale locale, Object value)
+  public @NotNull MatchResult match(@NotNull MessageSupportAccessor messageSupportAccessor,
+                                    @NotNull Locale locale, Object value)
   {
     if (value == null)
       return MISMATCH;

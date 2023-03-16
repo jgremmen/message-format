@@ -37,7 +37,7 @@ message returns [Message.WithSpaces value]
         ;
 
 message0 returns [Message.WithSpaces value]
-        : (textPart? parameter)* textPart?
+        : (textPart | parameterPart | templatePart)*
         ;
 
 textPart returns [TextPart value]
@@ -63,13 +63,19 @@ forceQuotedMessage returns [Message.WithSpaces value]
         | string
         ;
 
-parameter returns [ParameterPart value]
+parameterPart returns [ParameterPart value]
         : PARAM_START
           name=nameOrKeyword
           (COMMA format=nameOrKeyword)?
           (COMMA configElement)*
           (COMMA COLON forceQuotedMessage)?
           PARAM_END
+        ;
+
+templatePart returns [TemplatePart value]
+        : TEMPLATE_START
+          nameOrKeyword
+          TEMPLATE_END
         ;
 
 configElement returns [ConfigKey key, ConfigValue value]

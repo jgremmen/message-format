@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -45,12 +45,15 @@ class IntSupplierFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat()
   {
-    val context = new MessageContext(createFormatterService(new IntSupplierFormatter()), NO_CACHE_INSTANCE, ROOT);
+    val accessor = MessageSupportFactory
+        .create(createFormatterService(new IntSupplierFormatter()), NO_CACHE_INSTANCE)
+        .setLocale(ROOT)
+        .getAccessor();
 
-    assertEquals(nullText(), format(context, null));
-    assertEquals(noSpaceText("0"), format(context, (IntSupplier)() -> 0));
-    assertEquals(noSpaceText(Integer.toString(MAX_VALUE)), format(context, (IntSupplier)() -> MAX_VALUE));
-    assertEquals(noSpaceText(Integer.toString(MIN_VALUE)), format(context, (IntSupplier)() -> MIN_VALUE));
-    assertEquals(noSpaceText("123456789"), format(context, (IntSupplier)() -> 123456789));
+    assertEquals(nullText(), format(accessor, null));
+    assertEquals(noSpaceText("0"), format(accessor, (IntSupplier)() -> 0));
+    assertEquals(noSpaceText(Integer.toString(MAX_VALUE)), format(accessor, (IntSupplier)() -> MAX_VALUE));
+    assertEquals(noSpaceText(Integer.toString(MIN_VALUE)), format(accessor, (IntSupplier)() -> MIN_VALUE));
+    assertEquals(noSpaceText("123456789"), format(accessor, (IntSupplier)() -> 123456789));
   }
 }

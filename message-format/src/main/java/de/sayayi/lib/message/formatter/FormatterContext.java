@@ -16,8 +16,8 @@
 package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.parameter.key.ConfigKey;
@@ -43,7 +43,7 @@ public interface FormatterContext extends Parameters
    * @return  message context, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull MessageContext getMessageContext();
+  @NotNull MessageSupportAccessor getMessageSupport();
 
 
   @Contract(pure = true)

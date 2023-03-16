@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.parameter.value.ConfigValueString;
@@ -43,36 +43,43 @@ class EnumFormatterTest extends AbstractFormatterTest
   @Test
   void testFormat()
   {
-    val context = new MessageContext(createFormatterService(new EnumFormatter()), NO_CACHE_INSTANCE, ROOT);
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new EnumFormatter()), NO_CACHE_INSTANCE)
+        .setLocale(ROOT);
+    val accessor = messageSupport.getAccessor();
 
-    assertEquals(noSpaceText("3"), format(context, MyEnum.DD,
+    assertEquals(noSpaceText("3"), format(accessor, MyEnum.DD,
         singletonMap(new ConfigKeyName("enum"), new ConfigValueString("ordinal"))));
 
-    context.setDefaultParameterConfig("enum", "ordinal");
-    assertEquals(noSpaceText("0"), format(context, MyEnum.AA));
+    messageSupport.setDefaultParameterConfig("enum", "ordinal");
+    assertEquals(noSpaceText("0"), format(accessor, MyEnum.AA));
   }
 
 
   @Test
   void testMapWithoutDefault()
   {
-    val context = new MessageContext(createFormatterService(new EnumFormatter()), NO_CACHE_INSTANCE);
+    val accessor = MessageSupportFactory
+        .create(createFormatterService(new EnumFormatter()), NO_CACHE_INSTANCE)
+        .getAccessor();
 
-    assertEquals("upper", NO_CACHE_INSTANCE.parse("%{e,>'C':upper,<'C':lower}")
-        .format(context, context.parameters().with("e", MyEnum.CC)));
+    assertEquals("upper", NO_CACHE_INSTANCE.parseMessage("%{e,>'C':upper,<'C':lower}")
+        .format(accessor, singletonMap("e", MyEnum.CC)));
 
-    assertEquals("AA", NO_CACHE_INSTANCE.parse("%{e,>'C':upper}")
-        .format(context, context.parameters().with("e", MyEnum.AA)));
+    assertEquals("AA", NO_CACHE_INSTANCE.parseMessage("%{e,>'C':upper}")
+        .format(accessor, singletonMap("e", MyEnum.AA)));
   }
 
 
   @Test
   void testMapWithDefault()
   {
-    val context = new MessageContext(createFormatterService(new EnumFormatter()), NO_CACHE_INSTANCE);
+    val accessor = MessageSupportFactory
+        .create(createFormatterService(new EnumFormatter()), NO_CACHE_INSTANCE)
+        .getAccessor();
 
-    assertEquals("C or D", NO_CACHE_INSTANCE.parse("%{e,'AA':A,'BB':B,:'C or D'}")
-        .format(context, context.parameters().with("e", MyEnum.CC)));
+    assertEquals("C or D", NO_CACHE_INSTANCE.parseMessage("%{e,'AA':A,'BB':B,:'C or D'}")
+        .format(accessor, singletonMap("e", MyEnum.CC)));
   }
 
 

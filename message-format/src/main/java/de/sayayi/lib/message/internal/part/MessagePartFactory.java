@@ -16,14 +16,12 @@
 package de.sayayi.lib.message.internal.part;
 
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.internal.SpacesUtil.isTrimmedEmpty;
 import static de.sayayi.lib.message.internal.part.MessagePart.Text.EMPTY;
 import static de.sayayi.lib.message.internal.part.MessagePart.Text.NULL;
-import static lombok.AccessLevel.PRIVATE;
 
 
 /**
@@ -31,9 +29,11 @@ import static lombok.AccessLevel.PRIVATE;
  *
  * @author Jeroen Gremmen
  */
-@NoArgsConstructor(access = PRIVATE)
 public final class MessagePartFactory
 {
+  private MessagePartFactory() {}
+
+
   /**
    * Text part which represents a {@code null} text.
    *

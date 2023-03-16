@@ -28,6 +28,9 @@ tokens {
 PARAM_START
         : ParamStart -> pushMode(PARAMETER)
         ;
+TEMPLATE_START
+        : TemplateStart -> pushMode(TEMPLATE)
+        ;
 CH
         : Character
         ;
@@ -42,6 +45,9 @@ mode TEXT1;
 
 PARAM_START1
         : ParamStart -> pushMode(PARAMETER), type(PARAM_START)
+        ;
+TEMPLATE_START1
+        : TemplateStart -> pushMode(TEMPLATE), type(TEMPLATE_START)
         ;
 SINGLE_QUOTE_END
         : '\'' -> popMode
@@ -60,6 +66,9 @@ mode TEXT2;
 
 PARAM_START2
         : ParamStart -> pushMode(PARAMETER), type(PARAM_START)
+        ;
+TEMPLATE_START2
+        : TemplateStart -> pushMode(TEMPLATE), type(TEMPLATE_START)
         ;
 DOUBLE_QUOTE_END
         : '"' -> popMode
@@ -131,10 +140,29 @@ GTE
 
 
 
+// ------------------ Template -------------------
+mode TEMPLATE;
+
+TEMPLATE_END
+        : ']' -> popMode
+        ;
+T_NAME
+        : DashedName -> type(NAME)
+        ;
+T_WS
+        : (CtrlChar | ' ')+ -> skip
+        ;
+
+
+
 // ------------------ Fragments ------------------
 
 fragment ParamStart
         : '%{'
+        ;
+
+fragment TemplateStart
+        : '%['
         ;
 
 fragment CtrlChar
@@ -178,7 +206,7 @@ fragment Character
 
 fragment EscapeSequence
         : '\\u' HexDigit HexDigit HexDigit HexDigit
-        | '\\' ["'%{\\]
+        | '\\' ["'%{\\\u005b]
         ;
 
 fragment HexDigit

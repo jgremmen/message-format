@@ -15,20 +15,20 @@
  */
 package de.sayayi.lib.message.internal;
 
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import static java.lang.Character.*;
-import static lombok.AccessLevel.PRIVATE;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@NoArgsConstructor(access = PRIVATE)
 public final class SpacesUtil
 {
+  private SpacesUtil() {}
+
+
   @Contract(pure = true)
   public static boolean isSpaceChar(char ch) {
     return ((((1 << SPACE_SEPARATOR) | (1 << PARAGRAPH_SEPARATOR)) >> getType((int)ch)) & 1) != 0;

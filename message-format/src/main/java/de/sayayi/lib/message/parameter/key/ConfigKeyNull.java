@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.parameter.key;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import lombok.EqualsAndHashCode;
@@ -58,7 +58,8 @@ public final class ConfigKeyNull implements ConfigKey
 
 
   @Override
-  public @NotNull MatchResult match(@NotNull MessageContext messageContext, @NotNull Locale locale, Object value)
+  public @NotNull MatchResult match(@NotNull MessageSupportAccessor messageSupportAccessor,
+                                    @NotNull Locale locale, Object value)
   {
     if (value == null && compareType == EQ)
       return TYPELESS_EXACT;

@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import static java.util.Objects.requireNonNull;
@@ -29,7 +28,7 @@ abstract class AbstractMessageWithCode implements Message.WithCode
 {
   private static final long serialVersionUID = 800L;
 
-  @Getter protected final @NotNull String code;
+  protected final @NotNull String code;
 
 
   AbstractMessageWithCode(@NotNull String code)
@@ -38,6 +37,12 @@ abstract class AbstractMessageWithCode implements Message.WithCode
       throw new IllegalArgumentException("message code must not be empty");
 
     this.code = code;
+  }
+
+
+  @Override
+  public @NotNull String getCode() {
+    return code;
   }
 
 

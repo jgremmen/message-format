@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;

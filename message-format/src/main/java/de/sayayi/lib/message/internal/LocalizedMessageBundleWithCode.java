@@ -17,25 +17,28 @@ package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.LocaleAware;
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.Synchronized;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import static java.util.Collections.*;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Locale.ROOT;
 import static java.util.Locale.forLanguageTag;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toSet;
 
 
 /**
@@ -48,8 +51,6 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
   private final @NotNull Map<Locale,Message> localizedMessages;
 
-  private Boolean hasParameter;
-
 
   public LocalizedMessageBundleWithCode(@NotNull String code, @NotNull Map<Locale,Message> localizedMessages)
   {
@@ -61,8 +62,9 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
   @Override
   @Contract(pure = true)
-  public @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
-    return findMessageByLocale(parameters.getLocale()).format(messageContext, parameters);
+  public @NotNull String format(@NotNull MessageSupportAccessor messageSupport,
+                                @NotNull Parameters parameters) {
+    return findMessageByLocale(parameters.getLocale()).format(messageSupport, parameters);
   }
 
 
@@ -106,42 +108,6 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   }
 
 
-  @Synchronized
-  @Override
-  @Contract(pure = true)
-  public boolean hasParameters()
-  {
-    if (hasParameter == null)
-    {
-      hasParameter = Boolean.FALSE;
-
-      for(final Message message: localizedMessages.values())
-        if (message.hasParameters())
-        {
-          hasParameter = Boolean.TRUE;
-          break;
-        }
-    }
-
-    return hasParameter;
-  }
-
-
-  @Override
-  public @NotNull SortedSet<String> getParameterNames()
-  {
-    if (!hasParameters())
-      return emptySortedSet();
-
-    final SortedSet<String> parameterNames = new TreeSet<>();
-
-    for(final Message message: localizedMessages.values())
-      parameterNames.addAll(message.getParameterNames());
-
-    return parameterNames;
-  }
-
-
   @Override
   @Contract(value = "-> new", pure = true)
   public @NotNull Set<Locale> getLocales() {
@@ -152,6 +118,17 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   @Override
   public @NotNull Map<Locale,Message> getLocalizedMessages() {
     return unmodifiableMap(localizedMessages);
+  }
+
+
+  @Override
+  public @NotNull Set<String> getTemplateNames()
+  {
+    return unmodifiableSet(localizedMessages
+        .values()
+        .stream()
+        .flatMap(m -> m.getTemplateNames().stream())
+        .collect(toSet()));
   }
 
 

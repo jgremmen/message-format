@@ -16,15 +16,13 @@
 package de.sayayi.lib.message.parameter;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.parameter.key.ConfigKey;
 import de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.parameter.value.ConfigValue;
 import de.sayayi.lib.message.parameter.value.ConfigValue.Type;
-import de.sayayi.lib.message.parameter.value.ConfigValueMessage;
 import de.sayayi.lib.message.parameter.value.ConfigValueString;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -35,13 +33,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeSet;
 
 import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.parameter.value.ConfigValue.STRING_MESSAGE_TYPE;
 import static java.util.Collections.unmodifiableMap;
-import static java.util.stream.Collectors.toCollection;
 
 
 /**
@@ -49,13 +45,17 @@ import static java.util.stream.Collectors.toCollection;
  *
  * @author Jeroen Gremmen
  */
-@AllArgsConstructor
 @EqualsAndHashCode(doNotUseGetters = true)
 public final class ParamConfig implements Serializable
 {
   private static final long serialVersionUID = 800L;
 
-  private final @NotNull Map<ConfigKey, ConfigValue> map;
+  private final @NotNull Map<ConfigKey,ConfigValue> map;
+
+
+  public ParamConfig(@NotNull Map<ConfigKey,ConfigValue> map) {
+    this.map = map;
+  }
 
 
   @Contract(pure = true)
@@ -84,7 +84,7 @@ public final class ParamConfig implements Serializable
 
 
   @Contract(pure = true)
-  public ConfigValue find(@NotNull MessageContext messageContext, Object key,
+  public ConfigValue find(@NotNull MessageSupportAccessor messageSupportAccessor, Object key,
                           @NotNull Parameters parameters, @NotNull Set<ConfigKey.Type> keyTypes,
                           Set<ConfigValue.Type> valueTypes)
   {
@@ -101,7 +101,7 @@ public final class ParamConfig implements Serializable
         if (keyTypes.contains(configKey.getType()) &&
             (valueTypes == null || valueTypes.contains(configValue.getType())))
         {
-          final MatchResult matchResult = configKey.match(messageContext, locale, key);
+          final MatchResult matchResult = configKey.match(messageSupportAccessor, locale, key);
 
           if (matchResult == EXACT)
             return configValue;
@@ -119,11 +119,11 @@ public final class ParamConfig implements Serializable
 
 
   @Contract(pure = true)
-  public Message.WithSpaces getMessage(@NotNull MessageContext messageContext, Object key,
+  public Message.WithSpaces getMessage(@NotNull MessageSupportAccessor messageSupportAccessor, Object key,
                                        @NotNull Parameters parameters, @NotNull Set<ConfigKey.Type> keyTypes,
                                        boolean includeDefault)
   {
-    ConfigValue configValue = find(messageContext, key, parameters, keyTypes, STRING_MESSAGE_TYPE);
+    ConfigValue configValue = find(messageSupportAccessor, key, parameters, keyTypes, STRING_MESSAGE_TYPE);
 
     if (configValue == null)
     {
@@ -136,22 +136,7 @@ public final class ParamConfig implements Serializable
     }
 
     return configValue.getType() == Type.STRING
-        ? ((ConfigValueString)configValue).asMessage(messageContext.getMessageFactory())
+        ? ((ConfigValueString)configValue).asMessage(messageSupportAccessor.getMessageFactory())
         : (Message.WithSpaces)configValue.asObject();
-  }
-
-
-  /**
-   * Returns all parameter names occurring in messages in this map.
-   *
-   * @return  all parameter names, never {@code null}
-   */
-  @Contract(pure = true)
-  public @NotNull Set<String> getParameterNames()
-  {
-    return map.values().stream()
-        .filter(mapValue -> mapValue instanceof ConfigValueMessage)
-        .flatMap(mapValue -> ((ConfigValueMessage)mapValue).asObject().getParameterNames().stream())
-        .collect(toCollection(TreeSet::new));
   }
 }

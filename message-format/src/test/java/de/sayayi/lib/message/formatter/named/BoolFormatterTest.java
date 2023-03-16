@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.named;
 
-import de.sayayi.lib.message.MessageContext;
+import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.parameter.key.ConfigKey;
 import de.sayayi.lib.message.parameter.key.ConfigKeyBool;
@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class BoolFormatterTest extends AbstractFormatterTest
 {
   @Test
-  public void testFormattableTypes()
+  void testFormattableTypes()
   {
     assertFormatterForType(new BoolFormatter(), boolean.class);
     assertFormatterForType(new BoolFormatter(), Boolean.class);
@@ -48,48 +48,56 @@ public class BoolFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testFormat()
+  void testFormat()
   {
-    val context = new MessageContext(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE, "de-DE");
-    val map = new HashMap<ConfigKey, ConfigValue>();
+    val accessor = MessageSupportFactory
+        .create(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE)
+        .setLocale("de-DE")
+        .getAccessor();
+
+    val map = new HashMap<ConfigKey,ConfigValue>();
     map.put(ConfigKeyBool.TRUE, new ConfigValueString("wahr"));
     map.put(ConfigKeyBool.FALSE, new ConfigValueString("falsch"));
 
-    assertEquals(noSpaceText("wahr"), format(context, Boolean.TRUE, map));
-    assertEquals(noSpaceText("falsch"), format(context, 0.0d, map, "bool"));
-    assertEquals(noSpaceText("wahr"), format(context, -0.0001f, map, "bool"));
-    assertEquals(noSpaceText("falsch"), format(context, "FALSE", map, "bool"));
-    assertEquals(noSpaceText("wahr"), format(context, "TrUe", map, "bool"));
-    assertEquals(noSpaceText("wahr"), format(context, -4, map, "bool"));
-    assertEquals(nullText(), format(context, (Object)null, map, "bool"));
+    assertEquals(noSpaceText("wahr"), format(accessor, Boolean.TRUE, map));
+    assertEquals(noSpaceText("falsch"), format(accessor, 0.0d, map, "bool"));
+    assertEquals(noSpaceText("wahr"), format(accessor, -0.0001f, map, "bool"));
+    assertEquals(noSpaceText("falsch"), format(accessor, "FALSE", map, "bool"));
+    assertEquals(noSpaceText("wahr"), format(accessor, "TrUe", map, "bool"));
+    assertEquals(noSpaceText("wahr"), format(accessor, -4, map, "bool"));
+    assertEquals(nullText(), format(accessor, (Object)null, map, "bool"));
   }
 
 
   @Test
-  public void testFormatter()
+  void testFormatter()
   {
-    val context = new MessageContext(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE, ENGLISH);
-    val parameters = context.parameters()
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE)
+        .setLocale(ENGLISH);
+
+    assertEquals("false true 1234 true no 3.14", messageSupport
+        .message("%{a} %{b} %{c} %{c,bool} %{d,bool,true:'yes',false:'no'} %{e}")
         .with("a", Boolean.FALSE)
         .with("b", Boolean.TRUE)
         .with("c", Integer.valueOf(1234))
         .with("d", Integer.valueOf(0))
-        .with("e", Double.valueOf(3.14d));
-    val msg = context.getMessageFactory()
-        .parse("%{a} %{b} %{c} %{c,bool} %{d,bool,true:'yes',false:'no'} %{e}");
-
-    assertEquals("false true 1234 true no 3.14", msg.format(context, parameters));
+        .with("e", Double.valueOf(3.14d))
+        .format());
   }
 
 
   @Test
-  public void testNamedFormatter()
+  void testNamedFormatter()
   {
-    val context = new MessageContext(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE, GERMAN);
-    val msg = context.getMessageFactory().parse("%{b,bool,null:'<unknown>',true:'yes',false:'no'}");
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE)
+        .setLocale(GERMAN);
 
-    assertEquals("<unknown>", msg.format(context, context.parameters().with("b", null)));
-    assertEquals("yes", msg.format(context, context.parameters().with("b", true)));
-    assertEquals("no", msg.format(context, context.parameters().with("b", false)));
+    val msg = messageSupport.message("%{b,bool,null:'<unknown>',true:'yes',false:'no'}").getMessage();
+
+    assertEquals("<unknown>", messageSupport.message(msg).with("b", null).format());
+    assertEquals("yes", messageSupport.message(msg).with("b", true).format());
+    assertEquals("no", messageSupport.message(msg).with("b", false).format());
   }
 }

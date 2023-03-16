@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.parser.normalizer;
 
 import de.sayayi.lib.message.internal.part.MessagePart;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.cache.Cache;
@@ -25,10 +24,14 @@ import javax.cache.Cache;
 /**
  * @author Jeroen Gremmen
  */
-@AllArgsConstructor
 public final class JCacheMessagePartNormalizer implements MessagePartNormalizer
 {
   private final @NotNull Cache<MessagePart,MessagePart> cache;
+
+
+  public JCacheMessagePartNormalizer(@NotNull Cache<MessagePart,MessagePart> cache) {
+    this.cache = cache;
+  }
 
 
   /**

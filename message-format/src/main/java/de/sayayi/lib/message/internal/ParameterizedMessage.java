@@ -16,11 +16,11 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.ParameterPart;
+import de.sayayi.lib.message.internal.part.TemplatePart;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
@@ -31,9 +31,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.Set;
+
+import static java.util.Collections.unmodifiableSet;
+import static java.util.stream.Collectors.toSet;
 
 
 /**
@@ -64,7 +67,8 @@ public class ParameterizedMessage implements Message.WithSpaces
 
   @Override
   @Contract(pure = true)
-  public @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters)
+  public @NotNull String format(@NotNull MessageSupportAccessor messageSupport,
+                                @NotNull Parameters parameters)
   {
     final StringBuilder message = new StringBuilder();
     boolean spaceBefore = false;
@@ -72,7 +76,9 @@ public class ParameterizedMessage implements Message.WithSpaces
     for(final MessagePart part: parts)
     {
       final Text textPart = part instanceof ParameterPart
-          ? ((ParameterPart)part).getText(messageContext, parameters)
+          ? ((ParameterPart)part).getText(messageSupport, parameters)
+          : part instanceof TemplatePart
+          ? ((TemplatePart)part).getText(messageSupport, parameters)
           : (Text)part;
 
       if (!textPart.isEmpty())
@@ -90,26 +96,6 @@ public class ParameterizedMessage implements Message.WithSpaces
 
 
   @Override
-  @Contract(value = "-> true", pure = true)
-  public boolean hasParameters() {
-    return true;
-  }
-
-
-  @Override
-  public @NotNull SortedSet<String> getParameterNames()
-  {
-    final SortedSet<String> parameterNames = new TreeSet<>();
-
-    for(final MessagePart part: parts)
-      if (part instanceof ParameterPart)
-        parameterNames.addAll(((ParameterPart)part).getParameterNames());
-
-    return parameterNames;
-  }
-
-
-  @Override
   public boolean isSpaceBefore() {
     return parts[0].isSpaceBefore();
   }
@@ -118,6 +104,17 @@ public class ParameterizedMessage implements Message.WithSpaces
   @Override
   public boolean isSpaceAfter() {
     return parts[parts.length - 1].isSpaceAfter();
+  }
+
+
+  @Override
+  public @NotNull Set<String> getTemplateNames()
+  {
+    return unmodifiableSet(Arrays
+        .stream(parts)
+        .filter(p -> p instanceof TemplatePart)
+        .map(p -> ((TemplatePart)p).getName())
+        .collect(toSet()));
   }
 
 

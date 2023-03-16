@@ -22,9 +22,6 @@ import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import de.sayayi.lib.message.internal.ParameterizedMessage;
 import org.junit.jupiter.api.Test;
 
-import java.util.Locale;
-
-import static java.util.Collections.singleton;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -36,10 +33,8 @@ public class MessageFactoryTest
   @Test
   public void testParseString()
   {
-    Message.WithSpaces msg = MessageFactory.NO_CACHE_INSTANCE.parse("this is %{test}");
-    assertEquals(singleton("test"), msg.getParameterNames());
+    Message.WithSpaces msg = MessageFactory.NO_CACHE_INSTANCE.parseMessage("this is %{test}");
     assertTrue(msg instanceof ParameterizedMessage);
-    assertTrue(msg.hasParameters());
   }
 
 
@@ -59,14 +54,6 @@ public class MessageFactoryTest
   @SuppressWarnings("ResultOfMethodCallIgnored")
   @Test
   public void testSyntaxError() {
-    assertThrows(MessageParserException.class, () -> MessageFactory.NO_CACHE_INSTANCE.parse("%{x,{true false:1}"));
-  }
-
-
-  @Test
-  public void testForLanguageTag()
-  {
-    assertEquals(Locale.ROOT, MessageFactory.forLanguageTag(""));
-    assertEquals(Locale.GERMANY, MessageFactory.forLanguageTag("de_DE"));
+    assertThrows(MessageParserException.class, () -> MessageFactory.NO_CACHE_INSTANCE.parseMessage("%{x,{true false:1}"));
   }
 }

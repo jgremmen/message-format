@@ -77,7 +77,7 @@ public class LRUMessagePartNormalizerTest
   public void testCache() throws Exception
   {
     final LRUMessagePartNormalizer resolver = new LRUMessagePartNormalizer(10);
-    final Message.WithSpaces msg = new MessageFactory(resolver).parse("this is %{a,number} and %{b}this is %{b}");
+    final Message.WithSpaces msg = new MessageFactory(resolver).parseMessage("this is %{a,number} and %{b}this is %{b}");
     final MessagePart[] parts = (MessagePart[])
         tryToReadFieldValue(ParameterizedMessage.class, "parts", (ParameterizedMessage)msg).get();
 

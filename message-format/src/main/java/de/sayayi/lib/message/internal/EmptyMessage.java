@@ -16,24 +16,20 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import lombok.NoArgsConstructor;
+import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.SortedSet;
+import java.util.Set;
 
-import static java.util.Collections.emptySortedSet;
-import static lombok.AccessLevel.PRIVATE;
+import static java.util.Collections.emptySet;
 
 
 /**
  * @author Jeroen Gremmen
  */
 @ToString
-@NoArgsConstructor(access = PRIVATE)
 public final class EmptyMessage implements Message.WithSpaces
 {
   private static final long serialVersionUID = 800L;
@@ -41,23 +37,14 @@ public final class EmptyMessage implements Message.WithSpaces
   public static final Message.WithSpaces INSTANCE = new EmptyMessage();
 
 
+  private EmptyMessage() {}
+
+
   @Override
   @Contract(pure = true)
-  public @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
+  public @NotNull String format(@NotNull MessageSupportAccessor messageSupport,
+                                @NotNull Parameters parameters) {
     return "";
-  }
-
-
-  @Override
-  @Contract(value = "-> false", pure = true)
-  public boolean hasParameters() {
-    return false;
-  }
-
-
-  @Override
-  public @NotNull SortedSet<String> getParameterNames() {
-    return emptySortedSet();
   }
 
 
@@ -70,6 +57,12 @@ public final class EmptyMessage implements Message.WithSpaces
   @Override
   public boolean isSpaceAfter() {
     return false;
+  }
+
+
+  @Override
+  public @NotNull Set<String> getTemplateNames() {
+    return emptySet();
   }
 
 

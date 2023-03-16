@@ -15,8 +15,8 @@
  */
 package de.sayayi.lib.message.internal.part;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.FormatterContextImpl;
@@ -27,13 +27,14 @@ import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.parameter.ParamConfig;
 import de.sayayi.lib.message.parameter.key.ConfigKey;
 import de.sayayi.lib.message.parameter.value.ConfigValue;
-import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.addSpaces;
 import static java.util.Objects.requireNonNull;
@@ -44,22 +45,21 @@ import static java.util.Objects.requireNonNull;
  *
  * @author Jeroen Gremmen
  */
-@Getter
 public final class ParameterPart implements Parameter
 {
   private static final long serialVersionUID = 800L;
 
-  private final @NotNull String parameter;
+  private final @NotNull String name;
   private final String format;
   private final @NotNull ParamConfig map;
   private final boolean spaceBefore;
   private final boolean spaceAfter;
 
 
-  public ParameterPart(@NotNull String parameter, String format, boolean spaceBefore, boolean spaceAfter,
-                       @NotNull Map<ConfigKey, ConfigValue> map)
+  public ParameterPart(@NotNull String name, String format, boolean spaceBefore, boolean spaceAfter,
+                       @NotNull Map<ConfigKey,ConfigValue> map)
   {
-    this.parameter = parameter;
+    this.name = name;
     this.format = "".equals(format) ? null : format;
     this.map = new ParamConfig(map);
     this.spaceBefore = spaceBefore;
@@ -67,31 +67,38 @@ public final class ParameterPart implements Parameter
   }
 
 
+  @Contract(pure = true)
+  public @NotNull String getName() {
+    return name;
+  }
+
+
+  @Override
+  public boolean isSpaceBefore() {
+    return spaceBefore;
+  }
+
+
+  @Override
+  public boolean isSpaceAfter() {
+    return spaceAfter;
+  }
+
+
   @Override
   @Contract(pure = true)
-  public @NotNull Text getText(@NotNull MessageContext messageContext, @NotNull Parameters parameters)
+  public @NotNull Text getText(@NotNull MessageSupportAccessor messageSupport, @NotNull Parameters parameters)
   {
-    final FormatterContext formatterContext = new FormatterContextImpl(messageContext, parameters,
-        parameters.getParameterValue(parameter), null, format, map);
+    final FormatterContext formatterContext = new FormatterContextImpl(messageSupport, parameters,
+        parameters.getParameterValue(name), null, format, map);
 
     try {
       return addSpaces(formatterContext.delegateToNextFormatter(), spaceBefore, spaceAfter);
     } catch(Exception ex) {
-      throw new MessageException("failed to format parameter " + parameter, ex);
+      throw new MessageException("failed to format parameter " + name, ex);
     }
   }
 
-
-  @Contract(pure = true)
-  public @NotNull Set<String> getParameterNames()
-  {
-    final Set<String> parameterNames = new TreeSet<>();
-
-    parameterNames.add(parameter);
-    parameterNames.addAll(map.getParameterNames());
-
-    return parameterNames;
-  }
 
   @Override
   public boolean equals(Object o)
@@ -104,7 +111,7 @@ public final class ParameterPart implements Parameter
     final ParameterPart that = (ParameterPart)o;
 
     return
-        parameter.equals(that.parameter) &&
+        name.equals(that.name) &&
         Objects.equals(format, that.format) &&
         spaceBefore == that.spaceBefore &&
         spaceAfter == that.spaceAfter &&
@@ -114,7 +121,7 @@ public final class ParameterPart implements Parameter
 
   @Override
   public int hashCode() {
-    return parameter.hashCode() * 11 + (spaceBefore ? 8 : 0) + (spaceAfter ? 2 : 0);
+    return name.hashCode() * 11 + (spaceBefore ? 8 : 0) + (spaceAfter ? 2 : 0);
   }
 
 
@@ -122,19 +129,19 @@ public final class ParameterPart implements Parameter
   @Contract(pure = true)
   public String toString()
   {
-    final StringBuilder s = new StringBuilder("Parameter(name=").append(parameter);
+    final StringBuilder s = new StringBuilder("Parameter(name=").append(name);
 
     if (format != null)
-      s.append(", format=").append(format);
+      s.append(",format=").append(format);
     if (!map.isEmpty())
-      s.append(", map=").append(map);
+      s.append(",map=").append(map);
 
     if (spaceBefore && spaceAfter)
-      s.append(", space-around");
+      s.append(",space-around");
     else if (spaceBefore)
-      s.append(", space-before");
+      s.append(",space-before");
     else if (spaceAfter)
-      s.append(", space-after");
+      s.append(",space-after");
 
     return s.append(')').toString();
   }
@@ -149,15 +156,15 @@ public final class ParameterPart implements Parameter
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    final Map<ConfigKey, ConfigValue> map = this.map.getMap();
+    final Map<ConfigKey,ConfigValue> map = this.map.getMap();
 
     packStream.writeBoolean(spaceBefore);
     packStream.writeBoolean(spaceAfter);
     packStream.writeSmallVar(map.size());
     packStream.writeString(format);
-    packStream.writeString(parameter);
+    packStream.writeString(name);
 
-    for(Entry<ConfigKey, ConfigValue> mapEntry: map.entrySet())
+    for(Entry<ConfigKey,ConfigValue> mapEntry: map.entrySet())
     {
       PackHelper.pack(mapEntry.getKey(), packStream);
       PackHelper.pack(mapEntry.getValue(), packStream);
@@ -175,8 +182,7 @@ public final class ParameterPart implements Parameter
    *
    * @since 0.8.0
    */
-  public static @NotNull ParameterPart unpack(@NotNull PackHelper unpack,
-                                              @NotNull PackInputStream packStream)
+  public static @NotNull ParameterPart unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
     final boolean spaceBefore = packStream.readBoolean();
@@ -184,15 +190,10 @@ public final class ParameterPart implements Parameter
     final int size = packStream.readSmallVar();
     final String format = packStream.readString();
     final String parameter = requireNonNull(packStream.readString());
-    final Map<ConfigKey, ConfigValue> map = new HashMap<>();
+    final Map<ConfigKey,ConfigValue> map = new HashMap<>();
 
     for(int n = 0; n < size; n++)
-    {
-      final ConfigKey key = unpack.unpackMapKey(packStream);
-      final ConfigValue value = unpack.unpackMapValue(packStream);
-
-      map.put(key, value);
-    }
+      map.put(unpack.unpackMapKey(packStream), unpack.unpackMapValue(packStream));
 
     return new ParameterPart(parameter, format, spaceBefore, spaceAfter, map);
   }

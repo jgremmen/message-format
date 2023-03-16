@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message;
 
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +24,6 @@ import java.util.Locale;
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.UK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 /**
@@ -34,19 +32,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class MessageTest
 {
   @Test
-  public void testParse1()
+  void testParse1()
   {
-    final Message m = NO_CACHE_INSTANCE.parse("Just a simple message without parameters ");
-    assertNotNull(m);
+    val messageSupport = MessageSupportFactory.shared();
 
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
-    final String text = m.format(context, context.noParameters());
-    assertEquals("Just a simple message without parameters", text);
+    assertEquals("Just a simple message without parameters",
+        messageSupport.message("Just a simple message without parameters ").format());
   }
 
 
   @Test
-  public void testParseMultiLocale()
+  void testParseMultiLocale()
   {
     val texts = new HashMap<Locale,String>();
 
@@ -55,40 +51,31 @@ public class MessageTest
     texts.put(Locale.GERMAN, "%{n} %{n,choice,1: 'Farbe', :'Farben'}.");
     texts.put(Locale.US, "%{n} %{n,choice,1:'color', :'colors'}.");
 
-    val msg = NO_CACHE_INSTANCE.parse(texts);
-    val context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+    val msg = NO_CACHE_INSTANCE.parseMessage(texts);
+    val messageSupport = MessageSupportFactory.shared();
 
-    val nl = msg.format(context, context.parameters().withLocale("nl-NL").with("n", 1));
-    assertEquals("1 kleur.", nl);
-
-    val uk = msg.format(context, context.parameters().withLocale(UK).with("n", 4));
-    assertEquals("4 colours.", uk);
+    assertEquals("1 kleur.", messageSupport.message(msg).locale("nl-NL").with("n", 1).format());
+    assertEquals("4 colours.", messageSupport.message(msg).locale(UK).with("n", 4).format());
   }
 
 
   @Test
-  public void testCompareType()
+  void testCompareType()
   {
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
-    Message m = context.getMessageFactory().parse("%{n,choice,<0:'negative',>0:'positive',:'zero'}");
+    val messageSupport = MessageSupportFactory.shared();
+    val m = messageSupport.message("%{n,choice,<0:'negative',>0:'positive',:'zero'}").getMessage();
 
-    assertEquals("negative",
-        m.format(context, context.parameters().withLocale(UK).with("n", -1)));
-
-    assertEquals("zero",
-        m.format(context, context.parameters().withLocale(UK).with("n", 0)));
-
-    assertEquals("positive",
-        m.format(context, context.parameters().withLocale(UK).with("n", 1234)));
+    assertEquals("negative", messageSupport.message(m).locale(UK).with("n", -1).format());
+    assertEquals("zero", messageSupport.message(m).locale(UK).with("n", 0).format());
+    assertEquals("positive", messageSupport.message(m).locale(UK).with("n", 1234).format());
   }
 
 
   @Test
-  public void testEmptyMessage()
+  void testEmptyMessage()
   {
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
-    Message m = context.getMessageFactory().parse("");
+    val messageSupport = MessageSupportFactory.shared();
 
-    assertEquals("", m.format(context, context.noParameters()));
+    assertEquals("", messageSupport.message("").format());
   }
 }

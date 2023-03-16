@@ -20,7 +20,6 @@ package de.sayayi.lib.message.exception;
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
-@SuppressWarnings("serial")
 public class MessageLocaleParseException extends MessageException
 {
   public MessageLocaleParseException(String message) {

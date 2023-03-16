@@ -15,8 +15,8 @@
  */
 package de.sayayi.lib.message.internal.part;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.SpacesAware;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +25,8 @@ import java.io.Serializable;
 
 
 /**
+ * This interface represents a part of a compiled message (text, parameter or template).
+ *
  * @author Jeroen Gremmen
  */
 public interface MessagePart extends SpacesAware, Serializable
@@ -77,7 +79,41 @@ public interface MessagePart extends SpacesAware, Serializable
    */
   interface Parameter extends MessagePart
   {
+    /**
+     * Returns the name for this parameter.
+     *
+     * @return  parameter name, never {@code null}
+     */
     @Contract(pure = true)
-    @NotNull Text getText(@NotNull MessageContext messageContext, @NotNull Parameters parameters);
+    @NotNull String getName();
+
+
+    @Contract(pure = true)
+    @NotNull Text getText(@NotNull MessageSupportAccessor messageSupport, @NotNull Parameters parameters);
+  }
+
+
+
+
+  /**
+   * Message part containing a template reference to be evaluated during formatting.
+   *
+   * @see MessageSupportAccessor#getTemplateByName(String)
+   *
+   * @since 0.8.0
+   */
+  interface Template extends MessagePart
+  {
+    /**
+     * Returns the name of this template.
+     *
+     * @return  template name, never {@code null}
+     */
+    @Contract(pure = true)
+    @NotNull String getName();
+
+
+    @Contract(pure = true)
+    @NotNull Text getText(@NotNull MessageSupportAccessor messageSupport, @NotNull Parameters parameters);
   }
 }
