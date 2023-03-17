@@ -1,5 +1,5 @@
 # CI script
-image: java:17-jdk
+image: openjdk:17
 
 stages:
   - build
@@ -17,6 +17,8 @@ cache:
 
 build:
   stage: build
+  tags:
+    - docker
   script: ./gradlew clean build
   artifacts:
     name: "message-format-artifacts"
