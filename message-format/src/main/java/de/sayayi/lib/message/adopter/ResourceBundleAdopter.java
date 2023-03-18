@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.adopter;
 
 import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +32,11 @@ import static java.util.Collections.singletonMap;
  */
 public class ResourceBundleAdopter extends AbstractMessageAdopter
 {
+  public ResourceBundleAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {
+    super(configurableMessageSupport);
+  }
+
+
   public ResourceBundleAdopter(@NotNull MessageFactory messageFactory,
                                @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);

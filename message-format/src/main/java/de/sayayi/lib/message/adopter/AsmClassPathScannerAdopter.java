@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.adopter;
 
 import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
 import de.sayayi.lib.message.annotation.*;
 import de.sayayi.lib.message.annotation.impl.MessageDefImpl;
@@ -51,7 +52,19 @@ import static org.objectweb.asm.Type.getDescriptor;
 
 
 /**
+ * <p>
+ *   The asm classpath scanner scans classes and publishes the annotated messages found.
+ * </p>
+ * <p>
+ *   The scanned classes are not loaded by the classloader but instead are analysed using the ASM library.
+ *   Using this class therefore requires a dependency with library {@code org.ow2.asm:asm:9.4}.
+ * </p>
+ *
+ *
  * @author Jeroen Gremmen
+ * @since 0.8.0
+ *
+ * @see AnnotationAdopter
  */
 public final class AsmClassPathScannerAdopter extends AbstractMessageAdopter
 {
@@ -67,6 +80,14 @@ public final class AsmClassPathScannerAdopter extends AbstractMessageAdopter
   private final Set<String> packageNames;
   private final Set<String> visitedClasses;
   private final AnnotationAdopter annotationAdopter;
+
+
+  public AsmClassPathScannerAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport,
+                                    @NotNull Set<String> packageNames, ClassLoader classLoader)
+  {
+    this(configurableMessageSupport.getAccessor().getMessageFactory(), configurableMessageSupport,
+        packageNames, classLoader);
+  }
 
 
   public AsmClassPathScannerAdopter(@NotNull MessageFactory messageFactory,

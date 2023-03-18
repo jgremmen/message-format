@@ -32,6 +32,9 @@ import static java.util.Locale.forLanguageTag;
 
 
 /**
+ * The annotation adopter provides various methods for publishing messages defined by annotations
+ * like {@code @MessageDef} and {@code @TemplateDef}.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
@@ -42,7 +45,7 @@ public class AnnotationAdopter extends AbstractMessageAdopter
 
 
   public AnnotationAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {
-    this(configurableMessageSupport.getAccessor().getMessageFactory(), configurableMessageSupport);
+    super(configurableMessageSupport);
   }
 
 
@@ -74,7 +77,7 @@ public class AnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Parse message defined in the given {@link MessageDef} annotation.
+   * Publish message defined in the given {@link MessageDef} annotation.
    *
    * @param messageDef  {@code MessageDef} annotation, not {@code null}
    */
@@ -110,7 +113,7 @@ public class AnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Parse template defined in the given {@link TemplateDef} annotation.
+   * Publish template defined in the given {@link TemplateDef} annotation.
    *
    * @param templateDef  {@code TemplateDef} annotation, not {@code null}
    */

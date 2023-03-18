@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.adopter;
 
 import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
 import de.sayayi.lib.message.annotation.*;
 import de.sayayi.lib.message.annotation.impl.MessageDefImpl;
@@ -36,7 +37,19 @@ import java.util.Set;
 
 
 /**
+ * <p>
+ *   The spring classpath scanner scans classes and publishes the annotated messages found.
+ * </p>
+ * <p>
+ *   The scanned classes are not loaded by the classloader but instead are analysed using the Spring
+ *   {@code ClassPathScanningCandidateComponentProvider} class.
+ *   Using this class therefore requires a dependency with library
+ *   {@code org.springframework:spring-context:5.3.25}.
+ * </p>
+ *
+ *
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 public final class SpringClassPathScannerAdopter extends AbstractMessageAdopter
 {
@@ -48,6 +61,15 @@ public final class SpringClassPathScannerAdopter extends AbstractMessageAdopter
   private final Set<String> packageNames;
   private final ResourceLoader resourceLoader;
   private final AnnotationAdopter annotationAdopter;
+
+
+  public SpringClassPathScannerAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport,
+                                       @NotNull Set<String> packageNames,
+                                       @NotNull ResourceLoader resourceLoader)
+  {
+    this(configurableMessageSupport.getAccessor().getMessageFactory(), configurableMessageSupport,
+        packageNames, resourceLoader);
+  }
 
 
   public SpringClassPathScannerAdopter(@NotNull MessageFactory messageFactory,

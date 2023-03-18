@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.adopter;
 
 import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +34,11 @@ import java.util.Properties;
  */
 public class PropertiesAdopter extends AbstractMessageAdopter
 {
+  public PropertiesAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {
+    super(configurableMessageSupport);
+  }
+
+
   public PropertiesAdopter(@NotNull MessageFactory messageFactory,
                            @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);
