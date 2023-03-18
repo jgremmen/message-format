@@ -72,6 +72,14 @@ jar {
 }
 
 
+javadoc {
+  exclude '**/parser/Message*.java'
+  exclude '**/pack/*.java'
+  exclude '**/*Impl.java'
+  exclude '**/FixedSizeCacheMap.java'
+}
+
+
 publishing {
   publications {
 

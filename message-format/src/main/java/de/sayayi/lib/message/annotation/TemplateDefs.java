@@ -24,6 +24,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 
 /**
+ * Repeatable {@code TemplateDef} annotation.
+ *
  * @author Jeroen Gremmen
  *
  * @since 0.8.0

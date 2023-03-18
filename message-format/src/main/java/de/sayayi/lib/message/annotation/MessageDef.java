@@ -24,7 +24,22 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 
 /**
+ * Defines a message with a unique code.
+ * <p>
+ * For example:
+ * <blockquote><pre>
+ * &#x40;MessageDef(code = "MSG-001", texts = {
+ *   &#x40;Text(locale = "en", text = "%{r,size,1:'1 result',:'%{r,size} results'} found"),
+ *   &#x40;Text(locale = "de", text = "%{r,size,1:'1 Ergebnis',:'%{r,size} Ergebnisse'} gefunden")
+ * })
+ * </pre></blockquote>
+ *
+ *
  * @author Jeroen Gremmen
+ *
+ * @see de.sayayi.lib.message.adopter.AnnotationAdopter AnnotationAdopter
+ * @see de.sayayi.lib.message.adopter.AsmClassPathScannerAdopter AsmClassPathScannerAdopter
+ * @see de.sayayi.lib.message.adopter.SpringClassPathScannerAdopter SpringClassPathScannerAdopter
  */
 @Target({ ANNOTATION_TYPE, METHOD, TYPE })
 @Retention(RUNTIME)
@@ -36,8 +51,8 @@ public @interface MessageDef
    *   Unique message code.
    * </p>
    * <p>
-   *   Uniqueness is required to identify and retrieve a message by its {@code code} and is defined within the scope
-   *   of a message bundle.
+   *   Uniqueness is required to identify and retrieve a message by its {@code code} and is defined within
+   *   the scope of a {@link de.sayayi.lib.message.MessageSupport MessageSupport} instance.
    * </p>
    *
    * @return  unique message code, not empty

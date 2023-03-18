@@ -46,6 +46,15 @@ public interface MessageSupport
   @NotNull MessageSupportAccessor getAccessor();
 
 
+  /**
+   * Prepare a message with the given {@code code} for formatting.
+   *
+   * @param code  message code, not {@code null}
+   *
+   * @return  message configurer instance for the given {@code code}, never {@code null}
+   *
+   * @throws IllegalArgumentException  in case the given message {@code code} is unknown
+   */
   @Contract(value = "_ -> new", pure = true)
   @NotNull MessageConfigurer<Message.WithCode> code(@NotNull String code);
 
@@ -105,14 +114,31 @@ public interface MessageSupport
   @SuppressWarnings("UnstableApiUsage")
   interface MessageConfigurer<M extends Message>
   {
+    /**
+     * Returns the message associated with this message configurer.
+     *
+     * @return  message, never {@code null}
+     */
     @Contract(pure = true)
     @NotNull M getMessage();
 
 
+    /**
+     * Clear all message parameter values.
+     *
+     * @return  message configurer instance for this message, never {@code null}
+     */
     @Contract(value = "-> this", mutates = "this")
     @NotNull MessageConfigurer<M> clear();
 
 
+    /**
+     * Remove message parameter values with the given {@code parameter} name.
+     *
+     * @param parameter  parameter name, not {@code null}
+     *
+     * @return  message configurer instance for this message, never {@code null}
+     */
     @Contract(value = "_ -> this", mutates = "this")
     @NotNull MessageConfigurer<M> remove(@NotNull String parameter);
 
@@ -382,6 +408,14 @@ public interface MessageSupport
 
 
 
+  /**
+   * Message publisher provides methods for registering messages and templates.
+   * <p>
+   * The publisher is used intensively by message adopters (see package {@code de.sayayi.lib.message.adopter}).
+   *
+   * @author Jeroen Gremmen
+   * @since 0.8.0
+   */
   @SuppressWarnings("UnstableApiUsage")
   interface MessagePublisher
   {

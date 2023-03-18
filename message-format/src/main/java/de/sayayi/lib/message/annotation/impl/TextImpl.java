@@ -21,10 +21,12 @@ import java.lang.annotation.Annotation;
 
 
 /**
+ * {@code Text} annotation implementation.
+ *
  * @author Jeroen Gremmen
  */
 @SuppressWarnings("ClassExplicitlyAnnotation")
-public class TextImpl implements Text
+public final class TextImpl implements Text
 {
   private final String locale;
   private final String text;

@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -47,16 +46,19 @@ import static java.util.Objects.requireNonNull;
  * @see GenericFormatterService
  * @see FormatterContext#delegateToNextFormatter()
  */
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, doNotUseGetters = true)
 @ToString
 public final class FormattableType implements Comparable<FormattableType>, Serializable
 {
   private static final long serialVersionUID = 800L;
 
+  /**
+   * Default order value. If a formattable type has no explicit order, this default value will be used instead.
+   *
+   * @see #getOrder()
+   */
   public static final byte DEFAULT_ORDER = 100;
 
 
-  @EqualsAndHashCode.Include
   private final @NotNull Class<?> type;
 
   private final byte order;
@@ -116,11 +118,23 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
   /**
    * Returns the order for this formattable type.
    *
-   * @return  order
+   * @return  order in range {@code 0..127}
    */
   @Contract(pure = true)
   public @Range(from = 0, to = 127) int getOrder() {
     return order;
+  }
+
+
+  @Override
+  public boolean equals(Object o) {
+    return o == this || o instanceof FormattableType && type == ((FormattableType) o).type;
+  }
+
+
+  @Override
+  public int hashCode() {
+    return type.hashCode();
   }
 
 

@@ -24,17 +24,19 @@ import java.util.Arrays;
 
 
 /**
+ * {@code MessageDef} annotation implementation.
+ *
  * @author Jeroen Gremmen
  */
 @SuppressWarnings("ClassExplicitlyAnnotation")
-public class MessageDefImpl implements MessageDef
+public final class MessageDefImpl implements MessageDef
 {
   private final String code;
   private final String text;
   private final @NotNull Text[] texts;
 
 
-  public MessageDefImpl(String code, String text, @NotNull Text[] texts)
+  public MessageDefImpl(@NotNull String code, String text, @NotNull Text[] texts)
   {
     this.code = code;
     this.text = text;
@@ -44,7 +46,7 @@ public class MessageDefImpl implements MessageDef
 
   @Override
   public String code() {
-    return code == null ? "" : code;
+    return code;
   }
 
 

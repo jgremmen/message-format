@@ -41,6 +41,11 @@ public final class DuplicateMessageException extends MessageException
   }
 
 
+  /**
+   * Returns the message code which has been identified as being a duplicate.
+   *
+   * @return  duplicate message code, never {@code null}
+   */
   @Contract(pure = true)
   public @NotNull String getCode() {
     return code;

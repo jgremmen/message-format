@@ -28,6 +28,10 @@ abstract class AbstractMessageWithCode implements Message.WithCode
 {
   private static final long serialVersionUID = 800L;
 
+
+  /**
+   * Unique message code, never {@code null}.
+   */
   protected final @NotNull String code;
 
 

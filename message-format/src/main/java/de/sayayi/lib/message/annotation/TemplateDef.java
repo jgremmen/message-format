@@ -24,9 +24,19 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 
 /**
+ * Defines a template message with a unique name.
+ * <p>
+ * For example:
+ * <blockquote><pre>
+ * &#x40;TemplateDef(name = "ex-msg", text = "%{ex,!empty:': %{ex}'}")
+ * </pre></blockquote>
+ *
+ *
  * @author Jeroen Gremmen
  *
  * @since 0.8.0
+ *
+ * @see de.sayayi.lib.message.adopter.AnnotationAdopter AnnotationAdopter
  */
 @Target({ ANNOTATION_TYPE, METHOD, TYPE })
 @Retention(RUNTIME)

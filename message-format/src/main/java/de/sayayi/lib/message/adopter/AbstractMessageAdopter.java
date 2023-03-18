@@ -35,8 +35,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class AbstractMessageAdopter
 {
-  protected final MessageFactory messageFactory;
-  protected final MessagePublisher messagePublisher;
+  /** Message factory instance, not {@code null}. */
+  protected final @NotNull MessageFactory messageFactory;
+
+  /** Message publisher instance, not {@code null}. */
+  protected final @NotNull MessagePublisher messagePublisher;
 
 
   protected AbstractMessageAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {

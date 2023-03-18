@@ -41,6 +41,11 @@ public final class DuplicateTemplateException extends MessageException
   }
 
 
+  /**
+   * Returns the template name which has been identified as being a duplicate.
+   *
+   * @return  duplicate template name, never {@code null}
+   */
   @Contract(pure = true)
   public @NotNull String getName() {
     return name;

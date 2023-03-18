@@ -36,7 +36,10 @@ import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.*;
 @ToString(doNotUseGetters = true)
 public enum ConfigKeyBool implements ConfigKey
 {
+  /** Config key representing {@code false}. */
   FALSE(false),
+
+  /** Config key representing {@code true}. */
   TRUE(true);
 
 

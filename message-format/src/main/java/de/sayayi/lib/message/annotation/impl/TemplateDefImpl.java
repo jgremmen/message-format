@@ -24,18 +24,20 @@ import java.util.Arrays;
 
 
 /**
+ *  {@code TemplateDef} annotation implementation.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
 @SuppressWarnings("ClassExplicitlyAnnotation")
-public class TemplateDefImpl implements TemplateDef
+public final class TemplateDefImpl implements TemplateDef
 {
   private final String name;
   private final String text;
   private final @NotNull Text[] texts;
 
 
-  public TemplateDefImpl(String name, String text, @NotNull Text[] texts)
+  public TemplateDefImpl(@NotNull String name, String text, @NotNull Text[] texts)
   {
     this.name = name;
     this.text = text;
@@ -45,7 +47,7 @@ public class TemplateDefImpl implements TemplateDef
 
   @Override
   public String name() {
-    return name == null ? "" : name;
+    return name;
   }
 
 

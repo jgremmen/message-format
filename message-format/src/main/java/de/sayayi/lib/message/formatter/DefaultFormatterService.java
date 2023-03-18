@@ -28,9 +28,19 @@ public class DefaultFormatterService extends GenericFormatterService
 {
   private static final FormatterService INSTANCE = new DefaultFormatterService();
 
+  /**
+   * Classloader to be used to load parameter formatter service classes or {@code null} for
+   * the system class loader.
+   */
   protected final ClassLoader classLoader;
 
 
+  /**
+   * Returns a shared instance of the default formatter service. This service includes all parameter
+   * formatters which are available as a service and accessible by the system class loader.
+   *
+   * @return  shared instance of the default formatter service, never {@code null}
+   */
   public static FormatterService getSharedInstance() {
     return INSTANCE;
   }
@@ -50,12 +60,18 @@ public class DefaultFormatterService extends GenericFormatterService
   }
 
 
+  /**
+   * Adds the default formatters for this service.
+   */
   @SuppressWarnings("WeakerAccess")
   protected void addDefaultFormatters() {
     addFormattersFromService();
   }
 
 
+  /**
+   * Adds all parameter formatters on the classpath which are defined as a service.
+   */
   protected void addFormattersFromService()
   {
     ServiceLoader.load(ParameterFormatter.class, classLoader).forEach(parameterFormatter -> {

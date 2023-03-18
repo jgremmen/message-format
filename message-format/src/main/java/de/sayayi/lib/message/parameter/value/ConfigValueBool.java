@@ -28,7 +28,10 @@ import java.io.IOException;
  */
 public enum ConfigValueBool implements ConfigValue
 {
+  /** Config value representing {@code false}. */
   FALSE(false),
+
+  /** Config value representing {@code true}. */
   TRUE(true);
 
 

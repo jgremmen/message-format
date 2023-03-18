@@ -24,6 +24,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 
 /**
+ * Repeatable {@code MessageDef} annotation.
+ *
  * @author Jeroen Gremmen
  */
 @Target({ METHOD, TYPE })

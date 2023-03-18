@@ -36,7 +36,10 @@ public interface MessagePart extends SpacesAware, Serializable
    */
   interface Text extends MessagePart
   {
+    /** Message part representing an empty text value. */
     Text EMPTY = new NoSpaceTextPart("");
+
+    /** Message part representing a {@code null} value. */
     Text NULL = new TextPart(null);
 
 
