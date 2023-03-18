@@ -34,7 +34,7 @@ import static java.util.Locale.ROOT;
 
 
 /**
- * Factory implementation for creating message instances from various sources.
+ * Factory for creating message instances.
  *
  * @author Jeroen Gremmen
  */

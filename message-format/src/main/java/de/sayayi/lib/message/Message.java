@@ -87,6 +87,11 @@ public interface Message extends Serializable
   }
 
 
+  /**
+   * Returns a set with all templates names in use by this message.
+   *
+   * @return  template names, never {@code null}
+   */
   @Contract(pure = true)
   @Unmodifiable
   @NotNull Set<String> getTemplateNames();
@@ -101,9 +106,7 @@ public interface Message extends Serializable
 
 
   /**
-   * <p>
-   *   A message class implementing this interface provides an additional code uniquely identifying the message.
-   * </p>
+   * A message class implementing this interface provides an additional code uniquely identifying the message.
    */
   interface WithCode extends Message
   {
@@ -120,9 +123,7 @@ public interface Message extends Serializable
 
 
   /**
-   * <p>
-   *   Message classes implementing this interface are capable of formatting messages for one or more locales.
-   * </p>
+   * Message classes implementing this interface are capable of formatting messages for one or more locales.
    */
   interface LocaleAware extends Message
   {

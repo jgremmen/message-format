@@ -143,36 +143,84 @@ public interface MessageSupport
     @NotNull MessageConfigurer<M> remove(@NotNull String parameter);
 
 
+    /**
+     * Sets a boolean value for this message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return  message configurer instance for this message, never {@code null}
+     */
     @Contract(value = "_, _ -> this", mutates = "this")
     default @NotNull MessageConfigurer<M> with(@NotNull String parameter, boolean value) {
       return with(parameter, Boolean.valueOf(value));
     }
 
 
+    /**
+     * Sets an integer value for this message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return  message configurer instance for this message, never {@code null}
+     */
     @Contract(value = "_, _ -> this", mutates = "this")
     default @NotNull MessageConfigurer<M> with(@NotNull String parameter, int value) {
       return with(parameter, Integer.valueOf(value));
     }
 
 
+    /**
+     * Sets a long value for this message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return  message configurer instance for this message, never {@code null}
+     */
     @Contract(value = "_, _ -> this", mutates = "this")
     default @NotNull MessageConfigurer<M> with(@NotNull String parameter, long value) {
       return with(parameter, Long.valueOf(value));
     }
 
 
+    /**
+     * Sets a float value for this message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return  message configurer instance for this message, never {@code null}
+     */
     @Contract(value = "_, _ -> this", mutates = "this")
     default @NotNull MessageConfigurer<M> with(@NotNull String parameter, float value) {
       return with(parameter, Float.valueOf(value));
     }
 
 
+    /**
+     * Sets a double value for this message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return  message configurer instance for this message, never {@code null}
+     */
     @Contract(value = "_, _ -> this", mutates = "this")
     default @NotNull MessageConfigurer<M> with(@NotNull String parameter, double value) {
       return with(parameter, Double.valueOf(value));
     }
 
 
+    /**
+     * Sets a value for this message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return  message configurer instance for this message, never {@code null}
+     */
     @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull MessageConfigurer<M> with(@NotNull String parameter, Object value);
 
@@ -401,6 +449,11 @@ public interface MessageSupport
     ConfigValue getDefaultParameterConfig(@NotNull String name);
 
 
+    /**
+     * Returns the message factory.
+     *
+     * @return  message factory, never {@code null}
+     */
     @Contract(pure = true)
     @NotNull MessageFactory getMessageFactory();
   }
