@@ -64,7 +64,9 @@ import static de.sayayi.lib.message.parser.MessageLexer.SINGLE_QUOTE_END;
 import static de.sayayi.lib.message.parser.MessageLexer.SINGLE_QUOTE_START;
 import static de.sayayi.lib.message.parser.MessageParser.*;
 import static java.lang.Boolean.parseBoolean;
+import static java.lang.Character.isSpaceChar;
 import static java.util.stream.Collectors.toMap;
+import static org.antlr.v4.runtime.Token.EOF;
 
 
 /**
@@ -211,8 +213,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitText(TextContext ctx)
     {
       final List<TerminalNode> chNodes = ctx.CH();
-      final char[] text = new char[chNodes.size()];
-      int n = 0;
+      final StringBuilder text = new StringBuilder(64);
 
       for(final TerminalNode chNode: chNodes)
       {
@@ -227,13 +228,19 @@ public final class MessageCompiler extends AbstractAntlr4Parser
               : (char)Integer.parseInt(chText.substring(2), 16);
         }
 
-        if (!SpacesUtil.isSpaceChar(ch))
-          text[n++] = ch;
-        else if (n == 0 || !SpacesUtil.isSpaceChar(text[n - 1]))
-          text[n++] = ' ';
+        if (isSpaceChar(ch))
+        {
+          int n = text.length();
+          if (n == 0 || !isSpaceChar(text.charAt(n - 1)))
+            text.append(' ');
+        }
+        else if (chText.charAt(0) == '\\')
+          text.append(ch);
+        else
+          text.append(chText);
       }
 
-      ctx.value = new String(text, 0, n);
+      ctx.value = text.toString();
     }
 
 
@@ -422,10 +429,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       {
         final Token token = tokenStream.get(i);
 
-        if (token.getType() != Token.EOF)
+        if (token.getType() != EOF)
         {
           final String text = token.getText();
-          return !SpacesUtil.isEmpty(text) && SpacesUtil.isSpaceChar(text.charAt(0));
+          return !SpacesUtil.isEmpty(text) && isSpaceChar(text.charAt(0));
         }
       }
 

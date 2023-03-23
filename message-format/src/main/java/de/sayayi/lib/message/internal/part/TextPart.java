@@ -25,8 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.Objects;
 
-import static de.sayayi.lib.message.internal.SpacesUtil.isSpaceChar;
 import static de.sayayi.lib.message.internal.SpacesUtil.trimSpaces;
+import static java.lang.Character.isSpaceChar;
 
 
 /**

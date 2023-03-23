@@ -55,6 +55,13 @@ public class AnnotationAdopter extends AbstractMessageAdopter
   }
 
 
+  /**
+   * Publish the message or template defined on the annotated element.
+   * <p>
+   * This method recognizes {@link MessageDef} and {@link TemplateDef} annotations.
+   *
+   * @param element  annotated element (eg. method, field, class), not {@code null}
+   */
   @Contract(pure = true)
   public void adopt(@NotNull AnnotatedElement element)
   {
@@ -77,7 +84,7 @@ public class AnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Publish message defined in the given {@link MessageDef} annotation.
+   * Publish the message defined in the given {@link MessageDef} annotation.
    *
    * @param messageDef  {@code MessageDef} annotation, not {@code null}
    */
@@ -113,7 +120,7 @@ public class AnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Publish template defined in the given {@link TemplateDef} annotation.
+   * Publish the template defined in the given {@link TemplateDef} annotation.
    *
    * @param templateDef  {@code TemplateDef} annotation, not {@code null}
    */

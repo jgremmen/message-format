@@ -169,10 +169,6 @@ fragment CtrlChar
         : [\u0000-\u001f]
         ;
 
-fragment TextChar
-        : '\u0020'..'\uffff'
-        ;
-
 fragment DashedName
         : Name ('-' Name)*
         ;
@@ -191,7 +187,7 @@ fragment NameChar
 
 fragment NameStartChar
         : [a-zA-Z]
-        | ~[\u0000-\u007F\uD800-\uDBFF] // covers all characters above 0x7F which are not a surrogate
+        | ~[\u0000-\u007F\uD800-\uDBFF]  // covers all characters above 0x7F which are not a surrogate
         ;
 
 fragment Number
@@ -199,9 +195,12 @@ fragment Number
         ;
 
 fragment Character
-        : ' '+
-        | EscapeSequence
-        | TextChar
+        : EscapeSequence
+        | [\p{Zs}]+  // Unicode Zs (whitespace)
+        | [\p{L}]+   // Unicode L (letter)
+        | [\p{N}]+   // Unicode N (number)
+        | [\p{P}]+   // Unicode P (punctuation)
+        | [\p{S}]+   // Unicode S (symbol)
         ;
 
 fragment EscapeSequence
