@@ -49,13 +49,13 @@ text returns [String value]
         ;
 
 quotedMessage returns [Message.WithSpaces value]
-        : SINGLE_QUOTE_START message0 SINGLE_QUOTE_END
-        | DOUBLE_QUOTE_START message0 DOUBLE_QUOTE_END
+        : SQ_START message0 SQ_END
+        | DQ_START message0 DQ_END
         ;
 
 string returns [String value]
-        : SINGLE_QUOTE_START text? SINGLE_QUOTE_END
-        | DOUBLE_QUOTE_START text? DOUBLE_QUOTE_END
+        : SQ_START text? SQ_END
+        | DQ_START text? DQ_END
         ;
 
 forceQuotedMessage returns [Message.WithSpaces value]
@@ -64,18 +64,18 @@ forceQuotedMessage returns [Message.WithSpaces value]
         ;
 
 parameterPart returns [ParameterPart value]
-        : PARAM_START
+        : P_START
           name=nameOrKeyword
           (COMMA format=nameOrKeyword)?
           (COMMA configElement)*
           (COMMA COLON forceQuotedMessage)?
-          PARAM_END
+          P_END
         ;
 
 templatePart returns [TemplatePart value]
-        : TEMPLATE_START
+        : TPL_START
           nameOrKeyword
-          TEMPLATE_END
+          TPL_END
         ;
 
 configElement returns [ConfigKey key, ConfigValue value]

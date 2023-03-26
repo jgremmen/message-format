@@ -17,18 +17,18 @@ lexer grammar MessageLexer;
 
 
 tokens {
-    SINGLE_QUOTE_START,
-    DOUBLE_QUOTE_START
+    SQ_START,
+    DQ_START
 }
 
 
 
 // ------------------ Default mode ------------------
 
-PARAM_START
+P_START
         : ParamStart -> pushMode(PARAMETER)
         ;
-TEMPLATE_START
+TPL_START
         : TemplateStart -> pushMode(TEMPLATE)
         ;
 CH
@@ -43,13 +43,13 @@ CTRL_CHAR
 // ------------------ In single quoted text mode ------------------
 mode TEXT1;
 
-PARAM_START1
-        : ParamStart -> pushMode(PARAMETER), type(PARAM_START)
+P_START1
+        : ParamStart -> pushMode(PARAMETER), type(P_START)
         ;
-TEMPLATE_START1
-        : TemplateStart -> pushMode(TEMPLATE), type(TEMPLATE_START)
+TPL_START1
+        : TemplateStart -> pushMode(TEMPLATE), type(TPL_START)
         ;
-SINGLE_QUOTE_END
+SQ_END
         : '\'' -> popMode
         ;
 CH1
@@ -64,13 +64,13 @@ CTRL_CHAR1
 // ------------------ In double quoted text mode ------------------
 mode TEXT2;
 
-PARAM_START2
-        : ParamStart -> pushMode(PARAMETER), type(PARAM_START)
+P_START2
+        : ParamStart -> pushMode(PARAMETER), type(P_START)
         ;
-TEMPLATE_START2
-        : TemplateStart -> pushMode(TEMPLATE), type(TEMPLATE_START)
+TPL_START2
+        : TemplateStart -> pushMode(TEMPLATE), type(TPL_START)
         ;
-DOUBLE_QUOTE_END
+DQ_END
         : '"' -> popMode
         ;
 CH2
@@ -85,7 +85,7 @@ CTRL_CHAR2
 // ------------------ In parameter mode ------------------
 mode PARAMETER;
 
-PARAM_END
+P_END
         : '}' -> popMode
         ;
 COMMA
@@ -111,10 +111,10 @@ NUMBER
         : Number
         ;
 P_SQ_START
-        : '\'' -> pushMode(TEXT1), type(SINGLE_QUOTE_START)
+        : '\'' -> pushMode(TEXT1), type(SQ_START)
         ;
 P_DQ_START
-        : '"' -> pushMode(TEXT2), type(DOUBLE_QUOTE_START)
+        : '"' -> pushMode(TEXT2), type(DQ_START)
         ;
 P_WS
         : (CtrlChar | ' ')+ -> skip
@@ -143,7 +143,7 @@ GTE
 // ------------------ Template -------------------
 mode TEMPLATE;
 
-TEMPLATE_END
+TPL_END
         : ']' -> popMode
         ;
 T_NAME
@@ -197,10 +197,10 @@ fragment Number
 fragment Character
         : EscapeSequence
         | [\p{Zs}]+  // Unicode Zs (whitespace)
-        | [\p{L}]+   // Unicode L (letter)
-        | [\p{N}]+   // Unicode N (number)
-        | [\p{P}]+   // Unicode P (punctuation)
-        | [\p{S}]+   // Unicode S (symbol)
+        | [\p{L}]   // Unicode L (letter)
+        | [\p{N}]   // Unicode N (number)
+        | [\p{P}]   // Unicode P (punctuation)
+        | [\p{S}]   // Unicode S (symbol)
         ;
 
 fragment EscapeSequence

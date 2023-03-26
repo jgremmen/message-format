@@ -21,7 +21,7 @@ import org.antlr.v4.runtime.Token;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.parser.MessageLexer.CH;
-import static de.sayayi.lib.message.parser.MessageLexer.PARAM_START;
+import static de.sayayi.lib.message.parser.MessageLexer.P_START;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -61,7 +61,7 @@ public class MessageTokenizerTest
     // %{
     token = lexer.nextToken();
     assertEquals("%{", token.getText());
-    assertEquals(PARAM_START, token.getType());
+    assertEquals(P_START, token.getType());
     assertEquals(10, token.getCharPositionInLine());
   }
 
