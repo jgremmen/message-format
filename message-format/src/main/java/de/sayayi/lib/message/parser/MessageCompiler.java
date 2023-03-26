@@ -213,7 +213,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitText(TextContext ctx)
     {
       final List<TerminalNode> chNodes = ctx.CH();
-      final StringBuilder text = new StringBuilder(64);
+      final char[] text = new char[chNodes.size()];
+      int n = 0;
 
       for(final TerminalNode chNode: chNodes)
       {
@@ -228,19 +229,13 @@ public final class MessageCompiler extends AbstractAntlr4Parser
               : (char)Integer.parseInt(chText.substring(2), 16);
         }
 
-        if (isSpaceChar(ch))
-        {
-          int n = text.length();
-          if (n == 0 || !isSpaceChar(text.charAt(n - 1)))
-            text.append(' ');
-        }
-        else if (chText.charAt(0) == '\\')
-          text.append(ch);
-        else
-          text.append(chText);
+        if (!isSpaceChar(ch))
+          text[n++] = ch;
+        else if (n == 0 || !isSpaceChar(text[n - 1]))
+          text[n++] = ' ';
       }
 
-      ctx.value = text.toString();
+      ctx.value = new String(text, 0, n);
     }
 
 
