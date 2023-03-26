@@ -32,11 +32,6 @@ dependencies {
 }
 
 
-asciidoctorj {
-  requires './src/docs/ruby/rouge-adapter.rb'
-}
-
-
 libdocs {
   title = 'Message Format Library'
   email = 'message-format@reg.sayayi.de'
@@ -50,9 +45,5 @@ libdocs {
     exclude '**/pack/*.java'
     exclude '**/*Impl.java'
     exclude '**/FixedSizeCacheMap.java'
-  }
-
-  userManual {
-    highlighter = 'rouge'
   }
 }
