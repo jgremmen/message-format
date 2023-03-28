@@ -27,6 +27,16 @@ dependencies {
 }
 
 
+javadoc {
+  (options as StandardJavadocDocletOptions).with {
+    linksOffline "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
+        "${rootDir}/gradle/javadocs/message-format"
+    linksOffline "https://javadoc.io/doc/joda-time/joda-time/${jodatimeVersion}/",
+        "${rootDir}/gradle/javadocs/joda-time"
+  }
+}
+
+
 publishing {
   publications {
 
