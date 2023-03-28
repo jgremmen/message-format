@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+plugins {
+  id 'de.sayayi.plugin.gradle.libapi' version "1.0-SNAPSHOT"
+}
+
+
 description = 'Message Format Library (joda time formatters)'
 
 

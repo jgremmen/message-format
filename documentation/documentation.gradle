@@ -26,6 +26,7 @@ repositories {
 
 dependencies {
   runtimeOnly project(":message-format")
+  runtimeOnly project(":message-format-jodatime")
 
   runtimeOnly "org.projectlombok:lombok:${lombokVersion}"
   runtimeOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
@@ -39,12 +40,23 @@ libdocs {
   gitHubUrl = uri('https://github.com/jgremmen/message-format/')
 
   javadocs {
-    //useDefaultCss = true
+    useDefaultCss = true
 
     exclude '**/parser/MessageLexer.java'
     exclude '**/parser/MessageParser*.java'
     exclude '**/pack/*.java'
     exclude '**/*Impl.java'
     exclude '**/FixedSizeCacheMap.java'
+
+    linksOffline "https://javadoc.io/doc/org.antlr/antlr4-runtime/4.9.3/",
+        "${rootDir}/gradle/javadocs/antlr4-runtime"
+    linksOffline "https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/0.3.0/",
+        "${rootDir}/gradle/javadocs/antlr4-runtime-ext"
+    linksOffline "https://javadoc.io/doc/joda-time/joda-time/2.12.2/",
+        "${rootDir}/gradle/javadocs/joda-time"
+    linksOffline "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
+        "${rootDir}/gradle/javadocs/message-format"
+    linksOffline "https://javadoc.io/doc/org.springframework/spring-core/5.3.25/",
+        "${rootDir}/gradle/javadocs/spring-core"
   }
 }
