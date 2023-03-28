@@ -30,7 +30,7 @@ import java.util.*;
 /**
  * @author Jeroen Gremmen
  */
-public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneable, Serializable
+class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneable, Serializable
 {
   private static final long serialVersionUID = 8127450864651796228L;
 
@@ -54,7 +54,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   }
 
 
-  @SuppressWarnings("WeakerAccess")
+  @SuppressWarnings({"WeakerAccess", "unchecked"})
   public FixedSizeCacheMap(Comparator<K> comparator, int maxSize)
   {
     if (maxSize < 2)
@@ -63,7 +63,6 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
     this.comparator = new LinkSorter<>(comparator);
     this.maxSize = maxSize;
 
-    //noinspection unchecked
     entries = new Link[Math.min(16, maxSize)];
     meru = new Link<>(null);
 
@@ -146,12 +145,12 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   }
 
 
+  @SuppressWarnings("unchecked")
   private void ensureCapacity()
   {
     if (size == entries.length)
     {
       int newSize = Math.min(entries.length * 3 / 2, maxSize);
-      @SuppressWarnings("unchecked")
       Link<K,V>[] newEntries = new Link[newSize];
 
       System.arraycopy(entries, 0, newEntries, 0, size);
@@ -184,8 +183,8 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   }
 
 
-  @SuppressWarnings("unchecked")
   @Override
+  @SuppressWarnings("unchecked")
   public V remove(Object key)
   {
     try {
@@ -196,8 +195,8 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   }
 
 
-  @SuppressWarnings("unchecked")
   @Override
+  @SuppressWarnings("unchecked")
   public boolean containsKey(Object key) {
     return findEntry((K)key) != null;
   }
@@ -214,8 +213,8 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   }
 
 
-  @SuppressWarnings("unchecked")
   @Override
+  @SuppressWarnings("unchecked")
   public V get(Object key)
   {
     Link<K,V> link = findEntry((K)key);
@@ -265,9 +264,8 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   }
 
 
-  @NotNull
   @Synchronized
-  public Set<Entry<K,V>> entrySet()
+  public @NotNull Set<Entry<K,V>> entrySet()
   {
     if (entrySet == null)
       entrySet = new EntrySet();
@@ -276,10 +274,9 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   }
 
 
-  @NotNull
   @Synchronized
   @Override
-  public Set<K> keySet()
+  public @NotNull Set<K> keySet()
   {
     if (cacheKeySet == null)
       cacheKeySet = new KeySet();
@@ -288,10 +285,9 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
   }
 
 
-  @NotNull
   @Synchronized
   @Override
-  public Collection<V> values()
+  public @NotNull Collection<V> values()
   {
     if (cacheValueCollection == null)
       cacheValueCollection = new ValueCollection();
@@ -482,11 +478,11 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
     }
 
 
+    @SuppressWarnings("unchecked")
     public boolean remove(Object o)
     {
       if (o instanceof FixedSizeCacheMap.Link)
       {
-        //noinspection unchecked
         Link<K,V> e = (Link<K,V>)o;
         return remove0(e) != null;
       }
@@ -611,6 +607,7 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
 
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean equals(Object o)
     {
       if (this == o)
@@ -618,7 +615,6 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
       if (!(o instanceof Link))
         return false;
 
-      @SuppressWarnings("unchecked")
       Link<K,V> that = (Link<K,V>)o;
 
       return key.equals(that.key) && Objects.equals(value, that.value);
@@ -644,8 +640,8 @@ public class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneabl
     }
 
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public int compare(Link<K,V> o1, Link<K,V> o2) {
       return comparator == null ? ((Comparable<K>)o1.key).compareTo(o2.key) : comparator.compare(o1.key, o2.key);
     }
