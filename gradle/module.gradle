@@ -99,17 +99,17 @@ afterEvaluate {
     title "${project.description} ${version}"
 
     (options as StandardJavadocDocletOptions).with {
-      linksOffline 'http://javadox.com/org.jetbrains/annotations/15.0/', "${rootDir}/gradle/javadocs/jetbrains-annotations"
-      linksOffline 'https://www.antlr.org/api/Java/', "${rootDir}/gradle/javadocs/antlr4-runtime"
+      linksOffline "https://javadoc.io/doc/org.jetbrains/annotations/${jetbrainsAnnotationsVersion}/",
+          "${rootDir}/gradle/javadocs/jetbrains-annotations"
 
       encoding 'UTF-8'
 
       group("Message Core", [
           "de.sayayi.lib.message",
           "de.sayayi.lib.message.annotation",
-          "de.sayayi.lib.message.data*",
           "de.sayayi.lib.message.exception",
           "de.sayayi.lib.message.internal*",
+          "de.sayayi.lib.message.parameter*",
           "de.sayayi.lib.message.parser"
       ])
       group("Message Formatters", [

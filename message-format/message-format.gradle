@@ -73,7 +73,17 @@ jar {
 
 
 javadoc {
-  exclude '**/parser/Message*.java'
+  (options as StandardJavadocDocletOptions).with {
+    linksOffline "https://javadoc.io/doc/org.antlr/antlr4-runtime/${antlrVersion}/",
+        "${rootDir}/gradle/javadocs/antlr4-runtime"
+    linksOffline "https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/${antlrExtVersion}/",
+        "${rootDir}/gradle/javadocs/antlr4-runtime-ext"
+    linksOffline "https://javadoc.io/doc/org.springframework/spring-core/${springContextVersion}/",
+        "${rootDir}/gradle/javadocs/spring-core"
+  }
+
+  exclude '**/parser/MessageLexer.java'
+  exclude '**/parser/MessageParser*.java'
   exclude '**/pack/*.java'
   exclude '**/*Impl.java'
   exclude '**/FixedSizeCacheMap.java'
