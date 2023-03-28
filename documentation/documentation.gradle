@@ -41,7 +41,8 @@ libdocs {
   javadocs {
     //useDefaultCss = true
 
-    exclude '**/parser/Message*.java'
+    exclude '**/parser/MessageLexer.java'
+    exclude '**/parser/MessageParser*.java'
     exclude '**/pack/*.java'
     exclude '**/*Impl.java'
     exclude '**/FixedSizeCacheMap.java'
