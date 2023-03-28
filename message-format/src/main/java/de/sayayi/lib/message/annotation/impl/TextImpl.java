@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.annotation.impl;
 
 import de.sayayi.lib.message.annotation.Text;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Annotation;
 
@@ -28,34 +29,34 @@ import java.lang.annotation.Annotation;
 @SuppressWarnings("ClassExplicitlyAnnotation")
 public final class TextImpl implements Text
 {
-  private final String locale;
-  private final String text;
-  private final String value;
+  private final @NotNull String locale;
+  private final @NotNull String text;
+  private final @NotNull String value;
 
 
   public TextImpl(String locale, String text, String value)
   {
-    this.locale = locale;
-    this.text = text;
-    this.value = value;
+    this.locale = locale == null ? "" : locale.trim();
+    this.text = text == null ? "" : text.trim();
+    this.value = value == null ? "" : value.trim();
   }
 
 
   @Override
   public String locale() {
-    return locale == null ? "" : locale;
+    return locale;
   }
 
 
   @Override
   public String text() {
-    return text == null ? "" : text;
+    return text;
   }
 
 
   @Override
   public String value() {
-    return value == null ? "" : value;
+    return value;
   }
 
 
@@ -67,6 +68,6 @@ public final class TextImpl implements Text
 
   @Override
   public String toString() {
-    return "Text[locale=" + locale() + ",text=" + text() + ",value=" + value() + ']';
+    return "Text[locale=" + locale + ",text=" + text + ",value=" + value + ']';
   }
 }

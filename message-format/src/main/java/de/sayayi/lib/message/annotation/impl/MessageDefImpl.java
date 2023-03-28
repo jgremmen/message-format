@@ -31,15 +31,15 @@ import java.util.Arrays;
 @SuppressWarnings("ClassExplicitlyAnnotation")
 public final class MessageDefImpl implements MessageDef
 {
-  private final String code;
-  private final String text;
+  private final @NotNull String code;
+  private final @NotNull String text;
   private final @NotNull Text[] texts;
 
 
   public MessageDefImpl(@NotNull String code, String text, @NotNull Text[] texts)
   {
-    this.code = code;
-    this.text = text;
+    this.code = code.trim();
+    this.text = text == null ? "" : text.trim();
     this.texts = texts;
   }
 
@@ -51,14 +51,14 @@ public final class MessageDefImpl implements MessageDef
 
 
   @Override
-  public Text[] texts() {
-    return texts;
+  public String text() {
+    return text;
   }
 
 
   @Override
-  public String text() {
-    return text == null ? "" : text;
+  public Text[] texts() {
+    return texts;
   }
 
 
@@ -70,6 +70,6 @@ public final class MessageDefImpl implements MessageDef
 
   @Override
   public String toString() {
-    return "MessageDef[code=" + code() + ",text=" + text() + ",texts=" + Arrays.toString(texts) + ']';
+    return "MessageDef[code=" + code + ",text=" + text + ",texts=" + Arrays.toString(texts) + ']';
   }
 }

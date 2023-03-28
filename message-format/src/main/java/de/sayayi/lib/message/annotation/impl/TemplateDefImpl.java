@@ -32,15 +32,15 @@ import java.util.Arrays;
 @SuppressWarnings("ClassExplicitlyAnnotation")
 public final class TemplateDefImpl implements TemplateDef
 {
-  private final String name;
-  private final String text;
+  private final @NotNull String name;
+  private final @NotNull String text;
   private final @NotNull Text[] texts;
 
 
   public TemplateDefImpl(@NotNull String name, String text, @NotNull Text[] texts)
   {
-    this.name = name;
-    this.text = text;
+    this.name = name == null ? "" : name.trim();
+    this.text = text == null ? "" : text.trim();
     this.texts = texts;
   }
 
@@ -52,14 +52,14 @@ public final class TemplateDefImpl implements TemplateDef
 
 
   @Override
-  public Text[] texts() {
-    return texts;
+  public String text() {
+    return text;
   }
 
 
   @Override
-  public String text() {
-    return text == null ? "" : text;
+  public Text[] texts() {
+    return texts;
   }
 
 
@@ -71,6 +71,6 @@ public final class TemplateDefImpl implements TemplateDef
 
   @Override
   public String toString() {
-    return "TemplateDef[name=" + name() + ",text=" + text() + ",texts=" + Arrays.toString(texts) + ']';
+    return "TemplateDef[name=" + name + ",text=" + text + ",texts=" + Arrays.toString(texts) + ']';
   }
 }
