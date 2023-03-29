@@ -43,6 +43,14 @@ public final class MessageSupportFactory
   }
 
 
+  /**
+   * Returns an instance of the shared message support.
+   * <p>
+   * The shared message support cannot be configured and contains all formatters which can be found
+   * as services by the default classloader.
+   *
+   * @return  shared message support instance, never {@code null}
+   */
   @Synchronized
   public static @NotNull MessageSupport shared()
   {

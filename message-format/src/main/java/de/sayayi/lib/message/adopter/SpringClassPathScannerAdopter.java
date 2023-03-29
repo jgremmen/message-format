@@ -38,7 +38,7 @@ import java.util.Set;
 
 /**
  * <p>
- *   The spring classpath scanner scans classes and publishes the annotated messages found.
+ *   The Spring classpath scanner scans classes and publishes the annotated messages found.
  * </p>
  * <p>
  *   The scanned classes are not loaded by the classloader but instead are analysed using the Spring

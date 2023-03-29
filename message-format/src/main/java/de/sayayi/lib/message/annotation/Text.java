@@ -26,6 +26,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 
 /**
+ * Message text annotation.
+ *
  * @author Jeroen Gremmen
  *
  * @see MessageDef

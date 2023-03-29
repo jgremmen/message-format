@@ -445,6 +445,19 @@ public interface MessageSupport
     @NotNull List<ParameterFormatter> getFormatters(String format, @NotNull Class<?> type);
 
 
+    /**
+     * Returns the default configuration for the parameter identified by {@code name}.
+     *
+     * @param name  parameter name, not {@code null}
+     *
+     * @return  default configuration value, or {@code null} if no default configuration has been set for
+     *          parameter {@code name}
+     *          
+     * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, boolean) 
+     * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, long)
+     * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, String) 
+     * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, Message.WithSpaces) 
+     */
     @Contract(pure = true)
     ConfigValue getDefaultParameterConfig(@NotNull String name);
 
@@ -472,10 +485,21 @@ public interface MessageSupport
   @SuppressWarnings("UnstableApiUsage")
   interface MessagePublisher
   {
+    /**
+     * Adds a message with code to this publisher.
+     *
+     * @param message  message with code, not {@code null}
+     */
     @Contract(mutates = "this")
     void addMessage(@NotNull Message.WithCode message);
 
 
+    /**
+     * Adds a template identified by {@code name} to this publisher.
+     *
+     * @param name      template name, not {@code null}
+     * @param template  template message, not {@code null}
+     */
     @Contract(mutates = "this")
     void addTemplate(@NotNull String name, @NotNull Message template);
   }
