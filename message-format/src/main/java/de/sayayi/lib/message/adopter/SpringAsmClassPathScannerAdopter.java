@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Jeroen Gremmen
+ * Copyright 2023 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ import de.sayayi.lib.message.annotation.impl.MessageDefImpl;
 import de.sayayi.lib.message.annotation.impl.TemplateDefImpl;
 import de.sayayi.lib.message.annotation.impl.TextImpl;
 import org.jetbrains.annotations.NotNull;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
+import org.springframework.asm.AnnotationVisitor;
+import org.springframework.asm.ClassReader;
+import org.springframework.asm.ClassVisitor;
+import org.springframework.asm.MethodVisitor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,17 +34,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.objectweb.asm.Opcodes.ACC_SYNTHETIC;
-import static org.objectweb.asm.Opcodes.ASM9;
+import static org.springframework.asm.Opcodes.ACC_SYNTHETIC;
+import static org.springframework.asm.Opcodes.ASM9;
 
 
 /**
  * <p>
- *   The Asm classpath scanner scans classes and publishes the annotated messages found.
+ *   The Spring Asm classpath scanner scans classes and publishes the annotated messages found.
  * </p>
  * <p>
- *   The scanned classes are not loaded by the classloader but instead are analysed using the ASM library.
- *   Using this class therefore requires a dependency with library {@code org.ow2.asm:asm:9.4}.
+ *   The scanned classes are not loaded by the classloader but instead are analysed using the ASM library
+ *   bundled with Spring. Using this class therefore requires a dependency with library
+ *   {@code org.springframework:spring-core:5.3.25}.
  * </p>
  *
  *
@@ -53,18 +54,18 @@ import static org.objectweb.asm.Opcodes.ASM9;
  *
  * @see AnnotationAdopter
  */
-public final class AsmClassPathScannerAdopter extends AbstractAsmClassPathScannerAdopter
+public final class SpringAsmClassPathScannerAdopter extends AbstractAsmClassPathScannerAdopter
 {
-  public AsmClassPathScannerAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport,
-                                    @NotNull Set<String> packageNames, ClassLoader classLoader) {
+  public SpringAsmClassPathScannerAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport,
+                                          @NotNull Set<String> packageNames, ClassLoader classLoader) {
     super(configurableMessageSupport, packageNames, classLoader);
   }
 
 
-  public AsmClassPathScannerAdopter(@NotNull MessageFactory messageFactory,
-                                    @NotNull MessagePublisher publisher,
-                                    @NotNull Set<String> packageNames,
-                                    ClassLoader classLoader) {
+  public SpringAsmClassPathScannerAdopter(@NotNull MessageFactory messageFactory,
+                                          @NotNull MessagePublisher publisher,
+                                          @NotNull Set<String> packageNames,
+                                          ClassLoader classLoader) {
     super(messageFactory, publisher, packageNames, classLoader);
   }
 
