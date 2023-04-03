@@ -452,11 +452,11 @@ public interface MessageSupport
      *
      * @return  default configuration value, or {@code null} if no default configuration has been set for
      *          parameter {@code name}
-     *          
-     * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, boolean) 
+     *
+     * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, boolean)
      * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, long)
-     * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, String) 
-     * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, Message.WithSpaces) 
+     * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, String)
+     * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, Message.WithSpaces)
      */
     @Contract(pure = true)
     ConfigValue getDefaultParameterConfig(@NotNull String name);

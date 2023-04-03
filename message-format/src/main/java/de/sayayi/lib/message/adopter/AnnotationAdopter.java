@@ -49,8 +49,7 @@ public class AnnotationAdopter extends AbstractMessageAdopter
   }
 
 
-  public AnnotationAdopter(@NotNull MessageFactory messageFactory,
-                           @NotNull MessagePublisher publisher) {
+  public AnnotationAdopter(@NotNull MessageFactory messageFactory, @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);
   }
 
