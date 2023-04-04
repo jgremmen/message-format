@@ -45,6 +45,11 @@ public class PropertiesAdopter extends AbstractMessageAdopter
   }
 
 
+  /**
+   * Adopt messages from properties.
+   *
+   * @param properties  message properties, not {@code null}
+   */
   @Contract(pure = true)
   public void adopt(@NotNull Properties properties)
   {
@@ -53,18 +58,27 @@ public class PropertiesAdopter extends AbstractMessageAdopter
   }
 
 
+  /**
+   * Adopt messages from localized properties.
+   *
+   * @param properties  map with property messages keyed by locale, not {@code null}
+   */
   @Contract(pure = true)
   public void adopt(@NotNull Map<Locale,Properties> properties)
   {
     final Map<String,Map<Locale,String>> localizedMessagesByCode = new HashMap<>();
 
     for(Entry<Locale,Properties> entry: properties.entrySet())
+    {
+      final Locale locale = entry.getKey();
+
       for(Entry<Object,Object> localizedProperty: entry.getValue().entrySet())
       {
         localizedMessagesByCode
             .computeIfAbsent(localizedProperty.getKey().toString(), k -> new HashMap<>())
-            .put(entry.getKey(), localizedProperty.getValue().toString());
+            .put(locale, localizedProperty.getValue().toString());
       }
+    }
 
     localizedMessagesByCode.forEach((code,localizedTexts) ->
         messagePublisher.addMessage(messageFactory.parseMessage(code, localizedTexts)));

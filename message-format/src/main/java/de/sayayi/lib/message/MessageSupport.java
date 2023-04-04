@@ -15,6 +15,8 @@
  */
 package de.sayayi.lib.message;
 
+import de.sayayi.lib.message.exception.DuplicateMessageException;
+import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.parameter.value.ConfigValue;
 import org.jetbrains.annotations.Contract;
@@ -514,6 +516,8 @@ public interface MessageSupport
      * Adds a message with code to this publisher.
      *
      * @param message  message with code, not {@code null}
+     *
+     * @throws DuplicateMessageException  in case a message with the same code already exists
      */
     @Contract(mutates = "this")
     void addMessage(@NotNull Message.WithCode message);
@@ -524,6 +528,8 @@ public interface MessageSupport
      *
      * @param name      template name, not {@code null}
      * @param template  template message, not {@code null}
+     *
+     * @throws DuplicateTemplateException  in case a template with the same name already exists
      */
     @Contract(mutates = "this")
     void addTemplate(@NotNull String name, @NotNull Message template);

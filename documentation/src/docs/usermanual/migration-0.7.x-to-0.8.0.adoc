@@ -1,5 +1,4 @@
 = Upgrade from 0.7.x to 0.8.0
-:source-highlighter: prettify
 :navtitle: Upgrade from 0.7.x to 0.8.0
 
 == Parameter format designator
@@ -23,13 +22,13 @@ been flattened. It improves parameter readability as there are less braces.
 ----
 
 .Data map (since 0.8.0)
-[source,msg]
+[source,message]
 ----
 %{n,choice,0:'no color',1:'1 color',:'%{n} colors'}
 ----
 
 .Test
-[source,msg]
+[source,message]
 ----
 This is\u0026 %{n,choice , true:'yes', <=0:'no color',1:'1% color', empty:"empty" , :'%{n} colors'}', you see!
 ----
