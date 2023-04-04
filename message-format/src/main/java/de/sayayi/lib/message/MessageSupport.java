@@ -249,10 +249,21 @@ public interface MessageSupport
     @NotNull MessageConfigurer<M> locale(String locale);
 
 
+    /**
+     * Returns the formatted message.
+     *
+     * @return  formatted message, never {@code null}
+     */
     @Contract(pure = true)
     @NotNull String format();
 
 
+    /**
+     * Throw an exception with the formatted message.
+     *
+     * @param constructor  exception constructor, not {@code null}
+     * @param <T>          exception type
+     */
     @Contract("_ -> fail")
     <T extends Exception> void throwFormatted(@NotNull Function<String,T> constructor);
   }
@@ -326,10 +337,24 @@ public interface MessageSupport
                                                                   @NotNull Message.WithSpaces value);
 
 
+    /**
+     * Sets the default locale for this message support.
+     *
+     * @param locale  locale, not {@code null}
+     *
+     * @return  this message support, never {@code null}
+     */
     @Contract(mutates = "this")
     @NotNull ConfigurableMessageSupport setLocale(@NotNull Locale locale);
 
 
+    /**
+     * Sets the default locale for this message support.
+     *
+     * @param locale  locale, not {@code null}
+     *
+     * @return  this message support, never {@code null}
+     */
     @Contract(mutates = "this")
     @NotNull ConfigurableMessageSupport setLocale(@NotNull String locale);
 

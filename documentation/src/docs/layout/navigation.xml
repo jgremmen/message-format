@@ -27,4 +27,10 @@
     </item>
   </group>
 
+  <group title="Reference">
+    <item name="API Javadoc" link="../javadoc/index.html"/>
+    <item name="Single Page Manual" link="usermanual_single.html"/>
+    <item name="User Manual PDF" link="usermanual.pdf"/>
+  </group>
+
 </navigation>
