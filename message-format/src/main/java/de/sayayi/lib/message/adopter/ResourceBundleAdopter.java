@@ -55,16 +55,20 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
 
   @Contract(pure = true)
-  public void adopt(@NotNull Collection<ResourceBundle> properties)
+  public void adopt(@NotNull Collection<ResourceBundle> resourceBundles)
   {
     final Map<String,Map<Locale,String>> localizedMessagesByCode = new HashMap<>();
 
-    for(ResourceBundle resourceBundle: properties)
+    for(ResourceBundle resourceBundle: resourceBundles)
+    {
+      final Locale locale = resourceBundle.getLocale();
+
       for(String code: resourceBundle.keySet())
       {
         localizedMessagesByCode.computeIfAbsent(code, k -> new HashMap<>())
-            .put(resourceBundle.getLocale(), resourceBundle.getString(code));
+            .put(locale, resourceBundle.getString(code));
       }
+    }
 
     localizedMessagesByCode.forEach((code,localizedTexts) ->
         messagePublisher.addMessage(messageFactory.parseMessage(code, localizedTexts)));
