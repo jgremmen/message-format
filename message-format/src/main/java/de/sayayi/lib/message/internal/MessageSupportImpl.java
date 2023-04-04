@@ -20,6 +20,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
+import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.pack.PackHelper;
@@ -268,7 +269,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   protected boolean failOnDuplicateTemplate(@NotNull String name)
   {
     if (templates.containsKey(name))
-      throw new DuplicateMessageException(name, "Template with name '" + name + "' already exists");
+      throw new DuplicateTemplateException(name, "Template with name '" + name + "' already exists");
 
     return true;
   }
