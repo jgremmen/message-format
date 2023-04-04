@@ -91,21 +91,24 @@ public interface MessageSupport
   /**
    * <p>
    *   Pack all messages (optionally filtering them using a {@code messageCodeFilter} from this bundle into a
-   *   compact binary representation. This way message bundles can be prepared once and loaded very quickly
-   *   by adding the packed messages to another message bundle at runtime.
+   *   compact binary representation. This way a message support can be prepared once and loaded very quickly
+   *   by importing the packed messages at runtime.
    * </p>
    * <p>
-   *   Parameter {@code compress} switches GZip on/off, potentially reducing the packed size even more. For smaller
-   *   bundles the compression may not be substantial as the binary representation does some extensive bit-packing
-   *   already.
+   *   Parameter {@code compress} switches GZip on/off, potentially reducing the packed size even more. For
+   *   message support instances with a small amount of messages the compression may not be substantial as
+   *   the binary representation does some extensive bit-packing already.
    * </p>
    *
    * @param stream             pack output stream, not {@code null}
    * @param compress           {@code true} compress pack, {@code false} do not compress pack
    * @param messageCodeFilter  optional predicate for selecting message codes. If {@code null} all messages from
-   *                           this builder will be selected
+   *                           this message support will be selected
    *
    * @throws IOException  if an I/O error occurs
+   *
+   * @see ConfigurableMessageSupport#importMessages(InputStream...)
+   * @see ConfigurableMessageSupport#importMessages(Enumeration)
    */
   void exportMessages(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
       throws IOException;
