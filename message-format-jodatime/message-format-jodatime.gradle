@@ -22,7 +22,7 @@ plugins {
 description = 'Message Format Library (joda time formatters)'
 
 
-def jodatimeVersion = "2.12.2"
+def jodatimeVersion = "2.12.5"
 
 
 dependencies {

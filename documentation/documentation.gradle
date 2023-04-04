@@ -52,7 +52,7 @@ libdocs {
         "${rootDir}/gradle/javadocs/antlr4-runtime"
     linksOffline "https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/0.3.0/",
         "${rootDir}/gradle/javadocs/antlr4-runtime-ext"
-    linksOffline "https://javadoc.io/doc/joda-time/joda-time/2.12.2/",
+    linksOffline "https://javadoc.io/doc/joda-time/joda-time/2.12.5/",
         "${rootDir}/gradle/javadocs/joda-time"
     linksOffline "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
         "${rootDir}/gradle/javadocs/message-format"
