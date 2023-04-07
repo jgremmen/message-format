@@ -42,11 +42,22 @@ public abstract class AbstractMessageAdopter
   protected final @NotNull MessagePublisher messagePublisher;
 
 
+  /**
+   * Create a message adopter for the given {@code configurableMessageSupport}.
+   *
+   * @param configurableMessageSupport  configurable message support, not {@code null}
+   */
   protected AbstractMessageAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {
     this(configurableMessageSupport.getAccessor().getMessageFactory(), configurableMessageSupport);
   }
 
 
+  /**
+   * Create a message adopter for the given {@code messageFactory} and {@code publisher}.
+   *
+   * @param messageFactory  message factory, not {@code null}
+   * @param publisher       message publisher, not {@code null}
+   */
   protected AbstractMessageAdopter(@NotNull MessageFactory messageFactory,
                                    @NotNull MessagePublisher publisher)
   {

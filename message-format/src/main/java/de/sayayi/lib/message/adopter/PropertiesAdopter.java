@@ -34,11 +34,22 @@ import java.util.Properties;
  */
 public class PropertiesAdopter extends AbstractMessageAdopter
 {
+  /**
+   * Create a properties adopter for the given {@code configurableMessageSupport}.
+   *
+   * @param configurableMessageSupport  configurable message support, not {@code null}
+   */
   public PropertiesAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {
     super(configurableMessageSupport);
   }
 
 
+  /**
+   * Create a properties adopter for the given {@code messageFactory} and {@code publisher}.
+   *
+   * @param messageFactory  message factory, not {@code null}
+   * @param publisher       message publisher, not {@code null}
+   */
   public PropertiesAdopter(@NotNull MessageFactory messageFactory,
                            @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);

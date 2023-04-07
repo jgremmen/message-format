@@ -44,11 +44,22 @@ public class AnnotationAdopter extends AbstractMessageAdopter
   private final Set<Class<?>> indexedClasses = new HashSet<>();
 
 
+  /**
+   * Create an annotation adopter for the given {@code configurableMessageSupport}.
+   *
+   * @param configurableMessageSupport  configurable message support, not {@code null}
+   */
   public AnnotationAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {
     super(configurableMessageSupport);
   }
 
 
+  /**
+   * Create an annotation adopter for the given {@code messageFactory} and {@code publisher}.
+   *
+   * @param messageFactory  message factory, not {@code null}
+   * @param publisher       message publisher, not {@code null}
+   */
   public AnnotationAdopter(@NotNull MessageFactory messageFactory, @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);
   }

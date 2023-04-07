@@ -32,11 +32,22 @@ import static java.util.Collections.singletonMap;
  */
 public class ResourceBundleAdopter extends AbstractMessageAdopter
 {
+  /**
+   * Create a resource bundle adopter for the given {@code configurableMessageSupport}.
+   *
+   * @param configurableMessageSupport  configurable message support, not {@code null}
+   */
   public ResourceBundleAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {
     super(configurableMessageSupport);
   }
 
 
+  /**
+   * Create a resource bundle adopter for the given {@code messageFactory} and {@code publisher}.
+   *
+   * @param messageFactory  message factory, not {@code null}
+   * @param publisher       message publisher, not {@code null}
+   */
   public ResourceBundleAdopter(@NotNull MessageFactory messageFactory,
                                @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);
