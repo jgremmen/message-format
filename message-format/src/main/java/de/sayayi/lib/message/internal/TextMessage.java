@@ -20,21 +20,22 @@ import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
 
 
 /**
+ * This class represents a message consisting of text only. It also provides information about
+ * leading and trailing spaces.
+ *
  * @author Jeroen Gremmen
  */
-@ToString(doNotUseGetters = true)
-@EqualsAndHashCode(doNotUseGetters = true)
 public final class TextMessage implements Message.WithSpaces
 {
   private static final long serialVersionUID = 800L;
@@ -45,6 +46,11 @@ public final class TextMessage implements Message.WithSpaces
   private final boolean spaceAfter;
 
 
+  /**
+   * Construct a text message based on a {@code textPart}.
+   *
+   * @param textPart  text part, not {@code null}
+   */
   public TextMessage(@NotNull Text textPart) {
     this(textPart.getText(), textPart.isSpaceBefore(), textPart.isSpaceAfter());
   }
@@ -79,6 +85,45 @@ public final class TextMessage implements Message.WithSpaces
   @Override
   public @NotNull Set<String> getTemplateNames() {
     return emptySet();
+  }
+
+
+  @Override
+  public boolean equals(Object o)
+  {
+    if (this == o)
+      return true;
+    if (!(o instanceof TextMessage))
+      return false;
+
+    final TextMessage that = (TextMessage)o;
+
+    return spaceBefore == that.spaceBefore &&
+           spaceAfter == that.spaceAfter &&
+           Objects.equals(text, that.text);
+  }
+
+
+  @Override
+  public int hashCode() {
+    return (text == null ? 0 : text.hashCode()) * 11 + (spaceBefore ? 8 : 0) + (spaceAfter ? 2 : 0);
+  }
+
+
+  @Override
+  @Contract(pure = true)
+  public String toString()
+  {
+    final StringBuilder s = new StringBuilder("TextMessage(text=").append(text);
+
+    if (spaceBefore && spaceAfter)
+      s.append(",space-around");
+    else if (spaceBefore)
+      s.append(",space-before");
+    else if (spaceAfter)
+      s.append(",space-after");
+
+    return s.append(')').toString();
   }
 
 

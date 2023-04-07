@@ -19,7 +19,6 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,12 +32,18 @@ import static java.util.Objects.requireNonNull;
 /**
  * @author Jeroen Gremmen
  */
-@ToString
 public final class EmptyMessageWithCode extends AbstractMessageWithCode
 {
   private static final long serialVersionUID = 800L;
 
 
+  /**
+   * Constructs an empty message with {@code code}.
+   *
+   * @param code  message code, not {@code null}
+   *
+   * @throws IllegalArgumentException  if message code is empty
+   */
   public EmptyMessageWithCode(@NotNull String code) {
     super(code);
   }
@@ -55,6 +60,18 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
   @Override
   public @NotNull Set<String> getTemplateNames() {
     return emptySet();
+  }
+
+
+  @Override
+  public boolean equals(Object o) {
+    return this == o || o instanceof EmptyMessageWithCode && code.equals(((EmptyMessageWithCode)o).code);
+  }
+
+
+  @Override
+  public String toString() {
+    return "EmptyMessageWithCode(code=" + code + ')';
   }
 
 

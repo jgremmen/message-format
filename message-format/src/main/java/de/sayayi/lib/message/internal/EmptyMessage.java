@@ -17,7 +17,6 @@ package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
-import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +28,6 @@ import static java.util.Collections.emptySet;
 /**
  * @author Jeroen Gremmen
  */
-@ToString
 public final class EmptyMessage implements Message.WithSpaces
 {
   private static final long serialVersionUID = 800L;
@@ -75,5 +73,11 @@ public final class EmptyMessage implements Message.WithSpaces
   @Override
   public int hashCode() {
     return EmptyMessage.class.hashCode();
+  }
+
+
+  @Override
+  public String toString() {
+    return "EmptyMessage";
   }
 }
