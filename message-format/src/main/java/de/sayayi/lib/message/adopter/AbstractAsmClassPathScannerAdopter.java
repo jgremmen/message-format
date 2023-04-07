@@ -18,7 +18,6 @@ package de.sayayi.lib.message.adopter;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
-import de.sayayi.lib.message.annotation.*;
 import de.sayayi.lib.message.exception.MessageAdopterException;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +40,6 @@ import java.util.zip.ZipFile;
 
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.util.Arrays.asList;
-import static org.objectweb.asm.Type.getDescriptor;
 
 
 /**
@@ -56,12 +54,8 @@ import static org.objectweb.asm.Type.getDescriptor;
  * @see AnnotationAdopter
  */
 abstract class AbstractAsmClassPathScannerAdopter extends AbstractMessageAdopter
+    implements ClassPathScannerAdopter
 {
-  static final String MESSAGE_DEFS_DESCRIPTOR = getDescriptor(MessageDefs.class);
-  static final String MESSAGE_DEF_DESCRIPTOR = getDescriptor(MessageDef.class);
-  static final String TEMPLATE_DEFS_DESCRIPTOR = getDescriptor(TemplateDefs.class);
-  static final String TEMPLATE_DEF_DESCRIPTOR = getDescriptor(TemplateDef.class);
-  static final String TEXT_DESCRIPTOR = getDescriptor(Text.class);
 
   private static final Set<String> ZIP_PROTOCOLS = new HashSet<>(asList("zip", "jar", "war"));
 
@@ -94,6 +88,7 @@ abstract class AbstractAsmClassPathScannerAdopter extends AbstractMessageAdopter
   }
 
 
+  @Override
   public void scan()
   {
     try {

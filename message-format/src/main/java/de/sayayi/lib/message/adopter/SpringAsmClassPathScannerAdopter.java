@@ -18,7 +18,7 @@ package de.sayayi.lib.message.adopter;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
-import de.sayayi.lib.message.annotation.Text;
+import de.sayayi.lib.message.annotation.*;
 import de.sayayi.lib.message.annotation.impl.MessageDefImpl;
 import de.sayayi.lib.message.annotation.impl.TemplateDefImpl;
 import de.sayayi.lib.message.annotation.impl.TextImpl;
@@ -27,6 +27,7 @@ import org.springframework.asm.AnnotationVisitor;
 import org.springframework.asm.ClassReader;
 import org.springframework.asm.ClassVisitor;
 import org.springframework.asm.MethodVisitor;
+import org.springframework.core.io.ResourceLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static org.objectweb.asm.Type.getDescriptor;
 import static org.springframework.asm.Opcodes.ACC_SYNTHETIC;
 import static org.springframework.asm.Opcodes.ASM9;
 
@@ -56,17 +58,25 @@ import static org.springframework.asm.Opcodes.ASM9;
  */
 public final class SpringAsmClassPathScannerAdopter extends AbstractAsmClassPathScannerAdopter
 {
+  private static final String MESSAGE_DEFS_DESCRIPTOR = getDescriptor(MessageDefs.class);
+  private static final String MESSAGE_DEF_DESCRIPTOR = getDescriptor(MessageDef.class);
+  private static final String TEMPLATE_DEFS_DESCRIPTOR = getDescriptor(TemplateDefs.class);
+  private static final String TEMPLATE_DEF_DESCRIPTOR = getDescriptor(TemplateDef.class);
+  private static final String TEXT_DESCRIPTOR = getDescriptor(Text.class);
+
+
   public SpringAsmClassPathScannerAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport,
-                                          @NotNull Set<String> packageNames, ClassLoader classLoader) {
-    super(configurableMessageSupport, packageNames, classLoader);
+                                          @NotNull Set<String> packageNames,
+                                          @NotNull ResourceLoader resourceLoader) {
+    super(configurableMessageSupport, packageNames, resourceLoader.getClassLoader());
   }
 
 
   public SpringAsmClassPathScannerAdopter(@NotNull MessageFactory messageFactory,
                                           @NotNull MessagePublisher publisher,
                                           @NotNull Set<String> packageNames,
-                                          ClassLoader classLoader) {
-    super(messageFactory, publisher, packageNames, classLoader);
+                                          @NotNull ResourceLoader resourceLoader) {
+    super(messageFactory, publisher, packageNames, resourceLoader.getClassLoader());
   }
 
 

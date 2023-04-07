@@ -18,7 +18,7 @@ package de.sayayi.lib.message.adopter;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
-import de.sayayi.lib.message.annotation.Text;
+import de.sayayi.lib.message.annotation.*;
 import de.sayayi.lib.message.annotation.impl.MessageDefImpl;
 import de.sayayi.lib.message.annotation.impl.TemplateDefImpl;
 import de.sayayi.lib.message.annotation.impl.TextImpl;
@@ -36,6 +36,7 @@ import java.util.Set;
 
 import static org.objectweb.asm.Opcodes.ACC_SYNTHETIC;
 import static org.objectweb.asm.Opcodes.ASM9;
+import static org.objectweb.asm.Type.getDescriptor;
 
 
 /**
@@ -55,6 +56,13 @@ import static org.objectweb.asm.Opcodes.ASM9;
  */
 public final class AsmClassPathScannerAdopter extends AbstractAsmClassPathScannerAdopter
 {
+  private static final String MESSAGE_DEFS_DESCRIPTOR = getDescriptor(MessageDefs.class);
+  private static final String MESSAGE_DEF_DESCRIPTOR = getDescriptor(MessageDef.class);
+  private static final String TEMPLATE_DEFS_DESCRIPTOR = getDescriptor(TemplateDefs.class);
+  private static final String TEMPLATE_DEF_DESCRIPTOR = getDescriptor(TemplateDef.class);
+  private static final String TEXT_DESCRIPTOR = getDescriptor(Text.class);
+
+
   public AsmClassPathScannerAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport,
                                     @NotNull Set<String> packageNames, ClassLoader classLoader) {
     super(configurableMessageSupport, packageNames, classLoader);
