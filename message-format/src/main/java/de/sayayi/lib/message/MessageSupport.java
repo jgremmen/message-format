@@ -61,10 +61,24 @@ public interface MessageSupport
   @NotNull MessageConfigurer<Message.WithCode> code(@NotNull String code);
 
 
+  /**
+   * Prepare a {@code message} for formatting.
+   *
+   * @param message  message, not {@code null}
+   *
+   * @return  message configurer instance for the given {@code message}, never {@code null}
+   */
   @Contract(value = "_ -> new", pure = true)
   @NotNull MessageConfigurer<Message> message(@NotNull String message);
 
 
+  /**
+   * Prepare a {@code message} for formatting.
+   *
+   * @param message  message, not {@code null}
+   *
+   * @return  message configurer instance for the given {@code message}, never {@code null}
+   */
   @Contract(value = "_ -> new", pure = true)
   <M extends Message> @NotNull MessageConfigurer<M> message(@NotNull M message);
 
@@ -274,8 +288,10 @@ public interface MessageSupport
   }
 
 
-
-
+  /**
+   * Configurable extend of message support providing methods to add/import messages, set default
+   * parameter configuration values and change the default locale.
+   */
   @SuppressWarnings("UnstableApiUsage")
   interface ConfigurableMessageSupport extends MessageSupport, MessagePublisher
   {
@@ -284,12 +300,15 @@ public interface MessageSupport
      *
      * @param packResources  enumeration of pack resources, not {@code null}
      *
+     * @return  configurable message support instance, never {@code null}
+     *
      * @throws IOException  if an I/O error occurs
      *
      * @see #importMessages(InputStream...)
      */
     @Contract(mutates = "this")
-    void importMessages(@NotNull Enumeration<URL> packResources) throws IOException;
+    @NotNull ConfigurableMessageSupport importMessages(@NotNull Enumeration<URL> packResources)
+        throws IOException;
 
 
     /**
@@ -297,13 +316,16 @@ public interface MessageSupport
      *
      * @param packStream  pack stream, not {@code null}
      *
+     * @return  configurable message support instance, never {@code null}
+     *
      * @throws IOException  if an I/O error occurs
      *
      * @see #importMessages(InputStream...)
      */
     @Contract(mutates = "this")
-    default void importMessages(@NotNull InputStream packStream) throws IOException {
-      importMessages(new InputStream[] { packStream });
+    default @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream packStream)
+        throws IOException {
+      return importMessages(new InputStream[] { packStream });
     }
 
 
@@ -318,25 +340,71 @@ public interface MessageSupport
      *
      * @param packStreams  array of pack streams, not {@code null}
      *
+     * @return  configurable message support instance, never {@code null}
+     *
      * @throws IOException  if an I/O error occurs
      */
     @Contract(mutates = "this")
-    void importMessages(@NotNull InputStream... packStreams) throws IOException;
+    @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream... packStreams) throws IOException;
 
 
+    /**
+     * Set the default {@code value} for configuration parameter {@code name}.
+     * <p>
+     * If a parameter formatter is looking for a boolean configuration value, which has not been
+     * provided by the message parameter, the message support accessor is used to get a default value.
+     *
+     * @param name   configuration parameter name, not {@code null} or empty
+     * @param value  default value
+     *
+     * @return  configurable message support instance, never {@code null}
+     */
     @Contract(mutates = "this")
     @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, boolean value);
 
 
+    /**
+     * Set the default {@code value} for configuration parameter {@code name}.
+     * <p>
+     * If a parameter formatter is looking for a long configuration value, which has not been
+     * provided by the message parameter, the message support accessor is used to get a default value.
+     *
+     * @param name   configuration parameter name, not {@code null} or empty
+     * @param value  default value
+     *
+     * @return  configurable message support instance, never {@code null}
+     */
     @Contract(mutates = "this")
     @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, long value);
 
 
+    /**
+     * Set the default {@code value} for configuration parameter {@code name}.
+     * <p>
+     * If a parameter formatter is looking for a string configuration value, which has not been
+     * provided by the message parameter, the message support accessor is used to get a default value.
+     *
+     * @param name   configuration parameter name, not {@code null} or empty
+     * @param value  default value
+     *
+     * @return  configurable message support instance, never {@code null}
+     */
     @Contract(mutates = "this")
     @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
                                                                   @NotNull String value);
 
 
+    /**
+     * Set the default {@code value} for configuration parameter {@code name}.
+     * <p>
+     * If a parameter formatter is looking for a message configuration value, which has not been
+     * provided by the message parameter, the message support accessor is used to get a default value.
+     *
+     * @param name   configuration parameter name, not {@code null} or empty
+     * @param value  default value
+     *
+     * @return  configurable message support instance, never {@code null}
+     */
     @Contract(mutates = "this")
     @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
                                                                   @NotNull Message.WithSpaces value);
@@ -347,7 +415,7 @@ public interface MessageSupport
      *
      * @param locale  locale, not {@code null}
      *
-     * @return  this message support, never {@code null}
+     * @return  configurable message support instance, never {@code null}
      */
     @Contract(mutates = "this")
     @NotNull ConfigurableMessageSupport setLocale(@NotNull Locale locale);
@@ -358,7 +426,7 @@ public interface MessageSupport
      *
      * @param locale  locale, not {@code null}
      *
-     * @return  this message support, never {@code null}
+     * @return  configurable message support instance, never {@code null}
      */
     @Contract(mutates = "this")
     @NotNull ConfigurableMessageSupport setLocale(@NotNull String locale);

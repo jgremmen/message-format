@@ -165,19 +165,21 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public void importMessages(@NotNull Enumeration<URL> packResources) throws IOException
+  public @NotNull ConfigurableMessageSupport importMessages(@NotNull Enumeration<URL> packResources)
+      throws IOException
   {
     final List<InputStream> packStreams = new ArrayList<>();
 
     while(packResources.hasMoreElements())
       packStreams.add(packResources.nextElement().openStream());
 
-    importMessages(packStreams.toArray(new InputStream[0]));
+    return importMessages(packStreams.toArray(new InputStream[0]));
   }
 
 
   @Override
-  public void importMessages(@NotNull InputStream... packStreams) throws IOException
+  public @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream... packStreams)
+      throws IOException
   {
     final PackHelper packHelper = new PackHelper();
 
@@ -194,6 +196,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
               packHelper.unpackMessageWithSpaces(dataStream));
       }
     }
+
+    return this;
   }
 
 
