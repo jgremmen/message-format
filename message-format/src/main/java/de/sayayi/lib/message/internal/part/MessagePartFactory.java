@@ -82,16 +82,16 @@ public final class MessagePartFactory
   }
 
 
-  @Contract(pure = true)
-  public static @NotNull Text addSpaces(@NotNull Text text, boolean spaceBefore, boolean spaceAfter)
+  @Contract(value = "_, false, false -> param1", pure = true)
+  public static @NotNull Text addSpaces(@NotNull Text text, boolean addSpaceBefore, boolean addSpaceAfter)
   {
     final boolean textSpaceBefore = text.isSpaceBefore();
     final boolean textSpaceAfter = text.isSpaceAfter();
 
-    spaceBefore |= textSpaceBefore;
-    spaceAfter |= textSpaceAfter;
+    addSpaceBefore |= textSpaceBefore;
+    addSpaceAfter |= textSpaceAfter;
 
-    return spaceBefore == textSpaceBefore && spaceAfter == textSpaceAfter
-        ? text : new TextPart(text.getText(), spaceBefore, spaceAfter);
+    return addSpaceBefore == textSpaceBefore && addSpaceAfter == textSpaceAfter
+        ? text : new TextPart(text.getText(), addSpaceBefore, addSpaceAfter);
   }
 }
