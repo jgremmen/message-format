@@ -22,6 +22,8 @@ import static java.lang.Character.*;
 
 
 /**
+ * This class contains various methods regarding spaces in strings.
+ *
  * @author Jeroen Gremmen
  */
 public final class SpacesUtil
@@ -29,6 +31,23 @@ public final class SpacesUtil
   private SpacesUtil() {}
 
 
+  /**
+   * Determines if the specified character is a Unicode space character. A character is considered
+   * to be a space character if and only if it is specified to be a space character by the
+   * Unicode Standard. This method returns true if the character's general category type is any of
+   * the following:
+   * <ul>
+   * <li> {@code SPACE_SEPARATOR}
+   * <li> {@code PARAGRAPH_SEPARATOR}
+   * </ul>
+   *
+   * @param ch  the character to be tested
+   *
+   * @return  {@code true} if the character is a space character,
+   *          {@code false} otherwise
+   *
+   * @see Character#isSpaceChar(char)
+   */
   @Contract(pure = true)
   public static boolean isSpaceChar(char ch) {
     return ((((1 << SPACE_SEPARATOR) | (1 << PARAGRAPH_SEPARATOR)) >> getType((int)ch)) & 1) != 0;
@@ -73,7 +92,7 @@ public final class SpacesUtil
 
   @Contract(pure = true)
   @SuppressWarnings("DuplicatedCode")
-  public static boolean isTrimmedEmpty(String s)
+  public static boolean isTrimmedEmpty(@NotNull String s)
   {
     final char[] val = s.toCharArray();
     int endIndex = val.length;
@@ -89,6 +108,13 @@ public final class SpacesUtil
   }
 
 
+  /**
+   * Returns whether string {@code s} is empty or not.
+   *
+   * @param s  string or {@code null}
+   *
+   * @return  {@code true} if the string is empty or {@code null}, {@code false} otherwise
+   */
   @Contract(value = "null -> true", pure = true)
   public static boolean isEmpty(String s) {
     return s == null || s.isEmpty();

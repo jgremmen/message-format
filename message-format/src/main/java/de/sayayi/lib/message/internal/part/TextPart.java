@@ -25,8 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.Objects;
 
+import static de.sayayi.lib.message.internal.SpacesUtil.isSpaceChar;
 import static de.sayayi.lib.message.internal.SpacesUtil.trimSpaces;
-import static java.lang.Character.isSpaceChar;
 
 
 /**
@@ -43,24 +43,29 @@ public final class TextPart implements Text
   private final boolean spaceAfter;
 
 
+  /**
+   * Constructs a text part from the given {@code text}.
+   *
+   * @param text  text or {@code null}
+   */
   public TextPart(String text) {
     this(text, false, false);
   }
 
 
-  public TextPart(String text, boolean spaceBefore, boolean spaceAfter)
+  public TextPart(String text, boolean addSpaceBefore, boolean addSpaceAfter)
   {
     if (SpacesUtil.isEmpty(text))
     {
       this.text = text;
-      this.spaceBefore = spaceBefore;
-      this.spaceAfter = spaceAfter;
+      this.spaceBefore = addSpaceBefore;
+      this.spaceAfter = addSpaceAfter;
     }
     else
     {
       this.text = trimSpaces(text);
-      this.spaceBefore = spaceBefore || isSpaceChar(text.charAt(0));
-      this.spaceAfter = spaceAfter || isSpaceChar(text.charAt(text.length() - 1));
+      this.spaceBefore = addSpaceBefore || isSpaceChar(text.charAt(0));
+      this.spaceAfter = addSpaceAfter || isSpaceChar(text.charAt(text.length() - 1));
     }
   }
 
@@ -86,7 +91,7 @@ public final class TextPart implements Text
   @Override
   public @NotNull String getTextWithSpaces()
   {
-    if (text == null || text.isEmpty())
+    if (isEmpty())
       return spaceBefore || spaceAfter ? " " : "";
 
     return spaceBefore ? !spaceAfter ? ' ' + text : ' ' + text + ' ' : spaceAfter ? text + ' ' : text;

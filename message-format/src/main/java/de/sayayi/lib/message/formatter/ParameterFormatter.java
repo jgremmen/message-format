@@ -76,6 +76,12 @@ public interface ParameterFormatter
 
 
 
+  /**
+   * This interface marks a parameter formatter as being capable of determining whether a
+   * formattable type is empty.
+   *
+   * @see SizeQueryable
+   */
   interface EmptyMatcher
   {
     /**
@@ -94,12 +100,18 @@ public interface ParameterFormatter
 
 
 
+  /**
+   * This interface marks a parameter formatter as being capable of calculating the size of the
+   * formattable type.
+   *
+   * @see EmptyMatcher
+   */
   interface SizeQueryable
   {
     /**
      * Returns the size of the given {@code value}.
      *
-     * @param value  object to calculate the size of
+     * @param value  object to calculate the size of, not {@code null}
      *
      * @return  value size
      */
