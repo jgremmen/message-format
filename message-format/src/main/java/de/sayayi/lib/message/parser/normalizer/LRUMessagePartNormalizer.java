@@ -26,6 +26,7 @@ import static java.util.Arrays.copyOf;
 /**
  * @author Jeroen Gremmen
  */
+@SuppressWarnings("UnstableApiUsage")
 public final class LRUMessagePartNormalizer implements MessagePartNormalizer
 {
   private final int maxSize;

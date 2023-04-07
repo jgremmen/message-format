@@ -46,7 +46,8 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
   @Override
   @Contract(pure = true)
-  public @NotNull String format(@NotNull MessageSupportAccessor messageSupport, @NotNull Parameters parameters) {
+  public @NotNull String format(@NotNull MessageSupportAccessor messageSupport,
+                                @NotNull Parameters parameters) {
     return "";
   }
 

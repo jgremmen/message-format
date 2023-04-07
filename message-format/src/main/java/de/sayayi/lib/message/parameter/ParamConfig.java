@@ -44,6 +44,7 @@ import static java.util.Collections.unmodifiableMap;
  * This class represents the message parameter configuration map.
  *
  * @author Jeroen Gremmen
+ * @since 0.4.0
  */
 @EqualsAndHashCode(doNotUseGetters = true)
 public final class ParamConfig implements Serializable

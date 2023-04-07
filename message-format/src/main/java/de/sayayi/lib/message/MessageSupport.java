@@ -288,6 +288,8 @@ public interface MessageSupport
   }
 
 
+
+
   /**
    * Configurable extend of message support providing methods to add/import messages, set default
    * parameter configuration values and change the default locale.
