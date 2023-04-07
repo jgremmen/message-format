@@ -18,7 +18,7 @@ package de.sayayi.lib.message.internal;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import static java.lang.Character.isSpaceChar;
+import static java.lang.Character.*;
 
 
 /**
@@ -27,6 +27,12 @@ import static java.lang.Character.isSpaceChar;
 public final class SpacesUtil
 {
   private SpacesUtil() {}
+
+
+  @Contract(pure = true)
+  public static boolean isSpaceChar(char ch) {
+    return ((((1 << SPACE_SEPARATOR) | (1 << PARAGRAPH_SEPARATOR)) >> getType((int)ch)) & 1) != 0;
+  }
 
 
   @Contract(value = "null -> null", pure = true)
@@ -52,6 +58,13 @@ public final class SpacesUtil
   }
 
 
+  /**
+   * Returns the trimmed variant of {@code s}. If {@code s = null} an empty string is returned.
+   *
+   * @param s  string to trim
+   *
+   * @return  trimmed string, never {@code null}
+   */
   @Contract(pure = true)
   public static @NotNull String trimSpacesNotNull(String s) {
     return s == null ? "" : trimSpaces(s);
