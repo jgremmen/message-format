@@ -39,6 +39,12 @@ public final class NoSpaceTextPart implements Text
   private final @NotNull String text;
 
 
+  /**
+   * Constructs a text part without leading/trailing spaces. If {@code text} contains leading and/or
+   * trailing spaces, they will be removed.
+   *
+   * @param text  text, not {@code null}
+   */
   public NoSpaceTextPart(@NotNull String text) {
     this.text = trimSpaces(text);
   }
