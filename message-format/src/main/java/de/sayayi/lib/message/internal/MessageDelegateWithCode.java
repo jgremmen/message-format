@@ -45,7 +45,7 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
   {
     super(code);
 
-    this.message = message;
+    this.message = requireNonNull(message, "message must not be null");
   }
 
 

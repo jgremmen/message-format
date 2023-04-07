@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Locale.ROOT;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -40,6 +41,12 @@ import static java.util.Locale.ROOT;
  */
 public class MessageFactory
 {
+  /**
+   * Shared message factory without any caching capabilities.
+   * <p>
+   * This message factory will suffice in most cases. However, if you have a large amount of messages,
+   * it is better to construct a message factory with an appropriate {@link MessagePartNormalizer}.
+   */
   public static final MessageFactory NO_CACHE_INSTANCE = new MessageFactory(new MessagePartNormalizer() {
     @Override public <T extends MessagePart> @NotNull T normalize(@NotNull T part) { return part; }
   });
@@ -109,7 +116,7 @@ public class MessageFactory
   public @NotNull Message.WithCode parseMessage(@NotNull String code,
                                                 @NotNull Map<Locale,String> localizedTexts)
   {
-    if (localizedTexts.isEmpty())
+    if (requireNonNull(localizedTexts, "localizedTexts must not be null").isEmpty())
       return new EmptyMessageWithCode(code);
 
     final String message = localizedTexts.get(ROOT);
@@ -140,7 +147,7 @@ public class MessageFactory
   @Contract(pure = true)
   public @NotNull Message parseTemplate(@NotNull Map<Locale,String> localizedTexts)
   {
-    if (localizedTexts.isEmpty())
+    if (requireNonNull(localizedTexts, "localizedTexts must not be null").isEmpty())
       return EmptyMessage.INSTANCE;
 
     final String message = localizedTexts.get(ROOT);
@@ -158,7 +165,7 @@ public class MessageFactory
   @Contract(pure = true)
   public @NotNull Message.WithCode withCode(@NotNull String code, @NotNull Message message)
   {
-    if (message instanceof Message.WithCode)
+    if (requireNonNull(message, "message must not be null") instanceof Message.WithCode)
     {
       final Message.WithCode messageWithCode = (Message.WithCode)message;
 

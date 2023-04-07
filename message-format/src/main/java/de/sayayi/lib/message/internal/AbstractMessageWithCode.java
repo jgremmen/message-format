@@ -37,7 +37,7 @@ abstract class AbstractMessageWithCode implements Message.WithCode
 
   AbstractMessageWithCode(@NotNull String code)
   {
-    if (requireNonNull(code).isEmpty())
+    if (requireNonNull(code, "message code must not be null").isEmpty())
       throw new IllegalArgumentException("message code must not be empty");
 
     this.code = code;
