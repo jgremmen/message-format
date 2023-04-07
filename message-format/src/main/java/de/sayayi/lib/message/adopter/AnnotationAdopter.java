@@ -163,6 +163,16 @@ public class AnnotationAdopter extends AbstractMessageAdopter
   }
 
 
+  /**
+   * Adopt all the annotations ({@link MessageDef}, {@link TemplateDef}) found in the given class.
+   * <p>
+   * This method analyses the given {@code type} as well as all super classes and interfaces. It will
+   * look at the class and method level for message annotations.
+   *
+   * @param type  type to adopt messages from, not {@code null}
+   *
+   * @see #adopt(AnnotatedElement)
+   */
   @Contract(mutates = "this")
   public void adoptAll(@NotNull Class<?> type)
   {
