@@ -50,17 +50,20 @@ import java.util.Set;
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
+ *
+ * @see SpringAsmClassPathScannerAdopter
  */
 public final class SpringClassPathScannerAdopter extends AbstractMessageAdopter
+    implements ClassPathScannerAdopter
 {
   private static final String MESSAGE_DEFS_ANNOTATION_CLASSNAME = MessageDefs.class.getName();
   private static final String MESSAGE_DEF_ANNOTATION_CLASSNAME = MessageDef.class.getName();
   private static final String TEMPLATE_DEFS_ANNOTATION_CLASSNAME = TemplateDefs.class.getName();
   private static final String TEMPLATE_DEF_ANNOTATION_CLASSNAME = TemplateDef.class.getName();
 
-  private final Set<String> packageNames;
-  private final ResourceLoader resourceLoader;
-  private final AnnotationAdopter annotationAdopter;
+  private final @NotNull Set<String> packageNames;
+  private final @NotNull ResourceLoader resourceLoader;
+  private final @NotNull AnnotationAdopter annotationAdopter;
 
 
   public SpringClassPathScannerAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport,
@@ -75,7 +78,7 @@ public final class SpringClassPathScannerAdopter extends AbstractMessageAdopter
   public SpringClassPathScannerAdopter(@NotNull MessageFactory messageFactory,
                                        @NotNull MessagePublisher publisher,
                                        @NotNull Set<String> packageNames,
-                                       ResourceLoader resourceLoader) {
+                                       @NotNull ResourceLoader resourceLoader) {
     super(messageFactory, publisher);
 
     this.packageNames = packageNames;
@@ -85,6 +88,7 @@ public final class SpringClassPathScannerAdopter extends AbstractMessageAdopter
   }
 
 
+  @Override
   public void scan()
   {
     val scanner = new ClassPathScanningMessagesProvider();
