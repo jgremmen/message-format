@@ -59,8 +59,10 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
   public static final byte DEFAULT_ORDER = 100;
 
 
+  /** Formattable class. */
   private final @NotNull Class<?> type;
 
+  /** Formattable type order. */
   private final byte order;
 
 

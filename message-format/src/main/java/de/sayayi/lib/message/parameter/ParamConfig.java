@@ -59,6 +59,12 @@ public final class ParamConfig implements Serializable
   }
 
 
+  /**
+   * Tells whether the parameter configuration contains any values.
+   *
+   * @return  {@code true} if the parameter configuration contains at least 1 value,
+   *          {@code false} otherwise
+   */
   @Contract(pure = true)
   public boolean isEmpty() {
     return map.isEmpty();

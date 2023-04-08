@@ -38,6 +38,7 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
 {
   private static final long serialVersionUID = 800L;
 
+  /** Delegated message. */
   private final @NotNull Message message;
 
 

@@ -18,14 +18,23 @@ package de.sayayi.lib.message.exception;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Predicate;
+
 
 /**
+ * Duplicate template exception. This exception is thrown by the default template handler if a template
+ * with the same name is published twice.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
+ *
+ * @see de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport#setTemplateHandler(Predicate)
+ *      ConfigurableMessageSupport#setTemplateHandler(Predicate)
  */
 public final class DuplicateTemplateException extends MessageException
 {
-  private final String name;
+  /** Duplicate template name. */
+  private final @NotNull String name;
 
 
   public DuplicateTemplateException(@NotNull String name, String message) {

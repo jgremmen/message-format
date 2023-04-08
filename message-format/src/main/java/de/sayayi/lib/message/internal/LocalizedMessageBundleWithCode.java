@@ -49,6 +49,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 {
   private static final long serialVersionUID = 800L;
 
+  /** Localized message map. */
   private final @NotNull Map<Locale,Message> localizedMessages;
 
 

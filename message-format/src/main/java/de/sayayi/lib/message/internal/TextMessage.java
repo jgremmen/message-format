@@ -40,9 +40,13 @@ public final class TextMessage implements Message.WithSpaces
 {
   private static final long serialVersionUID = 800L;
 
+  /** Trimmed message text, or {@code null} */
   private final String text;
 
+  /** Does this message have a leading space? */
   private final boolean spaceBefore;
+
+  /** Does this message have a trailing space? */
   private final boolean spaceAfter;
 
 

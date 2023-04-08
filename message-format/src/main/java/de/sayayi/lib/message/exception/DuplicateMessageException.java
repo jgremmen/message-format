@@ -18,13 +18,22 @@ package de.sayayi.lib.message.exception;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Predicate;
+
 
 /**
+ * Duplicate message exception. This exception is thrown by the default message handler if a message
+ * with the same code is published twice.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
+ *
+ * @see de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport#setMessageHandler(Predicate)
+ *      ConfigurableMessageSupport#setMessageHandler(Predicate)
  */
 public final class DuplicateMessageException extends MessageException
 {
+  /** Duplicate message code. */
   private final String code;
 
 
