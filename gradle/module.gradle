@@ -106,11 +106,12 @@ afterEvaluate {
 
       group("Message Core", [
           "de.sayayi.lib.message",
+          "de.sayayi.lib.message.adopter",
           "de.sayayi.lib.message.annotation",
           "de.sayayi.lib.message.exception",
           "de.sayayi.lib.message.internal*",
           "de.sayayi.lib.message.parameter*",
-          "de.sayayi.lib.message.parser"
+          "de.sayayi.lib.message.parser*"
       ])
       group("Message Formatters", [
           "de.sayayi.lib.message.formatter*"
