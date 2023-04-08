@@ -1,5 +1,6 @@
 # CI script
-image: openjdk:17-slim-buster
+image: localhost:5000/sayayi-jdk:17
+#image: openjdk:17-slim-buster
 
 stages:
   - build
