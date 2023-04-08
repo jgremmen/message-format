@@ -1,5 +1,5 @@
 # CI script
-image: openjdk:19
+image: openjdk:19-slim-buster
 
 stages:
   - build
@@ -9,7 +9,7 @@ variables:
   GRADLE_USER_HOME: ".gradle-cache"
 
 before_script:
-  - export JAVA_HOME="/opt/openjdk-19"
+  - export JAVA_HOME="/usr/local/openjdk-19"
   - chmod +x ./gradlew
 
 cache:
