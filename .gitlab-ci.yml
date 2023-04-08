@@ -5,11 +5,11 @@ stages:
   - build
 
 variables:
-  JAVA_HOME: "/usr/local/openjdk-17"
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   GRADLE_USER_HOME: ".gradle-cache"
 
 before_script:
+  - export JAVA_HOME="/usr/local/openjdk-17"
   - chmod +x ./gradlew
 
 cache:
