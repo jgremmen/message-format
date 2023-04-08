@@ -9,6 +9,7 @@ variables:
   GRADLE_USER_HOME: ".gradle-cache"
 
 before_script:
+  - export JAVA_HOME="/usr/bin/java"
   - chmod +x ./gradlew
 
 cache:
