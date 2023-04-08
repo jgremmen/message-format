@@ -24,7 +24,10 @@ import lombok.val;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import java.util.TimeZone;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.internal.part.MessagePart.Text.EMPTY;
@@ -38,6 +41,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class JodaDateTimeFormatterTest extends AbstractFormatterTest
 {
+  @BeforeAll
+  static void init() {
+    TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
+  }
+
+
   @Test
   void testLocalDate()
   {

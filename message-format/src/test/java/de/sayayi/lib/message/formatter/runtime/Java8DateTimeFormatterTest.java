@@ -22,11 +22,13 @@ import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.parameter.value.ConfigValueString;
 import lombok.val;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.TimeZone;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
@@ -41,6 +43,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class Java8DateTimeFormatterTest extends AbstractFormatterTest
 {
+  @BeforeAll
+  static void init() {
+    TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
+  }
+
+
   @Test
   public void testFormattableTypes()
   {
