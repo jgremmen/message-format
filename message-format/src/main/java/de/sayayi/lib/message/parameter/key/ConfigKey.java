@@ -65,7 +65,7 @@ public interface ConfigKey extends Serializable
   /**
    * Calculates a match result for the given {@code value} with respect to this key.
    *
-   * @param messageSupportAccessor  message context instance, neot {@code null}
+   * @param messageSupportAccessor  message context instance, not {@code null}
    * @param locale          formatting locale, not {@code null}
    * @param value           value to compare with this key
    *
@@ -81,8 +81,25 @@ public interface ConfigKey extends Serializable
   /**
    * Type constants for map keys.
    */
-  enum Type {
-    STRING, NUMBER, BOOL, NULL, EMPTY, NAME
+  enum Type
+  {
+    /** String key type */
+    STRING,
+
+    /** Number key type */
+    NUMBER,
+
+    /** Boolean key type */
+    BOOL,
+
+    /** Null key type */
+    NULL,
+
+    /** Empty key type */
+    EMPTY,
+
+    /** Name key type */
+    NAME
   }
 
 
@@ -90,7 +107,23 @@ public interface ConfigKey extends Serializable
 
   enum CompareType
   {
-    LT, LTE, EQ, NE, GT, GTE;
+    /** Compare for "less than" */
+    LT,
+
+    /** Compare for "less than or equal to" */
+    LTE,
+
+    /** Compare for "equal" */
+    EQ,
+
+    /** Compare for "not equal" */
+    NE,
+
+    /** Compare for "greater than" */
+    GT,
+
+    /** Compare for "greater than or equal to" */
+    GTE;
 
 
     public boolean match(int signum)
@@ -130,6 +163,6 @@ public interface ConfigKey extends Serializable
     EQUIVALENT,
 
     /** exact match (type equality) */
-    EXACT;
+    EXACT
   }
 }
