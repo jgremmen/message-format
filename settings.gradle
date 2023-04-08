@@ -2,10 +2,11 @@ pluginManagement {
   repositories {
     maven {
       url "https://artifactory.sayayi.de/artifactory/plugins-snapshot/"
+      /*
       mavenContent {
         includeGroupByRegex 'de\\.sayayi\\.plugin\\.gradle.*'
         snapshotsOnly()
-      }
+      }*/
     }
 
     gradlePluginPortal()
