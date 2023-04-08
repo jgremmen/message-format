@@ -3,8 +3,7 @@ pluginManagement {
     gradlePluginPortal()
 
     maven {
-      url "http://artifactory.sayayi.de/artifactory/plugins-snapshot/"
-      allowInsecureProtocol = true
+      url "https://artifactory.sayayi.de/artifactory/plugins-snapshot/"
       mavenContent {
         includeGroupByRegex 'de\\.sayayi\\.plugin\\.gradle.*'
         snapshotsOnly()
