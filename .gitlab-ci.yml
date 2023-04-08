@@ -20,7 +20,7 @@ build:
   stage: build
   tags:
     - docker
-  script: ./gradlew clean build
+  script: ./gradlew clean build --info --stacktrace
   artifacts:
     name: "message-format-artifacts"
     paths:
