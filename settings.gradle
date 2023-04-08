@@ -1,7 +1,5 @@
 pluginManagement {
   repositories {
-    gradlePluginPortal()
-
     maven {
       url "https://artifactory.sayayi.de/artifactory/plugins-snapshot/"
       mavenContent {
@@ -9,6 +7,8 @@ pluginManagement {
         snapshotsOnly()
       }
     }
+
+    gradlePluginPortal()
   }
 }
 
