@@ -298,6 +298,20 @@ public interface MessageSupport
   interface ConfigurableMessageSupport extends MessageSupport, MessagePublisher
   {
     /**
+     * Adds a message with code to this message support.
+     *
+     * @param code     message code, not {@code null} or empty
+     * @param message  message text, not {@code null}
+     *
+     * @throws DuplicateMessageException  in case a message with the same code already exists
+     */
+    @Contract(mutates = "this")
+    default void addMessage(@NotNull String code, @NotNull String message) {
+      addMessage(getAccessor().getMessageFactory().parseMessage(code, message));
+    }
+
+
+    /**
      * Convenience method for adding multiple pack resources.
      *
      * @param packResources  enumeration of pack resources, not {@code null}

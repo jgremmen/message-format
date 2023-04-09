@@ -38,7 +38,7 @@ import static java.util.Locale.forLanguageTag;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-@SuppressWarnings({"DuplicatedCode", "UnstableApiUsage"})
+@SuppressWarnings({"DuplicatedCode", "UnstableApiUsage", "UnusedReturnValue"})
 public class AnnotationAdopter extends AbstractMessageAdopter
 {
   private final Set<Class<?>> indexedClasses = new HashSet<>();
@@ -71,9 +71,11 @@ public class AnnotationAdopter extends AbstractMessageAdopter
    * This method recognizes {@link MessageDef} and {@link TemplateDef} annotations.
    *
    * @param element  annotated element (eg. method, field, class), not {@code null}
+   *
+   * @return  this annotation adopter instance, never {@code null}
    */
   @Contract(pure = true)
-  public void adopt(@NotNull AnnotatedElement element)
+  public @NotNull AnnotationAdopter adopt(@NotNull AnnotatedElement element)
   {
     MessageDef messageDef = element.getAnnotation(MessageDef.class);
     if (messageDef != null)
@@ -90,6 +92,8 @@ public class AnnotationAdopter extends AbstractMessageAdopter
     TemplateDefs templateDefs = element.getAnnotation(TemplateDefs.class);
     if (templateDefs != null)
       Arrays.stream(templateDefs.value()).forEach(this::adopt);
+
+    return this;
   }
 
 
@@ -97,8 +101,10 @@ public class AnnotationAdopter extends AbstractMessageAdopter
    * Publish the message defined in the given {@link MessageDef} annotation.
    *
    * @param messageDef  {@code MessageDef} annotation, not {@code null}
+   *
+   * @return  this annotation adopter instance, never {@code null}
    */
-  public void adopt(@NotNull MessageDef messageDef)
+  public @NotNull AnnotationAdopter adopt(@NotNull MessageDef messageDef)
   {
     final Text[] texts = messageDef.texts();
     final String code = messageDef.code();
@@ -126,6 +132,8 @@ public class AnnotationAdopter extends AbstractMessageAdopter
 
       messagePublisher.addMessage(messageFactory.parseMessage(code, localizedTexts));
     }
+
+    return this;
   }
 
 
@@ -133,8 +141,10 @@ public class AnnotationAdopter extends AbstractMessageAdopter
    * Publish the template defined in the given {@link TemplateDef} annotation.
    *
    * @param templateDef  {@code TemplateDef} annotation, not {@code null}
+   *
+   * @return  this annotation adopter instance, never {@code null}
    */
-  public void adopt(@NotNull TemplateDef templateDef)
+  public @NotNull AnnotationAdopter adopt(@NotNull TemplateDef templateDef)
   {
     final Text[] texts = templateDef.texts();
     final String name = templateDef.name();
@@ -160,6 +170,8 @@ public class AnnotationAdopter extends AbstractMessageAdopter
     }
 
     messagePublisher.addTemplate(name, messageFactory.parseTemplate(localizedTexts));
+
+    return this;
   }
 
 
@@ -171,10 +183,13 @@ public class AnnotationAdopter extends AbstractMessageAdopter
    *
    * @param type  type to adopt messages from, not {@code null}
    *
+   * @return  this annotation adopter instance, never {@code null}
+   *
    * @see #adopt(AnnotatedElement)
    */
   @Contract(mutates = "this")
-  public void adoptAll(@NotNull Class<?> type)
+  @SuppressWarnings("ResultOfMethodCallIgnored")
+  public @NotNull AnnotationAdopter adoptAll(@NotNull Class<?> type)
   {
     for(Class<?> clazz = type; clazz != null && clazz != Object.class; clazz = clazz.getSuperclass())
       if (!indexedClasses.contains(clazz))
@@ -189,5 +204,7 @@ public class AnnotationAdopter extends AbstractMessageAdopter
 
         indexedClasses.add(clazz);
       }
+
+    return this;
   }
 }

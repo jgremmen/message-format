@@ -5,7 +5,6 @@
 == Create Message Support
 
 The main instance required for formatting messages, is the message
-support. There are various ways to create and customize a message
 support. For this quick start tutorial a shared version of the
 message support is used and can be retrieved from the
 `MessageSupportFactory`.
@@ -80,4 +79,58 @@ messageSupport
     .message("Unknown customer name: %{name}")
     .with("name", name)
     .throwFormatted(IllegalArgumentException::new);
+----
+
+
+== Defining Messages
+
+In the examples in the previous chapter messages are parsed on the
+fly. Message parsing is an expensive operation which should be reduced
+to a minimum. There is a way of defining messages once and then
+re-using them.
+
+.Defining message example 1
+[source,java]
+----
+ConfigurableMessageSupport messageSupport = MessageSupportFactory.create(
+    new DefaultFormatterService(), MessageFactory.NO_CACHE_INSTANCE);
+
+messageSupport.addMessage("RESULTS",
+    "%{n,choice,0:'no results',1:'1 result',:'%{n} results'} found");
+
+String msg = messageSupport
+    .code("RESULTS")
+    .with("n", 1)
+    .format();
+// msg = "1 result found"
+----
+
+Adding messages like this, especially if there are a lot of them,
+can be a tedious task and for larger applications with a lot of
+sub modules centralizing messages is not a good solution.
+
+The message format library provides a set of adopter classes that
+are capable of reading messages and publishing them to the message
+support instance. One of the most interesting adopters is the
+annotation adopter which analyses annotations with message definitions.
+
+.Defining message example 2
+[source,java]
+----
+public class AnnotationMessage
+{
+  private static ConfigurableMessageSupport MESSAGE_SUPPORT =
+      MessageSupportFactory.create(
+          new DefaultFormatterService(), MessageFactory.NO_CACHE_INSTANCE);
+
+  static {
+    new AnnotationAdopter(MESSAGE_SUPPORT).adoptAll(AnnotationMessage.class);
+  }
+
+  @MessageDef(code = "RESULTS", text =
+      "%{n,choice,0:'no results',1:'1 result',:'%{n} results'} found")
+  public String getResultMessage(int results) {
+    return MESSAGE_SUPPORT.code("RESULTS").with("n", results).format();
+  }
+}
 ----
