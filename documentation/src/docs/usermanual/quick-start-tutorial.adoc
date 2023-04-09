@@ -29,22 +29,22 @@ The message support can now be used to format messages.
 .Formatting example 1
 [source,java]
 ----
-MessageSupport support = MessageSupportFactory.shared();
+MessageSupport messageSupport = MessageSupportFactory.shared();
 
-String msg = support
+String msg = messageSupport
     .message("%{n,choice,0:'no results',1:'1 result',:'%{n} results'} found")
     .with("n", 4)
     .format();
 // msg = "4 results found"
-// msg = "no results found" (for n = 0)
+// msg = "no results found"  (for n = 0)
 ----
 
 .Formatting example 2
 [source,java]
 ----
-MessageSupport support = MessageSupportFactory.shared();
+MessageSupport messageSupport = MessageSupportFactory.shared();
 
-String msg = support
+String msg = messageSupport
     .message("I see %{names,list-sep-last:' and '}")
     .with("names", Arrays.asList("Brad", "Sue", "Molly"))
     .format();
@@ -55,16 +55,29 @@ String msg = support
 .Formatting example 3
 [source,java]
 ----
-MessageSupport support = MessageSupportFactory.shared();
+MessageSupport messageSupport = MessageSupportFactory.shared();
 
 try {
   // ...
 } catch(Exception ex) {
-  logger.error(support
+  logger.error(messageSupport
       .message("Something went wrong%{ex,!empty:': %{ex}'}")
       .with("ex", ex)
       .format(), ex);
   // error = "Something went wrong: parameter must not be null"
   // error = "Something went wrong"  (if exception message is empty)
 }
+----
+
+
+.Formatting example 4
+[source,java]
+----
+MessageSupport messageSupport = MessageSupportFactory.shared();
+
+// throw a formatted exception
+messageSupport
+    .message("Unknown customer name: %{name}")
+    .with("name", name)
+    .throwFormatted(IllegalArgumentException::new);
 ----
