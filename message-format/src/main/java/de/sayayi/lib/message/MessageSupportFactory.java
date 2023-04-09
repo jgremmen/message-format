@@ -88,7 +88,7 @@ public final class MessageSupportFactory
   private static final class SharedMessageSupport extends MessageSupportImpl
   {
     private SharedMessageSupport() {
-      super(new DefaultFormatterService(), NO_CACHE_INSTANCE);
+      super(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
     }
 
 
