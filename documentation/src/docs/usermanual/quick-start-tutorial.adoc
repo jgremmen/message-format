@@ -4,10 +4,10 @@
 
 == Create Message Support
 
-The main instance required for formatting messages, is the message
-support. For this quick start tutorial a shared version of the
-message support is used and can be retrieved from the
-`MessageSupportFactory`.
+The main instance required for formatting messages, is the message support.
+An application requires a single message support instance only. For this quick
+start tutorial a shared version of the message support is used and can be
+retrieved from the `MessageSupportFactory`.
 
 .Shared Message Support
 [source,java]
@@ -16,12 +16,12 @@ message support is used and can be retrieved from the
 MessageSupport support = MessageSupportFactory.shared();
 ----
 
-The shared message support contains all core formatters as well as
-additional formatters which have been registered as a service and are
-available on the classpath (eg. jodatime formatter).
+The shared message support contains all core formatters as well as additional
+formatters which have been registered as a service and are available on the
+classpath (eg. jodatime formatter).
 
 
-== Formatting Message
+== Formatting Messages
 
 The message support can now be used to format messages.
 
@@ -84,17 +84,18 @@ messageSupport
 
 == Defining Messages
 
-In the examples in the previous chapter messages are parsed on the
-fly. Message parsing is an expensive operation which should be reduced
-to a minimum. There is a way of defining messages once and then
-re-using them.
+In the examples in the previous chapter messages are parsed on the fly. Message
+parsing is an expensive operation which should be reduced to a minimum, if
+possible. There is a way of defining messages once and then re-using them.
 
-.Defining message example 1
+.Programmatic message definition example
 [source,java]
 ----
+// create a configurable message support
 ConfigurableMessageSupport messageSupport = MessageSupportFactory.create(
     new DefaultFormatterService(), MessageFactory.NO_CACHE_INSTANCE);
 
+// add pre-compiled message to message support
 messageSupport.addMessage("RESULTS",
     "%{n,choice,0:'no results',1:'1 result',:'%{n} results'} found");
 
@@ -105,16 +106,16 @@ String msg = messageSupport
 // msg = "1 result found"
 ----
 
-Adding messages like this, especially if there are a lot of them,
-can be a tedious task and for larger applications with a lot of
-sub modules centralizing messages is not a good solution.
+Adding messages like this, especially if there are a lot of them, can be a
+tedious task and for larger applications with a lot of sub modules centralizing
+messages is not a good solution.
 
-The message format library provides a set of adopter classes that
-are capable of reading messages and publishing them to the message
-support instance. One of the most interesting adopters is the
-annotation adopter which analyses annotations with message definitions.
+The message format library provides a set of adopter classes that are capable
+of reading messages and publishing them to the message support instance. One of
+the most interesting adopters is the annotation adopter which analyses message
+definition annotations.
 
-.Defining message example 2
+.Annotation message definition example
 [source,java]
 ----
 public class AnnotationMessage
