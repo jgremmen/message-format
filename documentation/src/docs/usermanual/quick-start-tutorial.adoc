@@ -1,0 +1,70 @@
+[[quick-start-tutorial]]
+= Quick Start Tutorial
+:navtitle: Quick Start Tutorial
+
+== Create Message Support
+
+The main instance required for formatting messages, is the message
+support. There are various ways to create and customize a message
+support. For this quick start tutorial a shared version of the
+message support is used and can be retrieved from the
+`MessageSupportFactory`.
+
+.Shared Message Support
+[source,java]
+----
+// get shared message support, configured for the default locale
+MessageSupport support = MessageSupportFactory.shared();
+----
+
+The shared message support contains all core formatters as well as
+additional formatters which have been registered as a service and are
+available on the classpath (eg. jodatime formatter).
+
+
+== Formatting Message
+
+The message support can now be used to format messages.
+
+.Formatting example 1
+[source,java]
+----
+MessageSupport support = MessageSupportFactory.shared();
+
+String msg = support
+    .message("%{n,choice,0:'no results',1:'1 result',:'%{n} results'} found")
+    .with("n", 4)
+    .format();
+// msg = "4 results found"
+// msg = "no results found" (for n = 0)
+----
+
+.Formatting example 2
+[source,java]
+----
+MessageSupport support = MessageSupportFactory.shared();
+
+String msg = support
+    .message("I see %{names,list-sep-last:' and '}")
+    .with("names", Arrays.asList("Brad", "Sue", "Molly"))
+    .format();
+// msg = "I see Brad, Sue and Molly"
+----
+
+
+.Formatting example 3
+[source,java]
+----
+MessageSupport support = MessageSupportFactory.shared();
+
+try {
+  // ...
+} catch(Exception ex) {
+  logger.error(support
+      .message("Something went wrong%{ex,!empty:': %{ex}'}")
+      .with("ex", ex)
+      .format(), ex);
+  // error = "Something went wrong: parameter must not be null"
+  // error = "Something went wrong"  (if exception message is empty)
+}
+----
