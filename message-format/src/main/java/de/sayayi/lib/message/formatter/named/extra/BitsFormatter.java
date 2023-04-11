@@ -32,7 +32,8 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
 /**
  * @author Jeroen Gremmen
  */
-public final class BitsFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
+public final class BitsFormatter extends AbstractParameterFormatter
+    implements NamedParameterFormatter
 {
   @Override
   public @NotNull String getName() {
@@ -67,7 +68,8 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
 
   private int detectBitCount(@NotNull FormatterContext formatterContext, @NotNull Object value)
   {
-    final ConfigValue configValue = formatterContext.getConfigValue("bits").orElse(null);
+    final ConfigValue configValue =
+        formatterContext.getConfigValue("bits").orElse(null);
 
     if (configValue instanceof ConfigValueString && "auto".equals(configValue.asObject()))
       return autoDetectBitCount(value);
@@ -97,7 +99,8 @@ public final class BitsFormatter extends AbstractParameterFormatter implements N
     }
 
     // auto detect for numbers of type byte, short, integer or long
-    if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long)
+    if (value instanceof Byte || value instanceof Short || value instanceof Integer ||
+        value instanceof Long)
     {
       final long l = ((Number)value).longValue();
 

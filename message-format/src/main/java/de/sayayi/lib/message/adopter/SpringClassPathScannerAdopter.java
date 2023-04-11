@@ -22,18 +22,16 @@ import de.sayayi.lib.message.annotation.*;
 import de.sayayi.lib.message.annotation.impl.MessageDefImpl;
 import de.sayayi.lib.message.annotation.impl.TemplateDefImpl;
 import de.sayayi.lib.message.annotation.impl.TextImpl;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.classreading.MetadataReader;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -91,12 +89,12 @@ public final class SpringClassPathScannerAdopter extends AbstractMessageAdopter
   @Override
   public void scan()
   {
-    val scanner = new ClassPathScanningMessagesProvider();
+    final ClassPathScanningCandidateComponentProvider scanner =
+        new ClassPathScanningMessagesProvider();
 
     scanner.setResourceLoader(resourceLoader);
 
-    for(val packageName: packageNames)
-      scanner.findCandidateComponents(packageName);
+    packageNames.forEach(scanner::findCandidateComponents);
   }
 
 
@@ -127,7 +125,7 @@ public final class SpringClassPathScannerAdopter extends AbstractMessageAdopter
     {
       if (visitedClassnames.add(metadataReader.getClassMetadata().getClassName()))
       {
-        val annotationMetadata = metadataReader.getAnnotationMetadata();
+        final AnnotationMetadata annotationMetadata = metadataReader.getAnnotationMetadata();
 
         handleAnnotations(annotationMetadata.getAnnotations());
 
@@ -179,16 +177,18 @@ public final class SpringClassPathScannerAdopter extends AbstractMessageAdopter
 
     private void handleMessageDefs(MergedAnnotation<MessageDefs> messageDefs)
     {
-      for(val messageDefAnnotation: messageDefs.getAnnotationArray("value", MessageDef.class))
-        handleMessageDef(messageDefAnnotation);
+      Arrays
+          .stream(messageDefs.getAnnotationArray("value", MessageDef.class))
+          .forEach(this::handleMessageDef);
     }
 
 
     private void handleMessageDef(MergedAnnotation<MessageDef> messageDef)
     {
-      val texts = new ArrayList<Text>();
+      final List<Text> texts = new ArrayList<>();
 
-      for(val textAnnotation: messageDef.getAnnotationArray("texts", Text.class))
+      for(MergedAnnotation<Text> textAnnotation:
+          messageDef.getAnnotationArray("texts", Text.class))
       {
         texts.add(new TextImpl(
             textAnnotation.getString("locale"),
@@ -225,16 +225,18 @@ public final class SpringClassPathScannerAdopter extends AbstractMessageAdopter
 
     private void handleTemplateDefs(MergedAnnotation<TemplateDefs> templateDefs)
     {
-      for(val templateDefAnnotation: templateDefs.getAnnotationArray("value", TemplateDef.class))
-        handleTemplateDef(templateDefAnnotation);
+      Arrays
+          .stream(templateDefs.getAnnotationArray("value", TemplateDef.class))
+          .forEach(this::handleTemplateDef);
     }
 
 
     private void handleTemplateDef(MergedAnnotation<TemplateDef> templateDef)
     {
-      val texts = new ArrayList<Text>();
+      final List<Text> texts = new ArrayList<>();
 
-      for(val textAnnotation: templateDef.getAnnotationArray("texts", Text.class))
+      for(MergedAnnotation<Text> textAnnotation:
+          templateDef.getAnnotationArray("texts", Text.class))
       {
         texts.add(new TextImpl(
             textAnnotation.getString("locale"),

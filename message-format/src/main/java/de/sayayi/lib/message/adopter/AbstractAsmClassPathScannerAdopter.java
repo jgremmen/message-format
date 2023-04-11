@@ -19,17 +19,13 @@ import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
 import de.sayayi.lib.message.exception.MessageAdopterException;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.JarURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.*;
+import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -39,6 +35,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import static java.lang.ClassLoader.getSystemClassLoader;
+import static java.nio.file.Files.newInputStream;
 import static java.util.Arrays.asList;
 
 
@@ -93,7 +90,7 @@ abstract class AbstractAsmClassPathScannerAdopter extends AbstractMessageAdopter
   public void scan()
   {
     try {
-      for(val packageName: packageNames)
+      for(String packageName: packageNames)
         scan(packageName);
     } catch(Exception ex) {
       throw new MessageAdopterException("failed to scan class path for messages and templates", ex);
@@ -110,14 +107,14 @@ abstract class AbstractAsmClassPathScannerAdopter extends AbstractMessageAdopter
     for(final Enumeration<URL> urls = classLoader.getResources(classPathPrefix);
         urls.hasMoreElements();)
     {
-      val url = urls.nextElement();
+      final URL url = urls.nextElement();
 
       if (ZIP_PROTOCOLS.contains(url.getProtocol()))
         scan_zipEntries(url, classPathPrefix);
       else
       {
-        val directory = url.getFile();
-        val baseDirectory = new File(directory.endsWith(classPathPrefix)
+        final String directory = url.getFile();
+        final File baseDirectory = new File(directory.endsWith(classPathPrefix)
             ? directory.substring(0, directory.length() - classPathPrefix.length()) : directory);
 
         if (baseDirectory.isDirectory())
@@ -130,22 +127,22 @@ abstract class AbstractAsmClassPathScannerAdopter extends AbstractMessageAdopter
   private void scan_directory(@NotNull File baseDirectory, @NotNull File directory)
       throws IOException
   {
-    val files = directory.listFiles();
+    final File[] files = directory.listFiles();
     if (files != null)
     {
-      val baseDirectoryPath = baseDirectory.toPath();
+      final Path baseDirectoryPath = baseDirectory.toPath();
 
-      for(val file: files)
+      for(File file: files)
         if (file.isDirectory())
           scan_directory(baseDirectory, file);
         else
         {
-          val classNamePath = baseDirectoryPath
+          final String classNamePath = baseDirectoryPath
               .relativize(file.toPath()).toString().replace('\\', '/');
 
           if (classNamePath.endsWith(".class") && scan_checkVisited(classNamePath))
           {
-            try(val classInputStream = new FileInputStream(file)) {
+            try(InputStream classInputStream = newInputStream(file.toPath())) {
               parseClass(classInputStream);
             }
           }
@@ -157,14 +154,14 @@ abstract class AbstractAsmClassPathScannerAdopter extends AbstractMessageAdopter
   private void scan_zipEntries(@NotNull URL zipUrl, @NotNull String classPathPrefix)
       throws IOException
   {
-    val con = zipUrl.openConnection();
+    final URLConnection con = zipUrl.openConnection();
     final ZipFile zipFile;
 
     if (con instanceof JarURLConnection)
       zipFile = ((JarURLConnection)con).getJarFile();
     else
     {
-      val urlFile = zipUrl.getFile();
+      final String urlFile = zipUrl.getFile();
       try {
         int separatorIndex = urlFile.indexOf("*/");
         if (separatorIndex == -1)
@@ -180,14 +177,14 @@ abstract class AbstractAsmClassPathScannerAdopter extends AbstractMessageAdopter
     try {
       for(Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements();)
       {
-        val zipEntry = entries.nextElement();
-        val classPathName = zipEntry.getName();
+        final ZipEntry zipEntry = entries.nextElement();
+        final String classPathName = zipEntry.getName();
 
         if (classPathName.endsWith(".class") &&
             classPathName.startsWith(classPathPrefix) &&
             scan_checkVisited(classPathName))
         {
-          try(val classInputStream = zipFile.getInputStream(zipEntry)) {
+          try(InputStream classInputStream = zipFile.getInputStream(zipEntry)) {
             parseClass(classInputStream);
           }
         }

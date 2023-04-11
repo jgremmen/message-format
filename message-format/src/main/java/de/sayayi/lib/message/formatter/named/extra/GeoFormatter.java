@@ -35,7 +35,8 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
  * @author Jeroen Gremmen
  */
 @SuppressWarnings("UnnecessaryUnicodeEscape")
-public final class GeoFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
+public final class GeoFormatter extends AbstractParameterFormatter
+    implements NamedParameterFormatter
 {
   private static final Map<String,Format> FORMAT = new HashMap<>();
 
@@ -154,7 +155,9 @@ public final class GeoFormatter extends AbstractParameterFormatter implements Na
 
       final int degree = (int)(millis / DEGREE_MILLIS);
 
-      return new double[] { degree, (millis - degree * DEGREE_MILLIS) / (double)MINUTE_MILLIS, 0.0 };
+      return new double[] {
+          degree, (millis - degree * DEGREE_MILLIS) / (double)MINUTE_MILLIS, 0.0
+      };
     }
 
     // round value to the number of second digits
@@ -218,7 +221,10 @@ public final class GeoFormatter extends AbstractParameterFormatter implements Na
     if (sss != null)
     {
       if (mmm == null)
-        throw new IllegalArgumentException("missing minute specification in geo format: " + formatString);
+      {
+        throw new IllegalArgumentException("missing minute specification in geo format: " +
+            formatString);
+      }
 
       format.minuteDigits = 0;  // reduce precision for minutes
       format.secondDigits = "s".equals(sss) ? 0 : sss.length();

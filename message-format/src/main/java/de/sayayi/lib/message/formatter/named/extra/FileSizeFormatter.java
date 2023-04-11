@@ -15,11 +15,11 @@
  */
 package de.sayayi.lib.message.formatter.named.extra;
 
+import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
@@ -35,16 +35,20 @@ import static java.lang.Boolean.FALSE;
 /**
  * @author Jeroen Gremmen
  */
-public final class FileSizeFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
+public final class FileSizeFormatter extends AbstractParameterFormatter
+    implements NamedParameterFormatter
 {
   private static final String[] UNITS = new String[] { "B", "KB", "MB", "GB", "TB", "PB" };
 
   private static final long[] POW10 = new long[] {
-      1L, 10L, 100L, 1000L, 10000L, 100000L, 1000000L, 10000000L, 100000000L, 1000000000L, 10000000000L,
-      100000000000L, 1000000000000L, 10000000000000L, 100000000000000L, 1000000000000000L
+      1L, 10L, 100L, 1000L, 10000L, 100000L, 1000000L, 10000000L, 100000000L, 1000000000L,
+      10000000000L, 100000000000L, 1000000000000L, 10000000000000L, 100000000000000L,
+      1000000000000000L
   };
 
-  private static final String[] FORMAT = new String[] { "#,##0", "#,##0.0", "#,##0.00", "#,##0.000" };
+  private static final String[] FORMAT = new String[] {
+      "#,##0", "#,##0.0", "#,##0.00", "#,##0.000"
+  };
 
 
   @Override
@@ -71,9 +75,9 @@ public final class FileSizeFormatter extends AbstractParameterFormatter implemen
     if (value == null)
       return nullText();
 
-    val size = ((Number)value).longValue();
+    final long size = ((Number)value).longValue();
     int scale = normalizeScale(formatterContext.getConfigValueNumber("scale").orElse(1));
-    val s = new StringBuilder();
+    final StringBuilder s = new StringBuilder();
     final int unitIndex;
 
     if (size <= 0)
@@ -86,12 +90,14 @@ public final class FileSizeFormatter extends AbstractParameterFormatter implemen
       if ((unitIndex = calculateUnitIndex(size, scale)) == 0)
         scale = 0;
 
-      s.append(new DecimalFormat(FORMAT[scale], DecimalFormatSymbols.getInstance(formatterContext.getLocale()))
+      s.append(new DecimalFormat(FORMAT[scale],
+          DecimalFormatSymbols.getInstance(formatterContext.getLocale()))
           .format((double)size / POW10[unitIndex * 3]));
     }
 
-    val unit = UNITS[unitIndex];
-    val unitMessage = formatterContext.getMapMessage(unit, EnumSet.of(STRING)).orElse(null);
+    final String unit = UNITS[unitIndex];
+    final Message.WithSpaces unitMessage =
+        formatterContext.getMapMessage(unit, EnumSet.of(STRING)).orElse(null);
 
     if ((unitMessage != null && unitMessage.isSpaceBefore()) ||
         formatterContext.getConfigValueBool("space").orElse(FALSE))

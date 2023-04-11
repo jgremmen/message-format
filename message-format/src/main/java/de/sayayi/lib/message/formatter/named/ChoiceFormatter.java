@@ -26,7 +26,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @author Jeroen Gremmen
  */
-public final class ChoiceFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
+public final class ChoiceFormatter extends AbstractParameterFormatter
+    implements NamedParameterFormatter
 {
   @Override
   @Contract(pure = true)
@@ -37,8 +38,10 @@ public final class ChoiceFormatter extends AbstractParameterFormatter implements
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value) {
-    return formatterContext.format(formatterContext.getMapMessageOrEmpty(value, NO_NAME_KEY_TYPES, true));
+  public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value)
+  {
+    return formatterContext.format(
+        formatterContext.getMapMessageOrEmpty(value, NO_NAME_KEY_TYPES, true));
   }
 
 

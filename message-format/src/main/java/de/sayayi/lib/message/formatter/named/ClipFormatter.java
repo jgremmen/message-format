@@ -20,7 +20,6 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
@@ -30,7 +29,8 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class ClipFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
+public final class ClipFormatter extends AbstractParameterFormatter
+    implements NamedParameterFormatter
 {
   @Override
   public @NotNull String getName() {
@@ -44,17 +44,19 @@ public final class ClipFormatter extends AbstractParameterFormatter implements N
     if (value == null)
       return nullText();
 
-    val text = formatterContext.format(value, false);
+    final Text text = formatterContext.format(value, false);
 
     String s = text.getText();
     if (s == null)
       return nullText();
     s = s.trim();
 
-    val maxSize = (int)Math.max(formatterContext.getConfigValueNumber("clip-size").orElse(64), 8);
+    final int maxSize =
+        (int)Math.max(formatterContext.getConfigValueNumber("clip-size").orElse(64), 8);
 
     return s.length() <= maxSize
         ? text
-        : new TextPart(s.substring(0, maxSize - 3).trim() + "...", text.isSpaceBefore(), text.isSpaceAfter());
+        : new TextPart(s.substring(0, maxSize - 3).trim() + "...", text.isSpaceBefore(),
+            text.isSpaceAfter());
   }
 }

@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
@@ -32,7 +33,8 @@ import static de.sayayi.lib.message.parameter.key.ConfigKey.NUMBER_TYPE;
 /**
  * @author Jeroen Gremmen
  */
-public final class SizeFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
+public final class SizeFormatter extends AbstractParameterFormatter
+    implements NamedParameterFormatter
 {
   @Override
   @Contract(pure = true)
@@ -48,12 +50,16 @@ public final class SizeFormatter extends AbstractParameterFormatter implements N
     long size = 0;
 
     if (value != null)
-      for(ParameterFormatter formatter: formatterContext.getMessageSupport().getFormatters(value.getClass()))
+    {
+      MessageSupportAccessor messageSupportAccessor = formatterContext.getMessageSupport();
+
+      for(ParameterFormatter formatter: messageSupportAccessor.getFormatters(value.getClass()))
         if (formatter instanceof SizeQueryable)
         {
           size = ((SizeQueryable)formatter).size(value);
           break;
         }
+    }
 
     final Optional<Message.WithSpaces> mappedMessage =
         formatterContext.getMapMessage(size, NUMBER_TYPE, true);
