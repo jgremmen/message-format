@@ -70,6 +70,8 @@ import static org.antlr.v4.runtime.Token.EOF;
 
 
 /**
+ * This class provides methods for compiling messages and templates.
+ *
  * @author Jeroen Gremmen
  */
 public final class MessageCompiler extends AbstractAntlr4Parser
@@ -85,12 +87,26 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   }
 
 
+  /**
+   * Compile the given message {@code text} into a spaces aware message object.
+   *
+   * @param text  message text, not {@code null}
+   *
+   * @return  compiled message, never {@code null}
+   */
   @Contract(pure = true)
   public @NotNull Message.WithSpaces compileMessage(@NotNull String text) {
     return compileMessage(text, false);
   }
 
 
+  /**
+   * Compile the given template {@code text} into a spaces aware message object.
+   *
+   * @param text  template text, not {@code null}
+   *
+   * @return  compiled template, never {@code null}
+   */
   @Contract(pure = true)
   public @NotNull Message.WithSpaces compileTemplate(@NotNull String text) {
     return compileMessage(text, true);
