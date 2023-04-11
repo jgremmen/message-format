@@ -18,8 +18,6 @@ package de.sayayi.lib.message.parameter.key;
 import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,8 +34,6 @@ import static java.util.Objects.requireNonNull;
 /**
  * @author Jeroen Gremmen
  */
-@ToString(doNotUseGetters = true)
-@EqualsAndHashCode(doNotUseGetters = true)
 public final class ConfigKeyString implements ConfigKey
 {
   private static final long serialVersionUID = 800L;
@@ -48,8 +44,8 @@ public final class ConfigKeyString implements ConfigKey
 
   public ConfigKeyString(@NotNull CompareType compareType, @NotNull String string)
   {
-    this.compareType = compareType;
-    this.string = string;
+    this.compareType = requireNonNull(compareType, "compareType must not be null");
+    this.string = requireNonNull(string, "string must not be null");
   }
 
 
@@ -114,6 +110,32 @@ public final class ConfigKeyString implements ConfigKey
     }
 
     return compareType.match(cmp) ? result : MISMATCH;
+  }
+
+
+  @Override
+  public boolean equals(Object o)
+  {
+    if (o == this)
+      return true;
+    else if (!(o instanceof ConfigKeyString))
+      return false;
+
+    ConfigKeyString that = (ConfigKeyString)o;
+
+    return compareType == that.compareType && string.equals(that.string);
+  }
+
+
+  @Override
+  public int hashCode() {
+    return (59 + compareType.hashCode()) * 59 + string.hashCode();
+  }
+
+
+  @Override
+  public String toString() {
+    return "ConfigKeyString(compareType=" + compareType + ",string=" + string + ')';
   }
 
 

@@ -22,7 +22,6 @@ import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,7 +43,6 @@ import static java.util.stream.Collectors.toSet;
 /**
  * @author Jeroen Gremmen
  */
-@ToString
 public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCode
     implements LocaleAware
 {
@@ -132,6 +130,12 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
         .stream()
         .flatMap(m -> m.getTemplateNames().stream())
         .collect(toSet()));
+  }
+
+
+  @Override
+  public String toString() {
+    return "LocalizedMessageBundleWithCode(localizedMessages=" + localizedMessages + ')';
   }
 
 

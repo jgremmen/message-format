@@ -20,8 +20,6 @@ import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -35,8 +33,6 @@ import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.*;
 /**
  * @author Jeroen Gremmen
  */
-@ToString(doNotUseGetters = true)
-@EqualsAndHashCode(doNotUseGetters = true)
 public final class ConfigKeyEmpty implements ConfigKey
 {
   private static final long serialVersionUID = 800L;
@@ -77,6 +73,26 @@ public final class ConfigKeyEmpty implements ConfigKey
       }
 
     return MISMATCH;
+  }
+
+
+  @Override
+  public boolean equals(Object o)
+  {
+    return o == this ||
+        o instanceof ConfigKeyEmpty && compareType == ((ConfigKeyEmpty)o).compareType;
+  }
+
+
+  @Override
+  public int hashCode() {
+    return 59 + compareType.hashCode();
+  }
+
+
+  @Override
+  public String toString() {
+    return "ConfigKeyEmpty(compareType=" + compareType + ')';
   }
 
 

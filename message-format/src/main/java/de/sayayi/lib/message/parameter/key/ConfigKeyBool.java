@@ -18,7 +18,6 @@ package de.sayayi.lib.message.parameter.key;
 import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +32,6 @@ import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.*;
 /**
  * @author Jeroen Gremmen
  */
-@ToString(doNotUseGetters = true)
 public enum ConfigKeyBool implements ConfigKey
 {
   /** Config key representing {@code false}. */
@@ -104,6 +102,12 @@ public enum ConfigKeyBool implements ConfigKey
     }
 
     return MISMATCH;
+  }
+
+
+  @Override
+  public String toString() {
+    return "ConfigKeyBool(bool=" + bool + ')';
   }
 
 

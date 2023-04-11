@@ -24,8 +24,6 @@ import de.sayayi.lib.message.internal.part.TemplatePart;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,15 +33,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.Arrays.*;
 import static java.util.Collections.unmodifiableSet;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toSet;
 
 
 /**
  * @author Jeroen Gremmen
  */
-@ToString
-@EqualsAndHashCode(doNotUseGetters = true)
 public class ParameterizedMessage implements Message.WithSpaces
 {
   private static final long serialVersionUID = 800L;
@@ -54,7 +52,7 @@ public class ParameterizedMessage implements Message.WithSpaces
   public ParameterizedMessage(@NotNull List<MessagePart> parts)
   {
     findParameter: {
-      for(final MessagePart part: parts)
+      for(final MessagePart part: requireNonNull(parts, "parts must not be null"))
         if (part instanceof ParameterPart)
           break findParameter;
 
@@ -115,6 +113,26 @@ public class ParameterizedMessage implements Message.WithSpaces
         .filter(p -> p instanceof TemplatePart)
         .map(p -> ((TemplatePart)p).getName())
         .collect(toSet()));
+  }
+
+
+  @Override
+  public boolean equals(Object o)
+  {
+    return o == this ||
+        o instanceof ParameterizedMessage && deepEquals(parts, ((ParameterizedMessage)o).parts);
+  }
+
+
+  @Override
+  public int hashCode() {
+    return 59 + deepHashCode(parts);
+  }
+
+
+  @Override
+  public String toString() {
+    return "ParameterizedMessage(parts=" + deepToString(parts) + ')';
   }
 
 

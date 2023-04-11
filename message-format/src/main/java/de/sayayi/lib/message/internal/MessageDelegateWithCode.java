@@ -20,7 +20,6 @@ import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +32,6 @@ import static java.util.Objects.requireNonNull;
 /**
  * @author Jeroen Gremmen
  */
-@ToString
 public final class MessageDelegateWithCode extends AbstractMessageWithCode
 {
   private static final long serialVersionUID = 800L;
@@ -72,6 +70,12 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
   @Override
   public @NotNull Set<String> getTemplateNames() {
     return message.getTemplateNames();
+  }
+
+
+  @Override
+  public String toString() {
+    return "MessageDelegateWithCode(message=" + message + ')';
   }
 
 

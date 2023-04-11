@@ -18,8 +18,6 @@ package de.sayayi.lib.message.parameter.key;
 import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -33,8 +31,6 @@ import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.TYPELESS
 /**
  * @author Jeroen Gremmen
  */
-@ToString(doNotUseGetters = true)
-@EqualsAndHashCode(doNotUseGetters = true)
 public final class ConfigKeyNull implements ConfigKey
 {
   private static final long serialVersionUID = 800L;
@@ -67,6 +63,24 @@ public final class ConfigKeyNull implements ConfigKey
       return TYPELESS_EXACT;
 
     return MatchResult.MISMATCH;
+  }
+
+
+  @Override
+  public boolean equals(Object o) {
+    return o == this || o instanceof ConfigKeyNull && compareType == ((ConfigKeyNull)o).compareType;
+  }
+
+
+  @Override
+  public int hashCode() {
+    return 59 + compareType.hashCode();
+  }
+
+
+  @Override
+  public String toString() {
+    return "ConfigKeyNull(compareType=" + compareType + ')';
   }
 
 

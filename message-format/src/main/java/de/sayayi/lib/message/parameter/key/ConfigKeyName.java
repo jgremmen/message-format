@@ -18,8 +18,6 @@ package de.sayayi.lib.message.parameter.key;
 import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,8 +32,6 @@ import static java.util.Objects.requireNonNull;
 /**
  * @author Jeroen Gremmen
  */
-@ToString(doNotUseGetters = true)
-@EqualsAndHashCode(doNotUseGetters = true)
 public final class ConfigKeyName implements ConfigKey
 {
   private static final long serialVersionUID = 800L;
@@ -44,7 +40,7 @@ public final class ConfigKeyName implements ConfigKey
 
 
   public ConfigKeyName(@NotNull String name) {
-    this.name = name;
+    this.name = requireNonNull(name, "name must not be null");
   }
 
 
@@ -71,6 +67,24 @@ public final class ConfigKeyName implements ConfigKey
   {
     return (value instanceof CharSequence || value instanceof Character) &&
         value.toString().equals(name) ? EXACT : MISMATCH;
+  }
+
+
+  @Override
+  public boolean equals(Object o) {
+    return o == this || o instanceof ConfigKeyName && name.equals(((ConfigKeyName)o).name);
+  }
+
+
+  @Override
+  public int hashCode() {
+    return 59 + name.hashCode();
+  }
+
+
+  @Override
+  public String toString() {
+    return "ConfigKeyName(name=" + name + ')';
   }
 
 
