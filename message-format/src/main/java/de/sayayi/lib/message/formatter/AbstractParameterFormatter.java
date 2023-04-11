@@ -25,6 +25,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import static de.sayayi.lib.message.parameter.key.ConfigKey.EMPTY_NULL_TYPE;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.Type.*;
 
 
 /**
@@ -33,18 +34,17 @@ import static de.sayayi.lib.message.parameter.key.ConfigKey.EMPTY_NULL_TYPE;
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractParameterFormatter implements ParameterFormatter
 {
-  /**
-   * A set containing all data map key types, except for {@link Type#NAME}.
-   */
+  /** A set containing all data map key types, except for {@link Type#NAME}. */
   protected static final Set<Type> NO_NAME_KEY_TYPES =
-      EnumSet.of(Type.NULL, Type.EMPTY, Type.BOOL, Type.NUMBER, Type.STRING);
+      EnumSet.of(NULL, EMPTY, BOOL, NUMBER, STRING);
 
 
   @Override
   public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value)
   {
     // handle empty, !empty, null and !null first
-    Message.WithSpaces msg = formatterContext.getMapMessage(value, EMPTY_NULL_TYPE).orElse(null);
+    Message.WithSpaces msg =
+        formatterContext.getMapMessage(value, EMPTY_NULL_TYPE).orElse(null);
     if (msg != null)
       return formatterContext.format(msg);
 
@@ -57,7 +57,22 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   }
 
 
-  protected abstract @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value);
+  /**
+   * Format {@code value} using {@code formatterContext}.
+   * <p>
+   * This method differs from {@link #format(FormatterContext, Object)} in that it has already
+   * handled {@code empty} and {@code null} cases matched in the parameter configuration.
+   * <p>
+   * In the same way it will handle {@code empty} and {@code null} cases for the text returned
+   * by this method.
+   *
+   * @param formatterContext  formatter context, not {@code null}
+   * @param value             value to be formatted
+   *
+   * @return  formatted text, never {@code null}
+   */
+  protected abstract @NotNull Text formatValue(@NotNull FormatterContext formatterContext,
+                                               Object value);
 
 
   @Contract(pure = true)
