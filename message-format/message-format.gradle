@@ -30,7 +30,7 @@ def antlrExtVersion = "0.3.0"
 def asmVersion = "9.4"
 def ehcacheVersion = "3.10.8"
 def javaxCacheApiVersion = "1.1.1"
-def springContextVersion = "5.3.25"
+def springContextVersion = "5.3.26"
 
 
 dependencies {
