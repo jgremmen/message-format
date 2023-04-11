@@ -16,12 +16,14 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message.Parameters;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 import java.util.SortedSet;
 
 import static java.util.Collections.emptySortedSet;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -33,8 +35,8 @@ public final class NoParameters implements Parameters
   private final Locale locale;
 
 
-  public NoParameters(Locale locale) {
-    this.locale = locale;
+  public NoParameters(@NotNull Locale locale) {
+    this.locale = requireNonNull(locale, "locale must not be null");
   }
 
 
@@ -45,11 +47,17 @@ public final class NoParameters implements Parameters
 
 
   @Override
+  @Contract("_ -> null")
   public Object getParameterValue(@NotNull String parameter) {
     return null;
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  unmodifiable empty set, never {@code null}
+   */
   @Override
   public @NotNull SortedSet<String> getParameterNames() {
     return emptySortedSet();

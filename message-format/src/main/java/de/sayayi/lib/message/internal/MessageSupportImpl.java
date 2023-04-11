@@ -57,6 +57,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   private final @NotNull Map<String,Message.WithCode> messages = new TreeMap<>();
   private final @NotNull Map<String,Message> templates = new TreeMap<>();
   private final @NotNull MessageSupportAccessor accessor;
+
   private @NotNull Locale locale;
   private @NotNull Predicate<String> messageHandler;
   private @NotNull Predicate<String> templateHandler;
@@ -99,6 +100,9 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
                                                                        boolean value)
   {
+    if (requireNonNull(name, "name must not be null").isEmpty())
+      throw new IllegalArgumentException("name must not be empty");
+
     defaultParameterConfig.put(name, value ? ConfigValueBool.TRUE : ConfigValueBool.FALSE);
     return this;
   }
@@ -108,6 +112,9 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
                                                                        long value)
   {
+    if (requireNonNull(name, "name must not be null").isEmpty())
+      throw new IllegalArgumentException("name must not be empty");
+
     defaultParameterConfig.put(name, new ConfigValueNumber(value));
     return this;
   }
@@ -117,6 +124,9 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
                                                                        @NotNull String value)
   {
+    if (requireNonNull(name, "name must not be null").isEmpty())
+      throw new IllegalArgumentException("name must not be empty");
+
     defaultParameterConfig.put(name, new ConfigValueString(value));
     return this;
   }
@@ -126,6 +136,9 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(
       @NotNull String name, @NotNull Message.WithSpaces value)
   {
+    if (requireNonNull(name, "name must not be null").isEmpty())
+      throw new IllegalArgumentException("name must not be empty");
+
     defaultParameterConfig.put(name, new ConfigValueMessage(value));
     return this;
   }
@@ -135,7 +148,9 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   public @NotNull ConfigurableMessageSupport setMessageHandler(
       @NotNull Predicate<String> messageHandler)
   {
-    this.messageHandler = requireNonNull(messageHandler);
+    this.messageHandler =
+        requireNonNull(messageHandler, "messageHandler must not be null");
+
     return this;
   }
 
@@ -144,7 +159,9 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   public @NotNull ConfigurableMessageSupport setTemplateHandler(
       @NotNull Predicate<String> templateHandler)
   {
-    this.templateHandler = requireNonNull(templateHandler);
+    this.templateHandler =
+        requireNonNull(templateHandler, "templateHandler must not be null");
+
     return this;
   }
 
@@ -152,7 +169,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   @Override
   public void addMessage(@NotNull Message.WithCode message)
   {
-    final String code = requireNonNull(message).getCode();
+    final String code = requireNonNull(message, "message must not be null").getCode();
     if (messageHandler.test(code))
       messages.put(code, message);
   }
@@ -161,7 +178,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   @Override
   public void addTemplate(@NotNull String name, @NotNull Message template)
   {
-    if (requireNonNull(name).isEmpty())
+    if (requireNonNull(name, "name must not be null").isEmpty())
       throw new IllegalArgumentException("name must not be empty");
 
     if (templateHandler.test(name))
@@ -246,7 +263,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   @Override
   public @NotNull MessageConfigurer<Message.WithCode> code(@NotNull String code)
   {
-    final Message.WithCode message = messages.get(requireNonNull(code));
+    final Message.WithCode message =
+        messages.get(requireNonNull(code, "code must not be null"));
     if (message == null)
       throw new IllegalArgumentException("unknown message code '" + code + "'");
 
@@ -322,7 +340,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public @NotNull MessageConfigurer<M> remove(@NotNull String parameter)
     {
-      parameterValues.remove(requireNonNull(parameter));
+      parameterValues.remove(requireNonNull(parameter, "parameter must not be null"));
       return this;
     }
 
@@ -330,7 +348,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public @NotNull MessageConfigurer<M> with(@NotNull String parameter, Object value)
     {
-      if (requireNonNull(parameter).isEmpty())
+      if (requireNonNull(parameter, "parameter must not be null").isEmpty())
         throw new IllegalArgumentException("parameter must not be empty");
 
       parameterValues.put(parameter, value);
