@@ -15,10 +15,8 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
 
 import java.io.Serializable;
 
@@ -26,19 +24,15 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
+ * A formattable type is an ordered type (class). The order is explicitly defined within a range
+ * {@code 0..127}.
  * <p>
- *   A formattable type is an ordered type (class). The order is explicitly defined within a range
- *   {@code 0..127}.
- * </p>
+ * During formatting there may be multiple suitable formatters for a specific value. The order
+ * determines in what order the formatters are presented. The best match (lowest order) will be
+ * used to format the value. However, it can decide to delegate formatting to the next formatter.
  * <p>
- *   During formatting there may be multiple suitable formatters for a specific value. The order
- *   determines in what order the formatters are presented. The best match (lowest order) will be
- *   used to format the value. However, it can decide to delegate formatting to the next formatter.
- * </p>
- * <p>
- *   All formatters bundled with the message format library (except for the string formatter) have a
- *   {@link #DEFAULT_ORDER}.
- * </p>
+ * All formatters bundled with the message format library (except for the string formatter) have
+ * a {@link #DEFAULT_ORDER}.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -46,13 +40,13 @@ import static java.util.Objects.requireNonNull;
  * @see GenericFormatterService
  * @see FormatterContext#delegateToNextFormatter()
  */
-@ToString
 public final class FormattableType implements Comparable<FormattableType>, Serializable
 {
   private static final long serialVersionUID = 800L;
 
   /**
-   * Default order value. If a formattable type has no explicit order, this default value will be used instead.
+   * Default order value. If a formattable type has no explicit order, this default value will be
+   * used instead.
    *
    * @see #getOrder()
    */
@@ -67,28 +61,23 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
 
 
   /**
+   * Constructs a formattable type with a specific {@code order}.
    * <p>
-   *   Constructs a formattable type with a specific {@code order}.
-   * </p>
-   * <p>
-   *   Note: {@code Object} type must be fixed at order 127. If a lower order number is provided
-   *   for this type an {@code IllegalArgumentException} is thrown.
-   * </p>
+   * Note: {@code Object} type must be fixed at order 127. If a lower order number is provided
+   *       for this type an {@code IllegalArgumentException} is thrown.
    *
-   * @param type  type, not {@code null}
+   * @param type   type, not {@code null}
    * @param order  order ({@code 0..127})
    */
-  public FormattableType(@NotNull Class<?> type, @Range(from = 0, to = 127) int order)
+  public FormattableType(@NotNull Class<?> type, byte order)
   {
     if (type == Object.class && order != 127)
       throw new IllegalArgumentException("Object type order must be 127");
-
-    //noinspection ConstantValue
-    if (order < 0 || order > 127)
+    else if (order < 0)
       throw new IllegalArgumentException("order must be in range 0..127");
 
-    this.type = requireNonNull(type);
-    this.order = (byte)order;
+    this.type = requireNonNull(type, "type must not be null");
+    this.order = order;
   }
 
 
@@ -101,7 +90,7 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
    */
   public FormattableType(@NotNull Class<?> type)
   {
-    this.type = requireNonNull(type);
+    this.type = requireNonNull(type, "type must not be null");
     order = type == Object.class ? 127 : DEFAULT_ORDER;
   }
 
@@ -123,14 +112,14 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
    * @return  order in range {@code 0..127}
    */
   @Contract(pure = true)
-  public @Range(from = 0, to = 127) int getOrder() {
+  public byte getOrder() {
     return order;
   }
 
 
   @Override
   public boolean equals(Object o) {
-    return o == this || o instanceof FormattableType && type == ((FormattableType) o).type;
+    return o == this || o instanceof FormattableType && type == ((FormattableType)o).type;
   }
 
 
@@ -149,5 +138,11 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
         cmp = type.getName().compareTo(o.type.getName());
 
     return cmp;
+  }
+
+
+  @Override
+  public String toString() {
+    return "FormattableType(type=" + type + ",order=" + order + ')';
   }
 }

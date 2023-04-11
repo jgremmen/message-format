@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Set;
 
@@ -54,8 +53,12 @@ public interface NamedParameterFormatter extends ParameterFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  unmodifiable empty set, never {@code null}
+   */
   @Override
-  @Unmodifiable
   default @NotNull Set<FormattableType> getFormattableTypes() {
     return emptySet();
   }

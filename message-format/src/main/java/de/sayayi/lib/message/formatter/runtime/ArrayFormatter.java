@@ -38,7 +38,8 @@ import static java.lang.reflect.Array.getLength;
 /**
  * @author Jeroen Gremmen
  */
-public final class ArrayFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
+public final class ArrayFormatter extends AbstractParameterFormatter
+    implements EmptyMatcher, SizeQueryable
 {
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext context, Object array)
@@ -53,18 +54,23 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
     final Class<?> arrayType = array.getClass();
     final Class<?> arrayElementType = arrayType.isPrimitive() ? arrayType.getComponentType() : null;
     final String sep =
-        spacedText(context.getConfigValueString("list-sep").orElse(", ")).getTextWithSpaces();
+        spacedText(context.getConfigValueString("list-sep").orElse(", "))
+            .getTextWithSpaces();
     final String sepLast =
-        spacedText(context.getConfigValueString("list-sep-last").orElse(sep)).getTextWithSpaces();
-    final Text nullText = noSpaceText(context.getConfigValueString("list-null").orElse(""));
-    final Text thisText = noSpaceText(context.getConfigValueString("list-this").orElse("(this array)"));
+        spacedText(context.getConfigValueString("list-sep-last").orElse(sep))
+            .getTextWithSpaces();
+    final Text nullText =
+        noSpaceText(context.getConfigValueString("list-null").orElse(""));
+    final Text thisText =
+        noSpaceText(context.getConfigValueString("list-this").orElse("(this array)"));
     final StringBuilder s = new StringBuilder();
 
     for(int i = 0; i < length; i++)
     {
       final Object value = get(array, i);
       final Text text = value == array
-          ? thisText : value == null ? nullText : context.format(value, arrayElementType, true);
+          ? thisText : value == null
+              ? nullText : context.format(value, arrayElementType, true);
 
       if (!text.isEmpty())
       {
@@ -95,13 +101,13 @@ public final class ArrayFormatter extends AbstractParameterFormatter implements 
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
     return new HashSet<>(Arrays.asList(
-        new FormattableType(Object[].class, 125),
-        new FormattableType(short[].class, 125),
-        new FormattableType(int[].class, 125),
-        new FormattableType(long[].class, 125),
-        new FormattableType(float[].class, 125),
-        new FormattableType(double[].class, 125),
-        new FormattableType(boolean[].class, 125)
+        new FormattableType(Object[].class, (byte)125),
+        new FormattableType(short[].class, (byte)125),
+        new FormattableType(int[].class, (byte)125),
+        new FormattableType(long[].class, (byte)125),
+        new FormattableType(float[].class, (byte)125),
+        new FormattableType(double[].class, (byte)125),
+        new FormattableType(boolean[].class, (byte)125)
     ));
   }
 }

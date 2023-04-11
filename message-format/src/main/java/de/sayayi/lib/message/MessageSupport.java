@@ -21,8 +21,6 @@ import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.parameter.value.ConfigValue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
-import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -479,20 +477,18 @@ public interface MessageSupport
     /**
      * Returns all codes contained in this message bundle.
      *
-     * @return  set with all message codes, never {@code null}
+     * @return  unmodifiable set with all message codes, never {@code null}
      */
     @Contract(value = "-> new", pure = true)
-    @UnmodifiableView
     @NotNull Set<String> getMessageCodes();
 
 
     /**
      * Returns all templates contained in this message builder.
      *
-     * @return  set with all template names, never {@code null}
+     * @return  unmodifiable set with all template names, never {@code null}
      */
     @Contract(value = "-> new", pure = true)
-    @UnmodifiableView
     @NotNull Set<String> getTemplateNames();
 
 
@@ -536,10 +532,9 @@ public interface MessageSupport
      *
      * @param type  type, never {@code null}
      *
-     * @return  formatter for the given {@code type}, never {@code null}
+     * @return  unmodifiable list of formatters for the given {@code type}, never {@code null}
      */
     @Contract(pure = true)
-    @Unmodifiable
     default @NotNull List<ParameterFormatter> getFormatters(@NotNull Class<?> type) {
       return getFormatters(null, type);
     }
@@ -554,11 +549,10 @@ public interface MessageSupport
      * @param format  formatter name
      * @param type    type, never {@code null}
      *
-     * @return  prioritized list of formatters for the given {@code format} and {@code type},
-     *          never {@code null}
+     * @return  unmodifiable prioritized list of formatters for the given {@code format} and
+     *          {@code type}, never {@code null}
      */
     @Contract(pure = true)
-    @Unmodifiable
     @NotNull List<ParameterFormatter> getFormatters(String format, @NotNull Class<?> type);
 
 

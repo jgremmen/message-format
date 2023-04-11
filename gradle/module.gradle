@@ -30,7 +30,7 @@ dependencies {
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
   compileOnly "org.projectlombok:lombok:${lombokVersion}"
-  compileOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
+  compileOnly "org.jetbrains:annotations-java5:${jetbrainsAnnotationsVersion}"
 
   testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
@@ -72,7 +72,7 @@ tasks.withType(Jar) {
     )
   }
 
-  from("${rootDir}") {
+  from(rootDir) {
     include "LICENSE"
     into "META-INF"
     expand(copyright: new Date().format("yyyy"), version: project.version)
@@ -99,7 +99,7 @@ afterEvaluate {
     title "${project.description} ${version}"
 
     (options as StandardJavadocDocletOptions).with {
-      linksOffline "https://javadoc.io/doc/org.jetbrains/annotations/${jetbrainsAnnotationsVersion}/",
+      linksOffline "https://javadoc.io/doc/org.jetbrains/annotations-java5/${jetbrainsAnnotationsVersion}/",
           "${rootDir}/gradle/javadocs/jetbrains-annotations"
 
       encoding 'UTF-8'

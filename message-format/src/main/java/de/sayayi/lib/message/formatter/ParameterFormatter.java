@@ -20,20 +20,17 @@ import de.sayayi.lib.message.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
 
 import java.util.Set;
 
 
 /**
+ * A parameter formatter takes care of formatting a parameter value.
  * <p>
- *   A parameter formatter takes care of formatting a parameter value.
- * </p>
- * <p>
- *   If {@link #getFormattableTypes()} returns a non-empty collection, parameter values that match one of the
- *   types in the collection will be formatted using this parameter formatter. If the returned collection is empty,
- *   the formatter is selected only if it implements {@link NamedParameterFormatter} and is referenced by name.
- * </p>
+ * If {@link #getFormattableTypes()} returns a non-empty collection, parameter values that match
+ * one of the types in the collection will be formatted using this parameter formatter. If the
+ * returned collection is empty, the formatter is selected only if it implements
+ * {@link NamedParameterFormatter} and is referenced by name.
  *
  * @author Jeroen Gremmen
  */
@@ -60,13 +57,10 @@ public interface ParameterFormatter
 
 
   /**
+   * Returns a set of java types which are supported by this formatter.
    * <p>
-   *   Returns a set of java types which are supported by this formatter.
-   * </p>
-   * <p>
-   *   On registration {@link FormatterService.WithRegistry#addFormatter(ParameterFormatter)} existing types
-   *   which are also supported by this formatter will be overridden.
-   * </p>
+   * On registration {@link FormatterService.WithRegistry#addFormatter(ParameterFormatter)}
+   * existing types which are also supported by this formatter will be overridden.
    *
    * @return  a set with supported java types for this formatter, not {@code null}
    */
@@ -87,11 +81,12 @@ public interface ParameterFormatter
     /**
      * Check whether the given {@code value} is empty as defined by this formatter.
      *
-     * @param compareType  comparison type (either {@link CompareType#EQ} or {@link CompareType#NE}),
-     *                     never {@code null}
+     * @param compareType  comparison type (either {@link CompareType#EQ} or
+     *                     {@link CompareType#NE}), never {@code null}
      * @param value        object to check for emptyness, never {@code null}
      *
-     * @return  {@link MatchResult#TYPELESS_EXACT}, {@link MatchResult#TYPELESS_LENIENT} or {@code null}
+     * @return  {@link MatchResult#TYPELESS_EXACT}, {@link MatchResult#TYPELESS_LENIENT} or
+     *          {@code null}
      */
     @Contract(pure = true)
     MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value);
@@ -113,10 +108,9 @@ public interface ParameterFormatter
      *
      * @param value  object to calculate the size of, not {@code null}
      *
-     * @return  value size
+     * @return  value size (&gt;= 0)
      */
     @Contract(pure = true)
-    @Range(from = 0, to = Long.MAX_VALUE)
     long size(@NotNull Object value);
   }
 }

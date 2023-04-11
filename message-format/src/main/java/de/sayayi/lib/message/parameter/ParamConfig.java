@@ -26,7 +26,6 @@ import de.sayayi.lib.message.parameter.value.ConfigValueString;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -81,10 +80,9 @@ public final class ParamConfig implements Serializable
   /**
    * Returns the parameter configuration as a map.
    *
-   * @return  map, never {@code null}
+   * @return  unmodifiable map, never {@code null}
    */
   @Contract(pure = true)
-  @Unmodifiable
   public @NotNull Map<ConfigKey,ConfigValue> getMap() {
     return unmodifiableMap(map);
   }

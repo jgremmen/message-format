@@ -29,7 +29,7 @@ dependencies {
   runtimeOnly project(":message-format-jodatime")
 
   runtimeOnly "org.projectlombok:lombok:${lombokVersion}"
-  runtimeOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
+  runtimeOnly "org.jetbrains:annotations-java5:${jetbrainsAnnotationsVersion}"
 }
 
 

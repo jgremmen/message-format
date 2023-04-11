@@ -18,8 +18,6 @@ package de.sayayi.lib.message.formatter;
 import de.sayayi.lib.message.formatter.runtime.StringFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
-import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
 
@@ -32,23 +30,20 @@ import java.util.List;
 public interface FormatterService
 {
   /**
+   * Returns a list of data formatters for the given {@code format} and {@code type}.
    * <p>
-   *   Returns a list of data formatters for the given {@code format} and {@code type}.
-   * </p>
-   * <p>
-   *   Implementing classes must make sure that for any combination of {@code format} and {@code type} this function
-   *   always returns at least 1 formatter. A good choice for a default formatter would be {@link StringFormatter}.
-   * </p>
+   * Implementing classes must make sure that for any combination of {@code format} and {@code type}
+   * this function always returns at least 1 formatter. A good choice for a default formatter would
+   * be {@link StringFormatter}.
    *
    * @param format  name of the formatter or {@code null}
    * @param type    type of the value to format
    *
-   * @return  list of prioritized data formatters, never {@code null} and never empty
+   * @return  unmodifiable list of prioritized data formatters, never {@code null} and never empty
    *
    * @see GenericFormatterService
    */
   @Contract(pure = true)
-  @Unmodifiable
   @NotNull List<ParameterFormatter> getFormatters(String format, @NotNull Class<?> type);
 
 
@@ -61,7 +56,8 @@ public interface FormatterService
   interface WithRegistry extends FormatterService
   {
     @Contract(mutates = "this")
-    void addFormatterForType(@NotNull FormattableType formattableType, @NotNull ParameterFormatter formatter);
+    void addFormatterForType(@NotNull FormattableType formattableType,
+                             @NotNull ParameterFormatter formatter);
 
 
     /**
@@ -80,6 +76,6 @@ public interface FormatterService
      * @since 0.8.0
      */
     @Contract(mutates = "this")
-    void setFormattableTypeOrder(@NotNull Class<?> type, @Range(from = 0, to = 127) int order);
+    void setFormattableTypeOrder(@NotNull Class<?> type, byte order);
   }
 }

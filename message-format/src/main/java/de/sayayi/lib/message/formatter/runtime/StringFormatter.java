@@ -40,7 +40,8 @@ import static java.util.Arrays.asList;
 /**
  * @author Jeroen Gremmen
  */
-public final class StringFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
+public final class StringFormatter extends AbstractParameterFormatter
+    implements EmptyMatcher, SizeQueryable
 {
   @Override
   @Contract(pure = true)
@@ -84,7 +85,7 @@ public final class StringFormatter extends AbstractParameterFormatter implements
   {
     return new HashSet<>(asList(
         new FormattableType(CharSequence.class),
-        new FormattableType(char[].class, 125)
+        new FormattableType(char[].class, (byte)125)
     ));
   }
 }

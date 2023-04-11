@@ -109,8 +109,8 @@ public class ArrayFormatterTest extends AbstractFormatterTest
       public @NotNull Set<FormattableType> getFormattableTypes()
       {
         return new HashSet<>(Arrays.asList(
-            new FormattableType(Boolean.class, 10),
-            new FormattableType(boolean.class, 10)));
+            new FormattableType(Boolean.class, (byte)10),
+            new FormattableType(boolean.class, (byte)10)));
       }
     });
 

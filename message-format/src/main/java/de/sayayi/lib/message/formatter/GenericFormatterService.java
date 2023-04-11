@@ -19,7 +19,6 @@ import de.sayayi.lib.message.formatter.runtime.StringFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,6 +29,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 import static java.util.Collections.*;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -43,7 +43,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   private static final @NotNull Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
 
   private final @NotNull Map<String,NamedParameterFormatter> namedFormatters = new ConcurrentHashMap<>();
-  private final @NotNull Map<Class<?>,Integer> typeOrderMap = new ConcurrentHashMap<>();
+  private final @NotNull Map<Class<?>,Byte> typeOrderMap = new ConcurrentHashMap<>();
   private final @NotNull Map<Class<?>,ParameterFormatter> typeFormatters = new ConcurrentHashMap<>();
   private final @NotNull Map<Class<?>,List<ParameterFormatter>> cachedFormatters =
       synchronizedMap(new FixedSizeCacheMap<>(CLASS_SORTER, 256));
@@ -68,12 +68,14 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
   @Override
   @MustBeInvokedByOverriders
-  public void addFormatterForType(@NotNull FormattableType formattableType, @NotNull ParameterFormatter formatter)
+  public void addFormatterForType(@NotNull FormattableType formattableType,
+                                  @NotNull ParameterFormatter formatter)
   {
-    final Class<?> type = formattableType.getType();
+    final Class<?> type =
+        requireNonNull(formattableType, "formattableType must not be null").getType();
 
     typeOrderMap.put(type, formattableType.getOrder());
-    typeFormatters.put(type, formatter);
+    typeFormatters.put(type, requireNonNull(formatter, "formatter must not be null"));
     cachedFormatters.clear();
   }
 
@@ -82,6 +84,8 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   @MustBeInvokedByOverriders
   public void addFormatter(@NotNull ParameterFormatter formatter)
   {
+    requireNonNull(formatter, "formatter must not be null");
+
     if (formatter instanceof NamedParameterFormatter)
     {
       final String format = ((NamedParameterFormatter)formatter).getName();
@@ -98,10 +102,12 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
   @Override
   @MustBeInvokedByOverriders
-  public void setFormattableTypeOrder(@NotNull Class<?> type, @Range(from = 0, to = 127) int order)
+  public void setFormattableTypeOrder(@NotNull Class<?> type, byte order)
   {
-    if (type == Object.class && order != 127)
+    if (requireNonNull(type, "type must not be null") == Object.class && order != 127)
       throw new IllegalArgumentException("Object type order must be 127");
+    else if (order < 0)
+      throw new IllegalArgumentException("order must be in range 0..127");
 
     if (typeFormatters.containsKey(type))
     {
@@ -114,6 +120,8 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   @Override
   public @NotNull List<ParameterFormatter> getFormatters(String format, @NotNull Class<?> type)
   {
+    requireNonNull(type, "type must not be null");
+
     if (format != null)
     {
       final NamedParameterFormatter namedFormatter = namedFormatters.get(format);
@@ -155,7 +163,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   @Contract(pure = true)
   private FormattableType convertToFormattableType(@NotNull Class<?> type)
   {
-    final Integer order = typeOrderMap.get(type);
+    final Byte order = typeOrderMap.get(type);
 
     return order == null ? null : new FormattableType(type, order);
   }

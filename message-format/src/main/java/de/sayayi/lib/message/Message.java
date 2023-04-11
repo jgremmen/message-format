@@ -19,7 +19,6 @@ import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.internal.NoParameters;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.Serializable;
 import java.util.*;
@@ -95,7 +94,6 @@ public interface Message extends Serializable
    * @return  template names, never {@code null}
    */
   @Contract(pure = true)
-  @Unmodifiable
   @NotNull Set<String> getTemplateNames();
 
 
@@ -150,20 +148,18 @@ public interface Message extends Serializable
     /**
      * Returns a set of all available locales this message supports.
      *
-     * @return  all available locales, never {@code null}
+     * @return  unmodifiable set of all available locales, never {@code null}
      */
     @Contract(pure = true)
-    @Unmodifiable
     @NotNull Set<Locale> getLocales();
 
 
     /**
      * Returns a map of all messages keyed by locale.
      *
-     * @return  map of all messages keyed by locale, never {@code null}
+     * @return  unmodifiable map of all messages keyed by locale, never {@code null}
      */
     @Contract(pure = true)
-    @Unmodifiable
     @NotNull Map<Locale,Message> getLocalizedMessages();
   }
 

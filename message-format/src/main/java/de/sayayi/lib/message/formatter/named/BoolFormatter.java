@@ -35,12 +35,14 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.EMPTY_NULL_TYPE;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.Type.BOOL;
 import static java.util.Arrays.asList;
+import static java.util.Objects.requireNonNull;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class BoolFormatter extends AbstractParameterFormatter implements NamedParameterFormatter
+public final class BoolFormatter extends AbstractParameterFormatter
+    implements NamedParameterFormatter
 {
   @Override
   @Contract(pure = true)
@@ -52,6 +54,8 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
   @Override
   public boolean canFormat(@NotNull Class<?> type)
   {
+    requireNonNull(type, "type must not be null");
+
     return
         type == Boolean.class || type == boolean.class ||
         Number.class.isAssignableFrom(type) ||
@@ -68,7 +72,9 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
   @Contract(pure = true)
   public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value)
   {
-    Message.WithSpaces msg = formatterContext.getMapMessage(value, EMPTY_NULL_TYPE).orElse(null);
+    Message.WithSpaces msg =
+        requireNonNull(formatterContext, "formatterContext must not be null")
+            .getMapMessage(value, EMPTY_NULL_TYPE).orElse(null);
     if (msg != null)
       return formatterContext.format(msg);
 
@@ -83,7 +89,8 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
       bool = ((java.math.BigInteger)value).signum() != 0;
     else if (value instanceof BigDecimal)
       bool = ((java.math.BigDecimal)value).signum() != 0;
-    else if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long)
+    else if (value instanceof Byte || value instanceof Short || value instanceof Integer ||
+             value instanceof Long)
       bool = ((Number)value).longValue() != 0;
     else if (value instanceof Number)
       bool = Math.signum(((Number)value).doubleValue()) != 0;
@@ -109,6 +116,6 @@ public final class BoolFormatter extends AbstractParameterFormatter implements N
   {
     return new HashSet<>(asList(
         new FormattableType(Boolean.class),
-        new FormattableType(boolean.class, 125)));
+        new FormattableType(boolean.class, (byte)125)));
   }
 }
