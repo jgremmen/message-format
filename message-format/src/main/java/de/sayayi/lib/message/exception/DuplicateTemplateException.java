@@ -22,8 +22,8 @@ import java.util.function.Predicate;
 
 
 /**
- * Duplicate template exception. This exception is thrown by the default template handler if a template
- * with the same name is published twice.
+ * Duplicate template exception. This exception is thrown by the default template handler if a
+ * template with the same name is published twice.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

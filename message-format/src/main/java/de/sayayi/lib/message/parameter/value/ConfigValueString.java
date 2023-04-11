@@ -113,7 +113,8 @@ public final class ConfigValueString implements ConfigValue
    *
    * @since 0.8.0
    */
-  public static @NotNull ConfigValueString unpack(@NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigValueString unpack(@NotNull PackInputStream packStream)
+      throws IOException {
     return new ConfigValueString(requireNonNull(packStream.readString()));
   }
 }

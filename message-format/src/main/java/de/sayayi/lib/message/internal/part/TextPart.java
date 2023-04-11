@@ -94,7 +94,8 @@ public final class TextPart implements Text
     if (isEmpty())
       return spaceBefore || spaceAfter ? " " : "";
 
-    return spaceBefore ? !spaceAfter ? ' ' + text : ' ' + text + ' ' : spaceAfter ? text + ' ' : text;
+    return spaceBefore ? !spaceAfter ? ' ' + text : ' ' + text + ' ' : spaceAfter
+        ? text + ' ' : text;
   }
 
 

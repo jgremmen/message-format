@@ -101,7 +101,8 @@ public final class ConfigKeyEmpty implements ConfigKey
    *
    * @since 0.8.0
    */
-  public static @NotNull ConfigKeyEmpty unpack(@NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigKeyEmpty unpack(@NotNull PackInputStream packStream)
+      throws IOException {
     return new ConfigKeyEmpty(packStream.readEnum(CompareType.class));
   }
 }

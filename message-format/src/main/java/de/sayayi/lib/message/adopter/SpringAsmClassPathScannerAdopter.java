@@ -65,9 +65,10 @@ public final class SpringAsmClassPathScannerAdopter extends AbstractAsmClassPath
   private static final String TEXT_DESCRIPTOR = getDescriptor(Text.class);
 
 
-  public SpringAsmClassPathScannerAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport,
-                                          @NotNull Set<String> packageNames,
-                                          @NotNull ResourceLoader resourceLoader) {
+  public SpringAsmClassPathScannerAdopter(
+      @NotNull ConfigurableMessageSupport configurableMessageSupport,
+      @NotNull Set<String> packageNames,
+      @NotNull ResourceLoader resourceLoader) {
     super(configurableMessageSupport, packageNames, resourceLoader.getClassLoader());
   }
 
@@ -161,8 +162,10 @@ public final class SpringAsmClassPathScannerAdopter extends AbstractAsmClassPath
     {
       return new AnnotationVisitor(ASM9) {
         @Override
-        public AnnotationVisitor visitAnnotation(String name, String descriptor) {
-          return MESSAGE_DEF_DESCRIPTOR.equals(descriptor) ? new MessageDefAnnotationVisitor() : null;
+        public AnnotationVisitor visitAnnotation(String name, String descriptor)
+        {
+          return MESSAGE_DEF_DESCRIPTOR.equals(descriptor)
+              ? new MessageDefAnnotationVisitor() : null;
         }
       };
     }
@@ -226,8 +229,10 @@ public final class SpringAsmClassPathScannerAdopter extends AbstractAsmClassPath
     {
       return new AnnotationVisitor(ASM9) {
         @Override
-        public AnnotationVisitor visitAnnotation(String name, String descriptor) {
-          return TEMPLATE_DEF_DESCRIPTOR.equals(descriptor) ? new TemplateDefAnnotationVisitor() : null;
+        public AnnotationVisitor visitAnnotation(String name, String descriptor)
+        {
+          return TEMPLATE_DEF_DESCRIPTOR.equals(descriptor)
+              ? new TemplateDefAnnotationVisitor() : null;
         }
       };
     }

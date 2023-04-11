@@ -60,7 +60,8 @@ public class AnnotationAdopter extends AbstractMessageAdopter
    * @param messageFactory  message factory, not {@code null}
    * @param publisher       message publisher, not {@code null}
    */
-  public AnnotationAdopter(@NotNull MessageFactory messageFactory, @NotNull MessagePublisher publisher) {
+  public AnnotationAdopter(@NotNull MessageFactory messageFactory,
+                           @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);
   }
 
@@ -124,7 +125,8 @@ public class AnnotationAdopter extends AbstractMessageAdopter
       for(final Text text: texts)
       {
         final Locale locale = forLanguageTag(text.locale());
-        final String value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
+        final String value = text.locale().isEmpty() &&
+            text.text().isEmpty() ? text.value() : text.text();
 
         if (!localizedTexts.containsKey(locale))
           localizedTexts.put(locale, value);
@@ -163,7 +165,8 @@ public class AnnotationAdopter extends AbstractMessageAdopter
     for(final Text text: texts)
     {
       final Locale locale = forLanguageTag(text.locale());
-      final String value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
+      final String value = text.locale().isEmpty() &&
+          text.text().isEmpty() ? text.value() : text.text();
 
       if (!localizedTexts.containsKey(locale))
         localizedTexts.put(locale, value);
@@ -178,8 +181,8 @@ public class AnnotationAdopter extends AbstractMessageAdopter
   /**
    * Adopt all the annotations ({@link MessageDef}, {@link TemplateDef}) found in the given class.
    * <p>
-   * This method analyses the given {@code type} as well as all super classes and interfaces. It will
-   * look at the class and method level for message annotations.
+   * This method analyses the given {@code type} as well as all super classes and interfaces.
+   * It will look at the class and method level for message annotations.
    *
    * @param type  type to adopt messages from, not {@code null}
    *
@@ -191,7 +194,8 @@ public class AnnotationAdopter extends AbstractMessageAdopter
   @SuppressWarnings("ResultOfMethodCallIgnored")
   public @NotNull AnnotationAdopter adoptAll(@NotNull Class<?> type)
   {
-    for(Class<?> clazz = type; clazz != null && clazz != Object.class; clazz = clazz.getSuperclass())
+    for(Class<?> clazz = type; clazz != null && clazz != Object.class;
+        clazz = clazz.getSuperclass())
       if (!indexedClasses.contains(clazz))
       {
         for(final Class<?> ifClass: clazz.getInterfaces())

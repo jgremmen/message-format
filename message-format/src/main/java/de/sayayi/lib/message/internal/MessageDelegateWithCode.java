@@ -101,7 +101,9 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
    */
   public static @NotNull Message.WithCode unpack(@NotNull PackHelper unpack,
                                                  @NotNull PackInputStream packStream)
-      throws IOException {
-    return new MessageDelegateWithCode(requireNonNull(packStream.readString()), unpack.unpackMessage(packStream));
+      throws IOException
+  {
+    return new MessageDelegateWithCode(requireNonNull(packStream.readString()),
+        unpack.unpackMessage(packStream));
   }
 }

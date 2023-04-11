@@ -102,7 +102,8 @@ public final class SpringClassPathScannerAdopter extends AbstractMessageAdopter
 
 
 
-  private final class ClassPathScanningMessagesProvider extends ClassPathScanningCandidateComponentProvider
+  private final class ClassPathScanningMessagesProvider
+      extends ClassPathScanningCandidateComponentProvider
   {
     private final Set<String> visitedClassnames;
 
@@ -158,7 +159,9 @@ public final class SpringClassPathScannerAdopter extends AbstractMessageAdopter
 
     private void handleMessageDefsAnnotations(MergedAnnotations annotations)
     {
-      MergedAnnotation<MessageDefs> messageDefsAnnotation = annotations.get(MESSAGE_DEFS_ANNOTATION_CLASSNAME);
+      MergedAnnotation<MessageDefs> messageDefsAnnotation =
+          annotations.get(MESSAGE_DEFS_ANNOTATION_CLASSNAME);
+
       if (messageDefsAnnotation.isDirectlyPresent())
         handleMessageDefs(messageDefsAnnotation);
     }
@@ -166,7 +169,9 @@ public final class SpringClassPathScannerAdopter extends AbstractMessageAdopter
 
     private void handleMessageDefAnnotations(MergedAnnotations annotations)
     {
-      MergedAnnotation<MessageDef> messageDefAnnotation = annotations.get(MESSAGE_DEF_ANNOTATION_CLASSNAME);
+      MergedAnnotation<MessageDef> messageDefAnnotation =
+          annotations.get(MESSAGE_DEF_ANNOTATION_CLASSNAME);
+
       if (messageDefAnnotation.isDirectlyPresent())
         handleMessageDef(messageDefAnnotation);
     }
@@ -200,7 +205,9 @@ public final class SpringClassPathScannerAdopter extends AbstractMessageAdopter
 
     private void handleTemplateDefsAnnotations(MergedAnnotations annotations)
     {
-      MergedAnnotation<TemplateDefs> templateDefsAnnotation = annotations.get(TEMPLATE_DEFS_ANNOTATION_CLASSNAME);
+      MergedAnnotation<TemplateDefs> templateDefsAnnotation =
+          annotations.get(TEMPLATE_DEFS_ANNOTATION_CLASSNAME);
+
       if (templateDefsAnnotation.isDirectlyPresent())
         handleTemplateDefs(templateDefsAnnotation);
     }
@@ -208,7 +215,9 @@ public final class SpringClassPathScannerAdopter extends AbstractMessageAdopter
 
     private void handleTemplateDefAnnotations(MergedAnnotations annotations)
     {
-      MergedAnnotation<TemplateDef> templateDefAnnotation = annotations.get(TEMPLATE_DEF_ANNOTATION_CLASSNAME);
+      MergedAnnotation<TemplateDef> templateDefAnnotation =
+          annotations.get(TEMPLATE_DEF_ANNOTATION_CLASSNAME);
+
       if (templateDefAnnotation.isDirectlyPresent())
         handleTemplateDef(templateDefAnnotation);
     }

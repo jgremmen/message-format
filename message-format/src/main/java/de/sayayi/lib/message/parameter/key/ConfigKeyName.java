@@ -69,8 +69,8 @@ public final class ConfigKeyName implements ConfigKey
   public @NotNull MatchResult match(@NotNull MessageSupportAccessor messageSupportAccessor,
                                     @NotNull Locale locale, Object value)
   {
-    return (value instanceof CharSequence || value instanceof Character) && value.toString().equals(name)
-        ? EXACT : MISMATCH;
+    return (value instanceof CharSequence || value instanceof Character) &&
+        value.toString().equals(name) ? EXACT : MISMATCH;
   }
 
 
@@ -95,7 +95,8 @@ public final class ConfigKeyName implements ConfigKey
    *
    * @since 0.8.0
    */
-  public static @NotNull ConfigKeyName unpack(@NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigKeyName unpack(@NotNull PackInputStream packStream)
+      throws IOException {
     return new ConfigKeyName(requireNonNull(packStream.readString()));
   }
 }

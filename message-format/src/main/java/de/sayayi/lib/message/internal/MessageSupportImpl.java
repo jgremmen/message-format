@@ -96,7 +96,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, boolean value)
+  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
+                                                                       boolean value)
   {
     defaultParameterConfig.put(name, value ? ConfigValueBool.TRUE : ConfigValueBool.FALSE);
     return this;
@@ -104,7 +105,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, long value)
+  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
+                                                                       long value)
   {
     defaultParameterConfig.put(name, new ConfigValueNumber(value));
     return this;
@@ -112,7 +114,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, @NotNull String value)
+  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
+                                                                       @NotNull String value)
   {
     defaultParameterConfig.put(name, new ConfigValueString(value));
     return this;
@@ -120,8 +123,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
-                                                                       @NotNull Message.WithSpaces value)
+  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(
+      @NotNull String name, @NotNull Message.WithSpaces value)
   {
     defaultParameterConfig.put(name, new ConfigValueMessage(value));
     return this;
@@ -129,7 +132,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setMessageHandler(@NotNull Predicate<String> messageHandler)
+  public @NotNull ConfigurableMessageSupport setMessageHandler(
+      @NotNull Predicate<String> messageHandler)
   {
     this.messageHandler = requireNonNull(messageHandler);
     return this;
@@ -137,7 +141,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setTemplateHandler(@NotNull Predicate<String> templateHandler)
+  public @NotNull ConfigurableMessageSupport setTemplateHandler(
+      @NotNull Predicate<String> templateHandler)
   {
     this.templateHandler = requireNonNull(templateHandler);
     return this;
@@ -202,8 +207,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public void exportMessages(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
-      throws IOException
+  public void exportMessages(@NotNull OutputStream stream, boolean compress,
+                             Predicate<String> messageCodeFilter) throws IOException
   {
     if (messageCodeFilter == null)
       messageCodeFilter = c -> true;
@@ -273,7 +278,10 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   protected boolean failOnDuplicateTemplate(@NotNull String name)
   {
     if (templates.containsKey(name))
-      throw new DuplicateTemplateException(name, "Template with name '" + name + "' already exists");
+    {
+      throw new DuplicateTemplateException(name, "Template with name '" + name +
+          "' already exists");
+    }
 
     return true;
   }

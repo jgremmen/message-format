@@ -57,7 +57,9 @@ abstract class AbstractMessageWithCode implements Message.WithCode
 
 
   @Override
-  public boolean equals(Object o) {
-    return this == o || (o instanceof AbstractMessageWithCode && code.equals(((AbstractMessageWithCode)o).code));
+  public boolean equals(Object o)
+  {
+    return this == o ||
+        (o instanceof AbstractMessageWithCode && code.equals(((AbstractMessageWithCode)o).code));
   }
 }

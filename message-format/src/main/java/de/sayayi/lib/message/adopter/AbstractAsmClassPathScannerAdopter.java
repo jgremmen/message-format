@@ -65,8 +65,9 @@ abstract class AbstractAsmClassPathScannerAdopter extends AbstractMessageAdopter
   protected final AnnotationAdopter annotationAdopter;
 
 
-  protected AbstractAsmClassPathScannerAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport,
-                                               @NotNull Set<String> packageNames, ClassLoader classLoader)
+  protected AbstractAsmClassPathScannerAdopter(
+      @NotNull ConfigurableMessageSupport configurableMessageSupport,
+      @NotNull Set<String> packageNames, ClassLoader classLoader)
   {
     this(configurableMessageSupport.getAccessor().getMessageFactory(), configurableMessageSupport,
         packageNames, classLoader);
@@ -106,7 +107,8 @@ abstract class AbstractAsmClassPathScannerAdopter extends AbstractMessageAdopter
     if (!classPathPrefix.endsWith("/"))
       classPathPrefix = classPathPrefix + '/';
 
-    for(final Enumeration<URL> urls = classLoader.getResources(classPathPrefix); urls.hasMoreElements();)
+    for(final Enumeration<URL> urls = classLoader.getResources(classPathPrefix);
+        urls.hasMoreElements();)
     {
       val url = urls.nextElement();
 
@@ -125,7 +127,8 @@ abstract class AbstractAsmClassPathScannerAdopter extends AbstractMessageAdopter
   }
 
 
-  private void scan_directory(@NotNull File baseDirectory, @NotNull File directory) throws IOException
+  private void scan_directory(@NotNull File baseDirectory, @NotNull File directory)
+      throws IOException
   {
     val files = directory.listFiles();
     if (files != null)
@@ -137,8 +140,8 @@ abstract class AbstractAsmClassPathScannerAdopter extends AbstractMessageAdopter
           scan_directory(baseDirectory, file);
         else
         {
-          val classNamePath =
-              baseDirectoryPath.relativize(file.toPath()).toString().replace('\\', '/');
+          val classNamePath = baseDirectoryPath
+              .relativize(file.toPath()).toString().replace('\\', '/');
 
           if (classNamePath.endsWith(".class") && scan_checkVisited(classNamePath))
           {
@@ -151,7 +154,8 @@ abstract class AbstractAsmClassPathScannerAdopter extends AbstractMessageAdopter
   }
 
 
-  private void scan_zipEntries(@NotNull URL zipUrl, @NotNull String classPathPrefix) throws IOException
+  private void scan_zipEntries(@NotNull URL zipUrl, @NotNull String classPathPrefix)
+      throws IOException
   {
     val con = zipUrl.openConnection();
     final ZipFile zipFile;
@@ -166,7 +170,8 @@ abstract class AbstractAsmClassPathScannerAdopter extends AbstractMessageAdopter
         if (separatorIndex == -1)
           separatorIndex = urlFile.indexOf("!/");
 
-        zipFile = scan_createZipFileFromUrl(separatorIndex != -1 ? urlFile.substring(0, separatorIndex) : urlFile);
+        zipFile = scan_createZipFileFromUrl(separatorIndex != -1
+            ? urlFile.substring(0, separatorIndex) : urlFile);
       } catch(ZipException ex) {
         return;
       }
@@ -198,7 +203,8 @@ abstract class AbstractAsmClassPathScannerAdopter extends AbstractMessageAdopter
     if (zipFileUrl.startsWith("file:"))
     {
       try {
-        return new JarFile(new URI(zipFileUrl.replace(" ", "%20")).getSchemeSpecificPart());
+        return new JarFile(
+            new URI(zipFileUrl.replace(" ", "%20")).getSchemeSpecificPart());
       } catch(URISyntaxException ex) {
         return new JarFile(zipFileUrl.substring(5));
       }

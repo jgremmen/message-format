@@ -126,11 +126,13 @@ public final class ParamConfig implements Serializable
 
 
   @Contract(pure = true)
-  public Message.WithSpaces getMessage(@NotNull MessageSupportAccessor messageSupportAccessor, Object key,
-                                       @NotNull Parameters parameters, @NotNull Set<ConfigKey.Type> keyTypes,
+  public Message.WithSpaces getMessage(@NotNull MessageSupportAccessor messageSupportAccessor,
+                                       Object key, @NotNull Parameters parameters,
+                                       @NotNull Set<ConfigKey.Type> keyTypes,
                                        boolean includeDefault)
   {
-    ConfigValue configValue = find(messageSupportAccessor, key, parameters, keyTypes, STRING_MESSAGE_TYPE);
+    ConfigValue configValue =
+        find(messageSupportAccessor, key, parameters, keyTypes, STRING_MESSAGE_TYPE);
 
     if (configValue == null)
     {

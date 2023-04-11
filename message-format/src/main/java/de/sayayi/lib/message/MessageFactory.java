@@ -44,12 +44,16 @@ public class MessageFactory
   /**
    * Shared message factory without any caching capabilities.
    * <p>
-   * This message factory will suffice in most cases. However, if you have a large amount of messages,
-   * it is better to construct a message factory with an appropriate {@link MessagePartNormalizer}.
+   * This message factory will suffice in most cases. However, if you have a large amount of
+   * messages, it is better to construct a message factory with an appropriate
+   * {@link MessagePartNormalizer}.
    */
-  public static final MessageFactory NO_CACHE_INSTANCE = new MessageFactory(new MessagePartNormalizer() {
-    @Override public <T extends MessagePart> @NotNull T normalize(@NotNull T part) { return part; }
-  });
+  public static final MessageFactory NO_CACHE_INSTANCE =
+      new MessageFactory(new MessagePartNormalizer() {
+        @Override public <T extends MessagePart> @NotNull T normalize(@NotNull T part) {
+          return part;
+        }
+      });
 
   private static final AtomicInteger CODE_ID = new AtomicInteger(0);
 
@@ -158,7 +162,8 @@ public class MessageFactory
 
     localizedTexts.forEach((locale,text) -> localizedMessages.put(locale, parseMessage(text)));
 
-    return new LocalizedMessageBundleWithCode("Template::" + CODE_ID.incrementAndGet(), localizedMessages);
+    return new LocalizedMessageBundleWithCode("Template::" + CODE_ID.incrementAndGet(),
+        localizedMessages);
   }
 
 

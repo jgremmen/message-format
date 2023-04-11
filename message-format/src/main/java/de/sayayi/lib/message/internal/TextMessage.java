@@ -81,7 +81,8 @@ public final class TextMessage implements Message.WithSpaces
 
 
   @Override
-  public @NotNull String format(@NotNull MessageSupportAccessor messageSupport, @NotNull Parameters parameters) {
+  public @NotNull String format(@NotNull MessageSupportAccessor messageSupport,
+                                @NotNull Parameters parameters) {
     return text == null ? "" : text;
   }
 
@@ -155,7 +156,8 @@ public final class TextMessage implements Message.WithSpaces
    *
    * @since 0.8.0
    */
-  public static @NotNull Message.WithSpaces unpack(@NotNull PackInputStream packStream) throws IOException
+  public static @NotNull Message.WithSpaces unpack(@NotNull PackInputStream packStream)
+      throws IOException
   {
     final boolean spaceBefore = packStream.readBoolean();
     final boolean spaceAfter = packStream.readBoolean();

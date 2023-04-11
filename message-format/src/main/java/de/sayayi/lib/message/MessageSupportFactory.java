@@ -77,8 +77,9 @@ public final class MessageSupportFactory
    * @return  new message support instance, never {@code null}
    */
   @Contract(value = "_, _ -> new")
-  public static @NotNull ConfigurableMessageSupport create(@NotNull FormatterService formatterService,
-                                                           @NotNull MessageFactory messageFactory) {
+  public static @NotNull ConfigurableMessageSupport create(
+      @NotNull FormatterService formatterService,
+      @NotNull MessageFactory messageFactory) {
     return new MessageSupportImpl(formatterService, messageFactory);
   }
 
@@ -99,13 +100,15 @@ public final class MessageSupportFactory
 
 
     @Override
-    public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, boolean value) {
+    public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
+                                                                         boolean value) {
       throw new UnsupportedOperationException("shared message support");
     }
 
 
     @Override
-    public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, long value) {
+    public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
+                                                                         long value) {
       throw new UnsupportedOperationException("shared message support");
     }
 
@@ -118,8 +121,9 @@ public final class MessageSupportFactory
 
 
     @Override
-    public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
-                                                                         @NotNull Message.WithSpaces value) {
+    public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(
+        @NotNull String name,
+        @NotNull Message.WithSpaces value) {
       throw new UnsupportedOperationException("shared message support");
     }
 

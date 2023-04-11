@@ -61,7 +61,8 @@ public final class MessagePartFactory
    *
    * @param text  text, or {@code null}
    *
-   * @return  text part representing the given {@code text} without leading/trailing space, never {@code null}
+   * @return  text part representing the given {@code text} without leading/trailing space,
+   *          never {@code null}
    */
   @Contract(pure = true)
   public static @NotNull Text noSpaceText(String text) {
@@ -74,7 +75,8 @@ public final class MessagePartFactory
    *
    * @param text  text, or {@code null}
    *
-   * @return  text part representing the given {@code text} preserving leading/trailing space, never {@code null}
+   * @return  text part representing the given {@code text} preserving leading/trailing space,
+   *          never {@code null}
    */
   @Contract(pure = true)
   public static @NotNull Text spacedText(String text) {
@@ -83,7 +85,8 @@ public final class MessagePartFactory
 
 
   @Contract(value = "_, false, false -> param1", pure = true)
-  public static @NotNull Text addSpaces(@NotNull Text text, boolean addSpaceBefore, boolean addSpaceAfter)
+  public static @NotNull Text addSpaces(@NotNull Text text, boolean addSpaceBefore,
+                                        boolean addSpaceAfter)
   {
     final boolean textSpaceBefore = text.isSpaceBefore();
     final boolean textSpaceAfter = text.isSpaceAfter();

@@ -40,14 +40,10 @@ import static org.objectweb.asm.Type.getDescriptor;
 
 
 /**
+ * The Asm classpath scanner scans classes and publishes the annotated messages found.
  * <p>
- *   The Asm classpath scanner scans classes and publishes the annotated messages found.
- * </p>
- * <p>
- *   The scanned classes are not loaded by the classloader but instead are analysed using the ASM library.
- *   Using this class therefore requires a dependency with library {@code org.ow2.asm:asm:9.4}.
- * </p>
- *
+ * The scanned classes are not loaded by the classloader but instead are analysed using the
+ * ASM library. Using this class therefore requires a dependency with library {@code org.ow2.asm:asm:9.4}.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -158,8 +154,10 @@ public final class AsmClassPathScannerAdopter extends AbstractAsmClassPathScanne
     {
       return new AnnotationVisitor(ASM9) {
         @Override
-        public AnnotationVisitor visitAnnotation(String name, String descriptor) {
-          return MESSAGE_DEF_DESCRIPTOR.equals(descriptor) ? new MessageDefAnnotationVisitor() : null;
+        public AnnotationVisitor visitAnnotation(String name, String descriptor)
+        {
+          return MESSAGE_DEF_DESCRIPTOR.equals(descriptor)
+              ? new MessageDefAnnotationVisitor() : null;
         }
       };
     }
@@ -223,8 +221,10 @@ public final class AsmClassPathScannerAdopter extends AbstractAsmClassPathScanne
     {
       return new AnnotationVisitor(ASM9) {
         @Override
-        public AnnotationVisitor visitAnnotation(String name, String descriptor) {
-          return TEMPLATE_DEF_DESCRIPTOR.equals(descriptor) ? new TemplateDefAnnotationVisitor() : null;
+        public AnnotationVisitor visitAnnotation(String name, String descriptor)
+        {
+          return TEMPLATE_DEF_DESCRIPTOR.equals(descriptor)
+              ? new TemplateDefAnnotationVisitor() : null;
         }
       };
     }

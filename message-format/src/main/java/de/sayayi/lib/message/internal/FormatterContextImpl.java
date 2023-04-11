@@ -93,14 +93,16 @@ public final class FormatterContextImpl implements FormatterContext
 
 
   @Override
-  public @NotNull Optional<ConfigValue> getMapValue(Object key, @NotNull Set<ConfigKey.Type> keyTypes,
+  public @NotNull Optional<ConfigValue> getMapValue(Object key,
+                                                    @NotNull Set<ConfigKey.Type> keyTypes,
                                                     Set<ConfigValue.Type> valueTypes) {
     return Optional.ofNullable(map.find(messageSupport, key, parameters, keyTypes, valueTypes));
   }
 
 
   @Override
-  public @NotNull Optional<Message.WithSpaces> getMapMessage(Object key, @NotNull Set<ConfigKey.Type> keyTypes,
+  public @NotNull Optional<Message.WithSpaces> getMapMessage(Object key,
+                                                             @NotNull Set<ConfigKey.Type> keyTypes,
                                                              boolean includeDefault) {
     return Optional.ofNullable(map.getMessage(messageSupport, key, parameters, keyTypes, includeDefault));
   }
@@ -109,7 +111,8 @@ public final class FormatterContextImpl implements FormatterContext
   @Override
   public @NotNull Optional<ConfigValue> getConfigValue(@NotNull String name)
   {
-    final ConfigValue configValue = map.find(messageSupport, name, parameters, NAME_TYPE, null);
+    final ConfigValue configValue =
+        map.find(messageSupport, name, parameters, NAME_TYPE, null);
 
     return configValue != null
         ? Optional.of(configValue)
@@ -120,8 +123,8 @@ public final class FormatterContextImpl implements FormatterContext
   @Override
   public @NotNull Optional<String> getConfigValueString(@NotNull String name)
   {
-    final ConfigValueString string =
-        (ConfigValueString)map.find(messageSupport, name, parameters, NAME_TYPE, ConfigValue.STRING_TYPE);
+    final ConfigValueString string = (ConfigValueString)
+        map.find(messageSupport, name, parameters, NAME_TYPE, ConfigValue.STRING_TYPE);
 
     if (string != null)
       return Optional.of(string.asObject());
@@ -137,8 +140,8 @@ public final class FormatterContextImpl implements FormatterContext
   @Override
   public @NotNull OptionalLong getConfigValueNumber(@NotNull String name)
   {
-    final ConfigValueNumber number =
-        (ConfigValueNumber)map.find(messageSupport, name, parameters, NAME_TYPE, ConfigValue.NUMBER_TYPE);
+    final ConfigValueNumber number = (ConfigValueNumber)
+        map.find(messageSupport, name, parameters, NAME_TYPE, ConfigValue.NUMBER_TYPE);
 
     if (number != null)
       return OptionalLong.of(number.asObject());
@@ -154,8 +157,8 @@ public final class FormatterContextImpl implements FormatterContext
   @Override
   public @NotNull Optional<Boolean> getConfigValueBool(@NotNull String name)
   {
-    final ConfigValueBool bool =
-        (ConfigValueBool)map.find(messageSupport, name, parameters, NAME_TYPE, ConfigValue.BOOL_TYPE);
+    final ConfigValueBool bool = (ConfigValueBool)
+        map.find(messageSupport, name, parameters, NAME_TYPE, ConfigValue.BOOL_TYPE);
 
     if (bool != null)
       return Optional.of(bool.asObject());
@@ -177,14 +180,16 @@ public final class FormatterContextImpl implements FormatterContext
   @Override
   public @NotNull Text format(Object value, Class<?> type, boolean propagateFormat)
   {
-    return new FormatterContextImpl(messageSupport, parameters, value, type, propagateFormat ? format : null, map)
-        .delegateToNextFormatter();
+    return new FormatterContextImpl(messageSupport, parameters, value, type,
+        propagateFormat ? format : null, map).delegateToNextFormatter();
   }
 
 
   @Override
-  public @NotNull Text format(Object value, Class<?> type, String format) {
-    return new FormatterContextImpl(messageSupport, parameters, value, type, format, map).delegateToNextFormatter();
+  public @NotNull Text format(Object value, Class<?> type, String format)
+  {
+    return new FormatterContextImpl(messageSupport, parameters, value, type, format, map)
+        .delegateToNextFormatter();
   }
 
 
@@ -193,6 +198,7 @@ public final class FormatterContextImpl implements FormatterContext
   {
     return message == null
         ? NULL
-        : new TextPart(message.format(messageSupport, parameters), message.isSpaceBefore(), message.isSpaceAfter());
+        : new TextPart(message.format(messageSupport, parameters), message.isSpaceBefore(),
+            message.isSpaceAfter());
   }
 }

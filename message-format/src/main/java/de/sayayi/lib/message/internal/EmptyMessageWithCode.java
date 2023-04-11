@@ -64,8 +64,10 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
 
   @Override
-  public boolean equals(Object o) {
-    return this == o || o instanceof EmptyMessageWithCode && code.equals(((EmptyMessageWithCode)o).code);
+  public boolean equals(Object o)
+  {
+    return this == o ||
+        o instanceof EmptyMessageWithCode && code.equals(((EmptyMessageWithCode)o).code);
   }
 
 
@@ -96,7 +98,8 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
    *
    * @since 0.8.0
    */
-  public static @NotNull Message.WithCode unpack(@NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull Message.WithCode unpack(@NotNull PackInputStream packStream)
+      throws IOException {
     return new EmptyMessageWithCode(requireNonNull(packStream.readString()));
   }
 }

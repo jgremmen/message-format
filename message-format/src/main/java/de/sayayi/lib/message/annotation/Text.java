@@ -38,13 +38,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface Text
 {
   /**
+   * Message locale, either the language code (de, es) or the language with country
+   * (de_DE, fr_CA).
    * <p>
-   *   Message locale, either the language code (de, es) or the language with country (de_DE, fr_CA).
-   * </p>
-   * <p>
-   *   The default value corresponds to {@link java.util.Locale#ROOT} which will match any locale used for formatting
-   *   this message.
-   * </p>
+   * The default value corresponds to {@link java.util.Locale#ROOT} which will match any locale
+   * used for formatting this message.
    *
    * @return  message locale
    *
@@ -62,12 +60,10 @@ public @interface Text
 
 
   /**
+   * Not localized message text.
    * <p>
-   *   Not localized message text.
-   * </p>
-   * <p>
-   *   This value is used only if {@code locale} and {@code text} are not set. Otherwise its value is ignored.
-   * </p>
+   * This value is used only if {@code locale} and {@code text} are not set. Otherwise its value
+   * is ignored.
    *
    * @return  message text
    */

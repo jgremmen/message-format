@@ -84,11 +84,9 @@ public interface MessageSupport
 
 
   /**
-   * <p>
-   *   Export all messages and templates from this message support to a compact binary representation.
-   *   This way a message support can be prepared once and loaded very quickly by importing the packed
-   *   messages at runtime.
-   * </p>
+   * Export all messages and templates from this message support to a compact binary representation.
+   * This way a message support can be prepared once and loaded very quickly by importing the packed
+   * messages at runtime.
    *
    * @param stream  pack output stream, not {@code null}
    *
@@ -103,29 +101,26 @@ public interface MessageSupport
 
 
   /**
+   * Pack all messages (optionally filtering them using a {@code messageCodeFilter} from this
+   * bundle into a compact binary representation. This way a message support can be prepared once
+   * and loaded very quickly by importing the packed messages at runtime.
    * <p>
-   *   Pack all messages (optionally filtering them using a {@code messageCodeFilter} from this bundle into a
-   *   compact binary representation. This way a message support can be prepared once and loaded very quickly
-   *   by importing the packed messages at runtime.
-   * </p>
-   * <p>
-   *   Parameter {@code compress} switches GZip on/off, potentially reducing the packed size even more. For
-   *   message support instances with a small amount of messages the compression may not be substantial as
-   *   the binary representation does some extensive bit-packing already.
-   * </p>
+   * Parameter {@code compress} switches GZip on/off, potentially reducing the packed size even
+   * more. For message support instances with a small amount of messages the compression may not be
+   * substantial as the binary representation does some extensive bit-packing already.
    *
    * @param stream             pack output stream, not {@code null}
    * @param compress           {@code true} compress pack, {@code false} do not compress pack
-   * @param messageCodeFilter  optional predicate for selecting message codes. If {@code null} all messages from
-   *                           this message support will be selected
+   * @param messageCodeFilter  optional predicate for selecting message codes. If {@code null}
+   *                           all messages from this message support will be selected
    *
    * @throws IOException  if an I/O error occurs
    *
    * @see ConfigurableMessageSupport#importMessages(InputStream...)
    * @see ConfigurableMessageSupport#importMessages(Enumeration)
    */
-  void exportMessages(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
-      throws IOException;
+  void exportMessages(@NotNull OutputStream stream, boolean compress,
+                      Predicate<String> messageCodeFilter) throws IOException;
 
 
 
@@ -361,14 +356,16 @@ public interface MessageSupport
      * @throws IOException  if an I/O error occurs
      */
     @Contract(mutates = "this")
-    @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream... packStreams) throws IOException;
+    @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream... packStreams)
+        throws IOException;
 
 
     /**
      * Set the default {@code value} for configuration parameter {@code name}.
      * <p>
      * If a parameter formatter is looking for a boolean configuration value, which has not been
-     * provided by the message parameter, the message support accessor is used to get a default value.
+     * provided by the message parameter, the message support accessor is used to get a default
+     * value.
      *
      * @param name   configuration parameter name, not {@code null} or empty
      * @param value  default value
@@ -376,14 +373,16 @@ public interface MessageSupport
      * @return  configurable message support instance, never {@code null}
      */
     @Contract(mutates = "this")
-    @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, boolean value);
+    @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
+                                                                  boolean value);
 
 
     /**
      * Set the default {@code value} for configuration parameter {@code name}.
      * <p>
      * If a parameter formatter is looking for a long configuration value, which has not been
-     * provided by the message parameter, the message support accessor is used to get a default value.
+     * provided by the message parameter, the message support accessor is used to get a default
+     * value.
      *
      * @param name   configuration parameter name, not {@code null} or empty
      * @param value  default value
@@ -398,7 +397,8 @@ public interface MessageSupport
      * Set the default {@code value} for configuration parameter {@code name}.
      * <p>
      * If a parameter formatter is looking for a string configuration value, which has not been
-     * provided by the message parameter, the message support accessor is used to get a default value.
+     * provided by the message parameter, the message support accessor is used to get a default
+     * value.
      *
      * @param name   configuration parameter name, not {@code null} or empty
      * @param value  default value
@@ -414,7 +414,8 @@ public interface MessageSupport
      * Set the default {@code value} for configuration parameter {@code name}.
      * <p>
      * If a parameter formatter is looking for a message configuration value, which has not been
-     * provided by the message parameter, the message support accessor is used to get a default value.
+     * provided by the message parameter, the message support accessor is used to get a default
+     * value.
      *
      * @param name   configuration parameter name, not {@code null} or empty
      * @param value  default value
@@ -422,8 +423,9 @@ public interface MessageSupport
      * @return  configurable message support instance, never {@code null}
      */
     @Contract(mutates = "this")
-    @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
-                                                                  @NotNull Message.WithSpaces value);
+    @NotNull ConfigurableMessageSupport setDefaultParameterConfig(
+        @NotNull String name,
+        @NotNull Message.WithSpaces value);
 
 
     /**
@@ -449,11 +451,13 @@ public interface MessageSupport
 
 
     @Contract(mutates = "this")
-    @NotNull ConfigurableMessageSupport setMessageHandler(@NotNull Predicate<String> messageHandler);
+    @NotNull ConfigurableMessageSupport setMessageHandler(
+        @NotNull Predicate<String> messageHandler);
 
 
     @Contract(mutates = "this")
-    @NotNull ConfigurableMessageSupport setTemplateHandler(@NotNull Predicate<String> templateHandler);
+    @NotNull ConfigurableMessageSupport setTemplateHandler(
+        @NotNull Predicate<String> templateHandler);
   }
 
 
@@ -508,8 +512,8 @@ public interface MessageSupport
      *
      * @param code  message code to check, or {@code null}
      *
-     * @return  {@code true} if {@code code} is not {@code null} and the bundle contains a message with
-     *          this code, {@code false} otherwise
+     * @return  {@code true} if {@code code} is not {@code null} and the bundle contains a
+     *          message with this code, {@code false} otherwise
      */
     @Contract(value = "null -> false", pure = true)
     boolean hasMessageWithCode(String code);
@@ -520,8 +524,8 @@ public interface MessageSupport
      *
      * @param name  template name to check, or {@code null}
      *
-     * @return  {@code true} if {@code name} is not {@code null} and this builder contains a template with
-     *          this name, {@code false} otherwise
+     * @return  {@code true} if {@code name} is not {@code null} and this builder contains a
+     *          template with this name, {@code false} otherwise
      */
     @Contract(value = "null -> false", pure = true)
     boolean hasTemplateWithName(String name);
@@ -542,17 +546,16 @@ public interface MessageSupport
 
 
     /**
+     * Returns a prioritized list of matching formatter for the given {@code format} and
+     * {@code type}
      * <p>
-     *   Returns a prioritized list of matching formatter for the given {@code format} and {@code type}
-     * </p>
-     * <p>
-     *   If {@code format} matches a named formatter it always takes precedence over {@code type}.
-     * </p>
+     * If {@code format} matches a named formatter it always takes precedence over {@code type}.
      *
      * @param format  formatter name
      * @param type    type, never {@code null}
      *
-     * @return  prioritized list of formatters for the given {@code format} and {@code type}, never {@code null}
+     * @return  prioritized list of formatters for the given {@code format} and {@code type},
+     *          never {@code null}
      */
     @Contract(pure = true)
     @Unmodifiable
@@ -564,8 +567,8 @@ public interface MessageSupport
      *
      * @param name  parameter name, not {@code null}
      *
-     * @return  default configuration value, or {@code null} if no default configuration has been set for
-     *          parameter {@code name}
+     * @return  default configuration value, or {@code null} if no default configuration has been
+     *          set for parameter {@code name}
      *
      * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, boolean)
      * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, long)
@@ -591,7 +594,8 @@ public interface MessageSupport
   /**
    * Message publisher provides methods for registering messages and templates.
    * <p>
-   * The publisher is used intensively by message adopters (see package {@code de.sayayi.lib.message.adopter}).
+   * The publisher is used intensively by message adopters (see package
+   * {@code de.sayayi.lib.message.adopter}).
    *
    * @author Jeroen Gremmen
    * @since 0.8.0

@@ -86,7 +86,8 @@ public enum ConfigKeyBool implements ConfigKey
       {
         final String string = value.toString();
 
-        if (("true".equalsIgnoreCase(string) && bool) || ("false".equalsIgnoreCase(string) && !bool))
+        if (("true".equalsIgnoreCase(string) && bool) ||
+            ("false".equalsIgnoreCase(string) && !bool))
           return EQUIVALENT;
 
         try {
@@ -127,7 +128,8 @@ public enum ConfigKeyBool implements ConfigKey
    *
    * @since 0.8.0
    */
-  public static @NotNull ConfigKeyBool unpack(@NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigKeyBool unpack(@NotNull PackInputStream packStream)
+      throws IOException {
     return packStream.readBoolean() ? TRUE : FALSE;
   }
 }

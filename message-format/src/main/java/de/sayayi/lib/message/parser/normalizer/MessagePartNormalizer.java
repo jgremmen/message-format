@@ -25,8 +25,8 @@ import org.jetbrains.annotations.NotNull;
 public interface MessagePartNormalizer
 {
   /**
-   * Normalize the given message part. The returned part may be replaced with an identical cached version
-   * in order to reduce memory load.
+   * Normalize the given message part. The returned part may be replaced with an identical
+   * cached version in order to reduce memory load.
    *
    * @param <T>   message part implementation type
    * @param part  message part

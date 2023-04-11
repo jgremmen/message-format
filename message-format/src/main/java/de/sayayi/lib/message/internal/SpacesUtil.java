@@ -73,7 +73,8 @@ public final class SpacesUtil
 
     return startIdx == endIndex
         ? ""
-        : startIdx > 0 || endIndex < val.length ? new String(val, startIdx, endIndex - startIdx) : s;
+        : startIdx > 0 || endIndex < val.length
+            ? new String(val, startIdx, endIndex - startIdx) : s;
   }
 
 

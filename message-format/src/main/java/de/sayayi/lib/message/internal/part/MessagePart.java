@@ -100,7 +100,8 @@ public interface MessagePart extends SpacesAware, Serializable
      * @return  formatted parameter as text part, never {@code null}
      */
     @Contract(pure = true)
-    @NotNull Text getText(@NotNull MessageSupportAccessor messageSupport, @NotNull Parameters parameters);
+    @NotNull Text getText(@NotNull MessageSupportAccessor messageSupport,
+                          @NotNull Parameters parameters);
   }
 
 
@@ -125,6 +126,7 @@ public interface MessagePart extends SpacesAware, Serializable
 
 
     @Contract(pure = true)
-    @NotNull Text getText(@NotNull MessageSupportAccessor messageSupport, @NotNull Parameters parameters);
+    @NotNull Text getText(@NotNull MessageSupportAccessor messageSupport,
+                          @NotNull Parameters parameters);
   }
 }

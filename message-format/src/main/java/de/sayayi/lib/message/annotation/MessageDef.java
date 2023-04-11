@@ -47,13 +47,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface MessageDef
 {
   /**
+   * Unique message code.
    * <p>
-   *   Unique message code.
-   * </p>
-   * <p>
-   *   Uniqueness is required to identify and retrieve a message by its {@code code} and is defined within
-   *   the scope of a {@link de.sayayi.lib.message.MessageSupport MessageSupport} instance.
-   * </p>
+   * Uniqueness is required to identify and retrieve a message by its {@code code} and is defined
+   * within the scope of a {@link de.sayayi.lib.message.MessageSupport MessageSupport} instance.
    *
    * @return  unique message code, not empty
    */

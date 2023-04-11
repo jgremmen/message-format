@@ -24,6 +24,8 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.io.Serializable;
 import java.util.*;
 
+import static java.util.Locale.ROOT;
+
 
 /**
  * <p>
@@ -173,7 +175,7 @@ public interface Message extends Serializable
    */
   interface Parameters
   {
-    Parameters EMPTY = new NoParameters(Locale.ROOT);
+    Parameters EMPTY = new NoParameters(ROOT);
 
 
     /**

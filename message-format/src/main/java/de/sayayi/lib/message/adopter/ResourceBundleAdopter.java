@@ -60,8 +60,8 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
     final Locale locale = resourceBundle.getLocale();
 
     resourceBundle.keySet().forEach(
-        code -> messagePublisher.addMessage(
-            messageFactory.parseMessage(code, singletonMap(locale, resourceBundle.getString(code)))));
+        code -> messagePublisher.addMessage(messageFactory
+            .parseMessage(code, singletonMap(locale, resourceBundle.getString(code)))));
   }
 
 

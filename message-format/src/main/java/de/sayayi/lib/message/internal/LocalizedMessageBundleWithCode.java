@@ -45,7 +45,8 @@ import static java.util.stream.Collectors.toSet;
  * @author Jeroen Gremmen
  */
 @ToString
-public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCode implements LocaleAware
+public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCode
+    implements LocaleAware
 {
   private static final long serialVersionUID = 800L;
 
@@ -53,7 +54,8 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   private final @NotNull Map<Locale,Message> localizedMessages;
 
 
-  public LocalizedMessageBundleWithCode(@NotNull String code, @NotNull Map<Locale,Message> localizedMessages)
+  public LocalizedMessageBundleWithCode(@NotNull String code,
+                                        @NotNull Map<Locale,Message> localizedMessages)
   {
     super(code);
 
@@ -172,7 +174,10 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
     final Map<Locale,Message> messages = new HashMap<>();
 
     for(int n = 0; n < messageCount; n++)
-      messages.put(forLanguageTag(requireNonNull(packStream.readString())), unpack.unpackMessage(packStream));
+    {
+      messages.put(forLanguageTag(requireNonNull(packStream.readString())),
+          unpack.unpackMessage(packStream));
+    }
 
     return new LocalizedMessageBundleWithCode(code, messages);
   }

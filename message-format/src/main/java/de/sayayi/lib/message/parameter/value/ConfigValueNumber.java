@@ -54,8 +54,8 @@ public final class ConfigValueNumber implements ConfigValue
    *   Return the number as int.
    * </p>
    * <p>
-   *   If the number is larger than the integer range, the returned value is either {@code 4294967295} for
-   *   positive values or {@code −4294967296} for negative values.
+   *   If the number is larger than the integer range, the returned value is either
+   *   {@code 4294967295} for positive values or {@code −4294967296} for negative values.
    * </p>
    *
    * @return  number as int
@@ -119,7 +119,8 @@ public final class ConfigValueNumber implements ConfigValue
    *
    * @since 0.8.0
    */
-  public static @NotNull ConfigValueNumber unpack(@NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigValueNumber unpack(@NotNull PackInputStream packStream)
+      throws IOException {
     return new ConfigValueNumber(packStream.readLong());
   }
 }

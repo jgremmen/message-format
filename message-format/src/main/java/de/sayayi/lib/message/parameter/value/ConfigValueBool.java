@@ -102,7 +102,8 @@ public enum ConfigValueBool implements ConfigValue
    *
    * @since 0.8.0
    */
-  public static @NotNull ConfigValueBool unpack(@NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigValueBool unpack(@NotNull PackInputStream packStream)
+      throws IOException {
     return packStream.readBoolean() ? TRUE : FALSE;
   }
 }

@@ -68,7 +68,8 @@ public final class PackHelper
   private final Map<Message.WithSpaces,Message.WithSpaces> messagesWithSpaces = new HashMap<>();
 
 
-  public static void pack(@NotNull Message message, @NotNull PackOutputStream packStream) throws IOException
+  public static void pack(@NotNull Message message, @NotNull PackOutputStream packStream)
+      throws IOException
   {
     if (message instanceof EmptyMessage)
       packStream.writeSmall(MESSAGE_EMPTY, 3);
@@ -98,7 +99,10 @@ public final class PackHelper
       ((TextMessage)message).pack(packStream);
     }
     else
-      throw new IllegalArgumentException("unknown message type " + message.getClass().getSimpleName());
+    {
+      throw new IllegalArgumentException("unknown message type " +
+          message.getClass().getSimpleName());
+    }
   }
 
 
@@ -205,11 +209,15 @@ public final class PackHelper
       ((TemplatePart)messagePart).pack(packStream);
     }
     else
-      throw new IllegalArgumentException("unknown message part type " + messagePart.getClass().getSimpleName());
+    {
+      throw new IllegalArgumentException("unknown message part type " +
+          messagePart.getClass().getSimpleName());
+    }
   }
 
 
-  public @NotNull MessagePart unpackMessagePart(@NotNull PackInputStream packStream) throws IOException
+  public @NotNull MessagePart unpackMessagePart(@NotNull PackInputStream packStream)
+      throws IOException
   {
     final MessagePart messagePart;
 
@@ -239,7 +247,8 @@ public final class PackHelper
   }
 
 
-  public static void pack(@NotNull ConfigKey configKey, @NotNull PackOutputStream packStream) throws IOException
+  public static void pack(@NotNull ConfigKey configKey, @NotNull PackOutputStream packStream)
+      throws IOException
   {
     if (configKey instanceof ConfigKeyBool)
     {
@@ -272,7 +281,10 @@ public final class PackHelper
       ((ConfigKeyString)configKey).pack(packStream);
     }
     else
-      throw new IllegalArgumentException("unknown map key type " + configKey.getClass().getSimpleName());
+    {
+      throw new IllegalArgumentException("unknown map key type " +
+          configKey.getClass().getSimpleName());
+    }
   }
 
 
@@ -314,7 +326,8 @@ public final class PackHelper
   }
 
 
-  public static void pack(@NotNull ConfigValue configValue, @NotNull PackOutputStream packStream) throws IOException
+  public static void pack(@NotNull ConfigValue configValue, @NotNull PackOutputStream packStream)
+      throws IOException
   {
     if (configValue instanceof ConfigValueBool)
     {
@@ -337,11 +350,15 @@ public final class PackHelper
       ((ConfigValueString)configValue).pack(packStream);
     }
     else
-      throw new IllegalArgumentException("unknown map value type " + configValue.getClass().getSimpleName());
+    {
+      throw new IllegalArgumentException("unknown map value type " +
+          configValue.getClass().getSimpleName());
+    }
   }
 
 
-  public @NotNull ConfigValue unpackMapValue(@NotNull PackInputStream packStream) throws IOException
+  public @NotNull ConfigValue unpackMapValue(@NotNull PackInputStream packStream)
+      throws IOException
   {
     final ConfigValue configValue;
 

@@ -220,8 +220,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitTextPart(TextPartContext ctx) {
-      ctx.value = messageFactory.getMessagePartNormalizer().normalize(new TextPart(ctx.text().value));
+    public void exitTextPart(TextPartContext ctx)
+    {
+      ctx.value = messageFactory.getMessagePartNormalizer()
+          .normalize(new TextPart(ctx.text().value));
     }
 
 
@@ -355,7 +357,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     {
       final StringContext stringContext = ctx.string();
 
-      ctx.value = new ConfigValueString(stringContext != null ? stringContext.value : ctx.nameOrKeyword().name);
+      ctx.value = new ConfigValueString(stringContext != null
+          ? stringContext.value : ctx.nameOrKeyword().name);
     }
 
 

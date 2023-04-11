@@ -87,7 +87,8 @@ public final class ParameterPart implements Parameter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text getText(@NotNull MessageSupportAccessor messageSupport, @NotNull Parameters parameters)
+  public @NotNull Text getText(@NotNull MessageSupportAccessor messageSupport,
+                               @NotNull Parameters parameters)
   {
     final FormatterContext formatterContext = new FormatterContextImpl(messageSupport, parameters,
         parameters.getParameterValue(name), null, format, map);
@@ -182,7 +183,8 @@ public final class ParameterPart implements Parameter
    *
    * @since 0.8.0
    */
-  public static @NotNull ParameterPart unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
+  public static @NotNull ParameterPart unpack(@NotNull PackHelper unpack,
+                                              @NotNull PackInputStream packStream)
       throws IOException
   {
     final boolean spaceBefore = packStream.readBoolean();

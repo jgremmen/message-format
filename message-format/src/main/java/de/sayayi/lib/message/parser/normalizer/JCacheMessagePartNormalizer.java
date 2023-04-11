@@ -35,8 +35,8 @@ public final class JCacheMessagePartNormalizer implements MessagePartNormalizer
 
 
   /**
-   * Normalize the given message part. The returned part may be replaced with an identical cached version in order to
-   * reduce memory load.
+   * Normalize the given message part. The returned part may be replaced with an identical
+   * cached version in order to reduce memory load.
    *
    * @param part message part
    *

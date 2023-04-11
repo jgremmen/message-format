@@ -84,7 +84,8 @@ public final class ConfigKeyNumber implements ConfigKey
     int cmp;
 
     doMatch: {
-      if (value instanceof Long || value instanceof Integer || value instanceof Short || value instanceof Byte)
+      if (value instanceof Long || value instanceof Integer || value instanceof Short ||
+          value instanceof Byte)
       {
         cmp = Long.signum(((Number)value).longValue() - number);
         break doMatch;
@@ -153,7 +154,8 @@ public final class ConfigKeyNumber implements ConfigKey
    *
    * @since 0.8.0
    */
-  public static @NotNull ConfigKeyNumber unpack(@NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigKeyNumber unpack(@NotNull PackInputStream packStream)
+      throws IOException {
     return new ConfigKeyNumber(packStream.readEnum(CompareType.class), packStream.readLong());
   }
 }
