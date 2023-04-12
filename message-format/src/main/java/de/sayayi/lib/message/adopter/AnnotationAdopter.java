@@ -19,6 +19,8 @@ import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
 import de.sayayi.lib.message.annotation.*;
+import de.sayayi.lib.message.exception.DuplicateMessageException;
+import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import org.jetbrains.annotations.Contract;
@@ -104,6 +106,8 @@ public class AnnotationAdopter extends AbstractMessageAdopter
    * @param messageDef  {@code MessageDef} annotation, not {@code null}
    *
    * @return  this annotation adopter instance, never {@code null}
+   *
+   * @throws DuplicateMessageException  if different messages are provided for the same locale
    */
   public @NotNull AnnotationAdopter adopt(@NotNull MessageDef messageDef)
   {
@@ -124,12 +128,17 @@ public class AnnotationAdopter extends AbstractMessageAdopter
 
       for(final Text text: texts)
       {
-        final Locale locale = forLanguageTag(text.locale());
         final String value = text.locale().isEmpty() &&
             text.text().isEmpty() ? text.value() : text.text();
 
-        if (!localizedTexts.containsKey(locale))
-          localizedTexts.put(locale, value);
+        localizedTexts.compute(forLanguageTag(text.locale()), (locale,mappedValue) -> {
+          if (mappedValue == null || mappedValue.equals(value))
+            return value;
+
+          // if message text differs from previous definition -> throw
+          throw new DuplicateMessageException(code,
+              "different message definition for same locale '" + locale + "'");
+        });
       }
 
       messagePublisher.addMessage(messageFactory.parseMessage(code, localizedTexts));
@@ -145,6 +154,9 @@ public class AnnotationAdopter extends AbstractMessageAdopter
    * @param templateDef  {@code TemplateDef} annotation, not {@code null}
    *
    * @return  this annotation adopter instance, never {@code null}
+   *
+   * @throws DuplicateTemplateException  if different template messages are provided for the
+   *                                     same locale
    */
   public @NotNull AnnotationAdopter adopt(@NotNull TemplateDef templateDef)
   {
@@ -164,12 +176,17 @@ public class AnnotationAdopter extends AbstractMessageAdopter
 
     for(final Text text: texts)
     {
-      final Locale locale = forLanguageTag(text.locale());
       final String value = text.locale().isEmpty() &&
           text.text().isEmpty() ? text.value() : text.text();
 
-      if (!localizedTexts.containsKey(locale))
-        localizedTexts.put(locale, value);
+      localizedTexts.compute(forLanguageTag(text.locale()), (locale, mappedValue) -> {
+        if (mappedValue == null || mappedValue.equals(value))
+          return value;
+
+        // if template text differs from previous definition -> throw
+        throw new DuplicateTemplateException(name,
+            "different template definition for same locale '" + locale + "'");
+      });
     }
 
     messagePublisher.addTemplate(name, messageFactory.parseTemplate(localizedTexts));
@@ -198,12 +215,15 @@ public class AnnotationAdopter extends AbstractMessageAdopter
         clazz = clazz.getSuperclass())
       if (!indexedClasses.contains(clazz))
       {
+        // adopt annotations from interface classes
         for(final Class<?> ifClass: clazz.getInterfaces())
           adoptAll(ifClass);
 
+        // adopt annotations at method level
         for(final Method method: clazz.getDeclaredMethods())
           adopt(method);
 
+        // adopt annotations at class level
         adopt(clazz);
 
         indexedClasses.add(clazz);

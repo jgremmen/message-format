@@ -70,6 +70,6 @@ public final class MessageDefImpl implements MessageDef
 
   @Override
   public String toString() {
-    return "MessageDef[code=" + code + ",text=" + text + ",texts=" + Arrays.toString(texts) + ']';
+    return "MessageDef(code=" + code + ",text=" + text + ",texts=" + Arrays.toString(texts) + ')';
   }
 }

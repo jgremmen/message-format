@@ -68,6 +68,6 @@ public final class TextImpl implements Text
 
   @Override
   public String toString() {
-    return "Text[locale=" + locale + ",text=" + text + ",value=" + value + ']';
+    return "Text(locale=" + locale + ",text=" + text + ",value=" + value + ')';
   }
 }

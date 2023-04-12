@@ -20,6 +20,8 @@ import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
 import org.jetbrains.annotations.NotNull;
 
+import static java.util.Objects.requireNonNull;
+
 
 /**
  * A message adopter takes message information from a particular source and publishes it to a
@@ -58,7 +60,7 @@ public abstract class AbstractMessageAdopter
   protected AbstractMessageAdopter(@NotNull MessageFactory messageFactory,
                                    @NotNull MessagePublisher publisher)
   {
-    this.messageFactory = messageFactory;
-    this.messagePublisher = publisher;
+    this.messageFactory = requireNonNull(messageFactory, "messageFactory must not be null");
+    this.messagePublisher = requireNonNull(publisher, "publisher must not be null");
   }
 }

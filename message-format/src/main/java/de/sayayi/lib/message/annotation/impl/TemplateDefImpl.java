@@ -37,9 +37,12 @@ public final class TemplateDefImpl implements TemplateDef
   private final @NotNull Text[] texts;
 
 
+  @SuppressWarnings("ConstantValue")
   public TemplateDefImpl(@NotNull String name, String text, @NotNull Text[] texts)
   {
-    this.name = name == null ? "" : name.trim();
+    if ((this.name = name == null ? "" : name.trim()).isEmpty())
+      throw new IllegalArgumentException("name must not be empty");
+
     this.text = text == null ? "" : text.trim();
     this.texts = texts;
   }
@@ -71,6 +74,6 @@ public final class TemplateDefImpl implements TemplateDef
 
   @Override
   public String toString() {
-    return "TemplateDef[name=" + name + ",text=" + text + ",texts=" + Arrays.toString(texts) + ']';
+    return "TemplateDef(name=" + name + ",text=" + text + ",texts=" + Arrays.toString(texts) + ')';
   }
 }
