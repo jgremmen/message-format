@@ -41,15 +41,11 @@ import static org.springframework.asm.Opcodes.ASM9;
 
 
 /**
+ * The Spring Asm classpath scanner scans classes and publishes the annotated messages found.
  * <p>
- *   The Spring Asm classpath scanner scans classes and publishes the annotated messages found.
- * </p>
- * <p>
- *   The scanned classes are not loaded by the classloader but instead are analysed using the ASM library
- *   bundled with Spring. Using this class therefore requires a dependency with library
- *   {@code org.springframework:spring-core:5.3.25}.
- * </p>
- *
+ * The scanned classes are not loaded by the classloader but instead are analysed using the ASM library
+ * bundled with Spring. Using this class therefore requires a dependency with library
+ * {@code org.springframework:spring-core:5.3.26}.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

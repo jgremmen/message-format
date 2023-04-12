@@ -44,9 +44,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface TemplateDef
 {
   /**
-   * <p>
-   *   Unique template name.
-   * </p>
+   * Unique template name.
    *
    * @return  unique template name, not empty
    */

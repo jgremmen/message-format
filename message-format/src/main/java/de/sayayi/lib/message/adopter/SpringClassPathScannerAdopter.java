@@ -35,16 +35,11 @@ import java.util.*;
 
 
 /**
+ * The Spring classpath scanner scans classes and publishes the annotated messages found.
  * <p>
- *   The Spring classpath scanner scans classes and publishes the annotated messages found.
- * </p>
- * <p>
- *   The scanned classes are not loaded by the classloader but instead are analysed using the Spring
- *   {@code ClassPathScanningCandidateComponentProvider} class.
- *   Using this class therefore requires a dependency with library
- *   {@code org.springframework:spring-context:5.3.25}.
- * </p>
- *
+ * The scanned classes are not loaded by the classloader but instead are analysed using the Spring
+ * {@code ClassPathScanningCandidateComponentProvider} class. Using this class therefore requires
+ * a dependency with library {@code org.springframework:spring-context:5.3.26}.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

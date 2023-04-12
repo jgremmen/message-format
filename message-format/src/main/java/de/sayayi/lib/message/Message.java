@@ -27,12 +27,9 @@ import static java.util.Locale.ROOT;
 
 
 /**
+ * This interface describes a message in its most generic form.
  * <p>
- *   This interface describes a message in its most generic form.
- * </p>
- * <p>
- *   Messages are thread safe.
- * </p>
+ * Messages are thread safe.
  *
  * @see LocaleAware
  * @see WithCode
@@ -42,9 +39,7 @@ import static java.util.Locale.ROOT;
 public interface Message extends Serializable
 {
   /**
-   * <p>
-   *   Formats the message based on the message parameters provided.
-   * </p>
+   * Formats the message based on the message parameters provided.
    *
    * @param messageSupport  message context providing formatting information, never {@code null}
    * @param parameters      message parameters, never {@code null}
@@ -56,9 +51,7 @@ public interface Message extends Serializable
 
 
   /**
-   * <p>
-   *   Formats the message based on the message parameters provided.
-   * </p>
+   * Formats the message based on the message parameters provided.
    *
    * @param messageSupport   message context providing formatting information, never {@code null}
    * @param parameterValues  message parameter values, never {@code null}
@@ -130,9 +123,8 @@ public interface Message extends Serializable
     /**
      * {@inheritDoc}
      * <p>
-     *   The message is formatted with respect to the locale provided by {@code parameters}. If the locale does not
-     *   match any of the localized messages, a default message will be selected using the following rules
-     * </p>
+     * The message is formatted with respect to the locale provided by {@code parameters}. If the locale does not
+     * match any of the localized messages, a default message will be selected using the following rules
      * <ol>
      *   <li>a message with the same language but a different country</li>
      *   <li>the 1st available message (this may be implementation dependant)</li>

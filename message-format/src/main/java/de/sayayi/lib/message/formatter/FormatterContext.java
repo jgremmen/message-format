@@ -86,23 +86,18 @@ public interface FormatterContext extends Parameters
 
 
   /**
+   * Delegate formatting to next best parameter formatter.
    * <p>
-   *   Delegate formatting to next best parameter formatter.
-   * </p>
+   * Based on the object type, format and registered formatters, a list of prioritized formatters
+   * is calculated and the top formatter is invoked. If that formatter delegates formatting, the
+   * next formatter from the list will be invoked with the same formatter context.
    * <p>
-   *   Based on the object type, format and registered formatters, a list of prioritized formatters
-   *   is calculated and the top formatter is invoked. If that formatter delegates formatting, the
-   *   next formatter from the list will be invoked with the same formatter context.
-   * </p>
+   * The last formatter from the list, which is usually the formatter associated with type
+   * {@code Object}, must not delegate to the next formatter or a {@code NoSuchElementException}
+   * is thrown. By default the {@code Object} formatter is a string formatter, which will never
+   * delegate. However, if this formatter is redefined, it must never delegate formatting.
    * <p>
-   *   The last formatter from the list, which is usually the formatter associated with type
-   *   {@code Object}, must not delegate to the next formatter or a {@code NoSuchElementException}
-   *   is thrown. By default the {@code Object} formatter is a string formatter, which will never
-   *   delegate. However, if this formatter is redefined, it must never delegate formatting.
-   * </p>
-   * <p>
-   *   A named formatter never has a next formatter it can delegate to.
-   * </p>
+   * A named formatter never has a next formatter it can delegate to.
    *
    * @return  formatted text, never {@code null}
    */

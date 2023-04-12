@@ -62,14 +62,11 @@ public final class MessageSupportFactory
 
 
   /**
+   * Create a new {@link MessageSupport} instance with the given {@code formatterService} and
+   * {@code messageFactory}.
    * <p>
-   *   Create a new {@link MessageSupport} instance with the given {@code formatterService} and
-   *   {@code messageFactory}.
-   * </p>
-   * <p>
-   *   The returned instance is the configurable version of the message support, which allows for
-   *   further configuration such as adding messages and templates.
-   * </p>
+   * The returned instance is the configurable version of the message support, which allows for
+   * further configuration such as adding messages and templates.
    *
    * @param formatterService  formatter service, not {@code null}
    * @param messageFactory    message factory, not {@code null}

@@ -40,10 +40,7 @@ import static java.util.Arrays.asList;
 
 
 /**
- * <p>
- *   This class provides the basis for Asm based classpath scanners.
- * </p>
- *
+ * This class provides the basis for Asm based classpath scanners.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

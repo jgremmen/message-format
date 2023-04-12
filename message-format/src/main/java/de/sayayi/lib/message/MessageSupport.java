@@ -339,13 +339,10 @@ public interface MessageSupport
 
 
     /**
+     * Import multiple packs into this message builder.
      * <p>
-     *   Import multiple packs into this message builder.
-     * </p>
-     * <p>
-     *   When importing from multiple packs, this method is preferred as it shares map key/values,
-     *   message parts and messages for all packs, thus reducing the memory footprint.
-     * </p>
+     * When importing from multiple packs, this method is preferred as it shares map key/values,
+     * message parts and messages for all packs, thus reducing the memory footprint.
      *
      * @param packStreams  array of pack streams, not {@code null}
      *

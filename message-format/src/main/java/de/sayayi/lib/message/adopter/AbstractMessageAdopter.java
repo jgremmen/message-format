@@ -22,13 +22,10 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
+ * A message adopter takes message information from a particular source and publishes it to a
+ * message publisher.
  * <p>
- *   A message adopter takes message information from a particular source and publishes it to a
- *   message publisher.
- * </p>
- * <p>
- *   This class provides the minimum requirements which are shared by all message adopters.
- * </p>
+ * This class provides the minimum requirements which are shared by all message adopters.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
