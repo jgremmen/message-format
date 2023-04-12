@@ -54,8 +54,6 @@ public final class BoolFormatter extends AbstractParameterFormatter
   @Override
   public boolean canFormat(@NotNull Class<?> type)
   {
-    requireNonNull(type, "type must not be null");
-
     return
         type == Boolean.class || type == boolean.class ||
         Number.class.isAssignableFrom(type) ||
