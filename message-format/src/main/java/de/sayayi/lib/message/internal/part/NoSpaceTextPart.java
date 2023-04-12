@@ -46,7 +46,7 @@ public final class NoSpaceTextPart implements Text
    * @param text  text, not {@code null}
    */
   public NoSpaceTextPart(@NotNull String text) {
-    this.text = trimSpaces(text);
+    this.text = trimSpaces(requireNonNull(text, "text must not be null"));
   }
 
 

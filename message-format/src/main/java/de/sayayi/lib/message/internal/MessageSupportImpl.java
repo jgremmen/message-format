@@ -66,8 +66,10 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   public MessageSupportImpl(@NotNull FormatterService formatterService,
                             @NotNull MessageFactory messageFactory)
   {
-    this.formatterService = requireNonNull(formatterService);
-    this.messageFactory = requireNonNull(messageFactory);
+    this.formatterService =
+        requireNonNull(formatterService, "formatterService must not be null");
+    this.messageFactory =
+        requireNonNull(messageFactory, "messageFactory must not be null");
 
     accessor = new Accessor();
     locale = Locale.getDefault();
@@ -85,7 +87,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   @Override
   public @NotNull ConfigurableMessageSupport setLocale(@NotNull Locale locale)
   {
-    this.locale = requireNonNull(locale);
+    this.locale = requireNonNull(locale, "locale must not be null");
     return this;
   }
 
@@ -170,6 +172,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   public void addMessage(@NotNull Message.WithCode message)
   {
     final String code = requireNonNull(message, "message must not be null").getCode();
+
     if (messageHandler.test(code))
       messages.put(code, message);
   }
@@ -190,6 +193,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   public @NotNull ConfigurableMessageSupport importMessages(@NotNull Enumeration<URL> packResources)
       throws IOException
   {
+    requireNonNull(packResources, "packResources must not be null");
+
     final List<InputStream> packStreams = new ArrayList<>();
 
     while(packResources.hasMoreElements())
@@ -203,6 +208,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   public @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream... packStreams)
       throws IOException
   {
+    requireNonNull(packStreams, "packStreams must not be null");
+
     final PackHelper packHelper = new PackHelper();
 
     for(final InputStream packStream: packStreams)
@@ -263,8 +270,10 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   @Override
   public @NotNull MessageConfigurer<Message.WithCode> code(@NotNull String code)
   {
-    final Message.WithCode message =
-        messages.get(requireNonNull(code, "code must not be null"));
+    if (requireNonNull(code, "code must not be null").isEmpty())
+      throw new IllegalArgumentException("code must not be empty");
+
+    final Message.WithCode message = messages.get(code);
     if (message == null)
       throw new IllegalArgumentException("unknown message code '" + code + "'");
 
@@ -280,7 +289,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
   @Override
   public <M extends Message> @NotNull MessageConfigurer<M> message(@NotNull M message) {
-    return new Configurer<>(requireNonNull(message));
+    return new Configurer<>(requireNonNull(message, "message must not be null"));
   }
 
 

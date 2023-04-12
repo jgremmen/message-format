@@ -48,7 +48,9 @@ public final class TemplatePart implements Template
 
   public TemplatePart(@NotNull String name, boolean spaceBefore, boolean spaceAfter)
   {
-    this.name = name;
+    if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
+      throw new IllegalArgumentException("name must not be empty");
+
     this.spaceBefore = spaceBefore;
     this.spaceAfter = spaceAfter;
   }

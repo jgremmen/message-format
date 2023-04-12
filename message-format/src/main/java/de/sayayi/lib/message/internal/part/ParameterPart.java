@@ -59,9 +59,11 @@ public final class ParameterPart implements Parameter
   public ParameterPart(@NotNull String name, String format, boolean spaceBefore, boolean spaceAfter,
                        @NotNull Map<ConfigKey,ConfigValue> map)
   {
-    this.name = name;
+    if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
+      throw new IllegalArgumentException("name must not be empty");
+
     this.format = "".equals(format) ? null : format;
-    this.map = new ParamConfig(map);
+    this.map = new ParamConfig(requireNonNull(map, "map must not be null"));
     this.spaceBefore = spaceBefore;
     this.spaceAfter = spaceAfter;
   }
@@ -165,7 +167,7 @@ public final class ParameterPart implements Parameter
     packStream.writeString(format);
     packStream.writeString(name);
 
-    for(Entry<ConfigKey,ConfigValue> mapEntry: map.entrySet())
+    for(final Entry<ConfigKey,ConfigValue> mapEntry: map.entrySet())
     {
       PackHelper.pack(mapEntry.getKey(), packStream);
       PackHelper.pack(mapEntry.getValue(), packStream);
