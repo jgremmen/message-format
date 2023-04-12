@@ -19,7 +19,6 @@ import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.internal.MessageSupportImpl;
-import lombok.Synchronized;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,6 +35,7 @@ import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
  */
 public final class MessageSupportFactory
 {
+  private static final Object $LOCK = new Object[0];
   private static MessageSupport SHARED = null;
 
 
@@ -51,13 +51,14 @@ public final class MessageSupportFactory
    *
    * @return  shared message support instance, never {@code null}
    */
-  @Synchronized
   public static @NotNull MessageSupport shared()
   {
-    if (SHARED == null)
-      SHARED = new SharedMessageSupport();
+    synchronized($LOCK) {
+      if (SHARED == null)
+        SHARED = new SharedMessageSupport();
 
-    return SHARED;
+      return SHARED;
+    }
   }
 
 

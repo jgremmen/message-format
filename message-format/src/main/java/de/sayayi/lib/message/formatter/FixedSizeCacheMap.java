@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter;
 
 import lombok.Getter;
-import lombok.Synchronized;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,6 +32,7 @@ import java.util.*;
 class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneable, Serializable
 {
   private static final long serialVersionUID = 8127450864651796228L;
+  private static final Object $LOCK = new Object[0];
 
   private final Comparator<Link<K,V>> comparator;
   private final int maxSize;
@@ -264,35 +264,38 @@ class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneable, Seri
   }
 
 
-  @Synchronized
   public @NotNull Set<Entry<K,V>> entrySet()
   {
-    if (entrySet == null)
-      entrySet = new EntrySet();
+    synchronized($LOCK) {
+      if (entrySet == null)
+        entrySet = new EntrySet();
 
-    return entrySet;
+      return entrySet;
+    }
   }
 
 
-  @Synchronized
   @Override
   public @NotNull Set<K> keySet()
   {
-    if (cacheKeySet == null)
-      cacheKeySet = new KeySet();
+    synchronized($LOCK) {
+      if (cacheKeySet == null)
+        cacheKeySet = new KeySet();
 
-    return cacheKeySet;
+      return cacheKeySet;
+    }
   }
 
 
-  @Synchronized
   @Override
   public @NotNull Collection<V> values()
   {
-    if (cacheValueCollection == null)
-      cacheValueCollection = new ValueCollection();
+    synchronized($LOCK) {
+      if (cacheValueCollection == null)
+        cacheValueCollection = new ValueCollection();
 
-    return cacheValueCollection;
+      return cacheValueCollection;
+    }
   }
 
 
