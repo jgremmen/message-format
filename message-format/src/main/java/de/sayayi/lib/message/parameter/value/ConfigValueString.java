@@ -41,7 +41,7 @@ public final class ConfigValueString implements ConfigValue
 
 
   public ConfigValueString(@NotNull String string) {
-    this.string = string;
+    this.string = requireNonNull(string, "string must not be null");
   }
 
 

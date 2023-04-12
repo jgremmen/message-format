@@ -23,7 +23,6 @@ import de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.parameter.value.ConfigValue;
 import de.sayayi.lib.message.parameter.value.ConfigValue.Type;
 import de.sayayi.lib.message.parameter.value.ConfigValueString;
-import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,6 +36,7 @@ import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.parameter.value.ConfigValue.STRING_MESSAGE_TYPE;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -45,7 +45,6 @@ import static java.util.Collections.unmodifiableMap;
  * @author Jeroen Gremmen
  * @since 0.4.0
  */
-@EqualsAndHashCode(doNotUseGetters = true)
 public final class ParamConfig implements Serializable
 {
   private static final long serialVersionUID = 800L;
@@ -54,7 +53,7 @@ public final class ParamConfig implements Serializable
 
 
   public ParamConfig(@NotNull Map<ConfigKey,ConfigValue> map) {
-    this.map = map;
+    this.map = requireNonNull(map, "map must not be null");
   }
 
 
@@ -145,5 +144,17 @@ public final class ParamConfig implements Serializable
     return configValue.getType() == Type.STRING
         ? ((ConfigValueString)configValue).asMessage(messageSupportAccessor.getMessageFactory())
         : (Message.WithSpaces)configValue.asObject();
+  }
+
+
+  @Override
+  public boolean equals(Object o) {
+    return o == this || o instanceof ParamConfig && map.equals(((ParamConfig)o).map);
+  }
+
+
+  @Override
+  public int hashCode() {
+    return 59 + map.hashCode();
   }
 }
