@@ -69,13 +69,6 @@ public final class ParamConfig implements Serializable
   }
 
 
-  @Override
-  @Contract(pure = true)
-  public String toString() {
-    return map.toString();
-  }
-
-
   /**
    * Returns the parameter configuration as a map.
    *
@@ -149,12 +142,19 @@ public final class ParamConfig implements Serializable
 
   @Override
   public boolean equals(Object o) {
-    return o == this || o instanceof ParamConfig && map.equals(((ParamConfig)o).map);
+    return this == o || o instanceof ParamConfig && map.equals(((ParamConfig)o).map);
   }
 
 
   @Override
   public int hashCode() {
     return 59 + map.hashCode();
+  }
+
+
+  @Override
+  @Contract(pure = true)
+  public String toString() {
+    return map.toString();
   }
 }

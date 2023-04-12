@@ -19,7 +19,6 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,13 +30,13 @@ import static java.util.Objects.requireNonNull;
 /**
  * @author Jeroen Gremmen
  */
-@EqualsAndHashCode(doNotUseGetters = true)
 public final class ConfigValueString implements ConfigValue
 {
   private static final long serialVersionUID = 800L;
 
   private final String string;
-  private Message.WithSpaces message;
+
+  private transient Message.WithSpaces message;
 
 
   public ConfigValueString(@NotNull String string) {
@@ -82,6 +81,20 @@ public final class ConfigValueString implements ConfigValue
       message = messageFactory.parseMessage(string);
 
     return message;
+  }
+
+
+  @Override
+  public boolean equals(Object o)
+  {
+    return this == o ||
+        o instanceof ConfigValueString && string.equals(((ConfigValueString)o).string);
+  }
+
+
+  @Override
+  public int hashCode() {
+    return 59 + string.hashCode();
   }
 
 

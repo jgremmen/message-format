@@ -57,7 +57,8 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   {
     super(code);
 
-    this.localizedMessages = localizedMessages;
+    this.localizedMessages =
+        requireNonNull(localizedMessages, "localizedMessages must not be null");
   }
 
 
@@ -132,6 +133,25 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
         .collect(toSet()));
   }
 
+  @Override
+  public boolean equals(Object o)
+  {
+    if (o == this)
+      return true;
+    else if (!(o instanceof LocalizedMessageBundleWithCode))
+      return false;
+
+    final LocalizedMessageBundleWithCode that = (LocalizedMessageBundleWithCode)o;
+
+    return code.equals(that.code) && localizedMessages.equals(that.localizedMessages);
+  }
+
+
+  @Override
+  public int hashCode() {
+    return (59 + code.hashCode()) * 59 + localizedMessages.hashCode();
+  }
+
 
   @Override
   public String toString() {
@@ -160,7 +180,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
 
   /**
-   * @param unpack     unpacker instance, not {@code null}
+   * @param unpack      unpacker instance, not {@code null}
    * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked localized message bundle with code, never {@code null}

@@ -23,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
+import static java.util.Objects.requireNonNull;
+
 
 /**
  * @author Jeroen Gremmen
@@ -35,7 +37,7 @@ public final class ConfigValueMessage implements ConfigValue
 
 
   public ConfigValueMessage(@NotNull Message.WithSpaces message) {
-    this.message = message;
+    this.message = requireNonNull(message, "message must not be null");
   }
 
 
@@ -53,6 +55,20 @@ public final class ConfigValueMessage implements ConfigValue
   @Override
   public @NotNull Message.WithSpaces asObject() {
     return message;
+  }
+
+
+  @Override
+  public boolean equals(Object o)
+  {
+    return this == o ||
+        o instanceof ConfigValueMessage && message.equals(((ConfigValueMessage)o).message);
+  }
+
+
+  @Override
+  public int hashCode() {
+    return 59 + message.hashCode();
   }
 
 

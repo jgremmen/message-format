@@ -17,7 +17,6 @@ package de.sayayi.lib.message.parameter.value;
 
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +29,6 @@ import static java.lang.Integer.MIN_VALUE;
 /**
  * @author Jeroen Gremmen
  */
-@EqualsAndHashCode(doNotUseGetters = true)
 public final class ConfigValueNumber implements ConfigValue
 {
   private static final long serialVersionUID = 800L;
@@ -50,13 +48,10 @@ public final class ConfigValueNumber implements ConfigValue
 
 
   /**
+   * Return the number as int.
    * <p>
-   *   Return the number as int.
-   * </p>
-   * <p>
-   *   If the number is larger than the integer range, the returned value is either
-   *   {@code 4294967295} for positive values or {@code −4294967296} for negative values.
-   * </p>
+   * If the number is larger than the integer range, the returned value is either
+   * {@code 4294967295} for positive values or {@code −4294967296} for negative values.
    *
    * @return  number as int
    *
@@ -88,6 +83,20 @@ public final class ConfigValueNumber implements ConfigValue
   @Contract(pure = true)
   public @NotNull Long asObject() {
     return number;
+  }
+
+
+  @Override
+  public boolean equals(Object o)
+  {
+    return this == o ||
+        o instanceof ConfigValueNumber && this.number == ((ConfigValueNumber)o).number;
+  }
+
+
+  @Override
+  public int hashCode() {
+    return 59 + Long.hashCode(number);
   }
 
 
