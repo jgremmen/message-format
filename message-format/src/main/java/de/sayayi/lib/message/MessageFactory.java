@@ -28,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
@@ -55,7 +54,7 @@ public class MessageFactory
         }
       });
 
-  private static final AtomicInteger CODE_ID = new AtomicInteger(0);
+  private static int CODE_ID = 0;
 
   private final @NotNull MessagePartNormalizer messagePartNormalizer;
   final MessageCompiler messageCompiler;
@@ -98,7 +97,7 @@ public class MessageFactory
 
   @Contract(value = "_ -> new", pure = true)
   public @NotNull Message parseMessage(@NotNull Map<Locale,String> localizedTexts) {
-    return parseMessage("Message::" + CODE_ID.incrementAndGet(), localizedTexts);
+    return parseMessage("Message::" + (++CODE_ID), localizedTexts);
   }
 
 
@@ -162,8 +161,7 @@ public class MessageFactory
 
     localizedTexts.forEach((locale,text) -> localizedMessages.put(locale, parseMessage(text)));
 
-    return new LocalizedMessageBundleWithCode("Template::" + CODE_ID.incrementAndGet(),
-        localizedMessages);
+    return new LocalizedMessageBundleWithCode("Template::" + (++CODE_ID), localizedMessages);
   }
 
 
