@@ -64,6 +64,11 @@ public final class ConfigKeyNumber implements ConfigKey
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@link Type#NUMBER Type#NUMBER}
+   */
   @Override
   public @NotNull Type getType() {
     return Type.NUMBER;

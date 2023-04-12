@@ -62,6 +62,11 @@ public enum ConfigKeyBool implements ConfigKey
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@link Type#BOOL Type#BOOL}
+   */
   @Override
   public @NotNull Type getType() {
     return Type.BOOL;

@@ -45,6 +45,11 @@ public enum ConfigValueBool implements ConfigValue
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@link Type#BOOL Type#BOOL}
+   */
   @Override
   public @NotNull Type getType() {
     return Type.BOOL;

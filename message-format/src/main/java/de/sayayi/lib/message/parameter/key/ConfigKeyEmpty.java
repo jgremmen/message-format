@@ -49,6 +49,11 @@ public final class ConfigKeyEmpty implements ConfigKey
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@link Type#EMPTY Type#EMPTY}
+   */
   @Override
   public @NotNull Type getType() {
     return Type.EMPTY;

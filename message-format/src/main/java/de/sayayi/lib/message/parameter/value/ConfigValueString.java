@@ -44,6 +44,11 @@ public final class ConfigValueString implements ConfigValue
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@link Type#STRING Type#STRING}
+   */
   @Override
   public @NotNull Type getType() {
     return Type.STRING;

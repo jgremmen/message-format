@@ -60,6 +60,11 @@ public final class ConfigKeyString implements ConfigKey
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@link Type#STRING Type#STRING}
+   */
   @Override
   public @NotNull Type getType() {
     return Type.STRING;

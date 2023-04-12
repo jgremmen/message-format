@@ -41,6 +41,11 @@ public final class ConfigValueMessage implements ConfigValue
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@link Type#MESSAGE Type#MESSAGE}
+   */
   @Override
   public @NotNull Type getType() {
     return Type.MESSAGE;

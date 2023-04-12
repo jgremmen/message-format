@@ -41,6 +41,11 @@ public final class ConfigValueNumber implements ConfigValue
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@link Type#NUMBER Type#NUMBER}
+   */
   @Override
   public @NotNull Type getType() {
     return Type.NUMBER;

@@ -46,12 +46,22 @@ public final class EmptyMessage implements Message.WithSpaces
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@code false}
+   */
   @Override
   public boolean isSpaceBefore() {
     return false;
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@code false}
+   */
   @Override
   public boolean isSpaceAfter() {
     return false;

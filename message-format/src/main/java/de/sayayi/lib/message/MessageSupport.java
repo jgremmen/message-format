@@ -445,11 +445,38 @@ public interface MessageSupport
     @NotNull ConfigurableMessageSupport setLocale(@NotNull String locale);
 
 
+    /**
+     * Set a {@code messageHandler} for this message support.
+     * <p>
+     * On adding a message the message handler is invoked with the message code. If the handler
+     * returns {@code true} the message is added to the message support. If the handler returns
+     * {@code false} the message is not added to the message support.
+     *
+     * @param messageHandler  message handler, not {@code null}
+     *
+     * @return  configurable message support instance, never {@code null}
+     *
+     * @see ConfigurableMessageSupport#addMessage(Message.WithCode)
+     * @see ConfigurableMessageSupport#addMessage(String, String)
+     */
     @Contract(mutates = "this")
     @NotNull ConfigurableMessageSupport setMessageHandler(
         @NotNull Predicate<String> messageHandler);
 
 
+    /**
+     * Set a {@code templateHandler} for this message support.
+     * <p>
+     * On adding a template the template handler is invoked with the template name. If the handler
+     * returns {@code true} the template is added to the message support. If the handler returns
+     * {@code false} the template is not added to the message support.
+     *
+     * @param templateHandler  template handler, not {@code null}
+     *
+     * @return  configurable message support instance, never {@code null}
+     *
+     * @see ConfigurableMessageSupport#addTemplate(String, Message)
+     */
     @Contract(mutates = "this")
     @NotNull ConfigurableMessageSupport setTemplateHandler(
         @NotNull Predicate<String> templateHandler);

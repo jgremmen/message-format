@@ -55,6 +55,11 @@ public final class ConfigKeyName implements ConfigKey
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@link Type#NAME Type#NAME}
+   */
   @Override
   public @NotNull Type getType() {
     return Type.NAME;

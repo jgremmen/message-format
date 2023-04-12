@@ -46,6 +46,11 @@ public final class NoParameters implements Parameters
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@code null}
+   */
   @Override
   @Contract("_ -> null")
   public Object getParameterValue(@NotNull String parameter) {

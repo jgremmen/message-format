@@ -47,6 +47,11 @@ public final class ConfigKeyNull implements ConfigKey
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@link Type#NULL Type#NULL}
+   */
   @Override
   public @NotNull Type getType() {
     return Type.NULL;

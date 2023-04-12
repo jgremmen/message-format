@@ -62,12 +62,22 @@ public final class NoSpaceTextPart implements Text
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@code false}
+   */
   @Override
   public boolean isSpaceBefore() {
     return false;
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@code false}
+   */
   @Override
   public boolean isSpaceAfter() {
     return false;
