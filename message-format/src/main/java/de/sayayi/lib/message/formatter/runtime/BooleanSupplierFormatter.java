@@ -40,7 +40,8 @@ public final class BooleanSupplierFormatter extends AbstractParameterFormatter
   {
     return value == null
         ? nullText()
-        : formatterContext.format(((BooleanSupplier)value).getAsBoolean(), boolean.class, true);
+        : formatterContext.format(((BooleanSupplier)value).getAsBoolean(),
+            boolean.class, true);
   }
 
 

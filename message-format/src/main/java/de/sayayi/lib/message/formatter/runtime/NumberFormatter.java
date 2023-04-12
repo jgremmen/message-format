@@ -47,7 +47,8 @@ import static java.util.Collections.singleton;
  */
 public final class NumberFormatter extends AbstractParameterFormatter
 {
-  private static final Map<Locale,DecimalFormatSymbols> FORMAT_SYMBOLS_CACHE = new ConcurrentHashMap<>();
+  private static final Map<Locale,DecimalFormatSymbols> FORMAT_SYMBOLS_CACHE =
+      new ConcurrentHashMap<>();
 
 
   @Override
@@ -95,7 +96,10 @@ public final class NumberFormatter extends AbstractParameterFormatter
       return NumberFormat.getCurrencyInstance(locale);
 
     if (format != null && !format.isEmpty())
-      return new DecimalFormat(format, FORMAT_SYMBOLS_CACHE.computeIfAbsent(locale, DecimalFormatSymbols::new));
+    {
+      return new DecimalFormat(format,
+          FORMAT_SYMBOLS_CACHE.computeIfAbsent(locale, DecimalFormatSymbols::new));
+    }
 
     return NumberFormat.getNumberInstance(locale);
   }

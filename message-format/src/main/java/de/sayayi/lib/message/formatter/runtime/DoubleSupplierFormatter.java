@@ -40,7 +40,8 @@ public final class DoubleSupplierFormatter extends AbstractParameterFormatter
   {
     return value == null
         ? nullText()
-        : formatterContext.format(((DoubleSupplier)value).getAsDouble(), double.class, true);
+        : formatterContext.format(((DoubleSupplier)value).getAsDouble(),
+            double.class, true);
   }
 
 

@@ -52,7 +52,8 @@ public final class EnumFormatter extends AbstractParameterFormatter
 
       case "name": {
         final String name = enumValue.name();
-        final Message.WithSpaces msg = context.getMapMessage(name, STRING_TYPE, true).orElse(null);
+        final Message.WithSpaces msg =
+            context.getMapMessage(name, STRING_TYPE, true).orElse(null);
 
         return msg != null ? context.format(msg) : noSpaceText(name);
       }

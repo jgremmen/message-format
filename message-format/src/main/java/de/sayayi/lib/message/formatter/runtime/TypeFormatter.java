@@ -42,7 +42,8 @@ public final class TypeFormatter extends AbstractParameterFormatter
   {
     return value == null
         ? nullText()
-        : noSpaceText(toString((Type) value, formatterContext.getConfigValueString("type").orElse("ju")));
+        : noSpaceText(toString((Type) value,
+            formatterContext.getConfigValueString("type").orElse("ju")));
   }
 
 
@@ -110,7 +111,8 @@ public final class TypeFormatter extends AbstractParameterFormatter
         if (ownerType instanceof ParameterizedType && rawType instanceof Class)
         {
           final Class<?> ownerRawType = (Class<?>)((ParameterizedType)ownerType).getRawType();
-          formattedType.append(((Class<?>)rawType).getName().replace(ownerRawType.getName() + "$", ""));
+          formattedType.append(((Class<?>)rawType).getName()
+              .replace(ownerRawType.getName() + "$", ""));
           break withOwnerType;
         }
       }
@@ -130,7 +132,8 @@ public final class TypeFormatter extends AbstractParameterFormatter
   }
 
 
-  private static String toString_typeVariable(@NotNull TypeVariable<?> typeVariable, @NotNull String typeFormat)
+  private static String toString_typeVariable(@NotNull TypeVariable<?> typeVariable,
+                                              @NotNull String typeFormat)
   {
     if (typeFormat.indexOf('v') < 0)
       return typeVariable.getName();
@@ -152,7 +155,8 @@ public final class TypeFormatter extends AbstractParameterFormatter
   }
 
 
-  private static String toString_wildcard(@NotNull WildcardType wildcardType, @NotNull String typeFormat)
+  private static String toString_wildcard(@NotNull WildcardType wildcardType,
+                                          @NotNull String typeFormat)
   {
     final StringBuilder formattedWildcardType = new StringBuilder();
     final Type[] lowerBounds = wildcardType.getLowerBounds();

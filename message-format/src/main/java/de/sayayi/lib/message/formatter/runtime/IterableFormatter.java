@@ -38,7 +38,8 @@ import static java.util.Collections.singleton;
 /**
  * @author Jeroen Gremmen
  */
-public final class IterableFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
+public final class IterableFormatter extends AbstractParameterFormatter
+    implements EmptyMatcher, SizeQueryable
 {
   @SuppressWarnings("rawtypes")
   @Override
@@ -53,12 +54,16 @@ public final class IterableFormatter extends AbstractParameterFormatter implemen
       return emptyText();
 
     final String sep =
-        spacedText(context.getConfigValueString("list-sep").orElse(", ")).getTextWithSpaces();
+        spacedText(context.getConfigValueString("list-sep").orElse(", "))
+            .getTextWithSpaces();
     final String sepLast =
-        spacedText(context.getConfigValueString("list-sep-last").orElse(sep)).getTextWithSpaces();
-    final Text nullText = noSpaceText(context.getConfigValueString("list-null").orElse(""));
+        spacedText(context.getConfigValueString("list-sep-last").orElse(sep))
+            .getTextWithSpaces();
+    final Text nullText =
+        noSpaceText(context.getConfigValueString("list-null").orElse(""));
     final Text thisText =
-        noSpaceText(context.getConfigValueString("list-this").orElse("(this collection)"));
+        noSpaceText(context.getConfigValueString("list-this")
+            .orElse("(this collection)"));
     final StringBuilder s = new StringBuilder();
 
     while(iterator.hasNext())

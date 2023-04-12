@@ -73,7 +73,7 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
   @Override
   public String toString() {
-    return "EmptyMessageWithCode(code=" + code + ')';
+    return "EmptyMessageWithCode(" + code + ')';
   }
 
 

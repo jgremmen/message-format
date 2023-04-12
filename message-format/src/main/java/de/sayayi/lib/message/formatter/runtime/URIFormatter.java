@@ -69,12 +69,14 @@ public final class URIFormatter extends AbstractParameterFormatter
         final int port = uri.getPort();
         if (port == -1)
         {
-          final Optional<String> portUndef = formatterContext.getConfigValueString("uri-port-undef");
+          final Optional<String> portUndef =
+              formatterContext.getConfigValueString("uri-port-undef");
           if (portUndef.isPresent())
             return noSpaceText(portUndef.get());
         }
 
-        final Message.WithSpaces msg = formatterContext.getMapMessage(port, NUMBER_TYPE).orElse(null);
+        final Message.WithSpaces msg =
+            formatterContext.getMapMessage(port, NUMBER_TYPE).orElse(null);
         return msg != null
             ? new TextPart(msg.format(formatterContext.getMessageSupport(), formatterContext),
                 msg.isSpaceBefore(), msg.isSpaceAfter())
@@ -86,7 +88,8 @@ public final class URIFormatter extends AbstractParameterFormatter
 
       case "scheme": {
         final String scheme = uri.getScheme();
-        final Message.WithSpaces msg = formatterContext.getMapMessage(scheme, STRING_EMPTY_TYPE).orElse(null);
+        final Message.WithSpaces msg =
+            formatterContext.getMapMessage(scheme, STRING_EMPTY_TYPE).orElse(null);
 
         return msg != null
             ? new TextPart(msg.format(formatterContext.getMessageSupport(), formatterContext),

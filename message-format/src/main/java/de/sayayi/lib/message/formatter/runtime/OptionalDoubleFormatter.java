@@ -39,7 +39,8 @@ import static java.util.Collections.singleton;
 /**
  * @author Jeroen Gremmen
  */
-public final class OptionalDoubleFormatter extends AbstractParameterFormatter implements EmptyMatcher, SizeQueryable
+public final class OptionalDoubleFormatter extends AbstractParameterFormatter
+    implements EmptyMatcher, SizeQueryable
 {
   @Override
   @Contract(pure = true)

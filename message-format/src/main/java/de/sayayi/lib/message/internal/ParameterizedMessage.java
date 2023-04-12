@@ -119,7 +119,7 @@ public class ParameterizedMessage implements Message.WithSpaces
   @Override
   public boolean equals(Object o)
   {
-    return o == this ||
+    return this == o ||
         o instanceof ParameterizedMessage && deepEquals(parts, ((ParameterizedMessage)o).parts);
   }
 
