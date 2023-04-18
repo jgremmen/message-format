@@ -17,6 +17,7 @@ pluginManagement {
 
 include "message-format"
 include "message-format-jodatime"
+include "gradle-plugin"
 include "documentation"
 
 rootProject.name = 'message-format-projects'
