@@ -50,7 +50,7 @@ import static org.objectweb.asm.Type.getDescriptor;
  *
  * @see AnnotationAdopter
  */
-public final class AsmClassPathScannerAdopter extends AbstractAsmClassPathScannerAdopter
+public class AsmClassPathScannerAdopter extends AbstractAsmClassPathScannerAdopter
 {
   private static final String MESSAGE_DEFS_DESCRIPTOR = getDescriptor(MessageDefs.class);
   private static final String MESSAGE_DEF_DESCRIPTOR = getDescriptor(MessageDef.class);

@@ -15,10 +15,46 @@
  */
 package de.sayayi.lib.message.plugin.gradle;
 
+import lombok.Getter;
+import org.gradle.api.file.ConfigurableFileCollection;
+import org.gradle.api.file.DirectoryProperty;
+import org.gradle.api.provider.Property;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 
 /**
  * @author Jeroen Gremmen
  */
 public abstract class MessageFormatExtension
 {
+  @Getter private final List<String> includeRegexFilter = new ArrayList<>();
+  @Getter private final List<String> excludeRegexFilter = new ArrayList<>();
+
+
+  public abstract Property<String> getPackFilename();
+
+
+  public abstract Property<Boolean> getCompress();
+
+
+  public abstract ConfigurableFileCollection getSources();
+
+
+  public abstract Property<DuplicatesStrategy> getDuplicatesStrategy();
+
+
+  public abstract DirectoryProperty getDestinationDirectory();
+
+
+  public void include(String... regex) {
+    includeRegexFilter.addAll(Arrays.asList(regex));
+  }
+
+
+  public void exclude(String... regex) {
+    excludeRegexFilter.addAll(Arrays.asList(regex));
+  }
 }
