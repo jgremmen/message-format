@@ -27,6 +27,7 @@ import java.util.List;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 public abstract class MessageFormatExtension
 {

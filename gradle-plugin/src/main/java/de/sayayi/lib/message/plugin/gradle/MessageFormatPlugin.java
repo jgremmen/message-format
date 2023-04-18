@@ -30,6 +30,7 @@ import static java.lang.Boolean.FALSE;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 public class MessageFormatPlugin implements Plugin<Project>
 {

@@ -34,17 +34,19 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.unmodifiableList;
 
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 public abstract class MessageFormatPackTask extends DefaultTask
 {
@@ -54,36 +56,39 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   @Input
   public List<String> getIncludeRegexFilters() {
-    return includeRegexFilters;
+    return unmodifiableList(includeRegexFilters);
   }
 
 
   @Input
   public List<String> getExcludeRegexFilters() {
-    return excludeRegexFilters;
+    return unmodifiableList(excludeRegexFilters);
   }
 
 
   @InputFiles
   public abstract ConfigurableFileCollection getSources();
 
+
   @Input
   public abstract Property<DuplicatesStrategy> getDuplicatesStrategy();
 
+
   @Input
   public abstract Property<Boolean> getCompress();
+
 
   @OutputFile
   public abstract RegularFileProperty getPackFile();
 
 
   public void include(String... regex) {
-    includeRegexFilters.addAll(Arrays.asList(regex));
+    includeRegexFilters.addAll(asList(regex));
   }
 
 
   public void exclude(String... regex) {
-    excludeRegexFilters.addAll(Arrays.asList(regex));
+    excludeRegexFilters.addAll(asList(regex));
   }
 
 
@@ -111,9 +116,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
     getProject().mkdir(packFile.getParentFile());
 
     try(val packOutputStream = newOutputStream(packFile.toPath())) {
-      messageSupport.exportMessages(
-          packOutputStream,
-          getCompress().getOrElse(false),
+      messageSupport.exportMessages(packOutputStream, getCompress().getOrElse(false),
           this::messageCodeFilter);
     } catch(IOException ex) {
       throw new GradleException("Failed to write packed messages", ex);
@@ -137,12 +140,13 @@ public abstract class MessageFormatPackTask extends DefaultTask
         }
     }
 
-    for(val regex: excludeRegexFilters)
-      if (code.matches(regex))
-      {
-        match = false;
-        break;
-      }
+    if (match)
+      for(val regex: excludeRegexFilters)
+        if (code.matches(regex))
+        {
+          match = false;
+          break;
+        }
 
     return match;
   }
@@ -252,7 +256,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   private static final class SourceSetScannerAdopter extends AsmClassPathScannerAdopter
   {
     public SourceSetScannerAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {
-      super(configurableMessageSupport, Collections.emptySet(), null);
+      super(configurableMessageSupport, emptySet(), null);
     }
 
 

@@ -18,6 +18,7 @@ package de.sayayi.lib.message.plugin.gradle;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 public enum DuplicatesStrategy
 {
