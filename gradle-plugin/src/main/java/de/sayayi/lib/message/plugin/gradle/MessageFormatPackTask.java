@@ -26,6 +26,7 @@ import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 import org.jetbrains.annotations.NotNull;
@@ -47,10 +48,23 @@ import static java.nio.file.Files.newOutputStream;
  */
 public abstract class MessageFormatPackTask extends DefaultTask
 {
-  private final List<String> includeRegexFilter = new ArrayList<>();
-  private final List<String> excludeRegexFilter = new ArrayList<>();
+  private final List<String> includeRegexFilters = new ArrayList<>();
+  private final List<String> excludeRegexFilters = new ArrayList<>();
+
 
   @Input
+  public List<String> getIncludeRegexFilters() {
+    return includeRegexFilters;
+  }
+
+
+  @Input
+  public List<String> getExcludeRegexFilters() {
+    return excludeRegexFilters;
+  }
+
+
+  @InputFiles
   public abstract ConfigurableFileCollection getSources();
 
   @Input
@@ -64,12 +78,12 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   public void include(String... regex) {
-    includeRegexFilter.addAll(Arrays.asList(regex));
+    includeRegexFilters.addAll(Arrays.asList(regex));
   }
 
 
   public void exclude(String... regex) {
-    excludeRegexFilter.addAll(Arrays.asList(regex));
+    excludeRegexFilters.addAll(Arrays.asList(regex));
   }
 
 
@@ -111,11 +125,11 @@ public abstract class MessageFormatPackTask extends DefaultTask
   {
     boolean match = true;
 
-    if (!includeRegexFilter.isEmpty())
+    if (!includeRegexFilters.isEmpty())
     {
       match = false;
 
-      for(val regex: includeRegexFilter)
+      for(val regex: includeRegexFilters)
         if (code.matches(regex))
         {
           match = true;
@@ -123,7 +137,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
         }
     }
 
-    for(val regex: excludeRegexFilter)
+    for(val regex: excludeRegexFilters)
       if (code.matches(regex))
       {
         match = false;
