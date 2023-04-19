@@ -17,6 +17,7 @@ package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
@@ -64,6 +65,12 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
   public @NotNull String format(@NotNull MessageSupportAccessor messageSupport,
                                 @NotNull Parameters parameters) {
     return message.format(messageSupport, parameters);
+  }
+
+
+  @Override
+  public @NotNull MessagePart[] getMessageParts() {
+    return message.getMessageParts();
   }
 
 

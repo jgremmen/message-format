@@ -17,13 +17,16 @@ package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 
@@ -88,8 +91,22 @@ public final class TextMessage implements Message.WithSpaces
 
 
   @Override
+  public @NotNull MessagePart[] getMessageParts() {
+    return new MessagePart[] { new TextPart(text, spaceBefore, spaceAfter) };
+  }
+
+
+  @Override
   public @NotNull Set<String> getTemplateNames() {
     return emptySet();
+  }
+
+
+  @Override
+  public boolean isSame(@NotNull Message message)
+  {
+    return !(message instanceof LocaleAware) &&
+        Arrays.equals(getMessageParts(), message.getMessageParts());
   }
 
 

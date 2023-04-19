@@ -106,6 +106,12 @@ public class ParameterizedMessage implements Message.WithSpaces
 
 
   @Override
+  public @NotNull MessagePart[] getMessageParts() {
+    return copyOf(parts, parts.length);
+  }
+
+
+  @Override
   public @NotNull Set<String> getTemplateNames()
   {
     return unmodifiableSet(Arrays
@@ -113,6 +119,14 @@ public class ParameterizedMessage implements Message.WithSpaces
         .filter(p -> p instanceof TemplatePart)
         .map(p -> ((TemplatePart)p).getName())
         .collect(toSet()));
+  }
+
+
+  @Override
+  public boolean isSame(@NotNull Message message)
+  {
+    return !(message instanceof LocaleAware) &&
+        Arrays.equals(getMessageParts(), message.getMessageParts());
   }
 
 

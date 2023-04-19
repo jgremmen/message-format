@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.exception.MessageException;
+import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
@@ -124,6 +125,12 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
 
   @Override
+  public @NotNull MessagePart[] getMessageParts() {
+    throw new UnsupportedOperationException();
+  }
+
+
+  @Override
   public @NotNull Set<String> getTemplateNames()
   {
     return unmodifiableSet(localizedMessages
@@ -132,6 +139,28 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
         .flatMap(m -> m.getTemplateNames().stream())
         .collect(toSet()));
   }
+
+
+  @Override
+  @SuppressWarnings("DuplicatedCode")
+  public boolean isSame(@NotNull Message message)
+  {
+    if (!(message instanceof LocaleAware))
+      return false;
+
+    final Map<Locale,Message> lmm1 = ((LocaleAware)this).getLocalizedMessages();
+    final Map<Locale,Message> lmm2 = ((LocaleAware)message).getLocalizedMessages();
+
+    if (!lmm1.keySet().equals(lmm2.keySet()))
+      return false;
+
+    for(final Entry<Locale,Message> entry: lmm1.entrySet())
+      if (!entry.getValue().isSame(lmm2.get(entry.getKey())))
+        return false;
+
+    return true;
+  }
+
 
   @Override
   public boolean equals(Object o)

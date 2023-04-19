@@ -17,11 +17,13 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.internal.NoParameters;
+import de.sayayi.lib.message.internal.part.MessagePart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static java.util.Locale.ROOT;
 
@@ -81,6 +83,10 @@ public interface Message extends Serializable
   }
 
 
+  @Contract(pure = true)
+  @NotNull MessagePart[] getMessageParts();
+
+
   /**
    * Returns a set with all templates names in use by this message.
    *
@@ -88,6 +94,32 @@ public interface Message extends Serializable
    */
   @Contract(pure = true)
   @NotNull Set<String> getTemplateNames();
+
+
+  @Contract(pure = true)
+  default boolean isSame(@NotNull Message message)
+  {
+    final boolean localeAware = this instanceof LocaleAware;
+
+    if (localeAware != (message instanceof LocaleAware))
+      return false;
+    else if (localeAware)
+    {
+      final Map<Locale,Message> lmm1 = ((LocaleAware)this).getLocalizedMessages();
+      final Map<Locale,Message> lmm2 = ((LocaleAware)message).getLocalizedMessages();
+
+      if (!lmm1.keySet().equals(lmm2.keySet()))
+        return false;
+
+      for(final Entry<Locale,Message> entry: lmm1.entrySet())
+        if (!entry.getValue().isSame(lmm2.get(entry.getKey())))
+          return false;
+
+      return true;
+    }
+    else
+      return Arrays.equals(getMessageParts(), message.getMessageParts());
+  }
 
 
 
