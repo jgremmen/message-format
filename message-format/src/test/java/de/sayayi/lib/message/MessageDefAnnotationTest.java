@@ -17,7 +17,7 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.Message.WithCode;
-import de.sayayi.lib.message.adopter.AnnotationAdopter;
+import de.sayayi.lib.message.adopter.AsmAnnotationAdopter;
 import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
@@ -49,9 +49,10 @@ public class MessageDefAnnotationTest
   @BeforeAll
   static void initialize()
   {
-    val cms = MessageSupportFactory.create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+    val cms = MessageSupportFactory
+        .create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
-    new AnnotationAdopter(cms).adoptAll(MessageDefAnnotationTest.class);
+    new AsmAnnotationAdopter(cms).adopt(MessageDefAnnotationTest.class);
 
     messageSupport = cms;
   }
@@ -64,7 +65,7 @@ public class MessageDefAnnotationTest
       @Text(locale = "en", text = "English message"),
       @Text(locale = "de", text = "Deutsche   Nachricht")
   })
-  void testMultiMessageAnotation()
+  void testMultiMessageAnnotation()
   {
     WithCode msg = messageSupport.code("T4").getMessage();
 
@@ -165,8 +166,8 @@ public class MessageDefAnnotationTest
     val packStream = new ByteArrayOutputStream();
     messageSupport.exportMessages(packStream, true, code -> code.startsWith("T"));
 
-    val newMessageSupport = MessageSupportFactory.create(DefaultFormatterService.getSharedInstance(),
-        NO_CACHE_INSTANCE);
+    val newMessageSupport = MessageSupportFactory
+        .create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
     newMessageSupport.importMessages(new ByteArrayInputStream(packStream.toByteArray()));
 
     val codes = newMessageSupport.getAccessor().getMessageCodes();

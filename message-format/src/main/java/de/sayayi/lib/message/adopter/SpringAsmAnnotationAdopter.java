@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Jeroen Gremmen
+ * Copyright 2023 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,12 @@ import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
 import de.sayayi.lib.message.annotation.*;
-import de.sayayi.lib.message.annotation.impl.MessageDefImpl;
-import de.sayayi.lib.message.annotation.impl.TemplateDefImpl;
-import de.sayayi.lib.message.annotation.impl.TextImpl;
 import org.jetbrains.annotations.NotNull;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
+import org.springframework.asm.AnnotationVisitor;
+import org.springframework.asm.ClassReader;
+import org.springframework.asm.ClassVisitor;
+import org.springframework.asm.MethodVisitor;
+import org.springframework.core.io.ResourceLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,23 +32,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.objectweb.asm.Opcodes.ACC_SYNTHETIC;
-import static org.objectweb.asm.Opcodes.ASM9;
+import static java.util.Objects.requireNonNull;
 import static org.objectweb.asm.Type.getDescriptor;
+import static org.springframework.asm.Opcodes.ACC_SYNTHETIC;
+import static org.springframework.asm.Opcodes.ASM9;
 
 
 /**
- * The Asm classpath scanner scans classes and publishes the annotated messages found.
+ * This annotation adopter scans classes and publishes the annotated messages found.
  * <p>
- * The scanned classes are not loaded by the classloader but instead are analysed using the
- * ASM library. Using this class therefore requires a dependency with library {@code org.ow2.asm:asm:9.4}.
+ * The scanned classes are analysed using the ASM library bundled with Spring. Using this class
+ * therefore requires a dependency with library {@code org.springframework:spring-core:5.3.26}.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
- *
- * @see AnnotationAdopter
  */
-public class AsmClassPathScannerAdopter extends AbstractAsmClassPathScannerAdopter
+@SuppressWarnings("unused")
+public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
 {
   private static final String MESSAGE_DEFS_DESCRIPTOR = getDescriptor(MessageDefs.class);
   private static final String MESSAGE_DEF_DESCRIPTOR = getDescriptor(MessageDef.class);
@@ -59,17 +57,23 @@ public class AsmClassPathScannerAdopter extends AbstractAsmClassPathScannerAdopt
   private static final String TEXT_DESCRIPTOR = getDescriptor(Text.class);
 
 
-  public AsmClassPathScannerAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport,
-                                    @NotNull Set<String> packageNames, ClassLoader classLoader) {
-    super(configurableMessageSupport, packageNames, classLoader);
+  public SpringAsmAnnotationAdopter(
+      @NotNull ConfigurableMessageSupport configurableMessageSupport) {
+    super(configurableMessageSupport);
   }
 
 
-  public AsmClassPathScannerAdopter(@NotNull MessageFactory messageFactory,
-                                    @NotNull MessagePublisher publisher,
-                                    @NotNull Set<String> packageNames,
-                                    ClassLoader classLoader) {
-    super(messageFactory, publisher, packageNames, classLoader);
+  public SpringAsmAnnotationAdopter(@NotNull MessageFactory messageFactory,
+                                    @NotNull MessagePublisher publisher) {
+    super(messageFactory, publisher);
+  }
+
+
+  public SpringAsmAnnotationAdopter adopt(@NotNull ResourceLoader resourceLoader,
+                                          @NotNull Set<String> packageNames)
+  {
+    return (SpringAsmAnnotationAdopter)
+        adopt(requireNonNull(resourceLoader.getClassLoader()), packageNames);
   }
 
 
@@ -202,7 +206,7 @@ public class AsmClassPathScannerAdopter extends AbstractAsmClassPathScannerAdopt
 
     @Override
     public void visitEnd() {
-      annotationAdopter.adopt(new MessageDefImpl(code, text, texts.toArray(new Text[0])));
+      adopt(new MessageDefImpl(code, text, texts.toArray(new Text[0])));
     }
   }
 
@@ -269,7 +273,7 @@ public class AsmClassPathScannerAdopter extends AbstractAsmClassPathScannerAdopt
 
     @Override
     public void visitEnd() {
-      annotationAdopter.adopt(new TemplateDefImpl(name, text, texts.toArray(new Text[0])));
+      adopt(new TemplateDefImpl(name, text, texts.toArray(new Text[0])));
     }
   }
 

@@ -17,7 +17,7 @@ package de.sayayi.lib.message.plugin.gradle;
 
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.adopter.AsmClassPathScannerAdopter;
+import de.sayayi.lib.message.adopter.AsmAnnotationAdopter;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import lombok.val;
 import org.gradle.api.DefaultTask;
@@ -31,16 +31,13 @@ import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableList;
 
 
@@ -101,14 +98,14 @@ public abstract class MessageFormatPackTask extends DefaultTask
     configureDuplicatesStrategy(messageSupport);
 
     try {
-      val adopter = new SourceSetScannerAdopter(messageSupport);
+      val adopter = new AsmAnnotationAdopter(messageSupport);
 
       for(val classFile: getSources().getFiles())
       {
         getLogger().debug("Scanning " + classFile.getAbsolutePath());
-        adopter.parseClass(classFile);
+        adopter.adopt(classFile);
       }
-    } catch(IOException ex) {
+    } catch(Exception ex) {
       throw new GradleException("Failed to scan messages", ex);
     }
 
@@ -248,23 +245,5 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
       return true;
     });
-  }
-
-
-
-
-  private static final class SourceSetScannerAdopter extends AsmClassPathScannerAdopter
-  {
-    public SourceSetScannerAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {
-      super(configurableMessageSupport, emptySet(), null);
-    }
-
-
-    void parseClass(@NotNull File classFile) throws IOException
-    {
-      try(val classInputStream = newInputStream(classFile.toPath())) {
-        parseClass(classInputStream);
-      }
-    }
   }
 }

@@ -19,40 +19,33 @@ import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
 import de.sayayi.lib.message.annotation.*;
-import de.sayayi.lib.message.annotation.impl.MessageDefImpl;
-import de.sayayi.lib.message.annotation.impl.TemplateDefImpl;
-import de.sayayi.lib.message.annotation.impl.TextImpl;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.asm.AnnotationVisitor;
-import org.springframework.asm.ClassReader;
-import org.springframework.asm.ClassVisitor;
-import org.springframework.asm.MethodVisitor;
-import org.springframework.core.io.ResourceLoader;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.MethodVisitor;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
+import static org.objectweb.asm.Opcodes.ACC_SYNTHETIC;
+import static org.objectweb.asm.Opcodes.ASM9;
 import static org.objectweb.asm.Type.getDescriptor;
-import static org.springframework.asm.Opcodes.ACC_SYNTHETIC;
-import static org.springframework.asm.Opcodes.ASM9;
 
 
 /**
- * The Spring Asm classpath scanner scans classes and publishes the annotated messages found.
+ * This annotation adopter scans classes and publishes the annotated messages found.
  * <p>
- * The scanned classes are not loaded by the classloader but instead are analysed using the ASM library
- * bundled with Spring. Using this class therefore requires a dependency with library
- * {@code org.springframework:spring-core:5.3.26}.
+ * The scanned classes are analysed using the ASM library. Using this class therefore requires a
+ * dependency with library {@code org.ow2.asm:asm:9.4}.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
- *
- * @see AnnotationAdopter
  */
-public final class SpringAsmClassPathScannerAdopter extends AbstractAsmClassPathScannerAdopter
+@SuppressWarnings("unused")
+public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
 {
   private static final String MESSAGE_DEFS_DESCRIPTOR = getDescriptor(MessageDefs.class);
   private static final String MESSAGE_DEF_DESCRIPTOR = getDescriptor(MessageDef.class);
@@ -61,19 +54,14 @@ public final class SpringAsmClassPathScannerAdopter extends AbstractAsmClassPath
   private static final String TEXT_DESCRIPTOR = getDescriptor(Text.class);
 
 
-  public SpringAsmClassPathScannerAdopter(
-      @NotNull ConfigurableMessageSupport configurableMessageSupport,
-      @NotNull Set<String> packageNames,
-      @NotNull ResourceLoader resourceLoader) {
-    super(configurableMessageSupport, packageNames, resourceLoader.getClassLoader());
+  public AsmAnnotationAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {
+    super(configurableMessageSupport);
   }
 
 
-  public SpringAsmClassPathScannerAdopter(@NotNull MessageFactory messageFactory,
-                                          @NotNull MessagePublisher publisher,
-                                          @NotNull Set<String> packageNames,
-                                          @NotNull ResourceLoader resourceLoader) {
-    super(messageFactory, publisher, packageNames, resourceLoader.getClassLoader());
+  public AsmAnnotationAdopter(@NotNull MessageFactory messageFactory,
+                              @NotNull MessagePublisher publisher) {
+    super(messageFactory, publisher);
   }
 
 
@@ -206,7 +194,7 @@ public final class SpringAsmClassPathScannerAdopter extends AbstractAsmClassPath
 
     @Override
     public void visitEnd() {
-      annotationAdopter.adopt(new MessageDefImpl(code, text, texts.toArray(new Text[0])));
+      adopt(new MessageDefImpl(code, text, texts.toArray(new Text[0])));
     }
   }
 
@@ -273,7 +261,7 @@ public final class SpringAsmClassPathScannerAdopter extends AbstractAsmClassPath
 
     @Override
     public void visitEnd() {
-      annotationAdopter.adopt(new TemplateDefImpl(name, text, texts.toArray(new Text[0])));
+      adopt(new TemplateDefImpl(name, text, texts.toArray(new Text[0])));
     }
   }
 

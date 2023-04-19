@@ -17,7 +17,7 @@ package de.sayayi.lib.message.adopter.asm;
 
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.adopter.AsmClassPathScannerAdopter;
+import de.sayayi.lib.message.adopter.AsmAnnotationAdopter;
 import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         @Text("Other language")
     })
 })
-public final class AsmClassPathScannerAdopterTest
+public final class AsmAnnotationsAdopterTest
 {
   @Test
   @MessageDef(code = "M1", text = "Method message 1")
@@ -51,12 +51,13 @@ public final class AsmClassPathScannerAdopterTest
     val messageFactory = new MessageFactory(new LRUMessagePartNormalizer(10));
     val messageSupport = MessageSupportFactory.create(new DefaultFormatterService(), messageFactory);
 
-    new AsmClassPathScannerAdopter(NO_CACHE_INSTANCE, messageSupport,
-        singleton(AsmClassPathScannerAdopterTest.class.getPackage().getName()), null)
-        .scan();
+    new AsmAnnotationAdopter(NO_CACHE_INSTANCE, messageSupport).adopt(
+        AsmAnnotationsAdopterTest.class.getClassLoader(),
+        singleton(AsmAnnotationsAdopterTest.class.getPackage().getName()));
 
     val accessor = messageSupport.getAccessor();
 
+    assertTrue(accessor.hasMessageWithCode("A0"));
     assertTrue(accessor.hasMessageWithCode("CLASS"));
     assertTrue(accessor.hasMessageWithCode("M1"));
     assertTrue(accessor.hasMessageWithCode("M2"));
@@ -75,6 +76,7 @@ public final class AsmClassPathScannerAdopterTest
 
 
   private interface InterfaceA {
+    @SuppressWarnings("unused")
     void syntheticA();
   }
 
@@ -90,6 +92,7 @@ public final class AsmClassPathScannerAdopterTest
 
 
 
+  @SuppressWarnings("unused")
   private static class B extends AbstractA {
   }
 }

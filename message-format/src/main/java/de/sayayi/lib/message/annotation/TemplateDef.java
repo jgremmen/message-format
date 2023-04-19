@@ -20,7 +20,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.RetentionPolicy.CLASS;
 
 
 /**
@@ -36,10 +36,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @since 0.8.0
  *
- * @see de.sayayi.lib.message.adopter.AnnotationAdopter AnnotationAdopter
+ * @see de.sayayi.lib.message.adopter.AsmAnnotationAdopter AsmAnnotationAdopter
+ * @see de.sayayi.lib.message.adopter.SpringAsmAnnotationAdopter SpringAsmAnnotationAdopter
  */
 @Target({ ANNOTATION_TYPE, METHOD, TYPE })
-@Retention(RUNTIME)
+@Retention(CLASS)
 @Repeatable(TemplateDefs.class)
 public @interface TemplateDef
 {
