@@ -25,7 +25,6 @@ import org.gradle.api.tasks.SourceSet;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.plugin.gradle.DuplicatesStrategy.IGNORE_AND_WARN;
-import static java.lang.Boolean.FALSE;
 
 
 /**
@@ -49,17 +48,20 @@ public class MessageFormatPlugin implements Plugin<Project>
     val messageFormatExtension = extensions.create(EXTENSION, MessageFormatExtension.class);
 
     messageFormatExtension.getPackFilename().convention("message.pack");
-    messageFormatExtension.getCompress().convention(FALSE);
+    messageFormatExtension.getCompress().convention(false);
     messageFormatExtension.getDuplicatesStrategy().convention(IGNORE_AND_WARN);
 
-    val mainSourceSet = extensions.getByType(JavaPluginExtension.class)
+    val mainJavaSourceSet = extensions.getByType(JavaPluginExtension.class)
         .getSourceSets().getByName("main");
 
-    messageFormatExtension.getDestinationDirectory().convention(
-        mainSourceSet.getResources().getDestinationDirectory().dir("META-INF"));
-    messageFormatExtension.getSources().from(mainSourceSet.getOutput());
+    // destination dir = {.build/resources/main/}META-INF/
+    messageFormatExtension.getDestinationDir().convention(
+        mainJavaSourceSet.getResources().getDestinationDirectory().dir("META-INF"));
 
-    registerPackTask(project, messageFormatExtension, mainSourceSet);
+    // sources = {.build/classes/java/main/}**/*.class
+    messageFormatExtension.getSources().from(mainJavaSourceSet.getOutput());
+
+    registerPackTask(project, messageFormatExtension, mainJavaSourceSet);
   }
 
 
@@ -77,7 +79,7 @@ public class MessageFormatPlugin implements Plugin<Project>
       packTask.getDuplicatesStrategy().convention(extension.getDuplicatesStrategy());
       packTask.getSources().from(extension.getSources());
       packTask.getPackFile().convention(project.provider(() ->
-          extension.getDestinationDirectory().file(extension.getPackFilename()).get()));
+          extension.getDestinationDir().file(extension.getPackFilename()).get()));
       packTask.include(extension.getIncludeRegexFilter().toArray(new String[0]));
       packTask.exclude(extension.getExcludeRegexFilter().toArray(new String[0]));
 

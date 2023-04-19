@@ -47,7 +47,7 @@ public abstract class MessageFormatExtension
   public abstract Property<DuplicatesStrategy> getDuplicatesStrategy();
 
 
-  public abstract DirectoryProperty getDestinationDirectory();
+  public abstract DirectoryProperty getDestinationDir();
 
 
   public void include(String... regex) {
