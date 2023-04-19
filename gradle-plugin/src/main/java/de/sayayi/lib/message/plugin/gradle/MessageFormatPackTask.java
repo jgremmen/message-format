@@ -184,14 +184,24 @@ public abstract class MessageFormatPackTask extends DefaultTask
       final String code = message.getCode();
 
       if (accessor.hasMessageWithCode(code))
-        throw new GradleException("Duplicate message code '" + code + "'");
+      {
+        if (!accessor.getMessageByCode(code).isSame(message))
+          throw new GradleException("Duplicate message code '" + code + "'");
+
+        return false;
+      }
 
       return true;
     });
 
-    messageSupport.setTemplateFilter((name,template) -> {
+    messageSupport.setTemplateFilter((name, template) -> {
       if (accessor.hasTemplateWithName(name))
-        throw new GradleException("Duplicate template name '" + name + "'");
+      {
+        if (!accessor.getTemplateByName(name).isSame(template))
+          throw new GradleException("Duplicate template name '" + name + "'");
+
+        return false;
+      }
 
       return true;
     });
@@ -208,7 +218,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
       if (accessor.hasMessageWithCode(code))
       {
-        if (warn)
+        if (warn && !accessor.getMessageByCode(code).isSame(message))
           getLogger().warn("Duplicate message code '" + code + "'");
 
         return false;
@@ -217,10 +227,10 @@ public abstract class MessageFormatPackTask extends DefaultTask
       return true;
     });
 
-    messageSupport.setTemplateFilter((name,template) -> {
+    messageSupport.setTemplateFilter((name, template) -> {
       if (accessor.hasTemplateWithName(name))
       {
-        if (warn)
+        if (warn && !accessor.getTemplateByName(name).isSame(template))
           getLogger().warn("Duplicate template name '" + name + "'");
 
         return false;
@@ -240,14 +250,24 @@ public abstract class MessageFormatPackTask extends DefaultTask
       final String code = message.getCode();
 
       if (warn && accessor.hasMessageWithCode(code))
+      {
+        if (accessor.getMessageByCode(code).isSame(message))
+          return false;
+
         getLogger().warn("Duplicate message code '" + code + "'");
+      }
 
       return true;
     });
 
-    messageSupport.setTemplateFilter((name,template) -> {
+    messageSupport.setTemplateFilter((name, template) -> {
       if (warn && accessor.hasTemplateWithName(name))
+      {
+        if (accessor.getTemplateByName(name).isSame(template))
+          return false;
+
         getLogger().warn("Duplicate template name '" + name + "'");
+      }
 
       return true;
     });

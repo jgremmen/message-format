@@ -295,12 +295,15 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   protected boolean failOnDuplicateMessage(@NotNull Message.WithCode message)
   {
     final String code = message.getCode();
+    final Message tm = messages.get(code);
 
-    if (messages.containsKey(code))
+    if (tm != null)
     {
-      if (!messages.get(code).isSame(message))
+      if (!tm.isSame(message))
+      {
         throw new DuplicateMessageException(code,
-            "Message with code '" + code + "' already exists");
+            "different message with identical code '" + code + "' already exists");
+      }
 
       return false;
     }
@@ -311,11 +314,15 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
   protected boolean failOnDuplicateTemplate(@NotNull String name, @NotNull Message template)
   {
-    if (templates.containsKey(name))
+    final Message ttm = templates.get(name);
+
+    if (ttm != null)
     {
-      if (templates.get(name).isSame(template))
+      if (ttm.isSame(template))
+      {
         throw new DuplicateTemplateException(name,
-            "Template with name '" + name + "' already exists");
+            "different template with identical name '" + name + "' already exists");
+      }
 
       return false;
     }

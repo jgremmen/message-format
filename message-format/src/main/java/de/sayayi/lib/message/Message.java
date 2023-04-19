@@ -83,6 +83,12 @@ public interface Message extends Serializable
   }
 
 
+  /**
+   *
+   * @return  message parts, never {@code null}
+   *
+   * @since 0.8.0
+   */
   @Contract(pure = true)
   @NotNull MessagePart[] getMessageParts();
 
@@ -91,11 +97,29 @@ public interface Message extends Serializable
    * Returns a set with all templates names in use by this message.
    *
    * @return  template names, never {@code null}
+   *
+   * @since 0.8.0
    */
   @Contract(pure = true)
   @NotNull Set<String> getTemplateNames();
 
 
+  /**
+   * Checks whether this message is the same as the given {@code message}. Messages are
+   * considered "the same" when the message parts of both messages are identical.
+   * <p>
+   * {@link LocaleAware} messages are "the same" when both locale and associated message are
+   * identical for all locales provided by this message. Locale aware messages must be properly
+   * handled by overriding methods.
+   *
+   * @param message  message to compare with this message, not {@code null}
+   *
+   * @return  {@code true} if both messages are identical, {@code false} otherwise
+   *
+   * @see Message#getMessageParts()
+   *
+   * @since 0.8.0
+   */
   @Contract(pure = true)
   default boolean isSame(@NotNull Message message)
   {
