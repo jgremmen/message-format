@@ -59,8 +59,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   private final @NotNull MessageSupportAccessor accessor;
 
   private @NotNull Locale locale;
-  private @NotNull Predicate<String> messageHandler;
-  private @NotNull Predicate<String> templateHandler;
+  private @NotNull MessageFilter messageFilter;
+  private @NotNull TemplateFilter templateFilter;
 
 
   public MessageSupportImpl(@NotNull FormatterService formatterService,
@@ -73,8 +73,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
     accessor = new Accessor();
     locale = Locale.getDefault();
-    messageHandler = this::failOnDuplicateMessage;
-    templateHandler = this::failOnDuplicateTemplate;
+    messageFilter = this::failOnDuplicateMessage;
+    templateFilter = this::failOnDuplicateTemplate;
   }
 
 
@@ -147,22 +147,21 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setMessageHandler(
-      @NotNull Predicate<String> messageHandler)
+  public @NotNull ConfigurableMessageSupport setMessageFilter(@NotNull MessageFilter messageFilter)
   {
-    this.messageHandler =
-        requireNonNull(messageHandler, "messageHandler must not be null");
+    this.messageFilter =
+        requireNonNull(messageFilter, "messageFilter must not be null");
 
     return this;
   }
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setTemplateHandler(
-      @NotNull Predicate<String> templateHandler)
+  public @NotNull ConfigurableMessageSupport setTemplateFilter(
+      @NotNull TemplateFilter templateFilter)
   {
-    this.templateHandler =
-        requireNonNull(templateHandler, "templateHandler must not be null");
+    this.templateFilter =
+        requireNonNull(templateFilter, "templateFilter must not be null");
 
     return this;
   }
@@ -173,7 +172,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   {
     final String code = requireNonNull(message, "message must not be null").getCode();
 
-    if (messageHandler.test(code))
+    if (messageFilter.filter(message))
       messages.put(code, message);
   }
 
@@ -184,7 +183,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     if (requireNonNull(name, "name must not be null").isEmpty())
       throw new IllegalArgumentException("name must not be empty");
 
-    if (templateHandler.test(name))
+    if (templateFilter.filter(name, template))
       templates.put(name, requireNonNull(template));
   }
 
@@ -293,21 +292,32 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   }
 
 
-  protected boolean failOnDuplicateMessage(@NotNull String code)
+  protected boolean failOnDuplicateMessage(@NotNull Message.WithCode message)
   {
+    final String code = message.getCode();
+
     if (messages.containsKey(code))
-      throw new DuplicateMessageException(code, "Message with code '" + code + "' already exists");
+    {
+      if (!messages.get(code).isSame(message))
+        throw new DuplicateMessageException(code,
+            "Message with code '" + code + "' already exists");
+
+      return false;
+    }
 
     return true;
   }
 
 
-  protected boolean failOnDuplicateTemplate(@NotNull String name)
+  protected boolean failOnDuplicateTemplate(@NotNull String name, @NotNull Message template)
   {
     if (templates.containsKey(name))
     {
-      throw new DuplicateTemplateException(name, "Template with name '" + name +
-          "' already exists");
+      if (templates.get(name).isSame(template))
+        throw new DuplicateTemplateException(name,
+            "Template with name '" + name + "' already exists");
+
+      return false;
     }
 
     return true;
@@ -450,6 +460,12 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public boolean hasMessageWithCode(String code) {
       return code != null && messages.containsKey(code);
+    }
+
+
+    @Override
+    public Message.WithCode getMessageByCode(@NotNull String code) {
+      return messages.get(code);
     }
 
 

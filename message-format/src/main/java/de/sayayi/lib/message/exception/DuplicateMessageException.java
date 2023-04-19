@@ -15,10 +15,9 @@
  */
 package de.sayayi.lib.message.exception;
 
+import de.sayayi.lib.message.MessageSupport;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Predicate;
 
 
 /**
@@ -28,8 +27,8 @@ import java.util.function.Predicate;
  * @author Jeroen Gremmen
  * @since 0.8.0
  *
- * @see de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport#setMessageHandler(Predicate)
- *      ConfigurableMessageSupport#setMessageHandler(Predicate)
+ * @see de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport#setMessageFilter(MessageSupport.MessageFilter)
+ *      ConfigurableMessageSupport#setMessageFilter(MessageFilter)
  */
 public final class DuplicateMessageException extends MessageException
 {

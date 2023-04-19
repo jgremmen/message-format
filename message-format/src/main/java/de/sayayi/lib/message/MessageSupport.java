@@ -332,6 +332,7 @@ public interface MessageSupport
      * @see #importMessages(InputStream...)
      */
     @Contract(mutates = "this")
+    @SuppressWarnings("UnusedReturnValue")
     default @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream packStream)
         throws IOException {
       return importMessages(new InputStream[] { packStream });
@@ -452,7 +453,7 @@ public interface MessageSupport
      * returns {@code true} the message is added to the message support. If the handler returns
      * {@code false} the message is not added to the message support.
      *
-     * @param messageHandler  message handler, not {@code null}
+     * @param messageFilter  message filter, not {@code null}
      *
      * @return  configurable message support instance, never {@code null}
      *
@@ -460,26 +461,24 @@ public interface MessageSupport
      * @see ConfigurableMessageSupport#addMessage(String, String)
      */
     @Contract(mutates = "this")
-    @NotNull ConfigurableMessageSupport setMessageHandler(
-        @NotNull Predicate<String> messageHandler);
+    @NotNull ConfigurableMessageSupport setMessageFilter(@NotNull MessageFilter messageFilter);
 
 
     /**
-     * Set a {@code templateHandler} for this message support.
+     * Set a {@code templateFilter} for this message support.
      * <p>
-     * On adding a template the template handler is invoked with the template name. If the handler
-     * returns {@code true} the template is added to the message support. If the handler returns
-     * {@code false} the template is not added to the message support.
+     * On adding a template the template filter is invoked with the template name and template
+     * message. If the filter returns {@code true} the template is added to the message support.
+     * If the filter returns {@code false} the template is not added to the message support.
      *
-     * @param templateHandler  template handler, not {@code null}
+     * @param templateFilter  template filter, not {@code null}
      *
      * @return  configurable message support instance, never {@code null}
      *
      * @see ConfigurableMessageSupport#addTemplate(String, Message)
      */
     @Contract(mutates = "this")
-    @NotNull ConfigurableMessageSupport setTemplateHandler(
-        @NotNull Predicate<String> templateHandler);
+    @NotNull ConfigurableMessageSupport setTemplateFilter(@NotNull TemplateFilter templateFilter);
   }
 
 
@@ -537,6 +536,17 @@ public interface MessageSupport
      */
     @Contract(value = "null -> false", pure = true)
     boolean hasMessageWithCode(String code);
+
+
+    /**
+     * Returns the message associated with {@code code}.
+     *
+     * @param code  message code, not {@code null}
+     *
+     * @return  message or {@code null} if no message with this code exists
+     */
+    @Contract(pure = true)
+    Message.WithCode getMessageByCode(@NotNull String code);
 
 
     /**
@@ -642,5 +652,29 @@ public interface MessageSupport
      */
     @Contract(mutates = "this")
     void addTemplate(@NotNull String name, @NotNull Message template);
+  }
+
+
+
+
+  /**
+   * @author Jeroen Gremmen
+   * @since 0.8.0
+   */
+  interface MessageFilter
+  {
+    boolean filter(@NotNull Message.WithCode message);
+  }
+
+
+
+
+  /**
+   * @author Jeroen Gremmen
+   * @since 0.8.0
+   */
+  interface TemplateFilter
+  {
+    boolean filter(@NotNull String name, @NotNull Message template);
   }
 }

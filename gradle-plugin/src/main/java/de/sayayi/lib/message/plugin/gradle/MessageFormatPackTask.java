@@ -180,14 +180,16 @@ public abstract class MessageFormatPackTask extends DefaultTask
   {
     val accessor = messageSupport.getAccessor();
 
-    messageSupport.setMessageHandler(code -> {
+    messageSupport.setMessageFilter(message -> {
+      final String code = message.getCode();
+
       if (accessor.hasMessageWithCode(code))
         throw new GradleException("Duplicate message code '" + code + "'");
 
       return true;
     });
 
-    messageSupport.setTemplateHandler(name -> {
+    messageSupport.setTemplateFilter((name,template) -> {
       if (accessor.hasTemplateWithName(name))
         throw new GradleException("Duplicate template name '" + name + "'");
 
@@ -201,7 +203,9 @@ public abstract class MessageFormatPackTask extends DefaultTask
   {
     val accessor = messageSupport.getAccessor();
 
-    messageSupport.setMessageHandler(code -> {
+    messageSupport.setMessageFilter(message -> {
+      final String code = message.getCode();
+
       if (accessor.hasMessageWithCode(code))
       {
         if (warn)
@@ -213,7 +217,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
       return true;
     });
 
-    messageSupport.setTemplateHandler(name -> {
+    messageSupport.setTemplateFilter((name,template) -> {
       if (accessor.hasTemplateWithName(name))
       {
         if (warn)
@@ -232,14 +236,16 @@ public abstract class MessageFormatPackTask extends DefaultTask
   {
     val accessor = messageSupport.getAccessor();
 
-    messageSupport.setMessageHandler(code -> {
+    messageSupport.setMessageFilter(message -> {
+      final String code = message.getCode();
+
       if (warn && accessor.hasMessageWithCode(code))
         getLogger().warn("Duplicate message code '" + code + "'");
 
       return true;
     });
 
-    messageSupport.setTemplateHandler(name -> {
+    messageSupport.setTemplateFilter((name,template) -> {
       if (warn && accessor.hasTemplateWithName(name))
         getLogger().warn("Duplicate template name '" + name + "'");
 
