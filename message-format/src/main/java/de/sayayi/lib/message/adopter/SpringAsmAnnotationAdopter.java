@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
-import static org.objectweb.asm.Type.getDescriptor;
 import static org.springframework.asm.Opcodes.ACC_SYNTHETIC;
 import static org.springframework.asm.Opcodes.ASM9;
+import static org.springframework.asm.Type.getDescriptor;
 
 
 /**
