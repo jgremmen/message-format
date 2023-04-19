@@ -41,19 +41,22 @@ public class MessageFactoryTest
   @Test
   public void testWithCode()
   {
-    WithCode msgWithCode1 = MessageFactory.NO_CACHE_INSTANCE.withCode("ABC", EmptyMessage.INSTANCE);
+    WithCode msgWithCode1 =
+        MessageFactory.NO_CACHE_INSTANCE.withCode("ABC", EmptyMessage.INSTANCE);
     assertEquals("ABC", msgWithCode1.getCode());
     assertTrue(msgWithCode1 instanceof EmptyMessageWithCode);
 
-    WithCode msgWithCode2 = MessageFactory.NO_CACHE_INSTANCE.withCode("ABC", new EmptyMessageWithCode("DEF"));
+    WithCode msgWithCode2 =
+        MessageFactory.NO_CACHE_INSTANCE.withCode("ABC", new EmptyMessageWithCode("DEF"));
     assertEquals("ABC", msgWithCode2.getCode());
     assertTrue(msgWithCode2 instanceof EmptyMessageWithCode);
   }
 
 
-  @SuppressWarnings("ResultOfMethodCallIgnored")
   @Test
-  public void testSyntaxError() {
-    assertThrows(MessageParserException.class, () -> MessageFactory.NO_CACHE_INSTANCE.parseMessage("%{x,{true false:1}"));
+  public void testSyntaxError()
+  {
+    assertThrows(MessageParserException.class,
+        () -> MessageFactory.NO_CACHE_INSTANCE.parseMessage("%{x,{true false:1}"));
   }
 }

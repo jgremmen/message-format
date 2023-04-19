@@ -76,7 +76,8 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
       for(String code: resourceBundle.keySet())
       {
-        localizedMessagesByCode.computeIfAbsent(code, k -> new HashMap<>())
+        localizedMessagesByCode
+            .computeIfAbsent(code, k -> new HashMap<>())
             .put(locale, resourceBundle.getString(code));
       }
     }

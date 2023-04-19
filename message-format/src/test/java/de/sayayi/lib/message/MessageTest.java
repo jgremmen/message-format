@@ -54,8 +54,10 @@ public class MessageTest
     val msg = NO_CACHE_INSTANCE.parseMessage(texts);
     val messageSupport = MessageSupportFactory.shared();
 
-    assertEquals("1 kleur.", messageSupport.message(msg).locale("nl-NL").with("n", 1).format());
-    assertEquals("4 colours.", messageSupport.message(msg).locale(UK).with("n", 4).format());
+    assertEquals("1 kleur.",
+        messageSupport.message(msg).locale("nl-NL").with("n", 1).format());
+    assertEquals("4 colours.",
+        messageSupport.message(msg).locale(UK).with("n", 4).format());
   }
 
 
@@ -65,9 +67,12 @@ public class MessageTest
     val messageSupport = MessageSupportFactory.shared();
     val m = messageSupport.message("%{n,choice,<0:'negative',>0:'positive',:'zero'}").getMessage();
 
-    assertEquals("negative", messageSupport.message(m).locale(UK).with("n", -1).format());
-    assertEquals("zero", messageSupport.message(m).locale(UK).with("n", 0).format());
-    assertEquals("positive", messageSupport.message(m).locale(UK).with("n", 1234).format());
+    assertEquals("negative",
+        messageSupport.message(m).locale(UK).with("n", -1).format());
+    assertEquals("zero",
+        messageSupport.message(m).locale(UK).with("n", 0).format());
+    assertEquals("positive",
+        messageSupport.message(m).locale(UK).with("n", 1234).format());
   }
 
 
