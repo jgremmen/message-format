@@ -18,6 +18,7 @@ package de.sayayi.lib.message.internal.part;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.SpacesAware;
+import de.sayayi.lib.message.parameter.ParamConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -89,6 +90,24 @@ public interface MessagePart extends SpacesAware, Serializable
      */
     @Contract(pure = true)
     @NotNull String getName();
+
+
+    /**
+     * Returns the optional format for this parameter.
+     *
+     * @return  format
+     */
+    @Contract(pure = true)
+    String getFormat();
+
+
+    /**
+     * Returns the configuration settings for this parameter.
+     *
+     * @return  parameter configuration, never {@code null}
+     */
+    @Contract(pure = true)
+    @NotNull ParamConfig getParamConfig();
 
 
     /**

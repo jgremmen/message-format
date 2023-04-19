@@ -51,7 +51,7 @@ public final class ParameterPart implements Parameter
 
   private final @NotNull String name;
   private final String format;
-  private final @NotNull ParamConfig map;
+  private final @NotNull ParamConfig paramConfig;
   private final boolean spaceBefore;
   private final boolean spaceAfter;
 
@@ -63,15 +63,30 @@ public final class ParameterPart implements Parameter
       throw new IllegalArgumentException("name must not be empty");
 
     this.format = "".equals(format) ? null : format;
-    this.map = new ParamConfig(requireNonNull(map, "map must not be null"));
+    this.paramConfig = new ParamConfig(requireNonNull(map, "map must not be null"));
     this.spaceBefore = spaceBefore;
     this.spaceAfter = spaceAfter;
   }
 
 
+  @Override
   @Contract(pure = true)
   public @NotNull String getName() {
     return name;
+  }
+
+
+  @Override
+  @Contract(pure = true)
+  public String getFormat() {
+    return format;
+  }
+
+
+  @Override
+  @Contract(pure = true)
+  public @NotNull ParamConfig getParamConfig() {
+    return paramConfig;
   }
 
 
@@ -93,7 +108,7 @@ public final class ParameterPart implements Parameter
                                @NotNull Parameters parameters)
   {
     final FormatterContext formatterContext = new FormatterContextImpl(messageSupport, parameters,
-        parameters.getParameterValue(name), null, format, map);
+        parameters.getParameterValue(name), null, format, paramConfig);
 
     try {
       return addSpaces(formatterContext.delegateToNextFormatter(), spaceBefore, spaceAfter);
@@ -108,17 +123,17 @@ public final class ParameterPart implements Parameter
   {
     if (this == o)
       return true;
-    if (!(o instanceof ParameterPart))
+    if (!(o instanceof Parameter))
       return false;
 
-    final ParameterPart that = (ParameterPart)o;
+    final Parameter that = (Parameter)o;
 
     return
-        name.equals(that.name) &&
-        Objects.equals(format, that.format) &&
-        spaceBefore == that.spaceBefore &&
-        spaceAfter == that.spaceAfter &&
-        map.equals(that.map);
+        name.equals(that.getName()) &&
+        Objects.equals(format, that.getFormat()) &&
+        spaceBefore == that.isSpaceBefore() &&
+        spaceAfter == that.isSpaceAfter() &&
+        paramConfig.equals(that.getParamConfig());
   }
 
 
@@ -136,8 +151,8 @@ public final class ParameterPart implements Parameter
 
     if (format != null)
       s.append(",format=").append(format);
-    if (!map.isEmpty())
-      s.append(",map=").append(map);
+    if (!paramConfig.isEmpty())
+      s.append(",map=").append(paramConfig);
 
     if (spaceBefore && spaceAfter)
       s.append(",space-around");
@@ -159,7 +174,7 @@ public final class ParameterPart implements Parameter
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    final Map<ConfigKey,ConfigValue> map = this.map.getMap();
+    final Map<ConfigKey,ConfigValue> map = this.paramConfig.getMap();
 
     packStream.writeBoolean(spaceBefore);
     packStream.writeBoolean(spaceAfter);
