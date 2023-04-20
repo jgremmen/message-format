@@ -2,28 +2,28 @@
 <navigation>
 
   <group title="Quick Start">
-    <item name="What is Message Format?" link="../usermanual/index.html"/>
-    <item name="Set Up" link="../usermanual/set-up.html"/>
-    <item name="Samples" link="../usermanual/sample.html"/>
+    <item name="What is Message Format?" link="index.html"/>
+    <item name="Set Up" link="set-up.html"/>
+    <item name="Samples" link="sample.html"/>
   </group>
 
   <group title="Message Structure">
-    <item name="Message Syntax" link="../usermanual/message-syntax.html"/>
-    <item name="Parameter Syntax" link="../usermanual/parameter-syntax.html"/>
-    <item name="Whitespace Handling" link="../usermanual/message-whitespace.html"/>
+    <item name="Message Syntax" link="message.html#message-syntax"/>
+    <item name="Parameter Syntax" link="message.html#parameter-syntax"/>
+    <item name="Whitespace Handling" link="message.html#whitespace-handling"/>
   </group>
 
   <group title="Formatters">
     <item name="Named Formatters">
-      <item name="Boolean" link="../usermanual/fmt-boolean.html"/>
-      <item name="Choice" link="../usermanual/fmt-choice.html"/>
-      <item name="Clip" link="../usermanual/fmt-clip.html"/>
-      <item name="Size" link="../usermanual/fmt-size.html"/>
+      <item name="Boolean" link="formatters_named.html#bool"/>
+      <item name="Choice" link="formatters_named.html#choice"/>
+      <item name="Clip" link="formatters_named.html#clip"/>
+      <item name="Size" link="formatters_named.html#size"/>
     </item>
     <item name="Typed Formatters">
-      <item name="Array" link="../usermanual/fmt-array.html"/>
-      <item name="Date" link="../usermanual/fmt-date.html"/>
-      <item name="Date (joda-time)" link="../usermanual/fmt-date-joda-time.html"/>
+      <item name="Array" link="fmt-array.html"/>
+      <item name="Date" link="fmt-date.html"/>
+      <item name="Date (joda-time)" link="fmt-date-joda-time.html"/>
     </item>
   </group>
 

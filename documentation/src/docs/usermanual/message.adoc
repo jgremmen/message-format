@@ -1,18 +1,21 @@
 = Message
 :navtitle: Message
 
-This chapter describes the message format - or better said - it's syntactical structure in more detail.
+This chapter describes the message format - or better said - it's syntactical structure in more
+detail.
 
-Essentially, a message is a description for generating human readable text. Nobody wants to present the user
-with a message like `the search found 1 results`. Yet, generated messages often lack grammatical consistency.
-This is especially true for some languages where the grammar is more complex.
+Essentially, a message is a description for generating human readable text. Nobody wants to present
+the user with a message like `the search found 1 results`. Yet, generated messages often lack
+grammatical consistency. This is especially true for some languages where the grammar is more
+complex.
 
-An message could read `I give the man/woman a book`. So man and woman are exchangeable and the sentence is
-still grammatically correct. For a language like german, it would be `Ich gebe dem Mann/der Frau ein Buch`.
-Here `the man` translates to `dem Mann` and `the woman` translates to `der Frau`.
+An message could read `I give the man/woman a book`. So man and woman are exchangeable and the
+sentence is still grammatically correct. For a language like german, it would be
+`Ich gebe dem Mann/der Frau ein Buch`. Here `the man` translates to `dem Mann` and `the woman`
+translates to `der Frau`.
 
-Let's assume the parameter to format is a character (`M` = man, `F` = woman) which represents the gender.
-The messages for the english, german and italian language would be:
+Let's assume the parameter to format is a character (`M` = man, `F` = woman) which represents the
+gender. The messages for the english, german and italian language would be:
 
 [cols="12,88"]
 |===
@@ -28,9 +31,9 @@ The messages for the english, german and italian language would be:
 |`"Do %{gender,choice,'M':'all\u0027uomo un libro','F':'un libro alla donna'}"`
 |===
 
-Using an appropriate `MessageBundle` message formats can be defined for each language the application has to
-be able to present. Just provide the message code, locale and parameters in your code and let the message format
-library do the formatting.
+Using an appropriate `MessageBundle` message formats can be defined for each language the
+application has to be able to present. Just provide the message code, locale and parameters in your
+code and let the message format library do the formatting.
 
 
 
@@ -38,16 +41,17 @@ library do the formatting.
 [[message-syntax]]
 == Message Syntax
 
-A message is an alternating sequence of text and parameter parts. The parameter parts are placeholders for
-parameter values which are provided during runtime and rendered based on the value type, optional format
-designator and parameter configuration. The remaining text parts are formatted as-is with the exception of
-escaped characters.
+A message is an alternating sequence of text, template and parameter parts. The parameter parts are
+placeholders for parameter values which are provided during runtime and rendered based on the value
+type, optional format designator and parameter configuration. A template is a message in itself
+which can be embedded in other messages. The remaining text parts are formatted as-is with the
+exception of escaped characters.
 
 [plantuml,message,svg,align=left]
 ....
 @startebnf
 skinparam backgroundColor transparent
-message = [text], { parameter, [text] };
+message = [text], { (parameter | template), [text] };
 @endebnf
 ....
 
@@ -84,8 +88,8 @@ Let's take a look at some text part examples:
 
 |`&nbsp;whitespace&nbsp;`
 |`whitespace` footnote:[
-    leading and trailing spaces are preserved during formatting and removed from the final output. For more detail
-    see the chapter on xref:message.adoc#whitespace-handling[whitespace handling].]
+    leading and trailing spaces are preserved during formatting and removed from the final output.
+    For more detail see the chapter on xref:message.adoc#whitespace-handling[whitespace handling].]
 
 |`I see a %\{color} ball.`
 |`I see a red ball.`
@@ -106,9 +110,9 @@ Let's take a look at some text part examples:
 [[parameter-syntax]]
 == Parameter Syntax
 
-The parameter part describes which parameter value to format and how. In it's simplest form it will only specify
-the parameter name but it's formatting can be controlled in more depth by specifying a named formatter and/or
-configuring the formatter.
+The parameter part describes which parameter value to format and how. In it's simplest form it will
+only specify the parameter name but it's formatting can be controlled in more depth by specifying a
+named formatter and/or configuring the formatter.
 
 [plantuml,parameter,svg,align=left]
 ....
@@ -121,8 +125,9 @@ parameter = '%{', name, [',', format], {',', config}, [',', ':', quoted-message]
 ....
 
 Parameter name::
-    When formatting a message, a parameter map is provided. The key represents the parameter name, the value is any
-    possible object or `null`. So the name in the parameter part specifies which value from the map must be formatted.
+    When formatting a message, a parameter map is provided. The key represents the parameter name,
+    the value is any possible object or `null`. So the name in the parameter part specifies which
+    value from the map must be formatted.
 
 [plantuml,name,svg,align=left]
 ....
@@ -133,14 +138,14 @@ name = ( ? a-z ? | ? A-Z ? ), { ? a-z ? | ? A-Z ? | ? 0-9 ? | '_' };
 ....
 
 Parameter format::
-    This is an optional setting and forces a specific named formatter to be used when formatting the value. If no
-    `format` is specified or if the value cannot be formatted by the specified named formatter, a suitable formatter
-    is selected from the `FormatterService`.
+    This is an optional setting and forces a specific named formatter to be used when formatting
+    the value. If no `format` is specified or if the value cannot be formatted by the specified
+    named formatter, a suitable formatter is selected from the `FormatterService`.
 
 Parameter config::
-    The optional configuration section provides the formatter with additional configuration settings. It is a comma
-    separated sequence of key-value pairs. The configuration keys are specific for each formatter. See the
-    xref:formatters.adoc[formatters] chapter for more details.
+    The optional configuration section provides the formatter with additional configuration
+    settings. It is a comma separated sequence of key-value pairs. The configuration keys are
+    specific for each formatter. See the xref:formatters.adoc[formatters] chapter for more details.
 
 [plantuml,config,svg,align=left]
 ....
@@ -159,8 +164,8 @@ config-key = (bool | name | [('=' | '!' | '<>' | '<' | '<=' | '>' | '>=')], (str
 ....
 
 Configuration key bool::
-    Boolean keys are used for formatting boolean values. They can be used to translate a boolean value in any
-    corresponding string representation. +
+    Boolean keys are used for formatting boolean values. They can be used to translate a boolean
+    value in any corresponding string representation. +
     Eg. `%{b,true:yes,false:'no!'}`
 
 [plantuml,bool,svg,align=left]
@@ -176,17 +181,18 @@ Configuration key name::
     Eg. `%{list,list-sep:' , ',list-sep-last:' and '}`
 
 Configuration key null::
-    Key `null` is a generic key and it's value will be used in most cases where the parameter value is `null`. +
+    Key `null` is a generic key and it's value will be used in most cases where the parameter value
+    is `null`. +
     Eg. `%{v,null:"<not specified>"}`
 
 Configuration key empty::
-    Key `empty` is a generic key and it's value will be used in most cases where the parameter value is considered
-    empty. This may match an empty string or an empty collection. +
+    Key `empty` is a generic key and it's value will be used in most cases where the parameter
+    value is considered empty. This may match an empty string or an empty collection. +
     Eg. `%{list,empty:'no elements'}`
 
 Configuration key string and number::
-    These keys are used by certain formatters (eg. xref:formatters_named.adoc#choice[`choice`] formatter) as way of translating the parameter value into
-    a string representation. +
+    These keys are used by certain formatters (eg. xref:formatters_named.adoc#choice[`choice`]
+    formatter) as way of translating the parameter value into a string representation. +
     Eg. `%{n,choice,0:'no cookies',1:'a cookie',:'%\{n} cookies'}`
 
 [plantuml,string,svg,align=left]
@@ -240,8 +246,8 @@ Eg. `%{s,choice,\<='ZZ':'less than or equal to ZZ'}`
 --
 
 Configuration value::
-    There are 4 configuration value types (bool, number, string, message). Keywords are considered string values and
-    provide a way to specify strings without quotes.
+    There are 4 configuration value types (bool, number, string, message). Keywords are considered
+    string values and provide a way to specify strings without quotes.
 
 [plantuml,config-value,svg,align=left]
 ....
@@ -254,8 +260,9 @@ config-value = (bool | number | quoted-message | string | name | 'null' | 'empty
 ....
 
 Configuration value quoted-message::
-    A quoted message is a message as described in the xref::message.adoc#message-syntax[message syntax] chapter.
-    It can contain message parameter parts which allows for complex message formatting. +
+    A quoted message is a message as described in the
+    xref::message.adoc#message-syntax[message syntax] chapter. It can contain message parameter
+    parts which allows for complex message formatting. +
     Eg. `"An error has occurred%{ex,!empty: #': %\{ex}'#}"`
 
 [plantuml,quoted-message,svg,align=left]
@@ -272,9 +279,11 @@ quoted-message = ('"', [message], '"' | "'", [message], "'");
 [[whitespace-handling]]
 == Whitespace Handling
 
-When a message is formatted multiple consecutive whitespace characters are collapsed into 1 single whitespace.
+When a message is formatted multiple consecutive whitespace characters are collapsed into 1 single
+whitespace.
 
-The message format library keeps track of leading and trailing spaces for both text and parameter parts.
+The message format library keeps track of leading and trailing spaces for both text and parameter
+parts.
 
 Let's take a look at an example message with 5 message parts: +
 Eg. `&nbsp;text1%\{p1} %\{p2} text2%\{p3}`

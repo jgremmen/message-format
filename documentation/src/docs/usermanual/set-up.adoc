@@ -4,8 +4,6 @@
 Message Format comprises the following artifacts:
 
 * _de.sayayi.lib:message-format_: contains the core message formatting functionality
-* _de.sayayi.lib:message-format-cpscan_: contains MessageBundle implementations capable of scanning
-  the classpath for `@MessageDef` annotations
 * _de.sayayi.lib:message-format-jodatime_: contains a ParameterFormatter for the date and time classes
   of the jodatime library
 
@@ -21,7 +19,7 @@ Add the following to your Gradle build file in order to use Message Format:
 ...
 dependencies {
   ...
-  implementation "de.sayayi.lib:message-format:{fullVersion}"
+  implementation "de.sayayi.lib:message-format:{docVersion}"
   ...
 }
 ...

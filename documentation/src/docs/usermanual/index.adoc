@@ -24,6 +24,7 @@ Overall, the *Message Format* library is a must-have tool for any Java developer
 create clear, concise, and easily maintainable messages and exceptions. Give it a try today and
 experience the difference it can make in your projects!
 
+
 == System Requirements
 
-Message Format {fullVersion} requires at least Java 8.
+Message Format {docVersion} requires at least Java 8.
