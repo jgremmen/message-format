@@ -2,7 +2,7 @@
 <navigation>
 
   <group title="Quick Start">
-    <item name="What is Message Format?" link="../usermanual/what-is.html"/>
+    <item name="What is Message Format?" link="../usermanual/index.html"/>
     <item name="Set Up" link="../usermanual/set-up.html"/>
     <item name="Samples" link="../usermanual/sample.html"/>
   </group>
