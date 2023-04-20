@@ -19,7 +19,6 @@ import lombok.val;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaBasePlugin;
-import org.gradle.api.plugins.JavaPlatformPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
 import org.jetbrains.annotations.NotNull;
@@ -39,9 +38,9 @@ public class MessageFormatPlugin implements Plugin<Project>
   @Override
   public void apply(Project project)
   {
-    // provide java plugin
+    // provide java base plugin
     val plugins = project.getPlugins();
-    if (!plugins.hasPlugin(JavaBasePlugin.class) && !plugins.hasPlugin(JavaPlatformPlugin.class))
+    if (!plugins.hasPlugin(JavaBasePlugin.class))
       project.apply(objectConfiguration -> objectConfiguration.plugin(JavaBasePlugin.class));
 
     val extensions = project.getExtensions();
