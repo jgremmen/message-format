@@ -125,7 +125,7 @@ public class AnnotationMessage
           new DefaultFormatterService(), MessageFactory.NO_CACHE_INSTANCE);
 
   static {
-    new AnnotationAdopter(MESSAGE_SUPPORT).adoptAll(AnnotationMessage.class);
+    new AsmAnnotationAdopter(MESSAGE_SUPPORT).adopt(AnnotationMessage.class);
   }
 
   @MessageDef(code = "RESULTS", text =
