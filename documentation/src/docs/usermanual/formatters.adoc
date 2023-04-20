@@ -2,8 +2,9 @@
 = Formatters
 :navtitle: Formatters
 
-The message format library comes with a large number of pre-defined parameter formatters.
-In this section you'll learn how to use and configure each formatter to meet your individual needs.
+The *Message Format* library includes a vast array of pre-defined parameter formatters that can be
+used right away. Developers can learn how to utilize and configure each formatter to cater to their
+specific requirements in this section.
 
 There are 2 types of parameter formatters:
 
