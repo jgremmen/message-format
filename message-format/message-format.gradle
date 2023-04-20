@@ -40,7 +40,7 @@ dependencies {
 
   implementation "javax.cache:cache-api:${javaxCacheApiVersion}", optional
   implementation "org.ow2.asm:asm:${asmVersion}", optional
-  implementation "org.springframework:spring-context:${springContextVersion}", optional
+  implementation "org.springframework:spring-core:${springContextVersion}", optional
 
   testImplementation "org.ehcache:ehcache:${ehcacheVersion}"
 

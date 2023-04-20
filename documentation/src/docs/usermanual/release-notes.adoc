@@ -45,9 +45,10 @@ _Release date: t.b.d._
 
 ==== Dependency Upgrades
 
-* Upgrade to EhCache 3.10.8 (optional)
-* Upgrade to Spring Context 5.3.24 (optional for `message-format-cpscan`)
-* Upgrade to Joda-Time 2.12.2 (required for `message-format-jodatime`)
+* Upgrade to Cache API 1.1.1 (required for class `JCacheMessagePartNormalizer`)
+* Upgrade to ASM 9.4 (required for class `AsmAnnotationAdopter`)
+* Upgrade to Spring Core 5.3.26 (required for class `SpringAsmAnnotationAdopter`)
+* Upgrade to Joda-Time 2.12.5 (required for artefact `message-format-jodatime`)
 
 
 [IMPORTANT]
