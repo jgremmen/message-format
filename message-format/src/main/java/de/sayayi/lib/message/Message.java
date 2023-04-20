@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static java.util.Collections.unmodifiableSortedSet;
 import static java.util.Locale.ROOT;
 
 
@@ -49,7 +50,8 @@ public interface Message extends Serializable
    * @return  formatted message, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull String format(@NotNull MessageSupportAccessor messageSupport, @NotNull Parameters parameters);
+  @NotNull String format(@NotNull MessageSupportAccessor messageSupport,
+                         @NotNull Parameters parameters);
 
 
   /**
@@ -77,13 +79,18 @@ public interface Message extends Serializable
 
       @Override
       public @NotNull SortedSet<String> getParameterNames() {
-        return Collections.unmodifiableSortedSet(new TreeSet<>(parameterValues.keySet()));
+        return unmodifiableSortedSet(new TreeSet<>(parameterValues.keySet()));
       }
     });
   }
 
 
   /**
+   * Returns the message parts that when concatenated are equivalent to this message.
+   * <p>
+   * Messages that implement ({@link LocaleAware LocaleAware}) are not required to return a
+   * sensible value. It is even valid to throw an exception like
+   * {@code UnsupportedOperationException}.
    *
    * @return  message parts, never {@code null}
    *
@@ -108,9 +115,12 @@ public interface Message extends Serializable
    * Checks whether this message is the same as the given {@code message}. Messages are
    * considered "the same" when the message parts of both messages are identical.
    * <p>
-   * {@link LocaleAware} messages are "the same" when both locale and associated message are
-   * identical for all locales provided by this message. Locale aware messages must be properly
-   * handled by overriding methods.
+   * {@link LocaleAware LocaleAware} messages are "the same" when both locale and associated
+   * message are identical for all locales provided by this message. Locale aware messages must be
+   * properly handled by overriding methods.
+   * <p>
+   * Identical messages with different codes ({@link WithCode WithCode}) are still considered the
+   * same.
    *
    * @param message  message to compare with this message, not {@code null}
    *
@@ -155,7 +165,8 @@ public interface Message extends Serializable
 
 
   /**
-   * A message class implementing this interface provides an additional code uniquely identifying the message.
+   * A message class implementing this interface provides an additional code uniquely
+   * identifying the message.
    */
   interface WithCode extends Message
   {
@@ -172,15 +183,17 @@ public interface Message extends Serializable
 
 
   /**
-   * Message classes implementing this interface are capable of formatting messages for one or more locales.
+   * Message classes implementing this interface are capable of formatting messages for one or
+   * more locales.
    */
   interface LocaleAware extends Message
   {
     /**
      * {@inheritDoc}
      * <p>
-     * The message is formatted with respect to the locale provided by {@code parameters}. If the locale does not
-     * match any of the localized messages, a default message will be selected using the following rules
+     * The message is formatted with respect to the locale provided by {@code parameters}. If the
+     * locale does not match any of the localized messages, a default message will be selected
+     * using the following rules
      * <ol>
      *   <li>a message with the same language but a different country</li>
      *   <li>the 1st available message (this may be implementation dependant)</li>
@@ -190,7 +203,8 @@ public interface Message extends Serializable
      */
     @Contract(pure = true)
     @Override
-    @NotNull String format(@NotNull MessageSupportAccessor messageSupport, @NotNull Parameters parameters);
+    @NotNull String format(@NotNull MessageSupportAccessor messageSupport,
+                           @NotNull Parameters parameters);
 
 
     /**
@@ -223,8 +237,9 @@ public interface Message extends Serializable
 
 
     /**
-     * Tells for which locale the message must be formatted. If no locale is provided or if no message
-     * is available for the given locale, the formatter will look for a reasonable default message.
+     * Tells for which locale the message must be formatted. If no locale is provided or if no
+     * message is available for the given locale, the formatter will look for a reasonable
+     * default message.
      *
      * @return  locale, never {@code null}
      */

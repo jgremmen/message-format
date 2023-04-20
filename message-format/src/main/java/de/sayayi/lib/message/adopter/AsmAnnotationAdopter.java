@@ -36,7 +36,17 @@ import static org.objectweb.asm.Type.getDescriptor;
 
 
 /**
- * This annotation adopter scans classes and publishes the annotated messages found.
+ * This class defines various methods for adopting messages and templates defined by annotations.
+ * <p>
+ * Messages are analysed per class (see {@link #parseClass(InputStream)}). If there is a
+ * requirement to select a part of the messages provided by a class, the message support must
+ * be configured with an appropriate
+ * {@link de.sayayi.lib.message.MessageSupport.MessageFilter MessageFilter} or
+ * {@link de.sayayi.lib.message.MessageSupport.TemplateFilter TemplateFilter}.
+ * <p>
+ * Even though the annotations all have class retention, 2 adopt methods
+ * ({@link #adopt(MessageDef)} and {@link #adopt(TemplateDef)}) are available to analyse
+ * synthesized/mocked annotations.
  * <p>
  * The scanned classes are analysed using the ASM library. Using this class therefore requires a
  * dependency with library {@code org.ow2.asm:asm:9.4}.

@@ -144,6 +144,14 @@ public interface MessagePart extends SpacesAware, Serializable
     @NotNull String getName();
 
 
+    /**
+     * Returns the formatted template as text.
+     *
+     * @param messageSupport  message support instance, not {@code null}
+     * @param parameters      formatting parameters, not {@code null}
+     *
+     * @return  formatted template as text part, never {@code null}
+     */
     @Contract(pure = true)
     @NotNull Text getText(@NotNull MessageSupportAccessor messageSupport,
                           @NotNull Parameters parameters);
