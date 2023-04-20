@@ -107,7 +107,7 @@ public final class NoSpaceTextPart implements Text
   @Override
   @Contract(pure = true)
   public String toString() {
-    return "Text(text=" + text + ')';
+    return "Text('" + text.replace("'", "\\'") + "')";
   }
 
 
