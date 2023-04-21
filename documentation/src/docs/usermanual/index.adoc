@@ -1,9 +1,11 @@
 = Introduction
 :navtitle: Introduction
 
-Introducing the *Message Format* library - a powerful and easy-to-use Java API for formatting
-messages and exceptions. With this library, developers can easily create messages that have
-placeholders for values, which are automatically formatted based on their types. The library
+== What is Message Format?
+
+Introducing the open-source *Message Format* library - a powerful and easy-to-use Java API for
+formatting messages and exceptions. With this library, developers can easily create messages that
+have placeholders for values, which are automatically formatted based on their types. The library
 includes formatters for most common Java types, and custom formatters can be easily developed and
 added.
 

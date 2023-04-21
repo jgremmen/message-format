@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation>
 
-  <group title="Quick Start">
+  <group title="Introduction">
     <item name="What is Message Format?" link="index.html"/>
+  </group>
+
+  <group title="What is new?">
+    <item name="Release Notes" link="release-notes.html"/>
+    <item name="Upgrading">
+      <item name="Version 0.7.x to 0.8.0" link="migration-0.7.x-to-0.8.0.html"/>
+    </item>
+  </group>
+
+  <group title="Quick Start">
     <item name="Set Up" link="set-up.html"/>
     <item name="Samples" link="sample.html"/>
   </group>
