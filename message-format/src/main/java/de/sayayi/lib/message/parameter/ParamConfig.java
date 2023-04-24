@@ -37,6 +37,7 @@ import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.MISMATCH
 import static de.sayayi.lib.message.parameter.value.ConfigValue.STRING_MESSAGE_TYPE;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.joining;
 
 
 /**
@@ -154,7 +155,11 @@ public final class ParamConfig implements Serializable
 
   @Override
   @Contract(pure = true)
-  public String toString() {
-    return map.toString();
+  public String toString()
+  {
+    return map.entrySet()
+        .stream()
+        .map(kv -> kv.getKey().toString() + ':' + kv.getValue().toString())
+        .collect(joining(",", "{", "}"));
   }
 }

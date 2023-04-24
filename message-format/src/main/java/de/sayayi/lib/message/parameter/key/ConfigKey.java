@@ -140,6 +140,23 @@ public interface ConfigKey extends Serializable
 
       return false;
     }
+
+
+    @Override
+    public String toString()
+    {
+      switch(this)
+      {
+        case EQ:  return "=";
+        case GT:  return ">";
+        case GTE: return ">=";
+        case LT:  return "<";
+        case LTE: return "<=";
+        case NE:  return "<>";
+      }
+
+      return name();
+    }
   }
 
 

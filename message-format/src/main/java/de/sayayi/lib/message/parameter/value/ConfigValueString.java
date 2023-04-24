@@ -106,7 +106,7 @@ public final class ConfigValueString implements ConfigValue
   @Override
   @Contract(pure = true)
   public @NotNull String toString() {
-    return string;
+    return '\'' + string.replace("'", "\\'") + '\'';
   }
 
 
