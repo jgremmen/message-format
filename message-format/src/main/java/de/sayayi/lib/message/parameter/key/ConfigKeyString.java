@@ -140,7 +140,7 @@ public final class ConfigKeyString implements ConfigKey
 
   @Override
   public String toString() {
-    return "ConfigKeyString(compareType=" + compareType + ",string=" + string + ')';
+    return "ConfigKeyString(compare=" + compareType + ",string=" + string + ')';
   }
 
 

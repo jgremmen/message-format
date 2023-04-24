@@ -89,7 +89,7 @@ public final class ConfigKeyName implements ConfigKey
 
   @Override
   public String toString() {
-    return "ConfigKeyName(name=" + name + ')';
+    return "ConfigKeyName(" + name + ')';
   }
 
 

@@ -112,7 +112,7 @@ public enum ConfigKeyBool implements ConfigKey
 
   @Override
   public String toString() {
-    return "ConfigKeyBool(bool=" + bool + ')';
+    return "ConfigKeyBool(" + bool + ')';
   }
 
 

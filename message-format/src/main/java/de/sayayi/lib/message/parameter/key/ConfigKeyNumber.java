@@ -155,7 +155,7 @@ public final class ConfigKeyNumber implements ConfigKey
 
   @Override
   public String toString() {
-    return "ConfigKeyNumber(compareType=" + compareType + ",number=" + number + ')';
+    return "ConfigKeyNumber(compare=" + compareType + ",number=" + number + ')';
   }
 
 

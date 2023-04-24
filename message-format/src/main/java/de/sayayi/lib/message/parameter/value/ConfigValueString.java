@@ -34,7 +34,7 @@ public final class ConfigValueString implements ConfigValue
 {
   private static final long serialVersionUID = 800L;
 
-  private final String string;
+  private final @NotNull String string;
 
   private transient Message.WithSpaces message;
 
@@ -118,7 +118,7 @@ public final class ConfigValueString implements ConfigValue
    * @since 0.8.0
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeString(asObject());
+    packStream.writeString(string);
   }
 
 
