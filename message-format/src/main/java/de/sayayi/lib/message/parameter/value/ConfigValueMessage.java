@@ -77,6 +77,12 @@ public final class ConfigValueMessage implements ConfigValue
   }
 
 
+  @Override
+  public String toString() {
+    return message.toString();
+  }
+
+
   /**
    * @param packStream  data output pack target
    *
