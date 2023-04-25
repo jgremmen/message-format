@@ -29,7 +29,7 @@ public interface MessagePartNormalizer
    * cached version in order to reduce memory load.
    *
    * @param <T>   message part implementation type
-   * @param part  message part
+   * @param part  message part, not {@code null}
    *
    * @return  message part
    */

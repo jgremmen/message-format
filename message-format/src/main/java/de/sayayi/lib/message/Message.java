@@ -103,7 +103,7 @@ public interface Message extends Serializable
   /**
    * Returns a set with all templates names in use by this message.
    *
-   * @return  template names, never {@code null}
+   * @return  unmodifiable set of template names, never {@code null}
    *
    * @since 0.8.0
    */
