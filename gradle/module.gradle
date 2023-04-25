@@ -20,18 +20,9 @@ apply plugin: "jacoco"
 apply plugin: "signing"
 
 
-configurations {
-  testAnnotationProcessor.extendsFrom annotationProcessor
-  testCompileOnly.extendsFrom compileOnly
-}
-
-
 dependencies {
-  annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-
   compileOnly "org.jetbrains:annotations-java5:${jetbrainsAnnotationsVersion}"
 
-  testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
   testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
 }

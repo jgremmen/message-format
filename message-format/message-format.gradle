@@ -34,8 +34,11 @@ def springContextVersion = "5.3.26"
 
 
 dependencies {
+  annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+  compileOnly "org.projectlombok:lombok:${lombokVersion}"
+
   implementation("de.sayayi.lib:antlr4-runtime-ext:${antlrExtVersion}") {
-    exclude group: 'org.antlr', module: 'antlr4'
+    transitive = false
   }
 
   implementation "javax.cache:cache-api:${javaxCacheApiVersion}", optional
@@ -45,6 +48,12 @@ dependencies {
   testImplementation "org.ehcache:ehcache:${ehcacheVersion}"
 
   antlr "org.antlr:antlr4:${antlrVersion}"
+}
+
+
+configurations {
+  testAnnotationProcessor.extendsFrom annotationProcessor
+  testCompileOnly.extendsFrom compileOnly
 }
 
 
