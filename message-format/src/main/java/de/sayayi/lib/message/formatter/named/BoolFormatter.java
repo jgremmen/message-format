@@ -34,6 +34,7 @@ import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.EMPTY_NULL_TYPE;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.Type.BOOL;
+import static java.lang.Boolean.parseBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 
@@ -93,7 +94,7 @@ public final class BoolFormatter extends AbstractParameterFormatter
     else if (value instanceof Number)
       bool = Math.signum(((Number)value).doubleValue()) != 0;
     else
-      bool = Boolean.parseBoolean(String.valueOf(value));
+      bool = parseBoolean(String.valueOf(value));
 
     // allow custom messages for true/false value?
     if ((msg = formatterContext.getMapMessage(bool, EnumSet.of(BOOL)).orElse(null)) != null)

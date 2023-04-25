@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -581,8 +580,8 @@ class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneable, Seri
 
   private static class Link<K,V> implements Entry<K,V>
   {
-    @Getter K key;
-    @Getter V value;
+    K key;
+    V value;
 
     Link<K,V> previous;
     Link<K,V> next;
@@ -590,6 +589,18 @@ class FixedSizeCacheMap<K,V> extends AbstractMap<K,V> implements Cloneable, Seri
 
     Link(K key) {
       this.key = key;
+    }
+
+
+    @Override
+    public K getKey() {
+      return key;
+    }
+
+
+    @Override
+    public V getValue() {
+      return value;
     }
 
 

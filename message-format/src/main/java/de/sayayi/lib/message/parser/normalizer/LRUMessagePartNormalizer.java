@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.copyOf;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -51,6 +52,8 @@ public final class LRUMessagePartNormalizer implements MessagePartNormalizer
   @Contract(mutates = "this")
   public <T extends MessagePart> @NotNull T normalize(@NotNull T part)
   {
+    requireNonNull(part, "part must not be null");
+
     int n = -1;
     MessagePart cachedPart = null;
 

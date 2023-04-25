@@ -65,6 +65,8 @@ import static de.sayayi.lib.message.parser.MessageParser.SQ_START;
 import static de.sayayi.lib.message.parser.MessageParser.*;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
+import static java.lang.Integer.parseInt;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toMap;
 import static org.antlr.v4.runtime.Token.EOF;
 
@@ -83,7 +85,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   {
     super(ErrorFormatter.INSTANCE);
 
-    this.messageFactory = messageFactory;
+    this.messageFactory = requireNonNull(messageFactory, "messageFactory must not be null");
   }
 
 
@@ -244,7 +246,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           // handle escape characters
           ch = chText.length() == 2
               ? chText.charAt(1)
-              : (char)Integer.parseInt(chText.substring(2), 16);
+              : (char)parseInt(chText.substring(2), 16);
         }
 
         if (!isSpaceChar(ch))

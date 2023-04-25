@@ -17,7 +17,6 @@ package de.sayayi.lib.message.pack;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
 
 import java.io.*;
 import java.util.Arrays;
@@ -81,7 +80,12 @@ public final class PackInputStream implements Closeable
   }
 
 
-  public @Range(from = 0, to = 65535) int readUnsignedShort() throws IOException {
+  /**
+   * @return  unsigned value (0..65535)
+   *
+   * @throws IOException  if an I/O error occurs
+   */
+  public int readUnsignedShort() throws IOException {
     return (int)readLarge(16);
   }
 
@@ -202,7 +206,7 @@ public final class PackInputStream implements Closeable
    *
    * @throws IOException  if an I/O error occurs
    */
-  public @Range(from = 0, to = 255) int readSmallVar() throws IOException
+  public int readSmallVar() throws IOException
   {
     final int v4 = readSmall(4);
 
@@ -215,8 +219,14 @@ public final class PackInputStream implements Closeable
   }
 
 
-  public @Range(from = 0, to = 255) int readSmall(@Range(from = 1, to = 8) int bitWidth)
-      throws IOException
+  /**
+   * @param bitWidth  bit width (1..8)
+   *
+   * @return  value in range 0..255
+   *
+   * @throws IOException  if an I/O error occurs
+   */
+  public int readSmall(int bitWidth) throws IOException
   {
     assertData();
 
@@ -246,7 +256,14 @@ public final class PackInputStream implements Closeable
   }
 
 
-  public long readLarge(@Range(from = 9, to = 64) int bitWidth) throws IOException
+  /**
+   * @param bitWidth  bit width (9..64)
+   *
+   * @return  long value
+   *
+   * @throws IOException  if an I/O error occurs
+   */
+  public long readLarge(int bitWidth) throws IOException
   {
     assertData();
 

@@ -46,7 +46,7 @@ public class ParameterizedMessage implements Message.WithSpaces
 {
   private static final long serialVersionUID = 800L;
 
-  private final MessagePart[] parts;
+  private final @NotNull MessagePart[] parts;
 
 
   public ParameterizedMessage(@NotNull List<MessagePart> parts)
@@ -167,7 +167,7 @@ public class ParameterizedMessage implements Message.WithSpaces
 
 
   /**
-   * @param unpack     unpacker instance, not {@code null}
+   * @param unpack      unpacker instance, not {@code null}
    * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked parameterized message, never {@code null}

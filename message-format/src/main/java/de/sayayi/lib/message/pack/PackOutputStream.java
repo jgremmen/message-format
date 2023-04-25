@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.pack;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -77,7 +76,12 @@ public final class PackOutputStream implements Closeable
   }
 
 
-  public void writeUnsignedShort(@Range(from = 0, to = 65535) int value) throws IOException {
+  /**
+   * @param value  unsigned value (0..65535)
+   *
+   * @throws IOException  if an I/O error occurs
+   */
+  public void writeUnsignedShort(int value) throws IOException {
     writeLarge(value, 16);
   }
 
@@ -157,7 +161,7 @@ public final class PackOutputStream implements Closeable
    *
    * @throws IOException  if an I/O error occurs
    */
-  public void writeSmallVar(@Range(from = 0, to = 255) int value) throws IOException
+  public void writeSmallVar(int value) throws IOException
   {
     if (value <= 7)
       writeSmall(value, 4);  // 0vvv
@@ -168,7 +172,13 @@ public final class PackOutputStream implements Closeable
   }
 
 
-  public void writeSmall(int value, @Range(from = 1, to = 8) int bitWidth) throws IOException
+  /**
+   * @param value     unsigned value (0..255)
+   * @param bitWidth  range 1..8 bits
+   *
+   * @throws IOException  if an I/O error occurs
+   */
+  public void writeSmall(int value, int bitWidth) throws IOException
   {
     if (value >= (1 << bitWidth))
     {
@@ -198,7 +208,13 @@ public final class PackOutputStream implements Closeable
   }
 
 
-  public void writeLarge(long value, @Range(from = 9, to = 64) int bitWidth) throws IOException
+  /**
+   * @param value     signed value
+   * @param bitWidth  range 9..64 bits
+   *
+   * @throws IOException  if an I/O error occurs
+   */
+  public void writeLarge(long value, int bitWidth) throws IOException
   {
     if (bit < 7)
     {

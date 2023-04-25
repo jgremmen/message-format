@@ -18,7 +18,6 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.internal.part.MessagePart;
-import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -28,6 +27,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 
+import static de.sayayi.lib.message.internal.part.MessagePart.Text.EMPTY;
 import static java.util.Collections.emptySet;
 import static java.util.Objects.requireNonNull;
 
@@ -62,7 +62,7 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
   @Override
   public @NotNull MessagePart[] getMessageParts() {
-    return new MessagePart[] { TextPart.EMPTY };
+    return new MessagePart[] { EMPTY };
   }
 
 

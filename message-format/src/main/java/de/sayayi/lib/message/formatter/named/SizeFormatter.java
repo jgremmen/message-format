@@ -51,7 +51,7 @@ public final class SizeFormatter extends AbstractParameterFormatter
 
     if (value != null)
     {
-      MessageSupportAccessor messageSupportAccessor = formatterContext.getMessageSupport();
+      final MessageSupportAccessor messageSupportAccessor = formatterContext.getMessageSupport();
 
       for(ParameterFormatter formatter: messageSupportAccessor.getFormatters(value.getClass()))
         if (formatter instanceof SizeQueryable)

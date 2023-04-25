@@ -20,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.cache.Cache;
 
+import static java.util.Objects.requireNonNull;
+
 
 /**
  * @author Jeroen Gremmen
@@ -30,7 +32,7 @@ public final class JCacheMessagePartNormalizer implements MessagePartNormalizer
 
 
   public JCacheMessagePartNormalizer(@NotNull Cache<MessagePart,MessagePart> cache) {
-    this.cache = cache;
+    this.cache = requireNonNull(cache, "cache must not be null");
   }
 
 
@@ -46,7 +48,7 @@ public final class JCacheMessagePartNormalizer implements MessagePartNormalizer
   public <T extends MessagePart> @NotNull T normalize(@NotNull T part)
   {
     //noinspection unchecked
-    T cachedPart = (T)cache.get(part);
+    T cachedPart = (T)cache.get(requireNonNull(part, "part must not be null"));
     if (cachedPart != null)
       return cachedPart;
 

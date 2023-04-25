@@ -149,8 +149,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   @Override
   public @NotNull ConfigurableMessageSupport setMessageFilter(@NotNull MessageFilter messageFilter)
   {
-    this.messageFilter =
-        requireNonNull(messageFilter, "messageFilter must not be null");
+    this.messageFilter = requireNonNull(messageFilter, "messageFilter must not be null");
 
     return this;
   }
@@ -160,8 +159,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   public @NotNull ConfigurableMessageSupport setTemplateFilter(
       @NotNull TemplateFilter templateFilter)
   {
-    this.templateFilter =
-        requireNonNull(templateFilter, "templateFilter must not be null");
+    this.templateFilter = requireNonNull(templateFilter, "templateFilter must not be null");
 
     return this;
   }
@@ -423,7 +421,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    @SneakyThrows
+    @SneakyThrows(Exception.class)
     public <T extends Exception> void throwFormatted(@NotNull Function<String,T> constructor) {
       throw constructor.apply(format());
     }
