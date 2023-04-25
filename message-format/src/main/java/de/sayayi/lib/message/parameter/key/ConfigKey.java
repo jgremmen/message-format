@@ -157,6 +157,11 @@ public interface ConfigKey extends Serializable
 
       return name();
     }
+
+
+    public @NotNull String asPrefix() {
+      return this == EQ ? "" : toString();
+    }
   }
 
 

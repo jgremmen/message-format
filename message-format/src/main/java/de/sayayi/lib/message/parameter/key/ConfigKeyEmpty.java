@@ -97,7 +97,7 @@ public final class ConfigKeyEmpty implements ConfigKey
 
   @Override
   public String toString() {
-    return (compareType == EQ ? "" : compareType.toString()) + "empty";
+    return compareType.asPrefix() + "empty";
   }
 
 

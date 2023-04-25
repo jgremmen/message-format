@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Locale;
 
-import static de.sayayi.lib.message.parameter.key.ConfigKey.CompareType.EQ;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.*;
 import static java.util.Objects.requireNonNull;
 
@@ -156,7 +155,7 @@ public final class ConfigKeyNumber implements ConfigKey
 
   @Override
   public String toString() {
-    return (compareType == EQ ? "" : compareType.toString()) + number;
+    return compareType.asPrefix() + number;
   }
 
 

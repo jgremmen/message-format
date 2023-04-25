@@ -139,10 +139,8 @@ public final class ConfigKeyString implements ConfigKey
 
 
   @Override
-  public String toString()
-  {
-    return (compareType == EQ ? "" : compareType.toString()) + '\'' +
-        string.replace("'", "\\'") + '\'';
+  public String toString() {
+    return compareType.asPrefix() + '\'' + string.replace("'", "\\'") + '\'';
   }
 
 

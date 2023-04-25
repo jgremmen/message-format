@@ -85,7 +85,7 @@ public final class ConfigKeyNull implements ConfigKey
 
   @Override
   public String toString() {
-    return (compareType == EQ ? "" : compareType.toString()) + "null";
+    return compareType.asPrefix() + "null";
   }
 
 
