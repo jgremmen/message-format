@@ -42,7 +42,6 @@ import static java.util.Collections.unmodifiableSet;
 import static java.util.Collections.unmodifiableSortedSet;
 import static java.util.Locale.forLanguageTag;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -231,16 +230,13 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   public void exportMessages(@NotNull OutputStream stream, boolean compress,
                              Predicate<String> messageCodeFilter) throws IOException
   {
-    if (messageCodeFilter == null)
-      messageCodeFilter = c -> true;
-
     try(final PackOutputStream dataStream = new PackOutputStream(stream, compress)) {
-      final List<String> messageCodes = messages.keySet()
-          .stream()
-          .filter(messageCodeFilter)
-          .sorted()
-          .collect(toList());
+      final Set<String> messageCodes = new TreeSet<>(messages.keySet());
       final Set<String> templateNames = new TreeSet<>();
+
+      // filter message codes
+      if (messageCodeFilter != null)
+        messageCodes.removeIf(code -> !messageCodeFilter.test(code));
 
       // pack all filtered messages
       dataStream.writeUnsignedShort(messageCodes.size());
@@ -252,14 +248,11 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
         PackHelper.pack(message, dataStream);
       }
 
-      // pack all required templates (if available)
+      // pack all required templates
+      templateNames.removeIf(templateName -> !templates.containsKey(templateName));
       dataStream.writeUnsignedShort(templateNames.size());
       for(final String templateName: templateNames)
-      {
-        final Message template = templates.get(templateName);
-        if (template != null)
-          PackHelper.pack(templates.get(templateName), dataStream);
-      }
+        PackHelper.pack(templates.get(templateName), dataStream);
     }
   }
 

@@ -18,17 +18,14 @@ package de.sayayi.lib.message.plugin.gradle;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.adopter.AsmAnnotationAdopter;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import de.sayayi.lib.message.formatter.GenericFormatterService;
 import lombok.val;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.InputFiles;
-import org.gradle.api.tasks.OutputFile;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -64,6 +61,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   @InputFiles
+  @SkipWhenEmpty
   public abstract ConfigurableFileCollection getSources();
 
 
@@ -93,7 +91,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   public void pack()
   {
     val messageSupport = MessageSupportFactory
-        .create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+        .create(new GenericFormatterService(), NO_CACHE_INSTANCE);
 
     configureDuplicatesStrategy(messageSupport);
 
