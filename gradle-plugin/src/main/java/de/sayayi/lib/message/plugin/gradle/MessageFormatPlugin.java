@@ -49,6 +49,7 @@ public class MessageFormatPlugin implements Plugin<Project>
     messageFormatExtension.getPackFilename().convention("message.pack");
     messageFormatExtension.getCompress().convention(false);
     messageFormatExtension.getDuplicatesStrategy().convention(IGNORE_AND_WARN);
+    messageFormatExtension.getValidateReferencedTemplates().convention(true);
 
     val mainJavaSourceSet = extensions.getByType(JavaPluginExtension.class)
         .getSourceSets().getByName("main");

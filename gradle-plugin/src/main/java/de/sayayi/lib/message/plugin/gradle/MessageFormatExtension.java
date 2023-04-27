@@ -47,6 +47,9 @@ public abstract class MessageFormatExtension
   public abstract Property<DuplicatesStrategy> getDuplicatesStrategy();
 
 
+  public abstract Property<Boolean> getValidateReferencedTemplates();
+
+
   public abstract DirectoryProperty getDestinationDir();
 
 
