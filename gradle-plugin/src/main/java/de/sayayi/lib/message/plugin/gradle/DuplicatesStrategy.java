@@ -22,9 +22,18 @@ package de.sayayi.lib.message.plugin.gradle;
  */
 public enum DuplicatesStrategy
 {
+  /** silently ignore duplicate messages and templates */
   IGNORE,
+
+  /** ignore duplicate messages and templates but log a warning */
   IGNORE_AND_WARN,
+
+  /** silently override duplicate messages and templates */
   OVERRIDE,
+
+  /** override duplicate messages and templates and log a warning */
   OVERRIDE_AND_WARN,
+
+  /** stop processing messages and templates if a duplicate is found */
   FAIL
 }
