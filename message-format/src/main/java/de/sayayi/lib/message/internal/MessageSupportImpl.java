@@ -37,6 +37,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Collections.unmodifiableSortedSet;
@@ -482,6 +483,19 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public @NotNull List<ParameterFormatter> getFormatters(String format, @NotNull Class<?> type) {
       return formatterService.getFormatters(format, type);
+    }
+
+
+    @Override
+    public @NotNull Set<String> findMissingTemplates(Predicate<String> messageCodeFilter)
+    {
+      return messages.values()
+          .stream()
+          .filter(message -> messageCodeFilter == null || messageCodeFilter.test(message.getCode()))
+          .flatMap(message -> message.getTemplateNames().stream())
+          .distinct()
+          .filter(templateName -> !templates.containsKey(templateName))
+          .collect(Collectors.toCollection(TreeSet::new));
     }
   }
 }

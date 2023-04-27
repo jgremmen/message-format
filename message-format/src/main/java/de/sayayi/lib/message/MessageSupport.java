@@ -614,6 +614,21 @@ public interface MessageSupport
      */
     @Contract(pure = true)
     @NotNull MessageFactory getMessageFactory();
+
+
+    /**
+     * Returns a collection of template names, that are referenced from messages but have not
+     * been published with this message support.
+     * <p>
+     * The messages that are analysed can be filtered by providing a {@code messageCodeFilter}.
+     * If this parameter is {@code null} all known messages are analysed.
+     *
+     * @param messageCodeFilter  message code filter or {@code null} to include all messages
+     *
+     * @return  a collections with referenced template names, that are unknown to this
+     *          message support, never {@code null}
+     */
+    @NotNull Set<String> findMissingTemplates(Predicate<String> messageCodeFilter);
   }
 
 
