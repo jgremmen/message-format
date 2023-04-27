@@ -197,10 +197,10 @@ fragment Number
 fragment Character
         : EscapeSequence
         | [\p{Zs}]+  // Unicode Zs (whitespace)
-        | [\p{L}]   // Unicode L (letter)
-        | [\p{N}]   // Unicode N (number)
-        | [\p{P}]   // Unicode P (punctuation)
-        | [\p{S}]   // Unicode S (symbol)
+        | [\p{L}]    // Unicode L (letter)
+        | [\p{N}]    // Unicode N (number)
+        | [\p{P}]    // Unicode P (punctuation)
+        | [\p{S}]    // Unicode S (symbol)
         ;
 
 fragment EscapeSequence
