@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.plugin.gradle;
 
+import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.adopter.AsmAnnotationAdopter;
@@ -25,7 +26,10 @@ import org.gradle.api.GradleException;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.*;
+import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputFiles;
+import org.gradle.api.tasks.OutputFile;
+import org.gradle.api.tasks.TaskAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -33,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static de.sayayi.lib.message.plugin.gradle.DuplicatesStrategy.IGNORE_AND_WARN;
 import static java.nio.file.Files.newOutputStream;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
@@ -48,6 +53,14 @@ public abstract class MessageFormatPackTask extends DefaultTask
   private final List<String> excludeRegexFilters = new ArrayList<>();
 
 
+  public MessageFormatPackTask()
+  {
+    getCompress().convention(false);
+    getDuplicatesStrategy().convention(IGNORE_AND_WARN);
+    getValidateReferencedTemplates().convention(true);
+  }
+
+
   @Input
   public List<String> getIncludeRegexFilters() {
     return unmodifiableList(includeRegexFilters);
@@ -61,12 +74,15 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   @InputFiles
-  @SkipWhenEmpty
   public abstract ConfigurableFileCollection getSources();
 
 
   @Input
   public abstract Property<DuplicatesStrategy> getDuplicatesStrategy();
+
+
+  @Input
+  public abstract Property<Boolean> getValidateReferencedTemplates();
 
 
   @Input
@@ -95,24 +111,69 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
     configureDuplicatesStrategy(messageSupport);
 
+    pack_scanMessages(messageSupport);
+    pack_validateTemplates(messageSupport);
+    pack_write(messageSupport);
+  }
+
+
+  private void pack_scanMessages(@NotNull ConfigurableMessageSupport messageSupport)
+  {
+    val logger = getLogger();
+
+    logger.info("Scanning classes for messages and templates");
+
     try {
       val adopter = new AsmAnnotationAdopter(messageSupport);
 
       for(val classFile: getSources().getFiles())
       {
-        getLogger().debug("Scanning " + classFile.getAbsolutePath());
+        logger.debug("Scanning " + classFile.getAbsolutePath());
         adopter.adopt(classFile);
       }
     } catch(Exception ex) {
       throw new GradleException("Failed to scan messages", ex);
     }
+  }
 
+
+  private void pack_validateTemplates(@NotNull MessageSupport messageSupport)
+  {
+    if (getValidateReferencedTemplates().get())
+    {
+      getLogger().debug("Validating referenced templates");
+
+      val missingTemplateNames = new ArrayList<>(messageSupport.getAccessor()
+          .findMissingTemplates(this::messageCodeFilter));
+      val count = missingTemplateNames.size();
+
+      switch(count)
+      {
+        case 0:
+          break;
+
+        case 1:
+          throw new GradleException("Missing message template: " + missingTemplateNames.get(0));
+
+        default:
+          throw new GradleException("Missing message templates: " +
+              String.join(", ", missingTemplateNames.subList(0, count - 1)) + " and " +
+              missingTemplateNames.get(count - 1));
+      }
+    }
+  }
+
+
+  private void pack_write(@NotNull MessageSupport messageSupport)
+  {
     val packFile = getPackFile().getAsFile().get();
+    getLogger().debug("Writing message pack: " + packFile.getAbsolutePath());
+
+    // create parent directory
     getProject().mkdir(packFile.getParentFile());
 
     try(val packOutputStream = newOutputStream(packFile.toPath())) {
-      messageSupport.exportMessages(packOutputStream, getCompress().getOrElse(false),
-          this::messageCodeFilter);
+      messageSupport.exportMessages(packOutputStream, getCompress().get(), this::messageCodeFilter);
     } catch(IOException ex) {
       throw new GradleException("Failed to write packed messages", ex);
     }
