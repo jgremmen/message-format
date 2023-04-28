@@ -28,10 +28,10 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.*;
+import static java.util.Arrays.asList;
 import static java.util.Collections.*;
 import static java.util.Objects.requireNonNull;
 import static org.gradle.testkit.runner.TaskOutcome.FAILED;
@@ -58,7 +58,7 @@ public class TestPlugin
   {
     write(new File(testProjectDir, "settings.gradle").toPath(),
         singletonList("rootProject.name = 'test-message-pack'"));
-    write(new File(testProjectDir, "build.gradle").toPath(), Arrays.asList(
+    write(new File(testProjectDir, "build.gradle").toPath(), asList(
         "plugins {",
         "  id 'java'",
         "  id 'de.sayayi.lib.message.plugin.gradle'",
@@ -67,7 +67,7 @@ public class TestPlugin
     buildDir = new File(testProjectDir, "build");
     javaDir = new File(testProjectDir, "src/main/java");
     testPackageDir = new File(javaDir, "test");
-    packFile = new File(buildDir, "messageFormat/resources/META-INF/message.pack");
+    packFile = new File(buildDir, "messageFormatPack/message.pack");
 
     createDirectories(testPackageDir.toPath());
   }
@@ -119,7 +119,7 @@ public class TestPlugin
   @Test
   void testWithFilteredSource() throws IOException
   {
-    write(new File(testProjectDir, "build.gradle").toPath(), Arrays.asList(
+    write(new File(testProjectDir, "build.gradle").toPath(), asList(
         "plugins {",
         "  id 'java'",
         "  id 'de.sayayi.lib.message.plugin.gradle'",
@@ -151,7 +151,7 @@ public class TestPlugin
   @Test
   void testDuplicateMessage() throws IOException
   {
-    write(new File(testProjectDir, "build.gradle").toPath(), Arrays.asList(
+    write(new File(testProjectDir, "build.gradle").toPath(), asList(
         "plugins {",
         "  id 'java'",
         "  id 'de.sayayi.lib.message.plugin.gradle'",
@@ -172,6 +172,38 @@ public class TestPlugin
         .buildAndFail();
 
     assertEquals(FAILED, requireNonNull(result.task(":messageFormatPack")).getOutcome());
+  }
+
+
+  @Test
+  void testJar() throws IOException
+  {
+    write(new File(testProjectDir, "build.gradle").toPath(), asList(
+        "plugins {",
+        "  id 'java'",
+        "  id 'de.sayayi.lib.message.plugin.gradle'",
+        "}",
+        "jar {",
+        "  from messageFormatPack {",
+        "    into 'META-INF'",
+        "  }",
+        "}"));
+
+    copy(getResource("test-source-1.java"),
+        new File(testPackageDir, "Source1.java").toPath());
+    copy(getResource("test-source-2.java"),
+        new File(testPackageDir, "Source2.java").toPath());
+
+    val result = GradleRunner.create()
+        .withProjectDir(testProjectDir)
+        .withArguments("jar")
+        .withPluginClasspath()
+        .withDebug(true)
+        .forwardOutput()
+        .build();
+
+    assertEquals(SUCCESS, requireNonNull(result.task(":jar")).getOutcome());
+    assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
   }
 
 
