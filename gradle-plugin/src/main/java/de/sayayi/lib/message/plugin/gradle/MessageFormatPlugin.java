@@ -55,13 +55,6 @@ public class MessageFormatPlugin implements Plugin<Project>
     val mainJavaSourceSet = extensions.getByType(JavaPluginExtension.class)
         .getSourceSets().getByName("main");
 
-    // resources dir = {.build}/messageFormat/resources
-    val resourcesDir = project.getLayout().getBuildDirectory().dir(EXTENSION + "/resources");
-    mainJavaSourceSet.getResources().srcDir(resourcesDir);
-
-    // destination dir = {.build/messageFormat/resources}META-INF/
-    messageFormatExtension.getDestinationDir().convention(resourcesDir.get().dir("META-INF"));
-
     // sources = {.build/classes/java/main/}**/*.class
     messageFormatExtension.getSources().from(mainJavaSourceSet.getOutput());
 
@@ -81,9 +74,8 @@ public class MessageFormatPlugin implements Plugin<Project>
 
       packTask.getCompress().convention(extension.getCompress());
       packTask.getDuplicatesStrategy().convention(extension.getDuplicatesStrategy());
+      packTask.getPackFilename().convention(extension.getPackFilename());
       packTask.getSources().from(extension.getSources());
-      packTask.getPackFile().convention(project.provider(() ->
-          extension.getDestinationDir().file(extension.getPackFilename()).get()));
       packTask.include(extension.getIncludeRegexFilter().toArray(new String[0]));
       packTask.exclude(extension.getExcludeRegexFilter().toArray(new String[0]));
 

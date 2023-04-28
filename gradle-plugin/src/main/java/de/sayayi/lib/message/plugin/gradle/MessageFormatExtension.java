@@ -17,7 +17,6 @@ package de.sayayi.lib.message.plugin.gradle;
 
 import lombok.Getter;
 import org.gradle.api.file.ConfigurableFileCollection;
-import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.Property;
 
 import java.util.ArrayList;
@@ -48,9 +47,6 @@ public abstract class MessageFormatExtension
 
 
   public abstract Property<Boolean> getValidateReferencedTemplates();
-
-
-  public abstract DirectoryProperty getDestinationDir();
 
 
   public void include(String... regex) {

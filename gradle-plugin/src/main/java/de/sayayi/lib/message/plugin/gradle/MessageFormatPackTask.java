@@ -28,7 +28,7 @@ import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.file.ConfigurableFileCollection;
-import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.file.RegularFile;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
@@ -65,6 +65,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
   private final List<String> includeRegexFilters = new ArrayList<>();
   private final List<String> excludeRegexFilters = new ArrayList<>();
 
+  private final ThreadLocal<String> currentClassName = new ThreadLocal<>();
+
 
   public MessageFormatPackTask()
   {
@@ -72,6 +74,10 @@ public abstract class MessageFormatPackTask extends DefaultTask
     getDuplicatesStrategy().convention(IGNORE_AND_WARN);
     getValidateReferencedTemplates().convention(true);
   }
+
+
+  @Input
+  public abstract Property<String> getPackFilename();
 
 
   @Input
@@ -103,7 +109,15 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   @OutputFile
-  public abstract RegularFileProperty getPackFile();
+  public RegularFile getPackFile()
+  {
+    val project = getProject();
+
+    return project.getLayout()
+        .getBuildDirectory()
+        .dir(project.provider(this::getName)).get()
+        .file(getPackFilename()).get();
+  }
 
 
   public void include(String... regex) {
@@ -136,20 +150,15 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
     logger.info("Scanning classes for messages and templates");
 
-    File currentClassFile = null;
-
     try {
       val adopter = new AsmAnnotationAdopter(messageSupport);
 
       for(val classFile: getSources().getAsFileTree().matching(CLASS_FILES).getFiles())
       {
         logger.debug("Scanning " + classFile.getAbsolutePath());
-        adopter.adopt(currentClassFile = classFile);
+        currentClassName.set(getClassName(classFile));
+        adopter.adopt(classFile);
       }
-    } catch(DuplicateMessageException | DuplicateTemplateException ex) {
-      assert currentClassFile != null;
-      logger.error(ex.getLocalizedMessage() + " in class " + getClassName(currentClassFile));
-      throw new GradleException("Failed to scan messages", ex);
     } catch(Exception ex) {
       throw new GradleException("Failed to scan messages", ex);
     }
@@ -185,7 +194,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void pack_write(@NotNull MessageSupport messageSupport)
   {
-    val packFile = getPackFile().getAsFile().get();
+    val packFile = getPackFile().getAsFile();
     getLogger().debug("Writing message pack: " + packFile.getAbsolutePath());
 
     // create parent directory
@@ -290,7 +299,12 @@ public abstract class MessageFormatPackTask extends DefaultTask
       if (!accessor.hasMessageWithCode(code))
         return true;
       else if (!accessor.getMessageByCode(code).isSame(message))
-        throw new DuplicateMessageException(code, "Duplicate message code '" + code + "'");
+      {
+        val msg = "Duplicate message code '" + code + "' in class " + currentClassName.get();
+        getLogger().error(msg);
+
+        throw new DuplicateMessageException(code, msg);
+      }
 
       return false;
     });
@@ -299,7 +313,12 @@ public abstract class MessageFormatPackTask extends DefaultTask
       if (!accessor.hasTemplateWithName(name))
         return true;
       else if (!accessor.getTemplateByName(name).isSame(template))
-        throw new DuplicateTemplateException(name, "Duplicate template name '" + name + "'");
+      {
+        val msg = "Duplicate template name '" + name + "' in class " + currentClassName.get();
+        getLogger().error(msg);
+
+        throw new DuplicateTemplateException(name, msg);
+      }
 
       return false;
     });
@@ -317,7 +336,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
       if (!accessor.hasMessageWithCode(code))
         return true;
       else if (warn && !accessor.getMessageByCode(code).isSame(message))
-        getLogger().warn("Duplicate message code '" + code + "'");
+        getLogger().warn("Duplicate message code '" + code + "' in class " + currentClassName.get());
 
       return false;
     });
@@ -326,7 +345,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
       if (!accessor.hasTemplateWithName(name))
         return true;
       else if (warn && !accessor.getTemplateByName(name).isSame(template))
-        getLogger().warn("Duplicate template name '" + name + "'");
+        getLogger().warn("Duplicate template name '" + name + "' in class " + currentClassName.get());
 
       return false;
     });
@@ -346,7 +365,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
         if (accessor.getMessageByCode(code).isSame(message))
           return false;
 
-        getLogger().warn("Duplicate message code '" + code + "'");
+        getLogger().warn("Duplicate message code '" + code + "' in class " + currentClassName.get());
       }
 
       return true;
@@ -358,7 +377,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
         if (accessor.getTemplateByName(name).isSame(template))
           return false;
 
-        getLogger().warn("Duplicate template name '" + name + "'");
+        getLogger().warn("Duplicate template name '" + name + "' in class " + currentClassName.get());
       }
 
       return true;
