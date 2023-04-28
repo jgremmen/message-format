@@ -19,6 +19,8 @@ import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.adopter.AsmAnnotationAdopter;
+import de.sayayi.lib.message.exception.DuplicateMessageException;
+import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import lombok.val;
 import org.gradle.api.Action;
@@ -131,11 +133,13 @@ public abstract class MessageFormatPackTask extends DefaultTask
     try {
       val adopter = new AsmAnnotationAdopter(messageSupport);
 
-      for(val classFile: getSources().getAsFileTree().matching(CLASS_FILES).getFiles())
-      {
+      for (val classFile : getSources().getAsFileTree().matching(CLASS_FILES).getFiles()) {
         logger.debug("Scanning " + classFile.getAbsolutePath());
         adopter.adopt(classFile);
       }
+    } catch(DuplicateMessageException | DuplicateTemplateException ex) {
+      logger.error(ex.getLocalizedMessage(), ex);
+      throw new GradleException("Failed to scan messages");
     } catch(Exception ex) {
       throw new GradleException("Failed to scan messages", ex);
     }
@@ -250,7 +254,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
       if (!accessor.hasMessageWithCode(code))
         return true;
       else if (!accessor.getMessageByCode(code).isSame(message))
-        throw new GradleException("Duplicate message code '" + code + "'");
+        throw new DuplicateMessageException(code, "Duplicate message code '" + code + "'");
 
       return false;
     });
@@ -259,7 +263,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
       if (!accessor.hasTemplateWithName(name))
         return true;
       else if (!accessor.getTemplateByName(name).isSame(template))
-        throw new GradleException("Duplicate template name '" + name + "'");
+        throw new DuplicateTemplateException(name, "Duplicate template name '" + name + "'");
 
       return false;
     });

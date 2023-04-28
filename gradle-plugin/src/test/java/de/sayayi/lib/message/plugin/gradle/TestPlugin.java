@@ -34,6 +34,7 @@ import static java.nio.file.Files.copy;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.Objects.requireNonNull;
+import static org.gradle.testkit.runner.TaskOutcome.FAILED;
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -144,6 +145,35 @@ public class TestPlugin
     val pack = readMessagePack(packFile);
     assertEquals(singleton("MSG-INNER1"), pack.getMessageCodes());
     assertEquals(emptySet(), pack.getTemplateNames());
+  }
+
+
+  @Test
+  void testDuplicateMessage() throws IOException
+  {
+    write(new File(testProjectDir, "build.gradle").toPath(), Arrays.asList(
+        "plugins {",
+        "  id 'java'",
+        "  id 'de.sayayi.lib.message.plugin.gradle'",
+        "}",
+        "messageFormat {",
+        "  duplicatesStrategy = de.sayayi.lib.message.plugin.gradle.DuplicatesStrategy.FAIL",
+        "}"));
+
+    copy(getResource("test-source-1.java"),
+        new File(testPackageDir, "Source1.java").toPath());
+    copy(getResource("test-source-2.java"),
+        new File(testPackageDir, "Source2.java").toPath());
+
+    val result = GradleRunner.create()
+        .withProjectDir(testProjectDir)
+        .withArguments("messageFormatPack")
+        .withPluginClasspath()
+        .withDebug(true)
+        .forwardOutput()
+        .buildAndFail();
+
+    assertEquals(FAILED, requireNonNull(result.task(":messageFormatPack")).getOutcome());
   }
 
 
