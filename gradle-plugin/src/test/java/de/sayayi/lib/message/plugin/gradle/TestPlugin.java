@@ -30,9 +30,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
+import static java.nio.file.Files.copy;
 import static java.nio.file.Files.*;
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singletonList;
+import static java.util.Collections.*;
 import static java.util.Objects.requireNonNull;
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -111,6 +111,38 @@ public class TestPlugin
 
     val pack = readMessagePack(packFile);
     assertEquals(4, pack.getMessageCodes().size());
+    assertEquals(emptySet(), pack.getTemplateNames());
+  }
+
+
+  @Test
+  void testWithFilteredSource() throws IOException
+  {
+    write(new File(testProjectDir, "build.gradle").toPath(), Arrays.asList(
+        "plugins {",
+        "  id 'java'",
+        "  id 'de.sayayi.lib.message.plugin.gradle'",
+        "}",
+        "messageFormat {",
+        "  include '.*INNER.*'",
+        "}"));
+
+    copy(getResource("test-source-1.java"),
+        new File(testPackageDir, "Source1.java").toPath());
+
+    val result = GradleRunner.create()
+        .withProjectDir(testProjectDir)
+        .withArguments("messageFormatPack")
+        .withPluginClasspath()
+        .withDebug(true)
+        .forwardOutput()
+        .build();
+
+    assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
+    assertTrue(packFile.isFile() && packFile.canRead());
+
+    val pack = readMessagePack(packFile);
+    assertEquals(singleton("MSG-INNER1"), pack.getMessageCodes());
     assertEquals(emptySet(), pack.getTemplateNames());
   }
 
