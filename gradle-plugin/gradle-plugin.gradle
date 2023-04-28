@@ -47,6 +47,9 @@ dependencies {
   compileOnly "org.projectlombok:lombok:${lombokVersion}"
 
   implementation "org.ow2.asm:asm:${asmVersion}"
+
+  testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+  testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
 }
 
 

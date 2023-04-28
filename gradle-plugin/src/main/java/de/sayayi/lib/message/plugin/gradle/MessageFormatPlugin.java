@@ -43,6 +43,7 @@ public class MessageFormatPlugin implements Plugin<Project>
     if (!plugins.hasPlugin(JavaBasePlugin.class))
       project.apply(objectConfiguration -> objectConfiguration.plugin(JavaBasePlugin.class));
 
+    // create extension and set conventions
     val extensions = project.getExtensions();
     val messageFormatExtension = extensions.create(EXTENSION, MessageFormatExtension.class);
 
@@ -54,9 +55,12 @@ public class MessageFormatPlugin implements Plugin<Project>
     val mainJavaSourceSet = extensions.getByType(JavaPluginExtension.class)
         .getSourceSets().getByName("main");
 
-    // destination dir = {.build/resources/main/}META-INF/
-    messageFormatExtension.getDestinationDir().convention(
-        mainJavaSourceSet.getResources().getDestinationDirectory().dir("META-INF"));
+    // resources dir = {.build}/messageFormat/resources
+    val resourcesDir = project.getLayout().getBuildDirectory().dir(EXTENSION + "/resources");
+    mainJavaSourceSet.getResources().srcDir(resourcesDir);
+
+    // destination dir = {.build/messageFormat/resources}META-INF/
+    messageFormatExtension.getDestinationDir().convention(resourcesDir.get().dir("META-INF"));
 
     // sources = {.build/classes/java/main/}**/*.class
     messageFormatExtension.getSources().from(mainJavaSourceSet.getOutput());

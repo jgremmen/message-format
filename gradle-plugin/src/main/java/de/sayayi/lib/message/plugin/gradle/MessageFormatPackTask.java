@@ -21,6 +21,7 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.adopter.AsmAnnotationAdopter;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import lombok.val;
+import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.file.ConfigurableFileCollection;
@@ -30,6 +31,7 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.util.PatternFilterable;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -49,6 +51,9 @@ import static java.util.Collections.unmodifiableList;
  */
 public abstract class MessageFormatPackTask extends DefaultTask
 {
+  private static final Action<PatternFilterable> CLASS_FILES =
+      pf -> pf.include("**/*.class");
+
   private final List<String> includeRegexFilters = new ArrayList<>();
   private final List<String> excludeRegexFilters = new ArrayList<>();
 
@@ -126,7 +131,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
     try {
       val adopter = new AsmAnnotationAdopter(messageSupport);
 
-      for(val classFile: getSources().getFiles())
+      for(val classFile: getSources().getAsFileTree().matching(CLASS_FILES).getFiles())
       {
         logger.debug("Scanning " + classFile.getAbsolutePath());
         adopter.adopt(classFile);
