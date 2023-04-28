@@ -23,6 +23,7 @@ import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import lombok.val;
+import lombok.var;
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
@@ -256,10 +257,13 @@ public abstract class MessageFormatPackTask extends DefaultTask
   @Contract(pure = true)
   private @NotNull DuplicatesStrategy configureDuplicatesStrategy_toEnum()
   {
-    val value = getDuplicatesStrategy().get();
+    var value = getDuplicatesStrategy().get();
 
     if (value instanceof DuplicatesStrategy)
       return (DuplicatesStrategy)value;
+
+    if (value instanceof Enum)
+      value = ((Enum<?>)value).name();
 
     if (value instanceof String)
     {
