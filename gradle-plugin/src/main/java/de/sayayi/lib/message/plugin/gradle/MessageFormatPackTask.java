@@ -49,6 +49,7 @@ import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
+import static java.util.Locale.ROOT;
 
 
 /**
@@ -262,16 +263,16 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
     if (value instanceof String)
     {
-      val valueAsIs = (String)value;
+      val valueAsIs = ((String)value).toUpperCase(ROOT);
       val valueUnderscore = valueAsIs.replace('-', '_');
 
       for(val ds: DuplicatesStrategy.values())
-        if (ds.name().equalsIgnoreCase(valueAsIs) ||
-            ds.name().equalsIgnoreCase(valueUnderscore))
+        if (ds.name().equals(valueAsIs) ||
+            ds.name().equals(valueUnderscore))
           return ds;
     }
 
-    throw new GradleException("unknown duplicates strategy: " + value);
+    throw new GradleException("Unknown duplicates strategy: " + value);
   }
 
 
