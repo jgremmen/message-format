@@ -34,14 +34,18 @@ import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.util.PatternFilterable;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.objectweb.asm.ClassReader;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.plugin.gradle.DuplicatesStrategy.IGNORE_AND_WARN;
+import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
@@ -85,7 +89,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   @Input
-  public abstract Property<DuplicatesStrategy> getDuplicatesStrategy();
+  public abstract Property<Object> getDuplicatesStrategy();
 
 
   @Input
@@ -130,16 +134,20 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
     logger.info("Scanning classes for messages and templates");
 
+    File currentClassFile = null;
+
     try {
       val adopter = new AsmAnnotationAdopter(messageSupport);
 
-      for (val classFile : getSources().getAsFileTree().matching(CLASS_FILES).getFiles()) {
+      for(val classFile: getSources().getAsFileTree().matching(CLASS_FILES).getFiles())
+      {
         logger.debug("Scanning " + classFile.getAbsolutePath());
-        adopter.adopt(classFile);
+        adopter.adopt(currentClassFile = classFile);
       }
     } catch(DuplicateMessageException | DuplicateTemplateException ex) {
-      logger.error(ex.getLocalizedMessage(), ex);
-      throw new GradleException("Failed to scan messages");
+      assert currentClassFile != null;
+      logger.error(ex.getLocalizedMessage() + " in class " + getClassName(currentClassFile));
+      throw new GradleException("Failed to scan messages", ex);
     } catch(Exception ex) {
       throw new GradleException("Failed to scan messages", ex);
     }
@@ -219,7 +227,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void configureDuplicatesStrategy(@NotNull ConfigurableMessageSupport messageSupport)
   {
-    switch(getDuplicatesStrategy().get())
+    switch(configureDuplicatesStrategy_toEnum())
     {
       case FAIL:
         configureDuplicateFailStrategy(messageSupport);
@@ -241,6 +249,29 @@ public abstract class MessageFormatPackTask extends DefaultTask
         configureDuplicateIgnoreStrategy(messageSupport, true);
         break;
     }
+  }
+
+
+  @Contract(pure = true)
+  private @NotNull DuplicatesStrategy configureDuplicatesStrategy_toEnum()
+  {
+    val value = getDuplicatesStrategy().get();
+
+    if (value instanceof DuplicatesStrategy)
+      return (DuplicatesStrategy)value;
+
+    if (value instanceof String)
+    {
+      val valueAsIs = (String)value;
+      val valueUnderscore = valueAsIs.replace('-', '_');
+
+      for(val ds: DuplicatesStrategy.values())
+        if (ds.name().equalsIgnoreCase(valueAsIs) ||
+            ds.name().equalsIgnoreCase(valueUnderscore))
+          return ds;
+    }
+
+    throw new GradleException("unknown duplicates strategy: " + value);
   }
 
 
@@ -327,5 +358,18 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
       return true;
     });
+  }
+
+
+  @Contract(pure = true)
+  private @NotNull String getClassName(@NotNull File classFile)
+  {
+    try {
+      return new ClassReader(newInputStream(classFile.toPath()))
+          .getClassName()
+          .replace('/', '.');
+    } catch(IOException ex) {
+      throw new GradleException("Failed to read class name from " + classFile, ex);
+    }
   }
 }
