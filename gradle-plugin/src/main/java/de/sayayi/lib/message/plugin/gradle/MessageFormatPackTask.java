@@ -29,6 +29,7 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.RegularFile;
+import org.gradle.api.logging.LogLevel;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
@@ -51,6 +52,8 @@ import static java.nio.file.Files.newOutputStream;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Locale.ROOT;
+import static org.gradle.api.logging.LogLevel.ERROR;
+import static org.gradle.api.logging.LogLevel.WARN;
 
 
 /**
@@ -299,12 +302,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
       if (!accessor.hasMessageWithCode(code))
         return true;
       else if (!accessor.getMessageByCode(code).isSame(message))
-      {
-        val msg = "Duplicate message code '" + code + "' in class " + currentClassName.get();
-        getLogger().error(msg);
-
-        throw new DuplicateMessageException(code, msg);
-      }
+        throw new DuplicateMessageException(code, logDuplicateMessage(ERROR, code));
 
       return false;
     });
@@ -313,12 +311,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
       if (!accessor.hasTemplateWithName(name))
         return true;
       else if (!accessor.getTemplateByName(name).isSame(template))
-      {
-        val msg = "Duplicate template name '" + name + "' in class " + currentClassName.get();
-        getLogger().error(msg);
-
-        throw new DuplicateTemplateException(name, msg);
-      }
+        throw new DuplicateTemplateException(name, logDuplicateTemplate(ERROR, name));
 
       return false;
     });
@@ -336,7 +329,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
       if (!accessor.hasMessageWithCode(code))
         return true;
       else if (warn && !accessor.getMessageByCode(code).isSame(message))
-        getLogger().warn("Duplicate message code '" + code + "' in class " + currentClassName.get());
+        logDuplicateMessage(WARN, code);
 
       return false;
     });
@@ -345,7 +338,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
       if (!accessor.hasTemplateWithName(name))
         return true;
       else if (warn && !accessor.getTemplateByName(name).isSame(template))
-        getLogger().warn("Duplicate template name '" + name + "' in class " + currentClassName.get());
+        logDuplicateTemplate(WARN, name);
 
       return false;
     });
@@ -365,7 +358,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
         if (accessor.getMessageByCode(code).isSame(message))
           return false;
 
-        getLogger().warn("Duplicate message code '" + code + "' in class " + currentClassName.get());
+        logDuplicateMessage(WARN, code);
       }
 
       return true;
@@ -377,11 +370,31 @@ public abstract class MessageFormatPackTask extends DefaultTask
         if (accessor.getTemplateByName(name).isSame(template))
           return false;
 
-        getLogger().warn("Duplicate template name '" + name + "' in class " + currentClassName.get());
+        logDuplicateTemplate(WARN, name);
       }
 
       return true;
     });
+  }
+
+
+  private @NotNull String logDuplicateMessage(@NotNull LogLevel level, @NotNull String code)
+  {
+    val msg = "Duplicate message code '" + code + "' in class " + currentClassName.get();
+
+    getLogger().log(level, msg);
+
+    return msg;
+  }
+
+
+  private @NotNull String logDuplicateTemplate(@NotNull LogLevel level, @NotNull String name)
+  {
+    val msg = "Duplicate template name '" + name + "' in class " + currentClassName.get();
+
+    getLogger().log(level, msg);
+
+    return msg;
   }
 
 
