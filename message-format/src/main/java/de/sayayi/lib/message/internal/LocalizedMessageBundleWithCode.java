@@ -148,14 +148,13 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
     if (!(message instanceof LocaleAware))
       return false;
 
-    final Map<Locale,Message> lmm1 = ((LocaleAware)this).getLocalizedMessages();
-    final Map<Locale,Message> lmm2 = ((LocaleAware)message).getLocalizedMessages();
+    final Map<Locale,Message> lm = ((LocaleAware)message).getLocalizedMessages();
 
-    if (!lmm1.keySet().equals(lmm2.keySet()))
+    if (!localizedMessages.keySet().equals(lm.keySet()))
       return false;
 
-    for(final Entry<Locale,Message> entry: lmm1.entrySet())
-      if (!entry.getValue().isSame(lmm2.get(entry.getKey())))
+    for(final Entry<Locale,Message> entry: localizedMessages.entrySet())
+      if (!entry.getValue().isSame(lm.get(entry.getKey())))
         return false;
 
     return true;
