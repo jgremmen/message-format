@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.plugin.gradle;
 
-import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
@@ -29,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.*;
 import static java.util.Arrays.asList;
@@ -214,8 +214,8 @@ public class TestPlugin
 
   private MessageSupportAccessor readMessagePack(File pack) throws IOException
   {
-    val messageSupport = MessageSupportFactory.create(new GenericFormatterService(),
-        MessageFactory.NO_CACHE_INSTANCE);
+    val messageSupport = MessageSupportFactory
+        .create(new GenericFormatterService(), NO_CACHE_INSTANCE);
 
     return messageSupport
         .importMessages(newInputStream(pack.toPath()))
