@@ -274,9 +274,6 @@ public abstract class MessageFormatPackTask extends DefaultTask
     if (value instanceof DuplicatesStrategy)
       return (DuplicatesStrategy)value;
 
-    if (value instanceof Enum)
-      value = ((Enum<?>)value).name();
-
     if (value instanceof String)
     {
       val valueAsIs = ((String)value).toUpperCase(ROOT);
