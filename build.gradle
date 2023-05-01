@@ -19,7 +19,6 @@ description = 'Message Format Library Projects'
 
 ext {
   moduleProjects = subprojects.findAll { it.name.startsWith("message-format") }
-  formatterProjects = subprojects.findAll { it.name.startsWith("message-format-") }
 }
 
 
@@ -42,8 +41,15 @@ configure(moduleProjects) {
 }
 
 
-configure(formatterProjects) {
+// formatter projects
+configure(subprojects.findAll { it.name.startsWith("message-format-") }) {
   dependencies {
     implementation project(':message-format')
   }
+}
+
+
+// publishable projects
+configure(subprojects.findAll {it.name != 'documentation' }) {
+  apply from: "${rootDir}/gradle/publish.gradle"
 }
