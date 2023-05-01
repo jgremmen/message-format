@@ -85,3 +85,47 @@ gradlePlugin {
     }
   }
 }
+
+
+publishing {
+  publications {
+
+    gradlePlugin(MavenPublication) {
+      from components.java
+
+      pom {
+        name = 'Java Message Format Gradle Plugin'
+        description = 'Gradle Plugin'
+        url = 'https://github.com/jgremmen/message-format'
+        inceptionYear = '2023'
+
+        licenses {
+          license {
+            name = 'Apache License, Version 2.0'
+            url = 'https://www.apache.org/licenses/LICENSE-2.0'
+            distribution = 'repo'
+          }
+        }
+
+        developers {
+          developer {
+            id = 'jgremmen'
+            name = 'Jeroen Gremmen'
+            email = 'jeroen.gremmen@sayayi.de'
+          }
+        }
+
+        scm {
+          connection = 'scm:git:git://github.com/jgremmen/message-format.git'
+          developerConnection = 'scm:git:git://github.com/jgremmen/message-format.git'
+          url = 'https://github.com/jgremmen/message-format'
+        }
+      }
+    }
+  }
+}
+
+
+signing {
+  sign publishing.publications.gradlePlugin
+}

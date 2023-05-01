@@ -15,9 +15,7 @@
  */
 
 apply plugin: "java-library"
-apply plugin: "maven-publish"
 apply plugin: "jacoco"
-apply plugin: "signing"
 
 
 dependencies {
@@ -135,24 +133,6 @@ jacocoTestReport {
     }
     html {
       required = true
-    }
-  }
-}
-
-
-publishing {
-  repositories {
-    maven {
-      name = "mavenTemp"
-      url = "${rootProject.buildDir}/repository"
-    }
-    maven {
-      name = "mavenCentral"
-      url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-      credentials {
-        username = rootProject.findProperty('mavenCentral.username')
-        password = rootProject.findProperty('mavenCentral.password')
-      }
     }
   }
 }
