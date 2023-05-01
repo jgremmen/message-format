@@ -62,6 +62,8 @@ import static de.sayayi.lib.message.parser.MessageParser.DQ_END;
 import static de.sayayi.lib.message.parser.MessageParser.DQ_START;
 import static de.sayayi.lib.message.parser.MessageParser.SQ_END;
 import static de.sayayi.lib.message.parser.MessageParser.SQ_START;
+import static de.sayayi.lib.message.parser.MessageParser.TPL_END;
+import static de.sayayi.lib.message.parser.MessageParser.TPL_START;
 import static de.sayayi.lib.message.parser.MessageParser.*;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
@@ -495,6 +497,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       add(P_START, "'%{'", "P_START");
       add(SQ_END, "'", "SQ_END");
       add(SQ_START, "'", "SQ_START");
+      add(TPL_START, "'%['", "TPL_START");
+      add(TPL_END, "']'", "TPL_END");
     }
   };
 }
