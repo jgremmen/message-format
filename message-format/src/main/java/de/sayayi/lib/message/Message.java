@@ -131,6 +131,7 @@ public interface Message extends Serializable
    * @since 0.8.0
    */
   @Contract(pure = true)
+  @SuppressWarnings("DuplicatedCode")
   default boolean isSame(@NotNull Message message)
   {
     final boolean localeAware = this instanceof LocaleAware;
