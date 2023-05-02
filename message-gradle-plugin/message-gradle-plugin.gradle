@@ -79,9 +79,9 @@ jar {
 gradlePlugin {
   plugins {
     'message-format' {
-      id = 'de.sayayi.lib.message'
+      id = 'de.sayayi.plugin.gradle.message'
       displayName = 'Message Format Gradle Plugin'
-      implementationClass = 'de.sayayi.lib.message.plugin.gradle.MessageFormatPlugin'
+      implementationClass = 'de.sayayi.plugin.gradle.message.MessageFormatPlugin'
     }
   }
 }

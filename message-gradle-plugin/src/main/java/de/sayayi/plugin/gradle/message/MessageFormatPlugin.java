@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.plugin.gradle;
+package de.sayayi.plugin.gradle.message;
 
 import lombok.val;
 import org.gradle.api.Plugin;
@@ -23,7 +23,7 @@ import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
 import org.jetbrains.annotations.NotNull;
 
-import static de.sayayi.lib.message.plugin.gradle.DuplicatesStrategy.IGNORE_AND_WARN;
+import static de.sayayi.plugin.gradle.message.DuplicatesStrategy.IGNORE_AND_WARN;
 
 
 /**
@@ -76,6 +76,9 @@ public class MessageFormatPlugin implements Plugin<Project>
       packTask.getDuplicatesStrategy().convention(extension.getDuplicatesStrategy());
       packTask.getPackFilename().convention(extension.getPackFilename());
       packTask.getSources().from(extension.getSources());
+      packTask.getValidateReferencedTemplates()
+          .convention(extension.getValidateReferencedTemplates());
+
       packTask.include(extension.getIncludeRegexFilter().toArray(new String[0]));
       packTask.exclude(extension.getExcludeRegexFilter().toArray(new String[0]));
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.plugin.gradle;
+package de.sayayi.plugin.gradle.message;
 
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
@@ -27,6 +27,7 @@ import lombok.var;
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
+import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.logging.LogLevel;
@@ -44,9 +45,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static de.sayayi.lib.message.plugin.gradle.DuplicatesStrategy.IGNORE_AND_WARN;
+import static de.sayayi.plugin.gradle.message.DuplicatesStrategy.IGNORE_AND_WARN;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
 import static java.util.Arrays.asList;
@@ -67,6 +69,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private final List<String> includeRegexFilters = new ArrayList<>();
   private final List<String> excludeRegexFilters = new ArrayList<>();
+  private Action<Set<String>> codesAction = null;
 
   private final ThreadLocal<String> currentClassName = new ThreadLocal<>();
 
@@ -133,6 +136,15 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  public void codes(Action<Set<String>> action)
+  {
+    if (action == null)
+      throw new InvalidUserDataException("Action must not be null!");
+
+    this.codesAction = action;
+  }
+
+
   @TaskAction
   public void pack()
   {
@@ -143,6 +155,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
     pack_scanMessages(messageSupport);
     pack_validateTemplates(messageSupport);
+    pack_codesAction(messageSupport);
     pack_write(messageSupport);
   }
 
@@ -192,6 +205,13 @@ public abstract class MessageFormatPackTask extends DefaultTask
               missingTemplateNames.get(count - 1));
       }
     }
+  }
+
+
+  private void pack_codesAction(@NotNull MessageSupport messageSupport)
+  {
+    if (codesAction != null)
+      codesAction.execute(messageSupport.getAccessor().getMessageCodes());
   }
 
 
