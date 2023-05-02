@@ -48,7 +48,7 @@ import static org.springframework.asm.Type.getDescriptor;
  * {@link de.sayayi.lib.message.MessageSupport.TemplateFilter TemplateFilter}.
  * <p>
  * Even though the annotations all have class retention, 2 adopt methods
- * ({@link #adopt(MessageDef)} and {@link #adopt(TemplateDef)}) are available to analyse
+ * ({@link #adopt(MessageDef)} and {@link #adopt(TemplateDef)}) are available for analyzing
  * synthesized/mocked annotations.
  * <p>
  * The scanned classes are analysed using the ASM library bundled with Spring. Using this class

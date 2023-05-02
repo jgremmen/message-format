@@ -226,7 +226,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
     try(val packOutputStream = newOutputStream(packFile.toPath())) {
       messageSupport.exportMessages(packOutputStream, getCompress().get(), this::messageCodeFilter);
     } catch(IOException ex) {
-      throw new GradleException("Failed to write packed messages", ex);
+      throw new GradleException("Failed to write message pack", ex);
     }
   }
 
