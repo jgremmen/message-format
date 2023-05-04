@@ -99,18 +99,8 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
 
 
     @Override
-    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible)
-    {
-      if (MESSAGE_DEF_DESCRIPTOR.equals(descriptor))
-        return new MessageDefAnnotationVisitor();
-      if (MESSAGE_DEFS_DESCRIPTOR.equals(descriptor))
-        return new MessageDefsAnnotationVisitor();
-      if (TEMPLATE_DEF_DESCRIPTOR.equals(descriptor))
-        return new TemplateDefAnnotationVisitor();
-      if (TEMPLATE_DEFS_DESCRIPTOR.equals(descriptor))
-        return new TemplateDefsAnnotationVisitor();
-
-      return null;
+    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+      return AsmAnnotationAdopter.this.visitAnnotation(descriptor);
     }
   }
 
@@ -118,6 +108,23 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
 
 
   @SuppressWarnings("DuplicatedCode")
+  private AnnotationVisitor visitAnnotation(String descriptor)
+  {
+    if (MESSAGE_DEF_DESCRIPTOR.equals(descriptor))
+      return new MessageDefAnnotationVisitor();
+    if (MESSAGE_DEFS_DESCRIPTOR.equals(descriptor))
+      return new MessageDefsAnnotationVisitor();
+    if (TEMPLATE_DEF_DESCRIPTOR.equals(descriptor))
+      return new TemplateDefAnnotationVisitor();
+    if (TEMPLATE_DEFS_DESCRIPTOR.equals(descriptor))
+      return new TemplateDefsAnnotationVisitor();
+
+    return null;
+  }
+
+
+
+
   private final class MessageMethodVisitor extends MethodVisitor
   {
     private MessageMethodVisitor() {
@@ -126,18 +133,8 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
 
 
     @Override
-    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible)
-    {
-      if (MESSAGE_DEF_DESCRIPTOR.equals(descriptor))
-        return new MessageDefAnnotationVisitor();
-      if (MESSAGE_DEFS_DESCRIPTOR.equals(descriptor))
-        return new MessageDefsAnnotationVisitor();
-      if (TEMPLATE_DEF_DESCRIPTOR.equals(descriptor))
-        return new TemplateDefAnnotationVisitor();
-      if (TEMPLATE_DEFS_DESCRIPTOR.equals(descriptor))
-        return new TemplateDefsAnnotationVisitor();
-
-      return null;
+    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+      return AsmAnnotationAdopter.this.visitAnnotation(descriptor);
     }
   }
 

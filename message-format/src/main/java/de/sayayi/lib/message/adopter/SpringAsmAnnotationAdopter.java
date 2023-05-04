@@ -111,19 +111,27 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
 
 
     @Override
-    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible)
-    {
-      if (MESSAGE_DEF_DESCRIPTOR.equals(descriptor))
-        return new MessageDefAnnotationVisitor();
-      if (MESSAGE_DEFS_DESCRIPTOR.equals(descriptor))
-        return new MessageDefsAnnotationVisitor();
-      if (TEMPLATE_DEF_DESCRIPTOR.equals(descriptor))
-        return new TemplateDefAnnotationVisitor();
-      if (TEMPLATE_DEFS_DESCRIPTOR.equals(descriptor))
-        return new TemplateDefsAnnotationVisitor();
-
-      return null;
+    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+      return SpringAsmAnnotationAdopter.this.visitAnnotation(descriptor);
     }
+  }
+
+
+
+
+  @SuppressWarnings("DuplicatedCode")
+  private AnnotationVisitor visitAnnotation(String descriptor)
+  {
+    if (MESSAGE_DEF_DESCRIPTOR.equals(descriptor))
+      return new MessageDefAnnotationVisitor();
+    if (MESSAGE_DEFS_DESCRIPTOR.equals(descriptor))
+      return new MessageDefsAnnotationVisitor();
+    if (TEMPLATE_DEF_DESCRIPTOR.equals(descriptor))
+      return new TemplateDefAnnotationVisitor();
+    if (TEMPLATE_DEFS_DESCRIPTOR.equals(descriptor))
+      return new TemplateDefsAnnotationVisitor();
+
+    return null;
   }
 
 
@@ -138,18 +146,8 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
 
 
     @Override
-    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible)
-    {
-      if (MESSAGE_DEF_DESCRIPTOR.equals(descriptor))
-        return new MessageDefAnnotationVisitor();
-      if (MESSAGE_DEFS_DESCRIPTOR.equals(descriptor))
-        return new MessageDefsAnnotationVisitor();
-      if (TEMPLATE_DEF_DESCRIPTOR.equals(descriptor))
-        return new TemplateDefAnnotationVisitor();
-      if (TEMPLATE_DEFS_DESCRIPTOR.equals(descriptor))
-        return new TemplateDefsAnnotationVisitor();
-
-      return null;
+    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+      return SpringAsmAnnotationAdopter.this.visitAnnotation(descriptor);
     }
   }
 
