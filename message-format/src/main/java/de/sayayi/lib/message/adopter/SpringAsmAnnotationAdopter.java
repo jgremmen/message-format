@@ -52,7 +52,7 @@ import static org.springframework.asm.Type.getDescriptor;
  * synthesized/mocked annotations.
  * <p>
  * The scanned classes are analysed using the ASM library bundled with Spring. Using this class
- * therefore requires a dependency with library {@code org.springframework:spring-core:5.3.26}.
+ * therefore requires a dependency with library {@code org.springframework:spring-core:5.3.+}.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

@@ -31,8 +31,8 @@ allprojects {
   version = "0.8.0"
 
   ext.jetbrainsAnnotationsVersion = "24.0.1"
-  ext.junitVersion = "5.9.2"
-  ext.lombokVersion = "1.18.26"
+  ext.junitVersion = "5.9.+"
+  ext.lombokVersion = "1.18.+"
 }
 
 

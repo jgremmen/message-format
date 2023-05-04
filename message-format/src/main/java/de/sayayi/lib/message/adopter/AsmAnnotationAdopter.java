@@ -49,7 +49,7 @@ import static org.objectweb.asm.Type.getDescriptor;
  * synthesized/mocked annotations.
  * <p>
  * The scanned classes are analysed using the ASM library. Using this class therefore requires a
- * dependency with library {@code org.ow2.asm:asm:9.4}.
+ * dependency with library {@code org.ow2.asm:asm:9.+}.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
