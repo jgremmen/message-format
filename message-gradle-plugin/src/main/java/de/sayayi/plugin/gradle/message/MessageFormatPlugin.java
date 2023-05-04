@@ -23,7 +23,7 @@ import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
 import org.jetbrains.annotations.NotNull;
 
-import static de.sayayi.plugin.gradle.message.DuplicatesStrategy.IGNORE_AND_WARN;
+import static de.sayayi.plugin.gradle.message.DuplicateMsgStrategy.IGNORE_AND_WARN;
 
 
 /**
@@ -49,7 +49,7 @@ public class MessageFormatPlugin implements Plugin<Project>
 
     messageFormatExtension.getPackFilename().convention("message.pack");
     messageFormatExtension.getCompress().convention(false);
-    messageFormatExtension.getDuplicatesStrategy().convention(IGNORE_AND_WARN);
+    messageFormatExtension.getDuplicateMsgStrategy().convention(IGNORE_AND_WARN);
     messageFormatExtension.getValidateReferencedTemplates().convention(true);
 
     val mainJavaSourceSet = extensions.getByType(JavaPluginExtension.class)
@@ -73,7 +73,7 @@ public class MessageFormatPlugin implements Plugin<Project>
       packTask.setDescription("Scans and packs message format definitions.");
 
       packTask.getCompress().convention(extension.getCompress());
-      packTask.getDuplicatesStrategy().convention(extension.getDuplicatesStrategy());
+      packTask.getDuplicateMsgStrategy().convention(extension.getDuplicateMsgStrategy());
       packTask.getPackFilename().convention(extension.getPackFilename());
       packTask.getSources().from(extension.getSources());
       packTask.getValidateReferencedTemplates()

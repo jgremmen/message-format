@@ -43,7 +43,7 @@ public abstract class MessageFormatExtension
   public abstract ConfigurableFileCollection getSources();
 
 
-  public abstract Property<Object> getDuplicatesStrategy();
+  public abstract Property<Object> getDuplicateMsgStrategy();
 
 
   public abstract Property<Boolean> getValidateReferencedTemplates();

@@ -156,7 +156,7 @@ public class TestPlugin
         "  id 'java'",
         "  id 'de.sayayi.lib.message.plugin.gradle'",
         "}",
-        "messageFormat.duplicatesStrategy = 'fail'"));
+        "messageFormat.duplicateMsgStrategy = 'fail'"));
 
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());

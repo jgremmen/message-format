@@ -20,7 +20,7 @@ package de.sayayi.plugin.gradle.message;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public enum DuplicatesStrategy
+public enum DuplicateMsgStrategy
 {
   /** silently ignore duplicate messages and templates */
   IGNORE,

@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Set;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static de.sayayi.plugin.gradle.message.DuplicatesStrategy.IGNORE_AND_WARN;
+import static de.sayayi.plugin.gradle.message.DuplicateMsgStrategy.IGNORE_AND_WARN;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
 import static java.util.Arrays.asList;
@@ -77,7 +77,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   public MessageFormatPackTask()
   {
     getCompress().convention(false);
-    getDuplicatesStrategy().convention(IGNORE_AND_WARN);
+    getDuplicateMsgStrategy().convention(IGNORE_AND_WARN);
     getValidateReferencedTemplates().convention(true);
   }
 
@@ -103,7 +103,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   @Input
-  public abstract Property<Object> getDuplicatesStrategy();
+  public abstract Property<Object> getDuplicateMsgStrategy();
 
 
   @Input
@@ -287,19 +287,19 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   @Contract(pure = true)
-  private @NotNull DuplicatesStrategy configureDuplicatesStrategy_toEnum()
+  private @NotNull DuplicateMsgStrategy configureDuplicatesStrategy_toEnum()
   {
-    var value = getDuplicatesStrategy().get();
+    var value = getDuplicateMsgStrategy().get();
 
-    if (value instanceof DuplicatesStrategy)
-      return (DuplicatesStrategy)value;
+    if (value instanceof DuplicateMsgStrategy)
+      return (DuplicateMsgStrategy)value;
 
     if (value instanceof String)
     {
       val valueAsIs = ((String)value).toUpperCase(ROOT);
       val valueUnderscore = valueAsIs.replace('-', '_');
 
-      for(val ds: DuplicatesStrategy.values())
+      for(val ds: DuplicateMsgStrategy.values())
         if (ds.name().equals(valueAsIs) ||
             ds.name().equals(valueUnderscore))
           return ds;
