@@ -41,11 +41,10 @@ repositories {
 dependencies {
   gradleApi()
 
-  api project(":message-format")
-
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
   compileOnly "org.projectlombok:lombok:${lombokVersion}"
 
+  implementation project(":message-format")
   implementation "org.ow2.asm:asm:${asmVersion}"
 
   testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
