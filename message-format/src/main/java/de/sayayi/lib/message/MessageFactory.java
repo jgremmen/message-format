@@ -34,7 +34,7 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * Factory for creating message instances.
+ * Factory class for creating message instances.
  *
  * @author Jeroen Gremmen
  */
