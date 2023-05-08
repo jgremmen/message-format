@@ -67,4 +67,10 @@ public final class NoParameters implements Parameters
   public @NotNull SortedSet<String> getParameterNames() {
     return emptySortedSet();
   }
+
+
+  @Override
+  public String toString() {
+    return "Parameters(locale='" + locale + "')";
+  }
 }

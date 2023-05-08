@@ -159,7 +159,7 @@ public final class ParamConfig implements Serializable
   {
     return map.entrySet()
         .stream()
-        .map(kv -> kv.getKey().toString() + ':' + kv.getValue().toString())
+        .map(kv -> String.valueOf(kv.getKey()) + ':' + kv.getValue())
         .collect(joining(",", "{", "}"));
   }
 }

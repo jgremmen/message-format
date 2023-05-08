@@ -359,11 +359,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     public @NotNull MessageConfigurer<M> remove(@NotNull String parameter)
     {
       if (!requireNonNull(parameter, "parameter must not be null").isEmpty())
-      {
-        int low = 0;
-        int high = parameterCount - 1;
-
-        while(low <= high)
+        for(int low = 0, high = parameterCount - 1; low <= high;)
         {
           final int mid = (low + high) >>> 1;
           final int cmp = parameter.compareTo((String)parameters[mid * 2]);
@@ -375,12 +371,10 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
           else
           {
             final int mid2 = mid * 2;
-            arraycopy(parameters, mid2 + 2, parameters, mid2,
-                    --parameterCount * 2 - mid2);
+            arraycopy(parameters, mid2 + 2, parameters, mid2, --parameterCount * 2 - mid2);
             break;
           }
         }
-      }
 
       return this;
     }
@@ -414,12 +408,11 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
         if (parameterCount * 2 == parameters.length)
           parameters = copyOf(parameters, parameterCount * 2 + 16);
 
-        final int low2 = low * 2;
-        arraycopy(parameters, low2, parameters, low2 + 2,
-                parameterCount++ * 2 - low2);
+        final int offset = low * 2;
+        arraycopy(parameters, offset, parameters, offset + 2, parameterCount++ * 2 - offset);
 
-        parameters[low2] = parameter;
-        parameters[low2 + 1] = value;
+        parameters[offset] = parameter;
+        parameters[offset + 1] = value;
       }
 
       return this;
@@ -435,40 +428,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    public @NotNull String format()
-    {
-      return message.format(getAccessor(), new Parameters() {
-        @Override
-        public @NotNull Locale getLocale() {
-          return locale;
-        }
-
-
-        @Override
-        public Object getParameterValue(@NotNull String parameter)
-        {
-          for(int low = 0, high = parameterCount - 1; low <= high;)
-          {
-            final int mid = (low + high) >>> 1;
-            final int cmp = parameter.compareTo((String)parameters[mid * 2]);
-
-            if (cmp < 0)
-              high = mid - 1;
-            else if (cmp > 0)
-              low = mid + 1;
-            else
-              return parameters[mid * 2 + 1];
-          }
-
-          return null;
-        }
-
-
-        @Override
-        public @NotNull SortedSet<String> getParameterNames() {
-          return new ParameterNameSet(Configurer.this);
-        }
-      });
+    public @NotNull String format() {
+      return message.format(getAccessor(), new Params(this));
     }
 
 
@@ -560,6 +521,69 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
 
+  private static final class Params implements Parameters
+  {
+    private final Configurer<?> configurer;
+    private final Object[] parameters;
+
+
+    private Params(@NotNull Configurer<?> configurer) {
+      parameters = (this.configurer = configurer).parameters;
+    }
+
+
+    @Override
+    public @NotNull Locale getLocale() {
+      return configurer.locale;
+    }
+
+
+    @Override
+    public Object getParameterValue(@NotNull String parameter)
+    {
+      for(int low = 0, high = configurer.parameterCount - 1; low <= high;)
+      {
+        final int mid = (low + high) >>> 1;
+        final int cmp = parameter.compareTo((String)parameters[mid * 2]);
+
+        if (cmp < 0)
+          high = mid - 1;
+        else if (cmp > 0)
+          low = mid + 1;
+        else
+          return parameters[mid * 2 + 1];
+      }
+
+      return null;
+    }
+
+
+    @Override
+    public @NotNull SortedSet<String> getParameterNames() {
+      return new ParameterNameSet(configurer);
+    }
+
+
+    @Override
+    public String toString()
+    {
+      final StringBuilder s = new StringBuilder("Parameters(locale='").append(configurer.locale).append("',{");
+
+      for(int n = 0, l = configurer.parameterCount * 2; n < l; n += 2)
+      {
+        if (n > 0)
+          s.append(',');
+
+        s.append(parameters[n]).append("=").append(parameters[n + 1]);
+      }
+
+      return s.append("})").toString();
+    }
+  }
+
+
+
+
   private static final class ParameterNameSet extends AbstractSet<String> implements SortedSet<String>
   {
     private final Configurer<?> configurer;
@@ -637,18 +661,21 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
   private static final class ParameterNameIterator implements Iterator<String>
   {
-    private final Configurer<?> configurer;
+    private final Object[] parameters;
+    private final int parameterCount;
     private int n;
 
 
-    private ParameterNameIterator(@NotNull Configurer<?> configurer) {
-      this.configurer = configurer;
+    private ParameterNameIterator(@NotNull Configurer<?> configurer)
+    {
+      parameters = configurer.parameters;
+      parameterCount = configurer.parameterCount;
     }
 
 
     @Override
     public boolean hasNext() {
-      return n < configurer.parameterCount;
+      return n < parameterCount;
     }
 
 
@@ -658,7 +685,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
       if (!hasNext())
         throw new NoSuchElementException();
 
-      return (String)configurer.parameters[n++ * 2];
+      return (String)parameters[n++ * 2];
     }
   }
 
@@ -667,21 +694,24 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
   private static final class ParameterNameSpliterator implements Spliterator<String>
   {
-    private final Configurer<?> configurer;
+    private final Object[] parameters;
+    private final int parameterCount;
     private int n;
 
 
-    private ParameterNameSpliterator(Configurer<?> configurer) {
-      this.configurer = configurer;
+    private ParameterNameSpliterator(@NotNull Configurer<?> configurer)
+    {
+      parameters = configurer.parameters;
+      parameterCount = configurer.parameterCount;
     }
 
 
     @Override
     public boolean tryAdvance(Consumer<? super String> action)
     {
-      if (n < configurer.parameterCount)
+      if (n < parameterCount)
       {
-        action.accept((String)configurer.parameters[n++ * 2]);
+        action.accept((String)parameters[n++ * 2]);
         return true;
       }
 
@@ -697,7 +727,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
     @Override
     public long estimateSize() {
-      return configurer.parameterCount - n;
+      return parameterCount - n;
     }
 
 
