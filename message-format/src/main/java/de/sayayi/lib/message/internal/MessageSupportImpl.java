@@ -29,20 +29,23 @@ import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.parameter.value.*;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
+import static java.lang.System.arraycopy;
+import static java.util.Arrays.copyOf;
 import static java.util.Collections.unmodifiableSet;
-import static java.util.Collections.unmodifiableSortedSet;
 import static java.util.Locale.forLanguageTag;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toCollection;
 
 
 /**
@@ -150,7 +153,6 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   public @NotNull ConfigurableMessageSupport setMessageFilter(@NotNull MessageFilter messageFilter)
   {
     this.messageFilter = requireNonNull(messageFilter, "messageFilter must not be null");
-
     return this;
   }
 
@@ -160,7 +162,6 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
       @NotNull TemplateFilter templateFilter)
   {
     this.templateFilter = requireNonNull(templateFilter, "templateFilter must not be null");
-
     return this;
   }
 
@@ -168,10 +169,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   @Override
   public void addMessage(@NotNull Message.WithCode message)
   {
-    final String code = requireNonNull(message, "message must not be null").getCode();
-
-    if (messageFilter.filter(message))
-      messages.put(code, message);
+    if (messageFilter.filter(requireNonNull(message, "message must not be null")))
+      messages.put(message.getCode(), message);
   }
 
 
@@ -328,16 +327,17 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   private final class Configurer<M extends Message> implements MessageConfigurer<M>
   {
     private final @NotNull M message;
-    private final SortedMap<String,Object> parameterValues;
     private @NotNull Locale locale;
+    private @NotNull Object[] parameters;
+    private int parameterCount;
 
 
     private Configurer(@NotNull M message)
     {
       this.message = message;
 
-      parameterValues = new TreeMap<>();
       locale = MessageSupportImpl.this.locale;
+      parameters = new Object[16];
     }
 
 
@@ -350,7 +350,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public @NotNull MessageConfigurer<M> clear()
     {
-      parameterValues.clear();
+      parameterCount = 0;
       return this;
     }
 
@@ -358,7 +358,30 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public @NotNull MessageConfigurer<M> remove(@NotNull String parameter)
     {
-      parameterValues.remove(requireNonNull(parameter, "parameter must not be null"));
+      if (!requireNonNull(parameter, "parameter must not be null").isEmpty())
+      {
+        int low = 0;
+        int high = parameterCount - 1;
+
+        while(low <= high)
+        {
+          final int mid = (low + high) >>> 1;
+          final int cmp = parameter.compareTo((String)parameters[mid * 2]);
+
+          if (cmp < 0)
+            high = mid - 1;
+          else if (cmp > 0)
+            low = mid + 1;
+          else
+          {
+            final int mid2 = mid * 2;
+            arraycopy(parameters, mid2 + 2, parameters, mid2,
+                    --parameterCount * 2 - mid2);
+            break;
+          }
+        }
+      }
+
       return this;
     }
 
@@ -369,7 +392,36 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
       if (requireNonNull(parameter, "parameter must not be null").isEmpty())
         throw new IllegalArgumentException("parameter must not be empty");
 
-      parameterValues.put(parameter, value);
+      setValue: {
+        int low = 0;
+
+        for(int high = parameterCount - 1; low <= high;)
+        {
+          final int mid = (low + high) >>> 1;
+          final int cmp = parameter.compareTo((String)parameters[mid * 2]);
+
+          if (cmp < 0)
+            high = mid - 1;
+          else if (cmp > 0)
+            low = mid + 1;
+          else
+          {
+            parameters[mid * 2 + 1] = value;  // overwrite current value
+            break setValue;
+          }
+        }
+
+        if (parameterCount * 2 == parameters.length)
+          parameters = copyOf(parameters, parameterCount * 2 + 16);
+
+        final int low2 = low * 2;
+        arraycopy(parameters, low2, parameters, low2 + 2,
+                parameterCount++ * 2 - low2);
+
+        parameters[low2] = parameter;
+        parameters[low2 + 1] = value;
+      }
+
       return this;
     }
 
@@ -378,14 +430,6 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     public @NotNull MessageConfigurer<M> locale(Locale locale)
     {
       this.locale = locale == null ? MessageSupportImpl.this.locale : locale;
-      return this;
-    }
-
-
-    @Override
-    public @NotNull MessageConfigurer<M> locale(String locale)
-    {
-      this.locale = locale == null ? MessageSupportImpl.this.locale : forLanguageTag(locale);
       return this;
     }
 
@@ -401,14 +445,28 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
         @Override
-        public Object getParameterValue(@NotNull String parameter) {
-          return parameterValues.get(parameter);
+        public Object getParameterValue(@NotNull String parameter)
+        {
+          for(int low = 0, high = parameterCount - 1; low <= high;)
+          {
+            final int mid = (low + high) >>> 1;
+            final int cmp = parameter.compareTo((String)parameters[mid * 2]);
+
+            if (cmp < 0)
+              high = mid - 1;
+            else if (cmp > 0)
+              low = mid + 1;
+            else
+              return parameters[mid * 2 + 1];
+          }
+
+          return null;
         }
 
 
         @Override
         public @NotNull SortedSet<String> getParameterNames() {
-          return unmodifiableSortedSet(new TreeSet<>(parameterValues.keySet()));
+          return new ParameterNameSet(Configurer.this);
         }
       });
     }
@@ -495,7 +553,163 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
           .flatMap(message -> message.getTemplateNames().stream())
           .distinct()
           .filter(templateName -> !templates.containsKey(templateName))
-          .collect(Collectors.toCollection(TreeSet::new));
+          .collect(toCollection(TreeSet::new));
+    }
+  }
+
+
+
+
+  private static final class ParameterNameSet extends AbstractSet<String> implements SortedSet<String>
+  {
+    private final Configurer<?> configurer;
+
+
+    private ParameterNameSet(@NotNull Configurer<?> configurer) {
+      this.configurer = configurer;
+    }
+
+
+    @Override
+    public int size() {
+      return configurer.parameterCount;
+    }
+
+
+    @Override
+    public @Nullable Comparator<String> comparator() {
+      return null;
+    }
+
+
+    @Override
+    public @NotNull SortedSet<String> subSet(String fromElement, String toElement) {
+      throw new UnsupportedOperationException("subSet");
+    }
+
+
+    @Override
+    public @NotNull SortedSet<String> headSet(String toElement) {
+      throw new UnsupportedOperationException("headSet");
+    }
+
+
+    @Override
+    public @NotNull SortedSet<String> tailSet(String fromElement) {
+      throw new UnsupportedOperationException("tailSet");
+    }
+
+
+    @Override
+    public String first() {
+      return configurer.parameterCount == 0 ? null : (String)configurer.parameters[0];
+    }
+
+
+    @Override
+    public String last()
+    {
+      return configurer.parameterCount == 0
+          ? null : (String)configurer.parameters[(configurer.parameterCount - 1) * 2];
+    }
+
+
+    @Override
+    public void clear() {
+      throw new UnsupportedOperationException("clear");
+    }
+
+
+    @Override
+    public @NotNull Iterator<String> iterator() {
+      return new ParameterNameIterator(configurer);
+    }
+
+
+    @Override
+    public @NotNull Spliterator<String> spliterator() {
+      return new ParameterNameSpliterator(configurer);
+    }
+  }
+
+
+
+
+  private static final class ParameterNameIterator implements Iterator<String>
+  {
+    private final Configurer<?> configurer;
+    private int n;
+
+
+    private ParameterNameIterator(@NotNull Configurer<?> configurer) {
+      this.configurer = configurer;
+    }
+
+
+    @Override
+    public boolean hasNext() {
+      return n < configurer.parameterCount;
+    }
+
+
+    @Override
+    public String next()
+    {
+      if (!hasNext())
+        throw new NoSuchElementException();
+
+      return (String)configurer.parameters[n++ * 2];
+    }
+  }
+
+
+
+
+  private static final class ParameterNameSpliterator implements Spliterator<String>
+  {
+    private final Configurer<?> configurer;
+    private int n;
+
+
+    private ParameterNameSpliterator(Configurer<?> configurer) {
+      this.configurer = configurer;
+    }
+
+
+    @Override
+    public boolean tryAdvance(Consumer<? super String> action)
+    {
+      if (n < configurer.parameterCount)
+      {
+        action.accept((String)configurer.parameters[n++ * 2]);
+        return true;
+      }
+
+      return false;
+    }
+
+
+    @Override
+    public Spliterator<String> trySplit() {
+      return null;
+    }
+
+
+    @Override
+    public long estimateSize() {
+      return configurer.parameterCount - n;
+    }
+
+
+    @Override
+    public int characteristics() {
+      return ORDERED | DISTINCT | IMMUTABLE | NONNULL | SORTED | SIZED;
+    }
+
+
+    @Override
+    public Comparator<? super String> getComparator() {
+      return null;
     }
   }
 }

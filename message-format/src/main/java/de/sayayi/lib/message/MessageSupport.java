@@ -30,6 +30,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static java.util.Locale.forLanguageTag;
+
 
 /**
  * @author Jeroen Gremmen
@@ -253,12 +255,32 @@ public interface MessageSupport
     }
 
 
+    /**
+     * Change the locale.
+     * <p>
+     * If {@code locale} is {@code null} the default locale for this message support is used.
+     *
+     * @param locale  locale or {@code null}
+     *
+     * @return  message configurer instance for this message, never {@code null}
+     */
     @Contract(value = "_ -> this", mutates = "this")
     @NotNull MessageConfigurer<M> locale(Locale locale);
 
 
+    /**
+     * Change the locale.
+     * <p>
+     * If {@code locale} is {@code null} the default locale for this message support is used.
+     *
+     * @param locale  locale or {@code null}
+     *
+     * @return  message configurer instance for this message, never {@code null}
+     */
     @Contract(value = "_ -> this", mutates = "this")
-    @NotNull MessageConfigurer<M> locale(String locale);
+    default @NotNull MessageConfigurer<M> locale(String locale) {
+      return locale(locale == null ? null : forLanguageTag(locale));
+    }
 
 
     /**
@@ -272,6 +294,8 @@ public interface MessageSupport
 
     /**
      * Throw an exception with the formatted message.
+     * <p>
+     * Exceptions thrown by the constructor function are relayed to the caller.
      *
      * @param constructor  exception constructor, not {@code null}
      * @param <T>          exception type
@@ -452,6 +476,8 @@ public interface MessageSupport
      * On adding a message the message handler is invoked with the message code. If the handler
      * returns {@code true} the message is added to the message support. If the handler returns
      * {@code false} the message is not added to the message support.
+     * <p>
+     * Exceptions thrown by the message filter are relayed to the caller.
      *
      * @param messageFilter  message filter, not {@code null}
      *
@@ -470,6 +496,8 @@ public interface MessageSupport
      * On adding a template the template filter is invoked with the template name and template
      * message. If the filter returns {@code true} the template is added to the message support.
      * If the filter returns {@code false} the template is not added to the message support.
+     * <p>
+     * Exceptions thrown by the template filter are relayed to the caller.
      *
      * @param templateFilter  template filter, not {@code null}
      *
