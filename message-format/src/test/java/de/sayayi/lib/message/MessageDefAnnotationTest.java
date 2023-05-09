@@ -70,7 +70,7 @@ public class MessageDefAnnotationTest
     WithCode msg = messageSupport.code("T4").getMessage();
 
     assertEquals("T4", msg.getCode());
-    assertTrue(msg instanceof LocaleAware);
+    assertFalse(msg instanceof LocaleAware);
 
     msg = messageSupport.code("T5").getMessage();
 

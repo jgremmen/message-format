@@ -48,6 +48,13 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   private final @NotNull Map<Locale,Message> localizedMessages;
 
 
+  /**
+   * Create a localized message bundle with code.
+   *
+   * @param code               message code, not {@code null} and not empty
+   * @param localizedMessages  localized message map, not {@code null}. The map must contain at
+   *                           least 2 entries and no mapped value can be {@code null}
+   */
   public LocalizedMessageBundleWithCode(@NotNull String code,
                                         @NotNull Map<Locale,Message> localizedMessages)
   {
@@ -56,10 +63,10 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
     if (requireNonNull(localizedMessages, "localizedMessages must not be null").isEmpty())
       throw new IllegalArgumentException("localizedMessages must not be empty");
 
-    if (localizedMessages.values().stream().anyMatch(Objects::isNull))
-      throw new IllegalArgumentException("message in localizedMessages must not be null");
+    assert localizedMessages.size() >= 2;
+    assert localizedMessages.values().stream().noneMatch(Objects::isNull);
 
-    this.localizedMessages = localizedMessages;
+    this.localizedMessages = new HashMap<>(localizedMessages);
   }
 
 

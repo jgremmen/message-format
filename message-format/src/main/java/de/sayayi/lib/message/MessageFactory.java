@@ -25,7 +25,10 @@ import de.sayayi.lib.message.parser.normalizer.MessagePartNormalizer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Random;
 
 import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
@@ -118,18 +121,22 @@ public class MessageFactory
   public @NotNull Message.WithCode parseMessage(@NotNull String code,
                                                 @NotNull Map<Locale,String> localizedTexts)
   {
-    if (requireNonNull(localizedTexts, "localizedTexts must not be null").isEmpty())
-      return new EmptyMessageWithCode(code);
+    switch(requireNonNull(localizedTexts, "localizedTexts must not be null").size())
+    {
+      case 0:
+        return new EmptyMessageWithCode(code);
 
-    final String message = localizedTexts.get(ROOT);
-    if (message != null && localizedTexts.size() == 1)
-      return new MessageDelegateWithCode(code, parseMessage(message));
+      case 1:
+        return parseMessage(code, localizedTexts.values().iterator().next());
 
-    final Map<Locale,Message> localizedMessages = new LinkedHashMap<>();
+      default: {
+        final Map<Locale,Message> localizedMessages = new HashMap<>();
 
-    localizedTexts.forEach((locale,text) -> localizedMessages.put(locale, parseMessage(text)));
+        localizedTexts.forEach((locale,text) -> localizedMessages.put(locale, parseMessage(text)));
 
-    return new LocalizedMessageBundleWithCode(code, localizedMessages);
+        return new LocalizedMessageBundleWithCode(code, localizedMessages);
+      }
+    }
   }
 
 
@@ -149,18 +156,22 @@ public class MessageFactory
   @Contract(pure = true)
   public @NotNull Message parseTemplate(@NotNull Map<Locale,String> localizedTexts)
   {
-    if (requireNonNull(localizedTexts, "localizedTexts must not be null").isEmpty())
-      return EmptyMessage.INSTANCE;
+    switch(requireNonNull(localizedTexts, "localizedTexts must not be null").size())
+    {
+      case 0:
+        return EmptyMessage.INSTANCE;
 
-    final String message = localizedTexts.get(ROOT);
-    if (message != null && localizedTexts.size() == 1)
-      return parseTemplate(message);
+      case 1:
+        return parseTemplate(localizedTexts.values().iterator().next());
 
-    final Map<Locale,Message> localizedMessages = new LinkedHashMap<>();
+      default: {
+        final Map<Locale,Message> localizedMessages = new HashMap<>();
 
-    localizedTexts.forEach((locale,text) -> localizedMessages.put(locale, parseMessage(text)));
+        localizedTexts.forEach((locale,text) -> localizedMessages.put(locale, parseMessage(text)));
 
-    return new LocalizedMessageBundleWithCode(generateCode("TPL"), localizedMessages);
+        return new LocalizedMessageBundleWithCode(generateCode("TPL"), localizedMessages);
+      }
+    }
   }
 
 
@@ -181,7 +192,7 @@ public class MessageFactory
     if (message instanceof LocalizedMessageBundleWithCode)
     {
       return new LocalizedMessageBundleWithCode(code,
-          new HashMap<>(((LocalizedMessageBundleWithCode)message).getLocalizedMessages()));
+          ((LocalizedMessageBundleWithCode)message).getLocalizedMessages());
     }
 
     if (message instanceof EmptyMessage || message instanceof EmptyMessageWithCode)
