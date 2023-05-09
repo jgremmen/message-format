@@ -35,6 +35,7 @@ import java.util.*;
 import static de.sayayi.lib.message.formatter.ParameterFormatter.NULL_TYPE;
 import static de.sayayi.lib.message.internal.part.MessagePart.Text.NULL;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.NAME_TYPE;
+import static java.util.Optional.ofNullable;
 
 
 /**
@@ -96,7 +97,7 @@ public final class FormatterContextImpl implements FormatterContext
   public @NotNull Optional<ConfigValue> getMapValue(Object key,
                                                     @NotNull Set<ConfigKey.Type> keyTypes,
                                                     Set<ConfigValue.Type> valueTypes) {
-    return Optional.ofNullable(map.find(messageSupport, key, parameters, keyTypes, valueTypes));
+    return ofNullable(map.find(messageSupport, key, parameters, keyTypes, valueTypes));
   }
 
 
@@ -104,7 +105,7 @@ public final class FormatterContextImpl implements FormatterContext
   public @NotNull Optional<Message.WithSpaces> getMapMessage(Object key,
                                                              @NotNull Set<ConfigKey.Type> keyTypes,
                                                              boolean includeDefault) {
-    return Optional.ofNullable(map.getMessage(messageSupport, key, parameters, keyTypes, includeDefault));
+    return ofNullable(map.getMessage(messageSupport, key, parameters, keyTypes, includeDefault));
   }
 
 
@@ -116,7 +117,7 @@ public final class FormatterContextImpl implements FormatterContext
 
     return configValue != null
         ? Optional.of(configValue)
-        : Optional.ofNullable(messageSupport.getDefaultParameterConfig(name));
+        : ofNullable(messageSupport.getDefaultParameterConfig(name));
   }
 
 
