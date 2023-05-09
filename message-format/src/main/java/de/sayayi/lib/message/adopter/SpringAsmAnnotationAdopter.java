@@ -67,20 +67,39 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
   private static final String TEXT_DESCRIPTOR = getDescriptor(Text.class);
 
 
+  /**
+   * Create an annotation adopter for the given {@code configurableMessageSupport}.
+   *
+   * @param configurableMessageSupport  configurable message support, not {@code null}
+   */
   public SpringAsmAnnotationAdopter(
       @NotNull ConfigurableMessageSupport configurableMessageSupport) {
     super(configurableMessageSupport);
   }
 
 
+  /**
+   * Create an annotation adopter for the given {@code messageFactory} and {@code publisher}.
+   *
+   * @param messageFactory  message factory, not {@code null}
+   * @param publisher       message publisher, not {@code null}
+   */
   public SpringAsmAnnotationAdopter(@NotNull MessageFactory messageFactory,
                                     @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);
   }
 
 
-  public SpringAsmAnnotationAdopter adopt(@NotNull ResourceLoader resourceLoader,
-                                          @NotNull Set<String> packageNames)
+  /**
+   * Scan the classpath (with the given packages) for message annotations and adopt them.
+   *
+   * @param resourceLoader  Spring resource loader for locating classes, not {@code null}
+   * @param packageNames    package names to scan, not {@code null}
+   *
+   * @return  this annotation adopter, never {@code null}
+   */
+  public @NotNull SpringAsmAnnotationAdopter adopt(@NotNull ResourceLoader resourceLoader,
+                                                   @NotNull Set<String> packageNames)
   {
     return (SpringAsmAnnotationAdopter)
         adopt(requireNonNull(resourceLoader.getClassLoader()), packageNames);

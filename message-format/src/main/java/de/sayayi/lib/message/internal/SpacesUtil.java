@@ -54,6 +54,14 @@ public final class SpacesUtil
   }
 
 
+  /**
+   * Returns a string without leading and trailing spaces. This method differs from
+   * {@link String#trim()} in that it doesn't trim newlines.
+   *
+   * @param s  string to trim, or {@code null}
+   *
+   * @return  trimmed string, or {@code null} if {@code s} is {@code null}
+   */
   @Contract(value = "null -> null", pure = true)
   @SuppressWarnings("DuplicatedCode")
   public static String trimSpaces(String s)

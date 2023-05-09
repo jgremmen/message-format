@@ -38,7 +38,7 @@ import static org.objectweb.asm.Type.getDescriptor;
 /**
  * This class defines various methods for adopting messages and templates defined by annotations.
  * <p>
- * Messages are analysed per class (see {@link #parseClass(InputStream)}). If there is a
+ * Message annotations are analysed per class (see {@link #parseClass(InputStream)}). If there is a
  * requirement to select a part of the messages provided by a class, the message support must
  * be configured with an appropriate
  * {@link de.sayayi.lib.message.MessageSupport.MessageFilter MessageFilter} or
@@ -64,11 +64,22 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
   private static final String TEXT_DESCRIPTOR = getDescriptor(Text.class);
 
 
+  /**
+   * Create an annotation adopter for the given {@code configurableMessageSupport}.
+   *
+   * @param configurableMessageSupport  configurable message support, not {@code null}
+   */
   public AsmAnnotationAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {
     super(configurableMessageSupport);
   }
 
 
+  /**
+   * Create an annotation adopter for the given {@code messageFactory} and {@code publisher}.
+   *
+   * @param messageFactory  message factory, not {@code null}
+   * @param publisher       message publisher, not {@code null}
+   */
   public AsmAnnotationAdopter(@NotNull MessageFactory messageFactory,
                               @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);

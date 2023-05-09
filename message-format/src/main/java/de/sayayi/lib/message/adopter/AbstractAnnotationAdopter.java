@@ -103,8 +103,8 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    *
    * @return  this annotation adopter, never {@code null}
    */
-  public AbstractAnnotationAdopter adopt(@NotNull ClassLoader classLoader,
-                                         @NotNull Set<String> packageNames)
+  public @NotNull AbstractAnnotationAdopter adopt(@NotNull ClassLoader classLoader,
+                                                  @NotNull Set<String> packageNames)
   {
     try {
       for(String packageName: packageNames)
@@ -237,6 +237,13 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   }
 
 
+  /**
+   * Adopt messages for the given {@code classFile}.
+   *
+   * @param classFile  location of the class file to analyse for messages, not {@code null}
+   *
+   * @return  this annotation adopter instance, never {@code null}
+   */
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull File classFile)
   {
     final Path classPath = classFile.toPath().toAbsolutePath();
@@ -256,6 +263,13 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   }
 
 
+  /**
+   * Adopt messages for the given {@code type}.
+   *
+   * @param type  type to analyse for messages, not {@code null}
+   *
+   * @return  this annotation adopter instance, never {@code null}
+   */
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull Class<?> type)
   {
     final String typeName = type.getName();
