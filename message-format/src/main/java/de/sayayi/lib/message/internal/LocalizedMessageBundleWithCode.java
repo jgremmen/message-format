@@ -183,7 +183,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
   @Override
   public String toString() {
-    return "LocalizedMessageBundleWithCode(localizedMessages=" + localizedMessages + ')';
+    return "LocalizedMessageBundleWithCode(" + localizedMessages + ')';
   }
 
 

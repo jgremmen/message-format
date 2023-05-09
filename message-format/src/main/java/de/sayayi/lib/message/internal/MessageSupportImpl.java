@@ -43,7 +43,6 @@ import java.util.function.Predicate;
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.copyOf;
 import static java.util.Collections.unmodifiableSet;
-import static java.util.Locale.forLanguageTag;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
 
@@ -69,10 +68,10 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   public MessageSupportImpl(@NotNull FormatterService formatterService,
                             @NotNull MessageFactory messageFactory)
   {
-    this.formatterService =
-        requireNonNull(formatterService, "formatterService must not be null");
-    this.messageFactory =
-        requireNonNull(messageFactory, "messageFactory must not be null");
+    this.formatterService = requireNonNull(formatterService,
+        "formatterService must not be null");
+    this.messageFactory = requireNonNull(messageFactory,
+        "messageFactory must not be null");
 
     accessor = new Accessor();
     locale = Locale.getDefault();
@@ -92,12 +91,6 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   {
     this.locale = requireNonNull(locale, "locale must not be null");
     return this;
-  }
-
-
-  @Override
-  public @NotNull ConfigurableMessageSupport setLocale(@NotNull String locale) {
-    return setLocale(forLanguageTag(locale));
   }
 
 
@@ -371,7 +364,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
           else
           {
             final int mid2 = mid * 2;
-            arraycopy(parameters, mid2 + 2, parameters, mid2, --parameterCount * 2 - mid2);
+            arraycopy(parameters, mid2 + 2, parameters, mid2,
+                --parameterCount * 2 - mid2);
             break;
           }
         }
@@ -409,7 +403,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
           parameters = copyOf(parameters, parameterCount * 2 + 16);
 
         final int offset = low * 2;
-        arraycopy(parameters, offset, parameters, offset + 2, parameterCount++ * 2 - offset);
+        arraycopy(parameters, offset, parameters, offset + 2,
+            parameterCount++ * 2 - offset);
 
         parameters[offset] = parameter;
         parameters[offset + 1] = value;
@@ -567,7 +562,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public String toString()
     {
-      final StringBuilder s = new StringBuilder("Parameters(locale='").append(configurer.locale).append("',{");
+      final StringBuilder s = new StringBuilder("Parameters(locale='")
+          .append(configurer.locale).append("',{");
 
       for(int n = 0, l = configurer.parameterCount * 2; n < l; n += 2)
       {
@@ -584,7 +580,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
 
-  private static final class ParameterNameSet extends AbstractSet<String> implements SortedSet<String>
+  private static final class ParameterNameSet extends AbstractSet<String>
+      implements SortedSet<String>
   {
     private final Configurer<?> configurer;
 

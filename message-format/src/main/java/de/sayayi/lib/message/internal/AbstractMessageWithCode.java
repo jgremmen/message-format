@@ -30,7 +30,7 @@ abstract class AbstractMessageWithCode implements Message.WithCode
 
 
   /**
-   * Unique message code, never {@code null}.
+   * Unique message code, never {@code null} nor empty.
    */
   protected final @NotNull String code;
 

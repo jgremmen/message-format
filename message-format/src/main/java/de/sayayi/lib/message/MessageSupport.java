@@ -467,7 +467,9 @@ public interface MessageSupport
      * @return  configurable message support instance, never {@code null}
      */
     @Contract(mutates = "this")
-    @NotNull ConfigurableMessageSupport setLocale(@NotNull String locale);
+    default @NotNull ConfigurableMessageSupport setLocale(@NotNull String locale) {
+      return setLocale(forLanguageTag(locale));
+    }
 
 
     /**

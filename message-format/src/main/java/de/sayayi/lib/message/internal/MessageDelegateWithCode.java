@@ -102,7 +102,7 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
 
   @Override
   public String toString() {
-    return "MessageDelegateWithCode(message=" + message + ')';
+    return "MessageDelegateWithCode(code=" + code + ",message=" + message + ')';
   }
 
 
