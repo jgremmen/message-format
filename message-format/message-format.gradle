@@ -45,7 +45,9 @@ dependencies {
   implementation "org.ow2.asm:asm:${asmVersion}", optional
   implementation "org.springframework:spring-core:${springContextVersion}", optional
 
-  testImplementation "org.ehcache:ehcache:${ehcacheVersion}"
+  testImplementation("org.ehcache:ehcache:${ehcacheVersion}") {
+    exclude module: "jaxb-runtime"
+  }
 
   antlr "org.antlr:antlr4:${antlrVersion}"
 }
