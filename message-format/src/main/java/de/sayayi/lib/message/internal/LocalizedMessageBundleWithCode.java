@@ -26,8 +26,11 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
@@ -63,9 +66,6 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
     if (requireNonNull(localizedMessages, "localizedMessages must not be null").isEmpty())
       throw new IllegalArgumentException("localizedMessages must not be empty");
 
-    assert localizedMessages.size() >= 2;
-    assert localizedMessages.values().stream().noneMatch(Objects::isNull);
-
     this.localizedMessages = new HashMap<>(localizedMessages);
   }
 
@@ -87,14 +87,10 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
     int match = -1;
     Message message = null;
 
-    assert !localizedMessages.isEmpty();
-
     for(final Entry<Locale,Message> entry: localizedMessages.entrySet())
     {
       final Locale keyLocale = entry.getKey();
       final Message localizedMessage = entry.getValue();
-
-      assert localizedMessage != null;
 
       if (match == -1 && (keyLocale == null || keyLocale.getLanguage().isEmpty()))
       {
@@ -117,7 +113,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
         message = localizedMessage;  // 1st match
     }
 
-    return message;
+    return requireNonNull(message);
   }
 
 

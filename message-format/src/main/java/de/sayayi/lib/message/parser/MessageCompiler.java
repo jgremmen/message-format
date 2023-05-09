@@ -124,7 +124,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
     return parse(new Lexer(text),
         lexer -> new Parser(listener.tokenStream = new BufferedTokenStream(lexer)),
-        Parser::message, listener, ctx -> ctx.value);
+        Parser::message, listener, ctx -> requireNonNull(ctx.value));
   }
 
 
