@@ -234,6 +234,7 @@ public interface Message extends Serializable
    */
   interface Parameters
   {
+    /** Instance with no parameters and no specific locale. */
     Parameters EMPTY = new NoParameters(ROOT);
 
 

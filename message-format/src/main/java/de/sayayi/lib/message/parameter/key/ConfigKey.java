@@ -105,27 +105,39 @@ public interface ConfigKey extends Serializable
 
 
 
+  /**
+   * Comparison type for parameter configuration map keys.
+   */
   enum CompareType
   {
-    /** Compare for "less than" */
+    /** Compare for "less than". */
     LT,
 
-    /** Compare for "less than or equal to" */
+    /** Compare for "less than or equal to". */
     LTE,
 
-    /** Compare for "equal" */
+    /** Compare for "equal". */
     EQ,
 
-    /** Compare for "not equal" */
+    /** Compare for "not equal". */
     NE,
 
-    /** Compare for "greater than" */
+    /** Compare for "greater than". */
     GT,
 
-    /** Compare for "greater than or equal to" */
+    /** Compare for "greater than or equal to". */
     GTE;
 
 
+    /**
+     * Tells whether the comparison type matches the comparison result {@code signum}.
+     *
+     * @param signum  the comparison result, essentially the result of
+     *                {@code value.compareTo(mapKey)}
+     *
+     * @return  {@code true} if the comparison type matches the comparison result,
+     *          {@code false} otherwise
+     */
     public boolean match(int signum)
     {
       switch(this)

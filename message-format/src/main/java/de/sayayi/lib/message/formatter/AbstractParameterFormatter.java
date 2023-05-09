@@ -75,6 +75,13 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
                                                Object value);
 
 
+  /**
+   * Return the trimmed text represented by the {@code text} message part.
+   *
+   * @param text  text message part
+   *
+   * @return  trimmed text or an empty string if {@code text} is {@code null}, never {@code null}
+   */
   @Contract(pure = true)
   protected @NotNull String trimNotNull(Text text)
   {
