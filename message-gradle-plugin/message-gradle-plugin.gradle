@@ -17,7 +17,6 @@
 plugins {
   id 'java-library'
   id 'java-gradle-plugin'
-  id 'maven-publish'
 }
 
 
