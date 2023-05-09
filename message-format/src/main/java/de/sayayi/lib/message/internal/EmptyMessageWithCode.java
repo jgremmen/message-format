@@ -43,7 +43,7 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
   /**
    * Constructs an empty message with {@code code}.
    *
-   * @param code  message code, not {@code null}
+   * @param code  message code, not {@code null} and not empty
    *
    * @throws IllegalArgumentException  if message code is empty
    */

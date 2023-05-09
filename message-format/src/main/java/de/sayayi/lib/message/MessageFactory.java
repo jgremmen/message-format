@@ -175,6 +175,14 @@ public class MessageFactory
   }
 
 
+  /**
+   * Modifies {@code message} so that it has the given {@code code}.
+   *
+   * @param code     (new) message code, not {@code null} and not empty
+   * @param message  message, not {@code null}
+   *
+   * @return  message with code, never {@code null}
+   */
   @Contract(pure = true)
   public @NotNull Message.WithCode withCode(@NotNull String code, @NotNull Message message)
   {
@@ -187,15 +195,13 @@ public class MessageFactory
     }
 
     if (message instanceof MessageDelegateWithCode)
-      return new MessageDelegateWithCode(code, ((MessageDelegateWithCode)message).getMessage());
-
-    if (message instanceof LocalizedMessageBundleWithCode)
+      message = ((MessageDelegateWithCode)message).getMessage();
+    else if (message instanceof LocalizedMessageBundleWithCode)
     {
       return new LocalizedMessageBundleWithCode(code,
           ((LocalizedMessageBundleWithCode)message).getLocalizedMessages());
     }
-
-    if (message instanceof EmptyMessage || message instanceof EmptyMessageWithCode)
+    else if (message instanceof EmptyMessage || message instanceof EmptyMessageWithCode)
       return new EmptyMessageWithCode(code);
 
     return new MessageDelegateWithCode(code, message);
