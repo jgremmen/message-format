@@ -22,6 +22,7 @@ import de.sayayi.lib.message.internal.MessageSupportImpl;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.InputStream;
 import java.util.Locale;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
@@ -93,28 +94,28 @@ public final class MessageSupportFactory
 
     @Override
     public @NotNull ConfigurableMessageSupport setLocale(@NotNull Locale locale) {
-      throw new UnsupportedOperationException("shared message support");
+      throw new UnsupportedOperationException("setLocale");
     }
 
 
     @Override
     public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
                                                                          boolean value) {
-      throw new UnsupportedOperationException("shared message support");
+      throw new UnsupportedOperationException("setDefaultParameterConfig");
     }
 
 
     @Override
     public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
                                                                          long value) {
-      throw new UnsupportedOperationException("shared message support");
+      throw new UnsupportedOperationException("setDefaultParameterConfig");
     }
 
 
     @Override
     public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
                                                                          @NotNull String value) {
-      throw new UnsupportedOperationException("shared message support");
+      throw new UnsupportedOperationException("setDefaultParameterConfig");
     }
 
 
@@ -122,19 +123,25 @@ public final class MessageSupportFactory
     public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(
         @NotNull String name,
         @NotNull Message.WithSpaces value) {
-      throw new UnsupportedOperationException("shared message support");
+      throw new UnsupportedOperationException("setDefaultParameterConfig");
     }
 
 
     @Override
     public void addMessage(@NotNull Message.WithCode message) {
-      throw new UnsupportedOperationException("shared message support");
+      throw new UnsupportedOperationException("addMessage");
     }
 
 
     @Override
     public void addTemplate(@NotNull String name, @NotNull Message template) {
-      throw new UnsupportedOperationException("shared message support");
+      throw new UnsupportedOperationException("addTemplate");
+    }
+
+
+    @Override
+    public @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream... packStreams) {
+      throw new UnsupportedOperationException("importMessages");
     }
   }
 }
