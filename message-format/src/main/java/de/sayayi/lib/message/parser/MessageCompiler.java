@@ -218,8 +218,24 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         else if (partCount == 1 && parts.get(0) instanceof TextPart)
           ctx.value = new TextMessage((TextPart)parts.get(0));
         else
+        {
+          parts.removeIf(this::exitMessage0_isRedundantTextPart);
           ctx.value = new CompoundMessage(parts);
+        }
       }
+    }
+
+
+    @Contract(pure = true)
+    private boolean exitMessage0_isRedundantTextPart(@NotNull MessagePart messagePart)
+    {
+      if (messagePart instanceof TextPart)
+      {
+        final TextPart textPart = (TextPart)messagePart;
+        return "".equals(textPart.getText()) && textPart.isSpaceAround();
+      }
+
+      return false;
     }
 
 
