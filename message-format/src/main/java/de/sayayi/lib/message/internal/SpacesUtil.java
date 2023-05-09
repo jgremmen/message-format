@@ -61,6 +61,8 @@ public final class SpacesUtil
    * @param s  string to trim, or {@code null}
    *
    * @return  trimmed string, or {@code null} if {@code s} is {@code null}
+   * 
+   * @see #isSpaceChar(char) 
    */
   @Contract(value = "null -> null", pure = true)
   @SuppressWarnings("DuplicatedCode")
@@ -92,6 +94,8 @@ public final class SpacesUtil
    * @param s  string to trim
    *
    * @return  trimmed string, never {@code null}
+   * 
+   * @see #trimSpaces(String) 
    */
   @Contract(pure = true)
   public static @NotNull String trimSpacesNotNull(String s) {
@@ -99,6 +103,17 @@ public final class SpacesUtil
   }
 
 
+  /**
+   * Tells if a string is empty.
+   * <p>
+   * A string is considered empty if it has zero length or it contains spaces only.  
+   * 
+   * @param s  string, not {@code null}
+   *           
+   * @return  {@code true} if the string is empty or contains spaces only, {@code false} otherwise
+   * 
+   * @see #isSpaceChar(char) 
+   */
   @Contract(pure = true)
   @SuppressWarnings("DuplicatedCode")
   public static boolean isTrimmedEmpty(@NotNull String s)

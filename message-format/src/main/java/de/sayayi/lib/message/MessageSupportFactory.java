@@ -45,10 +45,16 @@ public final class MessageSupportFactory
 
 
   /**
-   * Returns an instance of the shared message support.
+   * Returns a shared instance of the message support.
    * <p>
-   * The shared message support cannot be configured and contains all formatters which can be found
-   * as services by the default classloader.
+   * Even though the returned instance implements
+   * {@link ConfigurableMessageSupport ConfigurableMessageSupport}, it cannot be configured;
+   * all methods from this interface will throw an {@link UnsupportedOperationException}.
+   * <p>
+   * The shared message support is backed by the shared instance of the default formatter service
+   * ({@link DefaultFormatterService#getSharedInstance()}). This means that changes (eg. adding
+   * new formatters) to the formatting service will reflect in formatting operations of the
+   * shared message support.
    *
    * @return  shared message support instance, never {@code null}
    */
@@ -73,7 +79,7 @@ public final class MessageSupportFactory
    * @param formatterService  formatter service, not {@code null}
    * @param messageFactory    message factory, not {@code null}
    *
-   * @return  new message support instance, never {@code null}
+   * @return  new configurable message support instance, never {@code null}
    */
   @Contract(value = "_, _ -> new")
   public static @NotNull ConfigurableMessageSupport create(
@@ -85,6 +91,9 @@ public final class MessageSupportFactory
 
 
 
+  /**
+   * Message support implementation for shared usage that cannot be configured.
+   */
   private static final class SharedMessageSupport extends MessageSupportImpl
   {
     private SharedMessageSupport() {

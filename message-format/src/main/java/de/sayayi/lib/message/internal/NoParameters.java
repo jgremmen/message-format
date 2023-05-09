@@ -27,6 +27,8 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
+ * Parameters implementation with no parameters.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
@@ -35,6 +37,11 @@ public final class NoParameters implements Parameters
   private final Locale locale;
 
 
+  /**
+   * Constructs a new object with no parameters for the given {@code locale}.
+   *
+   * @param locale  locale, not {@code null}
+   */
   public NoParameters(@NotNull Locale locale) {
     this.locale = requireNonNull(locale, "locale must not be null");
   }
