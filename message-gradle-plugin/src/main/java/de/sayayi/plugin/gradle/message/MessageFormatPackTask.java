@@ -65,7 +65,7 @@ import static org.gradle.api.logging.LogLevel.WARN;
 public abstract class MessageFormatPackTask extends DefaultTask
 {
   private static final Action<PatternFilterable> CLASS_FILES =
-      pf -> pf.include("**/*.class");
+      patternFilterable -> patternFilterable.include("**/*.class");
 
   private final List<String> includeRegexFilters = new ArrayList<>();
   private final List<String> excludeRegexFilters = new ArrayList<>();
