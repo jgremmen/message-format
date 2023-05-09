@@ -18,7 +18,6 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
-import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
@@ -27,15 +26,11 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
-import static java.util.Locale.ROOT;
 import static java.util.Locale.forLanguageTag;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toSet;
@@ -58,8 +53,13 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   {
     super(code);
 
-    this.localizedMessages =
-        requireNonNull(localizedMessages, "localizedMessages must not be null");
+    if (requireNonNull(localizedMessages, "localizedMessages must not be null").isEmpty())
+      throw new IllegalArgumentException("localizedMessages must not be empty");
+
+    if (localizedMessages.values().stream().anyMatch(Objects::isNull))
+      throw new IllegalArgumentException("message in localizedMessages must not be null");
+
+    this.localizedMessages = localizedMessages;
   }
 
 
@@ -74,37 +74,40 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   @Contract(pure = true)
   private @NotNull Message findMessageByLocale(@NotNull Locale locale)
   {
-    if (localizedMessages.isEmpty())
-      throw new MessageException("message bundle with code " + getCode() + " contains no messages");
-
     final String searchLanguage = locale.getLanguage();
     final String searchCountry = locale.getCountry();
 
     int match = -1;
     Message message = null;
 
+    assert !localizedMessages.isEmpty();
+
     for(final Entry<Locale,Message> entry: localizedMessages.entrySet())
     {
       final Locale keyLocale = entry.getKey();
+      final Message localizedMessage = entry.getValue();
 
-      if (message == null)
-        message = entry.getValue();
+      assert localizedMessage != null;
 
-      if (match == -1 && (keyLocale == null || ROOT.equals(keyLocale)))
+      if (match == -1 && (keyLocale == null || keyLocale.getLanguage().isEmpty()))
       {
-        message = entry.getValue();
-        match = 0;
+        message = localizedMessage;
+        match = 0;  // "default" language match
       }
-      else if (keyLocale.getLanguage().equals(searchLanguage))
+      else if (keyLocale != null && keyLocale.getLanguage().equals(searchLanguage))
       {
         if (keyLocale.getCountry().equals(searchCountry))
-          return entry.getValue();
-        else if (match < 1)
+          return localizedMessage;
+
+        if (match < 1)
         {
-          message = entry.getValue();
-          match = 1;
+          message = localizedMessage;
+          match = 1;  // same language, different country
         }
       }
+
+      if (message == null)
+        message = localizedMessage;  // 1st match
     }
 
     return message;
@@ -126,7 +129,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
   @Override
   public @NotNull MessagePart[] getMessageParts() {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("getMessageParts");
   }
 
 
@@ -136,7 +139,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
     return unmodifiableSet(localizedMessages
         .values()
         .stream()
-        .flatMap(m -> m.getTemplateNames().stream())
+        .flatMap(message -> message.getTemplateNames().stream())
         .collect(toSet()));
   }
 
