@@ -113,7 +113,7 @@ public class MessageFactory
    */
   @Contract(value = "_, _ -> new", pure = true)
   public @NotNull Message.WithCode parseMessage(@NotNull String code, @NotNull String text) {
-    return new MessageDelegateWithCode(code, parseMessage(text));
+    return withCode(code, parseMessage(text));
   }
 
 
