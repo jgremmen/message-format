@@ -25,9 +25,7 @@ import de.sayayi.lib.message.parser.normalizer.MessagePartNormalizer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
@@ -54,6 +52,7 @@ public class MessageFactory
         }
       });
 
+  private static final Random RANDOM = new Random();
   private static int CODE_ID = 0;
 
   private final @NotNull MessagePartNormalizer messagePartNormalizer;
@@ -97,7 +96,7 @@ public class MessageFactory
 
   @Contract(value = "_ -> new", pure = true)
   public @NotNull Message parseMessage(@NotNull Map<Locale,String> localizedTexts) {
-    return parseMessage("Message::" + (++CODE_ID), localizedTexts);
+    return parseMessage(generateCode("MSG"), localizedTexts);
   }
 
 
@@ -161,7 +160,7 @@ public class MessageFactory
 
     localizedTexts.forEach((locale,text) -> localizedMessages.put(locale, parseMessage(text)));
 
-    return new LocalizedMessageBundleWithCode("Template::" + (++CODE_ID), localizedMessages);
+    return new LocalizedMessageBundleWithCode(generateCode("TPL"), localizedMessages);
   }
 
 
@@ -179,9 +178,34 @@ public class MessageFactory
     if (message instanceof MessageDelegateWithCode)
       return new MessageDelegateWithCode(code, ((MessageDelegateWithCode)message).getMessage());
 
+    if (message instanceof LocalizedMessageBundleWithCode)
+    {
+      return new LocalizedMessageBundleWithCode(code,
+          new HashMap<>(((LocalizedMessageBundleWithCode)message).getLocalizedMessages()));
+    }
+
     if (message instanceof EmptyMessage || message instanceof EmptyMessageWithCode)
       return new EmptyMessageWithCode(code);
 
     return new MessageDelegateWithCode(code, message);
+  }
+
+
+  @Contract(pure = true)
+  protected @NotNull String generateCode(@NotNull String prefix)
+  {
+    final byte[] hashBytes = new byte[6];
+    RANDOM.nextBytes(hashBytes);
+
+    final String hash = Long.toString(0x1000000000000L |
+        ((hashBytes[0] & 0xffL) << 40) |
+        ((hashBytes[1] & 0xffL) << 32) |
+        ((hashBytes[2] & 0xffL) << 24) |
+        ((hashBytes[3] & 0xffL) << 16) |
+        ((hashBytes[4] & 0xffL) << 8) |
+        (hashBytes[5] & 0xffL), 36);
+
+    return (prefix + '[' + hash + '-' + Integer.toString(++CODE_ID | 0x20000, 36) + ']')
+        .toUpperCase(ROOT);
   }
 }
