@@ -159,6 +159,11 @@ public interface ConfigKey extends Serializable
     }
 
 
+    /**
+     * Return a prefix representation for the comparison type.
+     *
+     * @return  comparison type as prefix, never {@code null}
+     */
     public @NotNull String asPrefix() {
       return this == EQ ? "" : toString();
     }

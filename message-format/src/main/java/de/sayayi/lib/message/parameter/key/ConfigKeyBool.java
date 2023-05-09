@@ -43,6 +43,7 @@ public enum ConfigKeyBool implements ConfigKey
 
   private static final long serialVersionUID = 800L;
 
+  /** Configuration key boolean. */
   private final boolean bool;
 
 

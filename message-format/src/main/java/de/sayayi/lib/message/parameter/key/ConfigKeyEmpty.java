@@ -37,6 +37,7 @@ public final class ConfigKeyEmpty implements ConfigKey
 {
   private static final long serialVersionUID = 800L;
 
+  /** Configuration empty key comparison type. */
   private final @NotNull CompareType compareType;
 
 

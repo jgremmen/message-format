@@ -33,6 +33,7 @@ public final class ConfigValueNumber implements ConfigValue
 {
   private static final long serialVersionUID = 800L;
 
+  /** Configuration value number. */
   private final long number;
 
 

@@ -37,6 +37,7 @@ public enum ConfigValueBool implements ConfigValue
 
   private static final long serialVersionUID = 800L;
 
+  /** Configuration value boolean. */
   private final boolean bool;
 
 

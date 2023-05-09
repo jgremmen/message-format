@@ -36,6 +36,7 @@ public final class ConfigKeyName implements ConfigKey
 {
   private static final long serialVersionUID = 800L;
 
+  /** Configuration key name. */
   private final @NotNull String name;
 
 

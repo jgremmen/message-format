@@ -703,11 +703,21 @@ public interface MessageSupport
 
 
   /**
+   * Interface used for filtering messages.
+   *
    * @author Jeroen Gremmen
    * @since 0.8.0
    */
   interface MessageFilter
   {
+    /**
+     * Decides if {@code message} is filtered or not.
+     *
+     * @param message  message to analyse, not {@code null}
+     *
+     * @return  {@code true} if the message will be included,
+     *          {@code false} if the message will be excluded
+     */
     boolean filter(@NotNull Message.WithCode message);
   }
 
@@ -715,11 +725,22 @@ public interface MessageSupport
 
 
   /**
+   * Interface used for filtering templates.
+   *
    * @author Jeroen Gremmen
    * @since 0.8.0
    */
   interface TemplateFilter
   {
+    /**
+     * Decides if {@code template} with {@code name} is filtered or not.
+     *
+     * @param name      template name, not {@code null}
+     * @param template  template message to analyse, not {@code null}
+     *
+     * @return  {@code true} if the template will be included,
+     *          {@code false} if the template will be excluded
+     */
     boolean filter(@NotNull String name, @NotNull Message template);
   }
 }
