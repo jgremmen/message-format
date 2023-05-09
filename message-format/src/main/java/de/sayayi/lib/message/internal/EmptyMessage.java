@@ -30,7 +30,7 @@ import static java.util.Collections.emptySet;
 
 /**
  * Message implementation, representing an empty text without leading/trailing spaces.
- * 
+ *
  * @author Jeroen Gremmen
  */
 public final class EmptyMessage implements Message.WithSpaces
@@ -69,6 +69,17 @@ public final class EmptyMessage implements Message.WithSpaces
    */
   @Override
   public boolean isSpaceAfter() {
+    return false;
+  }
+
+
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@code false}
+   */
+  @Override
+  public boolean isSpaceAround() {
     return false;
   }
 

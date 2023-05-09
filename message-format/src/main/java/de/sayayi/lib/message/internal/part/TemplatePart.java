@@ -75,6 +75,12 @@ public final class TemplatePart implements Template
 
 
   @Override
+  public boolean isSpaceAround() {
+    return spaceBefore && spaceAfter;
+  }
+
+
+  @Override
   public @NotNull Text getText(@NotNull MessageSupportAccessor messageSupport,
                                @NotNull Parameters parameters)
   {

@@ -89,6 +89,12 @@ public final class TextPart implements Text
 
 
   @Override
+  public boolean isSpaceAround() {
+    return spaceBefore && spaceAfter;
+  }
+
+
+  @Override
   public @NotNull String getTextWithSpaces()
   {
     if (isEmpty())

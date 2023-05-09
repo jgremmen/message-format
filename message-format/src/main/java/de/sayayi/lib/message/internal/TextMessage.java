@@ -84,6 +84,12 @@ public final class TextMessage implements Message.WithSpaces
 
 
   @Override
+  public boolean isSpaceAround() {
+    return spaceBefore && spaceAfter;
+  }
+
+
+  @Override
   public @NotNull String format(@NotNull MessageSupportAccessor messageSupport,
                                 @NotNull Parameters parameters) {
     return text == null ? "" : text;
