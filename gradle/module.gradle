@@ -88,8 +88,9 @@ afterEvaluate {
     title "${project.description} ${version}"
 
     (options as StandardJavadocDocletOptions).with {
-      linksOffline "https://javadoc.io/doc/org.jetbrains/annotations-java5/${jetbrainsAnnotationsVersion}/",
-          "${rootDir}/gradle/javadocs/jetbrains-annotations"
+      linksOffline(
+          "https://javadoc.io/doc/org.jetbrains/annotations-java5/${jetbrainsAnnotationsVersion}/",
+          "${rootDir}/gradle/javadocs/jetbrains-annotations")
 
       encoding 'UTF-8'
 
@@ -128,11 +129,7 @@ compileTestJava {
 
 jacocoTestReport {
   reports {
-    xml {
-      required = true
-    }
-    html {
-      required = true
-    }
+    xml.required = true
+    html.required = true
   }
 }
