@@ -17,6 +17,7 @@ package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.SpacesAware;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.ParameterPart;
@@ -40,24 +41,35 @@ import static java.util.stream.Collectors.toSet;
 
 
 /**
+ * A compound message is represented by a concatenation of message parts.
+ * <p>
+ * During formatting each part is rendered and concatenated. Spaces between rendered parts are
+ * inserted based on {@link SpacesAware#isSpaceBefore()} and {@link SpacesAware#isSpaceAfter()}.
+ *
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
-public class ParameterizedMessage implements Message.WithSpaces
+public class CompoundMessage implements Message.WithSpaces
 {
   private static final long serialVersionUID = 800L;
 
+  /** Message parts, not empty */
   private final @NotNull MessagePart[] parts;
 
 
-  public ParameterizedMessage(@NotNull List<MessagePart> parts)
+  /**
+   * Construct a compound message based on the given message {@code parts}.
+   * <p>
+   * At least 1 message part is required. If the sole message part is a
+   * {@link de.sayayi.lib.message.internal.part.TextPart TextPart}, it is better to use
+   * {@link EmptyMessage} or {@link TextMessage} in that case.
+   *
+   * @param parts  message parts, not {@code null} and not empty
+   */
+  public CompoundMessage(@NotNull List<MessagePart> parts)
   {
-    findParameter: {
-      for(final MessagePart part: requireNonNull(parts, "parts must not be null"))
-        if (part instanceof ParameterPart)
-          break findParameter;
-
-      throw new IllegalArgumentException("parts must contain at least 1 parameter part");
-    }
+    if (requireNonNull(parts, "parts must not be null").isEmpty())
+      throw new IllegalArgumentException("parts must not be empty");
 
     this.parts = parts.toArray(new MessagePart[0]);
   }
@@ -134,7 +146,7 @@ public class ParameterizedMessage implements Message.WithSpaces
   public boolean equals(Object o)
   {
     return this == o ||
-        o instanceof ParameterizedMessage && deepEquals(parts, ((ParameterizedMessage)o).parts);
+        o instanceof CompoundMessage && deepEquals(parts, ((CompoundMessage)o).parts);
   }
 
 
@@ -146,7 +158,7 @@ public class ParameterizedMessage implements Message.WithSpaces
 
   @Override
   public String toString() {
-    return "ParameterizedMessage(parts=" + deepToString(parts) + ')';
+    return "CompoundMessage(parts=" + deepToString(parts) + ')';
   }
 
 
@@ -185,6 +197,6 @@ public class ParameterizedMessage implements Message.WithSpaces
     for(int n = 0, l = packStream.readSmallVar(); n < l; n++)
       parts.add(unpack.unpackMessagePart(packStream));
 
-    return new ParameterizedMessage(parts);
+    return new CompoundMessage(parts);
   }
 }

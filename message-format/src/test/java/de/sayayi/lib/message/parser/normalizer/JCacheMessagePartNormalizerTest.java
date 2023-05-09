@@ -17,7 +17,7 @@ package de.sayayi.lib.message.parser.normalizer;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.internal.ParameterizedMessage;
+import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -62,7 +62,7 @@ public class JCacheMessagePartNormalizerTest
   {
     final Message.WithSpaces msg = new MessageFactory(resolver).parseMessage("this is %{a,number} and %{b}this is %{b}");
     final MessagePart[] parts = (MessagePart[])
-        tryToReadFieldValue(ParameterizedMessage.class, "parts", (ParameterizedMessage)msg).get();
+        tryToReadFieldValue(CompoundMessage.class, "parts", (CompoundMessage)msg).get();
 
     assertEquals(6, parts.length);
 

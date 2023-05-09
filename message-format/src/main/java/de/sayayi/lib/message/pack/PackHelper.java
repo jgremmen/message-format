@@ -58,7 +58,7 @@ public final class PackHelper
   private static final int MESSAGE_EMPTY_WITH_CODE = 1;
   private static final int MESSAGE_LOCALIZED_BUNDLE_WITH_CODE = 2;
   private static final int MESSAGE_DELEGATE_WITH_CODE = 3;
-  private static final int MESSAGE_PARAMETERIZED = 4;
+  private static final int MESSAGE_COMPOUND = 4;
   private static final int MESSAGE_TEXT = 5;
 
 
@@ -88,10 +88,10 @@ public final class PackHelper
       packStream.writeSmall(MESSAGE_DELEGATE_WITH_CODE, 3);
       ((MessageDelegateWithCode)message).pack(packStream);
     }
-    else if (message instanceof ParameterizedMessage)
+    else if (message instanceof CompoundMessage)
     {
-      packStream.writeSmall(MESSAGE_PARAMETERIZED, 3);
-      ((ParameterizedMessage)message).pack(packStream);
+      packStream.writeSmall(MESSAGE_COMPOUND, 3);
+      ((CompoundMessage)message).pack(packStream);
     }
     else if (message instanceof TextMessage)
     {
@@ -116,8 +116,8 @@ public final class PackHelper
       case MESSAGE_EMPTY:
         return EmptyMessage.INSTANCE;
 
-      case MESSAGE_PARAMETERIZED:
-        message = ParameterizedMessage.unpack(this, packStream);
+      case MESSAGE_COMPOUND:
+        message = CompoundMessage.unpack(this, packStream);
         break;
 
       case MESSAGE_TEXT:
@@ -169,8 +169,8 @@ public final class PackHelper
       case MESSAGE_DELEGATE_WITH_CODE:
         return MessageDelegateWithCode.unpack(this, packStream);
 
-      case MESSAGE_PARAMETERIZED:
-        message = ParameterizedMessage.unpack(this, packStream);
+      case MESSAGE_COMPOUND:
+        message = CompoundMessage.unpack(this, packStream);
         break;
 
       case MESSAGE_TEXT:

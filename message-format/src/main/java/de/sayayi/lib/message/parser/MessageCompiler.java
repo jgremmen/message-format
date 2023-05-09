@@ -21,8 +21,8 @@ import de.sayayi.lib.antlr4.syntax.GenericSyntaxErrorFormatter;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.exception.MessageParserException;
+import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.EmptyMessage;
-import de.sayayi.lib.message.internal.ParameterizedMessage;
 import de.sayayi.lib.message.internal.SpacesUtil;
 import de.sayayi.lib.message.internal.TextMessage;
 import de.sayayi.lib.message.internal.part.MessagePart;
@@ -218,7 +218,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         else if (partCount == 1 && parts.get(0) instanceof TextPart)
           ctx.value = new TextMessage((TextPart)parts.get(0));
         else
-          ctx.value = new ParameterizedMessage(parts);
+          ctx.value = new CompoundMessage(parts);
       }
     }
 

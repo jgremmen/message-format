@@ -17,9 +17,9 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.Message.WithCode;
 import de.sayayi.lib.message.exception.MessageParserException;
+import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
-import de.sayayi.lib.message.internal.ParameterizedMessage;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,7 +34,7 @@ public class MessageFactoryTest
   public void testParseString()
   {
     Message.WithSpaces msg = MessageFactory.NO_CACHE_INSTANCE.parseMessage("this is %{test}");
-    assertTrue(msg instanceof ParameterizedMessage);
+    assertTrue(msg instanceof CompoundMessage);
   }
 
 
