@@ -35,6 +35,7 @@ import de.sayayi.lib.message.parameter.value.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -78,6 +79,7 @@ import static org.antlr.v4.runtime.Token.EOF;
  *
  * @author Jeroen Gremmen
  */
+@SuppressWarnings("UnknownLanguage")
 public final class MessageCompiler extends AbstractAntlr4Parser
 {
   private final @NotNull MessageFactory messageFactory;
@@ -99,7 +101,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    * @return  compiled message, never {@code null}
    */
   @Contract(pure = true)
-  public @NotNull Message.WithSpaces compileMessage(@NotNull String text) {
+  public @NotNull Message.WithSpaces compileMessage(
+      @NotNull @Language("MessageFormat") String text) {
     return compileMessage(text, false);
   }
 
@@ -112,7 +115,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    * @return  compiled template, never {@code null}
    */
   @Contract(pure = true)
-  public @NotNull Message.WithSpaces compileTemplate(@NotNull String text) {
+  public @NotNull Message.WithSpaces compileTemplate(
+      @NotNull @Language("MessageFormat") String text) {
     return compileMessage(text, true);
   }
 
@@ -296,6 +300,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     {
       final QuotedMessageContext quotedMessage = ctx.quotedMessage();
 
+      //noinspection LanguageMismatch
       ctx.value = quotedMessage != null
           ? quotedMessage.value
           : messageFactory.parseMessage(ctx.string().value);

@@ -19,6 +19,7 @@ import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.parameter.value.ConfigValue;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,6 +39,7 @@ import static java.util.Locale.forLanguageTag;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
+@SuppressWarnings("UnknownLanguage")
 public interface MessageSupport
 {
   /**
@@ -70,7 +72,7 @@ public interface MessageSupport
    * @return  message configurer instance for the given {@code message}, never {@code null}
    */
   @Contract(value = "_ -> new", pure = true)
-  @NotNull MessageConfigurer<Message> message(@NotNull String message);
+  @NotNull MessageConfigurer<Message> message(@NotNull @Language("MessageFormat") String message);
 
 
   /**
@@ -336,7 +338,8 @@ public interface MessageSupport
      * @throws DuplicateMessageException  in case a message with the same code already exists
      */
     @Contract(mutates = "this")
-    default void addMessage(@NotNull String code, @NotNull String message) {
+    default void addMessage(@NotNull String code,
+                            @NotNull @Language("MessageFormat") String message) {
       addMessage(getAccessor().getMessageFactory().parseMessage(code, message));
     }
 

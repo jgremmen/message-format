@@ -22,6 +22,7 @@ import de.sayayi.lib.message.internal.MessageDelegateWithCode;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.parser.MessageCompiler;
 import de.sayayi.lib.message.parser.normalizer.MessagePartNormalizer;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,6 +40,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @author Jeroen Gremmen
  */
+@SuppressWarnings("UnknownLanguage")
 public class MessageFactory
 {
   /**
@@ -92,7 +94,7 @@ public class MessageFactory
    * @return  message instance, never {@code null}
    */
   @Contract(value = "_ -> new", pure = true)
-  public @NotNull Message.WithSpaces parseMessage(@NotNull String text) {
+  public @NotNull Message.WithSpaces parseMessage(@NotNull @Language("MessageFormat") String text) {
     return messageCompiler.compileMessage(text);
   }
 
@@ -112,7 +114,8 @@ public class MessageFactory
    * @return  message instance
    */
   @Contract(value = "_, _ -> new", pure = true)
-  public @NotNull Message.WithCode parseMessage(@NotNull String code, @NotNull String text) {
+  public @NotNull Message.WithCode parseMessage(@NotNull String code,
+                                                @NotNull @Language("MessageFormat") String text) {
     return withCode(code, parseMessage(text));
   }
 
@@ -132,7 +135,8 @@ public class MessageFactory
       default: {
         final Map<Locale,Message> localizedMessages = new HashMap<>();
 
-        localizedTexts.forEach((locale,text) -> localizedMessages.put(locale, parseMessage(text)));
+        localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) ->
+            localizedMessages.put(locale, parseMessage(text)));
 
         return new LocalizedMessageBundleWithCode(code, localizedMessages);
       }
@@ -148,7 +152,7 @@ public class MessageFactory
    * @return  message instance, never {@code null}
    */
   @Contract(value = "_ -> new", pure = true)
-  public @NotNull Message parseTemplate(@NotNull String text) {
+  public @NotNull Message parseTemplate(@NotNull @Language("MessageFormat") String text) {
     return messageCompiler.compileTemplate(text);
   }
 
@@ -167,7 +171,8 @@ public class MessageFactory
       default: {
         final Map<Locale,Message> localizedMessages = new HashMap<>();
 
-        localizedTexts.forEach((locale,text) -> localizedMessages.put(locale, parseMessage(text)));
+        localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) ->
+            localizedMessages.put(locale, parseMessage(text)));
 
         return new LocalizedMessageBundleWithCode(generateCode("TPL"), localizedMessages);
       }

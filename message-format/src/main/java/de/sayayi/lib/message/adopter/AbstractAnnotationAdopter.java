@@ -26,6 +26,7 @@ import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.exception.MessageAdopterException;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -64,7 +65,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-@SuppressWarnings({"DuplicatedCode", "UnusedReturnValue", "unused"})
+@SuppressWarnings({"DuplicatedCode", "UnusedReturnValue", "unused", "UnknownLanguage"})
 public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 {
   private static final Set<String> ZIP_PROTOCOLS = new HashSet<>(asList("zip", "jar", "war"));
@@ -311,7 +312,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
     if (texts.length == 0)
     {
-      final String text = messageDef.text();
+      @Language("MessageFormat") final String text = messageDef.text();
 
       messagePublisher.addMessage(text.isEmpty()
           ? new EmptyMessageWithCode(code)
@@ -360,7 +361,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
     if (texts.length == 0)
     {
-      final String text = templateDef.text();
+      @Language("MessageFormat") final String text = templateDef.text();
 
       messagePublisher.addTemplate(name, text.isEmpty()
           ? EmptyMessage.INSTANCE
@@ -409,6 +410,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   static final class MessageDefImpl implements MessageDef
   {
     private final @NotNull String code;
+    @Language("MessageFormat")
     private final @NotNull String text;
     private final @NotNull Text[] texts;
 
@@ -464,6 +466,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   static final class TemplateDefImpl implements TemplateDef
   {
     private final @NotNull String name;
+    @Language("MessageFormat")
     private final @NotNull String text;
     private final @NotNull Text[] texts;
 
@@ -521,7 +524,9 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   static final class TextImpl implements Text
   {
     private final @NotNull String locale;
+    @Language("MessageFormat")
     private final @NotNull String text;
+    @Language("MessageFormat")
     private final @NotNull String value;
 
 
