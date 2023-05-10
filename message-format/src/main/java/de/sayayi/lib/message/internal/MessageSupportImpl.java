@@ -39,6 +39,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.copyOf;
@@ -260,19 +261,22 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     if (message == null)
       throw new IllegalArgumentException("unknown message code '" + code + "'");
 
-    return new Configurer<>(message);
+    return new Configurer<>(() -> message);
   }
 
 
   @Override
   public @NotNull MessageConfigurer<Message> message(@NotNull String message) {
-    return message(messageFactory.parseMessage(message));
+    return new Configurer<>(() -> messageFactory.parseMessage(message));
   }
 
 
   @Override
-  public <M extends Message> @NotNull MessageConfigurer<M> message(@NotNull M message) {
-    return new Configurer<>(requireNonNull(message, "message must not be null"));
+  public <M extends Message> @NotNull MessageConfigurer<M> message(@NotNull M message)
+  {
+    requireNonNull(message, "message must not be null");
+
+    return new Configurer<>(() -> message);
   }
 
 
@@ -319,13 +323,13 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
   private final class Configurer<M extends Message> implements MessageConfigurer<M>
   {
-    private final @NotNull M message;
+    private final @NotNull Supplier<M> message;
     private @NotNull Locale locale;
     private @NotNull Object[] parameters;
     private int parameterCount;
 
 
-    private Configurer(@NotNull M message)
+    private Configurer(@NotNull Supplier<M> message)
     {
       this.message = message;
 
@@ -336,7 +340,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
     @Override
     public @NotNull M getMessage() {
-      return message;
+      return requireNonNull(message.get(), "message must not be null");
     }
 
 
@@ -424,7 +428,13 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
     @Override
     public @NotNull String format() {
-      return message.format(getAccessor(), new Params(this));
+      return getMessage().format(getAccessor(), new Params(this));
+    }
+
+
+    @Override
+    public @NotNull Supplier<String> formatSupplier() {
+      return this::format;
     }
 
 

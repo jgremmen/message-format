@@ -29,6 +29,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static java.util.Locale.forLanguageTag;
 
@@ -76,6 +77,7 @@ public interface MessageSupport
    * Prepare a {@code message} for formatting.
    *
    * @param message  message, not {@code null}
+   * @param <M>      message type
    *
    * @return  message configurer instance for the given {@code message}, never {@code null}
    */
@@ -290,6 +292,17 @@ public interface MessageSupport
      */
     @Contract(pure = true)
     @NotNull String format();
+
+
+    /**
+     * Returns a supplier capable of formatting the message.
+     * <p>
+     * Formatting the message is delayed until {@link Supplier#get()} is invoked.
+     *
+     * @return  format supplier, never {@code null}
+     */
+    @Contract(pure = true)
+    @NotNull Supplier<String> formatSupplier();
 
 
     /**
