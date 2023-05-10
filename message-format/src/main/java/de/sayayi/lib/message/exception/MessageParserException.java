@@ -30,6 +30,6 @@ public class MessageParserException extends MessageException
 
   @Override
   public synchronized RecognitionException getCause() {
-    return (RecognitionException) super.getCause();
+    return (RecognitionException)super.getCause();
   }
 }
