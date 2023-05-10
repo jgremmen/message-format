@@ -21,6 +21,14 @@ package de.sayayi.lib.message.exception;
  */
 public class MessageException extends RuntimeException
 {
+  /**
+   * Constructs a new message exception with the specified detail message.
+   * The cause is not initialized, and may subsequently be initialized by a
+   * call to {@link #initCause}.
+   *
+   * @param message  the detail message. The detail message is saved for later retrieval by the
+   *                 {@link #getMessage()} method.
+   */
   public MessageException(String message) {
     super(message);
   }
