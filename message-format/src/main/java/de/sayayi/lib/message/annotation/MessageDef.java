@@ -15,6 +15,8 @@
  */
 package de.sayayi.lib.message.annotation;
 
+import org.intellij.lang.annotations.Language;
+
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -43,6 +45,7 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 @Target({ ANNOTATION_TYPE, METHOD, TYPE })
 @Retention(CLASS)
 @Repeatable(MessageDefs.class)
+@SuppressWarnings("UnknownLanguage")
 public @interface MessageDef
 {
   /**
@@ -69,5 +72,6 @@ public @interface MessageDef
    *
    * @return  message text
    */
+  @Language("MessageFormat")
   String text() default "";
 }

@@ -17,6 +17,7 @@ package de.sayayi.lib.message.annotation;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import org.intellij.lang.annotations.Language;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -35,6 +36,7 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  */
 @Target(ANNOTATION_TYPE)
 @Retention(CLASS)
+@SuppressWarnings("UnknownLanguage")
 public @interface Text
 {
   /**
@@ -56,6 +58,7 @@ public @interface Text
    *
    * @return  message text
    */
+  @Language("MessageFormat")
   String text() default "";
 
 
@@ -67,5 +70,6 @@ public @interface Text
    *
    * @return  message text
    */
+  @Language("MessageFormat")
   String value() default "";
 }
