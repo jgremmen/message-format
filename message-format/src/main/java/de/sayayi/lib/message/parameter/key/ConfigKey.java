@@ -184,6 +184,9 @@ public interface ConfigKey extends Serializable
 
 
 
+  /**
+   * Configuration value lookup result.
+   */
   enum MatchResult
   {
     /** no match */
