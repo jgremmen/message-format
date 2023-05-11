@@ -46,8 +46,10 @@ public abstract class AbstractMessageAdopter
    *
    * @param configurableMessageSupport  configurable message support, not {@code null}
    */
-  protected AbstractMessageAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {
-    this(configurableMessageSupport.getAccessor().getMessageFactory(), configurableMessageSupport);
+  protected AbstractMessageAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport)
+  {
+    this(configurableMessageSupport.getMessageAccessor().getMessageFactory(),
+        configurableMessageSupport);
   }
 
 

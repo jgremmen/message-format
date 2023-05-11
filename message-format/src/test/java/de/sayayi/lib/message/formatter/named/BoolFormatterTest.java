@@ -50,22 +50,22 @@ public class BoolFormatterTest extends AbstractFormatterTest
   @Test
   void testFormat()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE)
         .setLocale("de-DE")
-        .getAccessor();
+        .getMessageAccessor();
 
     val map = new HashMap<ConfigKey,ConfigValue>();
     map.put(ConfigKeyBool.TRUE, new ConfigValueString("wahr"));
     map.put(ConfigKeyBool.FALSE, new ConfigValueString("falsch"));
 
-    assertEquals(noSpaceText("wahr"), format(accessor, Boolean.TRUE, map));
-    assertEquals(noSpaceText("falsch"), format(accessor, 0.0d, map, "bool"));
-    assertEquals(noSpaceText("wahr"), format(accessor, -0.0001f, map, "bool"));
-    assertEquals(noSpaceText("falsch"), format(accessor, "FALSE", map, "bool"));
-    assertEquals(noSpaceText("wahr"), format(accessor, "TrUe", map, "bool"));
-    assertEquals(noSpaceText("wahr"), format(accessor, -4, map, "bool"));
-    assertEquals(nullText(), format(accessor, (Object)null, map, "bool"));
+    assertEquals(noSpaceText("wahr"), format(messageAccessor, Boolean.TRUE, map));
+    assertEquals(noSpaceText("falsch"), format(messageAccessor, 0.0d, map, "bool"));
+    assertEquals(noSpaceText("wahr"), format(messageAccessor, -0.0001f, map, "bool"));
+    assertEquals(noSpaceText("falsch"), format(messageAccessor, "FALSE", map, "bool"));
+    assertEquals(noSpaceText("wahr"), format(messageAccessor, "TrUe", map, "bool"));
+    assertEquals(noSpaceText("wahr"), format(messageAccessor, -4, map, "bool"));
+    assertEquals(nullText(), format(messageAccessor, (Object)null, map, "bool"));
   }
 
 

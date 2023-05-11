@@ -55,13 +55,13 @@ public final class AsmAnnotationsAdopterTest
         AsmAnnotationsAdopterTest.class.getClassLoader(),
         singleton(AsmAnnotationsAdopterTest.class.getPackage().getName()));
 
-    val accessor = messageSupport.getAccessor();
+    val messageAccessor = messageSupport.getMessageAccessor();
 
-    assertTrue(accessor.hasMessageWithCode("A0"));
-    assertTrue(accessor.hasMessageWithCode("CLASS"));
-    assertTrue(accessor.hasMessageWithCode("M1"));
-    assertTrue(accessor.hasMessageWithCode("M2"));
-    assertTrue(accessor.hasMessageWithCode("INNER"));
+    assertTrue(messageAccessor.hasMessageWithCode("A0"));
+    assertTrue(messageAccessor.hasMessageWithCode("CLASS"));
+    assertTrue(messageAccessor.hasMessageWithCode("M1"));
+    assertTrue(messageAccessor.hasMessageWithCode("M2"));
+    assertTrue(messageAccessor.hasMessageWithCode("INNER"));
   }
 
 

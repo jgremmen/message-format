@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.internal.part;
 
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.FormatterContextImpl;
@@ -104,10 +104,10 @@ public final class ParameterPart implements Parameter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text getText(@NotNull MessageSupportAccessor messageSupport,
+  public @NotNull Text getText(@NotNull MessageAccessor messageAccessor,
                                @NotNull Parameters parameters)
   {
-    final FormatterContext formatterContext = new FormatterContextImpl(messageSupport, parameters,
+    final FormatterContext formatterContext = new FormatterContextImpl(messageAccessor, parameters,
         parameters.getParameterValue(name), null, format, paramConfig);
 
     try {

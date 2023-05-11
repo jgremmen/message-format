@@ -45,13 +45,13 @@ public class StringFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(new GenericFormatterService(), NO_CACHE_INSTANCE)
-        .getAccessor();
+        .getMessageAccessor();
 
-    assertEquals(noSpaceText("text"), format(accessor, " text "));
-    assertEquals(noSpaceText("RUNTIME"), format(accessor, RetentionPolicy.RUNTIME));
-    assertEquals(noSpaceText("hello"), format(accessor, new Object() {
+    assertEquals(noSpaceText("text"), format(messageAccessor, " text "));
+    assertEquals(noSpaceText("RUNTIME"), format(messageAccessor, RetentionPolicy.RUNTIME));
+    assertEquals(noSpaceText("hello"), format(messageAccessor, new Object() {
       @Override
       public String toString() {
         return " hello";
@@ -77,7 +77,8 @@ public class StringFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatterWithMap()
   {
-    val messageSupport = MessageSupportFactory.create(new GenericFormatterService(), NO_CACHE_INSTANCE);
+    val messageSupport = MessageSupportFactory.create(
+        new GenericFormatterService(), NO_CACHE_INSTANCE);
     val parameters = new HashMap<String,Object>();
 
     parameters.put("empty", "");
@@ -85,14 +86,21 @@ public class StringFormatterTest extends AbstractFormatterTest
     parameters.put("spaces", "  ");
     parameters.put("text", "hello  ");
 
-    assertEquals("", messageSupport.message("%{empty,!empty:nok}").with(parameters).format());
-    assertEquals("ok", messageSupport.message("%{empty,empty:ok}").with(parameters).format());
-    assertEquals("ok", messageSupport.message("%{null,empty:nok,null:ok}").with(parameters).format());
-    assertEquals("ok", messageSupport.message("%{null,empty:ok}").with(parameters).format());
-    assertEquals("ok", messageSupport.message("%{spaces,empty:ok}").with(parameters).format());
-    assertEquals("ok", messageSupport.message("%{spaces,!null:ok}").with(parameters).format());
-    assertEquals("hello!", messageSupport.message("%{text,null:nok,!empty:'%{text}!'}")
-        .with(parameters).format());
-    assertEquals("hello!", messageSupport.message("%{text,!null:'%{text}!'}").with(parameters).format());
+    assertEquals("",
+        messageSupport.message("%{empty,!empty:nok}").with(parameters).format());
+    assertEquals("ok",
+        messageSupport.message("%{empty,empty:ok}").with(parameters).format());
+    assertEquals("ok",
+        messageSupport.message("%{null,empty:nok,null:ok}").with(parameters).format());
+    assertEquals("ok",
+        messageSupport.message("%{null,empty:ok}").with(parameters).format());
+    assertEquals("ok",
+        messageSupport.message("%{spaces,empty:ok}").with(parameters).format());
+    assertEquals("ok",
+        messageSupport.message("%{spaces,!null:ok}").with(parameters).format());
+    assertEquals("hello!",
+        messageSupport.message("%{text,null:nok,!empty:'%{text}!'}").with(parameters).format());
+    assertEquals("hello!",
+        messageSupport.message("%{text,!null:'%{text}!'}").with(parameters).format());
   }
 }

@@ -54,59 +54,69 @@ public class BitsFormatterTest extends AbstractFormatterTest
   @Test
   void testByte()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new BitsFormatter()), NO_CACHE_INSTANCE)
-        .getAccessor();
+        .getMessageAccessor();
 
-    assertEquals(noSpaceText("11111111"), format(accessor, (byte)0xff, "bits"));
-    assertEquals(noSpaceText("00000000"), format(accessor, (byte)0, "bits"));
-    assertEquals(noSpaceText("10101010"), format(accessor, (byte)0xaa, "bits"));
-    assertEquals(noSpaceText("01010101"), format(accessor, (byte)0x55, "bits"));
-    assertEquals(noSpaceText("10101"), format(accessor, (byte)0x15,
+    assertEquals(noSpaceText("11111111"), format(messageAccessor, (byte)0xff, "bits"));
+    assertEquals(noSpaceText("00000000"), format(messageAccessor, (byte)0, "bits"));
+    assertEquals(noSpaceText("10101010"), format(messageAccessor, (byte)0xaa, "bits"));
+    assertEquals(noSpaceText("01010101"), format(messageAccessor, (byte)0x55, "bits"));
+    assertEquals(noSpaceText("10101"), format(messageAccessor, (byte)0x15,
         singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
-    assertEquals(noSpaceText("0"), format(accessor, (byte)0,
+    assertEquals(noSpaceText("0"), format(messageAccessor, (byte)0,
         singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
-    assertEquals(noSpaceText("101"), format(accessor, (byte)0x15,
+    assertEquals(noSpaceText("101"), format(messageAccessor, (byte)0x15,
         singletonMap(new ConfigKeyName("bits"), new ConfigValueNumber(3)), "bits"));
-    assertEquals(nullText(), format(accessor, (Object)null, "bits"));
+    assertEquals(nullText(), format(messageAccessor, (Object)null, "bits"));
   }
 
 
   @Test
   void testShort()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new BitsFormatter()), NO_CACHE_INSTANCE)
-        .getAccessor();
+        .getMessageAccessor();
 
-    assertEquals(noSpaceText("1111111111111111"), format(accessor, (short)0xffff, "bits"));
-    assertEquals(noSpaceText("0000000000000000"), format(accessor, (short)0, "bits"));
-    assertEquals(noSpaceText("1010101010101010"), format(accessor, (short)0xaaaa, "bits"));
-    assertEquals(noSpaceText("0101010101010101"), format(accessor, (short)0x5555, "bits"));
-    assertEquals(noSpaceText("101010101"), format(accessor, (short)0x155,
-        singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
-    assertEquals(noSpaceText("0"), format(accessor, (short)0,
-        singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
-    assertEquals(noSpaceText("010110"), format(accessor, (byte)0x456,
-        singletonMap(new ConfigKeyName("bits"), new ConfigValueNumber(6)), "bits"));
+    assertEquals(noSpaceText("1111111111111111"),
+        format(messageAccessor, (short)0xffff, "bits"));
+    assertEquals(noSpaceText("0000000000000000"),
+        format(messageAccessor, (short)0, "bits"));
+    assertEquals(noSpaceText("1010101010101010"),
+        format(messageAccessor, (short)0xaaaa, "bits"));
+    assertEquals(noSpaceText("0101010101010101"),
+        format(messageAccessor, (short)0x5555, "bits"));
+    assertEquals(noSpaceText("101010101"),
+        format(messageAccessor, (short)0x155,
+            singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
+    assertEquals(noSpaceText("0"),
+        format(messageAccessor, (short)0,
+            singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
+    assertEquals(noSpaceText("010110"),
+        format(messageAccessor, (byte)0x456,
+            singletonMap(new ConfigKeyName("bits"), new ConfigValueNumber(6)), "bits"));
   }
 
 
   @Test
   void testBitInteger()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new BitsFormatter()), NO_CACHE_INSTANCE)
-        .getAccessor();
+        .getMessageAccessor();
 
-    assertEquals(noSpaceText("101111000110000101001110"), format(accessor, new BigInteger("12345678"),
-        singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
-    assertEquals(noSpaceText("0"), format(accessor, BigInteger.ZERO,
-        singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
-    assertEquals(noSpaceText("01001110"), format(accessor, new BigInteger("12345678"),
-        singletonMap(new ConfigKeyName("bits"), new ConfigValueNumber(8)), "bits"));
+    assertEquals(noSpaceText("101111000110000101001110"),
+        format(messageAccessor, new BigInteger("12345678"),
+            singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
+    assertEquals(noSpaceText("0"),
+        format(messageAccessor, BigInteger.ZERO,
+            singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
+    assertEquals(noSpaceText("01001110"),
+        format(messageAccessor, new BigInteger("12345678"),
+            singletonMap(new ConfigKeyName("bits"), new ConfigValueNumber(8)), "bits"));
     assertEquals(noSpaceText("1010110101000111000101000100111010000000100001000101111000111101100"),
-        format(accessor, new BigInteger("99887766554433221100"),
+        format(messageAccessor, new BigInteger("99887766554433221100"),
             singletonMap(new ConfigKeyName("bits"), new ConfigValueNumber(67)), "bits"));
   }
 
@@ -114,16 +124,18 @@ public class BitsFormatterTest extends AbstractFormatterTest
   @Test
   void testWrapper()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new BitsFormatter(), new LongSupplierFormatter(),
             new OptionalIntFormatter()), NO_CACHE_INSTANCE)
-        .getAccessor();
+        .getMessageAccessor();
 
-    assertEquals(noSpaceText("101111000110000101001110"), format(accessor, (LongSupplier)() -> 12345678,
-        singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
-    assertEquals(noSpaceText("01001110"), format(accessor, OptionalInt.of(12345678),
-        singletonMap(new ConfigKeyName("bits"), new ConfigValueNumber(8)), "bits"));
-    assertEquals(nullText(), format(accessor, (Object)null, "bits"));
-    assertEquals(emptyText(), format(accessor, OptionalInt.empty(), "bits"));
+    assertEquals(noSpaceText("101111000110000101001110"),
+        format(messageAccessor, (LongSupplier)() -> 12345678,
+            singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
+    assertEquals(noSpaceText("01001110"),
+        format(messageAccessor, OptionalInt.of(12345678),
+            singletonMap(new ConfigKeyName("bits"), new ConfigValueNumber(8)), "bits"));
+    assertEquals(nullText(), format(messageAccessor, (Object)null, "bits"));
+    assertEquals(emptyText(), format(messageAccessor, OptionalInt.empty(), "bits"));
   }
 }

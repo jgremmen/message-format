@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.parameter.key;
 
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -68,7 +68,7 @@ public final class ConfigKeyName implements ConfigKey
 
 
   @Override
-  public @NotNull MatchResult match(@NotNull MessageSupportAccessor messageSupportAccessor,
+  public @NotNull MatchResult match(@NotNull MessageAccessor messageAccessor,
                                     @NotNull Locale locale, Object value)
   {
     return (value instanceof CharSequence || value instanceof Character) &&

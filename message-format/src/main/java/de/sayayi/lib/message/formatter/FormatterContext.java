@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.parameter.key.ConfigKey;
@@ -41,35 +41,35 @@ import java.util.Set;
 public interface FormatterContext extends Parameters
 {
   /**
-   * Returns the message context used to create this formatter context.
+   * Returns the message accessor used to create this formatter context.
    *
-   * @return  message context, never {@code null}
+   * @return  message accessor, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull MessageSupportAccessor getMessageSupport();
+  @NotNull MessageAccessor getMessageSupport();
 
 
   @Contract(pure = true)
-  @NotNull Optional<ConfigValue> getMapValue(
+  @NotNull Optional<ConfigValue> getConfigValue(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes, Set<ConfigValue.Type> valueTypes);
 
 
   @Contract(pure = true)
-  default @NotNull Optional<Message.WithSpaces> getMapMessage(
+  default @NotNull Optional<Message.WithSpaces> getConfigMessage(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes) {
-    return getMapMessage(key, keyTypes, false);
+    return getConfigMessage(key, keyTypes, false);
   }
 
 
   @Contract(pure = true)
-  @NotNull Optional<Message.WithSpaces> getMapMessage(
+  @NotNull Optional<Message.WithSpaces> getConfigMessage(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault);
 
 
   @Contract(pure = true)
-  default @NotNull Message.WithSpaces getMapMessageOrEmpty(
+  default @NotNull Message.WithSpaces getConfigMessageOrEmpty(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault) {
-    return getMapMessage(key, keyTypes, includeDefault).orElse(EmptyMessage.INSTANCE);
+    return getConfigMessage(key, keyTypes, includeDefault).orElse(EmptyMessage.INSTANCE);
   }
 
 

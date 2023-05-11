@@ -41,12 +41,13 @@ public class IterableFormatterTest extends AbstractFormatterTest
   @Test
   public void testObjectArray()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE)
         .setLocale("de-DE")
-        .getAccessor();
+        .getMessageAccessor();
 
-    assertEquals(noSpaceText("Test, true, -6"), format(accessor, asList("Test", true, null, -6)));
+    assertEquals(noSpaceText("Test, true, -6"),
+        format(messageAccessor, asList("Test", true, null, -6)));
   }
 
 

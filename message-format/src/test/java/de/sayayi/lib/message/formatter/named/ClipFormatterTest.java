@@ -51,12 +51,13 @@ public class ClipFormatterTest extends AbstractFormatterTest
   @Test
   void testDefault()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new ClipFormatter()), NO_CACHE_INSTANCE)
-        .getAccessor();
+        .getMessageAccessor();
 
     assertEquals(noSpaceText("This is a very long text which is clipped at a length of 64 c..."),
-        format(accessor, "This is a very long text which is clipped at a length of 64 characters",
+        format(messageAccessor,
+            "This is a very long text which is clipped at a length of 64 characters",
             "clip"));
   }
 
@@ -64,15 +65,16 @@ public class ClipFormatterTest extends AbstractFormatterTest
   @Test
   void testSize()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new ClipFormatter()), NO_CACHE_INSTANCE)
-        .getAccessor();
+        .getMessageAccessor();
 
     assertEquals(noSpaceText("This is a very..."),
-        format(accessor, "This is a very long text which is clipped at a length of 64 characters",
+        format(messageAccessor,
+            "This is a very long text which is clipped at a length of 64 characters",
             singletonMap(new ConfigKeyName("clip-size"), new ConfigValueNumber(18)), "clip"));
     assertEquals(noSpaceText("This..."),
-        format(accessor, "This is a very long text",
+        format(messageAccessor, "This is a very long text",
             singletonMap(new ConfigKeyName("clip-size"), new ConfigValueNumber(2)), "clip"));
   }
 
@@ -80,12 +82,13 @@ public class ClipFormatterTest extends AbstractFormatterTest
   @Test
   void testWrapper()
   {
-    val accessor = MessageSupportFactory
-        .create(createFormatterService(new ClipFormatter(), new DoubleSupplierFormatter()), NO_CACHE_INSTANCE)
-        .getAccessor();
+    val messageAccessor = MessageSupportFactory
+        .create(createFormatterService(new ClipFormatter(), new DoubleSupplierFormatter()),
+            NO_CACHE_INSTANCE)
+        .getMessageAccessor();
 
     assertEquals(noSpaceText("3.1415926..."),
-        format(accessor, (DoubleSupplier)() -> Math.PI,
+        format(messageAccessor, (DoubleSupplier)() -> Math.PI,
             singletonMap(new ConfigKeyName("clip-size"), new ConfigValueNumber(12)), "clip"));
   }
 
@@ -93,10 +96,11 @@ public class ClipFormatterTest extends AbstractFormatterTest
   @Test
   void testNull()
   {
-    val accessor = MessageSupportFactory
-        .create(createFormatterService(new ClipFormatter(), new DoubleSupplierFormatter()), NO_CACHE_INSTANCE)
-        .getAccessor();
+    val messageAccessor = MessageSupportFactory
+        .create(createFormatterService(new ClipFormatter(), new DoubleSupplierFormatter()),
+            NO_CACHE_INSTANCE)
+        .getMessageAccessor();
 
-    assertEquals(nullText(), format(accessor, (Object)null, "clip"));
+    assertEquals(nullText(), format(messageAccessor, (Object)null, "clip"));
   }
 }

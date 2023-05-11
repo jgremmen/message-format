@@ -17,7 +17,7 @@ package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
@@ -44,7 +44,7 @@ import static java.util.Optional.ofNullable;
  */
 public final class FormatterContextImpl implements FormatterContext
 {
-  private final @NotNull MessageSupportAccessor messageSupport;
+  private final @NotNull MessageAccessor messageSupport;
   private final @NotNull Parameters parameters;
   private final Object value;
   private final String format;
@@ -52,7 +52,7 @@ public final class FormatterContextImpl implements FormatterContext
   private final @NotNull Deque<ParameterFormatter> parameterFormatters;
 
 
-  public FormatterContextImpl(@NotNull MessageSupportAccessor messageSupport,
+  public FormatterContextImpl(@NotNull MessageAccessor messageSupport,
                               @NotNull Parameters parameters, Object value, Class<?> type,
                               String format, @NotNull ParamConfig map)
   {
@@ -70,7 +70,7 @@ public final class FormatterContextImpl implements FormatterContext
 
 
   @Override
-  public @NotNull MessageSupportAccessor getMessageSupport() {
+  public @NotNull MessageAccessor getMessageSupport() {
     return messageSupport;
   }
 
@@ -94,17 +94,15 @@ public final class FormatterContextImpl implements FormatterContext
 
 
   @Override
-  public @NotNull Optional<ConfigValue> getMapValue(Object key,
-                                                    @NotNull Set<ConfigKey.Type> keyTypes,
-                                                    Set<ConfigValue.Type> valueTypes) {
+  public @NotNull Optional<ConfigValue> getConfigValue(
+      Object key, @NotNull Set<ConfigKey.Type> keyTypes, Set<ConfigValue.Type> valueTypes) {
     return ofNullable(map.find(messageSupport, key, parameters, keyTypes, valueTypes));
   }
 
 
   @Override
-  public @NotNull Optional<Message.WithSpaces> getMapMessage(Object key,
-                                                             @NotNull Set<ConfigKey.Type> keyTypes,
-                                                             boolean includeDefault) {
+  public @NotNull Optional<Message.WithSpaces> getConfigMessage(
+      Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault) {
     return ofNullable(map.getMessage(messageSupport, key, parameters, keyTypes, includeDefault));
   }
 

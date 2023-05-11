@@ -76,7 +76,7 @@ public final class URIFormatter extends AbstractParameterFormatter
         }
 
         final Message.WithSpaces msg =
-            formatterContext.getMapMessage(port, NUMBER_TYPE).orElse(null);
+            formatterContext.getConfigMessage(port, NUMBER_TYPE).orElse(null);
         return msg != null
             ? new TextPart(msg.format(formatterContext.getMessageSupport(), formatterContext),
                 msg.isSpaceBefore(), msg.isSpaceAfter())
@@ -89,7 +89,7 @@ public final class URIFormatter extends AbstractParameterFormatter
       case "scheme": {
         final String scheme = uri.getScheme();
         final Message.WithSpaces msg =
-            formatterContext.getMapMessage(scheme, STRING_EMPTY_TYPE).orElse(null);
+            formatterContext.getConfigMessage(scheme, STRING_EMPTY_TYPE).orElse(null);
 
         return msg != null
             ? new TextPart(msg.format(formatterContext.getMessageSupport(), formatterContext),

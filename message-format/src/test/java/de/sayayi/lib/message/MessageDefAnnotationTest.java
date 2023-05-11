@@ -98,12 +98,13 @@ public class MessageDefAnnotationTest
   void testMessageWithoutLocale()
   {
     val msg = messageSupport.code("T3").getMessage();
-    val accessor = messageSupport.getAccessor();
+    val messageAccessor = messageSupport.getMessageAccessor();
 
-    assertEquals("m3", msg.format(accessor, NoParameters.EMPTY));
-    assertEquals("m3", msg.format(accessor, new NoParameters(Locale.ROOT)));
-    assertEquals("m3", msg.format(accessor, new NoParameters(Locale.US)));
-    assertEquals("m3", msg.format(accessor, new NoParameters(forLanguageTag("xx-YY"))));
+    assertEquals("m3", msg.format(messageAccessor, NoParameters.EMPTY));
+    assertEquals("m3", msg.format(messageAccessor, new NoParameters(Locale.ROOT)));
+    assertEquals("m3", msg.format(messageAccessor, new NoParameters(Locale.US)));
+    assertEquals("m3",
+        msg.format(messageAccessor, new NoParameters(forLanguageTag("xx-YY"))));
     assertFalse(msg instanceof LocaleAware);
   }
 
@@ -114,12 +115,13 @@ public class MessageDefAnnotationTest
   void testSingleMessageWithLocale()
   {
     val msg = messageSupport.code("T2").getMessage();
-    val accessor = messageSupport.getAccessor();
+    val messageAccessor = messageSupport.getMessageAccessor();
 
-    assertEquals("nl", msg.format(accessor, NoParameters.EMPTY));
-    assertEquals("nl", msg.format(accessor, new NoParameters(Locale.ROOT)));
-    assertEquals("nl", msg.format(accessor, new NoParameters(Locale.US)));
-    assertEquals("nl", msg.format(accessor, new NoParameters(forLanguageTag("xx-YY"))));
+    assertEquals("nl", msg.format(messageAccessor, NoParameters.EMPTY));
+    assertEquals("nl", msg.format(messageAccessor, new NoParameters(Locale.ROOT)));
+    assertEquals("nl", msg.format(messageAccessor, new NoParameters(Locale.US)));
+    assertEquals("nl",
+        msg.format(messageAccessor, new NoParameters(forLanguageTag("xx-YY"))));
   }
 
 
@@ -134,13 +136,15 @@ public class MessageDefAnnotationTest
   void testLocaleSelection()
   {
     val msg = messageSupport.code("T1").getMessage();
-    val accessor = messageSupport.getAccessor();
+    val messageAccessor = messageSupport.getMessageAccessor();
 
-    assertEquals("us", msg.format(accessor, new NoParameters(Locale.ROOT)));
-    assertEquals("uk", msg.format(accessor, new NoParameters(Locale.UK)));
-    assertEquals("nl", msg.format(accessor, new NoParameters(forLanguageTag("nl-BE"))));
-    assertEquals("us", msg.format(accessor, new NoParameters(Locale.CHINESE)));
-    assertEquals("de", msg.format(accessor, new NoParameters(forLanguageTag("de-AT"))));
+    assertEquals("us", msg.format(messageAccessor, new NoParameters(Locale.ROOT)));
+    assertEquals("uk", msg.format(messageAccessor, new NoParameters(Locale.UK)));
+    assertEquals("nl",
+        msg.format(messageAccessor, new NoParameters(forLanguageTag("nl-BE"))));
+    assertEquals("us", msg.format(messageAccessor, new NoParameters(Locale.CHINESE)));
+    assertEquals("de",
+        msg.format(messageAccessor, new NoParameters(forLanguageTag("de-AT"))));
   }
 
 
@@ -148,7 +152,7 @@ public class MessageDefAnnotationTest
   @DisplayName("All message codes present")
   void testCodes()
   {
-    val codes = messageSupport.getAccessor().getMessageCodes();
+    val codes = messageSupport.getMessageAccessor().getMessageCodes();
 
     assertTrue(codes.contains("T1"));
     assertTrue(codes.contains("T2"));
@@ -170,7 +174,7 @@ public class MessageDefAnnotationTest
         .create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
     newMessageSupport.importMessages(new ByteArrayInputStream(packStream.toByteArray()));
 
-    val codes = newMessageSupport.getAccessor().getMessageCodes();
+    val codes = newMessageSupport.getMessageAccessor().getMessageCodes();
 
     assertTrue(codes.contains("T1"));
     assertTrue(codes.contains("T2"));

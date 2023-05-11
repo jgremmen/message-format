@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
@@ -54,7 +54,7 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
   @Override
   @Contract(pure = true)
-  public @NotNull String format(@NotNull MessageSupportAccessor messageSupport,
+  public @NotNull String format(@NotNull MessageAccessor messageAccessor,
                                 @NotNull Parameters parameters) {
     return "";
   }

@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message;
 
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.internal.NoParameters;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import org.jetbrains.annotations.Contract;
@@ -44,32 +44,31 @@ public interface Message extends Serializable
   /**
    * Formats the message based on the message parameters provided.
    *
-   * @param messageSupport  message context providing formatting information, never {@code null}
-   * @param parameters      message parameters, never {@code null}
+   * @param messageAccessor  message context providing formatting information, never {@code null}
+   * @param parameters       message parameters, never {@code null}
    *
    * @return  formatted message, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull String format(@NotNull MessageSupportAccessor messageSupport,
-                         @NotNull Parameters parameters);
+  @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters);
 
 
   /**
    * Formats the message based on the message parameters provided.
    *
-   * @param messageSupport   message context providing formatting information, never {@code null}
-   * @param parameterValues  message parameter values, never {@code null}
+   * @param messageAccessor   message context providing formatting information, never {@code null}
+   * @param parameterValues   message parameter values, never {@code null}
    *
    * @return  formatted message
    */
   @Contract(pure = true)
-  default String format(@NotNull MessageSupportAccessor messageSupport,
+  default String format(@NotNull MessageAccessor messageAccessor,
                         @NotNull Map<String,Object> parameterValues)
   {
-    return format(messageSupport, new Parameters() {
+    return format(messageAccessor, new Parameters() {
       @Override
       public @NotNull Locale getLocale() {
-        return messageSupport.getLocale();
+        return messageAccessor.getLocale();
       }
 
       @Override
@@ -204,7 +203,7 @@ public interface Message extends Serializable
      */
     @Contract(pure = true)
     @Override
-    @NotNull String format(@NotNull MessageSupportAccessor messageSupport,
+    @NotNull String format(@NotNull MessageAccessor messageAccessor,
                            @NotNull Parameters parameters);
 
 

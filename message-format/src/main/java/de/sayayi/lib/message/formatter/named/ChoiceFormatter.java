@@ -41,7 +41,7 @@ public final class ChoiceFormatter extends AbstractParameterFormatter
   public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value)
   {
     return formatterContext.format(
-        formatterContext.getMapMessageOrEmpty(value, NO_NAME_KEY_TYPES, true));
+        formatterContext.getConfigMessageOrEmpty(value, NO_NAME_KEY_TYPES, true));
   }
 
 

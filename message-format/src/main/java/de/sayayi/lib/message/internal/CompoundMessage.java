@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.SpacesAware;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
@@ -77,7 +77,7 @@ public class CompoundMessage implements Message.WithSpaces
 
   @Override
   @Contract(pure = true)
-  public @NotNull String format(@NotNull MessageSupportAccessor messageSupport,
+  public @NotNull String format(@NotNull MessageAccessor messageAccessor,
                                 @NotNull Parameters parameters)
   {
     final StringBuilder message = new StringBuilder();
@@ -86,9 +86,9 @@ public class CompoundMessage implements Message.WithSpaces
     for(final MessagePart part: parts)
     {
       final Text textPart = part instanceof ParameterPart
-          ? ((ParameterPart)part).getText(messageSupport, parameters)
+          ? ((ParameterPart)part).getText(messageAccessor, parameters)
           : part instanceof TemplatePart
-          ? ((TemplatePart)part).getText(messageSupport, parameters)
+          ? ((TemplatePart)part).getText(messageAccessor, parameters)
           : (Text)part;
 
       if (!textPart.isEmpty())

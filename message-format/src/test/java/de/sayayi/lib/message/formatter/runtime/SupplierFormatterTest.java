@@ -40,23 +40,26 @@ public class SupplierFormatterTest extends AbstractFormatterTest
   @Test
   public void testBooleanSupplier()
   {
-    val accessor = MessageSupportFactory
-        .create(createFormatterService(new BoolFormatter(), new BooleanSupplierFormatter()), NO_CACHE_INSTANCE)
-        .getAccessor();
+    val messageAccessor = MessageSupportFactory
+        .create(createFormatterService(new BoolFormatter(), new BooleanSupplierFormatter()),
+            NO_CACHE_INSTANCE)
+        .getMessageAccessor();
 
-    assertEquals(noSpaceText("true"), format(accessor, (BooleanSupplier) () -> true));
+    assertEquals(noSpaceText("true"), format(messageAccessor, (BooleanSupplier) () -> true));
   }
 
 
   @Test
   public void testLongSupplier()
   {
-    val accessor = MessageSupportFactory
-        .create(createFormatterService(new NumberFormatter(), new LongSupplierFormatter()), NO_CACHE_INSTANCE)
+    val messageAccessor = MessageSupportFactory
+        .create(createFormatterService(new NumberFormatter(), new LongSupplierFormatter()),
+            NO_CACHE_INSTANCE)
         .setLocale("en")
-        .getAccessor();
+        .getMessageAccessor();
 
-    assertEquals(noSpaceText("1,234,567,890"), format(accessor, (LongSupplier) () -> 1234567890L,
-        singletonMap(new ConfigKeyName("number"), new ConfigValueString("###,###,###,###"))));
+    assertEquals(noSpaceText("1,234,567,890"),
+        format(messageAccessor, (LongSupplier) () -> 1234567890L,
+            singletonMap(new ConfigKeyName("number"), new ConfigValueString("###,###,###,###"))));
   }
 }

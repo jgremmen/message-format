@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.internal.FormatterContextImpl;
 import de.sayayi.lib.message.internal.NoParameters;
 import de.sayayi.lib.message.internal.part.MessagePart;
@@ -49,41 +49,41 @@ public abstract class AbstractFormatterTest
 
 
   @Contract(pure = true)
-  protected @NotNull MessagePart format(@NotNull MessageSupportAccessor messageContext, Object value) {
+  protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value) {
     return format(messageContext, new NoParameters(messageContext.getLocale()), value, emptyMap(), null);
   }
 
 
   @Contract(pure = true)
-  protected @NotNull MessagePart format(@NotNull MessageSupportAccessor messageContext, Object value,
+  protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
                                         @NotNull String format) {
     return format(messageContext, new NoParameters(messageContext.getLocale()), value, emptyMap(), format);
   }
 
 
   @Contract(pure = true)
-  protected @NotNull MessagePart format(@NotNull MessageSupportAccessor messageContext,
+  protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext,
                                         @NotNull Parameters parameters, Object value) {
     return format(messageContext, parameters, value, emptyMap(), null);
   }
 
 
   @Contract(pure = true)
-  protected @NotNull MessagePart format(@NotNull MessageSupportAccessor messageContext, Object value,
+  protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
                                         @NotNull Map<ConfigKey, ConfigValue> map) {
     return format(messageContext, new NoParameters(messageContext.getLocale()), value, map, null);
   }
 
 
   @Contract(pure = true)
-  protected @NotNull MessagePart format(@NotNull MessageSupportAccessor messageContext, Object value,
+  protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
                                         @NotNull Map<ConfigKey, ConfigValue> map, @NotNull String format) {
     return format(messageContext, new NoParameters(messageContext.getLocale()), value, map, format);
   }
 
 
   @Contract(pure = true)
-  protected @NotNull MessagePart format(@NotNull MessageSupportAccessor messageContext,
+  protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext,
                                         @NotNull Parameters parameters, Object value,
                                         @NotNull Map<ConfigKey, ConfigValue> map,
                                         String format)

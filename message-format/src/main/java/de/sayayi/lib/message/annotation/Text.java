@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.annotation;
 
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import org.intellij.lang.annotations.Language;
 
 import java.lang.annotation.Retention;
@@ -40,15 +40,15 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 public @interface Text
 {
   /**
-   * Message locale, either the language code (de, es) or the language with country
-   * (de_DE, fr_CA).
+   * Message locale, either the language code (eg. de, es) or the language with country
+   * (eg. de_DE, fr_CA).
    * <p>
    * The default value corresponds to {@link java.util.Locale#ROOT} which will match any locale
    * used for formatting this message.
    *
    * @return  message locale
    *
-   * @see de.sayayi.lib.message.Message#format(MessageSupportAccessor, Parameters)
+   * @see de.sayayi.lib.message.Message#format(MessageAccessor, Parameters)
    */
   String locale() default "";
 

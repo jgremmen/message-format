@@ -17,7 +17,7 @@ package de.sayayi.lib.message.internal.part;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.internal.part.MessagePart.Template;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
@@ -81,15 +81,15 @@ public final class TemplatePart implements Template
 
 
   @Override
-  public @NotNull Text getText(@NotNull MessageSupportAccessor messageSupport,
+  public @NotNull Text getText(@NotNull MessageAccessor messageAccessor,
                                @NotNull Parameters parameters)
   {
     Text text = emptyText();
 
     try {
-      final Message message = messageSupport.getTemplateByName(name);
+      final Message message = messageAccessor.getTemplateByName(name);
       if (message != null)
-        text = noSpaceText(message.format(messageSupport, parameters));
+        text = noSpaceText(message.format(messageAccessor, parameters));
     } catch(Exception ignored) {
     }
 

@@ -40,19 +40,19 @@ public class FileFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new FileFormatter()), NO_CACHE_INSTANCE)
         .setLocale(ROOT)
-        .getAccessor();
+        .getMessageAccessor();
     val f = new File("/path1/path2/filename.ext");
 
-    assertEquals(nullText(), format(accessor, null));
-    assertEquals(noSpaceText("/path1/path2/filename.ext"), format(accessor, f));
-    assertEquals(noSpaceText("filename.ext"), format(accessor, f,
+    assertEquals(nullText(), format(messageAccessor, null));
+    assertEquals(noSpaceText("/path1/path2/filename.ext"), format(messageAccessor, f));
+    assertEquals(noSpaceText("filename.ext"), format(messageAccessor, f,
         singletonMap(new ConfigKeyName("file"), new ConfigValueString("name"))));
-    assertEquals(noSpaceText("/path1/path2"), format(accessor, f,
+    assertEquals(noSpaceText("/path1/path2"), format(messageAccessor, f,
         singletonMap(new ConfigKeyName("file"), new ConfigValueString("parent"))));
-    assertEquals(noSpaceText("ext"), format(accessor, f,
+    assertEquals(noSpaceText("ext"), format(messageAccessor, f,
         singletonMap(new ConfigKeyName("file"), new ConfigValueString("extension"))));
   }
 

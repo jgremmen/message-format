@@ -73,7 +73,7 @@ public final class BoolFormatter extends AbstractParameterFormatter
   {
     Message.WithSpaces msg =
         requireNonNull(formatterContext, "formatterContext must not be null")
-            .getMapMessage(value, EMPTY_NULL_TYPE).orElse(null);
+            .getConfigMessage(value, EMPTY_NULL_TYPE).orElse(null);
     if (msg != null)
       return formatterContext.format(msg);
 
@@ -97,7 +97,7 @@ public final class BoolFormatter extends AbstractParameterFormatter
       bool = parseBoolean(String.valueOf(value));
 
     // allow custom messages for true/false value?
-    if ((msg = formatterContext.getMapMessage(bool, EnumSet.of(BOOL)).orElse(null)) != null)
+    if ((msg = formatterContext.getConfigMessage(bool, EnumSet.of(BOOL)).orElse(null)) != null)
       return formatterContext.format(msg);
 
     return noSpaceText(Boolean.toString(bool));

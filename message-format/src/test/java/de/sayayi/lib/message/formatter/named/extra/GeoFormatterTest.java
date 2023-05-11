@@ -104,28 +104,36 @@ public class GeoFormatterTest extends AbstractFormatterTest
   @Test
   void testFormatLongitude()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new GeoFormatter()), NO_CACHE_INSTANCE)
         .setLocale(ROOT)
-        .getAccessor();
+        .getMessageAccessor();
 
     // short-longitude
-    assertEquals(noSpaceText("4\u00b048'E"), format(accessor, dms(4, 48),
-        singletonMap(new ConfigKeyName("geo"), new ConfigValueString("short-longitude")), "geo"));
+    assertEquals(noSpaceText("4\u00b048'E"),
+        format(messageAccessor, dms(4, 48),
+            singletonMap(new ConfigKeyName("geo"), new ConfigValueString("short-longitude")),
+            "geo"));
 
     // longitude
-    assertEquals(noSpaceText("19\u00b00'0\"W"), format(accessor, -dms(18, 59, 59, 501),
-        singletonMap(new ConfigKeyName("geo"), new ConfigValueString("longitude")), "geo"));
+    assertEquals(noSpaceText("19\u00b00'0\"W"),
+        format(messageAccessor, -dms(18, 59, 59, 501),
+            singletonMap(new ConfigKeyName("geo"), new ConfigValueString("longitude")),
+            "geo"));
 
     // medium-longitude
-    assertEquals(noSpaceText("18\u00b059'59,9\"E"), format(accessor, new NoParameters(GERMANY),
-        dms(18, 59, 59, 891),
-        singletonMap(new ConfigKeyName("geo"), new ConfigValueString("medium-longitude")), "geo"));
+    assertEquals(noSpaceText("18\u00b059'59,9\"E"),
+        format(messageAccessor, new NoParameters(GERMANY),
+            dms(18, 59, 59, 891),
+            singletonMap(new ConfigKeyName("geo"), new ConfigValueString("medium-longitude")),
+            "geo"));
 
     // long-longitude
-    assertEquals(noSpaceText("18\u00b059'59.891\"W"), format(accessor, new NoParameters(UK),
-        -dms(18, 59, 59, 891),
-        singletonMap(new ConfigKeyName("geo"), new ConfigValueString("long-longitude")), "geo"));
+    assertEquals(noSpaceText("18\u00b059'59.891\"W"),
+        format(messageAccessor, new NoParameters(UK),
+            -dms(18, 59, 59, 891),
+            singletonMap(new ConfigKeyName("geo"), new ConfigValueString("long-longitude")),
+            "geo"));
   }
 
 
@@ -141,15 +149,24 @@ public class GeoFormatterTest extends AbstractFormatterTest
     parameters.put("lon", dms(4, 48));
 
     assertEquals("coordinates 4\u00b048'0\"E, 51\u00b034'9\"N", messageSupport
-        .message("coordinates %{lon,geo,geo:longitude}, %{lat,geo,geo:latitude}").with(parameters).format());
+        .message("coordinates %{lon,geo,geo:longitude}, %{lat,geo,geo:latitude}")
+        .with(parameters)
+        .format());
 
     assertEquals("coordinates 4\u00b048.0' E, 51\u00b034'9.000\"N", messageSupport
-        .message("coordinates %{lon,geo,geo:'dM LO'}, %{lat,geo,geo:long-latitude}").with(parameters).format());
+        .message("coordinates %{lon,geo,geo:'dM LO'}, %{lat,geo,geo:long-latitude}")
+        .with(parameters)
+        .format());
 
     assertEquals("51\u00b034'09\"N", messageSupport
-        .message("%{lat,geo,geo:'d0m0sLA'}").with(parameters).format());
+        .message("%{lat,geo,geo:'d0m0sLA'}")
+        .with(parameters)
+        .format());
 
-    assertEquals("", messageSupport.message("%{test,geo,geo:'d0m0sLA'}").with(parameters).format());
+    assertEquals("", messageSupport
+        .message("%{test,geo,geo:'d0m0sLA'}")
+        .with(parameters)
+        .format());
   }
 
 

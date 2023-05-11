@@ -61,24 +61,29 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
   @Test
   public void testLocalDate()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new Java8DateTimeFormatter()), NO_CACHE_INSTANCE)
         .setLocale(GERMANY)
-        .getAccessor();
+        .getMessageAccessor();
     val date = LocalDate.of(1972, 8, 17);
 
     assertEquals(noSpaceText("17.08.72"),
-        format(accessor, date, singletonMap(new ConfigKeyName("date"), new ConfigValueString("short"))));
+        format(messageAccessor, date,
+            singletonMap(new ConfigKeyName("date"), new ConfigValueString("short"))));
     assertEquals(noSpaceText("17.08.1972"),
-        format(accessor, date, singletonMap(new ConfigKeyName("date"), new ConfigValueString("medium"))));
+        format(messageAccessor, date,
+            singletonMap(new ConfigKeyName("date"), new ConfigValueString("medium"))));
     assertEquals(noSpaceText("17. August 1972"),
-        format(accessor, date, singletonMap(new ConfigKeyName("date"), new ConfigValueString("long"))));
+        format(messageAccessor, date,
+            singletonMap(new ConfigKeyName("date"), new ConfigValueString("long"))));
     assertEquals(noSpaceText("Donnerstag, 17. August 1972"),
-        format(accessor, date, singletonMap(new ConfigKeyName("date"), new ConfigValueString("full"))));
+        format(messageAccessor, date,
+            singletonMap(new ConfigKeyName("date"), new ConfigValueString("full"))));
     assertEquals(noSpaceText("17.08.1972"),
-        format(accessor, date, singletonMap(new ConfigKeyName("date"), new ConfigValueString("date"))));
+        format(messageAccessor, date,
+            singletonMap(new ConfigKeyName("date"), new ConfigValueString("date"))));
 
-    assertEquals(emptyText(), format(accessor, date,
+    assertEquals(emptyText(), format(messageAccessor, date,
         singletonMap(new ConfigKeyName("date"), new ConfigValueString("time"))));
   }
 
@@ -86,24 +91,24 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
   @Test
   public void testLocalTime()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new Java8DateTimeFormatter()), NO_CACHE_INSTANCE)
         .setLocale(GERMANY)
-        .getAccessor();
+        .getMessageAccessor();
     val time = LocalTime.of(16, 34, 11, 672000000);
 
-    assertEquals(new TextPart("16:34"), format(accessor, time,
+    assertEquals(new TextPart("16:34"), format(messageAccessor, time,
         singletonMap(new ConfigKeyName("date"), new ConfigValueString("short"))));
-    assertEquals(new TextPart("16:34:11"), format(accessor, time,
+    assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
         singletonMap(new ConfigKeyName("date"), new ConfigValueString("medium"))));
-    assertEquals(new TextPart("16:34:11"), format(accessor, time,
+    assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
         singletonMap(new ConfigKeyName("date"), new ConfigValueString("long"))));
-    assertEquals(new TextPart("16:34 Uhr"), format(accessor, time,
+    assertEquals(new TextPart("16:34 Uhr"), format(messageAccessor, time,
         singletonMap(new ConfigKeyName("date"), new ConfigValueString("full"))));
-    assertEquals(new TextPart("16:34:11"), format(accessor, time,
+    assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
         singletonMap(new ConfigKeyName("date"), new ConfigValueString("time"))));
 
-    assertEquals(Text.EMPTY, format(accessor, time,
+    assertEquals(Text.EMPTY, format(messageAccessor, time,
         singletonMap(new ConfigKeyName("date"), new ConfigValueString("date"))));
   }
 
@@ -111,43 +116,52 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
   @Test
   public void testDateTime()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new Java8DateTimeFormatter()), NO_CACHE_INSTANCE)
         .setLocale(UK)
-        .getAccessor();
+        .getMessageAccessor();
     val datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
 
     assertEquals(new TextPart("17/08/72 02:40"),
-        format(accessor, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("short"))));
+        format(messageAccessor, datetime,
+            singletonMap(new ConfigKeyName("date"), new ConfigValueString("short"))));
     assertEquals(new TextPart("17-Aug-1972 02:40:23"),
-        format(accessor, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("medium"))));
+        format(messageAccessor, datetime,
+            singletonMap(new ConfigKeyName("date"), new ConfigValueString("medium"))));
     assertEquals(new TextPart("17 August 1972 02:40:23 CET"),
-        format(accessor, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("long"))));
+        format(messageAccessor, datetime,
+            singletonMap(new ConfigKeyName("date"), new ConfigValueString("long"))));
     assertEquals(new TextPart("Thursday, 17 August 1972 02:40:23 o'clock CET"),
-        format(accessor, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("full"))));
+        format(messageAccessor, datetime,
+            singletonMap(new ConfigKeyName("date"), new ConfigValueString("full"))));
 
     assertEquals(new TextPart("17-Aug-1972"),
-        format(accessor, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("date"))));
+        format(messageAccessor, datetime,
+            singletonMap(new ConfigKeyName("date"), new ConfigValueString("date"))));
     assertEquals(new TextPart("02:40:23"),
-        format(accessor, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("time"))));
+        format(messageAccessor, datetime,
+            singletonMap(new ConfigKeyName("date"), new ConfigValueString("time"))));
   }
 
 
   @Test
   public void testCustomPattern()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new Java8DateTimeFormatter()), NO_CACHE_INSTANCE)
         .setLocale(FRANCE)
-        .getAccessor();
+        .getMessageAccessor();
     val datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
 
     assertEquals(new TextPart("17 août"),
-        format(accessor, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("dd MMMM"))));
+        format(messageAccessor, datetime,
+            singletonMap(new ConfigKeyName("date"), new ConfigValueString("dd MMMM"))));
     assertEquals(new TextPart("jeu. jeudi"),
-        format(accessor, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("EEE EEEE"))));
+        format(messageAccessor, datetime,
+            singletonMap(new ConfigKeyName("date"), new ConfigValueString("EEE EEEE"))));
     assertEquals(new TextPart("02:40:23,833"),
-        format(accessor, datetime, singletonMap(new ConfigKeyName("date"), new ConfigValueString("HH:mm:ss,SSS"))));
+        format(messageAccessor, datetime,
+            singletonMap(new ConfigKeyName("date"), new ConfigValueString("HH:mm:ss,SSS"))));
   }
 
 

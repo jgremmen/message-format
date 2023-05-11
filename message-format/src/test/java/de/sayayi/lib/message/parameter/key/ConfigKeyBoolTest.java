@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.parameter.key;
 
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,95 +32,95 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class ConfigKeyBoolTest
 {
-  private MessageSupportAccessor accessor;
+  private MessageAccessor messageAccessor;
 
 
   @BeforeEach
   void init() {
-    accessor = MessageSupportFactory.shared().getAccessor();
+    messageAccessor = MessageSupportFactory.shared().getMessageAccessor();
   }
 
 
   @Test
   void testMatchNull() {
-    assertEquals(MISMATCH, TRUE.match(accessor, accessor.getLocale(), null));
+    assertEquals(MISMATCH, TRUE.match(messageAccessor, messageAccessor.getLocale(), null));
   }
 
 
   @Test
   void testMatchBoolean()
   {
-    val locale = accessor.getLocale();
+    val locale = messageAccessor.getLocale();
 
-    assertEquals(EXACT, TRUE.match(accessor, locale, true));
-    assertEquals(MISMATCH, TRUE.match(accessor, locale, false));
-    assertEquals(MISMATCH, FALSE.match(accessor, locale, true));
-    assertEquals(EXACT, FALSE.match(accessor, locale, false));
+    assertEquals(EXACT, TRUE.match(messageAccessor, locale, true));
+    assertEquals(MISMATCH, TRUE.match(messageAccessor, locale, false));
+    assertEquals(MISMATCH, FALSE.match(messageAccessor, locale, true));
+    assertEquals(EXACT, FALSE.match(messageAccessor, locale, false));
   }
 
 
   @Test
   void testMatchNumber()
   {
-    val locale = accessor.getLocale();
+    val locale = messageAccessor.getLocale();
 
     // byte
-    assertEquals(MISMATCH, TRUE.match(accessor, locale, (byte)0));
-    assertEquals(LENIENT, TRUE.match(accessor, locale, (byte)100));
+    assertEquals(MISMATCH, TRUE.match(messageAccessor, locale, (byte)0));
+    assertEquals(LENIENT, TRUE.match(messageAccessor, locale, (byte)100));
 
-    assertEquals(LENIENT, FALSE.match(accessor, locale, (byte)0));
-    assertEquals(MISMATCH, FALSE.match(accessor, locale, Byte.MIN_VALUE));
+    assertEquals(LENIENT, FALSE.match(messageAccessor, locale, (byte)0));
+    assertEquals(MISMATCH, FALSE.match(messageAccessor, locale, Byte.MIN_VALUE));
 
     // integer
-    assertEquals(MISMATCH, TRUE.match(accessor, locale, 0));
-    assertEquals(LENIENT, TRUE.match(accessor, locale, 100));
+    assertEquals(MISMATCH, TRUE.match(messageAccessor, locale, 0));
+    assertEquals(LENIENT, TRUE.match(messageAccessor, locale, 100));
 
-    assertEquals(LENIENT, FALSE.match(accessor, locale, 0));
-    assertEquals(MISMATCH, FALSE.match(accessor, locale, Integer.MAX_VALUE));
+    assertEquals(LENIENT, FALSE.match(messageAccessor, locale, 0));
+    assertEquals(MISMATCH, FALSE.match(messageAccessor, locale, Integer.MAX_VALUE));
 
     // long
-    assertEquals(MISMATCH, TRUE.match(accessor, locale, 0L));
-    assertEquals(LENIENT, TRUE.match(accessor, locale, -100L));
+    assertEquals(MISMATCH, TRUE.match(messageAccessor, locale, 0L));
+    assertEquals(LENIENT, TRUE.match(messageAccessor, locale, -100L));
 
-    assertEquals(LENIENT, FALSE.match(accessor, locale, 0L));
-    assertEquals(MISMATCH, FALSE.match(accessor, locale, Long.MIN_VALUE));
+    assertEquals(LENIENT, FALSE.match(messageAccessor, locale, 0L));
+    assertEquals(MISMATCH, FALSE.match(messageAccessor, locale, Long.MIN_VALUE));
   }
 
 
   @Test
   void testMatchString()
   {
-    val locale = accessor.getLocale();
+    val locale = messageAccessor.getLocale();
 
-    assertEquals(EQUIVALENT, TRUE.match(accessor, locale, "true"));
-    assertEquals(MISMATCH, TRUE.match(accessor, locale, "false"));
-    assertEquals(EQUIVALENT, TRUE.match(accessor, locale, "TRUE"));
+    assertEquals(EQUIVALENT, TRUE.match(messageAccessor, locale, "true"));
+    assertEquals(MISMATCH, TRUE.match(messageAccessor, locale, "false"));
+    assertEquals(EQUIVALENT, TRUE.match(messageAccessor, locale, "TRUE"));
 
-    assertEquals(EQUIVALENT, FALSE.match(accessor, locale, "false"));
-    assertEquals(MISMATCH, FALSE.match(accessor, locale, "true"));
-    assertEquals(EQUIVALENT, FALSE.match(accessor, locale, "FALSE"));
+    assertEquals(EQUIVALENT, FALSE.match(messageAccessor, locale, "false"));
+    assertEquals(MISMATCH, FALSE.match(messageAccessor, locale, "true"));
+    assertEquals(EQUIVALENT, FALSE.match(messageAccessor, locale, "FALSE"));
 
-    assertEquals(LENIENT, TRUE.match(accessor, locale, "0.9"));
-    assertEquals(MISMATCH, TRUE.match(accessor, locale, "-0"));
-    assertEquals(LENIENT, TRUE.match(accessor, locale, "+1234567890000000"));
+    assertEquals(LENIENT, TRUE.match(messageAccessor, locale, "0.9"));
+    assertEquals(MISMATCH, TRUE.match(messageAccessor, locale, "-0"));
+    assertEquals(LENIENT, TRUE.match(messageAccessor, locale, "+1234567890000000"));
 
-    assertEquals(LENIENT, FALSE.match(accessor, locale, "+0"));
-    assertEquals(MISMATCH, FALSE.match(accessor, locale, "1e-100"));
-    assertEquals(MISMATCH, FALSE.match(accessor, locale, "-1234567890000000"));
+    assertEquals(LENIENT, FALSE.match(messageAccessor, locale, "+0"));
+    assertEquals(MISMATCH, FALSE.match(messageAccessor, locale, "1e-100"));
+    assertEquals(MISMATCH, FALSE.match(messageAccessor, locale, "-1234567890000000"));
   }
 
 
   @Test
   void testMatchCharacter()
   {
-    val locale = accessor.getLocale();
+    val locale = messageAccessor.getLocale();
 
-    assertEquals(LENIENT, TRUE.match(accessor, locale, '5'));
-    assertEquals(MISMATCH, TRUE.match(accessor, locale, (char)1));
-    assertEquals(MISMATCH, TRUE.match(accessor, locale, 'Y'));
+    assertEquals(LENIENT, TRUE.match(messageAccessor, locale, '5'));
+    assertEquals(MISMATCH, TRUE.match(messageAccessor, locale, (char)1));
+    assertEquals(MISMATCH, TRUE.match(messageAccessor, locale, 'Y'));
 
-    assertEquals(LENIENT, FALSE.match(accessor, locale, '0'));
-    assertEquals(MISMATCH, FALSE.match(accessor, locale, '9'));
-    assertEquals(MISMATCH, FALSE.match(accessor, locale, (char)0));
+    assertEquals(LENIENT, FALSE.match(messageAccessor, locale, '0'));
+    assertEquals(MISMATCH, FALSE.match(messageAccessor, locale, '9'));
+    assertEquals(MISMATCH, FALSE.match(messageAccessor, locale, (char)0));
   }
 }

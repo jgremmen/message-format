@@ -44,14 +44,14 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
   {
     // handle empty, !empty, null and !null first
     Message.WithSpaces msg =
-        formatterContext.getMapMessage(value, EMPTY_NULL_TYPE).orElse(null);
+        formatterContext.getConfigMessage(value, EMPTY_NULL_TYPE).orElse(null);
     if (msg != null)
       return formatterContext.format(msg);
 
     final Text text = formatValue(formatterContext, value);
 
     // handle empty, !empty, null and !null for result
-    msg = formatterContext.getMapMessage(text.getText(), EMPTY_NULL_TYPE).orElse(null);
+    msg = formatterContext.getConfigMessage(text.getText(), EMPTY_NULL_TYPE).orElse(null);
 
     return msg == null ? text : formatterContext.format(msg);
   }

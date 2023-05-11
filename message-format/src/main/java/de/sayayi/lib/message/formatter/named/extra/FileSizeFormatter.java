@@ -97,7 +97,7 @@ public final class FileSizeFormatter extends AbstractParameterFormatter
 
     final String unit = UNITS[unitIndex];
     final Message.WithSpaces unitMessage =
-        formatterContext.getMapMessage(unit, EnumSet.of(STRING)).orElse(null);
+        formatterContext.getConfigMessage(unit, EnumSet.of(STRING)).orElse(null);
 
     if ((unitMessage != null && unitMessage.isSpaceBefore()) ||
         formatterContext.getConfigValueBool("space").orElse(FALSE))

@@ -43,12 +43,13 @@ import static java.util.Locale.forLanguageTag;
 public interface MessageSupport
 {
   /**
-   * Returns the message support accessor instance.
+   * Returns the message accessor instance.
    *
-   * @return  message support accessor, never {@code null}
+   * @return  message accessor, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull MessageSupportAccessor getAccessor();
+  @NotNull
+  MessageAccessor getMessageAccessor();
 
 
   /**
@@ -340,7 +341,7 @@ public interface MessageSupport
     @Contract(mutates = "this")
     default void addMessage(@NotNull String code,
                             @NotNull @Language("MessageFormat") String message) {
-      addMessage(getAccessor().getMessageFactory().parseMessage(code, message));
+      addMessage(getMessageAccessor().getMessageFactory().parseMessage(code, message));
     }
 
 
@@ -400,8 +401,7 @@ public interface MessageSupport
      * Set the default {@code value} for configuration parameter {@code name}.
      * <p>
      * If a parameter formatter is looking for a boolean configuration value, which has not been
-     * provided by the message parameter, the message support accessor is used to get a default
-     * value.
+     * provided by the message parameter, the message accessor is used to get a default value.
      *
      * @param name   configuration parameter name, not {@code null} or empty
      * @param value  default value
@@ -417,8 +417,7 @@ public interface MessageSupport
      * Set the default {@code value} for configuration parameter {@code name}.
      * <p>
      * If a parameter formatter is looking for a long configuration value, which has not been
-     * provided by the message parameter, the message support accessor is used to get a default
-     * value.
+     * provided by the message parameter, the message accessor is used to get a default value.
      *
      * @param name   configuration parameter name, not {@code null} or empty
      * @param value  default value
@@ -433,8 +432,7 @@ public interface MessageSupport
      * Set the default {@code value} for configuration parameter {@code name}.
      * <p>
      * If a parameter formatter is looking for a string configuration value, which has not been
-     * provided by the message parameter, the message support accessor is used to get a default
-     * value.
+     * provided by the message parameter, the message accessor is used to get a default value.
      *
      * @param name   configuration parameter name, not {@code null} or empty
      * @param value  default value
@@ -450,8 +448,7 @@ public interface MessageSupport
      * Set the default {@code value} for configuration parameter {@code name}.
      * <p>
      * If a parameter formatter is looking for a message configuration value, which has not been
-     * provided by the message parameter, the message support accessor is used to get a default
-     * value.
+     * provided by the message parameter, the message accessor is used to get a default value.
      *
      * @param name   configuration parameter name, not {@code null} or empty
      * @param value  default value
@@ -460,8 +457,7 @@ public interface MessageSupport
      */
     @Contract(mutates = "this")
     @NotNull ConfigurableMessageSupport setDefaultParameterConfig(
-        @NotNull String name,
-        @NotNull Message.WithSpaces value);
+        @NotNull String name, @NotNull Message.WithSpaces value);
 
 
     /**
@@ -530,7 +526,7 @@ public interface MessageSupport
 
 
 
-  interface MessageSupportAccessor
+  interface MessageAccessor extends TemplateAccessor
   {
     /**
      * Returns the locale configured for this message support instance.
@@ -550,26 +546,6 @@ public interface MessageSupport
      */
     @Contract(value = "-> new", pure = true)
     @NotNull Set<String> getMessageCodes();
-
-
-    /**
-     * Returns all templates contained in this message builder.
-     *
-     * @return  unmodifiable set with all template names, never {@code null}
-     */
-    @Contract(value = "-> new", pure = true)
-    @NotNull Set<String> getTemplateNames();
-
-
-    /**
-     * Returns the template message associated with {@code name}.
-     *
-     * @param name  template name
-     *
-     * @return  template message or {@code null} if no template with this name exists
-     */
-    @Contract(pure = true)
-    Message getTemplateByName(@NotNull String name);
 
 
     /**
@@ -593,18 +569,6 @@ public interface MessageSupport
      */
     @Contract(pure = true)
     Message.WithCode getMessageByCode(@NotNull String code);
-
-
-    /**
-     * Tells if this builder contains a template with {@code name}.
-     *
-     * @param name  template name to check, or {@code null}
-     *
-     * @return  {@code true} if {@code name} is not {@code null} and this builder contains a
-     *          template with this name, {@code false} otherwise
-     */
-    @Contract(value = "null -> false", pure = true)
-    boolean hasTemplateWithName(String name);
 
 
     /**
@@ -660,6 +624,43 @@ public interface MessageSupport
      */
     @Contract(pure = true)
     @NotNull MessageFactory getMessageFactory();
+  }
+
+
+
+
+  interface TemplateAccessor
+  {
+    /**
+     * Returns all templates contained in this message builder.
+     *
+     * @return  unmodifiable set with all template names, never {@code null}
+     */
+    @Contract(value = "-> new", pure = true)
+    @NotNull Set<String> getTemplateNames();
+
+
+    /**
+     * Returns the template message associated with {@code name}.
+     *
+     * @param name  template name
+     *
+     * @return  template message or {@code null} if no template with this name exists
+     */
+    @Contract(pure = true)
+    Message getTemplateByName(@NotNull String name);
+
+
+    /**
+     * Tells if this builder contains a template with {@code name}.
+     *
+     * @param name  template name to check, or {@code null}
+     *
+     * @return  {@code true} if {@code name} is not {@code null} and this builder contains a
+     *          template with this name, {@code false} otherwise
+     */
+    @Contract(value = "null -> false", pure = true)
+    boolean hasTemplateWithName(String name);
 
 
     /**

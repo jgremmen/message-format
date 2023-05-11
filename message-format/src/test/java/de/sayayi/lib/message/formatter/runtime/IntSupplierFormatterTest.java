@@ -45,15 +45,17 @@ class IntSupplierFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new IntSupplierFormatter()), NO_CACHE_INSTANCE)
         .setLocale(ROOT)
-        .getAccessor();
+        .getMessageAccessor();
 
-    assertEquals(nullText(), format(accessor, null));
-    assertEquals(noSpaceText("0"), format(accessor, (IntSupplier)() -> 0));
-    assertEquals(noSpaceText(Integer.toString(MAX_VALUE)), format(accessor, (IntSupplier)() -> MAX_VALUE));
-    assertEquals(noSpaceText(Integer.toString(MIN_VALUE)), format(accessor, (IntSupplier)() -> MIN_VALUE));
-    assertEquals(noSpaceText("123456789"), format(accessor, (IntSupplier)() -> 123456789));
+    assertEquals(nullText(), format(messageAccessor, null));
+    assertEquals(noSpaceText("0"), format(messageAccessor, (IntSupplier)() -> 0));
+    assertEquals(noSpaceText(Integer.toString(MAX_VALUE)),
+        format(messageAccessor, (IntSupplier)() -> MAX_VALUE));
+    assertEquals(noSpaceText(Integer.toString(MIN_VALUE)),
+        format(messageAccessor, (IntSupplier)() -> MIN_VALUE));
+    assertEquals(noSpaceText("123456789"), format(messageAccessor, (IntSupplier)() -> 123456789));
   }
 }

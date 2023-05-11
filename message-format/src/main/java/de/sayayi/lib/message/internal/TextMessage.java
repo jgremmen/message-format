@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
@@ -90,7 +90,7 @@ public final class TextMessage implements Message.WithSpaces
 
 
   @Override
-  public @NotNull String format(@NotNull MessageSupportAccessor messageSupport,
+  public @NotNull String format(@NotNull MessageAccessor messageAccessor,
                                 @NotNull Parameters parameters) {
     return text == null ? "" : text;
   }

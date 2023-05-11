@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.parameter.key;
 
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.parameter.ParamConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -65,14 +65,14 @@ public interface ConfigKey extends Serializable
   /**
    * Calculates a match result for the given {@code value} with respect to this key.
    *
-   * @param messageSupportAccessor  message context instance, not {@code null}
-   * @param locale          formatting locale, not {@code null}
-   * @param value           value to compare with this key
+   * @param messageAccessor  message context instance, not {@code null}
+   * @param locale           formatting locale, not {@code null}
+   * @param value            value to compare with this key
    *
    * @return  matching result, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull MatchResult match(@NotNull MessageSupportAccessor messageSupportAccessor,
+  @NotNull MatchResult match(@NotNull MessageAccessor messageAccessor,
                              @NotNull Locale locale, Object value);
 
 

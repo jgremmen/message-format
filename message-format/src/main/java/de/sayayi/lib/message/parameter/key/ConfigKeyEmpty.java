@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.parameter.key;
 
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.pack.PackInputStream;
@@ -62,13 +62,13 @@ public final class ConfigKeyEmpty implements ConfigKey
 
 
   @Override
-  public @NotNull MatchResult match(@NotNull MessageSupportAccessor messageSupportAccessor,
+  public @NotNull MatchResult match(@NotNull MessageAccessor messageAccessor,
                                     @NotNull Locale locale, Object value)
   {
     if (value == null)
       return compareType == EQ ? TYPELESS_LENIENT : MISMATCH;
 
-    for(ParameterFormatter formatter: messageSupportAccessor.getFormatters(value.getClass()))
+    for(ParameterFormatter formatter: messageAccessor.getFormatters(value.getClass()))
       if (formatter instanceof EmptyMatcher)
       {
         final MatchResult result = ((EmptyMatcher)formatter).matchEmpty(compareType, value);

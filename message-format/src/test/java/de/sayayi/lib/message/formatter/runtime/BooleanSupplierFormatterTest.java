@@ -43,13 +43,13 @@ class BooleanSupplierFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new BooleanSupplierFormatter()), NO_CACHE_INSTANCE)
         .setLocale(ROOT)
-        .getAccessor();
+        .getMessageAccessor();
 
-    assertEquals(nullText(), format(accessor, null));
-    assertEquals(noSpaceText("true"), format(accessor, (BooleanSupplier)() -> true));
-    assertEquals(noSpaceText("false"), format(accessor, (BooleanSupplier)() -> false));
+    assertEquals(nullText(), format(messageAccessor, null));
+    assertEquals(noSpaceText("true"), format(messageAccessor, (BooleanSupplier)() -> true));
+    assertEquals(noSpaceText("false"), format(messageAccessor, (BooleanSupplier)() -> false));
   }
 }

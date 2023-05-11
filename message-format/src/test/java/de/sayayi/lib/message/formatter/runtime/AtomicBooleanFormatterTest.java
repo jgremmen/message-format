@@ -42,13 +42,13 @@ class AtomicBooleanFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormat()
   {
-    val accessor = MessageSupportFactory
+    val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new AtomicBooleanFormatter()), NO_CACHE_INSTANCE)
         .setLocale("de-DE")
-        .getAccessor();
+        .getMessageAccessor();
 
-    assertEquals(nullText(), format(accessor, null));
-    assertEquals(noSpaceText("true"), format(accessor, new AtomicBoolean(true)));
-    assertEquals(noSpaceText("false"), format(accessor, new AtomicBoolean(false)));
+    assertEquals(nullText(), format(messageAccessor, null));
+    assertEquals(noSpaceText("true"), format(messageAccessor, new AtomicBoolean(true)));
+    assertEquals(noSpaceText("false"), format(messageAccessor, new AtomicBoolean(false)));
   }
 }

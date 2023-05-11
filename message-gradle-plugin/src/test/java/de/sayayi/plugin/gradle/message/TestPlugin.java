@@ -15,7 +15,7 @@
  */
 package de.sayayi.plugin.gradle.message;
 
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import lombok.val;
@@ -212,13 +212,13 @@ public class TestPlugin
   }
 
 
-  private MessageSupportAccessor readMessagePack(File pack) throws IOException
+  private MessageAccessor readMessagePack(File pack) throws IOException
   {
     val messageSupport = MessageSupportFactory
         .create(new GenericFormatterService(), NO_CACHE_INSTANCE);
 
     return messageSupport
         .importMessages(newInputStream(pack.toPath()))
-        .getAccessor();
+        .getMessageAccessor();
   }
 }

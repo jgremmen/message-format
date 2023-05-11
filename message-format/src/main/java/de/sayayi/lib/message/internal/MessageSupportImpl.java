@@ -59,7 +59,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   private final @NotNull Map<String,ConfigValue> defaultParameterConfig = new TreeMap<>();
   private final @NotNull Map<String,Message.WithCode> messages = new TreeMap<>();
   private final @NotNull Map<String,Message> templates = new TreeMap<>();
-  private final @NotNull MessageSupportAccessor accessor;
+  private final @NotNull MessageAccessor messageAccessor;
 
   private @NotNull Locale locale;
   private @NotNull MessageFilter messageFilter;
@@ -74,7 +74,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     this.messageFactory = requireNonNull(messageFactory,
         "messageFactory must not be null");
 
-    accessor = new Accessor();
+    messageAccessor = new Accessor();
     locale = Locale.getDefault();
     messageFilter = this::failOnDuplicateMessage;
     templateFilter = this::failOnDuplicateTemplate;
@@ -82,8 +82,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull MessageSupportAccessor getAccessor() {
-    return accessor;
+  public @NotNull MessageAccessor getMessageAccessor() {
+    return messageAccessor;
   }
 
 
@@ -428,7 +428,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
     @Override
     public @NotNull String format() {
-      return getMessage().format(getAccessor(), new Params(this));
+      return getMessage().format(messageAccessor, new Params(this));
     }
 
 
@@ -448,7 +448,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
 
-  private final class Accessor implements MessageSupportAccessor
+  private final class Accessor implements MessageAccessor
   {
     @Override
     public @NotNull MessageFactory getMessageFactory() {

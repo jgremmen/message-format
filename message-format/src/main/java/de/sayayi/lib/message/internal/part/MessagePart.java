@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.internal.part;
 
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.SpacesAware;
 import de.sayayi.lib.message.parameter.ParamConfig;
 import org.jetbrains.annotations.Contract;
@@ -113,14 +113,13 @@ public interface MessagePart extends SpacesAware, Serializable
     /**
      * Returns the formatted parameter as text.
      *
-     * @param messageSupport  message support instance, not {@code null}
-     * @param parameters      formatting parameters, not {@code null}
+     * @param messageAccessor  message support instance, not {@code null}
+     * @param parameters       formatting parameters, not {@code null}
      *
      * @return  formatted parameter as text part, never {@code null}
      */
     @Contract(pure = true)
-    @NotNull Text getText(@NotNull MessageSupportAccessor messageSupport,
-                          @NotNull Parameters parameters);
+    @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters);
   }
 
 
@@ -129,7 +128,7 @@ public interface MessagePart extends SpacesAware, Serializable
   /**
    * Message part containing a template reference to be evaluated during formatting.
    *
-   * @see MessageSupportAccessor#getTemplateByName(String)
+   * @see MessageAccessor#getTemplateByName(String)
    *
    * @since 0.8.0
    */
@@ -147,13 +146,12 @@ public interface MessagePart extends SpacesAware, Serializable
     /**
      * Returns the formatted template as text.
      *
-     * @param messageSupport  message support instance, not {@code null}
-     * @param parameters      formatting parameters, not {@code null}
+     * @param messageAccessor  message support instance, not {@code null}
+     * @param parameters       formatting parameters, not {@code null}
      *
      * @return  formatted template as text part, never {@code null}
      */
     @Contract(pure = true)
-    @NotNull Text getText(@NotNull MessageSupportAccessor messageSupport,
-                          @NotNull Parameters parameters);
+    @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters);
   }
 }

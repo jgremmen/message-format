@@ -187,7 +187,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
     {
       getLogger().debug("Validating referenced templates");
 
-      val missingTemplateNames = new ArrayList<>(messageSupport.getAccessor()
+      val missingTemplateNames = new ArrayList<>(messageSupport.getMessageAccessor()
           .findMissingTemplates(this::messageCodeFilter));
       val count = missingTemplateNames.size();
 
@@ -211,7 +211,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   private void pack_codesAction(@NotNull MessageSupport messageSupport)
   {
     if (codesAction != null)
-      codesAction.execute(messageSupport.getAccessor().getMessageCodes());
+      codesAction.execute(messageSupport.getMessageAccessor().getMessageCodes());
   }
 
 
@@ -311,23 +311,23 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void configureDuplicateFailStrategy(@NotNull ConfigurableMessageSupport messageSupport)
   {
-    val accessor = messageSupport.getAccessor();
+    val messageAccessor = messageSupport.getMessageAccessor();
 
     messageSupport.setMessageFilter(message -> {
       final String code = message.getCode();
 
-      if (!accessor.hasMessageWithCode(code))
+      if (!messageAccessor.hasMessageWithCode(code))
         return true;
-      else if (!accessor.getMessageByCode(code).isSame(message))
+      else if (!messageAccessor.getMessageByCode(code).isSame(message))
         throw new DuplicateMessageException(code, logDuplicateMessage(ERROR, code));
 
       return false;
     });
 
     messageSupport.setTemplateFilter((name, template) -> {
-      if (!accessor.hasTemplateWithName(name))
+      if (!messageAccessor.hasTemplateWithName(name))
         return true;
-      else if (!accessor.getTemplateByName(name).isSame(template))
+      else if (!messageAccessor.getTemplateByName(name).isSame(template))
         throw new DuplicateTemplateException(name, logDuplicateTemplate(ERROR, name));
 
       return false;
@@ -338,23 +338,23 @@ public abstract class MessageFormatPackTask extends DefaultTask
   private void configureDuplicateIgnoreStrategy(@NotNull ConfigurableMessageSupport messageSupport,
                                                 boolean warn)
   {
-    val accessor = messageSupport.getAccessor();
+    val messageAccessor = messageSupport.getMessageAccessor();
 
     messageSupport.setMessageFilter(message -> {
       final String code = message.getCode();
 
-      if (!accessor.hasMessageWithCode(code))
+      if (!messageAccessor.hasMessageWithCode(code))
         return true;
-      else if (warn && !accessor.getMessageByCode(code).isSame(message))
+      else if (warn && !messageAccessor.getMessageByCode(code).isSame(message))
         logDuplicateMessage(WARN, code);
 
       return false;
     });
 
     messageSupport.setTemplateFilter((name, template) -> {
-      if (!accessor.hasTemplateWithName(name))
+      if (!messageAccessor.hasTemplateWithName(name))
         return true;
-      else if (warn && !accessor.getTemplateByName(name).isSame(template))
+      else if (warn && !messageAccessor.getTemplateByName(name).isSame(template))
         logDuplicateTemplate(WARN, name);
 
       return false;
@@ -365,14 +365,14 @@ public abstract class MessageFormatPackTask extends DefaultTask
   private void configureDuplicateOverrideStrategy(
       @NotNull ConfigurableMessageSupport messageSupport, boolean warn)
   {
-    val accessor = messageSupport.getAccessor();
+    val messageAccessor = messageSupport.getMessageAccessor();
 
     messageSupport.setMessageFilter(message -> {
       final String code = message.getCode();
 
-      if (warn && accessor.hasMessageWithCode(code))
+      if (warn && messageAccessor.hasMessageWithCode(code))
       {
-        if (accessor.getMessageByCode(code).isSame(message))
+        if (messageAccessor.getMessageByCode(code).isSame(message))
           return false;
 
         logDuplicateMessage(WARN, code);
@@ -382,9 +382,9 @@ public abstract class MessageFormatPackTask extends DefaultTask
     });
 
     messageSupport.setTemplateFilter((name, template) -> {
-      if (warn && accessor.hasTemplateWithName(name))
+      if (warn && messageAccessor.hasTemplateWithName(name))
       {
-        if (accessor.getTemplateByName(name).isSame(template))
+        if (messageAccessor.getTemplateByName(name).isSame(template))
           return false;
 
         logDuplicateTemplate(WARN, name);

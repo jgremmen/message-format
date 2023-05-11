@@ -17,7 +17,7 @@ package de.sayayi.lib.message.parameter;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.MessageSupport.MessageSupportAccessor;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.parameter.key.ConfigKey;
 import de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.parameter.value.ConfigValue;
@@ -83,7 +83,7 @@ public final class ParamConfig implements Serializable
 
 
   @Contract(pure = true)
-  public ConfigValue find(@NotNull MessageSupportAccessor messageSupportAccessor, Object key,
+  public ConfigValue find(@NotNull MessageAccessor messageAccessor, Object key,
                           @NotNull Parameters parameters, @NotNull Set<ConfigKey.Type> keyTypes,
                           Set<ConfigValue.Type> valueTypes)
   {
@@ -100,7 +100,7 @@ public final class ParamConfig implements Serializable
         if (keyTypes.contains(configKey.getType()) &&
             (valueTypes == null || valueTypes.contains(configValue.getType())))
         {
-          final MatchResult matchResult = configKey.match(messageSupportAccessor, locale, key);
+          final MatchResult matchResult = configKey.match(messageAccessor, locale, key);
 
           if (matchResult == EXACT)
             return configValue;
@@ -118,13 +118,12 @@ public final class ParamConfig implements Serializable
 
 
   @Contract(pure = true)
-  public Message.WithSpaces getMessage(@NotNull MessageSupportAccessor messageSupportAccessor,
+  public Message.WithSpaces getMessage(@NotNull MessageAccessor messageAccessor,
                                        Object key, @NotNull Parameters parameters,
                                        @NotNull Set<ConfigKey.Type> keyTypes,
                                        boolean includeDefault)
   {
-    ConfigValue configValue =
-        find(messageSupportAccessor, key, parameters, keyTypes, STRING_MESSAGE_TYPE);
+    ConfigValue configValue = find(messageAccessor, key, parameters, keyTypes, STRING_MESSAGE_TYPE);
 
     if (configValue == null)
     {
@@ -137,7 +136,7 @@ public final class ParamConfig implements Serializable
     }
 
     return configValue.getType() == Type.STRING
-        ? ((ConfigValueString)configValue).asMessage(messageSupportAccessor.getMessageFactory())
+        ? ((ConfigValueString)configValue).asMessage(messageAccessor.getMessageFactory())
         : (Message.WithSpaces)configValue.asObject();
   }
 
