@@ -526,6 +526,9 @@ public interface MessageSupport
 
 
 
+  /**
+   * This interface allows access to all messages and templates published to the message support.
+   */
   interface MessageAccessor extends TemplateAccessor
   {
     /**
@@ -629,6 +632,9 @@ public interface MessageSupport
 
 
 
+  /**
+   * This interface allows access to all templates published to the message support.
+   */
   interface TemplateAccessor
   {
     /**
