@@ -177,6 +177,48 @@ public interface MessageSupport
 
 
     /**
+     * Sets a byte value for this message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return  message configurer instance for this message, never {@code null}
+     */
+    @Contract(value = "_, _ -> this", mutates = "this")
+    default @NotNull MessageConfigurer<M> with(@NotNull String parameter, byte value) {
+      return with(parameter, Byte.valueOf(value));
+    }
+
+
+    /**
+     * Sets a character value for this message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return  message configurer instance for this message, never {@code null}
+     */
+    @Contract(value = "_, _ -> this", mutates = "this")
+    default @NotNull MessageConfigurer<M> with(@NotNull String parameter, char value) {
+      return with(parameter, Character.valueOf(value));
+    }
+
+
+    /**
+     * Sets a short value for this message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return  message configurer instance for this message, never {@code null}
+     */
+    @Contract(value = "_, _ -> this", mutates = "this")
+    default @NotNull MessageConfigurer<M> with(@NotNull String parameter, short value) {
+      return with(parameter, Short.valueOf(value));
+    }
+
+
+    /**
      * Sets an integer value for this message.
      *
      * @param parameter  parameter name, not {@code null}
@@ -671,7 +713,7 @@ public interface MessageSupport
 
     /**
      * Returns a collection of template names, that are referenced from messages but have not
-     * been published with this message support.
+     * been published to this message support.
      * <p>
      * The messages that are analysed can be filtered by providing a {@code messageCodeFilter}.
      * If this parameter is {@code null} all known messages are analysed.
