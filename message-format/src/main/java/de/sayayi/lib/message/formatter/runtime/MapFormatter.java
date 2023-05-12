@@ -125,7 +125,6 @@ public final class MapFormatter extends AbstractParameterFormatter
 
 
 
-
   private static final class KeyValueParameters implements Parameters
   {
     private final Locale locale;
