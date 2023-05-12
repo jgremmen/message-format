@@ -22,19 +22,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
 
-import static java.util.Collections.*;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.synchronizedMap;
 import static java.util.Objects.requireNonNull;
 
 
 /**
  * @author Jeroen Gremmen
  */
+@SuppressWarnings("UnstableApiUsage")
 public class GenericFormatterService implements FormatterService.WithRegistry
 {
   private static final Comparator<Class<?>> CLASS_SORTER =
@@ -139,101 +137,59 @@ public class GenericFormatterService implements FormatterService.WithRegistry
     if (type.isPrimitive() && !typeOrderMap.containsKey(type))
       type = WRAPPER_CLASS_MAP.get(type);
 
-    final Set<Class<?>> types = new HashSet<>();
-    types.add(Object.class);
+    // sort types by type order
+    final List<FormattableType> formattableTypes = new ArrayList<>(4);
+    Byte order;
 
-    while(type != null)
+    for(Class<?> t: resolveFormattersForType_collectTypes(type))
+      if ((order = typeOrderMap.get(t)) != null)
+        formattableTypes.add(new FormattableType(t, order));
+
+    final int typeCount = formattableTypes.size();
+
+    if (typeCount == 0)
+      return singletonList(typeFormatters.get(Object.class));
+    else if (typeCount == 1)
+      return singletonList(typeFormatters.get(formattableTypes.get(0).getType()));
+    else
     {
-      types.add(type);
-      types.addAll(getInterfaceTypes(type));
+      final FormattableType[] sortedTypes = formattableTypes.toArray(new FormattableType[typeCount]);
+      Arrays.sort(sortedTypes);
 
-      type = type.getSuperclass();
+      // create list of parameter formatters
+      final ParameterFormatter[] parameterFormatters = new ParameterFormatter[typeCount];
+      for(int n = 0; n < typeCount; n++)
+        parameterFormatters[n] = typeFormatters.get(sortedTypes[n].getType());
+
+      return asList(parameterFormatters);
+    }
+  }
+
+
+  @Contract(pure = true)
+  private @NotNull Set<Class<?>> resolveFormattersForType_collectTypes(Class<?> type)
+  {
+    final Set<Class<?>> collectedTypes = new HashSet<>();
+
+    for(; type != null; type = type.getSuperclass())
+    {
+      collectedTypes.add(type);
+      addInterfaceTypes(type, collectedTypes);
     }
 
-    return types
-        .stream()
-        .map(this::convertToFormattableType)
-        .filter(Objects::nonNull)
-        .sorted()
-        .map(this::convertToParameterFormatter)
-        .collect(ParameterFormatterCollector.INSTANCE);
+    return collectedTypes;
   }
 
 
-  @Contract(pure = true)
-  private FormattableType convertToFormattableType(@NotNull Class<?> type)
+  @Contract(mutates = "param2")
+  private static void addInterfaceTypes(@NotNull Class<?> type,
+                                        @NotNull Set<Class<?>> collectedTypes)
   {
-    final Byte order = typeOrderMap.get(type);
-
-    return order == null ? null : new FormattableType(type, order);
-  }
-
-
-  @Contract(pure = true)
-  private ParameterFormatter convertToParameterFormatter(@NotNull FormattableType formattableType) {
-    return typeFormatters.get(formattableType.getType());
-  }
-
-
-  private static @NotNull Set<Class<?>> getInterfaceTypes(@NotNull Class<?> type)
-  {
-    final Set<Class<?>> interfaceTypes = new LinkedHashSet<>();
-
     for(final Class<?> interfaceType: type.getInterfaces())
-      if (!interfaceTypes.contains(interfaceType))
+      if (!collectedTypes.contains(interfaceType))
       {
-        interfaceTypes.add(interfaceType);
-        interfaceTypes.addAll(getInterfaceTypes(interfaceType));
+        collectedTypes.add(interfaceType);
+        addInterfaceTypes(interfaceType, collectedTypes);
       }
-
-    return interfaceTypes;
-  }
-
-
-
-
-  private enum ParameterFormatterCollector
-      implements Collector<ParameterFormatter,ArrayList<ParameterFormatter>,List<ParameterFormatter>>
-  {
-    INSTANCE;
-
-
-    @Override
-    public Supplier<ArrayList<ParameterFormatter>> supplier() {
-      return () -> new ArrayList<>(8);
-    }
-
-
-    @Override
-    public BiConsumer<ArrayList<ParameterFormatter>,ParameterFormatter> accumulator() {
-      return List::add;
-    }
-
-
-    @Override
-    public BinaryOperator<ArrayList<ParameterFormatter>> combiner() {
-      return (list1, list2) -> { list1.addAll(list2); return list1; };
-    }
-
-
-    @Override
-    public Function<ArrayList<ParameterFormatter>,List<ParameterFormatter>> finisher()
-    {
-      return list -> {
-        if (list.size() == 1)
-          return singletonList(list.get(0));
-
-        // expected size < 8; reduce memory footprint
-        list.trimToSize();
-
-        return unmodifiableList(list);
-      };
-    }
-
-
-    @Override
-    public Set<Characteristics> characteristics() {
-      return emptySet();
-    }
   }
 }
