@@ -54,7 +54,7 @@ class MapFormatterTest extends AbstractFormatterTest
     val message = MessageSupportFactory
         .create(createFormatterService(new MapFormatter(), new IterableFormatter()), NO_CACHE_INSTANCE)
         .setLocale(UK)
-        .message("%{map1} %{map2,map-kv-sep:'   -> '} %{map3,map-kv-sep:':  '}");
+        .message("%{map1} %{map2,map-kv:'%{key}   -> %{value}'} %{map3,map-kv:' %{key}:  %{value} '}");
 
     assertEquals("key=value", message.with("map1", singletonMap("key", "value")).format());
     assertEquals("key -> value",
@@ -97,10 +97,11 @@ class MapFormatterTest extends AbstractFormatterTest
   void testMultiEntry()
   {
     val message = MessageSupportFactory
-        .create(createFormatterService(new MapFormatter(), new IterableFormatter(), new NumberFormatter()),
+        .create(createFormatterService(
+            new MapFormatter(), new IterableFormatter(), new NumberFormatter()),
             NO_CACHE_INSTANCE)
         .setLocale(UK)
-        .message("%{map,map-kv-sep:' -> ',list-sep:', ',list-sep-last:' and ',number:'0000'}");
+        .message("%{map,map-kv:'%{key} -> %{value,number:\"0000\"}',list-sep:', ',list-sep-last:' and '}");
 
     val map = new LinkedHashMap<String,Integer>();
     map.put("map1", 1);
@@ -119,7 +120,7 @@ class MapFormatterTest extends AbstractFormatterTest
     val message = MessageSupportFactory
         .create(createFormatterService(new MapFormatter(), new IterableFormatter(), new BoolFormatter()),
             NO_CACHE_INSTANCE)
-        .message("%{map,map-k-fmt:bool,map-kv-sep:':',list-sep:' / '}");
+        .message("%{map,map-kv:'%{key,bool}:%{value}',list-sep:' / '}");
 
     val map = new LinkedHashMap<Integer,Integer>();
     map.put(10, 1);
