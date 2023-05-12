@@ -70,6 +70,15 @@ public interface FormatterService
 
 
     /**
+     * Sets the {@code order} for a formattable type.
+     * <p>
+     * Formatters are prioritized in ascending order. The first formatter selected will be
+     * the one with the lowest order available for the value type to be formatted.
+     * <p>
+     * The formatter for type {@code Object} must be at order {@code 127} as it is the most
+     * unspecific formatter. By default this formatter is the
+     * {@link StringFormatter StringFormatter} which is a good choice for most applications.
+     *
      * @param type   registered type to change the order for, not {@code null}
      * @param order  new order for the specified type in range 0..127
      *

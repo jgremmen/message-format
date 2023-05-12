@@ -143,7 +143,7 @@ public interface FormatterContext extends Parameters
 
 
   /**
-   * Delegate formatting to next best parameter formatter.
+   * Delegate formatting to the next best parameter formatter.
    * <p>
    * Based on the object type, format and registered formatters, a list of prioritized formatters
    * is calculated and the top formatter is invoked. If that formatter delegates formatting, the
@@ -154,7 +154,7 @@ public interface FormatterContext extends Parameters
    * is thrown. By default the {@code Object} formatter is a string formatter, which will never
    * delegate. However, if this formatter is redefined, it must never delegate formatting.
    * <p>
-   * A named formatter never has a next formatter it can delegate to.
+   * A named-only formatter never has a next formatter it can delegate to.
    *
    * @return  formatted text, never {@code null}
    */
