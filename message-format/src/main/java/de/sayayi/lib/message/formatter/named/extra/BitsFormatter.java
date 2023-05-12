@@ -56,20 +56,19 @@ public final class BitsFormatter extends AbstractParameterFormatter
 
 
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
-    final int bitCount = detectBitCount(formatterContext, value);
+    final int bitCount = detectBitCount(context, value);
     return bitCount > 0 ? noSpaceText(format(bitCount, value)) : emptyText();
   }
 
 
-  private int detectBitCount(@NotNull FormatterContext formatterContext, @NotNull Object value)
+  private int detectBitCount(@NotNull FormatterContext context, @NotNull Object value)
   {
-    final ConfigValue configValue =
-        formatterContext.getConfigValue("bits").orElse(null);
+    final ConfigValue configValue = context.getConfigValue("bits").orElse(null);
 
     if (configValue instanceof ConfigValueString && "auto".equals(configValue.asObject()))
       return autoDetectBitCount(value);

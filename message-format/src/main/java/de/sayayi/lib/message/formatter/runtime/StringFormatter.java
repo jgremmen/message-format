@@ -45,7 +45,7 @@ public final class StringFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     return value == null
         ? nullText()

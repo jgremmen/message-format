@@ -37,14 +37,14 @@ public final class MethodFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
     final Method method = (Method)value;
 
-    switch(formatterContext.getConfigValueString("method").orElse("default"))
+    switch(context.getConfigValueString("method").orElse("default"))
     {
       case "name":
         return noSpaceText(method.getName());
@@ -59,7 +59,7 @@ public final class MethodFormatter extends AbstractParameterFormatter
         return noSpaceText(method.toString());
     }
 
-    return formatterContext.delegateToNextFormatter();
+    return context.delegateToNextFormatter();
   }
 
 

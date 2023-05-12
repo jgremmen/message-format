@@ -68,13 +68,12 @@ public final class BoolFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text format(@NotNull FormatterContext context, Object value)
   {
-    Message.WithSpaces msg =
-        requireNonNull(formatterContext, "formatterContext must not be null")
-            .getConfigValueMessage(value, EMPTY_NULL_TYPE).orElse(null);
+    Message.WithSpaces msg = requireNonNull(context, "context must not be null")
+        .getConfigMapMessage(value, EMPTY_NULL_TYPE).orElse(null);
     if (msg != null)
-      return formatterContext.format(msg);
+      return context.format(msg);
 
     if (value == null)
       return nullText();
@@ -96,15 +95,15 @@ public final class BoolFormatter extends AbstractParameterFormatter
       bool = parseBoolean(String.valueOf(value));
 
     // allow custom messages for true/false value?
-    if ((msg = formatterContext.getConfigValueMessage(bool, BOOL_TYPE).orElse(null)) != null)
-      return formatterContext.format(msg);
+    if ((msg = context.getConfigMapMessage(bool, BOOL_TYPE).orElse(null)) != null)
+      return context.format(msg);
 
     return noSpaceText(Boolean.toString(bool));
   }
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value) {
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, Object value) {
     throw new IllegalStateException();
   }
 

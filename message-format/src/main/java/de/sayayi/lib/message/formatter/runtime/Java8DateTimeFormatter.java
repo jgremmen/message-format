@@ -77,12 +77,12 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
-    final String format = formatterContext.getConfigValueString("date").orElse(null);
+    final String format = context.getConfigValueString("date").orElse(null);
     final DateTimeFormatter formatter;
 
     if (!STYLE.containsKey(format))
@@ -102,7 +102,7 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
 
     String text = formatter
         .withZone(ZoneId.systemDefault())
-        .withLocale(formatterContext.getLocale())
+        .withLocale(context.getLocale())
         .format((Temporal)value).trim();
 
     // strip trailing timezone for local time

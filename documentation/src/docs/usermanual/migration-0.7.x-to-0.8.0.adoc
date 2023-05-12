@@ -55,7 +55,7 @@ public @NotNull Text format(@NotNull MessageContext messageContext,
 [source,java]
 ----
 @Override
-public @NotNull Text format(@NotNull FormatterContext formatterContext,
+public @NotNull Text format(@NotNull FormatterContext context,
                             Object value) {
   ...
 }

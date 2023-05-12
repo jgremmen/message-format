@@ -40,14 +40,14 @@ import static java.util.Collections.singleton;
 public final class URLFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
     final URL url = (URL)value;
 
-    switch(formatterContext.getConfigValueString("url").orElse("external"))
+    switch(context.getConfigValueString("url").orElse("external"))
     {
       case "authority":
         return noSpaceText(url.getAuthority());
@@ -68,16 +68,17 @@ public final class URLFormatter extends AbstractParameterFormatter
         final int port = url.getPort();
         if (port == -1)
         {
-          final Optional<String> portUndef =
-              formatterContext.getConfigValueString("uri-port-undef");
+          final Optional<String> portUndef = context.getConfigValueString("uri-port-undef");
           if (portUndef.isPresent())
             return noSpaceText(portUndef.get());
         }
 
-        final Message.WithSpaces msg =
-            formatterContext.getConfigValueMessage(port, NUMBER_TYPE).orElse(null);
+        final Message.WithSpaces msg = context
+            .getConfigMapMessage(port, NUMBER_TYPE)
+            .orElse(null);
+
         return msg != null
-            ? new TextPart(msg.format(formatterContext.getMessageSupport(), formatterContext),
+            ? new TextPart(msg.format(context.getMessageSupport(), context),
                 msg.isSpaceBefore(), msg.isSpaceAfter())
             : port == -1 ? nullText() : noSpaceText(Integer.toString(port));
       }
@@ -95,7 +96,7 @@ public final class URLFormatter extends AbstractParameterFormatter
         return noSpaceText(url.getRef());
     }
 
-    return formatterContext.delegateToNextFormatter();
+    return context.delegateToNextFormatter();
   }
 
 

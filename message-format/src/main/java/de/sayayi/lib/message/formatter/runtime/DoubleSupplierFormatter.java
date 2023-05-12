@@ -36,12 +36,11 @@ public final class DoubleSupplierFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     return value == null
         ? nullText()
-        : formatterContext.format(((DoubleSupplier)value).getAsDouble(),
-            double.class, true);
+        : context.format(((DoubleSupplier)value).getAsDouble(), double.class, true);
   }
 
 

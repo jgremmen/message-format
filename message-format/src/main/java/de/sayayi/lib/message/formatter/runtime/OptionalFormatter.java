@@ -43,13 +43,13 @@ public final class OptionalFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
     return ((Optional<?>)value)
-        .map(o -> formatterContext.format(o, null, true))
+        .map(o -> context.format(o, null, true))
         .orElseGet(MessagePartFactory::emptyText);
   }
 

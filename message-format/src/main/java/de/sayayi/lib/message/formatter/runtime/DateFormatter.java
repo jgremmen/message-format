@@ -41,17 +41,17 @@ public final class DateFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
     try {
       return noSpaceText(getFormatter(
-          formatterContext.getConfigValueString("date").orElse(null),
-          formatterContext.getLocale()).format(value));
+          context.getConfigValueString("date").orElse(null),
+          context.getLocale()).format(value));
     } catch(IllegalArgumentException ex) {
-      return formatterContext.delegateToNextFormatter();
+      return context.delegateToNextFormatter();
     }
   }
 

@@ -36,11 +36,11 @@ public final class LongSupplierFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     return value == null
         ? nullText()
-        : formatterContext.format(((LongSupplier)value).getAsLong(), long.class, true);
+        : context.format(((LongSupplier)value).getAsLong(), long.class, true);
   }
 
 

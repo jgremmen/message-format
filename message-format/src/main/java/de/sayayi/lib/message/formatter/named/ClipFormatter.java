@@ -39,12 +39,12 @@ public final class ClipFormatter extends AbstractParameterFormatter
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
-    final Text text = formatterContext.format(value, false);
+    final Text text = context.format(value, false);
 
     String s = text.getText();
     if (s == null)
@@ -52,7 +52,7 @@ public final class ClipFormatter extends AbstractParameterFormatter
     s = s.trim();
 
     final int maxSize =
-        (int)Math.max(formatterContext.getConfigValueNumber("clip-size").orElse(64), 8);
+        (int)Math.max(context.getConfigValueNumber("clip-size").orElse(64), 8);
 
     return s.length() <= maxSize
         ? text

@@ -35,7 +35,7 @@ import static java.util.Collections.singleton;
 public final class PackageFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value) {
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value) {
     return value == null ? nullText() : noSpaceText(((Package)value).getName());
   }
 

@@ -37,14 +37,14 @@ import static java.util.Collections.singleton;
 public final class KeyFormatter extends AbstractParameterFormatter
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
     final Key key = (Key)value;
 
-    switch(formatterContext.getConfigValueString("key").orElse("name"))
+    switch(context.getConfigValueString("key").orElse("name"))
     {
       case "algorithm":
         return noSpaceText(key.getAlgorithm());
@@ -53,7 +53,7 @@ public final class KeyFormatter extends AbstractParameterFormatter
         return noSpaceText(key.getFormat());
     }
 
-    return formatterContext.delegateToNextFormatter();
+    return context.delegateToNextFormatter();
   }
 
 

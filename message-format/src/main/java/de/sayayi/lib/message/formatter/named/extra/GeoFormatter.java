@@ -73,12 +73,12 @@ public final class GeoFormatter extends AbstractParameterFormatter
 
 
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
-    final Format fmt = getFormat(formatterContext);
+    final Format fmt = getFormat(context);
     final StringBuilder s = new StringBuilder();
     final double v = ((Number)value).doubleValue();
     final double[] dms = dmsSplitter(fmt, v);
@@ -93,7 +93,7 @@ public final class GeoFormatter extends AbstractParameterFormatter
 
     if (fmt.hasMinutes())
     {
-      final Locale locale = formatterContext.getLocale();
+      final Locale locale = context.getLocale();
 
       s.append(formatMinOrSec(locale, dms[1], fmt.minuteDigits, fmt.zeroPadMinutes)).append('\'');
       if (fmt.separatorAfterMinute)
@@ -112,14 +112,14 @@ public final class GeoFormatter extends AbstractParameterFormatter
       if (fmt.longitude)
       {
         s.append(negative
-            ? formatterContext.getConfigValueString("geo-w").orElse("W")
-            : formatterContext.getConfigValueString("geo-e").orElse("E"));
+            ? context.getConfigValueString("geo-w").orElse("W")
+            : context.getConfigValueString("geo-e").orElse("E"));
       }
       else
       {
         s.append(negative
-            ? formatterContext.getConfigValueString("geo-s").orElse("S")
-            : formatterContext.getConfigValueString("geo-n").orElse("N"));
+            ? context.getConfigValueString("geo-s").orElse("S")
+            : context.getConfigValueString("geo-n").orElse("N"));
       }
     }
 
@@ -127,9 +127,9 @@ public final class GeoFormatter extends AbstractParameterFormatter
   }
 
 
-  private @NotNull Format getFormat(@NotNull FormatterContext formatterContext)
+  private @NotNull Format getFormat(@NotNull FormatterContext context)
   {
-    String formatString = formatterContext.getConfigValueString("geo").orElse("dms");
+    String formatString = context.getConfigValueString("geo").orElse("dms");
     Format format = FORMAT.get(formatString);
 
     return format == null ? parseFormatString(formatString) : format;

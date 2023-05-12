@@ -37,7 +37,7 @@ import static java.util.Collections.singleton;
 public final class PrincipalFormatter extends AbstractParameterFormatter
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value) {
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, Object value) {
     return value == null ? nullText() : noSpaceText(((Principal)value).getName());
   }
 

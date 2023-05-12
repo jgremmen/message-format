@@ -38,12 +38,12 @@ import static java.util.stream.Collectors.joining;
 public final class TypeFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     return value == null
         ? nullText()
-        : noSpaceText(toString((Type) value,
-            formatterContext.getConfigValueString("type").orElse("ju")));
+        : noSpaceText(toString((Type)value,
+            context.getConfigValueString("type").orElse("ju")));
   }
 
 

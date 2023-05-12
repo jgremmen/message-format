@@ -37,14 +37,14 @@ import static java.util.Collections.singleton;
 public final class PathFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
     Path path = (Path)value;
 
-    switch(formatterContext.getConfigValueString("path").orElse("path"))
+    switch(context.getConfigValueString("path").orElse("path"))
     {
       case "name":
         path = path.getFileName();
@@ -73,14 +73,15 @@ public final class PathFormatter extends AbstractParameterFormatter
           return emptyText();
 
         final String extension = name.substring(dotidx + 1);
-        final Message.WithSpaces msg =
-            formatterContext.getConfigValueMessage(extension, STRING_EMPTY_TYPE).orElse(null);
+        final Message.WithSpaces msg = context
+            .getConfigMapMessage(extension, STRING_EMPTY_TYPE)
+            .orElse(null);
 
-        return msg != null ? formatterContext.format(msg) : noSpaceText(extension);
+        return msg != null ? context.format(msg) : noSpaceText(extension);
       }
 
       default:
-        return formatterContext.delegateToNextFormatter();
+        return context.delegateToNextFormatter();
     }
 
     return path == null ? emptyText() : noSpaceText(path.toString());

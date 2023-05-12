@@ -107,11 +107,11 @@ public final class ParameterPart implements Parameter
   public @NotNull Text getText(@NotNull MessageAccessor messageAccessor,
                                @NotNull Parameters parameters)
   {
-    final FormatterContext formatterContext = new FormatterContextImpl(messageAccessor, parameters,
+    final FormatterContext context = new FormatterContextImpl(messageAccessor, parameters,
         parameters.getParameterValue(name), null, format, paramConfig);
 
     try {
-      return addSpaces(formatterContext.delegateToNextFormatter(), spaceBefore, spaceAfter);
+      return addSpaces(context.delegateToNextFormatter(), spaceBefore, spaceAfter);
     } catch(Exception ex) {
       throw new MessageException("failed to format parameter " + name, ex);
     }

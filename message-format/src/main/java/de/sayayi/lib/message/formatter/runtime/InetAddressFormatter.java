@@ -35,14 +35,14 @@ import static java.util.Collections.singleton;
 public final class InetAddressFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
     final InetAddress inetAddress = (InetAddress)value;
 
-    switch(formatterContext.getConfigValueString("inet").orElse("ip"))
+    switch(context.getConfigValueString("inet").orElse("ip"))
     {
       case "name":
         return noSpaceText(inetAddress.getHostName());
@@ -54,7 +54,7 @@ public final class InetAddressFormatter extends AbstractParameterFormatter
         return noSpaceText(inetAddress.getHostAddress());
     }
 
-    return formatterContext.delegateToNextFormatter();
+    return context.delegateToNextFormatter();
   }
 
 

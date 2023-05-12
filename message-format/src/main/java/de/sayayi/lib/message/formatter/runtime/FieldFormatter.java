@@ -38,14 +38,14 @@ public final class FieldFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
     final Field field = (Field)value;
     final StringBuilder formattedField = new StringBuilder();
-    final String format = formatterContext.getConfigValueString("field").orElse("juMTN");
+    final String format = context.getConfigValueString("field").orElse("juMTN");
 
     // c = short class
     // j = no java.lang. prefix

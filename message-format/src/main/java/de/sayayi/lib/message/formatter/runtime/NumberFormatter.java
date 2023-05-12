@@ -53,7 +53,7 @@ public final class NumberFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object v)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object v)
   {
     if (v == null)
       return nullText();
@@ -61,17 +61,17 @@ public final class NumberFormatter extends AbstractParameterFormatter
     final Number value = (Number)v;
 
     // check configuration map for match
-    final Message.WithSpaces msg = formatterContext
-        .getConfigValueMessage(value, NUMBER_TYPE, true)
+    final Message.WithSpaces msg = context
+        .getConfigMapMessage(value, NUMBER_TYPE, true)
         .orElse(null);
     if (msg != null)
-      return formatterContext.format(msg);
+      return context.format(msg);
 
-    final String format = formatterContext.getConfigValueString("number").orElse(null);
+    final String format = context.getConfigValueString("number").orElse(null);
 
     // special case: show number as bool
     if ("bool".equals(format))
-      return formatterContext.format(value, boolean.class);
+      return context.format(value, boolean.class);
 
     if ((format == null || "integer".equals(format)) &&
         (value instanceof BigInteger || value instanceof Long || value instanceof Integer ||
@@ -79,7 +79,7 @@ public final class NumberFormatter extends AbstractParameterFormatter
          value instanceof AtomicLong || value instanceof LongAdder))
       return noSpaceText(value.toString());
 
-    return noSpaceText(getFormatter(format, formatterContext).format(value));
+    return noSpaceText(getFormatter(format, context).format(value));
   }
 
 

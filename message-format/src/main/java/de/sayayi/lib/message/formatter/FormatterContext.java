@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.parameter.key.ConfigKey;
 import de.sayayi.lib.message.parameter.value.ConfigValue;
@@ -50,27 +49,15 @@ public interface FormatterContext extends Parameters
 
 
   @Contract(pure = true)
-  @NotNull Optional<ConfigValue> getConfigValue(
-      Object key, @NotNull Set<ConfigKey.Type> keyTypes, Set<ConfigValue.Type> valueTypes);
-
-
-  @Contract(pure = true)
-  default @NotNull Optional<Message.WithSpaces> getConfigValueMessage(
+  default @NotNull Optional<Message.WithSpaces> getConfigMapMessage(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes) {
-    return getConfigValueMessage(key, keyTypes, false);
+    return getConfigMapMessage(key, keyTypes, false);
   }
 
 
   @Contract(pure = true)
-  @NotNull Optional<Message.WithSpaces> getConfigValueMessage(
+  @NotNull Optional<Message.WithSpaces> getConfigMapMessage(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault);
-
-
-  @Contract(pure = true)
-  default @NotNull Message.WithSpaces getConfigValueMessageOrEmpty(
-      Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault) {
-    return getConfigValueMessage(key, keyTypes, includeDefault).orElse(EmptyMessage.INSTANCE);
-  }
 
 
   /**
@@ -136,6 +123,23 @@ public interface FormatterContext extends Parameters
    */
   @Contract(pure = true)
   @NotNull Optional<Boolean> getConfigValueBool(@NotNull String name);
+
+
+  /**
+   * Gets a message configuration value for named key {@code name}.
+   * <p>
+   * The value is taken from the parameter configuration map. If no such key is found the
+   * message support is queried for a default configuration value.
+   * <p>
+   * If a value is found for the given {@code name} but the type is not a string nor a message,
+   * the method returns {@link Optional#empty()}.
+   *
+   * @param name  parameter configuration key, not {@code null}
+   *
+   * @return  optional message instance representing the found value, never {@code null}
+   */
+  @Contract(pure = true)
+  @NotNull Optional<Message.WithSpaces> getConfigValueMessage(@NotNull String name);
 
 
   /**

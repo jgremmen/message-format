@@ -37,7 +37,6 @@ import java.util.*;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
-import static de.sayayi.lib.message.parameter.key.ConfigKey.NAME_TYPE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
 import static java.util.stream.Collectors.toList;
@@ -75,7 +74,7 @@ public final class MapFormatter extends AbstractParameterFormatter
       return emptyText();
 
     final Message.WithSpaces kvMessage = context
-        .getConfigValueMessage("map-kv", NAME_TYPE).orElse(DEFAULT_KEY_VALUE_MESSAGE);
+        .getConfigValueMessage("map-kv").orElse(DEFAULT_KEY_VALUE_MESSAGE);
     final String keyNull = context.getConfigValueString("map-k-null")
         .map(String::trim).orElse("(null)");
     final String valueNull = context.getConfigValueString("map-v-null")

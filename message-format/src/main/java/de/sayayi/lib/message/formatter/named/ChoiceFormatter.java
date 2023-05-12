@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter.named;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -38,15 +39,16 @@ public final class ChoiceFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text format(@NotNull FormatterContext context, Object value)
   {
-    return formatterContext.format(
-        formatterContext.getConfigValueMessageOrEmpty(value, NO_NAME_KEY_TYPES, true));
+    return context.format(context
+        .getConfigMapMessage(value, NO_NAME_KEY_TYPES, true)
+        .orElse(EmptyMessage.INSTANCE));
   }
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value) {
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, Object value) {
     throw new IllegalStateException();
   }
 }

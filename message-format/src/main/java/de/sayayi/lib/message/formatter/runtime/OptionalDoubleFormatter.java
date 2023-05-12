@@ -44,7 +44,7 @@ public final class OptionalDoubleFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
@@ -53,7 +53,7 @@ public final class OptionalDoubleFormatter extends AbstractParameterFormatter
 
     return !optional.isPresent()
         ? emptyText()
-        : formatterContext.format(optional.getAsDouble(), double.class, true);
+        : context.format(optional.getAsDouble(), double.class, true);
   }
 
 

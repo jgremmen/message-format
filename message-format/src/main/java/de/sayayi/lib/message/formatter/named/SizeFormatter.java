@@ -45,13 +45,13 @@ public final class SizeFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text format(@NotNull FormatterContext context, Object value)
   {
     long size = 0;
 
     if (value != null)
     {
-      final MessageAccessor messageAccessor = formatterContext.getMessageSupport();
+      final MessageAccessor messageAccessor = context.getMessageSupport();
 
       for(ParameterFormatter formatter: messageAccessor.getFormatters(value.getClass()))
         if (formatter instanceof SizeQueryable)
@@ -62,16 +62,16 @@ public final class SizeFormatter extends AbstractParameterFormatter
     }
 
     final Optional<Message.WithSpaces> mappedMessage =
-        formatterContext.getConfigValueMessage(size, NUMBER_TYPE, true);
+        context.getConfigMapMessage(size, NUMBER_TYPE, true);
 
     return mappedMessage.isPresent()
-        ? formatterContext.format(mappedMessage.get())
-        : formatterContext.format(size, long.class);
+        ? context.format(mappedMessage.get())
+        : context.format(size, long.class);
   }
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value) {
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, Object value) {
     throw new IllegalStateException();
   }
 }

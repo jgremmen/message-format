@@ -38,14 +38,14 @@ import static java.util.Collections.singleton;
 public final class FileFormatter extends AbstractParameterFormatter implements SizeQueryable
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
     final File file = (File)value;
 
-    switch(formatterContext.getConfigValueString("file").orElse("absolute-path"))
+    switch(context.getConfigValueString("file").orElse("absolute-path"))
     {
       case "name":
         return noSpaceText(file.getName());
@@ -64,17 +64,18 @@ public final class FileFormatter extends AbstractParameterFormatter implements S
           return emptyText();
 
         final String extension = name.substring(dotidx + 1);
-        final Message.WithSpaces msg =
-            formatterContext.getConfigValueMessage(extension, STRING_EMPTY_TYPE).orElse(null);
+        final Message.WithSpaces msg = context
+            .getConfigMapMessage(extension, STRING_EMPTY_TYPE)
+            .orElse(null);
 
-        return msg != null ? formatterContext.format(msg) : noSpaceText(extension);
+        return msg != null ? context.format(msg) : noSpaceText(extension);
       }
 
       case "absolute-path":
         return noSpaceText(file.getAbsolutePath());
     }
 
-    return formatterContext.delegateToNextFormatter();
+    return context.delegateToNextFormatter();
   }
 
 

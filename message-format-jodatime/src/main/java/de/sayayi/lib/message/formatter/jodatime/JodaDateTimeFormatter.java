@@ -54,19 +54,19 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
-    final String format = formatterContext.getConfigValueString("date").orElse(null);
+    final String format = context.getConfigValueString("date").orElse(null);
     final DateTimeFormatter formatter;
 
     if (!STYLE.containsKey(format))
     {
       formatter = DateTimeFormat
           .forPattern(requireNonNull(format))
-          .withLocale(formatterContext.getLocale());
+          .withLocale(context.getLocale());
     }
     else
     {
@@ -82,7 +82,7 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter
 
       formatter = DateTimeFormat
           .forStyle(new String(style))
-          .withLocale(formatterContext.getLocale());
+          .withLocale(context.getLocale());
     }
 
     return noSpaceText(value instanceof ReadablePartial

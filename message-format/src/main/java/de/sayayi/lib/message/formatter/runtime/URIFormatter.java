@@ -41,14 +41,14 @@ import static java.util.Collections.singleton;
 public final class URIFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
     final URI uri = (URI)value;
 
-    switch(formatterContext.getConfigValueString("uri").orElse("default"))
+    switch(context.getConfigValueString("uri").orElse("default"))
     {
       case "default":
         return noSpaceText(uri.toString());
@@ -69,16 +69,17 @@ public final class URIFormatter extends AbstractParameterFormatter
         final int port = uri.getPort();
         if (port == -1)
         {
-          final Optional<String> portUndef =
-              formatterContext.getConfigValueString("uri-port-undef");
+          final Optional<String> portUndef = context.getConfigValueString("uri-port-undef");
           if (portUndef.isPresent())
             return noSpaceText(portUndef.get());
         }
 
-        final Message.WithSpaces msg =
-            formatterContext.getConfigValueMessage(port, NUMBER_TYPE).orElse(null);
+        final Message.WithSpaces msg = context
+            .getConfigMapMessage(port, NUMBER_TYPE)
+            .orElse(null);
+
         return msg != null
-            ? new TextPart(msg.format(formatterContext.getMessageSupport(), formatterContext),
+            ? new TextPart(msg.format(context.getMessageSupport(), context),
                 msg.isSpaceBefore(), msg.isSpaceAfter())
             : port == -1 ? nullText() : noSpaceText(Integer.toString(port));
       }
@@ -88,11 +89,12 @@ public final class URIFormatter extends AbstractParameterFormatter
 
       case "scheme": {
         final String scheme = uri.getScheme();
-        final Message.WithSpaces msg =
-            formatterContext.getConfigValueMessage(scheme, STRING_EMPTY_TYPE).orElse(null);
+        final Message.WithSpaces msg = context
+            .getConfigMapMessage(scheme, STRING_EMPTY_TYPE)
+            .orElse(null);
 
         return msg != null
-            ? new TextPart(msg.format(formatterContext.getMessageSupport(), formatterContext),
+            ? new TextPart(msg.format(context.getMessageSupport(), context),
                 msg.isSpaceBefore(), msg.isSpaceAfter())
             : new TextPart(scheme);
       }
@@ -101,7 +103,7 @@ public final class URIFormatter extends AbstractParameterFormatter
         return noSpaceText(uri.getUserInfo());
     }
 
-    return formatterContext.delegateToNextFormatter();
+    return context.delegateToNextFormatter();
   }
 
 

@@ -91,36 +91,9 @@ public final class FormatterContextImpl implements FormatterContext
 
 
   @Override
-  public @NotNull Optional<ConfigValue> getConfigValue(
-      Object key, @NotNull Set<ConfigKey.Type> keyTypes, Set<ConfigValue.Type> valueTypes) {
-    return ofNullable(map.find(messageAccessor, key, parameters, keyTypes, valueTypes));
-  }
-
-
-  @Override
-  public @NotNull Optional<Message.WithSpaces> getConfigValueMessage(
-      Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault)
-  {
-    final Message.WithSpaces configMessage =
-        map.getMessage(messageAccessor, key, parameters, keyTypes, includeDefault);
-
-    if (configMessage != null)
-      return Optional.of(configMessage);
-
-    if (key instanceof String && keyTypes.contains(ConfigKey.Type.NAME))
-    {
-      final ConfigValue configValue = messageAccessor.getDefaultParameterConfig(key.toString());
-
-      if (configValue instanceof ConfigValueMessage)
-        return Optional.of(((ConfigValueMessage)configValue).asObject());
-      else if (configValue instanceof ConfigValueString)
-      {
-        return Optional.of(
-            ((ConfigValueString)configValue).asMessage(messageAccessor.getMessageFactory()));
-      }
-    }
-
-    return Optional.empty();
+  public @NotNull Optional<Message.WithSpaces> getConfigMapMessage(
+      Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault) {
+    return ofNullable(map.getMessage(messageAccessor, key, parameters, keyTypes, includeDefault));
   }
 
 
@@ -184,6 +157,28 @@ public final class FormatterContextImpl implements FormatterContext
     return configValue instanceof ConfigValueBool
         ? Optional.of(((ConfigValueBool)configValue).asObject())
         : Optional.empty();
+  }
+
+
+  @Override
+  public @NotNull Optional<Message.WithSpaces> getConfigValueMessage(@NotNull String name)
+  {
+    final Message.WithSpaces message =
+        map.getMessage(messageAccessor, name, parameters, NAME_TYPE, false);
+    if (message != null)
+      return Optional.of(message);
+
+    final ConfigValue configValue = messageAccessor.getDefaultParameterConfig(name);
+
+    if (configValue instanceof ConfigValueMessage)
+      return Optional.of(((ConfigValueMessage)configValue).asObject());
+    else if (configValue instanceof ConfigValueString)
+    {
+      return Optional.of(
+          ((ConfigValueString)configValue).asMessage(messageAccessor.getMessageFactory()));
+    }
+
+    return Optional.empty();
   }
 
 

@@ -20,15 +20,14 @@ import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.parameter.key.ConfigKey;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.EnumSet;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
-import static de.sayayi.lib.message.parameter.key.ConfigKey.Type.STRING;
 import static java.lang.Boolean.FALSE;
 
 
@@ -70,13 +69,13 @@ public final class FileSizeFormatter extends AbstractParameterFormatter
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
 
     final long size = ((Number)value).longValue();
-    int scale = normalizeScale(formatterContext.getConfigValueNumber("scale").orElse(1));
+    int scale = normalizeScale(context.getConfigValueNumber("scale").orElse(1));
     final StringBuilder s = new StringBuilder();
     final int unitIndex;
 
@@ -91,20 +90,21 @@ public final class FileSizeFormatter extends AbstractParameterFormatter
         scale = 0;
 
       s.append(new DecimalFormat(FORMAT[scale],
-          DecimalFormatSymbols.getInstance(formatterContext.getLocale()))
+          DecimalFormatSymbols.getInstance(context.getLocale()))
           .format((double)size / POW10[unitIndex * 3]));
     }
 
     final String unit = UNITS[unitIndex];
-    final Message.WithSpaces unitMessage =
-        formatterContext.getConfigValueMessage(unit, EnumSet.of(STRING)).orElse(null);
+    final Message.WithSpaces unitMessage = context
+        .getConfigMapMessage(unit, ConfigKey.STRING_TYPE)
+        .orElse(null);
 
     if ((unitMessage != null && unitMessage.isSpaceBefore()) ||
-        formatterContext.getConfigValueBool("space").orElse(FALSE))
+        context.getConfigValueBool("space").orElse(FALSE))
       s.append(' ');
 
     return noSpaceText(s
-        .append(unitMessage == null ? unit : formatterContext.format(unitMessage).getText())
+        .append(unitMessage == null ? unit : context.format(unitMessage).getText())
         .toString());
   }
 

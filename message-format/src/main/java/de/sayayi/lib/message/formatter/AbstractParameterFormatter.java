@@ -40,25 +40,27 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
 
 
   @Override
-  public @NotNull Text format(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text format(@NotNull FormatterContext context, Object value)
   {
     // handle empty, !empty, null and !null first
-    Message.WithSpaces msg =
-        formatterContext.getConfigValueMessage(value, EMPTY_NULL_TYPE).orElse(null);
-    if (msg != null)
-      return formatterContext.format(msg);
+    Message.WithSpaces msg = context
+        .getConfigMapMessage(value, EMPTY_NULL_TYPE)
+        .orElse(null);
 
-    final Text text = formatValue(formatterContext, value);
+    if (msg != null)
+      return context.format(msg);
+
+    final Text text = formatValue(context, value);
 
     // handle empty, !empty, null and !null for result
-    msg = formatterContext.getConfigValueMessage(text.getText(), EMPTY_NULL_TYPE).orElse(null);
+    msg = context.getConfigMapMessage(text.getText(), EMPTY_NULL_TYPE).orElse(null);
 
-    return msg == null ? text : formatterContext.format(msg);
+    return msg == null ? text : context.format(msg);
   }
 
 
   /**
-   * Format {@code value} using {@code formatterContext}.
+   * Format {@code value} using {@code context}.
    * <p>
    * This method differs from {@link #format(FormatterContext, Object)} in that it has already
    * handled {@code empty} and {@code null} cases matched in the parameter configuration.
@@ -66,13 +68,12 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
    * In the same way it will handle {@code empty} and {@code null} cases for the text returned
    * by this method.
    *
-   * @param formatterContext  formatter context, not {@code null}
-   * @param value             value to be formatted
+   * @param context  formatter context, not {@code null}
+   * @param value    value to be formatted
    *
    * @return  formatted text, never {@code null}
    */
-  protected abstract @NotNull Text formatValue(@NotNull FormatterContext formatterContext,
-                                               Object value);
+  protected abstract @NotNull Text formatValue(@NotNull FormatterContext context, Object value);
 
 
   /**

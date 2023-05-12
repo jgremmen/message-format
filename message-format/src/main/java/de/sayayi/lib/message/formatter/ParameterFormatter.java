@@ -47,13 +47,13 @@ public interface ParameterFormatter
   /**
    * Formats the parameter value to a string representation.
    *
-   * @param formatterContext  message context providing formatting information, never {@code null}
-   * @param value             parameter value (can be {@code null})
+   * @param context  message context providing formatting information, never {@code null}
+   * @param value    parameter value (can be {@code null})
    *
    * @return  formatted parameter value, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull Text format(@NotNull FormatterContext formatterContext, Object value);
+  @NotNull Text format(@NotNull FormatterContext context, Object value);
 
 
   /**

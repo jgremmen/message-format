@@ -43,7 +43,7 @@ public final class OptionalLongFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext formatterContext, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
       return nullText();
@@ -52,7 +52,7 @@ public final class OptionalLongFormatter extends AbstractParameterFormatter
 
     return !optional.isPresent()
         ? emptyText()
-        : formatterContext.format(optional.getAsLong(), long.class, true);
+        : context.format(optional.getAsLong(), long.class, true);
   }
 
 
