@@ -74,15 +74,16 @@ public final class MapFormatter extends AbstractParameterFormatter
     if (map.isEmpty())
       return emptyText();
 
-    final MessageAccessor messageAccessor = context.getMessageSupport();
     final Message.WithSpaces kvMessage = context
-        .getConfigMessage("map-kv", NAME_TYPE).orElse(DEFAULT_KEY_VALUE_MESSAGE);
+        .getConfigValueMessage("map-kv", NAME_TYPE).orElse(DEFAULT_KEY_VALUE_MESSAGE);
     final String keyNull = context.getConfigValueString("map-k-null")
         .map(String::trim).orElse("(null)");
     final String valueNull = context.getConfigValueString("map-v-null")
         .map(String::trim).orElse("(null)");
     final String thisString = context.getConfigValueString("map-this")
         .map(String::trim).orElse("(this map)");
+
+    final MessageAccessor messageAccessor = context.getMessageSupport();
     final KeyValueParameters parameters = new KeyValueParameters(messageAccessor.getLocale());
 
     return context.format(map
@@ -128,8 +129,8 @@ public final class MapFormatter extends AbstractParameterFormatter
   private static final class KeyValueParameters implements Parameters
   {
     private final Locale locale;
-    private Object key = null;
-    private Object value = null;
+    private Object key;
+    private Object value;
 
 
     private KeyValueParameters(@NotNull Locale locale) {
@@ -151,7 +152,7 @@ public final class MapFormatter extends AbstractParameterFormatter
 
     @Override
     public @NotNull SortedSet<String> getParameterNames() {
-      return KEY_VALUE_PARAMETER_NAMES;
+      return KEY_VALUE_PARAMETER_NAMES;  // probably never used
     }
   }
 }

@@ -26,14 +26,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.parameter.key.ConfigKey.BOOL_TYPE;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.EMPTY_NULL_TYPE;
-import static de.sayayi.lib.message.parameter.key.ConfigKey.Type.BOOL;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
@@ -73,7 +72,7 @@ public final class BoolFormatter extends AbstractParameterFormatter
   {
     Message.WithSpaces msg =
         requireNonNull(formatterContext, "formatterContext must not be null")
-            .getConfigMessage(value, EMPTY_NULL_TYPE).orElse(null);
+            .getConfigValueMessage(value, EMPTY_NULL_TYPE).orElse(null);
     if (msg != null)
       return formatterContext.format(msg);
 
@@ -97,7 +96,7 @@ public final class BoolFormatter extends AbstractParameterFormatter
       bool = parseBoolean(String.valueOf(value));
 
     // allow custom messages for true/false value?
-    if ((msg = formatterContext.getConfigMessage(bool, EnumSet.of(BOOL)).orElse(null)) != null)
+    if ((msg = formatterContext.getConfigValueMessage(bool, BOOL_TYPE).orElse(null)) != null)
       return formatterContext.format(msg);
 
     return noSpaceText(Boolean.toString(bool));

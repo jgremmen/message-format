@@ -62,7 +62,7 @@ public final class SizeFormatter extends AbstractParameterFormatter
     }
 
     final Optional<Message.WithSpaces> mappedMessage =
-        formatterContext.getConfigMessage(size, NUMBER_TYPE, true);
+        formatterContext.getConfigValueMessage(size, NUMBER_TYPE, true);
 
     return mappedMessage.isPresent()
         ? formatterContext.format(mappedMessage.get())

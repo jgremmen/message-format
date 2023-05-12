@@ -24,10 +24,7 @@ import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.parameter.ParamConfig;
 import de.sayayi.lib.message.parameter.key.ConfigKey;
-import de.sayayi.lib.message.parameter.value.ConfigValue;
-import de.sayayi.lib.message.parameter.value.ConfigValueBool;
-import de.sayayi.lib.message.parameter.value.ConfigValueNumber;
-import de.sayayi.lib.message.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.parameter.value.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -44,7 +41,7 @@ import static java.util.Optional.ofNullable;
  */
 public final class FormatterContextImpl implements FormatterContext
 {
-  private final @NotNull MessageAccessor messageSupport;
+  private final @NotNull MessageAccessor messageAccessor;
   private final @NotNull Parameters parameters;
   private final Object value;
   private final String format;
@@ -52,11 +49,11 @@ public final class FormatterContextImpl implements FormatterContext
   private final @NotNull Deque<ParameterFormatter> parameterFormatters;
 
 
-  public FormatterContextImpl(@NotNull MessageAccessor messageSupport,
+  public FormatterContextImpl(@NotNull MessageAccessor messageAccessor,
                               @NotNull Parameters parameters, Object value, Class<?> type,
                               String format, @NotNull ParamConfig map)
   {
-    this.messageSupport = messageSupport;
+    this.messageAccessor = messageAccessor;
     this.parameters = parameters;
     this.value = value;
     this.format = format;
@@ -65,13 +62,13 @@ public final class FormatterContextImpl implements FormatterContext
     if (type == null)
       type = value == null ? NULL_TYPE : value.getClass();
 
-    parameterFormatters = new ArrayDeque<>(messageSupport.getFormatters(format, type));
+    parameterFormatters = new ArrayDeque<>(messageAccessor.getFormatters(format, type));
   }
 
 
   @Override
   public @NotNull MessageAccessor getMessageSupport() {
-    return messageSupport;
+    return messageAccessor;
   }
 
 
@@ -96,14 +93,34 @@ public final class FormatterContextImpl implements FormatterContext
   @Override
   public @NotNull Optional<ConfigValue> getConfigValue(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes, Set<ConfigValue.Type> valueTypes) {
-    return ofNullable(map.find(messageSupport, key, parameters, keyTypes, valueTypes));
+    return ofNullable(map.find(messageAccessor, key, parameters, keyTypes, valueTypes));
   }
 
 
   @Override
-  public @NotNull Optional<Message.WithSpaces> getConfigMessage(
-      Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault) {
-    return ofNullable(map.getMessage(messageSupport, key, parameters, keyTypes, includeDefault));
+  public @NotNull Optional<Message.WithSpaces> getConfigValueMessage(
+      Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault)
+  {
+    final Message.WithSpaces configMessage =
+        map.getMessage(messageAccessor, key, parameters, keyTypes, includeDefault);
+
+    if (configMessage != null)
+      return Optional.of(configMessage);
+
+    if (key instanceof String && keyTypes.contains(ConfigKey.Type.NAME))
+    {
+      final ConfigValue configValue = messageAccessor.getDefaultParameterConfig(key.toString());
+
+      if (configValue instanceof ConfigValueMessage)
+        return Optional.of(((ConfigValueMessage)configValue).asObject());
+      else if (configValue instanceof ConfigValueString)
+      {
+        return Optional.of(
+            ((ConfigValueString)configValue).asMessage(messageAccessor.getMessageFactory()));
+      }
+    }
+
+    return Optional.empty();
   }
 
 
@@ -111,11 +128,11 @@ public final class FormatterContextImpl implements FormatterContext
   public @NotNull Optional<ConfigValue> getConfigValue(@NotNull String name)
   {
     final ConfigValue configValue =
-        map.find(messageSupport, name, parameters, NAME_TYPE, null);
+        map.find(messageAccessor, name, parameters, NAME_TYPE, null);
 
     return configValue != null
         ? Optional.of(configValue)
-        : ofNullable(messageSupport.getDefaultParameterConfig(name));
+        : ofNullable(messageAccessor.getDefaultParameterConfig(name));
   }
 
 
@@ -123,12 +140,12 @@ public final class FormatterContextImpl implements FormatterContext
   public @NotNull Optional<String> getConfigValueString(@NotNull String name)
   {
     final ConfigValueString string = (ConfigValueString)
-        map.find(messageSupport, name, parameters, NAME_TYPE, ConfigValue.STRING_TYPE);
+        map.find(messageAccessor, name, parameters, NAME_TYPE, ConfigValue.STRING_TYPE);
 
     if (string != null)
       return Optional.of(string.asObject());
 
-    final ConfigValue configValue = messageSupport.getDefaultParameterConfig(name);
+    final ConfigValue configValue = messageAccessor.getDefaultParameterConfig(name);
 
     return configValue instanceof ConfigValueString
         ? Optional.of(((ConfigValueString)configValue).asObject())
@@ -140,12 +157,12 @@ public final class FormatterContextImpl implements FormatterContext
   public @NotNull OptionalLong getConfigValueNumber(@NotNull String name)
   {
     final ConfigValueNumber number = (ConfigValueNumber)
-        map.find(messageSupport, name, parameters, NAME_TYPE, ConfigValue.NUMBER_TYPE);
+        map.find(messageAccessor, name, parameters, NAME_TYPE, ConfigValue.NUMBER_TYPE);
 
     if (number != null)
       return OptionalLong.of(number.asObject());
 
-    final ConfigValue configValue = messageSupport.getDefaultParameterConfig(name);
+    final ConfigValue configValue = messageAccessor.getDefaultParameterConfig(name);
 
     return configValue instanceof ConfigValueNumber
         ? OptionalLong.of(((ConfigValueNumber)configValue).asObject())
@@ -157,12 +174,12 @@ public final class FormatterContextImpl implements FormatterContext
   public @NotNull Optional<Boolean> getConfigValueBool(@NotNull String name)
   {
     final ConfigValueBool bool = (ConfigValueBool)
-        map.find(messageSupport, name, parameters, NAME_TYPE, ConfigValue.BOOL_TYPE);
+        map.find(messageAccessor, name, parameters, NAME_TYPE, ConfigValue.BOOL_TYPE);
 
     if (bool != null)
       return Optional.of(bool.asObject());
 
-    final ConfigValue configValue = messageSupport.getDefaultParameterConfig(name);
+    final ConfigValue configValue = messageAccessor.getDefaultParameterConfig(name);
 
     return configValue instanceof ConfigValueBool
         ? Optional.of(((ConfigValueBool)configValue).asObject())
@@ -179,7 +196,7 @@ public final class FormatterContextImpl implements FormatterContext
   @Override
   public @NotNull Text format(Object value, Class<?> type, boolean propagateFormat)
   {
-    return new FormatterContextImpl(messageSupport, parameters, value, type,
+    return new FormatterContextImpl(messageAccessor, parameters, value, type,
         propagateFormat ? format : null, map).delegateToNextFormatter();
   }
 
@@ -187,7 +204,7 @@ public final class FormatterContextImpl implements FormatterContext
   @Override
   public @NotNull Text format(Object value, Class<?> type, String format)
   {
-    return new FormatterContextImpl(messageSupport, parameters, value, type, format, map)
+    return new FormatterContextImpl(messageAccessor, parameters, value, type, format, map)
         .delegateToNextFormatter();
   }
 
@@ -197,7 +214,7 @@ public final class FormatterContextImpl implements FormatterContext
   {
     return message == null
         ? NULL
-        : new TextPart(message.format(messageSupport, parameters), message.isSpaceBefore(),
+        : new TextPart(message.format(messageAccessor, parameters), message.isSpaceBefore(),
             message.isSpaceAfter());
   }
 }

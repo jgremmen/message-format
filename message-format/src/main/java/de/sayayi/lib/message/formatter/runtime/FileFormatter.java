@@ -65,7 +65,7 @@ public final class FileFormatter extends AbstractParameterFormatter implements S
 
         final String extension = name.substring(dotidx + 1);
         final Message.WithSpaces msg =
-            formatterContext.getConfigMessage(extension, STRING_EMPTY_TYPE).orElse(null);
+            formatterContext.getConfigValueMessage(extension, STRING_EMPTY_TYPE).orElse(null);
 
         return msg != null ? formatterContext.format(msg) : noSpaceText(extension);
       }

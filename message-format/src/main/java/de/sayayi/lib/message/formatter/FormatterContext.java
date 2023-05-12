@@ -55,21 +55,21 @@ public interface FormatterContext extends Parameters
 
 
   @Contract(pure = true)
-  default @NotNull Optional<Message.WithSpaces> getConfigMessage(
+  default @NotNull Optional<Message.WithSpaces> getConfigValueMessage(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes) {
-    return getConfigMessage(key, keyTypes, false);
+    return getConfigValueMessage(key, keyTypes, false);
   }
 
 
   @Contract(pure = true)
-  @NotNull Optional<Message.WithSpaces> getConfigMessage(
+  @NotNull Optional<Message.WithSpaces> getConfigValueMessage(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault);
 
 
   @Contract(pure = true)
-  default @NotNull Message.WithSpaces getConfigMessageOrEmpty(
+  default @NotNull Message.WithSpaces getConfigValueMessageOrEmpty(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault) {
-    return getConfigMessage(key, keyTypes, includeDefault).orElse(EmptyMessage.INSTANCE);
+    return getConfigValueMessage(key, keyTypes, includeDefault).orElse(EmptyMessage.INSTANCE);
   }
 
 

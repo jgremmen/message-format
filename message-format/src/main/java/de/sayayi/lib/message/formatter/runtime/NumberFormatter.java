@@ -61,8 +61,9 @@ public final class NumberFormatter extends AbstractParameterFormatter
     final Number value = (Number)v;
 
     // check configuration map for match
-    final Message.WithSpaces msg =
-        formatterContext.getConfigMessage(value, NUMBER_TYPE, true).orElse(null);
+    final Message.WithSpaces msg = formatterContext
+        .getConfigValueMessage(value, NUMBER_TYPE, true)
+        .orElse(null);
     if (msg != null)
       return formatterContext.format(msg);
 

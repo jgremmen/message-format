@@ -75,7 +75,7 @@ public final class URLFormatter extends AbstractParameterFormatter
         }
 
         final Message.WithSpaces msg =
-            formatterContext.getConfigMessage(port, NUMBER_TYPE).orElse(null);
+            formatterContext.getConfigValueMessage(port, NUMBER_TYPE).orElse(null);
         return msg != null
             ? new TextPart(msg.format(formatterContext.getMessageSupport(), formatterContext),
                 msg.isSpaceBefore(), msg.isSpaceAfter())
