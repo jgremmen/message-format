@@ -175,6 +175,7 @@ public final class GeoFormatter extends AbstractParameterFormatter
 
   private String formatMinOrSec(Locale locale, double d, int digits, boolean zeropad)
   {
+    //noinspection MalformedFormatString
     String s = String.format(locale, "%." + digits + 'f', d);
 
     if (zeropad && d < 10.0)
@@ -200,34 +201,34 @@ public final class GeoFormatter extends AbstractParameterFormatter
 
   static @NotNull Format parseFormatString(@NotNull String formatString)
   {
-    Matcher matcher = PATTERN_FORMAT.matcher(formatString.trim());
-    if (!matcher.matches())
-      throw new IllegalArgumentException("invalid geo format: " + formatString);
+    final Matcher matcher = PATTERN_FORMAT.matcher(formatString.trim());
+    final Format format = new Format();
 
-    Format format = new Format();
-
-    format.longitude = matcher.group(8) == null ? null : "LO".equals(matcher.group(8));
-    format.separatorAfterDegree = matcher.group(1) != null;
-    format.separatorAfterMinute = matcher.group(4) != null;
-    format.separatorAfterSecond = matcher.group(7) != null;
-    format.zeroPadMinutes = matcher.group(2) != null;
-    format.zeroPadSeconds = matcher.group(5) != null;
-
-    String mmm = matcher.group(3);
-    if (mmm != null)
-      format.minuteDigits = "m".equals(mmm) ? 0 : mmm.length();
-
-    String sss = matcher.group(6);
-    if (sss != null)
+    if (matcher.matches())
     {
-      if (mmm == null)
-      {
-        throw new IllegalArgumentException("missing minute specification in geo format: " +
-            formatString);
-      }
+      format.longitude = matcher.group(8) == null ? null : "LO".equals(matcher.group(8));
+      format.separatorAfterDegree = matcher.group(1) != null;
+      format.separatorAfterMinute = matcher.group(4) != null;
+      format.separatorAfterSecond = matcher.group(7) != null;
+      format.zeroPadMinutes = matcher.group(2) != null;
+      format.zeroPadSeconds = matcher.group(5) != null;
 
-      format.minuteDigits = 0;  // reduce precision for minutes
-      format.secondDigits = "s".equals(sss) ? 0 : sss.length();
+      final String mmm = matcher.group(3);
+      if (mmm != null)
+        format.minuteDigits = "m".equals(mmm) ? 0 : mmm.length();
+
+      final String sss = matcher.group(6);
+      if (sss != null)
+      {
+        if (mmm == null)
+        {
+          throw new IllegalArgumentException("missing minute specification in geo format: " +
+              formatString);
+        }
+
+        format.minuteDigits = 0;  // reduce precision for minutes
+        format.secondDigits = "s".equals(sss) ? 0 : sss.length();
+      }
     }
 
     return format;
