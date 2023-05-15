@@ -174,7 +174,7 @@ public final class ParameterPart implements Parameter
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    final Map<ConfigKey,ConfigValue> map = this.paramConfig.getMap();
+    final Map<ConfigKey,ConfigValue> map = paramConfig.getMap();
 
     packStream.writeBoolean(spaceBefore);
     packStream.writeBoolean(spaceAfter);
@@ -208,12 +208,12 @@ public final class ParameterPart implements Parameter
     final boolean spaceAfter = packStream.readBoolean();
     final int size = packStream.readSmallVar();
     final String format = packStream.readString();
-    final String parameter = requireNonNull(packStream.readString());
+    final String name = requireNonNull(packStream.readString());
     final Map<ConfigKey,ConfigValue> map = new HashMap<>();
 
     for(int n = 0; n < size; n++)
       map.put(unpack.unpackMapKey(packStream), unpack.unpackMapValue(packStream));
 
-    return new ParameterPart(parameter, format, spaceBefore, spaceAfter, map);
+    return new ParameterPart(name, format, spaceBefore, spaceAfter, map);
   }
 }

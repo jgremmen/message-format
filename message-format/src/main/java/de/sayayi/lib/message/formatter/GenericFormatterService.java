@@ -137,10 +137,10 @@ public class GenericFormatterService implements FormatterService.WithRegistry
     if (type.isPrimitive() && !typeOrderMap.containsKey(type))
       type = WRAPPER_CLASS_MAP.get(type);
 
-    // sort types by type order
     final List<FormattableType> formattableTypes = new ArrayList<>(4);
     Byte order;
 
+    // build list with known formattable types
     for(Class<?> t: resolveFormattersForType_collectTypes(type))
       if ((order = typeOrderMap.get(t)) != null)
         formattableTypes.add(new FormattableType(t, order));
@@ -156,7 +156,6 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       final FormattableType[] sortedTypes = formattableTypes.toArray(new FormattableType[typeCount]);
       Arrays.sort(sortedTypes);
 
-      // create list of parameter formatters
       final ParameterFormatter[] parameterFormatters = new ParameterFormatter[typeCount];
       for(int n = 0; n < typeCount; n++)
         parameterFormatters[n] = typeFormatters.get(sortedTypes[n].getType());
