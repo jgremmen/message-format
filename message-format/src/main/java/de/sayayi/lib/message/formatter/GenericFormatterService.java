@@ -24,8 +24,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.synchronizedMap;
+import static java.util.Collections.*;
 import static java.util.Objects.requireNonNull;
 
 
@@ -42,8 +41,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
   private final @NotNull Map<String,NamedParameterFormatter> namedFormatters =
       new ConcurrentHashMap<>();
-  private final @NotNull Map<Class<?>,Byte> typeOrderMap = new ConcurrentHashMap<>();
-  private final @NotNull Map<Class<?>,ParameterFormatter> typeFormatters =
+  private final @NotNull Map<Class<?>,List<PrioritizedFormatter>> typeFormatters =
       new ConcurrentHashMap<>();
   private final @NotNull Map<Class<?>,List<ParameterFormatter>> cachedFormatters =
       synchronizedMap(new FixedSizeCacheMap<>(CLASS_SORTER, 256));
@@ -74,8 +72,8 @@ public class GenericFormatterService implements FormatterService.WithRegistry
     final Class<?> type =
         requireNonNull(formattableType, "formattableType must not be null").getType();
 
-    typeOrderMap.put(type, formattableType.getOrder());
-    typeFormatters.put(type, requireNonNull(formatter, "formatter must not be null"));
+    typeFormatters.computeIfAbsent(type, t -> new ArrayList<>(4)).add(
+        new PrioritizedFormatter(formattableType.getOrder(), formatter));
     cachedFormatters.clear();
   }
 
@@ -101,23 +99,6 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   @Override
-  @MustBeInvokedByOverriders
-  public void setFormattableTypeOrder(@NotNull Class<?> type, byte order)
-  {
-    if (requireNonNull(type, "type must not be null") == Object.class && order != 127)
-      throw new IllegalArgumentException("Object type order must be 127");
-    else if (order < 0)
-      throw new IllegalArgumentException("order must be in range 0..127");
-
-    if (typeFormatters.containsKey(type))
-    {
-      typeOrderMap.put(type, order);
-      cachedFormatters.clear();
-    }
-  }
-
-
-  @Override
   public @NotNull List<ParameterFormatter> getFormatters(String format, @NotNull Class<?> type)
   {
     requireNonNull(type, "type must not be null");
@@ -136,35 +117,30 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   private @NotNull List<ParameterFormatter> resolveFormattersForType(@NotNull Class<?> type)
   {
     // substitute wrapper type for primitive type if necessary
-    if (type.isPrimitive() && !typeOrderMap.containsKey(type))
+    if (type.isPrimitive() && !typeFormatters.containsKey(type))
       type = WRAPPER_CLASS_MAP.get(type);
 
-    final List<FormattableType> formattableTypes = new ArrayList<>(4);
-    Byte order;
+    final List<PrioritizedFormatter> prioritizedFormatters = new ArrayList<>();
+    List<PrioritizedFormatter> tpf;
 
     // build list with known formattable types
     for(Class<?> t: resolveFormattersForType_collectTypes(type))
-      if ((order = typeOrderMap.get(t)) != null)
-        formattableTypes.add(new FormattableType(t, order));
+      if ((tpf = typeFormatters.get(t)) != null)
+        prioritizedFormatters.addAll(tpf);
 
-    final int typeCount = formattableTypes.size();
+    if (prioritizedFormatters.isEmpty())
+      prioritizedFormatters.addAll(typeFormatters.get(Object.class));
 
-    if (typeCount == 0)
-      return singletonList(typeFormatters.get(Object.class));
-    else if (typeCount == 1)
-      return singletonList(typeFormatters.get(formattableTypes.get(0).getType()));
-    else
-    {
-      final FormattableType[] sortedTypes =
-          formattableTypes.toArray(new FormattableType[typeCount]);
-      Arrays.sort(sortedTypes);
+    final int formatterCount = prioritizedFormatters.size();
+    final PrioritizedFormatter[] sortedFormatters =
+        prioritizedFormatters.toArray(new PrioritizedFormatter[formatterCount]);
+    Arrays.sort(sortedFormatters);
 
-      final ParameterFormatter[] parameterFormatters = new ParameterFormatter[typeCount];
-      for(int n = 0; n < typeCount; n++)
-        parameterFormatters[n] = typeFormatters.get(sortedTypes[n].getType());
+    final ParameterFormatter[] parameterFormatters = new ParameterFormatter[formatterCount];
+    for(int n = 0; n < formatterCount; n++)
+      parameterFormatters[n] = sortedFormatters[n].formatter;
 
-      return asList(parameterFormatters);
-    }
+    return unmodifiableList(asList(parameterFormatters));
   }
 
 
@@ -193,5 +169,53 @@ public class GenericFormatterService implements FormatterService.WithRegistry
         collectedTypes.add(interfaceType);
         addInterfaceTypes(interfaceType, collectedTypes);
       }
+  }
+
+
+
+
+  private static final class PrioritizedFormatter implements Comparable<PrioritizedFormatter>
+  {
+    private final byte order;
+    private final @NotNull ParameterFormatter formatter;
+
+
+    private PrioritizedFormatter(byte order, @NotNull ParameterFormatter formatter)
+    {
+      this.order = order;
+      this.formatter = formatter;
+    }
+
+
+    @Override
+    public int compareTo(@NotNull PrioritizedFormatter o) {
+      return Byte.compare(order, o.order);
+    }
+
+
+    @Override
+    public boolean equals(Object o)
+    {
+      if (this == o)
+        return true;
+      if (!(o instanceof PrioritizedFormatter))
+        return false;
+
+      final PrioritizedFormatter that = (PrioritizedFormatter)o;
+
+      return order == that.order && formatter.equals(that.formatter);
+    }
+
+
+    @Override
+    public int hashCode() {
+      return (59 + order) * 59 + formatter.hashCode();
+    }
+
+
+    @Override
+    public String toString() {
+      return "PrioritizedFormatter(order=" + order + ",formatter=" + formatter + ')';
+    }
   }
 }

@@ -51,14 +51,12 @@ public final class ByteArrayFormatter extends AbstractParameterFormatter
     if (bytes == null || bytes.length == 0)
       return emptyText();
 
-    final String charset = context.getConfigValueString("charset").orElse(null);
-    if (charset != null && !charset.isEmpty())
-    {
-      return context.format(isSupported(charset)
-          ? new String(bytes, charset) : new String(bytes), true);
-    }
+    final String charset = context.getConfigValueString("charset").orElse("");
+    if (charset.isEmpty())
+      return context.delegateToNextFormatter();
 
-    return new ArrayFormatter().formatValue(context, bytes);
+    return context.format(isSupported(charset)
+        ? new String(bytes, charset) : new String(bytes), true);
   }
 
 
