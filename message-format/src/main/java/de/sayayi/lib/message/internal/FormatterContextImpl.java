@@ -20,6 +20,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.parameter.ParamConfig;
@@ -211,5 +212,21 @@ public final class FormatterContextImpl implements FormatterContext
         ? NULL
         : new TextPart(message.format(messageAccessor, parameters), message.isSpaceBefore(),
             message.isSpaceAfter());
+  }
+
+
+  @Override
+  public @NotNull OptionalLong size(Object value)
+  {
+    if (value != null)
+      for(ParameterFormatter formatter: messageAccessor.getFormatters(value.getClass()))
+        if (formatter instanceof SizeQueryable)
+        {
+          OptionalLong result = ((SizeQueryable)formatter).size(this, value);
+          if (result.isPresent())
+            return result;
+        }
+
+    return OptionalLong.empty();
   }
 }

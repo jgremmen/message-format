@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter.named;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.runtime.ArrayFormatter;
+import de.sayayi.lib.message.formatter.runtime.ByteArrayFormatter;
 import de.sayayi.lib.message.formatter.runtime.IterableFormatter;
 import de.sayayi.lib.message.formatter.runtime.MapFormatter;
 import lombok.val;
@@ -63,17 +64,17 @@ class SizeFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(new SizeFormatter()), NO_CACHE_INSTANCE)
         .setLocale(UK);
 
-    assertEquals("0", messageSupport.message("%{c,size}").with("c", true).format());
+    assertEquals("", messageSupport.message("%{c,size}").with("c", true).format());
   }
 
 
   @Test
   void testFormatDefaultFormatter()
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new SizeFormatter()), NO_CACHE_INSTANCE);
+    val messageSupport = MessageSupportFactory.create(
+        createFormatterService(new SizeFormatter(), new ByteArrayFormatter()), NO_CACHE_INSTANCE);
 
-    assertEquals("0", messageSupport.message("%{c,size}")
+    assertEquals("2", messageSupport.message("%{c,size}")
         .with("c", new byte[] { 'a', 'b' }).format());
   }
 }

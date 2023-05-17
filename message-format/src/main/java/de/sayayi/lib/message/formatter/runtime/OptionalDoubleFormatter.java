@@ -19,7 +19,6 @@ import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
-import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult;
@@ -40,7 +39,7 @@ import static java.util.Collections.singleton;
  * @author Jeroen Gremmen
  */
 public final class OptionalDoubleFormatter extends AbstractParameterFormatter
-    implements EmptyMatcher, SizeQueryable
+    implements EmptyMatcher
 {
   @Override
   @Contract(pure = true)
@@ -60,12 +59,6 @@ public final class OptionalDoubleFormatter extends AbstractParameterFormatter
   @Override
   public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
     return compareType.match(((Optional<?>)value).isPresent() ? 1 : 0) ? TYPELESS_EXACT : null;
-  }
-
-
-  @Override
-  public long size(@NotNull Object value) {
-    return ((OptionalDouble)value).isPresent() ? 1 : 0;
   }
 
 

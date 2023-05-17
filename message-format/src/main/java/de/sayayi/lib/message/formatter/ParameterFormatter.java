@@ -21,6 +21,7 @@ import de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.OptionalLong;
 import java.util.Set;
 
 
@@ -106,11 +107,12 @@ public interface ParameterFormatter
     /**
      * Returns the size of the given {@code value}.
      *
-     * @param value  object to calculate the size of, not {@code null}
+     * @param context  formatter context, not {@code null}
+     * @param value    object to calculate the size of, not {@code null}
      *
      * @return  value size (&gt;= 0)
      */
     @Contract(pure = true)
-    long size(@NotNull Object value);
+    @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value);
   }
 }

@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
@@ -80,10 +81,10 @@ public final class FileFormatter extends AbstractParameterFormatter implements S
 
 
   @Override
-  public long size(@NotNull Object value)
+  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value)
   {
     final File file = (File)value;
-    return file.isFile() && file.canRead() ? file.length() : -1;
+    return file.isFile() && file.canRead() ? OptionalLong.of(file.length()) : OptionalLong.empty();
   }
 
 

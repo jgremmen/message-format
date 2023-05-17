@@ -15,18 +15,16 @@
  */
 package de.sayayi.lib.message.formatter.named;
 
-import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
+import java.util.OptionalLong;
 
+import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.NUMBER_TYPE;
 
 
@@ -47,26 +45,18 @@ public final class SizeFormatter extends AbstractParameterFormatter
   @Contract(pure = true)
   public @NotNull Text format(@NotNull FormatterContext context, Object value)
   {
-    long size = 0;
+    final OptionalLong optionalSize = context.size(value);
 
-    if (value != null)
+    if (optionalSize.isPresent())
     {
-      final MessageAccessor messageAccessor = context.getMessageSupport();
+      final long size = optionalSize.getAsLong();
 
-      for(ParameterFormatter formatter: messageAccessor.getFormatters(value.getClass()))
-        if (formatter instanceof SizeQueryable)
-        {
-          size = ((SizeQueryable)formatter).size(value);
-          break;
-        }
+      return context.getConfigMapMessage(size, NUMBER_TYPE, true)
+          .map(context::format)
+          .orElseGet(() -> context.format(size, long.class));
     }
-
-    final Optional<Message.WithSpaces> mappedMessage =
-        context.getConfigMapMessage(size, NUMBER_TYPE, true);
-
-    return mappedMessage.isPresent()
-        ? context.format(mappedMessage.get())
-        : context.format(size, long.class);
+    else
+      return emptyText();
   }
 
 

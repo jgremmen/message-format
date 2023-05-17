@@ -241,4 +241,17 @@ public interface FormatterContext extends Parameters
    */
   @Contract(pure = true)
   @NotNull Text format(Message.WithSpaces message);
+
+
+  /**
+   * Determines the size of {@code value}.
+   *
+   * @param value  value to calculate size of or {@code null}
+   *
+   * @return  {@link OptionalLong#empty()} if {@code value} is {@code null} or if there's no
+   *          suitable formatter capable of calculating the size. If the size has been calculated,
+   *          {@link OptionalLong#getAsLong()} will return the value
+   */
+  @Contract(pure = true)
+  @NotNull OptionalLong size(Object value);
 }

@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
@@ -97,17 +98,17 @@ public final class IterableFormatter extends AbstractParameterFormatter
 
 
   @Override
-  public long size(@NotNull Object value)
+  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value)
   {
     if (value instanceof Collection)
-      return ((Collection<?>)value).size();
+      return OptionalLong.of(((Collection<?>)value).size());
 
     long size = 0;
 
     for(Object ignored: (Iterable<?>)value)
       size++;
 
-    return size;
+    return OptionalLong.of(size);
   }
 
 

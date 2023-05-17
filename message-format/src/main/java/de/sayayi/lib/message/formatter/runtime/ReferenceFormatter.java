@@ -26,6 +26,7 @@ import de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.Reference;
+import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
@@ -55,13 +56,13 @@ public final class ReferenceFormatter extends AbstractParameterFormatter
 
   @Override
   public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return compareType.match((int)size(value)) ? TYPELESS_EXACT : null;
+    return compareType.match(((Reference<?>)value).get() == null ? 0 : 1) ? TYPELESS_EXACT : null;
   }
 
 
   @Override
-  public long size(@NotNull Object value) {
-    return ((Reference<?>)value).get() == null ? 0 : 1;
+  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value) {
+    return context.size(((Reference<?>)value).get());
   }
 
 

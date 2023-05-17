@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.SpacesUtil.isTrimmedEmpty;
@@ -68,15 +69,14 @@ public final class StringFormatter extends AbstractParameterFormatter
 
 
   @Override
-  public long size(@NotNull Object value)
+  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value)
   {
     if (value instanceof char[])
-      return ((char[])value).length;
-    if (value instanceof CharSequence)
-      return ((CharSequence)value).length();
-
-    // string formatter is the default formatter so value might not be a string.
-    return 0;
+      return OptionalLong.of(((char[])value).length);
+    else if (value instanceof CharSequence)
+      return OptionalLong.of(((CharSequence)value).length());
+    else
+      return OptionalLong.empty();
   }
 
 

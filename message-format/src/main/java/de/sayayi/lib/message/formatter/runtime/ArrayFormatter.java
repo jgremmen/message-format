@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
@@ -92,8 +93,8 @@ public final class ArrayFormatter extends AbstractParameterFormatter
 
 
   @Override
-  public long size(@NotNull Object value) {
-    return getLength(value);
+  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value) {
+    return OptionalLong.of(getLength(value));
   }
 
 
@@ -102,12 +103,13 @@ public final class ArrayFormatter extends AbstractParameterFormatter
   {
     return new HashSet<>(Arrays.asList(
         new FormattableType(Object[].class, (byte)125),
+        new FormattableType(boolean[].class, (byte)125),
+        new FormattableType(byte[].class, (byte)125),
         new FormattableType(short[].class, (byte)125),
         new FormattableType(int[].class, (byte)125),
         new FormattableType(long[].class, (byte)125),
         new FormattableType(float[].class, (byte)125),
-        new FormattableType(double[].class, (byte)125),
-        new FormattableType(boolean[].class, (byte)125)
+        new FormattableType(double[].class, (byte)125)
     ));
   }
 }

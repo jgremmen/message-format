@@ -111,8 +111,8 @@ public final class MapFormatter extends AbstractParameterFormatter
 
 
   @Override
-  public long size(@NotNull Object value) {
-    return ((Map<?,?>)value).size();
+  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value) {
+    return OptionalLong.of(((Map<?,?>)value).size());
   }
 
 

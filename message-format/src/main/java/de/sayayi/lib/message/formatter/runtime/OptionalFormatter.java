@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
@@ -61,8 +62,11 @@ public final class OptionalFormatter extends AbstractParameterFormatter
 
 
   @Override
-  public long size(@NotNull Object value) {
-    return ((Optional<?>)value).isPresent() ? 1 : 0;
+  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value)
+  {
+    return ((Optional<?>)value)
+        .map(context::size)
+        .orElseGet(OptionalLong::empty);
   }
 
 
