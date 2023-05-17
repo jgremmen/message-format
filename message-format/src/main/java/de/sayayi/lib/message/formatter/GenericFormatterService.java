@@ -40,9 +40,11 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
   private static final @NotNull Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
 
-  private final @NotNull Map<String,NamedParameterFormatter> namedFormatters = new ConcurrentHashMap<>();
+  private final @NotNull Map<String,NamedParameterFormatter> namedFormatters =
+      new ConcurrentHashMap<>();
   private final @NotNull Map<Class<?>,Byte> typeOrderMap = new ConcurrentHashMap<>();
-  private final @NotNull Map<Class<?>,ParameterFormatter> typeFormatters = new ConcurrentHashMap<>();
+  private final @NotNull Map<Class<?>,ParameterFormatter> typeFormatters =
+      new ConcurrentHashMap<>();
   private final @NotNull Map<Class<?>,List<ParameterFormatter>> cachedFormatters =
       synchronizedMap(new FixedSizeCacheMap<>(CLASS_SORTER, 256));
 
@@ -153,7 +155,8 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       return singletonList(typeFormatters.get(formattableTypes.get(0).getType()));
     else
     {
-      final FormattableType[] sortedTypes = formattableTypes.toArray(new FormattableType[typeCount]);
+      final FormattableType[] sortedTypes =
+          formattableTypes.toArray(new FormattableType[typeCount]);
       Arrays.sort(sortedTypes);
 
       final ParameterFormatter[] parameterFormatters = new ParameterFormatter[typeCount];

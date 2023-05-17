@@ -29,9 +29,9 @@ import static java.util.Collections.emptySet;
 public interface NamedParameterFormatter extends ParameterFormatter
 {
   /**
-   * Tells the name of this data formatter
+   * Tells the name of this parameter formatter
    *
-   * @return  data formatter name, never {@code null}
+   * @return  parameter formatter name, never {@code null}
    */
   @Contract(pure = true)
   @NotNull String getName();

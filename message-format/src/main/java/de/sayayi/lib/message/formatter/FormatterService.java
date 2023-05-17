@@ -30,7 +30,7 @@ import java.util.List;
 public interface FormatterService
 {
   /**
-   * Returns a list of data formatters for the given {@code format} and {@code type}.
+   * Returns a list of parameter formatters for the given {@code format} and {@code type}.
    * <p>
    * Implementing classes must make sure that for any combination of {@code format} and {@code type}
    * this function always returns at least 1 formatter. A good choice for a default formatter would
@@ -39,7 +39,8 @@ public interface FormatterService
    * @param format  name of the formatter or {@code null}
    * @param type    type of the value to format
    *
-   * @return  unmodifiable list of prioritized data formatters, never {@code null} and never empty
+   * @return  unmodifiable list of prioritized parameter formatters,
+   *          never {@code null} and never empty
    *
    * @see GenericFormatterService
    */
