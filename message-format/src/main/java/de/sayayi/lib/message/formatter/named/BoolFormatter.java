@@ -108,11 +108,16 @@ public final class BoolFormatter extends AbstractParameterFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set with supported java types for this formatter, not {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
     return new HashSet<>(asList(
         new FormattableType(Boolean.class),
-        new FormattableType(boolean.class, (byte)125)));
+        new FormattableType(boolean.class, (byte)120)));
   }
 }
