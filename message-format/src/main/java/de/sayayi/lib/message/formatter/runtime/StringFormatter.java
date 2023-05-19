@@ -85,7 +85,7 @@ public final class StringFormatter extends AbstractParameterFormatter
   {
     return new HashSet<>(asList(
         new FormattableType(CharSequence.class),
-        new FormattableType(char[].class, (byte)125)
+        new FormattableType(char[].class, (byte)120)
     ));
   }
 }

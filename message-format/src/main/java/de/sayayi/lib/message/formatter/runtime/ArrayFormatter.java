@@ -102,14 +102,14 @@ public final class ArrayFormatter extends AbstractParameterFormatter
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
     return new HashSet<>(Arrays.asList(
-        new FormattableType(Object[].class, (byte)125),
-        new FormattableType(boolean[].class, (byte)125),
-        new FormattableType(byte[].class, (byte)125),
-        new FormattableType(short[].class, (byte)125),
-        new FormattableType(int[].class, (byte)125),
-        new FormattableType(long[].class, (byte)125),
-        new FormattableType(float[].class, (byte)125),
-        new FormattableType(double[].class, (byte)125)
+        new FormattableType(Object[].class, (byte)120),
+        new FormattableType(boolean[].class, (byte)120),
+        new FormattableType(byte[].class, (byte)120),
+        new FormattableType(short[].class, (byte)120),
+        new FormattableType(int[].class, (byte)120),
+        new FormattableType(long[].class, (byte)120),
+        new FormattableType(float[].class, (byte)120),
+        new FormattableType(double[].class, (byte)120)
     ));
   }
 }
