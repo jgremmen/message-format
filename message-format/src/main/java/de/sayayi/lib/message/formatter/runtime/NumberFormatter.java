@@ -28,6 +28,7 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -39,7 +40,7 @@ import java.util.concurrent.atomic.LongAdder;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
 import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.NUMBER_TYPE;
-import static java.util.Collections.singleton;
+import static java.util.Arrays.asList;
 
 
 /**
@@ -108,7 +109,16 @@ public final class NumberFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(Number.class));
+  public @NotNull Set<FormattableType> getFormattableTypes()
+  {
+    return new HashSet<>(asList(
+        new FormattableType(Number.class),
+        new FormattableType(byte.class, (byte)120),
+        new FormattableType(short.class, (byte)120),
+        new FormattableType(int.class, (byte)120),
+        new FormattableType(long.class, (byte)120),
+        new FormattableType(float.class, (byte)120),
+        new FormattableType(double.class, (byte)120)
+    ));
   }
 }
