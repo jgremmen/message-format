@@ -19,8 +19,6 @@ import de.sayayi.lib.message.formatter.runtime.StringFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 
 /**
  * This class provides parameter formatters for all java types.
@@ -39,13 +37,12 @@ public interface FormatterService
    * @param format  name of the formatter or {@code null}
    * @param type    type of the value to format
    *
-   * @return  unmodifiable list of prioritized parameter formatters,
-   *          never {@code null} and never empty
+   * @return  array of prioritized parameter formatters, never {@code null} and never empty
    *
    * @see GenericFormatterService
    */
-  @Contract(pure = true)
-  @NotNull List<ParameterFormatter> getFormatters(String format, @NotNull Class<?> type);
+  @Contract(value = "_, _ -> new", pure = true)
+  @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type);
 
 
 

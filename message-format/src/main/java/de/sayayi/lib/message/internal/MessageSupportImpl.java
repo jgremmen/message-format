@@ -505,7 +505,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    public @NotNull List<ParameterFormatter> getFormatters(String format, @NotNull Class<?> type) {
+    public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type) {
       return formatterService.getFormatters(format, type);
     }
 

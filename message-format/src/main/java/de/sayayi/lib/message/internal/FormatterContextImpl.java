@@ -47,7 +47,8 @@ public final class FormatterContextImpl implements FormatterContext
   private final Object value;
   private final String format;
   private final @NotNull ParamConfig map;
-  private final @NotNull Deque<ParameterFormatter> parameterFormatters;
+  private final @NotNull ParameterFormatter[] parameterFormatters;
+  private int parameterFormatterIndex = 0;
 
 
   public FormatterContextImpl(@NotNull MessageAccessor messageAccessor,
@@ -63,7 +64,7 @@ public final class FormatterContextImpl implements FormatterContext
     if (type == null)
       type = value == null ? NULL_TYPE : value.getClass();
 
-    parameterFormatters = new ArrayDeque<>(messageAccessor.getFormatters(format, type));
+    parameterFormatters = messageAccessor.getFormatters(format, type);
   }
 
 
@@ -184,8 +185,12 @@ public final class FormatterContextImpl implements FormatterContext
 
 
   @Override
-  public @NotNull Text delegateToNextFormatter() {
-    return parameterFormatters.removeFirst().format(this, value);
+  public @NotNull Text delegateToNextFormatter()
+  {
+    if (parameterFormatterIndex == parameterFormatters.length)
+      throw new NoSuchElementException();
+
+    return parameterFormatters[parameterFormatterIndex++].format(this, value);
   }
 
 

@@ -23,8 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.*;
+import static java.util.Arrays.copyOf;
+import static java.util.Collections.synchronizedMap;
 import static java.util.Objects.requireNonNull;
 
 
@@ -43,7 +43,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       new ConcurrentHashMap<>();
   private final @NotNull Map<Class<?>,List<PrioritizedFormatter>> typeFormatters =
       new ConcurrentHashMap<>();
-  private final @NotNull Map<Class<?>,List<ParameterFormatter>> cachedFormatters =
+  private final @NotNull Map<Class<?>,ParameterFormatter[]> cachedFormatters =
       synchronizedMap(new FixedSizeCacheMap<>(CLASS_SORTER, 256));
 
 
@@ -99,7 +99,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   @Override
-  public @NotNull List<ParameterFormatter> getFormatters(String format, @NotNull Class<?> type)
+  public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type)
   {
     requireNonNull(type, "type must not be null");
 
@@ -107,53 +107,47 @@ public class GenericFormatterService implements FormatterService.WithRegistry
     {
       final NamedParameterFormatter namedFormatter = namedFormatters.get(format);
       if (namedFormatter != null && namedFormatter.canFormat(type))
-        return singletonList(namedFormatter);
+        return new ParameterFormatter[] { namedFormatter };
     }
 
-    return cachedFormatters.computeIfAbsent(type, this::resolveFormattersForType);
-  }
+    final ParameterFormatter[] formatters =
+        cachedFormatters.computeIfAbsent(type, this::getFormatters_resolve);
 
-
-  private @NotNull List<ParameterFormatter> resolveFormattersForType(@NotNull Class<?> type)
-  {
-    // substitute wrapper type for primitive type if necessary
-    if (type.isPrimitive() && !typeFormatters.containsKey(type))
-      type = WRAPPER_CLASS_MAP.get(type);
-
-    final List<PrioritizedFormatter> prioritizedFormatters = new ArrayList<>();
-    List<PrioritizedFormatter> tpf;
-
-    // build list with known formattable types
-    for(Class<?> t: resolveFormattersForType_collectTypes(type))
-      if ((tpf = typeFormatters.get(t)) != null)
-        prioritizedFormatters.addAll(tpf);
-
-    if (prioritizedFormatters.isEmpty())
-      prioritizedFormatters.addAll(typeFormatters.get(Object.class));
-
-    final int formatterCount = prioritizedFormatters.size();
-    final PrioritizedFormatter[] sortedFormatters =
-        prioritizedFormatters.toArray(new PrioritizedFormatter[formatterCount]);
-    Arrays.sort(sortedFormatters);
-
-    final ParameterFormatter[] parameterFormatters = new ParameterFormatter[formatterCount];
-    for(int n = 0; n < formatterCount; n++)
-      parameterFormatters[n] = sortedFormatters[n].formatter;
-
-    return unmodifiableList(asList(parameterFormatters));
+    return copyOf(formatters, formatters.length, ParameterFormatter[].class);
   }
 
 
   @Contract(pure = true)
-  private @NotNull Set<Class<?>> resolveFormattersForType_collectTypes(Class<?> type)
+  private @NotNull ParameterFormatter[] getFormatters_resolve(@NotNull Class<?> type)
+  {
+    return getFormatters_resolve_collectTypes(type)
+        .stream()
+        .map(typeFormatters::get)
+        .filter(Objects::nonNull)
+        .flatMap(Collection::stream)
+        .sorted()
+        .map(pf -> pf.formatter)
+        .distinct()
+        .toArray(ParameterFormatter[]::new);
+  }
+
+
+  @Contract(pure = true)
+  private @NotNull Set<Class<?>> getFormatters_resolve_collectTypes(@NotNull Class<?> type)
   {
     final Set<Class<?>> collectedTypes = new HashSet<>();
+
+    // substitute wrapper type for primitive type if necessary
+    if (type.isPrimitive() && !typeFormatters.containsKey(type))
+      type = WRAPPER_CLASS_MAP.get(type);
 
     for(; type != null; type = type.getSuperclass())
     {
       collectedTypes.add(type);
       addInterfaceTypes(type, collectedTypes);
     }
+
+    collectedTypes.add(Object.class);
 
     return collectedTypes;
   }
