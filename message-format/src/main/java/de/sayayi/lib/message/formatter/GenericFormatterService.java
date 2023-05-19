@@ -33,6 +33,9 @@ import static java.util.Objects.requireNonNull;
 @SuppressWarnings("UnstableApiUsage")
 public class GenericFormatterService implements FormatterService.WithRegistry
 {
+  /** default cache size for type to parameter formatters cache */
+  public static final int DEFAULT_FORMATTER_CACHE_SIZE = 256;
+
   private static final @NotNull Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
 
   private final @NotNull Map<String,NamedParameterFormatter> namedFormatters =
@@ -55,7 +58,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   public GenericFormatterService() {
-    this(256);
+    this(DEFAULT_FORMATTER_CACHE_SIZE);
   }
 
 
