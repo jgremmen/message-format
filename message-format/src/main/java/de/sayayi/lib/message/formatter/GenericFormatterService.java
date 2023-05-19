@@ -24,7 +24,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Arrays.copyOf;
-import static java.util.Collections.synchronizedMap;
 import static java.util.Objects.requireNonNull;
 
 
@@ -34,17 +33,13 @@ import static java.util.Objects.requireNonNull;
 @SuppressWarnings("UnstableApiUsage")
 public class GenericFormatterService implements FormatterService.WithRegistry
 {
-  private static final Comparator<Class<?>> CLASS_SORTER =
-      (o1, o2) -> o1 == o2 ? 0 : o1.getName().compareTo(o2.getName());
-
   private static final @NotNull Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
 
   private final @NotNull Map<String,NamedParameterFormatter> namedFormatters =
       new ConcurrentHashMap<>();
   private final @NotNull Map<Class<?>,List<PrioritizedFormatter>> typeFormatters =
       new ConcurrentHashMap<>();
-  private final @NotNull Map<Class<?>,ParameterFormatter[]> cachedFormatters =
-      synchronizedMap(new FixedSizeCacheMap<>(CLASS_SORTER, 256));
+  private final @NotNull FormatterCache formatterCache;
 
 
   static
@@ -60,6 +55,14 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   public GenericFormatterService() {
+    this(256);
+  }
+
+
+  public GenericFormatterService(int formatterCacheSize)
+  {
+    formatterCache = new FormatterCache(formatterCacheSize);
+
     addFormatterForType(new FormattableType(Object.class), new StringFormatter());
   }
 
@@ -74,7 +77,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
     typeFormatters.computeIfAbsent(type, t -> new ArrayList<>(4)).add(
         new PrioritizedFormatter(formattableType.getOrder(), formatter));
-    cachedFormatters.clear();
+    formatterCache.clear();
   }
 
 
@@ -110,30 +113,23 @@ public class GenericFormatterService implements FormatterService.WithRegistry
         return new ParameterFormatter[] { namedFormatter };
     }
 
-    final ParameterFormatter[] formatters =
-        cachedFormatters.computeIfAbsent(type, this::getFormatters_resolve);
+    final ParameterFormatter[] formatters = formatterCache.lookup(type, t ->
+        getFormatters_collectTypes(t)
+            .stream()
+            .map(typeFormatters::get)
+            .filter(Objects::nonNull)
+            .flatMap(Collection::stream)
+            .sorted()
+            .map(pf -> pf.formatter)
+            .distinct()
+            .toArray(ParameterFormatter[]::new));
 
     return copyOf(formatters, formatters.length, ParameterFormatter[].class);
   }
 
 
   @Contract(pure = true)
-  private @NotNull ParameterFormatter[] getFormatters_resolve(@NotNull Class<?> type)
-  {
-    return getFormatters_resolve_collectTypes(type)
-        .stream()
-        .map(typeFormatters::get)
-        .filter(Objects::nonNull)
-        .flatMap(Collection::stream)
-        .sorted()
-        .map(pf -> pf.formatter)
-        .distinct()
-        .toArray(ParameterFormatter[]::new);
-  }
-
-
-  @Contract(pure = true)
-  private @NotNull Set<Class<?>> getFormatters_resolve_collectTypes(@NotNull Class<?> type)
+  private @NotNull Set<Class<?>> getFormatters_collectTypes(@NotNull Class<?> type)
   {
     final Set<Class<?>> collectedTypes = new HashSet<>();
 
