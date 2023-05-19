@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 
 
@@ -26,7 +25,9 @@ import java.util.ServiceLoader;
  */
 public class DefaultFormatterService extends GenericFormatterService
 {
-  private static final FormatterService INSTANCE = new DefaultFormatterService();
+  private static final Object $LOCK = new Object[0];
+
+  private static FormatterService INSTANCE = null;
 
   /**
    * Classloader to be used to load parameter formatter service classes or {@code null} for
@@ -41,19 +42,32 @@ public class DefaultFormatterService extends GenericFormatterService
    *
    * @return  shared instance of the default formatter service, never {@code null}
    */
-  public static FormatterService getSharedInstance() {
-    return INSTANCE;
+  public static FormatterService getSharedInstance()
+  {
+    synchronized($LOCK) {
+      if (INSTANCE == null)
+        INSTANCE = new DefaultFormatterService();
+
+      return INSTANCE;
+    }
   }
 
 
   public DefaultFormatterService() {
-    this(null);
+    this(null, DEFAULT_FORMATTER_CACHE_SIZE);
+  }
+
+
+  public DefaultFormatterService(int formatterCacheSize) {
+    this(null, formatterCacheSize);
   }
 
 
   @SuppressWarnings("WeakerAccess")
-  public DefaultFormatterService(ClassLoader classLoader)
+  public DefaultFormatterService(ClassLoader classLoader, int formatterCacheSize)
   {
+    super(formatterCacheSize);
+
     this.classLoader = classLoader == null ? ClassLoader.getSystemClassLoader() : classLoader;
 
     addDefaultFormatters();
@@ -74,11 +88,8 @@ public class DefaultFormatterService extends GenericFormatterService
    */
   protected void addFormattersFromService()
   {
-    ServiceLoader.load(ParameterFormatter.class, classLoader).forEach(parameterFormatter -> {
-      try {
-        addFormatter(parameterFormatter);
-      } catch(ServiceConfigurationError ignore) {
-      }
-    });
+    ServiceLoader
+        .load(ParameterFormatter.class, classLoader)
+        .forEach(this::addFormatter);
   }
 }
