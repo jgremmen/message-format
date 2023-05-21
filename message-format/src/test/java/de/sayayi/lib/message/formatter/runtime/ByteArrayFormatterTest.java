@@ -17,6 +17,7 @@ package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
+import de.sayayi.lib.message.formatter.named.SizeFormatter;
 import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.parameter.value.ConfigValueString;
@@ -94,5 +95,20 @@ public class ByteArrayFormatterTest extends AbstractFormatterTest
 
     assertEquals(new TextPart("71, 114, -61, -74, -61, -97, 101"),
         format(messageAccessor, "Größe".getBytes(UTF_8), emptyMap()));
+  }
+
+
+  @Test
+  void testSize()
+  {
+    val messageSupport = MessageSupportFactory.create(
+        createFormatterService(
+            new SizeFormatter(),
+            new ArrayFormatter(),
+            new ByteArrayFormatter()),
+        NO_CACHE_INSTANCE);
+
+    assertEquals("2", messageSupport.message("%{c,size}")
+        .with("c", new byte[] { 'a', 'b' }).format());
   }
 }
