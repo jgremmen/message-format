@@ -113,12 +113,12 @@ public final class NumberFormatter extends AbstractParameterFormatter
   {
     return new HashSet<>(asList(
         new FormattableType(Number.class),
-        new FormattableType(byte.class, (byte)120),
-        new FormattableType(short.class, (byte)120),
-        new FormattableType(int.class, (byte)120),
-        new FormattableType(long.class, (byte)120),
-        new FormattableType(float.class, (byte)120),
-        new FormattableType(double.class, (byte)120)
+        new FormattableType(byte.class),
+        new FormattableType(short.class),
+        new FormattableType(int.class),
+        new FormattableType(long.class),
+        new FormattableType(float.class),
+        new FormattableType(double.class)
     ));
   }
 }

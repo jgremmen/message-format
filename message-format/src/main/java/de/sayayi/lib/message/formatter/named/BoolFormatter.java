@@ -118,6 +118,6 @@ public final class BoolFormatter extends AbstractParameterFormatter
   {
     return new HashSet<>(asList(
         new FormattableType(Boolean.class),
-        new FormattableType(boolean.class, (byte)120)));
+        new FormattableType(boolean.class)));
   }
 }

@@ -52,6 +52,13 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
    */
   public static final byte DEFAULT_ORDER = 100;
 
+  /**
+   * Default order value for primitive and array types.
+   *
+   * @see #getOrder()
+   */
+  public static final byte DEFAULT_PRIMITIVE_OR_ARRAY_ORDER = 120;
+
 
   /** Formattable class. */
   private final @NotNull Class<?> type;
@@ -87,11 +94,14 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
    * @param type  type, not {@code null}
    *
    * @see #DEFAULT_ORDER
+   * @see #DEFAULT_PRIMITIVE_OR_ARRAY_ORDER
    */
   public FormattableType(@NotNull Class<?> type)
   {
     this.type = requireNonNull(type, "type must not be null");
-    order = type == Object.class ? 127 : DEFAULT_ORDER;
+
+    order = type == Object.class ? 127 : type.isPrimitive() || type.isArray()
+        ? DEFAULT_PRIMITIVE_OR_ARRAY_ORDER : DEFAULT_ORDER;
   }
 
 
