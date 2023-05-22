@@ -34,12 +34,29 @@ public abstract class MessageFormatExtension
   @Getter private final List<String> excludeRegexFilter = new ArrayList<>();
 
 
+  /**
+   * Return the pack filename property. The default value is {@code message.pack}
+   *
+   * @return  pack filename
+   */
   public abstract Property<String> getPackFilename();
 
 
+  /**
+   * Returns the compress property stating whether the message pack must be compressed or not.
+   * The default value is {@code false}.
+   *
+   * @return  compress flag
+   */
   public abstract Property<Boolean> getCompress();
 
 
+  /**
+   * Returns the collection of class files to be scanned for messages. The default value is the
+   * output of the {@code main/java} source set.
+   *
+   * @return  class files to be scanned for messages
+   */
   public abstract ConfigurableFileCollection getSources();
 
 
