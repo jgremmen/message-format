@@ -38,7 +38,7 @@ public class MessageFormatPlugin implements Plugin<Project>
   @Override
   public void apply(Project project)
   {
-    // provide java base plugin
+    // provide java base plugin (for main/java)
     val plugins = project.getPlugins();
     if (!plugins.hasPlugin(JavaBasePlugin.class))
       project.apply(objectConfiguration -> objectConfiguration.plugin(JavaBasePlugin.class));
@@ -52,11 +52,15 @@ public class MessageFormatPlugin implements Plugin<Project>
     messageFormatExtension.getDuplicateMsgStrategy().convention(IGNORE_AND_WARN);
     messageFormatExtension.getValidateReferencedTemplates().convention(true);
 
-    val mainJavaSourceSet = extensions.getByType(JavaPluginExtension.class)
-        .getSourceSets().getByName("main");
+    val mainJavaSourceSet = extensions
+        .getByType(JavaPluginExtension.class)
+        .getSourceSets()
+        .getByName("main");
 
     // sources = {.build/classes/java/main/}**/*.class
-    messageFormatExtension.getSources().from(mainJavaSourceSet.getOutput());
+    messageFormatExtension
+        .getSources()
+        .from(mainJavaSourceSet.getOutput());
 
     registerPackTask(project, messageFormatExtension, mainJavaSourceSet);
   }

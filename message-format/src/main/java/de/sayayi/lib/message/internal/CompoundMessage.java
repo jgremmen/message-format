@@ -30,14 +30,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Arrays.*;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toSet;
 
 
 /**
@@ -126,11 +123,15 @@ public class CompoundMessage implements Message.WithSpaces
   @Override
   public @NotNull Set<String> getTemplateNames()
   {
-    return unmodifiableSet(Arrays
-        .stream(parts)
-        .filter(p -> p instanceof TemplatePart)
-        .map(p -> ((TemplatePart)p).getName())
-        .collect(toSet()));
+    final Set<String> templateNames = new TreeSet<>();
+
+    for(final MessagePart messagePart: parts)
+      if (messagePart instanceof TemplatePart)
+        templateNames.add(((TemplatePart)messagePart).getName());
+      else if (messagePart instanceof ParameterPart)
+        templateNames.addAll(((ParameterPart)messagePart).getParamConfig().getTemplateNames());
+
+    return unmodifiableSet(templateNames);
   }
 
 

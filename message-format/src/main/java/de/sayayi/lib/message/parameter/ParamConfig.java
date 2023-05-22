@@ -22,6 +22,7 @@ import de.sayayi.lib.message.parameter.key.ConfigKey;
 import de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.parameter.value.ConfigValue;
 import de.sayayi.lib.message.parameter.value.ConfigValue.Type;
+import de.sayayi.lib.message.parameter.value.ConfigValueMessage;
 import de.sayayi.lib.message.parameter.value.ConfigValueString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -31,11 +32,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.parameter.value.ConfigValue.STRING_MESSAGE_TYPE;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 
@@ -138,6 +141,19 @@ public final class ParamConfig implements Serializable
     return configValue.getType() == Type.STRING
         ? ((ConfigValueString)configValue).asMessage(messageAccessor.getMessageFactory())
         : (Message.WithSpaces)configValue.asObject();
+  }
+
+
+  @Contract(pure = true)
+  public @NotNull Set<String> getTemplateNames()
+  {
+    final Set<String> templateNames = new TreeSet<>();
+
+    for(final ConfigValue configValue: map.values())
+      if (configValue instanceof ConfigValueMessage)
+        templateNames.addAll(((ConfigValueMessage)configValue).asObject().getTemplateNames());
+
+    return unmodifiableSet(templateNames);
   }
 
 
