@@ -18,6 +18,7 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.SpacesAware;
+import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.ParameterPart;
@@ -51,7 +52,7 @@ public class CompoundMessage implements Message.WithSpaces
   private static final long serialVersionUID = 800L;
 
   /** Message parts, not empty */
-  private final @NotNull MessagePart[] parts;
+  private final @NotNull MessagePart[] messageParts;
 
 
   /**
@@ -61,14 +62,14 @@ public class CompoundMessage implements Message.WithSpaces
    * {@link de.sayayi.lib.message.internal.part.TextPart TextPart}, it is better to use
    * {@link EmptyMessage} or {@link TextMessage} in that case.
    *
-   * @param parts  message parts, not {@code null} and not empty
+   * @param messageParts  message parts, not {@code null} and not empty
    */
-  public CompoundMessage(@NotNull List<MessagePart> parts)
+  public CompoundMessage(@NotNull List<MessagePart> messageParts)
   {
-    if (requireNonNull(parts, "parts must not be null").isEmpty())
+    if (requireNonNull(messageParts, "parts must not be null").isEmpty())
       throw new IllegalArgumentException("parts must not be empty");
 
-    this.parts = parts.toArray(new MessagePart[0]);
+    this.messageParts = messageParts.toArray(new MessagePart[0]);
   }
 
 
@@ -79,23 +80,42 @@ public class CompoundMessage implements Message.WithSpaces
   {
     final StringBuilder message = new StringBuilder();
     boolean spaceBefore = false;
+    MessagePart messagePart = null;
 
-    for(final MessagePart part: parts)
-    {
-      final Text textPart = part instanceof ParameterPart
-          ? ((ParameterPart)part).getText(messageAccessor, parameters)
-          : part instanceof TemplatePart
-          ? ((TemplatePart)part).getText(messageAccessor, parameters)
-          : (Text)part;
-
-      if (!textPart.isEmpty())
+    try {
+      //noinspection ForLoopReplaceableByForEach
+      for(int n = 0, l = messageParts.length; n < l; n ++)
       {
-        if ((spaceBefore || textPart.isSpaceBefore()) && message.length() > 0)
-          message.append(' ');
+        messagePart = messageParts[n];
 
-        message.append(textPart.getText());
-        spaceBefore = textPart.isSpaceAfter();
+        final Text textPart = messagePart instanceof ParameterPart
+            ? ((ParameterPart)messagePart).getText(messageAccessor, parameters)
+            : messagePart instanceof TemplatePart
+            ? ((TemplatePart)messagePart).getText(messageAccessor, parameters)
+            : (Text)messagePart;
+
+        if (!textPart.isEmpty())
+        {
+          if ((spaceBefore || textPart.isSpaceBefore()) && message.length() > 0)
+            message.append(' ');
+
+          message.append(textPart.getText());
+          spaceBefore = textPart.isSpaceAfter();
+        }
       }
+    } catch(Exception ex) {
+      if (messagePart instanceof ParameterPart)
+      {
+        throw new MessageException("failed to format parameter '" +
+            ((ParameterPart)messagePart).getName() + '\'', ex);
+      }
+      else if (messagePart instanceof TemplatePart)
+      {
+        throw new MessageException("failed to format template '" +
+            ((TemplatePart)messagePart).getName() + '\'', ex);
+      }
+      else
+        throw new MessageException("failed to format message", ex);
     }
 
     return message.toString();
@@ -104,19 +124,19 @@ public class CompoundMessage implements Message.WithSpaces
 
   @Override
   public boolean isSpaceBefore() {
-    return parts[0].isSpaceBefore();
+    return messageParts[0].isSpaceBefore();
   }
 
 
   @Override
   public boolean isSpaceAfter() {
-    return parts[parts.length - 1].isSpaceAfter();
+    return messageParts[messageParts.length - 1].isSpaceAfter();
   }
 
 
   @Override
   public @NotNull MessagePart[] getMessageParts() {
-    return copyOf(parts, parts.length);
+    return copyOf(messageParts, messageParts.length);
   }
 
 
@@ -125,7 +145,7 @@ public class CompoundMessage implements Message.WithSpaces
   {
     final Set<String> templateNames = new TreeSet<>();
 
-    for(final MessagePart messagePart: parts)
+    for(final MessagePart messagePart: messageParts)
       if (messagePart instanceof TemplatePart)
         templateNames.add(((TemplatePart)messagePart).getName());
       else if (messagePart instanceof ParameterPart)
@@ -147,19 +167,19 @@ public class CompoundMessage implements Message.WithSpaces
   public boolean equals(Object o)
   {
     return this == o ||
-        o instanceof CompoundMessage && deepEquals(parts, ((CompoundMessage)o).parts);
+        o instanceof CompoundMessage && deepEquals(messageParts, ((CompoundMessage)o).messageParts);
   }
 
 
   @Override
   public int hashCode() {
-    return 59 + deepHashCode(parts);
+    return 59 + deepHashCode(messageParts);
   }
 
 
   @Override
   public String toString() {
-    return "CompoundMessage(parts=" + deepToString(parts) + ')';
+    return "CompoundMessage(parts=" + deepToString(messageParts) + ')';
   }
 
 
@@ -172,9 +192,9 @@ public class CompoundMessage implements Message.WithSpaces
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.writeSmallVar(parts.length);
+    packStream.writeSmallVar(messageParts.length);
 
-    for(final MessagePart part: parts)
+    for(final MessagePart part: messageParts)
       PackHelper.pack(part, packStream);
   }
 

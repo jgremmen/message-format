@@ -17,7 +17,6 @@ package de.sayayi.lib.message.internal.part;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.FormatterContextImpl;
 import de.sayayi.lib.message.internal.part.MessagePart.Parameter;
@@ -110,11 +109,7 @@ public final class ParameterPart implements Parameter
     final FormatterContext context = new FormatterContextImpl(messageAccessor, parameters,
         parameters.getParameterValue(name), null, format, paramConfig);
 
-    try {
-      return addSpaces(context.delegateToNextFormatter(), spaceBefore, spaceAfter);
-    } catch(Exception ex) {
-      throw new MessageException("failed to format parameter " + name, ex);
-    }
+    return addSpaces(context.delegateToNextFormatter(), spaceBefore, spaceAfter);
   }
 
 

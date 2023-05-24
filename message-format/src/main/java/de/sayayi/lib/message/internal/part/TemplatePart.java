@@ -84,16 +84,11 @@ public final class TemplatePart implements Template
   public @NotNull Text getText(@NotNull MessageAccessor messageAccessor,
                                @NotNull Parameters parameters)
   {
-    Text text = emptyText();
+    final Message message = messageAccessor.getTemplateByName(name);
 
-    try {
-      final Message message = messageAccessor.getTemplateByName(name);
-      if (message != null)
-        text = noSpaceText(message.format(messageAccessor, parameters));
-    } catch(Exception ignored) {
-    }
-
-    return addSpaces(text, spaceBefore, spaceAfter);
+    return addSpaces(message != null
+        ? noSpaceText(message.format(messageAccessor, parameters))
+        : emptyText(), spaceBefore, spaceAfter);
   }
 
 

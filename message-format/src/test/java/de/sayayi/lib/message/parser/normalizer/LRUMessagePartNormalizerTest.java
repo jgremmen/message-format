@@ -79,7 +79,7 @@ public class LRUMessagePartNormalizerTest
     final LRUMessagePartNormalizer resolver = new LRUMessagePartNormalizer(10);
     final Message.WithSpaces msg = new MessageFactory(resolver).parseMessage("this is %{a,number} and %{b}this is %{b}");
     final MessagePart[] parts = (MessagePart[])
-        tryToReadFieldValue(CompoundMessage.class, "parts", (CompoundMessage)msg).get();
+        tryToReadFieldValue(CompoundMessage.class, "messageParts", (CompoundMessage)msg).get();
 
     assertEquals(6, parts.length);
 

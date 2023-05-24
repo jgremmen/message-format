@@ -18,6 +18,7 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
@@ -34,6 +35,7 @@ import java.util.Set;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
+import static java.util.Locale.ROOT;
 import static java.util.Locale.forLanguageTag;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toSet;
@@ -73,8 +75,16 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   @Override
   @Contract(pure = true)
   public @NotNull String format(@NotNull MessageAccessor messageAccessor,
-                                @NotNull Parameters parameters) {
-    return findMessageByLocale(parameters.getLocale()).format(messageAccessor, parameters);
+                                @NotNull Parameters parameters)
+  {
+    final Locale locale = parameters.getLocale();
+
+    try {
+      return findMessageByLocale(locale).format(messageAccessor, parameters);
+    } catch(MessageException ex) {
+      throw new MessageException("failed to format message with code '" + code + "' for locale " +
+          (ROOT.equals(locale) ? "ROOT" : locale.getDisplayName()), ex);
+    }
   }
 
 

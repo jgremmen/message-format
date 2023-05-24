@@ -17,6 +17,7 @@ package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
@@ -63,8 +64,13 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
   @Override
   @Contract(pure = true)
   public @NotNull String format(@NotNull MessageAccessor messageAccessor,
-                                @NotNull Parameters parameters) {
-    return message.format(messageAccessor, parameters);
+                                @NotNull Parameters parameters)
+  {
+    try {
+      return message.format(messageAccessor, parameters);
+    } catch(MessageException ex) {
+      throw new MessageException("failed to format message with code '" + code + '\'', ex);
+    }
   }
 
 
