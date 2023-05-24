@@ -22,7 +22,6 @@ import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
-import de.sayayi.lib.message.internal.NoParameters;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;

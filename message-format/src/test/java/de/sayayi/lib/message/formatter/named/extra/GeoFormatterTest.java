@@ -16,9 +16,9 @@
 package de.sayayi.lib.message.formatter.named.extra;
 
 import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.NoParameters;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.named.extra.GeoFormatter.Format;
-import de.sayayi.lib.message.internal.NoParameters;
 import de.sayayi.lib.message.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.parameter.value.ConfigValueString;
 import lombok.val;

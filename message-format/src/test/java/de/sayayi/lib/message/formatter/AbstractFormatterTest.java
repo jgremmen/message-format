@@ -17,8 +17,8 @@ package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.NoParameters;
 import de.sayayi.lib.message.internal.FormatterContextImpl;
-import de.sayayi.lib.message.internal.NoParameters;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.parameter.ParamConfig;
 import de.sayayi.lib.message.parameter.key.ConfigKey;

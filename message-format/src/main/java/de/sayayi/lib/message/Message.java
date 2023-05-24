@@ -16,7 +16,7 @@
 package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.internal.NoParameters;
+import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +26,6 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import static java.util.Collections.unmodifiableSortedSet;
-import static java.util.Locale.ROOT;
 
 
 /**
@@ -48,9 +47,12 @@ public interface Message extends Serializable
    * @param parameters       message parameters, never {@code null}
    *
    * @return  formatted message, never {@code null}
+   *
+   * @throws MessageException  in case a formatting error occurred
    */
   @Contract(pure = true)
-  @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters);
+  @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
+      throws MessageException;
 
 
   /**
@@ -233,10 +235,6 @@ public interface Message extends Serializable
    */
   interface Parameters
   {
-    /** Instance with no parameters and no specific locale. */
-    Parameters EMPTY = new NoParameters(ROOT);
-
-
     /**
      * Tells for which locale the message must be formatted. If no locale is provided or if no
      * message is available for the given locale, the formatter will look for a reasonable

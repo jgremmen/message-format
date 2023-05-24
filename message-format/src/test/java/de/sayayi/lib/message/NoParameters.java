@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal;
+package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.Message.Parameters;
 import org.jetbrains.annotations.Contract;
@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.SortedSet;
 
 import static java.util.Collections.emptySortedSet;
+import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
 
 
@@ -34,6 +35,31 @@ import static java.util.Objects.requireNonNull;
  */
 public final class NoParameters implements Parameters
 {
+  /** Instance with no parameters and no specific locale. */
+  public static final Parameters EMPTY = new Parameters() {
+    @Override
+    public @NotNull Locale getLocale() {
+      return ROOT;
+    }
+
+    @Override
+    public Object getParameterValue(@NotNull String parameter) {
+      return null;
+    }
+
+    @Override
+    public @NotNull SortedSet<String> getParameterNames() {
+      return emptySortedSet();
+    }
+
+    @Override
+    public String toString() {
+      return "Parameters(locale='ROOT')";
+    }
+  };
+
+
+
   private final Locale locale;
 
 
