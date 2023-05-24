@@ -18,7 +18,7 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.exception.MessageException;
+import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
@@ -35,7 +35,6 @@ import java.util.Set;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
-import static java.util.Locale.ROOT;
 import static java.util.Locale.forLanguageTag;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toSet;
@@ -81,9 +80,8 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
     try {
       return findMessageByLocale(locale).format(messageAccessor, parameters);
-    } catch(MessageException ex) {
-      throw new MessageException("failed to format message with code '" + code + "' for locale " +
-          (ROOT.equals(locale) ? "ROOT" : locale.getDisplayName()), ex);
+    } catch(MessageFormatException ex) {
+      throw ex.withCode(code).withLocale(locale);
     }
   }
 
@@ -243,7 +241,8 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
     for(int n = 0; n < messageCount; n++)
     {
-      messages.put(forLanguageTag(requireNonNull(packStream.readString())),
+      messages.put(
+          forLanguageTag(requireNonNull(packStream.readString())),
           unpack.unpackMessage(packStream));
     }
 

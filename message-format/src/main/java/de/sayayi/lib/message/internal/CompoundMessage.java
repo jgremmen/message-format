@@ -18,7 +18,7 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.SpacesAware;
-import de.sayayi.lib.message.exception.MessageException;
+import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.internal.part.ParameterPart;
@@ -84,7 +84,7 @@ public final class CompoundMessage implements Message.WithSpaces
 
     try {
       //noinspection ForLoopReplaceableByForEach
-      for(int n = 0, l = messageParts.length; n < l; n ++)
+      for(int n = 0, l = messageParts.length; n < l; n++)
       {
         final Text textPart = format_toText(messageAccessor, parameters,
             messagePart = messageParts[n]);
@@ -98,8 +98,10 @@ public final class CompoundMessage implements Message.WithSpaces
           spaceBefore = textPart.isSpaceAfter();
         }
       }
-    } catch(Exception ex) {
+    } catch(MessageFormatException ex) {
       format_exception(messagePart, ex);
+    } catch(Exception ex) {
+      format_exception(messagePart, new MessageFormatException(ex));
     }
 
     return message.toString();
@@ -122,21 +124,16 @@ public final class CompoundMessage implements Message.WithSpaces
 
 
   @Contract("_, _ -> fail")
-  private void format_exception(@NotNull MessagePart messagePart, @NotNull Exception ex)
+  private void format_exception(@NotNull MessagePart messagePart,
+                                @NotNull MessageFormatException ex)
   {
     if (messagePart instanceof ParameterPart)
-    {
-      throw new MessageException("failed to format parameter '" +
-          ((ParameterPart)messagePart).getName() + '\'', ex);
-    }
+      throw new MessageFormatException(ex).withParameter(((ParameterPart)messagePart).getName());
 
     if (messagePart instanceof TemplatePart)
-    {
-      throw new MessageException("failed to format template '" +
-          ((TemplatePart)messagePart).getName() + '\'', ex);
-    }
+      throw new MessageFormatException(ex).withTemplate(((TemplatePart)messagePart).getName());
 
-    throw new MessageException("failed to format message", ex);
+    throw new MessageFormatException(ex);
   }
 
 

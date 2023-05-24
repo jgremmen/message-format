@@ -230,4 +230,10 @@ public class MessageFactory
     return (prefix + '[' + hash + '-' + Integer.toString(++CODE_ID | 0x20000, 36) + ']')
         .toUpperCase(ROOT);
   }
+
+
+  @Contract(pure = true)
+  public static boolean isGeneratedCode(String code) {
+    return code != null && code.matches("(MSG|TPL)\\[[0-9A-Z-]+]");
+  }
 }

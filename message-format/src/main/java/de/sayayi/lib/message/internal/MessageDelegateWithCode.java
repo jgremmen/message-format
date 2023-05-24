@@ -17,7 +17,7 @@ package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.exception.MessageException;
+import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
@@ -68,8 +68,8 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
   {
     try {
       return message.format(messageAccessor, parameters);
-    } catch(MessageException ex) {
-      throw new MessageException("failed to format message with code '" + code + '\'', ex);
+    } catch(MessageFormatException ex) {
+      throw ex.withCode(code);
     }
   }
 

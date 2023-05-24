@@ -16,7 +16,7 @@
 package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.exception.MessageException;
+import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.internal.part.MessagePart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -48,11 +48,11 @@ public interface Message extends Serializable
    *
    * @return  formatted message, never {@code null}
    *
-   * @throws MessageException  in case a formatting error occurred
+   * @throws MessageFormatException  in case a formatting error occurred
    */
   @Contract(pure = true)
   @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
-      throws MessageException;
+      throws MessageFormatException;
 
 
   /**
