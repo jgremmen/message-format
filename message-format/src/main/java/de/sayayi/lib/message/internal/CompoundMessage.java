@@ -47,7 +47,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public class CompoundMessage implements Message.WithSpaces
+public final class CompoundMessage implements Message.WithSpaces
 {
   private static final long serialVersionUID = 800L;
 
@@ -86,13 +86,8 @@ public class CompoundMessage implements Message.WithSpaces
       //noinspection ForLoopReplaceableByForEach
       for(int n = 0, l = messageParts.length; n < l; n ++)
       {
-        messagePart = messageParts[n];
-
-        final Text textPart = messagePart instanceof ParameterPart
-            ? ((ParameterPart)messagePart).getText(messageAccessor, parameters)
-            : messagePart instanceof TemplatePart
-            ? ((TemplatePart)messagePart).getText(messageAccessor, parameters)
-            : (Text)messagePart;
+        final Text textPart = format_toText(messageAccessor, parameters,
+            messagePart = messageParts[n]);
 
         if (!textPart.isEmpty())
         {
@@ -104,21 +99,44 @@ public class CompoundMessage implements Message.WithSpaces
         }
       }
     } catch(Exception ex) {
-      if (messagePart instanceof ParameterPart)
-      {
-        throw new MessageException("failed to format parameter '" +
-            ((ParameterPart)messagePart).getName() + '\'', ex);
-      }
-      else if (messagePart instanceof TemplatePart)
-      {
-        throw new MessageException("failed to format template '" +
-            ((TemplatePart)messagePart).getName() + '\'', ex);
-      }
-      else
-        throw new MessageException("failed to format message", ex);
+      format_exception(messagePart, ex);
     }
 
     return message.toString();
+  }
+
+
+  @Contract(pure = true)
+  private @NotNull Text format_toText(@NotNull MessageAccessor messageAccessor,
+                                      @NotNull Parameters parameters,
+                                      @NotNull MessagePart messagePart)
+  {
+    if (messagePart instanceof ParameterPart)
+      return ((ParameterPart)messagePart).getText(messageAccessor, parameters);
+
+    if (messagePart instanceof TemplatePart)
+      return ((TemplatePart)messagePart).getText(messageAccessor, parameters);
+
+    return (Text)messagePart;
+  }
+
+
+  @Contract("_, _ -> fail")
+  private void format_exception(@NotNull MessagePart messagePart, @NotNull Exception ex)
+  {
+    if (messagePart instanceof ParameterPart)
+    {
+      throw new MessageException("failed to format parameter '" +
+          ((ParameterPart)messagePart).getName() + '\'', ex);
+    }
+
+    if (messagePart instanceof TemplatePart)
+    {
+      throw new MessageException("failed to format template '" +
+          ((TemplatePart)messagePart).getName() + '\'', ex);
+    }
+
+    throw new MessageException("failed to format message", ex);
   }
 
 
