@@ -147,11 +147,5 @@ public final class MapFormatter extends AbstractParameterFormatter
     public Object getParameterValue(@NotNull String parameter) {
       return "key".equals(parameter) ? key : "value".equals(parameter) ? value : null;
     }
-
-
-    @Override
-    public @NotNull SortedSet<String> getParameterNames() {
-      return KEY_VALUE_PARAMETER_NAMES;  // probably never used
-    }
   }
 }

@@ -22,10 +22,11 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
-
-import static java.util.Collections.unmodifiableSortedSet;
+import java.util.Set;
 
 
 /**
@@ -78,11 +79,6 @@ public interface Message extends Serializable
       @Override
       public Object getParameterValue(@NotNull String parameter) {
         return parameterValues.get(parameter);
-      }
-
-      @Override
-      public @NotNull SortedSet<String> getParameterNames() {
-        return unmodifiableSortedSet(new TreeSet<>(parameterValues.keySet()));
       }
     });
   }
@@ -261,15 +257,5 @@ public interface Message extends Serializable
      */
     @Contract(pure = true)
     Object getParameterValue(@NotNull String parameter);
-
-
-    /**
-     * Returns a set with names for all parameters available in this context.
-     *
-     * @return  set with all data names
-     */
-    @SuppressWarnings("unused")
-    @Contract(pure = true)
-    @NotNull SortedSet<String> getParameterNames();
   }
 }

@@ -29,14 +29,12 @@ import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.parameter.value.*;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -564,12 +562,6 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    public @NotNull SortedSet<String> getParameterNames() {
-      return new ParameterNameSet(configurer);
-    }
-
-
-    @Override
     public String toString()
     {
       final StringBuilder s = new StringBuilder("Parameters(locale='")
@@ -584,169 +576,6 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
       }
 
       return s.append("})").toString();
-    }
-  }
-
-
-
-
-  private static final class ParameterNameSet extends AbstractSet<String>
-      implements SortedSet<String>
-  {
-    private final Configurer<?> configurer;
-
-
-    private ParameterNameSet(@NotNull Configurer<?> configurer) {
-      this.configurer = configurer;
-    }
-
-
-    @Override
-    public int size() {
-      return configurer.parameterCount;
-    }
-
-
-    @Override
-    public @Nullable Comparator<String> comparator() {
-      return null;
-    }
-
-
-    @Override
-    public @NotNull SortedSet<String> subSet(String fromElement, String toElement) {
-      throw new UnsupportedOperationException("subSet");
-    }
-
-
-    @Override
-    public @NotNull SortedSet<String> headSet(String toElement) {
-      throw new UnsupportedOperationException("headSet");
-    }
-
-
-    @Override
-    public @NotNull SortedSet<String> tailSet(String fromElement) {
-      throw new UnsupportedOperationException("tailSet");
-    }
-
-
-    @Override
-    public String first() {
-      return configurer.parameterCount == 0 ? null : (String)configurer.parameters[0];
-    }
-
-
-    @Override
-    public String last()
-    {
-      return configurer.parameterCount == 0
-          ? null : (String)configurer.parameters[(configurer.parameterCount - 1) * 2];
-    }
-
-
-    @Override
-    public void clear() {
-      throw new UnsupportedOperationException("clear");
-    }
-
-
-    @Override
-    public @NotNull Iterator<String> iterator() {
-      return new ParameterNameIterator(configurer);
-    }
-
-
-    @Override
-    public @NotNull Spliterator<String> spliterator() {
-      return new ParameterNameSpliterator(configurer);
-    }
-  }
-
-
-
-
-  private static final class ParameterNameIterator implements Iterator<String>
-  {
-    private final Object[] parameters;
-    private final int parameterCount;
-    private int n;
-
-
-    private ParameterNameIterator(@NotNull Configurer<?> configurer)
-    {
-      parameters = configurer.parameters;
-      parameterCount = configurer.parameterCount;
-    }
-
-
-    @Override
-    public boolean hasNext() {
-      return n < parameterCount;
-    }
-
-
-    @Override
-    public String next()
-    {
-      if (!hasNext())
-        throw new NoSuchElementException();
-
-      return (String)parameters[n++ * 2];
-    }
-  }
-
-
-
-
-  private static final class ParameterNameSpliterator implements Spliterator<String>
-  {
-    private final Object[] parameters;
-    private final int parameterCount;
-    private int n;
-
-
-    private ParameterNameSpliterator(@NotNull Configurer<?> configurer)
-    {
-      parameters = configurer.parameters;
-      parameterCount = configurer.parameterCount;
-    }
-
-
-    @Override
-    public boolean tryAdvance(Consumer<? super String> action)
-    {
-      if (n < parameterCount)
-      {
-        action.accept((String)parameters[n++ * 2]);
-        return true;
-      }
-
-      return false;
-    }
-
-
-    @Override
-    public Spliterator<String> trySplit() {
-      return null;
-    }
-
-
-    @Override
-    public long estimateSize() {
-      return parameterCount - n;
-    }
-
-
-    @Override
-    public int characteristics() {
-      return ORDERED | DISTINCT | IMMUTABLE | NONNULL | SORTED | SIZED;
-    }
-
-
-    @Override
-    public Comparator<? super String> getComparator() {
-      return null;
     }
   }
 }
