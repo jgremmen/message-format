@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.formatter.runtime;
+package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
@@ -42,8 +43,14 @@ import static java.util.Arrays.asList;
  * @author Jeroen Gremmen
  */
 public final class StringFormatter extends AbstractParameterFormatter
-    implements EmptyMatcher, SizeQueryable
+    implements EmptyMatcher, SizeQueryable, NamedParameterFormatter
 {
+  @Override
+  public @NotNull String getName() {
+    return "string";
+  }
+
+
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)

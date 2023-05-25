@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.formatter.runtime.StringFormatter;
+import de.sayayi.lib.message.formatter.named.StringFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.formatter.runtime;
+package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
