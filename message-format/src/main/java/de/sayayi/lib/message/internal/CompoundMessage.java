@@ -19,13 +19,14 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.SpacesAware;
 import de.sayayi.lib.message.exception.MessageFormatException;
-import de.sayayi.lib.message.internal.part.MessagePart;
-import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import de.sayayi.lib.message.internal.part.ParameterPart;
-import de.sayayi.lib.message.internal.part.TemplatePart;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
+import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.ParameterPart;
+import de.sayayi.lib.message.part.TemplatePart;
+import de.sayayi.lib.message.part.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -59,7 +60,7 @@ public final class CompoundMessage implements Message.WithSpaces
    * Construct a compound message based on the given message {@code parts}.
    * <p>
    * At least 1 message part is required. If the sole message part is a
-   * {@link de.sayayi.lib.message.internal.part.TextPart TextPart}, it is better to use
+   * {@link TextPart TextPart}, it is better to use
    * {@link EmptyMessage} or {@link TextMessage} in that case.
    *
    * @param messageParts  message parts, not {@code null} and not empty

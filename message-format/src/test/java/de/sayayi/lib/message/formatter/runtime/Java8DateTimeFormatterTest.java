@@ -17,10 +17,10 @@ package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.TextPart;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -31,8 +31,8 @@ import java.time.LocalTime;
 import java.util.TimeZone;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static de.sayayi.lib.message.internal.part.TextPartFactory.emptyText;
-import static de.sayayi.lib.message.internal.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Collections.singletonMap;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;

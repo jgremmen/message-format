@@ -18,7 +18,7 @@ package de.sayayi.lib.message.formatter.jodatime;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.*;
@@ -28,7 +28,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.*;
 
-import static de.sayayi.lib.message.internal.part.TextPartFactory.*;
+import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static java.util.Objects.requireNonNull;
 
 

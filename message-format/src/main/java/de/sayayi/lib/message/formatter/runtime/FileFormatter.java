@@ -20,7 +20,7 @@ import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
-import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,8 +28,8 @@ import java.io.File;
 import java.util.OptionalLong;
 import java.util.Set;
 
-import static de.sayayi.lib.message.internal.part.TextPartFactory.*;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.STRING_EMPTY_TYPE;
+import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static java.util.Collections.singleton;
 
 

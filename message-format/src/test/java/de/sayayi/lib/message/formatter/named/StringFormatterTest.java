@@ -25,7 +25,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static de.sayayi.lib.message.internal.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 

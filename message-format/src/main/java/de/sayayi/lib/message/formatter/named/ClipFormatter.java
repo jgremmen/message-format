@@ -18,11 +18,11 @@ package de.sayayi.lib.message.formatter.named;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
-import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.TextPart;
 import org.jetbrains.annotations.NotNull;
 
-import static de.sayayi.lib.message.internal.part.TextPartFactory.nullText;
+import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 
 
 /**

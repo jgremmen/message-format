@@ -16,8 +16,8 @@
 package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.parameter.key.ConfigKey.Type;
+import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

@@ -18,15 +18,15 @@ package de.sayayi.lib.message.formatter.named.extra;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
-import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.parameter.value.ConfigValue;
 import de.sayayi.lib.message.parameter.value.ConfigValueNumber;
 import de.sayayi.lib.message.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 
-import static de.sayayi.lib.message.internal.part.TextPartFactory.*;
+import static de.sayayi.lib.message.part.TextPartFactory.*;
 
 
 /**

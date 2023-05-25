@@ -20,9 +20,9 @@ import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
-import de.sayayi.lib.message.internal.part.MessagePart.Text;
 import de.sayayi.lib.message.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult;
+import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -30,8 +30,8 @@ import java.util.HashSet;
 import java.util.OptionalLong;
 import java.util.Set;
 
-import static de.sayayi.lib.message.internal.part.TextPartFactory.*;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static java.lang.reflect.Array.get;
 import static java.lang.reflect.Array.getLength;
 

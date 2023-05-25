@@ -18,7 +18,7 @@ package de.sayayi.lib.message.formatter.named.extra;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
-import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -27,8 +27,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static de.sayayi.lib.message.internal.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.TextPartFactory.nullText;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 
 
 /**

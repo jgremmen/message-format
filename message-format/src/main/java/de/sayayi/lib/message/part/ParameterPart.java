@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal.part;
+package de.sayayi.lib.message.part;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.internal.FormatterContextImpl;
-import de.sayayi.lib.message.internal.part.MessagePart.Parameter;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.parameter.ParamConfig;
 import de.sayayi.lib.message.parameter.key.ConfigKey;
 import de.sayayi.lib.message.parameter.value.ConfigValue;
+import de.sayayi.lib.message.part.MessagePart.Parameter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 
-import static de.sayayi.lib.message.internal.part.TextPartFactory.addSpaces;
+import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
 import static java.util.Objects.requireNonNull;
 
 

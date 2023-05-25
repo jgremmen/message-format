@@ -17,9 +17,9 @@ package de.sayayi.lib.message.formatter.jodatime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.part.TextPart;
 import lombok.val;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 import java.util.TimeZone;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static de.sayayi.lib.message.internal.part.MessagePart.Text.EMPTY;
+import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
 import static java.util.Collections.singletonMap;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;

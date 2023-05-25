@@ -18,14 +18,14 @@ package de.sayayi.lib.message.formatter.named;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
-import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.OptionalLong;
 
-import static de.sayayi.lib.message.internal.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.NUMBER_TYPE;
+import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 
 
 /**

@@ -17,7 +17,7 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.exception.MessageFormatException;
-import de.sayayi.lib.message.internal.part.MessagePart;
+import de.sayayi.lib.message.part.MessagePart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

@@ -18,7 +18,7 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.internal.part.MessagePart.Text;
+import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +30,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.*;
 
-import static de.sayayi.lib.message.internal.part.TextPartFactory.*;
+import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static java.time.format.DateTimeFormatter.*;
 import static java.time.format.FormatStyle.*;
 import static java.util.Objects.requireNonNull;

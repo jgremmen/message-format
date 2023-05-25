@@ -24,19 +24,19 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.CompoundMessage;
-import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import de.sayayi.lib.message.internal.part.NoSpaceTextPart;
-import de.sayayi.lib.message.internal.part.ParameterPart;
 import de.sayayi.lib.message.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult;
+import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.NoSpaceTextPart;
+import de.sayayi.lib.message.part.ParameterPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-import static de.sayayi.lib.message.internal.part.TextPartFactory.emptyText;
-import static de.sayayi.lib.message.internal.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
+import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
 import static java.util.stream.Collectors.toList;

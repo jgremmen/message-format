@@ -19,8 +19,8 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,10 +28,10 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.Set;
 
-import static de.sayayi.lib.message.internal.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.NUMBER_TYPE;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.STRING_EMPTY_TYPE;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.util.Collections.singleton;
 
 
