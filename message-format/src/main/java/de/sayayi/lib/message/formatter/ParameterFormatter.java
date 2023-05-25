@@ -61,9 +61,15 @@ public interface ParameterFormatter
    * Returns a set of java types which are supported by this formatter.
    * <p>
    * On registration {@link FormatterService.WithRegistry#addFormatter(ParameterFormatter)}
-   * existing types which are also supported by this formatter will be overridden.
+   * existing types which are also supported by this formatter will co-exist with each other.
+   * The order attribute determines which formatter is preferred before the other. If different
+   * formatters have both the same type and order, the formatter precedence is determined by
+   * the class name. The behavior is deterministic but it is encouraged to select different
+   * order values for those cases.
    *
    * @return  a set with supported java types for this formatter, not {@code null}
+   *
+   * @see FormattableType#compareTo(FormattableType)
    */
   @Contract(pure = true)
   @NotNull Set<FormattableType> getFormattableTypes();

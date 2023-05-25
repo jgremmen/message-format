@@ -24,6 +24,10 @@ import static java.util.Collections.emptySet;
 
 
 /**
+ * Parameter formatter implementing this interface can be selected by specifying the formatter
+ * name in a message parameter. If, for instance, this formatter is named {@code xyz}, it can
+ * be addressed in a message as follows: {@code 'text %{p,xyz}.'}
+ *
  * @author Jeroen Gremmen
  */
 public interface NamedParameterFormatter extends ParameterFormatter
@@ -39,6 +43,10 @@ public interface NamedParameterFormatter extends ParameterFormatter
 
   /**
    * Tells whether this formatter is capable of formatting values of {@code type}.
+   * <p>
+   * If a parameter format is specified this method is invoked with the type of the value to
+   * be formatted. The return value determines whether this formatter is used ({@code true}) or
+   * another formatter is selected ({@code false}).
    *
    * @param type  type to check, not {@code null}
    *
