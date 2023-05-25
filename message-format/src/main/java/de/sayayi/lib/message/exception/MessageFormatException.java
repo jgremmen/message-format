@@ -27,6 +27,7 @@ import static java.util.Locale.UK;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 public class MessageFormatException extends MessageException
 {
@@ -56,8 +57,6 @@ public class MessageFormatException extends MessageException
   @Override
   public String getMessage()
   {
-    final StringBuilder msg = new StringBuilder();
-
     /*
       c | t | l | p | msg
       0 | 0 | 0 | 0 | failed to format message
@@ -78,12 +77,11 @@ public class MessageFormatException extends MessageException
       1 | 1 | 1 | 1 | failed to format parameter 'p' in template 't' for message with code 'c' and locale 'l'
      */
 
+    final StringBuilder msg = new StringBuilder("failed to format");
     final int n = (code != null && !isGeneratedCode(code) ? 8 : 0) +
         (template != null ? 4 : 0) + (locale != null ? 2 : 0) + (parameter != null ? 1 : 0);
 
-    msg.append("failed to format");
-
-    if (n < 0b0100)
+    if ((n & 0b1100) == 0)
       msg.append(" message");
 
     if ((n & 0b0001) != 0)  // parameter
@@ -122,19 +120,19 @@ public class MessageFormatException extends MessageException
 
 
   @Contract("_ -> new")
-  public MessageFormatException withTemplate(@NotNull String template) {
+  public @NotNull MessageFormatException withTemplate(@NotNull String template) {
     return new MessageFormatException(code, template, locale, parameter, getCause());
   }
 
 
   @Contract("_ -> new")
-  public MessageFormatException withLocale(@NotNull Locale locale) {
+  public @NotNull MessageFormatException withLocale(@NotNull Locale locale) {
     return new MessageFormatException(code, template, locale, parameter, getCause());
   }
 
 
   @Contract("_ -> new")
-  public MessageFormatException withParameter(@NotNull String parameter) {
+  public @NotNull MessageFormatException withParameter(@NotNull String parameter) {
     return new MessageFormatException(code, template, locale, parameter, getCause());
   }
 }
