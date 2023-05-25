@@ -37,11 +37,30 @@ public class MessageFormatException extends MessageException
   private final String parameter;
 
 
+  /**
+   * Constructs a new message exception with the specified cause.
+   * <p>
+   * Note that the detail message associated with {@code cause} is <i>not</i>
+   * incorporated in this runtime exception's detail message.
+   *
+   * @param cause    the cause (which is saved for later retrieval by the {@link #getCause()}
+   *                 method). (A {@code null} value is permitted, and indicates that the cause is
+   *                 nonexistent or unknown.)
+   */
   public MessageFormatException(Throwable cause) {
     this(null, null, null, null, cause);
   }
 
 
+  /**
+   * All arguments constructor for internal use.
+   *
+   * @param code       message code
+   * @param template   template name
+   * @param locale     message locale
+   * @param parameter  message parameter name
+   * @param cause      cause
+   */
   protected MessageFormatException(String code, String template, Locale locale, String parameter,
                                    Throwable cause)
   {
@@ -113,24 +132,104 @@ public class MessageFormatException extends MessageException
   }
 
 
+  /**
+   * Returns the message code, if available.
+   *
+   * @return  message code, or {@code null}
+   */
+  @Contract(pure = true)
+  public String getCode() {
+    return code;
+  }
+
+
+  /**
+   * Returns the template name, if available.
+   *
+   * @return  template name, or {@code null}
+   */
+  @Contract(pure = true)
+  public String getTemplate() {
+    return template;
+  }
+
+
+  /**
+   * Returns the message locale, if available.
+   *
+   * @return  message locale, or {@code null}
+   */
+  @Contract(pure = true)
+  public Locale getLocale() {
+    return locale;
+  }
+
+
+  /**
+   * Returns the message parameter name, if available.
+   *
+   * @return  message parameter name, or {@code null}
+   */
+  @Contract(pure = true)
+  public String getParameter() {
+    return parameter;
+  }
+
+
+  /**
+   * Returns a copy of this exception where the code value has been replaced with
+   * the given {@code code}.
+   *
+   * @param code  new code, not {@code null}
+   *
+   * @return  new exception based on the current exception with modified code value,
+   *          never {@code null}
+   */
   @Contract("_ -> new")
   public @NotNull MessageFormatException withCode(@NotNull String code) {
     return new MessageFormatException(code, template, locale, parameter, getCause());
   }
 
 
+  /**
+   * Returns a copy of this exception where the template value has been replaced with
+   * the given {@code template}.
+   *
+   * @param template  new template, not {@code null}
+   *
+   * @return  new exception based on the current exception with modified template value,
+   *          never {@code null}
+   */
   @Contract("_ -> new")
   public @NotNull MessageFormatException withTemplate(@NotNull String template) {
     return new MessageFormatException(code, template, locale, parameter, getCause());
   }
 
 
+  /**
+   * Returns a copy of this exception where the locale value has been replaced with
+   * the given {@code locale}.
+   *
+   * @param locale  new locale, not {@code null}
+   *
+   * @return  new exception based on the current exception with modified locale value,
+   *          never {@code null}
+   */
   @Contract("_ -> new")
   public @NotNull MessageFormatException withLocale(@NotNull Locale locale) {
     return new MessageFormatException(code, template, locale, parameter, getCause());
   }
 
 
+  /**
+   * Returns a copy of this exception where the parameter value has been replaced with
+   * the given {@code parameter}.
+   *
+   * @param parameter  new parameter, not {@code null}
+   *
+   * @return  new exception based on the current exception with modified parameter value,
+   *          never {@code null}
+   */
   @Contract("_ -> new")
   public @NotNull MessageFormatException withParameter(@NotNull String parameter) {
     return new MessageFormatException(code, template, locale, parameter, getCause());
