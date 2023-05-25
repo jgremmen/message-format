@@ -34,7 +34,6 @@ import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 /**
  * @author Jeroen Gremmen
  */
-@SuppressWarnings("UnnecessaryUnicodeEscape")
 public final class GeoFormatter extends AbstractParameterFormatter
     implements NamedParameterFormatter
 {
@@ -87,7 +86,7 @@ public final class GeoFormatter extends AbstractParameterFormatter
     if (negative && !fmt.hasLoLa() && (dms[0] > 0 || dms[1] > 0 || dms[2] > 0))
       s.append('-');
 
-    s.append((int)dms[0]).append('\u00b0');
+    s.append((int)dms[0]).append('°');
     if (fmt.separatorAfterDegree)
       s.append(' ');
 
