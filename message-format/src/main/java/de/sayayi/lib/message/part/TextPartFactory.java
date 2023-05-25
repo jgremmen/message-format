@@ -19,9 +19,9 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import static de.sayayi.lib.message.internal.SpacesUtil.isTrimmedEmpty;
 import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
 import static de.sayayi.lib.message.part.MessagePart.Text.NULL;
+import static de.sayayi.lib.message.util.SpacesUtil.isTrimmedEmpty;
 
 
 /**

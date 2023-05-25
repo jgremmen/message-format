@@ -26,7 +26,7 @@ import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import de.sayayi.lib.message.parameter.value.*;
+import de.sayayi.lib.message.part.parameter.value.*;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,7 +54,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 {
   private final @NotNull FormatterService formatterService;
   private final @NotNull MessageFactory messageFactory;
-  private final @NotNull Map<String,ConfigValue> defaultParameterConfig = new TreeMap<>();
+  private final @NotNull Map<String, ConfigValue> defaultParameterConfig = new TreeMap<>();
   private final @NotNull Map<String,Message.WithCode> messages = new TreeMap<>();
   private final @NotNull Map<String,Message> templates = new TreeMap<>();
   private final @NotNull MessageAccessor messageAccessor;

@@ -15,9 +15,9 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.parameter.key.ConfigKey.CompareType;
-import de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

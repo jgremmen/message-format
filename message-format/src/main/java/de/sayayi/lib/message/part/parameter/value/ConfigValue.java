@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parameter.value;
+package de.sayayi.lib.message.part.parameter.value;
 
-import de.sayayi.lib.message.parameter.ParamConfig;
+import de.sayayi.lib.message.part.parameter.ParamConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

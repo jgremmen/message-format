@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parameter;
+package de.sayayi.lib.message.part.parameter;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.parameter.key.ConfigKey;
-import de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult;
-import de.sayayi.lib.message.parameter.value.ConfigValue;
-import de.sayayi.lib.message.parameter.value.ConfigValue.Type;
-import de.sayayi.lib.message.parameter.value.ConfigValueMessage;
-import de.sayayi.lib.message.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
+import de.sayayi.lib.message.part.parameter.value.ConfigValue;
+import de.sayayi.lib.message.part.parameter.value.ConfigValue.Type;
+import de.sayayi.lib.message.part.parameter.value.ConfigValueMessage;
+import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,9 +34,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.EXACT;
-import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.MISMATCH;
-import static de.sayayi.lib.message.parameter.value.ConfigValue.STRING_MESSAGE_TYPE;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.EXACT;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
+import static de.sayayi.lib.message.part.parameter.value.ConfigValue.STRING_MESSAGE_TYPE;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;

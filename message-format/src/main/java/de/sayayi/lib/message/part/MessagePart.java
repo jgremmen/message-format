@@ -18,7 +18,7 @@ package de.sayayi.lib.message.part;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.SpacesAware;
-import de.sayayi.lib.message.parameter.ParamConfig;
+import de.sayayi.lib.message.part.parameter.ParamConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

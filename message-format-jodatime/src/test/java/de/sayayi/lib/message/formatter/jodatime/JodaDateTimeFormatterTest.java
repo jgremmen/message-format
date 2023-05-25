@@ -17,9 +17,9 @@ package de.sayayi.lib.message.formatter.jodatime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.parameter.key.ConfigKeyName;
-import de.sayayi.lib.message.parameter.value.ConfigValueString;
 import de.sayayi.lib.message.part.TextPart;
+import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
+import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;

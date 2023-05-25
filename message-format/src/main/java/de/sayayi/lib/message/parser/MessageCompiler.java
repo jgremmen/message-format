@@ -23,15 +23,15 @@ import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.EmptyMessage;
-import de.sayayi.lib.message.internal.SpacesUtil;
 import de.sayayi.lib.message.internal.TextMessage;
-import de.sayayi.lib.message.parameter.key.*;
-import de.sayayi.lib.message.parameter.key.ConfigKey.CompareType;
-import de.sayayi.lib.message.parameter.value.*;
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.part.ParameterPart;
 import de.sayayi.lib.message.part.TemplatePart;
 import de.sayayi.lib.message.part.TextPart;
+import de.sayayi.lib.message.part.parameter.ParameterPart;
+import de.sayayi.lib.message.part.parameter.key.*;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
+import de.sayayi.lib.message.part.parameter.value.*;
+import de.sayayi.lib.message.util.SpacesUtil;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -310,7 +310,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitParameterPart(ParameterPartContext ctx)
     {
-      final Map<ConfigKey,ConfigValue> mapElements = ctx.configElement().stream()
+      final Map<ConfigKey, ConfigValue> mapElements = ctx.configElement().stream()
           .collect(toMap(mec -> mec.key, mec -> mec.value, (a, b) -> b, LinkedHashMap::new));
       final ForceQuotedMessageContext forceQuotedMessage = ctx.forceQuotedMessage();
       if (forceQuotedMessage != null)

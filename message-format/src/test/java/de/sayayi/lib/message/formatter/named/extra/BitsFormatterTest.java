@@ -19,9 +19,9 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.runtime.LongSupplierFormatter;
 import de.sayayi.lib.message.formatter.runtime.OptionalIntFormatter;
-import de.sayayi.lib.message.parameter.key.ConfigKeyName;
-import de.sayayi.lib.message.parameter.value.ConfigValueNumber;
-import de.sayayi.lib.message.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
+import de.sayayi.lib.message.part.parameter.value.ConfigValueNumber;
+import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 

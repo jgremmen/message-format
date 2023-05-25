@@ -18,8 +18,8 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.named.BoolFormatter;
-import de.sayayi.lib.message.parameter.key.ConfigKeyName;
-import de.sayayi.lib.message.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
+import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 

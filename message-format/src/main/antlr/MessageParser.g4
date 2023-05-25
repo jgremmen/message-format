@@ -24,11 +24,11 @@ options {
 
 @header {
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.parameter.ParamConfig;
-import de.sayayi.lib.message.parameter.key.*;
-import de.sayayi.lib.message.parameter.value.*;
-import de.sayayi.lib.message.part.*;
-import java.util.Map;
+import de.sayayi.lib.message.part.TemplatePart;
+import de.sayayi.lib.message.part.TextPart;
+import de.sayayi.lib.message.part.parameter.ParameterPart;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey;
+import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 }
 
 

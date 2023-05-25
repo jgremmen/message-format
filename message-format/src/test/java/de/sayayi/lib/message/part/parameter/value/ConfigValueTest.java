@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parameter.value;
+package de.sayayi.lib.message.part.parameter.value;
 
 import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.parameter.value.ConfigValue.Type;
+import de.sayayi.lib.message.part.parameter.value.ConfigValue.Type;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

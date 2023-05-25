@@ -17,10 +17,10 @@ package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.parameter.key.ConfigKey;
-import de.sayayi.lib.message.parameter.key.ConfigKeyBool;
-import de.sayayi.lib.message.parameter.value.ConfigValue;
-import de.sayayi.lib.message.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey;
+import de.sayayi.lib.message.part.parameter.key.ConfigKeyBool;
+import de.sayayi.lib.message.part.parameter.value.ConfigValue;
+import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 

@@ -29,10 +29,10 @@ import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
 
-import static de.sayayi.lib.message.parameter.key.ConfigKey.BOOL_TYPE;
-import static de.sayayi.lib.message.parameter.key.ConfigKey.EMPTY_NULL_TYPE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.BOOL_TYPE;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.EMPTY_NULL_TYPE;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;

@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parameter.value;
+package de.sayayi.lib.message.part.parameter.value;
 
-import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -24,69 +22,73 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static java.util.Objects.requireNonNull;
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Integer.MIN_VALUE;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class ConfigValueString implements ConfigValue
+public final class ConfigValueNumber implements ConfigValue
 {
   private static final long serialVersionUID = 800L;
 
-  /** Configuration value string. */
-  private final @NotNull String string;
-
-  private transient Message.WithSpaces message;
+  /** Configuration value number. */
+  private final long number;
 
 
-  public ConfigValueString(@NotNull String string) {
-    this.string = requireNonNull(string, "string must not be null");
+  public ConfigValueNumber(long number) {
+    this.number = number;
   }
 
 
   /**
    * {@inheritDoc}
    *
-   * @return  always {@link Type#STRING Type#STRING}
+   * @return  always {@link Type#NUMBER Type#NUMBER}
    */
   @Override
   public @NotNull Type getType() {
-    return Type.STRING;
+    return Type.NUMBER;
   }
 
 
   /**
-   * Return the string value.
+   * Return the number as int.
+   * <p>
+   * If the number is larger than the integer range, the returned value is either
+   * {@code 4294967295} for positive values or {@code −4294967296} for negative values.
    *
-   * @return  string, never {@code null}
+   * @return  number as int
    *
    * @since 0.8.0
    */
-  public @NotNull String stringValue() {
-    return string;
+  public int intValue() {
+    return number < MIN_VALUE ? MIN_VALUE : number > MAX_VALUE ? MAX_VALUE : (int)number;
   }
 
 
   /**
-   * Returns the string value.
+   * Return the number as long.
    *
-   * @return  string, never {@code null}
+   * @return  number as long
+   *
+   * @since 0.8.0
    */
-  @Override
-  @Contract(pure = true)
-  public @NotNull String asObject() {
-    return string;
+  public long longValue() {
+    return number;
   }
 
 
-  @NotNull
-  public synchronized Message.WithSpaces asMessage(@NotNull MessageFactory messageFactory)
-  {
-    if (message == null)
-      message = messageFactory.parseMessage(string);
-
-    return message;
+  /**
+   * Returns the number value.
+   *
+   * @return  number, never {@code null}
+   */
+  @Override
+  @Contract(pure = true)
+  public @NotNull Long asObject() {
+    return number;
   }
 
 
@@ -94,20 +96,20 @@ public final class ConfigValueString implements ConfigValue
   public boolean equals(Object o)
   {
     return this == o ||
-        o instanceof ConfigValueString && string.equals(((ConfigValueString)o).string);
+        o instanceof ConfigValueNumber && this.number == ((ConfigValueNumber)o).number;
   }
 
 
   @Override
   public int hashCode() {
-    return 59 + string.hashCode();
+    return 59 + Long.hashCode(number);
   }
 
 
   @Override
   @Contract(pure = true)
-  public @NotNull String toString() {
-    return '\'' + string.replace("'", "\\'") + '\'';
+  public String toString() {
+    return Long.toString(number);
   }
 
 
@@ -119,21 +121,21 @@ public final class ConfigValueString implements ConfigValue
    * @since 0.8.0
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeString(string);
+    packStream.writeLong(number);
   }
 
 
   /**
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked string map value, never {@code null}
+   * @return  unpacked number map value, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
-  public static @NotNull ConfigValueString unpack(@NotNull PackInputStream packStream)
+  public static @NotNull ConfigValueNumber unpack(@NotNull PackInputStream packStream)
       throws IOException {
-    return new ConfigValueString(requireNonNull(packStream.readString()));
+    return new ConfigValueNumber(packStream.readLong());
   }
 }

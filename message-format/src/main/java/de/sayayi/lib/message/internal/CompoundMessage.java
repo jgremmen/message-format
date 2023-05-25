@@ -24,9 +24,9 @@ import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.ParameterPart;
 import de.sayayi.lib.message.part.TemplatePart;
 import de.sayayi.lib.message.part.TextPart;
+import de.sayayi.lib.message.part.parameter.ParameterPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

@@ -21,18 +21,18 @@ import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
-import de.sayayi.lib.message.parameter.ParamConfig;
-import de.sayayi.lib.message.parameter.key.ConfigKey;
-import de.sayayi.lib.message.parameter.value.*;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextPart;
+import de.sayayi.lib.message.part.parameter.ParamConfig;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey;
+import de.sayayi.lib.message.part.parameter.value.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 import static de.sayayi.lib.message.formatter.ParameterFormatter.NULL_TYPE;
-import static de.sayayi.lib.message.parameter.key.ConfigKey.NAME_TYPE;
 import static de.sayayi.lib.message.part.MessagePart.Text.NULL;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.NAME_TYPE;
 import static java.util.Optional.ofNullable;
 
 

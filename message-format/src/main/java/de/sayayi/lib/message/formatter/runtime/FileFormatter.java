@@ -28,8 +28,8 @@ import java.io.File;
 import java.util.OptionalLong;
 import java.util.Set;
 
-import static de.sayayi.lib.message.parameter.key.ConfigKey.STRING_EMPTY_TYPE;
 import static de.sayayi.lib.message.part.TextPartFactory.*;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.STRING_EMPTY_TYPE;
 import static java.util.Collections.singleton;
 
 

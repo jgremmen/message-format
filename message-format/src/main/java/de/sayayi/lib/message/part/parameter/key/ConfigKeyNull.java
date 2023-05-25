@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parameter.key;
+package de.sayayi.lib.message.part.parameter.key;
 
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.pack.PackInputStream;
@@ -23,9 +23,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.Locale;
 
-import static de.sayayi.lib.message.parameter.key.ConfigKey.CompareType.EQ;
-import static de.sayayi.lib.message.parameter.key.ConfigKey.CompareType.NE;
-import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 
 
 /**

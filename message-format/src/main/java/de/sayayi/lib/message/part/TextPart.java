@@ -15,18 +15,18 @@
  */
 package de.sayayi.lib.message.part;
 
-import de.sayayi.lib.message.internal.SpacesUtil;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.util.SpacesUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Objects;
 
-import static de.sayayi.lib.message.internal.SpacesUtil.isSpaceChar;
-import static de.sayayi.lib.message.internal.SpacesUtil.trimSpaces;
+import static de.sayayi.lib.message.util.SpacesUtil.isSpaceChar;
+import static de.sayayi.lib.message.util.SpacesUtil.trimSpaces;
 
 
 /**

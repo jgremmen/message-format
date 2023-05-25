@@ -24,8 +24,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.OptionalLong;
 
-import static de.sayayi.lib.message.parameter.key.ConfigKey.NUMBER_TYPE;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.NUMBER_TYPE;
 
 
 /**

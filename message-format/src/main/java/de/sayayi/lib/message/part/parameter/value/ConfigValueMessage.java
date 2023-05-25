@@ -13,77 +13,74 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parameter.value;
+package de.sayayi.lib.message.part.parameter.value;
 
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+
+import static java.util.Objects.requireNonNull;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public enum ConfigValueBool implements ConfigValue
+public final class ConfigValueMessage implements ConfigValue
 {
-  /** Config value representing {@code false}. */
-  FALSE(false),
-
-  /** Config value representing {@code true}. */
-  TRUE(true);
-
-
   private static final long serialVersionUID = 800L;
 
-  /** Configuration value boolean. */
-  private final boolean bool;
+  /** Configuration value message. */
+  private final @NotNull Message.WithSpaces message;
 
 
-  ConfigValueBool(boolean bool) {
-    this.bool = bool;
+  public ConfigValueMessage(@NotNull Message.WithSpaces message) {
+    this.message = requireNonNull(message, "message must not be null");
   }
 
 
   /**
    * {@inheritDoc}
    *
-   * @return  always {@link Type#BOOL Type#BOOL}
+   * @return  always {@link Type#MESSAGE Type#MESSAGE}
    */
   @Override
   public @NotNull Type getType() {
-    return Type.BOOL;
+    return Type.MESSAGE;
   }
 
 
   /**
-   * Return the number as boolean.
+   * Returns the message with spaces.
    *
-   * @return  number as boolean
-   *
-   * @since 0.8.0
-   */
-  @Contract(pure = true)
-  public boolean booleanValue() {
-    return bool;
-  }
-
-
-  /**
-   * Returns the boolean value.
-   *
-   * @return  boolean, never {@code null}
+   * @return  message with spaces, never {@code null}
    */
   @Override
-  public @NotNull Boolean asObject() {
-    return bool;
+  public @NotNull Message.WithSpaces asObject() {
+    return message;
+  }
+
+
+  @Override
+  public boolean equals(Object o)
+  {
+    return this == o ||
+        o instanceof ConfigValueMessage && message.equals(((ConfigValueMessage)o).message);
+  }
+
+
+  @Override
+  public int hashCode() {
+    return 59 + message.hashCode();
   }
 
 
   @Override
   public String toString() {
-    return Boolean.toString(bool);
+    return message.toString();
   }
 
 
@@ -95,21 +92,23 @@ public enum ConfigValueBool implements ConfigValue
    * @since 0.8.0
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeBoolean(bool);
+    PackHelper.pack(message, packStream);
   }
 
 
   /**
+   * @param unpack      unpacker instance, not {@code null}
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked boolean map value, never {@code null}
+   * @return  unpacked message map value, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
    */
-  public static @NotNull ConfigValueBool unpack(@NotNull PackInputStream packStream)
+  public static @NotNull ConfigValueMessage unpack(@NotNull PackHelper unpack,
+                                                   @NotNull PackInputStream packStream)
       throws IOException {
-    return packStream.readBoolean() ? TRUE : FALSE;
+    return new ConfigValueMessage(unpack.unpackMessageWithSpaces(packStream));
   }
 }

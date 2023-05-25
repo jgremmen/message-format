@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parameter.key;
+package de.sayayi.lib.message.part.parameter.key;
 
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
@@ -21,9 +21,9 @@ import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.*;
-import static de.sayayi.lib.message.parameter.key.ConfigKeyBool.FALSE;
-import static de.sayayi.lib.message.parameter.key.ConfigKeyBool.TRUE;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKeyBool.FALSE;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKeyBool.TRUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
