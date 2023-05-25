@@ -31,7 +31,7 @@ import static java.util.Collections.unmodifiableSortedSet;
 /**
  * This interface describes a message in its most generic form.
  * <p>
- * Messages are thread safe.
+ * Messages are immutable and thread safe.
  *
  * @see LocaleAware
  * @see WithCode
@@ -62,10 +62,12 @@ public interface Message extends Serializable
    * @param parameterValues   message parameter values, never {@code null}
    *
    * @return  formatted message
+   *
+   * @throws MessageFormatException  in case a formatting error occurred
    */
   @Contract(pure = true)
   default String format(@NotNull MessageAccessor messageAccessor,
-                        @NotNull Map<String,Object> parameterValues)
+                        @NotNull Map<String,Object> parameterValues) throws MessageFormatException
   {
     return format(messageAccessor, new Parameters() {
       @Override
@@ -160,6 +162,10 @@ public interface Message extends Serializable
 
 
 
+  /**
+   * A message class implementing this interface provides information about leading/trailing
+   * spaces.
+   */
   interface WithSpaces extends Message, SpacesAware {
   }
 
