@@ -431,8 +431,12 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    public @NotNull Supplier<String> formatSupplier() {
-      return this::format;
+    public @NotNull Supplier<String> formatSupplier()
+    {
+      // as formatting is deferred, make sure we're using a copy of the parameters
+      final Parameters parameters = new Params(this);
+
+      return () -> getMessage().format(messageAccessor, parameters);
     }
 
 
@@ -526,25 +530,27 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
   private static final class Params implements Parameters
   {
-    private final Configurer<?> configurer;
+    private final Locale locale;
     private final Object[] parameters;
 
 
-    private Params(@NotNull Configurer<?> configurer) {
-      parameters = (this.configurer = configurer).parameters;
+    private Params(@NotNull Configurer<?> configurer)
+    {
+      locale = configurer.locale;
+      parameters = copyOf(configurer.parameters, configurer.parameterCount * 2);
     }
 
 
     @Override
     public @NotNull Locale getLocale() {
-      return configurer.locale;
+      return locale;
     }
 
 
     @Override
     public Object getParameterValue(@NotNull String parameter)
     {
-      for(int low = 0, high = configurer.parameterCount - 1; low <= high;)
+      for(int low = 0, high = parameters.length / 2 - 1; low <= high;)
       {
         final int mid = (low + high) >>> 1;
         final int cmp = parameter.compareTo((String)parameters[mid * 2]);
@@ -565,9 +571,9 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     public String toString()
     {
       final StringBuilder s = new StringBuilder("Parameters(locale='")
-          .append(configurer.locale).append("',{");
+          .append(locale).append("',{");
 
-      for(int n = 0, l = configurer.parameterCount * 2; n < l; n += 2)
+      for(int n = 0, l = parameters.length; n < l; n += 2)
       {
         if (n > 0)
           s.append(',');
