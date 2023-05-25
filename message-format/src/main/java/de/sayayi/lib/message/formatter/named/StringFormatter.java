@@ -32,8 +32,8 @@ import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.internal.SpacesUtil.isTrimmedEmpty;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.TYPELESS_LENIENT;
 import static java.util.Arrays.asList;

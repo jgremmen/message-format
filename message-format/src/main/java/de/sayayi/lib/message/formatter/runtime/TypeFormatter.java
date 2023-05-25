@@ -26,8 +26,8 @@ import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.Set;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.nullText;
 import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.joining;
 

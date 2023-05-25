@@ -30,7 +30,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.*;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.*;
 import static java.time.format.DateTimeFormatter.*;
 import static java.time.format.FormatStyle.*;
 import static java.util.Objects.requireNonNull;

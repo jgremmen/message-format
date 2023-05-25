@@ -25,13 +25,13 @@ import static de.sayayi.lib.message.internal.part.MessagePart.Text.NULL;
 
 
 /**
- * Message part factory.
+ * Text part factory.
  *
  * @author Jeroen Gremmen
  */
-public final class MessagePartFactory
+public final class TextPartFactory
 {
-  private MessagePartFactory() {}
+  private TextPartFactory() {}
 
 
   /**

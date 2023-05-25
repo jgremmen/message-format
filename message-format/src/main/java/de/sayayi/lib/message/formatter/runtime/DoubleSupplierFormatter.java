@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.nullText;
 import static java.util.Collections.singleton;
 
 

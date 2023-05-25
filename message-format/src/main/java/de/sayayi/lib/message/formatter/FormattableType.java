@@ -32,7 +32,7 @@ import static java.util.Objects.requireNonNull;
  * used to format the value. However, it can decide to delegate formatting to the next formatter.
  * <p>
  * All formatters bundled with the message format library (except for the string formatter) have
- * a {@link #DEFAULT_ORDER}.
+ * either a {@link #DEFAULT_ORDER} or {@link #DEFAULT_PRIMITIVE_OR_ARRAY_ORDER}.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -142,10 +142,13 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
   @Override
   public int compareTo(@NotNull FormattableType o)
   {
-    int cmp = Byte.compare(order, o.order);
+    int cmp = order - o.order;
+
     if (cmp == 0)
-      if ((cmp = type.getSimpleName().compareTo(o.type.getSimpleName())) == 0)
-        cmp = type.getName().compareTo(o.type.getName());
+    {
+      // make comparison deterministic if order values are equal
+      cmp = type.getName().compareTo(o.type.getName());
+    }
 
     return cmp;
   }

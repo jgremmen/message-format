@@ -37,8 +37,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.NUMBER_TYPE;
 import static java.util.Arrays.asList;
 

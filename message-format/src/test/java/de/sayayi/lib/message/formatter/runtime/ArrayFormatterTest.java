@@ -23,8 +23,8 @@ import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.named.BoolFormatter;
 import de.sayayi.lib.message.internal.TextMessage;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import de.sayayi.lib.message.internal.part.MessagePartFactory;
 import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.internal.part.TextPartFactory;
 import de.sayayi.lib.message.parameter.key.ConfigKey;
 import de.sayayi.lib.message.parameter.key.ConfigKeyBool;
 import de.sayayi.lib.message.parameter.key.ConfigKeyName;
@@ -41,7 +41,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.nullText;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,9 +83,9 @@ public class ArrayFormatterTest extends AbstractFormatterTest
     val booleanMap = new HashMap<ConfigKey, ConfigValue>() {
       {
         put(ConfigKeyBool.TRUE,
-            new ConfigValueMessage(new TextMessage(MessagePartFactory.noSpaceText("YES"))));
+            new ConfigValueMessage(new TextMessage(TextPartFactory.noSpaceText("YES"))));
         put(ConfigKeyBool.FALSE,
-            new ConfigValueMessage(new TextMessage(MessagePartFactory.noSpaceText("NO"))));
+            new ConfigValueMessage(new TextMessage(TextPartFactory.noSpaceText("NO"))));
       }
     };
 

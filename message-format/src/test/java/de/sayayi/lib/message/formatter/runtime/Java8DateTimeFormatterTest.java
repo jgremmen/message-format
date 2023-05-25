@@ -31,8 +31,8 @@ import java.time.LocalTime;
 import java.util.TimeZone;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.emptyText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.noSpaceText;
 import static java.util.Collections.singletonMap;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;

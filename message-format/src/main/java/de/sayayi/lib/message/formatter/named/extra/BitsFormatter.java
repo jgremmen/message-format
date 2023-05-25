@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.*;
 
 
 /**

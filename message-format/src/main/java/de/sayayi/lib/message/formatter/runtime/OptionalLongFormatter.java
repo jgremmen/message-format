@@ -28,8 +28,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.OptionalLong;
 import java.util.Set;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.emptyText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.emptyText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static java.util.Collections.singleton;
 

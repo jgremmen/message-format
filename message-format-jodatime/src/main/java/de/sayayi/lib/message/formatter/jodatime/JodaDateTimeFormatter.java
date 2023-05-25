@@ -28,7 +28,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.*;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.*;
 import static java.util.Objects.requireNonNull;
 
 

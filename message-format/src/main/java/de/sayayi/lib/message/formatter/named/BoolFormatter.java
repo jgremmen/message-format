@@ -29,8 +29,8 @@ import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.BOOL_TYPE;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.EMPTY_NULL_TYPE;
 import static java.lang.Boolean.parseBoolean;

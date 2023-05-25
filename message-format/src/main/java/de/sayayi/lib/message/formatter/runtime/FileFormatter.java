@@ -28,7 +28,7 @@ import java.io.File;
 import java.util.OptionalLong;
 import java.util.Set;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.*;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.STRING_EMPTY_TYPE;
 import static java.util.Collections.singleton;
 

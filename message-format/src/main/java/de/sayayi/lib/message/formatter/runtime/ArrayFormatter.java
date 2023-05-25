@@ -30,7 +30,7 @@ import java.util.HashSet;
 import java.util.OptionalLong;
 import java.util.Set;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.*;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.*;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static java.lang.reflect.Array.get;
 import static java.lang.reflect.Array.getLength;

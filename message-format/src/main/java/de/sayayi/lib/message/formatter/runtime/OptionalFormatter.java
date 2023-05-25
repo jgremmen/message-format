@@ -21,7 +21,7 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.part.MessagePart.Text;
-import de.sayayi.lib.message.internal.part.MessagePartFactory;
+import de.sayayi.lib.message.internal.part.TextPartFactory;
 import de.sayayi.lib.message.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
@@ -31,7 +31,7 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static java.util.Collections.singleton;
 
@@ -51,7 +51,7 @@ public final class OptionalFormatter extends AbstractParameterFormatter
 
     return ((Optional<?>)value)
         .map(o -> context.format(o, null, true))
-        .orElseGet(MessagePartFactory::emptyText);
+        .orElseGet(TextPartFactory::emptyText);
   }
 
 

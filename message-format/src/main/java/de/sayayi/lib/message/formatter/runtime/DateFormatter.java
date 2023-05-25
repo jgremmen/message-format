@@ -28,8 +28,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Set;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.nullText;
 import static java.text.DateFormat.*;
 import static java.util.Collections.singleton;
 

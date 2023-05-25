@@ -26,8 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.noSpaceText;
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.nullText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.nullText;
 import static java.lang.Boolean.FALSE;
 
 

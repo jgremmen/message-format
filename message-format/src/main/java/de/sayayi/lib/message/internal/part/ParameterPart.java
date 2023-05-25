@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 
-import static de.sayayi.lib.message.internal.part.MessagePartFactory.addSpaces;
+import static de.sayayi.lib.message.internal.part.TextPartFactory.addSpaces;
 import static java.util.Objects.requireNonNull;
 
 
