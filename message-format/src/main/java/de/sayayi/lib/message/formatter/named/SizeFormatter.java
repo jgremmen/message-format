@@ -30,6 +30,7 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.NUMBER_TYPE;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 public final class SizeFormatter extends AbstractParameterFormatter
     implements NamedParameterFormatter

@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 public final class ChoiceFormatter extends AbstractParameterFormatter
     implements NamedParameterFormatter

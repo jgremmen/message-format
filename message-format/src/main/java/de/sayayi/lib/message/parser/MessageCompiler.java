@@ -122,7 +122,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   @Contract(pure = true)
-  private @NotNull Message.WithSpaces compileMessage(@NotNull String text, boolean template)
+  private @NotNull Message.WithSpaces compileMessage(
+      @NotNull @Language("MessageFormat") String text, boolean template)
   {
     final Listener listener = new Listener(template);
 

@@ -95,7 +95,7 @@ public final class ParamConfig implements Serializable
     ConfigKey configKey;
     ConfigValue bestMatch = null;
 
-    for(Entry<ConfigKey,ConfigValue> entry: map.entrySet())
+    for(final Entry<ConfigKey,ConfigValue> entry: map.entrySet())
       if ((configKey = entry.getKey()) != null)
       {
         final ConfigValue configValue = entry.getValue();

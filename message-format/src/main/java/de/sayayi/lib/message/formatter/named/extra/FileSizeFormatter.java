@@ -33,6 +33,7 @@ import static java.lang.Boolean.FALSE;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 public final class FileSizeFormatter extends AbstractParameterFormatter
     implements NamedParameterFormatter

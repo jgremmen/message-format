@@ -38,6 +38,7 @@ import static java.lang.reflect.Array.getLength;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 public final class ArrayFormatter extends AbstractParameterFormatter
     implements EmptyMatcher, SizeQueryable

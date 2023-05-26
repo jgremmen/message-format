@@ -41,6 +41,7 @@ import static java.util.Arrays.asList;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 public final class StringFormatter extends AbstractParameterFormatter
     implements EmptyMatcher, SizeQueryable, NamedParameterFormatter
