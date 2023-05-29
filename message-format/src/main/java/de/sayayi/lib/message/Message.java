@@ -249,11 +249,12 @@ public interface Message extends Serializable
 
 
     /**
-     * Returns the value for the named {@code data}.
+     * Returns the value for the named {@code parameter}.
      *
-     * @param parameter  data name
+     * @param parameter  parameter name
      *
-     * @return  data value or {@code null} if no value is available for the given data name
+     * @return  parameter value or {@code null} if no value is available for the given
+     *          parameter name
      */
     @Contract(pure = true)
     Object getParameterValue(@NotNull String parameter);
