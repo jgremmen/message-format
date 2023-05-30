@@ -40,7 +40,7 @@ import static java.lang.reflect.Array.getLength;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class ArrayFormatter extends AbstractParameterFormatter
+public final class PrimitiveArrayFormatter extends AbstractParameterFormatter
     implements EmptyMatcher, SizeQueryable
 {
   @Override
@@ -53,26 +53,18 @@ public final class ArrayFormatter extends AbstractParameterFormatter
     if (length == 0)
       return emptyText();
 
-    final Class<?> arrayType = array.getClass();
-    final Class<?> arrayElementType = arrayType.isPrimitive() ? arrayType.getComponentType() : null;
+    final Class<?> arrayElementType = array.getClass().getComponentType();
     final String sep =
         spacedText(context.getConfigValueString("list-sep").orElse(", "))
             .getTextWithSpaces();
     final String sepLast =
         spacedText(context.getConfigValueString("list-sep-last").orElse(sep))
             .getTextWithSpaces();
-    final Text nullText =
-        noSpaceText(context.getConfigValueString("list-null").orElse(""));
-    final Text thisText =
-        noSpaceText(context.getConfigValueString("list-this").orElse("(this array)"));
     final StringBuilder s = new StringBuilder();
 
     for(int i = 0; i < length; i++)
     {
-      final Object value = get(array, i);
-      final Text text = value == array
-          ? thisText : value == null
-              ? nullText : context.format(value, arrayElementType, true);
+      final Text text = context.format(get(array, i), arrayElementType, true);
 
       if (!text.isEmpty())
       {
@@ -103,7 +95,6 @@ public final class ArrayFormatter extends AbstractParameterFormatter
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
     return new HashSet<>(Arrays.asList(
-        new FormattableType(Object[].class),
         new FormattableType(boolean[].class),
         new FormattableType(byte[].class),
         new FormattableType(short[].class),

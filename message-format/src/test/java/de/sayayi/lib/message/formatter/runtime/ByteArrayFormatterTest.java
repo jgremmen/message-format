@@ -51,7 +51,7 @@ public class ByteArrayFormatterTest extends AbstractFormatterTest
   @SuppressWarnings({"ConvertToBasicLatin", "SpellCheckingInspection"})
   void testEncodedByteArray()
   {
-    val formatterService = createFormatterService(new ByteArrayFormatter(), new ArrayFormatter());
+    val formatterService = createFormatterService(new ByteArrayFormatter(), new ObjectArrayFormatter());
     val messageAccessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
         .setLocale("de-DE")
         .getMessageAccessor();
@@ -74,7 +74,7 @@ public class ByteArrayFormatterTest extends AbstractFormatterTest
   @Test
   void testIllegalCharset()
   {
-    val formatterService = createFormatterService(new ByteArrayFormatter(), new ArrayFormatter());
+    val formatterService = createFormatterService(new ByteArrayFormatter(), new ObjectArrayFormatter());
     val messageAccessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
         .setLocale("de-DE")
         .getMessageAccessor();
@@ -88,7 +88,9 @@ public class ByteArrayFormatterTest extends AbstractFormatterTest
   @Test
   void testDelegate()
   {
-    val formatterService = createFormatterService(new ByteArrayFormatter(), new ArrayFormatter());
+    val formatterService = createFormatterService(
+        new ByteArrayFormatter(),
+        new PrimitiveArrayFormatter());
     val messageAccessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
         .setLocale("de-DE")
         .getMessageAccessor();
@@ -104,7 +106,7 @@ public class ByteArrayFormatterTest extends AbstractFormatterTest
     val messageSupport = MessageSupportFactory.create(
         createFormatterService(
             new SizeFormatter(),
-            new ArrayFormatter(),
+            new PrimitiveArrayFormatter(),
             new ByteArrayFormatter()),
         NO_CACHE_INSTANCE);
 

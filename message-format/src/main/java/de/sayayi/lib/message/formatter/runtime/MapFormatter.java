@@ -38,8 +38,8 @@ import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static java.util.Arrays.asList;
-import static java.util.Collections.*;
-import static java.util.stream.Collectors.toList;
+import static java.util.Collections.singleton;
+import static java.util.Collections.unmodifiableSet;
 
 
 /**
@@ -55,10 +55,11 @@ public final class MapFormatter extends AbstractParameterFormatter
 
   static
   {
+    // default map-kv: %{key}=%{value}
     DEFAULT_KEY_VALUE_MESSAGE = new CompoundMessage(asList(
-        new ParameterPart("key", null, false, false, emptyMap()),
+        new ParameterPart("key", false, false),
         new NoSpaceTextPart("="),
-        new ParameterPart("value", null, false, false, emptyMap())
+        new ParameterPart("value", false, false)
     ));
   }
 
@@ -94,7 +95,7 @@ public final class MapFormatter extends AbstractParameterFormatter
 
           return kvMessage.format(messageAccessor, parameters);
         })
-        .collect(toList()), Iterable.class);
+        .toArray(String[]::new), String[].class);
   }
 
 

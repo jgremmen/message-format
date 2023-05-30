@@ -50,25 +50,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-public class ArrayFormatterTest extends AbstractFormatterTest
+public class ObjectArrayFormatterTest extends AbstractFormatterTest
 {
   @Test
-  void testFormattableTypes()
-  {
-    assertFormatterForType(new ArrayFormatter(), boolean[].class);
-    assertFormatterForType(new ArrayFormatter(), short[].class);
-    assertFormatterForType(new ArrayFormatter(), int[].class);
-    assertFormatterForType(new ArrayFormatter(), long[].class);
-    assertFormatterForType(new ArrayFormatter(), float[].class);
-    assertFormatterForType(new ArrayFormatter(), double[].class);
-    assertFormatterForType(new ArrayFormatter(), Object[].class);
+  void testFormattableTypes() {
+    assertFormatterForType(new ObjectArrayFormatter(), Object[].class);
   }
 
 
   @Test
   void testBooleanArray()
   {
-    val formatterService = createFormatterService(new ArrayFormatter(), new BoolFormatter());
+    val formatterService = createFormatterService(new ObjectArrayFormatter(), new BoolFormatter());
     val messageAccessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
         .setLocale("de-DE")
         .getMessageAccessor();
@@ -126,7 +119,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
   @Test
   void testIntegerArray()
   {
-    val formatterService = createFormatterService(new ArrayFormatter());
+    val formatterService = createFormatterService(new ObjectArrayFormatter());
     val messageAccessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
         .setLocale("de-DE")
         .getMessageAccessor();
@@ -172,7 +165,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
   void testObjectArray()
   {
     val registry = createFormatterService(
-        new ArrayFormatter(),
+        new ObjectArrayFormatter(),
         new BoolFormatter(),
         new NumberFormatter());
     val messageAccessor = MessageSupportFactory.create(registry, NO_CACHE_INSTANCE)
@@ -195,7 +188,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
   void testEmptyOrNullArray()
   {
     val messageSupport = MessageSupportFactory.create(
-        createFormatterService(new ArrayFormatter()), NO_CACHE_INSTANCE);
+        createFormatterService(new ObjectArrayFormatter()), NO_CACHE_INSTANCE);
     val message = messageSupport.message("%{array,null:null,empty:empty}").getMessage();
 
     assertEquals("null",
@@ -209,7 +202,7 @@ public class ArrayFormatterTest extends AbstractFormatterTest
   void testSeparator()
   {
     val messageSupport = MessageSupportFactory.create(
-        createFormatterService(new ArrayFormatter()), NO_CACHE_INSTANCE);
+        createFormatterService(new ObjectArrayFormatter()), NO_CACHE_INSTANCE);
 
     assertEquals("1, 2, 3, 4 and 5", messageSupport
         .message("%{c,list-sep:', ',list-sep-last:' and '}")

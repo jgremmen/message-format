@@ -52,11 +52,13 @@ class MapFormatterTest extends AbstractFormatterTest
   void testSeparator()
   {
     val message = MessageSupportFactory
-        .create(createFormatterService(new MapFormatter(), new IterableFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new MapFormatter(), new ObjectArrayFormatter()),
+            NO_CACHE_INSTANCE)
         .setLocale(UK)
         .message("%{map1} %{map2,map-kv:'%{key}   -> %{value}'} %{map3,map-kv:' %{key}:  %{value} '}");
 
-    assertEquals("key=value", message.with("map1", singletonMap("key", "value")).format());
+    assertEquals("key=value",
+        message.with("map1", singletonMap("key", "value")).format());
     assertEquals("key -> value",
         message.clear().with("map2", singletonMap("key", "value")).format());
     assertEquals("key: value",
@@ -69,7 +71,8 @@ class MapFormatterTest extends AbstractFormatterTest
   void testNullKeyValue()
   {
     val message = MessageSupportFactory
-        .create(createFormatterService(new MapFormatter(), new IterableFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new MapFormatter(), new ObjectArrayFormatter()),
+            NO_CACHE_INSTANCE)
         .setLocale(UK)
         .message("%{map1} %{map2,map-k-null:key,map-v-null:value}");
 
@@ -84,7 +87,7 @@ class MapFormatterTest extends AbstractFormatterTest
   void testEmpty()
   {
     val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new MapFormatter(), new IterableFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new MapFormatter(), new ObjectArrayFormatter()), NO_CACHE_INSTANCE)
         .setLocale(UK);
     val parameters = singletonMap("map", (Object)emptyMap());
 
@@ -98,7 +101,7 @@ class MapFormatterTest extends AbstractFormatterTest
   {
     val message = MessageSupportFactory
         .create(createFormatterService(
-            new MapFormatter(), new IterableFormatter(), new NumberFormatter()),
+            new MapFormatter(), new ObjectArrayFormatter(), new NumberFormatter()),
             NO_CACHE_INSTANCE)
         .setLocale(UK)
         .message("%{map,map-kv:'%{key} -> %{value,number:\"0000\"}',list-sep:', ',list-sep-last:' and '}");
@@ -118,7 +121,8 @@ class MapFormatterTest extends AbstractFormatterTest
   void testKeyFormat()
   {
     val message = MessageSupportFactory
-        .create(createFormatterService(new MapFormatter(), new IterableFormatter(), new BoolFormatter()),
+        .create(createFormatterService(
+            new MapFormatter(), new ObjectArrayFormatter(), new BoolFormatter()),
             NO_CACHE_INSTANCE)
         .message("%{map,map-kv:'%{key,bool}:%{value}',list-sep:' / '}");
 

@@ -136,9 +136,15 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   {
     final Set<Class<?>> collectedTypes = new HashSet<>();
 
-    // substitute wrapper type for primitive type if necessary
-    if (type.isPrimitive() && !typeFormatters.containsKey(type))
-      type = WRAPPER_CLASS_MAP.get(type);
+    if (!typeFormatters.containsKey(type))
+    {
+      // 1. substitute wrapper type for primitive type
+      // 2. object arrays != Object[] (eg. String[]) will imply Object[] as well
+      if (type.isPrimitive())
+        type = WRAPPER_CLASS_MAP.get(type);
+      else if (type.isArray() && type.getComponentType() != Object.class)
+        collectedTypes.add(Object[].class);  // default array formatter
+    }
 
     for(; type != null; type = type.getSuperclass())
     {

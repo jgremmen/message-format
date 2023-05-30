@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.formatter.runtime.ArrayFormatter;
+import de.sayayi.lib.message.formatter.runtime.ObjectArrayFormatter;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -58,7 +58,7 @@ class FormatterCacheTest
 
     // lookup int, requires call to buildFormatters (moves it to head) and removes long
     // cache: int, List, boolean, byte[], Map, Double, String, short
-    val pf = new ParameterFormatter[] { new ArrayFormatter() };
+    val pf = new ParameterFormatter[] { new ObjectArrayFormatter() };
     assertArrayEquals(pf, cache.lookup(int.class, t -> pf));
 
     // lookup byte[] which moves it to head

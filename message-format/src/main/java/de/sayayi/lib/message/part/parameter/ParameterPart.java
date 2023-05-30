@@ -35,6 +35,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
+import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 
 
@@ -52,6 +53,11 @@ public final class ParameterPart implements Parameter
   private final @NotNull ParamConfig paramConfig;
   private final boolean spaceBefore;
   private final boolean spaceAfter;
+
+
+  public ParameterPart(@NotNull String name, boolean spaceBefore, boolean spaceAfter) {
+    this(name, null, spaceBefore, spaceAfter, emptyMap());
+  }
 
 
   public ParameterPart(@NotNull String name, String format, boolean spaceBefore, boolean spaceAfter,

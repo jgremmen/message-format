@@ -17,9 +17,9 @@ package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.formatter.runtime.ArrayFormatter;
 import de.sayayi.lib.message.formatter.runtime.IterableFormatter;
 import de.sayayi.lib.message.formatter.runtime.MapFormatter;
+import de.sayayi.lib.message.formatter.runtime.ObjectArrayFormatter;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +40,7 @@ class SizeFormatterTest extends AbstractFormatterTest
   {
     val messageSupport = MessageSupportFactory
         .create(createFormatterService(new SizeFormatter(), new IterableFormatter(),
-            new ArrayFormatter(), new MapFormatter()), NO_CACHE_INSTANCE)
+            new ObjectArrayFormatter(), new MapFormatter()), NO_CACHE_INSTANCE)
         .setLocale(UK);
     val message = messageSupport
         .message("%{c,size} %{c,size,0:'empty',1:'singleton',:'multiple'}").getMessage();
