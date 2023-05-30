@@ -49,8 +49,8 @@ public final class MapFormatter extends AbstractParameterFormatter
     implements EmptyMatcher, SizeQueryable
 {
   private static final Message.WithSpaces DEFAULT_KEY_VALUE_MESSAGE;
-  private static final SortedSet<String> KEY_VALUE_PARAMETER_NAMES =
-      unmodifiableSortedSet(new TreeSet<>(asList("key", "value")));
+  private static final Set<String> KEY_VALUE_PARAMETER_NAMES =
+      unmodifiableSet(new TreeSet<>(asList("key", "value")));
 
 
   static
@@ -146,6 +146,18 @@ public final class MapFormatter extends AbstractParameterFormatter
     @Override
     public Object getParameterValue(@NotNull String parameter) {
       return "key".equals(parameter) ? key : "value".equals(parameter) ? value : null;
+    }
+
+
+    @Override
+    public @NotNull Set<String> getParameterNames() {
+      return KEY_VALUE_PARAMETER_NAMES;
+    }
+
+
+    @Override
+    public String toString() {
+      return "Parameters(locale='" + locale + "',{key=" + key + ",value=" + value + "})";
     }
   }
 }

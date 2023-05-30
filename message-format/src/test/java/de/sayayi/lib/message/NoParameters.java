@@ -20,7 +20,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
+import java.util.Set;
 
+import static java.util.Collections.emptySet;
 import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
 
@@ -34,27 +36,9 @@ import static java.util.Objects.requireNonNull;
 public final class NoParameters implements Parameters
 {
   /** Instance with no parameters and no specific locale. */
-  public static final Parameters EMPTY = new Parameters() {
-    @Override
-    public @NotNull Locale getLocale() {
-      return ROOT;
-    }
+  public static final Parameters EMPTY = new NoParameters(ROOT);
 
-
-    @Override
-    public Object getParameterValue(@NotNull String parameter) {
-      return null;
-    }
-
-
-    @Override
-    public String toString() {
-      return "Parameters(locale='ROOT')";
-    }
-  };
-
-
-
+  
   private final Locale locale;
 
 
@@ -83,6 +67,12 @@ public final class NoParameters implements Parameters
   @Contract("_ -> null")
   public Object getParameterValue(@NotNull String parameter) {
     return null;
+  }
+
+
+  @Override
+  public @NotNull Set<String> getParameterNames() {
+    return emptySet();
   }
 
 

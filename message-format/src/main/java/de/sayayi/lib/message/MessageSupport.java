@@ -541,6 +541,7 @@ public interface MessageSupport
      *
      * @see ConfigurableMessageSupport#addMessage(Message.WithCode)
      * @see ConfigurableMessageSupport#addMessage(String, String)
+     * @see DuplicateMessageException
      */
     @Contract(mutates = "this")
     @NotNull ConfigurableMessageSupport setMessageFilter(@NotNull MessageFilter messageFilter);
@@ -560,6 +561,7 @@ public interface MessageSupport
      * @return  configurable message support instance, never {@code null}
      *
      * @see ConfigurableMessageSupport#addTemplate(String, Message)
+     * @see DuplicateTemplateException
      */
     @Contract(mutates = "this")
     @NotNull ConfigurableMessageSupport setTemplateFilter(@NotNull TemplateFilter templateFilter);

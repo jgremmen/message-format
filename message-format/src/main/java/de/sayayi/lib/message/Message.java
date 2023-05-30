@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import static java.util.Collections.unmodifiableSet;
+
 
 /**
  * This interface describes a message in its most generic form.
@@ -79,6 +81,11 @@ public interface Message extends Serializable
       @Override
       public Object getParameterValue(@NotNull String parameter) {
         return parameterValues.get(parameter);
+      }
+
+      @Override
+      public @NotNull Set<String> getParameterNames() {
+        return unmodifiableSet(parameterValues.keySet());
       }
     });
   }
@@ -258,5 +265,14 @@ public interface Message extends Serializable
      */
     @Contract(pure = true)
     Object getParameterValue(@NotNull String parameter);
+
+
+    /**
+     * Returns a set with names for all parameters available in this context.
+     *
+     * @return  set with all data names, never {@code null}
+     */
+    @Contract(pure = true)
+    @NotNull Set<String> getParameterNames();
   }
 }

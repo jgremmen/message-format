@@ -209,8 +209,10 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
         // templates
         for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
+        {
           addTemplate(requireNonNull(dataStream.readString()),
               packHelper.unpackMessageWithSpaces(dataStream));
+        }
       }
     }
 
@@ -319,12 +321,12 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
 
-  private final class Configurer<M extends Message> implements MessageConfigurer<M>
+  final class Configurer<M extends Message> implements MessageConfigurer<M>
   {
     private final @NotNull Supplier<M> message;
-    private @NotNull Locale locale;
-    private @NotNull Object[] parameters;
-    private int parameterCount;
+    @NotNull Locale locale;
+    @NotNull Object[] parameters;
+    int parameterCount;
 
 
     private Configurer(@NotNull Supplier<M> message)
@@ -426,7 +428,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
     @Override
     public @NotNull String format() {
-      return getMessage().format(messageAccessor, new Params(this));
+      return getMessage().format(messageAccessor, new MessageParameters(this));
     }
 
 
@@ -434,7 +436,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     public @NotNull Supplier<String> formatSupplier()
     {
       // as formatting is deferred, make sure we're using a copy of the parameters
-      final Parameters parameters = new Params(this);
+      final Parameters parameters = new MessageParameters(this);
 
       return () -> getMessage().format(messageAccessor, parameters);
     }
@@ -522,66 +524,6 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
           .distinct()
           .filter(templateName -> !templates.containsKey(templateName))
           .collect(toCollection(TreeSet::new));
-    }
-  }
-
-
-
-
-  private static final class Params implements Parameters
-  {
-    private final Locale locale;
-    private final Object[] parameters;
-
-
-    private Params(@NotNull Configurer<?> configurer)
-    {
-      locale = configurer.locale;
-      parameters = copyOf(configurer.parameters, configurer.parameterCount * 2);
-    }
-
-
-    @Override
-    public @NotNull Locale getLocale() {
-      return locale;
-    }
-
-
-    @Override
-    public Object getParameterValue(@NotNull String parameter)
-    {
-      for(int low = 0, high = parameters.length / 2 - 1; low <= high;)
-      {
-        final int mid = (low + high) >>> 1;
-        final int cmp = parameter.compareTo((String)parameters[mid * 2]);
-
-        if (cmp < 0)
-          high = mid - 1;
-        else if (cmp > 0)
-          low = mid + 1;
-        else
-          return parameters[mid * 2 + 1];
-      }
-
-      return null;
-    }
-
-
-    @Override
-    public String toString()
-    {
-      final StringBuilder s = new StringBuilder("Parameters(locale='")
-          .append(locale).append("',{");
-
-      for(int n = 0, l = parameters.length; n < l; n += 2)
-      {
-        if (n > 0)
-          s.append(',');
-
-        s.append(parameters[n]).append("=").append(parameters[n + 1]);
-      }
-
-      return s.append("})").toString();
     }
   }
 }
