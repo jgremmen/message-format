@@ -21,8 +21,8 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -63,7 +63,7 @@ public final class AtomicIntegerArrayFormatter extends AbstractParameterFormatte
 
 
   @Override
-  public ConfigKey.MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
+  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
     return compareType.match(((AtomicIntegerArray)value).length()) ? TYPELESS_EXACT : null;
   }
 
