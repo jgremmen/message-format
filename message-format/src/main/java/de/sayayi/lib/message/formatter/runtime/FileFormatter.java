@@ -39,6 +39,7 @@ import static java.util.Collections.singleton;
 public final class FileFormatter extends AbstractParameterFormatter implements SizeQueryable
 {
   @Override
+  @SuppressWarnings("DuplicatedCode")
   public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)

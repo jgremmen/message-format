@@ -37,6 +37,7 @@ import static java.util.Collections.singleton;
 public final class PathFormatter extends AbstractParameterFormatter
 {
   @Override
+  @SuppressWarnings("DuplicatedCode")
   public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
