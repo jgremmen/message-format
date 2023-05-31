@@ -23,10 +23,12 @@ import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
+import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.OptionalLong;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
@@ -43,6 +45,7 @@ public final class ObjectArrayFormatter extends AbstractParameterFormatter
     implements EmptyMatcher, SizeQueryable
 {
   @Override
+  @SuppressWarnings("DuplicatedCode")
   public @NotNull Text formatValue(@NotNull FormatterContext context, Object array)
   {
     if (array == null)
@@ -58,18 +61,18 @@ public final class ObjectArrayFormatter extends AbstractParameterFormatter
     final String sepLast =
         spacedText(context.getConfigValueString("list-sep-last").orElse(sep))
             .getTextWithSpaces();
-    final Text nullText =
-        noSpaceText(context.getConfigValueString("list-null").orElse(""));
-    final Text thisText =
-        noSpaceText(context.getConfigValueString("list-this").orElse("(this array)"));
+    final Supplier<Text> nullText = SupplierDelegate.of(() ->
+        noSpaceText(context.getConfigValueString("list-null").orElse("")));
+    final Supplier<Text> thisText = SupplierDelegate.of(() ->
+        noSpaceText(context.getConfigValueString("list-this").orElse("(this array)")));
     final StringBuilder s = new StringBuilder();
 
     for(int i = 0; i < length; i++)
     {
       final Object value = get(array, i);
       final Text text = value == array
-          ? thisText : value == null
-              ? nullText : context.format(value, true);
+          ? thisText.get() : value == null
+              ? nullText.get() : context.format(value, true);
 
       if (!text.isEmpty())
       {

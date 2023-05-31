@@ -29,10 +29,12 @@ import de.sayayi.lib.message.part.NoSpaceTextPart;
 import de.sayayi.lib.message.part.parameter.ParameterPart;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
+import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
@@ -76,12 +78,12 @@ public final class MapFormatter extends AbstractParameterFormatter
 
     final Message.WithSpaces kvMessage = context
         .getConfigValueMessage("map-kv").orElse(DEFAULT_KEY_VALUE_MESSAGE);
-    final String keyNull = context.getConfigValueString("map-k-null")
-        .map(String::trim).orElse("(null)");
-    final String valueNull = context.getConfigValueString("map-v-null")
-        .map(String::trim).orElse("(null)");
-    final String thisString = context.getConfigValueString("map-this")
-        .map(String::trim).orElse("(this map)");
+    final Supplier<String> keyNull = SupplierDelegate.of(() ->
+        context.getConfigValueString("map-k-null").map(String::trim).orElse("(null)"));
+    final Supplier<String> valueNull = SupplierDelegate.of(() ->
+        context.getConfigValueString("map-v-null").map(String::trim).orElse("(null)"));
+    final Supplier<String> thisString = SupplierDelegate.of(() ->
+        context.getConfigValueString("map-this").map(String::trim).orElse("(this map)"));
 
     final MessageAccessor messageAccessor = context.getMessageSupport();
     final KeyValueParameters parameters = new KeyValueParameters(messageAccessor.getLocale());
@@ -100,8 +102,9 @@ public final class MapFormatter extends AbstractParameterFormatter
 
 
   private @NotNull Object fixValue(@NotNull Map<?,?> map, Object value,
-                                   @NotNull String nullString, @NotNull String thisString) {
-    return value == null ? nullString : value == map ? thisString : value;
+                                   @NotNull Supplier<String> nullString,
+                                   @NotNull Supplier<String> thisString) {
+    return value == null ? nullString.get() : value == map ? thisString.get() : value;
   }
 
 

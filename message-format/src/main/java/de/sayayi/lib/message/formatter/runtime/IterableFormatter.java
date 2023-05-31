@@ -23,6 +23,7 @@ import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
+import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +31,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.OptionalLong;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
@@ -42,9 +44,9 @@ import static java.util.Collections.singleton;
 public final class IterableFormatter extends AbstractParameterFormatter
     implements EmptyMatcher, SizeQueryable
 {
-  @SuppressWarnings("rawtypes")
   @Override
   @Contract(pure = true)
+  @SuppressWarnings({"rawtypes", "DuplicatedCode"})
   public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
@@ -60,18 +62,21 @@ public final class IterableFormatter extends AbstractParameterFormatter
     final String sepLast =
         spacedText(context.getConfigValueString("list-sep-last").orElse(sep))
             .getTextWithSpaces();
-    final Text nullText =
-        noSpaceText(context.getConfigValueString("list-null").orElse(""));
-    final Text thisText =
+
+    final Supplier<Text> nullText = SupplierDelegate.of(() ->
+        noSpaceText(context.getConfigValueString("list-null").orElse("")));
+    final Supplier<Text> thisText = SupplierDelegate.of(() ->
         noSpaceText(context.getConfigValueString("list-this")
-            .orElse("(this collection)"));
+            .orElse("(this collection)")));
+
     final StringBuilder s = new StringBuilder();
 
     while(iterator.hasNext())
     {
       final Object element = iterator.next();
       final Text text = element == value
-          ? thisText : element == null ? nullText : context.format(element, true);
+          ? thisText.get()
+          : element == null ? nullText.get() : context.format(element, true);
 
       if (!text.isEmpty())
       {
