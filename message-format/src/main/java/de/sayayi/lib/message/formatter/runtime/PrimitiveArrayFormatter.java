@@ -23,17 +23,19 @@ import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.OptionalLong;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicIntegerArray;
+import java.util.concurrent.atomic.AtomicLongArray;
 
 import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
-import static java.lang.reflect.Array.get;
-import static java.lang.reflect.Array.getLength;
 
 
 /**
@@ -53,7 +55,7 @@ public final class PrimitiveArrayFormatter extends AbstractParameterFormatter
     if (length == 0)
       return emptyText();
 
-    final Class<?> arrayElementType = array.getClass().getComponentType();
+    final Class<?> arrayElementType = getArrayElementType(array);
     final String sep =
         spacedText(context.getConfigValueString("list-sep").orElse(", "))
             .getTextWithSpaces();
@@ -61,10 +63,11 @@ public final class PrimitiveArrayFormatter extends AbstractParameterFormatter
         spacedText(context.getConfigValueString("list-sep-last").orElse(sep))
             .getTextWithSpaces();
     final StringBuilder s = new StringBuilder();
+    final Getter getter = createGetter(array);
 
     for(int i = 0; i < length; i++)
     {
-      final Text text = context.format(get(array, i), arrayElementType, true);
+      final Text text = context.format(getter.get(i), arrayElementType, true);
 
       if (!text.isEmpty())
       {
@@ -101,7 +104,53 @@ public final class PrimitiveArrayFormatter extends AbstractParameterFormatter
         new FormattableType(int[].class),
         new FormattableType(long[].class),
         new FormattableType(float[].class),
-        new FormattableType(double[].class)
+        new FormattableType(double[].class),
+        new FormattableType(AtomicIntegerArray.class),
+        new FormattableType(AtomicLongArray.class)
     ));
+  }
+
+
+  @Contract(pure = true)
+  private int getLength(@NotNull Object value)
+  {
+    if (value instanceof AtomicIntegerArray)
+      return ((AtomicIntegerArray)value).length();
+    else if (value instanceof AtomicLongArray)
+      return ((AtomicLongArray)value).length();
+    else
+      return Array.getLength(value);
+  }
+
+
+  @Contract(pure = true)
+  private @NotNull Class<?> getArrayElementType(@NotNull Object array)
+  {
+    return array instanceof AtomicIntegerArray
+        ? int.class
+        : array instanceof AtomicLongArray
+            ? long.class
+            : array.getClass().getComponentType();
+  }
+
+
+  @Contract(pure = true)
+  private @NotNull Getter createGetter(@NotNull Object value)
+  {
+    if (value instanceof AtomicIntegerArray)
+      return ((AtomicIntegerArray)value)::get;
+
+    if (value instanceof AtomicLongArray)
+      return ((AtomicLongArray)value)::get;
+
+    return index -> Array.get(value, index);
+  }
+
+
+
+
+  private interface Getter
+  {
+    Object get(int index);
   }
 }
