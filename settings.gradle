@@ -20,6 +20,7 @@ include "message-format-jodatime"
 include "message-gradle-plugin"
 include "documentation"
 
+
 rootProject.name = 'message-format-projects'
 rootProject.children.each {project ->
   project.buildFileName = "${project.name}.gradle"
