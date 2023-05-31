@@ -58,9 +58,7 @@ public class MessageFormatPlugin implements Plugin<Project>
         .getByName("main");
 
     // sources = {.build/classes/java/main/}**/*.class
-    messageFormatExtension
-        .getSources()
-        .from(mainJavaSourceSet.getOutput());
+    messageFormatExtension.sourceSet(mainJavaSourceSet);
 
     registerPackTask(project, messageFormatExtension, mainJavaSourceSet);
   }

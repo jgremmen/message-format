@@ -18,6 +18,7 @@ package de.sayayi.plugin.gradle.message;
 import lombok.Getter;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.SourceSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,5 +74,10 @@ public abstract class MessageFormatExtension
 
   public void exclude(String... regex) {
     excludeRegexFilter.addAll(Arrays.asList(regex));
+  }
+
+
+  public void sourceSet(SourceSet sourceSet) {
+    getSources().from(sourceSet.getOutput());
   }
 }
