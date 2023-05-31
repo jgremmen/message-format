@@ -78,12 +78,9 @@ public final class MapFormatter extends AbstractParameterFormatter
 
     final Message.WithSpaces kvMessage = context
         .getConfigValueMessage("map-kv").orElse(DEFAULT_KEY_VALUE_MESSAGE);
-    final Supplier<String> keyNull = SupplierDelegate.of(() ->
-        context.getConfigValueString("map-k-null").map(String::trim).orElse("(null)"));
-    final Supplier<String> valueNull = SupplierDelegate.of(() ->
-        context.getConfigValueString("map-v-null").map(String::trim).orElse("(null)"));
-    final Supplier<String> thisString = SupplierDelegate.of(() ->
-        context.getConfigValueString("map-this").map(String::trim).orElse("(this map)"));
+    final Supplier<String> keyNull = SupplierDelegate.of(() -> keyNull(context));
+    final Supplier<String> valueNull = SupplierDelegate.of(() -> valueNull(context));
+    final Supplier<String> thisString = SupplierDelegate.of(() -> mapThis(context));
 
     final MessageAccessor messageAccessor = context.getMessageSupport();
     final KeyValueParameters parameters = new KeyValueParameters(messageAccessor.getLocale());
@@ -126,6 +123,35 @@ public final class MapFormatter extends AbstractParameterFormatter
     return singleton(new FormattableType(Map.class));
   }
 
+
+  @Contract(pure = true)
+  private String keyNull(@NotNull FormatterContext context)
+  {
+    return context
+        .getConfigValueString("map-k-null")
+        .map(String::trim)
+        .orElse("(null)");
+  }
+
+
+  @Contract(pure = true)
+  private String valueNull(@NotNull FormatterContext context)
+  {
+    return context
+        .getConfigValueString("map-v-null")
+        .map(String::trim)
+        .orElse("(null)");
+  }
+
+
+  @Contract(pure = true)
+  private String mapThis(@NotNull FormatterContext context)
+  {
+    return context
+        .getConfigValueString("map-this")
+        .map(String::trim)
+        .orElse("(this map)");
+  }
 
 
 

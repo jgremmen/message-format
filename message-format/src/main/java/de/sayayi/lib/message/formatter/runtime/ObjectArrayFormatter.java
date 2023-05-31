@@ -21,9 +21,11 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.TextPartFactory;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.util.SupplierDelegate;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.OptionalLong;
@@ -49,22 +51,20 @@ public final class ObjectArrayFormatter extends AbstractParameterFormatter
   public @NotNull Text formatValue(@NotNull FormatterContext context, Object array)
   {
     if (array == null)
-      return nullText();
+      return TextPartFactory.nullText();
 
     final int length = getLength(array);
     if (length == 0)
       return emptyText();
 
-    final String sep =
-        spacedText(context.getConfigValueString("list-sep").orElse(", "))
-            .getTextWithSpaces();
-    final String sepLast =
-        spacedText(context.getConfigValueString("list-sep-last").orElse(sep))
-            .getTextWithSpaces();
-    final Supplier<Text> nullText = SupplierDelegate.of(() ->
-        noSpaceText(context.getConfigValueString("list-null").orElse("")));
-    final Supplier<Text> thisText = SupplierDelegate.of(() ->
-        noSpaceText(context.getConfigValueString("list-this").orElse("(this array)")));
+    final String sep = spacedText(context.getConfigValueString("list-sep").orElse(", "))
+        .getTextWithSpaces();
+    final String sepLast = spacedText(context.getConfigValueString("list-sep-last").orElse(sep))
+        .getTextWithSpaces();
+
+    final Supplier<Text> nullText = SupplierDelegate.of(() -> nullText(context));
+    final Supplier<Text> thisText = SupplierDelegate.of(() -> thisText(context));
+
     final StringBuilder s = new StringBuilder();
 
     for(int i = 0; i < length; i++)
@@ -102,5 +102,17 @@ public final class ObjectArrayFormatter extends AbstractParameterFormatter
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes() {
     return singleton(new FormattableType(Object[].class));
+  }
+
+
+  @Contract(pure = true)
+  private @NotNull Text nullText(@NotNull FormatterContext context) {
+    return noSpaceText(context.getConfigValueString("list-null").orElse(""));
+  }
+
+
+  @Contract(pure = true)
+  private @NotNull Text thisText(@NotNull FormatterContext context) {
+    return noSpaceText(context.getConfigValueString("list-this").orElse("(this array)"));
   }
 }
