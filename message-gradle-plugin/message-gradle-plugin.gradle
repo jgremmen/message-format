@@ -87,7 +87,6 @@ gradlePlugin {
 
 publishing {
   publications {
-
     gradlePlugin(MavenPublication) {
       from components.java
 
