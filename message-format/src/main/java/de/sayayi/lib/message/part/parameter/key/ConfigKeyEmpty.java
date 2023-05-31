@@ -31,6 +31,13 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
 
 
 /**
+ * The empty configuration key represents values which are considered empty by their associated
+ * parameter formatter.
+ * <p>
+ * In order to determine emptyness, the formatter must implement the
+ * {@link EmptyMatcher#matchEmpty(CompareType, Object) matchEmpty(CompareType, Object)}
+ * interface method.
+ *
  * @author Jeroen Gremmen
  */
 public final class ConfigKeyEmpty implements ConfigKey
@@ -41,6 +48,14 @@ public final class ConfigKeyEmpty implements ConfigKey
   private final @NotNull CompareType compareType;
 
 
+  /**
+   * Creates the empty configuration key with the given {@code compareType}.
+   *
+   * @param compareType  comparison type for the empty key, only
+   *                     {@link de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType#EQ EQ} and
+   *                     {@link de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType#NE NE}
+   *                     are allowed
+   */
   public ConfigKeyEmpty(@NotNull CompareType compareType)
   {
     if (compareType != EQ && compareType != NE)

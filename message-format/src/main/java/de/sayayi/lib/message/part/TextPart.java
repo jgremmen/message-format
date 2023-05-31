@@ -38,8 +38,13 @@ public final class TextPart implements Text
 {
   private static final long serialVersionUID = 800L;
 
+  /** trimmed text string or {@code null}. */
   private final String text;
+
+  /** tells whether the text has a leading space. */
   private final boolean spaceBefore;
+
+  /** tells whether the parameter has a trailing space. */
   private final boolean spaceAfter;
 
 

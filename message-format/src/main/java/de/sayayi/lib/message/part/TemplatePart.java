@@ -41,8 +41,13 @@ public final class TemplatePart implements Template
 {
   private static final long serialVersionUID = 800L;
 
+  /** template name. */
   private final @NotNull String name;
+
+  /** tells whether the template has a leading space. */
   private final boolean spaceBefore;
+
+  /** tells whether the template has a trailing space. */
   private final boolean spaceAfter;
 
 

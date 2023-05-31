@@ -48,10 +48,19 @@ public final class ParameterPart implements Parameter
 {
   private static final long serialVersionUID = 800L;
 
+  /** parameter name. */
   private final @NotNull String name;
+
+  /** optional parameter formatter name. */
   private final String format;
+
+  /** parameter configuration. */
   private final @NotNull ParamConfig paramConfig;
+
+  /** tells whether the parameter has a leading space. */
   private final boolean spaceBefore;
+
+  /** tells whether the parameter has a trailing space. */
   private final boolean spaceAfter;
 
 
