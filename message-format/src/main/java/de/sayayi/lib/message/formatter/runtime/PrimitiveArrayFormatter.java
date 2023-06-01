@@ -33,6 +33,7 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.concurrent.atomic.AtomicLongArray;
+import java.util.function.IntFunction;
 
 import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
@@ -63,11 +64,11 @@ public final class PrimitiveArrayFormatter extends AbstractParameterFormatter
         spacedText(context.getConfigValueString("list-sep-last").orElse(sep))
             .getTextWithSpaces();
     final StringBuilder s = new StringBuilder();
-    final Getter getter = createGetter(array);
+    final IntFunction<Object> getter = createGetter(array);
 
     for(int i = 0; i < length; i++)
     {
-      final Text text = context.format(getter.get(i), arrayElementType, true);
+      final Text text = context.format(getter.apply(i), arrayElementType, true);
 
       if (!text.isEmpty())
       {
@@ -135,7 +136,7 @@ public final class PrimitiveArrayFormatter extends AbstractParameterFormatter
 
 
   @Contract(pure = true)
-  private @NotNull Getter createGetter(@NotNull Object value)
+  private @NotNull IntFunction<Object> createGetter(@NotNull Object value)
   {
     if (value instanceof AtomicIntegerArray)
       return ((AtomicIntegerArray)value)::get;
@@ -144,13 +145,5 @@ public final class PrimitiveArrayFormatter extends AbstractParameterFormatter
       return ((AtomicLongArray)value)::get;
 
     return index -> Array.get(value, index);
-  }
-
-
-
-
-  private interface Getter
-  {
-    Object get(int index);
   }
 }

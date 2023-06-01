@@ -30,7 +30,7 @@ import java.text.CollationKey;
 import java.util.OptionalLong;
 import java.util.Set;
 
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static java.util.Collections.singleton;
 
@@ -44,11 +44,8 @@ public final class CollationKeyFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
-  {
-    return value == null
-        ? nullText()
-        : context.format(((CollationKey)value).getSourceString(), String.class, true);
+  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value) {
+    return noSpaceText(((CollationKey)value).getSourceString());
   }
 
 
