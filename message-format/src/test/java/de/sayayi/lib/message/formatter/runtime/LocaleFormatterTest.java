@@ -84,4 +84,22 @@ class LocaleFormatterTest extends AbstractFormatterTest
           put(new ConfigKeyString(EQ, "fr"), new ConfigValueString("francesa"));
         }}));
   }
+
+
+  @Test
+  void testFormatName()
+  {
+    val messageAccessor = MessageSupportFactory
+        .create(createFormatterService(new LocaleFormatter()), NO_CACHE_INSTANCE)
+        .setLocale(new Locale("nl", "BE"))
+        .getMessageAccessor();
+
+    assertEquals(noSpaceText("Engels (Verenigd Koninkrijk)"), format(messageAccessor, UK));
+
+    assertEquals(noSpaceText("Duits"), format(messageAccessor, GERMAN,
+        singletonMap(new ConfigKeyName("locale"), new ConfigValueString("name"))));
+
+    assertEquals(noSpaceText("Koreaans (Zuid-Korea)"), format(messageAccessor, KOREA,
+        singletonMap(new ConfigKeyName("locale"), new ConfigValueString("name"))));
+  }
 }
