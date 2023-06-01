@@ -29,6 +29,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 import java.util.Set;
 
+import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_PRIMITIVE_OR_ARRAY_ORDER;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
@@ -72,6 +73,6 @@ public final class ByteArrayFormatter extends AbstractParameterFormatter impleme
 
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(byte[].class));
+    return singleton(new FormattableType(byte[].class, (byte)(DEFAULT_PRIMITIVE_OR_ARRAY_ORDER - 5)));
   }
 }
