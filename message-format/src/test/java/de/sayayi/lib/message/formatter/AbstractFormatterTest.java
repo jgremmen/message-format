@@ -70,14 +70,14 @@ public abstract class AbstractFormatterTest
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
-                                        @NotNull Map<ConfigKey, ConfigValue> map) {
+                                        @NotNull Map<ConfigKey,ConfigValue> map) {
     return format(messageContext, new NoParameters(messageContext.getLocale()), value, map, null);
   }
 
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
-                                        @NotNull Map<ConfigKey, ConfigValue> map, @NotNull String format) {
+                                        @NotNull Map<ConfigKey,ConfigValue> map, @NotNull String format) {
     return format(messageContext, new NoParameters(messageContext.getLocale()), value, map, format);
   }
 
@@ -85,7 +85,7 @@ public abstract class AbstractFormatterTest
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext,
                                         @NotNull Parameters parameters, Object value,
-                                        @NotNull Map<ConfigKey, ConfigValue> map,
+                                        @NotNull Map<ConfigKey,ConfigValue> map,
                                         String format)
   {
     return new FormatterContextImpl(messageContext, parameters, value, null, format, new ParamConfig(map))

@@ -7,6 +7,7 @@ de.sayayi.lib.message.formatter.runtime.ObjectArrayFormatter
 de.sayayi.lib.message.formatter.runtime.AtomicBooleanFormatter
 de.sayayi.lib.message.formatter.runtime.BooleanSupplierFormatter
 de.sayayi.lib.message.formatter.runtime.ByteArrayFormatter
+de.sayayi.lib.message.formatter.runtime.CollationKeyFormatter
 de.sayayi.lib.message.formatter.runtime.DateFormatter
 de.sayayi.lib.message.formatter.runtime.DoubleSupplierFormatter
 de.sayayi.lib.message.formatter.runtime.EnumFormatter
@@ -17,6 +18,7 @@ de.sayayi.lib.message.formatter.runtime.IntSupplierFormatter
 de.sayayi.lib.message.formatter.runtime.IterableFormatter
 de.sayayi.lib.message.formatter.runtime.Java8DateTimeFormatter
 de.sayayi.lib.message.formatter.runtime.KeyFormatter
+de.sayayi.lib.message.formatter.runtime.LocaleFormatter
 de.sayayi.lib.message.formatter.runtime.LongSupplierFormatter
 de.sayayi.lib.message.formatter.runtime.MapFormatter
 de.sayayi.lib.message.formatter.runtime.MethodFormatter
