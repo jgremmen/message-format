@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter.named;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
@@ -32,8 +31,7 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.NUMBER_TYPE;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class SizeFormatter extends AbstractParameterFormatter<Object>
-    implements NamedParameterFormatter
+public final class SizeFormatter implements NamedParameterFormatter
 {
   @Override
   @Contract(pure = true)
@@ -58,11 +56,5 @@ public final class SizeFormatter extends AbstractParameterFormatter<Object>
     }
     else
       return emptyText();
-  }
-
-
-  @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value) {
-    throw new IllegalStateException();
   }
 }

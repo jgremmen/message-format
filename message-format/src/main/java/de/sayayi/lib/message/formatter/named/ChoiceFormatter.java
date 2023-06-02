@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter.named;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.EmptyMessage;
@@ -32,8 +31,7 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class ChoiceFormatter extends AbstractParameterFormatter<Object>
-    implements NamedParameterFormatter
+public final class ChoiceFormatter implements NamedParameterFormatter
 {
   @Override
   @Contract(pure = true)
@@ -49,11 +47,5 @@ public final class ChoiceFormatter extends AbstractParameterFormatter<Object>
     return context.format(context
         .getConfigMapMessage(value, EnumSet.of(NULL, EMPTY, BOOL, NUMBER, STRING), true)
         .orElse(EmptyMessage.INSTANCE));
-  }
-
-
-  @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value) {
-    throw new IllegalStateException();
   }
 }

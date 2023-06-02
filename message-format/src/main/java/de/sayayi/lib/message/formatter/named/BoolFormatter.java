@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
@@ -42,8 +41,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class BoolFormatter extends AbstractParameterFormatter<Object>
-    implements NamedParameterFormatter
+public final class BoolFormatter implements NamedParameterFormatter
 {
   @Override
   @Contract(pure = true)
@@ -100,12 +98,6 @@ public final class BoolFormatter extends AbstractParameterFormatter<Object>
       return context.format(msg);
 
     return noSpaceText(Boolean.toString(bool));
-  }
-
-
-  @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value) {
-    throw new IllegalStateException();
   }
 
 

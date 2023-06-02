@@ -24,13 +24,15 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.EMPTY_NULL_TYPE
 
 
 /**
+ * @param <T>  parameter type
+ *
  * @author Jeroen Gremmen
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractParameterFormatter<T> implements ParameterFormatter
 {
   @Override
-  public @NotNull Text format(@NotNull FormatterContext context, Object value)
+  public final @NotNull Text format(@NotNull FormatterContext context, Object value)
   {
     // handle empty, !empty, null and !null first
     Message.WithSpaces msg = context
