@@ -23,6 +23,10 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.EnumSet;
+
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
+
 
 /**
  * @author Jeroen Gremmen
@@ -43,7 +47,7 @@ public final class ChoiceFormatter extends AbstractParameterFormatter
   public @NotNull Text format(@NotNull FormatterContext context, Object value)
   {
     return context.format(context
-        .getConfigMapMessage(value, NO_NAME_KEY_TYPES, true)
+        .getConfigMapMessage(value, EnumSet.of(NULL, EMPTY, BOOL, NUMBER, STRING), true)
         .orElse(EmptyMessage.INSTANCE));
   }
 

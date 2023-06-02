@@ -17,15 +17,10 @@ package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.Type;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.EnumSet;
-import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.EMPTY_NULL_TYPE;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
 
 
 /**
@@ -34,11 +29,6 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractParameterFormatter implements ParameterFormatter
 {
-  /** A set containing all data map key types, except for {@link Type#NAME}. */
-  protected static final Set<Type> NO_NAME_KEY_TYPES =
-      EnumSet.of(NULL, EMPTY, BOOL, NUMBER, STRING);
-
-
   @Override
   public @NotNull Text format(@NotNull FormatterContext context, Object value)
   {
