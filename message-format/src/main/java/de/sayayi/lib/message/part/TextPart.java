@@ -142,8 +142,12 @@ public final class TextPart implements Text
   @Contract(pure = true)
   public String toString()
   {
-    final StringBuilder s = new StringBuilder("Text('")
-        .append(text.replace("'", "\\'")).append('\'');
+    final StringBuilder s = new StringBuilder("Text(");
+
+    if (text == null)
+      s.append("null");
+    else
+      s.append('\'').append(text.replace("'", "\\'")).append('\'');
 
     if (spaceBefore && spaceAfter)
       s.append(",space-around");
