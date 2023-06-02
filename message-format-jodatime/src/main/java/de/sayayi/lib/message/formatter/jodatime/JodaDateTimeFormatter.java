@@ -36,7 +36,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * @author Jeroen Gremmen
  */
-public final class JodaDateTimeFormatter extends AbstractParameterFormatter
+public final class JodaDateTimeFormatter extends AbstractParameterFormatter<Object>
 {
   private static final Map<String,String> STYLE = new HashMap<>();
 

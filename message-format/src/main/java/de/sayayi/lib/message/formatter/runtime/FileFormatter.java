@@ -16,35 +16,31 @@
 package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.OptionalLong;
-import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.STRING_EMPTY_TYPE;
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class FileFormatter extends AbstractParameterFormatter implements SizeQueryable
+public final class FileFormatter extends AbstractSingleTypeParameterFormatter<File>
+    implements SizeQueryable
 {
   @Override
   @SuppressWarnings("DuplicatedCode")
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull File file)
   {
-    final File file = (File)value;
-
     switch(context.getConfigValueString("file").orElse("absolute-path"))
     {
       case "name":
@@ -88,8 +84,7 @@ public final class FileFormatter extends AbstractParameterFormatter implements S
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(File.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(File.class);
   }
 }

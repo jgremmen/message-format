@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
@@ -26,27 +26,25 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.OptionalLong;
-import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class OptionalLongFormatter extends AbstractParameterFormatter implements EmptyMatcher
+public final class OptionalLongFormatter extends AbstractSingleTypeParameterFormatter<OptionalLong>
+    implements EmptyMatcher
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context,
+                                   @NotNull OptionalLong optionalLong)
   {
-    final OptionalLong optional = (OptionalLong)value;
-
-    return !optional.isPresent()
+    return !optionalLong.isPresent()
         ? emptyText()
-        : context.format(optional.getAsLong(), long.class, true);
+        : context.format(optionalLong.getAsLong(), long.class, true);
   }
 
 
@@ -57,8 +55,7 @@ public final class OptionalLongFormatter extends AbstractParameterFormatter impl
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(OptionalLong.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(OptionalLong.class);
   }
 }

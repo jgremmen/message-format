@@ -15,34 +15,32 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
 import java.util.function.DoubleSupplier;
-
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class DoubleSupplierFormatter extends AbstractParameterFormatter
+public final class DoubleSupplierFormatter
+    extends AbstractSingleTypeParameterFormatter<DoubleSupplier>
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value) {
-    return context.format(((DoubleSupplier)value).getAsDouble(), double.class, true);
+  public @NotNull Text formatValue(@NotNull FormatterContext context,
+                                   @NotNull DoubleSupplier doubleSupplier) {
+    return context.format(doubleSupplier.getAsDouble(), double.class, true);
   }
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(DoubleSupplier.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(DoubleSupplier.class);
   }
 }

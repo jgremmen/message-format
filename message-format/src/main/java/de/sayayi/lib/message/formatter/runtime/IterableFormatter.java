@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
@@ -30,26 +30,24 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.OptionalLong;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class IterableFormatter extends AbstractParameterFormatter
+public final class IterableFormatter extends AbstractSingleTypeParameterFormatter<Iterable<?>>
     implements EmptyMatcher, SizeQueryable
 {
   @Override
   @Contract(pure = true)
   @SuppressWarnings({"rawtypes", "DuplicatedCode"})
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Iterable<?> iterable)
   {
-    final Iterator iterator = ((Iterable)value).iterator();
+    final Iterator iterator = ((Iterable)iterable).iterator();
     if (!iterator.hasNext())
       return emptyText();
 
@@ -68,7 +66,7 @@ public final class IterableFormatter extends AbstractParameterFormatter
     while(iterator.hasNext())
     {
       final Object element = iterator.next();
-      final Text text = element == value
+      final Text text = element == iterable
           ? thisText.get()
           : element == null ? nullText.get() : context.format(element, true);
 
@@ -111,13 +109,6 @@ public final class IterableFormatter extends AbstractParameterFormatter
   }
 
 
-  @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(Iterable.class));
-  }
-
-
   @Contract(pure = true)
   private @NotNull Text nullText(@NotNull FormatterContext context) {
     return noSpaceText(context.getConfigValueString("list-null").orElse(""));
@@ -127,5 +118,11 @@ public final class IterableFormatter extends AbstractParameterFormatter
   @Contract(pure = true)
   private @NotNull Text thisText(@NotNull FormatterContext context) {
     return noSpaceText(context.getConfigValueString("list-this").orElse("(this collection)"));
+  }
+
+
+  @Override
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(Iterable.class);
   }
 }

@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
@@ -24,23 +24,19 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.*;
 import java.util.Arrays;
-import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.joining;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class TypeFormatter extends AbstractParameterFormatter
+public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Type>
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
-  {
-    return noSpaceText(toString((Type)value,
-        context.getConfigValueString("type").orElse("ju")));
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Type type) {
+    return noSpaceText(toString(type, context.getConfigValueString("type").orElse("ju")));
   }
 
 
@@ -180,8 +176,7 @@ public final class TypeFormatter extends AbstractParameterFormatter
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(Type.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(Type.class);
   }
 }

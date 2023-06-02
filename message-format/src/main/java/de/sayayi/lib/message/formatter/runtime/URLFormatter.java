@@ -16,34 +16,29 @@
 package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextPart;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URL;
 import java.util.Optional;
-import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.NUMBER_TYPE;
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class URLFormatter extends AbstractParameterFormatter
+public final class URLFormatter extends AbstractSingleTypeParameterFormatter<URL>
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull URL url)
   {
-    final URL url = (URL)value;
-
     switch(context.getConfigValueString("url").orElse("external"))
     {
       case "authority":
@@ -98,8 +93,7 @@ public final class URLFormatter extends AbstractParameterFormatter
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(URL.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(URL.class);
   }
 }

@@ -34,7 +34,7 @@ import static java.lang.Boolean.FALSE;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class FileSizeFormatter extends AbstractParameterFormatter
+public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
     implements NamedParameterFormatter
 {
   private static final String[] UNITS = new String[] { "B", "KB", "MB", "GB", "TB", "PB" };
@@ -69,9 +69,9 @@ public final class FileSizeFormatter extends AbstractParameterFormatter
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Number value)
   {
-    final long size = ((Number)value).longValue();
+    final long size = value.longValue();
     int scale = normalizeScale(context.getConfigValueNumber("scale").orElse(1));
     final StringBuilder s = new StringBuilder();
     final int unitIndex;

@@ -42,7 +42,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class BoolFormatter extends AbstractParameterFormatter
+public final class BoolFormatter extends AbstractParameterFormatter<Object>
     implements NamedParameterFormatter
 {
   @Override

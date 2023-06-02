@@ -15,35 +15,32 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.security.Principal;
-import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class PrincipalFormatter extends AbstractParameterFormatter
+public final class PrincipalFormatter extends AbstractSingleTypeParameterFormatter<Principal>
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value) {
-    return noSpaceText(((Principal)value).getName());
+  protected @NotNull Text formatValue(@NotNull FormatterContext context,
+                                      @NotNull Principal principal) {
+    return noSpaceText(principal.getName());
   }
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(Principal.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(Principal.class);
   }
 }

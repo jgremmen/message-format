@@ -15,32 +15,27 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
-import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.STRING_EMPTY_TYPE;
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class LocaleFormatter extends AbstractParameterFormatter
+public final class LocaleFormatter extends AbstractSingleTypeParameterFormatter<Locale>
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Locale locale)
   {
-    final Locale locale = (Locale)value;
-
     switch(context.getConfigValueString("locale").orElse("name"))
     {
       case "country":
@@ -71,8 +66,7 @@ public final class LocaleFormatter extends AbstractParameterFormatter
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(Locale.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(Locale.class);
   }
 }

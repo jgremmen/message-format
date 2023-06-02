@@ -16,38 +16,32 @@
 package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.STRING_TYPE;
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class EnumFormatter extends AbstractParameterFormatter
+public final class EnumFormatter extends AbstractSingleTypeParameterFormatter<Enum<?>>
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Enum<?> value)
   {
-    final Enum<?> enumValue = (Enum<?>)value;
-
     switch(context.getConfigValueString("enum").orElse("name"))
     {
       case "ordinal":
       case "ord":
-        return context.format(enumValue.ordinal(), int.class);
+        return context.format(value.ordinal(), int.class);
 
       case "name": {
-        final String name = enumValue.name();
+        final String name = value.name();
         final Message.WithSpaces msg = context
             .getConfigMapMessage(name, STRING_TYPE, true)
             .orElse(null);
@@ -62,8 +56,7 @@ public final class EnumFormatter extends AbstractParameterFormatter
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(Enum.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(Enum.class);
   }
 }

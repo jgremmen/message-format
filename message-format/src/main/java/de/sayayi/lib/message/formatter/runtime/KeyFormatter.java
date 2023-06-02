@@ -15,31 +15,26 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.security.Key;
-import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class KeyFormatter extends AbstractParameterFormatter
+public final class KeyFormatter extends AbstractSingleTypeParameterFormatter<Key>
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Key key)
   {
-    final Key key = (Key)value;
-
     switch(context.getConfigValueString("key").orElse("name"))
     {
       case "algorithm":
@@ -54,8 +49,7 @@ public final class KeyFormatter extends AbstractParameterFormatter
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(Key.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(Key.class);
   }
 }

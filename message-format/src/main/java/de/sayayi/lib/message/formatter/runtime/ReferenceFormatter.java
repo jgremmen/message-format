@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
@@ -27,24 +27,24 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.Reference;
 import java.util.OptionalLong;
-import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class ReferenceFormatter extends AbstractParameterFormatter
+public final class ReferenceFormatter extends AbstractSingleTypeParameterFormatter<Reference<?>>
     implements EmptyMatcher, SizeQueryable
 {
-  @SuppressWarnings("rawtypes")
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context,
+                                   @NotNull Reference<?> reference)
   {
-    return (value = ((Reference)value).get()) != null
+    final Object value = reference.get();
+
+    return value != null
         ? context.format(value, value.getClass(), true)
         : emptyText();
   }
@@ -63,7 +63,7 @@ public final class ReferenceFormatter extends AbstractParameterFormatter
 
 
   @Override
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(Reference.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(Reference.class);
   }
 }

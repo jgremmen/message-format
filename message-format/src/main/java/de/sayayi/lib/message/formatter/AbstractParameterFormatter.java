@@ -27,7 +27,7 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.EMPTY_NULL_TYPE
  * @author Jeroen Gremmen
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class AbstractParameterFormatter implements ParameterFormatter
+public abstract class AbstractParameterFormatter<T> implements ParameterFormatter
 {
   @Override
   public @NotNull Text format(@NotNull FormatterContext context, Object value)
@@ -43,7 +43,8 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
     if (value == null)
       return nullText();
 
-    final Text text = formatValue(context, value);
+    //noinspection unchecked
+    final Text text = formatValue(context, (T)value);
 
     // handle empty, !empty, null and !null for result
     return context
@@ -68,5 +69,5 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
    * @return  formatted text, never {@code null}
    */
   protected abstract @NotNull Text formatValue(@NotNull FormatterContext context,
-                                               @NotNull Object value);
+                                               @NotNull T value);
 }

@@ -33,7 +33,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 /**
  * @author Jeroen Gremmen
  */
-public final class GeoFormatter extends AbstractParameterFormatter
+public final class GeoFormatter extends AbstractParameterFormatter<Number>
     implements NamedParameterFormatter
 {
   private static final Map<String,Format> FORMAT = new HashMap<>();
@@ -71,11 +71,11 @@ public final class GeoFormatter extends AbstractParameterFormatter
 
 
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Number value)
   {
     final Format fmt = getFormat(context);
     final StringBuilder s = new StringBuilder();
-    final double v = ((Number)value).doubleValue();
+    final double v = value.doubleValue();
     final double[] dms = dmsSplitter(fmt, v);
     final boolean negative = v < 0.0;
 

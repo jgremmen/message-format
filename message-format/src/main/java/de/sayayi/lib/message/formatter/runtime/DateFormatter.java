@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
@@ -26,26 +26,24 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.text.DateFormat.*;
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class DateFormatter extends AbstractParameterFormatter
+public final class DateFormatter extends AbstractSingleTypeParameterFormatter<Date>
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Date date)
   {
     try {
       return noSpaceText(getFormatter(
           context.getConfigValueString("date").orElse(null),
-          context.getLocale()).format(value));
+          context.getLocale()).format(date));
     } catch(IllegalArgumentException ex) {
       return context.delegateToNextFormatter();
     }
@@ -72,8 +70,7 @@ public final class DateFormatter extends AbstractParameterFormatter
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(Date.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(Date.class);
   }
 }

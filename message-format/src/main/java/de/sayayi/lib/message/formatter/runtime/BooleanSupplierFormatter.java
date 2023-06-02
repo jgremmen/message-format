@@ -15,34 +15,32 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
 import java.util.function.BooleanSupplier;
-
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class BooleanSupplierFormatter extends AbstractParameterFormatter
+public final class BooleanSupplierFormatter
+    extends AbstractSingleTypeParameterFormatter<BooleanSupplier>
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value) {
-    return context.format(((BooleanSupplier)value).getAsBoolean(), boolean.class, true);
+  public @NotNull Text formatValue(@NotNull FormatterContext context,
+                                   @NotNull BooleanSupplier value) {
+    return context.format(value.getAsBoolean(), boolean.class, true);
   }
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(BooleanSupplier.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(BooleanSupplier.class);
   }
 }

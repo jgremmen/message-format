@@ -29,7 +29,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.nullText;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class ClipFormatter extends AbstractParameterFormatter
+public final class ClipFormatter extends AbstractParameterFormatter<Object>
     implements NamedParameterFormatter
 {
   @Override

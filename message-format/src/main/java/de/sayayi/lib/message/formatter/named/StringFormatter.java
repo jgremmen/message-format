@@ -42,7 +42,7 @@ import static java.util.Arrays.asList;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class StringFormatter extends AbstractParameterFormatter
+public final class StringFormatter extends AbstractParameterFormatter<Object>
     implements EmptyMatcher, SizeQueryable, NamedParameterFormatter
 {
   @Override

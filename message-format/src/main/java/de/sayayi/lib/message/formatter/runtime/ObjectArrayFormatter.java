@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
@@ -28,21 +28,19 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.OptionalLong;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static java.lang.reflect.Array.get;
 import static java.lang.reflect.Array.getLength;
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class ObjectArrayFormatter extends AbstractParameterFormatter
+public final class ObjectArrayFormatter extends AbstractSingleTypeParameterFormatter<Object>
     implements EmptyMatcher, SizeQueryable
 {
   @Override
@@ -96,8 +94,8 @@ public final class ObjectArrayFormatter extends AbstractParameterFormatter
 
 
   @Override
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(Object[].class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(Object[].class);
   }
 
 

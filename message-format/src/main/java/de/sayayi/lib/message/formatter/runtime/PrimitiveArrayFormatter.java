@@ -43,7 +43,7 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYP
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class PrimitiveArrayFormatter extends AbstractParameterFormatter
+public final class PrimitiveArrayFormatter extends AbstractParameterFormatter<Object>
     implements EmptyMatcher, SizeQueryable
 {
   @Override

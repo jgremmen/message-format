@@ -32,7 +32,7 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class ChoiceFormatter extends AbstractParameterFormatter
+public final class ChoiceFormatter extends AbstractParameterFormatter<Object>
     implements NamedParameterFormatter
 {
   @Override

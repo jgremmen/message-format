@@ -15,37 +15,35 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
 import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class SupplierFormatter extends AbstractParameterFormatter
+public final class SupplierFormatter extends AbstractSingleTypeParameterFormatter<Supplier<?>>
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Supplier<?> supplier)
   {
-    return (value = ((Supplier<?>)value).get()) == null
-        ? nullText() : context.format(value, value.getClass(), true);
+    final Object value = supplier.get();
+
+    return value == null ? nullText() : context.format(value, value.getClass(), true);
   }
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(Supplier.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(Supplier.class);
   }
 }

@@ -33,7 +33,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 /**
  * @author Jeroen Gremmen
  */
-public final class BitsFormatter extends AbstractParameterFormatter
+public final class BitsFormatter extends AbstractParameterFormatter<Object>
     implements NamedParameterFormatter
 {
   @Override

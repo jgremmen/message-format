@@ -15,29 +15,26 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetAddress;
-import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class InetAddressFormatter extends AbstractParameterFormatter
+public final class InetAddressFormatter extends AbstractSingleTypeParameterFormatter<InetAddress>
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context,
+                                   @NotNull InetAddress inetAddress)
   {
-    final InetAddress inetAddress = (InetAddress)value;
-
     switch(context.getConfigValueString("inet").orElse("ip"))
     {
       case "name":
@@ -55,7 +52,7 @@ public final class InetAddressFormatter extends AbstractParameterFormatter
 
 
   @Override
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(InetAddress.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(InetAddress.class);
   }
 }

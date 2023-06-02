@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
@@ -28,24 +28,23 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.CollationKey;
 import java.util.OptionalLong;
-import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class CollationKeyFormatter extends AbstractParameterFormatter
+public final class CollationKeyFormatter extends AbstractSingleTypeParameterFormatter<CollationKey>
     implements EmptyMatcher, SizeQueryable
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value) {
-    return noSpaceText(((CollationKey)value).getSourceString());
+  public @NotNull Text formatValue(@NotNull FormatterContext context,
+                                   @NotNull CollationKey collationKey) {
+    return noSpaceText(collationKey.getSourceString());
   }
 
 
@@ -64,8 +63,7 @@ public final class CollationKeyFormatter extends AbstractParameterFormatter
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(CollationKey.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(CollationKey.class);
   }
 }

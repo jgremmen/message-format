@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
@@ -27,28 +27,26 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.OptionalDouble;
-import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class OptionalDoubleFormatter extends AbstractParameterFormatter
+public final class OptionalDoubleFormatter
+    extends AbstractSingleTypeParameterFormatter<OptionalDouble>
     implements EmptyMatcher
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context,
+                                   @NotNull OptionalDouble optionalDouble)
   {
-    final OptionalDouble optional = (OptionalDouble)value;
-
-    return !optional.isPresent()
+    return !optionalDouble.isPresent()
         ? emptyText()
-        : context.format(optional.getAsDouble(), double.class, true);
+        : context.format(optionalDouble.getAsDouble(), double.class, true);
   }
 
 
@@ -59,8 +57,7 @@ public final class OptionalDoubleFormatter extends AbstractParameterFormatter
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(OptionalDouble.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(OptionalDouble.class);
   }
 }

@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
@@ -27,37 +27,35 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
-import java.util.Set;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_PRIMITIVE_OR_ARRAY_ORDER;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static java.nio.charset.Charset.isSupported;
-import static java.util.Collections.singleton;
 
 
 /**
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class ByteArrayFormatter extends AbstractParameterFormatter implements EmptyMatcher
+public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatter<byte[]>
+    implements EmptyMatcher
 {
   @Override
   @SneakyThrows(UnsupportedEncodingException.class)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object byteArray)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull byte[] byteArray)
   {
     final Optional<String> charsetConfig = context.getConfigValueString("charset");
     if (!charsetConfig.isPresent())
       return context.delegateToNextFormatter();
 
-    final byte[] bytes = (byte[])byteArray;
-    if (bytes.length == 0)
+    if (byteArray.length == 0)
       return emptyText();
 
     final String charset = charsetConfig.get();
 
     return context.format(charset.isEmpty() || !isSupported(charset)
-        ? new String(bytes) : new String(bytes, charset), true);
+        ? new String(byteArray) : new String(byteArray, charset), true);
   }
 
 
@@ -68,7 +66,7 @@ public final class ByteArrayFormatter extends AbstractParameterFormatter impleme
 
 
   @Override
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(byte[].class, (byte)(DEFAULT_PRIMITIVE_OR_ARRAY_ORDER - 5)));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(byte[].class, (byte)(DEFAULT_PRIMITIVE_OR_ARRAY_ORDER - 5));
   }
 }

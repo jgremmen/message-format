@@ -18,7 +18,7 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
@@ -39,14 +39,13 @@ import java.util.function.Supplier;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
 import static java.util.Collections.unmodifiableSet;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class MapFormatter extends AbstractParameterFormatter
+public final class MapFormatter extends AbstractSingleTypeParameterFormatter<Map<?,?>>
     implements EmptyMatcher, SizeQueryable
 {
   private static final Message.WithSpaces DEFAULT_KEY_VALUE_MESSAGE;
@@ -67,9 +66,8 @@ public final class MapFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Map<?,?> map)
   {
-    final Map<?,?> map = (Map<?,?>)value;
     if (map.isEmpty())
       return emptyText();
 
@@ -115,9 +113,8 @@ public final class MapFormatter extends AbstractParameterFormatter
 
 
   @Override
-  @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(new FormattableType(Map.class));
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(Map.class);
   }
 
 

@@ -40,7 +40,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * @author Jeroen Gremmen
  */
-public final class Java8DateTimeFormatter extends AbstractParameterFormatter
+public final class Java8DateTimeFormatter extends AbstractParameterFormatter<Temporal>
 {
   private static final Map<String,String> STYLE = new HashMap<>();
   private static final Map<String,DateTimeFormatter> FORMATTER = new HashMap<>();
@@ -78,7 +78,7 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Temporal value)
   {
     final String format = context.getConfigValueString("date").orElse(null);
     final DateTimeFormatter formatter;

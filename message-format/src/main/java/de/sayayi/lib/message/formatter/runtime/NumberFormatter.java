@@ -45,7 +45,7 @@ import static java.util.Arrays.asList;
 /**
  * @author Jeroen Gremmen
  */
-public final class NumberFormatter extends AbstractParameterFormatter
+public final class NumberFormatter extends AbstractParameterFormatter<Number>
 {
   private static final Map<Locale,DecimalFormatSymbols> FORMAT_SYMBOLS_CACHE =
       new ConcurrentHashMap<>();
@@ -53,10 +53,8 @@ public final class NumberFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Number number)
   {
-    final Number number = (Number)value;
-
     // check configuration map for match
     final Message.WithSpaces msg = context
         .getConfigMapMessage(number, NUMBER_TYPE, true)
