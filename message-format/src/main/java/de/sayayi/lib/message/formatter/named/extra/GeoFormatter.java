@@ -28,7 +28,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 
 
 /**
@@ -72,11 +71,8 @@ public final class GeoFormatter extends AbstractParameterFormatter
 
 
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    if (value == null)
-      return nullText();
-
     final Format fmt = getFormat(context);
     final StringBuilder s = new StringBuilder();
     final double v = ((Number)value).doubleValue();

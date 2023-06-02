@@ -40,11 +40,8 @@ import static java.util.Collections.singleton;
 public final class URLFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    if (value == null)
-      return nullText();
-
     final URL url = (URL)value;
 
     switch(context.getConfigValueString("url").orElse("external"))

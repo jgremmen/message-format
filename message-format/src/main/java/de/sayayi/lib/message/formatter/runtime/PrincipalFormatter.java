@@ -26,7 +26,6 @@ import java.security.Principal;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.util.Collections.singleton;
 
 
@@ -37,8 +36,8 @@ import static java.util.Collections.singleton;
 public final class PrincipalFormatter extends AbstractParameterFormatter
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, Object value) {
-    return value == null ? nullText() : noSpaceText(((Principal)value).getName());
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value) {
+    return noSpaceText(((Principal)value).getName());
   }
 
 

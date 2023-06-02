@@ -32,7 +32,6 @@ import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_LENIENT;
 import static de.sayayi.lib.message.util.SpacesUtil.isTrimmedEmpty;
@@ -54,11 +53,8 @@ public final class StringFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
-  {
-    return value == null
-        ? nullText()
-        : noSpaceText(value instanceof char[] ? new String((char[])value) : String.valueOf(value));
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value) {
+    return noSpaceText(value instanceof char[] ? new String((char[])value) : String.valueOf(value));
   }
 
 

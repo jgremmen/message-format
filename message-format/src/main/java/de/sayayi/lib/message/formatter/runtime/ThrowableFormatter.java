@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.util.Collections.singleton;
 
 
@@ -34,8 +33,8 @@ import static java.util.Collections.singleton;
 public final class ThrowableFormatter extends AbstractParameterFormatter
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, Object value) {
-    return value == null ? nullText() : noSpaceText(((Throwable)value).getLocalizedMessage());
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value) {
+    return noSpaceText(((Throwable)value).getLocalizedMessage());
   }
 
 

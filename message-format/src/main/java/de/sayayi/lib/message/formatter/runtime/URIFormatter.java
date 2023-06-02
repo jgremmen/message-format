@@ -41,11 +41,8 @@ import static java.util.Collections.singleton;
 public final class URIFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    if (value == null)
-      return nullText();
-
     final URI uri = (URI)value;
 
     switch(context.getConfigValueString("uri").orElse("default"))

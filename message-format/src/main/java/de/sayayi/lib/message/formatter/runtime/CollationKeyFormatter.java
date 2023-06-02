@@ -44,7 +44,7 @@ public final class CollationKeyFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value) {
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value) {
     return noSpaceText(((CollationKey)value).getSourceString());
   }
 

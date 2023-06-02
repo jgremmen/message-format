@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.STRING_TYPE;
 import static java.util.Collections.singleton;
 
@@ -37,11 +36,8 @@ import static java.util.Collections.singleton;
 public final class EnumFormatter extends AbstractParameterFormatter
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    if (value == null)
-      return nullText();
-
     final Enum<?> enumValue = (Enum<?>)value;
 
     switch(context.getConfigValueString("enum").orElse("name"))

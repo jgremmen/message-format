@@ -28,7 +28,8 @@ import java.io.File;
 import java.util.OptionalLong;
 import java.util.Set;
 
-import static de.sayayi.lib.message.part.TextPartFactory.*;
+import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.STRING_EMPTY_TYPE;
 import static java.util.Collections.singleton;
 
@@ -40,11 +41,8 @@ public final class FileFormatter extends AbstractParameterFormatter implements S
 {
   @Override
   @SuppressWarnings("DuplicatedCode")
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    if (value == null)
-      return nullText();
-
     final File file = (File)value;
 
     switch(context.getConfigValueString("file").orElse("absolute-path"))

@@ -31,7 +31,6 @@ import java.util.Set;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_PRIMITIVE_OR_ARRAY_ORDER;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static java.nio.charset.Charset.isSupported;
 import static java.util.Collections.singleton;
@@ -45,14 +44,11 @@ public final class ByteArrayFormatter extends AbstractParameterFormatter impleme
 {
   @Override
   @SneakyThrows(UnsupportedEncodingException.class)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object byteArray)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object byteArray)
   {
     final Optional<String> charsetConfig = context.getConfigValueString("charset");
     if (!charsetConfig.isPresent())
       return context.delegateToNextFormatter();
-
-    if (byteArray == null)
-      return nullText();
 
     final byte[] bytes = (byte[])byteArray;
     if (bytes.length == 0)

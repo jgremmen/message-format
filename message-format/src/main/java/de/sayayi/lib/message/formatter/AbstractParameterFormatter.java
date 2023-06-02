@@ -18,12 +18,12 @@ package de.sayayi.lib.message.formatter;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.Type;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
 import java.util.Set;
 
+import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.EMPTY_NULL_TYPE;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
 
@@ -50,12 +50,16 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
     if (msg != null)
       return context.format(msg);
 
+    if (value == null)
+      return nullText();
+
     final Text text = formatValue(context, value);
 
     // handle empty, !empty, null and !null for result
-    msg = context.getConfigMapMessage(text.getText(), EMPTY_NULL_TYPE).orElse(null);
-
-    return msg == null ? text : context.format(msg);
+    return context
+        .getConfigMapMessage(text.getText(), EMPTY_NULL_TYPE)
+        .map(context::format)
+        .orElse(text);
   }
 
 
@@ -69,28 +73,10 @@ public abstract class AbstractParameterFormatter implements ParameterFormatter
    * by this method.
    *
    * @param context  formatter context, not {@code null}
-   * @param value    value to be formatted
+   * @param value    value to be formatted, not {@code null}
    *
    * @return  formatted text, never {@code null}
    */
-  protected abstract @NotNull Text formatValue(@NotNull FormatterContext context, Object value);
-
-
-  /**
-   * Return the trimmed text represented by the {@code text} message part.
-   *
-   * @param text  text message part
-   *
-   * @return  trimmed text or an empty string if {@code text} is {@code null}, never {@code null}
-   */
-  @Contract(pure = true)
-  protected @NotNull String trimNotNull(Text text)
-  {
-    if (text == null)
-      return "";
-
-    String s = text.getText();
-
-    return s == null ? "" : s;
-  }
+  protected abstract @NotNull Text formatValue(@NotNull FormatterContext context,
+                                               @NotNull Object value);
 }

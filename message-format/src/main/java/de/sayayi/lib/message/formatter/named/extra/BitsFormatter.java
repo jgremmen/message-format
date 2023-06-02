@@ -26,7 +26,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 
-import static de.sayayi.lib.message.part.TextPartFactory.*;
+import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
@@ -56,11 +57,8 @@ public final class BitsFormatter extends AbstractParameterFormatter
 
 
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    if (value == null)
-      return nullText();
-
     final int bitCount = detectBitCount(context, value);
     return bitCount > 0 ? noSpaceText(format(bitCount, value)) : emptyText();
   }

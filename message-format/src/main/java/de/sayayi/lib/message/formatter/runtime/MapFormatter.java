@@ -37,7 +37,6 @@ import java.util.*;
 import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
@@ -68,11 +67,9 @@ public final class MapFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
     final Map<?,?> map = (Map<?,?>)value;
-    if (map == null)
-      return nullText();
     if (map.isEmpty())
       return emptyText();
 

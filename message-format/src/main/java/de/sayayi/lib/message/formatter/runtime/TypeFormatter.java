@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.joining;
 
@@ -38,12 +37,10 @@ import static java.util.stream.Collectors.joining;
 public final class TypeFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    return value == null
-        ? nullText()
-        : noSpaceText(toString((Type)value,
-            context.getConfigValueString("type").orElse("ju")));
+    return noSpaceText(toString((Type)value,
+        context.getConfigValueString("type").orElse("ju")));
   }
 
 

@@ -34,10 +34,8 @@ import static java.util.Collections.singleton;
 public final class AtomicBooleanFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
-  {
-    return context.format(value == null ? null : ((AtomicBoolean)value).get(),
-        boolean.class, true);
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value) {
+    return context.format(((AtomicBoolean)value).get(), boolean.class, true);
   }
 
 

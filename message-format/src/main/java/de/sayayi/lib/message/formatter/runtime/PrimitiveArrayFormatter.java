@@ -47,11 +47,8 @@ public final class PrimitiveArrayFormatter extends AbstractParameterFormatter
     implements EmptyMatcher, SizeQueryable
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object array)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object array)
   {
-    if (array == null)
-      return nullText();
-
     final int length = getLength(array);
     if (length == 0)
       return emptyText();

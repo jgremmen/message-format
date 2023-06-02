@@ -30,7 +30,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.*;
 
-import static de.sayayi.lib.message.part.TextPartFactory.*;
+import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.time.format.DateTimeFormatter.*;
 import static java.time.format.FormatStyle.*;
 import static java.util.Objects.requireNonNull;
@@ -77,11 +78,8 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    if (value == null)
-      return nullText();
-
     final String format = context.getConfigValueString("date").orElse(null);
     final DateTimeFormatter formatter;
 

@@ -30,7 +30,6 @@ import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static java.util.Collections.singleton;
 
@@ -43,11 +42,8 @@ public final class ReferenceFormatter extends AbstractParameterFormatter
 {
   @SuppressWarnings("rawtypes")
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    if (value == null)
-      return nullText();
-
     return (value = ((Reference)value).get()) != null
         ? context.format(value, value.getClass(), true)
         : emptyText();

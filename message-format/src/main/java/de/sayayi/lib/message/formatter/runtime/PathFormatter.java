@@ -38,11 +38,8 @@ public final class PathFormatter extends AbstractParameterFormatter
 {
   @Override
   @SuppressWarnings("DuplicatedCode")
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    if (value == null)
-      return nullText();
-
     Path path = (Path)value;
 
     switch(context.getConfigValueString("path").orElse("path"))

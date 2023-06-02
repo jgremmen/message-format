@@ -38,7 +38,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.NUMBER_TYPE;
 import static java.util.Arrays.asList;
 
@@ -54,16 +53,13 @@ public final class NumberFormatter extends AbstractParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object v)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    if (v == null)
-      return nullText();
-
-    final Number value = (Number)v;
+    final Number number = (Number)value;
 
     // check configuration map for match
     final Message.WithSpaces msg = context
-        .getConfigMapMessage(value, NUMBER_TYPE, true)
+        .getConfigMapMessage(number, NUMBER_TYPE, true)
         .orElse(null);
     if (msg != null)
       return context.format(msg);
@@ -72,15 +68,15 @@ public final class NumberFormatter extends AbstractParameterFormatter
 
     // special case: show number as bool
     if ("bool".equals(format))
-      return context.format(value, boolean.class);
+      return context.format(number, boolean.class);
 
     if ((format == null || "integer".equals(format)) &&
-        (value instanceof BigInteger || value instanceof Long || value instanceof Integer ||
-         value instanceof Short || value instanceof Byte || value instanceof AtomicInteger ||
-         value instanceof AtomicLong || value instanceof LongAdder))
-      return noSpaceText(value.toString());
+        (number instanceof BigInteger || number instanceof Long || number instanceof Integer ||
+         number instanceof Short || number instanceof Byte || number instanceof AtomicInteger ||
+         number instanceof AtomicLong || number instanceof LongAdder))
+      return noSpaceText(number.toString());
 
-    return noSpaceText(getFormatter(format, context).format(value));
+    return noSpaceText(getFormatter(format, context).format(number));
   }
 
 

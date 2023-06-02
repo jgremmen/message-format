@@ -21,7 +21,6 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.TextPartFactory;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.util.SupplierDelegate;
@@ -48,11 +47,8 @@ public final class ObjectArrayFormatter extends AbstractParameterFormatter
 {
   @Override
   @SuppressWarnings("DuplicatedCode")
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object array)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object array)
   {
-    if (array == null)
-      return TextPartFactory.nullText();
-
     final int length = getLength(array);
     if (length == 0)
       return emptyText();

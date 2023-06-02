@@ -49,7 +49,7 @@ public final class ChoiceFormatter extends AbstractParameterFormatter
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, Object value) {
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value) {
     throw new IllegalStateException();
   }
 }

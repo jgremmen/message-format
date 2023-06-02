@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 import java.util.function.IntSupplier;
 
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.util.Collections.singleton;
 
 
@@ -36,11 +35,8 @@ public final class IntSupplierFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
-  {
-    return value == null
-        ? nullText()
-        : context.format(((IntSupplier)value).getAsInt(), int.class, true);
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value) {
+    return context.format(((IntSupplier)value).getAsInt(), int.class, true);
   }
 
 

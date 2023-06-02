@@ -29,7 +29,6 @@ import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static java.util.Collections.singleton;
 
@@ -41,11 +40,8 @@ public final class OptionalLongFormatter extends AbstractParameterFormatter impl
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    if (value == null)
-      return nullText();
-
     final OptionalLong optional = (OptionalLong)value;
 
     return !optional.isPresent()

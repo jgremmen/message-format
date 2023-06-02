@@ -36,9 +36,9 @@ public final class SupplierFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    return value == null || (value = ((Supplier<?>)value).get()) == null
+    return (value = ((Supplier<?>)value).get()) == null
         ? nullText() : context.format(value, value.getClass(), true);
   }
 

@@ -25,7 +25,6 @@ import java.net.InetAddress;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.util.Collections.singleton;
 
 
@@ -35,11 +34,8 @@ import static java.util.Collections.singleton;
 public final class InetAddressFormatter extends AbstractParameterFormatter
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    if (value == null)
-      return nullText();
-
     final InetAddress inetAddress = (InetAddress)value;
 
     switch(context.getConfigValueString("inet").orElse("ip"))

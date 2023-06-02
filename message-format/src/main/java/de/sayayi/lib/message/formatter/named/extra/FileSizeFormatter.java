@@ -27,7 +27,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.lang.Boolean.FALSE;
 
 
@@ -70,11 +69,8 @@ public final class FileSizeFormatter extends AbstractParameterFormatter
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    if (value == null)
-      return nullText();
-
     final long size = ((Number)value).longValue();
     int scale = normalizeScale(context.getConfigValueNumber("scale").orElse(1));
     final StringBuilder s = new StringBuilder();

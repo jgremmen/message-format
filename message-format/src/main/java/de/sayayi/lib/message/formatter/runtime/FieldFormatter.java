@@ -27,7 +27,6 @@ import java.lang.reflect.Modifier;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.util.Collections.singleton;
 
 
@@ -38,11 +37,8 @@ public final class FieldFormatter extends AbstractParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, Object value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    if (value == null)
-      return nullText();
-
     final Field field = (Field)value;
     final StringBuilder formattedField = new StringBuilder();
     final String format = context.getConfigValueString("field").orElse("juMTN");
