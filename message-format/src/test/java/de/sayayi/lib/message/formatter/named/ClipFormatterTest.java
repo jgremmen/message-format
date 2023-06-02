@@ -18,12 +18,14 @@ package de.sayayi.lib.message.formatter.named;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.runtime.DoubleSupplierFormatter;
+import de.sayayi.lib.message.formatter.runtime.SupplierFormatter;
 import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueNumber;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
@@ -97,10 +99,11 @@ public class ClipFormatterTest extends AbstractFormatterTest
   void testNull()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new ClipFormatter(), new DoubleSupplierFormatter()),
+        .create(createFormatterService(new ClipFormatter(), new SupplierFormatter()),
             NO_CACHE_INSTANCE)
         .getMessageAccessor();
 
     assertEquals(nullText(), format(messageAccessor, (Object)null, "clip"));
+    assertEquals(nullText(), format(messageAccessor, (Supplier<Object>)() -> null, "clip"));
   }
 }
