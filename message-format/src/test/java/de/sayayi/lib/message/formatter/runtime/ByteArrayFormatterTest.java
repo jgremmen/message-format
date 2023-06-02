@@ -27,10 +27,12 @@ import org.junit.jupiter.api.Test;
 import java.nio.charset.IllegalCharsetNameException;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
+import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
@@ -68,6 +70,20 @@ public class ByteArrayFormatterTest extends AbstractFormatterTest
     assertEquals(new TextPart("Größe"),
         format(messageAccessor, "Größe".getBytes(),
             singletonMap(new ConfigKeyName("charset"), new ConfigValueString("AA-bb"))));
+  }
+
+
+  @Test
+  void testEmptyArray()
+  {
+    val formatterService = createFormatterService(new ByteArrayFormatter());
+    val messageAccessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
+        .setLocale(ROOT)
+        .getMessageAccessor();
+
+    assertEquals(EMPTY,
+        format(messageAccessor, "".getBytes(UTF_8),
+            singletonMap(new ConfigKeyName("charset"), new ConfigValueString("utf-8"))));
   }
 
 
