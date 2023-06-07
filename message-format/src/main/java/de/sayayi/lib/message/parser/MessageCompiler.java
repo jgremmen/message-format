@@ -69,6 +69,7 @@ import static de.sayayi.lib.message.parser.MessageParser.*;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
+import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toMap;
 import static org.antlr.v4.runtime.Token.EOF;
@@ -337,8 +338,15 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitConfigElement(ConfigElementContext ctx)
     {
-      ctx.key = ctx.configKey().key;
-      ctx.value = ctx.configValue().value;
+      final ConfigKey.Type keyType = (ctx.key = ctx.configKey().key).getType();
+      final ConfigValue.Type valueType = (ctx.value = ctx.configValue().value).getType();
+
+      if ((valueType == ConfigValue.Type.BOOL || valueType == ConfigValue.Type.NUMBER) &&
+          keyType != ConfigKey.Type.NAME)
+      {
+        syntaxError(ctx, valueType.name().toLowerCase(ROOT) +
+            " value not allowed for " + keyType.name().toLowerCase(ROOT) + " key");
+      }
     }
 
 
