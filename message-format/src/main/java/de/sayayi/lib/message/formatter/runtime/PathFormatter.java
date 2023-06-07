@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
@@ -25,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import java.nio.file.Path;
 
 import static de.sayayi.lib.message.part.TextPartFactory.*;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.STRING_EMPTY_TYPE;
 
 
 /**
@@ -55,29 +53,33 @@ public final class PathFormatter extends AbstractSingleTypeParameterFormatter<Pa
         break;
 
       case "ext":
-      case "extension": {
-        path = path.getFileName();
-        if (path == null)
-          return nullText();
-
-        final String name = path.toString();
-        final int dotidx = name.lastIndexOf('.');
-        if (dotidx == -1)
-          return emptyText();
-
-        final String extension = name.substring(dotidx + 1);
-        final Message.WithSpaces msg = context
-            .getConfigMapMessage(extension, STRING_EMPTY_TYPE)
-            .orElse(null);
-
-        return msg != null ? context.format(msg) : noSpaceText(extension);
-      }
+      case "extension":
+        return formatValue_extension(context, path);
 
       default:
         return context.delegateToNextFormatter();
     }
 
     return path == null ? emptyText() : noSpaceText(path.toString());
+  }
+
+
+  @SuppressWarnings("DuplicatedCode")
+  private @NotNull Text formatValue_extension(@NotNull FormatterContext context, @NotNull Path path)
+  {
+    path = path.getFileName();
+    if (path == null)
+      return nullText();
+
+    final String name = path.toString();
+    final int dotidx = name.lastIndexOf('.');
+    if (dotidx == -1)
+      return emptyText();
+
+    final String extension = name.substring(dotidx + 1);
+
+    return formatUsingMappedString(context, extension, true)
+        .orElseGet(() -> noSpaceText(extension));
   }
 
 
