@@ -66,7 +66,7 @@ class EnumFormatterTest extends AbstractFormatterTest
     assertEquals("upper", NO_CACHE_INSTANCE.parseMessage("%{e,>'C':upper,<'C':lower}")
         .format(messageAccessor, singletonMap("e", MyEnum.CC)));
 
-    assertEquals("AA", NO_CACHE_INSTANCE.parseMessage("%{e,>'C':upper}")
+    assertEquals("", NO_CACHE_INSTANCE.parseMessage("%{e,>'C':upper}")
         .format(messageAccessor, singletonMap("e", MyEnum.AA)));
   }
 

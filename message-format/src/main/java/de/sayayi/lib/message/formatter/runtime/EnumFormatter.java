@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
@@ -23,7 +22,6 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.STRING_TYPE;
 
 
 /**
@@ -38,16 +36,12 @@ public final class EnumFormatter extends AbstractSingleTypeParameterFormatter<En
     {
       case "ordinal":
       case "ord":
-        return context.format(value.ordinal(), int.class);
+        return formatUsingMappedNumber(context, value.ordinal(), true)
+            .orElseGet(() -> noSpaceText(Integer.toString(value.ordinal())));
 
-      case "name": {
-        final String name = value.name();
-        final Message.WithSpaces msg = context
-            .getConfigMapMessage(name, STRING_TYPE, true)
-            .orElse(null);
-
-        return msg != null ? context.format(msg) : noSpaceText(name);
-      }
+      case "name":
+        return formatUsingMappedString(context, value.name(), true)
+            .orElseGet(() -> noSpaceText(value.name()));
 
       default:
         return context.delegateToNextFormatter();
