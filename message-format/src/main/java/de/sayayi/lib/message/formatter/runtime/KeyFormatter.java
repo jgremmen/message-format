@@ -35,7 +35,7 @@ public final class KeyFormatter extends AbstractSingleTypeParameterFormatter<Key
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Key key)
   {
-    switch(context.getConfigValueString("key").orElse("name"))
+    switch(context.getConfigValueString("key").orElse(""))
     {
       case "algorithm":
         return noSpaceText(key.getAlgorithm());
