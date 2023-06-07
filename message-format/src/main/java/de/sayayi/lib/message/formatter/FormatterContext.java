@@ -48,6 +48,21 @@ public interface FormatterContext extends Parameters
   @NotNull MessageAccessor getMessageSupport();
 
 
+  /**
+   * Tells whether the parameter configuration map contains an entry with the given {@code keyType}.
+   *
+   * @param keyType  entry key type to look for, not {@code null}
+   *
+   * @return  {@code true} if the map contains an entry with the given key type,
+   *          {@code false} otherwise
+   *
+   * @see de.sayayi.lib.message.part.parameter.ParamConfig#hasEntryWithKeyType(ConfigKey.Type)
+   *      ParamConfig#hasEntryWithKeyType(ConfigKey.Type)
+   */
+  @Contract(pure = true)
+  boolean hasConfigMapMessage(@NotNull ConfigKey.Type keyType);
+
+
   @Contract(pure = true)
   default @NotNull Optional<Message.WithSpaces> getConfigMapMessage(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes) {

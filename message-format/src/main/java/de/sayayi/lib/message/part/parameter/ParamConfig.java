@@ -85,6 +85,20 @@ public final class ParamConfig implements Serializable
   }
 
 
+  /**
+   * Tells whether the parameter configuration map contains an entry with the given {@code keyType}.
+   *
+   * @param keyType  entry key type to look for, not {@code null}
+   *
+   * @return  {@code true} if the map contains an entry with the given key type,
+   *          {@code false} otherwise
+   */
+  @Contract(pure = true)
+  public boolean hasEntryWithKeyType(@NotNull ConfigKey.Type keyType) {
+    return map.keySet().stream().anyMatch(ck -> ck.getType() == keyType);
+  }
+
+
   @Contract(pure = true)
   public ConfigValue find(@NotNull MessageAccessor messageAccessor, Object key,
                           @NotNull Parameters parameters, @NotNull Set<ConfigKey.Type> keyTypes,

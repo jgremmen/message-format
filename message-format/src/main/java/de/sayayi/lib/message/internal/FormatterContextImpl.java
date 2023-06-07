@@ -93,6 +93,12 @@ public final class FormatterContextImpl implements FormatterContext
 
 
   @Override
+  public boolean hasConfigMapMessage(@NotNull ConfigKey.Type keyType) {
+    return map.hasEntryWithKeyType(keyType);
+  }
+
+
+  @Override
   public @NotNull Optional<Message.WithSpaces> getConfigMapMessage(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault) {
     return ofNullable(map.getMessage(messageAccessor, key, parameters, keyTypes, includeDefault));
