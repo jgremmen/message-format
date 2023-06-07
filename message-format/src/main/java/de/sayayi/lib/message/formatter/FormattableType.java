@@ -31,8 +31,8 @@ import static java.util.Objects.requireNonNull;
  * determines in what order the formatters are presented. The best match (lowest order) will be
  * used to format the value. However, it can decide to delegate formatting to the next formatter.
  * <p>
- * All formatters bundled with the message format library (except for the string formatter) have
- * either a {@link #DEFAULT_ORDER} or {@link #DEFAULT_PRIMITIVE_OR_ARRAY_ORDER}.
+ * All formatters bundled with the message format library (except for the Object and byte[]
+ * formatter) have either a {@link #DEFAULT_ORDER} or {@link #DEFAULT_PRIMITIVE_OR_ARRAY_ORDER}.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

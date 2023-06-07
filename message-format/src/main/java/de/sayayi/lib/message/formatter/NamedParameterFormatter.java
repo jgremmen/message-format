@@ -47,6 +47,9 @@ public interface NamedParameterFormatter extends ParameterFormatter
    * If a parameter format is specified this method is invoked with the type of the value to
    * be formatted. The return value determines whether this formatter is used ({@code true}) or
    * another formatter is selected ({@code false}).
+   * <p>
+   * If the value to be formatted is {@code null} a special
+   * {@link ParameterFormatter#NULL_TYPE NULL_TYPE} is passed to this method.
    *
    * @param type  type to check, not {@code null}
    *
