@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Locale;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.STRING_EMPTY_TYPE;
 
 
 /**
@@ -39,16 +38,12 @@ public final class LocaleFormatter extends AbstractSingleTypeParameterFormatter<
     switch(context.getConfigValueString("locale").orElse("name"))
     {
       case "country":
-        return noSpaceText(context
-            .getConfigMapMessage(locale.getCountry(), STRING_EMPTY_TYPE)
-            .map(message -> message.format(context.getMessageSupport(), context))
-            .orElseGet(() -> locale.getDisplayCountry(context.getLocale())));
+        return formatUsingMappedString(context, locale.getCountry(), true)
+            .orElseGet(() -> noSpaceText(locale.getDisplayCountry(context.getLocale())));
 
       case "language":
-        return noSpaceText(context
-            .getConfigMapMessage(locale.getLanguage(), STRING_EMPTY_TYPE)
-            .map(message -> message.format(context.getMessageSupport(), context))
-            .orElseGet(() -> locale.getDisplayLanguage(context.getLocale())));
+        return formatUsingMappedString(context, locale.getLanguage(), true)
+            .orElseGet(() -> noSpaceText(locale.getDisplayLanguage(context.getLocale())));
 
       case "name":
         return noSpaceText(locale.getDisplayName(context.getLocale()));
