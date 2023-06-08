@@ -46,8 +46,8 @@ public interface Message extends Serializable
   /**
    * Formats the message based on the message parameters provided.
    *
-   * @param messageAccessor  message context providing formatting information, never {@code null}
-   * @param parameters       message parameters, never {@code null}
+   * @param messageAccessor  message context providing formatting information, not {@code null}
+   * @param parameters       message parameters, not {@code null}
    *
    * @return  formatted message, never {@code null}
    *
@@ -61,16 +61,17 @@ public interface Message extends Serializable
   /**
    * Formats the message based on the message parameters provided.
    *
-   * @param messageAccessor   message context providing formatting information, never {@code null}
-   * @param parameterValues   message parameter values, never {@code null}
+   * @param messageAccessor   message context providing formatting information, not {@code null}
+   * @param parameterValues   message parameter values, not {@code null}
    *
-   * @return  formatted message
+   * @return  formatted message, never {@code null}
    *
    * @throws MessageFormatException  in case a formatting error occurred
    */
   @Contract(pure = true)
-  default String format(@NotNull MessageAccessor messageAccessor,
-                        @NotNull Map<String,Object> parameterValues) throws MessageFormatException
+  default @NotNull String format(@NotNull MessageAccessor messageAccessor,
+                                 @NotNull Map<String,Object> parameterValues)
+      throws MessageFormatException
   {
     return format(messageAccessor, new Parameters() {
       @Override
@@ -258,7 +259,7 @@ public interface Message extends Serializable
     /**
      * Returns the value for the named {@code parameter}.
      *
-     * @param parameter  parameter name
+     * @param parameter  parameter name, not {@code null}
      *
      * @return  parameter value or {@code null} if no value is available for the given
      *          parameter name
