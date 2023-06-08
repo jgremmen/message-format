@@ -21,8 +21,6 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
-import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-
 
 /**
  * @author Jeroen Gremmen
@@ -32,7 +30,7 @@ public final class ThrowableFormatter extends AbstractSingleTypeParameterFormatt
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext context,
                                       @NotNull Throwable throwable) {
-    return noSpaceText(throwable.getLocalizedMessage());
+    return context.format(throwable.getLocalizedMessage(), String.class, true);
   }
 
 
