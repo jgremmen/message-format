@@ -15,20 +15,16 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.TextPart;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URL;
-import java.util.Optional;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.NUMBER_TYPE;
 
 
 /**
@@ -37,6 +33,7 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.NUMBER_TYPE;
 public final class URLFormatter extends AbstractSingleTypeParameterFormatter<URL>
 {
   @Override
+  @SuppressWarnings("DuplicatedCode")
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull URL url)
   {
     switch(context.getConfigValueString("url").orElse("external"))
@@ -57,29 +54,18 @@ public final class URLFormatter extends AbstractSingleTypeParameterFormatter<URL
         return noSpaceText(url.getPath());
 
       case "port": {
-        final int port = url.getPort();
-        if (port == -1)
-        {
-          final Optional<String> portUndef = context.getConfigValueString("uri-port-undef");
-          if (portUndef.isPresent())
-            return noSpaceText(portUndef.get());
-        }
+        final int port = url.getPort() == -1 ? url.getDefaultPort() : url.getPort();
 
-        final Message.WithSpaces msg = context
-            .getConfigMapMessage(port, NUMBER_TYPE)
-            .orElse(null);
-
-        return msg != null
-            ? new TextPart(msg.format(context.getMessageSupport(), context),
-                msg.isSpaceBefore(), msg.isSpaceAfter())
-            : port == -1 ? nullText() : noSpaceText(Integer.toString(port));
+        return formatUsingMappedNumber(context, port, true)
+            .orElseGet(() -> port == -1 ? nullText() : noSpaceText(Integer.toString(port)));
       }
 
       case "query":
         return noSpaceText(url.getQuery());
 
       case "protocol":
-        return noSpaceText(url.getProtocol());
+        return formatUsingMappedString(context, url.getProtocol(), true)
+            .orElseGet(() -> noSpaceText(url.getProtocol()));
 
       case "user-info":
         return noSpaceText(url.getUserInfo());
