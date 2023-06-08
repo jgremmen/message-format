@@ -55,7 +55,7 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
     final String charset = charsetConfig.get();
 
     return context.format(charset.isEmpty() || !isSupported(charset)
-        ? new String(byteArray) : new String(byteArray, charset), true);
+        ? new String(byteArray) : new String(byteArray, charset), String.class, true);
   }
 
 

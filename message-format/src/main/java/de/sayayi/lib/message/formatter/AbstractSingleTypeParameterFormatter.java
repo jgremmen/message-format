@@ -25,6 +25,7 @@ import static java.util.Collections.singleton;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractSingleTypeParameterFormatter<T>
