@@ -19,9 +19,9 @@ import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.TextPart;
 import org.jetbrains.annotations.NotNull;
 
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 
 
@@ -46,14 +46,12 @@ public final class ClipFormatter extends AbstractParameterFormatter<Object>
     String s = text.getText();
     if (s == null)
       return nullText();
+
     s = s.trim();
 
     final int maxSize =
         (int)Math.max(context.getConfigValueNumber("clip-size").orElse(64), 8);
 
-    return s.length() <= maxSize
-        ? text
-        : new TextPart(s.substring(0, maxSize - 3).trim() + "...", text.isSpaceBefore(),
-            text.isSpaceAfter());
+    return s.length() <= maxSize ? text : noSpaceText(s.substring(0, maxSize - 3).trim() + "...");
   }
 }
