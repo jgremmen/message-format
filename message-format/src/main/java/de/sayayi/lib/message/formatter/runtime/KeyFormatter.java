@@ -42,6 +42,9 @@ public final class KeyFormatter extends AbstractSingleTypeParameterFormatter<Key
 
       case "format":
         return noSpaceText(key.getFormat());
+
+      case "encoded":
+        return context.format(key.getEncoded(), byte[].class, true);
     }
 
     return context.delegateToNextFormatter();
