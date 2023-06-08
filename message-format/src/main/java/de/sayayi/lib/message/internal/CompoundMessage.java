@@ -129,12 +129,12 @@ public final class CompoundMessage implements Message.WithSpaces
                                 @NotNull MessageFormatException ex)
   {
     if (messagePart instanceof ParameterPart)
-      throw new MessageFormatException(ex).withParameter(((ParameterPart)messagePart).getName());
+      throw ex.withParameter(((ParameterPart)messagePart).getName());
 
     if (messagePart instanceof TemplatePart)
-      throw new MessageFormatException(ex).withTemplate(((TemplatePart)messagePart).getName());
+      throw ex.withTemplate(((TemplatePart)messagePart).getName());
 
-    throw new MessageFormatException(ex);
+    throw ex;
   }
 
 
