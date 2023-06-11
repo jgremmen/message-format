@@ -22,6 +22,7 @@ de.sayayi.lib.message.formatter.runtime.LocaleFormatter
 de.sayayi.lib.message.formatter.runtime.LongSupplierFormatter
 de.sayayi.lib.message.formatter.runtime.MapFormatter
 de.sayayi.lib.message.formatter.runtime.MethodFormatter
+de.sayayi.lib.message.formatter.runtime.NodeFormatter
 de.sayayi.lib.message.formatter.runtime.NumberFormatter
 de.sayayi.lib.message.formatter.runtime.OptionalDoubleFormatter
 de.sayayi.lib.message.formatter.runtime.OptionalFormatter
