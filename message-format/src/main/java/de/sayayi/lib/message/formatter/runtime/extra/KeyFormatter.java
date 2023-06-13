@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Jeroen Gremmen
+ * Copyright 2023 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.formatter.runtime;
+package de.sayayi.lib.message.formatter.runtime.extra;
 
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
@@ -21,22 +21,38 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
+import java.security.Key;
+
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
-public final class PackageFormatter extends AbstractSingleTypeParameterFormatter<Package>
+public final class KeyFormatter extends AbstractSingleTypeParameterFormatter<Key>
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Package value) {
-    return noSpaceText(value.getName());
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Key key)
+  {
+    switch(context.getConfigValueString("key").orElse(""))
+    {
+      case "algorithm":
+        return noSpaceText(key.getAlgorithm());
+
+      case "format":
+        return noSpaceText(key.getFormat());
+
+      case "encoded":
+        return context.format(key.getEncoded(), byte[].class, true);
+    }
+
+    return context.delegateToNextFormatter();
   }
 
 
   @Override
   public @NotNull FormattableType getFormattableType() {
-    return new FormattableType(Package.class);
+    return new FormattableType(Key.class);
   }
 }

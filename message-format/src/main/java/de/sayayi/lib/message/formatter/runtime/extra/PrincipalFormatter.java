@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.formatter.runtime;
+package de.sayayi.lib.message.formatter.runtime.extra;
 
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
@@ -22,8 +22,6 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.security.Principal;
-
-import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
@@ -35,7 +33,7 @@ public final class PrincipalFormatter extends AbstractSingleTypeParameterFormatt
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext context,
                                       @NotNull Principal principal) {
-    return noSpaceText(principal.getName());
+    return context.format(principal.getName(), String.class, true);
   }
 
 

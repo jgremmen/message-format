@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.formatter.runtime;
+package de.sayayi.lib.message.formatter.runtime.extra;
 
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.runtime.TypeFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.Method;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
@@ -31,37 +31,33 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 /**
  * @author Jeroen Gremmen
  */
-public final class FieldFormatter extends AbstractSingleTypeParameterFormatter<Field>
+public final class MethodFormatter extends AbstractSingleTypeParameterFormatter<Method>
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Field field)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Method method)
   {
-    final StringBuilder formattedField = new StringBuilder();
-    final String format = context.getConfigValueString("field").orElse("juMTN");
+    switch(context.getConfigValueString("method").orElse("default"))
+    {
+      case "name":
+        return noSpaceText(method.getName());
 
-    // c = short class
-    // j = no java.lang. prefix
-    // u = no java.util. prefix
-    // M = with modifiers
-    // T = field type
-    // N = field name
+      case "class":
+        return noSpaceText(TypeFormatter.toString(method.getDeclaringClass(), "Cju"));
 
-    if (format.indexOf('M') >= 0)
-      formattedField.append(Modifier.toString(field.getModifiers())).append(' ');
+      case "return-type":
+        return noSpaceText(TypeFormatter.toString(method.getGenericReturnType(), "Cju"));
 
-    if (format.indexOf('T') >= 0)
-      formattedField.append(TypeFormatter.toString(field.getGenericType(), format)).append(' ');
+      case "default":
+        return noSpaceText(method.toString());
+    }
 
-    if (format.indexOf('N') >= 0)
-      formattedField.append(field.getName());
-
-    return noSpaceText(formattedField.toString());
+    return context.delegateToNextFormatter();
   }
 
 
   @Override
   public @NotNull FormattableType getFormattableType() {
-    return new FormattableType(Field.class);
+    return new FormattableType(Method.class);
   }
 }
