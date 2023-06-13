@@ -15,17 +15,22 @@
  */
 package de.sayayi.lib.message.formatter.runtime.extra;
 
-import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.TextPartFactory;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.lang.Math.max;
 import static java.lang.System.arraycopy;
 import static org.w3c.dom.Node.ATTRIBUTE_NODE;
@@ -36,19 +41,15 @@ import static org.w3c.dom.Node.ELEMENT_NODE;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class NodeFormatter extends AbstractSingleTypeParameterFormatter<Node>
+public final class XPathFormatter extends AbstractParameterFormatter<Node>
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Node value)
+  protected @NotNull Text formatValue(@NotNull FormatterContext context,
+                                      @SuppressWarnings("NullableProblems") Node node)
   {
-    return "xpath".equals(context.getConfigValueString("node").orElse("xpath"))
-        ? TextPartFactory.noSpaceText(formatValue_xpath(value))
-        : context.delegateToNextFormatter();
-  }
+    if (node instanceof Document)
+      node = null;
 
-
-  private @NotNull String formatValue_xpath(@NotNull Node node)
-  {
     final XPathBuilder path = new XPathBuilder();
     boolean firstStep = true;
 
@@ -98,13 +99,20 @@ public final class NodeFormatter extends AbstractSingleTypeParameterFormatter<No
         break;
     }
 
-    return path.toString();
+    path.add('/');
+
+    return noSpaceText(path.toString());
   }
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
-    return new FormattableType(Node.class);
+  public @NotNull Set<FormattableType> getFormattableTypes()
+  {
+    return new HashSet<>(Arrays.asList(
+        new FormattableType(Attr.class),
+        new FormattableType(Element.class),
+        new FormattableType(Document.class)
+    ));
   }
 
 
