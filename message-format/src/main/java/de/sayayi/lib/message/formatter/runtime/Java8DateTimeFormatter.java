@@ -101,7 +101,7 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter<Tem
     String text = formatter
         .withZone(ZoneId.systemDefault())
         .withLocale(context.getLocale())
-        .format((Temporal)value).trim();
+        .format(value).trim();
 
     // strip trailing timezone for local time
     if (value instanceof LocalTime && ("long".equals(format) || "full".equals(format)))
