@@ -16,44 +16,53 @@
 package de.sayayi.lib.message;
 
 import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.OptionalLong;
 
+import static de.sayayi.lib.message.MessageSupportFactory.shared;
 import static java.util.Locale.GERMANY;
 import static java.util.Locale.US;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
+@DisplayName("Test message support interface")
 class MessageSupportTest
 {
   @Test
-  void format()
+  @DisplayName("Immediate message formatting")
+  void testFormat()
   {
-    val messageSupport = MessageSupportFactory.shared();
+    assertEquals("69", shared()
+        .message("%{n}")
+        .with("n", OptionalLong.of(69))
+        .format());
 
-    assertEquals("69", messageSupport
-        .message("%{n}").with("n", OptionalLong.of(69)).format());
-
-    assertEquals("Messa...", messageSupport
-        .message("%{s,clip,clip-size:8}")
-        .with("s", "Message")
-        .remove("s")
+    assertEquals("Messa...", shared()
+        .message("%{r} %{s,clip,clip-size:8}")
+        .with("r", "Message")
+        .remove("r")  // test parameter removal
         .with("s", "Message Support")
         .format());
   }
 
 
   @Test
-  void formatSupplier()
+  @DisplayName("Deferred message formatting")
+  void testFormatSupplier()
   {
-    val messageSupport = MessageSupportFactory.shared();
-    val messageBuilder = messageSupport
+    val messageBuilder = shared()
         .message("%{d,date:medium}")
         .with("d", LocalDate.of(2023, 6, 15))
         .locale(GERMANY);
@@ -72,5 +81,38 @@ class MessageSupportTest
 
     // new supplier contains the new value and locale
     assertEquals("Jan 1, 2000", messageBuilder.formatSupplier().get());
+  }
+
+
+  @Test
+  @DisplayName("Immediate exception throw with formatted message")
+  void testThrowFormatted()
+  {
+    val exception = assertThrowsExactly(IOException.class, () -> shared()
+        .message("%{list,list-sep-last:' and '}")
+        .with("list", new int[] { -5, 12, 0 })
+        .throwFormatted(msg -> new IOException("error: " + msg)));
+
+    assertEquals("error: -5, 12 and 0", exception.getMessage());
+  }
+
+
+  @Test
+  @DisplayName("Deferred exception throw with formatted message")
+  void testFormattedExceptionSupplier()
+  {
+    val exception = assertThrowsExactly(IOException.class, () -> {
+      val supplier = shared()
+          .message("%{b,bool,true:yes,false:no}")
+          .with("b", BigInteger.valueOf(-5000))
+          .formattedExceptionSupplier(msg -> new IOException("answer = " + msg));
+
+      //noinspection DataFlowIssue
+      OptionalInt
+          .empty()
+          .orElseThrow(supplier);
+    });
+
+    assertEquals("answer = yes", exception.getMessage());
   }
 }
