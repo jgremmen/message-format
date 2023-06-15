@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Jeroen Gremmen
  */
 @TestMethodOrder(MethodOrderer.DisplayName.class)
+@DisplayName("Pack/unpack various types to/from stream")
 class PackStreamTest
 {
   @Test
