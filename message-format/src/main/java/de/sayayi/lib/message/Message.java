@@ -22,10 +22,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import static java.util.Collections.unmodifiableSet;
@@ -138,30 +136,7 @@ public interface Message extends Serializable
    * @since 0.8.0
    */
   @Contract(pure = true)
-  @SuppressWarnings("DuplicatedCode")
-  default boolean isSame(@NotNull Message message)
-  {
-    final boolean localeAware = this instanceof LocaleAware;
-
-    if (localeAware != (message instanceof LocaleAware))
-      return false;
-    else if (localeAware)
-    {
-      final Map<Locale,Message> lmm1 = ((LocaleAware)this).getLocalizedMessages();
-      final Map<Locale,Message> lmm2 = ((LocaleAware)message).getLocalizedMessages();
-
-      if (!lmm1.keySet().equals(lmm2.keySet()))
-        return false;
-
-      for(final Entry<Locale,Message> entry: lmm1.entrySet())
-        if (!entry.getValue().isSame(lmm2.get(entry.getKey())))
-          return false;
-
-      return true;
-    }
-    else
-      return Arrays.equals(getMessageParts(), message.getMessageParts());
-  }
+  boolean isSame(@NotNull Message message);
 
 
 
