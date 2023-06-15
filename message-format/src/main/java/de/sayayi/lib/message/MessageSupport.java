@@ -28,7 +28,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -356,10 +355,26 @@ public interface MessageSupport
      * Exceptions thrown by the constructor function are relayed to the caller.
      *
      * @param constructor  exception constructor, not {@code null}
-     * @param <T>          exception type
+     * @param <X>          exception type
      */
     @Contract("_ -> fail")
-    <T extends Exception> void throwFormatted(@NotNull Function<String,T> constructor);
+    <X extends Exception> void throwFormatted(@NotNull ExceptionConstructor<X> constructor);
+
+
+    /**
+     * Returns a supplier capable of creating an exception with the formatted message.
+     * This method is useful in combination with one of the optional class methods like
+     * {@link OptionalInt#orElseThrow(Supplier)}.
+     * <p>
+     * Formatting the message is delayed until {@link Supplier#get()} is invoked.
+     * <p>
+     * Exceptions thrown by the constructor function are relayed to the caller.
+     *
+     * @return  format supplier, never {@code null}
+     */
+    @Contract(pure = true)
+    <X extends Exception> @NotNull Supplier<X> formattedExceptionSupplier(
+        @NotNull ExceptionConstructor<X> constructor);
   }
 
 
@@ -809,5 +824,26 @@ public interface MessageSupport
      *          {@code false} if the template will be excluded
      */
     boolean filter(@NotNull String name, @NotNull Message template);
+  }
+
+
+
+
+  /**
+   * @param <X>  exception type created by this constructor
+   *
+   * @author Jeroen Gremmen
+   * @since 0.8.0
+   */
+  interface ExceptionConstructor<X extends Exception>
+  {
+    /**
+     * Create a new exception for the given {@code message}.
+     *
+     * @param message  formatted message, not {@code null}
+     *
+     * @return  exception instance, never {@code null}
+     */
+    @NotNull X construct(@NotNull String message);
   }
 }
