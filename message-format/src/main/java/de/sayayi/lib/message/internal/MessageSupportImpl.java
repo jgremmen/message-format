@@ -53,7 +53,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 {
   private final @NotNull FormatterService formatterService;
   private final @NotNull MessageFactory messageFactory;
-  private final @NotNull Map<String, ConfigValue> defaultParameterConfig = new TreeMap<>();
+  private final @NotNull Map<String,ConfigValue> defaultParameterConfig = new TreeMap<>();
   private final @NotNull Map<String,Message.WithCode> messages = new TreeMap<>();
   private final @NotNull Map<String,Message> templates = new TreeMap<>();
   private final @NotNull MessageAccessor messageAccessor;
@@ -305,7 +305,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
     if (ttm != null)
     {
-      if (ttm.isSame(template))
+      if (!ttm.isSame(template))
       {
         throw new DuplicateTemplateException(name,
             "different template with identical name '" + name + "' already exists");
