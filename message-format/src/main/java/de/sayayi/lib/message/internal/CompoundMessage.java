@@ -174,6 +174,9 @@ public final class CompoundMessage implements Message.WithSpaces
   @Override
   public boolean isSame(@NotNull Message message)
   {
+    if (message instanceof MessageDelegateWithCode)
+      message = ((MessageDelegateWithCode)message).getMessage();
+
     return !(message instanceof LocaleAware) &&
         Arrays.equals(getMessageParts(), message.getMessageParts());
   }

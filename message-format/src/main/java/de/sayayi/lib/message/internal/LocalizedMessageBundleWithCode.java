@@ -159,6 +159,9 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   @SuppressWarnings("DuplicatedCode")
   public boolean isSame(@NotNull Message message)
   {
+    if (message instanceof MessageDelegateWithCode)
+      message = ((MessageDelegateWithCode)message).getMessage();
+
     if (!(message instanceof LocaleAware))
       return false;
 
