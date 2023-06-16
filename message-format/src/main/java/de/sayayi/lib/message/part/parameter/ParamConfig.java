@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.part.parameter;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
@@ -57,6 +56,11 @@ public final class ParamConfig implements Serializable
   private final @NotNull Map<ConfigKey,ConfigValue> map;
 
 
+  /**
+   * Create a message parameter config instance with the given {@code map}.
+   *
+   * @param map  message parameter config map, not {@code null}
+   */
   public ParamConfig(@NotNull Map<ConfigKey,ConfigValue> map) {
     this.map = requireNonNull(map, "map must not be null");
   }
@@ -101,10 +105,9 @@ public final class ParamConfig implements Serializable
 
   @Contract(pure = true)
   public ConfigValue find(@NotNull MessageAccessor messageAccessor, Object key,
-                          @NotNull Parameters parameters, @NotNull Set<ConfigKey.Type> keyTypes,
+                          @NotNull Locale locale, @NotNull Set<ConfigKey.Type> keyTypes,
                           Set<ConfigValue.Type> valueTypes)
   {
-    final Locale locale = parameters.getLocale();
     MatchResult bestMatchResult = MISMATCH;
     ConfigKey configKey;
     ConfigValue bestMatch = null;
@@ -136,11 +139,11 @@ public final class ParamConfig implements Serializable
 
   @Contract(pure = true)
   public Message.WithSpaces getMessage(@NotNull MessageAccessor messageAccessor,
-                                       Object key, @NotNull Parameters parameters,
+                                       Object key, @NotNull Locale locale,
                                        @NotNull Set<ConfigKey.Type> keyTypes,
                                        boolean includeDefault)
   {
-    ConfigValue configValue = find(messageAccessor, key, parameters, keyTypes, STRING_MESSAGE_TYPE);
+    ConfigValue configValue = find(messageAccessor, key, locale, keyTypes, STRING_MESSAGE_TYPE);
 
     if (configValue == null)
     {
@@ -158,6 +161,12 @@ public final class ParamConfig implements Serializable
   }
 
 
+  /**
+   * Returns a set of template names referenced in all message values which are available in
+   * the message parameter configuration.
+   *
+   * @return  unmodifiable set of all referenced template names, never {@code null}
+   */
   @Contract(pure = true)
   public @NotNull Set<String> getTemplateNames()
   {
