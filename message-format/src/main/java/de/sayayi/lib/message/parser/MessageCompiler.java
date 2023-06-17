@@ -312,7 +312,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitParameterPart(ParameterPartContext ctx)
     {
-      final Map<ConfigKey, ConfigValue> mapElements = ctx.configElement().stream()
+      final Map<ConfigKey,ConfigValue> mapElements = ctx.configElement().stream()
           .collect(toMap(mec -> mec.key, mec -> mec.value, (a, b) -> b, LinkedHashMap::new));
       final ForceQuotedMessageContext forceQuotedMessage = ctx.forceQuotedMessage();
       if (forceQuotedMessage != null)

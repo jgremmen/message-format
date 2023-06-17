@@ -57,9 +57,9 @@ public final class MapFormatter extends AbstractSingleTypeParameterFormatter<Map
   {
     // default map-kv: %{key}=%{value}
     DEFAULT_KEY_VALUE_MESSAGE = new CompoundMessage(asList(
-        new ParameterPart("key", false, false),
+        new ParameterPart("key"),
         new NoSpaceTextPart("="),
-        new ParameterPart("value", false, false)
+        new ParameterPart("value")
     ));
   }
 
@@ -146,6 +146,7 @@ public final class MapFormatter extends AbstractSingleTypeParameterFormatter<Map
         .map(String::trim)
         .orElse("(this map)");
   }
+
 
 
 

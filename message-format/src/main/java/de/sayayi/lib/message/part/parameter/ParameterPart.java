@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -62,6 +62,11 @@ public final class ParameterPart implements Parameter
 
   /** tells whether the parameter has a trailing space. */
   private final boolean spaceAfter;
+
+
+  public ParameterPart(@NotNull String name) {
+    this(name, false, false);
+  }
 
 
   public ParameterPart(@NotNull String name, boolean spaceBefore, boolean spaceAfter) {
@@ -218,7 +223,7 @@ public final class ParameterPart implements Parameter
     final int size = packStream.readSmallVar();
     final String format = packStream.readString();
     final String name = requireNonNull(packStream.readString());
-    final Map<ConfigKey,ConfigValue> map = new HashMap<>();
+    final Map<ConfigKey,ConfigValue> map = new LinkedHashMap<>();
 
     for(int n = 0; n < size; n++)
       map.put(unpack.unpackMapKey(packStream), unpack.unpackMapValue(packStream));
