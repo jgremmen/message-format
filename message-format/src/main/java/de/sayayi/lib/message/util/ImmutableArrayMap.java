@@ -54,42 +54,41 @@ public final class ImmutableArrayMap<K,V> extends AbstractMap<K,V>
 
   private ImmutableArrayMap(@NotNull Object[] kv)
   {
-    if ((size = kv.length / 2) == 0)
+    size = kv.length / 2;
+    hashSlots = size == 1 ? 1 : max(size * 3 / 2, 5);
+    fill(hi = new int[size * 2 + hashSlots], -1);
+    this.kv = kv;
+
+    final int[] lastIndex4Slot = new int[size];
+    fill(lastIndex4Slot, -1);
+
+    for(int n = 0; n < size; n++)
     {
-      hashSlots = 0;
-      hi = null;
-      this.kv = null;
-    }
-    else
-    {
-      hashSlots = size == 1 ? 1 : max(size * 3 / 2, 5);
-      fill(hi = new int[size * 2 + hashSlots], -1);
-      this.kv = kv;
+      final int hash = hi[n] = hashCode(kv[n * 2]);
+      final int slotIdx = size * 2 + (hash % hashSlots);
+      final int initialSlot;
 
-      final int[] lastIndex4Slot = new int[size];
-      fill(lastIndex4Slot, -1);
+      if (hi[slotIdx] == -1)
+        initialSlot = hi[slotIdx] = n;
+      else
+        initialSlot = hi[slotIdx];
 
-      for(int n = 0; n < size; n++)
-      {
-        final int hash = hi[n] = hashCode(kv[n * 2]);
-        final int slotIdx = size * 2 + (hash % hashSlots);
-        final int initialSlot;
+      final int li4s = lastIndex4Slot[initialSlot];
+      if (li4s >= 0)
+        hi[size + li4s] = n;
 
-        if (hi[slotIdx] == -1)
-          initialSlot = hi[slotIdx] = n;
-        else
-          initialSlot = hi[slotIdx];
-
-        final int li4s = lastIndex4Slot[initialSlot];
-        if (li4s >= 0)
-          hi[size + li4s] = n;
-
-        lastIndex4Slot[initialSlot] = n;
-      }
+      lastIndex4Slot[initialSlot] = n;
     }
   }
 
 
+  /**
+   * Construct an immutable map for the given {@code map}.
+   * <p>
+   * The entries in the immutable map have the same order as the original map.
+   *
+   * @param map  map to copy entries from, not {@code null}
+   */
   public ImmutableArrayMap(@NotNull Map<K,V> map)
   {
     if ((size = map.size()) == 0)
@@ -741,7 +740,7 @@ public final class ImmutableArrayMap<K,V> extends AbstractMap<K,V>
     private final int idx;
 
 
-    public ImmutableEntry(int n) {
+    private ImmutableEntry(int n) {
       idx = n * 2;
     }
 
