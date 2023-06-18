@@ -23,15 +23,10 @@ import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.part.MessagePart.Parameter;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
@@ -64,24 +59,37 @@ public final class ParameterPart implements Parameter
   private final boolean spaceAfter;
 
 
+  /**
+   * Construct a parameter part with the given parameter {@code name}.
+   *
+   * @param name  parameter name, not {@code null} or empty
+   */
   public ParameterPart(@NotNull String name) {
     this(name, false, false);
   }
 
 
+  /**
+   * Construct a parameter part with the given parameter {@code name} and optional leading and
+   * trailing spaces.
+   *
+   * @param name  parameter name, not {@code null} or empty
+   * @param spaceBefore  adds a leading space to this parameter
+   * @param spaceAfter   adds a trailing space to this parameter
+   */
   public ParameterPart(@NotNull String name, boolean spaceBefore, boolean spaceAfter) {
-    this(name, null, spaceBefore, spaceAfter, emptyMap());
+    this(name, null, spaceBefore, spaceAfter, new ParamConfig(emptyMap()));
   }
 
 
   public ParameterPart(@NotNull String name, String format, boolean spaceBefore, boolean spaceAfter,
-                       @NotNull Map<ConfigKey,ConfigValue> map)
+                       @NotNull ParamConfig paramConfig)
   {
     if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
       throw new IllegalArgumentException("name must not be empty");
 
     this.format = "".equals(format) ? null : format;
-    this.paramConfig = new ParamConfig(requireNonNull(map, "map must not be null"));
+    this.paramConfig = requireNonNull(paramConfig, "paramConfig must not be null");
     this.spaceBefore = spaceBefore;
     this.spaceAfter = spaceAfter;
   }
@@ -188,19 +196,12 @@ public final class ParameterPart implements Parameter
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    final Map<ConfigKey,ConfigValue> map = paramConfig.getMap();
-
     packStream.writeBoolean(spaceBefore);
     packStream.writeBoolean(spaceAfter);
-    packStream.writeSmallVar(map.size());
     packStream.writeString(format);
     packStream.writeString(name);
 
-    for(final Entry<ConfigKey,ConfigValue> mapEntry: map.entrySet())
-    {
-      PackHelper.pack(mapEntry.getKey(), packStream);
-      PackHelper.pack(mapEntry.getValue(), packStream);
-    }
+    paramConfig.pack(packStream);
   }
 
 
@@ -220,14 +221,10 @@ public final class ParameterPart implements Parameter
   {
     final boolean spaceBefore = packStream.readBoolean();
     final boolean spaceAfter = packStream.readBoolean();
-    final int size = packStream.readSmallVar();
     final String format = packStream.readString();
     final String name = requireNonNull(packStream.readString());
-    final Map<ConfigKey,ConfigValue> map = new LinkedHashMap<>();
 
-    for(int n = 0; n < size; n++)
-      map.put(unpack.unpackMapKey(packStream), unpack.unpackMapValue(packStream));
-
-    return new ParameterPart(name, format, spaceBefore, spaceAfter, map);
+    return new ParameterPart(name, format, spaceBefore, spaceAfter,
+        ParamConfig.unpack(unpack, packStream));
   }
 }

@@ -17,29 +17,27 @@ package de.sayayi.lib.message.part.parameter;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.pack.PackHelper;
+import de.sayayi.lib.message.pack.PackInputStream;
+import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import de.sayayi.lib.message.part.parameter.value.ConfigValue.Type;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueMessage;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
-import de.sayayi.lib.message.util.ImmutableArrayMap;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
 
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.part.parameter.value.ConfigValue.STRING_MESSAGE_TYPE;
-import static java.util.Collections.*;
-import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.joining;
+import static java.util.Collections.unmodifiableSet;
 
 
 /**
@@ -52,8 +50,9 @@ public final class ParamConfig implements Serializable
 {
   private static final long serialVersionUID = 800L;
 
-  /** Parameter configuration map. */
-  private final @NotNull Map<ConfigKey,ConfigValue> map;
+  private final @NotNull ConfigKey[] keys;
+  private final @NotNull ConfigValue[] values;
+  private final ConfigValue nullKeyValue;
 
 
   /**
@@ -63,21 +62,25 @@ public final class ParamConfig implements Serializable
    */
   public ParamConfig(@NotNull Map<ConfigKey,ConfigValue> map)
   {
-    switch(requireNonNull(map, "map must not be null").size())
+    final int size = map.size();
+
+    keys = new ConfigKey[size];
+    values = new ConfigValue[size];
+
+    ConfigValue nullKeyValue = null;
+    int n = 0;
+
+    for(final Entry<ConfigKey,ConfigValue> entry: map.entrySet())
     {
-      case 0:
-        this.map = emptyMap();
-        break;
+      final ConfigValue value = values[n] = entry.getValue();
 
-      case 1:
-        final Entry<ConfigKey,ConfigValue> entry = map.entrySet().iterator().next();
-        this.map = singletonMap(entry.getKey(), entry.getValue());
-        break;
+      if ((keys[n] = entry.getKey()) == null)
+        nullKeyValue = value;
 
-      default:
-        this.map = new ImmutableArrayMap<>(map);
-        break;
+      n++;
     }
+
+    this.nullKeyValue = nullKeyValue;
   }
 
 
@@ -89,18 +92,7 @@ public final class ParamConfig implements Serializable
    */
   @Contract(pure = true)
   public boolean isEmpty() {
-    return map.isEmpty();
-  }
-
-
-  /**
-   * Returns the parameter configuration as a map.
-   *
-   * @return  unmodifiable map, never {@code null}
-   */
-  @Contract(pure = true)
-  public @NotNull Map<ConfigKey,ConfigValue> getMap() {
-    return unmodifiableMap(map);
+    return keys.length == 0;
   }
 
 
@@ -113,8 +105,13 @@ public final class ParamConfig implements Serializable
    *          {@code false} otherwise
    */
   @Contract(pure = true)
-  public boolean hasEntryWithKeyType(@NotNull ConfigKey.Type keyType) {
-    return map.keySet().stream().anyMatch(ck -> ck.getType() == keyType);
+  public boolean hasEntryWithKeyType(@NotNull ConfigKey.Type keyType)
+  {
+    for(final ConfigKey key: keys)
+      if (key != null && key.getType() == keyType)
+        return true;
+
+    return false;
   }
 
 
@@ -127,10 +124,10 @@ public final class ParamConfig implements Serializable
     ConfigKey configKey;
     ConfigValue bestMatch = null;
 
-    for(final Entry<ConfigKey,ConfigValue> entry: map.entrySet())
-      if ((configKey = entry.getKey()) != null)
+    for(int n = 0; n < keys.length; n++)
+      if ((configKey = keys[n]) != null)
       {
-        final ConfigValue configValue = entry.getValue();
+        final ConfigValue configValue = values[n];
 
         if (keyTypes.contains(configKey.getType()) &&
             (valueTypes == null || valueTypes.contains(configValue.getType())))
@@ -163,8 +160,8 @@ public final class ParamConfig implements Serializable
     if (configValue == null)
     {
       if (includeDefault &&
-          map.keySet().stream().anyMatch(mk -> mk != null && keyTypes.contains(mk.getType())))
-        configValue = map.get(null);
+          Arrays.stream(keys).anyMatch(mk -> mk != null && keyTypes.contains(mk.getType())))
+        configValue = nullKeyValue;
 
       if (configValue == null)
         return null;
@@ -187,24 +184,31 @@ public final class ParamConfig implements Serializable
   {
     final Set<String> templateNames = new TreeSet<>();
 
-    map.values().forEach(configValue -> {
+    for(ConfigValue configValue: values)
       if (configValue instanceof ConfigValueMessage)
         templateNames.addAll(((ConfigValueMessage)configValue).asObject().getTemplateNames());
-    });
 
     return unmodifiableSet(templateNames);
   }
 
 
   @Override
-  public boolean equals(Object o) {
-    return this == o || o instanceof ParamConfig && map.equals(((ParamConfig)o).map);
+  public boolean equals(Object o)
+  {
+    if (this == o)
+      return true;
+    else if (!(o instanceof ParamConfig))
+      return false;
+
+    final ParamConfig that = (ParamConfig)o;
+
+    return Arrays.equals(keys, that.keys) && Arrays.equals(values, that.values);
   }
 
 
   @Override
   public int hashCode() {
-    return 59 + map.hashCode();
+    return (59 + Arrays.hashCode(keys)) * 59 + Arrays.hashCode(values);
   }
 
 
@@ -212,9 +216,40 @@ public final class ParamConfig implements Serializable
   @Contract(pure = true)
   public String toString()
   {
-    return map.entrySet()
-        .stream()
-        .map(kv -> String.valueOf(kv.getKey()) + ':' + kv.getValue())
-        .collect(joining(",", "{", "}"));
+    final StringJoiner s = new StringJoiner(",", "{", "}");
+
+    for(int n = 0; n < keys.length; n++)
+    {
+      final ConfigKey key = keys[n];
+      s.add((key == null ? "(default):" : String.valueOf(key) + ':') + values[n]);
+    }
+
+    return s.toString();
+  }
+
+
+  public void pack(@NotNull PackOutputStream packStream) throws IOException
+  {
+    final int size = keys.length;
+
+    packStream.writeSmallVar(size);
+
+    for(int n = 0; n < size; n++)
+    {
+      PackHelper.pack(keys[n], packStream);
+      PackHelper.pack(values[n], packStream);
+    }
+  }
+
+
+  public static @NotNull ParamConfig unpack(@NotNull PackHelper unpack,
+                                            @NotNull PackInputStream packStream) throws IOException
+  {
+    final Map<ConfigKey,ConfigValue> map = new LinkedHashMap<>();
+
+    for(int n = 0, size = packStream.readSmallVar(); n < size; n++)
+      map.put(unpack.unpackMapKey(packStream), unpack.unpackMapValue(packStream));
+
+    return new ParamConfig(map);
   }
 }
