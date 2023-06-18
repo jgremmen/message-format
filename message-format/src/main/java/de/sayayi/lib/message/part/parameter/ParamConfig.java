@@ -23,6 +23,7 @@ import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import de.sayayi.lib.message.part.parameter.value.ConfigValue.Type;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueMessage;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.util.ImmutableArrayMap;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,8 +37,7 @@ import java.util.TreeSet;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.EXACT;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.part.parameter.value.ConfigValue.STRING_MESSAGE_TYPE;
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Collections.unmodifiableSet;
+import static java.util.Collections.*;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 
@@ -61,8 +61,23 @@ public final class ParamConfig implements Serializable
    *
    * @param map  message parameter config map, not {@code null}
    */
-  public ParamConfig(@NotNull Map<ConfigKey,ConfigValue> map) {
-    this.map = requireNonNull(map, "map must not be null");
+  public ParamConfig(@NotNull Map<ConfigKey,ConfigValue> map)
+  {
+    switch(requireNonNull(map, "map must not be null").size())
+    {
+      case 0:
+        this.map = emptyMap();
+        break;
+
+      case 1:
+        final Entry<ConfigKey,ConfigValue> entry = map.entrySet().iterator().next();
+        this.map = singletonMap(entry.getKey(), entry.getValue());
+        break;
+
+      default:
+        this.map = new ImmutableArrayMap<>(map);
+        break;
+    }
   }
 
 
@@ -172,9 +187,10 @@ public final class ParamConfig implements Serializable
   {
     final Set<String> templateNames = new TreeSet<>();
 
-    for(final ConfigValue configValue: map.values())
+    map.values().forEach(configValue -> {
       if (configValue instanceof ConfigValueMessage)
         templateNames.addAll(((ConfigValueMessage)configValue).asObject().getTemplateNames());
+    });
 
     return unmodifiableSet(templateNames);
   }
