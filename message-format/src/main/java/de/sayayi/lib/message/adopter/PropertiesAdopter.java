@@ -58,6 +58,9 @@ public class PropertiesAdopter extends AbstractMessageAdopter
 
   /**
    * Adopt messages from properties.
+   * <p>
+   * Each key from the properties object is used as the message code,
+   * the value is parsed as a message.
    *
    * @param properties  message properties, not {@code null}
    */
@@ -71,6 +74,11 @@ public class PropertiesAdopter extends AbstractMessageAdopter
 
   /**
    * Adopt messages from localized properties.
+   * <p>
+   * Each key from the properties object is used as the message code,
+   * the value is parsed as a message. If the same message code is available in multiple
+   * property objects, a single message containing multiple localized messages is created for
+   * each message code.
    *
    * @param properties  map with property messages keyed by locale, not {@code null}
    */
