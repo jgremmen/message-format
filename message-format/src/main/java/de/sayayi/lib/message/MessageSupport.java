@@ -47,8 +47,7 @@ public interface MessageSupport
    * @return  message accessor, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull
-  MessageAccessor getMessageAccessor();
+  @NotNull MessageAccessor getMessageAccessor();
 
 
   /**
