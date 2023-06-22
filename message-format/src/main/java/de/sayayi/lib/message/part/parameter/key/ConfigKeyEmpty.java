@@ -39,6 +39,7 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
  * interface method.
  *
  * @author Jeroen Gremmen
+ * @since 0.4.0 (renamed in 0.8.0)
  */
 public final class ConfigKeyEmpty implements ConfigKey
 {

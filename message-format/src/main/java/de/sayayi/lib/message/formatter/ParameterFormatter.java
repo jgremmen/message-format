@@ -34,6 +34,7 @@ import java.util.Set;
  * {@link NamedParameterFormatter} and is referenced by name.
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public interface ParameterFormatter
 {

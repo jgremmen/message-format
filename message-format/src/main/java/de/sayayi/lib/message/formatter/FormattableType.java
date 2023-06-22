@@ -34,11 +34,11 @@ import static java.util.Objects.requireNonNull;
  * All formatters bundled with the message format library (except for the Object and byte[]
  * formatter) have either a {@link #DEFAULT_ORDER} or {@link #DEFAULT_PRIMITIVE_OR_ARRAY_ORDER}.
  *
- * @author Jeroen Gremmen
- * @since 0.8.0
- *
  * @see GenericFormatterService
  * @see FormatterContext#delegateToNextFormatter()
+ *
+ * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 public final class FormattableType implements Comparable<FormattableType>, Serializable
 {

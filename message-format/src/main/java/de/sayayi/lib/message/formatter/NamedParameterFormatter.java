@@ -29,6 +29,7 @@ import static java.util.Collections.emptySet;
  * be addressed in a message as follows: {@code 'text %{p,xyz}.'}
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public interface NamedParameterFormatter extends ParameterFormatter
 {

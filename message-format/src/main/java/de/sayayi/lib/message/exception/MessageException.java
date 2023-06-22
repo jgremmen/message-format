@@ -18,6 +18,7 @@ package de.sayayi.lib.message.exception;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public class MessageException extends RuntimeException
 {

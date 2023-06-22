@@ -80,6 +80,7 @@ import static org.antlr.v4.runtime.Token.EOF;
  * This class provides methods for compiling messages and templates.
  *
  * @author Jeroen Gremmen
+ * @since 0.5.0
  */
 @SuppressWarnings("UnknownLanguage")
 public final class MessageCompiler extends AbstractAntlr4Parser

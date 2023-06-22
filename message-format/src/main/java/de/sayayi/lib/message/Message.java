@@ -38,6 +38,7 @@ import static java.util.Collections.unmodifiableSet;
  * @see WithCode
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public interface Message extends Serializable
 {

@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Contract;
  * This interface denotes that a message is aware of leading and trailing spaces.
  *
  * @author Jeroen Gremmen
+ * @since 0.5.0
  */
 public interface SpacesAware
 {

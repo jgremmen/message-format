@@ -33,13 +33,11 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * &#x40;TemplateDef(name = "ex-msg", text = "%{ex,!empty:': %{ex}'}")
  * </pre></blockquote>
  *
- *
- * @author Jeroen Gremmen
- *
- * @since 0.8.0
- *
  * @see de.sayayi.lib.message.adopter.AsmAnnotationAdopter AsmAnnotationAdopter
  * @see de.sayayi.lib.message.adopter.SpringAsmAnnotationAdopter SpringAsmAnnotationAdopter
+ *
+ * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 @Target({ ANNOTATION_TYPE, METHOD, TYPE })
 @Retention(CLASS)

@@ -31,6 +31,7 @@ import static java.util.Objects.requireNonNull;
  * Text message part without leading and trailing spaces.
  *
  * @author Jeroen Gremmen
+ * @since 0.5.0
  */
 public final class NoSpaceTextPart implements Text
 {

@@ -29,10 +29,11 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 /**
  * Message text annotation.
  *
- * @author Jeroen Gremmen
- *
  * @see MessageDef
  * @see TemplateDef
+ *
+ * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 @Target(ANNOTATION_TYPE)
 @Retention(CLASS)

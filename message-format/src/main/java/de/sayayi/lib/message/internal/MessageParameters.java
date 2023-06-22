@@ -32,6 +32,7 @@ import static java.util.Spliterators.emptySpliterator;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 final class MessageParameters implements Parameters
 {

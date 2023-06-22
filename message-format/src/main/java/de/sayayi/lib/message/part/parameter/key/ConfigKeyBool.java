@@ -31,6 +31,7 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.4.0 (renamed in 0.8.0)
  */
 public enum ConfigKeyBool implements ConfigKey
 {

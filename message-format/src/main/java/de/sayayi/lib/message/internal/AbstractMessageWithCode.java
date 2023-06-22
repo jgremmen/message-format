@@ -23,6 +23,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 abstract class AbstractMessageWithCode implements Message.WithCode
 {

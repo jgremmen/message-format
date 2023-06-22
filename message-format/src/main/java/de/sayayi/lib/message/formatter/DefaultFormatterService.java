@@ -22,6 +22,7 @@ import java.util.ServiceLoader;
  * Formatter service providing formatters for the most common java types.
  *
  * @author Jeroen Gremmen
+ * @since 0.4.2
  */
 public class DefaultFormatterService extends GenericFormatterService
 {

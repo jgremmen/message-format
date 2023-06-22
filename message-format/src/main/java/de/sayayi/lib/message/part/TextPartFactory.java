@@ -28,6 +28,7 @@ import static de.sayayi.lib.message.util.SpacesUtil.isTrimmedEmpty;
  * Text part factory.
  *
  * @author Jeroen Gremmen
+ * @since 0.5.0 (renamed in 0.8.0)
  */
 public final class TextPartFactory
 {

@@ -32,6 +32,7 @@ import static java.util.Collections.emptySet;
  * Message implementation, representing an empty text without leading/trailing spaces.
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public final class EmptyMessage implements Message.WithSpaces
 {

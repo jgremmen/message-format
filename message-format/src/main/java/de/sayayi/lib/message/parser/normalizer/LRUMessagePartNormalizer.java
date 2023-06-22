@@ -26,6 +26,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.6.0
  */
 @SuppressWarnings("UnstableApiUsage")
 public final class LRUMessagePartNormalizer implements MessagePartNormalizer

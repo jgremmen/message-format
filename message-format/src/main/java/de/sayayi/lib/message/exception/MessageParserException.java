@@ -20,6 +20,7 @@ import org.antlr.v4.runtime.RecognitionException;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public class MessageParserException extends MessageException
 {

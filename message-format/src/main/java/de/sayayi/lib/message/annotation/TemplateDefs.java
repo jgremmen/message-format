@@ -27,7 +27,6 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * Repeatable {@code TemplateDef} annotation.
  *
  * @author Jeroen Gremmen
- *
  * @since 0.8.0
  */
 @Target({ METHOD, TYPE })

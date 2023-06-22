@@ -25,6 +25,7 @@ import java.io.IOException;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.4.0 (renamed in 0.8.0)
  */
 public enum ConfigValueBool implements ConfigValue
 {

@@ -28,6 +28,7 @@ import static java.lang.Integer.MIN_VALUE;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 public final class ConfigValueNumber implements ConfigValue
 {

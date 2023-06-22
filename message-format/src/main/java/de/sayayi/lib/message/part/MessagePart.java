@@ -29,6 +29,7 @@ import java.io.Serializable;
  * This interface represents a part of a compiled message (text, parameter or template).
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public interface MessagePart extends SpacesAware, Serializable
 {

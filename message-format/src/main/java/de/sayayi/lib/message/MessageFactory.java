@@ -39,6 +39,7 @@ import static java.util.Objects.requireNonNull;
  * Factory class for creating message instances.
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 @SuppressWarnings("UnknownLanguage")
 public class MessageFactory

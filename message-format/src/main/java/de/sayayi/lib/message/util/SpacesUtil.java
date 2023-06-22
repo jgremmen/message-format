@@ -25,6 +25,7 @@ import static java.lang.Character.*;
  * This class contains various methods regarding spaces in strings.
  *
  * @author Jeroen Gremmen
+ * @since 0.6.4
  */
 public final class SpacesUtil
 {

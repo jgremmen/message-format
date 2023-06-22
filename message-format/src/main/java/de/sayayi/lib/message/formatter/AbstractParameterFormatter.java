@@ -34,6 +34,7 @@ import static java.util.Optional.empty;
  * @param <T>  parameter type
  *
  * @author Jeroen Gremmen
+ * @since 0.3.1
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractParameterFormatter<T> implements ParameterFormatter

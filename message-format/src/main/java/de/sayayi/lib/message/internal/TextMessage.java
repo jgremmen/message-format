@@ -38,6 +38,7 @@ import static java.util.Collections.emptySet;
  * leading and trailing spaces.
  *
  * @author Jeroen Gremmen
+ * @since 0.4.0
  */
 public final class TextMessage implements Message.WithSpaces
 {

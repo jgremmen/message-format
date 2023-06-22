@@ -29,6 +29,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.1.0 (renamed in 0.4.1)
  */
 @SuppressWarnings("UnstableApiUsage")
 public class GenericFormatterService implements FormatterService.WithRegistry

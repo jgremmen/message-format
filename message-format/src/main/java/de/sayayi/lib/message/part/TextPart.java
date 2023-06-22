@@ -33,6 +33,7 @@ import static de.sayayi.lib.message.util.SpacesUtil.trimSpaces;
  * Text message part with optional leading and/or trailing spaces.
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public final class TextPart implements Text
 {

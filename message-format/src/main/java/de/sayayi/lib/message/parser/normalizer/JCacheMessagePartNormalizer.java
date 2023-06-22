@@ -25,6 +25,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.6.0
  */
 public final class JCacheMessagePartNormalizer implements MessagePartNormalizer
 {

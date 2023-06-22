@@ -42,6 +42,7 @@ import static java.util.stream.Collectors.toSet;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.1.0 (renamed in 0.5.0)
  */
 public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCode
     implements LocaleAware

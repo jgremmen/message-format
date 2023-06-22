@@ -38,6 +38,7 @@ import static java.util.Objects.requireNonNull;
  * Parameter message part with optional leading and/or trailing spaces.
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public final class ParameterPart implements Parameter
 {

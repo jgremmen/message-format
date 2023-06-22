@@ -25,10 +25,10 @@ import java.util.function.Supplier;
  * This supplier implementation delegates to another supplier and caches the supplied value, thus
  * invoking the delegated supplier only once.
  *
+ * @param <T>  supplier value type
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
- *
- * @param <T>  supplier value type
  */
 public final class SupplierDelegate<T> implements Supplier<T>
 {
@@ -49,7 +49,7 @@ public final class SupplierDelegate<T> implements Supplier<T>
       if (supplier != null)
       {
         value = supplier.get();
-        supplier = null;
+        supplier = null;  // drop supplier; we don't need it anymore
       }
 
       return value;

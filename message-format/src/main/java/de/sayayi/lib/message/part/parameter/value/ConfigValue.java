@@ -30,6 +30,7 @@ import static java.util.Collections.unmodifiableSet;
  * Interface representing a typed value in a data map.
  *
  * @author Jeroen Gremmen
+ * @since 0.4.0 (renamed in 0.8.0)
  *
  * @see ParamConfig
  */
