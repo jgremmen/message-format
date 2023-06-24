@@ -60,6 +60,7 @@ string returns [String value]
 
 forceQuotedMessage returns [Message.WithSpaces value]
         : quotedMessage
+        | nameOrKeyword
         | string
         ;
 

@@ -303,11 +303,14 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitForceQuotedMessage(ForceQuotedMessageContext ctx)
     {
       final QuotedMessageContext quotedMessage = ctx.quotedMessage();
-
-      //noinspection LanguageMismatch
-      ctx.value = quotedMessage != null
-          ? quotedMessage.value
-          : messageFactory.parseMessage(ctx.string().value);
+      if (quotedMessage != null)
+        ctx.value = quotedMessage.value;
+      else
+      {
+        final NameOrKeywordContext nameOrKeyword = ctx.nameOrKeyword();
+        ctx.value = messageFactory.parseMessage(
+            nameOrKeyword != null ? nameOrKeyword.name : ctx.string().value);
+      }
     }
 
 
