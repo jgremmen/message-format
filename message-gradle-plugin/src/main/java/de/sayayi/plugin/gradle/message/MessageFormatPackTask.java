@@ -17,6 +17,7 @@ package de.sayayi.plugin.gradle.message;
 
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.adopter.AsmAnnotationAdopter;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
@@ -42,7 +43,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.plugin.gradle.message.DuplicateMsgStrategy.IGNORE_AND_WARN;
@@ -66,7 +66,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private final List<String> includeRegexFilters = new ArrayList<>();
   private final List<String> excludeRegexFilters = new ArrayList<>();
-  private Action<Set<String>> codesAction = null;
+  private Action<MessageAccessor> action = null;
 
   private final ThreadLocal<String> currentClassName = new ThreadLocal<>();
 
@@ -138,12 +138,12 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
-  public void codes(Action<Set<String>> action)
+  public void action(Action<MessageAccessor> action)
   {
     if (action == null)
       throw new InvalidUserDataException("Action must not be null!");
 
-    this.codesAction = action;
+    this.action = action;
   }
 
 
@@ -157,7 +157,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
     pack_scanMessages(messageSupport);
     pack_validateTemplates(messageSupport);
-    pack_codesAction(messageSupport);
+    pack_action(messageSupport);
     pack_write(messageSupport);
   }
 
@@ -210,10 +210,10 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
-  private void pack_codesAction(@NotNull MessageSupport messageSupport)
+  private void pack_action(@NotNull MessageSupport messageSupport)
   {
-    if (codesAction != null)
-      codesAction.execute(messageSupport.getMessageAccessor().getMessageCodes());
+    if (action != null)
+      action.execute(messageSupport.getMessageAccessor());
   }
 
 
