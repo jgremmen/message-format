@@ -32,7 +32,6 @@ import java.util.function.Supplier;
  */
 public final class SupplierDelegate<T> implements Supplier<T>
 {
-  private final Object $LOCK = new Object[0];
   private Supplier<T> supplier;
   private T value;
 
@@ -45,15 +44,13 @@ public final class SupplierDelegate<T> implements Supplier<T>
   @Override
   public T get()
   {
-    synchronized($LOCK) {
-      if (supplier != null)
-      {
-        value = supplier.get();
-        supplier = null;  // drop supplier; we don't need it anymore
-      }
-
-      return value;
+    if (supplier != null)
+    {
+      value = supplier.get();
+      supplier = null;  // drop supplier; we don't need it anymore
     }
+
+    return value;
   }
 
 
