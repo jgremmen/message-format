@@ -49,15 +49,19 @@ public abstract class AbstractFormatterTest
 
 
   @Contract(pure = true)
-  protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value) {
-    return format(messageContext, new NoParameters(messageContext.getLocale()), value, emptyMap(), null);
+  protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value)
+  {
+    return format(messageContext, new NoParameters(messageContext.getLocale()), value,
+        emptyMap(), null);
   }
 
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
-                                        @NotNull String format) {
-    return format(messageContext, new NoParameters(messageContext.getLocale()), value, emptyMap(), format);
+                                        @NotNull String format)
+  {
+    return format(messageContext, new NoParameters(messageContext.getLocale()), value,
+        emptyMap(), format);
   }
 
 
@@ -70,14 +74,17 @@ public abstract class AbstractFormatterTest
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
-                                        @NotNull Map<ConfigKey,ConfigValue> map) {
-    return format(messageContext, new NoParameters(messageContext.getLocale()), value, map, null);
+                                        @NotNull Map<ConfigKey,ConfigValue> map)
+  {
+    return format(messageContext, new NoParameters(messageContext.getLocale()), value, map,
+        null);
   }
 
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
-                                        @NotNull Map<ConfigKey,ConfigValue> map, @NotNull String format) {
+                                        @NotNull Map<ConfigKey,ConfigValue> map,
+                                        @NotNull String format) {
     return format(messageContext, new NoParameters(messageContext.getLocale()), value, map, format);
   }
 
@@ -88,13 +95,14 @@ public abstract class AbstractFormatterTest
                                         @NotNull Map<ConfigKey,ConfigValue> map,
                                         String format)
   {
-    return new FormatterContextImpl(messageContext, parameters, value, null, format, new ParamConfig(map))
-        .delegateToNextFormatter();
+    return new FormatterContextImpl(messageContext, parameters, value, null, format,
+        new ParamConfig(map)).delegateToNextFormatter();
   }
 
 
   @Contract(pure = true)
-  protected @NotNull FormatterService.WithRegistry createFormatterService(@NotNull ParameterFormatter ... formatters)
+  protected @NotNull FormatterService.WithRegistry createFormatterService(
+      @NotNull ParameterFormatter ... formatters)
   {
     val formatterService = new GenericFormatterService();
 
