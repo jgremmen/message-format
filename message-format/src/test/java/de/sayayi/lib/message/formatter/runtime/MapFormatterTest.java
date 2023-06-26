@@ -52,7 +52,7 @@ class MapFormatterTest extends AbstractFormatterTest
   void testSeparator()
   {
     val message = MessageSupportFactory
-        .create(createFormatterService(new MapFormatter(), new ObjectArrayFormatter()),
+        .create(createFormatterService(new MapFormatter(), new ArrayFormatter()),
             NO_CACHE_INSTANCE)
         .setLocale(UK)
         .message("%{map1} %{map2,map-kv:'%{key}   -> %{value}'} %{map3,map-kv:' %{key}:  %{value} '}");
@@ -71,7 +71,7 @@ class MapFormatterTest extends AbstractFormatterTest
   void testNullKeyValue()
   {
     val message = MessageSupportFactory
-        .create(createFormatterService(new MapFormatter(), new ObjectArrayFormatter()),
+        .create(createFormatterService(new MapFormatter(), new ArrayFormatter()),
             NO_CACHE_INSTANCE)
         .setLocale(UK)
         .message("%{map1} %{map2,map-k-null:key,map-v-null:value}");
@@ -87,7 +87,7 @@ class MapFormatterTest extends AbstractFormatterTest
   void testEmpty()
   {
     val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new MapFormatter(), new ObjectArrayFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new MapFormatter(), new ArrayFormatter()), NO_CACHE_INSTANCE)
         .setLocale(UK);
     val parameters = singletonMap("map", (Object)emptyMap());
 
@@ -101,7 +101,7 @@ class MapFormatterTest extends AbstractFormatterTest
   {
     val message = MessageSupportFactory
         .create(createFormatterService(
-            new MapFormatter(), new ObjectArrayFormatter(), new NumberFormatter()),
+            new MapFormatter(), new ArrayFormatter(), new NumberFormatter()),
             NO_CACHE_INSTANCE)
         .setLocale(UK)
         .message("%{map,map-kv:'%{key} -> %{value,number:\"0000\"}',list-sep:', ',list-sep-last:' and '}");
@@ -122,7 +122,7 @@ class MapFormatterTest extends AbstractFormatterTest
   {
     val message = MessageSupportFactory
         .create(createFormatterService(
-            new MapFormatter(), new ObjectArrayFormatter(), new BoolFormatter()),
+            new MapFormatter(), new ArrayFormatter(), new BoolFormatter()),
             NO_CACHE_INSTANCE)
         .message("%{map,map-kv:'%{key,bool}:%{value}',list-sep:' / '}");
 
