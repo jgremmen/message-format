@@ -15,12 +15,16 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.parameter.ParameterPart;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.util.SupplierDelegate;
@@ -34,6 +38,7 @@ import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
+import static java.util.Collections.singletonList;
 
 
 /**
@@ -42,15 +47,22 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYP
 public final class IterableFormatter extends AbstractSingleTypeParameterFormatter<Iterable<?>>
     implements EmptyMatcher, SizeQueryable
 {
+  private static final Message.WithSpaces DEFAULT_VALUE_MESSAGE =
+      new CompoundMessage(singletonList(new ParameterPart("value")));
+
+
   @Override
   @Contract(pure = true)
   @SuppressWarnings({"rawtypes", "DuplicatedCode"})
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Iterable<?> iterable)
+  public @NotNull Text formatValue(@NotNull FormatterContext context,
+                                   @NotNull Iterable<?> iterable)
   {
     final Iterator iterator = ((Iterable)iterable).iterator();
     if (!iterator.hasNext())
       return emptyText();
 
+    final Message.WithSpaces valueMessage = context
+        .getConfigValueMessage("list-value").orElse(DEFAULT_VALUE_MESSAGE);
     final String sep =
         spacedText(context.getConfigValueString("list-sep").orElse(", "))
             .getTextWithSpaces();
@@ -58,17 +70,24 @@ public final class IterableFormatter extends AbstractSingleTypeParameterFormatte
         spacedText(context.getConfigValueString("list-sep-last").orElse(sep))
             .getTextWithSpaces();
 
-    final Supplier<Text> nullText = SupplierDelegate.of(() -> nullText(context));
     final Supplier<Text> thisText = SupplierDelegate.of(() -> thisText(context));
-
+    final MessageAccessor messageAccessor = context.getMessageSupport();
+    final ValueParameters parameters =
+        new ValueParameters(context.getLocale(), "value");
     final StringBuilder s = new StringBuilder();
 
     while(iterator.hasNext())
     {
-      final Object element = iterator.next();
-      final Text text = element == iterable
-          ? thisText.get()
-          : element == null ? nullText.get() : context.format(element, true);
+      final Object value = iterator.next();
+      final Text text;
+
+      if (value == iterable)
+        text = thisText.get();
+      else
+      {
+        parameters.value = value;
+        text = noSpaceText(valueMessage.format(messageAccessor, parameters));
+      }
 
       if (!text.isEmpty())
       {
@@ -106,12 +125,6 @@ public final class IterableFormatter extends AbstractSingleTypeParameterFormatte
       size++;
 
     return OptionalLong.of(size);
-  }
-
-
-  @Contract(pure = true)
-  private @NotNull Text nullText(@NotNull FormatterContext context) {
-    return noSpaceText(context.getConfigValueString("list-null").orElse(""));
   }
 
 
