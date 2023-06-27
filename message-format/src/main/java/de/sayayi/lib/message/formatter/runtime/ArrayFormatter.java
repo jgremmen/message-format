@@ -53,11 +53,13 @@ import static java.util.Collections.singletonList;
 public final class ArrayFormatter extends AbstractParameterFormatter<Object>
     implements EmptyMatcher, SizeQueryable
 {
+  // default list-value: %{value}
   private static final Message.WithSpaces DEFAULT_VALUE_MESSAGE =
       new CompoundMessage(singletonList(new ParameterPart("value")));
 
 
   @Override
+  @SuppressWarnings("DuplicatedCode")
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object array)
   {
     final Text separator = spacedText(context
