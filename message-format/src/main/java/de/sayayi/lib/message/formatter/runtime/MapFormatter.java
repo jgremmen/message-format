@@ -26,9 +26,12 @@ import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.NoSpaceTextPart;
+import de.sayayi.lib.message.part.parameter.ParamConfig;
 import de.sayayi.lib.message.part.parameter.ParameterPart;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
+import de.sayayi.lib.message.part.parameter.key.ConfigKeyNull;
+import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -37,8 +40,10 @@ import java.util.*;
 import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableSet;
 
 
@@ -55,11 +60,14 @@ public final class MapFormatter extends AbstractSingleTypeParameterFormatter<Map
 
   static
   {
-    // default map-kv: %{key}=%{value}
+    final ParamConfig paramConfig = new ParamConfig(singletonMap(
+        new ConfigKeyNull(EQ), new ConfigValueString("(null)")));
+
+    // default map-kv: %{key,null:'(null)'}=%{value,null:'(null)'}
     DEFAULT_KEY_VALUE_MESSAGE = new CompoundMessage(asList(
-        new ParameterPart("key"),
+        new ParameterPart("key", paramConfig),
         new NoSpaceTextPart("="),
-        new ParameterPart("value")
+        new ParameterPart("value", paramConfig)
     ));
   }
 
@@ -73,9 +81,8 @@ public final class MapFormatter extends AbstractSingleTypeParameterFormatter<Map
 
     final Message.WithSpaces kvMessage = context
         .getConfigValueMessage("map-kv").orElse(DEFAULT_KEY_VALUE_MESSAGE);
-    final Supplier<String> keyNull = SupplierDelegate.of(() -> keyNull(context));
-    final Supplier<String> valueNull = SupplierDelegate.of(() -> valueNull(context));
-    final Supplier<String> thisString = SupplierDelegate.of(() -> mapThis(context));
+    final Supplier<String> thisString = SupplierDelegate.of(() -> context
+            .getConfigValueString("map-this").map(String::trim).orElse("(this map)"));
 
     final MessageAccessor messageAccessor = context.getMessageSupport();
     final KeyValueParameters parameters = new KeyValueParameters(messageAccessor.getLocale());
@@ -84,8 +91,8 @@ public final class MapFormatter extends AbstractSingleTypeParameterFormatter<Map
         .entrySet()
         .stream()
         .map(entry -> {
-          parameters.key = fixValue(map, entry.getKey(), keyNull, thisString);
-          parameters.value = fixValue(map, entry.getValue(), valueNull, thisString);
+          parameters.key = fixValue(map, entry.getKey(), thisString);
+          parameters.value = fixValue(map, entry.getValue(), thisString);
 
           return kvMessage.format(messageAccessor, parameters);
         })
@@ -93,10 +100,9 @@ public final class MapFormatter extends AbstractSingleTypeParameterFormatter<Map
   }
 
 
-  private @NotNull Object fixValue(@NotNull Map<?,?> map, Object value,
-                                   @NotNull Supplier<String> nullString,
-                                   @NotNull Supplier<String> thisString) {
-    return value == null ? nullString.get() : value == map ? thisString.get() : value;
+  private Object fixValue(@NotNull Map<?,?> map, Object value,
+                          @NotNull Supplier<String> thisString) {
+    return value == map ? thisString.get() : value;
   }
 
 
@@ -115,36 +121,6 @@ public final class MapFormatter extends AbstractSingleTypeParameterFormatter<Map
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(Map.class);
-  }
-
-
-  @Contract(pure = true)
-  private String keyNull(@NotNull FormatterContext context)
-  {
-    return context
-        .getConfigValueString("map-k-null")
-        .map(String::trim)
-        .orElse("(null)");
-  }
-
-
-  @Contract(pure = true)
-  private String valueNull(@NotNull FormatterContext context)
-  {
-    return context
-        .getConfigValueString("map-v-null")
-        .map(String::trim)
-        .orElse("(null)");
-  }
-
-
-  @Contract(pure = true)
-  private String mapThis(@NotNull FormatterContext context)
-  {
-    return context
-        .getConfigValueString("map-this")
-        .map(String::trim)
-        .orElse("(this map)");
   }
 
 

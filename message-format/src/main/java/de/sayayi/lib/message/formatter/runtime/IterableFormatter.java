@@ -23,6 +23,7 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.CompoundMessage;
+import de.sayayi.lib.message.internal.TextJoiner;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.ParameterPart;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
@@ -36,7 +37,8 @@ import java.util.Iterator;
 import java.util.OptionalLong;
 import java.util.function.Supplier;
 
-import static de.sayayi.lib.message.part.TextPartFactory.*;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static java.util.Collections.singletonList;
 
@@ -47,58 +49,40 @@ import static java.util.Collections.singletonList;
 public final class IterableFormatter extends AbstractSingleTypeParameterFormatter<Iterable<?>>
     implements EmptyMatcher, SizeQueryable
 {
+  // default list-value: %{value}
   private static final Message.WithSpaces DEFAULT_VALUE_MESSAGE =
       new CompoundMessage(singletonList(new ParameterPart("value")));
 
 
   @Override
   @Contract(pure = true)
-  @SuppressWarnings({"rawtypes", "DuplicatedCode"})
+  @SuppressWarnings("DuplicatedCode")
   public @NotNull Text formatValue(@NotNull FormatterContext context,
                                    @NotNull Iterable<?> iterable)
   {
-    final Iterator iterator = ((Iterable)iterable).iterator();
-    if (!iterator.hasNext())
-      return emptyText();
+    final Text separator = spacedText(context
+        .getConfigValueString("list-sep")
+        .orElse(", "));
+    final Text lastSeparator = spacedText(context
+        .getConfigValueString("list-sep-last")
+        .orElseGet(separator::getTextWithSpaces));
 
-    final Message.WithSpaces valueMessage = context
-        .getConfigValueMessage("list-value").orElse(DEFAULT_VALUE_MESSAGE);
-    final String sep =
-        spacedText(context.getConfigValueString("list-sep").orElse(", "))
-            .getTextWithSpaces();
-    final String sepLast =
-        spacedText(context.getConfigValueString("list-sep-last").orElse(sep))
-            .getTextWithSpaces();
+    final TextJoiner joiner = new TextJoiner();
+    boolean first = true;
 
-    final Supplier<Text> thisText = SupplierDelegate.of(() -> thisText(context));
-    final MessageAccessor messageAccessor = context.getMessageSupport();
-    final ValueParameters parameters =
-        new ValueParameters(context.getLocale(), "value");
-    final StringBuilder s = new StringBuilder();
-
-    while(iterator.hasNext())
+    for(final Iterator<Text> iterator = new TextIterator(context, iterable); iterator.hasNext();)
     {
-      final Object value = iterator.next();
-      final Text text;
+      final Text text = iterator.next();
 
-      if (value == iterable)
-        text = thisText.get();
+      if (first)
+        first = false;
       else
-      {
-        parameters.value = value;
-        text = noSpaceText(valueMessage.format(messageAccessor, parameters));
-      }
+        joiner.add(iterator.hasNext() ? separator : lastSeparator);
 
-      if (!text.isEmpty())
-      {
-        if (s.length() > 0)
-          s.append(iterator.hasNext() ? sep : sepLast);
-
-        s.append(text.getText());
-      }
+      joiner.add(text);
     }
 
-    return noSpaceText(s.toString());
+    return joiner.asNoSpaceText();
   }
 
 
@@ -128,14 +112,73 @@ public final class IterableFormatter extends AbstractSingleTypeParameterFormatte
   }
 
 
-  @Contract(pure = true)
-  private @NotNull Text thisText(@NotNull FormatterContext context) {
-    return noSpaceText(context.getConfigValueString("list-this").orElse("(this collection)"));
-  }
-
-
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(Iterable.class);
+  }
+
+
+
+
+  private static final class TextIterator implements Iterator<Text>
+  {
+    private final MessageAccessor messageAccessor;
+    private final Message.WithSpaces valueMessage;
+    private final ValueParameters parameters;
+    private final Supplier<Text> thisText;
+    private final Iterable<?> iterable;
+    private final Iterator<?> iterator;
+    private Text nextText;
+
+
+    private TextIterator(@NotNull FormatterContext context, @NotNull Iterable<?> iterable)
+    {
+      this.iterable = iterable;
+
+      iterator = iterable.iterator();
+      messageAccessor = context.getMessageSupport();
+
+      valueMessage = context
+          .getConfigValueMessage("list-value")
+          .orElse(DEFAULT_VALUE_MESSAGE);
+
+      parameters = new ValueParameters(context.getLocale(), "value");
+      thisText = SupplierDelegate.of(() ->
+          noSpaceText(context.getConfigValueString("list-this")
+              .orElse("(this collection)")));
+
+      prepareNextText();
+    }
+
+
+    private void prepareNextText()
+    {
+      for(nextText = null; nextText == null && iterator.hasNext();)
+      {
+        final Text text = (parameters.value = iterator.next()) == iterable
+            ? thisText.get()
+            : noSpaceText(valueMessage.format(messageAccessor, parameters));
+
+        if (!text.isEmpty())
+          nextText = text;
+      }
+    }
+
+
+    @Override
+    public boolean hasNext() {
+      return nextText != null;
+    }
+
+
+    @Override
+    public Text next()
+    {
+      final Text text = nextText;
+
+      prepareNextText();
+
+      return text;
+    }
   }
 }

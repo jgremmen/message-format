@@ -74,9 +74,10 @@ class MapFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(new MapFormatter(), new ArrayFormatter()),
             NO_CACHE_INSTANCE)
         .setLocale(UK)
-        .message("%{map1} %{map2,map-k-null:key,map-v-null:value}");
+        .message("%{map1} %{map2,map-kv:'%{key,null:key}=%{value,null:value}'}");
 
-    assertEquals("(null)=(null)", message.with("map1", singletonMap(null, null)).format());
+    assertEquals("(null)=(null)", message
+        .with("map1", singletonMap(null, null)).format());
     assertEquals("key=value",
         message.clear().with("map2", singletonMap(null, null)).format());
   }

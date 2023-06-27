@@ -83,6 +83,17 @@ public final class ParameterPart implements Parameter
   }
 
 
+  /**
+   * Construct a parameter part with the given parameter {@code name} and parameter configuration.
+   *
+   * @param name         parameter name, not {@code null} or empty
+   * @param paramConfig  parameter configuration, not {@code null}
+   */
+  public ParameterPart(@NotNull String name, @NotNull ParamConfig paramConfig) {
+    this(name, null, false, false, paramConfig);
+  }
+
+
   public ParameterPart(@NotNull String name, String format, boolean spaceBefore, boolean spaceAfter,
                        @NotNull ParamConfig paramConfig)
   {
