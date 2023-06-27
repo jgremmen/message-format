@@ -83,6 +83,7 @@ public abstract class AbstractParameterFormatter<T> implements ParameterFormatte
 
 
   @Contract(pure = true)
+  @SuppressWarnings("SameParameterValue")
   protected @NotNull Optional<Text> formatUsingMappedString(@NotNull FormatterContext context,
                                                             @NotNull String s,
                                                             boolean includeDefault)
@@ -100,6 +101,7 @@ public abstract class AbstractParameterFormatter<T> implements ParameterFormatte
 
 
   @Contract(pure = true)
+  @SuppressWarnings("SameParameterValue")
   protected @NotNull Optional<Text> formatUsingMappedNumber(@NotNull FormatterContext context,
                                                             long n, boolean includeDefault)
   {
