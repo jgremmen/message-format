@@ -35,17 +35,22 @@ public final class EnumFormatter extends AbstractSingleTypeParameterFormatter<En
     switch(context.getConfigValueString("enum").orElse("name"))
     {
       case "ordinal":
-      case "ord":
-        return formatUsingMappedNumber(context, value.ordinal(), true)
-            .orElseGet(() -> noSpaceText(Integer.toString(value.ordinal())));
+      case "ord": {
+        final int ordinal = value.ordinal();
 
-      case "name":
-        return formatUsingMappedString(context, value.name(), true)
-            .orElseGet(() -> noSpaceText(value.name()));
+        return formatUsingMappedNumber(context, ordinal, true)
+            .orElseGet(() -> context.format(ordinal, int.class, true));
+      }
 
-      default:
-        return context.delegateToNextFormatter();
+      case "name": {
+        final String name = value.name();
+
+        return formatUsingMappedString(context, name, true)
+            .orElseGet(() -> noSpaceText(name));
+      }
     }
+
+    return context.delegateToNextFormatter();
   }
 
 
