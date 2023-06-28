@@ -53,10 +53,9 @@ public final class LocaleFormatter extends AbstractSingleTypeParameterFormatter<
 
       case "variant":
         return noSpaceText(locale.getDisplayVariant(context.getLocale()));
-
-      default:
-        return context.delegateToNextFormatter();
     }
+
+    return context.delegateToNextFormatter();
   }
 
 

@@ -42,9 +42,9 @@ public final class OptionalLongFormatter extends AbstractSingleTypeParameterForm
   public @NotNull Text formatValue(@NotNull FormatterContext context,
                                    @NotNull OptionalLong optionalLong)
   {
-    return !optionalLong.isPresent()
-        ? emptyText()
-        : context.format(optionalLong.getAsLong(), long.class, true);
+    return optionalLong.isPresent()
+        ? context.format(optionalLong.getAsLong(), long.class, true)
+        : emptyText();
   }
 
 

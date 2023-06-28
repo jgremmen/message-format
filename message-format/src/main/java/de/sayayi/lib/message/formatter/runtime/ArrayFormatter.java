@@ -63,11 +63,9 @@ public final class ArrayFormatter extends AbstractParameterFormatter<Object>
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object array)
   {
     final Text separator = spacedText(context
-        .getConfigValueString("list-sep")
-        .orElse(", "));
+        .getConfigValueString("list-sep").orElse(", "));
     final Text lastSeparator = spacedText(context
-        .getConfigValueString("list-sep-last")
-        .orElseGet(separator::getTextWithSpaces));
+        .getConfigValueString("list-sep-last").orElseGet(separator::getTextWithSpaces));
 
     final TextJoiner joiner = new TextJoiner();
     boolean first = true;
@@ -174,8 +172,8 @@ public final class ArrayFormatter extends AbstractParameterFormatter<Object>
           .orElse(DEFAULT_VALUE_MESSAGE);
 
       parameters = new ValueParameters(context.getLocale(), "value");
-      thisText = SupplierDelegate.of(() ->
-          noSpaceText(context.getConfigValueString("list-this").orElse("(this array)")));
+      thisText = SupplierDelegate.of(() -> noSpaceText(
+          context.getConfigValueString("list-this").orElse("(this array)")));
       length = Array.getLength(array);
 
       prepareNextText();

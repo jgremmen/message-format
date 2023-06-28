@@ -82,7 +82,7 @@ public final class MapFormatter extends AbstractSingleTypeParameterFormatter<Map
     final Message.WithSpaces kvMessage = context
         .getConfigValueMessage("map-kv").orElse(DEFAULT_KEY_VALUE_MESSAGE);
     final Supplier<String> thisString = SupplierDelegate.of(() -> context
-            .getConfigValueString("map-this").map(String::trim).orElse("(this map)"));
+        .getConfigValueString("map-this").map(String::trim).orElse("(this map)"));
 
     final MessageAccessor messageAccessor = context.getMessageSupport();
     final KeyValueParameters parameters = new KeyValueParameters(messageAccessor.getLocale());

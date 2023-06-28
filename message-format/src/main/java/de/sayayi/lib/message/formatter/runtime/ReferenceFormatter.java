@@ -35,7 +35,8 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYP
 /**
  * @author Jeroen Gremmen
  */
-public final class ReferenceFormatter extends AbstractSingleTypeParameterFormatter<Reference<?>>
+public final class ReferenceFormatter
+    extends AbstractSingleTypeParameterFormatter<Reference<?>>
     implements EmptyMatcher, SizeQueryable
 {
   @Override

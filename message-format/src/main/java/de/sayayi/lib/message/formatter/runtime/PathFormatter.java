@@ -65,7 +65,8 @@ public final class PathFormatter extends AbstractSingleTypeParameterFormatter<Pa
 
 
   @SuppressWarnings("DuplicatedCode")
-  private @NotNull Text formatValue_extension(@NotNull FormatterContext context, @NotNull Path path)
+  private @NotNull Text formatValue_extension(@NotNull FormatterContext context,
+                                              @NotNull Path path)
   {
     path = path.getFileName();
     if (path == null)

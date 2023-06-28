@@ -42,9 +42,9 @@ public final class OptionalIntFormatter extends AbstractSingleTypeParameterForma
   public @NotNull Text formatValue(@NotNull FormatterContext context,
                                    @NotNull OptionalInt optionalInt)
   {
-    return !optionalInt.isPresent()
-        ? emptyText()
-        : context.format(optionalInt.getAsInt(), int.class, true);
+    return optionalInt.isPresent()
+        ? context.format(optionalInt.getAsInt(), int.class, true)
+        : emptyText();
   }
 
 

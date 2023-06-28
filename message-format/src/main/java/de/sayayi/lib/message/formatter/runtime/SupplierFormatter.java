@@ -38,7 +38,7 @@ public final class SupplierFormatter extends AbstractSingleTypeParameterFormatte
   {
     final Object value = supplier.get();
 
-    return value == null ? nullText() : context.format(value, value.getClass(), true);
+    return value == null ? nullText() : context.format(value, true);
   }
 
 

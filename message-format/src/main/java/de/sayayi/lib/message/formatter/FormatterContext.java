@@ -36,7 +36,6 @@ import java.util.Set;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-@SuppressWarnings("unused")
 public interface FormatterContext extends Parameters
 {
   /**
@@ -208,8 +207,8 @@ public interface FormatterContext extends Parameters
   /**
    * Format the given {@code value} using {@code type}.
    *
-   * @param value            value to format
-   * @param type             value type or {@code null}
+   * @param value  value to format
+   * @param type   value type or {@code null}
    *
    * @return  formatted text, never {@code null}
    */

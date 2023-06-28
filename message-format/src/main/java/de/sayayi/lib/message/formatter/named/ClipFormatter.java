@@ -41,7 +41,7 @@ public final class ClipFormatter extends AbstractParameterFormatter<Object>
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    final Text text = context.format(value, false);
+    final Text text = context.format(value);
 
     String s = text.getText();
     if (s == null)
