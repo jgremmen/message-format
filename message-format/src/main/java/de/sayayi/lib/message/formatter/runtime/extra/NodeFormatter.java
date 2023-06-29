@@ -41,11 +41,16 @@ import static org.w3c.dom.Node.ELEMENT_NODE;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class XPathFormatter extends AbstractParameterFormatter<Node>
+public final class NodeFormatter extends AbstractParameterFormatter<Node>
 {
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext context,
-                                      @SuppressWarnings("NullableProblems") Node node)
+                                      @SuppressWarnings("NullableProblems") Node node) {
+    return noSpaceText(toXPath(node));
+  }
+
+
+  public static @NotNull String toXPath(Node node)
   {
     if (node instanceof Document)
       node = null;
@@ -101,7 +106,7 @@ public final class XPathFormatter extends AbstractParameterFormatter<Node>
 
     path.add('/');
 
-    return noSpaceText(path.toString());
+    return path.toString();
   }
 
 
@@ -114,6 +119,8 @@ public final class XPathFormatter extends AbstractParameterFormatter<Node>
         new FormattableType(Document.class)
     ));
   }
+
+
 
 
   @SuppressWarnings({"UnusedReturnValue", "UnstableApiUsage"})
