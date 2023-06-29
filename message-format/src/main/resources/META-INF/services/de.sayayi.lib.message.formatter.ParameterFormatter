@@ -11,7 +11,6 @@ de.sayayi.lib.message.formatter.runtime.DateFormatter
 de.sayayi.lib.message.formatter.runtime.DoubleSupplierFormatter
 de.sayayi.lib.message.formatter.runtime.EnumFormatter
 de.sayayi.lib.message.formatter.runtime.FileFormatter
-de.sayayi.lib.message.formatter.runtime.InetAddressFormatter
 de.sayayi.lib.message.formatter.runtime.IntSupplierFormatter
 de.sayayi.lib.message.formatter.runtime.IterableFormatter
 de.sayayi.lib.message.formatter.runtime.Java8DateTimeFormatter
