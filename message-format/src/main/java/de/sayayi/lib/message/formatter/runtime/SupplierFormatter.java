@@ -24,8 +24,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
-
 
 /**
  * @author Jeroen Gremmen
@@ -34,11 +32,9 @@ public final class SupplierFormatter extends AbstractSingleTypeParameterFormatte
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Supplier<?> supplier)
-  {
-    final Object value = supplier.get();
-
-    return value == null ? nullText() : context.format(value, true);
+  public @NotNull Text formatValue(@NotNull FormatterContext context,
+                                   @NotNull Supplier<?> supplier) {
+    return context.format(supplier.get(), true);
   }
 
 

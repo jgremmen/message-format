@@ -45,7 +45,7 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
 {
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext context,
-                                      @SuppressWarnings("NullableProblems") Node node) {
+                                      @NotNull Node node) {
     return noSpaceText(toXPath(node));
   }
 
