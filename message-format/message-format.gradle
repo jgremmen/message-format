@@ -26,7 +26,7 @@ description = 'Message Format Library'
 
 
 def antlrVersion = "4.9.3"
-def antlrExtVersion = "0.3.0"
+def antlrExtVersion = "[0.3,0.4)"
 def asmVersion = "[9.0,)"
 def ehcacheVersion = "3.10.+"
 def javaxCacheApiVersion = "1.1.1"
