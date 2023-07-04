@@ -56,7 +56,7 @@ libdocs {
         "${rootDir}/gradle/javadocs/joda-time"
     linksOffline "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
         "${rootDir}/gradle/javadocs/message-format"
-    linksOffline "https://javadoc.io/doc/org.springframework/spring-core/5.3.25/",
+    linksOffline "https://javadoc.io/doc/org.springframework/spring-core/5.3.28/",
         "${rootDir}/gradle/javadocs/spring-core"
   }
 }
