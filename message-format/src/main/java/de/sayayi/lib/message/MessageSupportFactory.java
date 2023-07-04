@@ -130,20 +130,20 @@ public final class MessageSupportFactory
 
     @Override
     public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(
-        @NotNull String name,
-        @NotNull Message.WithSpaces value) {
+        @NotNull String name, @NotNull Message.WithSpaces value) {
       throw new UnsupportedOperationException("setDefaultParameterConfig");
     }
 
 
     @Override
-    public void addMessage(@NotNull Message.WithCode message) {
+    public @NotNull ConfigurableMessageSupport addMessage(@NotNull Message.WithCode message) {
       throw new UnsupportedOperationException("addMessage");
     }
 
 
     @Override
-    public void addTemplate(@NotNull String name, @NotNull Message template) {
+    public @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name,
+                                                           @NotNull Message template) {
       throw new UnsupportedOperationException("addTemplate");
     }
 

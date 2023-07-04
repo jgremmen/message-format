@@ -387,17 +387,40 @@ public interface MessageSupport
   interface ConfigurableMessageSupport extends MessageSupport, MessagePublisher
   {
     /**
+     * {@inheritDoc}
+     *
+     * @return  configurable message support instance, never {@code null}
+     */
+    @Override
+    @Contract(value = "_ -> this", mutates = "this")
+    @NotNull ConfigurableMessageSupport addMessage(@NotNull Message.WithCode message);
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return  configurable message support instance, never {@code null}
+     */
+    @Override
+    @Contract(value = "_, _ -> this", mutates = "this")
+    @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name,
+                                                    @NotNull Message template);
+
+
+    /**
      * Adds a message with code to this message support.
      *
      * @param code     message code, not {@code null} or empty
      * @param message  message text, not {@code null}
      *
+     * @return  configurable message support instance, never {@code null}
+     *
      * @throws DuplicateMessageException  in case a message with the same code already exists
      */
-    @Contract(mutates = "this")
-    default void addMessage(@NotNull String code,
-                            @NotNull @Language("MessageFormat") String message) {
-      addMessage(getMessageAccessor().getMessageFactory().parseMessage(code, message));
+    @Contract(value = "_, _ -> this", mutates = "this")
+    default @NotNull ConfigurableMessageSupport addMessage(
+        @NotNull String code, @NotNull @Language("MessageFormat") String message) {
+      return addMessage(getMessageAccessor().getMessageFactory().parseMessage(code, message));
     }
 
 
@@ -412,7 +435,7 @@ public interface MessageSupport
      *
      * @see #importMessages(InputStream...)
      */
-    @Contract(mutates = "this")
+    @Contract(value = "_ -> this", mutates = "this")
     @NotNull ConfigurableMessageSupport importMessages(@NotNull Enumeration<URL> packResources)
         throws IOException;
 
@@ -428,8 +451,7 @@ public interface MessageSupport
      *
      * @see #importMessages(InputStream...)
      */
-    @Contract(mutates = "this")
-    @SuppressWarnings("UnusedReturnValue")
+    @Contract(value = "_ -> this", mutates = "this")
     default @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream packStream)
         throws IOException {
       return importMessages(new InputStream[] { packStream });
@@ -448,7 +470,7 @@ public interface MessageSupport
      *
      * @throws IOException  if an I/O error occurs
      */
-    @Contract(mutates = "this")
+    @Contract(value = "_ -> this", mutates = "this")
     @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream... packStreams)
         throws IOException;
 
@@ -464,7 +486,7 @@ public interface MessageSupport
      *
      * @return  configurable message support instance, never {@code null}
      */
-    @Contract(mutates = "this")
+    @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
                                                                   boolean value);
 
@@ -480,7 +502,7 @@ public interface MessageSupport
      *
      * @return  configurable message support instance, never {@code null}
      */
-    @Contract(mutates = "this")
+    @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, long value);
 
 
@@ -495,7 +517,7 @@ public interface MessageSupport
      *
      * @return  configurable message support instance, never {@code null}
      */
-    @Contract(mutates = "this")
+    @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
                                                                   @NotNull String value);
 
@@ -511,7 +533,7 @@ public interface MessageSupport
      *
      * @return  configurable message support instance, never {@code null}
      */
-    @Contract(mutates = "this")
+    @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull ConfigurableMessageSupport setDefaultParameterConfig(
         @NotNull String name, @NotNull Message.WithSpaces value);
 
@@ -523,7 +545,7 @@ public interface MessageSupport
      *
      * @return  configurable message support instance, never {@code null}
      */
-    @Contract(mutates = "this")
+    @Contract(value = "_ -> this", mutates = "this")
     @NotNull ConfigurableMessageSupport setLocale(@NotNull Locale locale);
 
 
@@ -534,7 +556,7 @@ public interface MessageSupport
      *
      * @return  configurable message support instance, never {@code null}
      */
-    @Contract(mutates = "this")
+    @Contract(value = "_ -> this", mutates = "this")
     default @NotNull ConfigurableMessageSupport setLocale(@NotNull String locale) {
       return setLocale(forLanguageTag(locale));
     }
@@ -557,7 +579,7 @@ public interface MessageSupport
      * @see ConfigurableMessageSupport#addMessage(String, String)
      * @see DuplicateMessageException
      */
-    @Contract(mutates = "this")
+    @Contract(value = "_ -> this", mutates = "this")
     @NotNull ConfigurableMessageSupport setMessageFilter(@NotNull MessageFilter messageFilter);
 
 
@@ -577,7 +599,7 @@ public interface MessageSupport
      * @see ConfigurableMessageSupport#addTemplate(String, Message)
      * @see DuplicateTemplateException
      */
-    @Contract(mutates = "this")
+    @Contract(value = "_ -> this", mutates = "this")
     @NotNull ConfigurableMessageSupport setTemplateFilter(@NotNull TemplateFilter templateFilter);
   }
 
@@ -764,8 +786,8 @@ public interface MessageSupport
      *
      * @throws DuplicateMessageException  in case a message with the same code already exists
      */
-    @Contract(mutates = "this")
-    void addMessage(@NotNull Message.WithCode message);
+    @Contract(value = "_ -> this", mutates = "this")
+    @NotNull MessagePublisher addMessage(@NotNull Message.WithCode message);
 
 
     /**
@@ -776,8 +798,8 @@ public interface MessageSupport
      *
      * @throws DuplicateTemplateException  in case a template with the same name already exists
      */
-    @Contract(mutates = "this")
-    void addTemplate(@NotNull String name, @NotNull Message template);
+    @Contract(value = "_, _ -> this", mutates = "this")
+    @NotNull MessagePublisher addTemplate(@NotNull String name, @NotNull Message template);
   }
 
 

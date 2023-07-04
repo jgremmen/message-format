@@ -158,21 +158,26 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public void addMessage(@NotNull Message.WithCode message)
+  public @NotNull ConfigurableMessageSupport addMessage(@NotNull Message.WithCode message)
   {
     if (messageFilter.filter(requireNonNull(message, "message must not be null")))
       messages.put(message.getCode(), message);
+
+    return this;
   }
 
 
   @Override
-  public void addTemplate(@NotNull String name, @NotNull Message template)
+  public @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name,
+                                                         @NotNull Message template)
   {
     if (requireNonNull(name, "name must not be null").isEmpty())
       throw new IllegalArgumentException("name must not be empty");
 
     if (templateFilter.filter(name, template))
       templates.put(name, requireNonNull(template));
+
+    return this;
   }
 
 
