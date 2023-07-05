@@ -34,7 +34,7 @@ import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 import static org.springframework.asm.Opcodes.ACC_SYNTHETIC;
-import static org.springframework.asm.Opcodes.ASM9;
+import static org.springframework.asm.Opcodes.ASM6;
 import static org.springframework.asm.Type.getDescriptor;
 
 
@@ -118,7 +118,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
   private final class MainClassVisitor extends ClassVisitor
   {
     private MainClassVisitor() {
-      super(ASM9);
+      super(ASM6);
     }
 
 
@@ -160,7 +160,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
   private final class MessageMethodVisitor extends MethodVisitor
   {
     private MessageMethodVisitor() {
-      super(ASM9);
+      super(ASM6);
     }
 
 
@@ -176,14 +176,14 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
   private final class MessageDefsAnnotationVisitor extends AnnotationVisitor
   {
     private MessageDefsAnnotationVisitor() {
-      super(ASM9);
+      super(ASM6);
     }
 
 
     @Override
     public AnnotationVisitor visitArray(String name)
     {
-      return new AnnotationVisitor(ASM9) {
+      return new AnnotationVisitor(ASM6) {
         @Override
         public AnnotationVisitor visitAnnotation(String name, String descriptor)
         {
@@ -205,7 +205,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
 
 
     private MessageDefAnnotationVisitor() {
-      super(ASM9);
+      super(ASM6);
     }
 
 
@@ -222,7 +222,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
     @Override
     public AnnotationVisitor visitArray(String name)
     {
-      return new AnnotationVisitor(ASM9) {
+      return new AnnotationVisitor(ASM6) {
         @Override
         public AnnotationVisitor visitAnnotation(String name, String descriptor) {
           return TEXT_DESCRIPTOR.equals(descriptor) ? new TextAnnotationVisitor(texts) : null;
@@ -243,14 +243,14 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
   private final class TemplateDefsAnnotationVisitor extends AnnotationVisitor
   {
     private TemplateDefsAnnotationVisitor() {
-      super(ASM9);
+      super(ASM6);
     }
 
 
     @Override
     public AnnotationVisitor visitArray(String name)
     {
-      return new AnnotationVisitor(ASM9) {
+      return new AnnotationVisitor(ASM6) {
         @Override
         public AnnotationVisitor visitAnnotation(String name, String descriptor)
         {
@@ -272,7 +272,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
 
 
     private TemplateDefAnnotationVisitor() {
-      super(ASM9);
+      super(ASM6);
     }
 
 
@@ -289,7 +289,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
     @Override
     public AnnotationVisitor visitArray(String name)
     {
-      return new AnnotationVisitor(ASM9) {
+      return new AnnotationVisitor(ASM6) {
         @Override
         public AnnotationVisitor visitAnnotation(String name, String descriptor) {
           return TEXT_DESCRIPTOR.equals(descriptor) ? new TextAnnotationVisitor(texts) : null;
@@ -317,7 +317,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
 
     private TextAnnotationVisitor(List<Text> inheritedTexts)
     {
-      super(ASM9);
+      super(ASM6);
       this.inheritedTexts = inheritedTexts;
     }
 

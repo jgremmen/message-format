@@ -23,7 +23,7 @@ plugins {
 description = 'Message Format Gradle Plugin'
 
 
-def asmVersion = "[9.0,)"
+def asmVersion = "[6.0,)"
 
 
 configurations {
