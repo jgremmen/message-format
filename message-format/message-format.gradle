@@ -19,7 +19,6 @@
 plugins {
   id 'antlr'
   id 'idea'
-  id 'com.netflix.nebula.optional-base' version '9.0.0'
   id 'de.sayayi.plugin.gradle.libapi' version "1.0-SNAPSHOT"
 }
 
@@ -28,11 +27,23 @@ description = 'Message Format Library'
 
 
 def antlrVersion = "4.9.3"
-def antlrExtVersion = "[0.3,0.4)"
+def antlrExtVersion = "0.3.1"
 def asmVersion = "[9.0,)"
 def ehcacheVersion = "3.10.+"
 def javaxCacheApiVersion = "1.1.1"
 def springContextVersion = "[5.3,6.0)"
+
+
+configurations.configureEach {
+  resolutionStrategy.cacheDynamicVersionsFor 30, 'minutes'
+}
+
+
+java {
+  registerFeature('optional') {
+    usingSourceSet sourceSets.main
+  }
+}
 
 
 dependencies {
@@ -40,13 +51,19 @@ dependencies {
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
   compileOnly "org.projectlombok:lombok:${lombokVersion}"
 
-  implementation("de.sayayi.lib:antlr4-runtime-ext:${antlrExtVersion}") {
-    transitive = false
+  implementation("de.sayayi.lib:antlr4-runtime-ext") {
+    version {
+      strictly '[0.3, 0.4)'
+      prefer antlrExtVersion
+    }
+
+    exclude group: 'org.antlr', module: 'antlr4'
+    exclude group: 'org.jetbrains'
   }
 
-  implementation "javax.cache:cache-api:${javaxCacheApiVersion}", optional
-  implementation "org.ow2.asm:asm:${asmVersion}", optional
-  implementation "org.springframework:spring-core:${springContextVersion}", optional
+  optionalImplementation "javax.cache:cache-api:${javaxCacheApiVersion}"
+  optionalImplementation "org.ow2.asm:asm:${asmVersion}"
+  optionalImplementation "org.springframework:spring-core:${springContextVersion}"
 
   // test
   testImplementation("org.ehcache:ehcache:${ehcacheVersion}") {
@@ -101,7 +118,6 @@ javadoc {
   exclude '**/parser/MessageParser*.java'
   exclude '**/pack/*.java'
   exclude '**/*Impl.java'
-  exclude '**/FixedSizeCacheMap.java'
 }
 
 
@@ -109,6 +125,9 @@ publishing {
   publications {
 
     msgformat(MavenPublication) {
+      suppressPomMetadataWarningsFor 'optionalApiElements'
+      suppressPomMetadataWarningsFor 'optionalRuntimeElements'
+
       from components.java
 
       versionMapping {

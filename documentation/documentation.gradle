@@ -50,7 +50,7 @@ libdocs {
 
     linksOffline "https://javadoc.io/doc/org.antlr/antlr4-runtime/4.9.3/",
         "${rootDir}/gradle/javadocs/antlr4-runtime"
-    linksOffline "https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/0.3.0/",
+    linksOffline "https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/0.3.1/",
         "${rootDir}/gradle/javadocs/antlr4-runtime-ext"
     linksOffline "https://javadoc.io/doc/joda-time/joda-time/2.12.5/",
         "${rootDir}/gradle/javadocs/joda-time"
