@@ -25,7 +25,12 @@ repositories {
 
 
 dependencies {
-  runtimeOnly project(":message-format")
+  runtimeOnly(project(":message-format")) {
+    capabilities {
+      requireCapability 'de.sayayi.lib:message-format-optional'
+    }
+  }
+
   runtimeOnly project(":message-format-jodatime")
 
   runtimeOnly "org.projectlombok:lombok:${lombokVersion}"
