@@ -115,8 +115,7 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
   {
     return new HashSet<>(Arrays.asList(
         new FormattableType(Attr.class),
-        new FormattableType(Element.class),
-        new FormattableType(Document.class)
+        new FormattableType(Element.class)
     ));
   }
 
