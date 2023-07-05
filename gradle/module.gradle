@@ -95,17 +95,22 @@ afterEvaluate {
 
       encoding 'UTF-8'
 
-      group("Message Core", [
+      group("Core", [
           "de.sayayi.lib.message",
+          "de.sayayi.lib.message.exception",
+          "de.sayayi.lib.message.parser*",
+          "de.sayayi.lib.message.part*"
+      ])
+      group("Adopters", [
           "de.sayayi.lib.message.adopter",
           "de.sayayi.lib.message.annotation",
-          "de.sayayi.lib.message.exception",
-          "de.sayayi.lib.message.internal*",
-          "de.sayayi.lib.message.parameter*",
-          "de.sayayi.lib.message.parser*"
       ])
-      group("Message Formatters", [
+      group("Formatters", [
           "de.sayayi.lib.message.formatter*"
+      ])
+      group("Internal", [
+          "de.sayayi.lib.message.internal*",
+          "de.sayayi.lib.message.util"
       ])
 
       noQualifiers 'java.util', 'java.lang'
