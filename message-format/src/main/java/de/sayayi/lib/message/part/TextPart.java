@@ -59,6 +59,15 @@ public final class TextPart implements Text
   }
 
 
+  /**
+   * Constructs a text part.
+   *
+   * @param text            text or {@code null}
+   * @param addSpaceBefore  {@code true} if the part has a leading space,
+   *                        {@code false} if the part has no leading space
+   * @param addSpaceAfter   {@code true} if the part has a trailing space,
+   *                        {@code false} if the part has no trailing space
+   */
   public TextPart(String text, boolean addSpaceBefore, boolean addSpaceAfter)
   {
     if (SpacesUtil.isEmpty(text))

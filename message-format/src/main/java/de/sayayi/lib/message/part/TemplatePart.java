@@ -51,6 +51,15 @@ public final class TemplatePart implements Template
   private final boolean spaceAfter;
 
 
+  /**
+   * Constructs a template part.
+   *
+   * @param name         template name, not empty or {@code null}
+   * @param spaceBefore  {@code true} if the part has a leading space,
+   *                     {@code false} if the part has no leading space
+   * @param spaceAfter   {@code true} if the part has a trailing space,
+   *                     {@code false} if the part has no trailing space
+   */
   public TemplatePart(@NotNull String name, boolean spaceBefore, boolean spaceAfter)
   {
     if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
