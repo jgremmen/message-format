@@ -51,7 +51,6 @@ libdocs {
     exclude '**/parser/MessageParser*.java'
     exclude '**/pack/*.java'
     exclude '**/*Impl.java'
-    exclude '**/FixedSizeCacheMap.java'
 
     linksOffline "https://javadoc.io/doc/org.antlr/antlr4-runtime/4.9.3/",
         "${rootDir}/gradle/javadocs/antlr4-runtime"
