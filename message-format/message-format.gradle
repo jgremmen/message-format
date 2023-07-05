@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+//file:noinspection DependencyNotationArgument
+
 plugins {
   id 'antlr'
   id 'idea'
@@ -34,6 +36,7 @@ def springContextVersion = "[5.3,6.0)"
 
 
 dependencies {
+  // main
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
   compileOnly "org.projectlombok:lombok:${lombokVersion}"
 
@@ -45,6 +48,7 @@ dependencies {
   implementation "org.ow2.asm:asm:${asmVersion}", optional
   implementation "org.springframework:spring-core:${springContextVersion}", optional
 
+  // test
   testImplementation("org.ehcache:ehcache:${ehcacheVersion}") {
     exclude module: "jaxb-runtime"
   }
