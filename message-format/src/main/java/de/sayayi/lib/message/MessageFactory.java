@@ -21,7 +21,6 @@ import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.internal.MessageDelegateWithCode;
 import de.sayayi.lib.message.parser.MessageCompiler;
 import de.sayayi.lib.message.parser.normalizer.MessagePartNormalizer;
-import de.sayayi.lib.message.part.MessagePart;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
+import static de.sayayi.lib.message.parser.normalizer.MessagePartNormalizer.PASS_THROUGH;
 import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
 
@@ -51,12 +51,7 @@ public class MessageFactory
    * messages, it is better to construct a message factory with an appropriate
    * {@link MessagePartNormalizer}.
    */
-  public static final MessageFactory NO_CACHE_INSTANCE =
-      new MessageFactory(new MessagePartNormalizer() {
-        @Override public <T extends MessagePart> @NotNull T normalize(@NotNull T part) {
-          return part;
-        }
-      });
+  public static final MessageFactory NO_CACHE_INSTANCE = new MessageFactory(PASS_THROUGH);
 
   private static final Random RANDOM = new Random();
   private static int CODE_ID = 0;
@@ -233,6 +228,14 @@ public class MessageFactory
   }
 
 
+  /**
+   * Checks whether {@code code} is a generated message or template code.
+   *
+   * @param code  message or template code
+   *
+   * @return  {@code true} if the given code is a generated message or template code,
+   *          {@code false} otherwise
+   */
   @Contract(pure = true)
   public static boolean isGeneratedCode(String code) {
     return code != null && code.matches("(MSG|TPL)\\[[0-9A-Z-]+]");

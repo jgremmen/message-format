@@ -284,6 +284,14 @@ public interface MessageSupport
     @NotNull MessageConfigurer<M> with(@NotNull String parameter, Object value);
 
 
+    /**
+     * Sets multiple values for this message.
+     *
+     * @param parameterValues  map with parameters (key = parameter name, value = parameter value),
+     *                         not {@code null}
+     *
+     * @return  message configurer instance for this message, never {@code null}
+     */
     @Contract(value = "_ -> this", mutates = "this")
     default @NotNull MessageConfigurer<M> with(@NotNull Map<String,Object> parameterValues)
     {
@@ -292,6 +300,14 @@ public interface MessageSupport
     }
 
 
+    /**
+     * Sets multiple values for this message.
+     *
+     * @param properties  properties (key = parameter name, value = parameter value),
+     *                    not {@code null}
+     *
+     * @return  message configurer instance for this message, never {@code null}
+     */
     @Contract(value = "_ -> this", mutates = "this")
     default @NotNull MessageConfigurer<M> with(@NotNull Properties properties)
     {

@@ -26,6 +26,19 @@ import org.jetbrains.annotations.NotNull;
 public interface MessagePartNormalizer
 {
   /**
+   * Implementation that does not normalize message parts. Message parts are passed through
+   * without modification.
+   *
+   * @since 0.8.0
+   */
+  MessagePartNormalizer PASS_THROUGH = new MessagePartNormalizer() {
+    @Override public <T extends MessagePart> @NotNull T normalize(@NotNull T part) {
+      return part;
+    }
+  };
+
+
+  /**
    * Normalize the given message part. The returned part may be replaced with an identical
    * cached version in order to reduce memory load.
    *
