@@ -41,14 +41,6 @@ configure(moduleProjects) {
 }
 
 
-// formatter projects
-configure(subprojects.findAll { it.name.startsWith("message-format-") }) {
-  dependencies {
-    implementation project(':message-format')
-  }
-}
-
-
 // publishable projects
 configure(subprojects.findAll {it.name != 'documentation' }) {
   apply from: "${rootDir}/gradle/publish.gradle"
