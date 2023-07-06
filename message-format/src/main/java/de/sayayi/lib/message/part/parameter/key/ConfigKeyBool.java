@@ -48,6 +48,9 @@ public enum ConfigKeyBool implements ConfigKey
   private final boolean bool;
 
 
+  /**
+   * Constructs a bool configuration key.
+   */
   ConfigKeyBool(boolean bool) {
     this.bool = bool;
   }

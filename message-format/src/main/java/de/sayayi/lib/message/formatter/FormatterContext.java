@@ -30,6 +30,8 @@ import java.util.Set;
 
 
 /**
+ * The formatter context provides a parameter formatter with all context information it requires
+ * to format a parameter part.
  *
  * @see ParameterFormatter#format(FormatterContext, Object)
  *
@@ -48,7 +50,8 @@ public interface FormatterContext extends Parameters
 
 
   /**
-   * Tells whether the parameter configuration map contains an entry with the given {@code keyType}.
+   * Tells whether the parameter configuration map contains an entry with the given {@code keyType}
+   * that maps to a message.
    *
    * @param keyType  entry key type to look for, not {@code null}
    *
@@ -62,6 +65,16 @@ public interface FormatterContext extends Parameters
   boolean hasConfigMapMessage(@NotNull ConfigKey.Type keyType);
 
 
+  /**
+   * Gets a message for {@code key} from the parameter configuration map. The map will be
+   * probed for keys with the given {@code keyTypes} only.
+   *
+   * @param key       the key to get the message for
+   * @param keyTypes  key types to be considered when matching the {@code key}, not {@code null}
+   *
+   * @return  optional instance containing the mapped message, never {@code null}. If no matching
+   *          message is found, {@link Optional#empty()} is returned
+   */
   @Contract(pure = true)
   default @NotNull Optional<Message.WithSpaces> getConfigMapMessage(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes) {
@@ -69,6 +82,23 @@ public interface FormatterContext extends Parameters
   }
 
 
+  /**
+   * Gets a message for {@code key} from the parameter configuration map. The map will be
+   * probed for keys with the given {@code keyTypes} only. If no entry for {@code key} is
+   * found the default message, if present, will be returned.
+   * <p>
+   * The default message is considered only if the parameter configuration map contains at
+   * least 1 key with a type contained in {@code keyTypes}.
+   *
+   * @param key             the key to get the message for
+   * @param keyTypes        key types to be considered when matching the {@code key},
+   *                        not {@code null}
+   * @param includeDefault  {@code true} will return the default message (if any) in case no
+   *                        matching key is found, {@code false} will not return the default message
+   *
+   * @return  optional instance containing the mapped message, never {@code null}. If no matching
+   *          message is found, {@link Optional#empty()} is returned
+   */
   @Contract(pure = true)
   @NotNull Optional<Message.WithSpaces> getConfigMapMessage(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault);

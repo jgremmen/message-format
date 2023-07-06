@@ -40,6 +40,14 @@ public final class ConfigKeyNull implements ConfigKey
   private final @NotNull CompareType compareType;
 
 
+  /**
+   * Constructs a null configuration key with the given {@code compareType}.
+   *
+   * @param compareType  comparison type for the empty key, only
+   *                     {@link de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType#EQ EQ} and
+   *                     {@link de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType#NE NE}
+   *                     are allowed
+   */
   public ConfigKeyNull(@NotNull CompareType compareType)
   {
     if (compareType != EQ && compareType != NE)

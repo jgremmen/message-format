@@ -50,7 +50,7 @@ public final class ConfigKeyEmpty implements ConfigKey
 
 
   /**
-   * Creates the empty configuration key with the given {@code compareType}.
+   * Constructs the empty configuration key with the given {@code compareType}.
    *
    * @param compareType  comparison type for the empty key, only
    *                     {@link de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType#EQ EQ} and

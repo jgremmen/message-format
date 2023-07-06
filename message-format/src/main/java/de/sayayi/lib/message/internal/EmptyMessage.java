@@ -38,6 +38,10 @@ public final class EmptyMessage implements Message.WithSpaces
 {
   private static final long serialVersionUID = 800L;
 
+
+  /**
+   * Empty message instance.
+   */
   public static final Message.WithSpaces INSTANCE = new EmptyMessage();
 
 

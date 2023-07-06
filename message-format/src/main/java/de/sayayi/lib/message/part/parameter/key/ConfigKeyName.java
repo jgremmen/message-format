@@ -41,8 +41,15 @@ public final class ConfigKeyName implements ConfigKey
   private final @NotNull String name;
 
 
-  public ConfigKeyName(@NotNull String name) {
-    this.name = requireNonNull(name, "name must not be null");
+  /**
+   * Constructs a configuration key with {@code name}.
+   *
+   * @param name  configuration key name, not {@code null} or empty
+   */
+  public ConfigKeyName(@NotNull String name)
+  {
+    if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
+      throw new IllegalArgumentException("name must not be empty");
   }
 
 
