@@ -19,10 +19,12 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
 
@@ -33,6 +35,10 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
  */
 public final class ChoiceFormatter implements NamedParameterFormatter
 {
+  private static final Set<ConfigKey.Type> KEY_TYPES =
+      EnumSet.of(NULL, EMPTY, BOOL, NUMBER, STRING);
+
+
   @Override
   @Contract(pure = true)
   public @NotNull String getName() {
@@ -45,7 +51,7 @@ public final class ChoiceFormatter implements NamedParameterFormatter
   public @NotNull Text format(@NotNull FormatterContext context, Object value)
   {
     return context.format(context
-        .getConfigMapMessage(value, EnumSet.of(NULL, EMPTY, BOOL, NUMBER, STRING), true)
+        .getConfigMapMessage(value, KEY_TYPES, true)
         .orElse(EmptyMessage.INSTANCE));
   }
 }

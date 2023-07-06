@@ -95,7 +95,7 @@ public final class ParameterFormatterContext implements FormatterContext
 
   @Override
   public boolean hasConfigMapMessage(@NotNull ConfigKey.Type keyType) {
-    return map.hasEntryWithKeyType(keyType);
+    return keyType != ConfigKey.Type.NAME && map.hasEntryWithKeyType(keyType);
   }
 
 
@@ -103,8 +103,10 @@ public final class ParameterFormatterContext implements FormatterContext
   public @NotNull Optional<Message.WithSpaces> getConfigMapMessage(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault)
   {
-    return ofNullable(
-        map.getMessage(messageAccessor, key, parameters.getLocale(), keyTypes, includeDefault));
+    final Set<ConfigKey.Type> types = EnumSet.copyOf(keyTypes);
+    types.remove(ConfigKey.Type.NAME);
+
+    return ofNullable(map.getMessage(messageAccessor, key, getLocale(), types, includeDefault));
   }
 
 
@@ -112,7 +114,7 @@ public final class ParameterFormatterContext implements FormatterContext
   public @NotNull Optional<ConfigValue> getConfigValue(@NotNull String name)
   {
     final ConfigValue configValue =
-        map.find(messageAccessor, name, parameters.getLocale(), NAME_TYPE, null);
+        map.find(messageAccessor, name, getLocale(), NAME_TYPE, null);
 
     return configValue != null
         ? Optional.of(configValue)
@@ -124,7 +126,7 @@ public final class ParameterFormatterContext implements FormatterContext
   public @NotNull Optional<String> getConfigValueString(@NotNull String name)
   {
     final ConfigValueString string = (ConfigValueString)
-        map.find(messageAccessor, name, parameters.getLocale(), NAME_TYPE, ConfigValue.STRING_TYPE);
+        map.find(messageAccessor, name, getLocale(), NAME_TYPE, ConfigValue.STRING_TYPE);
 
     if (string != null)
       return Optional.of(string.asObject());
@@ -141,7 +143,7 @@ public final class ParameterFormatterContext implements FormatterContext
   public @NotNull OptionalLong getConfigValueNumber(@NotNull String name)
   {
     final ConfigValueNumber number = (ConfigValueNumber)
-        map.find(messageAccessor, name, parameters.getLocale(), NAME_TYPE, ConfigValue.NUMBER_TYPE);
+        map.find(messageAccessor, name, getLocale(), NAME_TYPE, ConfigValue.NUMBER_TYPE);
 
     if (number != null)
       return OptionalLong.of(number.asObject());
@@ -158,7 +160,7 @@ public final class ParameterFormatterContext implements FormatterContext
   public @NotNull Optional<Boolean> getConfigValueBool(@NotNull String name)
   {
     final ConfigValueBool bool = (ConfigValueBool)
-        map.find(messageAccessor, name, parameters.getLocale(), NAME_TYPE, ConfigValue.BOOL_TYPE);
+        map.find(messageAccessor, name, getLocale(), NAME_TYPE, ConfigValue.BOOL_TYPE);
 
     if (bool != null)
       return Optional.of(bool.asObject());
@@ -175,7 +177,7 @@ public final class ParameterFormatterContext implements FormatterContext
   public @NotNull Optional<Message.WithSpaces> getConfigValueMessage(@NotNull String name)
   {
     final Message.WithSpaces message =
-        map.getMessage(messageAccessor, name, parameters.getLocale(), NAME_TYPE, false);
+        map.getMessage(messageAccessor, name, getLocale(), NAME_TYPE, false);
     if (message != null)
       return Optional.of(message);
 
