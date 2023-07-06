@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal;
+package de.sayayi.lib.message.part.parameter;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
@@ -23,7 +23,6 @@ import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextPart;
-import de.sayayi.lib.message.part.parameter.ParamConfig;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import de.sayayi.lib.message.part.parameter.value.*;
 import org.jetbrains.annotations.NotNull;
@@ -37,10 +36,12 @@ import static java.util.Optional.ofNullable;
 
 
 /**
+ * Parameter formatter context implementation.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class FormatterContextImpl implements FormatterContext
+public final class ParameterFormatterContext implements FormatterContext
 {
   private final @NotNull MessageAccessor messageAccessor;
   private final @NotNull Parameters parameters;
@@ -51,9 +52,9 @@ public final class FormatterContextImpl implements FormatterContext
   private int parameterFormatterIndex = 0;
 
 
-  public FormatterContextImpl(@NotNull MessageAccessor messageAccessor,
-                              @NotNull Parameters parameters, Object value, Class<?> type,
-                              String format, @NotNull ParamConfig map)
+  public ParameterFormatterContext(@NotNull MessageAccessor messageAccessor,
+                                   @NotNull Parameters parameters, Object value, Class<?> type,
+                                   String format, @NotNull ParamConfig map)
   {
     this.messageAccessor = messageAccessor;
     this.parameters = parameters;
@@ -205,7 +206,7 @@ public final class FormatterContextImpl implements FormatterContext
   @Override
   public @NotNull Text format(Object value, Class<?> type, boolean propagateFormat)
   {
-    return new FormatterContextImpl(messageAccessor, parameters, value, type,
+    return new ParameterFormatterContext(messageAccessor, parameters, value, type,
         propagateFormat ? format : null, map).delegateToNextFormatter();
   }
 
@@ -213,7 +214,7 @@ public final class FormatterContextImpl implements FormatterContext
   @Override
   public @NotNull Text format(Object value, Class<?> type, String format)
   {
-    return new FormatterContextImpl(messageAccessor, parameters, value, type, format, map)
+    return new ParameterFormatterContext(messageAccessor, parameters, value, type, format, map)
         .delegateToNextFormatter();
   }
 

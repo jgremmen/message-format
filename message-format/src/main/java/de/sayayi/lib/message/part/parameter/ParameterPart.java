@@ -18,7 +18,6 @@ package de.sayayi.lib.message.part.parameter;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.internal.FormatterContextImpl;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
@@ -145,7 +144,7 @@ public final class ParameterPart implements Parameter
   public @NotNull Text getText(@NotNull MessageAccessor messageAccessor,
                                @NotNull Parameters parameters)
   {
-    final FormatterContext context = new FormatterContextImpl(messageAccessor, parameters,
+    final FormatterContext context = new ParameterFormatterContext(messageAccessor, parameters,
         parameters.getParameterValue(name), null, format, paramConfig);
 
     return addSpaces(context.delegateToNextFormatter(), spaceBefore, spaceAfter);
