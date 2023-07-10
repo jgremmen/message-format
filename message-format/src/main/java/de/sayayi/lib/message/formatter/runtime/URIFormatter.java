@@ -23,8 +23,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 
+import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 
 
 /**
@@ -56,7 +56,7 @@ public final class URIFormatter extends AbstractSingleTypeParameterFormatter<URI
         final int port = uri.getPort();
 
         return formatUsingMappedNumber(context, port, true)
-            .orElseGet(() -> port == -1 ? nullText() : noSpaceText(Integer.toString(port)));
+            .orElseGet(() -> port == -1 ? emptyText() : noSpaceText(Integer.toString(port)));
       }
 
       case "query":

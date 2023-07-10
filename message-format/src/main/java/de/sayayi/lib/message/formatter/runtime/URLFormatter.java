@@ -23,8 +23,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.URL;
 
+import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 
 
 /**
@@ -57,7 +57,7 @@ public final class URLFormatter extends AbstractSingleTypeParameterFormatter<URL
         final int port = url.getPort() == -1 ? url.getDefaultPort() : url.getPort();
 
         return formatUsingMappedNumber(context, port, true)
-            .orElseGet(() -> port == -1 ? nullText() : noSpaceText(Integer.toString(port)));
+            .orElseGet(() -> port == -1 ? emptyText() : noSpaceText(Integer.toString(port)));
       }
 
       case "query":
