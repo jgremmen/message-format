@@ -28,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.ref.Reference;
 import java.util.OptionalLong;
 
-import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 
 
@@ -41,13 +40,8 @@ public final class ReferenceFormatter
 {
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext context,
-                                   @NotNull Reference<?> reference)
-  {
-    final Object value = reference.get();
-
-    return value != null
-        ? context.format(value, value.getClass(), true)
-        : emptyText();
+                                   @NotNull Reference<?> reference) {
+    return context.format(reference.get(), true);
   }
 
 

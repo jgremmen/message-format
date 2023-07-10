@@ -117,7 +117,8 @@ public interface ParameterFormatter
      * @param context  formatter context, not {@code null}
      * @param value    object to calculate the size of, not {@code null}
      *
-     * @return  value size (&gt;= 0)
+     * @return  value size (&gt;= 0) or {@link OptionalLong#empty()} if this formatter is not
+     *          capable of determining the size, never {@code null}
      */
     @Contract(pure = true)
     @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value);

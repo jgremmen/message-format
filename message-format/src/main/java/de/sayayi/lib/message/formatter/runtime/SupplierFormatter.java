@@ -18,23 +18,33 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.OptionalLong;
 import java.util.function.Supplier;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class SupplierFormatter extends AbstractSingleTypeParameterFormatter<Supplier<?>>
+public final class SupplierFormatter
+    extends AbstractSingleTypeParameterFormatter<Supplier<?>>
+    implements SizeQueryable
 {
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull FormatterContext context,
                                    @NotNull Supplier<?> supplier) {
     return context.format(supplier.get(), true);
+  }
+
+
+  @Override
+  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value) {
+    return context.size(((Supplier<?>)value).get());
   }
 
 
