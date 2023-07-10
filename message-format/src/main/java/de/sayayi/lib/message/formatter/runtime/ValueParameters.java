@@ -28,14 +28,14 @@ import static java.util.Collections.singleton;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class ValueParameters implements Parameters
+final class ValueParameters implements Parameters
 {
   private final Locale locale;
   private final String parameterName;
-  public Object value;
+  Object value;
 
 
-  public ValueParameters(@NotNull Locale locale, @NotNull String parameterName)
+  ValueParameters(@NotNull Locale locale, @NotNull String parameterName)
   {
     this.locale = locale;
     this.parameterName = parameterName;
