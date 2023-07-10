@@ -18,10 +18,12 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
+import java.util.OptionalLong;
 
 import static de.sayayi.lib.message.part.TextPartFactory.*;
 
@@ -30,6 +32,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.*;
  * @author Jeroen Gremmen
  */
 public final class PathFormatter extends AbstractSingleTypeParameterFormatter<Path>
+    implements SizeQueryable
 {
   @Override
   @SuppressWarnings("DuplicatedCode")
@@ -81,6 +84,12 @@ public final class PathFormatter extends AbstractSingleTypeParameterFormatter<Pa
 
     return formatUsingMappedString(context, extension, true)
         .orElseGet(() -> noSpaceText(extension));
+  }
+
+
+  @Override
+  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value) {
+    return context.size(((Path)value).toFile());
   }
 
 
