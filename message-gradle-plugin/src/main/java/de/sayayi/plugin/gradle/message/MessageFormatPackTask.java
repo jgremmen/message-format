@@ -23,15 +23,11 @@ import de.sayayi.lib.message.adopter.AsmAnnotationAdopter;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
-import lombok.val;
-import lombok.var;
-import org.gradle.api.Action;
-import org.gradle.api.DefaultTask;
-import org.gradle.api.GradleException;
-import org.gradle.api.InvalidUserDataException;
+import org.gradle.api.*;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.logging.LogLevel;
+import org.gradle.api.logging.Logger;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
 import org.gradle.api.tasks.util.PatternFilterable;
@@ -41,6 +37,7 @@ import org.objectweb.asm.ClassReader;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,7 +111,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   @OutputFile
   public RegularFile getPackFile()
   {
-    val project = getProject();
+    final Project project = getProject();
 
     return project.getLayout()
         .getBuildDirectory()
@@ -150,7 +147,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   @TaskAction
   public void pack()
   {
-    val messageSupport = MessageSupportFactory
+    final ConfigurableMessageSupport messageSupport = MessageSupportFactory
         .create(new GenericFormatterService(), NO_CACHE_INSTANCE);
 
     configureDuplicatesStrategy(messageSupport);
@@ -164,14 +161,14 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void pack_scanMessages(@NotNull ConfigurableMessageSupport messageSupport)
   {
-    val logger = getLogger();
+    final Logger logger = getLogger();
 
     logger.info("Scanning classes for messages and templates");
 
     try {
-      val adopter = new AsmAnnotationAdopter(messageSupport);
+      final AsmAnnotationAdopter adopter = new AsmAnnotationAdopter(messageSupport);
 
-      for(val classFile: getSources().getAsFileTree().matching(CLASS_FILES).getFiles())
+      for(final File classFile: getSources().getAsFileTree().matching(CLASS_FILES).getFiles())
       {
         logger.debug("Scanning " + classFile.getAbsolutePath());
         currentClassName.set(getClassName(classFile));
@@ -189,9 +186,10 @@ public abstract class MessageFormatPackTask extends DefaultTask
     {
       getLogger().debug("Validating referenced templates");
 
-      val missingTemplateNames = new ArrayList<>(messageSupport.getMessageAccessor()
+      final List<String> missingTemplateNames = new ArrayList<>(messageSupport
+          .getMessageAccessor()
           .findMissingTemplates(this::messageCodeFilter));
-      val count = missingTemplateNames.size();
+      final int count = missingTemplateNames.size();
 
       switch(count)
       {
@@ -219,13 +217,13 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void pack_write(@NotNull MessageSupport messageSupport)
   {
-    val packFile = getPackFile().getAsFile();
+    final File packFile = getPackFile().getAsFile();
     getLogger().debug("Writing message pack: " + packFile.getAbsolutePath());
 
     // create parent directory
     getProject().mkdir(packFile.getParentFile());
 
-    try(val packOutputStream = newOutputStream(packFile.toPath())) {
+    try(final OutputStream packOutputStream = newOutputStream(packFile.toPath())) {
       messageSupport.exportMessages(packOutputStream, getCompress().get(), this::messageCodeFilter);
     } catch(IOException ex) {
       throw new GradleException("Failed to write message pack", ex);
@@ -241,7 +239,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
     {
       match = false;
 
-      for(val regex: includeRegexFilters)
+      for(final String regex: includeRegexFilters)
         if (code.matches(regex))
         {
           match = true;
@@ -250,7 +248,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
     }
 
     if (match)
-      for(val regex: excludeRegexFilters)
+      for(final String regex: excludeRegexFilters)
         if (code.matches(regex))
         {
           match = false;
@@ -291,17 +289,17 @@ public abstract class MessageFormatPackTask extends DefaultTask
   @Contract(pure = true)
   private @NotNull DuplicateMsgStrategy configureDuplicatesStrategy_toEnum()
   {
-    var value = getDuplicateMsgStrategy().get();
+    Object value = getDuplicateMsgStrategy().get();
 
     if (value instanceof DuplicateMsgStrategy)
       return (DuplicateMsgStrategy)value;
 
     if (value instanceof String)
     {
-      val valueAsIs = ((String)value).toUpperCase(ROOT);
-      val valueUnderscore = valueAsIs.replace('-', '_');
+      final String valueAsIs = ((String)value).toUpperCase(ROOT);
+      final String valueUnderscore = valueAsIs.replace('-', '_');
 
-      for(val ds: DuplicateMsgStrategy.values())
+      for(final DuplicateMsgStrategy ds: DuplicateMsgStrategy.values())
         if (ds.name().equals(valueAsIs) ||
             ds.name().equals(valueUnderscore))
           return ds;
@@ -313,7 +311,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void configureDuplicateFailStrategy(@NotNull ConfigurableMessageSupport messageSupport)
   {
-    val messageAccessor = messageSupport.getMessageAccessor();
+    final MessageAccessor messageAccessor = messageSupport.getMessageAccessor();
 
     messageSupport.setMessageFilter(message -> {
       final String code = message.getCode();
@@ -340,7 +338,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   private void configureDuplicateIgnoreStrategy(@NotNull ConfigurableMessageSupport messageSupport,
                                                 boolean warn)
   {
-    val messageAccessor = messageSupport.getMessageAccessor();
+    final MessageAccessor messageAccessor = messageSupport.getMessageAccessor();
 
     messageSupport.setMessageFilter(message -> {
       final String code = message.getCode();
@@ -367,7 +365,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   private void configureDuplicateOverrideStrategy(
       @NotNull ConfigurableMessageSupport messageSupport, boolean warn)
   {
-    val messageAccessor = messageSupport.getMessageAccessor();
+    final MessageAccessor messageAccessor = messageSupport.getMessageAccessor();
 
     messageSupport.setMessageFilter(message -> {
       final String code = message.getCode();
@@ -399,7 +397,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private @NotNull String logDuplicateMessage(@NotNull LogLevel level, @NotNull String code)
   {
-    val msg = "Duplicate message code '" + code + "' in class " + currentClassName.get();
+    final String msg = "Duplicate message code '" + code + "' in class " + currentClassName.get();
 
     getLogger().log(level, msg);
 
@@ -409,7 +407,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private @NotNull String logDuplicateTemplate(@NotNull LogLevel level, @NotNull String name)
   {
-    val msg = "Duplicate template name '" + name + "' in class " + currentClassName.get();
+    final String msg = "Duplicate template name '" + name + "' in class " + currentClassName.get();
 
     getLogger().log(level, msg);
 

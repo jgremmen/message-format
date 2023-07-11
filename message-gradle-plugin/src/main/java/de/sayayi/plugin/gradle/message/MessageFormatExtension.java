@@ -15,7 +15,6 @@
  */
 package de.sayayi.plugin.gradle.message;
 
-import lombok.Getter;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.SourceSet;
@@ -31,8 +30,18 @@ import java.util.List;
  */
 public abstract class MessageFormatExtension
 {
-  @Getter private final List<String> includeRegexFilter = new ArrayList<>();
-  @Getter private final List<String> excludeRegexFilter = new ArrayList<>();
+  private final List<String> includeRegexFilter = new ArrayList<>();
+  private final List<String> excludeRegexFilter = new ArrayList<>();
+
+
+  public List<String> getIncludeRegexFilter() {
+    return includeRegexFilter;
+  }
+
+
+  public List<String> getExcludeRegexFilter() {
+    return excludeRegexFilter;
+  }
 
 
   /**
