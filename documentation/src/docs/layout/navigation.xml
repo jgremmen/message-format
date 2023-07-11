@@ -14,7 +14,7 @@
 
   <group title="Quick Start">
     <item name="Set Up" link="set-up.html"/>
-    <item name="Samples" link="sample.html"/>
+    <item name="Tutorial" link="quick-start-tutorial.html"/>
   </group>
 
   <group title="Message Structure">
