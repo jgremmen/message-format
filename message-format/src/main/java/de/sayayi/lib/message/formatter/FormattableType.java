@@ -50,14 +50,14 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
    *
    * @see #getOrder()
    */
-  public static final byte DEFAULT_ORDER = 100;
+  public static final byte DEFAULT_ORDER = 80;
 
   /**
    * Default order value for primitive and array types.
    *
    * @see #getOrder()
    */
-  public static final byte DEFAULT_PRIMITIVE_OR_ARRAY_ORDER = 120;
+  public static final byte DEFAULT_PRIMITIVE_OR_ARRAY_ORDER = 100;
 
 
   /** Formattable class. */
