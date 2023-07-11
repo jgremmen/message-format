@@ -45,3 +45,13 @@ configure(moduleProjects) {
 configure(subprojects.findAll {it.name != 'documentation' }) {
   apply from: "${rootDir}/gradle/publish.gradle"
 }
+
+
+tasks.register('releaseAll') {
+  group = 'publishing'
+  description = 'Release all publications to Maven and Gradle Plugin repository'
+
+  dependsOn ':message-format:publishMsgformatPublicationToMavenCentralRepository'
+  dependsOn ':message-format-jodatime:publishJodatimePublicationToMavenCentralRepository'
+  dependsOn ':message-gradle-plugin:publishPlugins'
+}
