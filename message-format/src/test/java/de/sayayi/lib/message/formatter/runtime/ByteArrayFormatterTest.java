@@ -60,16 +60,16 @@ public class ByteArrayFormatterTest extends AbstractFormatterTest
 
     assertEquals(new TextPart("Größe"),
         format(messageAccessor, "Größe".getBytes(ISO_8859_1),
-            singletonMap(new ConfigKeyName("charset"), new ConfigValueString("iso-8859-1"))));
+            singletonMap(new ConfigKeyName("bytes"), new ConfigValueString("iso-8859-1"))));
     assertEquals(new TextPart("Größe"),
         format(messageAccessor, "Größe".getBytes(UTF_8),
-            singletonMap(new ConfigKeyName("charset"), new ConfigValueString("utf-8"))));
+            singletonMap(new ConfigKeyName("bytes"), new ConfigValueString("utf-8"))));
     assertEquals(new TextPart("Größe"),
         format(messageAccessor, "Größe".getBytes(),
-            singletonMap(new ConfigKeyName("charset"), new ConfigValueString(""))));
+            singletonMap(new ConfigKeyName("bytes"), new ConfigValueString(""))));
     assertEquals(new TextPart("Größe"),
         format(messageAccessor, "Größe".getBytes(),
-            singletonMap(new ConfigKeyName("charset"), new ConfigValueString("AA-bb"))));
+            singletonMap(new ConfigKeyName("bytes"), new ConfigValueString("AA-bb"))));
   }
 
 
@@ -83,7 +83,7 @@ public class ByteArrayFormatterTest extends AbstractFormatterTest
 
     assertEquals(EMPTY,
         format(messageAccessor, "".getBytes(UTF_8),
-            singletonMap(new ConfigKeyName("charset"), new ConfigValueString("utf-8"))));
+            singletonMap(new ConfigKeyName("bytes"), new ConfigValueString("utf-8"))));
   }
 
 
@@ -97,7 +97,34 @@ public class ByteArrayFormatterTest extends AbstractFormatterTest
 
     assertThrowsExactly(IllegalCharsetNameException.class, () ->
         format(messageAccessor, "Größe".getBytes(),
-            singletonMap(new ConfigKeyName("charset"), new ConfigValueString("XYZ&%"))));
+            singletonMap(new ConfigKeyName("bytes"), new ConfigValueString("XYZ&%"))));
+  }
+
+
+  @Test
+  void testBase64()
+  {
+    val formatterService = createFormatterService(new ByteArrayFormatter(), new ArrayFormatter());
+    val messageAccessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
+        .getMessageAccessor();
+
+    assertEquals(new TextPart("R3LDtsOfZQ=="), format(messageAccessor, "Größe".getBytes(),
+        singletonMap(new ConfigKeyName("bytes"), new ConfigValueString("base64"))));
+  }
+
+
+  @Test
+  void testBase64lf()
+  {
+    val formatterService = createFormatterService(new ByteArrayFormatter(), new ArrayFormatter());
+    val messageAccessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
+        .getMessageAccessor();
+
+    assertEquals(new TextPart(
+        "VGhpcyBhcHBlYXJzIHRvIGJlIGEgdmVyeSBsb25nIHRleHQgd2l0aCBhIHNpbmdsZSBsaW5lZmVl\nZCE="),
+        format(messageAccessor,
+            "This appears to be a very long text with a single linefeed!".getBytes(),
+            singletonMap(new ConfigKeyName("bytes"), new ConfigValueString("base64-lf"))));
   }
 
 

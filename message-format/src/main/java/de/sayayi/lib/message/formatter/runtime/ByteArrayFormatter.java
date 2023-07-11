@@ -26,10 +26,12 @@ import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Base64;
 import java.util.Optional;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_PRIMITIVE_OR_ARRAY_ORDER;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 import static java.nio.charset.Charset.isSupported;
 
@@ -45,17 +47,25 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
   @SneakyThrows(UnsupportedEncodingException.class)
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull byte[] byteArray)
   {
-    final Optional<String> charsetConfig = context.getConfigValueString("charset");
-    if (!charsetConfig.isPresent())
+    final Optional<String> bytesConfig = context.getConfigValueString("bytes");
+    if (!bytesConfig.isPresent())
       return context.delegateToNextFormatter();
 
     if (byteArray.length == 0)
       return emptyText();
 
-    final String charset = charsetConfig.get();
+    final String bytes = bytesConfig.get();
+    if ("base64".equals(bytes))
+      return noSpaceText(Base64.getEncoder().encodeToString(byteArray));
+    else if ("base64-lf".equals(bytes))
+    {
+      return noSpaceText(Base64.getMimeEncoder(76, new byte[] { '\n' })
+          .encodeToString(byteArray));
+    }
 
-    return context.format(charset.isEmpty() || !isSupported(charset)
-        ? new String(byteArray) : new String(byteArray, charset), String.class, true);
+    return context.format(bytes.isEmpty() || !isSupported(bytes)
+        ? new String(byteArray)
+        : new String(byteArray, bytes), String.class, true);
   }
 
 
@@ -67,6 +77,6 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
 
   @Override
   public @NotNull FormattableType getFormattableType() {
-    return new FormattableType(byte[].class, (byte)(DEFAULT_PRIMITIVE_OR_ARRAY_ORDER - 5));
+    return new FormattableType(byte[].class, (byte)(DEFAULT_PRIMITIVE_OR_ARRAY_ORDER - 10));
   }
 }
