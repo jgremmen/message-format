@@ -17,6 +17,7 @@
 plugins {
   id 'java-library'
   id 'java-gradle-plugin'
+  id 'com.gradle.plugin-publish' version '1.2.0'
 }
 
 
@@ -40,11 +41,11 @@ repositories {
 dependencies {
   gradleApi()
 
-  annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-  compileOnly "org.projectlombok:lombok:${lombokVersion}"
-
   implementation project(":message-format")
   implementation "org.ow2.asm:asm:${asmVersion}"
+
+  testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+  testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
 
   testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
@@ -75,10 +76,14 @@ jar {
 
 
 gradlePlugin {
+  website = 'https://github.com/jgremmen/message-format'
+  vcsUrl = 'https://github.com/jgremmen/message-format'
+
   plugins {
     'message-format' {
       id = 'de.sayayi.plugin.gradle.message'
-      displayName = 'Gradle Plugin to scan the class path, pre-compile and pack message and ' +
+      displayName = 'Message Format Gradle Plugin'
+      description = 'Gradle Plugin to scan the class path, pre-compile and pack message and ' +
                     'template formats into a single file.'
       implementationClass = 'de.sayayi.plugin.gradle.message.MessageFormatPlugin'
       tags.set(['sayayi', 'message-format', 'scan', 'pre-compile'])
