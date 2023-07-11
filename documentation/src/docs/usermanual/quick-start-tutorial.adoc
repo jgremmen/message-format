@@ -1,0 +1,137 @@
+[[quick-start-tutorial]]
+= Quick Start Tutorial
+:navtitle: Quick Start Tutorial
+
+== Create Message Support
+
+The main instance required for formatting messages, is the message support.
+An application requires a single message support instance only. For this quick
+start tutorial a shared version of the message support is used and can be
+retrieved from the `MessageSupportFactory`.
+
+.Shared Message Support
+[source,java]
+----
+// get shared message support, configured for the default locale
+MessageSupport support = MessageSupportFactory.shared();
+----
+
+The shared message support contains all core formatters as well as additional
+formatters which have been registered as a service and are available on the
+classpath (eg. jodatime formatter).
+
+
+== Formatting Messages
+
+The message support can now be used to format messages.
+
+.Formatting example 1
+[source,java]
+----
+MessageSupport messageSupport = MessageSupportFactory.shared();
+
+String msg = messageSupport
+    .message("%{n,choice,0:'no results',1:'1 result',:'%{n} results'} found")
+    .with("n", 4)
+    .format();
+// msg = "4 results found"
+// msg = "no results found"  (for n = 0)
+----
+
+.Formatting example 2
+[source,java]
+----
+MessageSupport messageSupport = MessageSupportFactory.shared();
+
+String msg = messageSupport
+    .message("I see %{names,list-sep-last:' and '}")
+    .with("names", Arrays.asList("Brad", "Sue", "Molly"))
+    .format();
+// msg = "I see Brad, Sue and Molly"
+----
+
+
+.Formatting example 3
+[source,java]
+----
+MessageSupport messageSupport = MessageSupportFactory.shared();
+
+try {
+  // ...
+} catch(Exception ex) {
+  logger.error(messageSupport
+      .message("Something went wrong%{ex,!empty:': %{ex}'}")
+      .with("ex", ex)
+      .format(), ex);
+  // error = "Something went wrong: parameter must not be null"
+  // error = "Something went wrong"  (if exception message is empty)
+}
+----
+
+
+.Formatting example 4
+[source,java]
+----
+MessageSupport messageSupport = MessageSupportFactory.shared();
+
+// throw a formatted exception
+messageSupport
+    .message("Unknown customer name: %{name}")
+    .with("name", name)
+    .throwFormatted(IllegalArgumentException::new);
+----
+
+
+== Defining Messages
+
+In the examples in the previous chapter messages are parsed on the fly. Message
+parsing is an expensive operation which should be reduced to a minimum, if
+possible. There is a way of defining messages once and then re-using them.
+
+.Programmatic message definition example
+[source,java]
+----
+// create a configurable message support
+ConfigurableMessageSupport messageSupport = MessageSupportFactory.create(
+    new DefaultFormatterService(), MessageFactory.NO_CACHE_INSTANCE);
+
+// add pre-compiled message to message support
+messageSupport.addMessage("RESULTS",
+    "%{n,choice,0:'no results',1:'1 result',:'%{n} results'} found");
+
+String msg = messageSupport
+    .code("RESULTS")
+    .with("n", 1)
+    .format();
+// msg = "1 result found"
+----
+
+Adding messages like this, especially if there are a lot of them, can be a
+tedious task and for larger applications with a lot of sub modules centralizing
+messages is not a good solution.
+
+The message format library provides a set of adopter classes that are capable
+of reading messages and publishing them to the message support instance. One of
+the most interesting adopters is the annotation adopter which analyses message
+definition annotations.
+
+.Annotation message definition example
+[source,java]
+----
+public class AnnotationMessage
+{
+  private static ConfigurableMessageSupport MESSAGE_SUPPORT =
+      MessageSupportFactory.create(
+          new DefaultFormatterService(), MessageFactory.NO_CACHE_INSTANCE);
+
+  static {
+    new AsmAnnotationAdopter(MESSAGE_SUPPORT).adopt(AnnotationMessage.class);
+  }
+
+  @MessageDef(code = "RESULTS", text =
+      "%{n,choice,0:'no results',1:'1 result',:'%{n} results'} found")
+  public String getResultMessage(int results) {
+    return MESSAGE_SUPPORT.code("RESULTS").with("n", results).format();
+  }
+}
+----

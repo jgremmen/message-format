@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,25 +15,31 @@
  */
 package de.sayayi.lib.message.parser.normalizer;
 
-import de.sayayi.lib.message.internal.part.MessagePart;
-import lombok.AllArgsConstructor;
+import de.sayayi.lib.message.part.MessagePart;
 import org.jetbrains.annotations.NotNull;
 
 import javax.cache.Cache;
 
+import static java.util.Objects.requireNonNull;
+
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.6.0
  */
-@AllArgsConstructor
 public final class JCacheMessagePartNormalizer implements MessagePartNormalizer
 {
   private final @NotNull Cache<MessagePart,MessagePart> cache;
 
 
+  public JCacheMessagePartNormalizer(@NotNull Cache<MessagePart,MessagePart> cache) {
+    this.cache = requireNonNull(cache, "cache must not be null");
+  }
+
+
   /**
-   * Normalize the given message part. The returned part may be replaced with an identical cached version in order to
-   * reduce memory load.
+   * Normalize the given message part. The returned part may be replaced with an identical
+   * cached version in order to reduce memory load.
    *
    * @param part message part
    *
@@ -43,7 +49,7 @@ public final class JCacheMessagePartNormalizer implements MessagePartNormalizer
   public <T extends MessagePart> @NotNull T normalize(@NotNull T part)
   {
     //noinspection unchecked
-    T cachedPart = (T)cache.get(part);
+    T cachedPart = (T)cache.get(requireNonNull(part, "part must not be null"));
     if (cachedPart != null)
       return cachedPart;
 

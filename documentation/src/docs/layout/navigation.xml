@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation>
+
+  <group title="Introduction">
+    <item name="What is Message Format?" link="index.html"/>
+  </group>
+
+  <group title="What is new?">
+    <item name="Release Notes" link="release-notes.html"/>
+    <item name="Upgrading">
+      <item name="Version 0.7.x to 0.8.0" link="migration-0.7.x-to-0.8.0.html"/>
+    </item>
+  </group>
+
+  <group title="Quick Start">
+    <item name="Set Up" link="set-up.html"/>
+    <item name="Tutorial" link="quick-start-tutorial.html"/>
+  </group>
+
+  <group title="Message Structure">
+    <item name="Message Syntax" link="message.html#message-syntax"/>
+    <item name="Parameter Syntax" link="message.html#parameter-syntax"/>
+    <item name="Whitespace Handling" link="message.html#whitespace-handling"/>
+  </group>
+
+  <group title="Formatters">
+    <item name="Named Formatters">
+      <item name="Boolean" link="formatters_named.html#bool"/>
+      <item name="Choice" link="formatters_named.html#choice"/>
+      <item name="Clip" link="formatters_named.html#clip"/>
+      <item name="Size" link="formatters_named.html#size"/>
+    </item>
+    <item name="Typed Formatters">
+      <item name="Array" link="fmt-array.html"/>
+      <item name="Date" link="fmt-date.html"/>
+      <item name="Date (joda-time)" link="fmt-date-joda-time.html"/>
+    </item>
+  </group>
+
+  <group title="Reference">
+    <item name="API Javadoc" link="../javadoc/index.html"/>
+    <item name="User Manual PDF" link="usermanual.pdf"/>
+  </group>
+
+</navigation>

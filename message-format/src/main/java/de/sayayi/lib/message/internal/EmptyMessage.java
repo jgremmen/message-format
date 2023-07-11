@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,65 +16,116 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.SortedSet;
+import java.util.Arrays;
+import java.util.Set;
 
-import static java.util.Collections.emptySortedSet;
-import static lombok.AccessLevel.PRIVATE;
+import static java.util.Collections.emptySet;
 
 
 /**
+ * Message implementation, representing an empty text without leading/trailing spaces.
+ *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
-@ToString
-@NoArgsConstructor(access = PRIVATE)
 public final class EmptyMessage implements Message.WithSpaces
 {
-  private static final long serialVersionUID = 600L;
+  private static final long serialVersionUID = 800L;
 
+
+  /**
+   * Empty message instance.
+   */
   public static final Message.WithSpaces INSTANCE = new EmptyMessage();
+
+
+  private EmptyMessage() {}
 
 
   @Override
   @Contract(pure = true)
-  public @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
+  public @NotNull String format(@NotNull MessageAccessor messageAccessor,
+                                @NotNull Parameters parameters) {
     return "";
   }
 
 
-  @Override
-  @Contract(value = "-> false", pure = true)
-  public boolean hasParameters() {
-    return false;
-  }
-
-
-  @Override
-  public @NotNull SortedSet<String> getParameterNames() {
-    return emptySortedSet();
-  }
-
-
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@code false}
+   */
   @Override
   public boolean isSpaceBefore() {
     return false;
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@code false}
+   */
   @Override
   public boolean isSpaceAfter() {
     return false;
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@code false}
+   */
   @Override
-  public @NotNull Message trim() {
-    return this;
+  public boolean isSpaceAround() {
+    return false;
+  }
+
+
+  @Override
+  public @NotNull MessagePart[] getMessageParts() {
+    return new MessagePart[] { TextPart.EMPTY };
+  }
+
+
+  @Override
+  public @NotNull Set<String> getTemplateNames() {
+    return emptySet();
+  }
+
+
+  @Override
+  public boolean isSame(@NotNull Message message)
+  {
+    if (message instanceof MessageDelegateWithCode)
+      message = ((MessageDelegateWithCode)message).getMessage();
+
+    return !(message instanceof LocaleAware) &&
+        Arrays.equals(getMessageParts(), message.getMessageParts());
+  }
+
+
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof EmptyMessage;
+  }
+
+
+  @Override
+  public int hashCode() {
+    return EmptyMessage.class.hashCode();
+  }
+
+
+  @Override
+  public String toString() {
+    return "EmptyMessage";
   }
 }

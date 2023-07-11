@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,54 +15,49 @@
  */
 package de.sayayi.lib.message;
 
-import de.sayayi.lib.message.annotation.MessageDef;
-import de.sayayi.lib.message.annotation.MessageDefs;
-import de.sayayi.lib.message.annotation.Text;
-import de.sayayi.lib.message.exception.MessageException;
-import de.sayayi.lib.message.exception.MessageLocaleParseException;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.internal.MessageDelegateWithCode;
-import de.sayayi.lib.message.internal.part.MessagePart;
 import de.sayayi.lib.message.parser.MessageCompiler;
 import de.sayayi.lib.message.parser.normalizer.MessagePartNormalizer;
-import lombok.Getter;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.AnnotatedElement;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Random;
 
-import static java.util.Collections.singletonMap;
+import static de.sayayi.lib.message.parser.normalizer.MessagePartNormalizer.PASS_THROUGH;
 import static java.util.Locale.ROOT;
+import static java.util.Objects.requireNonNull;
 
 
 /**
- * Factory implementation for creating message instances from various sources.
+ * Factory class for creating message instances.
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
+@SuppressWarnings("UnknownLanguage")
 public class MessageFactory
 {
-  public static final MessageFactory NO_CACHE_INSTANCE = new MessageFactory(new MessagePartNormalizer() {
-    @Override public <T extends MessagePart> @NotNull T normalize(@NotNull T part) { return part; }
-  });
+  /**
+   * Shared message factory without any caching capabilities.
+   * <p>
+   * This message factory will suffice in most cases. However, if you have a large amount of
+   * messages, it is better to construct a message factory with an appropriate
+   * {@link MessagePartNormalizer}.
+   */
+  public static final MessageFactory NO_CACHE_INSTANCE = new MessageFactory(PASS_THROUGH);
 
-  private static final AtomicInteger CODE_ID = new AtomicInteger(0);
+  private static final Random RANDOM = new Random();
+  private static int CODE_ID = 0;
 
-  @Getter private final @NotNull MessagePartNormalizer messagePartNormalizer;
-  private final MessageCompiler messageCompiler;
+  private final @NotNull MessagePartNormalizer messagePartNormalizer;
+  final MessageCompiler messageCompiler;
 
 
   /**
@@ -78,6 +73,16 @@ public class MessageFactory
 
 
   /**
+   * Returns the message part normalizer instance.
+   *
+   * @return  message part normalizer, never {@code null}
+   */
+  public @NotNull MessagePartNormalizer getMessagePartNormalizer() {
+    return messagePartNormalizer;
+  }
+
+
+  /**
    * Parse a message format text into a message instance.
    *
    * @param text  message format text, not {@code null}
@@ -85,14 +90,14 @@ public class MessageFactory
    * @return  message instance, never {@code null}
    */
   @Contract(value = "_ -> new", pure = true)
-  public @NotNull Message.WithSpaces parse(@NotNull String text) {
+  public @NotNull Message.WithSpaces parseMessage(@NotNull @Language("MessageFormat") String text) {
     return messageCompiler.compileMessage(text);
   }
 
 
   @Contract(value = "_ -> new", pure = true)
-  public @NotNull Message parse(@NotNull Map<Locale,String> localizedTexts) {
-    return parse("Generated::" + CODE_ID.incrementAndGet(), localizedTexts);
+  public @NotNull Message parseMessage(@NotNull Map<Locale,String> localizedTexts) {
+    return parseMessage(generateCode("MSG"), localizedTexts);
   }
 
 
@@ -105,89 +110,84 @@ public class MessageFactory
    * @return  message instance
    */
   @Contract(value = "_, _ -> new", pure = true)
-  public @NotNull Message.WithCode parse(@NotNull String code, @NotNull String text) {
-    return new MessageDelegateWithCode(code, parse(text));
+  public @NotNull Message.WithCode parseMessage(@NotNull String code,
+                                                @NotNull @Language("MessageFormat") String text) {
+    return withCode(code, parseMessage(text));
   }
 
 
   @Contract(value = "_, _ -> new", pure = true)
-  public @NotNull Message.WithCode parse(@NotNull String code, @NotNull Map<Locale,String> localizedTexts)
+  public @NotNull Message.WithCode parseMessage(@NotNull String code,
+                                                @NotNull Map<Locale,String> localizedTexts)
   {
-    if (localizedTexts.isEmpty())
-      return new EmptyMessageWithCode(code);
+    switch(requireNonNull(localizedTexts, "localizedTexts must not be null").size())
+    {
+      case 0:
+        return new EmptyMessageWithCode(code);
 
-    final String message = localizedTexts.get(ROOT);
-    if (message != null && localizedTexts.size() == 1)
-      return new MessageDelegateWithCode(code, parse(message));
+      case 1:
+        return parseMessage(code, localizedTexts.values().iterator().next());
 
-    final Map<Locale,Message> localizedParts = new LinkedHashMap<>();
+      default: {
+        final Map<Locale,Message> localizedMessages = new HashMap<>();
 
-    localizedTexts.forEach((locale,text) -> localizedParts.put(locale, parse(text)));
+        localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) ->
+            localizedMessages.put(locale, parseMessage(text)));
 
-    return new LocalizedMessageBundleWithCode(code, localizedParts);
-  }
-
-
-  @SuppressWarnings("WeakerAccess")
-  @Contract(value = "_ -> new", pure = true)
-  public @NotNull Set<Message.WithCode> parseAnnotations(@NotNull AnnotatedElement element)
-  {
-    final Set<Message.WithCode> messages = new HashSet<>();
-
-    MessageDef annotation = element.getAnnotation(MessageDef.class);
-    if (annotation != null)
-      messages.add(parse(annotation));
-
-    MessageDefs messageDefsAnnotation = element.getAnnotation(MessageDefs.class);
-    if (messageDefsAnnotation != null)
-      for(MessageDef messageDef: messageDefsAnnotation.value())
-      {
-        Message.WithCode mwc = parse(messageDef);
-
-        if (!messages.add(mwc))
-          throw new MessageException("duplicate message code " + mwc.getCode() + " found");
-
-        messages.add(mwc);
+        return new LocalizedMessageBundleWithCode(code, localizedMessages);
       }
-
-    return messages;
+    }
   }
 
 
+  /**
+   * Parse a template format text into a message instance.
+   *
+   * @param text  template format text, not {@code null}
+   *
+   * @return  message instance, never {@code null}
+   */
   @Contract(value = "_ -> new", pure = true)
-  public @NotNull Message.WithCode parse(@NotNull MessageDef annotation)
-  {
-    final Text[] texts = annotation.texts();
-    final String code = annotation.code();
-
-    if (texts.length == 0)
-    {
-      String text = annotation.text();
-      return text.isEmpty() ? new EmptyMessageWithCode(code) : parse(code, text);
-    }
-
-    final Map<Locale,String> localizedTexts = new LinkedHashMap<>();
-
-    for(final Text text: texts)
-    {
-      final Locale locale = forLanguageTag(text.locale());
-      final String value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
-
-      if (!localizedTexts.containsKey(locale))
-        localizedTexts.put(locale, value);
-    }
-
-    return parse(code, localizedTexts);
+  public @NotNull Message parseTemplate(@NotNull @Language("MessageFormat") String text) {
+    return messageCompiler.compileTemplate(text);
   }
 
 
   @Contract(pure = true)
+  public @NotNull Message parseTemplate(@NotNull Map<Locale,String> localizedTexts)
+  {
+    switch(requireNonNull(localizedTexts, "localizedTexts must not be null").size())
+    {
+      case 0:
+        return EmptyMessage.INSTANCE;
+
+      case 1:
+        return parseTemplate(localizedTexts.values().iterator().next());
+
+      default: {
+        final Map<Locale,Message> localizedMessages = new HashMap<>();
+
+        localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) ->
+            localizedMessages.put(locale, parseMessage(text)));
+
+        return new LocalizedMessageBundleWithCode(generateCode("TPL"), localizedMessages);
+      }
+    }
+  }
+
+
+  /**
+   * Modifies {@code message} so that it has the given {@code code}.
+   *
+   * @param code     (new) message code, not {@code null} and not empty
+   * @param message  message, not {@code null}
+   *
+   * @return  message with code, never {@code null}
+   */
+  @Contract(pure = true)
   public @NotNull Message.WithCode withCode(@NotNull String code, @NotNull Message message)
   {
-    if (message instanceof MessageDelegateWithCode)
-      return new MessageDelegateWithCode(code, ((MessageDelegateWithCode)message).getMessage());
-
-    if (message instanceof Message.WithCode)
+    if (requireNonNull(message, "message must not be null") instanceof Message.WithCode)
     {
       final Message.WithCode messageWithCode = (Message.WithCode)message;
 
@@ -195,7 +195,14 @@ public class MessageFactory
         return messageWithCode;
     }
 
-    if (message instanceof EmptyMessage || message instanceof EmptyMessageWithCode)
+    if (message instanceof MessageDelegateWithCode)
+      message = ((MessageDelegateWithCode)message).getMessage();
+    else if (message instanceof LocalizedMessageBundleWithCode)
+    {
+      return new LocalizedMessageBundleWithCode(code,
+          ((LocalizedMessageBundleWithCode)message).getLocalizedMessages());
+    }
+    else if (message instanceof EmptyMessage || message instanceof EmptyMessageWithCode)
       return new EmptyMessageWithCode(code);
 
     return new MessageDelegateWithCode(code, message);
@@ -203,86 +210,34 @@ public class MessageFactory
 
 
   @Contract(pure = true)
-  public @NotNull MessageBundle bundle(@NotNull Properties properties)
+  protected @NotNull String generateCode(@NotNull String prefix)
   {
-    final MessageBundle bundle = new MessageBundle(this);
+    final byte[] hashBytes = new byte[6];
+    RANDOM.nextBytes(hashBytes);
 
-    properties.forEach((k,v) -> bundle.add(parse(k.toString(), String.valueOf(v))));
+    final String hash = Long.toString(0x1000000000000L |
+        ((hashBytes[0] & 0xffL) << 40) |
+        ((hashBytes[1] & 0xffL) << 32) |
+        ((hashBytes[2] & 0xffL) << 24) |
+        ((hashBytes[3] & 0xffL) << 16) |
+        ((hashBytes[4] & 0xffL) << 8) |
+        (hashBytes[5] & 0xffL), 36);
 
-    return bundle;
+    return (prefix + '[' + hash + '-' + Integer.toString(++CODE_ID | 0x20000, 36) + ']')
+        .toUpperCase(ROOT);
   }
 
 
+  /**
+   * Checks whether {@code code} is a generated message or template code.
+   *
+   * @param code  message or template code
+   *
+   * @return  {@code true} if the given code is a generated message or template code,
+   *          {@code false} otherwise
+   */
   @Contract(pure = true)
-  public @NotNull MessageBundle bundle(@NotNull ResourceBundle resourceBundle)
-  {
-    final MessageBundle bundle = new MessageBundle(this);
-    final Locale locale = resourceBundle.getLocale();
-
-    resourceBundle.keySet().forEach(
-        code -> bundle.add(parse(code, singletonMap(locale, resourceBundle.getString(code)))));
-
-    return bundle;
-  }
-
-
-  @Contract(pure = true)
-  public @NotNull MessageBundle bundle(@NotNull Map<Locale,Properties> properties)
-  {
-    final Map<String,Map<Locale,Message>> localizedMessagesByCode = new HashMap<>();
-
-    for(Entry<Locale,Properties> entry: properties.entrySet())
-      for(Entry<Object,Object> localizedProperty: entry.getValue().entrySet())
-      {
-        localizedMessagesByCode.computeIfAbsent(localizedProperty.getKey().toString(), k -> new HashMap<>())
-            .put(entry.getKey(), parse(String.valueOf(localizedProperty.getValue())));
-      }
-
-    return new MessageBundle(this, localizedMessagesByCode);
-  }
-
-
-  @Contract(pure = true)
-  public @NotNull MessageBundle bundle(@NotNull Collection<ResourceBundle> properties)
-  {
-    final Map<String,Map<Locale,Message>> localizedMessagesByCode = new HashMap<>();
-
-    for(ResourceBundle resourceBundle: properties)
-      for(String code: resourceBundle.keySet())
-      {
-        localizedMessagesByCode.computeIfAbsent(code, k -> new HashMap<>())
-            .put(resourceBundle.getLocale(), parse(resourceBundle.getString(code)));
-      }
-
-    return new MessageBundle(this, localizedMessagesByCode);
-  }
-
-
-  @Contract(pure = true)
-  static @NotNull Locale forLanguageTag(@NotNull String locale)
-  {
-    if (locale.isEmpty())
-      return ROOT;
-
-    final int length = locale.length();
-    if (length < 2)
-      throw new MessageLocaleParseException("missing language code for locale " + locale);
-
-    if (!Character.isLowerCase(locale.charAt(0)) || !Character.isLowerCase(locale.charAt(1)))
-        throw new MessageLocaleParseException("invalid language code for locale " + locale);
-
-    if (length == 2)
-      return new Locale(locale);
-
-    if (length != 5)
-      throw new MessageLocaleParseException("unexpected length " + length + " for locale " + locale);
-
-    if (locale.charAt(2) != '-' && locale.charAt(2) != '_')
-      throw new MessageLocaleParseException("missing separator '-' between language and country code for locale " + locale);
-
-    if (!Character.isUpperCase(locale.charAt(3)) || !Character.isUpperCase(locale.charAt(4)))
-      throw new MessageLocaleParseException("invalid country code for locale " + locale);
-
-    return new Locale(locale.substring(0,  2), locale.substring(3, 5));
+  public static boolean isGeneratedCode(String code) {
+    return code != null && code.matches("(MSG|TPL)\\[[0-9A-Z-]+]");
   }
 }

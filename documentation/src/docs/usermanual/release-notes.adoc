@@ -1,0 +1,58 @@
+= Release Notes
+:navtitle: Release Notes
+
+image:https://img.shields.io/github/v/tag/jgremmen/message-format?label=release[GitHub tag (latest SemVer)]
+image:https://img.shields.io/github/languages/code-size/jgremmen/message-format[GitHub code size in bytes]
+image:https://img.shields.io/github/last-commit/jgremmen/message-format[GitHub last commit]
+image:https://img.shields.io/github/license/jgremmen/message-format[GitHub]
+
+
+[[release-0.8.0]]
+== 0.8.0
+_Release date: t.b.d._
+
+
+==== New Features
+
+* Add named formatter xref:formatters_named.adoc#clip[`clip`]
+* More detailed formatter configuration keys
+* Introduce `FormatterContext` for `ParameterFormatter#format(...)` method
+* Add order support for Formattable types so formatters can be prioritized if a parameter value matches
+  multiple formatters
+* A parameter formatter can delegate formatting to the next (based on formattable type priority) formatter
+* Add pack support for exporting and importing message bundles
+* Documentation
+
+
+==== Changes
+
+* Flatten parameter data map, eg.: +
+  `%{n,choice,1:'color',:'colors'}` +
+  instead of +
+  `%{n,choice,{1:'color','colors'}}`
+* Rename formatter configuration keys
+* Remove named formatters xref:formatters_named.adoc#bits[`bits`], xref:formatters_named.adoc#bits[`filesize`] and
+  xref:formatters_named.adoc#geo[`geo`] from default formatter registration
+* Remove `Message.WithSpaces#trim()`
+* Drop UTF-16 support for parameter name, format and map key
+
+
+==== Bug Fixes
+
+* Improve formatter selection based on parameter format designator and value class type
+* Use parameter format designator for selecting a named parameter formatter only
+
+
+==== Dependency Upgrades
+
+* Upgrade to Cache API 1.1.1 (required for class `JCacheMessagePartNormalizer`)
+* Upgrade to ASM 9.4 (required for class `AsmAnnotationAdopter`)
+* Upgrade to Spring Core 5.3.26 (required for class `SpringAsmAnnotationAdopter`)
+* Upgrade to Joda-Time 2.12.5 (required for artefact `message-format-jodatime`)
+
+
+[IMPORTANT]
+====
+Due to a major change in the message parameter syntax, this version generally breaks backward compatibility.
+Please refer to the xref:migration-0.7.x-to-0.8.0.adoc[migration guide] for more detailed information.
+====

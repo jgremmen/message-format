@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,26 +15,39 @@
  */
 package de.sayayi.lib.message.internal;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import lombok.ToString;
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.pack.PackInputStream;
+import de.sayayi.lib.message.pack.PackOutputStream;
+import de.sayayi.lib.message.part.MessagePart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.SortedSet;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Set;
 
-import static java.util.Collections.emptySortedSet;
+import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
+import static java.util.Collections.emptySet;
+import static java.util.Objects.requireNonNull;
 
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
-@ToString
 public final class EmptyMessageWithCode extends AbstractMessageWithCode
 {
-  private static final long serialVersionUID = 600L;
+  private static final long serialVersionUID = 800L;
 
 
+  /**
+   * Constructs an empty message with {@code code}.
+   *
+   * @param code  message code, not {@code null} and not empty
+   *
+   * @throws IllegalArgumentException  if message code is empty
+   */
   public EmptyMessageWithCode(@NotNull String code) {
     super(code);
   }
@@ -42,20 +55,72 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
   @Override
   @Contract(pure = true)
-  public @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
+  public @NotNull String format(@NotNull MessageAccessor messageAccessor,
+                                @NotNull Parameters parameters) {
     return "";
   }
 
 
   @Override
-  @Contract(value = "-> false", pure = true)
-  public boolean hasParameters() {
-    return false;
+  public @NotNull MessagePart[] getMessageParts() {
+    return new MessagePart[] { EMPTY };
   }
 
 
   @Override
-  public @NotNull SortedSet<String> getParameterNames() {
-    return emptySortedSet();
+  public @NotNull Set<String> getTemplateNames() {
+    return emptySet();
+  }
+
+
+  @Override
+  public boolean isSame(@NotNull Message message)
+  {
+    if (message instanceof MessageDelegateWithCode)
+      message = ((MessageDelegateWithCode)message).getMessage();
+
+    return !(message instanceof LocaleAware) &&
+        Arrays.equals(getMessageParts(), message.getMessageParts());
+  }
+
+
+  @Override
+  public boolean equals(Object o)
+  {
+    return this == o ||
+        o instanceof EmptyMessageWithCode && code.equals(((EmptyMessageWithCode)o).code);
+  }
+
+
+  @Override
+  public String toString() {
+    return "EmptyMessageWithCode(" + code + ')';
+  }
+
+
+  /**
+   * @param packStream  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull PackOutputStream packStream) throws IOException {
+    packStream.writeString(getCode());
+  }
+
+
+  /**
+   * @param packStream  source data input, not {@code null}
+   *
+   * @return  unpacked empty message with code, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull Message.WithCode unpack(@NotNull PackInputStream packStream)
+      throws IOException {
+    return new EmptyMessageWithCode(requireNonNull(packStream.readString()));
   }
 }

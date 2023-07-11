@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,8 +20,8 @@ import org.antlr.v4.runtime.RecognitionException;
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
-@SuppressWarnings("serial")
 public class MessageParserException extends MessageException
 {
   public MessageParserException(String message, RecognitionException cause) {
@@ -31,6 +31,6 @@ public class MessageParserException extends MessageException
 
   @Override
   public synchronized RecognitionException getCause() {
-    return (RecognitionException) super.getCause();
+    return (RecognitionException)super.getCause();
   }
 }

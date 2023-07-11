@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,49 +17,78 @@ package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.LocaleAware;
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
-import lombok.Synchronized;
-import lombok.ToString;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.exception.MessageFormatException;
+import de.sayayi.lib.message.pack.PackHelper;
+import de.sayayi.lib.message.pack.PackInputStream;
+import de.sayayi.lib.message.pack.PackOutputStream;
+import de.sayayi.lib.message.part.MessagePart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import static java.util.Collections.*;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
+import static java.util.Locale.forLanguageTag;
+import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toSet;
 
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.1.0 (renamed in 0.5.0)
  */
-@SuppressWarnings("squid:S2160")
-@ToString
-public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode implements LocaleAware
+public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCode
+    implements LocaleAware
 {
-  private static final long serialVersionUID = 600L;
+  private static final long serialVersionUID = 800L;
 
+  /** Localized message map. */
   private final @NotNull Map<Locale,Message> localizedMessages;
 
-  private Boolean hasParameter;
 
-
-  public LocalizedMessageBundleWithCode(@NotNull String code, @NotNull Map<Locale,Message> localizedMessages)
+  /**
+   * Create a localized message bundle with code.
+   *
+   * @param code               message code, not {@code null} and not empty
+   * @param localizedMessages  localized message map, not {@code null}. The map must contain at
+   *                           least 2 entries and no mapped value can be {@code null}
+   */
+  public LocalizedMessageBundleWithCode(@NotNull String code,
+                                        @NotNull Map<Locale,Message> localizedMessages)
   {
     super(code);
 
-    this.localizedMessages = localizedMessages;
+    if (requireNonNull(localizedMessages, "localizedMessages must not be null").isEmpty())
+      throw new IllegalArgumentException("localizedMessages must not be empty");
+
+    this.localizedMessages = new HashMap<>(localizedMessages);
   }
 
 
   @Override
   @Contract(pure = true)
-  public @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters) {
-    return findMessageByLocale(parameters.getLocale()).format(messageContext, parameters);
+  public @NotNull String format(@NotNull MessageAccessor messageAccessor,
+                                @NotNull Parameters parameters)
+  {
+    final Locale locale = parameters.getLocale();
+
+    try {
+      return findMessageByLocale(locale).format(messageAccessor, parameters);
+    } catch(MessageFormatException ex) {
+      throw ex.withCode(code).withLocale(locale);
+    }
   }
 
 
-  private Message findMessageByLocale(Locale locale)
+  @Contract(pure = true)
+  private @NotNull Message findMessageByLocale(@NotNull Locale locale)
   {
     final String searchLanguage = locale.getLanguage();
     final String searchCountry = locale.getCountry();
@@ -70,64 +99,30 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
     for(final Entry<Locale,Message> entry: localizedMessages.entrySet())
     {
       final Locale keyLocale = entry.getKey();
+      final Message localizedMessage = entry.getValue();
 
-      if (message == null)
-        message = entry.getValue();
-
-      if (match == -1 && (keyLocale == null || Locale.ROOT.equals(keyLocale)))
+      if (match == -1 && (keyLocale == null || keyLocale.getLanguage().isEmpty()))
       {
-        message = entry.getValue();
-        match = 0;
+        message = localizedMessage;
+        match = 0;  // "default" language match
       }
-      else if (keyLocale.getLanguage().equals(searchLanguage))
+      else if (keyLocale != null && keyLocale.getLanguage().equals(searchLanguage))
       {
         if (keyLocale.getCountry().equals(searchCountry))
-          return entry.getValue();
-        else if (match < 1)
+          return localizedMessage;
+
+        if (match < 1)
         {
-          message = entry.getValue();
-          match = 1;
+          message = localizedMessage;
+          match = 1;  // same language, different country
         }
       }
+
+      if (message == null)
+        message = localizedMessage;  // 1st match
     }
 
-    return message;
-  }
-
-
-  @Synchronized
-  @Override
-  @Contract(pure = true)
-  public boolean hasParameters()
-  {
-    if (hasParameter == null)
-    {
-      hasParameter = Boolean.FALSE;
-
-      for(final Message message: localizedMessages.values())
-        if (message.hasParameters())
-        {
-          hasParameter = Boolean.TRUE;
-          break;
-        }
-    }
-
-    return hasParameter;
-  }
-
-
-  @Override
-  public @NotNull SortedSet<String> getParameterNames()
-  {
-    if (!hasParameters())
-      return emptySortedSet();
-
-    final SortedSet<String> parameterNames = new TreeSet<>();
-
-    for(Message message: localizedMessages.values())
-      parameterNames.addAll(message.getParameterNames());
-
-    return parameterNames;
+    return requireNonNull(message);
   }
 
 
@@ -141,5 +136,120 @@ public class LocalizedMessageBundleWithCode extends AbstractMessageWithCode impl
   @Override
   public @NotNull Map<Locale,Message> getLocalizedMessages() {
     return unmodifiableMap(localizedMessages);
+  }
+
+
+  @Override
+  public @NotNull MessagePart[] getMessageParts() {
+    throw new UnsupportedOperationException("getMessageParts");
+  }
+
+
+  @Override
+  public @NotNull Set<String> getTemplateNames()
+  {
+    return unmodifiableSet(localizedMessages
+        .values()
+        .stream()
+        .flatMap(message -> message.getTemplateNames().stream())
+        .collect(toSet()));
+  }
+
+
+  @Override
+  @SuppressWarnings("DuplicatedCode")
+  public boolean isSame(@NotNull Message message)
+  {
+    if (message instanceof MessageDelegateWithCode)
+      message = ((MessageDelegateWithCode)message).getMessage();
+
+    if (!(message instanceof LocaleAware))
+      return false;
+
+    final Map<Locale,Message> lm = ((LocaleAware)message).getLocalizedMessages();
+
+    if (!localizedMessages.keySet().equals(lm.keySet()))
+      return false;
+
+    for(final Entry<Locale,Message> entry: localizedMessages.entrySet())
+      if (!entry.getValue().isSame(lm.get(entry.getKey())))
+        return false;
+
+    return true;
+  }
+
+
+  @Override
+  public boolean equals(Object o)
+  {
+    if (o == this)
+      return true;
+    else if (!(o instanceof LocalizedMessageBundleWithCode))
+      return false;
+
+    final LocalizedMessageBundleWithCode that = (LocalizedMessageBundleWithCode)o;
+
+    return code.equals(that.code) && localizedMessages.equals(that.localizedMessages);
+  }
+
+
+  @Override
+  public int hashCode() {
+    return (59 + code.hashCode()) * 59 + localizedMessages.hashCode();
+  }
+
+
+  @Override
+  public String toString() {
+    return "LocalizedMessageBundleWithCode(" + localizedMessages + ')';
+  }
+
+
+  /**
+   * @param packStream  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs
+   *
+   * @since 0.8.0
+   */
+  public void pack(@NotNull PackOutputStream packStream) throws IOException
+  {
+    packStream.writeSmallVar(localizedMessages.size());
+    packStream.writeString(getCode());
+
+    for(final Entry<Locale,Message> entry: localizedMessages.entrySet())
+    {
+      packStream.writeString(entry.getKey().toLanguageTag());
+      PackHelper.pack(entry.getValue(), packStream);
+    }
+  }
+
+
+  /**
+   * @param unpack      unpacker instance, not {@code null}
+   * @param packStream  source data input, not {@code null}
+   *
+   * @return  unpacked localized message bundle with code, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs
+   *
+   * @since 0.8.0
+   */
+  public static @NotNull Message.WithCode unpack(@NotNull PackHelper unpack,
+                                                 @NotNull PackInputStream packStream)
+      throws IOException
+  {
+    final int messageCount = packStream.readSmallVar();
+    final String code = requireNonNull(packStream.readString());
+    final Map<Locale,Message> messages = new HashMap<>();
+
+    for(int n = 0; n < messageCount; n++)
+    {
+      messages.put(
+          forLanguageTag(requireNonNull(packStream.readString())),
+          unpack.unpackMessage(packStream));
+    }
+
+    return new LocalizedMessageBundleWithCode(code, messages);
   }
 }

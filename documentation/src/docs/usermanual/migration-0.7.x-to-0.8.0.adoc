@@ -1,0 +1,227 @@
+= Upgrade from 0.7.x to 0.8.0
+:navtitle: Upgrade from 0.7.x to 0.8.0
+
+== Parameter format designator
+
+The _format_ designator in `%{<param>,<format>,<data>}` now is used for matching named
+parameter formatters only. In previous versions _format_ could be a formatting option as well but
+this mixture lead to problems where the formatting option was the same as a named formatter.
+
+As a result of this the formatting options for various parameter formatters have been changed
+and/or added.
+
+== Parameter data map
+
+The parameter data map, which used to be similar to a json object inside a parameter definition, has
+been flattened. It improves parameter readability as there are less braces.
+
+.Data map (before 0.8.0)
+[source]
+----
+%{n,choice,{0:'no color',1:'1 color','%{n} colors'}}
+----
+
+.Data map (since 0.8.0)
+[source,message]
+----
+%{n,choice,0:'no color',1:'1 color',:'%{n} colors'}
+----
+
+.Test
+[source,message]
+----
+This is\u0026 %{n,choice , true:'yes', <=0:'no color',1:'1% color', empty:"empty" , :'%{n} colors'}', you see!
+----
+
+
+
+== FormatterContext
+
+A formatter context provides a parameter formatter with all information it requires to format an object
+and thus reduces the number of method arguments passed to `ParameterFormatter#format(...)`.
+
+.Formatter method (before 0.8.0)
+[source,java]
+----
+@Override
+public @NotNull Text format(@NotNull MessageContext messageContext,
+                            Object value, String format,
+                            @NotNull Parameters parameters, DataMap map) {
+  ...
+}
+----
+
+.Formatter method (since 0.8.0)
+[source,java]
+----
+@Override
+public @NotNull Text format(@NotNull FormatterContext context,
+                            Object value) {
+  ...
+}
+----
+
+Various helper methods from `AbstractParameterFormatter` have been moved to `FormatterContext`.
+
+
+== Named Formatters _bits_, _filesize_ and _geo_
+
+The named formatters `bits`, `filesize` and `geo` are not automatically registered by the `DefaultFormatterService`
+anymore and must be explicitly added. Eg.:
+[source,java]
+----
+DefaultFormatterService
+    .getSharedInstance()
+    .addFormatter(new GeoFormatter());
+----
+
+
+== Formatter Configuration Keys
+:table-caption!:
+
+.xref:formatters_typed.adoc#_array[Array Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|`sep`
+|`list-sep`
+
+|`sep-last`
+|`list-sep-last`
+|===
+
+.xref:formatters_named.adoc#bits[Bits Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|`length`
+|`bits`
+|===
+
+.xref:formatters_typed.adoc#_date[Date Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`date`
+
+|`format`
+|`date`
+|===
+
+.xref:formatters_typed.adoc#enum[Enum Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`enum`
+|===
+
+.xref:formatters_typed.adoc#field[Field Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`field`
+|===
+
+.xref:formatters_typed.adoc#file[File Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`file`
+|===
+
+.xref:formatters_named.adoc#geo[Geo Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`geo`
+|===
+
+.xref:formatters_typed.adoc#inet[Inet Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`inet`
+|===
+
+.xref:formatters_typed.adoc#iterable[Iterable Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|`sep`
+|`list-sep`
+
+|`sep-last`
+|`list-sep-last`
+|===
+
+.xref:formatters_typed.adoc#map[Map Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|`null-key`
+|`map-k-null`
+
+|`null-value`
+|`map-v-null`
+|===
+
+.xref:formatters_typed.adoc#method[Method Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`method`
+|===
+
+.xref:formatters_typed.adoc#number[Number Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`number`
+|===
+
+.xref:formatters_typed.adoc#path[Path Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`path`
+|===
+
+.xref:formatters_typed.adoc#uri[URI Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`uri`
+|===
+
+.xref:formatters_typed.adoc#url[URL Formatter]
+[frame=none,grid=rows,cols="1,1",width=67%]
+|===
+|Old key |New key
+
+|(format)
+|`url`
+|===

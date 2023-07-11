@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,28 +16,38 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+
+import static java.util.Objects.requireNonNull;
 
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 abstract class AbstractMessageWithCode implements Message.WithCode
 {
-  private static final long serialVersionUID = 600L;
-
-  @Getter protected final @NotNull String code;
+  private static final long serialVersionUID = 800L;
 
 
-  @SuppressWarnings("squid:S2589")
+  /**
+   * Unique message code, never {@code null} nor empty.
+   */
+  protected final @NotNull String code;
+
+
   AbstractMessageWithCode(@NotNull String code)
   {
-    //noinspection ConstantConditions
-    if (code == null || code.isEmpty())
+    if (requireNonNull(code, "message code must not be null").isEmpty())
       throw new IllegalArgumentException("message code must not be empty");
 
     this.code = code;
+  }
+
+
+  @Override
+  public @NotNull String getCode() {
+    return code;
   }
 
 
@@ -48,7 +58,9 @@ abstract class AbstractMessageWithCode implements Message.WithCode
 
 
   @Override
-  public boolean equals(Object o) {
-    return this == o || (o instanceof AbstractMessageWithCode && code.equals(((AbstractMessageWithCode)o).code));
+  public boolean equals(Object o)
+  {
+    return this == o ||
+        (o instanceof AbstractMessageWithCode && code.equals(((AbstractMessageWithCode)o).code));
   }
 }

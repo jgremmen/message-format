@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,33 +15,35 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.formatter.support.StringFormatter;
+import de.sayayi.lib.message.formatter.named.StringFormatter;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static java.util.Collections.synchronizedMap;
+import static java.util.Arrays.copyOf;
+import static java.util.Objects.requireNonNull;
 
 
 /**
  * @author Jeroen Gremmen
+ * @since 0.1.0 (renamed in 0.4.1)
  */
+@SuppressWarnings("UnstableApiUsage")
 public class GenericFormatterService implements FormatterService.WithRegistry
 {
-  private static final Comparator<Class<?>> CLASS_SORTER =
-      (o1, o2) -> o1 == o2 ? 0 : o1.getName().compareTo(o2.getName());
+  /** default cache size for type to parameter formatters cache */
+  public static final int DEFAULT_FORMATTER_CACHE_SIZE = 256;
 
-  private static final Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
+  private static final @NotNull Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
 
-  private final Map<String,NamedParameterFormatter> namedFormatters = new ConcurrentHashMap<>();
-  private final Map<Class<?>,ParameterFormatter> typeFormatters = new ConcurrentHashMap<>();
-  private final Map<Class<?>,ParameterFormatter> cachedFormatters =
-      synchronizedMap(new FixedSizeCacheMap<>(CLASS_SORTER, 128));
+  private final @NotNull Map<String,NamedParameterFormatter> namedFormatters =
+      new ConcurrentHashMap<>();
+  private final @NotNull Map<Class<?>,List<PrioritizedFormatter>> typeFormatters =
+      new ConcurrentHashMap<>();
+  private final @NotNull FormatterCache formatterCache;
 
 
   static
@@ -56,94 +58,164 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
-  public GenericFormatterService()
-  {
-    final StringFormatter stringFormatter = new StringFormatter();
+  public GenericFormatterService() {
+    this(DEFAULT_FORMATTER_CACHE_SIZE);
+  }
 
-    addFormatter(stringFormatter);
-    addFormatterForType(Object.class, stringFormatter);
+
+  public GenericFormatterService(int formatterCacheSize)
+  {
+    formatterCache = new FormatterCache(formatterCacheSize);
+
+    addFormatterForType(new FormattableType(Object.class), new StringFormatter());
   }
 
 
   @Override
-  public void addFormatterForType(@NotNull Class<?> type, @NotNull ParameterFormatter formatter)
+  @MustBeInvokedByOverriders
+  public void addFormatterForType(@NotNull FormattableType formattableType,
+                                  @NotNull ParameterFormatter formatter)
   {
-    final ParameterFormatter currentFormatter = typeFormatters.get(type);
+    final Class<?> type =
+        requireNonNull(formattableType, "formattableType must not be null").getType();
 
-    if (currentFormatter == null || currentFormatter.getPriority() < formatter.getPriority())
-    {
-      typeFormatters.put(type, formatter);
-      cachedFormatters.clear();
-    }
+    typeFormatters.computeIfAbsent(type, t -> new ArrayList<>(4)).add(
+        new PrioritizedFormatter(formattableType.getOrder(), formatter));
+    formatterCache.clear();
   }
 
 
   @Override
+  @MustBeInvokedByOverriders
   public void addFormatter(@NotNull ParameterFormatter formatter)
   {
+    requireNonNull(formatter, "formatter must not be null");
+
     if (formatter instanceof NamedParameterFormatter)
     {
       final String format = ((NamedParameterFormatter)formatter).getName();
       if (format.isEmpty())
         throw new IllegalArgumentException("formatter name must not be empty");
 
-      ParameterFormatter currentFormatter = namedFormatters.get(format);
-      if (currentFormatter == null || currentFormatter.getPriority() < formatter.getPriority())
-        namedFormatters.put(format, (NamedParameterFormatter)formatter);
+      namedFormatters.put(format, (NamedParameterFormatter)formatter);
     }
 
-    for(final Class<?> type: formatter.getFormattableTypes())
-      addFormatterForType(type, formatter);
+    formatter.getFormattableTypes()
+        .forEach(formattableType -> addFormatterForType(formattableType, formatter));
   }
 
 
   @Override
-  public @NotNull ParameterFormatter getFormatter(String format, @NotNull Class<?> type)
+  public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type)
   {
-    ParameterFormatter formatter = format == null ? null : namedFormatters.get(format);
+    requireNonNull(type, "type must not be null");
 
-    if (formatter == null && (formatter = cachedFormatters.get(type)) == null)
-      cachedFormatters.put(type, formatter = resolveFormatterForType(type));
-
-    return formatter;
-  }
-
-
-  @SuppressWarnings("java:S1119")
-  private @NotNull ParameterFormatter resolveFormatterForType(@NotNull Class<?> type)
-  {
-    ParameterFormatter formatter = null;
-
-    if (type.isPrimitive() && (formatter = typeFormatters.get(type)) == null)
-      type = WRAPPER_CLASS_MAP.get(type);
-
-    resolve:{
-      while(formatter == null && type != null)
-        if ((formatter = typeFormatters.get(type)) == null)
-        {
-          for(final Class<?> interfaceType: getInterfaceTypes(type))
-            if ((formatter = typeFormatters.get(interfaceType)) != null)
-              break resolve;
-
-          type = type.getSuperclass();
-        }
+    if (format != null)
+    {
+      final NamedParameterFormatter namedFormatter = namedFormatters.get(format);
+      if (namedFormatter != null && namedFormatter.canFormat(type))
+        return new ParameterFormatter[] { namedFormatter };
     }
 
-    return formatter == null ? typeFormatters.get(Object.class) : formatter;
+    final ParameterFormatter[] formatters = formatterCache.lookup(type, t ->
+        getFormatters_collectTypes(t)
+            .stream()
+            .map(typeFormatters::get)
+            .filter(Objects::nonNull)
+            .flatMap(Collection::stream)
+            .sorted()
+            .map(pf -> pf.formatter)
+            .distinct()
+            .toArray(ParameterFormatter[]::new));
+
+    return copyOf(formatters, formatters.length, ParameterFormatter[].class);
   }
 
 
-  private static @NotNull Set<Class<?>> getInterfaceTypes(@NotNull Class<?> type)
+  @Contract(pure = true)
+  private @NotNull Set<Class<?>> getFormatters_collectTypes(@NotNull Class<?> type)
   {
-    final Set<Class<?>> interfaceTypes = new LinkedHashSet<>();
+    final Set<Class<?>> collectedTypes = new HashSet<>();
 
+    if (!typeFormatters.containsKey(type))
+    {
+      // 1. substitute wrapper type for primitive type
+      // 2. object arrays != Object[] (eg. String[]) will imply Object[] as well
+      if (type.isPrimitive())
+        type = WRAPPER_CLASS_MAP.get(type);
+      else if (type.isArray() && type.getComponentType() != Object.class)
+        collectedTypes.add(Object[].class);  // default array formatter
+    }
+
+    for(; type != null; type = type.getSuperclass())
+    {
+      collectedTypes.add(type);
+      addInterfaceTypes(type, collectedTypes);
+    }
+
+    collectedTypes.add(Object.class);
+
+    return collectedTypes;
+  }
+
+
+  @Contract(mutates = "param2")
+  private static void addInterfaceTypes(@NotNull Class<?> type,
+                                        @NotNull Set<Class<?>> collectedTypes)
+  {
     for(final Class<?> interfaceType: type.getInterfaces())
-      if (!interfaceTypes.contains(interfaceType))
+      if (!collectedTypes.contains(interfaceType))
       {
-        interfaceTypes.add(interfaceType);
-        interfaceTypes.addAll(getInterfaceTypes(interfaceType));
+        collectedTypes.add(interfaceType);
+        addInterfaceTypes(interfaceType, collectedTypes);
       }
+  }
 
-    return interfaceTypes;
+
+
+
+  private static final class PrioritizedFormatter implements Comparable<PrioritizedFormatter>
+  {
+    private final byte order;
+    private final @NotNull ParameterFormatter formatter;
+
+
+    private PrioritizedFormatter(byte order, @NotNull ParameterFormatter formatter)
+    {
+      this.order = order;
+      this.formatter = formatter;
+    }
+
+
+    @Override
+    public int compareTo(@NotNull PrioritizedFormatter o) {
+      return Byte.compare(order, o.order);
+    }
+
+
+    @Override
+    public boolean equals(Object o)
+    {
+      if (this == o)
+        return true;
+      if (!(o instanceof PrioritizedFormatter))
+        return false;
+
+      final PrioritizedFormatter that = (PrioritizedFormatter)o;
+
+      return order == that.order && formatter.equals(that.formatter);
+    }
+
+
+    @Override
+    public int hashCode() {
+      return (59 + order) * 59 + formatter.hashCode();
+    }
+
+
+    @Override
+    public String toString() {
+      return "PrioritizedFormatter(order=" + order + ",formatter=" + formatter + ')';
+    }
   }
 }

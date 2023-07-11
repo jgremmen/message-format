@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,10 +24,11 @@ options {
 
 @header {
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.internal.part.*;
-import de.sayayi.lib.message.data.Data;
-import de.sayayi.lib.message.data.map.*;
-import java.util.Map;
+import de.sayayi.lib.message.part.TemplatePart;
+import de.sayayi.lib.message.part.TextPart;
+import de.sayayi.lib.message.part.parameter.ParameterPart;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey;
+import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 }
 
 
@@ -36,7 +37,7 @@ message returns [Message.WithSpaces value]
         ;
 
 message0 returns [Message.WithSpaces value]
-        : (textPart? parameter)* textPart?
+        : (textPart | parameterPart | templatePart)*
         ;
 
 textPart returns [TextPart value]
@@ -48,63 +49,62 @@ text returns [String value]
         ;
 
 quotedMessage returns [Message.WithSpaces value]
-        : SINGLE_QUOTE_START message0 SINGLE_QUOTE_END
-        | DOUBLE_QUOTE_START message0 DOUBLE_QUOTE_END
+        : SQ_START message0 SQ_END
+        | DQ_START message0 DQ_END
         ;
 
 string returns [String value]
-        : SINGLE_QUOTE_START text? SINGLE_QUOTE_END
-        | DOUBLE_QUOTE_START text? DOUBLE_QUOTE_END
+        : SQ_START text? SQ_END
+        | DQ_START text? DQ_END
         ;
 
 forceQuotedMessage returns [Message.WithSpaces value]
         : quotedMessage
+        | nameOrKeyword
         | string
         ;
 
-parameter returns [ParameterPart value]
-        : PARAM_START name=NAME (COMMA format=NAME)? (COMMA data)? PARAM_END
+parameterPart returns [ParameterPart value]
+        : P_START
+          name=nameOrKeyword
+          (COMMA format=nameOrKeyword)?
+          (COMMA configElement)*
+          (COMMA COLON forceQuotedMessage)?
+          P_END
         ;
 
-data returns [Data value]
-        : string  #dataString
-        | NUMBER  #dataNumber
-        | map     #dataMap
+templatePart returns [TemplatePart value]
+        : TPL_START
+          nameOrKeyword
+          TPL_END
         ;
 
-map returns [Map<MapKey,MapValue> value]
-        : MAP_START mapElements (COMMA forceQuotedMessage)? MAP_END
+configElement returns [ConfigKey key, ConfigValue value]
+        : configKey COLON configValue
         ;
 
-mapElements returns [Map<MapKey,MapValue> value]
-        : mapElement (COMMA mapElement)*
+configKey returns [ConfigKey key]
+        : relationalOperatorOptional string  #configKeyString
+        | relationalOperatorOptional NUMBER  #configKeyNumber
+        | BOOL                               #configKeyBool
+        | equalOperatorOptional NULL         #configKeyNull
+        | equalOperatorOptional EMPTY        #configKeyEmpty
+        | NAME                               #configKeyName
         ;
 
-mapElement returns [MapKey key, MapValue value]
-        : mapKey COLON mapValue
+configValue returns [ConfigValue value]
+        : BOOL           #configValueBool
+        | NUMBER         #configValueNumber
+        | string         #configValueString
+        | nameOrKeyword  #configValueString
+        | quotedMessage  #configValueMessage
         ;
 
-mapKey returns [MapKey key]
-        : relationalOperatorOptional string  #mapKeyString
-        | relationalOperatorOptional NUMBER  #mapKeyNumber
-        | BOOL                               #mapKeyBool
-        | equalOperatorOptional NULL         #mapKeyNull
-        | equalOperatorOptional EMPTY        #mapKeyEmpty
-        | NAME                               #mapKeyName
-        ;
-
-mapValue returns [MapValue value]
-        : string         #mapValueString
-        | NUMBER         #mapValueNumber
-        | BOOL           #mapValueBool
-        | quotedMessage  #mapValueMessage
-        ;
-
-relationalOperatorOptional returns [MapKey.CompareType cmp]
+relationalOperatorOptional returns [ConfigKey.CompareType cmp]
         : relationalOperator?
         ;
 
-relationalOperator returns [MapKey.CompareType cmp]
+relationalOperator returns [ConfigKey.CompareType cmp]
         : equalOperator
         | LTE
         | LT
@@ -112,11 +112,18 @@ relationalOperator returns [MapKey.CompareType cmp]
         | GTE
         ;
 
-equalOperatorOptional returns [MapKey.CompareType cmp]
+equalOperatorOptional returns [ConfigKey.CompareType cmp]
         : equalOperator?
         ;
 
-equalOperator returns [MapKey.CompareType cmp]
+equalOperator returns [ConfigKey.CompareType cmp]
         : EQ
         | NE
+        ;
+
+nameOrKeyword returns [String name]
+        : NAME
+        | BOOL
+        | NULL
+        | EMPTY
         ;

@@ -1,0 +1,128 @@
+= Typed Formatters
+
+TODO
+
+
+[[array]]
+== Array
+
+[frame=none,grid=rows,cols="2,3,5",width=100%]
+|===
+|Key |Default |Description
+
+|`list-null`
+|(empty)
+|Replacement text for `null` elements
+
+|`list-this`
+|`(this array)`
+|Replacement text for an element which references this array
+
+|`list-sep`
+|`, `
+|Separartor text between elements
+
+|`list-sep-last`
+|(same as `list-sep`)
+|Separator text between the last 2 elements
+|===
+
+
+[[date]]
+== Date
+
+TODO
+
+
+[[enum]]
+== Enum
+
+TODO
+
+
+[[field]]
+== Field
+
+TODO
+
+
+[[file]]
+== File
+
+TODO
+
+
+[[inet]]
+== Inet
+
+TODO
+
+
+[[iterable]]
+== Iterable
+
+TODO
+
+
+[[map]]
+== Map
+
+TODO
+
+
+[[method]]
+== Method
+
+TODO
+
+
+[[number]]
+== Number
+
+TODO
+
+
+[[optional]]
+== Optional
+
+TODO
+
+
+[[path]]
+== Path
+
+TODO
+
+
+[[string]]
+== String
+
+This formatter will be automatically selected for character
+sequences (`char[]` or `java.lang.CharSequence`). In addition to that it is also the default formatter
+associated with `java.lang.Object`.
+
+The formatter has no formatting configuration options.
+
+
+[[supplier]]
+== Supplier
+
+TODO
+
+
+[[throwable]]
+== Throwable
+
+TODO
+
+
+[[uri]]
+== URI
+
+TODO
+
+
+[[url]]
+== URL
+
+TODO

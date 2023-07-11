@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,9 @@
  */
 package de.sayayi.lib.message;
 
-import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.exception.MessageFormatException;
+import de.sayayi.lib.message.part.MessagePart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,98 +25,136 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
+
+import static java.util.Collections.unmodifiableSet;
 
 
 /**
+ * This interface describes a message in its most generic form.
  * <p>
- *   This interface describes a message in its most generic form.
- * </p>
- * <p>
- *   Messages are thread safe.
- * </p>
+ * Messages are immutable and thread safe.
  *
  * @see LocaleAware
  * @see WithCode
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public interface Message extends Serializable
 {
   /**
-   * <p>
-   *   Formats the message based on the message parameters provided.
-   * </p>
+   * Formats the message based on the message parameters provided.
    *
-   * @param messageContext  message context providing formatting information, never {@code null}
-   * @param parameters      message parameters, never {@code null}
+   * @param messageAccessor  message context providing formatting information, not {@code null}
+   * @param parameters       message parameters, not {@code null}
    *
    * @return  formatted message, never {@code null}
+   *
+   * @throws MessageFormatException  in case a formatting error occurred
    */
   @Contract(pure = true)
-  @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters);
+  @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
+      throws MessageFormatException;
 
 
   /**
-   * <p>
-   *   Formats the message based on the message parameters provided.
-   * </p>
+   * Formats the message based on the message parameters provided.
    *
-   * @param messageContext   message context providing formatting information, never {@code null}
-   * @param parameterValues  message parameter values, never {@code null}
+   * @param messageAccessor   message context providing formatting information, not {@code null}
+   * @param parameterValues   message parameter values, not {@code null}
    *
-   * @return  formatted message
+   * @return  formatted message, never {@code null}
+   *
+   * @throws MessageFormatException  in case a formatting error occurred
    */
   @Contract(pure = true)
-  default String format(@NotNull MessageContext messageContext, @NotNull Map<String,Object> parameterValues) {
-    return format(messageContext, messageContext.parameters(parameterValues));
-  }
-
-
-  /**
-   * Tells whether this message contains one or more parameters.
-   *
-   * @return  {@code true} if this message contains parameters, {@code false} otherwise
-   */
-  @Contract(pure = true)
-  boolean hasParameters();
-
-
-  /**
-   * Return a set of all parameters provided with this message.
-   *
-   * @return  parameter names, never {@code null}
-   */
-  @Contract(pure = true)
-  @NotNull SortedSet<String> getParameterNames();
-
-
-
-
-  interface WithSpaces extends Message, SpacesAware
+  default @NotNull String format(@NotNull MessageAccessor messageAccessor,
+                                 @NotNull Map<String,Object> parameterValues)
+      throws MessageFormatException
   {
-    /**
-     * <p>
-     *   Returns this message without leading or trailing space.
-     * </p>
-     * <p>
-     *   The returned message may still implement {@link WithSpaces} but the methods
-     *   {@link WithSpaces#isSpaceBefore()} and {@link WithSpaces#isSpaceAfter()} must return {@code false}.
-     * </p>
-     *
-     * @return  trimmed message, never {@code null}
-     */
-    @Contract(pure = true)
-    @NotNull Message trim();
+    return format(messageAccessor, new Parameters() {
+      @Override
+      public @NotNull Locale getLocale() {
+        return messageAccessor.getLocale();
+      }
+
+      @Override
+      public Object getParameterValue(@NotNull String parameter) {
+        return parameterValues.get(parameter);
+      }
+
+      @Override
+      public @NotNull Set<String> getParameterNames() {
+        return unmodifiableSet(parameterValues.keySet());
+      }
+    });
+  }
+
+
+  /**
+   * Returns the message parts that when concatenated are equivalent to this message.
+   * <p>
+   * Messages that implement ({@link LocaleAware LocaleAware}) are not required to return a
+   * sensible value. It is even valid to throw an exception like
+   * {@code UnsupportedOperationException}.
+   *
+   * @return  message parts, never {@code null}
+   *
+   * @since 0.8.0
+   */
+  @Contract(pure = true)
+  @NotNull MessagePart[] getMessageParts();
+
+
+  /**
+   * Returns a set with all templates names in use by this message.
+   *
+   * @return  unmodifiable set of template names, never {@code null}
+   *
+   * @since 0.8.0
+   */
+  @Contract(pure = true)
+  @NotNull Set<String> getTemplateNames();
+
+
+  /**
+   * Checks whether this message is the same as the given {@code message}. Messages are
+   * considered "the same" when the message parts of both messages are identical.
+   * <p>
+   * {@link LocaleAware LocaleAware} messages are "the same" when both locale and associated
+   * message are identical for all locales provided by this message. Locale aware messages must be
+   * properly handled by overriding methods.
+   * <p>
+   * Identical messages with different codes ({@link WithCode WithCode}) are still considered the
+   * same.
+   *
+   * @param message  message to compare with this message, not {@code null}
+   *
+   * @return  {@code true} if both messages are identical, {@code false} otherwise
+   *
+   * @see Message#getMessageParts()
+   *
+   * @since 0.8.0
+   */
+  @Contract(pure = true)
+  boolean isSame(@NotNull Message message);
+
+
+
+
+  /**
+   * A message class implementing this interface provides information about leading/trailing
+   * spaces.
+   */
+  interface WithSpaces extends Message, SpacesAware {
   }
 
 
 
 
   /**
-   * <p>
-   *   A message class implementing this interface provides an additional code uniquely identifying the message.
-   * </p>
+   * A message class implementing this interface provides an additional code uniquely
+   * identifying the message.
    */
   interface WithCode extends Message
   {
@@ -131,18 +171,17 @@ public interface Message extends Serializable
 
 
   /**
-   * <p>
-   *   Message classes implementing this interface are capable of formatting messages for one or more locales.
-   * </p>
+   * Message classes implementing this interface are capable of formatting messages for one or
+   * more locales.
    */
   interface LocaleAware extends Message
   {
     /**
      * {@inheritDoc}
      * <p>
-     *   The message is formatted with respect to the locale provided by {@code parameters}. If the locale does not
-     *   match any of the localized messages, a default message will be selected using the following rules
-     * </p>
+     * The message is formatted with respect to the locale provided by {@code parameters}. If the
+     * locale does not match any of the localized messages, a default message will be selected
+     * using the following rules
      * <ol>
      *   <li>a message with the same language but a different country</li>
      *   <li>the 1st available message (this may be implementation dependant)</li>
@@ -152,19 +191,65 @@ public interface Message extends Serializable
      */
     @Contract(pure = true)
     @Override
-    @NotNull String format(@NotNull MessageContext messageContext, @NotNull Parameters parameters);
+    @NotNull String format(@NotNull MessageAccessor messageAccessor,
+                           @NotNull Parameters parameters);
 
 
     /**
      * Returns a set of all available locales this message supports.
      *
-     * @return  all available locales, never {@code null}
+     * @return  unmodifiable set of all available locales, never {@code null}
      */
     @Contract(pure = true)
     @NotNull Set<Locale> getLocales();
 
 
+    /**
+     * Returns a map of all messages keyed by locale.
+     *
+     * @return  unmodifiable map of all messages keyed by locale, never {@code null}
+     */
     @Contract(pure = true)
     @NotNull Map<Locale,Message> getLocalizedMessages();
+  }
+
+
+
+
+  /**
+   * @since 0.8.0
+   */
+  interface Parameters
+  {
+    /**
+     * Tells for which locale the message must be formatted. If no locale is provided or if no
+     * message is available for the given locale, the formatter will look for a reasonable
+     * default message.
+     *
+     * @return  locale, never {@code null}
+     */
+    @Contract(pure = true)
+    @NotNull Locale getLocale();
+
+
+    /**
+     * Returns the value for the named {@code parameter}.
+     *
+     * @param parameter  parameter name, not {@code null}
+     *
+     * @return  parameter value or {@code null} if no value is available for the given
+     *          parameter name
+     */
+    @Contract(pure = true)
+    Object getParameterValue(@NotNull String parameter);
+
+
+    /**
+     * Returns a set with names for all parameters available in this context.
+     *
+     * @return  set with all data names, never {@code null}
+     */
+    @Contract(pure = true)
+    @NotNull Set<String> getParameterNames();
   }
 }

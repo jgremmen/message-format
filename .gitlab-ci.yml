@@ -1,5 +1,5 @@
 # CI script
-image: java:8-jdk
+image: localhost:5000/sayayi-jdk:17
 
 stages:
   - build
@@ -9,6 +9,7 @@ variables:
   GRADLE_USER_HOME: ".gradle-cache"
 
 before_script:
+  - export JAVA_HOME="/usr/lib/jvm/jdk-17"
   - chmod +x ./gradlew
 
 cache:
@@ -17,14 +18,15 @@ cache:
 
 build:
   stage: build
-  script: ./gradlew clean build
+  tags:
+    - docker
+  script:
+    - ./gradlew clean build
+    - ./gradlew docs
   artifacts:
     name: "message-format-artifacts"
     paths:
       - message-format/.build/libs/*.jar
-      - message-format-cpscan/.build/libs/*.jar
       - message-format-jodatime/.build/libs/*.jar
-      - message-format-jsr354/.build/libs/*.jar
-    exclude:
-      - message-format/.build/libs/message-format-test-*.jar
+      - message-gradle-plugin/.build/libs/*.jar
     expire_in: 2 weeks

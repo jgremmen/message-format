@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,14 +17,12 @@ package de.sayayi.lib.message.parser.normalizer;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.internal.ParameterizedMessage;
-import de.sayayi.lib.message.internal.part.MessagePart;
-import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.internal.CompoundMessage;
+import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.TextPart;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.platform.commons.util.ReflectionUtils.tryToReadFieldValue;
 
 
@@ -79,9 +77,9 @@ public class LRUMessagePartNormalizerTest
   public void testCache() throws Exception
   {
     final LRUMessagePartNormalizer resolver = new LRUMessagePartNormalizer(10);
-    final Message.WithSpaces msg = new MessageFactory(resolver).parse("this is %{a,number} and %{b}this is %{b}");
+    final Message.WithSpaces msg = new MessageFactory(resolver).parseMessage("this is %{a,number} and %{b}this is %{b}");
     final MessagePart[] parts = (MessagePart[])
-        tryToReadFieldValue(ParameterizedMessage.class, "parts", (ParameterizedMessage)msg).get();
+        tryToReadFieldValue(CompoundMessage.class, "messageParts", (CompoundMessage)msg).get();
 
     assertEquals(6, parts.length);
 

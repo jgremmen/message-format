@@ -1,0 +1,66 @@
+/*
+ * Copyright 2023 Jeroen Gremmen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+  id 'de.sayayi.plugin.gradle.libdocs' version "1.0-SNAPSHOT"
+}
+
+
+repositories {
+  mavenCentral()
+}
+
+
+dependencies {
+  runtimeOnly(project(":message-format")) {
+    capabilities {
+      requireCapability 'de.sayayi.lib:message-format-optional'
+    }
+  }
+
+  runtimeOnly project(":message-format-jodatime")
+
+  runtimeOnly "org.projectlombok:lombok:${lombokVersion}"
+  runtimeOnly "org.jetbrains:annotations-java5:${jetbrainsAnnotationsVersion}"
+}
+
+
+libdocs {
+  title = 'Message Format Library'
+  email = 'message-format@reg.sayayi.de'
+
+  gitHubUrl = uri('https://github.com/jgremmen/message-format/')
+
+  javadocs {
+    useDefaultCss = true
+
+    exclude '**/parser/MessageLexer.java'
+    exclude '**/parser/MessageParser*.java'
+    exclude '**/pack/*.java'
+    exclude '**/*Impl.java'
+
+    linksOffline "https://javadoc.io/doc/org.antlr/antlr4-runtime/4.9.3/",
+        "${rootDir}/gradle/javadocs/antlr4-runtime"
+    linksOffline "https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/0.3.1/",
+        "${rootDir}/gradle/javadocs/antlr4-runtime-ext"
+    linksOffline "https://javadoc.io/doc/joda-time/joda-time/2.12.5/",
+        "${rootDir}/gradle/javadocs/joda-time"
+    linksOffline "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
+        "${rootDir}/gradle/javadocs/message-format"
+    linksOffline "https://javadoc.io/doc/org.springframework/spring-core/5.3.28/",
+        "${rootDir}/gradle/javadocs/spring-core"
+  }
+}

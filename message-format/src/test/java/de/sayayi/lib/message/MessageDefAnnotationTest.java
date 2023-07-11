@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,17 +17,23 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.Message.WithCode;
+import de.sayayi.lib.message.adopter.AsmAnnotationAdopter;
 import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
+import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Locale;
-import java.util.Set;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static java.util.Locale.forLanguageTag;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -36,43 +42,49 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class MessageDefAnnotationTest
 {
-  private static MessageBundle bundle;
+  private static MessageSupport messageSupport;
 
 
   @BeforeAll
-  static void initialize() {
-    bundle = new MessageBundle(NO_CACHE_INSTANCE, MessageDefAnnotationTest.class);
+  static void initialize()
+  {
+    val cms = MessageSupportFactory
+        .create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+
+    new AsmAnnotationAdopter(cms).adopt(MessageDefAnnotationTest.class);
+
+    messageSupport = cms;
   }
 
 
   @Test
+  @DisplayName("Multiple message def annotations on same method")
   @MessageDef(code = "T4", texts = @Text(locale = "en", text = "Message %{p1}"))
   @MessageDef(code = "T5", texts = {
       @Text(locale = "en", text = "English message"),
       @Text(locale = "de", text = "Deutsche   Nachricht")
   })
-  public void testMultiMessageAnotation()
+  void testMultiMessageAnnotation()
   {
-    WithCode msg = bundle.getByCode("T4");
+    WithCode msg = messageSupport.code("T4").getMessage();
 
     assertEquals("T4", msg.getCode());
-    assertTrue(msg.hasParameters());
-    assertTrue(msg instanceof LocaleAware);
+    assertFalse(msg instanceof LocaleAware);
 
-    msg = bundle.getByCode("T5");
+    msg = messageSupport.code("T5").getMessage();
 
     assertEquals("T5", msg.getCode());
-    assertFalse(msg.hasParameters());
     assertTrue(msg instanceof LocaleAware);
   }
 
 
   @Test
+  @DisplayName("Empty message with code")
   @MessageDef(code = "MSG-052", texts = {})
   @SuppressWarnings("DefaultAnnotationParam")
-  public void testEmptyMessageWithCode()
+  void testEmptyMessageWithCode()
   {
-    final WithCode msg = bundle.getByCode("MSG-052");
+    val msg = messageSupport.code("MSG-052").getMessage();
 
     assertTrue(msg instanceof EmptyMessageWithCode);
     assertEquals("MSG-052", msg.getCode());
@@ -80,58 +92,66 @@ public class MessageDefAnnotationTest
 
 
   @Test
+  @DisplayName("Message without locale for context with locale")
   @MessageDef(code = "T3", text = "m3")
-  public void testMessageWithoutLocale()
+  void testMessageWithoutLocale()
   {
-    final WithCode msg = bundle.getByCode("T3");
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+    val msg = messageSupport.code("T3").getMessage();
+    val messageAccessor = messageSupport.getMessageAccessor();
 
-    assertEquals("m3", msg.format(context, context.noParameters()));
-    assertEquals("m3", msg.format(context, context.parameters().withLocale(Locale.ROOT)));
-    assertEquals("m3", msg.format(context, context.parameters().withLocale(Locale.US)));
-    assertEquals("m3", msg.format(context, context.parameters().withLocale("xx-YY")));
+    assertEquals("m3", msg.format(messageAccessor, NoParameters.EMPTY));
+    assertEquals("m3", msg.format(messageAccessor, new NoParameters(Locale.ROOT)));
+    assertEquals("m3", msg.format(messageAccessor, new NoParameters(Locale.US)));
+    assertEquals("m3",
+        msg.format(messageAccessor, new NoParameters(forLanguageTag("xx-YY"))));
     assertFalse(msg instanceof LocaleAware);
   }
 
 
   @Test
+  @DisplayName("Single message selection for context with exact and lenient locales")
   @MessageDef(code = "T2", texts = @Text(locale = "nl-NL", text = "nl"))
-  public void testSingleMessageWithLocale()
+  void testSingleMessageWithLocale()
   {
-    final WithCode msg = bundle.getByCode("T2");
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+    val msg = messageSupport.code("T2").getMessage();
+    val messageAccessor = messageSupport.getMessageAccessor();
 
-    assertEquals("nl", msg.format(context, context.noParameters()));
-    assertEquals("nl", msg.format(context, context.parameters().withLocale(Locale.ROOT)));
-    assertEquals("nl", msg.format(context, context.parameters().withLocale(Locale.US)));
-    assertEquals("nl", msg.format(context, context.parameters().withLocale("xx-YY")));
+    assertEquals("nl", msg.format(messageAccessor, NoParameters.EMPTY));
+    assertEquals("nl", msg.format(messageAccessor, new NoParameters(Locale.ROOT)));
+    assertEquals("nl", msg.format(messageAccessor, new NoParameters(Locale.US)));
+    assertEquals("nl",
+        msg.format(messageAccessor, new NoParameters(forLanguageTag("xx-YY"))));
   }
 
 
   @Test
+  @DisplayName("Message selection for context with exact and lenient locales")
   @MessageDef(code = "T1", texts={
       @Text(locale = "en-US", text = "us"),
       @Text(locale = "nl", text = "nl"),
       @Text(locale = "en-GB", text = "uk"),
       @Text(locale = "de-DE", text = "de")
   })
-  public void testLocaleSelection()
+  void testLocaleSelection()
   {
-    final WithCode msg = bundle.getByCode("T1");
-    final MessageContext context = new MessageContext(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+    val msg = messageSupport.code("T1").getMessage();
+    val messageAccessor = messageSupport.getMessageAccessor();
 
-    assertEquals("us", msg.format(context, context.parameters().withLocale(Locale.ROOT)));
-    assertEquals("uk", msg.format(context, context.parameters().withLocale(Locale.UK)));
-    assertEquals("nl", msg.format(context, context.parameters().withLocale("nl-BE")));
-    assertEquals("us", msg.format(context, context.parameters().withLocale(Locale.CHINESE)));
-    assertEquals("de", msg.format(context, context.parameters().withLocale("de-AT")));
+    assertEquals("us", msg.format(messageAccessor, new NoParameters(Locale.ROOT)));
+    assertEquals("uk", msg.format(messageAccessor, new NoParameters(Locale.UK)));
+    assertEquals("nl",
+        msg.format(messageAccessor, new NoParameters(forLanguageTag("nl-BE"))));
+    assertEquals("us", msg.format(messageAccessor, new NoParameters(Locale.CHINESE)));
+    assertEquals("de",
+        msg.format(messageAccessor, new NoParameters(forLanguageTag("de-AT"))));
   }
 
 
   @Test
-  public void testCodes()
+  @DisplayName("All message codes present")
+  void testCodes()
   {
-    Set<String> codes = bundle.getCodes();
+    val codes = messageSupport.getMessageAccessor().getMessageCodes();
 
     assertTrue(codes.contains("T1"));
     assertTrue(codes.contains("T2"));
@@ -139,5 +159,27 @@ public class MessageDefAnnotationTest
     assertTrue(codes.contains("T4"));
     assertTrue(codes.contains("T5"));
     assertTrue(codes.contains("MSG-052"));
+  }
+
+
+  @Test
+  @DisplayName("Pack message bundle and unpack it to a new bundle")
+  void testPackUnpack() throws IOException
+  {
+    val packStream = new ByteArrayOutputStream();
+    messageSupport.exportMessages(packStream, true, code -> code.startsWith("T"));
+
+    val newMessageSupport = MessageSupportFactory
+        .create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+    newMessageSupport.importMessages(new ByteArrayInputStream(packStream.toByteArray()));
+
+    val codes = newMessageSupport.getMessageAccessor().getMessageCodes();
+
+    assertTrue(codes.contains("T1"));
+    assertTrue(codes.contains("T2"));
+    assertTrue(codes.contains("T3"));
+    assertTrue(codes.contains("T4"));
+    assertTrue(codes.contains("T5"));
+    assertFalse(codes.contains("MSG-052"));
   }
 }

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,35 +15,41 @@
  */
 package de.sayayi.lib.message.annotation;
 
-import de.sayayi.lib.message.MessageContext;
-import de.sayayi.lib.message.MessageContext.Parameters;
+import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import org.intellij.lang.annotations.Language;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.RetentionPolicy.CLASS;
 
 
 /**
+ * Message text annotation.
+ *
+ * @see MessageDef
+ * @see TemplateDef
+ *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 @Target(ANNOTATION_TYPE)
-@Retention(RUNTIME)
+@Retention(CLASS)
+@SuppressWarnings("UnknownLanguage")
 public @interface Text
 {
   /**
+   * Message locale, either the language code (eg. de, es) or the language with country
+   * (eg. de_DE, fr_CA).
    * <p>
-   *   Message locale, either the language code (de, es) or the language with country (de_DE, fr_CA).
-   * </p>
-   * <p>
-   *   The default value corresponds to {@link java.util.Locale#ROOT} which will match any locale used for formatting
-   *   this message.
-   * </p>
+   * The default value corresponds to {@link java.util.Locale#ROOT} which will match any locale
+   * used for formatting this message.
    *
    * @return  message locale
    *
-   * @see de.sayayi.lib.message.Message#format(MessageContext, Parameters)
+   * @see de.sayayi.lib.message.Message#format(MessageAccessor, Parameters)
    */
   String locale() default "";
 
@@ -53,18 +59,18 @@ public @interface Text
    *
    * @return  message text
    */
+  @Language("MessageFormat")
   String text() default "";
 
 
   /**
+   * Not localized message text.
    * <p>
-   *   Not localized message text.
-   * </p>
-   * <p>
-   *   This value is used only if {@code locale} and {@code text} are not set. Otherwise its value is ignored.
-   * </p>
+   * This value is used only if {@code locale} and {@code text} are not set. Otherwise its value
+   * is ignored.
    *
    * @return  message text
    */
+  @Language("MessageFormat")
   String value() default "";
 }

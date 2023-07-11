@@ -1,6 +1,25 @@
+pluginManagement {
+  repositories {
+    // plugin snapshot repository
+    maven {
+      url "https://artifactory.sayayi.de/artifactory/plugins-snapshot/"
+      mavenContent {
+        includeGroupByRegex 'de\\.sayayi\\.plugin\\.gradle.*'
+        snapshotsOnly()
+      }
+    }
+
+    // default gradle plugin portal
+    gradlePluginPortal()
+  }
+}
+
+
 include "message-format"
-include "message-format-cpscan"
 include "message-format-jodatime"
+include "message-gradle-plugin"
+include "documentation"
+
 
 rootProject.name = 'message-format-projects'
 rootProject.children.each {project ->

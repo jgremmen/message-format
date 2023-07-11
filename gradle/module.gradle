@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,37 +15,25 @@
  */
 
 apply plugin: "java-library"
-apply plugin: "maven-publish"
 apply plugin: "jacoco"
-apply plugin: "signing"
 
 
 dependencies {
-  annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-
-  compileOnly "org.projectlombok:lombok:${lombokVersion}"
-  compileOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
+  compileOnly "org.jetbrains:annotations-java5:${jetbrainsAnnotationsVersion}"
 
   testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+  testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-  testCompileOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
+  testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 
 repositories {
   mavenCentral()
-  maven {
-    url "http://artifactory.sayayi.de/artifactory/maven/"
-    allowInsecureProtocol = true
-  }
 }
 
 
 java {
-  toolchain {
-    languageVersion = JavaLanguageVersion.of(8)
-  }
-
   withJavadocJar()
   withSourcesJar()
 }
@@ -56,7 +44,10 @@ test {
 }
 
 
-tasks.withType(Jar) {
+jar.dependsOn test
+
+
+tasks.withType(Jar).configureEach {
   includeEmptyDirs = false
   preserveFileTimestamps = true
   reproducibleFileOrder = true
@@ -67,15 +58,29 @@ tasks.withType(Jar) {
         "Implementation-Vendor-Id": "de.sayayi",
         "Implementation-Title": project.name,
         "Implementation-Version": project.version,
-        "Created-By": "${System.getProperty("java.version")} (${System.getProperty("java.specification.vendor")})",
+        "Created-By": "${System.getProperty("java.version")}",
         "Built-Date": new Date().format('yyyy-MM-dd HH:mm:ss')
     )
   }
 
-  from("${rootDir}") {
+  from(rootDir) {
     include "LICENSE"
     into "META-INF"
     expand(copyright: new Date().format("yyyy"), version: project.version)
+  }
+}
+
+
+tasks.withType(JavaCompile).configureEach {
+  javaCompiler = javaToolchains.compilerFor {
+    languageVersion = JavaLanguageVersion.of(8)
+  }
+}
+
+
+tasks.withType(Test).configureEach {
+  javaLauncher = javaToolchains.launcherFor {
+    languageVersion = JavaLanguageVersion.of(8)
   }
 }
 
@@ -85,21 +90,28 @@ afterEvaluate {
     title "${project.description} ${version}"
 
     (options as StandardJavadocDocletOptions).with {
-      linksOffline 'http://javadox.com/org.jetbrains/annotations/15.0/', "${rootDir}/gradle/javadocs/jetbrains-annotations"
-      linksOffline 'https://www.antlr.org/api/Java/', "${rootDir}/gradle/javadocs/antlr4-runtime"
+      linksOffline(
+          "https://javadoc.io/doc/org.jetbrains/annotations-java5/${jetbrainsAnnotationsVersion}/",
+          "${rootDir}/gradle/javadocs/jetbrains-annotations")
 
       encoding 'UTF-8'
 
-      group("Message Core", [
+      group("Core", [
           "de.sayayi.lib.message",
-          "de.sayayi.lib.message.annotation",
-          "de.sayayi.lib.message.data*",
           "de.sayayi.lib.message.exception",
-          "de.sayayi.lib.message.internal*",
-          "de.sayayi.lib.message.parser"
+          "de.sayayi.lib.message.parser*",
+          "de.sayayi.lib.message.part*"
       ])
-      group("Message Formatters", [
+      group("Adopters", [
+          "de.sayayi.lib.message.adopter",
+          "de.sayayi.lib.message.annotation",
+      ])
+      group("Formatters", [
           "de.sayayi.lib.message.formatter*"
+      ])
+      group("Internal", [
+          "de.sayayi.lib.message.internal*",
+          "de.sayayi.lib.message.util"
       ])
 
       noQualifiers 'java.util', 'java.lang'
@@ -124,25 +136,7 @@ compileTestJava {
 
 jacocoTestReport {
   reports {
-    xml.enabled true
-    html.enabled true
-  }
-}
-
-
-publishing {
-  repositories {
-    maven {
-      name = "mavenTemp"
-      url = "${rootProject.buildDir}/repository"
-    }
-    maven {
-      name = "mavenCentral"
-      url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-      credentials {
-        username = rootProject.findProperty('mavenCentral.username')
-        password = rootProject.findProperty('mavenCentral.password')
-      }
-    }
+    xml.required = true
+    html.required = true
   }
 }

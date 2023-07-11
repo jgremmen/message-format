@@ -1,0 +1,130 @@
+/*
+ * Copyright 2023 Jeroen Gremmen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+  id 'java-library'
+  id 'java-gradle-plugin'
+}
+
+
+description = 'Message Format Gradle Plugin'
+
+
+def asmVersion = "[6.0,)"
+
+
+configurations {
+  testAnnotationProcessor.extendsFrom annotationProcessor
+  testCompileOnly.extendsFrom compileOnly
+}
+
+
+repositories {
+  mavenCentral()
+}
+
+
+dependencies {
+  gradleApi()
+
+  annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+  compileOnly "org.projectlombok:lombok:${lombokVersion}"
+
+  implementation project(":message-format")
+  implementation "org.ow2.asm:asm:${asmVersion}"
+
+  testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+  testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+}
+
+
+tasks.withType(JavaCompile).configureEach {
+  javaCompiler = javaToolchains.compilerFor {
+    languageVersion = JavaLanguageVersion.of(8)
+  }
+}
+
+
+jar {
+  archiveBaseName = 'message-format-gradle-plugin'
+
+  manifest {
+    attributes(
+        "Implementation-Vendor": "Jeroen Gremmen",
+        "Implementation-Vendor-Id": "de.sayayi",
+        "Implementation-Title": project.description,
+        "Implementation-Version": project.version,
+        "Created-By": System.getProperty("java.version"),
+        "Built-Date": new Date().format('yyyy-MM-dd HH:mm:ss')
+    )
+  }
+}
+
+
+gradlePlugin {
+  plugins {
+    'message-format' {
+      id = 'de.sayayi.plugin.gradle.message'
+      displayName = 'Gradle Plugin to scan the class path, pre-compile and pack message and ' +
+                    'template formats into a single file.'
+      implementationClass = 'de.sayayi.plugin.gradle.message.MessageFormatPlugin'
+      tags.set(['sayayi', 'message-format', 'scan', 'pre-compile'])
+    }
+  }
+}
+
+
+publishing {
+  publications {
+    gradlePlugin(MavenPublication) {
+      from components.java
+
+      pom {
+        name = 'Java Message Format Gradle Plugin'
+        description = 'Gradle Plugin'
+        url = 'https://github.com/jgremmen/message-format'
+        inceptionYear = '2023'
+
+        licenses {
+          license {
+            name = 'Apache License, Version 2.0'
+            url = 'https://www.apache.org/licenses/LICENSE-2.0'
+            distribution = 'repo'
+          }
+        }
+
+        developers {
+          developer {
+            id = 'jgremmen'
+            name = 'Jeroen Gremmen'
+            email = 'jeroen.gremmen@sayayi.de'
+          }
+        }
+
+        scm {
+          connection = 'scm:git:git://github.com/jgremmen/message-format.git'
+          developerConnection = 'scm:git:git://github.com/jgremmen/message-format.git'
+          url = 'https://github.com/jgremmen/message-format'
+        }
+      }
+    }
+  }
+}
+
+
+signing {
+  sign publishing.publications.gradlePlugin
+}

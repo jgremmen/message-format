@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,13 +15,13 @@
  */
 package de.sayayi.lib.message.parser;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.parser.MessageLexer.CH;
-import static de.sayayi.lib.message.parser.MessageLexer.PARAM_START;
+import static de.sayayi.lib.message.parser.MessageLexer.P_START;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MessageTokenizerTest
 {
   @Test
+  @SuppressWarnings("UnnecessaryUnicodeEscape")
   public void testDefaultMode()
   {
     Lexer lexer = createFor("hi  \\u0021%{");
@@ -60,13 +61,13 @@ public class MessageTokenizerTest
     // %{
     token = lexer.nextToken();
     assertEquals("%{", token.getText());
-    assertEquals(PARAM_START, token.getType());
+    assertEquals(P_START, token.getType());
     assertEquals(10, token.getCharPositionInLine());
   }
 
 
-  @SuppressWarnings({ "SameParameterValue", "deprecation" })
+  @SuppressWarnings("SameParameterValue")
   private MessageLexer createFor(String msg) {
-    return new MessageLexer(new ANTLRInputStream(msg));
+    return new MessageLexer(CharStreams.fromString(msg));
   }
 }

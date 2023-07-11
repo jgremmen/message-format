@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,39 +14,76 @@
  * limitations under the License.
  */
 
+//file:noinspection DependencyNotationArgument
+
 plugins {
   id 'antlr'
   id 'idea'
-  id 'nebula.optional-base' version '5.0.3'
+  id 'de.sayayi.plugin.gradle.libapi' version "1.0-SNAPSHOT"
 }
 
 
 description = 'Message Format Library'
 
 
-configurations {
-  compile {
-    extendsFrom = extendsFrom.findAll { it != configurations.antlr }
+def antlrVersion = "4.9.3"
+def antlrExtVersion = "0.3.1"
+def asmVersion = "[6.0,)"
+def ehcacheVersion = "3.10.+"
+def javaxCacheApiVersion = "1.1.1"
+def springCoreVersion = "5.3.28"
+
+
+configurations.configureEach {
+  resolutionStrategy.cacheDynamicVersionsFor 30, 'minutes'
+}
+
+
+java {
+  registerFeature('optional') {
+    usingSourceSet sourceSets.main
   }
 }
 
 
-def antlrVersion = "4.9.3"
-def antlrExtVersion = "0.3.0"
-def ehcacheVersion = "3.10.4"
-def javaxCacheApiVersion = "1.1.1"
-
-
 dependencies {
-  implementation("de.sayayi.lib:antlr4-runtime-ext:${antlrExtVersion}") {
+  // main
+  annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+  compileOnly "org.projectlombok:lombok:${lombokVersion}"
+
+  implementation("de.sayayi.lib:antlr4-runtime-ext") {
+    version {
+      strictly '[0.3,0.4)'
+      prefer antlrExtVersion
+    }
+
     exclude group: 'org.antlr', module: 'antlr4'
+    exclude group: 'org.jetbrains'
   }
 
-  implementation "javax.cache:cache-api:${javaxCacheApiVersion}", optional
+  optionalImplementation "javax.cache:cache-api:${javaxCacheApiVersion}"
+  optionalImplementation "org.ow2.asm:asm:${asmVersion}"
+  optionalImplementation("org.springframework:spring-core") {
+    version {
+      strictly '[5.0,6.0)'
+      prefer springCoreVersion
+    }
 
-  testImplementation "org.ehcache:ehcache:${ehcacheVersion}"
+    transitive = false
+  }
+
+  // test
+  testImplementation("org.ehcache:ehcache:${ehcacheVersion}") {
+    exclude module: "jaxb-runtime"
+  }
 
   antlr "org.antlr:antlr4:${antlrVersion}"
+}
+
+
+configurations {
+  testAnnotationProcessor.extendsFrom annotationProcessor
+  testCompileOnly.extendsFrom compileOnly
 }
 
 
@@ -74,17 +111,31 @@ jar {
 }
 
 
+javadoc {
+  (options as StandardJavadocDocletOptions).with {
+    linksOffline "https://javadoc.io/doc/org.antlr/antlr4-runtime/${antlrVersion}/",
+        "${rootDir}/gradle/javadocs/antlr4-runtime"
+    linksOffline "https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/${antlrExtVersion}/",
+        "${rootDir}/gradle/javadocs/antlr4-runtime-ext"
+    linksOffline "https://javadoc.io/doc/org.springframework/spring-core/${springCoreVersion}/",
+        "${rootDir}/gradle/javadocs/spring-core"
+  }
+
+  exclude '**/parser/MessageLexer.java'
+  exclude '**/parser/MessageParser*.java'
+  exclude '**/pack/*.java'
+  exclude '**/*Impl.java'
+}
+
+
 publishing {
   publications {
 
     msgformat(MavenPublication) {
-      from components.java
+      suppressPomMetadataWarningsFor 'optionalApiElements'
+      suppressPomMetadataWarningsFor 'optionalRuntimeElements'
 
-      versionMapping {
-        usage('java-runtime') {
-          fromResolutionResult()
-        }
-      }
+      from components.java
 
       pom {
         name = 'Java Message Format Library'

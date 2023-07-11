@@ -1,6 +1,7 @@
 /.gradle/
-/.idea
+/gradle.properties
 
+.idea/
 .build/
 bin/
 out/

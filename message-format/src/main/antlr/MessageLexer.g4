@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,20 +17,19 @@ lexer grammar MessageLexer;
 
 
 tokens {
-    BOOL,
-    NUMBER,
-    COMMA,
-    NAME,
-    SINGLE_QUOTE_START,
-    DOUBLE_QUOTE_START
+    SQ_START,
+    DQ_START
 }
 
 
 
 // ------------------ Default mode ------------------
 
-PARAM_START
+P_START
         : ParamStart -> pushMode(PARAMETER)
+        ;
+TPL_START
+        : TemplateStart -> pushMode(TEMPLATE)
         ;
 CH
         : Character
@@ -44,10 +43,13 @@ CTRL_CHAR
 // ------------------ In single quoted text mode ------------------
 mode TEXT1;
 
-PARAM_START1
-        : ParamStart -> pushMode(PARAMETER), type(PARAM_START)
+P_START1
+        : ParamStart -> pushMode(PARAMETER), type(P_START)
         ;
-SINGLE_QUOTE_END
+TPL_START1
+        : TemplateStart -> pushMode(TEMPLATE), type(TPL_START)
+        ;
+SQ_END
         : '\'' -> popMode
         ;
 CH1
@@ -62,10 +64,13 @@ CTRL_CHAR1
 // ------------------ In double quoted text mode ------------------
 mode TEXT2;
 
-PARAM_START2
-        : ParamStart -> pushMode(PARAMETER), type(PARAM_START)
+P_START2
+        : ParamStart -> pushMode(PARAMETER), type(P_START)
         ;
-DOUBLE_QUOTE_END
+TPL_START2
+        : TemplateStart -> pushMode(TEMPLATE), type(TPL_START)
+        ;
+DQ_END
         : '"' -> popMode
         ;
 CH2
@@ -80,50 +85,18 @@ CTRL_CHAR2
 // ------------------ In parameter mode ------------------
 mode PARAMETER;
 
-PARAM_END
+P_END
         : '}' -> popMode
         ;
-P_COMMA
-        : ',' -> type(COMMA)
-        ;
-P_BOOL
-        : BoolLiteral -> type(BOOL)
-        ;
-P_NAME
-        : DashedName -> type(NAME)
-        ;
-P_NUMBER
-        : Number -> type(NUMBER)
-        ;
-P_SQ_START
-        : '\'' -> pushMode(TEXT1), type(SINGLE_QUOTE_START)
-        ;
-P_DQ_START
-        : '"' -> pushMode(TEXT2), type(DOUBLE_QUOTE_START)
-        ;
-P_WS
-        : (CtrlChar | ' ')+ -> skip
-        ;
-MAP_START
-        : '{' -> pushMode(MAP)
-        ;
-
-
-
-// ------------------ In map mode ------------------
-mode MAP;
-
-MAP_END
-        : '}' -> popMode
+COMMA
+        : ','
         ;
 COLON
         : ':'
         ;
-M_WS
-        : (CtrlChar | ' ')+ -> skip
-        ;
-M_COMMA
-        : ',' -> type(COMMA)
+BOOL
+        : 'true'
+        | 'false'
         ;
 NULL
         : 'null'
@@ -131,20 +104,20 @@ NULL
 EMPTY
         : 'empty'
         ;
-M_BOOL
-        : BoolLiteral -> type(BOOL)
+NAME
+        : DashedName
         ;
-M_NAME
-        : DashedName -> type(NAME)
+NUMBER
+        : Number
         ;
-M_NUMBER
-        : Number -> type(NUMBER)
+P_SQ_START
+        : '\'' -> pushMode(TEXT1), type(SQ_START)
         ;
-M_SQ_START
-        : '\'' -> pushMode(TEXT1), type(SINGLE_QUOTE_START)
+P_DQ_START
+        : '"' -> pushMode(TEXT2), type(DQ_START)
         ;
-M_DQ_START
-        : '"' -> pushMode(TEXT2), type(DOUBLE_QUOTE_START)
+P_WS
+        : (CtrlChar | ' ')+ -> skip
         ;
 EQ
         : '='
@@ -167,23 +140,33 @@ GTE
 
 
 
+// ------------------ Template -------------------
+mode TEMPLATE;
+
+TPL_END
+        : ']' -> popMode
+        ;
+T_NAME
+        : DashedName -> type(NAME)
+        ;
+T_WS
+        : (CtrlChar | ' ')+ -> skip
+        ;
+
+
+
 // ------------------ Fragments ------------------
 
 fragment ParamStart
         : '%{'
         ;
 
-fragment BoolLiteral
-        : 'true'
-        | 'false'
+fragment TemplateStart
+        : '%['
         ;
 
 fragment CtrlChar
         : [\u0000-\u001f]
-        ;
-
-fragment TextChar
-        : '\u0020'..'\uffff'
         ;
 
 fragment DashedName
@@ -204,8 +187,7 @@ fragment NameChar
 
 fragment NameStartChar
         : [a-zA-Z]
-        | ~[\u0000-\u007F\uD800-\uDBFF] // covers all characters above 0x7F which are not a surrogate
-        | [\uD800-\uDBFF] [\uDC00-\uDFFF] // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
+        | ~[\u0000-\u007F\uD800-\uDBFF]  // covers all characters above 0x7F which are not a surrogate
         ;
 
 fragment Number
@@ -213,14 +195,17 @@ fragment Number
         ;
 
 fragment Character
-        : ' '+
-        | EscapeSequence
-        | TextChar
+        : EscapeSequence
+        | [\p{Zs}]+  // Unicode Zs (whitespace)
+        | [\p{L}]    // Unicode L (letter)
+        | [\p{N}]    // Unicode N (number)
+        | [\p{P}]    // Unicode P (punctuation)
+        | [\p{S}]    // Unicode S (symbol)
         ;
 
 fragment EscapeSequence
         : '\\u' HexDigit HexDigit HexDigit HexDigit
-        | '\\' ["'%{\\]
+        | '\\' ["'%{\\\u005b]
         ;
 
 fragment HexDigit

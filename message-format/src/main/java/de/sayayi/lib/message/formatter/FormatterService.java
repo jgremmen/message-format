@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.formatter;
 
+import de.sayayi.lib.message.formatter.named.StringFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,28 +24,26 @@ import org.jetbrains.annotations.NotNull;
  * This class provides parameter formatters for all java types.
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public interface FormatterService
 {
   /**
+   * Returns a list of parameter formatters for the given {@code format} and {@code type}.
    * <p>
-   *   Returns a data formatter for the given {@code format} and {@code type}.
-   * </p>
-   * <p>
-   *   Implementing classes must make sure that for any combination of {@code format} and {@code type} this function
-   *   always returns a formatter. A good choice for a default formatter would be
-   *   {@link de.sayayi.lib.message.formatter.support.StringFormatter} associated with {@link Object}.
-   * </p>
+   * Implementing classes must make sure that for any combination of {@code format} and {@code type}
+   * this function always returns at least 1 formatter. A good choice for a default formatter would
+   * be {@link StringFormatter}.
    *
    * @param format  name of the formatter or {@code null}
    * @param type    type of the value to format
    *
-   * @return  data formatter, never {@code null}
+   * @return  array of prioritized parameter formatters, never {@code null} and never empty
    *
    * @see GenericFormatterService
    */
-  @Contract(pure = true)
-  @NotNull ParameterFormatter getFormatter(String format, @NotNull Class<?> type);
+  @Contract(value = "_, _ -> new", pure = true)
+  @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type);
 
 
 
@@ -52,10 +51,12 @@ public interface FormatterService
   /**
    * Add registry functionality to a formatter service.
    */
+  @SuppressWarnings("UnstableApiUsage")
   interface WithRegistry extends FormatterService
   {
     @Contract(mutates = "this")
-    void addFormatterForType(@NotNull Class<?> type, @NotNull ParameterFormatter formatter);
+    void addFormatterForType(@NotNull FormattableType formattableType,
+                             @NotNull ParameterFormatter formatter);
 
 
     /**

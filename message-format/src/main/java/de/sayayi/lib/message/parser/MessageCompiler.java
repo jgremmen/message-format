@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,57 +20,69 @@ import de.sayayi.lib.antlr4.AbstractVocabulary;
 import de.sayayi.lib.antlr4.syntax.GenericSyntaxErrorFormatter;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.data.DataMap;
-import de.sayayi.lib.message.data.DataNumber;
-import de.sayayi.lib.message.data.DataString;
-import de.sayayi.lib.message.data.map.MapKey.CompareType;
-import de.sayayi.lib.message.data.map.*;
 import de.sayayi.lib.message.exception.MessageParserException;
+import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.EmptyMessage;
-import de.sayayi.lib.message.internal.ParameterizedMessage;
-import de.sayayi.lib.message.internal.SpacesUtil;
 import de.sayayi.lib.message.internal.TextMessage;
-import de.sayayi.lib.message.internal.part.MessagePart;
-import de.sayayi.lib.message.internal.part.ParameterPart;
-import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.TemplatePart;
+import de.sayayi.lib.message.part.TextPart;
+import de.sayayi.lib.message.part.parameter.ParamConfig;
+import de.sayayi.lib.message.part.parameter.ParameterPart;
+import de.sayayi.lib.message.part.parameter.key.*;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
+import de.sayayi.lib.message.part.parameter.value.*;
+import de.sayayi.lib.message.util.SpacesUtil;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static de.sayayi.lib.message.parser.MessageLexer.BOOL;
 import static de.sayayi.lib.message.parser.MessageLexer.COLON;
 import static de.sayayi.lib.message.parser.MessageLexer.COMMA;
-import static de.sayayi.lib.message.parser.MessageLexer.DOUBLE_QUOTE_END;
-import static de.sayayi.lib.message.parser.MessageLexer.DOUBLE_QUOTE_START;
 import static de.sayayi.lib.message.parser.MessageLexer.EMPTY;
 import static de.sayayi.lib.message.parser.MessageLexer.EQ;
 import static de.sayayi.lib.message.parser.MessageLexer.GT;
 import static de.sayayi.lib.message.parser.MessageLexer.GTE;
 import static de.sayayi.lib.message.parser.MessageLexer.LT;
 import static de.sayayi.lib.message.parser.MessageLexer.LTE;
-import static de.sayayi.lib.message.parser.MessageLexer.MAP_END;
-import static de.sayayi.lib.message.parser.MessageLexer.MAP_START;
 import static de.sayayi.lib.message.parser.MessageLexer.NAME;
 import static de.sayayi.lib.message.parser.MessageLexer.NE;
 import static de.sayayi.lib.message.parser.MessageLexer.NULL;
 import static de.sayayi.lib.message.parser.MessageLexer.NUMBER;
-import static de.sayayi.lib.message.parser.MessageLexer.PARAM_END;
-import static de.sayayi.lib.message.parser.MessageLexer.PARAM_START;
-import static de.sayayi.lib.message.parser.MessageLexer.SINGLE_QUOTE_END;
-import static de.sayayi.lib.message.parser.MessageLexer.SINGLE_QUOTE_START;
+import static de.sayayi.lib.message.parser.MessageLexer.P_END;
+import static de.sayayi.lib.message.parser.MessageLexer.P_START;
+import static de.sayayi.lib.message.parser.MessageParser.DQ_END;
+import static de.sayayi.lib.message.parser.MessageParser.DQ_START;
+import static de.sayayi.lib.message.parser.MessageParser.SQ_END;
+import static de.sayayi.lib.message.parser.MessageParser.SQ_START;
+import static de.sayayi.lib.message.parser.MessageParser.TPL_END;
+import static de.sayayi.lib.message.parser.MessageParser.TPL_START;
 import static de.sayayi.lib.message.parser.MessageParser.*;
 import static java.lang.Boolean.parseBoolean;
-import static java.util.stream.Collectors.toList;
+import static java.lang.Character.isSpaceChar;
+import static java.lang.Integer.parseInt;
+import static java.util.Locale.ROOT;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toMap;
+import static org.antlr.v4.runtime.Token.EOF;
 
 
 /**
+ * This class provides methods for compiling messages and templates.
+ *
  * @author Jeroen Gremmen
+ * @since 0.5.0
  */
+@SuppressWarnings("UnknownLanguage")
 public final class MessageCompiler extends AbstractAntlr4Parser
 {
   private final @NotNull MessageFactory messageFactory;
@@ -80,18 +92,47 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   {
     super(ErrorFormatter.INSTANCE);
 
-    this.messageFactory = messageFactory;
+    this.messageFactory = requireNonNull(messageFactory, "messageFactory must not be null");
+  }
+
+
+  /**
+   * Compile the given message {@code text} into a spaces aware message object.
+   *
+   * @param text  message text, not {@code null}
+   *
+   * @return  compiled message, never {@code null}
+   */
+  @Contract(pure = true)
+  public @NotNull Message.WithSpaces compileMessage(
+      @NotNull @Language("MessageFormat") String text) {
+    return compileMessage(text, false);
+  }
+
+
+  /**
+   * Compile the given template {@code text} into a spaces aware message object.
+   *
+   * @param text  template text, not {@code null}
+   *
+   * @return  compiled template, never {@code null}
+   */
+  @Contract(pure = true)
+  public @NotNull Message.WithSpaces compileTemplate(
+      @NotNull @Language("MessageFormat") String text) {
+    return compileMessage(text, true);
   }
 
 
   @Contract(pure = true)
-  public @NotNull Message.WithSpaces compileMessage(@NotNull String text)
+  private @NotNull Message.WithSpaces compileMessage(
+      @NotNull @Language("MessageFormat") String text, boolean template)
   {
-    final Listener listener = new Listener();
+    final Listener listener = new Listener(template);
 
     return parse(new Lexer(text),
         lexer -> new Parser(listener.tokenStream = new BufferedTokenStream(lexer)),
-        Parser::message, listener, ctx -> ctx.value);
+        Parser::message, listener, ctx -> requireNonNull(ctx.value));
   }
 
 
@@ -139,7 +180,13 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
   private final class Listener extends MessageParserBaseListener
   {
+    private final boolean template;
     private TokenStream tokenStream;
+
+
+    private Listener(boolean template) {
+      this.template = template;
+    }
 
 
     @Override
@@ -155,10 +202,23 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         ctx.value = EmptyMessage.INSTANCE;
       else
       {
-        final List<MessagePart> parts = ctx.children
-            .stream()
-            .map(pt -> pt instanceof ParameterContext ? ((ParameterContext)pt).value : ((TextPartContext)pt).value)
-            .collect(toList());
+        final List<MessagePart> parts = new ArrayList<>();
+
+        for(final ParseTree part: ctx.children)
+        {
+          if (part instanceof ParameterPartContext)
+            parts.add(((ParameterPartContext)part).value);
+          else if (part instanceof TextPartContext)
+            parts.add(((TextPartContext)part).value);
+          else
+          {
+            if (template)
+              syntaxError((TemplatePartContext)part, "no nested template allowed");
+
+            parts.add(((TemplatePartContext)part).value);
+          }
+        }
+
         final int partCount = parts.size();
 
         if (partCount == 0)
@@ -166,14 +226,32 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         else if (partCount == 1 && parts.get(0) instanceof TextPart)
           ctx.value = new TextMessage((TextPart)parts.get(0));
         else
-          ctx.value = new ParameterizedMessage(parts);
+        {
+          parts.removeIf(this::exitMessage0_isRedundantTextPart);
+          ctx.value = new CompoundMessage(parts);
+        }
       }
     }
 
 
+    @Contract(pure = true)
+    private boolean exitMessage0_isRedundantTextPart(@NotNull MessagePart messagePart)
+    {
+      if (messagePart instanceof TextPart)
+      {
+        final TextPart textPart = (TextPart)messagePart;
+        return "".equals(textPart.getText()) && textPart.isSpaceAround();
+      }
+
+      return false;
+    }
+
+
     @Override
-    public void exitTextPart(TextPartContext ctx) {
-      ctx.value = messageFactory.getMessagePartNormalizer().normalize(new TextPart(ctx.text().value));
+    public void exitTextPart(TextPartContext ctx)
+    {
+      ctx.value = messageFactory.getMessagePartNormalizer()
+          .normalize(new TextPart(ctx.text().value));
     }
 
 
@@ -194,12 +272,12 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           // handle escape characters
           ch = chText.length() == 2
               ? chText.charAt(1)
-              : (char)Integer.parseInt(chText.substring(2), 16);
+              : (char)parseInt(chText.substring(2), 16);
         }
 
-        if (!SpacesUtil.isSpaceChar(ch))
+        if (!isSpaceChar(ch))
           text[n++] = ch;
-        else if (n == 0 || !SpacesUtil.isSpaceChar(text[n - 1]))
+        else if (n == 0 || !isSpaceChar(text[n - 1]))
           text[n++] = ' ';
       }
 
@@ -225,147 +303,119 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitForceQuotedMessage(ForceQuotedMessageContext ctx)
     {
       final QuotedMessageContext quotedMessage = ctx.quotedMessage();
-
-      ctx.value = quotedMessage != null
-          ? quotedMessage.value
-          : messageFactory.parse(ctx.string().value);
-    }
-
-
-    @Override
-    public void exitParameter(ParameterContext ctx)
-    {
-      final DataContext data = ctx.data();
-
-      ctx.value = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(
-          ctx.name.getText(),
-          ctx.format == null ? null : ctx.format.getText(),
-          exitParameter_isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
-          exitParameter_isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
-          data == null ? null : data.value));
-    }
-
-
-    @SuppressWarnings("java:S100")
-    private boolean exitParameter_isSpaceAtTokenIndex(int i)
-    {
-      if (i >= 0)
+      if (quotedMessage != null)
+        ctx.value = quotedMessage.value;
+      else
       {
-        final Token token = tokenStream.get(i);
-
-        if (token.getType() != Token.EOF)
-        {
-          final String text = token.getText();
-          return !SpacesUtil.isEmpty(text) && SpacesUtil.isSpaceChar(text.charAt(0));
-        }
+        final NameOrKeywordContext nameOrKeyword = ctx.nameOrKeyword();
+        ctx.value = messageFactory.parseMessage(
+            nameOrKeyword != null ? nameOrKeyword.name : ctx.string().value);
       }
-
-      return false;
     }
 
 
     @Override
-    public void exitDataString(DataStringContext ctx) {
-      ctx.value = new DataString(ctx.string().value);
-    }
-
-
-    @Override
-    public void exitDataNumber(DataNumberContext ctx) {
-      ctx.value = new DataNumber(ctx.NUMBER().getText());
-    }
-
-
-    @Override
-    public void exitDataMap(DataMapContext ctx) {
-      ctx.value = new DataMap(ctx.map().value);
-    }
-
-
-    @Override
-    public void exitMap(MapContext ctx)
+    public void exitParameterPart(ParameterPartContext ctx)
     {
-      ctx.value = ctx.mapElements().value;
-
+      final Map<ConfigKey,ConfigValue> mapElements = ctx.configElement().stream()
+          .collect(toMap(mec -> mec.key, mec -> mec.value, (a, b) -> b, LinkedHashMap::new));
       final ForceQuotedMessageContext forceQuotedMessage = ctx.forceQuotedMessage();
       if (forceQuotedMessage != null)
-        ctx.value.put(null, new MapValueMessage(forceQuotedMessage.value));
+        mapElements.put(null, new ConfigValueMessage(forceQuotedMessage.value));
+
+      ctx.value = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(
+          ctx.name.name, ctx.format == null ? null : ctx.format.name,
+          isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
+          isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
+          new ParamConfig(mapElements)));
     }
 
 
     @Override
-    public void exitMapElements(MapElementsContext ctx)
+    public void exitTemplatePart(TemplatePartContext ctx)
     {
-      ctx.value = ctx.mapElement().stream()
-          .collect(toMap(mec -> mec.key, mec -> mec.value, (a, b) -> b, LinkedHashMap::new));
+      ctx.value = new TemplatePart(ctx.nameOrKeyword().name,
+          isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
+          isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1));
     }
 
 
     @Override
-    public void exitMapElement(MapElementContext ctx)
+    public void exitConfigElement(ConfigElementContext ctx)
     {
-      ctx.key = ctx.mapKey().key;
-      ctx.value = ctx.mapValue().value;
+      final ConfigKey.Type keyType = (ctx.key = ctx.configKey().key).getType();
+      final ConfigValue.Type valueType = (ctx.value = ctx.configValue().value).getType();
+
+      if ((valueType == ConfigValue.Type.BOOL || valueType == ConfigValue.Type.NUMBER) &&
+          keyType != ConfigKey.Type.NAME)
+      {
+        syntaxError(ctx, valueType.name().toLowerCase(ROOT) +
+            " value not allowed for " + keyType.name().toLowerCase(ROOT) + " key");
+      }
     }
 
 
     @Override
-    public void exitMapKeyString(MapKeyStringContext ctx) {
-      ctx.key = new MapKeyString(ctx.relationalOperatorOptional().cmp, ctx.string().value);
+    public void exitConfigKeyString(ConfigKeyStringContext ctx) {
+      ctx.key = new ConfigKeyString(ctx.relationalOperatorOptional().cmp, ctx.string().value);
     }
 
 
     @Override
-    public void exitMapKeyNumber(MapKeyNumberContext ctx) {
-      ctx.key = new MapKeyNumber(ctx.relationalOperatorOptional().cmp, ctx.NUMBER().getText());
+    public void exitConfigKeyNumber(ConfigKeyNumberContext ctx) {
+      ctx.key = new ConfigKeyNumber(ctx.relationalOperatorOptional().cmp, ctx.NUMBER().getText());
     }
 
 
     @Override
-    public void exitMapKeyBool(MapKeyBoolContext ctx) {
-      ctx.key = parseBoolean(ctx.BOOL().getText()) ? MapKeyBool.TRUE : MapKeyBool.FALSE;
+    public void exitConfigKeyBool(ConfigKeyBoolContext ctx) {
+      ctx.key = parseBoolean(ctx.BOOL().getText()) ? ConfigKeyBool.TRUE : ConfigKeyBool.FALSE;
     }
 
 
     @Override
-    public void exitMapKeyNull(MapKeyNullContext ctx) {
-      ctx.key = new MapKeyNull(ctx.equalOperatorOptional().cmp);
+    public void exitConfigKeyNull(ConfigKeyNullContext ctx) {
+      ctx.key = new ConfigKeyNull(ctx.equalOperatorOptional().cmp);
     }
 
 
     @Override
-    public void exitMapKeyEmpty(MapKeyEmptyContext ctx) {
-      ctx.key = new MapKeyEmpty(ctx.equalOperatorOptional().cmp);
+    public void exitConfigKeyEmpty(ConfigKeyEmptyContext ctx) {
+      ctx.key = new ConfigKeyEmpty(ctx.equalOperatorOptional().cmp);
     }
 
 
     @Override
-    public void exitMapKeyName(MapKeyNameContext ctx) {
-      ctx.key = new MapKeyName(ctx.NAME().getText());
+    public void exitConfigKeyName(ConfigKeyNameContext ctx) {
+      ctx.key = new ConfigKeyName(ctx.NAME().getText());
     }
 
 
     @Override
-    public void exitMapValueString(MapValueStringContext ctx) {
-      ctx.value = new MapValueString(ctx.string().value);
+    public void exitConfigValueString(ConfigValueStringContext ctx)
+    {
+      final StringContext stringContext = ctx.string();
+
+      ctx.value = new ConfigValueString(stringContext != null
+          ? stringContext.value : ctx.nameOrKeyword().name);
     }
 
 
     @Override
-    public void exitMapValueNumber(MapValueNumberContext ctx) {
-      ctx.value = new MapValueNumber(Long.parseLong(ctx.NUMBER().getText()));
+    public void exitConfigValueNumber(ConfigValueNumberContext ctx) {
+      ctx.value = new ConfigValueNumber(Long.parseLong(ctx.NUMBER().getText()));
     }
 
 
     @Override
-    public void exitMapValueBool(MapValueBoolContext ctx) {
-      ctx.value = parseBoolean(ctx.BOOL().getText()) ? MapValueBool.TRUE : MapValueBool.FALSE;
+    public void exitConfigValueBool(ConfigValueBoolContext ctx) {
+      ctx.value = parseBoolean(ctx.BOOL().getText()) ? ConfigValueBool.TRUE : ConfigValueBool.FALSE;
     }
 
 
     @Override
-    public void exitMapValueMessage(MapValueMessageContext ctx) {
-      ctx.value = new MapValueMessage(ctx.quotedMessage().value);
+    public void exitConfigValueMessage(ConfigValueMessageContext ctx) {
+      ctx.value = new ConfigValueMessage(ctx.quotedMessage().value);
     }
 
 
@@ -418,6 +468,29 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitEqualOperator(EqualOperatorContext ctx) {
       ctx.cmp = ctx.EQ() != null ? CompareType.EQ : CompareType.NE;
     }
+
+
+    @Override
+    public void exitNameOrKeyword(NameOrKeywordContext ctx) {
+      ctx.name = ctx.getChild(0).getText();
+    }
+
+
+    private boolean isSpaceAtTokenIndex(int i)
+    {
+      if (i >= 0)
+      {
+        final Token token = tokenStream.get(i);
+
+        if (token.getType() != EOF)
+        {
+          final String text = token.getText();
+          return !SpacesUtil.isEmpty(text) && isSpaceChar(text.charAt(0));
+        }
+      }
+
+      return false;
+    }
   }
 
 
@@ -443,24 +516,24 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       add(BOOL, "'true' or 'false'", "BOOL");
       add(COLON, "':'", "COLON");
       add(COMMA, "','", "COMMA");
-      add(DOUBLE_QUOTE_END, "\"", "DOUBLE_QUOTE_END");
-      add(DOUBLE_QUOTE_START, "\"", "DOUBLE_QUOTE_START");
+      add(DQ_END, "\"", "DQ_END");
+      add(DQ_START, "\"", "DQ_START");
       add(EMPTY, "'empty'", "EMPTY");
       add(EQ, "'='", "EQ");
       add(GT, "'>'", "GT");
       add(GTE, "'>='", "GTE");
       add(LT, "'<'", "LT");
       add(LTE, "'<='", "LTE");
-      add(MAP_END, "'}'", "MAP_END");
-      add(MAP_START, "'{'", "MAP_START");
       add(NAME, "<name>", "NAME");
       add(NE, "'<>' or '!'", "NE");
       add(NULL, "'null'", "NULL");
       add(NUMBER, "<number>", "NUMBER");
-      add(PARAM_END, "'}'", "PARAM_END");
-      add(PARAM_START, "'%{'", "PARAM_START");
-      add(SINGLE_QUOTE_END, "'", "SINGLE_QUOTE_END");
-      add(SINGLE_QUOTE_START, "'", "SINGLE_QUOTE_START");
+      add(P_END, "'}'", "P_END");
+      add(P_START, "'%{'", "P_START");
+      add(SQ_END, "'", "SQ_END");
+      add(SQ_START, "'", "SQ_START");
+      add(TPL_START, "'%['", "TPL_START");
+      add(TPL_END, "']'", "TPL_END");
     }
   };
 }
