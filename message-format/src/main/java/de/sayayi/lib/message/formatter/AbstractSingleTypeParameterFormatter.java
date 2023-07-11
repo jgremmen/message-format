@@ -30,7 +30,6 @@ import static java.util.Collections.singleton;
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractSingleTypeParameterFormatter<T>
     extends AbstractParameterFormatter<T>
-    implements ParameterFormatter
 {
   @Override
   public final @NotNull Set<FormattableType> getFormattableTypes() {

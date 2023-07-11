@@ -43,7 +43,7 @@ public abstract class AbstractParameterFormatter<T> implements ParameterFormatte
   public final @NotNull Text format(@NotNull FormatterContext context, Object value)
   {
     // handle empty, !empty, null and !null first
-    Message.WithSpaces msg = context
+    final Message.WithSpaces msg = context
         .getConfigMapMessage(value, EMPTY_NULL_TYPE)
         .orElse(null);
 
