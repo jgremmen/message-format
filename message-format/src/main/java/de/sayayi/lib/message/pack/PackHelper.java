@@ -259,7 +259,7 @@ public final class PackHelper
       packStream.writeSmall(MAP_KEY_BOOL_ID, 3);
       ((ConfigKeyBool)configKey).pack(packStream);
     }
-    if (configKey instanceof ConfigKeyEmpty)
+    else if (configKey instanceof ConfigKeyEmpty)
     {
       packStream.writeSmall(MAP_KEY_EMPTY_ID, 3);
       ((ConfigKeyEmpty)configKey).pack(packStream);
@@ -338,7 +338,7 @@ public final class PackHelper
       packStream.writeSmall(MAP_VALUE_BOOL_ID, 2);
       ((ConfigValueBool)configValue).pack(packStream);
     }
-    if (configValue instanceof ConfigValueMessage)
+    else if (configValue instanceof ConfigValueMessage)
     {
       packStream.writeSmall(MAP_VALUE_MESSAGE_ID, 2);
       ((ConfigValueMessage)configValue).pack(packStream);
