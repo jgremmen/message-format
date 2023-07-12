@@ -47,6 +47,7 @@ public final class PackHelper
   private static final int MAP_KEY_NULL_ID = 3;
   private static final int MAP_KEY_NUMBER_ID = 4;
   private static final int MAP_KEY_STRING_ID = 5;
+  private static final int MAP_KEY_DEFAULT_ID = 6;
 
   private static final int MAP_VALUE_BOOL_ID = 0;
   private static final int MAP_VALUE_MESSAGE_ID = 1;
@@ -251,10 +252,12 @@ public final class PackHelper
   }
 
 
-  public static void pack(@NotNull ConfigKey configKey, @NotNull PackOutputStream packStream)
+  public static void pack(ConfigKey configKey, @NotNull PackOutputStream packStream)
       throws IOException
   {
-    if (configKey instanceof ConfigKeyBool)
+    if (configKey == null)
+      packStream.writeSmall(MAP_KEY_DEFAULT_ID, 3);
+    else if (configKey instanceof ConfigKeyBool)
     {
       packStream.writeSmall(MAP_KEY_BOOL_ID, 3);
       ((ConfigKeyBool)configKey).pack(packStream);
@@ -292,7 +295,7 @@ public final class PackHelper
   }
 
 
-  public @NotNull ConfigKey unpackMapKey(@NotNull PackInputStream packStream) throws IOException
+  public ConfigKey unpackMapKey(@NotNull PackInputStream packStream) throws IOException
   {
     final ConfigKey configKey;
 
@@ -320,6 +323,10 @@ public final class PackHelper
 
       case MAP_KEY_STRING_ID:
         configKey = ConfigKeyString.unpack(packStream);
+        break;
+
+      case MAP_KEY_DEFAULT_ID:
+        configKey = null;
         break;
 
       default:
