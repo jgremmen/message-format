@@ -40,6 +40,7 @@ class MessageSupportPackTest
   @MessageDef(code = "MSG-005", text =
       "%{n,true:yes,64:'2^6','name':'name',null:'val %{n1}',empty:'empty',:'xyz'}")
   @MessageDef(code = "MSG-006", text = "%{n,name:-128,check:false,str:'string',msg:'msg %{p}'}")
+  @MessageDef(code = "MSG-007", text = "^°!§$%&/()=?ßüöäÖÄÜ@€«∑®†Ω¨⁄øπ@∆ª©ƒ∂‚å¥≈ç√∫~∞…")
   static void initMessageSupport()
   {
     messageSupport = MessageSupportFactory.create(new GenericFormatterService(), NO_CACHE_INSTANCE);
@@ -63,8 +64,16 @@ class MessageSupportPackTest
       messageSupportCloned.importMessages(inStream);
     }
 
-    assertEquals(
-        messageSupport.getMessageAccessor().getMessageCodes(),
-        messageSupportCloned.getMessageAccessor().getMessageCodes());
+    val messageAccessor = messageSupport.getMessageAccessor();
+    val messageAccessorCloned = messageSupportCloned.getMessageAccessor();
+
+    val messageCodes = messageAccessor.getMessageCodes();
+    assertEquals(messageCodes, messageAccessorCloned.getMessageCodes());
+
+    for(val messageCode: messageCodes)
+    {
+      assertEquals(messageAccessor.getMessageByCode(messageCode),
+          messageAccessorCloned.getMessageByCode(messageCode));
+    }
   }
 }
