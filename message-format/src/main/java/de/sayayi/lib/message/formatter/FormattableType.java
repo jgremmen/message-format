@@ -50,21 +50,21 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
    *
    * @see #getOrder()
    */
-  public static final byte DEFAULT_ORDER = 80;
+  public static final int DEFAULT_ORDER = 80;
 
   /**
    * Default order value for primitive and array types.
    *
    * @see #getOrder()
    */
-  public static final byte DEFAULT_PRIMITIVE_OR_ARRAY_ORDER = 100;
+  public static final int DEFAULT_PRIMITIVE_OR_ARRAY_ORDER = 100;
 
 
   /** Formattable class. */
   private final @NotNull Class<?> type;
 
   /** Formattable type order. */
-  private final byte order;
+  private final int order;
 
 
   /**
@@ -76,11 +76,11 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
    * @param type   type, not {@code null}
    * @param order  order ({@code 0..127})
    */
-  public FormattableType(@NotNull Class<?> type, byte order)
+  public FormattableType(@NotNull Class<?> type, int order)
   {
     if (type == Object.class && order != 127)
       throw new IllegalArgumentException("Object type order must be 127");
-    else if (order < 0)
+    else if (order < 0 || order >= 128)
       throw new IllegalArgumentException("order must be in range 0..127");
 
     this.type = requireNonNull(type, "type must not be null");
@@ -122,7 +122,7 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
    * @return  order in range {@code 0..127}
    */
   @Contract(pure = true)
-  public byte getOrder() {
+  public int getOrder() {
     return order;
   }
 
@@ -142,7 +142,7 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
   @Override
   public int compareTo(@NotNull FormattableType o)
   {
-    int cmp = order - o.order;
+    int cmp = Integer.compare(order, o.order);
 
     if (cmp == 0)
     {

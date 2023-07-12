@@ -36,12 +36,12 @@ class FormattableTypeTest
   @DisplayName("Check constructors")
   void constructor()
   {
-    assertEquals(String.class, new FormattableType(String.class, (byte)0).getType());
-    assertEquals((byte)127, new FormattableType(String.class, (byte)127).getOrder());
+    assertEquals(String.class, new FormattableType(String.class, 0).getType());
+    assertEquals(127, new FormattableType(String.class, 127).getOrder());
 
-    assertThrows(IllegalArgumentException.class, () -> new FormattableType(String.class, (byte)-1));
-    assertThrows(IllegalArgumentException.class, () -> new FormattableType(int.class, (byte)128));
-    assertThrows(IllegalArgumentException.class, () -> new FormattableType(Object.class, (byte)64));
+    assertThrows(IllegalArgumentException.class, () -> new FormattableType(String.class, -1));
+    assertThrows(IllegalArgumentException.class, () -> new FormattableType(int.class, 128));
+    assertThrows(IllegalArgumentException.class, () -> new FormattableType(Object.class, 64));
 
     assertEquals(127, new FormattableType(Object.class).getOrder());
     assertEquals(DEFAULT_PRIMITIVE_OR_ARRAY_ORDER, new FormattableType(long.class).getOrder());

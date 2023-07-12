@@ -176,11 +176,11 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
   private static final class PrioritizedFormatter implements Comparable<PrioritizedFormatter>
   {
-    private final byte order;
+    private final int order;
     private final @NotNull ParameterFormatter formatter;
 
 
-    private PrioritizedFormatter(byte order, @NotNull ParameterFormatter formatter)
+    private PrioritizedFormatter(int order, @NotNull ParameterFormatter formatter)
     {
       this.order = order;
       this.formatter = formatter;
@@ -189,7 +189,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
     @Override
     public int compareTo(@NotNull PrioritizedFormatter o) {
-      return Byte.compare(order, o.order);
+      return Integer.compare(order, o.order);
     }
 
 
