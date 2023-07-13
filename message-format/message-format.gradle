@@ -99,8 +99,8 @@ compileJava.dependsOn generateGrammarSource
 sourcesJar {
   dependsOn generateGrammarSource
 
-  exclude "**/*.tokens"
-  exclude "**/*.g4"
+  exclude "gen/*"
+  exclude "**/*.interp"
 }
 
 
