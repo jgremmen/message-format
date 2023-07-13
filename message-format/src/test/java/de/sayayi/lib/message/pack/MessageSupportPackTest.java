@@ -5,6 +5,7 @@ import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.adopter.AsmAnnotationAdopter;
 import de.sayayi.lib.message.annotation.MessageDef;
+import de.sayayi.lib.message.annotation.TemplateDef;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import lombok.val;
@@ -41,6 +42,7 @@ class MessageSupportPackTest
       "%{n,true:yes,64:'2^6','name':'name',null:'val %{n1}',empty:'empty',:'xyz'}")
   @MessageDef(code = "MSG-006", text = "%{n,name:-128,check:false,str:'string',msg:'msg %{p}'}")
   @MessageDef(code = "MSG-007", text = "^°!§$%&/()=?ßüöäÖÄÜ@€«∑®†Ω¨⁄øπ@∆ª©ƒ∂‚å¥≈ç√∫~∞…")
+  @TemplateDef(name = "exception", text = "%{ex,!empty:': %{ex}'}")
   static void initMessageSupport()
   {
     messageSupport = MessageSupportFactory.create(new GenericFormatterService(), NO_CACHE_INSTANCE);
