@@ -133,3 +133,16 @@ publishing {
 signing {
   sign publishing.publications.gradlePlugin
 }
+
+
+publishGradlePluginPublicationToMavenTempRepository.configure {
+  dependsOn 'signGradlePluginPublication'
+  dependsOn 'signPluginMavenPublication'
+}
+
+
+afterEvaluate {
+  publishPluginMavenPublicationToMavenTempRepository.configure {
+    dependsOn 'signGradlePluginPublication'
+  }
+}
