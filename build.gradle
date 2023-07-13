@@ -48,10 +48,19 @@ configure(subprojects.findAll {it.name != 'documentation' }) {
 
 
 tasks.register('releaseAll') {
-  group = 'publishing'
-  description = 'Release all publications to Maven and Gradle Plugin repository'
+  group = 'release'
+  description = 'Release all publications to Maven and Gradle Plugin repository.'
 
   dependsOn ':message-format:publishMsgformatPublicationToMavenCentralRepository'
   dependsOn ':message-format-jodatime:publishJodatimePublicationToMavenCentralRepository'
+  dependsOn ':message-gradle-plugin:publishGradlePluginPublicationToMavenCentralRepository'
   dependsOn ':message-gradle-plugin:publishPlugins'
+}
+
+
+tasks.register('releaseAllTemp') {
+  group = 'release'
+  description = 'Release all publications to temporary Maven repository.'
+
+  dependsOn ':message-format:publishAllPublicationsToMavenTempRepository'
 }

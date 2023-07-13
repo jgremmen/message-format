@@ -24,6 +24,7 @@ publishing {
       name = "mavenTemp"
       url = "${rootProject.buildDir}/repository"
     }
+
     maven {
       name = "mavenCentral"
       url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
