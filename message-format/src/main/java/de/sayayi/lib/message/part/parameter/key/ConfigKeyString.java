@@ -171,10 +171,10 @@ public final class ConfigKeyString implements ConfigKey
    *
    * @since 0.8.0
    */
-  public static @NotNull ConfigKeyNumber unpack(@NotNull PackInputStream packStream)
+  public static @NotNull ConfigKeyString unpack(@NotNull PackInputStream packStream)
       throws IOException
   {
-    return new ConfigKeyNumber(packStream.readEnum(CompareType.class),
+    return new ConfigKeyString(packStream.readEnum(CompareType.class),
         requireNonNull(packStream.readString()));
   }
 }

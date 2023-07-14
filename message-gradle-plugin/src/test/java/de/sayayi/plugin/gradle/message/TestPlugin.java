@@ -58,6 +58,8 @@ public class TestPlugin
   {
     write(new File(testProjectDir, "settings.gradle").toPath(),
         singletonList("rootProject.name = 'test-message-pack'"));
+    write(new File(testProjectDir, "gradle.properties").toPath(),
+        singletonList("org.gradle.configuration-cache=true"));
     write(new File(testProjectDir, "build.gradle").toPath(), asList(
         "plugins {",
         "  id 'java'",

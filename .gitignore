@@ -14,3 +14,4 @@ out/
 
 *.iml
 .DS_Store
+/message-gradle-plugin/src/main/generated/

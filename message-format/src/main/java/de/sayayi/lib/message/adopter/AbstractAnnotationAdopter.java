@@ -367,25 +367,27 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
           ? EmptyMessage.INSTANCE
           : messageFactory.parseTemplate(text));
     }
-
-    final Map<Locale,String> localizedTexts = new LinkedHashMap<>();
-
-    for(final Text text: texts)
+    else
     {
-      final String value = text.locale().isEmpty() &&
-          text.text().isEmpty() ? text.value() : text.text();
+      final Map<Locale,String> localizedTexts = new LinkedHashMap<>();
 
-      localizedTexts.compute(forLanguageTag(text.locale()), (locale, mappedValue) -> {
-        if (mappedValue == null || mappedValue.equals(value))
-          return value;
+      for(final Text text: texts)
+      {
+        final String value = text.locale().isEmpty() &&
+            text.text().isEmpty() ? text.value() : text.text();
 
-        // if template text differs from previous definition -> throw
-        throw new DuplicateTemplateException(name,
-            "different template definition for same locale '" + locale + "'");
-      });
+        localizedTexts.compute(forLanguageTag(text.locale()), (locale, mappedValue) -> {
+          if (mappedValue == null || mappedValue.equals(value))
+            return value;
+
+          // if template text differs from previous definition -> throw
+          throw new DuplicateTemplateException(name,
+              "different template definition for same locale '" + locale + "'");
+        });
+      }
+
+      messagePublisher.addTemplate(name, messageFactory.parseTemplate(localizedTexts));
     }
-
-    messagePublisher.addTemplate(name, messageFactory.parseTemplate(localizedTexts));
 
     return this;
   }

@@ -15,12 +15,15 @@
  */
 package de.sayayi.plugin.gradle.message;
 
-import lombok.val;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.plugins.JavaBasePlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
+import org.gradle.api.plugins.PluginContainer;
 import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.TaskContainer;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.plugin.gradle.message.DuplicateMsgStrategy.IGNORE_AND_WARN;
@@ -39,20 +42,21 @@ public class MessageFormatPlugin implements Plugin<Project>
   public void apply(Project project)
   {
     // provide java base plugin (for main/java)
-    val plugins = project.getPlugins();
+    final PluginContainer plugins = project.getPlugins();
     if (!plugins.hasPlugin(JavaBasePlugin.class))
       project.apply(objectConfiguration -> objectConfiguration.plugin(JavaBasePlugin.class));
 
     // create extension and set conventions
-    val extensions = project.getExtensions();
-    val messageFormatExtension = extensions.create(EXTENSION, MessageFormatExtension.class);
+    final ExtensionContainer extensions = project.getExtensions();
+    final MessageFormatExtension messageFormatExtension =
+        extensions.create(EXTENSION, MessageFormatExtension.class);
 
     messageFormatExtension.getPackFilename().convention("message.pack");
     messageFormatExtension.getCompress().convention(false);
     messageFormatExtension.getDuplicateMsgStrategy().convention(IGNORE_AND_WARN);
     messageFormatExtension.getValidateReferencedTemplates().convention(true);
 
-    val mainJavaSourceSet = extensions
+    final SourceSet mainJavaSourceSet = extensions
         .getByType(JavaPluginExtension.class)
         .getSourceSets()
         .getByName("main");
@@ -68,16 +72,24 @@ public class MessageFormatPlugin implements Plugin<Project>
                                 @NotNull MessageFormatExtension extension,
                                 @NotNull SourceSet mainSourceSet)
   {
-    val tasks = project.getTasks();
+    final TaskContainer tasks = project.getTasks();
+    final ObjectFactory objects = project.getObjects();
 
     tasks.register("messageFormatPack", MessageFormatPackTask.class, packTask -> {
       packTask.setGroup("build");
       packTask.setDescription("Scans and packs message format definitions.");
 
+      // sources
+      packTask.getSources().from(extension.getSources());
+
+      // pack file
+      packTask.getDestinationDir().convention(
+          objects.directoryProperty().fileValue(project.getBuildDir()));
+      packTask.getPackFilename().convention(extension.getPackFilename());
+
+      // settings
       packTask.getCompress().convention(extension.getCompress());
       packTask.getDuplicateMsgStrategy().convention(extension.getDuplicateMsgStrategy());
-      packTask.getPackFilename().convention(extension.getPackFilename());
-      packTask.getSources().from(extension.getSources());
       packTask.getValidateReferencedTemplates()
           .convention(extension.getValidateReferencedTemplates());
 

@@ -27,8 +27,8 @@ allprojects {
 
   apply plugin: "base"
 
-  group = "de.sayayi.lib"
-  version = "0.8.0"
+  group = 'de.sayayi.lib'
+  version = '0.8.1'
 
   ext.jetbrainsAnnotationsVersion = "24.0.1"
   ext.junitVersion = "5.9.+"
@@ -44,4 +44,26 @@ configure(moduleProjects) {
 // publishable projects
 configure(subprojects.findAll {it.name != 'documentation' }) {
   apply from: "${rootDir}/gradle/publish.gradle"
+}
+
+
+tasks.register('releaseAll') {
+  group = 'release'
+  description = 'Release all publications to Maven and Gradle Plugin repository.'
+
+  dependsOn ':message-format:publishMsgformatPublicationToMavenCentralRepository'
+  dependsOn ':message-format-jodatime:publishJodatimePublicationToMavenCentralRepository'
+  dependsOn ':message-gradle-plugin:publishGradlePluginPublicationToMavenCentralRepository'
+  dependsOn ':message-gradle-plugin:publishPlugins'
+}
+
+
+tasks.register('releaseAllTemp') {
+  group = 'release'
+  description = 'Release all publications to temporary Maven repository.'
+
+  dependsOn ':message-format:publishMsgformatPublicationToMavenTempRepository'
+  dependsOn ':message-format-jodatime:publishJodatimePublicationToMavenTempRepository'
+  dependsOn ':message-gradle-plugin:publishGradlePluginPublicationToMavenTempRepository'
+  dependsOn ':message-gradle-plugin:publishMessageFormatPluginMarkerMavenPublicationToMavenTempRepository'
 }

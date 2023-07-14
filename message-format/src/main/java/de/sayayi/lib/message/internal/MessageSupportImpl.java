@@ -250,7 +250,10 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
       templateNames.removeIf(templateName -> !templates.containsKey(templateName));
       dataStream.writeUnsignedShort(templateNames.size());
       for(final String templateName: templateNames)
+      {
+        dataStream.writeString(templateName);
         PackHelper.pack(templates.get(templateName), dataStream);
+      }
     }
   }
 
