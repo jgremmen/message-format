@@ -62,5 +62,8 @@ tasks.register('releaseAllTemp') {
   group = 'release'
   description = 'Release all publications to temporary Maven repository.'
 
-  dependsOn ':message-format:publishAllPublicationsToMavenTempRepository'
+  dependsOn ':message-format:publishMsgformatPublicationToMavenTempRepository'
+  dependsOn ':message-format-jodatime:publishJodatimePublicationToMavenTempRepository'
+  dependsOn ':message-gradle-plugin:publishGradlePluginPublicationToMavenTempRepository'
+  dependsOn ':message-gradle-plugin:publishMessageFormatPluginMarkerMavenPublicationToMavenTempRepository'
 }
