@@ -141,6 +141,11 @@ publishGradlePluginPublicationToMavenTempRepository.configure {
 }
 
 
+publishGradlePluginPublicationToMavenCentralRepository.configure {
+  dependsOn 'signPluginMavenPublication'
+}
+
+
 afterEvaluate {
   publishPluginMavenPublicationToMavenTempRepository.configure {
     dependsOn 'signGradlePluginPublication'
