@@ -23,8 +23,12 @@ import de.sayayi.lib.message.adopter.AsmAnnotationAdopter;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
-import org.gradle.api.*;
+import org.gradle.api.Action;
+import org.gradle.api.DefaultTask;
+import org.gradle.api.GradleException;
+import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.file.ConfigurableFileCollection;
+import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.logging.LogLevel;
 import org.gradle.api.logging.Logger;
@@ -76,6 +80,10 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  @InputDirectory
+  public abstract DirectoryProperty getDestinationDir();
+
+
   @Input
   public abstract Property<String> getPackFilename();
 
@@ -109,14 +117,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   @OutputFile
-  public RegularFile getPackFile()
-  {
-    final Project project = getProject();
-
-    return project.getLayout()
-        .getBuildDirectory()
-        .dir(project.provider(this::getName)).get()
-        .file(getPackFilename()).get();
+  public RegularFile getPackFile() {
+    return getDestinationDir().dir(getName()).get().file(getPackFilename()).get();
   }
 
 
@@ -221,7 +223,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
     getLogger().debug("Writing message pack: " + packFile.getAbsolutePath());
 
     // create parent directory
-    getProject().mkdir(packFile.getParentFile());
+    //noinspection ResultOfMethodCallIgnored
+    packFile.getParentFile().mkdirs();
 
     try(final OutputStream packOutputStream = newOutputStream(packFile.toPath())) {
       messageSupport.exportMessages(packOutputStream, getCompress().get(), this::messageCodeFilter);

@@ -17,6 +17,7 @@ package de.sayayi.plugin.gradle.message;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.plugins.JavaBasePlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
@@ -72,15 +73,23 @@ public class MessageFormatPlugin implements Plugin<Project>
                                 @NotNull SourceSet mainSourceSet)
   {
     final TaskContainer tasks = project.getTasks();
+    final ObjectFactory objects = project.getObjects();
 
     tasks.register("messageFormatPack", MessageFormatPackTask.class, packTask -> {
       packTask.setGroup("build");
       packTask.setDescription("Scans and packs message format definitions.");
 
+      // sources
+      packTask.getSources().from(extension.getSources());
+
+      // pack file
+      packTask.getDestinationDir().convention(
+          objects.directoryProperty().fileValue(project.getBuildDir()));
+      packTask.getPackFilename().convention(extension.getPackFilename());
+
+      // settings
       packTask.getCompress().convention(extension.getCompress());
       packTask.getDuplicateMsgStrategy().convention(extension.getDuplicateMsgStrategy());
-      packTask.getPackFilename().convention(extension.getPackFilename());
-      packTask.getSources().from(extension.getSources());
       packTask.getValidateReferencedTemplates()
           .convention(extension.getValidateReferencedTemplates());
 
