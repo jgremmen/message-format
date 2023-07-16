@@ -217,6 +217,7 @@ class TestPlugin
 
     assertEquals(SUCCESS, requireNonNull(result.task(":jar")).getOutcome());
     assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
+    System.err.println(output.toString());
     assertTrue(output.toString().contains("Duplicate message code 'MSG3' in class test.Source1"));
   }
 
