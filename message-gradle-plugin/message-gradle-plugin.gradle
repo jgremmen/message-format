@@ -37,26 +37,22 @@ dependencies {
 }
 
 
-afterEvaluate {
-  javadoc {
-    title "${project.description} ${version}"
+javadoc {
+  title "${project.description} ${version}"
 
-    (options as StandardJavadocDocletOptions).with {
-      linksOffline(
-              "https://javadoc.io/doc/org.jetbrains/annotations-java5/${jetbrainsAnnotationsVersion}/",
-              "${rootDir}/gradle/javadocs/jetbrains-annotations")
+  (options as StandardJavadocDocletOptions).with {
+    linksOffline(
+            "https://javadoc.io/doc/org.jetbrains/annotations-java5/${jetbrainsAnnotationsVersion}/",
+            "${rootDir}/gradle/javadocs/jetbrains-annotations")
 
-      encoding 'UTF-8'
+    encoding 'UTF-8'
 
-      group("Gradle Plugin", [
-              "de.sayayi.plugin.gradle.message",
-      ])
+    group("Gradle Plugin", [ "de.sayayi.plugin.gradle.message" ])
 
-      noQualifiers 'java.util', 'java.lang'
-    }
-
-    failOnError false
+    noQualifiers 'java.util', 'java.lang'
   }
+
+  failOnError false
 }
 
 
