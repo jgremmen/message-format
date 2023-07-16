@@ -80,11 +80,11 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
-  @InputDirectory
+  @Internal
   public abstract DirectoryProperty getDestinationDir();
 
 
-  @Input
+  @Internal
   public abstract Property<String> getPackFilename();
 
 
@@ -118,20 +118,35 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   @OutputFile
   public RegularFile getPackFile() {
-    return getDestinationDir().dir(getName()).get().file(getPackFilename()).get();
+    return getDestinationDir().file(getPackFilename()).get();
   }
 
 
+  /**
+   * Include messages matching the {@code regex}.
+   *
+   * @param regex  regex matching message codes
+   */
   public void include(String... regex) {
     includeRegexFilters.addAll(asList(regex));
   }
 
 
+  /**
+   * Exclude messages matching the {@code regex}.
+   *
+   * @param regex  regex matching message codes
+   */
   public void exclude(String... regex) {
     excludeRegexFilters.addAll(asList(regex));
   }
 
 
+  /**
+   * Adds a source set to the list of sources.
+   *
+   * @param sourceSet  source set
+   */
   public void sourceSet(SourceSet sourceSet) {
     getSources().from(sourceSet.getOutput());
   }
@@ -146,6 +161,9 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  /**
+   * Task action.
+   */
   @TaskAction
   public void pack()
   {
