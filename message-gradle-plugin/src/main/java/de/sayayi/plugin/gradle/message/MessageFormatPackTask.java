@@ -75,6 +75,9 @@ public abstract class MessageFormatPackTask extends DefaultTask
   private final ThreadLocal<String> currentClassName = new ThreadLocal<>();
 
 
+  /**
+   * Gradle task constructor.
+   */
   public MessageFormatPackTask()
   {
     getCompress().convention(false);
@@ -83,11 +86,21 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
-  @Internal
+  /**
+   * Parameter containing the destination directory where the packed message file is stored.
+   *
+   * @return  destination directory parameter
+   */
+  @Internal  // part of task output
   public abstract DirectoryProperty getDestinationDir();
 
 
-  @Internal
+  /**
+   * Parameter containing the packed message file name.
+   *
+   * @return  packed message file name
+   */
+  @Internal  // part of task output
   public abstract Property<String> getPackFilename();
 
 
