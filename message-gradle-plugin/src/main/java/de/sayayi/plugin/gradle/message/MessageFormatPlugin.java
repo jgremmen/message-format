@@ -35,6 +35,7 @@ import static de.sayayi.plugin.gradle.message.DuplicateMsgStrategy.IGNORE_AND_WA
  */
 public class MessageFormatPlugin implements Plugin<Project>
 {
+  /** Plugin extension name */
   public static final String EXTENSION = "messageFormat";
 
 
@@ -84,7 +85,7 @@ public class MessageFormatPlugin implements Plugin<Project>
 
       // pack file
       packTask.getDestinationDir().convention(
-          objects.directoryProperty().fileValue(project.getBuildDir()));
+          objects.directoryProperty().fileValue(project.getBuildDir()).dir(packTask.getName()));
       packTask.getPackFilename().convention(extension.getPackFilename());
 
       // settings
