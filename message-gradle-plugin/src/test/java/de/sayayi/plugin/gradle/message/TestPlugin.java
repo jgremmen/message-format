@@ -213,6 +213,7 @@ class TestPlugin
         .withDebug(true)
         .forwardOutput()
         .forwardStdOutput(output)
+        .forwardStdError(output)
         .build();
 
     assertEquals(SUCCESS, requireNonNull(result.task(":jar")).getOutcome());
