@@ -254,9 +254,9 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
       try(final InputStream inputStream = Files.newInputStream(classPath)) {
         parseClass(inputStream);
         indexedClasses.add(classPath.toString());
-      } catch(IOException | NullPointerException ex) {
-        throw new MessageAdopterException("failed to adopt messages from class file " +
-            classFile, ex);
+      } catch(Exception ex) {
+        throw new MessageAdopterException(
+            "failed to adopt messages and templates from class file " + classFile, ex);
       }
     }
 
@@ -286,8 +286,9 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
         try(final InputStream inputStream = classLoader.getResourceAsStream(classResourceName)) {
           parseClass(requireNonNull(inputStream));
           indexedClasses.add(typeName);
-        } catch(IOException | NullPointerException ex) {
-          throw new MessageAdopterException("failed to adopt messages from type " + typeName, ex);
+        } catch(Exception ex) {
+          throw new MessageAdopterException(
+              "failed to adopt messages and templates from type " + typeName, ex);
         }
       }
     }
