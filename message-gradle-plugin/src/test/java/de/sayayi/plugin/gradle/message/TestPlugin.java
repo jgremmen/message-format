@@ -20,6 +20,8 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import lombok.val;
 import org.gradle.testkit.runner.GradleRunner;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.nio.file.Files.copy;
@@ -168,15 +171,18 @@ class TestPlugin
     copy(getResource("test-source-2.java"),
         new File(testPackageDir, "Source2.java").toPath());
 
+    val output = new StringWriter();
     val result = GradleRunner.create()
         .withProjectDir(testProjectDir)
         .withArguments("messageFormatPack")
         .withPluginClasspath()
         .withDebug(true)
         .forwardOutput()
+        .forwardStdError(output)
         .buildAndFail();
 
     assertEquals(FAILED, requireNonNull(result.task(":messageFormatPack")).getOutcome());
+    assertTrue(output.toString().contains("Duplicate message code 'MSG3' in class test.Source1"));
   }
 
 
@@ -199,25 +205,30 @@ class TestPlugin
     copy(getResource("test-source-2.java"),
         new File(testPackageDir, "Source2.java").toPath());
 
+    val output = new StringWriter();
     val result = GradleRunner.create()
         .withProjectDir(testProjectDir)
         .withArguments("jar")
         .withPluginClasspath()
         .withDebug(true)
         .forwardOutput()
+        .forwardStdOutput(output)
         .build();
 
     assertEquals(SUCCESS, requireNonNull(result.task(":jar")).getOutcome());
     assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
+    assertTrue(output.toString().contains("Duplicate message code 'MSG3' in class test.Source1"));
   }
 
 
-  private InputStream getResource(String filename) {
+  @Contract(pure = true)
+  private InputStream getResource(@NotNull String filename) {
     return requireNonNull(getClass().getClassLoader().getResourceAsStream(filename));
   }
 
 
-  private MessageAccessor readMessagePack(File pack) throws IOException
+  @Contract(pure = true)
+  private @NotNull MessageAccessor readMessagePack(@NotNull File pack) throws IOException
   {
     val messageSupport = MessageSupportFactory
         .create(new GenericFormatterService(), NO_CACHE_INSTANCE);
