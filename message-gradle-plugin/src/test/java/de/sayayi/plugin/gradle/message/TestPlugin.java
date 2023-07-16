@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public class TestPlugin
+class TestPlugin
 {
   @TempDir File testProjectDir;
   File buildDir;
@@ -58,13 +58,15 @@ public class TestPlugin
   {
     write(new File(testProjectDir, "settings.gradle").toPath(),
         singletonList("rootProject.name = 'test-message-pack'"));
+
     write(new File(testProjectDir, "gradle.properties").toPath(), asList(
         "org.gradle.configuration-cache=true",
         "org.gradle.configuration-cache.problems=warn"));
+
     write(new File(testProjectDir, "build.gradle").toPath(), asList(
         "plugins {",
         "  id 'java'",
-        "  id 'de.sayayi.lib.message.plugin.gradle'",
+        "  id 'de.sayayi.plugin.gradle.message'",
         "}"));
 
     buildDir = new File(testProjectDir, "build");
@@ -80,7 +82,6 @@ public class TestPlugin
   void testNoSources() throws IOException
   {
     val result = GradleRunner.create()
-        .withGradleVersion("8.2.1")
         .withProjectDir(testProjectDir)
         .withArguments("messageFormatPack")
         .withPluginClasspath()
@@ -104,7 +105,6 @@ public class TestPlugin
         new File(testPackageDir, "Source1.java").toPath());
 
     val result = GradleRunner.create()
-        .withGradleVersion("8.2.1")
         .withProjectDir(testProjectDir)
         .withArguments("messageFormatPack")
         .withPluginClasspath()
@@ -127,7 +127,7 @@ public class TestPlugin
     write(new File(testProjectDir, "build.gradle").toPath(), asList(
         "plugins {",
         "  id 'java'",
-        "  id 'de.sayayi.lib.message.plugin.gradle'",
+        "  id 'de.sayayi.plugin.gradle.message'",
         "}",
         "messageFormat {",
         "  include '.*INNER.*'",
@@ -137,7 +137,6 @@ public class TestPlugin
         new File(testPackageDir, "Source1.java").toPath());
 
     val result = GradleRunner.create()
-        .withGradleVersion("8.2.1")
         .withProjectDir(testProjectDir)
         .withArguments("messageFormatPack")
         .withPluginClasspath()
@@ -160,7 +159,7 @@ public class TestPlugin
     write(new File(testProjectDir, "build.gradle").toPath(), asList(
         "plugins {",
         "  id 'java'",
-        "  id 'de.sayayi.lib.message.plugin.gradle'",
+        "  id 'de.sayayi.plugin.gradle.message'",
         "}",
         "messageFormat.duplicateMsgStrategy = 'fail'"));
 
@@ -170,7 +169,6 @@ public class TestPlugin
         new File(testPackageDir, "Source2.java").toPath());
 
     val result = GradleRunner.create()
-        .withGradleVersion("8.2.1")
         .withProjectDir(testProjectDir)
         .withArguments("messageFormatPack")
         .withPluginClasspath()
@@ -188,7 +186,7 @@ public class TestPlugin
     write(new File(testProjectDir, "build.gradle").toPath(), asList(
         "plugins {",
         "  id 'java'",
-        "  id 'de.sayayi.lib.message.plugin.gradle'",
+        "  id 'de.sayayi.plugin.gradle.message'",
         "}",
         "jar {",
         "  from messageFormatPack {",
@@ -202,7 +200,6 @@ public class TestPlugin
         new File(testPackageDir, "Source2.java").toPath());
 
     val result = GradleRunner.create()
-        .withGradleVersion("8.2.1")
         .withProjectDir(testProjectDir)
         .withArguments("jar")
         .withPluginClasspath()
