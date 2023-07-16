@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-class TestPlugin
+class PluginTest
 {
   @TempDir File testProjectDir;
   File buildDir;
