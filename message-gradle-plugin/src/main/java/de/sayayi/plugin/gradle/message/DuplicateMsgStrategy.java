@@ -17,6 +17,9 @@ package de.sayayi.plugin.gradle.message;
 
 
 /**
+ * Strategy for handling duplicate message codes. Duplicate messages are messages with the
+ * same message code but with different message texts.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */

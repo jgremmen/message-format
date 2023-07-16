@@ -57,6 +57,9 @@ import static org.gradle.api.logging.LogLevel.WARN;
 
 
 /**
+ * Gradle task for scanning classes and packing them into a single file which can be imported
+ * into a {@link MessageSupport.ConfigurableMessageSupport}.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
