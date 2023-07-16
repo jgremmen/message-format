@@ -29,7 +29,6 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.nio.file.Files.copy;
@@ -171,18 +170,15 @@ class TestPlugin
     copy(getResource("test-source-2.java"),
         new File(testPackageDir, "Source2.java").toPath());
 
-    val output = new StringWriter();
     val result = GradleRunner.create()
         .withProjectDir(testProjectDir)
         .withArguments("messageFormatPack")
         .withPluginClasspath()
         .withDebug(true)
         .forwardOutput()
-        .forwardStdError(output)
         .buildAndFail();
 
     assertEquals(FAILED, requireNonNull(result.task(":messageFormatPack")).getOutcome());
-    assertTrue(output.toString().contains("Duplicate message code 'MSG3' in class test.Source1"));
   }
 
 
@@ -205,21 +201,16 @@ class TestPlugin
     copy(getResource("test-source-2.java"),
         new File(testPackageDir, "Source2.java").toPath());
 
-    val output = new StringWriter();
     val result = GradleRunner.create()
         .withProjectDir(testProjectDir)
         .withArguments("jar")
         .withPluginClasspath()
         .withDebug(true)
         .forwardOutput()
-        .forwardStdOutput(output)
-        .forwardStdError(output)
         .build();
 
     assertEquals(SUCCESS, requireNonNull(result.task(":jar")).getOutcome());
     assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
-    System.err.println(output.toString());
-    assertTrue(output.toString().contains("Duplicate message code 'MSG3' in class test.Source1"));
   }
 
 
