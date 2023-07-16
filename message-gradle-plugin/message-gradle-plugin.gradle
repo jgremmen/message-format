@@ -31,9 +31,6 @@ dependencies {
 
   implementation project(":message-format")
   implementation "org.ow2.asm:asm:${asmVersion}"
-
-  testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-  testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
 }
 
 
@@ -42,8 +39,8 @@ javadoc {
 
   (options as StandardJavadocDocletOptions).with {
     linksOffline(
-            "https://javadoc.io/doc/org.jetbrains/annotations-java5/${jetbrainsAnnotationsVersion}/",
-            "${rootDir}/gradle/javadocs/jetbrains-annotations")
+        "https://javadoc.io/doc/org.jetbrains/annotations-java5/${jetbrainsAnnotationsVersion}/",
+        "${rootDir}/gradle/javadocs/jetbrains-annotations")
 
     encoding 'UTF-8'
 

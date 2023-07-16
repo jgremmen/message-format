@@ -1,3 +1,14 @@
 de.sayayi.lib.message
+de.sayayi.lib.message.adopter
+de.sayayi.lib.message.annotation
+de.sayayi.lib.message.exception
 de.sayayi.lib.message.formatter
-de.sayayi.lib.message.internal.part.MessagePart
+de.sayayi.lib.message.formatter.named
+de.sayayi.lib.message.formatter.named.extra
+de.sayayi.lib.message.formatter.runtime
+de.sayayi.lib.message.formatter.runtime.extra
+de.sayayi.lib.message.internal
+de.sayayi.lib.message.pack
+de.sayayi.lib.message.parser
+de.sayayi.lib.message.part
+de.sayayi.lib.message.util
