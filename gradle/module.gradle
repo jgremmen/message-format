@@ -14,76 +14,6 @@
  * limitations under the License.
  */
 
-apply plugin: "java-library"
-apply plugin: "jacoco"
-
-
-dependencies {
-  compileOnly "org.jetbrains:annotations-java5:${jetbrainsAnnotationsVersion}"
-
-  testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
-  testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
-  testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-  testRuntimeOnly "org.junit.platform:junit-platform-launcher"
-}
-
-
-repositories {
-  mavenCentral()
-}
-
-
-java {
-  withJavadocJar()
-  withSourcesJar()
-}
-
-
-test {
-  useJUnitPlatform()
-}
-
-
-jar.dependsOn test
-
-
-tasks.withType(Jar).configureEach {
-  includeEmptyDirs = false
-  preserveFileTimestamps = true
-  reproducibleFileOrder = true
-
-  manifest {
-    attributes(
-        "Implementation-Vendor": "Jeroen Gremmen",
-        "Implementation-Vendor-Id": "de.sayayi",
-        "Implementation-Title": project.name,
-        "Implementation-Version": project.version,
-        "Created-By": "${System.getProperty("java.version")}",
-        "Built-Date": new Date().format('yyyy-MM-dd HH:mm:ss')
-    )
-  }
-
-  from(rootDir) {
-    include "LICENSE"
-    into "META-INF"
-    expand(copyright: new Date().format("yyyy"), version: project.version)
-  }
-}
-
-
-tasks.withType(JavaCompile).configureEach {
-  javaCompiler = javaToolchains.compilerFor {
-    languageVersion = JavaLanguageVersion.of(8)
-  }
-}
-
-
-tasks.withType(Test).configureEach {
-  javaLauncher = javaToolchains.launcherFor {
-    languageVersion = JavaLanguageVersion.of(8)
-  }
-}
-
 
 afterEvaluate {
   javadoc {
@@ -118,25 +48,5 @@ afterEvaluate {
     }
 
     failOnError false
-  }
-}
-
-
-compileJava {
-  sourceCompatibility = 1.8
-  targetCompatibility = 1.8
-}
-
-
-compileTestJava {
-  sourceCompatibility = 1.8
-  targetCompatibility = 1.8
-}
-
-
-jacocoTestReport {
-  reports {
-    xml.required = true
-    html.required = true
   }
 }

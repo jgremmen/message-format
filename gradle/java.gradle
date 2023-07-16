@@ -1,0 +1,111 @@
+/*
+ * Copyright 2023 Jeroen Gremmen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: "java-library"
+apply plugin: "jacoco"
+
+
+dependencies {
+  compileOnly "org.jetbrains:annotations-java5:${jetbrainsAnnotationsVersion}"
+
+  testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+  testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
+  testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+  testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+
+repositories {
+  mavenCentral()
+}
+
+
+java {
+  withJavadocJar()
+  withSourcesJar()
+}
+
+
+test {
+  useJUnitPlatform()
+}
+
+
+jar.dependsOn test
+
+
+tasks.withType(Jar).configureEach {
+  includeEmptyDirs = false
+  preserveFileTimestamps = true
+  reproducibleFileOrder = true
+
+  manifest {
+    attributes(
+        "Implementation-Vendor": "Jeroen Gremmen",
+        "Implementation-Vendor-Id": "de.sayayi",
+        "Implementation-Title": project.name,
+        "Implementation-Version": project.version,
+        "Created-By": "${System.getProperty("java.version")}",
+        "Built-Date": new Date().format('yyyy-MM-dd HH:mm:ss')
+    )
+  }
+
+  from(rootDir) {
+    include "LICENSE"
+    into "META-INF"
+    expand(copyright: new Date().format("yyyy"), version: project.version)
+  }
+}
+
+
+tasks.withType(JavaCompile).configureEach {
+  javaCompiler = javaToolchains.compilerFor {
+    languageVersion = JavaLanguageVersion.of(8)
+  }
+}
+
+
+tasks.withType(Test).configureEach {
+  javaLauncher = javaToolchains.launcherFor {
+    languageVersion = JavaLanguageVersion.of(8)
+  }
+}
+
+
+compileJava {
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
+}
+
+
+compileTestJava {
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
+}
+
+
+configurations {
+  testAnnotationProcessor.extendsFrom annotationProcessor
+  testCompileOnly.extendsFrom compileOnly
+}
+
+
+jacocoTestReport {
+  reports {
+    xml.required = true
+    html.required = true
+  }
+}

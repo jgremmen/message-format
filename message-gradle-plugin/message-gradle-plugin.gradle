@@ -15,7 +15,6 @@
  */
 
 plugins {
-  id 'java-library'
   id 'java-gradle-plugin'
   id 'com.gradle.plugin-publish' version '1.2.0'
 }
@@ -27,17 +26,6 @@ description = 'Message Format Gradle Plugin'
 def asmVersion = "[6.0,)"
 
 
-configurations {
-  testAnnotationProcessor.extendsFrom annotationProcessor
-  testCompileOnly.extendsFrom compileOnly
-}
-
-
-repositories {
-  mavenCentral()
-}
-
-
 dependencies {
   gradleApi()
 
@@ -46,32 +34,34 @@ dependencies {
 
   testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
   testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
-
-  testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
-  testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
 }
 
 
-tasks.withType(JavaCompile).configureEach {
-  javaCompiler = javaToolchains.compilerFor {
-    languageVersion = JavaLanguageVersion.of(8)
+afterEvaluate {
+  javadoc {
+    title "${project.description} ${version}"
+
+    (options as StandardJavadocDocletOptions).with {
+      linksOffline(
+              "https://javadoc.io/doc/org.jetbrains/annotations-java5/${jetbrainsAnnotationsVersion}/",
+              "${rootDir}/gradle/javadocs/jetbrains-annotations")
+
+      encoding 'UTF-8'
+
+      group("Gradle Plugin", [
+              "de.sayayi.plugin.gradle.message",
+      ])
+
+      noQualifiers 'java.util', 'java.lang'
+    }
+
+    failOnError false
   }
 }
 
 
 jar {
   archiveBaseName = 'message-format-gradle-plugin'
-
-  manifest {
-    attributes(
-        "Implementation-Vendor": "Jeroen Gremmen",
-        "Implementation-Vendor-Id": "de.sayayi",
-        "Implementation-Title": project.description,
-        "Implementation-Version": project.version,
-        "Created-By": System.getProperty("java.version"),
-        "Built-Date": new Date().format('yyyy-MM-dd HH:mm:ss')
-    )
-  }
 }
 
 

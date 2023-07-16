@@ -17,11 +17,6 @@
 description = 'Message Format Library Projects'
 
 
-ext {
-  moduleProjects = subprojects.findAll { it.name.startsWith("message-format") }
-}
-
-
 allprojects {
   buildDir = ".build"
 
@@ -36,13 +31,13 @@ allprojects {
 }
 
 
-configure(moduleProjects) {
+configure(subprojects.findAll { it.name.startsWith("message-format") }) {
   apply from: "${rootDir}/gradle/module.gradle"
 }
 
 
-// publishable projects
 configure(subprojects.findAll {it.name != 'documentation' }) {
+  apply from: "${rootDir}/gradle/java.gradle"
   apply from: "${rootDir}/gradle/publish.gradle"
 }
 

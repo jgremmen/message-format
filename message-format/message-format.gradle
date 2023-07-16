@@ -81,12 +81,6 @@ dependencies {
 }
 
 
-configurations {
-  testAnnotationProcessor.extendsFrom annotationProcessor
-  testCompileOnly.extendsFrom compileOnly
-}
-
-
 generateGrammarSource {
   outputDirectory = file("${buildDir}/generated-src/antlr/main/de/sayayi/lib/message/parser")
   arguments += [ '-package', 'de.sayayi.lib.message.parser' ]
