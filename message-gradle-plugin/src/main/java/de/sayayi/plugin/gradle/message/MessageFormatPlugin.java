@@ -27,6 +27,7 @@ import org.gradle.api.tasks.TaskContainer;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.plugin.gradle.message.DuplicateMsgStrategy.IGNORE_AND_WARN;
+import static org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME;
 
 
 /**
@@ -60,7 +61,7 @@ public class MessageFormatPlugin implements Plugin<Project>
     final SourceSet mainJavaSourceSet = extensions
         .getByType(JavaPluginExtension.class)
         .getSourceSets()
-        .getByName("main");
+        .getByName(MAIN_SOURCE_SET_NAME);
 
     // sources = {.build/classes/java/main/}**/*.class
     messageFormatExtension.sourceSet(mainJavaSourceSet);
