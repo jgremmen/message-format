@@ -292,7 +292,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitString(StringContext ctx)
+    public void exitQuotedString(QuotedStringContext ctx)
     {
       final TextContext text = ctx.text();
       ctx.value = text == null ? "" : text.value;
@@ -309,7 +309,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       {
         final NameOrKeywordContext nameOrKeyword = ctx.nameOrKeyword();
         ctx.value = messageFactory.parseMessage(
-            nameOrKeyword != null ? nameOrKeyword.name : ctx.string().value);
+            nameOrKeyword != null ? nameOrKeyword.name : ctx.quotedString().value);
       }
     }
 
@@ -357,7 +357,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
     @Override
     public void exitConfigKeyString(ConfigKeyStringContext ctx) {
-      ctx.key = new ConfigKeyString(ctx.relationalOperatorOptional().cmp, ctx.string().value);
+      ctx.key = new ConfigKeyString(ctx.relationalOperatorOptional().cmp, ctx.quotedString().value);
     }
 
 
@@ -394,10 +394,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitConfigValueString(ConfigValueStringContext ctx)
     {
-      final StringContext stringContext = ctx.string();
+      final QuotedStringContext quotedStringContext = ctx.quotedString();
 
-      ctx.value = new ConfigValueString(stringContext != null
-          ? stringContext.value : ctx.nameOrKeyword().name);
+      ctx.value = new ConfigValueString(quotedStringContext != null
+          ? quotedStringContext.value : ctx.nameOrKeyword().name);
     }
 
 

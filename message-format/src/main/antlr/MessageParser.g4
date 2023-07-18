@@ -53,15 +53,15 @@ quotedMessage returns [Message.WithSpaces value]
         | DQ_START message0 DQ_END
         ;
 
-string returns [String value]
+quotedString returns [String value]
         : SQ_START text? SQ_END
         | DQ_START text? DQ_END
         ;
 
 forceQuotedMessage returns [Message.WithSpaces value]
         : quotedMessage
+        | quotedString
         | nameOrKeyword
-        | string
         ;
 
 parameterPart returns [ParameterPart value]
@@ -84,18 +84,18 @@ configElement returns [ConfigKey key, ConfigValue value]
         ;
 
 configKey returns [ConfigKey key]
-        : relationalOperatorOptional string  #configKeyString
-        | relationalOperatorOptional NUMBER  #configKeyNumber
-        | BOOL                               #configKeyBool
-        | equalOperatorOptional NULL         #configKeyNull
-        | equalOperatorOptional EMPTY        #configKeyEmpty
-        | NAME                               #configKeyName
+        : relationalOperatorOptional quotedString  #configKeyString
+        | relationalOperatorOptional NUMBER        #configKeyNumber
+        | BOOL                                     #configKeyBool
+        | equalOperatorOptional NULL               #configKeyNull
+        | equalOperatorOptional EMPTY              #configKeyEmpty
+        | NAME                                     #configKeyName
         ;
 
 configValue returns [ConfigValue value]
         : BOOL           #configValueBool
         | NUMBER         #configValueNumber
-        | string         #configValueString
+        | quotedString   #configValueString
         | nameOrKeyword  #configValueString
         | quotedMessage  #configValueMessage
         ;
