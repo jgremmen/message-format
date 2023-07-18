@@ -25,6 +25,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAccumulator;
+import java.util.concurrent.atomic.LongAdder;
 
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
 import static java.util.Objects.requireNonNull;
@@ -91,7 +95,8 @@ public final class ConfigKeyNumber implements ConfigKey
 
     doMatch: {
       if (value instanceof Long || value instanceof Integer || value instanceof Short ||
-          value instanceof Byte)
+          value instanceof Byte || value instanceof AtomicInteger || value instanceof AtomicLong ||
+          value instanceof LongAdder || value instanceof LongAccumulator)
       {
         cmp = Long.signum(((Number)value).longValue() - number);
         break doMatch;

@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAccumulator;
 import java.util.concurrent.atomic.LongAdder;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
@@ -71,7 +72,8 @@ public final class NumberFormatter extends AbstractParameterFormatter<Number>
     if ((format == null || "integer".equals(format)) &&
         (number instanceof BigInteger || number instanceof Long || number instanceof Integer ||
          number instanceof Short || number instanceof Byte || number instanceof AtomicInteger ||
-         number instanceof AtomicLong || number instanceof LongAdder))
+         number instanceof AtomicLong || number instanceof LongAdder ||
+         number instanceof LongAccumulator))
       return noSpaceText(number.toString());
 
     return noSpaceText(getFormatter(format, context).format(number));
