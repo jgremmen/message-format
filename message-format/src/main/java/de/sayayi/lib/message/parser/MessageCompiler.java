@@ -70,7 +70,6 @@ import static de.sayayi.lib.message.parser.MessageParser.*;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
-import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toMap;
 import static org.antlr.v4.runtime.Token.EOF;
@@ -343,79 +342,104 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitConfigElement(ConfigElementContext ctx)
     {
-      final ConfigKey.Type keyType = (ctx.key = ctx.configKey().key).getType();
-      final ConfigValue.Type valueType = (ctx.value = ctx.configValue().value).getType();
+      final ConfigParameterElementContext cpec = ctx.configParameterElement();
 
-      if ((valueType == ConfigValue.Type.BOOL || valueType == ConfigValue.Type.NUMBER) &&
-          keyType != ConfigKey.Type.NAME)
+      if (cpec != null)
       {
-        syntaxError(ctx, valueType.name().toLowerCase(ROOT) +
-            " value not allowed for " + keyType.name().toLowerCase(ROOT) + " key");
+        ctx.key = cpec.key;
+        ctx.value = cpec.value;
+      }
+      else
+      {
+        final ConfigMapElementContext cmec = ctx.configMapElement();
+
+        ctx.key = cmec.key;
+        ctx.value = cmec.value;
       }
     }
 
 
     @Override
-    public void exitConfigKeyString(ConfigKeyStringContext ctx) {
-      ctx.key = new ConfigKeyString(ctx.relationalOperatorOptional().cmp, ctx.quotedString().value);
+    public void exitConfigMapMessage(ConfigMapMessageContext ctx)
+    {
+      ctx.key = ctx.configMapKey().key;
+      ctx.value = new ConfigValueMessage(ctx.quotedMessage().value);
     }
 
 
     @Override
-    public void exitConfigKeyNumber(ConfigKeyNumberContext ctx) {
-      ctx.key = new ConfigKeyNumber(ctx.relationalOperatorOptional().cmp, ctx.NUMBER().getText());
-    }
-
-
-    @Override
-    public void exitConfigKeyBool(ConfigKeyBoolContext ctx) {
-      ctx.key = parseBoolean(ctx.BOOL().getText()) ? ConfigKeyBool.TRUE : ConfigKeyBool.FALSE;
-    }
-
-
-    @Override
-    public void exitConfigKeyNull(ConfigKeyNullContext ctx) {
-      ctx.key = new ConfigKeyNull(ctx.equalOperatorOptional().cmp);
-    }
-
-
-    @Override
-    public void exitConfigKeyEmpty(ConfigKeyEmptyContext ctx) {
-      ctx.key = new ConfigKeyEmpty(ctx.equalOperatorOptional().cmp);
-    }
-
-
-    @Override
-    public void exitConfigKeyName(ConfigKeyNameContext ctx) {
-      ctx.key = new ConfigKeyName(ctx.NAME().getText());
-    }
-
-
-    @Override
-    public void exitConfigValueString(ConfigValueStringContext ctx)
+    public void exitConfigMapString(ConfigMapStringContext ctx)
     {
       final QuotedStringContext quotedStringContext = ctx.quotedString();
 
+      ctx.key = ctx.configMapKey().key;
       ctx.value = new ConfigValueString(quotedStringContext != null
           ? quotedStringContext.value : ctx.nameOrKeyword().name);
     }
 
 
     @Override
-    public void exitConfigValueNumber(ConfigValueNumberContext ctx) {
-      ctx.value = new ConfigValueNumber(Long.parseLong(ctx.NUMBER().getText()));
-    }
-
-
-    @Override
-    public void exitConfigValueBool(ConfigValueBoolContext ctx) {
+    public void exitConfigParameterBool(ConfigParameterBoolContext ctx)
+    {
+      ctx.key = new ConfigKeyName(ctx.NAME().getText());
       ctx.value = parseBoolean(ctx.BOOL().getText()) ? ConfigValueBool.TRUE : ConfigValueBool.FALSE;
     }
 
 
     @Override
-    public void exitConfigValueMessage(ConfigValueMessageContext ctx) {
+    public void exitConfigParameterNumber(ConfigParameterNumberContext ctx)
+    {
+      ctx.key = new ConfigKeyName(ctx.NAME().getText());
+      ctx.value = new ConfigValueNumber(Long.parseLong(ctx.NUMBER().getText()));
+    }
+
+
+    @Override
+    public void exitConfigParameterMessage(ConfigParameterMessageContext ctx)
+    {
+      ctx.key = new ConfigKeyName(ctx.NAME().getText());
       ctx.value = new ConfigValueMessage(ctx.quotedMessage().value);
+    }
+
+
+    @Override
+    public void exitConfigParameterString(ConfigParameterStringContext ctx)
+    {
+      final QuotedStringContext quotedStringContext = ctx.quotedString();
+
+      ctx.key = new ConfigKeyName(ctx.NAME().getText());
+      ctx.value = new ConfigValueString(quotedStringContext != null
+          ? quotedStringContext.value : ctx.nameOrKeyword().name);
+    }
+
+
+    @Override
+    public void exitConfigMapKeyNull(ConfigMapKeyNullContext ctx) {
+      ctx.key = new ConfigKeyNull(ctx.equalOperatorOptional().cmp);
+    }
+
+
+    @Override
+    public void exitConfigMapKeyEmpty(ConfigMapKeyEmptyContext ctx) {
+      ctx.key = new ConfigKeyEmpty(ctx.equalOperatorOptional().cmp);
+    }
+
+
+    @Override
+    public void exitConfigMapKeyBool(ConfigMapKeyBoolContext ctx) {
+      ctx.key = parseBoolean(ctx.BOOL().getText()) ? ConfigKeyBool.TRUE : ConfigKeyBool.FALSE;
+    }
+
+
+    @Override
+    public void exitConfigMapKeyNumber(ConfigMapKeyNumberContext ctx) {
+      ctx.key = new ConfigKeyNumber(ctx.relationalOperatorOptional().cmp, ctx.NUMBER().getText());
+    }
+
+
+    @Override
+    public void exitConfigMapKeyString(ConfigMapKeyStringContext ctx) {
+      ctx.key = new ConfigKeyString(ctx.relationalOperatorOptional().cmp, ctx.quotedString().value);
     }
 
 

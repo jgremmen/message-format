@@ -28,6 +28,7 @@ import de.sayayi.lib.message.part.TemplatePart;
 import de.sayayi.lib.message.part.TextPart;
 import de.sayayi.lib.message.part.parameter.ParameterPart;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
+import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 }
 
@@ -76,28 +77,35 @@ parameterPart returns [ParameterPart value]
 templatePart returns [TemplatePart value]
         : TPL_START
           nameOrKeyword
+          (COMMA configParameterElement)*
           TPL_END
         ;
 
 configElement returns [ConfigKey key, ConfigValue value]
-        : configKey COLON configValue
+        : configParameterElement
+        | configMapElement
         ;
 
-configKey returns [ConfigKey key]
-        : relationalOperatorOptional quotedString  #configKeyString
-        | relationalOperatorOptional NUMBER        #configKeyNumber
-        | BOOL                                     #configKeyBool
-        | equalOperatorOptional NULL               #configKeyNull
-        | equalOperatorOptional EMPTY              #configKeyEmpty
-        | NAME                                     #configKeyName
+configMapElement returns [ConfigKey key, ConfigValue value]
+        : configMapKey COLON quotedMessage  #configMapMessage
+        | configMapKey COLON quotedString   #configMapString
+        | configMapKey COLON nameOrKeyword  #configMapString
         ;
 
-configValue returns [ConfigValue value]
-        : BOOL           #configValueBool
-        | NUMBER         #configValueNumber
-        | quotedString   #configValueString
-        | nameOrKeyword  #configValueString
-        | quotedMessage  #configValueMessage
+configParameterElement returns [ConfigKeyName key, ConfigValue value]
+        : NAME COLON BOOL           #configParameterBool
+        | NAME COLON NUMBER         #configParameterNumber
+        | NAME COLON quotedString   #configParameterString
+        | NAME COLON nameOrKeyword  #configParameterString
+        | NAME COLON quotedMessage  #configParameterMessage
+        ;
+
+configMapKey returns [ConfigKey key]
+        : equalOperatorOptional NULL               #configMapKeyNull
+        | equalOperatorOptional EMPTY              #configMapKeyEmpty
+        | BOOL                                     #configMapKeyBool
+        | relationalOperatorOptional NUMBER        #configMapKeyNumber
+        | relationalOperatorOptional quotedString  #configMapKeyString
         ;
 
 relationalOperatorOptional returns [ConfigKey.CompareType cmp]
