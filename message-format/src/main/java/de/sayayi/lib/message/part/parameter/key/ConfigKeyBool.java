@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
 
@@ -85,6 +86,8 @@ public enum ConfigKeyBool implements ConfigKey
     if (value != null)
     {
       if (value instanceof Boolean && (Boolean)value == bool)
+        return EXACT;
+      if (value instanceof AtomicBoolean && ((AtomicBoolean)value).get() == bool)
         return EXACT;
 
       if (value instanceof BigInteger)
