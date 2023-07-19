@@ -25,6 +25,7 @@ import java.util.Locale;
 
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 
 
@@ -77,7 +78,7 @@ public final class ConfigKeyNull implements ConfigKey
     if (value != null && compareType == NE)
       return TYPELESS_EXACT;
 
-    return MatchResult.MISMATCH;
+    return MISMATCH;
   }
 
 

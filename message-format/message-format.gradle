@@ -170,10 +170,13 @@ signing {
 
 
 clean.doLast {
+  println "cleanup: ${projectDir}"
   fileTree("${projectDir}/src/main").matching {
     include "antlr/*.tokens"
   }.files.forEach({ it.delete() })
-  file("${projectDir}/src/main/gen").delete()
+
+  file("${projectDir}/src/main/antlr/gen").deleteDir()
+  file("${projectDir}/src/main/gen").deleteDir()
 }
 
 
