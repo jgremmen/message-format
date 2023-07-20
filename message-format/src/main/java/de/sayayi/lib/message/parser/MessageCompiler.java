@@ -70,8 +70,6 @@ import static de.sayayi.lib.message.parser.MessageParser.SQ_START;
 import static de.sayayi.lib.message.parser.MessageParser.TPL_END;
 import static de.sayayi.lib.message.parser.MessageParser.TPL_START;
 import static de.sayayi.lib.message.parser.MessageParser.*;
-import static de.sayayi.lib.message.util.StreamUtil.foldCombiner;
-import static de.sayayi.lib.message.util.StreamUtil.unmodifyableMapFinisher;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
@@ -392,7 +390,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
       @Override
       public Function<Map<String,ConfigValue>,Map<String,ConfigValue>> finisher() {
-        return unmodifyableMapFinisher();
+        return identity();
       }
     };
 
@@ -583,6 +581,12 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
       return false;
     }
+  }
+
+
+  @Contract(pure = true)
+  private static <K,V> BinaryOperator<Map<K,V>> foldCombiner() {
+    return (map1,map2) -> { map1.putAll(map2); return map1; };
   }
 
 

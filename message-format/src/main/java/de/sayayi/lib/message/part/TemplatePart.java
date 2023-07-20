@@ -30,7 +30,8 @@ import java.io.IOException;
 import java.util.*;
 
 import static de.sayayi.lib.message.part.TextPartFactory.*;
-import static java.util.Collections.*;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 
@@ -240,33 +241,13 @@ public final class TemplatePart implements Template
 
     final boolean spaceBefore = packStream.readBoolean();
     final boolean spaceAfter = packStream.readBoolean();
-    final int size = packStream.readSmallVar();
-    final Map<String,ConfigValue> defaultParameterMap;
+    final Map<String,ConfigValue> defaultParameterMap = new HashMap<>();
 
-    switch(size)
+    for(int n = 0, size = packStream.readSmallVar(); n < size; n++)
     {
-      case 0:
-        defaultParameterMap = emptyMap();
-        break;
-
-      case 1:
-        defaultParameterMap = singletonMap(
-            requireNonNull(packStream.readString()),
-            unpack.unpackMapValue(packStream));
-        break;
-
-      default: {
-        defaultParameterMap = new HashMap<>();
-
-        for(int n = 0; n < size; n++)
-        {
-          defaultParameterMap.put(
-              requireNonNull(packStream.readString()),
-              unpack.unpackMapValue(packStream));
-        }
-
-        break;
-      }
+      defaultParameterMap.put(
+          requireNonNull(packStream.readString()),
+          unpack.unpackMapValue(packStream));
     }
 
     return new TemplatePart(requireNonNull(packStream.readString()),
