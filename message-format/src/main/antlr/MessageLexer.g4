@@ -18,7 +18,12 @@ lexer grammar MessageLexer;
 
 tokens {
     SQ_START,
-    DQ_START
+    DQ_START,
+    COMMA,
+    COLON,
+    BOOL,
+    NUMBER,
+    NAME
 }
 
 
@@ -88,15 +93,14 @@ mode PARAMETER;
 P_END
         : '}' -> popMode
         ;
-COMMA
-        : ','
+P_COMMA
+        : ',' -> type(COMMA)
         ;
-COLON
-        : ':'
+P_COLON
+        : ':' -> type(COLON)
         ;
-BOOL
-        : 'true'
-        | 'false'
+P_BOOL
+        : ('true' | 'false') -> type(BOOL)
         ;
 NULL
         : 'null'
@@ -104,11 +108,11 @@ NULL
 EMPTY
         : 'empty'
         ;
-NAME
-        : DashedName
+P_NAME
+        : DashedName -> type(NAME)
         ;
-NUMBER
-        : Number
+P_NUMBER
+        : Number -> type(NUMBER)
         ;
 P_SQ_START
         : '\'' -> pushMode(TEXT1), type(SQ_START)
@@ -140,14 +144,32 @@ GTE
 
 
 
-// ------------------ Template -------------------
+// ------------------ In template mode ------------------
 mode TEMPLATE;
 
 TPL_END
         : ']' -> popMode
         ;
+T_COMMA
+        : ',' -> type(COMMA)
+        ;
+T_COLON
+        : ':' -> type(COLON)
+        ;
+T_BOOL
+        : ('true' | 'false') -> type(BOOL)
+        ;
+T_NUMBER
+        : Number -> type(NUMBER)
+        ;
 T_NAME
         : DashedName -> type(NAME)
+        ;
+T_SQ_START
+        : '\'' -> pushMode(TEXT1), type(SQ_START)
+        ;
+T_DQ_START
+        : '"' -> pushMode(TEXT2), type(DQ_START)
         ;
 T_WS
         : (CtrlChar | ' ')+ -> skip

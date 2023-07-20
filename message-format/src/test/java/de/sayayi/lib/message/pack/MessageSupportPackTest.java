@@ -43,7 +43,7 @@ class MessageSupportPackTest
   @MessageDef(code = "MSG-006", text = "%{n,name:-128,check:false,str:'string',msg:'msg %{p}'}")
   @MessageDef(code = "MSG-007", text = "^°!§$%&/()=?ßüöäÖÄÜ@€«∑®†Ω¨⁄øπ@∆ª©ƒ∂‚å¥≈ç√∫~∞…")
   @TemplateDef(name = "exception", text = "%{ex,!empty:': %{ex}'}")
-  @MessageDef(code = "MSG-008", text = "Something went wrong%[exception]")
+  @MessageDef(code = "MSG-008", text = "Something went wrong%[exception,withStack:true]")
   static void initMessageSupport()
   {
     messageSupport = MessageSupportFactory.create(new GenericFormatterService(), NO_CACHE_INSTANCE);

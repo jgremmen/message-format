@@ -40,10 +40,12 @@ import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 
 import static de.sayayi.lib.message.parser.MessageLexer.BOOL;
 import static de.sayayi.lib.message.parser.MessageLexer.COLON;
@@ -60,6 +62,7 @@ import static de.sayayi.lib.message.parser.MessageLexer.NULL;
 import static de.sayayi.lib.message.parser.MessageLexer.NUMBER;
 import static de.sayayi.lib.message.parser.MessageLexer.P_END;
 import static de.sayayi.lib.message.parser.MessageLexer.P_START;
+import static de.sayayi.lib.message.parser.MessageParser.CH;
 import static de.sayayi.lib.message.parser.MessageParser.DQ_END;
 import static de.sayayi.lib.message.parser.MessageParser.DQ_START;
 import static de.sayayi.lib.message.parser.MessageParser.SQ_END;
@@ -67,11 +70,16 @@ import static de.sayayi.lib.message.parser.MessageParser.SQ_START;
 import static de.sayayi.lib.message.parser.MessageParser.TPL_END;
 import static de.sayayi.lib.message.parser.MessageParser.TPL_START;
 import static de.sayayi.lib.message.parser.MessageParser.*;
+import static de.sayayi.lib.message.util.StreamUtil.foldCombiner;
+import static de.sayayi.lib.message.util.StreamUtil.unmodifyableMapFinisher;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
+import static java.util.Collections.singleton;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toMap;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collector.Characteristics.IDENTITY_FINISH;
+import static java.util.stream.Collector.Characteristics.UNORDERED;
 import static org.antlr.v4.runtime.Token.EOF;
 
 
@@ -249,7 +257,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitTextPart(TextPartContext ctx)
     {
-      ctx.value = messageFactory.getMessagePartNormalizer()
+      ctx.value = messageFactory
+          .getMessagePartNormalizer()
           .normalize(new TextPart(ctx.text().value));
     }
 
@@ -313,11 +322,42 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    final Collector<ConfigElementContext,Map<ConfigKey,ConfigValue>,Map<ConfigKey,ConfigValue>>
+        PARAMETER_CONFIG_COLLECTOR =
+        new Collector<ConfigElementContext,Map<ConfigKey,ConfigValue>,Map<ConfigKey,ConfigValue>>() {
+      @Override public Supplier<Map<ConfigKey,ConfigValue>> supplier() { return LinkedHashMap::new; }
+      @Override public BinaryOperator<Map<ConfigKey,ConfigValue>> combiner() { return foldCombiner(); }
+      @Override public Set<Characteristics> characteristics() { return singleton(IDENTITY_FINISH); }
+
+      @Override
+      public BiConsumer<Map<ConfigKey,ConfigValue>,ConfigElementContext> accumulator()
+      {
+        return (map,cec) -> {
+          final ConfigKey key = cec.key;
+
+          if (map.containsKey(key))
+          {
+            final String parameter = ((ParameterPartContext)cec.parent).name.name;
+            syntaxError(cec, "duplicate config element " + key + " for parameter '" +
+                parameter + '\'');
+          }
+
+          map.put(key, cec.value);
+        };
+      }
+
+      @Override
+      public Function<Map<ConfigKey,ConfigValue>,Map<ConfigKey,ConfigValue>> finisher() {
+        return identity();
+      }
+    };
+
+
     @Override
     public void exitParameterPart(ParameterPartContext ctx)
     {
-      final Map<ConfigKey,ConfigValue> mapElements = ctx.configElement().stream()
-          .collect(toMap(mec -> mec.key, mec -> mec.value, (a, b) -> b, LinkedHashMap::new));
+      final Map<ConfigKey,ConfigValue> mapElements =
+          ctx.configElement().stream().collect(PARAMETER_CONFIG_COLLECTOR);
       final ForceQuotedMessageContext forceQuotedMessage = ctx.forceQuotedMessage();
       if (forceQuotedMessage != null)
         mapElements.put(null, new ConfigValueMessage(forceQuotedMessage.value));
@@ -330,12 +370,40 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    final Collector<ConfigParameterElementContext,Map<String,ConfigValue>,Map<String,ConfigValue>>
+        TEMPLATE_CONFIG_PARAMETER_COLLECTOR =
+        new Collector<ConfigParameterElementContext,Map<String,ConfigValue>,Map<String,ConfigValue>>() {
+      @Override public Supplier<Map<String,ConfigValue>> supplier() { return TreeMap::new; }
+      @Override public BinaryOperator<Map<String,ConfigValue>> combiner() { return foldCombiner(); }
+      @Override public Set<Characteristics> characteristics() { return singleton(UNORDERED); }
+
+      @Override
+      public BiConsumer<Map<String,ConfigValue>,ConfigParameterElementContext> accumulator()
+      {
+        return (map,cpec) -> {
+          final String name = cpec.key.getName();
+
+          if (map.containsKey(name))
+            syntaxError(cpec, "duplicate template default parameter '" + name + "'");
+
+          map.put(name, cpec.value);
+        };
+      }
+
+      @Override
+      public Function<Map<String,ConfigValue>,Map<String,ConfigValue>> finisher() {
+        return unmodifyableMapFinisher();
+      }
+    };
+
+
     @Override
     public void exitTemplatePart(TemplatePartContext ctx)
     {
       ctx.value = new TemplatePart(ctx.nameOrKeyword().name,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
-          isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1));
+          isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
+          ctx.configParameterElement().stream().collect(TEMPLATE_CONFIG_PARAMETER_COLLECTOR));
     }
 
 
@@ -538,6 +606,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     protected void addTokens()
     {
       add(BOOL, "'true' or 'false'", "BOOL");
+      add(CH, "<character>", "CH");
       add(COLON, "':'", "COLON");
       add(COMMA, "','", "COMMA");
       add(DQ_END, "\"", "DQ_END");

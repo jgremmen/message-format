@@ -241,7 +241,7 @@ public final class PackHelper
         break;
 
       case PART_TEMPLATE_ID:
-        messagePart = TemplatePart.unpack(packStream);
+        messagePart = TemplatePart.unpack(this, packStream);
         break;
 
       default:

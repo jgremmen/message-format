@@ -18,16 +18,21 @@ package de.sayayi.lib.message.part;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.part.MessagePart.Template;
+import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.*;
 
 import static de.sayayi.lib.message.part.TextPartFactory.*;
+import static java.util.Collections.*;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.joining;
 
 
 /**
@@ -50,23 +55,41 @@ public final class TemplatePart implements Template
   /** tells whether the template has a trailing space. */
   private final boolean spaceAfter;
 
+  private final Object[] defaultParameterMap;
+  private final int defaultParameterCount;
+
 
   /**
    * Constructs a template part.
    *
-   * @param name         template name, not empty or {@code null}
-   * @param spaceBefore  {@code true} if the part has a leading space,
-   *                     {@code false} if the part has no leading space
-   * @param spaceAfter   {@code true} if the part has a trailing space,
-   *                     {@code false} if the part has no trailing space
+   * @param name               template name, not empty or {@code null}
+   * @param spaceBefore        {@code true} if the part has a leading space,
+   *                           {@code false} if the part has no leading space
+   * @param spaceAfter         {@code true} if the part has a trailing space,
+   *                           {@code false} if the part has no trailing space
+   * @param defaultParameters  default parameter map, not {@code null}
    */
-  public TemplatePart(@NotNull String name, boolean spaceBefore, boolean spaceAfter)
+  public TemplatePart(@NotNull String name, boolean spaceBefore, boolean spaceAfter,
+                      @NotNull Map<String,ConfigValue> defaultParameters)
   {
     if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
       throw new IllegalArgumentException("name must not be empty");
 
     this.spaceBefore = spaceBefore;
     this.spaceAfter = spaceAfter;
+
+    final List<String> parameterNames = new ArrayList<>(defaultParameters.keySet());
+
+    defaultParameterCount = parameterNames.size();
+    defaultParameterMap = defaultParameterCount == 0 ? null : new Object[defaultParameterCount * 2];
+
+    for(int n = 0; n < defaultParameterCount; n++)
+    {
+      final String parameterName = parameterNames.get(n);
+
+      defaultParameterMap[n * 2] = parameterName;
+      defaultParameterMap[n * 2 + 1] = defaultParameters.get(parameterName);
+    }
   }
 
 
@@ -101,7 +124,7 @@ public final class TemplatePart implements Template
     final Message message = messageAccessor.getTemplateByName(name);
 
     return addSpaces(message != null
-        ? noSpaceText(message.format(messageAccessor, parameters))
+        ? noSpaceText(message.format(messageAccessor, new ParameterAdapter(parameters)))
         : emptyText(), spaceBefore, spaceAfter);
   }
 
@@ -141,6 +164,16 @@ public final class TemplatePart implements Template
     else if (spaceAfter)
       s.append(",space-after");
 
+    if (defaultParameterCount != 0)
+    {
+      s.append(",{");
+
+      for(int n = 0; n < defaultParameterCount; n++)
+        s.append(defaultParameterMap[n * 2]).append('=').append(defaultParameterMap[n * 2 + 1]);
+
+      s.append('}');
+    }
+
     return s.append(')').toString();
   }
 
@@ -154,6 +187,14 @@ public final class TemplatePart implements Template
   {
     packStream.writeBoolean(spaceBefore);
     packStream.writeBoolean(spaceAfter);
+    packStream.writeSmallVar(defaultParameterCount);
+
+    for(int n = 0; n < defaultParameterCount; n++)
+    {
+      packStream.writeString((String)defaultParameterMap[n * 2]);
+      PackHelper.pack((ConfigValue)defaultParameterMap[n * 2 + 1], packStream);
+    }
+
     packStream.writeString(name);
   }
 
@@ -165,11 +206,137 @@ public final class TemplatePart implements Template
    *
    * @throws IOException  if an I/O error occurs
    */
-  public static @NotNull Template unpack(@NotNull PackInputStream packStream) throws IOException
+  public static @NotNull Template unpack(@NotNull PackHelper unpack,
+                                         @NotNull PackInputStream packStream) throws IOException
   {
+    switch(packStream.getVersion())
+    {
+      case 1:
+        return unpack_v1(packStream);
+
+      case 2:
+      default:
+        return unpack_v2(unpack, packStream);
+    }
+  }
+
+
+  private static @NotNull Template unpack_v1(@NotNull PackInputStream packStream) throws IOException
+  {
+    // v1 = spaceBefore, spaceAfter, name
+
     final boolean spaceBefore = packStream.readBoolean();
     final boolean spaceAfter = packStream.readBoolean();
 
-    return new TemplatePart(requireNonNull(packStream.readString()), spaceBefore, spaceAfter);
+    return new TemplatePart(requireNonNull(packStream.readString()),
+        spaceBefore, spaceAfter, emptyMap());
+  }
+
+
+  private static @NotNull Template unpack_v2(@NotNull PackHelper unpack,
+                                             @NotNull PackInputStream packStream) throws IOException
+  {
+    // v2 = spaceBefore, spaceAfter, def. param map (size + key/value-pairs), name
+
+    final boolean spaceBefore = packStream.readBoolean();
+    final boolean spaceAfter = packStream.readBoolean();
+    final int size = packStream.readSmallVar();
+    final Map<String,ConfigValue> defaultParameterMap;
+
+    switch(size)
+    {
+      case 0:
+        defaultParameterMap = emptyMap();
+        break;
+
+      case 1:
+        defaultParameterMap = singletonMap(
+            requireNonNull(packStream.readString()),
+            unpack.unpackMapValue(packStream));
+        break;
+
+      default: {
+        defaultParameterMap = new HashMap<>();
+
+        for(int n = 0; n < size; n++)
+        {
+          defaultParameterMap.put(
+              requireNonNull(packStream.readString()),
+              unpack.unpackMapValue(packStream));
+        }
+
+        break;
+      }
+    }
+
+    return new TemplatePart(requireNonNull(packStream.readString()),
+        spaceBefore, spaceAfter, defaultParameterMap);
+  }
+
+
+
+
+  private final class ParameterAdapter implements Parameters
+  {
+    private final Parameters parameters;
+
+
+    private ParameterAdapter(@NotNull Parameters parameters) {
+      this.parameters = parameters;
+    }
+
+
+    @Override
+    public @NotNull Locale getLocale() {
+      return parameters.getLocale();
+    }
+
+
+    @Override
+    public @NotNull Set<String> getParameterNames()
+    {
+      final TreeSet<String> names = new TreeSet<>(parameters.getParameterNames());
+
+      for(int n = 0; n < defaultParameterCount; n++)
+        names.add((String)defaultParameterMap[n * 2]);
+
+      return unmodifiableSet(names);
+    }
+
+
+    @Override
+    public Object getParameterValue(@NotNull String parameter)
+    {
+      Object value = parameters.getParameterValue(parameter);
+
+      if (value == null)
+        for(int low = 0, high = defaultParameterCount - 1; low <= high; )
+        {
+          final int mid = (low + high) >>> 1;
+          final int cmp = ((String)defaultParameterMap[mid * 2]).compareTo(parameter);
+
+          if (cmp < 0)
+            low = mid + 1;
+          else if (cmp > 0)
+            high = mid - 1;
+          else
+          {
+            value = ((ConfigValue)defaultParameterMap[mid * 2 + 1]).asObject();
+            break;
+          }
+        }
+
+      return value;
+    }
+
+
+    @Override
+    public String toString()
+    {
+      return "Parameters(locale='" + parameters.getLocale() + "'," + getParameterNames()
+          .stream()
+          .map(name -> name + '=' + getParameterValue(name))
+          .collect(joining(",", "{", "})"));
+    }
   }
 }
