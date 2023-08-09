@@ -370,10 +370,81 @@ public interface MessageSupport
      * Exceptions thrown by the constructor function are relayed to the caller.
      *
      * @param constructor  exception constructor, not {@code null}
+     * @param cause        exception root cause
+     * @param <X>          exception type
+     *
+     * @since 0.8.3
+     */
+    @Contract("_, _ -> fail")
+    <X extends Exception> void throwFormatted(@NotNull ExceptionConstructorWithCause<X> constructor,
+                                              Throwable cause);
+
+
+    /**
+     * Throw an exception with the formatted message.
+     * <p>
+     * Exceptions thrown by the constructor function are relayed to the caller.
+     *
+     * @param constructor  exception constructor, not {@code null}
+     * @param <X>          exception type
+     *
+     * @since 0.8.3
+     */
+    @Contract("_ -> fail")
+    default <X extends Exception> void throwFormatted(
+        @NotNull ExceptionConstructorWithCause<X> constructor) {
+      throwFormatted(constructor, null);
+    }
+
+
+    /**
+     * Throw an exception with the formatted message.
+     * <p>
+     * Exceptions thrown by the constructor function are relayed to the caller.
+     *
+     * @param constructor  exception constructor, not {@code null}
      * @param <X>          exception type
      */
     @Contract("_ -> fail")
     <X extends Exception> void throwFormatted(@NotNull ExceptionConstructor<X> constructor);
+
+
+    /**
+     * Returns a supplier capable of creating an exception with the formatted message.
+     * This method is useful in combination with one of the optional class methods like
+     * {@link OptionalInt#orElseThrow(Supplier)}.
+     * <p>
+     * Formatting the message is delayed until {@link Supplier#get()} is invoked.
+     * <p>
+     * Exceptions thrown by the constructor function are relayed to the caller.
+     *
+     * @return  format supplier, never {@code null}
+     *
+     * @since 0.8.3
+     */
+    @Contract(pure = true)
+    <X extends Exception> @NotNull Supplier<X> formattedExceptionSupplier(
+        @NotNull ExceptionConstructorWithCause<X> constructor, Throwable cause);
+
+
+    /**
+     * Returns a supplier capable of creating an exception with the formatted message.
+     * This method is useful in combination with one of the optional class methods like
+     * {@link OptionalInt#orElseThrow(Supplier)}.
+     * <p>
+     * Formatting the message is delayed until {@link Supplier#get()} is invoked.
+     * <p>
+     * Exceptions thrown by the constructor function are relayed to the caller.
+     *
+     * @return  format supplier, never {@code null}
+     *
+     * @since 0.8.3
+     */
+    @Contract(pure = true)
+    default <X extends Exception> @NotNull Supplier<X> formattedExceptionSupplier(
+        @NotNull ExceptionConstructorWithCause<X> constructor) {
+      return formattedExceptionSupplier(constructor, null);
+    }
 
 
     /**
@@ -882,5 +953,27 @@ public interface MessageSupport
      * @return  exception instance, never {@code null}
      */
     @NotNull X construct(@NotNull String message);
+  }
+
+
+
+
+  /**
+   * @param <X>  exception type created by this constructor
+   *
+   * @author Jeroen Gremmen
+   * @since 0.8.3
+   */
+  interface ExceptionConstructorWithCause<X extends Exception>
+  {
+    /**
+     * Create a new exception for the given {@code message} and {@code cause}.
+     *
+     * @param message  formatted message, not {@code null}
+     * @param cause    root cause of the exception
+     *
+     * @return  exception instance, never {@code null}
+     */
+    @NotNull X construct(@NotNull String message, Throwable cause);
   }
 }

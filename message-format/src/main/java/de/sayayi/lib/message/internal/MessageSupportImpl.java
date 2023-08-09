@@ -451,8 +451,27 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
     @Override
     @SneakyThrows(Exception.class)
+    public <X extends Exception> void throwFormatted(
+        @NotNull ExceptionConstructorWithCause<X> constructor, Throwable cause) {
+      throw constructor.construct(format(), cause);
+    }
+
+
+    @Override
+    @SneakyThrows(Exception.class)
     public <X extends Exception> void throwFormatted(@NotNull ExceptionConstructor<X> constructor) {
       throw constructor.construct(format());
+    }
+
+
+    @Override
+    public @NotNull <X extends Exception> Supplier<X> formattedExceptionSupplier(
+        @NotNull ExceptionConstructorWithCause<X> constructor, Throwable cause)
+    {
+      // as formatting is deferred, make sure we're using a copy of the parameters
+      final Parameters parameters = new MessageParameters(this);
+
+      return () -> constructor.construct(getMessage().format(messageAccessor, parameters), cause);
     }
 
 
