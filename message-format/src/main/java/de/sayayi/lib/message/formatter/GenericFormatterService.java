@@ -28,6 +28,8 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
+ * Generic formatter service implementation.
+ *
  * @author Jeroen Gremmen
  * @since 0.1.0 (renamed in 0.4.1)
  */
@@ -79,8 +81,10 @@ public class GenericFormatterService implements FormatterService.WithRegistry
     final Class<?> type =
         requireNonNull(formattableType, "formattableType must not be null").getType();
 
-    typeFormatters.computeIfAbsent(type, t -> new ArrayList<>(4)).add(
-        new PrioritizedFormatter(formattableType.getOrder(), formatter));
+    typeFormatters
+        .computeIfAbsent(type, t -> new ArrayList<>(4))
+        .add(new PrioritizedFormatter(formattableType.getOrder(), formatter));
+
     formatterCache.clear();
   }
 
@@ -93,14 +97,17 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
     if (formatter instanceof NamedParameterFormatter)
     {
-      final String format = ((NamedParameterFormatter)formatter).getName();
+      final NamedParameterFormatter namedParameterFormatter = (NamedParameterFormatter)formatter;
+      final String format = namedParameterFormatter.getName();
+
       if (format.isEmpty())
         throw new IllegalArgumentException("formatter name must not be empty");
 
-      namedFormatters.put(format, (NamedParameterFormatter)formatter);
+      namedFormatters.put(format, namedParameterFormatter);
     }
 
-    formatter.getFormattableTypes()
+    formatter
+        .getFormattableTypes()
         .forEach(formattableType -> addFormatterForType(formattableType, formatter));
   }
 
