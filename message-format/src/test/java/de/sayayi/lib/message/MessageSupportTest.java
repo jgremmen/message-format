@@ -86,12 +86,14 @@ class MessageSupportTest
 
   @Test
   @DisplayName("Immediate exception throw with formatted message")
-  void testThrowFormatted()
+  void testException()
   {
-    val exception = assertThrowsExactly(IOException.class, () -> shared()
-        .message("%{list,list-sep-last:' and '}")
-        .with("list", new int[] { -5, 12, 0 })
-        .throwFormatted(msg -> new IOException("error: " + msg)));
+    val exception = assertThrowsExactly(IOException.class, () -> {
+      throw shared()
+          .message("%{list,list-sep-last:' and '}")
+          .with("list", new int[] { -5, 12, 0 })
+          .formattedException(msg -> new IOException("error: " + msg));
+    });
 
     assertEquals("error: -5, 12 and 0", exception.getMessage());
   }

@@ -27,7 +27,7 @@ import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.part.parameter.value.*;
-import lombok.SneakyThrows;
+import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -274,7 +274,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
   @Override
   public @NotNull MessageConfigurer<Message> message(@NotNull String message) {
-    return new Configurer<>(() -> messageFactory.parseMessage(message));
+    return new Configurer<>(SupplierDelegate.of(() -> messageFactory.parseMessage(message)));
   }
 
 
@@ -450,17 +450,16 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    @SneakyThrows(Exception.class)
-    public <X extends Exception> void throwFormatted(
+    public @NotNull <X extends Exception> X formattedException(
         @NotNull ExceptionConstructorWithCause<X> constructor, Throwable cause) {
-      throw constructor.construct(format(), cause);
+      return constructor.construct(format(), cause);
     }
 
 
     @Override
-    @SneakyThrows(Exception.class)
-    public <X extends Exception> void throwFormatted(@NotNull ExceptionConstructor<X> constructor) {
-      throw constructor.construct(format());
+    public @NotNull <X extends Exception> X formattedException(
+        @NotNull ExceptionConstructor<X> constructor) {
+      return constructor.construct(format());
     }
 
 

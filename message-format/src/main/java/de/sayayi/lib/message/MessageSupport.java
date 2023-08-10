@@ -365,7 +365,7 @@ public interface MessageSupport
 
 
     /**
-     * Throw an exception with the formatted message.
+     * Create an exception with the formatted message.
      * <p>
      * Exceptions thrown by the constructor function are relayed to the caller.
      *
@@ -373,27 +373,32 @@ public interface MessageSupport
      * @param cause        exception root cause
      * @param <X>          exception type
      *
+     * @return  newly created exception with the formatted message and the given root cause,
+     *          never {@code null}
+     *
      * @since 0.8.3
      */
-    @Contract("_, _ -> fail")
-    <X extends Exception> void throwFormatted(@NotNull ExceptionConstructorWithCause<X> constructor,
-                                              Throwable cause);
+    @Contract("_, _ -> new")
+    @NotNull <X extends Exception> X formattedException(
+        @NotNull ExceptionConstructorWithCause<X> constructor, Throwable cause);
 
 
     /**
-     * Throw an exception with the formatted message.
+     * Create an exception with the formatted message.
      * <p>
      * Exceptions thrown by the constructor function are relayed to the caller.
      *
      * @param constructor  exception constructor, not {@code null}
      * @param <X>          exception type
      *
+     * @return  newly created exception with the formatted message, never {@code null}
+     *
      * @since 0.8.3
      */
-    @Contract("_ -> fail")
-    default <X extends Exception> void throwFormatted(
+    @Contract("_ -> new")
+    default @NotNull <X extends Exception> X formattedException(
         @NotNull ExceptionConstructorWithCause<X> constructor) {
-      throwFormatted(constructor, null);
+      return formattedException(constructor, null);
     }
 
 
@@ -404,9 +409,12 @@ public interface MessageSupport
      *
      * @param constructor  exception constructor, not {@code null}
      * @param <X>          exception type
+     *
+     * @return  newly created exception with the formatted message, never {@code null}
      */
-    @Contract("_ -> fail")
-    <X extends Exception> void throwFormatted(@NotNull ExceptionConstructor<X> constructor);
+    @Contract("_ -> new")
+    @NotNull <X extends Exception> X formattedException(
+        @NotNull ExceptionConstructor<X> constructor);
 
 
     /**
@@ -938,6 +946,8 @@ public interface MessageSupport
 
 
   /**
+   * Interface with a single method mimicking the standard exception constructor for a message.
+   *
    * @param <X>  exception type created by this constructor
    *
    * @author Jeroen Gremmen
@@ -959,6 +969,9 @@ public interface MessageSupport
 
 
   /**
+   * Interface with a single method mimicking the standard exception constructor for a message
+   * and cause.
+   *
    * @param <X>  exception type created by this constructor
    *
    * @author Jeroen Gremmen
