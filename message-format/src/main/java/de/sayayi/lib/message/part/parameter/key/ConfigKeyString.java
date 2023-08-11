@@ -130,7 +130,7 @@ public final class ConfigKeyString implements ConfigKey
     else if (!(o instanceof ConfigKeyString))
       return false;
 
-    ConfigKeyString that = (ConfigKeyString)o;
+    final ConfigKeyString that = (ConfigKeyString)o;
 
     return compareType == that.compareType && string.equals(that.string);
   }
