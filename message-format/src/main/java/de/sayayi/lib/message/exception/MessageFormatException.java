@@ -97,8 +97,11 @@ public class MessageFormatException extends MessageException
      */
 
     final StringBuilder msg = new StringBuilder("failed to format");
-    final int n = (code != null && !isGeneratedCode(code) ? 8 : 0) +
-        (template != null ? 4 : 0) + (locale != null ? 2 : 0) + (parameter != null ? 1 : 0);
+    final int n =
+        (code != null && !isGeneratedCode(code) ? 8 : 0) +
+        (template != null ? 4 : 0) +
+        (locale != null ? 2 : 0) +
+        (parameter != null ? 1 : 0);
 
     if ((n & 0b1100) == 0)
       msg.append(" message");
