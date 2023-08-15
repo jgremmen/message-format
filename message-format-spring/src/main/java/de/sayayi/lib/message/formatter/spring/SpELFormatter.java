@@ -32,9 +32,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import static de.sayayi.lib.message.part.TextPartFactory.nullText;
+import static java.lang.Integer.MAX_VALUE;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
+import static org.springframework.expression.spel.SpelCompilerMode.MIXED;
 import static org.springframework.expression.spel.SpelMessage.VARIABLE_ASSIGNMENT_NOT_SUPPORTED;
 
 
@@ -44,12 +47,12 @@ import static org.springframework.expression.spel.SpelMessage.VARIABLE_ASSIGNMEN
  */
 public final class SpELFormatter implements NamedParameterFormatter
 {
-  private static final OperatorOverloader operatorOverloader = new StandardOperatorOverloader();
-  private static final TypeComparator typeComparator = new StandardTypeComparator();
-  private static final TypeLocator typeLocator = new StandardTypeLocator();
-  private static final List<MethodResolver> methodResolvers =
+  private static final OperatorOverloader OPERATOR_OVERLOADER = new StandardOperatorOverloader();
+  private static final TypeComparator TYPE_COMPARATOR = new StandardTypeComparator();
+  private static final TypeLocator TYPE_LOCATOR = new StandardTypeLocator();
+  private static final List<MethodResolver> METHOD_RESOLVERS =
       singletonList(new ReflectiveMethodResolver());
-  private static final List<PropertyAccessor> propertyAccessors =
+  private static final List<PropertyAccessor> PROPERTY_ACCESSORS =
       singletonList(DataBindingPropertyAccessor.forReadOnlyAccess());
 
   private final SpelExpressionParser spelExpressionParser;
@@ -72,10 +75,9 @@ public final class SpELFormatter implements NamedParameterFormatter
   public SpELFormatter(@NotNull ConversionService conversionService,
                        @NotNull ClassLoader classLoader)
   {
-    this.typeConverter = new StandardTypeConverter(conversionService);
-
+    typeConverter = new StandardTypeConverter(conversionService);
     spelExpressionParser = new SpelExpressionParser(
-        new SpelParserConfiguration(null, classLoader));
+        new SpelParserConfiguration(MIXED, classLoader, false, false, MAX_VALUE));
   }
 
 
@@ -90,6 +92,9 @@ public final class SpELFormatter implements NamedParameterFormatter
   @Contract(pure = true)
   public @NotNull Text format(@NotNull FormatterContext context, Object value)
   {
+    if (value == null)
+      return nullText();
+
     final Optional<String> spelExpr = context.getConfigValueString("spel-expr");
 
     if (spelExpr.isPresent())
@@ -114,7 +119,7 @@ public final class SpELFormatter implements NamedParameterFormatter
 
 
 
-    private ParameterEvaluationContext(@NotNull FormatterContext context, Object value)
+    private ParameterEvaluationContext(@NotNull FormatterContext context, @NotNull Object value)
     {
       this.context = context;
       this.value = new TypedValue(value);
@@ -142,19 +147,19 @@ public final class SpELFormatter implements NamedParameterFormatter
 
     @Override
     public @NotNull List<MethodResolver> getMethodResolvers() {
-      return methodResolvers;
+      return METHOD_RESOLVERS;
     }
 
 
     @Override
     public @NotNull OperatorOverloader getOperatorOverloader() {
-      return operatorOverloader;
+      return OPERATOR_OVERLOADER;
     }
 
 
     @Override
     public @NotNull List<PropertyAccessor> getPropertyAccessors() {
-      return propertyAccessors;
+      return PROPERTY_ACCESSORS;
     }
 
 
@@ -166,7 +171,7 @@ public final class SpELFormatter implements NamedParameterFormatter
 
     @Override
     public @NotNull TypeComparator getTypeComparator() {
-      return typeComparator;
+      return TYPE_COMPARATOR;
     }
 
 
@@ -178,7 +183,7 @@ public final class SpELFormatter implements NamedParameterFormatter
 
     @Override
     public @NotNull TypeLocator getTypeLocator() {
-      return typeLocator;
+      return TYPE_LOCATOR;
     }
 
 
