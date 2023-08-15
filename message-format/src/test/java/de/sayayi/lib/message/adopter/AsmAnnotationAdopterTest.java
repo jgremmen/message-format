@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.adopter.asm;
+package de.sayayi.lib.message.adopter;
 
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.adopter.AsmAnnotationAdopter;
 import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
@@ -41,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         @Text("Other language")
     })
 })
-public final class AsmAnnotationsAdopterTest
+public final class AsmAnnotationAdopterTest
 {
   @Test
   @MessageDef(code = "M1", text = "Method message 1")
@@ -52,8 +51,8 @@ public final class AsmAnnotationsAdopterTest
     val messageSupport = MessageSupportFactory.create(new DefaultFormatterService(), messageFactory);
 
     new AsmAnnotationAdopter(NO_CACHE_INSTANCE, messageSupport).adopt(
-        AsmAnnotationsAdopterTest.class.getClassLoader(),
-        singleton(AsmAnnotationsAdopterTest.class.getPackage().getName()));
+        AsmAnnotationAdopterTest.class.getClassLoader(),
+        singleton(AsmAnnotationAdopterTest.class.getPackage().getName()));
 
     val messageAccessor = messageSupport.getMessageAccessor();
 

@@ -48,6 +48,8 @@ tasks.register('releaseAll') {
 
   dependsOn ':message-format:publishMsgformatPublicationToMavenCentralRepository'
   dependsOn ':message-format-jodatime:publishJodatimePublicationToMavenCentralRepository'
+  dependsOn ':message-format-spring:publishSpringPublicationToMavenCentralRepository'
+
   dependsOn ':message-gradle-plugin:publishGradlePluginPublicationToMavenCentralRepository'
   dependsOn ':message-gradle-plugin:publishPlugins'
 }
@@ -59,6 +61,8 @@ tasks.register('releaseAllTemp') {
 
   dependsOn ':message-format:publishMsgformatPublicationToMavenTempRepository'
   dependsOn ':message-format-jodatime:publishJodatimePublicationToMavenTempRepository'
+  dependsOn ':message-format-spring:publishSpringPublicationToMavenTempRepository'
+
   dependsOn ':message-gradle-plugin:publishGradlePluginPublicationToMavenTempRepository'
   dependsOn ':message-gradle-plugin:publishMessageFormatPluginMarkerMavenPublicationToMavenTempRepository'
 }

@@ -31,7 +31,6 @@ def antlrExtVersion = "0.3.1"
 def asmVersion = "[6.0,)"
 def ehcacheVersion = "3.10.+"
 def javaxCacheApiVersion = "1.1.1"
-def springCoreVersion = "5.3.29"
 
 
 configurations.configureEach {
@@ -63,14 +62,6 @@ dependencies {
 
   optionalImplementation "javax.cache:cache-api:${javaxCacheApiVersion}"
   optionalImplementation "org.ow2.asm:asm:${asmVersion}"
-  optionalImplementation("org.springframework:spring-core") {
-    version {
-      strictly '[5.0,6.0)'
-      prefer springCoreVersion
-    }
-
-    transitive = false
-  }
 
   // test
   testImplementation("org.ehcache:ehcache:${ehcacheVersion}") {
@@ -111,8 +102,6 @@ javadoc {
         "${rootDir}/gradle/javadocs/antlr4-runtime"
     linksOffline "https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/${antlrExtVersion}/",
         "${rootDir}/gradle/javadocs/antlr4-runtime-ext"
-    linksOffline "https://javadoc.io/doc/org.springframework/spring-core/${springCoreVersion}/",
-        "${rootDir}/gradle/javadocs/spring-core"
   }
 
   exclude '**/parser/MessageLexer.java'

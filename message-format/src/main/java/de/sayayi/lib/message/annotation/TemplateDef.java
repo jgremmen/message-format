@@ -34,7 +34,6 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * </pre></blockquote>
  *
  * @see de.sayayi.lib.message.adopter.AsmAnnotationAdopter AsmAnnotationAdopter
- * @see de.sayayi.lib.message.adopter.SpringAsmAnnotationAdopter SpringAsmAnnotationAdopter
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

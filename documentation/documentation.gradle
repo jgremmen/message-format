@@ -32,6 +32,7 @@ dependencies {
   }
 
   runtimeOnly project(":message-format-jodatime")
+  runtimeOnly project(":message-format-spring")
 
   runtimeOnly "org.projectlombok:lombok:${lombokVersion}"
   runtimeOnly "org.jetbrains:annotations-java5:${jetbrainsAnnotationsVersion}"
