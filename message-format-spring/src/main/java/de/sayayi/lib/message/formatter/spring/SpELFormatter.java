@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.spring;
 
+import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
@@ -32,12 +33,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
-import static java.lang.Integer.MAX_VALUE;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
-import static org.springframework.expression.spel.SpelCompilerMode.MIXED;
 import static org.springframework.expression.spel.SpelMessage.VARIABLE_ASSIGNMENT_NOT_SUPPORTED;
 
 
@@ -45,7 +43,8 @@ import static org.springframework.expression.spel.SpelMessage.VARIABLE_ASSIGNMEN
  * @author Jeroen Gremmen
  * @since 0.8.3
  */
-public final class SpELFormatter implements NamedParameterFormatter
+public final class SpELFormatter extends AbstractParameterFormatter<Object>
+    implements NamedParameterFormatter
 {
   private static final OperatorOverloader OPERATOR_OVERLOADER = new StandardOperatorOverloader();
   private static final TypeComparator TYPE_COMPARATOR = new StandardTypeComparator();
@@ -77,7 +76,7 @@ public final class SpELFormatter implements NamedParameterFormatter
   {
     typeConverter = new StandardTypeConverter(conversionService);
     spelExpressionParser = new SpelExpressionParser(
-        new SpelParserConfiguration(MIXED, classLoader, false, false, MAX_VALUE));
+        new SpelParserConfiguration(null, classLoader));
   }
 
 
@@ -89,12 +88,8 @@ public final class SpELFormatter implements NamedParameterFormatter
 
 
   @Override
-  @Contract(pure = true)
-  public @NotNull Text format(@NotNull FormatterContext context, Object value)
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    if (value == null)
-      return nullText();
-
     final Optional<String> spelExpr = context.getConfigValueString("spel-expr");
 
     if (spelExpr.isPresent())
