@@ -128,10 +128,20 @@ public abstract class MessageFormatPackTask extends DefaultTask
   public abstract Property<Boolean> getValidateReferencedTemplates();
 
 
+  /**
+   * Return compress message pack property. The default for this property is {@code false}.
+   *
+   * @return  compress property, never {@code null}
+   */
   @Input
   public abstract Property<Boolean> getCompress();
 
 
+  /**
+   * Returns the target message pack file location.
+   *
+   * @return  message pack file, never {@code null}
+   */
   @OutputFile
   public RegularFile getPackFile() {
     return getDestinationDir().file(getPackFilename()).get();
