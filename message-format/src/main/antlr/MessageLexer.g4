@@ -201,15 +201,12 @@ fragment Name
 
 fragment NameChar
         : NameStartChar
-        | [0-9_]
-        | '\u00b7'
-        | '\u0300'..'\u036f'
-        | '\u203f'..'\u2040'
+        | [\p{N}]  // Unicode N (number)
+        | '_'
         ;
 
 fragment NameStartChar
-        : [a-zA-Z]
-        | ~[\u0000-\u007F\uD800-\uDBFF]  // covers all characters above 0x7F which are not a surrogate
+        : [\p{L}]  // Unicode L (letter)
         ;
 
 fragment Number
