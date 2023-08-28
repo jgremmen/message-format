@@ -76,11 +76,21 @@ public abstract class MessageFormatExtension
   public abstract Property<Boolean> getValidateReferencedTemplates();
 
 
+  /**
+   * Include messages that match the given regular expressions.
+   *
+   * @param regex  array of regular expressions, not {@code null}
+   */
   public void include(String... regex) {
     includeRegexFilter.addAll(Arrays.asList(regex));
   }
 
 
+  /**
+   * Exclude messages that match the given regular expressions.
+   *
+   * @param regex  array of regular expressions, not {@code null}
+   */
   public void exclude(String... regex) {
     excludeRegexFilter.addAll(Arrays.asList(regex));
   }

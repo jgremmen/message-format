@@ -58,6 +58,9 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object>
   private final TypeConverter typeConverter;
 
 
+  /**
+   * Create a new SpEL formatter with the default configuration.
+   */
   public SpELFormatter()
   {
     typeConverter = new StandardTypeConverter();
