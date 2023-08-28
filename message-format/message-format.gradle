@@ -72,8 +72,13 @@ dependencies {
 }
 
 
+def grammarOutputDirectory = layout.buildDirectory
+    .getLocationOnly().get()
+    .dir("generated-src/antlr/main/de/sayayi/lib/message/parser")
+    .asFile
+
 generateGrammarSource {
-  outputDirectory = file("${buildDir}/generated-src/antlr/main/de/sayayi/lib/message/parser")
+  outputDirectory = grammarOutputDirectory
   arguments += [ '-package', 'de.sayayi.lib.message.parser' ]
 }
 

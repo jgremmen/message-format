@@ -18,11 +18,16 @@ apply plugin: "maven-publish"
 apply plugin: "signing"
 
 
+def tmpRepositoryDirectory = rootProject.layout.buildDirectory
+    .getLocationOnly().get()
+    .dir("repository")
+    .asFile
+
 publishing {
   repositories {
     maven {
       name = "mavenTemp"
-      url = "${rootProject.buildDir}/repository"
+      url = tmpRepositoryDirectory
     }
 
     maven {

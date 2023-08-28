@@ -18,7 +18,7 @@ description = 'Message Format Library Projects'
 
 
 allprojects {
-  buildDir = ".build"
+  layout.buildDirectory = ".build"
 
   apply plugin: "base"
 

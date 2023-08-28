@@ -17,7 +17,7 @@ package de.sayayi.plugin.gradle.message;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.plugins.JavaBasePlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
@@ -75,7 +75,7 @@ public class MessageFormatPlugin implements Plugin<Project>
                                 @NotNull SourceSet mainSourceSet)
   {
     final TaskContainer tasks = project.getTasks();
-    final ObjectFactory objects = project.getObjects();
+    final ProjectLayout layout = project.getLayout();
 
     tasks.register("messageFormatPack", MessageFormatPackTask.class, packTask -> {
       packTask.setGroup("build");
@@ -85,8 +85,7 @@ public class MessageFormatPlugin implements Plugin<Project>
       packTask.getSources().from(extension.getSources());
 
       // pack file
-      packTask.getDestinationDir().convention(
-          objects.directoryProperty().fileValue(project.getBuildDir()).dir(packTask.getName()));
+      packTask.getDestinationDir().convention(layout.getBuildDirectory().dir(packTask.getName()));
       packTask.getPackFilename().convention(extension.getPackFilename());
 
       // settings
