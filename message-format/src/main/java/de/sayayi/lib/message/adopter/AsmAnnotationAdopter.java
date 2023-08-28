@@ -20,16 +20,15 @@ import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
 import de.sayayi.lib.message.annotation.*;
 import org.jetbrains.annotations.NotNull;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Math.max;
 import static org.objectweb.asm.Opcodes.ACC_SYNTHETIC;
 import static org.objectweb.asm.Opcodes.ASM6;
 import static org.objectweb.asm.Type.getDescriptor;
@@ -62,6 +61,26 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
   private static final String TEMPLATE_DEFS_DESCRIPTOR = getDescriptor(TemplateDefs.class);
   private static final String TEMPLATE_DEF_DESCRIPTOR = getDescriptor(TemplateDef.class);
   private static final String TEXT_DESCRIPTOR = getDescriptor(Text.class);
+
+  /** Highest supported ASM Api version (excluding experimental) */
+  private static final int ASM_API;
+
+
+  static
+  {
+    int api = ASM6;  // lowest supported version
+
+    for(Field field: Opcodes.class.getDeclaredFields())
+      if (field.getName().matches("ASM[0-9]+"))
+      {
+        try {
+          api = max(field.getInt(null), api);
+        } catch(IllegalAccessException ignored) {
+        }
+      }
+
+    ASM_API = api;
+  }
 
 
   /**
@@ -98,7 +117,7 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
   private final class MainClassVisitor extends ClassVisitor
   {
     private MainClassVisitor() {
-      super(ASM6);
+      super(ASM_API);
     }
 
 
@@ -139,7 +158,7 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
   private final class MessageMethodVisitor extends MethodVisitor
   {
     private MessageMethodVisitor() {
-      super(ASM6);
+      super(ASM_API);
     }
 
 
@@ -155,14 +174,14 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
   private final class MessageDefsAnnotationVisitor extends AnnotationVisitor
   {
     private MessageDefsAnnotationVisitor() {
-      super(ASM6);
+      super(ASM_API);
     }
 
 
     @Override
     public AnnotationVisitor visitArray(String name)
     {
-      return new AnnotationVisitor(ASM6) {
+      return new AnnotationVisitor(ASM_API) {
         @Override
         public AnnotationVisitor visitAnnotation(String name, String descriptor)
         {
@@ -184,7 +203,7 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
 
 
     private MessageDefAnnotationVisitor() {
-      super(ASM6);
+      super(ASM_API);
     }
 
 
@@ -201,7 +220,7 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
     @Override
     public AnnotationVisitor visitArray(String name)
     {
-      return new AnnotationVisitor(ASM6) {
+      return new AnnotationVisitor(ASM_API) {
         @Override
         public AnnotationVisitor visitAnnotation(String name, String descriptor) {
           return TEXT_DESCRIPTOR.equals(descriptor) ? new TextAnnotationVisitor(texts) : null;
@@ -222,14 +241,14 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
   private final class TemplateDefsAnnotationVisitor extends AnnotationVisitor
   {
     private TemplateDefsAnnotationVisitor() {
-      super(ASM6);
+      super(ASM_API);
     }
 
 
     @Override
     public AnnotationVisitor visitArray(String name)
     {
-      return new AnnotationVisitor(ASM6) {
+      return new AnnotationVisitor(ASM_API) {
         @Override
         public AnnotationVisitor visitAnnotation(String name, String descriptor)
         {
@@ -251,7 +270,7 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
 
 
     private TemplateDefAnnotationVisitor() {
-      super(ASM6);
+      super(ASM_API);
     }
 
 
@@ -268,7 +287,7 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
     @Override
     public AnnotationVisitor visitArray(String name)
     {
-      return new AnnotationVisitor(ASM6) {
+      return new AnnotationVisitor(ASM_API) {
         @Override
         public AnnotationVisitor visitAnnotation(String name, String descriptor) {
           return TEXT_DESCRIPTOR.equals(descriptor) ? new TextAnnotationVisitor(texts) : null;
@@ -296,7 +315,7 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
 
     private TextAnnotationVisitor(List<Text> inheritedTexts)
     {
-      super(ASM6);
+      super(ASM_API);
       this.inheritedTexts = inheritedTexts;
     }
 
