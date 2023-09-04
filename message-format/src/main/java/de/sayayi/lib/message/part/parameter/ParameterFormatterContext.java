@@ -24,14 +24,12 @@ import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextPart;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
-import de.sayayi.lib.message.part.parameter.value.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 import static de.sayayi.lib.message.formatter.ParameterFormatter.NULL_TYPE;
 import static de.sayayi.lib.message.part.MessagePart.Text.NULL;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.NAME_TYPE;
 import static java.util.Optional.ofNullable;
 
 
@@ -41,26 +39,26 @@ import static java.util.Optional.ofNullable;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class ParameterFormatterContext implements FormatterContext
+public final class ParameterFormatterContext
+    extends AbstractParameterConfigAccessor
+    implements FormatterContext
 {
-  private final @NotNull MessageAccessor messageAccessor;
   private final @NotNull Parameters parameters;
   private final Object value;
   private final String format;
-  private final @NotNull ParamConfig map;
   private final @NotNull ParameterFormatter[] parameterFormatters;
   private int parameterFormatterIndex = 0;
 
 
   public ParameterFormatterContext(@NotNull MessageAccessor messageAccessor,
                                    @NotNull Parameters parameters, Object value, Class<?> type,
-                                   String format, @NotNull ParamConfig map)
+                                   String format, @NotNull ParameterConfig parameterConfig)
   {
-    this.messageAccessor = messageAccessor;
+    super(messageAccessor, parameterConfig);
+
     this.parameters = parameters;
     this.value = value;
     this.format = format;
-    this.map = map;
 
     if (type == null)
       type = value == null ? NULL_TYPE : value.getClass();
@@ -95,7 +93,7 @@ public final class ParameterFormatterContext implements FormatterContext
 
   @Override
   public boolean hasConfigMapMessage(@NotNull ConfigKey.Type keyType) {
-    return keyType != ConfigKey.Type.NAME && map.hasEntryWithKeyType(keyType);
+    return parameterConfig.hasMessageWithKeyType(keyType);
   }
 
 
@@ -106,92 +104,7 @@ public final class ParameterFormatterContext implements FormatterContext
     final Set<ConfigKey.Type> types = EnumSet.copyOf(keyTypes);
     types.remove(ConfigKey.Type.NAME);
 
-    return ofNullable(map.getMessage(messageAccessor, key, getLocale(), types, includeDefault));
-  }
-
-
-  @Override
-  public @NotNull Optional<ConfigValue> getConfigValue(@NotNull String name)
-  {
-    final ConfigValue configValue =
-        map.find(messageAccessor, name, getLocale(), NAME_TYPE, null);
-
-    return configValue != null
-        ? Optional.of(configValue)
-        : ofNullable(messageAccessor.getDefaultParameterConfig(name));
-  }
-
-
-  @Override
-  public @NotNull Optional<String> getConfigValueString(@NotNull String name)
-  {
-    final ConfigValueString string = (ConfigValueString)
-        map.find(messageAccessor, name, getLocale(), NAME_TYPE, ConfigValue.STRING_TYPE);
-
-    if (string != null)
-      return Optional.of(string.asObject());
-
-    final ConfigValue configValue = messageAccessor.getDefaultParameterConfig(name);
-
-    return configValue instanceof ConfigValueString
-        ? Optional.of(((ConfigValueString)configValue).asObject())
-        : Optional.empty();
-  }
-
-
-  @Override
-  public @NotNull OptionalLong getConfigValueNumber(@NotNull String name)
-  {
-    final ConfigValueNumber number = (ConfigValueNumber)
-        map.find(messageAccessor, name, getLocale(), NAME_TYPE, ConfigValue.NUMBER_TYPE);
-
-    if (number != null)
-      return OptionalLong.of(number.asObject());
-
-    final ConfigValue configValue = messageAccessor.getDefaultParameterConfig(name);
-
-    return configValue instanceof ConfigValueNumber
-        ? OptionalLong.of(((ConfigValueNumber)configValue).asObject())
-        : OptionalLong.empty();
-  }
-
-
-  @Override
-  public @NotNull Optional<Boolean> getConfigValueBool(@NotNull String name)
-  {
-    final ConfigValueBool bool = (ConfigValueBool)
-        map.find(messageAccessor, name, getLocale(), NAME_TYPE, ConfigValue.BOOL_TYPE);
-
-    if (bool != null)
-      return Optional.of(bool.asObject());
-
-    final ConfigValue configValue = messageAccessor.getDefaultParameterConfig(name);
-
-    return configValue instanceof ConfigValueBool
-        ? Optional.of(((ConfigValueBool)configValue).asObject())
-        : Optional.empty();
-  }
-
-
-  @Override
-  public @NotNull Optional<Message.WithSpaces> getConfigValueMessage(@NotNull String name)
-  {
-    final Message.WithSpaces message =
-        map.getMessage(messageAccessor, name, getLocale(), NAME_TYPE, false);
-    if (message != null)
-      return Optional.of(message);
-
-    final ConfigValue configValue = messageAccessor.getDefaultParameterConfig(name);
-
-    if (configValue instanceof ConfigValueMessage)
-      return Optional.of(((ConfigValueMessage)configValue).asObject());
-    else if (configValue instanceof ConfigValueString)
-    {
-      return Optional.of(
-          ((ConfigValueString)configValue).asMessage(messageAccessor.getMessageFactory()));
-    }
-
-    return Optional.empty();
+    return ofNullable(parameterConfig.getMessage(messageAccessor, key, getLocale(), types, includeDefault));
   }
 
 
@@ -209,14 +122,14 @@ public final class ParameterFormatterContext implements FormatterContext
   public @NotNull Text format(Object value, Class<?> type, boolean propagateFormat)
   {
     return new ParameterFormatterContext(messageAccessor, parameters, value, type,
-        propagateFormat ? format : null, map).delegateToNextFormatter();
+        propagateFormat ? format : null, parameterConfig).delegateToNextFormatter();
   }
 
 
   @Override
   public @NotNull Text format(Object value, Class<?> type, String format)
   {
-    return new ParameterFormatterContext(messageAccessor, parameters, value, type, format, map)
+    return new ParameterFormatterContext(messageAccessor, parameters, value, type, format, parameterConfig)
         .delegateToNextFormatter();
   }
 

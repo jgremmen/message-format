@@ -18,17 +18,24 @@ package de.sayayi.lib.message.formatter.runtime.extra;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.security.Principal;
+
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
 
 
 /**
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class PrincipalFormatter extends AbstractSingleTypeParameterFormatter<Principal>
+public final class PrincipalFormatter
+    extends AbstractSingleTypeParameterFormatter<Principal>
+    implements ConfigKeyComparator<Principal>
 {
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext context,
@@ -40,5 +47,17 @@ public final class PrincipalFormatter extends AbstractSingleTypeParameterFormatt
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(Principal.class);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToConfigKey(@NotNull Principal value,
+                                                 @NotNull ComparatorContext context)
+  {
+    if (context.getKeyType() == EMPTY)
+      return context.getCompareType().match(1) ? TYPELESS_EXACT : MISMATCH;
+
+    final MatchResult result = context.matchForObject(value.getName());
+    return result == EXACT ? LENIENT : result;
   }
 }

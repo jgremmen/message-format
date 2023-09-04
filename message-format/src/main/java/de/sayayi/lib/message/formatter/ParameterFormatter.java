@@ -16,11 +16,14 @@
 package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.parameter.ParameterConfigAccessor;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
 import java.util.OptionalLong;
 import java.util.Set;
 
@@ -79,36 +82,8 @@ public interface ParameterFormatter
 
 
   /**
-   * This interface marks a parameter formatter as being capable of determining whether a
-   * formattable type is empty.
-   *
-   * @see SizeQueryable
-   */
-  interface EmptyMatcher
-  {
-    /**
-     * Check whether the given {@code value} is empty as defined by this formatter.
-     *
-     * @param compareType  comparison type (either {@link CompareType#EQ CompareType#EQ} or
-     *                     {@link CompareType#NE CompareType#NE}), never {@code null}
-     * @param value        object to check for emptyness, never {@code null}
-     *
-     * @return  {@link MatchResult#TYPELESS_EXACT MatchResult#TYPELESS_EXACT},
-     *          {@link MatchResult#TYPELESS_LENIENT MatchResult#TYPELESS_LENIENT} or
-     *          {@code null}
-     */
-    @Contract(pure = true)
-    MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value);
-  }
-
-
-
-
-  /**
    * This interface marks a parameter formatter as being capable of calculating the size of the
    * formattable type.
-   *
-   * @see EmptyMatcher
    */
   interface SizeQueryable
   {
@@ -123,5 +98,111 @@ public interface ParameterFormatter
      */
     @Contract(pure = true)
     @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value);
+  }
+
+
+
+
+  /**
+   * This interface allows formatters to match a value against parameter configuration map keys.
+   *
+   * @param <T>  type of the value this comparator is capable of comparing
+   *
+   * @since 0.8.4
+   */
+  interface ConfigKeyComparator<T>
+  {
+    /**
+     *
+     * @param value    value to compare against the configuration key, not {@code null}
+     * @param context  comparator context instance, not {@code null}
+     *
+     * @return  comparison match result, never {@code null}
+     */
+    @Contract(pure = true)
+    @NotNull MatchResult compareToConfigKey(@NotNull T value, @NotNull ComparatorContext context);
+  }
+
+
+
+
+  /**
+   * @since 0.8.4
+   */
+  interface ComparatorContext extends ParameterConfigAccessor
+  {
+    /**
+     * Returns the comparison type for the current configuration key.
+     *
+     * @return  comparison type, never {@code null}
+     */
+    @Contract(pure = true)
+    @NotNull CompareType getCompareType();
+
+
+    /**
+     * Returns the configuration key type.
+     *
+     * @return  configuration key type, never {@code null}, {@code NAME} or {@code NULL}
+     */
+    @Contract(pure = true)
+    @NotNull ConfigKey.Type getKeyType();
+
+
+    /**
+     * Returns the boolean value of a bool configuration key.
+     *
+     * @return  boolean key value
+     *
+     * @throws ClassCastException  if the configuration key is not a bool type
+     */
+    @Contract(pure = true)
+    boolean getBoolKeyValue();
+
+
+    /**
+     * Returns the number value of a number configuration key.
+     *
+     * @return  number key value
+     *
+     * @throws ClassCastException  if the configuration key is not a number type
+     */
+    @Contract(pure = true)
+    long getNumberKeyValue();
+
+
+    /**
+     * Returns the string value of a string configuration key.
+     *
+     * @return  string key value, never {@code null}
+     *
+     * @throws ClassCastException  if the configuration key is not a string type
+     */
+    @Contract(pure = true)
+    @NotNull String getStringKeyValue();
+
+
+    @Contract(pure = true)
+    @NotNull Locale getLocale();
+
+
+    @Contract(pure = true)
+    @NotNull MatchResult matchForObject(Object value);
+
+
+    @Contract(pure = true)
+    @NotNull <T> MatchResult matchForObject(@NotNull T value, @NotNull Class<T> valueType);
+  }
+
+
+
+
+  /**
+   * Qualifies a parameter formatter for being assigned to type {@code Object}.
+   *
+   * @see GenericFormatterService#addFormatterForType(FormattableType, ParameterFormatter)
+   * @since 0.8.4
+   */
+  interface DefaultFormatter {
   }
 }

@@ -754,7 +754,8 @@ public interface MessageSupport
      *
      * @param type  type, never {@code null}
      *
-     * @return  unmodifiable list of formatters for the given {@code type}, never {@code null}
+     * @return  unmodifiable list of formatters for the given {@code type},
+     *          never {@code null} and never empty
      */
     @Contract(value = "_ -> new", pure = true)
     default @NotNull ParameterFormatter[] getFormatters(@NotNull Class<?> type) {
@@ -772,7 +773,7 @@ public interface MessageSupport
      * @param type    type, never {@code null}
      *
      * @return  unmodifiable prioritized list of formatters for the given {@code format} and
-     *          {@code type}, never {@code null}
+     *          {@code type}, never {@code null} and never empty
      */
     @Contract(value = "_, _ -> new", pure = true)
     @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type);

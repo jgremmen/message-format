@@ -15,28 +15,19 @@
  */
 package de.sayayi.lib.message.part.parameter.key;
 
-import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
-import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Locale;
 
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
 
 
 /**
  * The empty configuration key represents values which are considered empty by their associated
  * parameter formatter.
- * <p>
- * In order to determine emptyness, the formatter must implement the
- * {@link EmptyMatcher#matchEmpty(CompareType, Object) matchEmpty(CompareType, Object)}
- * interface method.
  *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
@@ -66,6 +57,12 @@ public final class ConfigKeyEmpty implements ConfigKey
   }
 
 
+  @Override
+  public @NotNull CompareType getCompareType() {
+    return compareType;
+  }
+
+
   /**
    * {@inheritDoc}
    *
@@ -74,27 +71,6 @@ public final class ConfigKeyEmpty implements ConfigKey
   @Override
   public @NotNull Type getType() {
     return Type.EMPTY;
-  }
-
-
-  @Override
-  public @NotNull MatchResult match(@NotNull MessageAccessor messageAccessor,
-                                    @NotNull Locale locale, Object value)
-  {
-    if (value == null)
-      return compareType == EQ ? TYPELESS_LENIENT : MISMATCH;
-
-    for(ParameterFormatter formatter: messageAccessor.getFormatters(value.getClass()))
-      if (formatter instanceof EmptyMatcher)
-      {
-        final MatchResult result = ((EmptyMatcher)formatter).matchEmpty(compareType, value);
-        assert result == TYPELESS_LENIENT || result == TYPELESS_EXACT || result == null;
-
-        if (result != null)
-          return result;
-      }
-
-    return MISMATCH;
   }
 
 

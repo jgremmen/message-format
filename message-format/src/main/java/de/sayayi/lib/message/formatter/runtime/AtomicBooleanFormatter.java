@@ -18,10 +18,17 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
 
 
 /**
@@ -29,6 +36,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public final class AtomicBooleanFormatter
     extends AbstractSingleTypeParameterFormatter<AtomicBoolean>
+    implements ConfigKeyComparator<AtomicBoolean>
 {
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext context,
@@ -40,5 +48,18 @@ public final class AtomicBooleanFormatter
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(AtomicBoolean.class);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToConfigKey(@NotNull AtomicBoolean value,
+                                                 @NotNull ComparatorContext context)
+  {
+    if (context.getKeyType() == EMPTY)
+      return context.getCompareType().match(1) ? TYPELESS_EXACT : MISMATCH;
+
+    final ConfigKey.Type keyType = context.getKeyType();
+    return keyType == BOOL || keyType == STRING
+        ? context.matchForObject(value.get(), boolean.class) : MISMATCH;
   }
 }

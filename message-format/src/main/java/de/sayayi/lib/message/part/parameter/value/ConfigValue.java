@@ -15,15 +15,11 @@
  */
 package de.sayayi.lib.message.part.parameter.value;
 
-import de.sayayi.lib.message.part.parameter.ParamConfig;
+import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.util.EnumSet;
-import java.util.Set;
-
-import static java.util.Collections.unmodifiableSet;
 
 
 /**
@@ -32,23 +28,10 @@ import static java.util.Collections.unmodifiableSet;
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  *
- * @see ParamConfig
+ * @see ParameterConfig
  */
 public interface ConfigValue extends Serializable
 {
-  /** Config value types {@code string} and {@code message}. */
-  Set<Type> STRING_MESSAGE_TYPE = unmodifiableSet(EnumSet.of(Type.STRING, Type.MESSAGE));
-
-  /** Config value type {@code string}. */
-  Set<Type> STRING_TYPE = unmodifiableSet(EnumSet.of(Type.STRING));
-
-  /** Config value type {@code bool}. */
-  Set<Type> BOOL_TYPE = unmodifiableSet(EnumSet.of(Type.BOOL));
-
-  /** Config value type {@code number}. */
-  Set<Type> NUMBER_TYPE = unmodifiableSet(EnumSet.of(Type.NUMBER));
-
-
   /**
    * Return the config value type.
    *

@@ -18,18 +18,18 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
 import java.util.OptionalDouble;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
 
 
 /**
@@ -37,7 +37,7 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYP
  */
 public final class OptionalDoubleFormatter
     extends AbstractSingleTypeParameterFormatter<OptionalDouble>
-    implements EmptyMatcher
+    implements ConfigKeyComparator<OptionalDouble>
 {
   @Override
   @Contract(pure = true)
@@ -51,13 +51,17 @@ public final class OptionalDoubleFormatter
 
 
   @Override
-  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return compareType.match(((Optional<?>)value).isPresent() ? 1 : 0) ? TYPELESS_EXACT : null;
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(OptionalDouble.class);
   }
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
-    return new FormattableType(OptionalDouble.class);
+  public @NotNull MatchResult compareToConfigKey(@NotNull OptionalDouble value,
+                                                 @NotNull ComparatorContext context)
+  {
+    return context.getKeyType() == EMPTY
+        ? context.getCompareType().match(value.isPresent() ? 1 : 0) ? TYPELESS_EXACT : MISMATCH
+        : value.isPresent() ? context.matchForObject(value.getAsDouble(), double.class) : MISMATCH;
   }
 }

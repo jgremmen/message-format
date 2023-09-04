@@ -18,20 +18,26 @@ package de.sayayi.lib.message.formatter.runtime.extra;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.runtime.TypeFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class MethodFormatter extends AbstractSingleTypeParameterFormatter<Method>
+public final class MethodFormatter
+    extends AbstractSingleTypeParameterFormatter<Method>
+    implements ConfigKeyComparator<Method>
 {
   @Override
   @Contract(pure = true)
@@ -59,5 +65,25 @@ public final class MethodFormatter extends AbstractSingleTypeParameterFormatter<
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(Method.class);
+  }
+
+
+  @Override
+  public @NotNull ConfigKey.MatchResult compareToConfigKey(@NotNull Method value,
+                                                           @NotNull ComparatorContext context)
+  {
+    final CompareType compareType = context.getCompareType();
+
+    switch(context.getKeyType())
+    {
+      case EMPTY:
+        return compareType.match(1) ? TYPELESS_EXACT : MISMATCH;
+
+      case STRING:
+        return compareType.match(value.getName().compareTo(context.getStringKeyValue()))
+            ? EQUIVALENT : MISMATCH;
+    }
+
+    return MISMATCH;
   }
 }

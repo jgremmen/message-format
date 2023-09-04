@@ -19,7 +19,8 @@ import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
-import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.ParameterFormatter.DefaultFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
@@ -27,14 +28,15 @@ import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigDecimal;
+import java.text.Collator;
 import java.util.HashSet;
 import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_LENIENT;
-import static de.sayayi.lib.message.util.SpacesUtil.isTrimmedEmpty;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
+import static java.text.Collator.*;
 import static java.util.Arrays.asList;
 
 
@@ -43,7 +45,7 @@ import static java.util.Arrays.asList;
  * @since 0.8.0
  */
 public final class StringFormatter extends AbstractParameterFormatter<Object>
-    implements EmptyMatcher, SizeQueryable, NamedParameterFormatter
+    implements SizeQueryable, NamedParameterFormatter, ConfigKeyComparator<Object>, DefaultFormatter
 {
   @Override
   public @NotNull String getName() {
@@ -55,20 +57,6 @@ public final class StringFormatter extends AbstractParameterFormatter<Object>
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value) {
     return noSpaceText(value instanceof char[] ? new String((char[])value) : String.valueOf(value));
-  }
-
-
-  @Override
-  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value)
-  {
-    final String s = value instanceof char[] ? new String((char[])value) : String.valueOf(value);
-    final boolean empty = s.isEmpty();
-    final boolean lenientEmpty = isTrimmedEmpty(s);
-
-    if (compareType == CompareType.EQ)
-      return empty ? TYPELESS_EXACT : (lenientEmpty ? TYPELESS_LENIENT : null);
-    else
-      return lenientEmpty ? (empty ? null : TYPELESS_LENIENT) : TYPELESS_EXACT;
   }
 
 
@@ -91,5 +79,84 @@ public final class StringFormatter extends AbstractParameterFormatter<Object>
         new FormattableType(CharSequence.class),
         new FormattableType(char[].class)
     ));
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToConfigKey(@NotNull Object value, @NotNull ComparatorContext context)
+  {
+    final String s = value instanceof char[] ? new String((char[]) value) : String.valueOf(value);
+
+    switch(context.getKeyType())
+    {
+      case EMPTY:
+        return compareToEmptyKey(s, context.getCompareType());
+
+      case BOOL:
+        return compareToBoolKey(s, context.getBoolKeyValue());
+
+      case NUMBER:
+        return compareToNumberKey(s, context, context.getNumberKeyValue());
+
+      case STRING:
+        return compareToStringKey(s, context);
+    }
+
+    return MISMATCH;
+  }
+
+
+  private @NotNull MatchResult compareToEmptyKey(String value, @NotNull CompareType compareType)
+  {
+    return compareType.match(value.length())
+        ? TYPELESS_EXACT
+        : compareType.match(value.trim().length()) ? TYPELESS_LENIENT : MISMATCH;
+  }
+
+
+  private @NotNull MatchResult compareToBoolKey(String value, boolean bool)
+  {
+    if ("true".equals(value))
+      return bool ? EQUIVALENT : MISMATCH;
+
+    if ("false".equals(value))
+      return bool ? MISMATCH : EQUIVALENT;
+
+    return MISMATCH;
+  }
+
+
+  private @NotNull MatchResult compareToNumberKey(String value, @NotNull ComparatorContext context,
+                                                  long number)
+  {
+    try {
+      return context.getCompareType().match(new BigDecimal(value).compareTo(BigDecimal.valueOf(number)))
+          ? EQUIVALENT : MISMATCH;
+    } catch(NumberFormatException ignored) {
+    }
+
+    return MISMATCH;
+  }
+
+
+  private @NotNull MatchResult compareToStringKey(String value, @NotNull ComparatorContext context)
+  {
+    final CompareType compareType = context.getCompareType();
+    final Collator collator = Collator.getInstance(context.getLocale());
+    final String string = context.getStringKeyValue();
+
+    collator.setDecomposition(CANONICAL_DECOMPOSITION);
+
+    // match exact comparison
+    collator.setStrength(IDENTICAL);
+    if (compareType.match(collator.compare(value, string)))
+      return EXACT;
+
+    // match lenient comparison by ignoring case
+    collator.setStrength(PRIMARY);
+    if (compareType.match(collator.compare(value, string)))
+      return LENIENT;
+
+    return MISMATCH;
   }
 }

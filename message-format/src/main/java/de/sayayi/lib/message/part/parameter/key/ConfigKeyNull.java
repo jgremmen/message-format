@@ -15,18 +15,14 @@
  */
 package de.sayayi.lib.message.part.parameter.key;
 
-import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Locale;
 
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
 
 
 /**
@@ -58,6 +54,12 @@ public final class ConfigKeyNull implements ConfigKey
   }
 
 
+  @Override
+  public @NotNull CompareType getCompareType() {
+    return compareType;
+  }
+
+
   /**
    * {@inheritDoc}
    *
@@ -66,19 +68,6 @@ public final class ConfigKeyNull implements ConfigKey
   @Override
   public @NotNull Type getType() {
     return Type.NULL;
-  }
-
-
-  @Override
-  public @NotNull MatchResult match(@NotNull MessageAccessor messageAccessor,
-                                    @NotNull Locale locale, Object value)
-  {
-    if (value == null && compareType == EQ)
-      return TYPELESS_EXACT;
-    if (value != null && compareType == NE)
-      return TYPELESS_EXACT;
-
-    return MISMATCH;
   }
 
 

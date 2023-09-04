@@ -18,7 +18,9 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +32,7 @@ import java.util.function.DoubleSupplier;
  */
 public final class DoubleSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<DoubleSupplier>
+    implements ConfigKeyComparator<DoubleSupplier>
 {
   @Override
   @Contract(pure = true)
@@ -42,5 +45,12 @@ public final class DoubleSupplierFormatter
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(DoubleSupplier.class);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToConfigKey(@NotNull DoubleSupplier value,
+                                                 @NotNull ComparatorContext context) {
+    return context.matchForObject(value.getAsDouble(), double.class);
   }
 }

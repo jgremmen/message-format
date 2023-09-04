@@ -15,19 +15,13 @@
  */
 package de.sayayi.lib.message.part.parameter.key;
 
-import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.text.Collator;
-import java.util.Locale;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
 import static java.util.Objects.requireNonNull;
 
 
@@ -53,6 +47,12 @@ public final class ConfigKeyString implements ConfigKey
   }
 
 
+  @Override
+  public @NotNull CompareType getCompareType() {
+    return compareType;
+  }
+
+
   /**
    * Returns the config key string value.
    *
@@ -72,53 +72,6 @@ public final class ConfigKeyString implements ConfigKey
   @Override
   public @NotNull Type getType() {
     return Type.STRING;
-  }
-
-
-  @Override
-  public @NotNull MatchResult match(@NotNull MessageAccessor messageAccessor,
-                                    @NotNull Locale locale, Object value)
-  {
-    if (value == null)
-      return MISMATCH;
-
-    MatchResult result = EXACT;
-    int cmp = 0;
-
-    doMatch: {
-      if (!(value instanceof CharSequence || value instanceof Character))
-        result = EQUIVALENT;
-
-      final String text = value.toString();
-
-      if (compareType == EQ)
-      {
-        if (text.equals(string))
-          break doMatch;
-
-        //noinspection DuplicateExpressions
-        if (text.toLowerCase(locale).equals(string.toLowerCase(locale)))
-        {
-          result = LENIENT;
-          break doMatch;
-        }
-
-        cmp = 1;
-        break doMatch;
-      }
-
-      //noinspection DuplicateExpressions
-      if (compareType == NE && !text.toLowerCase(locale).equals(string.toLowerCase(locale)))
-      {
-        result = LENIENT;
-        cmp = 1;
-        break doMatch;
-      }
-
-      cmp = Collator.getInstance(locale).compare(text, string);
-    }
-
-    return compareType.match(cmp) ? result : MISMATCH;
   }
 
 

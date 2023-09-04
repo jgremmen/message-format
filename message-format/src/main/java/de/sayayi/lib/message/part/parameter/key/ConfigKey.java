@@ -15,16 +15,15 @@
  */
 package de.sayayi.lib.message.part.parameter.key;
 
-import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.part.parameter.ParamConfig;
+import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.EnumSet;
-import java.util.Locale;
 import java.util.Set;
 
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
 import static java.util.Collections.unmodifiableSet;
 
 
@@ -34,10 +33,13 @@ import static java.util.Collections.unmodifiableSet;
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  *
- * @see ParamConfig
+ * @see ParameterConfig
  */
 public interface ConfigKey extends Serializable
 {
+  /** Map key type {@code empty}. */
+  Set<Type> EMPTY_TYPE = unmodifiableSet(EnumSet.of(Type.EMPTY));
+
   /** Map key types {@code empty} and {@code null}. */
   Set<Type> EMPTY_NULL_TYPE = unmodifiableSet(EnumSet.of(Type.EMPTY, Type.NULL));
 
@@ -53,9 +55,6 @@ public interface ConfigKey extends Serializable
   /** Map key type {@code number}. */
   Set<Type> NUMBER_TYPE = unmodifiableSet(EnumSet.of(Type.NUMBER));
 
-  /** Map key type {@code name}. */
-  Set<Type> NAME_TYPE = unmodifiableSet(EnumSet.of(Type.NAME));
-
 
   /**
    * Return the type for this key.
@@ -67,17 +66,12 @@ public interface ConfigKey extends Serializable
 
 
   /**
-   * Calculates a match result for the given {@code value} with respect to this key.
-   *
-   * @param messageAccessor  message context instance, not {@code null}
-   * @param locale           formatting locale, not {@code null}
-   * @param value            value to compare with this key
-   *
-   * @return  matching result, never {@code null}
+   * @since 0.8.4
    */
   @Contract(pure = true)
-  @NotNull MatchResult match(@NotNull MessageAccessor messageAccessor,
-                             @NotNull Locale locale, Object value);
+  default @NotNull CompareType getCompareType() {
+    return EQ;
+  }
 
 
 
@@ -103,7 +97,21 @@ public interface ConfigKey extends Serializable
     EMPTY,
 
     /** Name key type */
-    NAME
+    NAME;
+
+
+    /**
+     * Tells whether the key type is {@code null} or {@code empty}.
+     *
+     * @return  {@code true} if key type is {@code null} or {@code empty},
+     *          {@code false} otherwise
+     *
+     * @since 0.8.4
+     */
+    @Contract(pure = true)
+    public boolean isNullOrEmpty() {
+      return this == NULL || this == EMPTY;
+    }
   }
 
 

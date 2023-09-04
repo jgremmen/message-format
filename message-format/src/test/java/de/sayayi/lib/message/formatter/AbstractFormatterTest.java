@@ -19,7 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.NoParameters;
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.part.parameter.ParamConfig;
+import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import de.sayayi.lib.message.part.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import de.sayayi.lib.message.part.parameter.value.ConfigValue;
@@ -96,7 +96,7 @@ public abstract class AbstractFormatterTest
                                         String format)
   {
     return new ParameterFormatterContext(messageContext, parameters, value, null, format,
-        new ParamConfig(map)).delegateToNextFormatter();
+        new ParameterConfig(map)).delegateToNextFormatter();
   }
 
 

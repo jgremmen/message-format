@@ -18,8 +18,10 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +34,7 @@ import java.util.function.Supplier;
  */
 public final class SupplierFormatter
     extends AbstractSingleTypeParameterFormatter<Supplier<?>>
-    implements SizeQueryable
+    implements SizeQueryable, ConfigKeyComparator<Supplier<?>>
 {
   @Override
   @Contract(pure = true)
@@ -51,5 +53,12 @@ public final class SupplierFormatter
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(Supplier.class);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToConfigKey(@NotNull Supplier<?> value,
+                                                 @NotNull ComparatorContext context) {
+    return context.matchForObject(value.get());
   }
 }

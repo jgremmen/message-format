@@ -50,7 +50,7 @@ public final class ParameterPart implements Parameter
   private final String format;
 
   /** parameter configuration. */
-  private final @NotNull ParamConfig paramConfig;
+  private final @NotNull ParameterConfig paramConfig;
 
   /** tells whether the parameter has a leading space. */
   private final boolean spaceBefore;
@@ -78,7 +78,7 @@ public final class ParameterPart implements Parameter
    * @param spaceAfter   adds a trailing space to this parameter
    */
   public ParameterPart(@NotNull String name, boolean spaceBefore, boolean spaceAfter) {
-    this(name, null, spaceBefore, spaceAfter, new ParamConfig(emptyMap()));
+    this(name, null, spaceBefore, spaceAfter, new ParameterConfig(emptyMap()));
   }
 
 
@@ -88,13 +88,13 @@ public final class ParameterPart implements Parameter
    * @param name         parameter name, not {@code null} or empty
    * @param paramConfig  parameter configuration, not {@code null}
    */
-  public ParameterPart(@NotNull String name, @NotNull ParamConfig paramConfig) {
+  public ParameterPart(@NotNull String name, @NotNull ParameterConfig paramConfig) {
     this(name, null, false, false, paramConfig);
   }
 
 
   public ParameterPart(@NotNull String name, String format, boolean spaceBefore, boolean spaceAfter,
-                       @NotNull ParamConfig paramConfig)
+                       @NotNull ParameterConfig paramConfig)
   {
     if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
       throw new IllegalArgumentException("name must not be empty");
@@ -122,7 +122,7 @@ public final class ParameterPart implements Parameter
 
   @Override
   @Contract(pure = true)
-  public @NotNull ParamConfig getParamConfig() {
+  public @NotNull ParameterConfig getParamConfig() {
     return paramConfig;
   }
 
@@ -236,6 +236,6 @@ public final class ParameterPart implements Parameter
     final String name = requireNonNull(packStream.readString());
 
     return new ParameterPart(name, format, spaceBefore, spaceAfter,
-        ParamConfig.unpack(unpack, packStream));
+        ParameterConfig.unpack(unpack, packStream));
   }
 }

@@ -18,11 +18,11 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextPartFactory;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -30,14 +30,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 import java.util.OptionalLong;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
 
 
 /**
  * @author Jeroen Gremmen
  */
 public final class OptionalFormatter extends AbstractSingleTypeParameterFormatter<Optional<?>>
-    implements EmptyMatcher, SizeQueryable
+    implements SizeQueryable, ConfigKeyComparator<Optional<?>>
 {
   @Override
   @Contract(pure = true)
@@ -46,12 +47,6 @@ public final class OptionalFormatter extends AbstractSingleTypeParameterFormatte
     return optional
         .map(o -> context.format(o, true))
         .orElseGet(TextPartFactory::emptyText);
-  }
-
-
-  @Override
-  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return compareType.match(((Optional<?>)value).isPresent() ? 1 : 0) ? TYPELESS_EXACT : null;
   }
 
 
@@ -67,5 +62,25 @@ public final class OptionalFormatter extends AbstractSingleTypeParameterFormatte
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(Optional.class);
+  }
+
+
+
+  @Override
+  public @NotNull MatchResult compareToConfigKey(@NotNull Optional<?> value,
+                                                 @NotNull ComparatorContext context)
+  {
+    final ConfigKey.Type keyType = context.getKeyType();
+
+    if (keyType.isNullOrEmpty())
+    {
+      return context.getCompareType().match(value.isPresent() ? 1 : 0)
+          ? keyType == EMPTY ? TYPELESS_EXACT : TYPELESS_LENIENT
+          : MISMATCH;
+    }
+
+    return value
+        .map(context::matchForObject)
+        .orElse(MISMATCH);
   }
 }

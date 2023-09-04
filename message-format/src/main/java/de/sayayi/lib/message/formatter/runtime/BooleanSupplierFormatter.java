@@ -18,11 +18,18 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BooleanSupplier;
+
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
 
 
 /**
@@ -30,6 +37,7 @@ import java.util.function.BooleanSupplier;
  */
 public final class BooleanSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<BooleanSupplier>
+    implements ConfigKeyComparator<BooleanSupplier>
 {
   @Override
   @Contract(pure = true)
@@ -42,5 +50,18 @@ public final class BooleanSupplierFormatter
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(BooleanSupplier.class);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToConfigKey(@NotNull BooleanSupplier value,
+                                                 @NotNull ComparatorContext context)
+  {
+    if (context.getKeyType() == EMPTY)
+      return context.getCompareType().match(1) ? TYPELESS_EXACT : MISMATCH;
+
+    final ConfigKey.Type keyType = context.getKeyType();
+    return keyType == BOOL || keyType == STRING
+        ? context.matchForObject(value.getAsBoolean(), boolean.class) : MISMATCH;
   }
 }

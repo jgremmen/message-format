@@ -15,17 +15,13 @@
  */
 package de.sayayi.lib.message.part.parameter.key;
 
-import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Locale;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.EXACT;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
 import static java.util.Objects.requireNonNull;
 
 
@@ -72,15 +68,6 @@ public final class ConfigKeyName implements ConfigKey
   @Override
   public @NotNull Type getType() {
     return Type.NAME;
-  }
-
-
-  @Override
-  public @NotNull MatchResult match(@NotNull MessageAccessor messageAccessor,
-                                    @NotNull Locale locale, Object value)
-  {
-    return (value instanceof CharSequence || value instanceof Character) &&
-        value.toString().equals(name) ? EXACT : MISMATCH;
   }
 
 
