@@ -18,8 +18,11 @@ package de.sayayi.lib.message.formatter.runtime.extra;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.runtime.TypeFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,12 +30,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class FieldFormatter extends AbstractSingleTypeParameterFormatter<Field>
+public final class FieldFormatter
+    extends AbstractSingleTypeParameterFormatter<Field>
+    implements ConfigKeyComparator<Field>
 {
   @Override
   @Contract(pure = true)
@@ -64,5 +70,25 @@ public final class FieldFormatter extends AbstractSingleTypeParameterFormatter<F
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(Field.class);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToConfigKey(@NotNull Field value,
+                                                 @NotNull ComparatorContext context)
+  {
+    final CompareType compareType = context.getCompareType();
+
+    switch(context.getKeyType())
+    {
+      case EMPTY:
+        return compareType.match(1) ? TYPELESS_EXACT : MISMATCH;
+
+      case STRING:
+        return compareType.match(value.getName().compareTo(context.getStringKeyValue()))
+            ? EQUIVALENT : MISMATCH;
+    }
+
+    return MISMATCH;
   }
 }

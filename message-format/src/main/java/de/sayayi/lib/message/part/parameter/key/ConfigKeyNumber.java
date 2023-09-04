@@ -15,22 +15,13 @@
  */
 package de.sayayi.lib.message.part.parameter.key;
 
-import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.LongAccumulator;
-import java.util.concurrent.atomic.LongAdder;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
 import static java.util.Objects.requireNonNull;
 
 
@@ -61,6 +52,12 @@ public final class ConfigKeyNumber implements ConfigKey
   }
 
 
+  @Override
+  public @NotNull CompareType getCompareType() {
+    return compareType;
+  }
+
+
   /**
    * Returns the config key number value.
    *
@@ -80,65 +77,6 @@ public final class ConfigKeyNumber implements ConfigKey
   @Override
   public @NotNull Type getType() {
     return Type.NUMBER;
-  }
-
-
-  @Override
-  public @NotNull MatchResult match(@NotNull MessageAccessor messageAccessor,
-                                    @NotNull Locale locale, Object value)
-  {
-    if (value == null)
-      return MISMATCH;
-
-    MatchResult result = EXACT;
-    int cmp;
-
-    doMatch: {
-      if (value instanceof Long || value instanceof Integer || value instanceof Short ||
-          value instanceof Byte || value instanceof AtomicInteger || value instanceof AtomicLong ||
-          value instanceof LongAdder || value instanceof LongAccumulator)
-      {
-        cmp = Long.signum(((Number)value).longValue() - number);
-        break doMatch;
-      }
-
-      if (value instanceof BigInteger)
-      {
-        cmp = ((BigInteger)value).compareTo(BigInteger.valueOf(number));
-        break doMatch;
-      }
-
-      if (value instanceof CharSequence || value instanceof Character)
-      {
-        try {
-          value = new BigDecimal(value.toString());
-          result = LENIENT;
-        } catch(Exception ignore) {
-        }
-      }
-
-      if (value instanceof BigDecimal)
-      {
-        cmp = ((BigDecimal)value).compareTo(BigDecimal.valueOf(number));
-        break doMatch;
-      }
-
-      if (value instanceof Float)
-      {
-        cmp = Float.compare((Float)value, number);
-        break doMatch;
-      }
-
-      if (value instanceof Number)
-      {
-        cmp = Double.compare(((Number)value).doubleValue(), number);
-        break doMatch;
-      }
-
-      return MISMATCH;
-    }
-
-    return compareType.match(cmp) ? result : MISMATCH;
   }
 
 

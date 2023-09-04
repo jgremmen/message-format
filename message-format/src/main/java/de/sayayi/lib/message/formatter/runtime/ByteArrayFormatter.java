@@ -18,9 +18,8 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +31,9 @@ import java.util.Optional;
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_PRIMITIVE_OR_ARRAY_ORDER;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
 import static java.nio.charset.Charset.isSupported;
 
 
@@ -41,7 +42,7 @@ import static java.nio.charset.Charset.isSupported;
  * @since 0.8.0
  */
 public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatter<byte[]>
-    implements EmptyMatcher
+    implements ConfigKeyComparator<byte[]>
 {
   @Override
   @SneakyThrows(UnsupportedEncodingException.class)
@@ -70,13 +71,16 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
 
 
   @Override
-  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return compareType.match(((byte[])value).length) ? TYPELESS_EXACT : null;
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(byte[].class, DEFAULT_PRIMITIVE_OR_ARRAY_ORDER - 10);
   }
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
-    return new FormattableType(byte[].class, DEFAULT_PRIMITIVE_OR_ARRAY_ORDER - 10);
+  public @NotNull MatchResult compareToConfigKey(@NotNull byte[] value,
+                                                 @NotNull ComparatorContext context)
+  {
+    return context.getKeyType() == EMPTY && context.getCompareType().match(value.length)
+        ? TYPELESS_EXACT : MISMATCH;
   }
 }

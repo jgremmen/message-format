@@ -21,14 +21,13 @@ import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.NoSpaceTextPart;
-import de.sayayi.lib.message.part.parameter.ParamConfig;
+import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import de.sayayi.lib.message.part.parameter.ParameterPart;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.part.parameter.key.ConfigKeyNull;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
@@ -41,7 +40,9 @@ import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableSet;
@@ -51,7 +52,7 @@ import static java.util.Collections.unmodifiableSet;
  * @author Jeroen Gremmen
  */
 public final class MapFormatter extends AbstractSingleTypeParameterFormatter<Map<?,?>>
-    implements EmptyMatcher, SizeQueryable
+    implements SizeQueryable, ConfigKeyComparator<Map<?,?>>
 {
   private static final Message.WithSpaces DEFAULT_KEY_VALUE_MESSAGE;
   private static final Set<String> KEY_VALUE_PARAMETER_NAMES =
@@ -60,14 +61,14 @@ public final class MapFormatter extends AbstractSingleTypeParameterFormatter<Map
 
   static
   {
-    final ParamConfig paramConfig = new ParamConfig(singletonMap(
+    final ParameterConfig parameterConfig = new ParameterConfig(singletonMap(
         new ConfigKeyNull(EQ), new ConfigValueString("(null)")));
 
     // default map-kv: %{key,null:'(null)'}=%{value,null:'(null)'}
     DEFAULT_KEY_VALUE_MESSAGE = new CompoundMessage(asList(
-        new ParameterPart("key", paramConfig),
+        new ParameterPart("key", parameterConfig),
         new NoSpaceTextPart("="),
-        new ParameterPart("value", paramConfig)
+        new ParameterPart("value", parameterConfig)
     ));
   }
 
@@ -107,12 +108,6 @@ public final class MapFormatter extends AbstractSingleTypeParameterFormatter<Map
 
 
   @Override
-  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return compareType.match(((Map<?,?>)value).size()) ? TYPELESS_EXACT : null;
-  }
-
-
-  @Override
   public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value) {
     return OptionalLong.of(((Map<?,?>)value).size());
   }
@@ -121,6 +116,15 @@ public final class MapFormatter extends AbstractSingleTypeParameterFormatter<Map
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(Map.class);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToConfigKey(@NotNull Map<?,?> value,
+                                                 @NotNull ComparatorContext context)
+  {
+    return context.getKeyType() == EMPTY && context.getCompareType().match(value.size())
+        ? TYPELESS_EXACT : MISMATCH;
   }
 
 

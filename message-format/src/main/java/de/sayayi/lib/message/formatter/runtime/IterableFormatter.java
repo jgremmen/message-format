@@ -20,13 +20,12 @@ import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.TextJoiner;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.ParameterPart;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.Contract;
@@ -39,7 +38,9 @@ import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
 import static java.util.Collections.singletonList;
 
 
@@ -47,7 +48,7 @@ import static java.util.Collections.singletonList;
  * @author Jeroen Gremmen
  */
 public final class IterableFormatter extends AbstractSingleTypeParameterFormatter<Iterable<?>>
-    implements EmptyMatcher, SizeQueryable
+    implements SizeQueryable, ConfigKeyComparator<Iterable<?>>
 {
   // default list-value: %{value}
   private static final Message.WithSpaces DEFAULT_VALUE_MESSAGE =
@@ -87,17 +88,6 @@ public final class IterableFormatter extends AbstractSingleTypeParameterFormatte
 
 
   @Override
-  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value)
-  {
-    final int cmp = value instanceof Collection
-        ? ((Collection<?>)value).size()
-        : (((Iterable<?>)value).iterator().hasNext() ? 1 : 0);
-
-    return compareType.match(cmp) ? TYPELESS_EXACT : null;
-  }
-
-
-  @Override
   public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value)
   {
     if (value instanceof Collection)
@@ -105,7 +95,7 @@ public final class IterableFormatter extends AbstractSingleTypeParameterFormatte
 
     long size = 0;
 
-    for(Object ignored: (Iterable<?>)value)
+    for(@SuppressWarnings("UnusedAssignment") Object ignored: (Iterable<?>)value)
       size++;
 
     return OptionalLong.of(size);
@@ -115,6 +105,24 @@ public final class IterableFormatter extends AbstractSingleTypeParameterFormatte
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(Iterable.class);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToConfigKey(@NotNull Iterable<?> value,
+                                                 @NotNull ComparatorContext context)
+  {
+    if (context.getKeyType() == EMPTY)
+    {
+      final int cmp = value instanceof Collection
+          ? ((Collection<?>)value).size()
+          : (value.iterator().hasNext() ? 1 : 0);
+
+      if (context.getCompareType().match(cmp))
+        return TYPELESS_EXACT;
+    }
+
+    return MISMATCH;
   }
 
 

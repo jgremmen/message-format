@@ -17,6 +17,7 @@ package de.sayayi.lib.message.formatter.named;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -102,5 +103,21 @@ public class StringFormatterTest extends AbstractFormatterTest
         messageSupport.message("%{text,null:nok,!empty:'%{text}!'}").with(parameters).format());
     assertEquals("hello!",
         messageSupport.message("%{text,!null:'%{text}!'}").with(parameters).format());
+  }
+
+
+  @Test
+  void testMapKey()
+  {
+    val messageSupport = MessageSupportFactory.create(
+        new DefaultFormatterService(), NO_CACHE_INSTANCE);
+
+    assertEquals("exact", messageSupport
+        .message("%{text,choice,'Süd':'exact'}")
+        .with("text", "Süd").format());
+
+    assertEquals("lenient", messageSupport
+        .message("%{text,choice,'SUD':'lenient'}")
+        .with("text", "Süd").format());
   }
 }

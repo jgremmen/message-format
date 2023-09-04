@@ -19,8 +19,9 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.parameter.ParameterConfig;
+import de.sayayi.lib.message.part.parameter.ParameterConfigAccessor;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +39,7 @@ import java.util.Set;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public interface FormatterContext extends Parameters
+public interface FormatterContext extends Parameters, ParameterConfigAccessor
 {
   /**
    * Returns the message accessor used to create this formatter context.
@@ -58,7 +59,7 @@ public interface FormatterContext extends Parameters
    * @return  {@code true} if the map contains an entry with the given key type,
    *          {@code false} otherwise
    *
-   * @see de.sayayi.lib.message.part.parameter.ParamConfig#hasEntryWithKeyType(ConfigKey.Type)
+   * @see ParameterConfig#hasMessageWithKeyType(ConfigKey.Type)
    *      ParamConfig#hasEntryWithKeyType(ConfigKey.Type)
    */
   @Contract(pure = true)
@@ -102,88 +103,6 @@ public interface FormatterContext extends Parameters
   @Contract(pure = true)
   @NotNull Optional<Message.WithSpaces> getConfigMapMessage(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault);
-
-
-  /**
-   * Gets a configuration value for named key {@code name}.
-   * <p>
-   * The value is taken from the parameter configuration map. If no such key is found the
-   * message support is queried for a default configuration value.
-   *
-   * @param name  parameter configuration key, not {@code null}
-   *
-   * @return  optional instance representing the found value, never {@code null}
-   */
-  @Contract(pure = true)
-  @NotNull Optional<ConfigValue> getConfigValue(@NotNull String name);
-
-
-  /**
-   * Gets a string configuration value for named key {@code name}.
-   * <p>
-   * The value is taken from the parameter configuration map. If no such key is found the
-   * message support is queried for a default configuration value.
-   * <p>
-   * If a value is found for the given {@code name} but the type is not a string, the method
-   * returns {@link Optional#empty()}.
-   *
-   * @param name  parameter configuration key, not {@code null}
-   *
-   * @return  optional string instance representing the found value, never {@code null}
-   */
-  @Contract(pure = true)
-  @NotNull Optional<String> getConfigValueString(@NotNull String name);
-
-
-  /**
-   * Gets a number configuration value for named key {@code name}.
-   * <p>
-   * The value is taken from the parameter configuration map. If no such key is found the
-   * message support is queried for a default configuration value.
-   * <p>
-   * If a value is found for the given {@code name} but the type is not a number, the method
-   * returns {@link Optional#empty()}.
-   *
-   * @param name  parameter configuration key, not {@code null}
-   *
-   * @return  optional number instance representing the found value, never {@code null}
-   */
-  @Contract(pure = true)
-  @NotNull OptionalLong getConfigValueNumber(@NotNull String name);
-
-
-  /**
-   * Gets a boolean configuration value for named key {@code name}.
-   * <p>
-   * The value is taken from the parameter configuration map. If no such key is found the
-   * message support is queried for a default configuration value.
-   * <p>
-   * If a value is found for the given {@code name} but the type is not boolean, the method
-   * returns {@link Optional#empty()}.
-   *
-   * @param name  parameter configuration key, not {@code null}
-   *
-   * @return  optional boolean instance representing the found value, never {@code null}
-   */
-  @Contract(pure = true)
-  @NotNull Optional<Boolean> getConfigValueBool(@NotNull String name);
-
-
-  /**
-   * Gets a message configuration value for named key {@code name}.
-   * <p>
-   * The value is taken from the parameter configuration map. If no such key is found the
-   * message support is queried for a default configuration value.
-   * <p>
-   * If a value is found for the given {@code name} but the type is not a string nor a message,
-   * the method returns {@link Optional#empty()}.
-   *
-   * @param name  parameter configuration key, not {@code null}
-   *
-   * @return  optional message instance representing the found value, never {@code null}
-   */
-  @Contract(pure = true)
-  @NotNull Optional<Message.WithSpaces> getConfigValueMessage(@NotNull String name);
 
 
   /**

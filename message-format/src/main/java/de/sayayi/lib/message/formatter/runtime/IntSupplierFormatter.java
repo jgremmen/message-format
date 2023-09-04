@@ -18,7 +18,9 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +30,9 @@ import java.util.function.IntSupplier;
 /**
  * @author Jeroen Gremmen
  */
-public final class IntSupplierFormatter extends AbstractSingleTypeParameterFormatter<IntSupplier>
+public final class IntSupplierFormatter
+    extends AbstractSingleTypeParameterFormatter<IntSupplier>
+    implements ConfigKeyComparator<IntSupplier>
 {
   @Override
   @Contract(pure = true)
@@ -41,5 +45,12 @@ public final class IntSupplierFormatter extends AbstractSingleTypeParameterForma
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(IntSupplier.class);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToConfigKey(@NotNull IntSupplier value,
+                                                 @NotNull ComparatorContext context) {
+    return context.matchForObject(value.getAsInt(), int.class);
   }
 }

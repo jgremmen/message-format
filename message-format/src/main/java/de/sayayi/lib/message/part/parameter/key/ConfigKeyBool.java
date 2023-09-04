@@ -15,19 +15,12 @@
  */
 package de.sayayi.lib.message.part.parameter.key;
 
-import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Locale;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
 
 
 /**
@@ -76,45 +69,6 @@ public enum ConfigKeyBool implements ConfigKey
   @Override
   public @NotNull Type getType() {
     return Type.BOOL;
-  }
-
-
-  @Override
-  public @NotNull MatchResult match(@NotNull MessageAccessor messageAccessor,
-                                    @NotNull Locale locale, Object value)
-  {
-    if (value != null)
-    {
-      if (value instanceof Boolean && (Boolean)value == bool)
-        return EXACT;
-      if (value instanceof AtomicBoolean && ((AtomicBoolean)value).get() == bool)
-        return EXACT;
-
-      if (value instanceof BigInteger)
-        return ((((BigInteger)value).signum() != 0) == bool) ? LENIENT : MISMATCH;
-
-      if (value instanceof CharSequence || value instanceof Character)
-      {
-        final String string = value.toString();
-
-        if (("true".equalsIgnoreCase(string) && bool) ||
-            ("false".equalsIgnoreCase(string) && !bool))
-          return EQUIVALENT;
-
-        try {
-          value = new BigDecimal(string);
-        } catch(Exception ignore) {
-        }
-      }
-
-      if (value instanceof BigDecimal)
-       return ((((BigDecimal)value).signum() != 0) == bool) ? LENIENT : MISMATCH;
-
-      if (value instanceof Number && (((Number)value).longValue() != 0) == bool)
-        return LENIENT;
-    }
-
-    return MISMATCH;
   }
 
 

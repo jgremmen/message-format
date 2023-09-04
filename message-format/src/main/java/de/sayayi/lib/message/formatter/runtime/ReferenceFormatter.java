@@ -18,17 +18,18 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.Reference;
 import java.util.OptionalLong;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
 
 
 /**
@@ -36,18 +37,12 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYP
  */
 public final class ReferenceFormatter
     extends AbstractSingleTypeParameterFormatter<Reference<?>>
-    implements EmptyMatcher, SizeQueryable
+    implements SizeQueryable, ConfigKeyComparator<Reference<?>>
 {
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext context,
                                    @NotNull Reference<?> reference) {
     return context.format(reference.get(), true);
-  }
-
-
-  @Override
-  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return compareType.match(((Reference<?>)value).get() == null ? 0 : 1) ? TYPELESS_EXACT : null;
   }
 
 
@@ -60,5 +55,22 @@ public final class ReferenceFormatter
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(Reference.class);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToConfigKey(@NotNull Reference<?> value,
+                                                 @NotNull ComparatorContext context)
+  {
+    final ConfigKey.Type keyType = context.getKeyType();
+
+    if (keyType.isNullOrEmpty())
+    {
+      return context.getCompareType().match(value.get() == null ? 0 : 1)
+          ? keyType == EMPTY ? TYPELESS_EXACT : TYPELESS_LENIENT
+          : MISMATCH;
+    }
+
+    return context.matchForObject(value.get());
   }
 }

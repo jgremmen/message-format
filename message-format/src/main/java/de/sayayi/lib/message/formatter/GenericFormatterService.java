@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.formatter;
 
+import de.sayayi.lib.message.formatter.ParameterFormatter.DefaultFormatter;
 import de.sayayi.lib.message.formatter.named.StringFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -78,6 +79,13 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   public void addFormatterForType(@NotNull FormattableType formattableType,
                                   @NotNull ParameterFormatter formatter)
   {
+    if (new FormattableType(Object.class).equals(formattableType) &&
+        !(formatter instanceof DefaultFormatter))
+    {
+      throw new IllegalArgumentException(
+          "formatter associated with Object must implement DefaultFormatter interface");
+    }
+
     final Class<?> type =
         requireNonNull(formattableType, "formattableType must not be null").getType();
 

@@ -18,9 +18,8 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -28,14 +27,17 @@ import org.jetbrains.annotations.NotNull;
 import java.util.OptionalLong;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class OptionalLongFormatter extends AbstractSingleTypeParameterFormatter<OptionalLong>
-    implements EmptyMatcher
+public final class OptionalLongFormatter
+    extends AbstractSingleTypeParameterFormatter<OptionalLong>
+    implements ConfigKeyComparator<OptionalLong>
 {
   @Override
   @Contract(pure = true)
@@ -49,13 +51,17 @@ public final class OptionalLongFormatter extends AbstractSingleTypeParameterForm
 
 
   @Override
-  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return compareType.match(((OptionalLong)value).isPresent() ? 1 : 0) ? TYPELESS_EXACT : null;
+  public @NotNull FormattableType getFormattableType() {
+    return new FormattableType(OptionalLong.class);
   }
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
-    return new FormattableType(OptionalLong.class);
+  public @NotNull MatchResult compareToConfigKey(@NotNull OptionalLong value,
+                                                 @NotNull ComparatorContext context)
+  {
+    return context.getKeyType() == EMPTY
+        ? context.getCompareType().match(value.isPresent() ? 1 : 0) ? TYPELESS_EXACT : MISMATCH
+        : value.isPresent() ? context.matchForObject(value.getAsLong(), long.class) : MISMATCH;
   }
 }

@@ -20,13 +20,12 @@ import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.TextJoiner;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.ParameterPart;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.Contract;
@@ -42,7 +41,9 @@ import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
 import static java.util.Collections.singletonList;
 
 
@@ -51,7 +52,7 @@ import static java.util.Collections.singletonList;
  * @since 0.8.0
  */
 public final class ArrayFormatter extends AbstractParameterFormatter<Object>
-    implements EmptyMatcher, SizeQueryable
+    implements SizeQueryable, ConfigKeyComparator<Object>
 {
   // default list-value: %{value}
   private static final Message.WithSpaces DEFAULT_VALUE_MESSAGE =
@@ -83,12 +84,6 @@ public final class ArrayFormatter extends AbstractParameterFormatter<Object>
     }
 
     return joiner.asNoSpaceText();
-  }
-
-
-  @Override
-  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value) {
-    return compareType.match(getLength(value)) ? TYPELESS_EXACT : null;
   }
 
 
@@ -142,6 +137,15 @@ public final class ArrayFormatter extends AbstractParameterFormatter<Object>
         new FormattableType(AtomicLongArray.class),
         new FormattableType(AtomicReferenceArray.class)
     ));
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToConfigKey(@NotNull Object value,
+                                                 @NotNull ComparatorContext context)
+  {
+    return context.getKeyType() == EMPTY && context.getCompareType().match(getLength(value))
+        ? TYPELESS_EXACT : MISMATCH;
   }
 
 

@@ -18,10 +18,9 @@ package de.sayayi.lib.message.formatter.runtime.extra;
 import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.formatter.ParameterFormatter.EmptyMatcher;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +29,9 @@ import java.text.CollationKey;
 import java.util.OptionalLong;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
 
 
 /**
@@ -38,21 +39,13 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYP
  * @since 0.8.0
  */
 public final class CollationKeyFormatter extends AbstractSingleTypeParameterFormatter<CollationKey>
-    implements EmptyMatcher, SizeQueryable
+    implements SizeQueryable, ConfigKeyComparator<CollationKey>
 {
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull FormatterContext context,
                                    @NotNull CollationKey collationKey) {
     return noSpaceText(collationKey.getSourceString());
-  }
-
-
-  @Override
-  public MatchResult matchEmpty(@NotNull CompareType compareType, @NotNull Object value)
-  {
-    return compareType.match(((CollationKey)value).getSourceString().length())
-        ? TYPELESS_EXACT : null;
   }
 
 
@@ -65,5 +58,15 @@ public final class CollationKeyFormatter extends AbstractSingleTypeParameterForm
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(CollationKey.class);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToConfigKey(@NotNull CollationKey value,
+                                                 @NotNull ComparatorContext context)
+  {
+    return context.getKeyType() == EMPTY &&
+           context.getCompareType().match(value.getSourceString().length())
+        ? TYPELESS_EXACT : MISMATCH;
   }
 }
