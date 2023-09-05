@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter.named;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
@@ -23,13 +22,14 @@ import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.ParameterFormatter.DefaultFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.text.Collator;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.OptionalLong;
 import java.util.Set;
@@ -38,15 +38,23 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
 import static java.text.Collator.*;
 import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableSet;
 
 
 /**
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class StringFormatter extends AbstractParameterFormatter<Object>
+public final class StringFormatter
     implements SizeQueryable, NamedParameterFormatter, ConfigKeyComparator<Object>, DefaultFormatter
 {
+  private static final Set<ConfigKey.Type> STRING_KEY_TYPES = unmodifiableSet(EnumSet.of(
+      ConfigKey.Type.EMPTY,
+      ConfigKey.Type.NULL,
+      ConfigKey.Type.STRING
+  ));
+
+
   @Override
   public @NotNull String getName() {
     return "string";
@@ -54,9 +62,16 @@ public final class StringFormatter extends AbstractParameterFormatter<Object>
 
 
   @Override
-  @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value) {
-    return noSpaceText(value instanceof char[] ? new String((char[])value) : String.valueOf(value));
+  public @NotNull Text format(@NotNull FormatterContext context, Object value)
+  {
+    if (value == null)
+      return formatNull(context);
+
+    final String s = value instanceof char[] ? new String((char[])value) : String.valueOf(value);
+
+    return context.getConfigMapMessage(s, STRING_KEY_TYPES)
+        .map(context::format)
+        .orElseGet(() -> noSpaceText(s));
   }
 
 

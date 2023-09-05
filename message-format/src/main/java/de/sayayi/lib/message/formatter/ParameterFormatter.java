@@ -27,6 +27,11 @@ import java.util.Locale;
 import java.util.OptionalLong;
 import java.util.Set;
 
+import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
+import static de.sayayi.lib.message.part.TextPartFactory.nullText;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.EMPTY_NULL_TYPE;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.EMPTY_TYPE;
+
 
 /**
  * A parameter formatter takes care of formatting a parameter value.
@@ -59,6 +64,46 @@ public interface ParameterFormatter
    */
   @Contract(pure = true)
   @NotNull Text format(@NotNull FormatterContext context, Object value);
+
+
+  /**
+   * Format a {@code null} value, optionally using a mapped message from the parameter
+   * configuration using key type {@code null}.
+   *
+   * @param context  message context providing formatting information, never {@code null}
+   *
+   * @return  formatted null text, never {@code null}
+   *
+   * @since 0.8.4
+   */
+  @Contract(pure = true)
+  default @NotNull Text formatNull(@NotNull FormatterContext context)
+  {
+    return context
+        .getConfigMapMessage(null, EMPTY_NULL_TYPE)
+        .map(context::format)
+        .orElse(nullText());
+  }
+
+
+  /**
+   * Format an empty value, optionally using a mapped message from the parameter
+   * configuration using key type {@code empty}.
+   *
+   * @param context  message context providing formatting information, never {@code null}
+   *
+   * @return  formatted empty text, never {@code null}
+   *
+   * @since 0.8.4
+   */
+  @Contract(pure = true)
+  default @NotNull Text formatEmpty(@NotNull FormatterContext context)
+  {
+    return context
+        .getConfigMapMessage("", EMPTY_TYPE)
+        .map(context::format)
+        .orElse(emptyText());
+  }
 
 
   /**

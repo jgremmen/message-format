@@ -31,10 +31,11 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static de.sayayi.lib.message.part.TextPartFactory.*;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.*;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -91,33 +92,13 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
   {
     // null value -> map or return null string
     if (value == null)
-      return format_null(context);
+      return formatNull(context);
 
     // map true/false to mapped value or return its string representation
     // invalid value -> map or return empty string
     return convertValueToBool(value)
         .map(bool -> format_bool(context, bool))
-        .orElseGet(() -> format_empty(context));
-  }
-
-
-  @Contract(pure = true)
-  private @NotNull Text format_null(@NotNull FormatterContext context)
-  {
-    return context
-        .getConfigMapMessage(null, EMPTY_NULL_TYPE)
-        .map(context::format)
-        .orElse(nullText());
-  }
-
-
-  @Contract(pure = true)
-  private @NotNull Text format_empty(@NotNull FormatterContext context)
-  {
-    return context
-        .getConfigMapMessage("", EMPTY_TYPE)
-        .map(context::format)
-        .orElse(emptyText());
+        .orElseGet(() -> formatEmpty(context));
   }
 
 

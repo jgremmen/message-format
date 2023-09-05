@@ -46,12 +46,6 @@ public interface ConfigKey extends Serializable
   /** Map key type {@code string}. */
   Set<Type> STRING_TYPE = unmodifiableSet(EnumSet.of(Type.STRING));
 
-  /** Map key types {@code string} and {@code empty}. */
-  Set<Type> STRING_EMPTY_TYPE = unmodifiableSet(EnumSet.of(Type.STRING, Type.EMPTY));
-
-  /** Map key type {@code bool}. */
-  Set<Type> BOOL_TYPE = unmodifiableSet(EnumSet.of(Type.BOOL));
-
   /** Map key type {@code number}. */
   Set<Type> NUMBER_TYPE = unmodifiableSet(EnumSet.of(Type.NUMBER));
 

@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.OptionalLong;
 
-import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.NUMBER_TYPE;
 
 
@@ -44,6 +43,9 @@ public final class SizeFormatter implements NamedParameterFormatter
   @Contract(pure = true)
   public @NotNull Text format(@NotNull FormatterContext context, Object value)
   {
+    if (value == null)
+      return formatNull(context);
+
     final OptionalLong optionalSize = context.size(value);
 
     if (optionalSize.isPresent())
@@ -55,6 +57,6 @@ public final class SizeFormatter implements NamedParameterFormatter
           .orElseGet(() -> context.format(size, long.class));
     }
     else
-      return emptyText();
+      return formatEmpty(context);
   }
 }
