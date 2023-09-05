@@ -101,10 +101,8 @@ public final class ParameterFormatterContext
   public @NotNull Optional<Message.WithSpaces> getConfigMapMessage(
       Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault)
   {
-    final Set<ConfigKey.Type> types = EnumSet.copyOf(keyTypes);
-    types.remove(ConfigKey.Type.NAME);
-
-    return ofNullable(parameterConfig.getMessage(messageAccessor, key, getLocale(), types, includeDefault));
+    return ofNullable(parameterConfig
+        .getMessage(messageAccessor, key, getLocale(), keyTypes, includeDefault));
   }
 
 

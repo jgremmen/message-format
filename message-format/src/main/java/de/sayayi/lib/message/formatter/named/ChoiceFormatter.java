@@ -35,8 +35,7 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
  */
 public final class ChoiceFormatter implements NamedParameterFormatter
 {
-  private static final Set<ConfigKey.Type> KEY_TYPES =
-      EnumSet.of(NULL, EMPTY, BOOL, NUMBER, STRING);
+  private static final Set<ConfigKey.Type> KEY_TYPES = EnumSet.of(NULL, EMPTY, BOOL, NUMBER, STRING);
 
 
   @Override
