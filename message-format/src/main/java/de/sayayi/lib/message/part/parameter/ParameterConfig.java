@@ -56,11 +56,17 @@ public final class ParameterConfig implements Serializable
 {
   private static final long serialVersionUID = 800L;
 
+  /** map containing the parameter configuration values keyed by configuration name. */
   private final @NotNull Map<String,ConfigValue> config;
 
+  /** Array containing the sorted mapped message keys (null, empty, bool, number and string). */
   private final @NotNull ConfigKey[] mapKeys;
+
+  /** Array containing the mapped message corresponding to the map key at the same index. */
   private final @NotNull ConfigValue[] mapValues;
-  private final ConfigValue mapNullValue;
+
+  /** Default message. */
+  private final ConfigValue defaultValue;
 
 
   /**
@@ -98,7 +104,7 @@ public final class ParameterConfig implements Serializable
       mapValues[n] = map.get(mapKeys[n]);
     }
 
-    this.mapNullValue = mapNullValue;
+    this.defaultValue = mapNullValue;
   }
 
 
@@ -110,7 +116,7 @@ public final class ParameterConfig implements Serializable
    */
   @Contract(pure = true)
   public boolean isEmpty() {
-    return config.isEmpty() && mapValues.length == 0 && mapNullValue == null;
+    return config.isEmpty() && mapValues.length == 0 && defaultValue == null;
   }
 
 
@@ -152,7 +158,7 @@ public final class ParameterConfig implements Serializable
     {
       if (includeDefault &&
           Arrays.stream(mapKeys).anyMatch(mk -> mk != null && keyTypes.contains(mk.getType())))
-        configValue = mapNullValue;
+        configValue = defaultValue;
 
       if (configValue == null)
         return null;
@@ -174,10 +180,6 @@ public final class ParameterConfig implements Serializable
     if (value == null)
       return getMessage_findNull(keyTypes);
 
-    final Set<ConfigKey.Type> allowedTypes = EnumSet.copyOf(keyTypes);
-
-    allowedTypes.remove(NAME);
-
     final ConfigKeyComparatorContext comparatorContext =
         new ConfigKeyComparatorContext(messageAccessor, locale);
     final ParameterFormatter[] formatters = messageAccessor.getFormatters(value.getClass());
@@ -185,7 +187,7 @@ public final class ParameterConfig implements Serializable
     MatchResult bestMatchResult = MISMATCH;
 
     for(int n = 0, l = mapKeys.length; n < l && bestMatchResult != EXACT; n++)
-      if (allowedTypes.contains((comparatorContext.configKey = mapKeys[n]).getType()))
+      if (keyTypes.contains((comparatorContext.configKey = mapKeys[n]).getType()))
       {
         final MatchResult matchResult = findBestMatch(comparatorContext, formatters, value);
 
@@ -293,14 +295,14 @@ public final class ParameterConfig implements Serializable
         config.equals(that.config) &&
         Arrays.equals(mapKeys, that.mapKeys) &&
         Arrays.equals(mapValues, that.mapValues) &&
-        Objects.equals(mapNullValue, that.mapNullValue);
+        Objects.equals(defaultValue, that.defaultValue);
   }
 
 
   @Override
   public int hashCode()
   {
-    return (((config.hashCode() * 59) + Objects.hashCode(mapNullValue)) * 59 +
+    return (((config.hashCode() * 59) + Objects.hashCode(defaultValue)) * 59 +
         Arrays.hashCode(mapKeys)) * 59 + Arrays.hashCode(mapValues);
   }
 
@@ -319,8 +321,8 @@ public final class ParameterConfig implements Serializable
     for(int n = 0; n < mapKeys.length; n++)
       s.add(mapKeys[n].toString() + ':' + mapValues[n]);
 
-    if (mapNullValue != null)
-      s.add(":" + mapNullValue);
+    if (defaultValue != null)
+      s.add(":" + defaultValue);
 
     return s.toString();
   }
@@ -328,7 +330,7 @@ public final class ParameterConfig implements Serializable
 
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.writeSmallVar(config.size() + mapKeys.length + (mapNullValue == null ? 0 : 1));
+    packStream.writeSmallVar(config.size() + mapKeys.length + (defaultValue == null ? 0 : 1));
 
     // config
     for(final Entry<String,ConfigValue> configEntry: config.entrySet())
@@ -344,10 +346,10 @@ public final class ParameterConfig implements Serializable
       PackHelper.pack(mapValues[n], packStream);
     }
 
-    if (mapNullValue != null)
+    if (defaultValue != null)
     {
       PackHelper.pack((ConfigKey)null, packStream);
-      PackHelper.pack(mapNullValue, packStream);
+      PackHelper.pack(defaultValue, packStream);
     }
   }
 
