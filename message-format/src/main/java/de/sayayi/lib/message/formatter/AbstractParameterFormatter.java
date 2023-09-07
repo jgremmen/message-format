@@ -17,17 +17,10 @@ package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.TextPartFactory;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
-
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.*;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.NUMBER;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.STRING;
-import static java.util.Optional.empty;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.EMPTY_NULL_TYPE;
 
 
 /**
@@ -80,39 +73,4 @@ public abstract class AbstractParameterFormatter<T> implements ParameterFormatte
    */
   protected abstract @NotNull Text formatValue(@NotNull FormatterContext context,
                                                @NotNull T value);
-
-
-  @Contract(pure = true)
-  @SuppressWarnings("SameParameterValue")
-  protected @NotNull Optional<Text> formatUsingMappedString(@NotNull FormatterContext context,
-                                                            @NotNull String s,
-                                                            boolean includeDefault)
-  {
-    if (context.hasConfigMapMessage(STRING))
-    {
-      return Optional.of(context
-          .getConfigMapMessage(s, STRING_TYPE, includeDefault)
-          .map(context::format)
-          .orElseGet(TextPartFactory::emptyText));
-    }
-
-    return empty();
-  }
-
-
-  @Contract(pure = true)
-  @SuppressWarnings("SameParameterValue")
-  protected @NotNull Optional<Text> formatUsingMappedNumber(@NotNull FormatterContext context,
-                                                            long n, boolean includeDefault)
-  {
-    if (context.hasConfigMapMessage(NUMBER))
-    {
-      return Optional.of(context
-          .getConfigMapMessage(n, NUMBER_TYPE, includeDefault)
-          .map(context::format)
-          .orElseGet(TextPartFactory::emptyText));
-    }
-
-    return empty();
-  }
 }

@@ -16,21 +16,24 @@
 package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.TextPartFactory;
 import de.sayayi.lib.message.part.parameter.ParameterConfigAccessor;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.EMPTY_NULL_TYPE;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.EMPTY_TYPE;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.*;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.NUMBER;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.STRING;
+import static java.util.Optional.empty;
 
 
 /**
@@ -103,6 +106,78 @@ public interface ParameterFormatter
         .getConfigMapMessage("", EMPTY_TYPE)
         .map(context::format)
         .orElse(emptyText());
+  }
+
+
+  /**
+   * Lookup a message in the parameter configuration map with the given number key {@code n}.
+   * <p>
+   * If the key is matched, the mapped message will be formatted with the formatter {@code context}.
+   * If the key is not found an empty message is returned unless {@code includeDefault} is set
+   * to {@code true} and the map contains a default mapped message.
+   * <p>
+   * The default mapped message will be used only if {@code includeDefault} is set to {@code true}
+   * and at least 1 key of type number is present in the parameter configuration map.
+   *
+   * @param context         formatter context instance, not {@code null}
+   * @param n               number key, not {@code null}
+   * @param includeDefault  {@code true} use the default message if no mapping was found for the
+   *                                     given number key {@code n},
+   *                        {@code false} use only the mapped messages with keys of type number
+   *
+   * @return  formatted text for the given search key {@code n}, never {@code null}
+   *
+   * @since 0.8.4 (moved up from AbstractParameterFormatter)
+   */
+  @Contract(pure = true)
+  default @NotNull Optional<Text> formatUsingMappedNumber(@NotNull FormatterContext context,
+                                                          long n, boolean includeDefault)
+  {
+    if (context.hasConfigMapMessage(NUMBER))
+    {
+      return Optional.of(context
+          .getConfigMapMessage(n, NUMBER_TYPE, includeDefault)
+          .map(context::format)
+          .orElseGet(TextPartFactory::emptyText));
+    }
+
+    return empty();
+  }
+
+
+  /**
+   * Lookup a message in the parameter configuration map with the given string key {@code s}.
+   * <p>
+   * If the key is matched, the mapped message will be formatted with the formatter {@code context}.
+   * If the key is not found an empty message is returned unless {@code includeDefault} is set
+   * to {@code true} and the map contains a default mapped message.
+   * <p>
+   * The default mapped message will be used only if {@code includeDefault} is set to {@code true}
+   * and at least 1 key of type string is present in the parameter configuration map.
+   *
+   * @param context         formatter context instance, not {@code null}
+   * @param s               string key, not {@code null}
+   * @param includeDefault  {@code true} use the default message if no mapping was found for the
+   *                                     given string key {@code s},
+   *                        {@code false} use only the mapped messages with keys of type string
+   *
+   * @return  formatted text for the given search key {@code s}, never {@code null}
+   *
+   * @since 0.8.4 (moved up from AbstractParameterFormatter)
+   */
+  @Contract(pure = true)
+  default @NotNull Optional<Text> formatUsingMappedString(@NotNull FormatterContext context,
+                                                          @NotNull String s, boolean includeDefault)
+  {
+    if (context.hasConfigMapMessage(STRING))
+    {
+      return Optional.of(context
+          .getConfigMapMessage(s, STRING_TYPE, includeDefault)
+          .map(context::format)
+          .orElseGet(TextPartFactory::emptyText));
+    }
+
+    return empty();
   }
 
 
