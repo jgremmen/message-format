@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
+import static java.lang.Math.max;
 
 
 /**
@@ -50,7 +51,7 @@ public final class ClipFormatter extends AbstractParameterFormatter<Object>
     s = s.trim();
 
     final int maxSize =
-        (int)Math.max(context.getConfigValueNumber("clip-size").orElse(64), 8);
+        (int)max(context.getConfigValueNumber("clip-size").orElse(64), 8);
 
     return s.length() <= maxSize ? text : noSpaceText(s.substring(0, maxSize - 3).trim() + "...");
   }
