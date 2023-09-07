@@ -54,7 +54,7 @@ import static java.util.Collections.unmodifiableSet;
  */
 public final class ParameterConfig implements Serializable
 {
-  private static final long serialVersionUID = 800L;
+  private static final long serialVersionUID = 804L;
 
   /** map containing the parameter configuration values keyed by configuration name. */
   private final @NotNull Map<String,ConfigValue> config;
@@ -67,6 +67,9 @@ public final class ParameterConfig implements Serializable
 
   /** Default message. */
   private final ConfigValue defaultValue;
+
+  /** Bitmask for {@link ConfigKey.Type} stating which keys map to a message. */
+  private final byte hasKeyType;
 
 
   /**
@@ -81,13 +84,19 @@ public final class ParameterConfig implements Serializable
     final List<OrderedConfigKey> mapKeyList = new ArrayList<>();
     ConfigValue mapNullValue = null;
     ConfigKey key;
+    int keyTypeMask = 0;
 
     for(final Entry<ConfigKey,ConfigValue> entry: map.entrySet())
     {
+      ConfigKey.Type keyType;
+
       if ((key = entry.getKey()) == null)
         mapNullValue = entry.getValue();
-      else if (key.getType() != NAME)
+      else if ((keyType = key.getType()) != NAME)
+      {
         mapKeyList.add(new OrderedConfigKey(mapKeyList.size(), key));
+        keyTypeMask |= 1 << keyType.ordinal();
+      }
       else
         config.put(((ConfigKeyName)key).getName(), entry.getValue());
     }
@@ -105,6 +114,7 @@ public final class ParameterConfig implements Serializable
     }
 
     this.defaultValue = mapNullValue;
+    this.hasKeyType = (byte)keyTypeMask;
   }
 
 
@@ -121,22 +131,17 @@ public final class ParameterConfig implements Serializable
 
 
   /**
-   * Tells whether the parameter configuration map contains an entry with the given {@code keyType}.
+   * Tells whether the parameter configuration map contains a message entry with the given
+   * {@code keyType}.
    *
    * @param keyType  entry key type to look for, not {@code null}
    *
-   * @return  {@code true} if the map contains an entry with the given key type,
+   * @return  {@code true} if the map contains a message with the given key type,
    *          {@code false} otherwise
    */
   @Contract(pure = true)
-  public boolean hasMessageWithKeyType(@NotNull ConfigKey.Type keyType)
-  {
-    if (keyType != NAME)
-      for(final ConfigKey key: mapKeys)
-        if (key.getType() == keyType)
-          return true;
-
-    return false;
+  public boolean hasMessageWithKeyType(@NotNull ConfigKey.Type keyType) {
+    return (hasKeyType & (1 << keyType.ordinal())) != 0;
   }
 
 
@@ -292,6 +297,7 @@ public final class ParameterConfig implements Serializable
     final ParameterConfig that = (ParameterConfig)o;
 
     return
+        hasKeyType == that.hasKeyType &&
         config.equals(that.config) &&
         Arrays.equals(mapKeys, that.mapKeys) &&
         Arrays.equals(mapValues, that.mapValues) &&
