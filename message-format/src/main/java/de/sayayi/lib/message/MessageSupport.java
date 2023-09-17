@@ -907,6 +907,7 @@ public interface MessageSupport
    * @author Jeroen Gremmen
    * @since 0.8.0
    */
+  @FunctionalInterface
   interface MessageFilter
   {
     /**
@@ -929,6 +930,7 @@ public interface MessageSupport
    * @author Jeroen Gremmen
    * @since 0.8.0
    */
+  @FunctionalInterface
   interface TemplateFilter
   {
     /**
@@ -954,6 +956,7 @@ public interface MessageSupport
    * @author Jeroen Gremmen
    * @since 0.8.0
    */
+  @FunctionalInterface
   interface ExceptionConstructor<X extends Exception>
   {
     /**
@@ -978,6 +981,7 @@ public interface MessageSupport
    * @author Jeroen Gremmen
    * @since 0.8.3
    */
+  @FunctionalInterface
   interface ExceptionConstructorWithCause<X extends Exception>
   {
     /**
