@@ -23,6 +23,7 @@ import de.sayayi.lib.message.adopter.AsmAnnotationAdopter;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
+import groovy.lang.GString;
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
@@ -57,8 +58,8 @@ import static org.gradle.api.logging.LogLevel.WARN;
 
 
 /**
- * Gradle task for scanning classes and packing them into a single file which can be imported
- * into a {@link MessageSupport.ConfigurableMessageSupport}.
+ * Gradle task for scanning messages in classes and packing them into a single file which can be
+ * imported into a {@link MessageSupport.ConfigurableMessageSupport}.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -340,6 +341,9 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
     if (value instanceof DuplicateMsgStrategy)
       return (DuplicateMsgStrategy)value;
+
+    if (value instanceof GString)
+      value = ((GString)value).toString();
 
     if (value instanceof String)
     {
