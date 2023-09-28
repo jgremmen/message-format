@@ -58,7 +58,8 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
   ));
 
   private static final Text[] BOOL_TEXT = new Text[] {
-      noSpaceText("false"), noSpaceText("true")
+      noSpaceText("false"),
+      noSpaceText("true")
   };
 
 

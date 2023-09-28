@@ -21,13 +21,13 @@ plugins {
 
 
 description = 'Message Format Gradle Plugin'
-//version = '0.8.1'
+
 
 def asmVersion = "[6.0,)"
 
 
 dependencies {
-  gradleApi()
+  api gradleApi()
 
   implementation project(":message-format")
   implementation "org.ow2.asm:asm:${asmVersion}"

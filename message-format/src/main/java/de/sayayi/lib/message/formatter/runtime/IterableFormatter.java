@@ -95,7 +95,7 @@ public final class IterableFormatter extends AbstractSingleTypeParameterFormatte
 
     long size = 0;
 
-    for(@SuppressWarnings("UnusedAssignment") Object ignored: (Iterable<?>)value)
+    for(Object ignored: (Iterable<?>)value)
       size++;
 
     return OptionalLong.of(size);

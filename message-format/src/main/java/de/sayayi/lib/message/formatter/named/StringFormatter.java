@@ -98,7 +98,8 @@ public final class StringFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull Object value, @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToConfigKey(@NotNull Object value,
+                                                 @NotNull ComparatorContext context)
   {
     final String s = value instanceof char[] ? new String((char[]) value) : String.valueOf(value);
 
