@@ -54,7 +54,7 @@ public final class PackOutputStream implements Closeable
   public void writeBoolean(boolean value) throws IOException
   {
     if (value)
-      b |= 1 << bit;
+      b |= (byte)(1 << bit);
 
     if (bit-- == 0)
     {
@@ -190,7 +190,7 @@ public final class PackOutputStream implements Closeable
 
     if (bitsRemaining > 0)
     {
-      b |= (value & ((1 << bitWidth) - 1)) << bitsRemaining;
+      b |= (byte)((value & ((1 << bitWidth) - 1)) << bitsRemaining);
       bit -= bitWidth;
     }
     else if (bitsRemaining == 0)
@@ -220,7 +220,7 @@ public final class PackOutputStream implements Closeable
     {
       final int bitsLeft = bit + 1 - bitWidth;
 
-      b |= (byte)(value >>> -bitsLeft) & ((1 << (bit + 1)) - 1);
+      b |= (byte)((byte)(value >>> -bitsLeft) & ((1 << (bit + 1)) - 1));
       stream.write(b);
 
       bitWidth -= bit + 1;
