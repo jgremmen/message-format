@@ -68,12 +68,24 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object>
   }
 
 
+  /**
+   * Create a new SpEL formatter with the given conversion service and resource loader.
+   *
+   * @param conversionService  type conversion service, not {@code null}
+   * @param resourceLoader     resource loader (usually the application context), not {@code null}
+   */
   public SpELFormatter(@NotNull ConversionService conversionService,
                        @NotNull ResourceLoader resourceLoader) {
     this(conversionService, requireNonNull(resourceLoader.getClassLoader()));
   }
 
 
+  /**
+   * Create a new SpEL formatter with the given conversion service and class loader.
+   *
+   * @param conversionService  type conversion service, not {@code null}
+   * @param classLoader        class loader, not {@code null}
+   */
   public SpELFormatter(@NotNull ConversionService conversionService,
                        @NotNull ClassLoader classLoader)
   {
