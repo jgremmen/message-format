@@ -22,6 +22,7 @@ import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import org.junit.jupiter.api.Test;
 
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -33,7 +34,7 @@ public class MessageFactoryTest
   @Test
   public void testParseString()
   {
-    Message.WithSpaces msg = MessageFactory.NO_CACHE_INSTANCE.parseMessage("this is %{test}");
+    Message.WithSpaces msg = NO_CACHE_INSTANCE.parseMessage("this is %{test}");
     assertTrue(msg instanceof CompoundMessage);
   }
 
@@ -41,13 +42,11 @@ public class MessageFactoryTest
   @Test
   public void testWithCode()
   {
-    WithCode msgWithCode1 =
-        MessageFactory.NO_CACHE_INSTANCE.withCode("ABC", EmptyMessage.INSTANCE);
+    WithCode msgWithCode1 = NO_CACHE_INSTANCE.withCode("ABC", EmptyMessage.INSTANCE);
     assertEquals("ABC", msgWithCode1.getCode());
     assertTrue(msgWithCode1 instanceof EmptyMessageWithCode);
 
-    WithCode msgWithCode2 =
-        MessageFactory.NO_CACHE_INSTANCE.withCode("ABC", new EmptyMessageWithCode("DEF"));
+    WithCode msgWithCode2 = NO_CACHE_INSTANCE.withCode("ABC", new EmptyMessageWithCode("DEF"));
     assertEquals("ABC", msgWithCode2.getCode());
     assertTrue(msgWithCode2 instanceof EmptyMessageWithCode);
   }
@@ -56,7 +55,12 @@ public class MessageFactoryTest
   @Test
   public void testSyntaxError()
   {
+    // lexer error
     assertThrows(MessageParserException.class,
-        () -> MessageFactory.NO_CACHE_INSTANCE.parseMessage("%{x,{true false:1}"));
+        () -> NO_CACHE_INSTANCE.parseMessage("%{x,{true false:1}"));
+
+    // parser error
+    assertThrows(MessageParserException.class,
+        () -> NO_CACHE_INSTANCE.parseMessage("%{x,true false:1}"));
   }
 }
