@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.exception;
 
-import org.antlr.v4.runtime.RecognitionException;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -24,13 +25,43 @@ import org.antlr.v4.runtime.RecognitionException;
  */
 public class MessageParserException extends MessageException
 {
-  public MessageParserException(String message, RecognitionException cause) {
-    super(message, cause);
+  private final String errorMessage;
+  private final String syntaxError;
+
+
+  public MessageParserException(@NotNull String errorMessage, @NotNull String syntaxError,
+                                Exception cause)
+  {
+    super(errorMessage + '\n' + syntaxError, cause);
+
+    this.errorMessage = errorMessage;
+    this.syntaxError = syntaxError;
   }
 
 
-  @Override
-  public synchronized RecognitionException getCause() {
-    return (RecognitionException)super.getCause();
+  /**
+   * Returns the error message describing what went wrong during parsing.
+   *
+   * @return  error message, never {@code null}
+   *
+   * @since 0.8.4
+   */
+  @Contract(pure = true)
+  public @NotNull String getErrorMessage() {
+    return errorMessage;
+  }
+
+
+  /**
+   * Returns a visual representation of the location where the syntax error occurred during
+   * parsing.
+   *
+   * @return  syntax error, never {@code null}
+   *
+   * @since 0.8.4
+   */
+  @Contract(pure = true)
+  public @NotNull String getSyntaxError() {
+    return syntaxError;
   }
 }

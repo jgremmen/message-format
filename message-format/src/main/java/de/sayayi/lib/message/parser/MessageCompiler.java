@@ -142,10 +142,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   @Override
-  protected @NotNull MessageParserException createException(
+  protected @NotNull RuntimeException createException(
       @NotNull Token startToken, @NotNull Token stopToken, @NotNull String formattedMessage,
-      @NotNull String errorMsg, RecognitionException ex) {
-    return new MessageParserException(formattedMessage, ex);
+      @NotNull String errorMsg, Exception cause) {
+    return new MessageParserException(errorMsg, formattedMessage, cause);
   }
 
 
@@ -598,7 +598,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     private ErrorFormatter() {
-      super(1, 0, 0);
+      super(1, 0, 0, 2);
     }
   }
 
