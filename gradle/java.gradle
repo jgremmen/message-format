@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-apply plugin: "java-library"
-apply plugin: "jacoco"
+apply plugin: 'java-library'
+apply plugin: 'jacoco'
 
 
 dependencies {
@@ -32,6 +32,13 @@ dependencies {
 
 
 repositories {
+  maven {
+    url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    mavenContent {
+      snapshotsOnly()
+    }
+  }
+
   mavenCentral()
 }
 
@@ -57,19 +64,19 @@ tasks.withType(Jar).configureEach {
 
   manifest {
     attributes(
-        "Implementation-Vendor": "Jeroen Gremmen",
-        "Implementation-Vendor-Id": "de.sayayi",
-        "Implementation-Title": project.name,
-        "Implementation-Version": project.version,
-        "Created-By": "${System.getProperty("java.version")}",
-        "Built-Date": new Date().format('yyyy-MM-dd HH:mm:ss')
+        'Implementation-Vendor': 'Jeroen Gremmen',
+        'Implementation-Vendor-Id': 'de.sayayi',
+        'Implementation-Title': project.name,
+        'Implementation-Version': project.version,
+        'Created-By': System.getProperty('java.version'),
+        'Built-Date': new Date().format('yyyy-MM-dd HH:mm:ss')
     )
   }
 
   from(rootDir) {
-    include "LICENSE"
-    into "META-INF"
-    expand(copyright: new Date().format("yyyy"), version: project.version)
+    include 'LICENSE'
+    into 'META-INF'
+    expand(copyright: new Date().format('yyyy'), version: project.version)
   }
 }
 
