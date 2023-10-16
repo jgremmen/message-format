@@ -26,15 +26,15 @@ plugins {
 description = 'Message Format Library'
 
 
-def antlrVersion = "4.9.3"
-def antlrExtVersion = "0.3.1"
-def asmVersion = "[6.0,)"
-def ehcacheVersion = "3.10.+"
-def javaxCacheApiVersion = "1.1.1"
+def antlrVersion = '4.9.3'
+def antlrExtVersion = '0.4.1-SNAPSHOT'
+def asmVersion = '[6.0,)'
+def ehcacheVersion = '3.10.+'
+def javaxCacheApiVersion = '1.1.1'
 
 
 configurations.configureEach {
-  resolutionStrategy.cacheDynamicVersionsFor 30, 'minutes'
+  resolutionStrategy.cacheDynamicVersionsFor 15, 'minutes'
 }
 
 
@@ -52,12 +52,13 @@ dependencies {
 
   implementation("de.sayayi.lib:antlr4-runtime-ext") {
     version {
-      strictly '[0.3,0.4)'
+      if (!antlrExtVersion.endsWith('-SNAPSHOT'))
+        strictly '[0.4,0.5)'
+
       prefer antlrExtVersion
     }
 
-    exclude group: 'org.antlr', module: 'antlr4'
-    exclude group: 'org.jetbrains'
+    transitive = false
   }
 
   optionalImplementation "javax.cache:cache-api:${javaxCacheApiVersion}"
@@ -65,7 +66,7 @@ dependencies {
 
   // test
   testImplementation("org.ehcache:ehcache:${ehcacheVersion}") {
-    exclude module: "jaxb-runtime"
+    exclude module: 'jaxb-runtime'
   }
 
   antlr "org.antlr:antlr4:${antlrVersion}"
@@ -74,7 +75,7 @@ dependencies {
 
 def grammarOutputDirectory = layout.buildDirectory
     .getLocationOnly().get()
-    .dir("generated-src/antlr/main/de/sayayi/lib/message/parser")
+    .dir('generated-src/antlr/main/de/sayayi/lib/message/parser')
     .asFile
 
 generateGrammarSource {
@@ -166,7 +167,7 @@ signing {
 clean.doLast {
   println "cleanup: ${projectDir}"
   fileTree("${projectDir}/src/main").matching {
-    include "antlr/*.tokens"
+    include 'antlr/*.tokens'
   }.files.forEach({ it.delete() })
 
   file("${projectDir}/src/main/antlr/gen").deleteDir()
@@ -176,6 +177,6 @@ clean.doLast {
 
 idea {
   module {
-    resourceDirs += file("src/main/antlr")
+    resourceDirs += file('src/main/antlr')
   }
 }
