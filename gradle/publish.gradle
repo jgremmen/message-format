@@ -18,9 +18,11 @@ apply plugin: "maven-publish"
 apply plugin: "signing"
 
 
+def snapshot = version.toString().endsWith('-SNAPSHOT')
 def tmpRepositoryDirectory = rootProject.layout.buildDirectory
     .getLocationOnly().get()
     .dir("repository")
+    .dir(snapshot ? 'snapshot' : 'release')
     .asFile
 
 publishing {
@@ -32,7 +34,10 @@ publishing {
 
     maven {
       name = "mavenCentral"
-      url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+      url = snapshot
+          ? 'https://oss.sonatype.org/content/repositories/snapshots'
+          : 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+
       credentials {
         username = rootProject.findProperty('mavenCentral.username')
         password = rootProject.findProperty('mavenCentral.password')
