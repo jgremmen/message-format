@@ -28,6 +28,18 @@ allprojects {
   ext.jetbrainsAnnotationsVersion = "24.0.1"
   ext.junitVersion = "5.9.+"
   ext.lombokVersion = "1.18.+"
+
+  repositories {
+    maven {
+      url 'https://oss.sonatype.org/content/repositories/snapshots/'
+      mavenContent {
+        includeGroup 'de.sayayi.lib'
+        snapshotsOnly()
+      }
+    }
+
+    mavenCentral()
+  }
 }
 
 

@@ -31,19 +31,6 @@ dependencies {
 }
 
 
-repositories {
-  maven {
-    url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    mavenContent {
-      includeGroup 'de.sayayi.lib'
-      snapshotsOnly()
-    }
-  }
-
-  mavenCentral()
-}
-
-
 java {
   withJavadocJar()
   withSourcesJar()
