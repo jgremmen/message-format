@@ -33,8 +33,16 @@ def ehcacheVersion = '3.10.+'
 def javaxCacheApiVersion = '1.1.1'
 
 
-configurations.configureEach {
-  resolutionStrategy.cacheDynamicVersionsFor 15, 'minutes'
+configurations {
+  antlr4 {
+    visible = false;
+  }
+
+  api.setExtendsFrom([])
+
+  configureEach {
+    resolutionStrategy.cacheDynamicVersionsFor 15, 'minutes'
+  }
 }
 
 
@@ -58,7 +66,7 @@ dependencies {
       prefer antlrExtVersion
     }
 
-    transitive = false
+    exclude group:'org.jetbrains'
   }
 
   optionalImplementation "javax.cache:cache-api:${javaxCacheApiVersion}"
@@ -69,7 +77,7 @@ dependencies {
     exclude module: 'jaxb-runtime'
   }
 
-  antlr "org.antlr:antlr4:${antlrVersion}"
+  antlr4 "org.antlr:antlr4:${antlrVersion}"
 }
 
 
@@ -79,7 +87,9 @@ def grammarOutputDirectory = layout.buildDirectory
     .asFile
 
 generateGrammarSource {
+  antlrClasspath = configurations.antlr4
   outputDirectory = grammarOutputDirectory
+
   arguments += [ '-package', 'de.sayayi.lib.message.parser' ]
 }
 
@@ -165,7 +175,6 @@ signing {
 
 
 clean.doLast {
-  println "cleanup: ${projectDir}"
   fileTree("${projectDir}/src/main").matching {
     include 'antlr/*.tokens'
   }.files.forEach({ it.delete() })
