@@ -27,7 +27,7 @@ description = 'Message Format Library'
 
 
 def antlrVersion = '4.9.3'
-def antlrExtVersion = '0.4.1-SNAPSHOT'
+def antlrExtVersion = '0.4.1'
 def asmVersion = '[6.0,)'
 def ehcacheVersion = '3.10.+'
 def javaxCacheApiVersion = '1.1.1'
@@ -61,7 +61,7 @@ dependencies {
   implementation("de.sayayi.lib:antlr4-runtime-ext") {
     version {
       if (!antlrExtVersion.endsWith('-SNAPSHOT'))
-        strictly '[0.4,0.5)'
+        strictly '[0.4.1,0.5)'
 
       prefer antlrExtVersion
     }
