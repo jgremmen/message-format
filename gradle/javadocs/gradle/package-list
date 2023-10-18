@@ -1,0 +1,7 @@
+org.gradle.api
+org.gradle.api.file
+org.gradle.api.internal
+org.gradle.api.plugins
+org.gradle.api.provider
+org.gradle.api.tasks
+org.gradle.util
