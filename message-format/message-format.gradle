@@ -19,7 +19,7 @@
 plugins {
   id 'antlr'
   id 'idea'
-  id 'de.sayayi.plugin.gradle.libapi' version "1.0-SNAPSHOT"
+  id 'de.sayayi.plugin.gradle.libapi' version '1.0-SNAPSHOT'
 }
 
 
@@ -27,7 +27,7 @@ description = 'Message Format Library'
 
 
 def antlrVersion = '4.9.3'
-def antlrExtVersion = '0.4.1'
+def antlrExtVersion = '[0.4.1,)'
 def asmVersion = '[6.0,)'
 def ehcacheVersion = '3.10.+'
 def javaxCacheApiVersion = '1.1.1'
@@ -58,15 +58,8 @@ dependencies {
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
   compileOnly "org.projectlombok:lombok:${lombokVersion}"
 
-  implementation("de.sayayi.lib:antlr4-runtime-ext") {
-    version {
-      if (!antlrExtVersion.endsWith('-SNAPSHOT'))
-        strictly '[0.4.1,0.5)'
-
-      prefer antlrExtVersion
-    }
-
-    exclude group:'org.jetbrains'
+  implementation("de.sayayi.lib:antlr4-runtime-ext:${antlrExtVersion}") {
+    exclude group: 'org.jetbrains'
   }
 
   optionalImplementation "javax.cache:cache-api:${javaxCacheApiVersion}"
@@ -82,9 +75,7 @@ dependencies {
 
 
 def grammarOutputDirectory = layout.buildDirectory
-    .getLocationOnly().get()
-    .dir('generated-src/antlr/main/de/sayayi/lib/message/parser')
-    .asFile
+    .dir('generated-src/antlr/main/de/sayayi/lib/message/parser').get().asFile
 
 generateGrammarSource {
   antlrClasspath = configurations.antlr4
@@ -100,24 +91,37 @@ compileJava.dependsOn generateGrammarSource
 sourcesJar {
   dependsOn generateGrammarSource
 
-  exclude "gen/*"
-  exclude "**/*.interp"
+  exclude 'gen/*'
+  exclude '**/*.interp'
 }
 
 
 jar {
   manifest {
-    attributes['Implementation-Title'] = "${project.description}"
+    attributes['Implementation-Title'] = project.description
   }
 }
 
 
+def resolvedAntlrExtVersion = configurations
+    .getByName('compileClasspath')
+    .resolvedConfiguration
+    .resolvedArtifacts
+    .find { it.name == 'antlr4-runtime-ext' }
+    .moduleVersion.id.version
+
+
 javadoc {
   (options as StandardJavadocDocletOptions).with {
-    linksOffline "https://javadoc.io/doc/org.antlr/antlr4-runtime/${antlrVersion}/",
-        "${rootDir}/gradle/javadocs/antlr4-runtime"
-    linksOffline "https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/${antlrExtVersion}/",
-        "${rootDir}/gradle/javadocs/antlr4-runtime-ext"
+    linksOffline(
+        "https://javadoc.io/doc/org.antlr/antlr4-runtime/${antlrVersion}/",
+        "${rootDir}/gradle/javadocs/antlr4-runtime")
+    linksOffline(
+        "https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/${resolvedAntlrExtVersion}/",
+        "${rootDir}/gradle/javadocs/antlr4-runtime-ext")
+    linksOffline(
+        "https://javadoc.io/doc/javax.cache/cache-api/${javaxCacheApiVersion}/",
+        "${rootDir}/gradle/javadocs/javax-cache")
   }
 
   exclude '**/parser/MessageLexer.java'
