@@ -15,14 +15,14 @@
  */
 
 plugins {
-  id 'de.sayayi.plugin.gradle.libapi' version "1.0-SNAPSHOT"
+  id 'de.sayayi.plugin.gradle.libapi' version '1.0-SNAPSHOT'
 }
 
 
 description = 'Message Format Library (joda time formatters)'
 
 
-def jodatimeVersion = "[2.12.0,)"
+def jodatimeVersion = '[2.12.0,)'
 
 
 dependencies {
@@ -33,12 +33,22 @@ dependencies {
 }
 
 
+def resolvedJodaTimeVersion = configurations
+    .compileClasspath
+    .resolvedConfiguration
+    .resolvedArtifacts
+    .find { it.name == 'joda-time' }
+    .moduleVersion.id.version
+
+
 javadoc {
   (options as StandardJavadocDocletOptions).with {
-    linksOffline "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
-        "${rootDir}/gradle/javadocs/message-format"
-    linksOffline "https://javadoc.io/doc/joda-time/joda-time/${jodatimeVersion}/",
-        "${rootDir}/gradle/javadocs/joda-time"
+    linksOffline(
+        "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
+        "${rootDir}/gradle/javadocs/message-format")
+    linksOffline(
+        "https://javadoc.io/doc/joda-time/joda-time/${resolvedJodaTimeVersion}/",
+        "${rootDir}/gradle/javadocs/joda-time")
   }
 }
 
@@ -50,7 +60,7 @@ publishing {
       from components.java
 
       pom {
-        name = "${project.description}"
+        name = project.description
         description = 'Highly configurable message format library supporting message definition through annotations'
         url = 'https://github.com/jgremmen/message-format'
         inceptionYear = '2020'
