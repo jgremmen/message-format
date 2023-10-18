@@ -183,7 +183,10 @@ public final class TemplatePart implements Template
    * @param packStream  data output pack target
    *
    * @throws IOException  if an I/O error occurs
+   *
+   * @hidden
    */
+  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeBoolean(spaceBefore);
@@ -206,7 +209,10 @@ public final class TemplatePart implements Template
    * @return  unpacked template part, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
+   *
+   * @hidden
    */
+  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull Template unpack(@NotNull PackHelper unpack,
                                          @NotNull PackInputStream packStream) throws IOException
   {

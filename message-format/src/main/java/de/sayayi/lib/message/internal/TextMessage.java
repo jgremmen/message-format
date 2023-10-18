@@ -165,7 +165,10 @@ public final class TextMessage implements Message.WithSpaces
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
+   *
+   * @hidden
    */
+  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeBoolean(spaceBefore);
@@ -182,7 +185,10 @@ public final class TextMessage implements Message.WithSpaces
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
+   *
+   * @hidden
    */
+  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull Message.WithSpaces unpack(@NotNull PackInputStream packStream)
       throws IOException
   {

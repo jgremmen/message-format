@@ -94,7 +94,10 @@ public enum ConfigValueBool implements ConfigValue
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
+   *
+   * @hidden
    */
+  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeBoolean(bool);
   }
@@ -108,7 +111,10 @@ public enum ConfigValueBool implements ConfigValue
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
+   *
+   * @hidden
    */
+  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull ConfigValueBool unpack(@NotNull PackInputStream packStream)
       throws IOException {
     return packStream.readBoolean() ? TRUE : FALSE;

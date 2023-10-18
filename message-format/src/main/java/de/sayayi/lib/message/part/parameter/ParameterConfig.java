@@ -334,6 +334,10 @@ public final class ParameterConfig implements Serializable
   }
 
 
+  /**
+   * @hidden
+   */
+  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeSmallVar(config.size() + mapKeys.length + (defaultValue == null ? 0 : 1));
@@ -360,6 +364,10 @@ public final class ParameterConfig implements Serializable
   }
 
 
+  /**
+   * @hidden
+   */
+  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull ParameterConfig unpack(@NotNull PackHelper unpack,
                                                 @NotNull PackInputStream packStream) throws IOException
   {

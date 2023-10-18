@@ -100,7 +100,10 @@ public final class ConfigKeyEmpty implements ConfigKey
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
+   *
+   * @hidden
    */
+  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeEnum(compareType);
   }
@@ -114,7 +117,10 @@ public final class ConfigKeyEmpty implements ConfigKey
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
+   *
+   * @hidden
    */
+  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull ConfigKeyEmpty unpack(@NotNull PackInputStream packStream)
       throws IOException {
     return new ConfigKeyEmpty(packStream.readEnum(CompareType.class));

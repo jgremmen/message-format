@@ -204,7 +204,10 @@ public final class ParameterPart implements Parameter
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
+   *
+   * @hidden
    */
+  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeBoolean(spaceBefore);
@@ -225,7 +228,10 @@ public final class ParameterPart implements Parameter
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
+   *
+   * @hidden
    */
+  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull ParameterPart unpack(@NotNull PackHelper unpack,
                                               @NotNull PackInputStream packStream)
       throws IOException

@@ -211,7 +211,10 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
+   *
+   * @hidden
    */
+  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeSmallVar(localizedMessages.size());
@@ -234,7 +237,10 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
+   *
+   * @hidden
    */
+  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull Message.WithCode unpack(@NotNull PackHelper unpack,
                                                  @NotNull PackInputStream packStream)
       throws IOException
