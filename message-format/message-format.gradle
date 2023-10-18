@@ -104,7 +104,7 @@ jar {
 
 
 def resolvedAntlrExtVersion = configurations
-    .getByName('compileClasspath')
+    .compileClasspath
     .resolvedConfiguration
     .resolvedArtifacts
     .find { it.name == 'antlr4-runtime-ext' }
