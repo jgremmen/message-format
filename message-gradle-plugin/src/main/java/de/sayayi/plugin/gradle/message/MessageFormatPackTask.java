@@ -105,26 +105,94 @@ public abstract class MessageFormatPackTask extends DefaultTask
   public abstract Property<String> getPackFilename();
 
 
+  /**
+   * Return a list of regulare expressions which will be matched against each message code.
+   * If it matches, the message will be included in the packed message file. If it doesn't match
+   * the message is skipped.
+   * <p>
+   * If the list is empty, all messages are included, unless they're explicitly excluded.
+   *
+   * @return  list of regular expression for message inclusion, never {@code null}
+   *
+   * @see #getExcludeRegexFilters()
+   */
   @Input
   public List<String> getIncludeRegexFilters() {
     return unmodifiableList(includeRegexFilters);
   }
 
 
+  /**
+   * Return a list of regulare expressions which will be matched against each message code.
+   * If it matches, the message will be excluded from the packed message file. If it doesn't match
+   * the message is included.
+   *
+   * @return  list of regular expression for message exclusion, never {@code null}
+   *
+   * @see #getIncludeRegexFilters()
+   */
   @Input
   public List<String> getExcludeRegexFilters() {
     return unmodifiableList(excludeRegexFilters);
   }
 
 
+  /**
+   * Returns a collection of source files to scan for message and template annotations.
+   * <p>
+   * There's no restriction on what kind of files are in the collection. This task will only
+   * use and scan class ({@code *.class}) files.
+   *
+   * @return  collection of source files to scan for messages and templates, never {@code null}
+   *
+   * @see #sourceSet(SourceSet)
+   */
   @InputFiles
   public abstract ConfigurableFileCollection getSources();
 
 
+  /**
+   * Property containing the strategy to use in case a duplicate message code or template name
+   * (with different message definition) is found. The default strategy is
+   * {@link DuplicateMsgStrategy#IGNORE_AND_WARN IGNORE_AND_WARN}.
+   * <p>
+   * This property accepts various formats:
+   * <ul>
+   *   <li>
+   *     {@link DuplicateMsgStrategy} enum value (eg. {@link DuplicateMsgStrategy#FAIL FAIL})
+   *   </li>
+   *   <li>
+   *     Strategy string. The string is converted to uppercase, dashes are translated to
+   *     underscores and the resulting strategy name is matched against
+   *     {@link DuplicateMsgStrategy} (eg. {@code 'override-and-warn'} matches
+   *     {@link DuplicateMsgStrategy#OVERRIDE_AND_WARN OVERRIDE_AND_WARN})
+   *   </li>
+   * </ul>
+   * A duplicate is either a message with an already known message code or a template with
+   * an already known template name and a different message definition. This means that if the
+   * same message or template is encountered twice, it is not considered a duplicate.
+   *
+   * @return  duplicate message strategy property, never {@code null}
+   *
+   * @see DuplicateMsgStrategy
+   */
   @Input
   public abstract Property<Object> getDuplicateMsgStrategy();
 
 
+  /**
+   * Property containing a boolean stating whether or not to validate referenced templates. The
+   * default value resolves to {@code true}.
+   * <p>
+   * If the property resolves to {@code true} the task will check whether all referenced
+   * templates (including nested tempates) are available and included in the packed message file.
+   * <p>
+   * If the property resolves to {@code false} no checks are performed. This may lead to a
+   * situation where a message cannot be formatted if the referenced template is missing from
+   * the message support.
+   *
+   * @return  validate referenced templates property, never {@code null}
+   */
   @Input
   public abstract Property<Boolean> getValidateReferencedTemplates();
 
@@ -170,15 +238,46 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Adds a source set to the list of sources.
+   * Add all outputs for the given {@code sourceSet} to the collection of sources.
    *
-   * @param sourceSet  source set
+   * @param sourceSet  source set to include in message/template scanning
+   *
+   * @see #getSources()
    */
   public void sourceSet(SourceSet sourceSet) {
     getSources().from(sourceSet.getOutput());
   }
 
 
+  /**
+   * Provide the task with an action that allows for querying the scanned messages and templates.
+   * This action is invoked just before the messages and templates are written to the packed
+   * message file.
+   * <p>
+   * Here's an example of how to use this action.<br>
+   * Let's say all message codes start with a prefix
+   * {@code MSG-} followed by a 4-digit number (eg. {@code MSG-0318}). The action could then be
+   * used to output the next 10 available message codes:
+   * <pre>
+   *   action {
+   *       def codes = getMessageCodes()
+   *       def unusedCodes = new ArrayList&lt;String&gt;()
+   *
+   *       for(int n = 1; unusedCodes.size() &lt; 10; n++)
+   *       {
+   *         def code = String.format("MSG-%04d", n)
+   *
+   *         if (!codes.contains(code))
+   *           unusedCodes.add(code)
+   *       }
+   *
+   *       println 'Available message codes:'
+   *       println String.join(" ", unusedCodes)
+   *   }
+   * </pre>
+   *
+   * @param action  custom action, not {@code null}
+   */
   public void action(Action<MessageAccessor> action)
   {
     if (action == null)
