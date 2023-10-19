@@ -147,11 +147,17 @@ public class StringFormatterTest extends AbstractFormatterTest
         .with("object", object)
         .format());
 
-
     // ignore
     messageSupport.setDefaultParameterConfig("ignore-default-tostring", true);
     assertEquals("", messageSupport
         .code("OBJ")
+        .with("object", object)
+        .format());
+
+    // ignored empty
+    messageSupport.setDefaultParameterConfig("ignore-default-tostring", true);
+    assertEquals("(empty)", messageSupport
+        .message("%{object,empty:'(empty)'}")
         .with("object", object)
         .format());
   }

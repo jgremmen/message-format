@@ -72,11 +72,11 @@ public final class StringFormatter
     if (value == null)
       return formatNull(context);
 
-    final String s = valueAsString(context.getMessageSupport(), value);
+    final String string = valueAsString(context.getMessageSupport(), value);
 
-    return context.getConfigMapMessage(s, STRING_KEY_TYPES)
+    return context.getConfigMapMessage(string, STRING_KEY_TYPES)
         .map(context::format)
-        .orElseGet(() -> noSpaceText(s));
+        .orElseGet(() -> noSpaceText(string));
   }
 
 
@@ -88,16 +88,16 @@ public final class StringFormatter
     else if (value instanceof String)
       return (String)value;
 
-    String s = value.toString();
+    String string = value.toString();
 
     final ConfigValue cv =
         messageAccessor.getDefaultParameterConfig("ignore-default-tostring");
 
     if (cv != null && cv.getType() == BOOL && ((ConfigValueBool)cv).booleanValue() &&
-        (value.getClass().getName() + '@' + toHexString(value.hashCode())).equals(s))
-      s = "";
+        (value.getClass().getName() + '@' + toHexString(value.hashCode())).equals(string))
+      string = "";
 
-    return s;
+    return string;
   }
 
 
