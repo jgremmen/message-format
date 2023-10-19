@@ -114,10 +114,45 @@ public class StringFormatterTest extends AbstractFormatterTest
 
     assertEquals("exact", messageSupport
         .message("%{text,choice,'Süd':'exact'}")
-        .with("text", "Süd").format());
+        .with("text", "Süd")
+        .format());
 
     assertEquals("lenient", messageSupport
         .message("%{text,choice,'SUD':'lenient'}")
-        .with("text", "Süd").format());
+        .with("text", "Süd")
+        .format());
+  }
+
+
+  @Test
+  void testDefaultToString()
+  {
+    val messageSupport = MessageSupportFactory.create(
+        new DefaultFormatterService(), NO_CACHE_INSTANCE);
+    messageSupport.addMessage("OBJ", "%{object}");
+
+    val object = new Object();
+    val objectToString = object.toString();
+
+    // default
+    assertEquals(objectToString, messageSupport
+        .code("OBJ")
+        .with("object", object)
+        .format());
+
+    // default
+    messageSupport.setDefaultParameterConfig("ignore-default-tostring", false);
+    assertEquals(objectToString, messageSupport
+        .code("OBJ")
+        .with("object", object)
+        .format());
+
+
+    // ignore
+    messageSupport.setDefaultParameterConfig("ignore-default-tostring", true);
+    assertEquals("", messageSupport
+        .code("OBJ")
+        .with("object", object)
+        .format());
   }
 }

@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.named;
 
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
@@ -25,6 +26,8 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
+import de.sayayi.lib.message.part.parameter.value.ConfigValue;
+import de.sayayi.lib.message.part.parameter.value.ConfigValueBool;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
@@ -36,6 +39,8 @@ import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
+import static de.sayayi.lib.message.part.parameter.value.ConfigValue.Type.BOOL;
+import static java.lang.Integer.toHexString;
 import static java.text.Collator.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;
@@ -67,11 +72,32 @@ public final class StringFormatter
     if (value == null)
       return formatNull(context);
 
-    final String s = value instanceof char[] ? new String((char[])value) : String.valueOf(value);
+    final String s = valueAsString(context.getMessageSupport(), value);
 
     return context.getConfigMapMessage(s, STRING_KEY_TYPES)
         .map(context::format)
         .orElseGet(() -> noSpaceText(s));
+  }
+
+
+  private @NotNull String valueAsString(@NotNull MessageAccessor messageAccessor,
+                                        @NotNull Object value)
+  {
+    if (value instanceof char[])
+      return new String((char[])value);
+    else if (value instanceof String)
+      return (String)value;
+
+    String s = value.toString();
+
+    final ConfigValue cv =
+        messageAccessor.getDefaultParameterConfig("ignore-default-tostring");
+
+    if (cv != null && cv.getType() == BOOL && ((ConfigValueBool)cv).booleanValue() &&
+        (value.getClass().getName() + '@' + toHexString(value.hashCode())).equals(s))
+      s = "";
+
+    return s;
   }
 
 
