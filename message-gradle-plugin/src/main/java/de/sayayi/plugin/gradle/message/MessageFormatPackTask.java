@@ -58,8 +58,8 @@ import static org.gradle.api.logging.LogLevel.WARN;
 
 
 /**
- * Gradle task for scanning messages in classes and packing them into a single file which can be
- * imported into a {@link MessageSupport.ConfigurableMessageSupport}.
+ * Gradle task for scanning messages and templates in classes and packing them into a single
+ * file which can be imported into a {@link MessageSupport.ConfigurableMessageSupport}.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -106,13 +106,13 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Return a list of regulare expressions which will be matched against each message code.
+   * Return a list of regular expressions which will be matched against each message code.
    * If it matches, the message will be included in the packed message file. If it doesn't match
    * the message is skipped.
    * <p>
    * If the list is empty, all messages are included, unless they're explicitly excluded.
    *
-   * @return  list of regular expression for message inclusion, never {@code null}
+   * @return  list of regular expressions for message inclusion, never {@code null}
    *
    * @see #getExcludeRegexFilters()
    */
@@ -123,11 +123,11 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Return a list of regulare expressions which will be matched against each message code.
+   * Return a list of regular expressions which will be matched against each message code.
    * If it matches, the message will be excluded from the packed message file. If it doesn't match
    * the message is included.
    *
-   * @return  list of regular expression for message exclusion, never {@code null}
+   * @return  list of regular expressions for message exclusion, never {@code null}
    *
    * @see #getIncludeRegexFilters()
    */
@@ -168,6 +168,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
    *     {@link DuplicateMsgStrategy#OVERRIDE_AND_WARN OVERRIDE_AND_WARN})
    *   </li>
    * </ul>
+   * <p>
    * A duplicate is either a message with an already known message code or a template with
    * an already known template name and a different message definition. This means that if the
    * same message or template is encountered twice, it is not considered a duplicate.

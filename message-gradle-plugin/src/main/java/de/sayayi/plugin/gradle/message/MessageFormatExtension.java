@@ -25,6 +25,8 @@ import java.util.List;
 
 
 /**
+ * Gradle extension {@code messageFormat}
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
@@ -35,15 +37,17 @@ public abstract class MessageFormatExtension
 
 
   /**
-   * Return a list of regulare expressions which will be matched against each message code.
+   * Return a list of regular expressions which will be matched against each message code.
    * If it matches, the message will be included in the packed message file. If it doesn't match
    * the message is skipped.
    * <p>
    * If the list is empty, all messages are included, unless they're explicitly excluded.
    *
-   * @return  list of regular expression for message inclusion, never {@code null}
+   * @return  list of regular expressions for message inclusion, never {@code null}
    *
    * @see #getExcludeRegexFilters()
+   *
+   * @since 0.8.0 (renamed in 0.9.1)
    */
   public List<String> getIncludeRegexFilters() {
     return includeRegexFilter;
@@ -51,13 +55,15 @@ public abstract class MessageFormatExtension
 
 
   /**
-   * Return a list of regulare expressions which will be matched against each message code.
+   * Return a list of regular expressions which will be matched against each message code.
    * If it matches, the message will be excluded from the packed message file. If it doesn't match
    * the message is included.
    *
-   * @return  list of regular expression for message exclusion, never {@code null}
+   * @return  list of regular expressions for message exclusion, never {@code null}
    *
    * @see #getIncludeRegexFilters()
+   *
+   * @since 0.8.0 (renamed in 0.9.1)
    */
   public List<String> getExcludeRegexFilters() {
     return excludeRegexFilter;
@@ -67,16 +73,16 @@ public abstract class MessageFormatExtension
   /**
    * Return the pack filename property. The default value is {@code message.pack}
    *
-   * @return  pack filename
+   * @return  pack filename property, never {@code null}
    */
   public abstract Property<String> getPackFilename();
 
 
   /**
-   * Returns the compress property stating whether the message pack must be compressed or not.
+   * Compress property stating whether the message pack must be compressed or not.
    * The default value is {@code false}.
    *
-   * @return  compress flag
+   * @return  compress property, never {@code null}
    */
   public abstract Property<Boolean> getCompress();
 
@@ -114,6 +120,7 @@ public abstract class MessageFormatExtension
    *     {@link DuplicateMsgStrategy#OVERRIDE_AND_WARN OVERRIDE_AND_WARN})
    *   </li>
    * </ul>
+   * <p>
    * A duplicate is either a message with an already known message code or a template with
    * an already known template name and a different message definition. This means that if the
    * same message or template is encountered twice, it is not considered a duplicate.
