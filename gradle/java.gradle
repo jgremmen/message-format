@@ -16,6 +16,7 @@
 
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
+apply plugin: 'com.adarshr.test-logger'
 
 
 dependencies {
@@ -77,6 +78,9 @@ tasks.withType(JavaCompile).configureEach {
 
 
 tasks.withType(Test).configureEach {
+  if (System.getProperty("test-pack-compat") == 'true')
+    jvmArgs '-Dtest-pack-compat=true'
+
   javaLauncher = javaToolchains.launcherFor {
     languageVersion = JavaLanguageVersion.of(8)
   }
@@ -98,6 +102,12 @@ compileTestJava {
 configurations {
   testAnnotationProcessor.extendsFrom annotationProcessor
   testCompileOnly.extendsFrom compileOnly
+}
+
+
+testlogger {
+  theme 'mocha'
+  slowThreshold 2500
 }
 
 

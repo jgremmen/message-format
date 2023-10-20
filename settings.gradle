@@ -1,3 +1,4 @@
+
 pluginManagement {
   repositories {
     // plugin snapshot repository
@@ -11,6 +12,17 @@ pluginManagement {
 
     // default gradle plugin portal
     gradlePluginPortal()
+  }
+}
+
+
+buildscript {
+  repositories {
+    gradlePluginPortal()
+  }
+
+  dependencies {
+    classpath 'com.adarshr:gradle-test-logger-plugin:4.0.0'
   }
 }
 
