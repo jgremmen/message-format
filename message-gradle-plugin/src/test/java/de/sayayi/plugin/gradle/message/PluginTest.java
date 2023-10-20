@@ -26,10 +26,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.nio.file.Files.copy;
@@ -63,9 +67,7 @@ class PluginTest
     write(new File(testProjectDir, "settings.gradle").toPath(),
         singletonList("rootProject.name = 'test-message-pack'"));
 
-    write(new File(testProjectDir, "gradle.properties").toPath(), asList(
-        "org.gradle.configuration-cache=true",
-        "org.gradle.configuration-cache.problems=warn"));
+    write(new File(testProjectDir, "gradle.properties").toPath(), singletonList(""));
 
     write(new File(testProjectDir, "build.gradle").toPath(), asList(
         "plugins {",
@@ -160,31 +162,48 @@ class PluginTest
   }
 
 
-  @Test
-  @DisplayName("Pack task with 'fail' duplicate strategy")
-  void testDuplicateMessage() throws IOException
+  private static Stream<Arguments> testDuplicateMessage_parameters()
+  {
+    return Stream.of(
+        Arguments.of("ignore", true),
+        Arguments.of("ignore-and-warn", true),
+        Arguments.of("override", true),
+        Arguments.of("override-and-warn", true),
+        Arguments.of("fail", false)
+    );
+  }
+
+
+  @DisplayName("Pack task with duplicate strategy")
+  @ParameterizedTest(name = "Strategy: {0}")
+  @MethodSource("testDuplicateMessage_parameters")
+  void testDuplicateMessage(@NotNull String duplicateMsgStrategy, boolean success)
+      throws IOException
   {
     write(new File(testProjectDir, "build.gradle").toPath(), asList(
         "plugins {",
         "  id 'java'",
         "  id 'de.sayayi.plugin.gradle.message'",
         "}",
-        "messageFormat.duplicateMsgStrategy = 'fail'"));
+        "messageFormat.duplicateMsgStrategy = '" + duplicateMsgStrategy + "'"));
 
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
     copy(getResource("test-source-2.java"),
         new File(testPackageDir, "Source2.java").toPath());
 
-    val result = GradleRunner.create()
+    val runner = GradleRunner.create()
         .withProjectDir(testProjectDir)
         .withArguments("messageFormatPack")
         .withPluginClasspath()
         .withDebug(true)
-        .forwardOutput()
-        .buildAndFail();
+        .forwardOutput();
+    val result = success
+        ? runner.build()
+        : runner.buildAndFail();
 
-    assertEquals(FAILED, requireNonNull(result.task(":messageFormatPack")).getOutcome());
+    assertEquals(success ? SUCCESS : FAILED,
+        requireNonNull(result.task(":messageFormatPack")).getOutcome());
   }
 
 
