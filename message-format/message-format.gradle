@@ -66,6 +66,7 @@ dependencies {
   optionalImplementation "org.ow2.asm:asm:${asmVersion}"
 
   // test
+  testImplementation gradleTestKit()
   testImplementation("org.ehcache:ehcache:${ehcacheVersion}") {
     exclude module: 'jaxb-runtime'
   }
