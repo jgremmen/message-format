@@ -17,6 +17,7 @@ package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.formatter.runtime.ArrayFormatter;
 import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
@@ -31,9 +32,11 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Jeroen Gremmen
  */
+@DisplayName("Formatter cache")
 class FormatterCacheTest
 {
   @Test
+  @DisplayName("Cache entry reorganization on lookup")
   void lookup()
   {
     val cache = new FormatterCache(8);

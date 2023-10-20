@@ -15,18 +15,16 @@
  */
 package de.sayayi.lib.message.parser.normalizer;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.part.MessagePart;
+import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import javax.cache.Cache;
-import javax.cache.CacheManager;
 import javax.cache.Caching;
 import javax.cache.configuration.MutableConfiguration;
-import javax.cache.spi.CachingProvider;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -36,7 +34,8 @@ import static org.junit.platform.commons.util.ReflectionUtils.tryToReadFieldValu
 /**
  * @author Jeroen Gremmen
  */
-public class JCacheMessagePartNormalizerTest
+@DisplayName("JCache message part normalizer")
+class JCacheMessagePartNormalizerTest
 {
   private static MessagePartNormalizer resolver;
 
@@ -44,24 +43,24 @@ public class JCacheMessagePartNormalizerTest
   @BeforeAll
   static void init()
   {
-    final CachingProvider cachingProvider = Caching.getCachingProvider();
-    final CacheManager cacheManager = cachingProvider.getCacheManager();
-    final MutableConfiguration<MessagePart,MessagePart> config = new MutableConfiguration<>();
+    val cachingProvider = Caching.getCachingProvider();
+    val cacheManager = cachingProvider.getCacheManager();
+    val config = new MutableConfiguration<MessagePart,MessagePart>();
 
     config.setTypes(MessagePart.class, MessagePart.class);
     config.setStoreByValue(false);
 
-    final Cache<MessagePart,MessagePart> cache = cacheManager.createCache("message-part-cache", config);
+    val cache = cacheManager.createCache("message-part-cache", config);
 
     resolver = new JCacheMessagePartNormalizer(cache);
   }
 
 
   @Test
-  public void testCache() throws Exception
+  void testCache() throws Exception
   {
-    final Message.WithSpaces msg = new MessageFactory(resolver).parseMessage("this is %{a,number} and %{b}this is %{b}");
-    final MessagePart[] parts = (MessagePart[])
+    val msg = new MessageFactory(resolver).parseMessage("this is %{a,number} and %{b}this is %{b}");
+    val parts = (MessagePart[])
         tryToReadFieldValue(CompoundMessage.class, "messageParts", (CompoundMessage)msg).get();
 
     assertEquals(6, parts.length);

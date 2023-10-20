@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-@DisplayName("Test message support interface")
+@DisplayName("Message support interface")
 class MessageSupportTest
 {
   @Test
@@ -85,7 +85,7 @@ class MessageSupportTest
 
 
   @Test
-  @DisplayName("Immediate exception throw with formatted message")
+  @DisplayName("Immediate exception construction with formatted message")
   void testException()
   {
     val exception = assertThrowsExactly(IOException.class, () -> {
@@ -100,7 +100,7 @@ class MessageSupportTest
 
 
   @Test
-  @DisplayName("Deferred exception throw with formatted message")
+  @DisplayName("Deferred exception construction with formatted message")
   void testFormattedExceptionSupplier()
   {
     val exception = assertThrowsExactly(IOException.class, () -> {

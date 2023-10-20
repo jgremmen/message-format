@@ -15,11 +15,12 @@
  */
 package de.sayayi.lib.message.parser.normalizer;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TextPart;
+import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,15 +30,17 @@ import static org.junit.platform.commons.util.ReflectionUtils.tryToReadFieldValu
 /**
  * @author Jeroen Gremmen
  */
-public class LRUMessagePartNormalizerTest
+@DisplayName("LRU message part normalizer")
+class LRUMessagePartNormalizerTest
 {
   @Test
-  public void testNoEviction()
+  @DisplayName("normalize without eviction")
+  void testNoEviction()
   {
-    final LRUMessagePartNormalizer cache = new LRUMessagePartNormalizer(4);
-    final MessagePart mp1 = new TextPart("mp1");
-    final MessagePart mp2 = new TextPart("mp2");
-    final MessagePart mp3 = new TextPart("mp3");
+    val cache = new LRUMessagePartNormalizer(4);
+    val mp1 = new TextPart("mp1");
+    val mp2 = new TextPart("mp2");
+    val mp3 = new TextPart("mp3");
 
     assertSame(mp1, cache.normalize(mp1));
     assertSame(mp2, cache.normalize(mp2));
@@ -50,15 +53,16 @@ public class LRUMessagePartNormalizerTest
 
 
   @Test
-  public void testWithEviction()
+  @DisplayName("normalize with eviction")
+  void testWithEviction()
   {
-    final LRUMessagePartNormalizer cache = new LRUMessagePartNormalizer(4);
-    final MessagePart mp1 = new TextPart("mp1");
-    final MessagePart mp2 = new TextPart("mp2");
-    final MessagePart mp3 = new TextPart("mp3");
-    final MessagePart mp4 = new TextPart("mp4");
-    final MessagePart mp5 = new TextPart("mp5");
-    final MessagePart mp6 = new TextPart("mp6");
+    val cache = new LRUMessagePartNormalizer(4);
+    val mp1 = new TextPart("mp1");
+    val mp2 = new TextPart("mp2");
+    val mp3 = new TextPart("mp3");
+    val mp4 = new TextPart("mp4");
+    val mp5 = new TextPart("mp5");
+    val mp6 = new TextPart("mp6");
 
     cache.normalize(mp1);
     cache.normalize(mp2);
@@ -74,11 +78,12 @@ public class LRUMessagePartNormalizerTest
 
 
   @Test
-  public void testCache() throws Exception
+  @DisplayName("validate normalization on message parsing")
+  void testCache() throws Exception
   {
-    final LRUMessagePartNormalizer resolver = new LRUMessagePartNormalizer(10);
-    final Message.WithSpaces msg = new MessageFactory(resolver).parseMessage("this is %{a,number} and %{b}this is %{b}");
-    final MessagePart[] parts = (MessagePart[])
+    val resolver = new LRUMessagePartNormalizer(10);
+    val msg = new MessageFactory(resolver).parseMessage("this is %{a,number} and %{b}this is %{b}");
+    val parts = (MessagePart[])
         tryToReadFieldValue(CompoundMessage.class, "messageParts", (CompoundMessage)msg).get();
 
     assertEquals(6, parts.length);

@@ -23,6 +23,7 @@ import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.parser.normalizer.LRUMessagePartNormalizer;
 import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
@@ -34,16 +35,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Jeroen Gremmen
  * @since 0.8.3
  */
-@SuppressWarnings("SimplifiableAnnotation")
+@DisplayName("Spring ASM annotation adopter")
 @MessageDefs({
     @MessageDef(code = "CLASS", texts = {
         @Text(locale = "de", text = "Deutsch"),
         @Text("Other language")
     })
 })
+@SuppressWarnings("SimplifiableAnnotation")
 public final class SpringAsmAnnotationAdopterTest
 {
   @Test
+  @DisplayName("Scan messages")
   @MessageDef(code = "M1", text = "Method message 1")
   @MessageDef(code = "M2", texts = @Text("Method message 2"))
   void testScan()

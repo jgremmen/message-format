@@ -21,6 +21,7 @@ import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.convert.support.DefaultConversionService;
 
@@ -34,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jeroen Gremmen
  * @since 0.8.3
  */
+@DisplayName("Spring expression language formatter")
 class SpELFormatterTest extends AbstractFormatterTest
 {
   private static MessageSupport messageSupport;
@@ -52,6 +54,7 @@ class SpELFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Extract value from bean with optional format selector")
   void testFormat()
   {
     val map = new TreeMap<String,Integer>();

@@ -75,9 +75,9 @@ class MessageFormatExceptionTest
   }
 
 
-  @ParameterizedTest
-  @MethodSource("getMessage_parameters")
   @DisplayName("Detailed exception messages")
+  @ParameterizedTest(name = "msg: {4}")
+  @MethodSource("getMessage_parameters")
   void testGetMessage(String code, String template, Locale locale, String parameter,
                       @NotNull String msg)
   {

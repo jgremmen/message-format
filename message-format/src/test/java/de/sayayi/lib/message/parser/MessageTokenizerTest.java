@@ -15,9 +15,10 @@
  */
 package de.sayayi.lib.message.parser;
 
+import lombok.val;
 import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.parser.MessageLexer.CH;
@@ -28,13 +29,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
+@DisplayName("Message format lexer")
 public class MessageTokenizerTest
 {
   @Test
   @SuppressWarnings("UnnecessaryUnicodeEscape")
   public void testDefaultMode()
   {
-    Lexer lexer = createFor("hi  \\u0021%{");
+    val lexer = createFor("hi  \\u0021%{");
 
     // h
     Token token = lexer.nextToken();

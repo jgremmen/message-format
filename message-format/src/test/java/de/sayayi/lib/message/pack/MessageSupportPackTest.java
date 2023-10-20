@@ -54,6 +54,7 @@ class MessageSupportPackTest
 
 
   @Test
+  @DisplayName("Import exported messages and templates")
   void testExportImport() throws IOException
   {
     val pack = new ByteArrayOutputStream();

@@ -23,6 +23,7 @@ import org.gradle.testkit.runner.GradleRunner;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -46,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
+@DisplayName("Message format Gradle plugin")
 class PluginTest
 {
   @TempDir File testProjectDir;
@@ -81,6 +83,7 @@ class PluginTest
 
 
   @Test
+  @DisplayName("Pack task without sources")
   void testNoSources() throws IOException
   {
     val result = GradleRunner.create()
@@ -101,6 +104,7 @@ class PluginTest
 
 
   @Test
+  @DisplayName("Pack task with a single class")
   void testWithSource() throws IOException
   {
     copy(getResource("test-source-1.java"),
@@ -124,6 +128,7 @@ class PluginTest
 
 
   @Test
+  @DisplayName("Pack task with filtered message codes")
   void testWithFilteredSource() throws IOException
   {
     write(new File(testProjectDir, "build.gradle").toPath(), asList(
@@ -156,6 +161,7 @@ class PluginTest
 
 
   @Test
+  @DisplayName("Pack task with 'fail' duplicate strategy")
   void testDuplicateMessage() throws IOException
   {
     write(new File(testProjectDir, "build.gradle").toPath(), asList(
@@ -183,6 +189,7 @@ class PluginTest
 
 
   @Test
+  @DisplayName("Jar task with messageFormatPack dependency")
   void testJar() throws IOException
   {
     write(new File(testProjectDir, "build.gradle").toPath(), asList(

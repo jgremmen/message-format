@@ -95,7 +95,7 @@ class PackStreamTest
 
 
   @Test
-  @DisplayName("Pack/unpack small value 0..255 with fix bit widths")
+  @DisplayName("Pack/unpack small value 0..255 with fixed bit widths")
   void packSmall() throws IOException
   {
     val byteStream = new ByteArrayOutputStream();
@@ -117,7 +117,7 @@ class PackStreamTest
 
 
   @Test
-  @DisplayName("Pack/unpack large values with fix bit widths")
+  @DisplayName("Pack/unpack large values with fixed bit widths")
   void packLarge() throws IOException
   {
     val random = new Random(currentTimeMillis());
