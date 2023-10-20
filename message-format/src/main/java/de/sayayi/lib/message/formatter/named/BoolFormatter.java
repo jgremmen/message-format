@@ -26,10 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
@@ -83,6 +80,8 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
         type == double.class ||
         type == float.class ||
         type == String.class ||
+        type == Optional.class ||
+        type == OptionalInt.class || type == OptionalLong.class ||
         type == NULL_TYPE;
   }
 
@@ -98,13 +97,13 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
     // map true/false to mapped value or return its string representation
     // invalid value -> map or return empty string
     return convertValueToBool(value)
-        .map(bool -> format_bool(context, bool))
+        .map(bool -> formatBool(context, bool))
         .orElseGet(() -> formatEmpty(context));
   }
 
 
   @Contract(pure = true)
-  private @NotNull Text format_bool(@NotNull FormatterContext context, boolean bool)
+  private @NotNull Text formatBool(@NotNull FormatterContext context, boolean bool)
   {
     return context
         .getConfigMapMessage(bool, BOOL_KEY_TYPES)
@@ -116,6 +115,10 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
   @Contract(pure = true)
   private @NotNull Optional<Boolean> convertValueToBool(Object value)
   {
+    // unwrap optional
+    if (value instanceof Optional)
+      value = ((Optional<?>)value).orElse(null);
+
     if (value instanceof Boolean)
       return Optional.of((Boolean)value);
 
@@ -148,6 +151,12 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
       else
         return Optional.of(signum(number.doubleValue()) != 0);
     }
+
+    if (value instanceof OptionalInt && ((OptionalInt)value).isPresent())
+      return Optional.of(((OptionalInt)value).getAsInt() != 0);
+
+    if (value instanceof OptionalLong && ((OptionalLong)value).isPresent())
+      return Optional.of(((OptionalLong)value).getAsLong() != 0);
 
     return Optional.empty();
   }
@@ -201,6 +210,9 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
 
   private @NotNull MatchResult compareToBoolKey(Object value, boolean bool)
   {
+    if (value instanceof Optional)
+      value = ((Optional<?>)value).orElse(null);
+
     // boolean object for automatic formatter selection
     if (value instanceof Boolean)
       return ((Boolean)value) == bool ? EXACT : MISMATCH;
@@ -235,6 +247,12 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
       else
         return (signum(number.doubleValue()) != 0) == bool ? LENIENT : MISMATCH;
     }
+
+    if (value instanceof OptionalInt && ((OptionalInt)value).isPresent())
+      return (((OptionalInt)value).getAsInt() != 0) == bool ? LENIENT : MISMATCH;
+
+    if (value instanceof OptionalLong && ((OptionalLong)value).isPresent())
+      return (((OptionalLong)value).getAsLong() != 0) == bool ? LENIENT : MISMATCH;
 
     return MISMATCH;
   }

@@ -28,6 +28,9 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
@@ -162,10 +165,13 @@ public class BoolFormatterTest extends AbstractFormatterTest
     var message = messageSupport.message("%{b,true:true,false:false}");
 
     assertEquals("true", message
-        .with("b", TRUE)
+        .with("b", true)
         .format());
     assertEquals("false", message
-        .with("b", FALSE)
+        .with("b", false)
+        .format());
+    assertEquals("false", message
+        .with("b", Optional.of(false))
         .format());
 
     message = messageSupport.message("%{b,bool,true:true,false:false}");
@@ -176,6 +182,9 @@ public class BoolFormatterTest extends AbstractFormatterTest
         .format());
     assertEquals("false", message
         .with("b", 0)
+        .format());
+    assertEquals("true", message
+        .with("b", Optional.of(4))
         .format());
 
     // float value
@@ -193,6 +202,9 @@ public class BoolFormatterTest extends AbstractFormatterTest
     assertEquals("false", message
         .with("b", BigDecimal.ZERO)
         .format());
+    assertEquals("true", message
+        .with("b", Optional.of(BigDecimal.ONE))
+        .format());
 
     // string value
     assertEquals("true", message
@@ -200,6 +212,31 @@ public class BoolFormatterTest extends AbstractFormatterTest
         .format());
     assertEquals("false", message
         .with("b", "false")
+        .format());
+    assertEquals("false", message
+        .with("b", Optional.of("false"))
+        .format());
+
+    // optional int value
+    assertEquals("true", message
+        .with("b", OptionalInt.of(-24))
+        .format());
+    assertEquals("false", message
+        .with("b", OptionalInt.of(0))
+        .format());
+    assertEquals("", message
+        .with("b", OptionalInt.empty())
+        .format());
+
+    // optional long value
+    assertEquals("true", message
+        .with("b", OptionalLong.of(Long.MAX_VALUE))
+        .format());
+    assertEquals("false", message
+        .with("b", OptionalLong.of(0))
+        .format());
+    assertEquals("", message
+        .with("b", OptionalLong.empty())
         .format());
   }
 
