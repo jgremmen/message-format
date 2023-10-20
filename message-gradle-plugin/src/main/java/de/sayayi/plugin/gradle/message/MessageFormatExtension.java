@@ -114,7 +114,7 @@ public abstract class MessageFormatExtension
    *     {@link DuplicateMsgStrategy} enum value (eg. {@link DuplicateMsgStrategy#FAIL FAIL})
    *   </li>
    *   <li>
-   *     Strategy string. The string is converted to uppercase, dashes are translated to
+   *     Duplicate strategy string. The string is converted to uppercase, dashes are translated to
    *     underscores and the resulting strategy name is matched against
    *     {@link DuplicateMsgStrategy} (eg. {@code 'override-and-warn'} matches
    *     {@link DuplicateMsgStrategy#OVERRIDE_AND_WARN OVERRIDE_AND_WARN})
