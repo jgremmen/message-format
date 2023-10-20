@@ -4,7 +4,7 @@ import de.sayayi.lib.message.annotation.MessageDef;
 
 
 @MessageDef(code = "MSG1", text = "Hello 1")
-public class Version000803
+public class Version0_8_2
 {
   @MessageDef(code = "MSG2", text = "Hello 2")
   @MessageDef(code = "MSG3", text = "Hello 3")

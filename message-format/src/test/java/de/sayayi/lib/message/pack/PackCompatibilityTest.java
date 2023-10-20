@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.nio.file.Files.*;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,9 +40,9 @@ public class PackCompatibilityTest
   private static Stream<Arguments> pluginVersionParameters()
   {
     return Stream.of(
-        Arguments.of("0.8.2", "Version000802.java", "8.2.1", 4, 0),
-        Arguments.of("0.8.3", "Version000803.java", "8.3", 4, 0),
-        Arguments.of("0.8.3.1", "Version0008031.java", "8.3", 4, 0)
+        Arguments.of("0.8.2", "Version0_8_2.java", "8.2.1", 4, 0),
+        Arguments.of("0.8.3", "Version0_8_3.java", "8.3", 4, 0),
+        Arguments.of("0.8.3.1", "Version0_8_3_1.java", "8.3", 4, 0)
     );
   }
 
@@ -62,7 +63,7 @@ public class PackCompatibilityTest
         "}",
         "rootProject.name = 'test-message-pack'"));
 
-    write(new File(testProjectDir, "gradle.properties").toPath(), asList(""));
+    write(new File(testProjectDir, "gradle.properties").toPath(), singletonList(""));
 
     write(new File(testProjectDir, "build.gradle").toPath(), asList(
         "plugins {",
@@ -71,7 +72,11 @@ public class PackCompatibilityTest
         "}",
         "layout.buildDirectory = '.build'",
         "println 'Gradle version ' + gradle.gradleVersion",
-        "messageFormat {",
+        "messageFormatPack {",
+        "  action {",
+        "    println 'packing ' + messageCodes.size() + ' messages'",
+        "    println 'packing ' + templateNames.size() + ' templates'",
+        "  }",
         "}"));
 
     val testPackageDir = new File(testProjectDir, "src/main/java/test");
