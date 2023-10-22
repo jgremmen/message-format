@@ -33,39 +33,43 @@ import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 }
 
 
-message returns [Message.WithSpaces value]
+message returns [Message.WithSpaces messageWithSpaces]
         : message0 EOF
         ;
 
-message0 returns [Message.WithSpaces value]
+message0 returns [Message.WithSpaces messageWithSpaces]
         : (textPart | parameterPart | templatePart)*
         ;
 
-textPart returns [TextPart value]
+textPart returns [TextPart part]
         : text
         ;
 
-text returns [String value]
+text returns [String characters]
         : CH+
         ;
 
-quotedMessage returns [Message.WithSpaces value]
+quotedMessage returns [Message.WithSpaces messageWithSpaces]
         : SQ_START message0 SQ_END
         | DQ_START message0 DQ_END
         ;
 
-quotedString returns [String value]
+quotedString returns [String string]
         : SQ_START text? SQ_END
         | DQ_START text? DQ_END
         ;
 
-forceQuotedMessage returns [Message.WithSpaces value]
-        : quotedMessage
+simpleString returns [String string]
+        : nameOrKeyword
         | quotedString
-        | nameOrKeyword
         ;
 
-parameterPart returns [ParameterPart value]
+forceQuotedMessage returns [Message.WithSpaces messageWithSpaces]
+        : quotedMessage
+        | simpleString
+        ;
+
+parameterPart returns [ParameterPart part]
         : P_START
           name=nameOrKeyword
           (COMMA format=nameOrKeyword)?
@@ -74,33 +78,31 @@ parameterPart returns [ParameterPart value]
           P_END
         ;
 
-templatePart returns [TemplatePart value]
+templatePart returns [TemplatePart part]
         : TPL_START
-          nameOrKeyword
+          name=simpleString
           (COMMA configParameterElement)*
           TPL_END
         ;
 
-configElement returns [ConfigKey key, ConfigValue value]
+configElement returns [ConfigKey configKey, ConfigValue configValue]
         : configParameterElement
         | configMapElement
         ;
 
-configMapElement returns [ConfigKey key, ConfigValue value]
+configMapElement returns [ConfigKey configKey, ConfigValue configValue]
         : configMapKey COLON quotedMessage  #configMapMessage
-        | configMapKey COLON quotedString   #configMapString
-        | configMapKey COLON nameOrKeyword  #configMapString
+        | configMapKey COLON simpleString   #configMapString
         ;
 
-configParameterElement returns [ConfigKeyName key, ConfigValue value]
+configParameterElement returns [ConfigKeyName configKey, ConfigValue configValue]
         : NAME COLON BOOL           #configParameterBool
         | NAME COLON NUMBER         #configParameterNumber
-        | NAME COLON quotedString   #configParameterString
-        | NAME COLON nameOrKeyword  #configParameterString
+        | NAME COLON simpleString   #configParameterString
         | NAME COLON quotedMessage  #configParameterMessage
         ;
 
-configMapKey returns [ConfigKey key]
+configMapKey returns [ConfigKey configKey]
         : equalOperatorOptional NULL               #configMapKeyNull
         | equalOperatorOptional EMPTY              #configMapKeyEmpty
         | BOOL                                     #configMapKeyBool

@@ -137,7 +137,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
     return parse(new Lexer(text),
         lexer -> new Parser(listener.tokenStream = new BufferedTokenStream(lexer)),
-        Parser::message, listener, ctx -> requireNonNull(ctx.value));
+        Parser::message, listener, ctx -> requireNonNull(ctx.messageWithSpaces));
   }
 
 
@@ -196,7 +196,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
     @Override
     public void exitMessage(MessageContext ctx) {
-      ctx.value = ctx.message0().value;
+      ctx.messageWithSpaces = ctx.message0().messageWithSpaces;
     }
 
 
@@ -204,7 +204,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitMessage0(Message0Context ctx)
     {
       if (ctx.children == null)
-        ctx.value = EmptyMessage.INSTANCE;
+        ctx.messageWithSpaces = EmptyMessage.INSTANCE;
       else
       {
         final List<MessagePart> parts = new ArrayList<>();
@@ -212,28 +212,28 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         for(final ParseTree part: ctx.children)
         {
           if (part instanceof ParameterPartContext)
-            parts.add(((ParameterPartContext)part).value);
+            parts.add(((ParameterPartContext)part).part);
           else if (part instanceof TextPartContext)
-            parts.add(((TextPartContext)part).value);
+            parts.add(((TextPartContext)part).part);
           else
           {
             if (template)
               syntaxError((TemplatePartContext)part, "no nested template allowed");
 
-            parts.add(((TemplatePartContext)part).value);
+            parts.add(((TemplatePartContext)part).part);
           }
         }
 
         final int partCount = parts.size();
 
         if (partCount == 0)
-          ctx.value = EmptyMessage.INSTANCE;
+          ctx.messageWithSpaces = EmptyMessage.INSTANCE;
         else if (partCount == 1 && parts.get(0) instanceof TextPart)
-          ctx.value = new TextMessage((TextPart)parts.get(0));
+          ctx.messageWithSpaces = new TextMessage((TextPart)parts.get(0));
         else
         {
           parts.removeIf(this::exitMessage0_isRedundantTextPart);
-          ctx.value = new CompoundMessage(parts);
+          ctx.messageWithSpaces = new CompoundMessage(parts);
         }
       }
     }
@@ -255,9 +255,9 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitTextPart(TextPartContext ctx)
     {
-      ctx.value = messageFactory
+      ctx.part = messageFactory
           .getMessagePartNormalizer()
-          .normalize(new TextPart(ctx.text().value));
+          .normalize(new TextPart(ctx.text().characters));
     }
 
 
@@ -287,13 +287,13 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           text[n++] = ' ';
       }
 
-      ctx.value = new String(text, 0, n);
+      ctx.characters = new String(text, 0, n);
     }
 
 
     @Override
     public void exitQuotedMessage(QuotedMessageContext ctx) {
-      ctx.value = ctx.message0().value;
+      ctx.messageWithSpaces = ctx.message0().messageWithSpaces;
     }
 
 
@@ -301,7 +301,15 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitQuotedString(QuotedStringContext ctx)
     {
       final TextContext text = ctx.text();
-      ctx.value = text == null ? "" : text.value;
+      ctx.string = text == null ? "" : text.characters;
+    }
+
+
+    @Override
+    public void exitSimpleString(SimpleStringContext ctx)
+    {
+      final NameOrKeywordContext nameOrKeyword = ctx.nameOrKeyword();
+      ctx.string = nameOrKeyword != null ? nameOrKeyword.name : ctx.quotedString().string;
     }
 
 
@@ -310,12 +318,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     {
       final QuotedMessageContext quotedMessage = ctx.quotedMessage();
       if (quotedMessage != null)
-        ctx.value = quotedMessage.value;
+        ctx.messageWithSpaces = quotedMessage.messageWithSpaces;
       else
       {
-        final NameOrKeywordContext nameOrKeyword = ctx.nameOrKeyword();
-        ctx.value = messageFactory.parseMessage(
-            nameOrKeyword != null ? nameOrKeyword.name : ctx.quotedString().value);
+        //noinspection LanguageMismatch
+        ctx.messageWithSpaces = messageFactory.parseMessage(ctx.simpleString().string);
       }
     }
 
@@ -331,7 +338,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       public BiConsumer<Map<ConfigKey,ConfigValue>,ConfigElementContext> accumulator()
       {
         return (map,cec) -> {
-          final ConfigKey key = cec.key;
+          final ConfigKey key = cec.configKey;
 
           if (map.containsKey(key))
           {
@@ -340,7 +347,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
                 parameter + '\'');
           }
 
-          map.put(key, cec.value);
+          map.put(key, cec.configValue);
         };
       }
 
@@ -358,9 +365,9 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           ctx.configElement().stream().collect(PARAMETER_CONFIG_COLLECTOR);
       final ForceQuotedMessageContext forceQuotedMessage = ctx.forceQuotedMessage();
       if (forceQuotedMessage != null)
-        mapElements.put(null, new ConfigValueMessage(forceQuotedMessage.value));
+        mapElements.put(null, new ConfigValueMessage(forceQuotedMessage.messageWithSpaces));
 
-      ctx.value = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(
+      ctx.part = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(
           ctx.name.name, ctx.format == null ? null : ctx.format.name,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
@@ -379,12 +386,12 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       public BiConsumer<Map<String,ConfigValue>,ConfigParameterElementContext> accumulator()
       {
         return (map,cpec) -> {
-          final String name = cpec.key.getName();
+          final String name = cpec.configKey.getName();
 
           if (map.containsKey(name))
             syntaxError(cpec, "duplicate template default parameter '" + name + "'");
 
-          map.put(name, cpec.value);
+          map.put(name, cpec.configValue);
         };
       }
 
@@ -398,7 +405,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitTemplatePart(TemplatePartContext ctx)
     {
-      ctx.value = new TemplatePart(ctx.nameOrKeyword().name,
+      ctx.part = new TemplatePart(ctx.simpleString().string,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
           ctx.configParameterElement().stream().collect(TEMPLATE_CONFIG_PARAMETER_COLLECTOR));
@@ -412,15 +419,15 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
       if (cpec != null)
       {
-        ctx.key = cpec.key;
-        ctx.value = cpec.value;
+        ctx.configKey = cpec.configKey;
+        ctx.configValue = cpec.configValue;
       }
       else
       {
         final ConfigMapElementContext cmec = ctx.configMapElement();
 
-        ctx.key = cmec.key;
-        ctx.value = cmec.value;
+        ctx.configKey = cmec.configKey;
+        ctx.configValue = cmec.configValue;
       }
     }
 
@@ -428,84 +435,79 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitConfigMapMessage(ConfigMapMessageContext ctx)
     {
-      ctx.key = ctx.configMapKey().key;
-      ctx.value = new ConfigValueMessage(ctx.quotedMessage().value);
+      ctx.configKey = ctx.configMapKey().configKey;
+      ctx.configValue = new ConfigValueMessage(ctx.quotedMessage().messageWithSpaces);
     }
 
 
     @Override
     public void exitConfigMapString(ConfigMapStringContext ctx)
     {
-      final QuotedStringContext quotedStringContext = ctx.quotedString();
-
-      ctx.key = ctx.configMapKey().key;
-      ctx.value = new ConfigValueString(quotedStringContext != null
-          ? quotedStringContext.value : ctx.nameOrKeyword().name);
+      ctx.configKey = ctx.configMapKey().configKey;
+      ctx.configValue = new ConfigValueString(ctx.simpleString().string);
     }
 
 
     @Override
     public void exitConfigParameterBool(ConfigParameterBoolContext ctx)
     {
-      ctx.key = new ConfigKeyName(ctx.NAME().getText());
-      ctx.value = parseBoolean(ctx.BOOL().getText()) ? ConfigValueBool.TRUE : ConfigValueBool.FALSE;
+      ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
+      ctx.configValue = parseBoolean(ctx.BOOL().getText())
+          ? ConfigValueBool.TRUE : ConfigValueBool.FALSE;
     }
 
 
     @Override
     public void exitConfigParameterNumber(ConfigParameterNumberContext ctx)
     {
-      ctx.key = new ConfigKeyName(ctx.NAME().getText());
-      ctx.value = new ConfigValueNumber(Long.parseLong(ctx.NUMBER().getText()));
+      ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
+      ctx.configValue = new ConfigValueNumber(Long.parseLong(ctx.NUMBER().getText()));
     }
 
 
     @Override
     public void exitConfigParameterMessage(ConfigParameterMessageContext ctx)
     {
-      ctx.key = new ConfigKeyName(ctx.NAME().getText());
-      ctx.value = new ConfigValueMessage(ctx.quotedMessage().value);
+      ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
+      ctx.configValue = new ConfigValueMessage(ctx.quotedMessage().messageWithSpaces);
     }
 
 
     @Override
     public void exitConfigParameterString(ConfigParameterStringContext ctx)
     {
-      final QuotedStringContext quotedStringContext = ctx.quotedString();
-
-      ctx.key = new ConfigKeyName(ctx.NAME().getText());
-      ctx.value = new ConfigValueString(quotedStringContext != null
-          ? quotedStringContext.value : ctx.nameOrKeyword().name);
+      ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
+      ctx.configValue = new ConfigValueString(ctx.simpleString().string);
     }
 
 
     @Override
     public void exitConfigMapKeyNull(ConfigMapKeyNullContext ctx) {
-      ctx.key = new ConfigKeyNull(ctx.equalOperatorOptional().cmp);
+      ctx.configKey = new ConfigKeyNull(ctx.equalOperatorOptional().cmp);
     }
 
 
     @Override
     public void exitConfigMapKeyEmpty(ConfigMapKeyEmptyContext ctx) {
-      ctx.key = new ConfigKeyEmpty(ctx.equalOperatorOptional().cmp);
+      ctx.configKey = new ConfigKeyEmpty(ctx.equalOperatorOptional().cmp);
     }
 
 
     @Override
     public void exitConfigMapKeyBool(ConfigMapKeyBoolContext ctx) {
-      ctx.key = parseBoolean(ctx.BOOL().getText()) ? ConfigKeyBool.TRUE : ConfigKeyBool.FALSE;
+      ctx.configKey = parseBoolean(ctx.BOOL().getText()) ? ConfigKeyBool.TRUE : ConfigKeyBool.FALSE;
     }
 
 
     @Override
     public void exitConfigMapKeyNumber(ConfigMapKeyNumberContext ctx) {
-      ctx.key = new ConfigKeyNumber(ctx.relationalOperatorOptional().cmp, ctx.NUMBER().getText());
+      ctx.configKey = new ConfigKeyNumber(ctx.relationalOperatorOptional().cmp, ctx.NUMBER().getText());
     }
 
 
     @Override
     public void exitConfigMapKeyString(ConfigMapKeyStringContext ctx) {
-      ctx.key = new ConfigKeyString(ctx.relationalOperatorOptional().cmp, ctx.quotedString().value);
+      ctx.configKey = new ConfigKeyString(ctx.relationalOperatorOptional().cmp, ctx.quotedString().string);
     }
 
 
