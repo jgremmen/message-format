@@ -42,13 +42,13 @@ class PackCompatibilityTest
   private static Stream<Arguments> pluginVersionParameters()
   {
     return Stream.of(
-        Arguments.of("0.8.0", "Version0_8_0.java", false, "8.2", 4, 0),
-        Arguments.of("0.8.1", "Version0_8_1.java", false, "8.2.1", 4, 0),
-        Arguments.of("0.8.1.1", "Version0_8_1_1.java", false, "8.2.1", 4, 0),
-        Arguments.of("0.8.2", "Version0_8_2.java", true, "8.2.1", 4, 0),
-        Arguments.of("0.8.3", "Version0_8_3.java", true, "8.3", 4, 0),
-        Arguments.of("0.8.3.1", "Version0_8_3_1.java", true, "8.3", 4, 0),
-        Arguments.of("0.9.0", "Version0_9_0.java", false, "8.4", 4, 0)
+        Arguments.of("0.8.0", "Version0_8_0.java", false, "8.2", 8, 0),
+        Arguments.of("0.8.1", "Version0_8_1.java", false, "8.2.1", 9, 1),
+        Arguments.of("0.8.1.1", "Version0_8_1_1.java", false, "8.2.1", 9, 1),
+        Arguments.of("0.8.2", "Version0_8_2.java", true, "8.2.1", 9, 1),
+        Arguments.of("0.8.3", "Version0_8_3.java", true, "8.3", 9, 1),
+        Arguments.of("0.8.3.1", "Version0_8_3_1.java", true, "8.3", 9, 1),
+        Arguments.of("0.9.0", "Version0_9_0.java", false, "8.4", 9, 1)
     );
   }
 
@@ -75,7 +75,7 @@ class PackCompatibilityTest
     val result = GradleRunner.create()
         .withGradleVersion(gradleVersion)
         .withProjectDir(testProjectDir)
-        .withArguments("messageFormatPack")
+        .withArguments("messageFormatPack", "--stacktrace")
         .withDebug(true)
         .forwardOutput()
         .build();
