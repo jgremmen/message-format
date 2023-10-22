@@ -25,6 +25,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.TimeZone;
@@ -39,7 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-public class JodaDateTimeFormatterTest extends AbstractFormatterTest
+@DisplayName("Joda-time date/time formatter")
+class JodaDateTimeFormatterTest extends AbstractFormatterTest
 {
   @BeforeAll
   static void init() {

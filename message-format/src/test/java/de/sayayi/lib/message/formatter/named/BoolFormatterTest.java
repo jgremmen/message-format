@@ -24,6 +24,7 @@ import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;
 import lombok.var;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -45,7 +46,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-public class BoolFormatterTest extends AbstractFormatterTest
+@DisplayName("'bool' formatter")
+class BoolFormatterTest extends AbstractFormatterTest
 {
   @Test
   void testFormattableTypes()

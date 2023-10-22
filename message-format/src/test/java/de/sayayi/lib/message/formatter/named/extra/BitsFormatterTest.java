@@ -23,6 +23,7 @@ import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueNumber;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
@@ -39,7 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Jeroen Gremmen
  */
-public class BitsFormatterTest extends AbstractFormatterTest
+@DisplayName("'bits' formatter")
+class BitsFormatterTest extends AbstractFormatterTest
 {
   @Test
   void testFormatterConfig()

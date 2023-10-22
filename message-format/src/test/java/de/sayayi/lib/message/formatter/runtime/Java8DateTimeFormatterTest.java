@@ -23,6 +23,7 @@ import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -41,7 +42,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-public class Java8DateTimeFormatterTest extends AbstractFormatterTest
+@DisplayName("Java 8 date/time formatter")
+class Java8DateTimeFormatterTest extends AbstractFormatterTest
 {
   @BeforeAll
   static void init() {
@@ -50,7 +52,7 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testFormattableTypes()
+  void testFormattableTypes()
   {
     assertFormatterForType(new Java8DateTimeFormatter(), LocalDate.class);
     assertFormatterForType(new Java8DateTimeFormatter(), LocalTime.class);
@@ -59,7 +61,7 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testLocalDate()
+  void testLocalDate()
   {
     val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new Java8DateTimeFormatter()), NO_CACHE_INSTANCE)
@@ -89,7 +91,7 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testLocalTime()
+  void testLocalTime()
   {
     val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new Java8DateTimeFormatter()), NO_CACHE_INSTANCE)
@@ -114,7 +116,7 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testDateTime()
+  void testDateTime()
   {
     val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new Java8DateTimeFormatter()), NO_CACHE_INSTANCE)
@@ -145,7 +147,7 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testCustomPattern()
+  void testCustomPattern()
   {
     val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new Java8DateTimeFormatter()), NO_CACHE_INSTANCE)
@@ -166,7 +168,7 @@ public class Java8DateTimeFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testFormatter()
+  void testFormatter()
   {
     val messageSupport = MessageSupportFactory
         .create(createFormatterService(new Java8DateTimeFormatter()), NO_CACHE_INSTANCE);

@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
@@ -30,10 +31,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jeroen Gremmen
  * @since 0.9.1
  */
+@DisplayName("Number formatter")
 class NumberFormatterTest extends AbstractFormatterTest
 {
   @Test
-  public void testFormattableTypes()
+  void testFormattableTypes()
   {
     val formatter = new NumberFormatter();
 
@@ -48,7 +50,7 @@ class NumberFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testDoubleFormat()
+  void testDoubleFormat()
   {
     val messageSupport = MessageSupportFactory
         .create(createFormatterService(new NumberFormatter()), NO_CACHE_INSTANCE)

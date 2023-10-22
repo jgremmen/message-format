@@ -19,6 +19,7 @@ import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.regex.Matcher;
@@ -31,13 +32,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
+@DisplayName("Matcher formatter")
 class MatcherFormatterTest extends AbstractFormatterTest
 {
   private MessageSupport context;
 
 
   @BeforeEach
-  public void init()
+  void init()
   {
     context = MessageSupportFactory.create(
         createFormatterService(new MatcherFormatter()), NO_CACHE_INSTANCE);
@@ -45,13 +47,13 @@ class MatcherFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testFormattableTypes() {
+  void testFormattableTypes() {
     assertFormatterForType(new MatcherFormatter(), Matcher.class);
   }
 
 
   @Test
-  public void testFormatGroupNumber()
+  void testFormatGroupNumber()
   {
     final Pattern pattern = Pattern.compile("[vV]?(?<major>\\d+)(\\.(?<minor>\\d+))?");
     final Matcher matcher = pattern.matcher("v5.12");
@@ -73,7 +75,7 @@ class MatcherFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testFormatGroupName()
+  void testFormatGroupName()
   {
     final Pattern pattern = Pattern.compile("[vV]?(?<major>\\d+)(\\.(?<minor>\\d+))?");
     final Matcher matcher = pattern.matcher("v5.12");
@@ -91,7 +93,7 @@ class MatcherFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testFormat()
+  void testFormat()
   {
     final Pattern pattern = Pattern.compile("[vV]?(?<major>\\d+)(\\.(?<minor>\\d+))?");
     final Matcher matcher = pattern.matcher("v4.999");

@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.formatter.runtime;
 
 import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -29,6 +30,7 @@ import static org.junit.platform.commons.util.ReflectionUtils.findMethod;
 /**
  * @author Jeroen Gremmen
  */
+@DisplayName("Type formatter")
 class TypeFormatterTest
 {
   @Test

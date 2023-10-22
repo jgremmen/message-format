@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
+@DisplayName("Formattable type")
 class FormattableTypeTest
 {
   @Test

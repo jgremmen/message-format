@@ -22,6 +22,7 @@ import de.sayayi.lib.message.formatter.named.extra.GeoFormatter.Format;
 import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -36,8 +37,9 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Jeroen Gremmen
  */
+@DisplayName("'geo' formatter")
 @SuppressWarnings("UnnecessaryUnicodeEscape")
-public class GeoFormatterTest extends AbstractFormatterTest
+class GeoFormatterTest extends AbstractFormatterTest
 {
   private static double dms(int degree, int minutes) {
     return degree + minutes / 60.0;

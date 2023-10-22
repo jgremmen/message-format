@@ -22,6 +22,7 @@ import de.sayayi.lib.message.formatter.runtime.SupplierFormatter;
 import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueNumber;
 import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.DoubleSupplier;
@@ -38,7 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Jeroen Gremmen
  */
-public class ClipFormatterTest extends AbstractFormatterTest
+@DisplayName("'clip' formatter")
+class ClipFormatterTest extends AbstractFormatterTest
 {
   @Test
   void testFormatterConfig()

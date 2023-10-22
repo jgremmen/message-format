@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter.runtime.extra;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -31,16 +32,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-public class MethodFormatterTest extends AbstractFormatterTest
+@DisplayName("Method formatter")
+class MethodFormatterTest extends AbstractFormatterTest
 {
   @Test
-  public void testFormattableTypes() {
+  void testFormattableTypes() {
     assertFormatterForType(new MethodFormatter(), Method.class);
   }
 
 
   @Test
-  public void testFormat() throws Exception
+  void testFormat() throws Exception
   {
     val message = MessageSupportFactory
         .create(createFormatterService(new MethodFormatter()), NO_CACHE_INSTANCE)

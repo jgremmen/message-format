@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jeroen Gremmen
  */
 @TestMethodOrder(MethodOrderer.DisplayName.class)
+@DisplayName("Map formatter")
 class MapFormatterTest extends AbstractFormatterTest
 {
   @Test

@@ -29,6 +29,7 @@ import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -43,7 +44,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-public class ArrayFormatterTest extends AbstractFormatterTest
+@DisplayName("Array formatter")
+class ArrayFormatterTest extends AbstractFormatterTest
 {
   @Test
   void testFormattableTypes() {

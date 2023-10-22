@@ -23,6 +23,7 @@ import de.sayayi.lib.message.part.parameter.key.ConfigKeyString;
 import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -40,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
+@DisplayName("Locale formatter")
 class LocaleFormatterTest extends AbstractFormatterTest
 {
   @Test

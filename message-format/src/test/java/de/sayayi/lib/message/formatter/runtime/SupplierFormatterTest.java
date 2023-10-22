@@ -21,6 +21,7 @@ import de.sayayi.lib.message.formatter.named.BoolFormatter;
 import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.BooleanSupplier;
@@ -35,10 +36,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-public class SupplierFormatterTest extends AbstractFormatterTest
+@DisplayName("Supplier formatter")
+class SupplierFormatterTest extends AbstractFormatterTest
 {
   @Test
-  public void testBooleanSupplier()
+  void testBooleanSupplier()
   {
     val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new BoolFormatter(), new BooleanSupplierFormatter()),
@@ -50,7 +52,7 @@ public class SupplierFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testLongSupplier()
+  void testLongSupplier()
   {
     val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new NumberFormatter(), new LongSupplierFormatter()),

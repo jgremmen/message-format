@@ -20,6 +20,7 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -33,25 +34,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-public class FieldFormatterTest extends AbstractFormatterTest
+@DisplayName("Field formatter")
+class FieldFormatterTest extends AbstractFormatterTest
 {
   private MessageSupport context;
 
 
   @BeforeEach
-  public void init() {
+  void init() {
     context = MessageSupportFactory.create(createFormatterService(new FieldFormatter()), NO_CACHE_INSTANCE);
   }
 
 
   @Test
-  public void testFormattableTypes() {
+  void testFormattableTypes() {
     assertFormatterForType(new FieldFormatter(), Field.class);
   }
 
 
   @Test
-  public void testFormatV1() throws Exception
+  void testFormatV1() throws Exception
   {
     val v1 = Dummy.class.getDeclaredField("v1");
 
@@ -63,7 +65,7 @@ public class FieldFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testFormatV2() throws Exception
+  void testFormatV2() throws Exception
   {
     val v2 = Dummy.class.getDeclaredField("v2");
 
@@ -74,6 +76,8 @@ public class FieldFormatterTest extends AbstractFormatterTest
     assertEquals("java.util.Map<java.lang.String, java.lang.Integer> v2",
         context.message("%{f,field:TN}").with("f", v2).format());
   }
+
+
 
 
   @SuppressWarnings("unused")

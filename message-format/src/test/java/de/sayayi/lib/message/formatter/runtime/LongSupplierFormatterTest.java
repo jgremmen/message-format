@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.LongSupplier;
@@ -34,16 +35,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
+@DisplayName("LongSupplier formatter")
 class LongSupplierFormatterTest extends AbstractFormatterTest
 {
   @Test
-  public void testFormattableTypes() {
+  void testFormattableTypes() {
     assertFormatterForType(new LongSupplierFormatter(), LongSupplier.class);
   }
 
 
   @Test
-  public void testFormat()
+  void testFormat()
   {
     val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new LongSupplierFormatter()), NO_CACHE_INSTANCE)

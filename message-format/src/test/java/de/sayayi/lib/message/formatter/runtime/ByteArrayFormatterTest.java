@@ -22,6 +22,7 @@ import de.sayayi.lib.message.part.TextPart;
 import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.IllegalCharsetNameException;
@@ -41,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
+@DisplayName("byte[] formatter")
 public class ByteArrayFormatterTest extends AbstractFormatterTest
 {
   @Test

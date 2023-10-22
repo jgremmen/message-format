@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Jeroen Gremmen
  */
+@DisplayName("@MessageDef annotations")
 public class MessageDefAnnotationTest
 {
   private static MessageSupport messageSupport;

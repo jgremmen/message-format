@@ -20,6 +20,7 @@ import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.RetentionPolicy;
@@ -33,7 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-public class StringFormatterTest extends AbstractFormatterTest
+@DisplayName("'string' formatter")
+class StringFormatterTest extends AbstractFormatterTest
 {
   @Test
   public void testFormattableTypes()
