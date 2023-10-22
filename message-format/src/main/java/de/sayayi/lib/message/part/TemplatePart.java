@@ -56,7 +56,17 @@ public final class TemplatePart implements Template
   /** tells whether the template has a trailing space. */
   private final boolean spaceAfter;
 
+  /**
+   * Default parameter map. If a parameter which is referenced in the template message is not
+   * provided during formatting, a default value form this map is used, if available.
+   * <p>
+   * The map is optimized to require the least amount of space.
+   */
   private final Object[] defaultParameterMap;
+
+  /**
+   * Tells the number of default parameters. This is always {@code defaultParameterMap.size() / 2}.
+   */
   private final int defaultParameterCount;
 
 
@@ -80,6 +90,7 @@ public final class TemplatePart implements Template
     this.spaceAfter = spaceAfter;
 
     final List<String> parameterNames = new ArrayList<>(defaultParameters.keySet());
+    parameterNames.sort(null);
 
     defaultParameterCount = parameterNames.size();
     defaultParameterMap = defaultParameterCount == 0 ? null : new Object[defaultParameterCount * 2];

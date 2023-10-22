@@ -85,6 +85,26 @@ public final class TextPartFactory
   }
 
 
+  /**
+   * Changes the {@code text} as follows:
+   * <ul>
+   *   <li>
+   *     if {@code addSpaceBefore} is {@code true} a leading space will be added.
+   *     If the text alread had a leading space, no changes are made
+   *   </li>
+   *   <li>
+   *     if {@code addSpaceAfter} is {@code true} a trailing space will be added.
+   *     If the text alread had a trailing space, no changes are made
+   *   </li>
+   * </ul>
+   *
+   * @param text            text to modify, not {@code null}
+   * @param addSpaceBefore  add a leading space if {@code true}
+   * @param addSpaceAfter   add a trailing space if {code true}
+   *
+   * @return  the modified text or the original {@code text} if no changes were made,
+   *          never {@code null}
+   */
   @Contract(value = "_, false, false -> param1", pure = true)
   public static @NotNull Text addSpaces(@NotNull Text text, boolean addSpaceBefore,
                                         boolean addSpaceAfter)

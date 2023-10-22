@@ -25,7 +25,14 @@ import org.jetbrains.annotations.NotNull;
  */
 public class MessageParserException extends MessageException
 {
+  /**
+   * Error message describing the error that occurred durcing parsing.
+   */
   private final String errorMessage;
+
+  /**
+   * A visual representation of the syntax error and where it occurred.
+   */
   private final String syntaxError;
 
 

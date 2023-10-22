@@ -37,6 +37,9 @@ public final class NoSpaceTextPart implements Text
 {
   private static final long serialVersionUID = 800L;
 
+  /**
+   * Text without leading/trailing spaces.
+   */
   private final @NotNull String text;
 
 

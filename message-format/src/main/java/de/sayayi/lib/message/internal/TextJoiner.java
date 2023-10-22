@@ -33,12 +33,22 @@ public final class TextJoiner
   private boolean insertSpaceBefore;
 
 
+  /**
+   * Returns the joined text parts as a text preserving leading/trailing spaces.
+   *
+   * @return  joined text optionally with leading/trailing spaces, never {@code null}
+   */
   @Contract(pure = true)
   public @NotNull Text asSpacedText() {
     return addSpaces(spacedText(joined.toString()), false, insertSpaceBefore);
   }
 
 
+  /**
+   * Returns the joined text parts as a text with no leading/trailing space.
+   *
+   * @return  joined text without leading/trailing spaces, never {@code null}
+   */
   @Contract(pure = true)
   public @NotNull Text asNoSpaceText() {
     return noSpaceText(joined.toString());
