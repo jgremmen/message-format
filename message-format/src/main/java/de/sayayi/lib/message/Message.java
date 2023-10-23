@@ -26,8 +26,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import static java.util.Collections.unmodifiableSet;
-
 
 /**
  * This interface describes a message in its most generic form.
@@ -48,7 +46,7 @@ public interface Message extends Serializable
    * @param messageAccessor  message context providing formatting information, not {@code null}
    * @param parameters       message parameters, not {@code null}
    *
-   * @return  formatted message, never {@code null}
+   * @return  formatted message without leading/trailing spaces, never {@code null}
    *
    * @throws MessageFormatException  in case a formatting error occurred
    */
@@ -85,7 +83,7 @@ public interface Message extends Serializable
 
       @Override
       public @NotNull Set<String> getParameterNames() {
-        return unmodifiableSet(parameterValues.keySet());
+        return parameterValues.keySet();
       }
     });
   }

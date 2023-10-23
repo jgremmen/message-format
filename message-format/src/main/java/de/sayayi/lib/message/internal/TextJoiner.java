@@ -23,6 +23,8 @@ import static de.sayayi.lib.message.part.TextPartFactory.*;
 
 
 /**
+ * Text and string object joiner.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
@@ -58,7 +60,7 @@ public final class TextJoiner
   @Contract(value = "_ -> this", mutates = "this")
   public TextJoiner add(@NotNull Text text)
   {
-    insertSpaceBefore |= joined.length() > 0 && text.isSpaceBefore();
+    insertSpaceBefore |= text.isSpaceBefore();
 
     String s = text.getText();
     if (s != null && !s.isEmpty())

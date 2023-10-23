@@ -19,9 +19,9 @@ class TextJoinerTest
     val joiner = new TextJoiner();
 
     joiner
-        .addWithSpace(" ")
         .addWithSpace(" Test ")
         .addWithSpace(null)
+        .addWithSpace(" ")
         .addWithSpace("1 ");
 
     assertEquals(noSpaceText("Test 1"), joiner.asNoSpaceText());

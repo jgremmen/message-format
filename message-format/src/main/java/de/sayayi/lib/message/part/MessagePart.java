@@ -113,7 +113,7 @@ public interface MessagePart extends SpacesAware, Serializable
 
 
     /**
-     * Returns the formatted parameter as text.
+     * Returns the formatted parameter as text with optional leading/trailing spaces.
      *
      * @param messageAccessor  message support instance, not {@code null}
      * @param parameters       formatting parameters, not {@code null}
@@ -146,7 +146,7 @@ public interface MessagePart extends SpacesAware, Serializable
 
 
     /**
-     * Returns the formatted template as text.
+     * Returns the formatted template as text with optional leading/trailing spaces.
      *
      * @param messageAccessor  message support instance, not {@code null}
      * @param parameters       formatting parameters, not {@code null}

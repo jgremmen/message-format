@@ -79,62 +79,47 @@ public final class CompoundMessage implements Message.WithSpaces
   public @NotNull String format(@NotNull MessageAccessor messageAccessor,
                                 @NotNull Parameters parameters)
   {
-    final StringBuilder message = new StringBuilder();
-    boolean spaceBefore = false;
-    MessagePart messagePart = null;
+    final TextJoiner message = new TextJoiner();
 
-    try {
-      //noinspection ForLoopReplaceableByForEach
-      for(int n = 0, l = messageParts.length; n < l; n++)
-      {
-        final Text textPart = format_toText(messageAccessor, parameters,
-            messagePart = messageParts[n]);
+    for(MessagePart messagePart: messageParts)
+      message.add(format(messageAccessor, parameters, messagePart));
 
-        if (!textPart.isEmpty())
-        {
-          if ((spaceBefore || textPart.isSpaceBefore()) && message.length() > 0)
-            message.append(' ');
-
-          message.append(textPart.getText());
-          spaceBefore = textPart.isSpaceAfter();
-        }
-      }
-    } catch(MessageFormatException ex) {
-      format_exception(messagePart, ex);
-    } catch(Exception ex) {
-      format_exception(messagePart, new MessageFormatException(ex));
-    }
-
-    return message.toString();
+    return message.asNoSpaceText().getText();
   }
 
 
   @Contract(pure = true)
-  private @NotNull Text format_toText(@NotNull MessageAccessor messageAccessor,
-                                      @NotNull Parameters parameters,
-                                      @NotNull MessagePart messagePart)
+  private @NotNull Text format(@NotNull MessageAccessor messageAccessor,
+                               @NotNull Parameters parameters,
+                               @NotNull MessagePart messagePart)
   {
     if (messagePart instanceof ParameterPart)
-      return ((ParameterPart)messagePart).getText(messageAccessor, parameters);
+    {
+      final ParameterPart parameterPart = (ParameterPart)messagePart;
+
+      try {
+        return parameterPart.getText(messageAccessor, parameters);
+      } catch(MessageFormatException ex) {
+        throw ex.withParameter(parameterPart.getName());
+      } catch(Exception ex) {
+        throw new MessageFormatException(ex).withParameter(parameterPart.getName());
+      }
+    }
 
     if (messagePart instanceof TemplatePart)
-      return ((TemplatePart)messagePart).getText(messageAccessor, parameters);
+    {
+      final TemplatePart templatePart = (TemplatePart)messagePart;
+
+      try {
+        return templatePart.getText(messageAccessor, parameters);
+      } catch(MessageFormatException ex) {
+        throw ex.withTemplate(templatePart.getName());
+      } catch(Exception ex) {
+        throw new MessageFormatException(ex).withTemplate(templatePart.getName());
+      }
+    }
 
     return (Text)messagePart;
-  }
-
-
-  @Contract("_, _ -> fail")
-  private void format_exception(@NotNull MessagePart messagePart,
-                                @NotNull MessageFormatException ex)
-  {
-    if (messagePart instanceof ParameterPart)
-      throw ex.withParameter(((ParameterPart)messagePart).getName());
-
-    if (messagePart instanceof TemplatePart)
-      throw ex.withTemplate(((TemplatePart)messagePart).getName());
-
-    throw ex;
   }
 
 
