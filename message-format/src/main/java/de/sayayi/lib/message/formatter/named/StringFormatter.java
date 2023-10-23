@@ -172,8 +172,10 @@ public final class StringFormatter
                                                   long number)
   {
     try {
-      return context.getCompareType().match(new BigDecimal(value).compareTo(BigDecimal.valueOf(number)))
-          ? EQUIVALENT : MISMATCH;
+      return context
+          .getCompareType()
+          .match(new BigDecimal(value).compareTo(BigDecimal.valueOf(number)))
+              ? EQUIVALENT : MISMATCH;
     } catch(NumberFormatException ignored) {
     }
 

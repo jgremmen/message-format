@@ -37,8 +37,6 @@ import static de.sayayi.lib.message.util.SpacesUtil.trimSpaces;
  */
 public final class TextPart implements Text
 {
-  private static final long serialVersionUID = 800L;
-
   /** trimmed text string or {@code null}. */
   private final String text;
 
@@ -92,6 +90,23 @@ public final class TextPart implements Text
 
 
   @Override
+  public @NotNull String getTextWithSpaces()
+  {
+    return isEmpty()
+        ? spaceBefore || spaceAfter
+            ? " "
+            : ""
+        : spaceBefore
+            ? !spaceAfter
+                ? ' ' + text
+                : ' ' + text + ' '
+            : spaceAfter
+                ? text + ' '
+                : text;
+  }
+
+
+  @Override
   public boolean isSpaceBefore() {
     return spaceBefore;
   }
@@ -106,17 +121,6 @@ public final class TextPart implements Text
   @Override
   public boolean isSpaceAround() {
     return spaceBefore && spaceAfter;
-  }
-
-
-  @Override
-  public @NotNull String getTextWithSpaces()
-  {
-    if (isEmpty())
-      return spaceBefore || spaceAfter ? " " : "";
-
-    return spaceBefore ? !spaceAfter ? ' ' + text : ' ' + text + ' ' : spaceAfter
-        ? text + ' ' : text;
   }
 
 

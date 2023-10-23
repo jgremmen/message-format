@@ -73,7 +73,9 @@ public final class NumberFormatter
     if (msg != null)
       return context.format(msg);
 
-    final String format = context.getConfigValueString("number").orElse(null);
+    final String format = context
+        .getConfigValueString("number")
+        .orElse(null);
 
     // special case: show number as bool
     if ("bool".equals(format))
@@ -130,7 +132,8 @@ public final class NumberFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull Number value, @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToConfigKey(@NotNull Number value,
+                                                 @NotNull ComparatorContext context)
   {
     final CompareType compareType = context.getCompareType();
 

@@ -66,7 +66,8 @@ public final class ArrayFormatter extends AbstractParameterFormatter<Object>
     final Text separator = spacedText(context
         .getConfigValueString("list-sep").orElse(", "));
     final Text lastSeparator = spacedText(context
-        .getConfigValueString("list-sep-last").orElseGet(separator::getTextWithSpaces));
+        .getConfigValueString("list-sep-last")
+        .orElseGet(separator::getTextWithSpaces));
 
     final TextJoiner joiner = new TextJoiner();
     boolean first = true;

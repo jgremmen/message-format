@@ -29,7 +29,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.*;
 
-import static de.sayayi.lib.message.part.TextPartFactory.*;
+import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
+import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
@@ -135,7 +137,8 @@ public final class TemplatePart implements Template
 
     return addSpaces(message != null
         ? noSpaceText(message.format(messageAccessor, new ParameterAdapter(parameters)))
-        : emptyText(), spaceBefore, spaceAfter);
+        : EMPTY,
+        spaceBefore, spaceAfter);
   }
 
 
@@ -179,7 +182,12 @@ public final class TemplatePart implements Template
       s.append(",{");
 
       for(int n = 0; n < defaultParameterCount; n++)
+      {
+        if (n > 0)
+          s.append(',');
+
         s.append(defaultParameterMap[n * 2]).append('=').append(defaultParameterMap[n * 2 + 1]);
+      }
 
       s.append('}');
     }

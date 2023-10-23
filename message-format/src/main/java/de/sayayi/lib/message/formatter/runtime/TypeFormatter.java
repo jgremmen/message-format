@@ -35,8 +35,10 @@ import static java.util.stream.Collectors.joining;
 public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Type>
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Type type) {
-    return noSpaceText(toString(type, context.getConfigValueString("type").orElse("ju")));
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Type type)
+  {
+    return noSpaceText(
+        toString(type, context.getConfigValueString("type").orElse("ju")));
   }
 
 

@@ -177,7 +177,8 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull Object value, @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToConfigKey(@NotNull Object value,
+                                                 @NotNull ComparatorContext context)
   {
     switch(context.getKeyType())
     {

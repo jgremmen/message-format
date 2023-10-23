@@ -51,7 +51,8 @@ import static java.util.Collections.unmodifiableSet;
 /**
  * @author Jeroen Gremmen
  */
-public final class MapFormatter extends AbstractSingleTypeParameterFormatter<Map<?,?>>
+public final class MapFormatter
+    extends AbstractSingleTypeParameterFormatter<Map<?,?>>
     implements SizeQueryable, ConfigKeyComparator<Map<?,?>>
 {
   private static final Message.WithSpaces DEFAULT_KEY_VALUE_MESSAGE;
@@ -61,14 +62,14 @@ public final class MapFormatter extends AbstractSingleTypeParameterFormatter<Map
 
   static
   {
-    final ParameterConfig parameterConfig = new ParameterConfig(singletonMap(
+    final ParameterConfig nullConfig = new ParameterConfig(singletonMap(
         new ConfigKeyNull(EQ), new ConfigValueString("(null)")));
 
     // default map-kv: %{key,null:'(null)'}=%{value,null:'(null)'}
     DEFAULT_KEY_VALUE_MESSAGE = new CompoundMessage(asList(
-        new ParameterPart("key", parameterConfig),
+        new ParameterPart("key", nullConfig),
         new NoSpaceTextPart("="),
-        new ParameterPart("value", parameterConfig)
+        new ParameterPart("value", nullConfig)
     ));
   }
 
@@ -81,9 +82,12 @@ public final class MapFormatter extends AbstractSingleTypeParameterFormatter<Map
       return emptyText();
 
     final Message.WithSpaces kvMessage = context
-        .getConfigValueMessage("map-kv").orElse(DEFAULT_KEY_VALUE_MESSAGE);
+        .getConfigValueMessage("map-kv")
+        .orElse(DEFAULT_KEY_VALUE_MESSAGE);
     final Supplier<String> thisString = SupplierDelegate.of(() -> context
-        .getConfigValueString("map-this").map(String::trim).orElse("(this map)"));
+        .getConfigValueString("map-this")
+        .map(String::trim)
+        .orElse("(this map)"));
 
     final MessageAccessor messageAccessor = context.getMessageSupport();
     final KeyValueParameters parameters = new KeyValueParameters(messageAccessor.getLocale());
