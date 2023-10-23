@@ -138,6 +138,12 @@ public final class ParameterPart implements Parameter
 
 
   @Override
+  public boolean isSpaceAround() {
+    return spaceBefore && spaceAfter;
+  }
+
+
+  @Override
   @Contract(pure = true)
   public @NotNull Text getText(@NotNull MessageAccessor messageAccessor,
                                @NotNull Parameters parameters)
