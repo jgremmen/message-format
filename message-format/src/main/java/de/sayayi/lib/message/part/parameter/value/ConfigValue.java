@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
- * Interface representing a typed value in a data map.
+ * Interface representing a typed value in a parameter configuration map.
  *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
@@ -40,9 +40,9 @@ public interface ConfigValue
 
 
   /**
-   * Returns the underlying raw data object.
+   * Returns the underlying raw value object.
    *
-   * @return  raw data object, never {@code null}
+   * @return  raw value object, never {@code null}
    */
   @Contract(pure = true)
   @NotNull Object asObject();

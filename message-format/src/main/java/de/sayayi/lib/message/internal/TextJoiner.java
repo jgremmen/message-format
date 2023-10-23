@@ -57,8 +57,15 @@ public final class TextJoiner
   }
 
 
+  /**
+   * Add text respecting leading/trailing spaces.
+   *
+   * @param text  text to add, not {@code null}
+   *
+   * @return  this text joiner, never {@code null}
+   */
   @Contract(value = "_ -> this", mutates = "this")
-  public TextJoiner add(@NotNull Text text)
+  public @NotNull TextJoiner add(@NotNull Text text)
   {
     insertSpaceBefore |= text.isSpaceBefore();
 
@@ -78,26 +85,47 @@ public final class TextJoiner
   }
 
 
+  /**
+   * Add text dropping leading/trailing spaces.
+   *
+   * @param text  text to add, not {@code null}
+   *
+   * @return  this text joiner, never {@code null}
+   */
   @Contract(mutates = "this")
-  public TextJoiner addNoSpace(@NotNull Text text) {
+  public @NotNull TextJoiner addNoSpace(@NotNull Text text) {
     return add(noSpaceText(text.getText()));
   }
 
 
+  /**
+   * Add string dropping leading/trailing spaces.
+   *
+   * @param text  string to add, or {@code null}
+   *
+   * @return  this text joiner, never {@code null}
+   */
   @Contract(mutates = "this")
-  public TextJoiner addNoSpace(String text) {
+  public @NotNull TextJoiner addNoSpace(String text) {
     return add(noSpaceText(text));
   }
 
 
+  /**
+   * Add string respecting leading/trailing spaces.
+   *
+   * @param text  string to add, or {@code null}
+   *
+   * @return  this text joiner, never {@code null}
+   */
   @Contract(mutates = "this")
-  public TextJoiner addWithSpace(String s) {
-    return add(spacedText(s));
+  public @NotNull TextJoiner addWithSpace(String text) {
+    return add(spacedText(text));
   }
 
 
   @Override
-  public String toString() {
+  public @NotNull String toString() {
     return asSpacedText().toString();
   }
 }
