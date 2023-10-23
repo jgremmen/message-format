@@ -19,7 +19,6 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextPartFactory;
 import de.sayayi.lib.message.part.parameter.ParameterConfigAccessor;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -205,7 +204,7 @@ public interface ParameterFormatter
    * This interface marks a parameter formatter as being capable of calculating the size of the
    * formattable type.
    */
-  interface SizeQueryable
+  interface SizeQueryable extends ParameterFormatter
   {
     /**
      * Returns the size of the given {@code value}.
@@ -230,7 +229,7 @@ public interface ParameterFormatter
    *
    * @since 0.8.4
    */
-  interface ConfigKeyComparator<T>
+  interface ConfigKeyComparator<T> extends ParameterFormatter
   {
     /**
      *
