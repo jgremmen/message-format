@@ -19,7 +19,6 @@ import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -35,7 +34,7 @@ import static java.util.Collections.unmodifiableSet;
  *
  * @see ParameterConfig
  */
-public interface ConfigKey extends Serializable
+public interface ConfigKey
 {
   /** Map key type {@code empty}. */
   Set<Type> EMPTY_TYPE = unmodifiableSet(EnumSet.of(Type.EMPTY));

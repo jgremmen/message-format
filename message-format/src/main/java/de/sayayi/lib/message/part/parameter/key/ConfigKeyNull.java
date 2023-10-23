@@ -31,8 +31,6 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
  */
 public final class ConfigKeyNull implements ConfigKey
 {
-  private static final long serialVersionUID = 800L;
-
   /** Configuration null key comparison type. */
   private final @NotNull CompareType compareType;
 

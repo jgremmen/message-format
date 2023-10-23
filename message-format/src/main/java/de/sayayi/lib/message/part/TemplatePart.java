@@ -45,8 +45,6 @@ import static java.util.stream.Collectors.joining;
  */
 public final class TemplatePart implements Template
 {
-  private static final long serialVersionUID = 800L;
-
   /** template name. */
   private final @NotNull String name;
 

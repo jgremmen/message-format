@@ -41,8 +41,6 @@ import static java.util.Objects.requireNonNull;
  */
 public final class ParameterPart implements Parameter
 {
-  private static final long serialVersionUID = 800L;
-
   /** parameter name. */
   private final @NotNull String name;
 

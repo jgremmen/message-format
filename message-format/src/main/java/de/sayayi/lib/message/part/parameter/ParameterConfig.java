@@ -35,7 +35,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -52,10 +51,8 @@ import static java.util.Collections.unmodifiableSet;
  * @author Jeroen Gremmen
  * @since 0.4.0
  */
-public final class ParameterConfig implements Serializable
+public final class ParameterConfig
 {
-  private static final long serialVersionUID = 804L;
-
   /** map containing the parameter configuration values keyed by configuration name. */
   private final @NotNull Map<String,ConfigValue> config;
 

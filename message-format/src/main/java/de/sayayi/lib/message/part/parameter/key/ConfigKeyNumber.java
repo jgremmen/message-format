@@ -31,8 +31,6 @@ import static java.util.Objects.requireNonNull;
  */
 public final class ConfigKeyNumber implements ConfigKey
 {
-  private static final long serialVersionUID = 800L;
-
   /** Configuration number key comparison type. */
   private final @NotNull CompareType compareType;
 

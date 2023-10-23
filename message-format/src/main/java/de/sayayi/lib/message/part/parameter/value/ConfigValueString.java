@@ -33,8 +33,6 @@ import static java.util.Objects.requireNonNull;
  */
 public final class ConfigValueString implements ConfigValue
 {
-  private static final long serialVersionUID = 800L;
-
   /** Configuration value string. */
   private final @NotNull String string;
 

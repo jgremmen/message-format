@@ -30,7 +30,7 @@ import java.io.Serializable;
  *
  * @see ParameterConfig
  */
-public interface ConfigValue extends Serializable
+public interface ConfigValue
 {
   /**
    * Return the config value type.
