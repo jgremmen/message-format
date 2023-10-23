@@ -26,14 +26,24 @@ import static java.util.Locale.UK;
 
 
 /**
+ * Exception providing detailed information about what went wrong during message/template
+ * formatting.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
 public class MessageFormatException extends MessageException
 {
+  /** Code of the message being formatted as the exception occurs or {@code null}. */
   private final String code;
+
+  /** Name of the template being formatted as the exception occurs or {@code null}. */
   private final String template;
+
+  /** Locale in effect during message/template formatting as the exception occurs or {@code null}. */
   private final Locale locale;
+
+  /** Name of the parameter being formatted as the exception occurs or {@code null}. */
   private final String parameter;
 
 
