@@ -18,10 +18,10 @@ package de.sayayi.lib.message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -38,7 +38,7 @@ import java.util.Set;
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
-public interface Message extends Serializable
+public interface Message
 {
   /**
    * Formats the message based on the message parameters provided.
@@ -51,8 +51,29 @@ public interface Message extends Serializable
    * @throws MessageFormatException  in case a formatting error occurred
    */
   @Contract(pure = true)
-  @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
-      throws MessageFormatException;
+  default @NotNull String format(@NotNull MessageAccessor messageAccessor,
+                                 @NotNull Parameters parameters) throws MessageFormatException
+  {
+    final Text text = formatAsText(messageAccessor, parameters);
+    return text.isEmpty() ? "" : text.getText();
+  }
+
+
+  /**
+   * Formats the message based on the message parameters provided.
+   *
+   * @param messageAccessor  message context providing formatting information, not {@code null}
+   * @param parameters       message parameters, not {@code null}
+   *
+   * @return  formatted message as text optionally with leading/trailing spaces, never {@code null}
+   *
+   * @throws MessageFormatException  in case a formatting error occurred
+   *
+   * @since 0.9.1
+   */
+  @Contract(pure = true)
+  @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
+                             @NotNull Parameters parameters) throws MessageFormatException;
 
 
   /**
@@ -189,8 +210,8 @@ public interface Message extends Serializable
      */
     @Contract(pure = true)
     @Override
-    @NotNull String format(@NotNull MessageAccessor messageAccessor,
-                           @NotNull Parameters parameters);
+    @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
+                               @NotNull Parameters parameters);
 
 
     /**

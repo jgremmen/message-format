@@ -50,8 +50,6 @@ import static java.util.Objects.requireNonNull;
  */
 public final class CompoundMessage implements Message.WithSpaces
 {
-  private static final long serialVersionUID = 800L;
-
   /** Message parts, not empty */
   private final @NotNull MessagePart[] messageParts;
 
@@ -75,16 +73,15 @@ public final class CompoundMessage implements Message.WithSpaces
 
 
   @Override
-  @Contract(pure = true)
-  public @NotNull String format(@NotNull MessageAccessor messageAccessor,
-                                @NotNull Parameters parameters)
+  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
+                                    @NotNull Parameters parameters) throws MessageFormatException
   {
     final TextJoiner message = new TextJoiner();
 
     for(MessagePart messagePart: messageParts)
       message.add(format(messageAccessor, parameters, messagePart));
 
-    return message.asNoSpaceText().getText();
+    return message.asSpacedText();
   }
 
 
@@ -95,27 +92,19 @@ public final class CompoundMessage implements Message.WithSpaces
   {
     if (messagePart instanceof ParameterPart)
     {
-      final ParameterPart parameterPart = (ParameterPart)messagePart;
-
       try {
-        return parameterPart.getText(messageAccessor, parameters);
-      } catch(MessageFormatException ex) {
-        throw ex.withParameter(parameterPart.getName());
+        return ((ParameterPart)messagePart).getText(messageAccessor, parameters);
       } catch(Exception ex) {
-        throw new MessageFormatException(ex).withParameter(parameterPart.getName());
+        throw MessageFormatException.of(ex).withParameter(((ParameterPart)messagePart).getName());
       }
     }
 
     if (messagePart instanceof TemplatePart)
     {
-      final TemplatePart templatePart = (TemplatePart)messagePart;
-
       try {
-        return templatePart.getText(messageAccessor, parameters);
-      } catch(MessageFormatException ex) {
-        throw ex.withTemplate(templatePart.getName());
+        return ((TemplatePart)messagePart).getText(messageAccessor, parameters);
       } catch(Exception ex) {
-        throw new MessageFormatException(ex).withTemplate(templatePart.getName());
+        throw MessageFormatException.of(ex).withTemplate(((TemplatePart)messagePart).getName());
       }
     }
 

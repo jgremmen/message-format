@@ -47,7 +47,7 @@ public class MessageFormatException extends MessageException
    *                 method). (A {@code null} value is permitted, and indicates that the cause is
    *                 nonexistent or unknown.)
    */
-  public MessageFormatException(Throwable cause) {
+  protected MessageFormatException(Throwable cause) {
     this(null, null, null, null, cause);
   }
 
@@ -236,5 +236,21 @@ public class MessageFormatException extends MessageException
   @Contract("_ -> new")
   public @NotNull MessageFormatException withParameter(@NotNull String parameter) {
     return new MessageFormatException(code, template, locale, parameter, getCause());
+  }
+
+
+  /**
+   * Cast to or create a new MessageFormatException instance based of {@code ex}.
+   *
+   * @param ex  exception, or {@code null}
+   *
+   * @return  {@code MessageFormatException} instance, never {@code null}
+   */
+  @Contract(pure = true)
+  public static @NotNull MessageFormatException of(Exception ex)
+  {
+    return ex instanceof MessageFormatException
+        ? (MessageFormatException)ex
+        : new MessageFormatException(ex);
   }
 }

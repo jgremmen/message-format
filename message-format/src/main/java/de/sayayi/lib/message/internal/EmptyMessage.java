@@ -17,14 +17,15 @@ package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.part.TextPart;
-import org.jetbrains.annotations.Contract;
+import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Set;
 
+import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
 import static java.util.Collections.emptySet;
 
 
@@ -36,9 +37,6 @@ import static java.util.Collections.emptySet;
  */
 public final class EmptyMessage implements Message.WithSpaces
 {
-  private static final long serialVersionUID = 800L;
-
-
   /**
    * Empty message instance.
    */
@@ -49,10 +47,16 @@ public final class EmptyMessage implements Message.WithSpaces
 
 
   @Override
-  @Contract(pure = true)
   public @NotNull String format(@NotNull MessageAccessor messageAccessor,
-                                @NotNull Parameters parameters) {
+                                @NotNull Parameters parameters) throws MessageFormatException {
     return "";
+  }
+
+
+  @Override
+  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
+                                    @NotNull Parameters parameters) throws MessageFormatException {
+    return EMPTY;
   }
 
 
@@ -91,7 +95,7 @@ public final class EmptyMessage implements Message.WithSpaces
 
   @Override
   public @NotNull MessagePart[] getMessageParts() {
-    return new MessagePart[] { TextPart.EMPTY };
+    return new MessagePart[] { EMPTY };
   }
 
 

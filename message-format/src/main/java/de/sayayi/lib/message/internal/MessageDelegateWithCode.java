@@ -22,6 +22,7 @@ import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,8 +38,6 @@ import static java.util.Objects.requireNonNull;
  */
 public final class MessageDelegateWithCode extends AbstractMessageWithCode
 {
-  private static final long serialVersionUID = 800L;
-
   /** Delegated message. */
   private final @NotNull Message message;
 
@@ -63,12 +62,11 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
 
 
   @Override
-  @Contract(pure = true)
-  public @NotNull String format(@NotNull MessageAccessor messageAccessor,
-                                @NotNull Parameters parameters)
+  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
+                                    @NotNull Parameters parameters) throws MessageFormatException
   {
     try {
-      return message.format(messageAccessor, parameters);
+      return message.formatAsText(messageAccessor, parameters);
     } catch(MessageFormatException ex) {
       throw ex.withCode(code);
     }

@@ -17,6 +17,7 @@ package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.part.MessagePart;
@@ -27,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
@@ -42,16 +42,8 @@ import static java.util.Collections.emptySet;
  */
 public final class TextMessage implements Message.WithSpaces
 {
-  private static final long serialVersionUID = 800L;
-
-  /** Trimmed message text, or {@code null} */
-  private final String text;
-
-  /** Does this message have a leading space? */
-  private final boolean spaceBefore;
-
-  /** Does this message have a trailing space? */
-  private final boolean spaceAfter;
+  /** Text part, not {@code null} */
+  private final Text textPart;
 
 
   /**
@@ -60,46 +52,38 @@ public final class TextMessage implements Message.WithSpaces
    * @param textPart  text part, not {@code null}
    */
   public TextMessage(@NotNull Text textPart) {
-    this(textPart.getText(), textPart.isSpaceBefore(), textPart.isSpaceAfter());
-  }
-
-
-  private TextMessage(String text, boolean spaceBefore, boolean spaceAfter)
-  {
-    this.text = text;
-    this.spaceBefore = spaceBefore;
-    this.spaceAfter = spaceAfter;
+    this.textPart = textPart;
   }
 
 
   @Override
   public boolean isSpaceBefore() {
-    return spaceBefore;
+    return textPart.isSpaceBefore();
   }
 
 
   @Override
   public boolean isSpaceAfter() {
-    return spaceAfter;
+    return textPart.isSpaceAfter();
   }
 
 
   @Override
   public boolean isSpaceAround() {
-    return spaceBefore && spaceAfter;
+    return textPart.isSpaceAround();
   }
 
 
   @Override
-  public @NotNull String format(@NotNull MessageAccessor messageAccessor,
-                                @NotNull Parameters parameters) {
-    return text == null ? "" : text;
+  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
+                                    @NotNull Parameters parameters) throws MessageFormatException {
+    return textPart;
   }
 
 
   @Override
   public @NotNull MessagePart[] getMessageParts() {
-    return new MessagePart[] { new TextPart(text, spaceBefore, spaceAfter) };
+    return new MessagePart[] { textPart };
   }
 
 
@@ -121,24 +105,14 @@ public final class TextMessage implements Message.WithSpaces
 
 
   @Override
-  public boolean equals(Object o)
-  {
-    if (this == o)
-      return true;
-    if (!(o instanceof TextMessage))
-      return false;
-
-    final TextMessage that = (TextMessage)o;
-
-    return spaceBefore == that.spaceBefore &&
-           spaceAfter == that.spaceAfter &&
-           Objects.equals(text, that.text);
+  public boolean equals(Object o) {
+    return this == o || o instanceof TextMessage && textPart.equals(((TextMessage)o).textPart);
   }
 
 
   @Override
   public int hashCode() {
-    return (text == null ? 0 : text.hashCode()) * 11 + (spaceBefore ? 8 : 0) + (spaceAfter ? 2 : 0);
+    return textPart.hashCode();
   }
 
 
@@ -146,13 +120,13 @@ public final class TextMessage implements Message.WithSpaces
   @Contract(pure = true)
   public String toString()
   {
-    final StringBuilder s = new StringBuilder("TextMessage(text=").append(text);
+    final StringBuilder s = new StringBuilder("TextMessage(text=").append(textPart.getText());
 
-    if (spaceBefore && spaceAfter)
+    if (textPart.isSpaceBefore() && textPart.isSpaceAfter())
       s.append(",space-around");
-    else if (spaceBefore)
+    else if (textPart.isSpaceBefore())
       s.append(",space-before");
-    else if (spaceAfter)
+    else if (textPart.isSpaceAfter())
       s.append(",space-after");
 
     return s.append(')').toString();
@@ -171,9 +145,9 @@ public final class TextMessage implements Message.WithSpaces
   @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.writeBoolean(spaceBefore);
-    packStream.writeBoolean(spaceAfter);
-    packStream.writeString(text);
+    packStream.writeBoolean(textPart.isSpaceBefore());
+    packStream.writeBoolean(textPart.isSpaceAfter());
+    packStream.writeString(textPart.getText());
   }
 
 
@@ -195,6 +169,6 @@ public final class TextMessage implements Message.WithSpaces
     final boolean spaceBefore = packStream.readBoolean();
     final boolean spaceAfter = packStream.readBoolean();
 
-    return new TextMessage(packStream.readString(), spaceBefore, spaceAfter);
+    return new TextMessage(new TextPart(packStream.readString(), spaceBefore, spaceAfter));
   }
 }

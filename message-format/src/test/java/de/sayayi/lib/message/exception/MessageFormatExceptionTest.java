@@ -82,7 +82,7 @@ class MessageFormatExceptionTest
   void testGetMessage(String code, String template, Locale locale, String parameter,
                       @NotNull String msg)
   {
-    var ex = new MessageFormatException(null);
+    var ex = MessageFormatException.of(null);
 
     if (code != null)
       ex = ex.withCode(code);
@@ -105,7 +105,7 @@ class MessageFormatExceptionTest
   void testGeneratedMessageCode()
   {
     assertEquals("failed to format message parameter 'q' for locale Dutch (Netherlands)",
-        new MessageFormatException(null)
+        MessageFormatException.of(null)
             .withCode("MSG[5JJRMZBVNJ-30UO]")
             .withParameter("q")
             .withLocale(new Locale("nl", "NL"))

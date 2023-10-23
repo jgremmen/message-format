@@ -23,6 +23,7 @@ import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -47,8 +48,6 @@ import static java.util.stream.Collectors.toSet;
 public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCode
     implements LocaleAware
 {
-  private static final long serialVersionUID = 800L;
-
   /** Localized message map. */
   private final @NotNull Map<Locale,Message> localizedMessages;
 
@@ -73,16 +72,15 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
 
   @Override
-  @Contract(pure = true)
-  public @NotNull String format(@NotNull MessageAccessor messageAccessor,
-                                @NotNull Parameters parameters)
+  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
+                                    @NotNull Parameters parameters) throws MessageFormatException
   {
     final Locale locale = parameters.getLocale();
 
     try {
-      return findMessageByLocale(locale).format(messageAccessor, parameters);
-    } catch(MessageFormatException ex) {
-      throw ex.withCode(code).withLocale(locale);
+      return findMessageByLocale(locale).formatAsText(messageAccessor, parameters);
+    } catch(Exception ex) {
+      throw MessageFormatException.of(ex).withCode(code).withLocale(locale);
     }
   }
 

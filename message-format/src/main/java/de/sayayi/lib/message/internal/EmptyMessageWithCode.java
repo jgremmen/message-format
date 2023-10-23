@@ -17,9 +17,11 @@ package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,9 +40,6 @@ import static java.util.Objects.requireNonNull;
  */
 public final class EmptyMessageWithCode extends AbstractMessageWithCode
 {
-  private static final long serialVersionUID = 800L;
-
-
   /**
    * Constructs an empty message with {@code code}.
    *
@@ -58,6 +57,13 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
   public @NotNull String format(@NotNull MessageAccessor messageAccessor,
                                 @NotNull Parameters parameters) {
     return "";
+  }
+
+
+  @Override
+  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
+                                    @NotNull Parameters parameters) throws MessageFormatException {
+    return EMPTY;
   }
 
 
