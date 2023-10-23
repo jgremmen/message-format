@@ -22,19 +22,17 @@ import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
-
 
 /**
- * This interface represents a part of a compiled message (text, parameter or template).
+ * This interface represents an immutable part of a compiled message (text, parameter or template).
  *
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
-public interface MessagePart extends SpacesAware, Serializable
+public interface MessagePart extends SpacesAware
 {
   /**
-   * Message part containing text only.
+   * Message part containing text only, optionally decorated with leading/trailing space.
    */
   interface Text extends MessagePart
   {
@@ -46,7 +44,7 @@ public interface MessagePart extends SpacesAware, Serializable
 
 
     /**
-     * Returns the text for this message part.
+     * Returns the trimmed text for this message part.
      *
      * @return  trimmed text or {@code null}
      */
@@ -55,16 +53,13 @@ public interface MessagePart extends SpacesAware, Serializable
 
 
     /**
-     * Returns the text for this message part decorated with spaces, if available.
+     * Returns the text for this message part decorated with spaces, if available. If the message
+     * text is {@code null} an empty string is returned.
      *
      * @return  text, never {@code null}
      */
     @Contract(pure = true)
-    default @NotNull String getTextWithSpaces()
-    {
-      String text = getText();
-      return text != null ? text : "";
-    }
+    @NotNull String getTextWithSpaces();
 
 
     /**

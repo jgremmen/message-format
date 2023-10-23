@@ -19,8 +19,6 @@ import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
-
 
 /**
  * Interface representing a typed value in a data map.
@@ -47,7 +45,7 @@ public interface ConfigValue
    * @return  raw data object, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull Serializable asObject();
+  @NotNull Object asObject();
 
 
 
@@ -55,7 +53,18 @@ public interface ConfigValue
   /**
    * Type constants for map values.
    */
-  enum Type {
-    STRING, NUMBER, BOOL, MESSAGE
+  enum Type
+  {
+    /** String value type. */
+    STRING,
+
+    /** Number value type. */
+    NUMBER,
+
+    /** Boolean value type. */
+    BOOL,
+
+    /** Message value type. */
+    MESSAGE
   }
 }

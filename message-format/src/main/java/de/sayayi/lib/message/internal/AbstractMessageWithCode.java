@@ -27,9 +27,6 @@ import static java.util.Objects.requireNonNull;
  */
 abstract class AbstractMessageWithCode implements Message.WithCode
 {
-  private static final long serialVersionUID = 800L;
-
-
   /**
    * Unique message code, never {@code null} nor empty.
    */

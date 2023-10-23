@@ -35,17 +35,13 @@ import static java.util.Objects.requireNonNull;
  */
 public final class NoSpaceTextPart implements Text
 {
-  private static final long serialVersionUID = 800L;
-
-  /**
-   * Text without leading/trailing spaces.
-   */
+  /** Text without leading/trailing spaces. */
   private final @NotNull String text;
 
 
   /**
-   * Constructs a text part without leading/trailing spaces. If {@code text} contains leading and/or
-   * trailing spaces, they will be removed.
+   * Constructs a text part without leading/trailing spaces. If {@code text} contains leading
+   * and/or trailing spaces, they will be removed.
    *
    * @param text  text, not {@code null}
    */
@@ -56,6 +52,12 @@ public final class NoSpaceTextPart implements Text
 
   @Override
   public @NotNull String getText() {
+    return text;
+  }
+
+
+  @Override
+  public @NotNull String getTextWithSpaces() {
     return text;
   }
 
