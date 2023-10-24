@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message;
 
+import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
@@ -28,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import static de.sayayi.lib.message.parser.normalizer.MessagePartNormalizer.PASS_THROUGH;
@@ -88,6 +90,8 @@ public class MessageFactory
    * @param text  message format text, not {@code null}
    *
    * @return  message instance, never {@code null}
+   *
+   * @throws MessageParserException  in case the message could not be parsed
    */
   @Contract(value = "_ -> new", pure = true)
   public @NotNull Message.WithSpaces parseMessage(@NotNull @Language("MessageFormat") String text) {
@@ -108,11 +112,18 @@ public class MessageFactory
    * @param text  message format
    *
    * @return  message instance
+   *
+   * @throws MessageParserException  in case the message could not be parsed
    */
   @Contract(value = "_, _ -> new", pure = true)
   public @NotNull Message.WithCode parseMessage(@NotNull String code,
-                                                @NotNull @Language("MessageFormat") String text) {
-    return withCode(code, parseMessage(text));
+                                                @NotNull @Language("MessageFormat") String text)
+  {
+    try {
+      return withCode(code, parseMessage(text));
+    } catch(MessageParserException ex) {
+      throw ex.withCode(code);
+    }
   }
 
 
@@ -131,8 +142,13 @@ public class MessageFactory
       default: {
         final Map<Locale,Message> localizedMessages = new HashMap<>();
 
-        localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) ->
-            localizedMessages.put(locale, parseMessage(text)));
+        localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) -> {
+          try {
+            localizedMessages.put(locale, parseMessage(text));
+          } catch(MessageParserException ex) {
+            throw ex.withCode(code).withLocale(locale);
+          }
+        });
 
         return new LocalizedMessageBundleWithCode(code, localizedMessages);
       }
@@ -146,6 +162,8 @@ public class MessageFactory
    * @param text  template format text, not {@code null}
    *
    * @return  message instance, never {@code null}
+   *
+   * @throws MessageParserException  in case the template could not be parsed
    */
   @Contract(value = "_ -> new", pure = true)
   public @NotNull Message parseTemplate(@NotNull @Language("MessageFormat") String text) {
@@ -161,14 +179,26 @@ public class MessageFactory
       case 0:
         return EmptyMessage.INSTANCE;
 
-      case 1:
-        return parseTemplate(localizedTexts.values().iterator().next());
+      case 1: {
+        final Entry<Locale,String> entry = localizedTexts.entrySet().iterator().next();
+
+        try {
+          return parseTemplate(entry.getValue());
+        } catch(MessageParserException ex) {
+          throw ex.withLocale(entry.getKey());
+        }
+      }
 
       default: {
         final Map<Locale,Message> localizedMessages = new HashMap<>();
 
-        localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) ->
-            localizedMessages.put(locale, parseMessage(text)));
+        localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) -> {
+          try {
+            localizedMessages.put(locale, parseMessage(text));
+          } catch(MessageParserException ex) {
+            throw ex.withLocale(locale);
+          }
+        });
 
         return new LocalizedMessageBundleWithCode(generateCode("TPL"), localizedMessages);
       }

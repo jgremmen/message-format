@@ -107,6 +107,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    * @param text  message text, not {@code null}
    *
    * @return  compiled message, never {@code null}
+   *
+   * @throws MessageParserException  in case the message could not be parsed
    */
   @Contract(pure = true)
   public @NotNull Message.WithSpaces compileMessage(
@@ -121,6 +123,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    * @param text  template text, not {@code null}
    *
    * @return  compiled template, never {@code null}
+   *
+   * @throws MessageParserException  in case the template could not be parsed
    */
   @Contract(pure = true)
   public @NotNull Message.WithSpaces compileTemplate(

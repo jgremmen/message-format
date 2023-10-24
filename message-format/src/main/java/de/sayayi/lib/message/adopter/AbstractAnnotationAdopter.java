@@ -24,6 +24,7 @@ import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.exception.MessageAdopterException;
+import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import org.intellij.lang.annotations.Language;
@@ -103,6 +104,8 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * @param packageNames  package names to scan, not {@code null}
    *
    * @return  this annotation adopter, never {@code null}
+   *
+   * @throws MessageParserException  in case the template could not be parsed
    */
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull ClassLoader classLoader,
                                                   @NotNull Set<String> packageNames)
@@ -244,6 +247,8 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * @param classFile  location of the class file to analyse for messages, not {@code null}
    *
    * @return  this annotation adopter instance, never {@code null}
+   *
+   * @throws MessageParserException  in case the template could not be parsed
    */
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull File classFile)
   {
@@ -270,6 +275,8 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * @param type  type to analyse for messages, not {@code null}
    *
    * @return  this annotation adopter instance, never {@code null}
+   *
+   * @throws MessageParserException  in case the template could not be parsed
    */
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull Class<?> type)
   {
@@ -305,6 +312,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * @return  this annotation adopter instance, never {@code null}
    *
    * @throws DuplicateMessageException  if different messages are provided for the same locale
+   * @throws MessageParserException     in case the template could not be parsed
    */
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull MessageDef messageDef)
   {
@@ -354,6 +362,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    *
    * @throws DuplicateTemplateException  if different template messages are provided for the
    *                                     same locale
+   * @throws MessageParserException      in case the template could not be parsed
    */
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull TemplateDef templateDef)
   {
@@ -387,7 +396,11 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
         });
       }
 
-      messagePublisher.addTemplate(name, messageFactory.parseTemplate(localizedTexts));
+      try {
+        messagePublisher.addTemplate(name, messageFactory.parseTemplate(localizedTexts));
+      } catch(MessageParserException ex) {
+        throw ex.withTemplate(name);
+      }
     }
 
     return this;
