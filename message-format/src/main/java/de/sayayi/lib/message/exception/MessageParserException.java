@@ -26,6 +26,10 @@ import static java.util.Locale.UK;
 
 
 /**
+ * A message parser exception provides detailed information about what went wrong during message or
+ * template parsing and provides a visual representation showing exactly where the parsing error
+ * occurred.
+ *
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
@@ -50,6 +54,15 @@ public class MessageParserException extends MessageException
   private final Locale locale;
 
 
+  /**
+   * Create a new message parser exception.
+   *
+   * @param errorMessage  error message describing what went wrong during parsing, not {@code null}
+   * @param syntaxError   a visual representation showing where the parsing error occurred, not {@code null}
+   * @param cause         the exception that caused this exception
+   *
+   * @since 0.9.1
+   */
   public MessageParserException(@NotNull String errorMessage, @NotNull String syntaxError,
                                 Exception cause) {
     this(null, errorMessage, syntaxError, null, null, null, cause);
@@ -57,6 +70,16 @@ public class MessageParserException extends MessageException
 
 
   /**
+   * Create a new message parser exception.
+   *
+   * @param type          parse type
+   * @param errorMessage  error message describing what went wrong during parsing, not {@code null}
+   * @param syntaxError   a visual representation showing where the parsing error occurred, not {@code null}
+   * @param code          message code associated with the message being parsed
+   * @param template      template name associated with the template being parsed
+   * @param locale        locale associated with the message or template being parsed
+   * @param cause         the exception that caused this exception
+   *
    * @since 0.9.1
    */
   public MessageParserException(Type type, @NotNull String errorMessage,

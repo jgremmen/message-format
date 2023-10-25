@@ -221,6 +221,7 @@ public final class TemplatePart implements Template
 
 
   /**
+   * @param unpack      pack helper instance, not {@code null}
    * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked template part, never {@code null}

@@ -59,6 +59,11 @@ public interface ConfigKey
 
 
   /**
+   * Returns the compare type for this configuration key. The compare type determines how the
+   * provided value is compared to this key value.
+   *
+   * @return  compare type, never {@code null}
+   *
    * @since 0.8.4
    */
   @Contract(pure = true)

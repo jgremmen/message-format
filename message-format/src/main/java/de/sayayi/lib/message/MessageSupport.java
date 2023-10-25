@@ -370,7 +370,7 @@ public interface MessageSupport
      * Exceptions thrown by the constructor function are relayed to the caller.
      *
      * @param constructor  exception constructor, not {@code null}
-     * @param cause        exception root cause
+     * @param cause        the throwable that caused this exception
      * @param <X>          exception type
      *
      * @return  newly created exception with the formatted message and the given root cause,
@@ -426,6 +426,10 @@ public interface MessageSupport
      * <p>
      * Exceptions thrown by the constructor function are relayed to the caller.
      *
+     * @param constructor  exception constructor, not {@code null}
+     * @param cause        the throwable that caused this exception
+     * @param <X>          exception type
+     *
      * @return  format supplier, never {@code null}
      *
      * @since 0.8.3
@@ -443,6 +447,9 @@ public interface MessageSupport
      * Formatting the message is delayed until {@link Supplier#get()} is invoked.
      * <p>
      * Exceptions thrown by the constructor function are relayed to the caller.
+     *
+     * @param constructor  exception constructor, not {@code null}
+     * @param <X>          exception type
      *
      * @return  format supplier, never {@code null}
      *
@@ -463,6 +470,9 @@ public interface MessageSupport
      * Formatting the message is delayed until {@link Supplier#get()} is invoked.
      * <p>
      * Exceptions thrown by the constructor function are relayed to the caller.
+     *
+     * @param constructor  exception constructor, not {@code null}
+     * @param <X>          exception type
      *
      * @return  format supplier, never {@code null}
      */
@@ -880,6 +890,8 @@ public interface MessageSupport
      *
      * @param message  message with code, not {@code null}
      *
+     * @return  this message publisher instance, never {@code null}
+     *
      * @throws DuplicateMessageException  in case a message with the same code already exists
      */
     @Contract(value = "_ -> this", mutates = "this")
@@ -891,6 +903,8 @@ public interface MessageSupport
      *
      * @param name      template name, not {@code null}
      * @param template  template message, not {@code null}
+     *
+     * @return  this message publisher instance, never {@code null}
      *
      * @throws DuplicateTemplateException  in case a template with the same name already exists
      */
