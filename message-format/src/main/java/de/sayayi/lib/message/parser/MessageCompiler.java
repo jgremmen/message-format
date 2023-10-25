@@ -47,6 +47,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
+import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAGE;
+import static de.sayayi.lib.message.exception.MessageParserException.Type.TEMPLATE;
 import static de.sayayi.lib.message.parser.MessageLexer.BOOL;
 import static de.sayayi.lib.message.parser.MessageLexer.COLON;
 import static de.sayayi.lib.message.parser.MessageLexer.COMMA;
@@ -139,9 +141,13 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   {
     final Listener listener = new Listener(template);
 
-    return parse(new Lexer(text),
-        lexer -> new Parser(listener.tokenStream = new BufferedTokenStream(lexer)),
-        Parser::message, listener, ctx -> requireNonNull(ctx.messageWithSpaces));
+    try {
+      return parse(new Lexer(text),
+          lexer -> new Parser(listener.tokenStream = new BufferedTokenStream(lexer)),
+          Parser::message, listener, ctx -> requireNonNull(ctx.messageWithSpaces));
+    } catch(MessageParserException ex) {
+      throw ex.withType(template ? TEMPLATE : MESSAGE);
+    }
   }
 
 

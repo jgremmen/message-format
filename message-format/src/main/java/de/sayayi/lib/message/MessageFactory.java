@@ -108,10 +108,10 @@ public class MessageFactory
   /**
    * Parse the message {@code text} into a {@link Message} instance.
    *
-   * @param code  message code
-   * @param text  message format
+   * @param code  message code, not {@code null}
+   * @param text  message format, not {@code null}
    *
-   * @return  message instance
+   * @return  message instance, never {@code null}
    *
    * @throws MessageParserException  in case the message could not be parsed
    */
@@ -194,7 +194,7 @@ public class MessageFactory
 
         localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) -> {
           try {
-            localizedMessages.put(locale, parseMessage(text));
+            localizedMessages.put(locale, parseTemplate(text));
           } catch(MessageParserException ex) {
             throw ex.withLocale(locale);
           }

@@ -109,7 +109,7 @@ public class MessageFormatException extends MessageException
     final StringBuilder msg = new StringBuilder("failed to format");
     final int n =
         (code != null && !isGeneratedCode(code) ? 0b1000 : 0b0000) +
-        (template != null ? 0b0100 : 0b0000) +
+        (template != null && !isGeneratedCode(template) ? 0b0100 : 0b0000) +
         (locale != null ? 0b0010 : 0b0000) +
         (parameter != null ? 0b0001 : 0b0000);
 
@@ -137,8 +137,8 @@ public class MessageFormatException extends MessageException
 
     if ((n & 0b0010) != 0)  // locale
     {
-      msg.append((n & 0b1000) != 0 ? " and" : " for").append(" locale ");
-      msg.append(ROOT.equals(locale) ? "ROOT" : locale.getDisplayName(UK));
+      msg.append((n & 0b1000) != 0 ? " and" : " for").append(" locale ")
+         .append(ROOT.equals(locale) ? "ROOT" : locale.getDisplayName(UK));
     }
 
     return msg.toString();

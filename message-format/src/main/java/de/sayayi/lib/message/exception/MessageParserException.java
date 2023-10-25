@@ -20,6 +20,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
+import static de.sayayi.lib.message.MessageFactory.isGeneratedCode;
+import static java.util.Locale.ROOT;
+import static java.util.Locale.UK;
+
 
 /**
  * @author Jeroen Gremmen
@@ -27,41 +31,111 @@ import java.util.Locale;
  */
 public class MessageParserException extends MessageException
 {
+  /** Exception type. */
+  private final Type type;
+
   /** Error message describing the error that occurred durcing parsing. */
   private final String errorMessage;
 
   /** A visual representation of the syntax error and where it occurred. */
   private final String syntaxError;
 
-  /** Code of the message being formatted as the exception occurs or {@code null}. */
+  /** Code of the message being parsed as the exception occurs or {@code null}. */
   private final String code;
 
-  /** Name of the template being formatted as the exception occurs or {@code null}. */
+  /** Name of the template being parsed as the exception occurs or {@code null}. */
   private final String template;
 
-  /** Locale in effect during message/template formatting as the exception occurs or {@code null}. */
+  /** Locale in effect during message/template parsing as the exception occurs or {@code null}. */
   private final Locale locale;
 
 
   public MessageParserException(@NotNull String errorMessage, @NotNull String syntaxError,
                                 Exception cause) {
-    this(errorMessage, syntaxError, null, null, null, cause);
+    this(null, errorMessage, syntaxError, null, null, null, cause);
   }
 
 
   /**
    * @since 0.9.1
    */
-  public MessageParserException(@NotNull String errorMessage, @NotNull String syntaxError,
-                                String code, String template, Locale locale, Exception cause)
+  public MessageParserException(Type type, @NotNull String errorMessage,
+                                @NotNull String syntaxError, String code, String template,
+                                Locale locale, Exception cause)
   {
-    super(errorMessage + '\n' + syntaxError, cause);
+    super(cause);
 
+    this.type = type;
     this.errorMessage = errorMessage;
     this.syntaxError = syntaxError;
     this.code = code;
     this.template = template;
     this.locale = locale;
+  }
+
+
+  @Override
+  public String getMessage()
+  {
+    /*
+      c | tpl | l | t |  msg
+      0 |  0  | 0 | - |
+      0 |  0  | 0 | M |  failed to parse message
+      0 |  0  | 0 | T |  failed to parse template
+      0 |  0  | 1 | - |  failed to parse message/template for locale 'l'
+      0 |  0  | 1 | M |  failed to parse message for locale 'l'
+      0 |  0  | 1 | T |  failed to parse template for locale 'l'
+      0 |  1  | 0 | T |  failed to parse template 't'
+      0 |  1  | 1 | T |  failed to parse template 't' for locale 'l'
+      1 |  0  | 0 | M |  failed to parse message with code 'c'
+      1 |  0  | 1 | M |  failed to parse message with code 'c' for locale 'l'
+    */
+
+    final StringBuilder msg = new StringBuilder();
+    final int n =
+        (code != null && !isGeneratedCode(code) ? 0b100 : 0b000) +
+        (template != null && !isGeneratedCode(template) ? 0b010 : 0b000) +
+        (locale != null ? 0b001 : 0b000);
+
+    if (n != 0 || type != null)
+    {
+      msg.append("failed to parse ");
+
+      if (type == Type.MESSAGE)
+      {
+        msg.append("message");
+        if ((n & 0b100) != 0)
+          msg.append(" with code '").append(code).append('\'');
+      }
+      else if (type == Type.TEMPLATE)
+      {
+        msg.append("template");
+        if ((n & 0b010) != 0)
+          msg.append(" '").append(template).append('\'');
+      }
+      else if (n == 1)
+        msg.append("message/template");
+
+      if ((n & 0b001) != 0)
+        msg.append(" for locale ").append(ROOT.equals(locale) ? "ROOT" : locale.getDisplayName(UK));
+
+      msg.append(": ");
+    }
+
+    return msg.append(errorMessage).append('\n').append(syntaxError).toString();
+  }
+
+
+  /**
+   * Returns the exception type, if available.
+   *
+   * @return  exception type, or {@code null}
+   *
+   * @since 0.9.1
+   */
+  @Contract(pure = true)
+  public Type getType() {
+    return type;
   }
 
 
@@ -145,7 +219,7 @@ public class MessageParserException extends MessageException
   @Contract("_ -> new")
   public @NotNull MessageParserException withCode(@NotNull String code)
   {
-    return new MessageParserException(errorMessage, syntaxError, code, null, locale,
+    return new MessageParserException(Type.MESSAGE, errorMessage, syntaxError, code, null, locale,
         (Exception)getCause());
   }
 
@@ -164,8 +238,8 @@ public class MessageParserException extends MessageException
   @Contract("_ -> new")
   public @NotNull MessageParserException withTemplate(@NotNull String template)
   {
-    return new MessageParserException(errorMessage, syntaxError, null, template, locale,
-        (Exception)getCause());
+    return new MessageParserException(Type.TEMPLATE, errorMessage, syntaxError, null, template,
+        locale, (Exception)getCause());
   }
 
 
@@ -183,7 +257,35 @@ public class MessageParserException extends MessageException
   @Contract("_ -> new")
   public @NotNull MessageParserException withLocale(@NotNull Locale locale)
   {
-    return new MessageParserException(errorMessage, syntaxError, code, template, locale,
+    return new MessageParserException(type, errorMessage, syntaxError, code, template, locale,
         (Exception)getCause());
+  }
+
+
+  /**
+   * Returns a copy of this exception where the type has been replaced with the given {@code type}.
+   *
+   * @param type  type, not {@code null}
+   *
+   * @return  new exception based on the current exception with modified locale value,
+   *          never {@code null}
+   *
+   * @since 0.9.1
+   */
+  @Contract("_ -> new")
+  public @NotNull MessageParserException withType(@NotNull Type type)
+  {
+    return new MessageParserException(type, errorMessage, syntaxError,
+        type == Type.MESSAGE ? code : null, type == Type.TEMPLATE ? template : null, locale,
+        (Exception)getCause());
+  }
+
+
+
+
+  public enum Type
+  {
+    MESSAGE,
+    TEMPLATE
   }
 }
