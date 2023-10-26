@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-@DisplayName("Message format parse exception")
+@DisplayName("Message format exception")
 class MessageFormatExceptionTest
 {
   private static Stream<Arguments> getMessage_parameters()
