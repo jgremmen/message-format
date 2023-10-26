@@ -136,8 +136,15 @@ public class MessageFactory
       case 0:
         return new EmptyMessageWithCode(code);
 
-      case 1:
-        return parseMessage(code, localizedTexts.values().iterator().next());
+      case 1: {
+        final Entry<Locale,String> entry = localizedTexts.entrySet().iterator().next();
+
+        try {
+          return parseMessage(code, entry.getValue());
+        } catch(MessageParserException ex) {
+          throw ex.withLocale(entry.getKey());
+        }
+      }
 
       default: {
         final Map<Locale,Message> localizedMessages = new HashMap<>();

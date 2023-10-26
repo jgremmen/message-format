@@ -15,10 +15,15 @@
  */
 package de.sayayi.lib.message.exception;
 
+import de.sayayi.lib.message.exception.MessageParserException.Type;
 import lombok.var;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -26,10 +31,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Locale;
 import java.util.stream.Stream;
 
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAGE;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.TEMPLATE;
+import static java.util.Collections.singletonMap;
 import static java.util.Locale.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -37,9 +44,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 0.9.1
  */
 @DisplayName("Message/template parse exception")
+@TestMethodOrder(OrderAnnotation.class)
 class MessageParserExceptionTest
 {
-  private static Stream<Arguments> getMessage_parameters()
+  private static Stream<Arguments> testGetMessage_parameters()
   {
     return Stream.of(
         Arguments.of(null, null, null, null,
@@ -76,11 +84,12 @@ class MessageParserExceptionTest
   }
 
 
-  @DisplayName("Detailed exception messages")
+  @DisplayName("Detailed exception messages (directly constructed)")
   @ParameterizedTest(name = "msg: {5}")
-  @MethodSource("getMessage_parameters")
-  void testGetMessage(String code, String template, Locale locale, MessageParserException.Type type,
-                      @NotNull String msg, @NotNull String displayText)
+  @MethodSource("testGetMessage_parameters")
+  @Order(1)
+  void testGetMessage(String code, String template, Locale locale, Type type, @NotNull String msg,
+                      @SuppressWarnings("unused") @NotNull String displayText)
   {
     var ex = new MessageParserException("ERROR", "SYNTAX", new IllegalArgumentException());
 
@@ -102,6 +111,7 @@ class MessageParserExceptionTest
 
   @Test
   @DisplayName("Exclude generated code from detailed exception message")
+  @Order(3)
   void testGeneratedMessageCode()
   {
     assertEquals("failed to parse message for locale Dutch (Netherlands): ERROR\nSYNTAX",
@@ -109,5 +119,81 @@ class MessageParserExceptionTest
             .withCode("MSG[5JJRMZBVNJ-30UO]")
             .withLocale(new Locale("nl", "NL"))
             .getMessage());
+  }
+
+
+  @Test
+  @DisplayName("Exclude generated template name from detailed exception message")
+  @Order(4)
+  void testGeneratedTemplateName()
+  {
+    assertEquals("failed to parse template for locale Dutch (Netherlands): ERROR\nSYNTAX",
+        new MessageParserException("ERROR", "SYNTAX", null)
+            .withTemplate("TPL[5JJRMZBVNJ-30UO]")
+            .withLocale(new Locale("nl", "NL"))
+            .getMessage());
+  }
+
+
+  private static Stream<Arguments> testParseFailure_parameters()
+  {
+    return Stream.of(
+        Arguments.of(null, null, MESSAGE, "%{@var",
+            "failed to parse message"),
+        Arguments.of(null, null, TEMPLATE, "\\u0021\\'%{b,true:yes,false:no,,}",
+            "failed to parse template"),
+        Arguments.of(null, US, MESSAGE, "%{array,size{",
+            "failed to parse message for locale English (United States)"),
+        Arguments.of(null, FRENCH, TEMPLATE, "%[colon-ex]",
+            "failed to parse template for locale French"),
+        Arguments.of("MSG-001", null, MESSAGE, "%{f,>0.5:true,:false}",
+            "failed to parse message with code 'MSG-001'"),
+        Arguments.of("MSG-003", TRADITIONAL_CHINESE, MESSAGE, "%{8}",
+            "failed to parse message with code 'MSG-003' for locale Chinese (Taiwan)")
+    );
+  }
+
+
+  @DisplayName("Detailed exception messages (thrown by parser)")
+  @ParameterizedTest(name = "parse: {4}")
+  @MethodSource("testParseFailure_parameters")
+  @SuppressWarnings("UnknownLanguage")
+  @Order(2)
+  void testParseFailure(String code, Locale locale, @NotNull Type type,
+                        @Language("MessageFormat") @NotNull String parseString, @NotNull String msg)
+  {
+    final int n =
+        (type == TEMPLATE ? 0b010 : 0b000) +
+        (code != null ? 0b100 : 0b000) +
+        (locale != null ? 0b001 : 0b000);
+
+    assertTrue(assertThrows(MessageParserException.class, () -> {
+      switch(n)
+      {
+        case 0b000:
+          NO_CACHE_INSTANCE.parseMessage(parseString);
+          break;
+
+        case 0b001:
+          NO_CACHE_INSTANCE.parseMessage(singletonMap(locale, parseString));
+          break;
+
+        case 0b100:
+          NO_CACHE_INSTANCE.parseMessage(code, parseString);
+          break;
+
+        case 0b101:
+          NO_CACHE_INSTANCE.parseMessage(code, singletonMap(locale, parseString));
+          break;
+
+        case 0b010:
+          NO_CACHE_INSTANCE.parseTemplate(parseString);
+          break;
+
+        case 0b011:
+          NO_CACHE_INSTANCE.parseTemplate(singletonMap(locale, parseString));
+          break;
+      }
+    }).getMessage().startsWith(msg + ": "));
   }
 }
