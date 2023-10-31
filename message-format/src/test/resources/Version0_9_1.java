@@ -18,5 +18,5 @@ import de.sayayi.lib.message.annotation.Text;
 @MessageDef(code = "MSG-08", text = "%{s,'yes':true,'no':false}")
 @MessageDef(code = "MSG-09", text = "%{t,name:true}%['TPL01',a:true,b:'hello',c:-6]")
 @TemplateDef(name = "TPL01", text = "%{a} %{b} %{c}")
-public class Version0_9_0 {
+public class Version0_9_1 {
 }
