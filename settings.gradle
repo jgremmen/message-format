@@ -18,7 +18,7 @@ pluginManagement {
   repositories {
     // plugin snapshot repository
     maven {
-      url "https://artifactory.sayayi.de/artifactory/plugins-snapshot/"
+      url 'https://artifactory.sayayi.de/artifactory/plugins-snapshot/'
       mavenContent {
         includeGroupByRegex 'de\\.sayayi\\.plugin\\.gradle.*'
         snapshotsOnly()
@@ -31,7 +31,7 @@ pluginManagement {
 }
 
 
-//System.setProperty("documentation", "true")
+//System.setProperty('documentation', 'true')
 
 
 buildscript {
@@ -45,13 +45,13 @@ buildscript {
 }
 
 
-include "message-format"
-include "message-format-jodatime"
-include "message-format-spring"
-include "message-gradle-plugin"
+include 'message-format'
+include 'message-format-jodatime'
+include 'message-format-spring'
+include 'message-gradle-plugin'
 
 if ('true' == System.getProperty('documentation'))
-  include "documentation"
+  include 'documentation'
 
 
 rootProject.name = 'message-format-projects'
