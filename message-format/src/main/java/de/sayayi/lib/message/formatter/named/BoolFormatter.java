@@ -138,19 +138,7 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
     }
 
     if (value instanceof Number)
-    {
-      final Number number = (Number)value;
-
-      if (value instanceof Byte || value instanceof Short ||
-          value instanceof Integer || value instanceof Long)
-        return Optional.of(((Number)value).longValue() != 0);
-      else if (value instanceof BigInteger)
-        return Optional.of(((BigInteger)value).signum() != 0);
-      else if (value instanceof BigDecimal)
-        return Optional.of(((BigDecimal)value).signum() != 0);
-      else
-        return Optional.of(signum(number.doubleValue()) != 0);
-    }
+      return convertNumberToBool((Number)value);
 
     if (value instanceof OptionalInt && ((OptionalInt)value).isPresent())
       return Optional.of(((OptionalInt)value).getAsInt() != 0);
@@ -159,6 +147,22 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
       return Optional.of(((OptionalLong)value).getAsLong() != 0);
 
     return Optional.empty();
+  }
+
+
+  private @NotNull Optional<Boolean> convertNumberToBool(@NotNull Number number)
+  {
+    if (number instanceof Byte || number instanceof Short ||
+        number instanceof Integer || number instanceof Long)
+      return Optional.of(number.longValue() != 0);
+
+    if (number instanceof BigInteger)
+      return Optional.of(((BigInteger)number).signum() != 0);
+
+    if (number instanceof BigDecimal)
+      return Optional.of(((BigDecimal)number).signum() != 0);
+
+    return Optional.of(signum(number.doubleValue()) != 0);
   }
 
 
@@ -235,19 +239,7 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
     }
 
     if (value instanceof Number)
-    {
-      final Number number = (Number)value;
-
-      if (value instanceof Byte || value instanceof Short ||
-          value instanceof Integer || value instanceof Long)
-        return (((Number)value).longValue() != 0) == bool ? LENIENT : MISMATCH;
-      else if (value instanceof BigInteger)
-        return (((BigInteger)value).signum() != 0) == bool ? LENIENT : MISMATCH;
-      else if (value instanceof BigDecimal)
-        return (((BigDecimal)value).signum() != 0) == bool ? LENIENT : MISMATCH;
-      else
-        return (signum(number.doubleValue()) != 0) == bool ? LENIENT : MISMATCH;
-    }
+      return compareNumberToBoolKey((Number)value, bool);
 
     if (value instanceof OptionalInt && ((OptionalInt)value).isPresent())
       return (((OptionalInt)value).getAsInt() != 0) == bool ? LENIENT : MISMATCH;
@@ -256,6 +248,22 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
       return (((OptionalLong)value).getAsLong() != 0) == bool ? LENIENT : MISMATCH;
 
     return MISMATCH;
+  }
+
+
+  private @NotNull MatchResult compareNumberToBoolKey(Number number, boolean bool)
+  {
+    if (number instanceof Byte || number instanceof Short ||
+        number instanceof Integer || number instanceof Long)
+      return (number.longValue() != 0) == bool ? LENIENT : MISMATCH;
+
+    if (number instanceof BigInteger)
+      return (((BigInteger)number).signum() != 0) == bool ? LENIENT : MISMATCH;
+
+    if (number instanceof BigDecimal)
+      return (((BigDecimal)number).signum() != 0) == bool ? LENIENT : MISMATCH;
+
+    return (signum(number.doubleValue()) != 0) == bool ? LENIENT : MISMATCH;
   }
 
 

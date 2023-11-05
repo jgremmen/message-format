@@ -26,13 +26,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.OptionalInt;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.lang.Math.max;
 import static java.lang.System.arraycopy;
+import static java.util.Arrays.asList;
 import static org.w3c.dom.Node.ATTRIBUTE_NODE;
 import static org.w3c.dom.Node.ELEMENT_NODE;
 
@@ -44,8 +45,7 @@ import static org.w3c.dom.Node.ELEMENT_NODE;
 public final class NodeFormatter extends AbstractParameterFormatter<Node>
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context,
-                                      @NotNull Node node) {
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Node node) {
     return noSpaceText(toXPath(node));
   }
 
@@ -77,25 +77,8 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
       }
       else if (type == ELEMENT_NODE)
       {
-        int index = 1;
-
-        for(Node e = node; (e = e.getPreviousSibling()) != null;)
-          if (e instanceof Element && name.equals(e.getNodeName()))
-            index++;
-
-        boolean indexed = index > 1;
-
-        if (!indexed)
-          for(Node e = node; (e = e.getNextSibling()) != null;)
-            if (e instanceof Element && (indexed = name.equals(e.getNodeName())))
-              break;
-
-        if (indexed)
-        {
-          path.add(']');
-          path.add(Integer.toString(index));
-          path.add('[');
-        }
+        determineElementIndex(node, name)
+            .ifPresent(index -> addIndexPredicateToPath(path, index));
 
         path.add(name);
         node = node.getParentNode();
@@ -110,10 +93,39 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
   }
 
 
+  private static void addIndexPredicateToPath(@NotNull XPathBuilder path, int index)
+  {
+    path.add(']');
+    path.add(Integer.toString(index));
+    path.add('[');
+  }
+
+
+  @Contract(pure = true)
+  private static @NotNull OptionalInt determineElementIndex(@NotNull Node node,
+                                                            @NotNull String name)
+  {
+    int index = 1;
+
+    for(Node n = node; (n = n.getPreviousSibling()) != null;)
+      if (n instanceof Element && name.equals(n.getNodeName()))
+        index++;
+
+    boolean indexed = index > 1;
+
+    if (!indexed)
+      for(Node n = node; (n = n.getNextSibling()) != null;)
+        if (n instanceof Element && (indexed = name.equals(n.getNodeName())))
+          break;
+
+    return indexed ? OptionalInt.of(index) : OptionalInt.empty();
+  }
+
+
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
-    return new HashSet<>(Arrays.asList(
+    return new HashSet<>(asList(
         new FormattableType(Attr.class),
         new FormattableType(Element.class)
     ));

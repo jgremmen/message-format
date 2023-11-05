@@ -19,6 +19,7 @@ import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static java.lang.Math.round;
 
 
 /**
@@ -71,15 +73,14 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number>
 
 
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Number value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Number number)
   {
     final Format fmt = getFormat(context);
     final StringBuilder s = new StringBuilder();
-    final double v = value.doubleValue();
+    final double v = number.doubleValue();
     final double[] dms = dmsSplitter(fmt, v);
-    final boolean negative = v < 0.0;
 
-    if (negative && !fmt.hasLoLa() && (dms[0] > 0 || dms[1] > 0 || dms[2] > 0))
+    if (!fmt.hasLoLa() && v < 0.0 && (dms[0] > 0 || dms[1] > 0 || dms[2] > 0))
       s.append('-');
 
     s.append((int)dms[0]).append('°');
@@ -106,13 +107,13 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number>
     {
       if (fmt.longitude)
       {
-        s.append(negative
+        s.append(v < 0.0
             ? context.getConfigValueString("geo-w").orElse("W")
             : context.getConfigValueString("geo-e").orElse("E"));
       }
       else
       {
-        s.append(negative
+        s.append(v < 0.0
             ? context.getConfigValueString("geo-s").orElse("S")
             : context.getConfigValueString("geo-n").orElse("N"));
       }
@@ -135,15 +136,16 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number>
   private static final int DEGREE_MILLIS = 3600000;
   private static final int MINUTE_MILLIS = 60000;
 
-  static double[] dmsSplitter(Format fmt, double v)
+  @Contract(pure = true)
+  static double[] dmsSplitter(@NotNull Format fmt, double v)
   {
-    long millis = Math.round(Math.abs(v) * DEGREE_MILLIS);
+    long millis = round(Math.abs(v) * DEGREE_MILLIS);
 
-    if (!fmt.hasMinutes() && !fmt.hasSeconds())
-      return new double[] { (int)((millis + DEGREE_MILLIS / 2) / DEGREE_MILLIS), 0.0, 0.0 };
-
-    if (fmt.hasMinutes() && !fmt.hasSeconds())
+    if (!fmt.hasSeconds())
     {
+      if (!fmt.hasMinutes())
+        return new double[] { (int)((millis + DEGREE_MILLIS / 2) / DEGREE_MILLIS), 0.0, 0.0 };
+
       // round value to the number of minute digits
       final int factor = MINUTE_MILLIS / 1000 * DIGIT_FACTOR[fmt.minuteDigits];
       millis = (millis + factor / 2) / factor * factor;
@@ -168,7 +170,9 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number>
   }
 
 
-  private String formatMinOrSec(Locale locale, double d, int digits, boolean zeropad)
+  @Contract(pure = true)
+  private @NotNull String formatMinOrSec(@NotNull Locale locale, double d, int digits,
+                                         boolean zeropad)
   {
     //noinspection MalformedFormatString
     String s = String.format(locale, "%." + digits + 'f', d);
@@ -194,6 +198,7 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number>
      8 = (LO|LA)  ->  longitude
    */
 
+  @Contract(pure = true)
   static @NotNull Format parseFormatString(@NotNull String formatString)
   {
     final Matcher matcher = PATTERN_FORMAT.matcher(formatString.trim());
@@ -208,21 +213,21 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number>
       format.zeroPadMinutes = matcher.group(2) != null;
       format.zeroPadSeconds = matcher.group(5) != null;
 
-      final String mmm = matcher.group(3);
-      if (mmm != null)
-        format.minuteDigits = "m".equals(mmm) ? 0 : mmm.length();
+      final String minuteFormat = matcher.group(3);
+      if (minuteFormat != null)
+        format.minuteDigits = "m".equals(minuteFormat) ? 0 : minuteFormat.length();
 
-      final String sss = matcher.group(6);
-      if (sss != null)
+      final String secondsFormat = matcher.group(6);
+      if (secondsFormat != null)
       {
-        if (mmm == null)
+        if (minuteFormat == null)
         {
           throw new IllegalArgumentException("missing minute specification in geo format: " +
               formatString);
         }
 
         format.minuteDigits = 0;  // reduce precision for minutes
-        format.secondDigits = "s".equals(sss) ? 0 : sss.length();
+        format.secondDigits = "s".equals(secondsFormat) ? 0 : secondsFormat.length();
       }
     }
 
