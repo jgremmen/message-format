@@ -99,7 +99,7 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
     final MessageConfigurer<Message.WithCode> msg;
 
     try {
-      msg = messageSupport.code(code).locale(locale);
+      msg = messageSupport.code(code);
     } catch(IllegalArgumentException ex) {
       if (parentMessageSource != null)
         return parentMessageSource.getMessage(code, args, locale);
@@ -107,10 +107,13 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
       throw new NoSuchMessageException(code, locale);
     }
 
-    for(int n = 0; n < args.length; n++)
-      msg.with(parameterPrefix + n, args[n]);
+    if (args != null)
+      for(int n = 0; n < args.length; n++)
+        msg.with(parameterPrefix + (n + 1), args[n]);
 
-    return msg.format();
+    return msg
+        .locale(locale)
+        .format();
   }
 
 

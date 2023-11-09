@@ -43,7 +43,7 @@ public interface Message
   /**
    * Formats the message based on the message parameters provided.
    *
-   * @param messageAccessor  message context providing formatting information, not {@code null}
+   * @param messageAccessor  message accessor providing formatting information, not {@code null}
    * @param parameters       message parameters, not {@code null}
    *
    * @return  formatted message without leading/trailing spaces, never {@code null}
@@ -62,7 +62,7 @@ public interface Message
   /**
    * Formats the message based on the message parameters provided.
    *
-   * @param messageAccessor  message context providing formatting information, not {@code null}
+   * @param messageAccessor  message accessor providing formatting information, not {@code null}
    * @param parameters       message parameters, not {@code null}
    *
    * @return  formatted message as text optionally with leading/trailing spaces, never {@code null}
@@ -79,7 +79,7 @@ public interface Message
   /**
    * Formats the message based on the message parameters provided.
    *
-   * @param messageAccessor   message context providing formatting information, not {@code null}
+   * @param messageAccessor   message accessor providing formatting information, not {@code null}
    * @param parameterValues   message parameter values, not {@code null}
    *
    * @return  formatted message, never {@code null}
@@ -145,7 +145,7 @@ public interface Message
    * properly handled by overriding methods.
    * <p>
    * Identical messages with different codes ({@link WithCode WithCode}) are still considered the
-   * same.
+   * same as only the message part is compared.
    *
    * @param message  message to compare with this message, not {@code null}
    *
