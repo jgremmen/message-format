@@ -180,9 +180,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   @Override
   public boolean equals(Object o)
   {
-    if (o == this)
-      return true;
-    else if (!(o instanceof LocalizedMessageBundleWithCode))
+    if (!(o instanceof LocalizedMessageBundleWithCode))
       return false;
 
     final LocalizedMessageBundleWithCode that = (LocalizedMessageBundleWithCode)o;

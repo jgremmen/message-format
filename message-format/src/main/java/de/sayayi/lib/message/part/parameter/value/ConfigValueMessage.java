@@ -64,10 +64,8 @@ public final class ConfigValueMessage implements ConfigValue
 
 
   @Override
-  public boolean equals(Object o)
-  {
-    return this == o ||
-        o instanceof ConfigValueMessage && message.equals(((ConfigValueMessage)o).message);
+  public boolean equals(Object o) {
+    return o instanceof ConfigValueMessage && message.equals(((ConfigValueMessage)o).message);
   }
 
 

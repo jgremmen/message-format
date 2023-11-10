@@ -94,9 +94,7 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
   @Override
   public boolean equals(Object o)
   {
-    if (this == o)
-      return true;
-    else if (!(o instanceof MessageDelegateWithCode))
+    if (!(o instanceof MessageDelegateWithCode))
       return false;
 
     final MessageDelegateWithCode that = (MessageDelegateWithCode)o;

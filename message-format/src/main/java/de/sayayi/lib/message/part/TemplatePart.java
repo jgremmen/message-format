@@ -145,8 +145,6 @@ public final class TemplatePart implements Template
   @Override
   public boolean equals(Object o)
   {
-    if (this == o)
-      return true;
     if (!(o instanceof Template))
       return false;
 

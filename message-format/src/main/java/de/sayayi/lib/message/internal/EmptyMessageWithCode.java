@@ -91,10 +91,8 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
 
   @Override
-  public boolean equals(Object o)
-  {
-    return this == o ||
-        o instanceof EmptyMessageWithCode && code.equals(((EmptyMessageWithCode)o).code);
+  public boolean equals(Object o) {
+    return o instanceof EmptyMessageWithCode && code.equals(((EmptyMessageWithCode)o).code);
   }
 
 

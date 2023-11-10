@@ -76,9 +76,7 @@ public final class ConfigKeyString implements ConfigKey
   @Override
   public boolean equals(Object o)
   {
-    if (o == this)
-      return true;
-    else if (!(o instanceof ConfigKeyString))
+    if (!(o instanceof ConfigKeyString))
       return false;
 
     final ConfigKeyString that = (ConfigKeyString)o;

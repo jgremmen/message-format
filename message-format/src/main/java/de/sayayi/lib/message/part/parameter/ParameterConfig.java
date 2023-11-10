@@ -286,9 +286,7 @@ public final class ParameterConfig
   @Override
   public boolean equals(Object o)
   {
-    if (this == o)
-      return true;
-    else if (!(o instanceof ParameterConfig))
+    if (!(o instanceof ParameterConfig))
       return false;
 
     final ParameterConfig that = (ParameterConfig)o;

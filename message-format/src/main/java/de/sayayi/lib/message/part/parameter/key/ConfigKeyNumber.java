@@ -81,9 +81,7 @@ public final class ConfigKeyNumber implements ConfigKey
   @Override
   public boolean equals(Object o)
   {
-    if (o == this)
-      return true;
-    else if (!(o instanceof ConfigKeyNumber))
+    if (!(o instanceof ConfigKeyNumber))
       return false;
 
     final ConfigKeyNumber that = (ConfigKeyNumber)o;

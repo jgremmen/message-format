@@ -106,7 +106,7 @@ public final class TextMessage implements Message.WithSpaces
 
   @Override
   public boolean equals(Object o) {
-    return this == o || o instanceof TextMessage && textPart.equals(((TextMessage)o).textPart);
+    return o instanceof TextMessage && textPart.equals(((TextMessage)o).textPart);
   }
 
 

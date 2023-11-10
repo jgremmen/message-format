@@ -211,8 +211,6 @@ public class GenericFormatterService implements FormatterService.WithRegistry
     @Override
     public boolean equals(Object o)
     {
-      if (this == o)
-        return true;
       if (!(o instanceof PrioritizedFormatter))
         return false;
 

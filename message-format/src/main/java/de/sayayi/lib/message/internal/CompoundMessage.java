@@ -157,10 +157,8 @@ public final class CompoundMessage implements Message.WithSpaces
 
 
   @Override
-  public boolean equals(Object o)
-  {
-    return this == o ||
-        o instanceof CompoundMessage && deepEquals(messageParts, ((CompoundMessage)o).messageParts);
+  public boolean equals(Object o) {
+    return o instanceof CompoundMessage && deepEquals(messageParts, ((CompoundMessage)o).messageParts);
   }
 
 

@@ -71,7 +71,7 @@ public final class ConfigKeyName implements ConfigKey
 
   @Override
   public boolean equals(Object o) {
-    return o == this || o instanceof ConfigKeyName && name.equals(((ConfigKeyName)o).name);
+    return o instanceof ConfigKeyName && name.equals(((ConfigKeyName)o).name);
   }
 
 

@@ -104,8 +104,6 @@ public final class NoSpaceTextPart implements Text
   @Override
   public boolean equals(Object o)
   {
-    if (this == o)
-      return true;
     if (!(o instanceof Text))
       return false;
 

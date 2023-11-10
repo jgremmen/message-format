@@ -71,7 +71,7 @@ public final class ConfigKeyNull implements ConfigKey
 
   @Override
   public boolean equals(Object o) {
-    return o == this || o instanceof ConfigKeyNull && compareType == ((ConfigKeyNull)o).compareType;
+    return o instanceof ConfigKeyNull && compareType == ((ConfigKeyNull)o).compareType;
   }
 
 

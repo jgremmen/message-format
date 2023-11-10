@@ -82,8 +82,6 @@ final class MessageParameters implements Parameters
   @Override
   public boolean equals(Object o)
   {
-    if (this == o)
-      return true;
     if (!(o instanceof Parameters))
       return false;
 

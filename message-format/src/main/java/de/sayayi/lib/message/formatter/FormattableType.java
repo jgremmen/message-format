@@ -129,7 +129,7 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
 
   @Override
   public boolean equals(Object o) {
-    return o == this || o instanceof FormattableType && type == ((FormattableType)o).type;
+    return o instanceof FormattableType && type == ((FormattableType)o).type;
   }
 
 

@@ -93,10 +93,8 @@ public final class ConfigValueString implements ConfigValue
 
 
   @Override
-  public boolean equals(Object o)
-  {
-    return this == o ||
-        o instanceof ConfigValueString && string.equals(((ConfigValueString)o).string);
+  public boolean equals(Object o) {
+    return o instanceof ConfigValueString && string.equals(((ConfigValueString)o).string);
   }
 
 

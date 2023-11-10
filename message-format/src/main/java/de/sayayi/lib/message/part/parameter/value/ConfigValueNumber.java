@@ -92,10 +92,8 @@ public final class ConfigValueNumber implements ConfigValue
 
 
   @Override
-  public boolean equals(Object o)
-  {
-    return this == o ||
-        o instanceof ConfigValueNumber && this.number == ((ConfigValueNumber)o).number;
+  public boolean equals(Object o) {
+    return o instanceof ConfigValueNumber && this.number == ((ConfigValueNumber)o).number;
   }
 
 
