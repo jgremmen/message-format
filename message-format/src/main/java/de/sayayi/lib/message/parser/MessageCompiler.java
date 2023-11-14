@@ -337,15 +337,15 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final Collector<ConfigElementContext,Map<ConfigKey,ConfigValue>,Map<ConfigKey,ConfigValue>>
+    final Collector<ParameterConfigElementContext,Map<ConfigKey,ConfigValue>,Map<ConfigKey,ConfigValue>>
         PARAMETER_CONFIG_COLLECTOR =
-        new Collector<ConfigElementContext,Map<ConfigKey,ConfigValue>,Map<ConfigKey,ConfigValue>>() {
+        new Collector<ParameterConfigElementContext,Map<ConfigKey,ConfigValue>,Map<ConfigKey,ConfigValue>>() {
       @Override public Supplier<Map<ConfigKey,ConfigValue>> supplier() { return LinkedHashMap::new; }
       @Override public BinaryOperator<Map<ConfigKey,ConfigValue>> combiner() { return foldCombiner(); }
       @Override public Set<Characteristics> characteristics() { return singleton(IDENTITY_FINISH); }
 
       @Override
-      public BiConsumer<Map<ConfigKey,ConfigValue>,ConfigElementContext> accumulator()
+      public BiConsumer<Map<ConfigKey,ConfigValue>,ParameterConfigElementContext> accumulator()
       {
         return (map,cec) -> {
           final ConfigKey key = cec.configKey;
@@ -372,7 +372,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitParameterPart(ParameterPartContext ctx)
     {
       final Map<ConfigKey,ConfigValue> mapElements =
-          ctx.configElement().stream().collect(PARAMETER_CONFIG_COLLECTOR);
+          ctx.parameterConfigElement().stream().collect(PARAMETER_CONFIG_COLLECTOR);
       final ForceQuotedMessageContext forceQuotedMessage = ctx.forceQuotedMessage();
       if (forceQuotedMessage != null)
         mapElements.put(null, new ConfigValueMessage(forceQuotedMessage.messageWithSpaces));
@@ -385,15 +385,15 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final Collector<ConfigParameterElementContext,Map<String,ConfigValue>,Map<String,ConfigValue>>
-        TEMPLATE_CONFIG_PARAMETER_COLLECTOR =
-        new Collector<ConfigParameterElementContext,Map<String,ConfigValue>,Map<String,ConfigValue>>() {
+    final Collector<ConfigNamedElementContext,Map<String,ConfigValue>,Map<String,ConfigValue>>
+        TEMPLATE_NAMED_PARAMETER_COLLECTOR =
+        new Collector<ConfigNamedElementContext,Map<String,ConfigValue>,Map<String,ConfigValue>>() {
       @Override public Supplier<Map<String,ConfigValue>> supplier() { return TreeMap::new; }
       @Override public BinaryOperator<Map<String,ConfigValue>> combiner() { return foldCombiner(); }
       @Override public Set<Characteristics> characteristics() { return singleton(UNORDERED); }
 
       @Override
-      public BiConsumer<Map<String,ConfigValue>,ConfigParameterElementContext> accumulator()
+      public BiConsumer<Map<String,ConfigValue>,ConfigNamedElementContext> accumulator()
       {
         return (map,cpec) -> {
           final String name = cpec.configKey.getName();
@@ -412,20 +412,55 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     };
 
 
+    final Collector<TemplateParameterDelegateContext,Map<String,String>,Map<String,String>>
+        TEMPLATE_PARAMETER_DELEGATE_COLLECTOR =
+        new Collector<TemplateParameterDelegateContext,Map<String,String>,Map<String,String>>() {
+      @Override public Supplier<Map<String, String>> supplier() { return HashMap::new; }
+      @Override public BinaryOperator<Map<String, String>> combiner() { return foldCombiner(); }
+      @Override public Set<Characteristics> characteristics() { return singleton(UNORDERED); }
+
+      @Override
+      public BiConsumer<Map<String,String>,TemplateParameterDelegateContext> accumulator()
+      {
+        return (map,tpdc) -> {
+          if (map.containsKey(tpdc.parameter))
+            syntaxError(tpdc, "duplicate template parameter delegate '" + tpdc.parameter + "'");
+
+          map.put(tpdc.parameter, tpdc.delegatedParameter);
+        };
+      }
+
+
+      @Override
+      public Function<Map<String, String>, Map<String, String>> finisher() {
+        return identity();
+      }
+    };
+
+
     @Override
     public void exitTemplatePart(TemplatePartContext ctx)
     {
       ctx.part = new TemplatePart(ctx.simpleString().string,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
-          ctx.configParameterElement().stream().collect(TEMPLATE_CONFIG_PARAMETER_COLLECTOR));
+          ctx.configNamedElement().stream().collect(TEMPLATE_NAMED_PARAMETER_COLLECTOR),
+          ctx.templateParameterDelegate().stream().collect(TEMPLATE_PARAMETER_DELEGATE_COLLECTOR));
     }
 
 
     @Override
-    public void exitConfigElement(ConfigElementContext ctx)
+    public void exitTemplateParameterDelegate(TemplateParameterDelegateContext ctx)
     {
-      final ConfigParameterElementContext cpec = ctx.configParameterElement();
+      ctx.parameter = ((SimpleStringContext)ctx.getChild(0)).string;
+      ctx.delegatedParameter = ((SimpleStringContext)ctx.getChild(2)).string;
+    }
+
+
+    @Override
+    public void exitParameterConfigElement(ParameterConfigElementContext ctx)
+    {
+      final ConfigNamedElementContext cpec = ctx.configNamedElement();
 
       if (cpec != null)
       {
@@ -459,7 +494,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitConfigParameterBool(ConfigParameterBoolContext ctx)
+    public void exitConfigNamedBool(ConfigNamedBoolContext ctx)
     {
       ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
       ctx.configValue = parseBoolean(ctx.BOOL().getText())
@@ -468,7 +503,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitConfigParameterNumber(ConfigParameterNumberContext ctx)
+    public void exitConfigNamedNumber(ConfigNamedNumberContext ctx)
     {
       ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
       ctx.configValue = new ConfigValueNumber(Long.parseLong(ctx.NUMBER().getText()));
@@ -476,7 +511,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitConfigParameterMessage(ConfigParameterMessageContext ctx)
+    public void exitConfigNamedMessage(ConfigNamedMessageContext ctx)
     {
       ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
       ctx.configValue = new ConfigValueMessage(ctx.quotedMessage().messageWithSpaces);
@@ -484,7 +519,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitConfigParameterString(ConfigParameterStringContext ctx)
+    public void exitConfigNamedString(ConfigNamedStringContext ctx)
     {
       ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
       ctx.configValue = new ConfigValueString(ctx.simpleString().string);

@@ -34,7 +34,7 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
  */
 public final class PackOutputStream implements Closeable
 {
-  public static final int PACK_VERSION = 2;
+  public static final int PACK_VERSION = 3;
   static final byte[] PACK_HEADER = "%{msg}".getBytes(US_ASCII);
 
   private final @NotNull OutputStream stream;

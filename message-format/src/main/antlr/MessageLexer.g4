@@ -23,7 +23,8 @@ tokens {
     COLON,
     BOOL,
     NUMBER,
-    NAME
+    NAME,
+    EQ
 }
 
 
@@ -123,8 +124,8 @@ P_DQ_START
 P_WS
         : (CtrlChar | ' ')+ -> skip
         ;
-EQ
-        : '='
+P_EQ
+        : '=' -> type(EQ)
         ;
 NE
         : '<>' | '!'
@@ -155,6 +156,9 @@ T_COMMA
         ;
 T_COLON
         : ':' -> type(COLON)
+        ;
+T_EQ
+        : '=' -> type(EQ)
         ;
 T_BOOL
         : ('true' | 'false') -> type(BOOL)

@@ -73,21 +73,25 @@ parameterPart returns [ParameterPart part]
         : P_START
           name=nameOrKeyword
           (COMMA format=nameOrKeyword)?
-          (COMMA configElement)*
+          (COMMA parameterConfigElement)*
           (COMMA COLON forceQuotedMessage)?
           P_END
+        ;
+
+parameterConfigElement returns [ConfigKey configKey, ConfigValue configValue]
+        : configNamedElement
+        | configMapElement
         ;
 
 templatePart returns [TemplatePart part]
         : TPL_START
           name=simpleString
-          (COMMA configParameterElement)*
+          (COMMA (configNamedElement | templateParameterDelegate))*
           TPL_END
         ;
 
-configElement returns [ConfigKey configKey, ConfigValue configValue]
-        : configParameterElement
-        | configMapElement
+templateParameterDelegate returns [String parameter, String delegatedParameter]
+        : simpleString EQ simpleString
         ;
 
 configMapElement returns [ConfigKey configKey, ConfigValue configValue]
@@ -95,11 +99,11 @@ configMapElement returns [ConfigKey configKey, ConfigValue configValue]
         | configMapKey COLON simpleString   #configMapString
         ;
 
-configParameterElement returns [ConfigKeyName configKey, ConfigValue configValue]
-        : NAME COLON BOOL           #configParameterBool
-        | NAME COLON NUMBER         #configParameterNumber
-        | NAME COLON simpleString   #configParameterString
-        | NAME COLON quotedMessage  #configParameterMessage
+configNamedElement returns [ConfigKeyName configKey, ConfigValue configValue]
+        : NAME COLON BOOL           #configNamedBool
+        | NAME COLON NUMBER         #configNamedNumber
+        | NAME COLON simpleString   #configNamedString
+        | NAME COLON quotedMessage  #configNamedMessage
         ;
 
 configMapKey returns [ConfigKey configKey]

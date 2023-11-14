@@ -62,8 +62,8 @@ public class TemplateTest
   {
     // akkusativ singular
     assertEquals("Ich gebe dem Mann das Buch", messageSupport
-        .message("Ich gebe dem Mann %[buch,fall:akk]")
-        .with("collection", singletonList("Buch 1"))
+        .message("Ich gebe dem Mann %[buch,collection=col,fall:akk]")
+        .with("col", singletonList("Buch 1"))
         .format());
 
     // akkusativ plural

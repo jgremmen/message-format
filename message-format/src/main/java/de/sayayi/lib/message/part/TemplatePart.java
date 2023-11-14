@@ -23,11 +23,13 @@ import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.part.MessagePart.Template;
 import de.sayayi.lib.message.part.parameter.value.ConfigValue;
+import de.sayayi.lib.message.util.SortedArrayMap;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
@@ -39,7 +41,7 @@ import static java.util.stream.Collectors.joining;
 
 
 /**
- * Text message part with optional leading and/or trailing spaces.
+ * Template message part with optional leading and/or trailing spaces.
  *
  * @author Jeroen Gremmen
  *
@@ -62,26 +64,31 @@ public final class TemplatePart implements Template
    * <p>
    * The map is optimized to require the least amount of space.
    */
-  private final Object[] defaultParameterMap;
+  private final SortedArrayMap<String,ConfigValue> defaultParameterMap;
 
   /**
-   * Tells the number of default parameters. This is always {@code defaultParameterMap.size() / 2}.
+   * Parameter delegate map. If a parameter is referenced in the template message the parameter
+   * name is delegated if an entry exists in this map.
+   * <p>
+   * The map is optimized to require the least amount of space.
    */
-  private final int defaultParameterCount;
+  private final SortedArrayMap<String,String> parameterDelegateMap;
 
 
   /**
    * Constructs a template part.
    *
-   * @param name               template name, not empty or {@code null}
-   * @param spaceBefore        {@code true} if the part has a leading space,
-   *                           {@code false} if the part has no leading space
-   * @param spaceAfter         {@code true} if the part has a trailing space,
-   *                           {@code false} if the part has no trailing space
-   * @param defaultParameters  default parameter map, not {@code null}
+   * @param name                template name, not empty or {@code null}
+   * @param spaceBefore         {@code true} if the part has a leading space,
+   *                            {@code false} if the part has no leading space
+   * @param spaceAfter          {@code true} if the part has a trailing space,
+   *                            {@code false} if the part has no trailing space
+   * @param defaultParameters   default parameter map, not {@code null}
+   * @param parameterDelegates  parameter delegate map, not {@code null}
    */
   public TemplatePart(@NotNull String name, boolean spaceBefore, boolean spaceAfter,
-                      @NotNull Map<String,ConfigValue> defaultParameters)
+                      @NotNull Map<String,ConfigValue> defaultParameters,
+                      @NotNull Map<String,String> parameterDelegates)
   {
     if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
       throw new IllegalArgumentException("name must not be empty");
@@ -89,19 +96,8 @@ public final class TemplatePart implements Template
     this.spaceBefore = spaceBefore;
     this.spaceAfter = spaceAfter;
 
-    final List<String> parameterNames = new ArrayList<>(defaultParameters.keySet());
-    parameterNames.sort(null);
-
-    defaultParameterCount = parameterNames.size();
-    defaultParameterMap = defaultParameterCount == 0 ? null : new Object[defaultParameterCount * 2];
-
-    for(int n = 0; n < defaultParameterCount; n++)
-    {
-      final String parameterName = parameterNames.get(n);
-
-      defaultParameterMap[n * 2] = parameterName;
-      defaultParameterMap[n * 2 + 1] = defaultParameters.get(parameterName);
-    }
+    defaultParameterMap = new SortedArrayMap<>(defaultParameters);
+    parameterDelegateMap = new SortedArrayMap<>(parameterDelegates);
   }
 
 
@@ -175,19 +171,12 @@ public final class TemplatePart implements Template
     else if (spaceAfter)
       s.append(",space-after");
 
-    if (defaultParameterCount != 0)
+    if (!defaultParameterMap.isEmpty())
     {
-      s.append(",{");
-
-      for(int n = 0; n < defaultParameterCount; n++)
-      {
-        if (n > 0)
-          s.append(',');
-
-        s.append(defaultParameterMap[n * 2]).append('=').append(defaultParameterMap[n * 2 + 1]);
-      }
-
-      s.append('}');
+      s.append(defaultParameterMap
+          .stream()
+          .map(Entry::toString)
+          .collect(joining(",", ",{", "}")));
     }
 
     return s.append(')').toString();
@@ -206,12 +195,20 @@ public final class TemplatePart implements Template
   {
     packStream.writeBoolean(spaceBefore);
     packStream.writeBoolean(spaceAfter);
-    packStream.writeSmallVar(defaultParameterCount);
 
-    for(int n = 0; n < defaultParameterCount; n++)
+    packStream.writeSmallVar(defaultParameterMap.size());
+    packStream.writeSmallVar(parameterDelegateMap.size());
+
+    for(final Entry<String,ConfigValue> defaultParameter: defaultParameterMap)
     {
-      packStream.writeString((String)defaultParameterMap[n * 2]);
-      PackHelper.pack((ConfigValue)defaultParameterMap[n * 2 + 1], packStream);
+      packStream.writeString(defaultParameter.getKey());
+      PackHelper.pack(defaultParameter.getValue(), packStream);
+    }
+
+    for(final Entry<String,String> parameterDelegate: parameterDelegateMap)
+    {
+      packStream.writeString(parameterDelegate.getKey());
+      packStream.writeString(parameterDelegate.getValue());
     }
 
     packStream.writeString(name);
@@ -238,8 +235,11 @@ public final class TemplatePart implements Template
         return unpack_v1(packStream);
 
       case 2:
-      default:
         return unpack_v2(unpack, packStream);
+
+      case 3:
+      default:
+        return unpack_v3(unpack, packStream);
     }
   }
 
@@ -252,7 +252,7 @@ public final class TemplatePart implements Template
     final boolean spaceAfter = packStream.readBoolean();
 
     return new TemplatePart(requireNonNull(packStream.readString()),
-        spaceBefore, spaceAfter, emptyMap());
+        spaceBefore, spaceAfter, emptyMap(), emptyMap());
   }
 
 
@@ -273,7 +273,40 @@ public final class TemplatePart implements Template
     }
 
     return new TemplatePart(requireNonNull(packStream.readString()),
-        spaceBefore, spaceAfter, defaultParameterMap);
+        spaceBefore, spaceAfter, defaultParameterMap, emptyMap());
+  }
+
+
+  private static @NotNull Template unpack_v3(@NotNull PackHelper unpack,
+                                             @NotNull PackInputStream packStream) throws IOException
+  {
+    // v3 = spaceBefore, spaceAfter, size default param map, size parameter delegate map,
+    // param map key/value-pairs), param delegate map key/value-pairs, name
+
+    final boolean spaceBefore = packStream.readBoolean();
+    final boolean spaceAfter = packStream.readBoolean();
+
+    final int defaultParameterMapSize = packStream.readSmallVar();
+    final int parameterDelegateMapSize = packStream.readSmallVar();
+
+    final Map<String,ConfigValue> defaultParameterMap = new HashMap<>();
+    for(int n = 0; n < defaultParameterMapSize; n++)
+    {
+      defaultParameterMap.put(
+          requireNonNull(packStream.readString()),
+          unpack.unpackMapValue(packStream));
+    }
+
+    final Map<String,String> parameterDelegateMap = new HashMap<>();
+    for(int n = 0; n < parameterDelegateMapSize; n++)
+    {
+      parameterDelegateMap.put(
+          requireNonNull(packStream.readString()),
+          requireNonNull(packStream.readString()));
+    }
+
+    return new TemplatePart(requireNonNull(packStream.readString()),
+        spaceBefore, spaceAfter, defaultParameterMap, parameterDelegateMap);
   }
 
 
@@ -298,10 +331,9 @@ public final class TemplatePart implements Template
     @Override
     public @NotNull Set<String> getParameterNames()
     {
-      final TreeSet<String> names = new TreeSet<>(parameters.getParameterNames());
+      final TreeSet<String> names = new TreeSet<>();
 
-      for(int n = 0; n < defaultParameterCount; n++)
-        names.add((String)defaultParameterMap[n * 2]);
+      defaultParameterMap.forEach(defaultParameter -> names.add(defaultParameter.getKey()));
 
       return unmodifiableSet(names);
     }
@@ -310,24 +342,17 @@ public final class TemplatePart implements Template
     @Override
     public Object getParameterValue(@NotNull String parameter)
     {
+      final String delegatedParameter = parameterDelegateMap.findValue(parameter);
+      if (delegatedParameter != null)
+        parameter = delegatedParameter;
+
       Object value = parameters.getParameterValue(parameter);
-
       if (value == null)
-        for(int low = 0, high = defaultParameterCount - 1; low <= high; )
-        {
-          final int mid = (low + high) >>> 1;
-          final int cmp = ((String)defaultParameterMap[mid * 2]).compareTo(parameter);
-
-          if (cmp < 0)
-            low = mid + 1;
-          else if (cmp > 0)
-            high = mid - 1;
-          else
-          {
-            value = ((ConfigValue)defaultParameterMap[mid * 2 + 1]).asObject();
-            break;
-          }
-        }
+      {
+        final ConfigValue templateConfigValue = defaultParameterMap.findValue(parameter);
+        if (templateConfigValue != null)
+          value = templateConfigValue.asObject();
+      }
 
       return value;
     }
