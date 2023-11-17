@@ -352,7 +352,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
           if (map.containsKey(key))
           {
-            final String parameter = ((ParameterPartContext)cec.parent).name.name;
+            final String parameter = ((ParameterPartContext)cec.parent).name.string;
             syntaxError(cec, "duplicate config element " + key + " for parameter '" +
                 parameter + '\'');
           }
@@ -378,7 +378,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         mapElements.put(null, new ConfigValueMessage(forceQuotedMessage.messageWithSpaces));
 
       ctx.part = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(
-          ctx.name.name, ctx.format == null ? null : ctx.format.name,
+          ctx.name.string, ctx.format == null ? null : ctx.format.name,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
           new ParameterConfig(mapElements)));

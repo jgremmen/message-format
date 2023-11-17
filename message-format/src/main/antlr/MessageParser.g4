@@ -71,7 +71,7 @@ forceQuotedMessage returns [Message.WithSpaces messageWithSpaces]
 
 parameterPart returns [ParameterPart part]
         : P_START
-          name=nameOrKeyword
+          name=simpleString
           (COMMA format=nameOrKeyword)?
           (COMMA parameterConfigElement)*
           (COMMA COLON forceQuotedMessage)?
