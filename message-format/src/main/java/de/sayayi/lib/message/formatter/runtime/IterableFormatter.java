@@ -38,16 +38,15 @@ import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
 import static java.util.Collections.singletonList;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class IterableFormatter extends AbstractSingleTypeParameterFormatter<Iterable<?>>
+public final class IterableFormatter
+    extends AbstractSingleTypeParameterFormatter<Iterable<?>>
     implements SizeQueryable, ConfigKeyComparator<Iterable<?>>
 {
   // default list-value: %{value}
@@ -109,20 +108,13 @@ public final class IterableFormatter extends AbstractSingleTypeParameterFormatte
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull Iterable<?> value,
-                                                 @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToEmptyKey(Iterable<?> value,
+                                                @NotNull ComparatorContext context)
   {
-    if (context.getKeyType() == EMPTY)
-    {
-      final int cmp = value instanceof Collection
-          ? ((Collection<?>)value).size()
-          : (value.iterator().hasNext() ? 1 : 0);
-
-      if (context.getCompareType().match(cmp))
-        return TYPELESS_EXACT;
-    }
-
-    return MISMATCH;
+    return forEmptyKey(context.getCompareType(),
+        value instanceof Collection
+            ? ((Collection<?>)value).isEmpty()
+            : value == null || !value.iterator().hasNext());
   }
 
 
@@ -144,7 +136,7 @@ public final class IterableFormatter extends AbstractSingleTypeParameterFormatte
       this.iterable = iterable;
 
       iterator = iterable.iterator();
-      messageAccessor = context.getMessageSupport();
+      messageAccessor = context.getMessageAccessor();
 
       valueMessage = context
           .getConfigValueMessage("list-value")

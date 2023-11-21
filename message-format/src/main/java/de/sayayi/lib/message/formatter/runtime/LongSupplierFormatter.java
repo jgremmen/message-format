@@ -49,7 +49,21 @@ public final class LongSupplierFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull LongSupplier value,
+  public @NotNull MatchResult compareToBoolKey(@NotNull LongSupplier value,
+                                               @NotNull ComparatorContext context) {
+    return context.matchForObject(value.getAsLong(), long.class);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToNumberKey(@NotNull LongSupplier value,
+                                                 @NotNull ComparatorContext context) {
+    return context.matchForObject(value.getAsLong(), long.class);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToStringKey(@NotNull LongSupplier value,
                                                  @NotNull ComparatorContext context) {
     return context.matchForObject(value.getAsLong(), long.class);
   }

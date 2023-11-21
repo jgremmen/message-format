@@ -38,10 +38,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.NAME;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.NULL;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.MISMATCH;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
 import static java.util.Collections.unmodifiableSet;
 
 
@@ -158,11 +156,10 @@ public final class ParameterConfig
 
     if (configValue == null)
     {
-      if (includeDefault &&
+      if (includeDefault && defaultValue != null &&
           Arrays.stream(mapKeys).anyMatch(mk -> mk != null && keyTypes.contains(mk.getType())))
         configValue = defaultValue;
-
-      if (configValue == null)
+      else
         return null;
     }
 
@@ -179,21 +176,19 @@ public final class ParameterConfig
   {
     ConfigValue bestMatch = null;
 
-    if (value == null)
-      return getMessage_findNull(keyTypes);
-
     final ConfigKeyComparatorContext comparatorContext =
         new ConfigKeyComparatorContext(messageAccessor, locale);
-    final ParameterFormatter[] formatters = messageAccessor.getFormatters(value.getClass());
+    final ParameterFormatter[] formatters =
+        messageAccessor.getFormatters(value == null ? Object.class : value.getClass());
 
     MatchResult bestMatchResult = MISMATCH;
 
-    for(int n = 0, l = mapKeys.length; n < l && bestMatchResult != EXACT; n++)
+    for(int n = 0, l = mapKeys.length; n < l; n++)
       if (keyTypes.contains((comparatorContext.configKey = mapKeys[n]).getType()))
       {
         final MatchResult matchResult = findBestMatch(comparatorContext, formatters, value);
 
-        if (matchResult.compareTo(bestMatchResult) > 0)
+        if (MatchResult.compare(matchResult, bestMatchResult) > 0)
         {
           bestMatchResult = matchResult;
           bestMatch = mapValues[n];
@@ -204,55 +199,27 @@ public final class ParameterConfig
   }
 
 
-  private ConfigValue getMessage_findNull(@NotNull Set<ConfigKey.Type> keyTypes)
-  {
-    ConfigValue value = null;
-
-    for(int n = 0, l = mapKeys.length; n < l; n++)
-    {
-      final ConfigKey configKey = mapKeys[n];
-      final ConfigKey.Type keyType = configKey.getType();
-
-      if (keyType.isNullOrEmpty() &&
-          keyTypes.contains(keyType) &&
-          configKey.getCompareType().match(0))
-      {
-        value = mapValues[n];
-
-        // prefer 'null' key over 'empty' key
-        if (configKey.getType() == NULL)
-          break;
-      }
-    }
-
-    return value;
-  }
-
-
   @SuppressWarnings({"rawtypes", "unchecked"})
   private static @NotNull MatchResult findBestMatch(@NotNull ComparatorContext context,
                                                     @NotNull ParameterFormatter[] formatters,
-                                                    @NotNull Object value)
+                                                    Object value)
   {
+    final ConfigKey.Type keyType = context.getKeyType();
     MatchResult bestMatchResult = MISMATCH;
 
-    if (context.getKeyType() == NULL && context.getCompareType() == NE)
-      bestMatchResult = TYPELESS_EXACT;
-    else
+    for(int i = 0, l = formatters.length - 1; i <= l; i++)
     {
-      for(int i = 0, l = formatters.length - 1; i <= l && bestMatchResult != EXACT; i++)
+      final ParameterFormatter formatter = formatters[i];
+
+      if (formatter instanceof ConfigKeyComparator &&
+          !(i > 0 && i == l && formatter instanceof DefaultFormatter))
       {
-        final ParameterFormatter formatter = formatters[i];
+        final MatchResult matchResult = value != null || keyType == NULL || keyType == EMPTY
+            ? keyType.compareValueToKey((ConfigKeyComparator)formatter, value, context)
+            : MISMATCH;
 
-        if (formatter instanceof ConfigKeyComparator &&
-            !(i > 0 && i == l && formatter instanceof DefaultFormatter))
-        {
-          final MatchResult matchResult =
-              ((ConfigKeyComparator)formatter).compareToConfigKey(value, context);
-
-          if (matchResult.compareTo(bestMatchResult) > 0)
-            bestMatchResult = matchResult;
-        }
+        if (MatchResult.compare(matchResult, bestMatchResult) > 0)
+          bestMatchResult = matchResult;
       }
     }
 
@@ -433,17 +400,8 @@ public final class ParameterConfig
     @Override
     public @NotNull MatchResult matchForObject(Object value)
     {
-      if (value == null)
-      {
-        final ConfigKey.Type keyType = getKeyType();
-
-        if (keyType.isNullOrEmpty() && configKey.getCompareType().match(0))
-          return keyType == NULL ? TYPELESS_EXACT : TYPELESS_LENIENT;
-
-        return MISMATCH;
-      }
-
-      return findBestMatch(this, messageAccessor.getFormatters(value.getClass()), value);
+      return findBestMatch(this,
+          messageAccessor.getFormatters(value == null ? Object.class : value.getClass()), value);
     }
 
 

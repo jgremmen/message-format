@@ -15,6 +15,8 @@
  */
 package de.sayayi.lib.message.part.parameter.key;
 
+import de.sayayi.lib.message.formatter.ParameterFormatter.ComparatorContext;
+import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +25,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
 import static java.util.Collections.unmodifiableSet;
 
 
@@ -80,36 +83,67 @@ public interface ConfigKey
   enum Type
   {
     /** String key type */
-    STRING,
+    STRING {
+      @Override
+      public @NotNull <T> MatchResult compareValueToKey(
+          @NotNull ConfigKeyComparator<T> comparator, @NotNull T value,
+          @NotNull ComparatorContext context) {
+        return comparator.compareToStringKey(value, context);
+      }
+    },
 
     /** Number key type */
-    NUMBER,
+    NUMBER {
+      @Override
+      public @NotNull <T> MatchResult compareValueToKey(
+          @NotNull ConfigKeyComparator<T> comparator, @NotNull T value,
+          @NotNull ComparatorContext context) {
+        return comparator.compareToNumberKey(value, context);
+      }
+    },
 
     /** Boolean key type */
-    BOOL,
+    BOOL {
+      @Override
+      public @NotNull <T> MatchResult compareValueToKey(
+          @NotNull ConfigKeyComparator<T> comparator, @NotNull T value,
+          @NotNull ComparatorContext context) {
+        return comparator.compareToBoolKey(value, context);
+      }
+    },
 
     /** Null key type */
-    NULL,
+    NULL {
+      @Override
+      public @NotNull <T> MatchResult compareValueToKey(
+          @NotNull ConfigKeyComparator<T> comparator, T value, @NotNull ComparatorContext context) {
+        return comparator.compareToNullKey(value, context);
+      }
+    },
 
     /** Empty key type */
-    EMPTY,
+    EMPTY {
+      @Override
+      public @NotNull <T> MatchResult compareValueToKey(
+          @NotNull ConfigKeyComparator<T> comparator, T value, @NotNull ComparatorContext context) {
+        return comparator.compareToEmptyKey(value, context);
+      }
+    },
 
     /** Name key type */
-    NAME;
+    NAME {
+      @Override
+      public @NotNull <T> MatchResult compareValueToKey(
+          @NotNull ConfigKeyComparator<T> comparator, @NotNull T value,
+          @NotNull ComparatorContext context) {
+        throw new UnsupportedOperationException("compareValueToKey");
+      }
+    };
 
 
-    /**
-     * Tells whether the key type is {@code null} or {@code empty}.
-     *
-     * @return  {@code true} if key type is {@code null} or {@code empty},
-     *          {@code false} otherwise
-     *
-     * @since 0.8.4
-     */
     @Contract(pure = true)
-    public boolean isNullOrEmpty() {
-      return this == NULL || this == EMPTY;
-    }
+    public abstract <T> @NotNull MatchResult compareValueToKey(
+        @NotNull ConfigKeyComparator<T> comparator, T value, @NotNull ComparatorContext context);
   }
 
 
@@ -194,27 +228,92 @@ public interface ConfigKey
 
 
 
-  /**
-   * Configuration value lookup result.
-   */
-  enum MatchResult
+  @FunctionalInterface
+  interface MatchResult
   {
-    /** no match */
-    MISMATCH,
+    @Contract(pure = true)
+    int value();
 
-    /** empty = "  " */
-    TYPELESS_LENIENT,
 
-    /** null or empty */
-    TYPELESS_EXACT,
+    @Contract(pure = true)
+    default boolean isMismatch() {
+      return value() <= 0;
+    }
 
-    /** same value meaning (eg. 0 = false, "yes" = "Yes") */
-    LENIENT,
 
-    /** same value but different type (eg. 4 = "4") */
-    EQUIVALENT,
+    @Contract(pure = true)
+    static int compare(@NotNull MatchResult r1, @NotNull MatchResult r2) {
+      return r1.value() - r2.value();
+    }
 
-    /** exact match (type equality) */
-    EXACT
+
+    @Contract(pure = true)
+    static @NotNull MatchResult forNullKey(@NotNull CompareType compareType, boolean isNull)
+    {
+      return compareType == EQ && isNull
+          ? Defined.NULL
+          : compareType == NE && !isNull
+              ? Defined.NOT_NULL
+              : Defined.MISMATCH;
+    }
+
+
+    @Contract(pure = true)
+    static @NotNull MatchResult forEmptyKey(@NotNull CompareType compareType, boolean isEmpty)
+    {
+      return compareType == EQ && isEmpty
+          ? Defined.EMPTY
+          : compareType == NE && !isEmpty
+              ? Defined.NOT_EMPTY
+              : Defined.MISMATCH;
+    }
+
+
+
+
+    enum Defined implements MatchResult
+    {
+      /** no match */
+      MISMATCH,
+
+      /** not empty match */
+      NOT_EMPTY,
+
+      /** not null match */
+      NOT_NULL,
+
+      /** empty match */
+      EMPTY,
+
+      /** null match */
+      NULL,
+
+      /** same value meaning (eg. 0 = false, "yes" = "Yes") */
+      LENIENT,
+
+      /** same value but different type (eg. 4 = "4") */
+      EQUIVALENT,
+
+      /** exact match (type equality) */
+      EXACT;
+
+
+      @Override
+      public int value() {
+        return ordinal() * 2;
+      }
+
+
+      @Override
+      public boolean isMismatch() {
+        return this == MISMATCH;
+      }
+
+
+      @Override
+      public String toString() {
+        return name() + '(' + value() + ')';
+      }
+    }
   }
 }

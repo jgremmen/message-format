@@ -25,8 +25,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.security.Principal;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.EQUIVALENT;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.MISMATCH;
 
 
 /**
@@ -51,13 +51,10 @@ public final class PrincipalFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull Principal value,
+  public @NotNull MatchResult compareToStringKey(@NotNull Principal value,
                                                  @NotNull ComparatorContext context)
   {
-    if (context.getKeyType() == EMPTY)
-      return context.getCompareType().match(1) ? TYPELESS_EXACT : MISMATCH;
-
-    final MatchResult result = context.matchForObject(value.getName());
-    return result == EXACT ? LENIENT : result;
+    return context.getCompareType().match(value.getName().compareTo(context.getStringKeyValue()))
+        ? EQUIVALENT : MISMATCH;
   }
 }

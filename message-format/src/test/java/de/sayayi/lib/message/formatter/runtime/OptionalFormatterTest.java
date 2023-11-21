@@ -34,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 0.8.4
  */
 @DisplayName("Optional formatter")
-
 class OptionalFormatterTest extends AbstractFormatterTest
 {
   @Test
@@ -45,7 +44,7 @@ class OptionalFormatterTest extends AbstractFormatterTest
             NO_CACHE_INSTANCE)
         .setLocale(ROOT);
 
-    assertEquals("empty", messageSupport
+    assertEquals("null", messageSupport
         .message("%{opt,empty:empty,null:null}")
         .with("opt", Optional.empty())
         .format());

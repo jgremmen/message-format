@@ -21,15 +21,14 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.Reference;
 import java.util.OptionalLong;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forNullKey;
 
 
 /**
@@ -59,18 +58,42 @@ public final class ReferenceFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull Reference<?> value,
-                                                 @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToNullKey(Reference<?> value,
+                                               @NotNull ComparatorContext context)
   {
-    final ConfigKey.Type keyType = context.getKeyType();
+    return value == null || value.get() == null
+        ? forNullKey(context.getCompareType(), true)
+        : context.matchForObject(value.get());
+  }
 
-    if (keyType.isNullOrEmpty())
-    {
-      return context.getCompareType().match(value.get() == null ? 0 : 1)
-          ? keyType == EMPTY ? TYPELESS_EXACT : TYPELESS_LENIENT
-          : MISMATCH;
-    }
 
+  @Override
+  public @NotNull MatchResult compareToEmptyKey(Reference<?> value,
+                                                @NotNull ComparatorContext context)
+  {
+    return value == null || value.get() == null
+        ? forEmptyKey(context.getCompareType(), true)
+        : context.matchForObject(value.get());
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToBoolKey(@NotNull Reference<?> value,
+                                               @NotNull ComparatorContext context) {
+    return context.matchForObject(value.get());
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToNumberKey(@NotNull Reference<?> value,
+                                                 @NotNull ComparatorContext context) {
+    return context.matchForObject(value.get());
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToStringKey(@NotNull Reference<?> value,
+                                                 @NotNull ComparatorContext context) {
     return context.matchForObject(value.get());
   }
 }

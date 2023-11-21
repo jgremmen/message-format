@@ -29,9 +29,7 @@ import java.text.CollationKey;
 import java.util.OptionalLong;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
 
 
 /**
@@ -62,11 +60,10 @@ public final class CollationKeyFormatter extends AbstractSingleTypeParameterForm
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull CollationKey value,
-                                                 @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToEmptyKey(CollationKey value,
+                                                @NotNull ComparatorContext context)
   {
-    return context.getKeyType() == EMPTY &&
-           context.getCompareType().match(value.getSourceString().length())
-        ? TYPELESS_EXACT : MISMATCH;
+    return forEmptyKey(context.getCompareType(),
+        value == null || value.getSourceString().isEmpty());
   }
 }

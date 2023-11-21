@@ -20,12 +20,11 @@ import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.*;
 
 
 /**
@@ -67,25 +66,19 @@ public final class EnumFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull Enum<?> value,
+  public @NotNull MatchResult compareToNumberKey(@NotNull Enum<?> value,
                                                  @NotNull ComparatorContext context)
   {
-    final ConfigKey.CompareType compareType = context.getCompareType();
+    return context.getCompareType()
+        .match(Long.compare(value.ordinal(), context.getNumberKeyValue())) ? LENIENT : MISMATCH;
+  }
 
-    switch(context.getKeyType())
-    {
-      case EMPTY:
-        return compareType.match(1) ? TYPELESS_EXACT : MISMATCH;
 
-      case STRING:
-        return compareType.match(value.name().compareTo(context.getStringKeyValue()))
-            ? EQUIVALENT : MISMATCH;
-
-      case NUMBER:
-        return compareType.match(Long.compare(value.ordinal(), context.getNumberKeyValue()))
-            ? LENIENT : MISMATCH;
-    }
-
-    return MISMATCH;
+  @Override
+  public @NotNull MatchResult compareToStringKey(@NotNull Enum<?> value,
+                                                 @NotNull ComparatorContext context)
+  {
+    return context.getCompareType()
+        .match(value.name().compareTo(context.getStringKeyValue())) ? EXACT : MISMATCH;
   }
 }

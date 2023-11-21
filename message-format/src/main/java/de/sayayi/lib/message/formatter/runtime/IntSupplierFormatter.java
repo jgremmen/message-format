@@ -49,7 +49,21 @@ public final class IntSupplierFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull IntSupplier value,
+  public @NotNull MatchResult compareToBoolKey(@NotNull IntSupplier value,
+                                               @NotNull ComparatorContext context) {
+    return context.matchForObject(value.getAsInt(), int.class);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToNumberKey(@NotNull IntSupplier value,
+                                                 @NotNull ComparatorContext context) {
+    return context.matchForObject(value.getAsInt(), int.class);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToStringKey(@NotNull IntSupplier value,
                                                  @NotNull ComparatorContext context) {
     return context.matchForObject(value.getAsInt(), int.class);
   }

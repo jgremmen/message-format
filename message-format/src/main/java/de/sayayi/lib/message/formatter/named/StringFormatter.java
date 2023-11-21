@@ -19,7 +19,6 @@ import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
-import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.ParameterFormatter.DefaultFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
@@ -38,7 +37,9 @@ import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.*;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
 import static de.sayayi.lib.message.part.parameter.value.ConfigValue.Type.BOOL;
 import static java.lang.Integer.toHexString;
 import static java.text.Collator.*;
@@ -51,7 +52,7 @@ import static java.util.Collections.unmodifiableSet;
  * @since 0.8.0
  */
 public final class StringFormatter
-    implements SizeQueryable, NamedParameterFormatter, ConfigKeyComparator<Object>, DefaultFormatter
+    implements SizeQueryable, NamedParameterFormatter, DefaultFormatter
 {
   private static final Set<ConfigKey.Type> STRING_KEY_TYPES = unmodifiableSet(EnumSet.of(
       ConfigKey.Type.EMPTY,
@@ -72,7 +73,7 @@ public final class StringFormatter
     if (value == null)
       return formatNull(context);
 
-    final String string = valueAsString(context.getMessageSupport(), value);
+    final String string = valueAsString(context.getMessageAccessor(), value);
 
     return context.getConfigMapMessage(string, STRING_KEY_TYPES)
         .map(context::format)
@@ -124,58 +125,59 @@ public final class StringFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull Object value,
-                                                 @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToEmptyKey(Object value, @NotNull ComparatorContext context)
   {
-    final String s = value instanceof char[] ? new String((char[]) value) : String.valueOf(value);
+    final CompareType compareType = context.getCompareType();
 
-    switch(context.getKeyType())
+    if (value == null)
+      return forEmptyKey(compareType, true);
+
+    if (value instanceof char[])
+      return forEmptyKey(compareType, ((char[])value).length == 0);
+
+    final String string = String.valueOf(value);
+    if (string.isEmpty())
+      return forEmptyKey(compareType, true);
+
+    if (string.trim().isEmpty() && compareType == EQ)
+      return () -> EMPTY.value() - 1;
+
+    return forEmptyKey(compareType, false);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToBoolKey(@NotNull Object value,
+                                               @NotNull ComparatorContext context)
+  {
+    if (context.getCompareType().match(0))
     {
-      case EMPTY:
-        return compareToEmptyKey(s, context.getCompareType());
+      final String string = value instanceof char[] ? new String((char[]) value) : String.valueOf(value);
+      final boolean bool = context.getBoolKeyValue();
 
-      case BOOL:
-        return compareToBoolKey(s, context.getBoolKeyValue());
+      if (("true".equals(string) && bool) ||
+          ("false".equals(string) && !bool))
+        return EQUIVALENT;
 
-      case NUMBER:
-        return compareToNumberKey(s, context, context.getNumberKeyValue());
-
-      case STRING:
-        return compareToStringKey(s, context);
+      if (("true".equalsIgnoreCase(string) && bool) ||
+          ("false".equalsIgnoreCase(string) && !bool))
+        return LENIENT;
     }
 
     return MISMATCH;
   }
 
 
-  private @NotNull MatchResult compareToEmptyKey(String value, @NotNull CompareType compareType)
-  {
-    return compareType.match(value.length())
-        ? TYPELESS_EXACT
-        : compareType.match(value.trim().length()) ? TYPELESS_LENIENT : MISMATCH;
-  }
-
-
-  private @NotNull MatchResult compareToBoolKey(String value, boolean bool)
-  {
-    if ("true".equals(value))
-      return bool ? EQUIVALENT : MISMATCH;
-
-    if ("false".equals(value))
-      return bool ? MISMATCH : EQUIVALENT;
-
-    return MISMATCH;
-  }
-
-
-  private @NotNull MatchResult compareToNumberKey(String value, @NotNull ComparatorContext context,
-                                                  long number)
+  @Override
+  public @NotNull MatchResult compareToNumberKey(@NotNull Object value,
+                                                 @NotNull ComparatorContext context)
   {
     try {
-      return context
-          .getCompareType()
-          .match(new BigDecimal(value).compareTo(BigDecimal.valueOf(number)))
-              ? EQUIVALENT : MISMATCH;
+      final String string = value instanceof char[] ? new String((char[]) value) : String.valueOf(value);
+      final int cmp = new BigDecimal(string).compareTo(BigDecimal.valueOf(context.getNumberKeyValue()));
+
+      if (context.getCompareType().match(cmp))
+        return EQUIVALENT;
     } catch(NumberFormatException ignored) {
     }
 
@@ -183,22 +185,25 @@ public final class StringFormatter
   }
 
 
-  private @NotNull MatchResult compareToStringKey(String value, @NotNull ComparatorContext context)
+  @Override
+  public @NotNull MatchResult compareToStringKey(@NotNull Object value,
+                                                 @NotNull ComparatorContext context)
   {
+    final String string = value instanceof char[] ? new String((char[]) value) : String.valueOf(value);
     final CompareType compareType = context.getCompareType();
     final Collator collator = Collator.getInstance(context.getLocale());
-    final String string = context.getStringKeyValue();
+    final String stringKeyValue = context.getStringKeyValue();
 
     collator.setDecomposition(CANONICAL_DECOMPOSITION);
 
     // match exact comparison
     collator.setStrength(IDENTICAL);
-    if (compareType.match(collator.compare(value, string)))
+    if (compareType.match(collator.compare(string, stringKeyValue)))
       return EXACT;
 
     // match lenient comparison by ignoring case
     collator.setStrength(PRIMARY);
-    if (compareType.match(collator.compare(value, string)))
+    if (compareType.match(collator.compare(string, stringKeyValue)))
       return LENIENT;
 
     return MISMATCH;

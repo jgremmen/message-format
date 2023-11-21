@@ -22,7 +22,6 @@ import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextPartFactory;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -30,8 +29,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 import java.util.OptionalLong;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.MISMATCH;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forNullKey;
 
 
 /**
@@ -65,22 +65,43 @@ public final class OptionalFormatter extends AbstractSingleTypeParameterFormatte
   }
 
 
+  @Override
+  public @NotNull MatchResult compareToNullKey(Optional<?> value,
+                                               @NotNull ComparatorContext context)
+  {
+    return value == null || !value.isPresent()
+        ? forNullKey(context.getCompareType(), true)
+        : context.matchForObject(value.get());
+  }
+
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull Optional<?> value,
-                                                 @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToEmptyKey(Optional<?> value,
+                                                @NotNull ComparatorContext context)
   {
-    final ConfigKey.Type keyType = context.getKeyType();
+    return value == null || !value.isPresent()
+        ? forEmptyKey(context.getCompareType(), true)
+        : context.matchForObject(value.get());
+  }
 
-    if (keyType.isNullOrEmpty())
-    {
-      return context.getCompareType().match(value.isPresent() ? 1 : 0)
-          ? keyType == EMPTY ? TYPELESS_EXACT : TYPELESS_LENIENT
-          : MISMATCH;
-    }
 
-    return value
-        .map(context::matchForObject)
-        .orElse(MISMATCH);
+  @Override
+  public @NotNull MatchResult compareToBoolKey(@NotNull Optional<?> value,
+                                               @NotNull ComparatorContext context) {
+    return value.map(context::matchForObject).orElse(MISMATCH);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToNumberKey(@NotNull Optional<?> value,
+                                                 @NotNull ComparatorContext context) {
+    return value.map(context::matchForObject).orElse(MISMATCH);
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToStringKey(@NotNull Optional<?> value,
+                                                 @NotNull ComparatorContext context) {
+    return value.map(context::matchForObject).orElse(MISMATCH);
   }
 }

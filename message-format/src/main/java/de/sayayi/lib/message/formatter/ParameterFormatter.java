@@ -30,6 +30,9 @@ import java.util.Set;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.*;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.MISMATCH;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forNullKey;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.NUMBER;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.STRING;
 import static java.util.Optional.empty;
@@ -232,14 +235,76 @@ public interface ParameterFormatter
   interface ConfigKeyComparator<T> extends ParameterFormatter
   {
     /**
-     *
-     * @param value    value to compare against the configuration key, not {@code null}
+     * @param value    value to compare against the null configuration key
      * @param context  comparator context instance, not {@code null}
      *
      * @return  comparison match result, never {@code null}
+     *
+     * @since 0.9.2
      */
     @Contract(pure = true)
-    @NotNull MatchResult compareToConfigKey(@NotNull T value, @NotNull ComparatorContext context);
+    default @NotNull MatchResult compareToNullKey(T value, @NotNull ComparatorContext context) {
+      return forNullKey(context.getCompareType(), value == null);
+    }
+
+
+    /**
+     * @param value    value to compare against the empty configuration key
+     * @param context  comparator context instance, not {@code null}
+     *
+     * @return  comparison match result, never {@code null}
+     *
+     * @since 0.9.2
+     */
+    @Contract(pure = true)
+    default @NotNull MatchResult compareToEmptyKey(T value, @NotNull ComparatorContext context) {
+      return forEmptyKey(context.getCompareType(), value == null);
+    }
+
+
+    /**
+     * @param value    value to compare against the bool configuration key, not {@code null}
+     * @param context  comparator context instance, not {@code null}
+     *
+     * @return  comparison match result, never {@code null}
+     *
+     * @since 0.9.2
+     */
+    @Contract(pure = true)
+    default @NotNull MatchResult compareToBoolKey(@NotNull T value,
+                                                  @NotNull ComparatorContext context) {
+      return MISMATCH;
+    }
+
+
+    /**
+     * @param value    value to compare against the number configuration key, not {@code null}
+     * @param context  comparator context instance, not {@code null}
+     *
+     * @return  comparison match result, never {@code null}
+     *
+     * @since 0.9.2
+     */
+    @Contract(pure = true)
+    default @NotNull MatchResult compareToNumberKey(@NotNull T value,
+                                                    @NotNull ComparatorContext context) {
+      return MISMATCH;
+    }
+
+
+    /**
+     * @param value    value to compare against the string configuration key, not {@code null}
+     * @param context  comparator context instance, not {@code null}
+     *
+     * @return  comparison match result, never {@code null}
+     *
+     * @since 0.9.2
+     */
+    @Contract(pure = true)
+    default @NotNull MatchResult compareToStringKey(@NotNull T value,
+                                                    @NotNull ComparatorContext context) {
+      return MISMATCH;
+    }
   }
 
 
@@ -310,7 +375,7 @@ public interface ParameterFormatter
 
 
     @Contract(pure = true)
-    @NotNull <T> MatchResult matchForObject(@NotNull T value, @NotNull Class<T> valueType);
+    @NotNull <T> MatchResult matchForObject(T value, @NotNull Class<T> valueType);
   }
 
 
@@ -322,6 +387,6 @@ public interface ParameterFormatter
    * @see GenericFormatterService#addFormatterForType(FormattableType, ParameterFormatter)
    * @since 0.8.4
    */
-  interface DefaultFormatter {
+  interface DefaultFormatter extends ConfigKeyComparator<Object> {
   }
 }

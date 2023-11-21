@@ -57,7 +57,21 @@ public final class SupplierFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull Supplier<?> value,
+  public @NotNull MatchResult compareToBoolKey(@NotNull Supplier<?> value,
+                                               @NotNull ComparatorContext context) {
+    return context.matchForObject(value.get());
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToNumberKey(@NotNull Supplier<?> value,
+                                                 @NotNull ComparatorContext context) {
+    return context.matchForObject(value.get());
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToStringKey(@NotNull Supplier<?> value,
                                                  @NotNull ComparatorContext context) {
     return context.matchForObject(value.get());
   }

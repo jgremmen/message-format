@@ -27,9 +27,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.OptionalLong;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.MISMATCH;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
 
 
 /**
@@ -57,11 +56,29 @@ public final class OptionalLongFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull OptionalLong value,
-                                                 @NotNull ComparatorContext context)
-  {
-    return context.getKeyType() == EMPTY
-        ? context.getCompareType().match(value.isPresent() ? 1 : 0) ? TYPELESS_EXACT : MISMATCH
-        : value.isPresent() ? context.matchForObject(value.getAsLong(), long.class) : MISMATCH;
+  public @NotNull MatchResult compareToEmptyKey(OptionalLong value,
+                                                @NotNull ComparatorContext context) {
+    return forEmptyKey(context.getCompareType(), value == null || !value.isPresent());
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToBoolKey(@NotNull OptionalLong value,
+                                               @NotNull ComparatorContext context) {
+    return value.isPresent() ? context.matchForObject(value.getAsLong(), long.class) : MISMATCH;
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToNumberKey(@NotNull OptionalLong value,
+                                                 @NotNull ComparatorContext context) {
+    return value.isPresent() ? context.matchForObject(value.getAsLong(), long.class) : MISMATCH;
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToStringKey(@NotNull OptionalLong value,
+                                                 @NotNull ComparatorContext context) {
+    return value.isPresent() ? context.matchForObject(value.getAsLong(), long.class) : MISMATCH;
   }
 }

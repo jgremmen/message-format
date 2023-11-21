@@ -29,11 +29,9 @@ import java.math.BigInteger;
 import java.util.*;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.EXACT;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.MISMATCH;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Math.signum;
@@ -181,126 +179,10 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull Object value,
-                                                 @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToBoolKey(@NotNull Object value,
+                                               @NotNull ComparatorContext context)
   {
-    switch(context.getKeyType())
-    {
-      case NULL:
-        return compareToNullKey(context.getCompareType());
-
-      case EMPTY:
-        return compareToEmptyKey(context.getCompareType());
-
-      case BOOL:
-        return compareToBoolKey(value, context.getBoolKeyValue());
-
-      case STRING:
-        return compareToStringKey(value, context.getCompareType(), context.getStringKeyValue());
-    }
-
-    return MISMATCH;
-  }
-
-
-  private @NotNull MatchResult compareToNullKey(@NotNull CompareType compareType) {
-    return compareType.match(1) ? TYPELESS_EXACT : MISMATCH;
-  }
-
-
-  private @NotNull MatchResult compareToEmptyKey(@NotNull CompareType compareType) {
-    return compareType.match(1) ? TYPELESS_LENIENT : MISMATCH;
-  }
-
-
-  private @NotNull MatchResult compareToBoolKey(Object value, boolean bool)
-  {
-    if (value instanceof Optional)
-      value = ((Optional<?>)value).orElse(null);
-
-    // boolean object for automatic formatter selection
-    if (value instanceof Boolean)
-      return ((Boolean)value) == bool ? EXACT : MISMATCH;
-
-    // string and number objects for forced 'bool' formatter
-    if (value instanceof String)
-    {
-      final String s = (String)value;
-
-      if ("true".equals(s))
-        return bool ? EQUIVALENT : MISMATCH;
-      else if ("false".equals(s))
-        return bool ? MISMATCH : EQUIVALENT;
-
-      try {
-        value = new BigDecimal(s);
-      } catch(NumberFormatException ignored) {
-      }
-    }
-
-    if (value instanceof Number)
-      return compareNumberToBoolKey((Number)value, bool);
-
-    if (value instanceof OptionalInt && ((OptionalInt)value).isPresent())
-      return (((OptionalInt)value).getAsInt() != 0) == bool ? LENIENT : MISMATCH;
-
-    if (value instanceof OptionalLong && ((OptionalLong)value).isPresent())
-      return (((OptionalLong)value).getAsLong() != 0) == bool ? LENIENT : MISMATCH;
-
-    return MISMATCH;
-  }
-
-
-  private @NotNull MatchResult compareNumberToBoolKey(Number number, boolean bool)
-  {
-    if (number instanceof Byte || number instanceof Short ||
-        number instanceof Integer || number instanceof Long)
-      return (number.longValue() != 0) == bool ? LENIENT : MISMATCH;
-
-    if (number instanceof BigInteger)
-      return (((BigInteger)number).signum() != 0) == bool ? LENIENT : MISMATCH;
-
-    if (number instanceof BigDecimal)
-      return (((BigDecimal)number).signum() != 0) == bool ? LENIENT : MISMATCH;
-
-    return (signum(number.doubleValue()) != 0) == bool ? LENIENT : MISMATCH;
-  }
-
-
-  private @NotNull MatchResult compareToStringKey(Object value, @NotNull CompareType compareType,
-                                                  @NotNull String string)
-  {
-    if (compareType == EQ || compareType == NE)
-    {
-      boolean bool;
-
-      if ("true".equals(string))
-        bool = true;
-      else if ("false".equals(string))
-        bool = false;
-      else
-        return MISMATCH;
-
-      if (value instanceof Boolean)
-        return compareBool(EQUIVALENT, (Boolean)value, compareType, bool);
-
-      if ("true".equals(value))
-        return compareBool(EXACT, true, compareType, bool);
-
-      if ("false".equals(value))
-        return compareBool(EXACT, false, compareType, bool);
-    }
-
-    return MISMATCH;
-  }
-
-
-  @Contract(pure = true)
-  private @NotNull MatchResult compareBool(@NotNull MatchResult precision, boolean value,
-                                           @NotNull CompareType compareType, boolean bool)
-  {
-    return compareType == EQ
-        ? value == bool ? precision : MISMATCH
-        : value != bool ? precision : MISMATCH;
+    return context.getCompareType()
+        .match((Boolean)value == context.getBoolKeyValue() ? 0 : 1) ? EXACT : MISMATCH;
   }
 }

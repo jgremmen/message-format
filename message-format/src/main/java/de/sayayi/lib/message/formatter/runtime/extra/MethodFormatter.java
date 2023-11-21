@@ -22,14 +22,14 @@ import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.runtime.TypeFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.EQUIVALENT;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.MISMATCH;
 
 
 /**
@@ -69,21 +69,10 @@ public final class MethodFormatter
 
 
   @Override
-  public @NotNull ConfigKey.MatchResult compareToConfigKey(@NotNull Method value,
+  public @NotNull ConfigKey.MatchResult compareToStringKey(@NotNull Method value,
                                                            @NotNull ComparatorContext context)
   {
-    final CompareType compareType = context.getCompareType();
-
-    switch(context.getKeyType())
-    {
-      case EMPTY:
-        return compareType.match(1) ? TYPELESS_EXACT : MISMATCH;
-
-      case STRING:
-        return compareType.match(value.getName().compareTo(context.getStringKeyValue()))
-            ? EQUIVALENT : MISMATCH;
-    }
-
-    return MISMATCH;
+    return context.getCompareType().match(value.getName().compareTo(context.getStringKeyValue()))
+        ? EQUIVALENT : MISMATCH;
   }
 }

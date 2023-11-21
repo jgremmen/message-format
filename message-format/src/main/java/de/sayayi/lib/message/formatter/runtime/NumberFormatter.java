@@ -43,9 +43,7 @@ import java.util.concurrent.atomic.LongAccumulator;
 import java.util.concurrent.atomic.LongAdder;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.*;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.*;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.NUMBER_TYPE;
 import static java.lang.Math.signum;
 import static java.util.Arrays.asList;
@@ -132,81 +130,65 @@ public final class NumberFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull Number value,
-                                                 @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToBoolKey(@NotNull Number value,
+                                               @NotNull ComparatorContext context)
   {
-    final CompareType compareType = context.getCompareType();
+    final boolean bool;
 
-    switch(context.getKeyType())
-    {
-      case EMPTY:
-        return context.getCompareType().match(1) ? TYPELESS_EXACT : MISMATCH;
-
-      case BOOL:
-        return compareToBoolKey(value, compareType, context.getBoolKeyValue());
-
-      case NUMBER:
-        return compareToNumberKey(value, compareType, context.getNumberKeyValue());
-
-      case STRING:
-        return compareToStringKey(value, compareType, context.getStringKeyValue());
-    }
-
-    return MISMATCH;
-  }
-
-
-  private @NotNull MatchResult compareToBoolKey(Number value, @NotNull CompareType compareType,
-                                                boolean bool)
-  {
-    if (compareType == EQ || compareType == NE)
-    {
-      if (value instanceof Byte || value instanceof Short ||
-          value instanceof Integer || value instanceof Long)
-        return (value.longValue() != 0) == bool ? LENIENT : MISMATCH;
-      else if (value instanceof BigInteger)
-        return (((BigInteger)value).signum() != 0) == bool ? LENIENT : MISMATCH;
-      else if (value instanceof BigDecimal)
-        return (((BigDecimal)value).signum() != 0) == bool ? LENIENT : MISMATCH;
-      else
-        return (signum(value.doubleValue()) != 0) == bool ? LENIENT : MISMATCH;
-    }
-
-    return MISMATCH;
-  }
-
-
-  private @NotNull MatchResult compareToNumberKey(Number value, @NotNull CompareType compareType,
-                                                  long number)
-  {
     if (value instanceof Byte || value instanceof Short ||
         value instanceof Integer || value instanceof Long)
-      return compareType.match(Long.compare(value.longValue(), number)) ? EXACT : MISMATCH;
+      bool = value.longValue() != 0;
+    else if (value instanceof BigInteger)
+      bool = ((BigInteger)value).signum() != 0;
+    else if (value instanceof BigDecimal)
+      bool = ((BigDecimal)value).signum() != 0;
+    else
+      bool = signum(value.doubleValue()) != 0;
 
-    if (value instanceof BigInteger)
-    {
-      return compareType.match(((BigInteger)value).compareTo(BigInteger.valueOf(number)))
-          ? EXACT : MISMATCH;
-    }
-
-    if (value instanceof BigDecimal)
-    {
-      return compareType.match(((BigDecimal)value).compareTo(BigDecimal.valueOf(number)))
-          ? EXACT : MISMATCH;
-    }
-
-    return compareType.match(Double.compare(value.doubleValue(), number)) ? EXACT : MISMATCH;
+    return context.getCompareType()
+        .match(bool == context.getBoolKeyValue() ? 0 : 1) ? LENIENT : MISMATCH;
   }
 
 
-  private @NotNull MatchResult compareToStringKey(Number value, @NotNull CompareType compareType,
-                                                  @NotNull String string)
+  @Override
+  public @NotNull MatchResult compareToNumberKey(@NotNull Number number,
+                                                 @NotNull ComparatorContext context)
+  {
+    final long numberKeyValue = context.getNumberKeyValue();
+    final CompareType compareType = context.getCompareType();
+
+    if (number instanceof Byte || number instanceof Short ||
+        number instanceof Integer || number instanceof Long)
+      return compareType.match(Long.compare(number.longValue(), numberKeyValue)) ? EXACT : MISMATCH;
+
+    if (number instanceof BigInteger)
+    {
+      return compareType.match(((BigInteger)number).compareTo(BigInteger.valueOf(numberKeyValue)))
+          ? EXACT : MISMATCH;
+    }
+
+    if (number instanceof BigDecimal)
+    {
+      return compareType.match(((BigDecimal)number).compareTo(BigDecimal.valueOf(numberKeyValue)))
+          ? EXACT : MISMATCH;
+    }
+
+    return compareType.match(Double.compare(number.doubleValue(), numberKeyValue)) ? EXACT : MISMATCH;
+  }
+
+
+  @Override
+  public @NotNull MatchResult compareToStringKey(@NotNull Number value,
+                                                 @NotNull ComparatorContext context)
   {
     if (value instanceof Byte || value instanceof Short ||
         value instanceof Integer || value instanceof Long)
       value = BigInteger.valueOf(value.longValue());
     else if (value instanceof Double || value instanceof Float)
       value = BigDecimal.valueOf(value.doubleValue());
+
+    final CompareType compareType = context.getCompareType();
+    final String string = context.getStringKeyValue();
 
     if (value instanceof BigInteger)
     {

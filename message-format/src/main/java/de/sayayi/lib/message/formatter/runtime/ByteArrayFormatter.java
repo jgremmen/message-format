@@ -31,10 +31,9 @@ import java.util.Optional;
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_PRIMITIVE_OR_ARRAY_ORDER;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
 import static java.nio.charset.Charset.isSupported;
+import static java.util.Base64.getMimeEncoder;
 
 
 /**
@@ -44,6 +43,9 @@ import static java.nio.charset.Charset.isSupported;
 public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatter<byte[]>
     implements ConfigKeyComparator<byte[]>
 {
+  private static final byte[] LINE_SEPARATOR = new byte[] { '\n' };
+
+
   @Override
   @SneakyThrows(UnsupportedEncodingException.class)
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull byte[] byteArray)
@@ -59,10 +61,7 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
     if ("base64".equals(bytes))
       return noSpaceText(Base64.getEncoder().encodeToString(byteArray));
     else if ("base64-lf".equals(bytes))
-    {
-      return noSpaceText(Base64.getMimeEncoder(76, new byte[] { '\n' })
-          .encodeToString(byteArray));
-    }
+      return noSpaceText(getMimeEncoder(76, LINE_SEPARATOR).encodeToString(byteArray));
 
     return context.format(bytes.isEmpty() || !isSupported(bytes)
         ? new String(byteArray)
@@ -77,10 +76,7 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull byte[] value,
-                                                 @NotNull ComparatorContext context)
-  {
-    return context.getKeyType() == EMPTY && context.getCompareType().match(value.length)
-        ? TYPELESS_EXACT : MISMATCH;
+  public @NotNull MatchResult compareToEmptyKey(byte[] value, @NotNull ComparatorContext context) {
+    return forEmptyKey(context.getCompareType(), value == null || value.length == 0);
   }
 }

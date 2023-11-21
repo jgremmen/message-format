@@ -40,9 +40,7 @@ import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableSet;
@@ -89,7 +87,7 @@ public final class MapFormatter
         .map(String::trim)
         .orElse("(this map)"));
 
-    final MessageAccessor messageAccessor = context.getMessageSupport();
+    final MessageAccessor messageAccessor = context.getMessageAccessor();
     final KeyValueParameters parameters = new KeyValueParameters(messageAccessor.getLocale());
 
     return context.format(map
@@ -124,11 +122,8 @@ public final class MapFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull Map<?,?> value,
-                                                 @NotNull ComparatorContext context)
-  {
-    return context.getKeyType() == EMPTY && context.getCompareType().match(value.size())
-        ? TYPELESS_EXACT : MISMATCH;
+  public @NotNull MatchResult compareToEmptyKey(Map<?,?> value, @NotNull ComparatorContext context) {
+    return forEmptyKey(context.getCompareType(), value == null || value.isEmpty());
   }
 
 
