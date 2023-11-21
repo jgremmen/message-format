@@ -41,9 +41,7 @@ import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.MISMATCH;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.TYPELESS_EXACT;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.EMPTY;
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
 import static java.util.Collections.singletonList;
 
 
@@ -89,36 +87,38 @@ public final class ArrayFormatter extends AbstractParameterFormatter<Object>
 
 
   @Override
-  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value) {
-    return OptionalLong.of(getLength(value));
+  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object array) {
+    return OptionalLong.of(getLength(array));
   }
 
 
   @Contract(pure = true)
-  private int getLength(@NotNull Object value)
+  private int getLength(@NotNull Object array)
   {
-    if (value instanceof AtomicIntegerArray)
-      return ((AtomicIntegerArray)value).length();
-    else if (value instanceof AtomicLongArray)
-      return ((AtomicLongArray)value).length();
+    if (array instanceof AtomicIntegerArray)
+      return ((AtomicIntegerArray)array).length();
+    else if (array instanceof AtomicLongArray)
+      return ((AtomicLongArray)array).length();
+    else if (array instanceof AtomicReferenceArray)
+      return ((AtomicReferenceArray<?>)array).length();
     else
-      return Array.getLength(value);
+      return Array.getLength(array);
   }
 
 
   @Contract(pure = true)
-  private static @NotNull IntFunction<Object> createGetter(@NotNull Object value)
+  private static @NotNull IntFunction<Object> createGetter(@NotNull Object array)
   {
-    if (value instanceof AtomicIntegerArray)
-      return ((AtomicIntegerArray)value)::get;
+    if (array instanceof AtomicIntegerArray)
+      return ((AtomicIntegerArray)array)::get;
 
-    if (value instanceof AtomicLongArray)
-      return ((AtomicLongArray)value)::get;
+    if (array instanceof AtomicLongArray)
+      return ((AtomicLongArray)array)::get;
 
-    if (value instanceof AtomicReferenceArray)
-      return ((AtomicReferenceArray<?>)value)::get;
+    if (array instanceof AtomicReferenceArray)
+      return ((AtomicReferenceArray<?>)array)::get;
 
-    return index -> Array.get(value, index);
+    return index -> Array.get(array, index);
   }
 
 
@@ -142,11 +142,8 @@ public final class ArrayFormatter extends AbstractParameterFormatter<Object>
 
 
   @Override
-  public @NotNull MatchResult compareToConfigKey(@NotNull Object value,
-                                                 @NotNull ComparatorContext context)
-  {
-    return context.getKeyType() == EMPTY && context.getCompareType().match(getLength(value))
-        ? TYPELESS_EXACT : MISMATCH;
+  public @NotNull MatchResult compareToEmptyKey(Object value, @NotNull ComparatorContext context) {
+    return forEmptyKey(context.getCompareType(), value == null || getLength(value) == 0);
   }
 
 
@@ -169,7 +166,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter<Object>
     {
       this.array = array;
 
-      messageAccessor = context.getMessageSupport();
+      messageAccessor = context.getMessageAccessor();
       getter = createGetter(array);
 
       valueMessage = context

@@ -45,9 +45,11 @@ public interface FormatterContext extends Parameters, ParameterConfigAccessor
    * Returns the message accessor used to create this formatter context.
    *
    * @return  message accessor, never {@code null}
+   *
+   * @since 0.8.0 (renamed in 0.9.2)
    */
   @Contract(pure = true)
-  @NotNull MessageAccessor getMessageSupport();
+  @NotNull MessageAccessor getMessageAccessor();
 
 
   /**

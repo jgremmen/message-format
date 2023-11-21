@@ -22,7 +22,6 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.TextPart;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +29,7 @@ import java.util.*;
 
 import static de.sayayi.lib.message.formatter.ParameterFormatter.NULL_TYPE;
 import static de.sayayi.lib.message.part.MessagePart.Text.NULL;
+import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
 import static java.util.Optional.ofNullable;
 
 
@@ -68,7 +68,7 @@ public final class ParameterFormatterContext
 
 
   @Override
-  public @NotNull MessageAccessor getMessageSupport() {
+  public @NotNull MessageAccessor getMessageAccessor() {
     return messageAccessor;
   }
 
@@ -137,7 +137,9 @@ public final class ParameterFormatterContext
   {
     return message == null
         ? NULL
-        : new TextPart(message.format(messageAccessor, parameters), message.isSpaceBefore(),
+        : addSpaces(
+            message.formatAsText(messageAccessor, parameters),
+            message.isSpaceBefore(),
             message.isSpaceAfter());
   }
 
@@ -146,13 +148,14 @@ public final class ParameterFormatterContext
   public @NotNull OptionalLong size(Object value)
   {
     if (value != null)
+    {
+      OptionalLong result;
+
       for(ParameterFormatter formatter: messageAccessor.getFormatters(value.getClass()))
-        if (formatter instanceof SizeQueryable)
-        {
-          OptionalLong result = ((SizeQueryable)formatter).size(this, value);
-          if (result.isPresent())
-            return result;
-        }
+        if (formatter instanceof SizeQueryable &&
+            (result = ((SizeQueryable)formatter).size(this, value)).isPresent())
+          return result;
+    }
 
     return OptionalLong.empty();
   }
