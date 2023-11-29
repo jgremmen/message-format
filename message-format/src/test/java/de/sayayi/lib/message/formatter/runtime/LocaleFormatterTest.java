@@ -31,7 +31,6 @@ import java.util.Locale;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
 import static java.util.Collections.singletonMap;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -64,7 +63,7 @@ class LocaleFormatterTest extends AbstractFormatterTest
     assertEquals(noSpaceText("The Great Kingdom"), format(messageAccessor, UK,
         new HashMap<ConfigKey,ConfigValue>() {{
           put(new ConfigKeyName("locale"), new ConfigValueString("country"));
-          put(new ConfigKeyString(EQ, "GB"), new ConfigValueString("The Great Kingdom"));
+          put(new ConfigKeyString("GB"), new ConfigValueString("The Great Kingdom"));
         }}));
   }
 
@@ -83,7 +82,7 @@ class LocaleFormatterTest extends AbstractFormatterTest
     assertEquals(noSpaceText("francesa"), format(messageAccessor, FRANCE,
         new HashMap<ConfigKey,ConfigValue>() {{
           put(new ConfigKeyName("locale"), new ConfigValueString("language"));
-          put(new ConfigKeyString(EQ, "fr"), new ConfigValueString("francesa"));
+          put(new ConfigKeyString("fr"), new ConfigValueString("francesa"));
         }}));
   }
 

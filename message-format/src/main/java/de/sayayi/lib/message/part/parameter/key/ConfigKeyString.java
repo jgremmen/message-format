@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
+import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
 import static java.util.Objects.requireNonNull;
 
 
@@ -38,6 +39,24 @@ public final class ConfigKeyString implements ConfigKey
   private final @NotNull String string;
 
 
+  /**
+   * Constructs a configuration key string.
+   *
+   * @param string  configuration key string, not {@code null}
+   *
+   * @since 0.10.0
+   */
+  public ConfigKeyString(@NotNull String string) {
+    this(EQ, string);
+  }
+
+
+  /**
+   * Constructs a configuration key string with comparison type.
+   *
+   * @param compareType  configuration key comparison type, not {@code null}
+   * @param string  configuration key string, not {@code null}
+   */
   public ConfigKeyString(@NotNull CompareType compareType, @NotNull String string)
   {
     this.compareType = requireNonNull(compareType, "compareType must not be null");
