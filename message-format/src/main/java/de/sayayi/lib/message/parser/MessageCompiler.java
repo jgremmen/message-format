@@ -545,14 +545,18 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitConfigMapKeyNumber(ConfigMapKeyNumberContext ctx) {
-      ctx.configKey = new ConfigKeyNumber(ctx.relationalOperatorOptional().cmp, ctx.NUMBER().getText());
+    public void exitConfigMapKeyNumber(ConfigMapKeyNumberContext ctx)
+    {
+      ctx.configKey = new ConfigKeyNumber(ctx.relationalOperatorOptional().cmp,
+          Long.parseLong(ctx.NUMBER().getText()));
     }
 
 
     @Override
-    public void exitConfigMapKeyString(ConfigMapKeyStringContext ctx) {
-      ctx.configKey = new ConfigKeyString(ctx.relationalOperatorOptional().cmp, ctx.quotedString().string);
+    public void exitConfigMapKeyString(ConfigMapKeyStringContext ctx)
+    {
+      ctx.configKey = new ConfigKeyString(ctx.relationalOperatorOptional().cmp,
+          ctx.quotedString().string);
     }
 
 

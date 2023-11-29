@@ -38,12 +38,15 @@ public final class ConfigKeyNumber implements ConfigKey
   private final long number;
 
 
-  public ConfigKeyNumber(@NotNull CompareType compareType, @NotNull String number) {
-    this(compareType, Long.parseLong(number));
-  }
-
-
-  private ConfigKeyNumber(@NotNull CompareType compareType, long number)
+  /**
+   * Constructs a configuration key number with comparison type.
+   *
+   * @param compareType  configuration key comparison type, not {@code null}
+   * @param number       configuration key number
+   *
+   * @since 0.4.0 (made public in 0.10.0)
+   */
+  public ConfigKeyNumber(@NotNull CompareType compareType, long number)
   {
     this.compareType = requireNonNull(compareType, "compareType must not be null");
     this.number = number;
