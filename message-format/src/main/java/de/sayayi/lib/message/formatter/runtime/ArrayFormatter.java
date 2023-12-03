@@ -32,7 +32,10 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.OptionalLong;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.concurrent.atomic.AtomicReferenceArray;
@@ -42,6 +45,7 @@ import java.util.function.Supplier;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
 
@@ -125,7 +129,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter<Object>
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
-    return new HashSet<>(Arrays.asList(
+    return new HashSet<>(asList(
         new FormattableType(boolean[].class),
         new FormattableType(byte[].class),
         new FormattableType(short[].class),
