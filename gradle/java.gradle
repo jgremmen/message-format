@@ -29,7 +29,7 @@ dependencies {
 
   testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
   testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
-  
+
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
   testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
@@ -68,7 +68,9 @@ tasks.withType(Jar).configureEach {
   from(rootDir) {
     include 'LICENSE'
     into 'META-INF'
-    expand(copyright: new Date().format('yyyy'), version: project.version)
+    expand(
+        copyright: new Date().format('yyyy'),
+        version: project.version)
   }
 }
 
@@ -81,7 +83,7 @@ tasks.withType(JavaCompile).configureEach {
 
 
 tasks.withType(Test).configureEach {
-  if (System.getProperty("test-pack-compat") == 'true')
+  if (System.getProperty('test-pack-compat') == 'true')
     jvmArgs '-Dtest-pack-compat=true'
 
   javaLauncher = javaToolchains.launcherFor {

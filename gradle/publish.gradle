@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-apply plugin: "maven-publish"
-apply plugin: "signing"
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 
 def snapshot = version.toString().endsWith('-SNAPSHOT')
 def tmpRepositoryDirectory = rootProject.layout.buildDirectory
-    .dir("repository").get()
+    .dir('repository').get()
     .dir(snapshot ? 'snapshot' : 'release')
     .asFile
 
 publishing {
   repositories {
     maven {
-      name = "mavenTemp"
+      name = 'mavenTemp'
       url = tmpRepositoryDirectory
     }
 
     maven {
-      name = "mavenCentral"
+      name = 'mavenCentral'
       url = snapshot
           ? 'https://oss.sonatype.org/content/repositories/snapshots'
           : 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
