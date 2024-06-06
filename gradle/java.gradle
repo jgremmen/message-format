@@ -79,6 +79,8 @@ tasks.withType(JavaCompile).configureEach {
   javaCompiler = javaToolchains.compilerFor {
     languageVersion = JavaLanguageVersion.of(8)
   }
+
+  options.encoding = 'UTF-8'
 }
 
 
