@@ -45,6 +45,8 @@ afterEvaluate {
       ])
 
       noQualifiers 'java.util', 'java.lang'
+
+      addStringOption('Xdoclint:none', '-quiet')
     }
 
     failOnError false

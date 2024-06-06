@@ -53,6 +53,8 @@ javadoc {
     group('Gradle Plugin', [ 'de.sayayi.plugin.gradle.message' ])
 
     noQualifiers 'java.util', 'java.lang'
+
+    addStringOption('Xdoclint:none', '-quiet')
   }
 
   failOnError false
