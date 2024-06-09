@@ -23,7 +23,7 @@ allprojects {
   apply plugin: 'base'
 
   group = 'de.sayayi.lib'
-  version = '0.10.0-SNAPSHOT'
+  version = '0.10.0'
 
   ext.jetbrainsAnnotationsVersion = '24.1.0'
   ext.junitVersion = '5.10.+'
@@ -49,7 +49,7 @@ configure(subprojects.findAll { it.name.startsWith('message-format') }) {
 }
 
 
-configure(subprojects.findAll {it.name != 'documentation' }) {
+configure(subprojects.findAll { it.name != 'documentation' }) {
   apply from: "${rootDir}/gradle/java.gradle"
   apply from: "${rootDir}/gradle/publish.gradle"
 }
