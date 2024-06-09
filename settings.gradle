@@ -31,6 +31,9 @@ pluginManagement {
 }
 
 
+def withDocumentation = 'true' == System.getProperty('documentation')
+
+
 buildscript {
   repositories {
     gradlePluginPortal()
@@ -47,11 +50,11 @@ include 'message-format-jodatime'
 include 'message-format-spring'
 include 'message-gradle-plugin'
 
-if ('true' == System.getProperty('documentation'))
+if (withDocumentation)
   include 'documentation'
 
 
 rootProject.name = 'message-format-projects'
-rootProject.children.each {project ->
+rootProject.children.each { project ->
   project.buildFileName = "${project.name}.gradle"
 }

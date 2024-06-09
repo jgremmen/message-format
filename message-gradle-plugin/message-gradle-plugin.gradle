@@ -29,7 +29,7 @@ def asmVersion = '[9.0,)'
 dependencies {
   api gradleApi()
 
-  implementation project(":message-format")
+  implementation project(':message-format')
   implementation "org.ow2.asm:asm:${asmVersion}"
 }
 
