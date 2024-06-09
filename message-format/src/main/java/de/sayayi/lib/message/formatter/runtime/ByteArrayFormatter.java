@@ -19,6 +19,7 @@ import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import lombok.SneakyThrows;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.OptionalLong;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_PRIMITIVE_OR_ARRAY_ORDER;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
@@ -41,7 +43,7 @@ import static java.util.Base64.getMimeEncoder;
  * @since 0.8.0
  */
 public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatter<byte[]>
-    implements ConfigKeyComparator<byte[]>
+    implements SizeQueryable, ConfigKeyComparator<byte[]>
 {
   private static final byte[] LINE_SEPARATOR = new byte[] { '\n' };
 
@@ -72,6 +74,12 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(byte[].class, DEFAULT_PRIMITIVE_OR_ARRAY_ORDER - 10);
+  }
+
+
+  @Override
+  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value) {
+    return OptionalLong.of(((byte[])value).length);
   }
 
 
