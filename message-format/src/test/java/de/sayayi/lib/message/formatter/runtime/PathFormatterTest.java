@@ -73,7 +73,7 @@ class PathFormatterTest extends AbstractFormatterTest
   void formatPathFileExtension()
   {
     val context = MessageSupportFactory
-        .create(createFormatterService(new PathFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new IterableFormatter(), new PathFormatter()), NO_CACHE_INSTANCE)
         .setLocale(ROOT);
 
     assertEquals("file.jpg = image/jpeg", context
