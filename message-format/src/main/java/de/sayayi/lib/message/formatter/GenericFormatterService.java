@@ -42,15 +42,15 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
   private static final @NotNull Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
 
-  private final @NotNull Map<String,NamedParameterFormatter> namedFormatters =
-      new ConcurrentHashMap<>();
-  private final @NotNull Map<Class<?>,List<PrioritizedFormatter>> typeFormatters =
-      new ConcurrentHashMap<>();
+  private final @NotNull Map<String,NamedParameterFormatter> namedFormatters = new ConcurrentHashMap<>();
+  private final @NotNull Map<Class<?>,List<PrioritizedFormatter>> typeFormatters = new ConcurrentHashMap<>();
   private final @NotNull FormatterCache formatterCache;
 
 
   static
   {
+    // primitives
+    WRAPPER_CLASS_MAP.put(boolean.class, Boolean.class);
     WRAPPER_CLASS_MAP.put(char.class, Character.class);
     WRAPPER_CLASS_MAP.put(byte.class, Byte.class);
     WRAPPER_CLASS_MAP.put(double.class, Double.class);
@@ -58,6 +58,16 @@ public class GenericFormatterService implements FormatterService.WithRegistry
     WRAPPER_CLASS_MAP.put(int.class, Integer.class);
     WRAPPER_CLASS_MAP.put(long.class, Long.class);
     WRAPPER_CLASS_MAP.put(short.class, Short.class);
+
+    // primitive arrays
+    WRAPPER_CLASS_MAP.put(boolean[].class, Boolean[].class);
+    WRAPPER_CLASS_MAP.put(char[].class, Character[].class);
+    WRAPPER_CLASS_MAP.put(byte[].class, Byte[].class);
+    WRAPPER_CLASS_MAP.put(double[].class, Double[].class);
+    WRAPPER_CLASS_MAP.put(float[].class, Float[].class);
+    WRAPPER_CLASS_MAP.put(int[].class, Integer[].class);
+    WRAPPER_CLASS_MAP.put(long[].class, Long[].class);
+    WRAPPER_CLASS_MAP.put(short[].class, Short[].class);
   }
 
 
@@ -76,21 +86,15 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
   @Override
   @MustBeInvokedByOverriders
-  public void addFormatterForType(@NotNull FormattableType formattableType,
-                                  @NotNull ParameterFormatter formatter)
+  public void addFormatterForType(@NotNull FormattableType formattableType, @NotNull ParameterFormatter formatter)
   {
-    if (new FormattableType(Object.class).equals(formattableType) &&
-        !(formatter instanceof DefaultFormatter))
-    {
-      throw new IllegalArgumentException(
-          "formatter associated with Object must implement DefaultFormatter interface");
-    }
-
-    final Class<?> type =
-        requireNonNull(formattableType, "formattableType must not be null").getType();
+    if (formattableType.getType() == Object.class && !(formatter instanceof DefaultFormatter))
+      throw new IllegalArgumentException("formatter associated with Object must implement DefaultFormatter interface");
 
     typeFormatters
-        .computeIfAbsent(type, t -> new ArrayList<>(4))
+        .computeIfAbsent(
+            requireNonNull(formattableType, "formattableType must not be null").getType(),
+            type -> new ArrayList<>(4))
         .add(new PrioritizedFormatter(formattableType.getOrder(), formatter));
 
     formatterCache.clear();
@@ -108,15 +112,15 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       final NamedParameterFormatter namedParameterFormatter = (NamedParameterFormatter)formatter;
       final String format = namedParameterFormatter.getName();
 
-      if (format.isEmpty())
+      //noinspection ConstantValue
+      if (format == null || format.isEmpty())
         throw new IllegalArgumentException("formatter name must not be empty");
 
       namedFormatters.put(format, namedParameterFormatter);
     }
 
-    formatter
-        .getFormattableTypes()
-        .forEach(formattableType -> addFormatterForType(formattableType, formatter));
+    for(FormattableType formattableType: formatter.getFormattableTypes())
+      addFormatterForType(formattableType, formatter);
   }
 
 
@@ -133,7 +137,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
     }
 
     final ParameterFormatter[] formatters = formatterCache.lookup(type, t ->
-        getFormatters_collectTypes(t)
+        collectTypes(t)
             .stream()
             .map(typeFormatters::get)
             .filter(Objects::nonNull)
@@ -148,17 +152,20 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   @Contract(pure = true)
-  private @NotNull Set<Class<?>> getFormatters_collectTypes(@NotNull Class<?> type)
+  private @NotNull Set<Class<?>> collectTypes(@NotNull Class<?> type)
   {
     final Set<Class<?>> collectedTypes = new HashSet<>();
 
     if (!typeFormatters.containsKey(type))
     {
-      // 1. substitute wrapper type for primitive type
-      // 2. object arrays != Object[] (eg. String[]) will imply Object[] as well
-      if (type.isPrimitive())
+      final boolean isArray = type.isArray();
+
+      // if no formatter for this primitive (array) type exists, continue collecting using its wrapper type
+      if (type.isPrimitive() || (isArray && type.getComponentType().isPrimitive()))
         type = WRAPPER_CLASS_MAP.get(type);
-      else if (type.isArray() && type.getComponentType() != Object.class)
+
+      // object arrays != Object[] (eg. String[]) will imply Object[] as well
+      if (isArray && type.getComponentType() != Object.class)
         collectedTypes.add(Object[].class);  // default array formatter
     }
 
@@ -175,8 +182,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   @Contract(mutates = "param2")
-  private static void addInterfaceTypes(@NotNull Class<?> type,
-                                        @NotNull Set<Class<?>> collectedTypes)
+  private static void addInterfaceTypes(@NotNull Class<?> type, @NotNull Set<Class<?>> collectedTypes)
   {
     for(final Class<?> interfaceType: type.getInterfaces())
       if (!collectedTypes.contains(interfaceType))
@@ -222,7 +228,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
     @Override
     public int hashCode() {
-      return (59 + order) * 59 + formatter.hashCode();
+      return formatter.hashCode() * 31 + order;
     }
 
 
