@@ -23,6 +23,10 @@ import static java.lang.System.arraycopy;
 
 
 /**
+ * The formatter cache is a fixed size cache for storing a sorted list of parameter formatters for each value type.
+ * <p>
+ * The cache prioritizes frequently used value types and drops least used ones as soon as the cache size is exhausted.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
@@ -36,7 +40,7 @@ final class FormatterCache
   private Node tail;
 
 
-  public FormatterCache(int n)
+  FormatterCache(int n)
   {
     capacity = Math.max(n, 8);
     typeFormatters = new Object[n * 2];
@@ -45,7 +49,7 @@ final class FormatterCache
   }
 
 
-  public synchronized void clear()
+  synchronized void clear()
   {
     head = null;
     tail = null;
@@ -53,31 +57,31 @@ final class FormatterCache
   }
 
 
-  public synchronized @NotNull ParameterFormatter[] lookup(
-      @NotNull Class<?> type, @NotNull Function<Class<?>,ParameterFormatter[]> buildFormatters)
+  synchronized @NotNull ParameterFormatter[] lookup(@NotNull Class<?> type,
+                                                    @NotNull Function<Class<?>,ParameterFormatter[]> buildFormatters)
   {
     final int idx = findTypeIndex(type);
+    final ParameterFormatter[] formatters;
 
     if (idx >= 0)
     {
       final Node node = (Node)typeFormatters[idx * 2 + 1];
 
       // move to head?
+      // start moving if we're at 75% of the total capacity and the node is located in the lower 25%
       if (node != head && typeCount >= capacity * 3 / 4 && node.countNext < typeCount / 4)
-        lookup_moveNodeToHead(node);
+        moveNodeToHead(node);
 
-      return node.formatters;
+      formatters = node.formatters;
     }
-
-    final ParameterFormatter[] formatters = buildFormatters.apply(type);
-
-    lookup_addNew(type, formatters);
+    else
+      addNew(type, formatters = buildFormatters.apply(type));
 
     return formatters;
   }
 
 
-  private void lookup_moveNodeToHead(@NotNull Node node)
+  private void moveNodeToHead(@NotNull Node node)
   {
     final Node prevNode = node.prev;
     assert prevNode != null;
@@ -101,7 +105,7 @@ final class FormatterCache
   }
 
 
-  private void lookup_addNew(@NotNull Class<?> type, @NotNull ParameterFormatter[] formatters)
+  private void addNew(@NotNull Class<?> type, @NotNull ParameterFormatter[] formatters)
   {
     // if capacity has been reached -> remove tail
     if (typeCount == capacity)
@@ -176,6 +180,23 @@ final class FormatterCache
   }
 
 
+  @Override
+  public String toString()
+  {
+    final StringBuilder s = new StringBuilder("[");
+
+    for(Node n = head; n != null; n = n.next)
+    {
+      if (n != head)
+        s.append(", ");
+
+      s.append(n);
+    }
+
+    return s.append(']').toString();
+  }
+
+
 
 
   private static final class Node
@@ -188,17 +209,19 @@ final class FormatterCache
     private int countNext;
 
 
-    public Node(@NotNull Class<?> type, @NotNull ParameterFormatter[] formatters)
+    private Node(@NotNull Class<?> type, @NotNull ParameterFormatter[] formatters)
     {
       this.type = type;
       this.formatters = formatters;
     }
 
+
     @Override
     public String toString()
     {
-      return "Node(countNext=" + countNext + ",type=" + type + ",head=" + (prev == null) +
-          ",tail=" + (next == null) + ')';
+      final String name = type.getCanonicalName();
+
+      return countNext + ":(" + (name == null ? type.toString() : name) + ')';
     }
   }
 }

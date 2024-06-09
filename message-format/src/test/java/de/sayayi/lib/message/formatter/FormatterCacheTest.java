@@ -64,8 +64,8 @@ class FormatterCacheTest
     val pf = new ParameterFormatter[] { new ArrayFormatter() };
     assertArrayEquals(pf, cache.lookup(int.class, t -> pf));
 
-    // lookup byte[] which moves it to head
-    // cache: byte[], int, List, boolean, Map, Double, String, short
+    // lookup byte[] which doesn't move it to head (not in lower quarter)
+    // cache: int, List, boolean, byte[], Map, Double, String, short
     assertArrayEquals(new ParameterFormatter[0], cache.lookup(byte[].class, t -> fail()));
 
     // lookup Iterator, requires call to buildFormatters (moves it to head) and removes short
