@@ -17,13 +17,17 @@ package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
+import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
@@ -36,14 +40,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-@DisplayName("File formatter")
-class FileFormatterTest extends AbstractFormatterTest
+@DisplayName("File/Path formatter")
+class PathFormatterTest extends AbstractFormatterTest
 {
+  private static final ConfigKey PATH_KEY = new ConfigKeyName("path");
+
+
   @Test
-  public void testFormat()
+  @EnabledOnOs({ OS.MAC, OS.LINUX })
+  @DisplayName("Format File")
+  void formatFile()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new FileFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new PathFormatter(), new IterableFormatter()), NO_CACHE_INSTANCE)
         .setLocale(ROOT)
         .getMessageAccessor();
     val f = new File("/path1/path2/filename.ext");
@@ -51,24 +60,25 @@ class FileFormatterTest extends AbstractFormatterTest
     assertEquals(nullText(), format(messageAccessor, null));
     assertEquals(noSpaceText("/path1/path2/filename.ext"), format(messageAccessor, f));
     assertEquals(noSpaceText("filename.ext"), format(messageAccessor, f,
-        singletonMap(new ConfigKeyName("file"), new ConfigValueString("name"))));
+        singletonMap(PATH_KEY, new ConfigValueString("name"))));
     assertEquals(noSpaceText("/path1/path2"), format(messageAccessor, f,
-        singletonMap(new ConfigKeyName("file"), new ConfigValueString("parent"))));
+        singletonMap(PATH_KEY, new ConfigValueString("parent"))));
     assertEquals(noSpaceText("ext"), format(messageAccessor, f,
-        singletonMap(new ConfigKeyName("file"), new ConfigValueString("extension"))));
+        singletonMap(PATH_KEY, new ConfigValueString("extension"))));
   }
 
 
   @Test
-  public void testFormatter()
+  @DisplayName("Format path file extension")
+  void formatPathFileExtension()
   {
     val context = MessageSupportFactory
-        .create(createFormatterService(new FileFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new PathFormatter()), NO_CACHE_INSTANCE)
         .setLocale(ROOT);
 
     assertEquals("file.jpg = image/jpeg", context
-        .message("%{f,file:name}  =  %{f,file:extension,'jpg':'image/jpeg'}")
-        .with("f", new File("/test/file.jpg"))
+        .message("%{f,path:name}  =  %{f,path:extension,'jpg':'image/jpeg'}")
+        .with("f", Paths.get("/test/file.jpg"))
         .format());
   }
 }
