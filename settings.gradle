@@ -31,9 +31,6 @@ pluginManagement {
 }
 
 
-//System.setProperty('documentation', 'true')
-
-
 buildscript {
   repositories {
     gradlePluginPortal()
