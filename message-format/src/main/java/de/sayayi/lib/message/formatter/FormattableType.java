@@ -100,8 +100,11 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
   {
     this.type = requireNonNull(type, "type must not be null");
 
-    order = type == Object.class ? 127 : type.isPrimitive() || type.isArray()
-        ? DEFAULT_PRIMITIVE_OR_ARRAY_ORDER : DEFAULT_ORDER;
+    order = type == Object.class
+        ? 127
+        : type.isPrimitive() || type.isArray()
+            ? DEFAULT_PRIMITIVE_OR_ARRAY_ORDER
+            : DEFAULT_ORDER;
   }
 
 
