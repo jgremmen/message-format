@@ -28,13 +28,19 @@ import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.part.parameter.value.*;
 import de.sayayi.lib.message.util.SupplierDelegate;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.*;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Map.Entry;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -352,6 +358,12 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
+    public @NotNull Map<String,Object> getParameters() {
+      return new ParameterMap(this);
+    }
+
+
+    @Override
     public @NotNull MessageConfigurer<M> clear()
     {
       parameterCount = 0;
@@ -374,9 +386,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
             low = mid + 1;
           else
           {
-            final int mid2 = mid * 2;
-            arraycopy(parameters, mid2 + 2, parameters, mid2,
-                --parameterCount * 2 - mid2);
+            final int offset = mid * 2;
+            arraycopy(parameters, offset + 2, parameters, offset, --parameterCount * 2 - offset);
             break;
           }
         }
@@ -414,8 +425,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
           parameters = copyOf(parameters, parameterCount * 2 + 16);
 
         final int offset = low * 2;
-        arraycopy(parameters, offset, parameters, offset + 2,
-            parameterCount++ * 2 - offset);
+        arraycopy(parameters, offset, parameters, offset + 2, parameterCount++ * 2 - offset);
 
         parameters[offset] = parameter;
         parameters[offset + 1] = value;
@@ -560,6 +570,323 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
           .distinct()
           .filter(templateName -> !templates.containsKey(templateName))
           .collect(toCollection(TreeSet::new));
+    }
+  }
+
+
+
+
+  private static final class ParameterMap extends AbstractMap<String,Object> implements Serializable
+  {
+    private final @NotNull Object[] parameters;
+
+
+    private ParameterMap(@NotNull Configurer<?> configurer) {
+      parameters = copyOf(configurer.parameters, configurer.parameterCount * 2);
+    }
+
+
+    @Override
+    public int size() {
+      return parameters.length / 2;
+    }
+
+
+    @Override
+    public boolean isEmpty() {
+      return parameters.length == 0;
+    }
+
+
+    @Override
+    public boolean containsKey(Object key)
+    {
+      if (key instanceof String)
+        for(int offset = 0, length = parameters.length; offset < length; offset += 2)
+          if (parameters[offset].equals(key))
+            return true;
+
+      return false;
+    }
+
+
+    @Override
+    public boolean containsValue(Object value)
+    {
+      for(int offset = 1, length = parameters.length; offset < length; offset += 2)
+        if (Objects.equals(parameters[offset], value))
+          return true;
+
+      return false;
+    }
+
+
+    @Override
+    public Object get(Object key) {
+      return getOrDefault(key, null);
+    }
+
+
+    @Override
+    public Object getOrDefault(Object key, Object defaultValue)
+    {
+      if (key instanceof String)
+        for(int low = 0, high = parameters.length - 2; low <= high;)
+        {
+          final int mid = ((low + high) >>> 1) & 0xfffe;
+          final int cmp = ((String)key).compareTo((String)parameters[mid]);
+
+          if (cmp < 0)
+            high = mid - 2;
+          else if (cmp > 0)
+            low = mid + 2;
+          else
+            return parameters[mid + 1];
+        }
+
+      return defaultValue;
+    }
+
+
+    @Override
+    public Object remove(Object key) {
+      throw new UnsupportedOperationException("remove");
+    }
+
+
+    @Override
+    public void clear() {
+      throw new UnsupportedOperationException("clear");
+    }
+
+
+    @Override
+    public @NotNull Set<Entry<String,Object>> entrySet() {
+      return new ParameterEntrySet(parameters);
+    }
+
+
+    @Override
+    public void forEach(BiConsumer<? super String,? super Object> action)
+    {
+      requireNonNull(action);
+
+      for(int offset = 0, length = parameters.length; offset < length; offset += 2)
+        action.accept((String)parameters[offset], parameters[offset + 1]);
+    }
+
+
+    @Override
+    public boolean equals(Object o)
+    {
+      if (this != o)
+      {
+        if (!(o instanceof Map))
+          return false;
+
+        final Map<?,?> that = (Map<?,?>)o;
+        if (size() != that.size())
+          return false;
+
+        for(int offset = 0, length = parameters.length; offset < length; offset += 2)
+        {
+          final Object key = parameters[offset];
+          final Object value = parameters[offset + 1];
+          final Object thatValue = that.get(key);
+
+          if (value == null)
+          {
+            if (thatValue != null || !that.containsKey(key))
+              return false;
+          }
+          else if (!value.equals(thatValue))
+            return false;
+        }
+      }
+
+      return true;
+    }
+
+
+    @Override
+    public int hashCode() {
+      return Arrays.hashCode(parameters);
+    }
+
+
+    @Override
+    public String toString()
+    {
+      final int length = parameters.length;
+      if (length == 0)
+        return "{}";
+
+      final StringBuilder sb = new StringBuilder("{");
+
+      for(int offset = 0; offset < length; offset += 2)
+      {
+        if (offset > 0)
+          sb.append(", ");
+
+        sb.append(parameters[offset]).append('=').append(parameters[offset + 1]);
+      }
+
+      return sb.append("}").toString();
+    }
+  }
+
+
+
+
+  private static final class ParameterEntrySet extends AbstractSet<Entry<String,Object>> implements Serializable
+  {
+    private final @NotNull Object[] parameters;
+
+
+    private ParameterEntrySet(@NotNull Object[] parameters) {
+      this.parameters = parameters;
+    }
+
+
+    @Override
+    public int size() {
+      return parameters.length / 2;
+    }
+
+
+    @Override
+    public boolean isEmpty() {
+      return parameters.length == 0;
+    }
+
+
+    @Override
+    public @NotNull Iterator<Entry<String,Object>> iterator()
+    {
+      return new Iterator<Entry<String,Object>>() {
+        int offset = 0;
+
+        @Override
+        public boolean hasNext() {
+          return offset < parameters.length;
+        }
+
+        @Override
+        public Entry<String,Object> next()
+        {
+          if (!hasNext())
+            throw new NoSuchElementException();
+
+          final Entry<String,Object> entry = createEntry(offset);
+          offset += 2;
+
+          return entry;
+        }
+      };
+    }
+
+
+    @Override
+    public Spliterator<Entry<String,Object>> spliterator()
+    {
+      return new Spliterator<Entry<String,Object>>() {
+        int offset = 0;
+
+        @Override
+        public boolean tryAdvance(Consumer<? super Entry<String,Object>> action)
+        {
+          if (offset == parameters.length)
+            return false;
+
+          action.accept(createEntry(offset));
+          offset += 2;
+
+          return true;
+        }
+
+        @Override
+        public Spliterator<Entry<String,Object>> trySplit() {
+          return null;
+        }
+
+        @Override
+        public long estimateSize() {
+          return parameters.length / 2;
+        }
+
+        @Override
+        public long getExactSizeIfKnown() {
+          return parameters.length / 2;
+        }
+
+        @Override
+        public Comparator<? super Entry<String,Object>> getComparator() {
+          return null;
+        }
+
+        @Override
+        public int characteristics() {
+          return ORDERED | DISTINCT | NONNULL | SIZED | IMMUTABLE;
+        }
+      };
+    }
+
+
+    @Override
+    public void clear() {
+      throw new UnsupportedOperationException("clear");
+    }
+
+
+    @Override
+    public boolean remove(Object o) {
+      throw new UnsupportedOperationException("remove");
+    }
+
+
+    @Override
+    public boolean removeIf(Predicate<? super Entry<String,Object>> filter) {
+      throw new UnsupportedOperationException("removeIf");
+    }
+
+
+    @Override
+    public void forEach(Consumer<? super Entry<String,Object>> action)
+    {
+      for(int offset = 0, length = parameters.length; offset < length; offset += 2)
+        action.accept(createEntry(offset));
+    }
+
+
+    @Override
+    public int hashCode() {
+      return Arrays.hashCode(parameters);
+    }
+
+
+    @Override
+    public String toString()
+    {
+      if (parameters.length == 0)
+        return "[]";
+
+      final StringBuilder sb = new StringBuilder("[");
+
+      for(int offset = 0, length = parameters.length; offset < length; offset += 2)
+      {
+        if (offset > 0)
+          sb.append(", ");
+
+        sb.append(parameters[offset]).append('=').append(parameters[offset + 1]);
+      }
+
+      return sb.append("]").toString();
+    }
+
+
+    @Contract(pure = true)
+    private @NotNull Entry<String,Object> createEntry(int offset) {
+      return new SimpleImmutableEntry<>((String)parameters[offset], parameters[offset + 1]);
     }
   }
 }

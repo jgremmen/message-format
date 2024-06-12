@@ -141,6 +141,17 @@ public interface MessageSupport
 
 
     /**
+     * Returns a map with all parameters configured for this message.
+     * <p>
+     * The returned map is not backed by this configurer, so changes to the configurer will not reflect in the map.
+     *
+     * @return  unmodifiable parameter map, never {@code null}
+     */
+    @Contract(pure = true)
+    @NotNull Map<String,Object> getParameters();
+
+
+    /**
      * Clear all message parameter values.
      *
      * @return  message configurer instance for this message, never {@code null}
