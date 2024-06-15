@@ -28,7 +28,6 @@ import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.part.parameter.value.*;
 import de.sayayi.lib.message.util.SupplierDelegate;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -576,7 +575,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
 
-  private static final class ParameterMap extends AbstractMap<String,Object> implements Serializable
+  private static final class ParameterMap extends AbstractMap<String,Object> implements Serializable, Cloneable
   {
     private final @NotNull Object[] parameters;
 
@@ -669,10 +668,14 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public void forEach(BiConsumer<? super String,? super Object> action)
     {
-      requireNonNull(action);
-
       for(int offset = 0, length = parameters.length; offset < length; offset += 2)
         action.accept((String)parameters[offset], parameters[offset + 1]);
+    }
+
+
+    @Override
+    public @NotNull Map<String,Object> clone() throws CloneNotSupportedException {
+      return (ParameterMap)super.clone();
     }
 
 
@@ -738,7 +741,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
 
-  private static final class ParameterEntrySet extends AbstractSet<Entry<String,Object>> implements Serializable
+  private static final class ParameterEntrySet extends AbstractSet<Entry<String,Object>>
+      implements Serializable, Cloneable
   {
     private final @NotNull Object[] parameters;
 
@@ -777,7 +781,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
           if (!hasNext())
             throw new NoSuchElementException();
 
-          final Entry<String,Object> entry = createEntry(offset);
+          final Entry<String,Object> entry =
+              new SimpleImmutableEntry<>((String)parameters[offset], parameters[offset + 1]);
           offset += 2;
 
           return entry;
@@ -798,7 +803,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
           if (offset == parameters.length)
             return false;
 
-          action.accept(createEntry(offset));
+          action.accept(new SimpleImmutableEntry<>((String)parameters[offset], parameters[offset + 1]));
           offset += 2;
 
           return true;
@@ -811,11 +816,6 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
         @Override
         public long estimateSize() {
-          return parameters.length / 2;
-        }
-
-        @Override
-        public long getExactSizeIfKnown() {
           return parameters.length / 2;
         }
 
@@ -851,10 +851,16 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    public void forEach(Consumer<? super Entry<String,Object>> action)
+    public void forEach(@NotNull Consumer<? super Entry<String,Object>> action)
     {
       for(int offset = 0, length = parameters.length; offset < length; offset += 2)
-        action.accept(createEntry(offset));
+        action.accept(new SimpleImmutableEntry<>((String)parameters[offset], parameters[offset + 1]));
+    }
+
+
+    @Override
+    public @NotNull Set<Entry<String,Object>> clone() throws CloneNotSupportedException {
+      return (ParameterEntrySet)super.clone();
     }
 
 
@@ -867,26 +873,21 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public String toString()
     {
-      if (parameters.length == 0)
+      final int length = parameters.length;
+      if (length == 0)
         return "[]";
 
       final StringBuilder sb = new StringBuilder("[");
 
-      for(int offset = 0, length = parameters.length; offset < length; offset += 2)
+      for(int offset = 0; offset < length; offset += 2)
       {
         if (offset > 0)
           sb.append(", ");
 
-        sb.append(parameters[offset]).append('=').append(parameters[offset + 1]);
+        sb.append((String)parameters[offset]).append('=').append(parameters[offset + 1]);
       }
 
       return sb.append("]").toString();
-    }
-
-
-    @Contract(pure = true)
-    private @NotNull Entry<String,Object> createEntry(int offset) {
-      return new SimpleImmutableEntry<>((String)parameters[offset], parameters[offset + 1]);
     }
   }
 }

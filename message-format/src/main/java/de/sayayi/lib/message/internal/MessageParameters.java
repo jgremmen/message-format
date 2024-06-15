@@ -56,17 +56,17 @@ final class MessageParameters implements Parameters
   @Override
   public Object getParameterValue(@NotNull String parameter)
   {
-    for(int low = 0, high = parameters.length / 2 - 1; low <= high;)
+    for(int low = 0, high = parameters.length - 2; low <= high;)
     {
-      final int mid = (low + high) >>> 1;
-      final int cmp = parameter.compareTo((String)parameters[mid * 2]);
+      final int mid = ((low + high) >>> 1) & 0xfffe;
+      final int cmp = parameter.compareTo((String)parameters[mid]);
 
       if (cmp < 0)
-        high = mid - 1;
+        high = mid - 2;
       else if (cmp > 0)
-        low = mid + 1;
+        low = mid + 2;
       else
-        return parameters[mid * 2 + 1];
+        return parameters[mid + 1];
     }
 
     return null;
@@ -143,15 +143,15 @@ final class MessageParameters implements Parameters
     public boolean contains(Object o)
     {
       if (o instanceof String)
-        for(int low = 0, high = parameters.length / 2 - 1; low <= high;)
+        for(int low = 0, high = parameters.length - 2; low <= high;)
         {
-          final int mid = (low + high) >>> 1;
-          final int cmp = ((String)o).compareTo((String)parameters[mid * 2]);
+          final int mid = ((low + high) >>> 1) & 0xfffe;
+          final int cmp = ((String)o).compareTo((String)parameters[mid]);
 
           if (cmp < 0)
-            high = mid - 1;
+            high = mid - 2;
           else if (cmp > 0)
-            low = mid + 1;
+            low = mid + 2;
           else
             return true;
         }
