@@ -24,7 +24,9 @@ tokens {
     BOOL,
     NUMBER,
     NAME,
-    EQ
+    EQ,
+    L_PAREN,
+    R_PAREN
 }
 
 
@@ -141,6 +143,12 @@ GT
         ;
 GTE
         : '>='
+        ;
+P_L_PAREN
+        : '(' -> type(L_PAREN)
+        ;
+P_R_PAREN
+        : ')' -> type(R_PAREN)
         ;
 
 

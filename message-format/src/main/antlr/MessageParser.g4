@@ -78,7 +78,7 @@ parameterPart returns [ParameterPart part]
           P_END
         ;
 
-parameterConfigElement returns [ConfigKey configKey, ConfigValue configValue]
+parameterConfigElement returns [List<ConfigKey> configKeys, ConfigValue configValue]
         : configNamedElement
         | configMapElement
         ;
@@ -94,9 +94,9 @@ templateParameterDelegate returns [String parameter, String delegatedParameter]
         : simpleString EQ simpleString
         ;
 
-configMapElement returns [ConfigKey configKey, ConfigValue configValue]
-        : configMapKey COLON quotedMessage  #configMapMessage
-        | configMapKey COLON simpleString   #configMapString
+configMapElement returns [List<ConfigKey> configKeys, ConfigValue configValue]
+        : configMapKeys COLON quotedMessage  #configMapMessage
+        | configMapKeys COLON simpleString   #configMapString
         ;
 
 configNamedElement returns [ConfigKeyName configKey, ConfigValue configValue]
@@ -104,6 +104,11 @@ configNamedElement returns [ConfigKeyName configKey, ConfigValue configValue]
         | NAME COLON NUMBER         #configNamedNumber
         | NAME COLON simpleString   #configNamedString
         | NAME COLON quotedMessage  #configNamedMessage
+        ;
+
+configMapKeys returns [List<ConfigKey> configKeys]
+        : configMapKey
+        | L_PAREN configMapKey (COMMA configMapKey)+ R_PAREN
         ;
 
 configMapKey returns [ConfigKey configKey]

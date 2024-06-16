@@ -32,6 +32,7 @@ import de.sayayi.lib.message.annotation.Text;
 @MessageDef(code = "MSG-07", text = "%{n,>0:'pos',<10:'small',<>3467864826:''}")
 @MessageDef(code = "MSG-08", text = "%{s,'yes':true,'no':false}")
 @MessageDef(code = "MSG-09", text = "%{t,name:true}%['TPL01',a:true,b:'hello',c:-6]")
+@MessageDef(code = "MSG-10", text = "%{x,choice,(1,21,41,61):'A',(true,>80):'B'}")
 @TemplateDef(name = "TPL01", text = "%{a} %{true} %{'c4'}")
 public class Version0_10_1 {
 }

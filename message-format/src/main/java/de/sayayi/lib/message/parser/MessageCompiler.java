@@ -67,6 +67,8 @@ import static de.sayayi.lib.message.parser.MessageLexer.P_START;
 import static de.sayayi.lib.message.parser.MessageParser.CH;
 import static de.sayayi.lib.message.parser.MessageParser.DQ_END;
 import static de.sayayi.lib.message.parser.MessageParser.DQ_START;
+import static de.sayayi.lib.message.parser.MessageParser.L_PAREN;
+import static de.sayayi.lib.message.parser.MessageParser.R_PAREN;
 import static de.sayayi.lib.message.parser.MessageParser.SQ_END;
 import static de.sayayi.lib.message.parser.MessageParser.SQ_START;
 import static de.sayayi.lib.message.parser.MessageParser.TPL_END;
@@ -76,10 +78,12 @@ import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collector.Characteristics.IDENTITY_FINISH;
 import static java.util.stream.Collector.Characteristics.UNORDERED;
+import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.Token.EOF;
 
 
@@ -348,16 +352,16 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       public BiConsumer<Map<ConfigKey,ConfigValue>,ParameterConfigElementContext> accumulator()
       {
         return (map,cec) -> {
-          final ConfigKey key = cec.configKey;
-
-          if (map.containsKey(key))
+          for(ConfigKey key: cec.configKeys)
           {
-            final String parameter = ((ParameterPartContext)cec.parent).name.string;
-            syntaxError(cec, "duplicate config element " + key + " for parameter '" +
-                parameter + '\'');
-          }
+            if (map.containsKey(key))
+            {
+              syntaxError(cec, "duplicate config element " + key + " for parameter '" +
+                  ((ParameterPartContext)cec.parent).name.string + '\'');
+            }
 
-          map.put(key, cec.configValue);
+            map.put(key, cec.configValue);
+          }
         };
       }
 
@@ -464,14 +468,14 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
       if (cpec != null)
       {
-        ctx.configKey = cpec.configKey;
+        ctx.configKeys = singletonList(cpec.configKey);
         ctx.configValue = cpec.configValue;
       }
       else
       {
         final ConfigMapElementContext cmec = ctx.configMapElement();
 
-        ctx.configKey = cmec.configKey;
+        ctx.configKeys = cmec.configKeys;
         ctx.configValue = cmec.configValue;
       }
     }
@@ -480,7 +484,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitConfigMapMessage(ConfigMapMessageContext ctx)
     {
-      ctx.configKey = ctx.configMapKey().configKey;
+      ctx.configKeys = ctx.configMapKeys().configKeys;
       ctx.configValue = new ConfigValueMessage(ctx.quotedMessage().messageWithSpaces);
     }
 
@@ -488,7 +492,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitConfigMapString(ConfigMapStringContext ctx)
     {
-      ctx.configKey = ctx.configMapKey().configKey;
+      ctx.configKeys = ctx.configMapKeys().configKeys;
       ctx.configValue = new ConfigValueString(ctx.simpleString().string);
     }
 
@@ -523,6 +527,17 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     {
       ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
       ctx.configValue = new ConfigValueString(ctx.simpleString().string);
+    }
+
+
+    @Override
+    public void exitConfigMapKeys(ConfigMapKeysContext ctx)
+    {
+      ctx.configKeys = ctx
+          .configMapKey()
+          .stream()
+          .map(cmkc -> cmkc.configKey)
+          .collect(toList());
     }
 
 
@@ -682,6 +697,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       add(SQ_START, "'", "SQ_START");
       add(TPL_START, "'%['", "TPL_START");
       add(TPL_END, "']'", "TPL_END");
+      add(L_PAREN, "'('", "L_PAREN");
+      add(R_PAREN, "')'", "R_PAREN");
     }
   };
 }
