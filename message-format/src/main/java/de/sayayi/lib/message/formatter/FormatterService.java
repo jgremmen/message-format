@@ -54,15 +54,32 @@ public interface FormatterService
   @SuppressWarnings("UnstableApiUsage")
   interface WithRegistry extends FormatterService
   {
+    /**
+     * Register a parameter formatter for the given formattable type. The formattable types returned by
+     * {@link ParameterFormatter#getFormattableTypes()} are ignored by this method.
+     *
+     * @param formattableType  formattable type, not {@code null}
+     * @param formatter        formatter to be registered, not {@code null}
+     *
+     * @see #addFormatter(ParameterFormatter)
+     */
     @Contract(mutates = "this")
     void addFormatterForType(@NotNull FormattableType formattableType,
                              @NotNull ParameterFormatter formatter);
 
 
     /**
-     * Add parameter formatter to the formatter service.
+     * Register a parameter formatter.
+     * <p>
+     * The formatter will be registered for all formattable types, returned by
+     * {@link ParameterFormatter#getFormattableTypes()}.
+     * <p>
+     * If the formatter implements {@link NamedParameterFormatter}, it will aditionally be registered as a named
+     * parameter with the name returned by {@link NamedParameterFormatter#getName()}.
      *
-     * @param formatter  parameter formatter
+     * @param formatter  parameter formatter, not {@code null}
+     *
+     * @see #addFormatterForType(FormattableType, ParameterFormatter)                   
      */
     @Contract(mutates = "this")
     void addFormatter(@NotNull ParameterFormatter formatter);

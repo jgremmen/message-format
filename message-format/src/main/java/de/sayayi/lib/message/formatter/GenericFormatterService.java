@@ -71,11 +71,23 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
+  /**
+   * Create a generic formatter service with a {@link #DEFAULT_FORMATTER_CACHE_SIZE default} size.
+   * <p>
+   * The formatter service provides a default formatter which translates every object into a string using the
+   * {@link Object#toString()} method.
+   */
   public GenericFormatterService() {
     this(DEFAULT_FORMATTER_CACHE_SIZE);
   }
 
 
+  /**
+   * Create a generic formatter service with the given {@code formatterCacheSize} size.
+   * <p>
+   * The formatter service provides a default formatter which translates every object into a string using the
+   * {@link Object#toString()} method.
+   */
   public GenericFormatterService(int formatterCacheSize)
   {
     formatterCache = new FormatterCache(formatterCacheSize);
