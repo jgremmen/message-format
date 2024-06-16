@@ -18,12 +18,15 @@ package de.sayayi.lib.message.adopter;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
+import de.sayayi.lib.message.exception.MessageAdopterException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 import static java.util.Collections.singletonMap;
+import static java.util.Locale.getAvailableLocales;
+import static java.util.ResourceBundle.getBundle;
 
 
 /**
@@ -79,6 +82,71 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
         localizedMessagesByCode
             .computeIfAbsent(code, k -> new HashMap<>())
             .put(locale, resourceBundle.getString(code));
+      }
+    }
+
+    localizedMessagesByCode.forEach((code,localizedTexts) ->
+        messagePublisher.addMessage(messageFactory.parseMessage(code, localizedTexts)));
+  }
+
+
+  @Contract(pure = true)
+  public void adopt(@NotNull String bundleBaseName) {
+    adopt(bundleBaseName, null, null, false);
+  }
+
+
+  @Contract(pure = true)
+  public void adopt(@NotNull String bundleBaseName, @NotNull ClassLoader classLoader) {
+    adopt(bundleBaseName, null, classLoader, false);
+  }
+
+
+  @Contract(pure = true)
+  public void adopt(@NotNull String bundleBaseName, @NotNull Set<Locale> locales) {
+    adopt(bundleBaseName, locales.toArray(new Locale[0]), null, true);
+  }
+
+
+  @Contract(pure = true)
+  public void adopt(@NotNull String bundleBaseName, @NotNull Set<Locale> locales,
+                    @NotNull ClassLoader classLoader)
+  {
+    adopt(bundleBaseName, locales.toArray(new Locale[0]), classLoader,
+        true);
+  }
+
+
+  @Contract(pure = true)
+  protected void adopt(@NotNull String bundleBaseName, Locale[] locales, ClassLoader classLoader,
+                       boolean throwOnMissingResourceBundle)
+  {
+    final Map<String,Map<Locale,String>> localizedMessagesByCode = new HashMap<>();
+
+    if (locales == null)
+    {
+      locales = getAvailableLocales();
+      throwOnMissingResourceBundle = false;
+    }
+
+    if (classLoader == null)
+      classLoader = getClass().getClassLoader();
+
+    for(Locale locale: locales)
+    {
+      try {
+        final ResourceBundle resourceBundle = getBundle(bundleBaseName, locale, classLoader);
+        final Locale foundLocale = resourceBundle.getLocale();
+
+        for(String code: resourceBundle.keySet())
+        {
+          localizedMessagesByCode
+              .computeIfAbsent(code, k -> new HashMap<>())
+              .put(foundLocale, resourceBundle.getString(code));
+        }
+      } catch(MissingResourceException ex) {
+        if (throwOnMissingResourceBundle)
+          throw new MessageAdopterException(ex.getLocalizedMessage(), ex);
       }
     }
 
