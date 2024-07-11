@@ -454,7 +454,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
       // as formatting is deferred, make sure we're using a copy of the parameters
       final Parameters parameters = new MessageParameters(this);
 
-      return () -> getMessage().format(messageAccessor, parameters);
+      return SupplierDelegate.of(() -> getMessage().format(messageAccessor, parameters));
     }
 
 
@@ -479,7 +479,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
       // as formatting is deferred, make sure we're using a copy of the parameters
       final Parameters parameters = new MessageParameters(this);
 
-      return () -> constructor.construct(getMessage().format(messageAccessor, parameters), cause);
+      return SupplierDelegate.of(() -> constructor.construct(getMessage().format(messageAccessor, parameters), cause));
     }
 
 
