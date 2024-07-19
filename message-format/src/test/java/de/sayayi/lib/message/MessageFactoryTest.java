@@ -35,7 +35,7 @@ public class MessageFactoryTest
   public void testParseString()
   {
     Message.WithSpaces msg = NO_CACHE_INSTANCE.parseMessage("this is %{test}");
-    assertTrue(msg instanceof CompoundMessage);
+    assertInstanceOf(CompoundMessage.class, msg);
   }
 
 
@@ -44,11 +44,11 @@ public class MessageFactoryTest
   {
     WithCode msgWithCode1 = NO_CACHE_INSTANCE.withCode("ABC", EmptyMessage.INSTANCE);
     assertEquals("ABC", msgWithCode1.getCode());
-    assertTrue(msgWithCode1 instanceof EmptyMessageWithCode);
+    assertInstanceOf(EmptyMessageWithCode.class, msgWithCode1);
 
     WithCode msgWithCode2 = NO_CACHE_INSTANCE.withCode("ABC", new EmptyMessageWithCode("DEF"));
     assertEquals("ABC", msgWithCode2.getCode());
-    assertTrue(msgWithCode2 instanceof EmptyMessageWithCode);
+    assertInstanceOf(EmptyMessageWithCode.class, msgWithCode2);
   }
 
 

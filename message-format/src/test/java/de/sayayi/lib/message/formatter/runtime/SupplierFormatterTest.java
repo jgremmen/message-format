@@ -47,7 +47,7 @@ class SupplierFormatterTest extends AbstractFormatterTest
             NO_CACHE_INSTANCE)
         .getMessageAccessor();
 
-    assertEquals(noSpaceText("true"), format(messageAccessor, (BooleanSupplier) () -> true));
+    assertEquals(noSpaceText("true"), format(messageAccessor, (BooleanSupplier)() -> true));
   }
 
 
@@ -61,7 +61,7 @@ class SupplierFormatterTest extends AbstractFormatterTest
         .getMessageAccessor();
 
     assertEquals(noSpaceText("1,234,567,890"),
-        format(messageAccessor, (LongSupplier) () -> 1234567890L,
+        format(messageAccessor, (LongSupplier)() -> 1234567890L,
             singletonMap(new ConfigKeyName("number"), new ConfigValueString("###,###,###,###"))));
   }
 }

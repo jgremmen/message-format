@@ -75,7 +75,7 @@ public class MessageDefAnnotationTest
     msg = messageSupport.code("T5").getMessage();
 
     assertEquals("T5", msg.getCode());
-    assertTrue(msg instanceof LocaleAware);
+    assertInstanceOf(LocaleAware.class, msg);
   }
 
 
@@ -87,7 +87,7 @@ public class MessageDefAnnotationTest
   {
     val msg = messageSupport.code("MSG-052").getMessage();
 
-    assertTrue(msg instanceof EmptyMessageWithCode);
+    assertInstanceOf(EmptyMessageWithCode.class, msg);
     assertEquals("MSG-052", msg.getCode());
   }
 
