@@ -94,8 +94,8 @@ public class MessageFormatPlugin implements Plugin<Project>
       packTask.getValidateReferencedTemplates()
           .convention(extension.getValidateReferencedTemplates());
 
-      packTask.include(extension.getIncludeRegexFilters().toArray(new String[0]));
-      packTask.exclude(extension.getExcludeRegexFilters().toArray(new String[0]));
+      packTask.include(extension.getIncludeRegexFilters().toArray(String[]::new));
+      packTask.exclude(extension.getExcludeRegexFilters().toArray(String[]::new));
 
       packTask.dependsOn(mainSourceSet.getOutput());
     });

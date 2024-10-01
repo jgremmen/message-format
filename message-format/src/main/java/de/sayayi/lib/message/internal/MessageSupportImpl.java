@@ -68,8 +68,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   private @NotNull TemplateFilter templateFilter;
 
 
-  public MessageSupportImpl(@NotNull FormatterService formatterService,
-                            @NotNull MessageFactory messageFactory)
+  public MessageSupportImpl(@NotNull FormatterService formatterService, @NotNull MessageFactory messageFactory)
   {
     this.formatterService = requireNonNull(formatterService,
         "formatterService must not be null");
@@ -98,8 +97,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
-                                                                       boolean value)
+  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, boolean value)
   {
     if (requireNonNull(name, "name must not be null").isEmpty())
       throw new IllegalArgumentException("name must not be empty");
@@ -110,8 +108,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
-                                                                       long value)
+  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, long value)
   {
     if (requireNonNull(name, "name must not be null").isEmpty())
       throw new IllegalArgumentException("name must not be empty");
@@ -122,8 +119,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
-                                                                       @NotNull String value)
+  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, @NotNull String value)
   {
     if (requireNonNull(name, "name must not be null").isEmpty())
       throw new IllegalArgumentException("name must not be empty");
@@ -154,8 +150,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setTemplateFilter(
-      @NotNull TemplateFilter templateFilter)
+  public @NotNull ConfigurableMessageSupport setTemplateFilter(@NotNull TemplateFilter templateFilter)
   {
     this.templateFilter = requireNonNull(templateFilter, "templateFilter must not be null");
     return this;
@@ -187,8 +182,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport importMessages(@NotNull Enumeration<URL> packResources)
-      throws IOException
+  public @NotNull ConfigurableMessageSupport importMessages(@NotNull Enumeration<URL> packResources) throws IOException
   {
     requireNonNull(packResources, "packResources must not be null");
 
@@ -197,13 +191,12 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     while(packResources.hasMoreElements())
       packStreams.add(packResources.nextElement().openStream());
 
-    return importMessages(packStreams.toArray(new InputStream[0]));
+    return importMessages(packStreams.toArray(InputStream[]::new));
   }
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream... packStreams)
-      throws IOException
+  public @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream... packStreams) throws IOException
   {
     requireNonNull(packStreams, "packStreams must not be null");
 

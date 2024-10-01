@@ -103,16 +103,14 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
   @Contract(pure = true)
   public void adopt(@NotNull String bundleBaseName, @NotNull Set<Locale> locales) {
-    adopt(bundleBaseName, locales.toArray(new Locale[0]), null, true);
+    adopt(bundleBaseName, locales.toArray(Locale[]::new), null, true);
   }
 
 
   @Contract(pure = true)
   public void adopt(@NotNull String bundleBaseName, @NotNull Set<Locale> locales,
-                    @NotNull ClassLoader classLoader)
-  {
-    adopt(bundleBaseName, locales.toArray(new Locale[0]), classLoader,
-        true);
+                    @NotNull ClassLoader classLoader) {
+    adopt(bundleBaseName, locales.toArray(Locale[]::new), classLoader, true);
   }
 
 

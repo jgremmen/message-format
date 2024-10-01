@@ -68,13 +68,13 @@ public final class CompoundMessage implements Message.WithSpaces
     if (requireNonNull(messageParts, "parts must not be null").isEmpty())
       throw new IllegalArgumentException("parts must not be empty");
 
-    this.messageParts = messageParts.toArray(new MessagePart[0]);
+    this.messageParts = messageParts.toArray(MessagePart[]::new);
   }
 
 
   @Override
-  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
-                                    @NotNull Parameters parameters) throws MessageFormatException
+  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
+      throws MessageFormatException
   {
     final TextJoiner message = new TextJoiner();
 

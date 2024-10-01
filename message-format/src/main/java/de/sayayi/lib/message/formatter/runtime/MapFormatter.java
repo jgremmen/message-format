@@ -99,8 +99,7 @@ public final class MapFormatter
   }
 
 
-  private Object fixValue(@NotNull Map<?,?> map, Object value,
-                          @NotNull Supplier<String> thisString) {
+  private Object fixValue(@NotNull Map<?,?> map, Object value, @NotNull Supplier<String> thisString) {
     return value == map ? thisString.get() : value;
   }
 

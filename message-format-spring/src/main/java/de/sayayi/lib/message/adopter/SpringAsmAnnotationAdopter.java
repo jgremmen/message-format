@@ -233,7 +233,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
 
     @Override
     public void visitEnd() {
-      adopt(new MessageDefImpl(code, text, texts.toArray(new Text[0])));
+      adopt(new MessageDefImpl(code, text, texts.toArray(Text[]::new)));
     }
   }
 
@@ -300,7 +300,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
 
     @Override
     public void visitEnd() {
-      adopt(new TemplateDefImpl(name, text, texts.toArray(new Text[0])));
+      adopt(new TemplateDefImpl(name, text, texts.toArray(Text[]::new)));
     }
   }
 
