@@ -26,10 +26,10 @@ plugins {
 description = 'Message Format Library'
 
 
-def antlrVersion = '4.13.2'
-def antlrExtVersion = '[0.5.0,)'
-def asmVersion = '[6.0,)'
-def ehcacheVersion = '3.10.+'
+def antlrVersion = '[4.13.0,4.14)'
+def antlrExtVersion = '[0.5,0.6)'
+def asmVersion = '[9.0,10.0)'
+def ehcacheVersion = '[3.10,3.11)'
 def javaxCacheApiVersion = '1.1.1'
 
 
@@ -60,7 +60,9 @@ dependencies {
 
   implementation("de.sayayi.lib:antlr4-runtime-ext:${antlrExtVersion}") {
     exclude group: 'org.jetbrains'
+    exclude group: 'org.antlr'
   }
+  implementation "org.antlr:antlr4-runtime:${antlrVersion}"
 
   optionalImplementation "javax.cache:cache-api:${javaxCacheApiVersion}"
   optionalImplementation "org.ow2.asm:asm:${asmVersion}"
@@ -104,6 +106,13 @@ jar {
 }
 
 
+def resolvedAntlrVersion = configurations
+    .compileClasspath
+    .resolvedConfiguration
+    .resolvedArtifacts
+    .find { it.name == 'antlr4-runtime' }
+    .moduleVersion.id.version
+
 def resolvedAntlrExtVersion = configurations
     .compileClasspath
     .resolvedConfiguration
@@ -115,7 +124,7 @@ def resolvedAntlrExtVersion = configurations
 javadoc {
   (options as StandardJavadocDocletOptions).with {
     linksOffline(
-        "https://javadoc.io/doc/org.antlr/antlr4-runtime/${antlrVersion}/",
+        "https://javadoc.io/doc/org.antlr/antlr4-runtime/${resolvedAntlrVersion}/",
         "${rootDir}/gradle/javadocs/antlr4-runtime")
     linksOffline(
         "https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/${resolvedAntlrExtVersion}/",

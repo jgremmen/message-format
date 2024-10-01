@@ -23,7 +23,7 @@ plugins {
 description = 'Message Format Gradle Plugin'
 
 
-def asmVersion = '[9.0,)'
+def asmVersion = '[9.0,10.0)'
 
 
 dependencies {
@@ -42,7 +42,7 @@ javadoc {
         "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
         "${rootDir}/gradle/javadocs/message-format")
     linksOffline(
-        "https://javadoc.io/doc/org.jetbrains/annotations-java5/${jetbrainsAnnotationsVersion}/",
+        "https://javadoc.io/doc/org.jetbrains/annotations/${jetbrainsAnnotationsVersion}/",
         "${rootDir}/gradle/javadocs/jetbrains-annotations")
     linksOffline(
         "https://docs.gradle.org/${gradle.gradleVersion}/javadoc/",
