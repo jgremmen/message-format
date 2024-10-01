@@ -42,8 +42,7 @@ public interface ParameterConfigAccessor
    * @return  optional instance representing the found value, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull
-  Optional<ConfigValue> getConfigValue(@NotNull String name);
+  @NotNull Optional<ConfigValue> getConfigValue(@NotNull String name);
 
 
   /**
@@ -77,8 +76,7 @@ public interface ParameterConfigAccessor
    * @return  optional number instance representing the found value, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull
-  OptionalLong getConfigValueNumber(@NotNull String name);
+  @NotNull OptionalLong getConfigValueNumber(@NotNull String name);
 
 
   /**

@@ -62,8 +62,8 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
 
 
   @Override
-  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
-                                    @NotNull Parameters parameters) throws MessageFormatException
+  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
+      throws MessageFormatException
   {
     try {
       return message.formatAsText(messageAccessor, parameters);
@@ -145,11 +145,8 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
    * @hidden
    */
   @SuppressWarnings("JavadocDeclaration")
-  public static @NotNull Message.WithCode unpack(@NotNull PackHelper unpack,
-                                                 @NotNull PackInputStream packStream)
-      throws IOException
-  {
-    return new MessageDelegateWithCode(requireNonNull(packStream.readString()),
-        unpack.unpackMessage(packStream));
+  public static @NotNull Message.WithCode unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
+      throws IOException {
+    return new MessageDelegateWithCode(requireNonNull(packStream.readString()), unpack.unpackMessage(packStream));
   }
 }

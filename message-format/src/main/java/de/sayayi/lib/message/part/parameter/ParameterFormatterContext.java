@@ -39,9 +39,7 @@ import static java.util.Optional.ofNullable;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class ParameterFormatterContext
-    extends AbstractParameterConfigAccessor
-    implements FormatterContext
+public final class ParameterFormatterContext extends AbstractParameterConfigAccessor implements FormatterContext
 {
   private final @NotNull Parameters parameters;
   private final Object value;

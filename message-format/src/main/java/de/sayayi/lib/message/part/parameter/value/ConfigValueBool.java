@@ -113,8 +113,7 @@ public enum ConfigValueBool implements ConfigValue
    * @hidden
    */
   @SuppressWarnings("JavadocDeclaration")
-  public static @NotNull ConfigValueBool unpack(@NotNull PackInputStream packStream)
-      throws IOException {
+  public static @NotNull ConfigValueBool unpack(@NotNull PackInputStream packStream) throws IOException {
     return packStream.readBoolean() ? TRUE : FALSE;
   }
 }

@@ -234,8 +234,7 @@ public final class ParameterPart implements Parameter
    * @hidden
    */
   @SuppressWarnings("JavadocDeclaration")
-  public static @NotNull ParameterPart unpack(@NotNull PackHelper unpack,
-                                              @NotNull PackInputStream packStream)
+  public static @NotNull ParameterPart unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
     final boolean spaceBefore = packStream.readBoolean();

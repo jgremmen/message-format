@@ -116,8 +116,7 @@ public class MessageFactory
    * @throws MessageParserException  in case the message could not be parsed
    */
   @Contract(value = "_, _ -> new", pure = true)
-  public @NotNull Message.WithCode parseMessage(@NotNull String code,
-                                                @NotNull @Language("MessageFormat") String text)
+  public @NotNull Message.WithCode parseMessage(@NotNull String code, @NotNull @Language("MessageFormat") String text)
   {
     try {
       return withCode(code, parseMessage(text));
@@ -128,8 +127,7 @@ public class MessageFactory
 
 
   @Contract(value = "_, _ -> new", pure = true)
-  public @NotNull Message.WithCode parseMessage(@NotNull String code,
-                                                @NotNull Map<Locale,String> localizedTexts)
+  public @NotNull Message.WithCode parseMessage(@NotNull String code, @NotNull Map<Locale,String> localizedTexts)
   {
     switch(requireNonNull(localizedTexts, "localizedTexts must not be null").size())
     {

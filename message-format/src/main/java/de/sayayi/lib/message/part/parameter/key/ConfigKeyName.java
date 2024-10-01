@@ -114,8 +114,7 @@ public final class ConfigKeyName implements ConfigKey
    * @hidden
    */
   @SuppressWarnings("JavadocDeclaration")
-  public static @NotNull ConfigKeyName unpack(@NotNull PackInputStream packStream)
-      throws IOException {
+  public static @NotNull ConfigKeyName unpack(@NotNull PackInputStream packStream) throws IOException {
     return new ConfigKeyName(requireNonNull(packStream.readString()));
   }
 }

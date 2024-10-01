@@ -51,8 +51,8 @@ public interface Message
    * @throws MessageFormatException  in case a formatting error occurred
    */
   @Contract(pure = true)
-  default @NotNull String format(@NotNull MessageAccessor messageAccessor,
-                                 @NotNull Parameters parameters) throws MessageFormatException
+  default @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
+      throws MessageFormatException
   {
     final Text text = formatAsText(messageAccessor, parameters);
     return text.isEmpty() ? "" : text.getText();
@@ -72,8 +72,8 @@ public interface Message
    * @since 0.9.1
    */
   @Contract(pure = true)
-  @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
-                             @NotNull Parameters parameters) throws MessageFormatException;
+  @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
+      throws MessageFormatException;
 
 
   /**
@@ -87,8 +87,7 @@ public interface Message
    * @throws MessageFormatException  in case a formatting error occurred
    */
   @Contract(pure = true)
-  default @NotNull String format(@NotNull MessageAccessor messageAccessor,
-                                 @NotNull Map<String,Object> parameterValues)
+  default @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Map<String,Object> parameterValues)
       throws MessageFormatException
   {
     return format(messageAccessor, new Parameters() {

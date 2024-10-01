@@ -206,8 +206,7 @@ public final class CompoundMessage implements Message.WithSpaces
    * @hidden
    */
   @SuppressWarnings("JavadocDeclaration")
-  public static @NotNull Message.WithSpaces unpack(@NotNull PackHelper unpack,
-                                                   @NotNull PackInputStream packStream)
+  public static @NotNull Message.WithSpaces unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
     final List<MessagePart> parts = new ArrayList<>();

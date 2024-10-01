@@ -112,10 +112,7 @@ abstract class AbstractParameterConfigAccessor implements ParameterConfigAccesso
     if (configValue instanceof ConfigValueMessage)
       return Optional.of(((ConfigValueMessage)configValue).asObject());
     else if (configValue instanceof ConfigValueString)
-    {
-      return Optional.of(
-          ((ConfigValueString)configValue).asMessage(messageAccessor.getMessageFactory()));
-    }
+      return Optional.of(((ConfigValueString)configValue).asMessage(messageAccessor.getMessageFactory()));
 
     return Optional.empty();
   }

@@ -109,8 +109,7 @@ public final class ConfigValueMessage implements ConfigValue
    * @hidden
    */
   @SuppressWarnings("JavadocDeclaration")
-  public static @NotNull ConfigValueMessage unpack(@NotNull PackHelper unpack,
-                                                   @NotNull PackInputStream packStream)
+  public static @NotNull ConfigValueMessage unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
       throws IOException {
     return new ConfigValueMessage(unpack.unpackMessageWithSpaces(packStream));
   }

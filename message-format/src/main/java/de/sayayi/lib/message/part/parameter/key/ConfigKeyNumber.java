@@ -134,8 +134,7 @@ public final class ConfigKeyNumber implements ConfigKey
    * @hidden
    */
   @SuppressWarnings("JavadocDeclaration")
-  public static @NotNull ConfigKeyNumber unpack(@NotNull PackInputStream packStream)
-      throws IOException {
+  public static @NotNull ConfigKeyNumber unpack(@NotNull PackInputStream packStream) throws IOException {
     return new ConfigKeyNumber(packStream.readEnum(CompareType.class), packStream.readLong());
   }
 }

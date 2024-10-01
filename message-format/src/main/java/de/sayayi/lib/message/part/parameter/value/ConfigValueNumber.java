@@ -137,8 +137,7 @@ public final class ConfigValueNumber implements ConfigValue
    * @hidden
    */
   @SuppressWarnings("JavadocDeclaration")
-  public static @NotNull ConfigValueNumber unpack(@NotNull PackInputStream packStream)
-      throws IOException {
+  public static @NotNull ConfigValueNumber unpack(@NotNull PackInputStream packStream) throws IOException {
     return new ConfigValueNumber(packStream.readLong());
   }
 }

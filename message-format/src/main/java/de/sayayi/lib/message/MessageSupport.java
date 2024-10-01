@@ -122,8 +122,8 @@ public interface MessageSupport
    * @see ConfigurableMessageSupport#importMessages(InputStream...)
    * @see ConfigurableMessageSupport#importMessages(Enumeration)
    */
-  void exportMessages(@NotNull OutputStream stream, boolean compress,
-                      Predicate<String> messageCodeFilter) throws IOException;
+  void exportMessages(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
+      throws IOException;
 
 
 
@@ -424,8 +424,7 @@ public interface MessageSupport
      * @return  newly created exception with the formatted message, never {@code null}
      */
     @Contract("_ -> new")
-    @NotNull <X extends Exception> X formattedException(
-        @NotNull ExceptionConstructor<X> constructor);
+    @NotNull <X extends Exception> X formattedException(@NotNull ExceptionConstructor<X> constructor);
 
 
     /**
@@ -519,8 +518,7 @@ public interface MessageSupport
      */
     @Override
     @Contract(value = "_, _ -> this", mutates = "this")
-    @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name,
-                                                    @NotNull Message template);
+    @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name, @NotNull Message template);
 
 
     /**
@@ -552,8 +550,7 @@ public interface MessageSupport
      * @see #importMessages(InputStream...)
      */
     @Contract(value = "_ -> this", mutates = "this")
-    @NotNull ConfigurableMessageSupport importMessages(@NotNull Enumeration<URL> packResources)
-        throws IOException;
+    @NotNull ConfigurableMessageSupport importMessages(@NotNull Enumeration<URL> packResources) throws IOException;
 
 
     /**
@@ -568,8 +565,7 @@ public interface MessageSupport
      * @see #importMessages(InputStream...)
      */
     @Contract(value = "_ -> this", mutates = "this")
-    default @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream packStream)
-        throws IOException {
+    default @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream packStream) throws IOException {
       return importMessages(new InputStream[] { packStream });
     }
 
@@ -587,8 +583,7 @@ public interface MessageSupport
      * @throws IOException  if an I/O error occurs
      */
     @Contract(value = "_ -> this", mutates = "this")
-    @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream... packStreams)
-        throws IOException;
+    @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream... packStreams) throws IOException;
 
 
     /**
@@ -603,8 +598,7 @@ public interface MessageSupport
      * @return  configurable message support instance, never {@code null}
      */
     @Contract(value = "_, _ -> this", mutates = "this")
-    @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
-                                                                  boolean value);
+    @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, boolean value);
 
 
     /**
@@ -634,8 +628,7 @@ public interface MessageSupport
      * @return  configurable message support instance, never {@code null}
      */
     @Contract(value = "_, _ -> this", mutates = "this")
-    @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
-                                                                  @NotNull String value);
+    @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, @NotNull String value);
 
 
     /**

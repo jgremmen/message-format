@@ -145,8 +145,7 @@ public final class ConfigKeyString implements ConfigKey
    * @hidden
    */
   @SuppressWarnings("JavadocDeclaration")
-  public static @NotNull ConfigKeyString unpack(@NotNull PackInputStream packStream)
-      throws IOException
+  public static @NotNull ConfigKeyString unpack(@NotNull PackInputStream packStream) throws IOException
   {
     return new ConfigKeyString(packStream.readEnum(CompareType.class),
         requireNonNull(packStream.readString()));

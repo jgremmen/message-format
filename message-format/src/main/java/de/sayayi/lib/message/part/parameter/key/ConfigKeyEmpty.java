@@ -117,8 +117,7 @@ public final class ConfigKeyEmpty implements ConfigKey
    * @hidden
    */
   @SuppressWarnings("JavadocDeclaration")
-  public static @NotNull ConfigKeyEmpty unpack(@NotNull PackInputStream packStream)
-      throws IOException {
+  public static @NotNull ConfigKeyEmpty unpack(@NotNull PackInputStream packStream) throws IOException {
     return new ConfigKeyEmpty(packStream.readEnum(CompareType.class));
   }
 }

@@ -106,8 +106,7 @@ public final class TextPartFactory
    *          never {@code null}
    */
   @Contract(value = "_, false, false -> param1", pure = true)
-  public static @NotNull Text addSpaces(@NotNull Text text, boolean addSpaceBefore,
-                                        boolean addSpaceAfter)
+  public static @NotNull Text addSpaces(@NotNull Text text, boolean addSpaceBefore, boolean addSpaceAfter)
   {
     final boolean textSpaceBefore = text.isSpaceBefore();
     final boolean textSpaceAfter = text.isSpaceAfter();

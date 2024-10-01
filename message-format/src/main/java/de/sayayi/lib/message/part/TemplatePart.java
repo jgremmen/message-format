@@ -126,8 +126,7 @@ public final class TemplatePart implements Template
 
 
   @Override
-  public @NotNull Text getText(@NotNull MessageAccessor messageAccessor,
-                               @NotNull Parameters parameters)
+  public @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
   {
     final Message message = messageAccessor.getTemplateByName(name);
 
@@ -226,8 +225,8 @@ public final class TemplatePart implements Template
    * @hidden
    */
   @SuppressWarnings("JavadocDeclaration")
-  public static @NotNull Template unpack(@NotNull PackHelper unpack,
-                                         @NotNull PackInputStream packStream) throws IOException
+  public static @NotNull Template unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
+      throws IOException
   {
     switch(packStream.getVersion())
     {
@@ -256,8 +255,8 @@ public final class TemplatePart implements Template
   }
 
 
-  private static @NotNull Template unpack_v2(@NotNull PackHelper unpack,
-                                             @NotNull PackInputStream packStream) throws IOException
+  private static @NotNull Template unpack_v2(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
+      throws IOException
   {
     // v2 = spaceBefore, spaceAfter, def. param map (size + key/value-pairs), name
 
@@ -277,8 +276,8 @@ public final class TemplatePart implements Template
   }
 
 
-  private static @NotNull Template unpack_v3(@NotNull PackHelper unpack,
-                                             @NotNull PackInputStream packStream) throws IOException
+  private static @NotNull Template unpack_v3(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
+      throws IOException
   {
     // v3 = spaceBefore, spaceAfter, size default param map, size parameter delegate map,
     // param map key/value-pairs), param delegate map key/value-pairs, name

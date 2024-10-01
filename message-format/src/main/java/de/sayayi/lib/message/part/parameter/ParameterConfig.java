@@ -329,8 +329,8 @@ public final class ParameterConfig
    * @hidden
    */
   @SuppressWarnings("JavadocDeclaration")
-  public static @NotNull ParameterConfig unpack(@NotNull PackHelper unpack,
-                                                @NotNull PackInputStream packStream) throws IOException
+  public static @NotNull ParameterConfig unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
+      throws IOException
   {
     final Map<ConfigKey,ConfigValue> map = new LinkedHashMap<>();
 

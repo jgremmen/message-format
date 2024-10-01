@@ -486,8 +486,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
-  private void configureDuplicateIgnoreStrategy(@NotNull ConfigurableMessageSupport messageSupport,
-                                                boolean warn)
+  private void configureDuplicateIgnoreStrategy(@NotNull ConfigurableMessageSupport messageSupport, boolean warn)
   {
     final MessageAccessor messageAccessor = messageSupport.getMessageAccessor();
 
@@ -513,8 +512,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
-  private void configureDuplicateOverrideStrategy(
-      @NotNull ConfigurableMessageSupport messageSupport, boolean warn)
+  private void configureDuplicateOverrideStrategy(@NotNull ConfigurableMessageSupport messageSupport, boolean warn)
   {
     final MessageAccessor messageAccessor = messageSupport.getMessageAccessor();
 

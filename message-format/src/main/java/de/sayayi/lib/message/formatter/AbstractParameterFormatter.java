@@ -71,6 +71,5 @@ public abstract class AbstractParameterFormatter<T> implements ParameterFormatte
    *
    * @return  formatted text, never {@code null}
    */
-  protected abstract @NotNull Text formatValue(@NotNull FormatterContext context,
-                                               @NotNull T value);
+  protected abstract @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull T value);
 }

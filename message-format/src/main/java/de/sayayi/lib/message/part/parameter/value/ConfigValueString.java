@@ -138,8 +138,7 @@ public final class ConfigValueString implements ConfigValue
    * @hidden
    */
   @SuppressWarnings("JavadocDeclaration")
-  public static @NotNull ConfigValueString unpack(@NotNull PackInputStream packStream)
-      throws IOException {
+  public static @NotNull ConfigValueString unpack(@NotNull PackInputStream packStream) throws IOException {
     return new ConfigValueString(requireNonNull(packStream.readString()));
   }
 }

@@ -108,22 +108,19 @@ public final class MessageSupportFactory
 
 
     @Override
-    public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
-                                                                         boolean value) {
+    public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, boolean value) {
       throw new UnsupportedOperationException("setDefaultParameterConfig");
     }
 
 
     @Override
-    public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
-                                                                         long value) {
+    public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, long value) {
       throw new UnsupportedOperationException("setDefaultParameterConfig");
     }
 
 
     @Override
-    public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
-                                                                         @NotNull String value) {
+    public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, @NotNull String value) {
       throw new UnsupportedOperationException("setDefaultParameterConfig");
     }
 
@@ -142,8 +139,7 @@ public final class MessageSupportFactory
 
 
     @Override
-    public @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name,
-                                                           @NotNull Message template) {
+    public @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name, @NotNull Message template) {
       throw new UnsupportedOperationException("addTemplate");
     }
 

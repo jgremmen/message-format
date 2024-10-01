@@ -54,15 +54,14 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
   @Override
   @Contract(pure = true)
-  public @NotNull String format(@NotNull MessageAccessor messageAccessor,
-                                @NotNull Parameters parameters) {
+  public @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters) {
     return "";
   }
 
 
   @Override
-  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
-                                    @NotNull Parameters parameters) throws MessageFormatException {
+  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
+      throws MessageFormatException {
     return EMPTY;
   }
 
@@ -129,8 +128,7 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
    * @hidden
    */
   @SuppressWarnings("JavadocDeclaration")
-  public static @NotNull Message.WithCode unpack(@NotNull PackInputStream packStream)
-      throws IOException {
+  public static @NotNull Message.WithCode unpack(@NotNull PackInputStream packStream) throws IOException {
     return new EmptyMessageWithCode(requireNonNull(packStream.readString()));
   }
 }
