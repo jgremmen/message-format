@@ -176,8 +176,7 @@ public final class ParameterConfig
   {
     ConfigValue bestMatch = null;
 
-    final ConfigKeyComparatorContext comparatorContext =
-        new ConfigKeyComparatorContext(messageAccessor, locale);
+    final ConfigKeyComparatorContext comparatorContext = new ConfigKeyComparatorContext(messageAccessor, locale);
     final ParameterFormatter[] formatters =
         messageAccessor.getFormatters(value == null ? Object.class : value.getClass());
 

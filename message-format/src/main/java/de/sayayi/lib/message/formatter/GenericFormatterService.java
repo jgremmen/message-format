@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.copyOf;
 import static java.util.Objects.requireNonNull;
@@ -149,8 +150,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
     }
 
     final ParameterFormatter[] formatters = formatterCache.lookup(type, t ->
-        collectTypes(t)
-            .stream()
+        streamTypes(t)
             .map(typeFormatters::get)
             .filter(Objects::nonNull)
             .flatMap(Collection::stream)
@@ -164,7 +164,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   @Contract(pure = true)
-  private @NotNull Set<Class<?>> collectTypes(@NotNull Class<?> type)
+  private @NotNull Stream<Class<?>> streamTypes(@NotNull Class<?> type)
   {
     final Set<Class<?>> collectedTypes = new HashSet<>();
 
@@ -189,7 +189,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
     collectedTypes.add(Object.class);
 
-    return collectedTypes;
+    return collectedTypes.stream();
   }
 
 
