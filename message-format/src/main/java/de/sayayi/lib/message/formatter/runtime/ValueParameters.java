@@ -21,8 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Locale;
 import java.util.Set;
 
-import static java.util.Collections.singleton;
-
 
 /**
  * @author Jeroen Gremmen
@@ -56,7 +54,7 @@ final class ValueParameters implements Parameters
 
   @Override
   public @NotNull Set<String> getParameterNames() {
-    return singleton(parameterName);
+    return Set.of(parameterName);
   }
 
 

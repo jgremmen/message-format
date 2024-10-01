@@ -33,13 +33,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static java.nio.file.Files.copy;
 import static java.nio.file.Files.*;
-import static java.util.Arrays.asList;
-import static java.util.Collections.*;
+import static java.util.Collections.emptySet;
 import static java.util.Objects.requireNonNull;
 import static org.gradle.testkit.runner.TaskOutcome.FAILED;
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS;
@@ -65,11 +65,11 @@ class PluginTest
   void prepareProject() throws IOException
   {
     write(new File(testProjectDir, "settings.gradle").toPath(),
-        singletonList("rootProject.name = 'test-message-pack'"));
+        List.of("rootProject.name = 'test-message-pack'"));
 
-    write(new File(testProjectDir, "gradle.properties").toPath(), singletonList(""));
+    write(new File(testProjectDir, "gradle.properties").toPath(), List.of(""));
 
-    write(new File(testProjectDir, "build.gradle").toPath(), asList(
+    write(new File(testProjectDir, "build.gradle").toPath(), List.of(
         "plugins {",
         "  id 'java'",
         "  id 'de.sayayi.plugin.gradle.message'",
@@ -133,7 +133,7 @@ class PluginTest
   @DisplayName("Pack task with filtered message codes")
   void testWithFilteredSource() throws IOException
   {
-    write(new File(testProjectDir, "build.gradle").toPath(), asList(
+    write(new File(testProjectDir, "build.gradle").toPath(), List.of(
         "plugins {",
         "  id 'java'",
         "  id 'de.sayayi.plugin.gradle.message'",
@@ -157,7 +157,7 @@ class PluginTest
     assertTrue(packFile.isFile() && packFile.canRead());
 
     val pack = readMessagePack(packFile);
-    assertEquals(singleton("MSG-INNER1"), pack.getMessageCodes());
+    assertEquals(Set.of("MSG-INNER1"), pack.getMessageCodes());
     assertEquals(emptySet(), pack.getTemplateNames());
   }
 
@@ -180,7 +180,7 @@ class PluginTest
   void testDuplicateMessage(@NotNull String duplicateMsgStrategy, boolean success)
       throws IOException
   {
-    write(new File(testProjectDir, "build.gradle").toPath(), asList(
+    write(new File(testProjectDir, "build.gradle").toPath(), List.of(
         "plugins {",
         "  id 'java'",
         "  id 'de.sayayi.plugin.gradle.message'",
@@ -211,7 +211,7 @@ class PluginTest
   @DisplayName("Jar task with messageFormatPack dependency")
   void testJar() throws IOException
   {
-    write(new File(testProjectDir, "build.gradle").toPath(), asList(
+    write(new File(testProjectDir, "build.gradle").toPath(), List.of(
         "plugins {",
         "  id 'java'",
         "  id 'de.sayayi.plugin.gradle.message'",

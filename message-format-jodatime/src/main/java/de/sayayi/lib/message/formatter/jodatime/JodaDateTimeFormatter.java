@@ -27,13 +27,11 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 
 
@@ -97,8 +95,8 @@ public final class JodaDateTimeFormatter extends AbstractParameterFormatter<Obje
   @Contract(pure = true)
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
-    return new HashSet<>(asList(
+    return Set.of(
         new FormattableType(BaseLocal.class),
-        new FormattableType(ReadableDateTime.class)));
+        new FormattableType(ReadableDateTime.class));
   }
 }

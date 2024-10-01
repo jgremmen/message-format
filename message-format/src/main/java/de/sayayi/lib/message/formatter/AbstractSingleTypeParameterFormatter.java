@@ -20,8 +20,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-import static java.util.Collections.singleton;
-
 
 /**
  * @author Jeroen Gremmen
@@ -33,7 +31,7 @@ public abstract class AbstractSingleTypeParameterFormatter<T>
 {
   @Override
   public final @NotNull Set<FormattableType> getFormattableTypes() {
-    return singleton(getFormattableType());
+    return Set.of(getFormattableType());
   }
 
 

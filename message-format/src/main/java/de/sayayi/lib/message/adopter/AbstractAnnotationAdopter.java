@@ -44,7 +44,6 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import static java.nio.file.Files.newInputStream;
-import static java.util.Arrays.asList;
 import static java.util.Locale.forLanguageTag;
 import static java.util.Objects.requireNonNull;
 
@@ -69,7 +68,7 @@ import static java.util.Objects.requireNonNull;
 @SuppressWarnings({"DuplicatedCode", "UnusedReturnValue", "unused", "UnknownLanguage"})
 public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 {
-  private static final Set<String> ZIP_PROTOCOLS = new HashSet<>(asList("zip", "jar", "war"));
+  private static final Set<String> ZIP_PROTOCOLS = Set.of("zip", "jar", "war");
 
   private final Set<String> indexedClasses = new HashSet<>();
 

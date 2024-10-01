@@ -28,11 +28,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
 import java.util.TimeZone;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
-import static java.util.Collections.singletonMap;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -59,18 +59,18 @@ class JodaDateTimeFormatterTest extends AbstractFormatterTest
     val date = new LocalDate(1972, 8, 17);
 
     assertEquals(new TextPart("17.08.72"), format(messageAccessor, date,
-        singletonMap(new ConfigKeyName("date"), new ConfigValueString("short"))));
+        Map.of(new ConfigKeyName("date"), new ConfigValueString("short"))));
     assertEquals(new TextPart("17.08.1972"), format(messageAccessor, date,
-        singletonMap(new ConfigKeyName("date"), new ConfigValueString("medium"))));
+        Map.of(new ConfigKeyName("date"), new ConfigValueString("medium"))));
     assertEquals(new TextPart("17. August 1972"), format(messageAccessor, date,
-        singletonMap(new ConfigKeyName("date"), new ConfigValueString("long"))));
+        Map.of(new ConfigKeyName("date"), new ConfigValueString("long"))));
     assertEquals(new TextPart("Donnerstag, 17. August 1972"), format(messageAccessor, date,
-        singletonMap(new ConfigKeyName("date"), new ConfigValueString("full"))));
+        Map.of(new ConfigKeyName("date"), new ConfigValueString("full"))));
     assertEquals(new TextPart("17.08.1972"), format(messageAccessor, date,
-        singletonMap(new ConfigKeyName("date"), new ConfigValueString("date"))));
+        Map.of(new ConfigKeyName("date"), new ConfigValueString("date"))));
 
     assertEquals(EMPTY, format(messageAccessor, date,
-        singletonMap(new ConfigKeyName("date"), new ConfigValueString("time"))));
+        Map.of(new ConfigKeyName("date"), new ConfigValueString("time"))));
   }
 
 
@@ -84,18 +84,18 @@ class JodaDateTimeFormatterTest extends AbstractFormatterTest
     val time = new LocalTime(16, 34, 11, 672);
 
     assertEquals(new TextPart("16:34"), format(messageAccessor, time,
-        singletonMap(new ConfigKeyName("date"), new ConfigValueString("short"))));
+        Map.of(new ConfigKeyName("date"), new ConfigValueString("short"))));
     assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
-        singletonMap(new ConfigKeyName("date"), new ConfigValueString("medium"))));
+        Map.of(new ConfigKeyName("date"), new ConfigValueString("medium"))));
     assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
-        singletonMap(new ConfigKeyName("date"), new ConfigValueString("long"))));
+        Map.of(new ConfigKeyName("date"), new ConfigValueString("long"))));
     assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
-        singletonMap(new ConfigKeyName("date"), new ConfigValueString("full"))));
+        Map.of(new ConfigKeyName("date"), new ConfigValueString("full"))));
     assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
-        singletonMap(new ConfigKeyName("date"), new ConfigValueString("time"))));
+        Map.of(new ConfigKeyName("date"), new ConfigValueString("time"))));
 
     assertEquals(EMPTY, format(messageAccessor, time,
-        singletonMap(new ConfigKeyName("date"), new ConfigValueString("date"))));
+        Map.of(new ConfigKeyName("date"), new ConfigValueString("date"))));
   }
 
 
@@ -110,21 +110,21 @@ class JodaDateTimeFormatterTest extends AbstractFormatterTest
 
     assertEquals(new TextPart("17/08/1972, 02:40"),
         format(messageAccessor, datetime,
-            singletonMap(new ConfigKeyName("date"), new ConfigValueString("short"))));
+            Map.of(new ConfigKeyName("date"), new ConfigValueString("short"))));
     assertEquals(new TextPart("17 Aug 1972, 02:40:23"),
         format(messageAccessor, datetime,
-            singletonMap(new ConfigKeyName("date"), new ConfigValueString("medium"))));
+            Map.of(new ConfigKeyName("date"), new ConfigValueString("medium"))));
     assertEquals(new TextPart("17 August 1972 at 02:40:23 CET"),
         format(messageAccessor, datetime,
-            singletonMap(new ConfigKeyName("date"), new ConfigValueString("long"))));
+            Map.of(new ConfigKeyName("date"), new ConfigValueString("long"))));
     assertEquals(new TextPart("Thursday, 17 August 1972 at 02:40:23 Central European Standard Time"),
         format(messageAccessor, datetime,
-            singletonMap(new ConfigKeyName("date"), new ConfigValueString("full"))));
+            Map.of(new ConfigKeyName("date"), new ConfigValueString("full"))));
 
     assertEquals(new TextPart("17 Aug 1972"), format(messageAccessor, datetime,
-        singletonMap(new ConfigKeyName("date"), new ConfigValueString("date"))));
+        Map.of(new ConfigKeyName("date"), new ConfigValueString("date"))));
     assertEquals(new TextPart("02:40:23"), format(messageAccessor, datetime,
-        singletonMap(new ConfigKeyName("date"), new ConfigValueString("time"))));
+        Map.of(new ConfigKeyName("date"), new ConfigValueString("time"))));
   }
 
 
@@ -139,13 +139,13 @@ class JodaDateTimeFormatterTest extends AbstractFormatterTest
 
     assertEquals(new TextPart("17 août"),
         format(messageAccessor, datetime,
-            singletonMap(new ConfigKeyName("date"), new ConfigValueString("dd MMMM"))));
+            Map.of(new ConfigKeyName("date"), new ConfigValueString("dd MMMM"))));
     assertEquals(new TextPart("jeu. jeudi"),
         format(messageAccessor, datetime,
-            singletonMap(new ConfigKeyName("date"), new ConfigValueString("EEE EEEE"))));
+            Map.of(new ConfigKeyName("date"), new ConfigValueString("EEE EEEE"))));
     assertEquals(new TextPart("02:40:23,833"),
         format(messageAccessor, datetime,
-            singletonMap(new ConfigKeyName("date"), new ConfigValueString("HH:mm:ss,SSS"))));
+            Map.of(new ConfigKeyName("date"), new ConfigValueString("HH:mm:ss,SSS"))));
   }
 
 

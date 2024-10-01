@@ -59,11 +59,11 @@ class MapFormatterTest extends AbstractFormatterTest
         .message("%{map1} %{map2,map-kv:'%{key}   -> %{value}'} %{map3,map-kv:' %{key}:  %{value} '}");
 
     assertEquals("key=value",
-        message.with("map1", singletonMap("key", "value")).format());
+        message.with("map1", Map.of("key", "value")).format());
     assertEquals("key -> value",
-        message.clear().with("map2", singletonMap("key", "value")).format());
+        message.clear().with("map2", Map.of("key", "value")).format());
     assertEquals("key: value",
-        message.clear().with("map3", singletonMap("key", "value")).format());
+        message.clear().with("map3", Map.of("key", "value")).format());
   }
 
 
@@ -91,7 +91,7 @@ class MapFormatterTest extends AbstractFormatterTest
     val messageSupport = MessageSupportFactory
         .create(createFormatterService(new MapFormatter(), new ArrayFormatter()), NO_CACHE_INSTANCE)
         .setLocale(UK);
-    val parameters = singletonMap("map", (Object)emptyMap());
+    val parameters = Map.of("map", (Object)emptyMap());
 
     assertEquals("", messageSupport.message("%{map}").with(parameters).format());
     assertEquals("empty", messageSupport.message("%{map,empty:empty}").with(parameters).format());

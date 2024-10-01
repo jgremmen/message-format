@@ -23,9 +23,10 @@ import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static java.util.Collections.singletonMap;
 import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -51,7 +52,7 @@ class EnumFormatterTest extends AbstractFormatterTest
     val messageAccessor = messageSupport.getMessageAccessor();
 
     assertEquals(noSpaceText("3"), format(messageAccessor, MyEnum.DD,
-        singletonMap(new ConfigKeyName("enum"), new ConfigValueString("ordinal"))));
+        Map.of(new ConfigKeyName("enum"), new ConfigValueString("ordinal"))));
 
     messageSupport.setDefaultParameterConfig("enum", "ordinal");
     assertEquals(noSpaceText("0"), format(messageAccessor, MyEnum.AA));
@@ -66,10 +67,10 @@ class EnumFormatterTest extends AbstractFormatterTest
         .getMessageAccessor();
 
     assertEquals("upper", NO_CACHE_INSTANCE.parseMessage("%{e,>'C':upper,<'C':lower}")
-        .format(messageAccessor, singletonMap("e", MyEnum.CC)));
+        .format(messageAccessor, Map.of("e", MyEnum.CC)));
 
     assertEquals("", NO_CACHE_INSTANCE.parseMessage("%{e,>'C':upper}")
-        .format(messageAccessor, singletonMap("e", MyEnum.AA)));
+        .format(messageAccessor, Map.of("e", MyEnum.AA)));
   }
 
 
@@ -82,7 +83,7 @@ class EnumFormatterTest extends AbstractFormatterTest
 
     assertEquals("C or D", NO_CACHE_INSTANCE
         .parseMessage("%{e,'AA':A,'BB':B,:'C or D'}")
-        .format(messageAccessor, singletonMap("e", MyEnum.CC)));
+        .format(messageAccessor, Map.of("e", MyEnum.CC)));
   }
 
 

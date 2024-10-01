@@ -26,8 +26,9 @@ import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
+
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static java.util.Collections.singleton;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -55,7 +56,7 @@ public final class AsmAnnotationAdopterTest
 
     new AsmAnnotationAdopter(NO_CACHE_INSTANCE, messageSupport).adopt(
         AsmAnnotationAdopterTest.class.getClassLoader(),
-        singleton(AsmAnnotationAdopterTest.class.getPackage().getName()));
+        Set.of(AsmAnnotationAdopterTest.class.getPackage().getName()));
 
     val messageAccessor = messageSupport.getMessageAccessor();
 

@@ -26,14 +26,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.HashSet;
 import java.util.OptionalInt;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.lang.Math.max;
 import static java.lang.System.arraycopy;
-import static java.util.Arrays.asList;
 import static org.w3c.dom.Node.ATTRIBUTE_NODE;
 import static org.w3c.dom.Node.ELEMENT_NODE;
 
@@ -125,10 +123,9 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
-    return new HashSet<>(asList(
+    return Set.of(
         new FormattableType(Attr.class),
-        new FormattableType(Element.class)
-    ));
+        new FormattableType(Element.class));
   }
 
 

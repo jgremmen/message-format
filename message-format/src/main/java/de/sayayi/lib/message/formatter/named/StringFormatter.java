@@ -31,8 +31,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.text.Collator;
-import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.OptionalLong;
 import java.util.Set;
 
@@ -43,8 +41,6 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.for
 import static de.sayayi.lib.message.part.parameter.value.ConfigValue.Type.BOOL;
 import static java.lang.Integer.toHexString;
 import static java.text.Collator.*;
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableSet;
 
 
 /**
@@ -54,11 +50,11 @@ import static java.util.Collections.unmodifiableSet;
 public final class StringFormatter
     implements SizeQueryable, NamedParameterFormatter, DefaultFormatter
 {
-  private static final Set<ConfigKey.Type> STRING_KEY_TYPES = unmodifiableSet(EnumSet.of(
+  private static final Set<ConfigKey.Type> STRING_KEY_TYPES = Set.of(
       ConfigKey.Type.EMPTY,
       ConfigKey.Type.NULL,
       ConfigKey.Type.STRING
-  ));
+  );
 
 
   @Override
@@ -117,10 +113,9 @@ public final class StringFormatter
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
-    return new HashSet<>(asList(
+    return Set.of(
         new FormattableType(CharSequence.class),
-        new FormattableType(char[].class)
-    ));
+        new FormattableType(char[].class));
   }
 
 

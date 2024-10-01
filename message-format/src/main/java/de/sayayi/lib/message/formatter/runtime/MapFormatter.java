@@ -41,9 +41,6 @@ import java.util.function.Supplier;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonMap;
-import static java.util.Collections.unmodifiableSet;
 
 
 /**
@@ -54,17 +51,16 @@ public final class MapFormatter
     implements SizeQueryable, ConfigKeyComparator<Map<?,?>>
 {
   private static final Message.WithSpaces DEFAULT_KEY_VALUE_MESSAGE;
-  private static final Set<String> KEY_VALUE_PARAMETER_NAMES =
-      unmodifiableSet(new TreeSet<>(asList("key", "value")));
+  private static final Set<String> KEY_VALUE_PARAMETER_NAMES = Set.of("key", "value");
 
 
   static
   {
-    final ParameterConfig nullConfig = new ParameterConfig(singletonMap(
-        new ConfigKeyNull(EQ), new ConfigValueString("(null)")));
+    final ParameterConfig nullConfig = new ParameterConfig(
+        Map.of(new ConfigKeyNull(EQ), new ConfigValueString("(null)")));
 
     // default map-kv: %{key,null:'(null)'}=%{value,null:'(null)'}
-    DEFAULT_KEY_VALUE_MESSAGE = new CompoundMessage(asList(
+    DEFAULT_KEY_VALUE_MESSAGE = new CompoundMessage(List.of(
         new ParameterPart("key", nullConfig),
         new NoSpaceTextPart("="),
         new ParameterPart("value", nullConfig)

@@ -32,12 +32,12 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
-import static java.util.Collections.singleton;
-import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -61,14 +61,14 @@ class ArrayFormatterTest extends AbstractFormatterTest
         .setLocale("de-DE")
         .getMessageAccessor();
 
-    val map = Collections.<ConfigKey,ConfigValue>singletonMap(
+    val map = Map.<ConfigKey,ConfigValue>of(
         new ConfigKeyName("list-value"),
         new ConfigValueString("%{value,true:wahr,false:falsch}"));
 
     assertEquals(new TextPart("wahr, falsch, wahr"),
         format(messageAccessor, new boolean[] { true, false, true }, map));
 
-    val booleanMap = Collections.<ConfigKey,ConfigValue>singletonMap(
+    val booleanMap = Map.<ConfigKey,ConfigValue>of(
         new ConfigKeyName("list-value"),
         new ConfigValueString("%{value,true:YES,false:NO}"));
 
@@ -95,9 +95,9 @@ class ArrayFormatterTest extends AbstractFormatterTest
       @Override
       public @NotNull Set<FormattableType> getFormattableTypes()
       {
-        return new HashSet<>(Arrays.asList(
+        return Set.of(
             new FormattableType(Boolean.class, 10),
-            new FormattableType(boolean.class, 10)));
+            new FormattableType(boolean.class, 10));
       }
     });
 
@@ -117,13 +117,12 @@ class ArrayFormatterTest extends AbstractFormatterTest
     assertEquals(new TextPart("12, -7, 99"), format(messageAccessor, new int[] { 12, -7, 99 }));
 
     assertEquals(new TextPart("1, -7, 248"), format(messageAccessor, new int[] { 1, -7, 248 },
-        singletonMap(new ConfigKeyName("number"), new ConfigValueString("##00"))));
+        Map.of(new ConfigKeyName("number"), new ConfigValueString("##00"))));
 
     formatterService.addFormatter(new NumberFormatter());
 
     assertEquals(new TextPart("01, -07, 248"), format(messageAccessor, new int[] { 1, -7, 248 },
-        singletonMap(new ConfigKeyName("list-value"),
-            new ConfigValueString("%{value,number:'##00'}"))));
+        Map.of(new ConfigKeyName("list-value"), new ConfigValueString("%{value,number:'##00'}"))));
 
     formatterService.addFormatter(new NamedParameterFormatter() {
       @Override
@@ -143,13 +142,13 @@ class ArrayFormatterTest extends AbstractFormatterTest
 
       @Override
       public @NotNull Set<FormattableType> getFormattableTypes() {
-        return singleton(new FormattableType(Integer.class));
+        return Set.of(new FormattableType(Integer.class));
       }
     });
 
     assertEquals(new TextPart("0x40, 0xda, 0x2e"),
         format(messageAccessor, new int[] { 64, 218, 46 },
-            singletonMap(new ConfigKeyName("list-value"), new ConfigValueString("%{value,hex}"))));
+            Map.of(new ConfigKeyName("list-value"), new ConfigValueString("%{value,hex}"))));
   }
 
 

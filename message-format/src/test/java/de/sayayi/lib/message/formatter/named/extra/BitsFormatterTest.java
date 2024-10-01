@@ -27,12 +27,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
+import java.util.Map;
 import java.util.OptionalInt;
 import java.util.function.LongSupplier;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.*;
-import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -65,11 +65,11 @@ class BitsFormatterTest extends AbstractFormatterTest
     assertEquals(noSpaceText("10101010"), format(messageAccessor, (byte)0xaa, "bits"));
     assertEquals(noSpaceText("01010101"), format(messageAccessor, (byte)0x55, "bits"));
     assertEquals(noSpaceText("10101"), format(messageAccessor, (byte)0x15,
-        singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
+        Map.of(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
     assertEquals(noSpaceText("0"), format(messageAccessor, (byte)0,
-        singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
+        Map.of(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
     assertEquals(noSpaceText("101"), format(messageAccessor, (byte)0x15,
-        singletonMap(new ConfigKeyName("bits"), new ConfigValueNumber(3)), "bits"));
+        Map.of(new ConfigKeyName("bits"), new ConfigValueNumber(3)), "bits"));
     assertEquals(nullText(), format(messageAccessor, (Object)null, "bits"));
   }
 
@@ -91,13 +91,13 @@ class BitsFormatterTest extends AbstractFormatterTest
         format(messageAccessor, (short)0x5555, "bits"));
     assertEquals(noSpaceText("101010101"),
         format(messageAccessor, (short)0x155,
-            singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
+            Map.of(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
     assertEquals(noSpaceText("0"),
         format(messageAccessor, (short)0,
-            singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
+            Map.of(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
     assertEquals(noSpaceText("010110"),
         format(messageAccessor, (byte)0x456,
-            singletonMap(new ConfigKeyName("bits"), new ConfigValueNumber(6)), "bits"));
+            Map.of(new ConfigKeyName("bits"), new ConfigValueNumber(6)), "bits"));
   }
 
 
@@ -110,16 +110,16 @@ class BitsFormatterTest extends AbstractFormatterTest
 
     assertEquals(noSpaceText("101111000110000101001110"),
         format(messageAccessor, new BigInteger("12345678"),
-            singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
+            Map.of(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
     assertEquals(noSpaceText("0"),
         format(messageAccessor, BigInteger.ZERO,
-            singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
+            Map.of(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
     assertEquals(noSpaceText("01001110"),
         format(messageAccessor, new BigInteger("12345678"),
-            singletonMap(new ConfigKeyName("bits"), new ConfigValueNumber(8)), "bits"));
+            Map.of(new ConfigKeyName("bits"), new ConfigValueNumber(8)), "bits"));
     assertEquals(noSpaceText("1010110101000111000101000100111010000000100001000101111000111101100"),
         format(messageAccessor, new BigInteger("99887766554433221100"),
-            singletonMap(new ConfigKeyName("bits"), new ConfigValueNumber(67)), "bits"));
+            Map.of(new ConfigKeyName("bits"), new ConfigValueNumber(67)), "bits"));
   }
 
 
@@ -133,10 +133,10 @@ class BitsFormatterTest extends AbstractFormatterTest
 
     assertEquals(noSpaceText("101111000110000101001110"),
         format(messageAccessor, (LongSupplier)() -> 12345678,
-            singletonMap(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
+            Map.of(new ConfigKeyName("bits"), new ConfigValueString("auto")), "bits"));
     assertEquals(noSpaceText("01001110"),
         format(messageAccessor, OptionalInt.of(12345678),
-            singletonMap(new ConfigKeyName("bits"), new ConfigValueNumber(8)), "bits"));
+            Map.of(new ConfigKeyName("bits"), new ConfigValueNumber(8)), "bits"));
     assertEquals(nullText(), format(messageAccessor, (Object)null, "bits"));
     assertEquals(emptyText(), format(messageAccessor, OptionalInt.empty(), "bits"));
   }

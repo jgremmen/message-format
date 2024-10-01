@@ -28,7 +28,9 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
@@ -119,9 +121,9 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter<Tem
   @Contract(value = "-> new", pure = true)
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
-    return new HashSet<>(Arrays.asList(
+    return Set.of(
         new FormattableType(LocalDate.class),
         new FormattableType(LocalTime.class),
-        new FormattableType(LocalDateTime.class)));
+        new FormattableType(LocalDateTime.class));
   }
 }

@@ -25,13 +25,13 @@ import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
-import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -76,10 +76,10 @@ class ClipFormatterTest extends AbstractFormatterTest
     assertEquals(noSpaceText("This is a very..."),
         format(messageAccessor,
             "This is a very long text which is clipped at a length of 64 characters",
-            singletonMap(new ConfigKeyName("clip-size"), new ConfigValueNumber(18)), "clip"));
+            Map.of(new ConfigKeyName("clip-size"), new ConfigValueNumber(18)), "clip"));
     assertEquals(noSpaceText("This..."),
         format(messageAccessor, "This is a very long text",
-            singletonMap(new ConfigKeyName("clip-size"), new ConfigValueNumber(2)), "clip"));
+            Map.of(new ConfigKeyName("clip-size"), new ConfigValueNumber(2)), "clip"));
   }
 
 
@@ -93,7 +93,7 @@ class ClipFormatterTest extends AbstractFormatterTest
 
     assertEquals(noSpaceText("3.1415926..."),
         format(messageAccessor, (DoubleSupplier)() -> Math.PI,
-            singletonMap(new ConfigKeyName("clip-size"), new ConfigValueNumber(12)), "clip"));
+            Map.of(new ConfigKeyName("clip-size"), new ConfigValueNumber(12)), "clip"));
   }
 
 

@@ -35,10 +35,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static java.util.Collections.singletonMap;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
@@ -187,7 +187,7 @@ class MessageFormatExceptionTest
     assertEquals("failed to format message for locale German (Germany)",
         assertThrowsExactly(MessageFormatException.class, () -> MESSAGE_SUPPORT
             .message(new LocalizedMessageBundleWithCode("MSG[ABC]",
-                singletonMap(new Locale("de", "CH"), THROWING_MESSAGE)))
+                Map.of(new Locale("de", "CH"), THROWING_MESSAGE)))
             .locale(GERMANY)
             .format())
             .getMessage());
@@ -314,7 +314,7 @@ class MessageFormatExceptionTest
     assertEquals("failed to format message with code 'MSG-003' and locale Chinese (Taiwan)",
         assertThrowsExactly(MessageFormatException.class, () -> MESSAGE_SUPPORT
             .message(new LocalizedMessageBundleWithCode("MSG-003",
-                singletonMap(new Locale("de", "CH"), THROWING_MESSAGE)))
+                Map.of(new Locale("de", "CH"), THROWING_MESSAGE)))
             .locale(TRADITIONAL_CHINESE)
             .format())
             .getMessage());

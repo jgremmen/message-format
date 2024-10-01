@@ -26,10 +26,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static java.util.Collections.singletonMap;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -114,27 +114,27 @@ class GeoFormatterTest extends AbstractFormatterTest
     // short-longitude
     assertEquals(noSpaceText("4\u00b048'E"),
         format(messageAccessor, dms(4, 48),
-            singletonMap(new ConfigKeyName("geo"), new ConfigValueString("short-longitude")),
+            Map.of(new ConfigKeyName("geo"), new ConfigValueString("short-longitude")),
             "geo"));
 
     // longitude
     assertEquals(noSpaceText("19\u00b00'0\"W"),
         format(messageAccessor, -dms(18, 59, 59, 501),
-            singletonMap(new ConfigKeyName("geo"), new ConfigValueString("longitude")),
+            Map.of(new ConfigKeyName("geo"), new ConfigValueString("longitude")),
             "geo"));
 
     // medium-longitude
     assertEquals(noSpaceText("18\u00b059'59,9\"E"),
         format(messageAccessor, new NoParameters(GERMANY),
             dms(18, 59, 59, 891),
-            singletonMap(new ConfigKeyName("geo"), new ConfigValueString("medium-longitude")),
+            Map.of(new ConfigKeyName("geo"), new ConfigValueString("medium-longitude")),
             "geo"));
 
     // long-longitude
     assertEquals(noSpaceText("18\u00b059'59.891\"W"),
         format(messageAccessor, new NoParameters(UK),
             -dms(18, 59, 59, 891),
-            singletonMap(new ConfigKeyName("geo"), new ConfigValueString("long-longitude")),
+            Map.of(new ConfigKeyName("geo"), new ConfigValueString("long-longitude")),
             "geo"));
   }
 

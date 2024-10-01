@@ -26,7 +26,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
+import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
@@ -35,8 +38,6 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Def
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Math.signum;
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableSet;
 
 
 /**
@@ -45,12 +46,12 @@ import static java.util.Collections.unmodifiableSet;
  */
 public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyComparator<Object>
 {
-  private static final Set<ConfigKey.Type> BOOL_KEY_TYPES = unmodifiableSet(EnumSet.of(
+  private static final Set<ConfigKey.Type> BOOL_KEY_TYPES = Set.of(
       ConfigKey.Type.EMPTY,
       ConfigKey.Type.NULL,
       ConfigKey.Type.BOOL,
       ConfigKey.Type.STRING
-  ));
+  );
 
   private static final Text[] BOOL_TEXT = new Text[] {
       noSpaceText("false"),
@@ -172,9 +173,9 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
-    return new HashSet<>(asList(
+    return Set.of(
         new FormattableType(Boolean.class),
-        new FormattableType(boolean.class)));
+        new FormattableType(boolean.class));
   }
 
 

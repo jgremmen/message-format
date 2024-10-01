@@ -32,8 +32,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Array;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicIntegerArray;
@@ -45,8 +45,6 @@ import java.util.function.Supplier;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 
 
 /**
@@ -58,7 +56,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter<Object>
 {
   // default list-value: %{value}
   private static final Message.WithSpaces DEFAULT_VALUE_MESSAGE =
-      new CompoundMessage(singletonList(new ParameterPart("value")));
+      new CompoundMessage(List.of(new ParameterPart("value")));
 
 
   @Override
@@ -129,7 +127,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter<Object>
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
-    return new HashSet<>(asList(
+    return Set.of(
         new FormattableType(boolean[].class),
         new FormattableType(byte[].class),
         new FormattableType(short[].class),
@@ -140,8 +138,7 @@ public final class ArrayFormatter extends AbstractParameterFormatter<Object>
         new FormattableType(Object[].class),
         new FormattableType(AtomicIntegerArray.class),
         new FormattableType(AtomicLongArray.class),
-        new FormattableType(AtomicReferenceArray.class)
-    ));
+        new FormattableType(AtomicReferenceArray.class));
   }
 
 

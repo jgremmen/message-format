@@ -22,10 +22,9 @@ import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
+import java.util.List;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static java.util.Collections.singletonList;
 import static java.util.Locale.GERMANY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -63,13 +62,13 @@ public class TemplateTest
     // akkusativ singular
     assertEquals("Ich gebe dem Mann das Buch", messageSupport
         .message("Ich gebe dem Mann %[buch,collection=col,fall:akk]")
-        .with("col", singletonList("Buch 1"))
+        .with("col", List.of("Buch 1"))
         .format());
 
     // akkusativ plural
     assertEquals("Ich gebe dem Mann die Bücher", messageSupport
         .message("Ich gebe dem Mann %['buch',fall:akk]")
-        .with("collection", Arrays.asList("Buch 1", "Buch 2"))
+        .with("collection", List.of("Buch 1", "Buch 2"))
         .format());
   }
 }

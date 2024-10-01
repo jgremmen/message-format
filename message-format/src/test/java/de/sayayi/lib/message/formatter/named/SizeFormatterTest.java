@@ -24,9 +24,10 @@ import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.Map;
+
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonMap;
 import static java.util.Locale.UK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -48,10 +49,10 @@ class SizeFormatterTest extends AbstractFormatterTest
         .message("%{c,size} %{c,size,0:'empty',1:'singleton',:'multiple'}").getMessage();
 
     assertEquals("0 empty", messageSupport.message(message)
-        .with("c", emptyList()).format());
+        .with("c", List.of()).format());
 
     assertEquals("1 singleton", messageSupport.message(message)
-        .with("c", singletonMap("a", "b")).format());
+        .with("c", Map.of("a", "b")).format());
 
     assertEquals("4 multiple", messageSupport.message(message)
         .with("c", new int[] { 4, -45, 8, 1 }).format());

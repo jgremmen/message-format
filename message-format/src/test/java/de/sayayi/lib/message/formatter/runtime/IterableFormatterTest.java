@@ -21,6 +21,8 @@ import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Arrays.asList;
@@ -72,9 +74,9 @@ public class IterableFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE);
 
     assertEquals("1, 2, 3, 4 and 5", messageSupport
-        .message("%{c,list-sep:', ',list-sep-last:' and '}").with("c", asList(1, 2, 3, 4, 5)).format());
+        .message("%{c,list-sep:', ',list-sep-last:' and '}").with("c", List.of(1, 2, 3, 4, 5)).format());
 
     assertEquals("1.2.3.4.5", messageSupport
-        .message("%{c,list-sep:'.'}").with("c", asList(1, 2, 3, 4, 5)).format());
+        .message("%{c,list-sep:'.'}").with("c", List.of(1, 2, 3, 4, 5)).format());
   }
 }

@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-import static java.util.Collections.singletonMap;
 import static java.util.Locale.getAvailableLocales;
 import static java.util.ResourceBundle.getBundle;
 
@@ -64,7 +63,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
     resourceBundle.keySet().forEach(
         code -> messagePublisher.addMessage(messageFactory
-            .parseMessage(code, singletonMap(locale, resourceBundle.getString(code)))));
+            .parseMessage(code, Map.of(locale, resourceBundle.getString(code)))));
   }
 
 

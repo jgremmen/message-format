@@ -24,12 +24,12 @@ import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.LongSupplier;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -62,6 +62,6 @@ class SupplierFormatterTest extends AbstractFormatterTest
 
     assertEquals(noSpaceText("1,234,567,890"),
         format(messageAccessor, (LongSupplier)() -> 1234567890L,
-            singletonMap(new ConfigKeyName("number"), new ConfigValueString("###,###,###,###"))));
+            Map.of(new ConfigKeyName("number"), new ConfigValueString("###,###,###,###"))));
   }
 }

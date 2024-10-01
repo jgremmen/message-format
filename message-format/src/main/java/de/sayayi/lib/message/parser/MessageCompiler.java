@@ -77,8 +77,6 @@ import static de.sayayi.lib.message.parser.MessageParser.*;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
-import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collector.Characteristics.IDENTITY_FINISH;
@@ -345,7 +343,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         PARAMETER_CONFIG_COLLECTOR = new Collector<>() {
       @Override public Supplier<Map<ConfigKey,ConfigValue>> supplier() { return LinkedHashMap::new; }
       @Override public BinaryOperator<Map<ConfigKey,ConfigValue>> combiner() { return foldCombiner(); }
-      @Override public Set<Characteristics> characteristics() { return singleton(IDENTITY_FINISH); }
+      @Override public Set<Characteristics> characteristics() { return Set.of(IDENTITY_FINISH); }
 
       @Override
       public BiConsumer<Map<ConfigKey,ConfigValue>,ParameterConfigElementContext> accumulator()
@@ -392,7 +390,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         TEMPLATE_NAMED_PARAMETER_COLLECTOR = new Collector<>() {
       @Override public Supplier<Map<String,ConfigValue>> supplier() { return TreeMap::new; }
       @Override public BinaryOperator<Map<String,ConfigValue>> combiner() { return foldCombiner(); }
-      @Override public Set<Characteristics> characteristics() { return singleton(UNORDERED); }
+      @Override public Set<Characteristics> characteristics() { return Set.of(UNORDERED); }
 
       @Override
       public BiConsumer<Map<String,ConfigValue>,ConfigNamedElementContext> accumulator()
@@ -418,7 +416,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         TEMPLATE_PARAMETER_DELEGATE_COLLECTOR = new Collector<>() {
       @Override public Supplier<Map<String, String>> supplier() { return HashMap::new; }
       @Override public BinaryOperator<Map<String, String>> combiner() { return foldCombiner(); }
-      @Override public Set<Characteristics> characteristics() { return singleton(UNORDERED); }
+      @Override public Set<Characteristics> characteristics() { return Set.of(UNORDERED); }
 
       @Override
       public BiConsumer<Map<String,String>,TemplateParameterDelegateContext> accumulator()
@@ -465,7 +463,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
       if (cpec != null)
       {
-        ctx.configKeys = singletonList(cpec.configKey);
+        ctx.configKeys = List.of(cpec.configKey);
         ctx.configValue = cpec.configValue;
       }
       else

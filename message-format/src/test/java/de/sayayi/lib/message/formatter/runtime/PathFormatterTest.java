@@ -28,11 +28,11 @@ import org.junit.jupiter.api.condition.OS;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
-import static java.util.Collections.singletonMap;
 import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -60,11 +60,11 @@ class PathFormatterTest extends AbstractFormatterTest
     assertEquals(nullText(), format(messageAccessor, null));
     assertEquals(noSpaceText("/path1/path2/filename.ext"), format(messageAccessor, f));
     assertEquals(noSpaceText("filename.ext"), format(messageAccessor, f,
-        singletonMap(PATH_KEY, new ConfigValueString("name"))));
+        Map.of(PATH_KEY, new ConfigValueString("name"))));
     assertEquals(noSpaceText("/path1/path2"), format(messageAccessor, f,
-        singletonMap(PATH_KEY, new ConfigValueString("parent"))));
+        Map.of(PATH_KEY, new ConfigValueString("parent"))));
     assertEquals(noSpaceText("ext"), format(messageAccessor, f,
-        singletonMap(PATH_KEY, new ConfigValueString("extension"))));
+        Map.of(PATH_KEY, new ConfigValueString("extension"))));
   }
 
 

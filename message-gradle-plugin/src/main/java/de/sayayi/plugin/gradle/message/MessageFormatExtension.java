@@ -20,7 +20,6 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.SourceSet;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -154,7 +153,7 @@ public abstract class MessageFormatExtension
    * @param regex  array of regular expressions, not {@code null}
    */
   public void include(String... regex) {
-    includeRegexFilter.addAll(Arrays.asList(regex));
+    includeRegexFilter.addAll(List.of(regex));
   }
 
 
@@ -164,7 +163,7 @@ public abstract class MessageFormatExtension
    * @param regex  array of regular expressions, not {@code null}
    */
   public void exclude(String... regex) {
-    excludeRegexFilter.addAll(Arrays.asList(regex));
+    excludeRegexFilter.addAll(List.of(regex));
   }
 
 

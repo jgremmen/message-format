@@ -50,7 +50,6 @@ import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.plugin.gradle.message.DuplicateMsgStrategy.IGNORE_AND_WARN;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
-import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Locale.ROOT;
 import static org.gradle.api.logging.LogLevel.ERROR;
@@ -224,7 +223,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * @param regex  regex matching message codes
    */
   public void include(String... regex) {
-    includeRegexFilters.addAll(asList(regex));
+    includeRegexFilters.addAll(List.of(regex));
   }
 
 
@@ -234,7 +233,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * @param regex  regex matching message codes
    */
   public void exclude(String... regex) {
-    excludeRegexFilters.addAll(asList(regex));
+    excludeRegexFilters.addAll(List.of(regex));
   }
 
 

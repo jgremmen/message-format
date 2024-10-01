@@ -21,12 +21,10 @@ import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.EnumSet;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
-import static java.util.Collections.unmodifiableSet;
 
 
 /**
@@ -40,16 +38,16 @@ import static java.util.Collections.unmodifiableSet;
 public interface ConfigKey
 {
   /** Map key type {@code empty}. */
-  Set<Type> EMPTY_TYPE = unmodifiableSet(EnumSet.of(Type.EMPTY));
+  Set<Type> EMPTY_TYPE = Set.of(Type.EMPTY);
 
   /** Map key types {@code empty} and {@code null}. */
-  Set<Type> EMPTY_NULL_TYPE = unmodifiableSet(EnumSet.of(Type.EMPTY, Type.NULL));
+  Set<Type> EMPTY_NULL_TYPE = Set.of(Type.EMPTY, Type.NULL);
 
   /** Map key type {@code string}. */
-  Set<Type> STRING_TYPE = unmodifiableSet(EnumSet.of(Type.STRING));
+  Set<Type> STRING_TYPE = Set.of(Type.STRING);
 
   /** Map key type {@code number}. */
-  Set<Type> NUMBER_TYPE = unmodifiableSet(EnumSet.of(Type.NUMBER));
+  Set<Type> NUMBER_TYPE = Set.of(Type.NUMBER);
 
 
   /**

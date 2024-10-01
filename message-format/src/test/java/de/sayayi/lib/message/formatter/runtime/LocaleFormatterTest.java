@@ -17,21 +17,18 @@ package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.part.parameter.key.ConfigKeyString;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static java.util.Collections.singletonMap;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -58,13 +55,11 @@ class LocaleFormatterTest extends AbstractFormatterTest
         .getMessageAccessor();
 
     assertEquals(noSpaceText("États-Unis"), format(messageAccessor, US,
-        singletonMap(new ConfigKeyName("locale"), new ConfigValueString("country"))));
+        Map.of(new ConfigKeyName("locale"), new ConfigValueString("country"))));
 
-    assertEquals(noSpaceText("The Great Kingdom"), format(messageAccessor, UK,
-        new HashMap<ConfigKey,ConfigValue>() {{
-          put(new ConfigKeyName("locale"), new ConfigValueString("country"));
-          put(new ConfigKeyString("GB"), new ConfigValueString("The Great Kingdom"));
-        }}));
+    assertEquals(noSpaceText("The Great Kingdom"), format(messageAccessor, UK, Map.of(
+        new ConfigKeyName("locale"), new ConfigValueString("country"),
+        new ConfigKeyString("GB"), new ConfigValueString("The Great Kingdom"))));
   }
 
 
@@ -77,13 +72,11 @@ class LocaleFormatterTest extends AbstractFormatterTest
         .getMessageAccessor();
 
     assertEquals(noSpaceText("inglés"), format(messageAccessor, UK,
-        singletonMap(new ConfigKeyName("locale"), new ConfigValueString("language"))));
+        Map.of(new ConfigKeyName("locale"), new ConfigValueString("language"))));
 
-    assertEquals(noSpaceText("francesa"), format(messageAccessor, FRANCE,
-        new HashMap<ConfigKey,ConfigValue>() {{
-          put(new ConfigKeyName("locale"), new ConfigValueString("language"));
-          put(new ConfigKeyString("fr"), new ConfigValueString("francesa"));
-        }}));
+    assertEquals(noSpaceText("francesa"), format(messageAccessor, FRANCE, Map.of(
+        new ConfigKeyName("locale"), new ConfigValueString("language"),
+        new ConfigKeyString("fr"), new ConfigValueString("francesa"))));
   }
 
 
@@ -98,9 +91,9 @@ class LocaleFormatterTest extends AbstractFormatterTest
     assertEquals(noSpaceText("Engels (Verenigd Koninkrijk)"), format(messageAccessor, UK));
 
     assertEquals(noSpaceText("Duits"), format(messageAccessor, GERMAN,
-        singletonMap(new ConfigKeyName("locale"), new ConfigValueString("name"))));
+        Map.of(new ConfigKeyName("locale"), new ConfigValueString("name"))));
 
     assertEquals(noSpaceText("Koreaans (Zuid-Korea)"), format(messageAccessor, KOREA,
-        singletonMap(new ConfigKeyName("locale"), new ConfigValueString("name"))));
+        Map.of(new ConfigKeyName("locale"), new ConfigValueString("name"))));
   }
 }

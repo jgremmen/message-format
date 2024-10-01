@@ -27,14 +27,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_ORDER;
 import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static java.nio.file.Files.isRegularFile;
-import static java.util.Arrays.asList;
 import static java.util.OptionalLong.empty;
 
 
@@ -132,12 +130,12 @@ public final class PathFormatter extends AbstractParameterFormatter<Object> impl
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
-    return new HashSet<>(asList(
+    return Set.of(
         new FormattableType(File.class),
 
         // path implements iterable, so make sure it has a higher precedence than IterableFormatter
         new FormattableType(Path.class, DEFAULT_ORDER - 5)
-    ));
+    );
   }
 
 

@@ -28,12 +28,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAGE;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.TEMPLATE;
-import static java.util.Collections.singletonMap;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -174,7 +174,7 @@ class MessageParserExceptionTest
           break;
 
         case 0b001:
-          NO_CACHE_INSTANCE.parseMessage(singletonMap(locale, parseString));
+          NO_CACHE_INSTANCE.parseMessage(Map.of(locale, parseString));
           break;
 
         case 0b100:
@@ -182,7 +182,7 @@ class MessageParserExceptionTest
           break;
 
         case 0b101:
-          NO_CACHE_INSTANCE.parseMessage(code, singletonMap(locale, parseString));
+          NO_CACHE_INSTANCE.parseMessage(code, Map.of(locale, parseString));
           break;
 
         case 0b010:
@@ -190,7 +190,7 @@ class MessageParserExceptionTest
           break;
 
         case 0b011:
-          NO_CACHE_INSTANCE.parseTemplate(singletonMap(locale, parseString));
+          NO_CACHE_INSTANCE.parseTemplate(Map.of(locale, parseString));
           break;
       }
     }).getMessage().startsWith(msg + ": "));

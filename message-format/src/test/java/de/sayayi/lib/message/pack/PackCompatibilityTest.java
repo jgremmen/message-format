@@ -17,12 +17,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.nio.file.Files.*;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -102,7 +101,7 @@ class PackCompatibilityTest
 
     if (pluginRepo)
     {
-      settingLines.addAll(asList(
+      settingLines.addAll(List.of(
           "pluginManagement {",
           "  repositories {",
           "    gradlePluginPortal()",
@@ -111,7 +110,7 @@ class PackCompatibilityTest
     }
     else
     {
-      settingLines.addAll(asList(
+      settingLines.addAll(List.of(
           "buildscript {",
           "  repositories {",
           "    mavenCentral()",
@@ -128,7 +127,7 @@ class PackCompatibilityTest
 
 
   private void writeGradleProperties() throws IOException {
-    write(new File(testProjectDir, "gradle.properties").toPath(), singletonList(""));
+    write(new File(testProjectDir, "gradle.properties").toPath(), List.of(""));
   }
 
 
@@ -138,7 +137,7 @@ class PackCompatibilityTest
 
     if (pluginRepo)
     {
-      buildLines.addAll(asList(
+      buildLines.addAll(List.of(
           "plugins {",
           "  id 'java'",
           "  id 'de.sayayi.plugin.gradle.message' version '" + version + "'",
@@ -146,14 +145,14 @@ class PackCompatibilityTest
     }
     else
     {
-      buildLines.addAll(asList(
+      buildLines.addAll(List.of(
           "plugins {",
           "  id 'java'",
           "}",
           "apply plugin: 'de.sayayi.plugin.gradle.message'"));
     }
 
-    buildLines.addAll(asList(
+    buildLines.addAll(List.of(
         "layout.buildDirectory = '.build'",
         "println 'Gradle version ' + gradle.gradleVersion",
         "messageFormatPack {",

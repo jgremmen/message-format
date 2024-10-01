@@ -32,7 +32,6 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -46,7 +45,6 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.*;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.NUMBER_TYPE;
 import static java.lang.Math.signum;
-import static java.util.Arrays.asList;
 
 
 /**
@@ -117,15 +115,14 @@ public final class NumberFormatter
   @Contract(value = "-> new", pure = true)
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
-    return new HashSet<>(asList(
+    return Set.of(
         new FormattableType(Number.class),
         new FormattableType(byte.class),
         new FormattableType(short.class),
         new FormattableType(int.class),
         new FormattableType(long.class),
         new FormattableType(float.class),
-        new FormattableType(double.class)
-    ));
+        new FormattableType(double.class));
   }
 
 

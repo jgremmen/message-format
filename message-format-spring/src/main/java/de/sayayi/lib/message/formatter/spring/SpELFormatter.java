@@ -34,7 +34,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 import static org.springframework.expression.spel.SpelMessage.VARIABLE_ASSIGNMENT_NOT_SUPPORTED;
 
@@ -49,10 +48,9 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object>
   private static final OperatorOverloader OPERATOR_OVERLOADER = new StandardOperatorOverloader();
   private static final TypeComparator TYPE_COMPARATOR = new StandardTypeComparator();
   private static final TypeLocator TYPE_LOCATOR = new StandardTypeLocator();
-  private static final List<MethodResolver> METHOD_RESOLVERS =
-      singletonList(new ReflectiveMethodResolver());
+  private static final List<MethodResolver> METHOD_RESOLVERS = List.of(new ReflectiveMethodResolver());
   private static final List<PropertyAccessor> PROPERTY_ACCESSORS =
-      singletonList(DataBindingPropertyAccessor.forReadOnlyAccess());
+      List.of(DataBindingPropertyAccessor.forReadOnlyAccess());
 
   private final SpelExpressionParser spelExpressionParser;
   private final TypeConverter typeConverter;

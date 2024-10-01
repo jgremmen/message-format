@@ -33,13 +33,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.OptionalLong;
 import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
-import static java.util.Collections.singletonList;
 
 
 /**
@@ -51,7 +51,7 @@ public final class IterableFormatter
 {
   // default list-value: %{value}
   private static final Message.WithSpaces DEFAULT_VALUE_MESSAGE =
-      new CompoundMessage(singletonList(new ParameterPart("value")));
+      new CompoundMessage(List.of(new ParameterPart("value")));
 
 
   @Override
