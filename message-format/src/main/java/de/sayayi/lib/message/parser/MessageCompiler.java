@@ -342,8 +342,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     final Collector<ParameterConfigElementContext,Map<ConfigKey,ConfigValue>,Map<ConfigKey,ConfigValue>>
-        PARAMETER_CONFIG_COLLECTOR =
-        new Collector<ParameterConfigElementContext,Map<ConfigKey,ConfigValue>,Map<ConfigKey,ConfigValue>>() {
+        PARAMETER_CONFIG_COLLECTOR = new Collector<>() {
       @Override public Supplier<Map<ConfigKey,ConfigValue>> supplier() { return LinkedHashMap::new; }
       @Override public BinaryOperator<Map<ConfigKey,ConfigValue>> combiner() { return foldCombiner(); }
       @Override public Set<Characteristics> characteristics() { return singleton(IDENTITY_FINISH); }
@@ -390,8 +389,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     final Collector<ConfigNamedElementContext,Map<String,ConfigValue>,Map<String,ConfigValue>>
-        TEMPLATE_NAMED_PARAMETER_COLLECTOR =
-        new Collector<ConfigNamedElementContext,Map<String,ConfigValue>,Map<String,ConfigValue>>() {
+        TEMPLATE_NAMED_PARAMETER_COLLECTOR = new Collector<>() {
       @Override public Supplier<Map<String,ConfigValue>> supplier() { return TreeMap::new; }
       @Override public BinaryOperator<Map<String,ConfigValue>> combiner() { return foldCombiner(); }
       @Override public Set<Characteristics> characteristics() { return singleton(UNORDERED); }
@@ -417,8 +415,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     final Collector<TemplateParameterDelegateContext,Map<String,String>,Map<String,String>>
-        TEMPLATE_PARAMETER_DELEGATE_COLLECTOR =
-        new Collector<TemplateParameterDelegateContext,Map<String,String>,Map<String,String>>() {
+        TEMPLATE_PARAMETER_DELEGATE_COLLECTOR = new Collector<>() {
       @Override public Supplier<Map<String, String>> supplier() { return HashMap::new; }
       @Override public BinaryOperator<Map<String, String>> combiner() { return foldCombiner(); }
       @Override public Set<Characteristics> characteristics() { return singleton(UNORDERED); }

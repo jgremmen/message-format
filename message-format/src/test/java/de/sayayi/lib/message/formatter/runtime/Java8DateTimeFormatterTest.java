@@ -105,7 +105,7 @@ class Java8DateTimeFormatterTest extends AbstractFormatterTest
         singletonMap(new ConfigKeyName("date"), new ConfigValueString("medium"))));
     assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
         singletonMap(new ConfigKeyName("date"), new ConfigValueString("long"))));
-    assertEquals(new TextPart("16:34 Uhr"), format(messageAccessor, time,
+    assertEquals(new TextPart("16:34:11 Mitteleuropäische"), format(messageAccessor, time,
         singletonMap(new ConfigKeyName("date"), new ConfigValueString("full"))));
     assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
         singletonMap(new ConfigKeyName("date"), new ConfigValueString("time"))));
@@ -124,20 +124,20 @@ class Java8DateTimeFormatterTest extends AbstractFormatterTest
         .getMessageAccessor();
     val datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
 
-    assertEquals(new TextPart("17/08/72 02:40"),
+    assertEquals(new TextPart("17/08/1972, 02:40"),
         format(messageAccessor, datetime,
             singletonMap(new ConfigKeyName("date"), new ConfigValueString("short"))));
-    assertEquals(new TextPart("17-Aug-1972 02:40:23"),
+    assertEquals(new TextPart("17 Aug 1972, 02:40:23"),
         format(messageAccessor, datetime,
             singletonMap(new ConfigKeyName("date"), new ConfigValueString("medium"))));
-    assertEquals(new TextPart("17 August 1972 02:40:23 CET"),
+    assertEquals(new TextPart("17 August 1972 at 02:40:23 CET"),
         format(messageAccessor, datetime,
             singletonMap(new ConfigKeyName("date"), new ConfigValueString("long"))));
-    assertEquals(new TextPart("Thursday, 17 August 1972 02:40:23 o'clock CET"),
+    assertEquals(new TextPart("Thursday, 17 August 1972 at 02:40:23 Central European Standard Time"),
         format(messageAccessor, datetime,
             singletonMap(new ConfigKeyName("date"), new ConfigValueString("full"))));
 
-    assertEquals(new TextPart("17-Aug-1972"),
+    assertEquals(new TextPart("17 Aug 1972"),
         format(messageAccessor, datetime,
             singletonMap(new ConfigKeyName("date"), new ConfigValueString("date"))));
     assertEquals(new TextPart("02:40:23"),
@@ -173,7 +173,7 @@ class Java8DateTimeFormatterTest extends AbstractFormatterTest
     val messageSupport = MessageSupportFactory
         .create(createFormatterService(new Java8DateTimeFormatter()), NO_CACHE_INSTANCE);
 
-    assertEquals("17-aug-1972 16:45 14:23:01 2019-02-19 feb", messageSupport
+    assertEquals("17 aug. 1972 16:45 14:23:01 2019-02-19 feb.", messageSupport
         .message("%{a} %{b,date:'short'} %{c,date:'time'} %{c,date:'yyyy-MM-dd MMM'}")
         .with("a", LocalDate.of(1972, 8, 17))
         .with("b", LocalTime.of(16, 45, 9, 123))

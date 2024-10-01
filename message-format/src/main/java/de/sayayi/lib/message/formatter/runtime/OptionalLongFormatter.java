@@ -40,8 +40,7 @@ public final class OptionalLongFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context,
-                                   @NotNull OptionalLong optionalLong)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull OptionalLong optionalLong)
   {
     return optionalLong.isPresent()
         ? context.format(optionalLong.getAsLong(), long.class, true)
@@ -56,29 +55,26 @@ public final class OptionalLongFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToEmptyKey(OptionalLong value,
-                                                @NotNull ComparatorContext context) {
-    return forEmptyKey(context.getCompareType(), value == null || !value.isPresent());
+  @SuppressWarnings("OptionalAssignedToNull")
+  public @NotNull MatchResult compareToEmptyKey(OptionalLong value, @NotNull ComparatorContext context) {
+    return forEmptyKey(context.getCompareType(), value == null || value.isEmpty());
   }
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull OptionalLong value,
-                                               @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToBoolKey(@NotNull OptionalLong value, @NotNull ComparatorContext context) {
     return value.isPresent() ? context.matchForObject(value.getAsLong(), long.class) : MISMATCH;
   }
 
 
   @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull OptionalLong value,
-                                                 @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToNumberKey(@NotNull OptionalLong value, @NotNull ComparatorContext context) {
     return value.isPresent() ? context.matchForObject(value.getAsLong(), long.class) : MISMATCH;
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull OptionalLong value,
-                                                 @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToStringKey(@NotNull OptionalLong value, @NotNull ComparatorContext context) {
     return value.isPresent() ? context.matchForObject(value.getAsLong(), long.class) : MISMATCH;
   }
 }

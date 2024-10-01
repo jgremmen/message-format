@@ -66,42 +66,39 @@ public final class OptionalFormatter extends AbstractSingleTypeParameterFormatte
 
 
   @Override
-  public @NotNull MatchResult compareToNullKey(Optional<?> value,
-                                               @NotNull ComparatorContext context)
+  @SuppressWarnings("OptionalAssignedToNull")
+  public @NotNull MatchResult compareToNullKey(Optional<?> value, @NotNull ComparatorContext context)
   {
-    return value == null || !value.isPresent()
+    return value == null || value.isEmpty()
         ? forNullKey(context.getCompareType(), true)
         : context.matchForObject(value.get());
   }
 
 
   @Override
-  public @NotNull MatchResult compareToEmptyKey(Optional<?> value,
-                                                @NotNull ComparatorContext context)
+  @SuppressWarnings("OptionalAssignedToNull")
+  public @NotNull MatchResult compareToEmptyKey(Optional<?> value, @NotNull ComparatorContext context)
   {
-    return value == null || !value.isPresent()
+    return value == null || value.isEmpty()
         ? forEmptyKey(context.getCompareType(), true)
         : context.matchForObject(value.get());
   }
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull Optional<?> value,
-                                               @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToBoolKey(@NotNull Optional<?> value, @NotNull ComparatorContext context) {
     return value.map(context::matchForObject).orElse(MISMATCH);
   }
 
 
   @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull Optional<?> value,
-                                                 @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToNumberKey(@NotNull Optional<?> value, @NotNull ComparatorContext context) {
     return value.map(context::matchForObject).orElse(MISMATCH);
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull Optional<?> value,
-                                                 @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToStringKey(@NotNull Optional<?> value, @NotNull ComparatorContext context) {
     return value.map(context::matchForObject).orElse(MISMATCH);
   }
 }

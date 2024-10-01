@@ -21,7 +21,7 @@ afterEvaluate {
 
     (options as StandardJavadocDocletOptions).with {
       linksOffline(
-          "https://javadoc.io/doc/org.jetbrains/annotations-java5/${jetbrainsAnnotationsVersion}/",
+          "https://javadoc.io/doc/org.jetbrains/annotations/${jetbrainsAnnotationsVersion}/",
           "${rootDir}/gradle/javadocs/jetbrains-annotations")
 
       encoding 'UTF-8'

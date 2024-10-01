@@ -120,9 +120,9 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
 
 
   @Override
-  public @NotNull Iterator<Entry<K, V>> iterator()
+  public @NotNull Iterator<Entry<K,V>> iterator()
   {
-    return new Iterator<Entry<K, V>>() {
+    return new Iterator<>() {
       private int n = 0;
 
 
@@ -147,7 +147,7 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
   @Override
   public Spliterator<Entry<K,V>> spliterator()
   {
-    return new Spliterator<Entry<K, V>>() {
+    return new Spliterator<>() {
       private int n = 0;
 
 

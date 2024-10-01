@@ -44,7 +44,7 @@ public final class MatcherFormatter extends AbstractSingleTypeParameterFormatter
     if (matcher.matches())
     {
       final Optional<ConfigValue> matcherConfig = context.getConfigValue("matcher");
-      if (!matcherConfig.isPresent())
+      if (matcherConfig.isEmpty())
         return formatValue_groupNumber(matcher, 0);
 
       final ConfigValue cv = matcherConfig.get();

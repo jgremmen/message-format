@@ -64,8 +64,7 @@ public interface FormatterService
      * @see #addFormatter(ParameterFormatter)
      */
     @Contract(mutates = "this")
-    void addFormatterForType(@NotNull FormattableType formattableType,
-                             @NotNull ParameterFormatter formatter);
+    void addFormatterForType(@NotNull FormattableType formattableType, @NotNull ParameterFormatter formatter);
 
 
     /**

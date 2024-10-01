@@ -23,7 +23,6 @@ import de.sayayi.lib.message.part.parameter.key.ConfigKeyBool;
 import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;
-import lombok.var;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

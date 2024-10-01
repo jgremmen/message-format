@@ -40,8 +40,7 @@ public final class OptionalIntFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context,
-                                   @NotNull OptionalInt optionalInt)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull OptionalInt optionalInt)
   {
     return optionalInt.isPresent()
         ? context.format(optionalInt.getAsInt(), int.class, true)
@@ -56,29 +55,26 @@ public final class OptionalIntFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToEmptyKey(OptionalInt value,
-                                                @NotNull ComparatorContext context) {
-    return forEmptyKey(context.getCompareType(), value == null || !value.isPresent());
+  @SuppressWarnings("OptionalAssignedToNull")
+  public @NotNull MatchResult compareToEmptyKey(OptionalInt value, @NotNull ComparatorContext context) {
+    return forEmptyKey(context.getCompareType(), value == null || value.isEmpty());
   }
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull OptionalInt value,
-                                               @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToBoolKey(@NotNull OptionalInt value, @NotNull ComparatorContext context) {
     return value.isPresent() ? context.matchForObject(value.getAsInt(), int.class) : MISMATCH;
   }
 
 
   @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull OptionalInt value,
-                                                 @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToNumberKey(@NotNull OptionalInt value, @NotNull ComparatorContext context) {
     return value.isPresent() ? context.matchForObject(value.getAsInt(), int.class) : MISMATCH;
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull OptionalInt value,
-                                                 @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToStringKey(@NotNull OptionalInt value, @NotNull ComparatorContext context) {
     return value.isPresent() ? context.matchForObject(value.getAsInt(), int.class) : MISMATCH;
   }
 }

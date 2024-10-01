@@ -50,10 +50,10 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
 
   @Override
   @SneakyThrows(UnsupportedEncodingException.class)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull byte[] byteArray)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, byte @NotNull [] byteArray)
   {
     final Optional<String> bytesConfig = context.getConfigValueString("bytes");
-    if (!bytesConfig.isPresent())
+    if (bytesConfig.isEmpty())
       return context.delegateToNextFormatter();
 
     if (byteArray.length == 0)

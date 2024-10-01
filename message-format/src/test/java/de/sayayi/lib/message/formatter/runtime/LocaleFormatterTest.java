@@ -57,7 +57,7 @@ class LocaleFormatterTest extends AbstractFormatterTest
         .setLocale(FRANCE)
         .getMessageAccessor();
 
-    assertEquals(noSpaceText("Etats-Unis"), format(messageAccessor, US,
+    assertEquals(noSpaceText("États-Unis"), format(messageAccessor, US,
         singletonMap(new ConfigKeyName("locale"), new ConfigValueString("country"))));
 
     assertEquals(noSpaceText("The Great Kingdom"), format(messageAccessor, UK,

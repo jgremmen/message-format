@@ -38,15 +38,14 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Locale.forLanguageTag;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 
 
 /**
  * @author Jeroen Gremmen
  * @since 0.1.0 (renamed in 0.5.0)
  */
-public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCode
-    implements LocaleAware
+public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCode implements LocaleAware
 {
   /** Localized message map. */
   private final @NotNull Map<Locale,Message> localizedMessages;
@@ -59,8 +58,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
    * @param localizedMessages  localized message map, not {@code null}. The map must contain at
    *                           least 2 entries and no mapped value can be {@code null}
    */
-  public LocalizedMessageBundleWithCode(@NotNull String code,
-                                        @NotNull Map<Locale,Message> localizedMessages)
+  public LocalizedMessageBundleWithCode(@NotNull String code, @NotNull Map<Locale,Message> localizedMessages)
   {
     super(code);
 
@@ -72,8 +70,8 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
 
   @Override
-  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
-                                    @NotNull Parameters parameters) throws MessageFormatException
+  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
+      throws MessageFormatException
   {
     final Locale locale = parameters.getLocale();
 
@@ -146,11 +144,11 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   @Override
   public @NotNull Set<String> getTemplateNames()
   {
-    return unmodifiableSet(localizedMessages
+    return localizedMessages
         .values()
         .stream()
         .flatMap(message -> message.getTemplateNames().stream())
-        .collect(toSet()));
+        .collect(toUnmodifiableSet());
   }
 
 
@@ -237,8 +235,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
    * @hidden
    */
   @SuppressWarnings("JavadocDeclaration")
-  public static @NotNull Message.WithCode unpack(@NotNull PackHelper unpack,
-                                                 @NotNull PackInputStream packStream)
+  public static @NotNull Message.WithCode unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
     final int messageCount = packStream.readSmallVar();

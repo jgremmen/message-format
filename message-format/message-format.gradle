@@ -26,8 +26,8 @@ plugins {
 description = 'Message Format Library'
 
 
-def antlrVersion = '4.9.3'
-def antlrExtVersion = '[0.4.1,)'
+def antlrVersion = '4.13.2'
+def antlrExtVersion = '[0.5.0,)'
 def asmVersion = '[6.0,)'
 def ehcacheVersion = '3.10.+'
 def javaxCacheApiVersion = '1.1.1'

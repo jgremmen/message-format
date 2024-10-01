@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.exception;
 
 import de.sayayi.lib.message.exception.MessageParserException.Type;
-import lombok.var;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
