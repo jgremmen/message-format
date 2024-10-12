@@ -44,36 +44,34 @@ public enum OrderedConfigKeySorter implements Comparator<OrderedConfigKeySorter.
   public int compare(OrderedConfigKey k1, OrderedConfigKey k2)
   {
     int cmp = Integer.compare(configKeyToOrder(k1), configKeyToOrder(k2));
-    if (cmp == 0 && k1.configKey != null)
+    if (cmp == 0)
       cmp = Integer.compare(k1.getOrder(), k2.getOrder());
 
     return cmp;
   }
 
 
+  @Contract(pure = true)
   private int configKeyToOrder(@NotNull OrderedConfigKey orderedConfigKey)
   {
     final ConfigKey configKey = orderedConfigKey.configKey;
-    if (configKey != null)
-    {
-      final CompareType compareType = configKey.getCompareType();
-      final ConfigKey.Type keyType = configKey.getType();
+    final CompareType compareType = configKey.getCompareType();
+    final ConfigKey.Type keyType = configKey.getType();
 
-      if (keyType == NULL && compareType == EQ)
-        return 0;  // =null
-      if (keyType == EMPTY && compareType == EQ)
-        return 1;  // =empty
-      if (keyType == BOOL)
-        return 2;  // bool
-      if (keyType == NUMBER)
-        return 3;  // number
-      if (keyType == STRING)
-        return 4;  // string
-      if (keyType == EMPTY && compareType == NE)
-        return 5;  // !empty
-      if (keyType == NULL && compareType == NE)
-        return 6;  // !null
-    }
+    if (keyType == NULL && compareType == EQ)
+      return 0;  // =null
+    if (keyType == EMPTY && compareType == EQ)
+      return 1;  // =empty
+    if (keyType == BOOL)
+      return 2;  // bool
+    if (keyType == NUMBER)
+      return 3;  // number
+    if (keyType == STRING)
+      return 4;  // string
+    if (keyType == EMPTY && compareType == NE)
+      return 5;  // !empty
+    if (keyType == NULL && compareType == NE)
+      return 6;  // !null
 
     return 7;  // (default)
   }
@@ -84,10 +82,10 @@ public enum OrderedConfigKeySorter implements Comparator<OrderedConfigKeySorter.
   public static final class OrderedConfigKey
   {
     private final int order;
-    private final ConfigKey configKey;
+    private final @NotNull ConfigKey configKey;
 
 
-    public OrderedConfigKey(int order, ConfigKey configKey)
+    public OrderedConfigKey(int order, @NotNull ConfigKey configKey)
     {
       this.order = order;
       this.configKey = configKey;

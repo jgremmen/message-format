@@ -147,17 +147,15 @@ public final class ParameterConfig
 
 
   @Contract(pure = true)
-  public Message.WithSpaces getMessage(@NotNull MessageAccessor messageAccessor,
-                                       Object key, @NotNull Locale locale,
-                                       @NotNull Set<ConfigKey.Type> keyTypes,
-                                       boolean includeDefault)
+  public Message.WithSpaces getMessage(@NotNull MessageAccessor messageAccessor, Object key, @NotNull Locale locale,
+                                       @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault)
   {
     ConfigValue configValue = getMessage_findMappedValue(messageAccessor, locale, key, keyTypes);
 
     if (configValue == null)
     {
       if (includeDefault && defaultValue != null &&
-          Arrays.stream(mapKeys).anyMatch(mk -> mk != null && keyTypes.contains(mk.getType())))
+          Arrays.stream(mapKeys).anyMatch(mk -> keyTypes.contains(mk.getType())))
         configValue = defaultValue;
       else
         return null;
@@ -170,9 +168,8 @@ public final class ParameterConfig
 
 
   @Contract(pure = true)
-  private ConfigValue getMessage_findMappedValue(@NotNull MessageAccessor messageAccessor,
-                                                 @NotNull Locale locale, Object value,
-                                                 @NotNull Set<ConfigKey.Type> keyTypes)
+  private ConfigValue getMessage_findMappedValue(@NotNull MessageAccessor messageAccessor, @NotNull Locale locale,
+                                                 Object value, @NotNull Set<ConfigKey.Type> keyTypes)
   {
     ConfigValue bestMatch = null;
 
@@ -200,8 +197,7 @@ public final class ParameterConfig
 
   @SuppressWarnings({"rawtypes", "unchecked"})
   private static @NotNull MatchResult findBestMatch(@NotNull ComparatorContext context,
-                                                    @NotNull ParameterFormatter[] formatters,
-                                                    Object value)
+                                                    @NotNull ParameterFormatter[] formatters, Object value)
   {
     final ConfigKey.Type keyType = context.getKeyType();
     MatchResult bestMatchResult = MISMATCH;
@@ -298,7 +294,6 @@ public final class ParameterConfig
   /**
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeSmallVar(config.size() + mapKeys.length + (defaultValue == null ? 0 : 1));
@@ -328,7 +323,6 @@ public final class ParameterConfig
   /**
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull ParameterConfig unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
@@ -343,16 +337,13 @@ public final class ParameterConfig
 
 
 
-  private final class ConfigKeyComparatorContext
-      extends AbstractParameterConfigAccessor
-      implements ComparatorContext
+  private final class ConfigKeyComparatorContext extends AbstractParameterConfigAccessor implements ComparatorContext
   {
     private final Locale locale;
     private ConfigKey configKey;
 
 
-    private ConfigKeyComparatorContext(@NotNull MessageAccessor messageAccessor,
-                                       @NotNull Locale locale)
+    private ConfigKeyComparatorContext(@NotNull MessageAccessor messageAccessor, @NotNull Locale locale)
     {
       super(messageAccessor, ParameterConfig.this);
 
