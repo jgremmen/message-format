@@ -135,7 +135,6 @@ public final class NoSpaceTextPart implements Text
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeString(text);
   }
@@ -152,7 +151,6 @@ public final class NoSpaceTextPart implements Text
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull Text unpack(@NotNull PackInputStream packStream) throws IOException
   {
     final String text = requireNonNull(packStream.readString());

@@ -19,6 +19,7 @@ import de.sayayi.lib.message.part.MessagePart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import static java.lang.Math.min;
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.copyOf;
 import static java.util.Objects.requireNonNull;
@@ -28,7 +29,6 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.6.0
  */
-@SuppressWarnings("UnstableApiUsage")
 public final class LRUMessagePartNormalizer implements MessagePartNormalizer
 {
   private final int maxSize;
@@ -72,7 +72,7 @@ public final class LRUMessagePartNormalizer implements MessagePartNormalizer
       {
         ensureSize();
 
-        arraycopy(parts, 0, parts, 1, Math.min(maxSize - 1, size));
+        arraycopy(parts, 0, parts, 1, min(maxSize - 1, size));
         cachedPart = part;
 
         if (size < maxSize)
@@ -94,8 +94,8 @@ public final class LRUMessagePartNormalizer implements MessagePartNormalizer
     if (parts == null || (parts.length == size && size < maxSize))
     {
       parts = parts == null
-          ? new MessagePart[Math.min(8, maxSize)]
-          : copyOf(parts, Math.min(Math.max(size * 2, 8), maxSize));
+          ? new MessagePart[min(8, maxSize)]
+          : copyOf(parts, min(Math.max(size * 2, 8), maxSize));
     }
   }
 }

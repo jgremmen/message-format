@@ -75,8 +75,8 @@ public final class TextMessage implements Message.WithSpaces
 
 
   @Override
-  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
-                                    @NotNull Parameters parameters) throws MessageFormatException {
+  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
+      throws MessageFormatException {
     return textPart;
   }
 
@@ -99,8 +99,7 @@ public final class TextMessage implements Message.WithSpaces
     if (message instanceof MessageDelegateWithCode)
       message = ((MessageDelegateWithCode)message).getMessage();
 
-    return !(message instanceof LocaleAware) &&
-        Arrays.equals(getMessageParts(), message.getMessageParts());
+    return !(message instanceof LocaleAware) && Arrays.equals(getMessageParts(), message.getMessageParts());
   }
 
 
@@ -142,7 +141,6 @@ public final class TextMessage implements Message.WithSpaces
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeBoolean(textPart.isSpaceBefore());
@@ -162,9 +160,7 @@ public final class TextMessage implements Message.WithSpaces
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
-  public static @NotNull Message.WithSpaces unpack(@NotNull PackInputStream packStream)
-      throws IOException
+  public static @NotNull Message.WithSpaces unpack(@NotNull PackInputStream packStream) throws IOException
   {
     final boolean spaceBefore = packStream.readBoolean();
     final boolean spaceAfter = packStream.readBoolean();

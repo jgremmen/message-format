@@ -28,7 +28,6 @@ import static de.sayayi.lib.message.part.TextPartFactory.*;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-@SuppressWarnings("UnstableApiUsage")
 public final class TextJoiner
 {
   private final StringBuilder joined = new StringBuilder();

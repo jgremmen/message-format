@@ -136,10 +136,12 @@ public final class CompoundMessage implements Message.WithSpaces
     final Set<String> templateNames = new TreeSet<>();
 
     for(final MessagePart messagePart: messageParts)
+    {
       if (messagePart instanceof TemplatePart)
         templateNames.add(((TemplatePart)messagePart).getName());
       else if (messagePart instanceof ParameterPart)
         templateNames.addAll(((ParameterPart)messagePart).getParamConfig().getTemplateNames());
+    }
 
     return unmodifiableSet(templateNames);
   }
@@ -151,8 +153,7 @@ public final class CompoundMessage implements Message.WithSpaces
     if (message instanceof MessageDelegateWithCode)
       message = ((MessageDelegateWithCode)message).getMessage();
 
-    return !(message instanceof LocaleAware) &&
-        Arrays.equals(getMessageParts(), message.getMessageParts());
+    return !(message instanceof LocaleAware) && Arrays.equals(getMessageParts(), message.getMessageParts());
   }
 
 
@@ -183,7 +184,6 @@ public final class CompoundMessage implements Message.WithSpaces
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeSmallVar(messageParts.length);
@@ -205,7 +205,6 @@ public final class CompoundMessage implements Message.WithSpaces
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull Message.WithSpaces unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
       throws IOException
   {

@@ -83,9 +83,8 @@ public interface ConfigKey
     /** String key type */
     STRING {
       @Override
-      public @NotNull <T> MatchResult compareValueToKey(
-          @NotNull ConfigKeyComparator<T> comparator, @NotNull T value,
-          @NotNull ComparatorContext context) {
+      public @NotNull <T> MatchResult compareValueToKey(@NotNull ConfigKeyComparator<T> comparator, @NotNull T value,
+                                                        @NotNull ComparatorContext context) {
         return comparator.compareToStringKey(value, context);
       }
     },
@@ -93,9 +92,8 @@ public interface ConfigKey
     /** Number key type */
     NUMBER {
       @Override
-      public @NotNull <T> MatchResult compareValueToKey(
-          @NotNull ConfigKeyComparator<T> comparator, @NotNull T value,
-          @NotNull ComparatorContext context) {
+      public @NotNull <T> MatchResult compareValueToKey(@NotNull ConfigKeyComparator<T> comparator, @NotNull T value,
+                                                        @NotNull ComparatorContext context) {
         return comparator.compareToNumberKey(value, context);
       }
     },
@@ -103,9 +101,8 @@ public interface ConfigKey
     /** Boolean key type */
     BOOL {
       @Override
-      public @NotNull <T> MatchResult compareValueToKey(
-          @NotNull ConfigKeyComparator<T> comparator, @NotNull T value,
-          @NotNull ComparatorContext context) {
+      public @NotNull <T> MatchResult compareValueToKey(@NotNull ConfigKeyComparator<T> comparator, @NotNull T value,
+                                                        @NotNull ComparatorContext context) {
         return comparator.compareToBoolKey(value, context);
       }
     },
@@ -113,8 +110,8 @@ public interface ConfigKey
     /** Null key type */
     NULL {
       @Override
-      public @NotNull <T> MatchResult compareValueToKey(
-          @NotNull ConfigKeyComparator<T> comparator, T value, @NotNull ComparatorContext context) {
+      public @NotNull <T> MatchResult compareValueToKey(@NotNull ConfigKeyComparator<T> comparator, T value,
+                                                        @NotNull ComparatorContext context) {
         return comparator.compareToNullKey(value, context);
       }
     },
@@ -122,8 +119,8 @@ public interface ConfigKey
     /** Empty key type */
     EMPTY {
       @Override
-      public @NotNull <T> MatchResult compareValueToKey(
-          @NotNull ConfigKeyComparator<T> comparator, T value, @NotNull ComparatorContext context) {
+      public @NotNull <T> MatchResult compareValueToKey(@NotNull ConfigKeyComparator<T> comparator, T value,
+                                                        @NotNull ComparatorContext context) {
         return comparator.compareToEmptyKey(value, context);
       }
     },
@@ -131,17 +128,16 @@ public interface ConfigKey
     /** Name key type */
     NAME {
       @Override
-      public @NotNull <T> MatchResult compareValueToKey(
-          @NotNull ConfigKeyComparator<T> comparator, @NotNull T value,
-          @NotNull ComparatorContext context) {
+      public @NotNull <T> MatchResult compareValueToKey(@NotNull ConfigKeyComparator<T> comparator, @NotNull T value,
+                                                        @NotNull ComparatorContext context) {
         throw new UnsupportedOperationException("compareValueToKey");
       }
     };
 
 
     @Contract(pure = true)
-    public abstract <T> @NotNull MatchResult compareValueToKey(
-        @NotNull ConfigKeyComparator<T> comparator, T value, @NotNull ComparatorContext context);
+    public abstract <T> @NotNull MatchResult compareValueToKey(@NotNull ConfigKeyComparator<T> comparator, T value,
+                                                               @NotNull ComparatorContext context);
   }
 
 

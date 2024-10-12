@@ -128,7 +128,6 @@ public interface MessageSupport
 
 
 
-  @SuppressWarnings("UnstableApiUsage")
   interface MessageConfigurer<M extends Message>
   {
     /**
@@ -498,7 +497,6 @@ public interface MessageSupport
    * Configurable extend of message support providing methods to add/import messages, set default
    * parameter configuration values and change the default locale.
    */
-  @SuppressWarnings("UnstableApiUsage")
   interface ConfigurableMessageSupport extends MessageSupport, MessagePublisher
   {
     /**
@@ -532,8 +530,8 @@ public interface MessageSupport
      * @throws DuplicateMessageException  in case a message with the same code already exists
      */
     @Contract(value = "_, _ -> this", mutates = "this")
-    default @NotNull ConfigurableMessageSupport addMessage(
-        @NotNull String code, @NotNull @Language("MessageFormat") String message) {
+    default @NotNull ConfigurableMessageSupport addMessage(@NotNull String code,
+                                                           @NotNull @Language("MessageFormat") String message) {
       return addMessage(getMessageAccessor().getMessageFactory().parseMessage(code, message));
     }
 
@@ -643,8 +641,8 @@ public interface MessageSupport
      * @return  configurable message support instance, never {@code null}
      */
     @Contract(value = "_, _ -> this", mutates = "this")
-    @NotNull ConfigurableMessageSupport setDefaultParameterConfig(
-        @NotNull String name, @NotNull Message.WithSpaces value);
+    @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
+                                                                  @NotNull Message.WithSpaces value);
 
 
     /**
@@ -886,7 +884,6 @@ public interface MessageSupport
    * @author Jeroen Gremmen
    * @since 0.8.0
    */
-  @SuppressWarnings("UnstableApiUsage")
   interface MessagePublisher
   {
     /**

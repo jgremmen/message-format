@@ -181,7 +181,6 @@ public final class TextPart implements Text
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeBoolean(spaceBefore);
@@ -201,7 +200,6 @@ public final class TextPart implements Text
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull Text unpack(@NotNull PackInputStream packStream) throws IOException
   {
     final boolean spaceBefore = packStream.readBoolean();

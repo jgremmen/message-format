@@ -96,7 +96,6 @@ public final class ConfigKeyNull implements ConfigKey
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeEnum(compareType);
   }
@@ -113,7 +112,6 @@ public final class ConfigKeyNull implements ConfigKey
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull ConfigKeyNull unpack(@NotNull PackInputStream packStream) throws IOException {
     return new ConfigKeyNull(packStream.readEnum(CompareType.class));
   }

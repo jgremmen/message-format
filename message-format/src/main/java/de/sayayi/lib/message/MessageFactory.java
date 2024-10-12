@@ -256,10 +256,9 @@ public class MessageFactory
         ((hashBytes[2] & 0xffL) << 24) |
         ((hashBytes[3] & 0xffL) << 16) |
         ((hashBytes[4] & 0xffL) << 8) |
-        (hashBytes[5] & 0xffL), 36);
+         (hashBytes[5] & 0xffL), 36);
 
-    return (prefix + '[' + hash + '-' + Integer.toString(++CODE_ID | 0x20000, 36) + ']')
-        .toUpperCase(ROOT);
+    return (prefix + '[' + hash + '-' + Integer.toString(++CODE_ID | 0x20000, 36) + ']').toUpperCase(ROOT);
   }
 
 

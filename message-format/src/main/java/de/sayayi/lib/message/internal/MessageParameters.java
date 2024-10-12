@@ -100,8 +100,7 @@ final class MessageParameters implements Parameters
   @Override
   public String toString()
   {
-    final StringBuilder s = new StringBuilder("Parameters(locale='")
-        .append(locale).append("',{");
+    final StringBuilder s = new StringBuilder("Parameters(locale='").append(locale).append("',{");
 
     for(int n = 0, l = parameters.length; n < l; n += 2)
     {
@@ -132,10 +131,8 @@ final class MessageParameters implements Parameters
 
 
     @Override
-    public void clear()
-    {
-      if (parameters.length > 0)
-        throw new UnsupportedOperationException("clear");
+    public void clear() {
+      throw new UnsupportedOperationException("clear");
     }
 
 

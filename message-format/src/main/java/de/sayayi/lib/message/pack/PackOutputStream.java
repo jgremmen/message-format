@@ -181,10 +181,7 @@ public final class PackOutputStream implements Closeable
   public void writeSmall(int value, int bitWidth) throws IOException
   {
     if (value >= (1 << bitWidth))
-    {
-      throw new IllegalArgumentException("value " + value + " occupies more than " +
-          bitWidth + " bits");
-    }
+      throw new IllegalArgumentException("value " + value + " occupies more than " + bitWidth + " bits");
 
     final int bitsRemaining = bit + 1 - bitWidth;
 

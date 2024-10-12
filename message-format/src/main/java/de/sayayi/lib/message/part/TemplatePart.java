@@ -189,7 +189,6 @@ public final class TemplatePart implements Template
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeBoolean(spaceBefore);
@@ -224,7 +223,6 @@ public final class TemplatePart implements Template
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull Template unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
@@ -250,8 +248,7 @@ public final class TemplatePart implements Template
     final boolean spaceBefore = packStream.readBoolean();
     final boolean spaceAfter = packStream.readBoolean();
 
-    return new TemplatePart(requireNonNull(packStream.readString()),
-        spaceBefore, spaceAfter, emptyMap(), emptyMap());
+    return new TemplatePart(requireNonNull(packStream.readString()), spaceBefore, spaceAfter, emptyMap(), emptyMap());
   }
 
 

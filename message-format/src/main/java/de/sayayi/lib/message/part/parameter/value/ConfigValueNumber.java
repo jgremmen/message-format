@@ -119,7 +119,6 @@ public final class ConfigValueNumber implements ConfigValue
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeLong(number);
   }
@@ -136,7 +135,6 @@ public final class ConfigValueNumber implements ConfigValue
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull ConfigValueNumber unpack(@NotNull PackInputStream packStream) throws IOException {
     return new ConfigValueNumber(packStream.readLong());
   }

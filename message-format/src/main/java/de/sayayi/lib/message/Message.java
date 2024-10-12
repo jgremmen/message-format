@@ -209,8 +209,7 @@ public interface Message
      */
     @Contract(pure = true)
     @Override
-    @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
-                               @NotNull Parameters parameters);
+    @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters);
 
 
     /**

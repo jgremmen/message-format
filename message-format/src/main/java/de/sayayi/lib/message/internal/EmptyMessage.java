@@ -47,15 +47,15 @@ public final class EmptyMessage implements Message.WithSpaces
 
 
   @Override
-  public @NotNull String format(@NotNull MessageAccessor messageAccessor,
-                                @NotNull Parameters parameters) throws MessageFormatException {
+  public @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
+      throws MessageFormatException {
     return "";
   }
 
 
   @Override
-  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
-                                    @NotNull Parameters parameters) throws MessageFormatException {
+  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
+      throws MessageFormatException {
     return EMPTY;
   }
 
@@ -111,8 +111,7 @@ public final class EmptyMessage implements Message.WithSpaces
     if (message instanceof MessageDelegateWithCode)
       message = ((MessageDelegateWithCode)message).getMessage();
 
-    return !(message instanceof LocaleAware) &&
-        Arrays.equals(getMessageParts(), message.getMessageParts());
+    return !(message instanceof LocaleAware) && Arrays.equals(getMessageParts(), message.getMessageParts());
   }
 
 

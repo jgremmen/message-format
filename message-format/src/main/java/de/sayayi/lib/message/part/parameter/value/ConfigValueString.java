@@ -120,7 +120,6 @@ public final class ConfigValueString implements ConfigValue
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeString(string);
   }
@@ -137,7 +136,6 @@ public final class ConfigValueString implements ConfigValue
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull ConfigValueString unpack(@NotNull PackInputStream packStream) throws IOException {
     return new ConfigValueString(requireNonNull(packStream.readString()));
   }

@@ -170,8 +170,7 @@ public final class PackInputStream implements Closeable
           if ((char2 & 0b1100_0000) != 0b1000_0000 || (char3 & 0b1100_0000) != 0b1000_0000)
             throw new UTFDataFormatException("malformed input around byte " + (count - 1));
 
-          chars[charIdx++] = (char)(((c & 0b0000_1111) << 12) |
-              ((char2 & 0b0011_1111) << 6) | (char3 & 0b0011_1111));
+          chars[charIdx++] = (char)(((c & 0b0000_1111) << 12) | ((char2 & 0b0011_1111) << 6) | (char3 & 0b0011_1111));
           break;
         }
 

@@ -48,9 +48,8 @@ public final class ParameterFormatterContext extends AbstractParameterConfigAcce
   private int parameterFormatterIndex = 0;
 
 
-  public ParameterFormatterContext(@NotNull MessageAccessor messageAccessor,
-                                   @NotNull Parameters parameters, Object value, Class<?> type,
-                                   String format, @NotNull ParameterConfig parameterConfig)
+  public ParameterFormatterContext(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters,
+                                   Object value, Class<?> type, String format, @NotNull ParameterConfig parameterConfig)
   {
     super(messageAccessor, parameterConfig);
 
@@ -97,10 +96,8 @@ public final class ParameterFormatterContext extends AbstractParameterConfigAcce
 
   @Override
   public @NotNull Optional<Message.WithSpaces> getConfigMapMessage(
-      Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault)
-  {
-    return ofNullable(parameterConfig
-        .getMessage(messageAccessor, key, getLocale(), keyTypes, includeDefault));
+      Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault) {
+    return ofNullable(parameterConfig.getMessage(messageAccessor, key, getLocale(), keyTypes, includeDefault));
   }
 
 

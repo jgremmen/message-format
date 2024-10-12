@@ -145,8 +145,7 @@ public final class ParameterPart implements Parameter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text getText(@NotNull MessageAccessor messageAccessor,
-                               @NotNull Parameters parameters)
+  public @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
   {
     final FormatterContext context = new ParameterFormatterContext(messageAccessor, parameters,
         parameters.getParameterValue(name), null, format, paramConfig);
@@ -209,7 +208,6 @@ public final class ParameterPart implements Parameter
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeBoolean(spaceBefore);
@@ -233,7 +231,6 @@ public final class ParameterPart implements Parameter
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull ParameterPart unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
@@ -242,7 +239,6 @@ public final class ParameterPart implements Parameter
     final String format = packStream.readString();
     final String name = requireNonNull(packStream.readString());
 
-    return new ParameterPart(name, format, spaceBefore, spaceAfter,
-        ParameterConfig.unpack(unpack, packStream));
+    return new ParameterPart(name, format, spaceBefore, spaceAfter, ParameterConfig.unpack(unpack, packStream));
   }
 }

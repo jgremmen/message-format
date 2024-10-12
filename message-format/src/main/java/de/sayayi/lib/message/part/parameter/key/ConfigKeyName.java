@@ -96,7 +96,6 @@ public final class ConfigKeyName implements ConfigKey
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeString(name);
   }
@@ -113,7 +112,6 @@ public final class ConfigKeyName implements ConfigKey
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull ConfigKeyName unpack(@NotNull PackInputStream packStream) throws IOException {
     return new ConfigKeyName(requireNonNull(packStream.readString()));
   }

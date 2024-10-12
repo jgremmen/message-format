@@ -84,8 +84,7 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
     if (message instanceof MessageDelegateWithCode)
       message = ((MessageDelegateWithCode)message).getMessage();
 
-    return !(message instanceof LocaleAware) &&
-        Arrays.equals(getMessageParts(), message.getMessageParts());
+    return !(message instanceof LocaleAware) && Arrays.equals(getMessageParts(), message.getMessageParts());
   }
 
 
@@ -110,7 +109,6 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeString(getCode());
   }
@@ -127,7 +125,6 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
    *
    * @hidden
    */
-  @SuppressWarnings("JavadocDeclaration")
   public static @NotNull Message.WithCode unpack(@NotNull PackInputStream packStream) throws IOException {
     return new EmptyMessageWithCode(requireNonNull(packStream.readString()));
   }
