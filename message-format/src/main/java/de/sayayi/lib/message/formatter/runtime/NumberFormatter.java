@@ -127,8 +127,7 @@ public final class NumberFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull Number value,
-                                               @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToBoolKey(@NotNull Number value, @NotNull ComparatorContext context)
   {
     final boolean bool;
 
@@ -142,14 +141,12 @@ public final class NumberFormatter
     else
       bool = signum(value.doubleValue()) != 0;
 
-    return context.getCompareType()
-        .match(bool == context.getBoolKeyValue() ? 0 : 1) ? LENIENT : MISMATCH;
+    return context.getCompareType().match(bool == context.getBoolKeyValue() ? 0 : 1) ? LENIENT : MISMATCH;
   }
 
 
   @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull Number number,
-                                                 @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToNumberKey(@NotNull Number number, @NotNull ComparatorContext context)
   {
     final long numberKeyValue = context.getNumberKeyValue();
     final CompareType compareType = context.getCompareType();
@@ -159,24 +156,17 @@ public final class NumberFormatter
       return compareType.match(Long.compare(number.longValue(), numberKeyValue)) ? EXACT : MISMATCH;
 
     if (number instanceof BigInteger)
-    {
-      return compareType.match(((BigInteger)number).compareTo(BigInteger.valueOf(numberKeyValue)))
-          ? EXACT : MISMATCH;
-    }
+      return compareType.match(((BigInteger)number).compareTo(BigInteger.valueOf(numberKeyValue))) ? EXACT : MISMATCH;
 
     if (number instanceof BigDecimal)
-    {
-      return compareType.match(((BigDecimal)number).compareTo(BigDecimal.valueOf(numberKeyValue)))
-          ? EXACT : MISMATCH;
-    }
+      return compareType.match(((BigDecimal)number).compareTo(BigDecimal.valueOf(numberKeyValue))) ? EXACT : MISMATCH;
 
     return compareType.match(Double.compare(number.doubleValue(), numberKeyValue)) ? EXACT : MISMATCH;
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull Number value,
-                                                 @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToStringKey(@NotNull Number value, @NotNull ComparatorContext context)
   {
     if (value instanceof Byte || value instanceof Short ||
         value instanceof Integer || value instanceof Long)
@@ -201,8 +191,7 @@ public final class NumberFormatter
     if (value instanceof BigDecimal)
     {
       try {
-        return compareType.match(((BigDecimal)value).compareTo(new BigDecimal(string)))
-            ? EQUIVALENT : MISMATCH;
+        return compareType.match(((BigDecimal)value).compareTo(new BigDecimal(string))) ? EQUIVALENT : MISMATCH;
       } catch(NumberFormatException ignored) {
       }
     }

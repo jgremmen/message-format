@@ -50,8 +50,7 @@ public class PropertiesAdopter extends AbstractMessageAdopter
    * @param messageFactory  message factory, not {@code null}
    * @param publisher       message publisher, not {@code null}
    */
-  public PropertiesAdopter(@NotNull MessageFactory messageFactory,
-                           @NotNull MessagePublisher publisher) {
+  public PropertiesAdopter(@NotNull MessageFactory messageFactory, @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);
   }
 
@@ -65,10 +64,8 @@ public class PropertiesAdopter extends AbstractMessageAdopter
    * @param properties  message properties, not {@code null}
    */
   @Contract(pure = true)
-  public void adopt(@NotNull Properties properties)
-  {
-    properties.forEach((k,v) -> messagePublisher.addMessage(
-        messageFactory.parseMessage(k.toString(), v.toString())));
+  public void adopt(@NotNull Properties properties) {
+    properties.forEach((k,v) -> messagePublisher.addMessage(messageFactory.parseMessage(k.toString(), v.toString())));
   }
 
 

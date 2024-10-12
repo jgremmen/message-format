@@ -35,8 +35,7 @@ import static java.lang.Math.round;
 /**
  * @author Jeroen Gremmen
  */
-public final class GeoFormatter extends AbstractParameterFormatter<Number>
-    implements NamedParameterFormatter
+public final class GeoFormatter extends AbstractParameterFormatter<Number> implements NamedParameterFormatter
 {
   private static final Map<String,Format> FORMAT = new HashMap<>();
 
@@ -171,13 +170,12 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number>
 
 
   @Contract(pure = true)
-  private @NotNull String formatMinOrSec(@NotNull Locale locale, double d, int digits,
-                                         boolean zeropad)
+  private @NotNull String formatMinOrSec(@NotNull Locale locale, double d, int digits, boolean zeroPadding)
   {
     //noinspection MalformedFormatString
     String s = String.format(locale, "%." + digits + 'f', d);
 
-    if (zeropad && d < 10.0)
+    if (zeroPadding && d < 10.0)
       s = "0" + s;
 
     return s;

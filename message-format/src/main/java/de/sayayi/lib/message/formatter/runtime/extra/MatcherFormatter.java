@@ -38,8 +38,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 public final class MatcherFormatter extends AbstractSingleTypeParameterFormatter<Matcher>
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context,
-                                      @NotNull Matcher matcher)
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Matcher matcher)
   {
     if (matcher.matches())
     {

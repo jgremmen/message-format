@@ -38,8 +38,7 @@ public final class PrincipalFormatter
     implements ConfigKeyComparator<Principal>
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context,
-                                      @NotNull Principal principal) {
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Principal principal) {
     return context.format(principal.getName(), String.class, true);
   }
 
@@ -51,8 +50,7 @@ public final class PrincipalFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull Principal value,
-                                                 @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToStringKey(@NotNull Principal value, @NotNull ComparatorContext context)
   {
     return context.getCompareType().match(value.getName().compareTo(context.getStringKeyValue()))
         ? EQUIVALENT : MISMATCH;

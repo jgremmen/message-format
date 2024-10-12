@@ -41,8 +41,7 @@ public final class CollationKeyFormatter extends AbstractSingleTypeParameterForm
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context,
-                                   @NotNull CollationKey collationKey) {
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull CollationKey collationKey) {
     return noSpaceText(collationKey.getSourceString());
   }
 
@@ -60,10 +59,7 @@ public final class CollationKeyFormatter extends AbstractSingleTypeParameterForm
 
 
   @Override
-  public @NotNull MatchResult compareToEmptyKey(CollationKey value,
-                                                @NotNull ComparatorContext context)
-  {
-    return forEmptyKey(context.getCompareType(),
-        value == null || value.getSourceString().isEmpty());
+  public @NotNull MatchResult compareToEmptyKey(CollationKey value, @NotNull ComparatorContext context) {
+    return forEmptyKey(context.getCompareType(), value == null || value.getSourceString().isEmpty());
   }
 }

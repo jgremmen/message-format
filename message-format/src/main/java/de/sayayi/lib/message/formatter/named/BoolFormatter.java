@@ -180,10 +180,7 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull Object value,
-                                               @NotNull ComparatorContext context)
-  {
-    return context.getCompareType()
-        .match((Boolean)value == context.getBoolKeyValue() ? 0 : 1) ? EXACT : MISMATCH;
+  public @NotNull MatchResult compareToBoolKey(@NotNull Object value, @NotNull ComparatorContext context) {
+    return context.getCompareType().match((Boolean)value == context.getBoolKeyValue() ? 0 : 1) ? EXACT : MISMATCH;
   }
 }

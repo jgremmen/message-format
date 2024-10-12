@@ -36,8 +36,7 @@ public final class IntSupplierFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context,
-                                   @NotNull IntSupplier intSupplier) {
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull IntSupplier intSupplier) {
     return context.format(intSupplier.getAsInt(), int.class, true);
   }
 
@@ -49,22 +48,19 @@ public final class IntSupplierFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull IntSupplier value,
-                                               @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToBoolKey(@NotNull IntSupplier value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.getAsInt(), int.class);
   }
 
 
   @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull IntSupplier value,
-                                                 @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToNumberKey(@NotNull IntSupplier value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.getAsInt(), int.class);
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull IntSupplier value,
-                                                 @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToStringKey(@NotNull IntSupplier value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.getAsInt(), int.class);
   }
 }

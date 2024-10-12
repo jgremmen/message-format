@@ -50,8 +50,7 @@ public final class EnumFormatter
       case "name": {
         final String name = value.name();
 
-        return formatUsingMappedString(context, name, true)
-            .orElseGet(() -> noSpaceText(name));
+        return formatUsingMappedString(context, name, true).orElseGet(() -> noSpaceText(name));
       }
     }
 
@@ -66,8 +65,7 @@ public final class EnumFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull Enum<?> value,
-                                                 @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToNumberKey(@NotNull Enum<?> value, @NotNull ComparatorContext context)
   {
     return context.getCompareType()
         .match(Long.compare(value.ordinal(), context.getNumberKeyValue())) ? LENIENT : MISMATCH;
@@ -75,10 +73,7 @@ public final class EnumFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull Enum<?> value,
-                                                 @NotNull ComparatorContext context)
-  {
-    return context.getCompareType()
-        .match(value.name().compareTo(context.getStringKeyValue())) ? EXACT : MISMATCH;
+  public @NotNull MatchResult compareToStringKey(@NotNull Enum<?> value, @NotNull ComparatorContext context) {
+    return context.getCompareType().match(value.name().compareTo(context.getStringKeyValue())) ? EXACT : MISMATCH;
   }
 }

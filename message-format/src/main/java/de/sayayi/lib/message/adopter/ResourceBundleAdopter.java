@@ -50,8 +50,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    * @param messageFactory  message factory, not {@code null}
    * @param publisher       message publisher, not {@code null}
    */
-  public ResourceBundleAdopter(@NotNull MessageFactory messageFactory,
-                               @NotNull MessagePublisher publisher) {
+  public ResourceBundleAdopter(@NotNull MessageFactory messageFactory, @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);
   }
 
@@ -108,8 +107,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
 
   @Contract(pure = true)
-  public void adopt(@NotNull String bundleBaseName, @NotNull Set<Locale> locales,
-                    @NotNull ClassLoader classLoader) {
+  public void adopt(@NotNull String bundleBaseName, @NotNull Set<Locale> locales, @NotNull ClassLoader classLoader) {
     adopt(bundleBaseName, locales.toArray(Locale[]::new), classLoader, true);
   }
 

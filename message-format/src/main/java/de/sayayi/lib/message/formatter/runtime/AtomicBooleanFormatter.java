@@ -34,8 +34,7 @@ public final class AtomicBooleanFormatter
     implements ConfigKeyComparator<AtomicBoolean>
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context,
-                                   @NotNull AtomicBoolean atomicBoolean) {
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull AtomicBoolean atomicBoolean) {
     return context.format(atomicBoolean.get(), boolean.class, true);
   }
 
@@ -47,15 +46,13 @@ public final class AtomicBooleanFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull AtomicBoolean value,
-                                               @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToBoolKey(@NotNull AtomicBoolean value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.get(), boolean.class);
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull AtomicBoolean value,
-                                                 @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToStringKey(@NotNull AtomicBoolean value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.get(), boolean.class);
   }
 }

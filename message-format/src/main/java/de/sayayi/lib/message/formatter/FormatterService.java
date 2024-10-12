@@ -51,7 +51,6 @@ public interface FormatterService
   /**
    * Add registry functionality to a formatter service.
    */
-  @SuppressWarnings("UnstableApiUsage")
   interface WithRegistry extends FormatterService
   {
     /**

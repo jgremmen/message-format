@@ -35,10 +35,8 @@ import static java.util.stream.Collectors.joining;
 public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Type>
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Type type)
-  {
-    return noSpaceText(
-        toString(type, context.getConfigValueString("type").orElse("ju")));
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Type type) {
+    return noSpaceText(toString(type, context.getConfigValueString("type").orElse("ju")));
   }
 
 
@@ -127,8 +125,7 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
   }
 
 
-  private static String toString_typeVariable(@NotNull TypeVariable<?> typeVariable,
-                                              @NotNull String typeFormat)
+  private static String toString_typeVariable(@NotNull TypeVariable<?> typeVariable, @NotNull String typeFormat)
   {
     if (typeFormat.indexOf('v') < 0)
       return typeVariable.getName();
@@ -150,8 +147,7 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
   }
 
 
-  private static String toString_wildcard(@NotNull WildcardType wildcardType,
-                                          @NotNull String typeFormat)
+  private static String toString_wildcard(@NotNull WildcardType wildcardType, @NotNull String typeFormat)
   {
     final StringBuilder formattedWildcardType = new StringBuilder();
     final Type[] lowerBounds = wildcardType.getLowerBounds();

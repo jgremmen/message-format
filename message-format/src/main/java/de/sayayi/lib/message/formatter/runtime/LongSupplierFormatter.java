@@ -36,8 +36,7 @@ public final class LongSupplierFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context,
-                                   @NotNull LongSupplier longSupplier) {
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull LongSupplier longSupplier) {
     return context.format(longSupplier.getAsLong(), long.class, true);
   }
 
@@ -49,22 +48,19 @@ public final class LongSupplierFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull LongSupplier value,
-                                               @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToBoolKey(@NotNull LongSupplier value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.getAsLong(), long.class);
   }
 
 
   @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull LongSupplier value,
-                                                 @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToNumberKey(@NotNull LongSupplier value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.getAsLong(), long.class);
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull LongSupplier value,
-                                                 @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToStringKey(@NotNull LongSupplier value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.getAsLong(), long.class);
   }
 }

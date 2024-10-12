@@ -67,8 +67,7 @@ public final class MethodParameterFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull Parameter value,
-                                                 @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToStringKey(@NotNull Parameter value, @NotNull ComparatorContext context)
   {
     return context
         .getCompareType()

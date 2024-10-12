@@ -100,8 +100,7 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
 
 
   @Contract(pure = true)
-  private static @NotNull OptionalInt determineElementIndex(@NotNull Node node,
-                                                            @NotNull String name)
+  private static @NotNull OptionalInt determineElementIndex(@NotNull Node node, @NotNull String name)
   {
     int index = 1;
 
@@ -131,7 +130,7 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
 
 
 
-  @SuppressWarnings({"UnusedReturnValue", "UnstableApiUsage"})
+  @SuppressWarnings("UnusedReturnValue")
   private static final class XPathBuilder
   {
     private char[] xpath = new char[64];

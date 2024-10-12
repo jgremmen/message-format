@@ -26,8 +26,7 @@ import java.util.Set;
  * @since 0.8.0
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class AbstractSingleTypeParameterFormatter<T>
-    extends AbstractParameterFormatter<T>
+public abstract class AbstractSingleTypeParameterFormatter<T> extends AbstractParameterFormatter<T>
 {
   @Override
   public final @NotNull Set<FormattableType> getFormattableTypes() {

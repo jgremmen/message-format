@@ -57,8 +57,7 @@ public final class IterableFormatter
   @Override
   @Contract(pure = true)
   @SuppressWarnings("DuplicatedCode")
-  public @NotNull Text formatValue(@NotNull FormatterContext context,
-                                   @NotNull Iterable<?> iterable)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Iterable<?> iterable)
   {
     final Text separator = spacedText(context
         .getConfigValueString("list-sep")
@@ -108,8 +107,7 @@ public final class IterableFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToEmptyKey(Iterable<?> value,
-                                                @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToEmptyKey(Iterable<?> value, @NotNull ComparatorContext context)
   {
     return forEmptyKey(context.getCompareType(),
         value instanceof Collection

@@ -72,8 +72,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
    *
    * @param configurableMessageSupport  configurable message support, not {@code null}
    */
-  public SpringAsmAnnotationAdopter(
-      @NotNull ConfigurableMessageSupport configurableMessageSupport) {
+  public SpringAsmAnnotationAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {
     super(configurableMessageSupport);
   }
 
@@ -84,8 +83,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
    * @param messageFactory  message factory, not {@code null}
    * @param publisher       message publisher, not {@code null}
    */
-  public SpringAsmAnnotationAdopter(@NotNull MessageFactory messageFactory,
-                                    @NotNull MessagePublisher publisher) {
+  public SpringAsmAnnotationAdopter(@NotNull MessageFactory messageFactory, @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);
   }
 
@@ -99,10 +97,8 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
    * @return  this annotation adopter, never {@code null}
    */
   public @NotNull SpringAsmAnnotationAdopter adopt(@NotNull ResourceLoader resourceLoader,
-                                                   @NotNull Set<String> packageNames)
-  {
-    return (SpringAsmAnnotationAdopter)
-        adopt(requireNonNull(resourceLoader.getClassLoader()), packageNames);
+                                                   @NotNull Set<String> packageNames) {
+    return (SpringAsmAnnotationAdopter)adopt(requireNonNull(resourceLoader.getClassLoader()), packageNames);
   }
 
 
@@ -185,10 +181,8 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
     {
       return new AnnotationVisitor(ASM_VERSION) {
         @Override
-        public AnnotationVisitor visitAnnotation(String name, String descriptor)
-        {
-          return MESSAGE_DEF_DESCRIPTOR.equals(descriptor)
-              ? new MessageDefAnnotationVisitor() : null;
+        public AnnotationVisitor visitAnnotation(String name, String descriptor) {
+          return MESSAGE_DEF_DESCRIPTOR.equals(descriptor) ? new MessageDefAnnotationVisitor() : null;
         }
       };
     }
@@ -252,10 +246,8 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
     {
       return new AnnotationVisitor(ASM_VERSION) {
         @Override
-        public AnnotationVisitor visitAnnotation(String name, String descriptor)
-        {
-          return TEMPLATE_DEF_DESCRIPTOR.equals(descriptor)
-              ? new TemplateDefAnnotationVisitor() : null;
+        public AnnotationVisitor visitAnnotation(String name, String descriptor) {
+          return TEMPLATE_DEF_DESCRIPTOR.equals(descriptor) ? new TemplateDefAnnotationVisitor() : null;
         }
       };
     }

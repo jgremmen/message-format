@@ -71,8 +71,7 @@ public class MessageFormatException extends MessageException
    * @param parameter  message parameter name
    * @param cause      cause
    */
-  protected MessageFormatException(String code, String template, Locale locale, String parameter,
-                                   Throwable cause)
+  protected MessageFormatException(String code, String template, Locale locale, String parameter, Throwable cause)
   {
     super(cause);
 

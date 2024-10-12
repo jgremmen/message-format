@@ -63,8 +63,7 @@ public class MessageParserException extends MessageException
    *
    * @since 0.9.1
    */
-  public MessageParserException(@NotNull String errorMessage, @NotNull String syntaxError,
-                                Exception cause) {
+  public MessageParserException(@NotNull String errorMessage, @NotNull String syntaxError, Exception cause) {
     this(null, errorMessage, syntaxError, null, null, null, cause);
   }
 
@@ -82,9 +81,8 @@ public class MessageParserException extends MessageException
    *
    * @since 0.9.1
    */
-  public MessageParserException(Type type, @NotNull String errorMessage,
-                                @NotNull String syntaxError, String code, String template,
-                                Locale locale, Exception cause)
+  public MessageParserException(Type type, @NotNull String errorMessage, @NotNull String syntaxError,
+                                String code, String template, Locale locale, Exception cause)
   {
     super(cause);
 
@@ -278,10 +276,8 @@ public class MessageParserException extends MessageException
    * @since 0.9.1
    */
   @Contract("_ -> new")
-  public @NotNull MessageParserException withLocale(@NotNull Locale locale)
-  {
-    return new MessageParserException(type, errorMessage, syntaxError, code, template, locale,
-        (Exception)getCause());
+  public @NotNull MessageParserException withLocale(@NotNull Locale locale) {
+    return new MessageParserException(type, errorMessage, syntaxError, code, template, locale, (Exception)getCause());
   }
 
 

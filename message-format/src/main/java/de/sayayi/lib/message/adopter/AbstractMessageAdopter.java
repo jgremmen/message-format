@@ -46,10 +46,8 @@ public abstract class AbstractMessageAdopter
    *
    * @param configurableMessageSupport  configurable message support, not {@code null}
    */
-  protected AbstractMessageAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport)
-  {
-    this(configurableMessageSupport.getMessageAccessor().getMessageFactory(),
-        configurableMessageSupport);
+  protected AbstractMessageAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {
+    this(configurableMessageSupport.getMessageAccessor().getMessageFactory(), configurableMessageSupport);
   }
 
 
@@ -59,8 +57,7 @@ public abstract class AbstractMessageAdopter
    * @param messageFactory  message factory, not {@code null}
    * @param publisher       message publisher, not {@code null}
    */
-  protected AbstractMessageAdopter(@NotNull MessageFactory messageFactory,
-                                   @NotNull MessagePublisher publisher)
+  protected AbstractMessageAdopter(@NotNull MessageFactory messageFactory, @NotNull MessagePublisher publisher)
   {
     this.messageFactory = requireNonNull(messageFactory, "messageFactory must not be null");
     this.messagePublisher = requireNonNull(publisher, "publisher must not be null");

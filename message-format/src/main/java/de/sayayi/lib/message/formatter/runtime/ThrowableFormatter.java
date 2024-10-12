@@ -28,8 +28,7 @@ import org.jetbrains.annotations.NotNull;
 public final class ThrowableFormatter extends AbstractSingleTypeParameterFormatter<Throwable>
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context,
-                                      @NotNull Throwable throwable) {
+  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Throwable throwable) {
     return context.format(throwable.getLocalizedMessage(), String.class, true);
   }
 

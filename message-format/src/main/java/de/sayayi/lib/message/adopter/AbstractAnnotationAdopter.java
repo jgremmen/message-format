@@ -78,8 +78,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    *
    * @param configurableMessageSupport  configurable message support, not {@code null}
    */
-  protected AbstractAnnotationAdopter(
-      @NotNull ConfigurableMessageSupport configurableMessageSupport) {
+  protected AbstractAnnotationAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {
     super(configurableMessageSupport);
   }
 
@@ -90,8 +89,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * @param messageFactory  message factory, not {@code null}
    * @param publisher       message publisher, not {@code null}
    */
-  protected AbstractAnnotationAdopter(@NotNull MessageFactory messageFactory,
-                                      @NotNull MessagePublisher publisher) {
+  protected AbstractAnnotationAdopter(@NotNull MessageFactory messageFactory, @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);
   }
 
@@ -106,8 +104,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    *
    * @throws MessageParserException  in case the template could not be parsed
    */
-  public @NotNull AbstractAnnotationAdopter adopt(@NotNull ClassLoader classLoader,
-                                                  @NotNull Set<String> packageNames)
+  public @NotNull AbstractAnnotationAdopter adopt(@NotNull ClassLoader classLoader, @NotNull Set<String> packageNames)
   {
     try {
       for(String packageName: packageNames)
@@ -120,15 +117,13 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   }
 
 
-  private void adopt_scan(@NotNull ClassLoader classLoader, @NotNull String packageName)
-      throws Exception
+  private void adopt_scan(@NotNull ClassLoader classLoader, @NotNull String packageName) throws Exception
   {
     String classPathPrefix = packageName.replace('.', '/');
     if (!classPathPrefix.endsWith("/"))
       classPathPrefix = classPathPrefix + '/';
 
-    for(final Enumeration<URL> urls = classLoader.getResources(classPathPrefix);
-        urls.hasMoreElements();)
+    for(final Enumeration<URL> urls = classLoader.getResources(classPathPrefix); urls.hasMoreElements();)
     {
       final URL url = urls.nextElement();
 
@@ -147,8 +142,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   }
 
 
-  private void adopt_scan_directory(@NotNull File baseDirectory, @NotNull File directory)
-      throws IOException
+  private void adopt_scan_directory(@NotNull File baseDirectory, @NotNull File directory) throws IOException
   {
     final File[] files = directory.listFiles();
     if (files != null)
@@ -174,8 +168,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   }
 
 
-  private void adopt_scan_zipEntries(@NotNull URL zipUrl, @NotNull String classPathPrefix)
-      throws IOException
+  private void adopt_scan_zipEntries(@NotNull URL zipUrl, @NotNull String classPathPrefix) throws IOException
   {
     final URLConnection con = zipUrl.openConnection();
     final ZipFile zipFile;
@@ -218,14 +211,12 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   }
 
 
-  private @NotNull ZipFile adopt_scan_createZipFileFromUrl(@NotNull String zipFileUrl)
-      throws IOException
+  private @NotNull ZipFile adopt_scan_createZipFileFromUrl(@NotNull String zipFileUrl) throws IOException
   {
     if (zipFileUrl.startsWith("file:"))
     {
       try {
-        return new JarFile(
-            new URI(zipFileUrl.replace(" ", "%20")).getSchemeSpecificPart());
+        return new JarFile(new URI(zipFileUrl.replace(" ", "%20")).getSchemeSpecificPart());
       } catch(URISyntaxException ex) {
         return new JarFile(zipFileUrl.substring(5));
       }
@@ -259,8 +250,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
         parseClass(inputStream);
         indexedClasses.add(classPath.toString());
       } catch(Exception ex) {
-        throw new MessageAdopterException(
-            "failed to adopt messages and templates from class file " + classFile, ex);
+        throw new MessageAdopterException("failed to adopt messages and templates from class file " + classFile, ex);
       }
     }
 
@@ -293,8 +283,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
           parseClass(requireNonNull(inputStream));
           indexedClasses.add(typeName);
         } catch(Exception ex) {
-          throw new MessageAdopterException(
-              "failed to adopt messages and templates from type " + typeName, ex);
+          throw new MessageAdopterException("failed to adopt messages and templates from type " + typeName, ex);
         }
       }
     }
@@ -340,8 +329,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
             return value;
 
           // if message text differs from previous definition -> throw
-          throw new DuplicateMessageException(code,
-              "different message definition for same locale '" + locale + "'");
+          throw new DuplicateMessageException(code, "different message definition for same locale '" + locale + "'");
         });
       }
 
@@ -382,16 +370,14 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
       for(final Text text: texts)
       {
-        final String value = text.locale().isEmpty() &&
-            text.text().isEmpty() ? text.value() : text.text();
+        final String value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
 
         localizedTexts.compute(forLanguageTag(text.locale()), (locale, mappedValue) -> {
           if (mappedValue == null || mappedValue.equals(value))
             return value;
 
           // if template text differs from previous definition -> throw
-          throw new DuplicateTemplateException(name,
-              "different template definition for same locale '" + locale + "'");
+          throw new DuplicateTemplateException(name, "different template definition for same locale '" + locale + "'");
         });
       }
 

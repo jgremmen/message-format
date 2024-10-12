@@ -39,8 +39,7 @@ public final class ReferenceFormatter
     implements SizeQueryable, ConfigKeyComparator<Reference<?>>
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context,
-                                   @NotNull Reference<?> reference) {
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Reference<?> reference) {
     return context.format(reference.get(), true);
   }
 
@@ -58,8 +57,7 @@ public final class ReferenceFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToNullKey(Reference<?> value,
-                                               @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToNullKey(Reference<?> value, @NotNull ComparatorContext context)
   {
     return value == null || value.get() == null
         ? forNullKey(context.getCompareType(), true)
@@ -68,8 +66,7 @@ public final class ReferenceFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToEmptyKey(Reference<?> value,
-                                                @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToEmptyKey(Reference<?> value, @NotNull ComparatorContext context)
   {
     return value == null || value.get() == null
         ? forEmptyKey(context.getCompareType(), true)
@@ -78,22 +75,19 @@ public final class ReferenceFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull Reference<?> value,
-                                               @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToBoolKey(@NotNull Reference<?> value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.get());
   }
 
 
   @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull Reference<?> value,
-                                                 @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToNumberKey(@NotNull Reference<?> value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.get());
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull Reference<?> value,
-                                                 @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToStringKey(@NotNull Reference<?> value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.get());
   }
 }

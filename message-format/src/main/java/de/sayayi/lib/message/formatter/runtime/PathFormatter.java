@@ -105,8 +105,7 @@ public final class PathFormatter extends AbstractParameterFormatter<Object> impl
 
     final String extension = name.substring(dotidx + 1);
 
-    return formatUsingMappedString(context, extension, true)
-        .orElseGet(() -> noSpaceText(extension));
+    return formatUsingMappedString(context, extension, true).orElseGet(() -> noSpaceText(extension));
   }
 
 

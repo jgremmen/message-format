@@ -36,8 +36,7 @@ public final class BooleanSupplierFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context,
-                                   @NotNull BooleanSupplier value) {
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull BooleanSupplier value) {
     return context.format(value.getAsBoolean(), boolean.class, true);
   }
 
@@ -49,15 +48,13 @@ public final class BooleanSupplierFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull BooleanSupplier value,
-                                               @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToBoolKey(@NotNull BooleanSupplier value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.getAsBoolean(), boolean.class);
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull BooleanSupplier value,
-                                                 @NotNull ComparatorContext context) {
+  public @NotNull MatchResult compareToStringKey(@NotNull BooleanSupplier value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.getAsBoolean(), boolean.class);
   }
 }

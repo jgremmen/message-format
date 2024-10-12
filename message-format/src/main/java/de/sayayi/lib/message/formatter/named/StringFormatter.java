@@ -47,8 +47,7 @@ import static java.text.Collator.*;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class StringFormatter
-    implements SizeQueryable, NamedParameterFormatter, DefaultFormatter
+public final class StringFormatter implements SizeQueryable, NamedParameterFormatter, DefaultFormatter
 {
   private static final Set<ConfigKey.Type> STRING_KEY_TYPES = Set.of(
       ConfigKey.Type.EMPTY,
@@ -77,8 +76,7 @@ public final class StringFormatter
   }
 
 
-  private @NotNull String valueAsString(@NotNull MessageAccessor messageAccessor,
-                                        @NotNull Object value)
+  private @NotNull String valueAsString(@NotNull MessageAccessor messageAccessor, @NotNull Object value)
   {
     if (value instanceof char[])
       return new String((char[])value);
@@ -87,8 +85,7 @@ public final class StringFormatter
 
     String string = value.toString();
 
-    final ConfigValue cv =
-        messageAccessor.getDefaultParameterConfig("ignore-default-tostring");
+    final ConfigValue cv = messageAccessor.getDefaultParameterConfig("ignore-default-tostring");
 
     if (cv != null && cv.getType() == BOOL && ((ConfigValueBool)cv).booleanValue() &&
         (value.getClass().getName() + '@' + toHexString(value.hashCode())).equals(string))
@@ -142,8 +139,7 @@ public final class StringFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull Object value,
-                                               @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToBoolKey(@NotNull Object value, @NotNull ComparatorContext context)
   {
     if (context.getCompareType().match(0))
     {
@@ -164,8 +160,7 @@ public final class StringFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull Object value,
-                                                 @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToNumberKey(@NotNull Object value, @NotNull ComparatorContext context)
   {
     try {
       final String string = value instanceof char[] ? new String((char[]) value) : String.valueOf(value);
@@ -181,8 +176,7 @@ public final class StringFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull Object value,
-                                                 @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToStringKey(@NotNull Object value, @NotNull ComparatorContext context)
   {
     final String string = value instanceof char[] ? new String((char[]) value) : String.valueOf(value);
     final CompareType compareType = context.getCompareType();

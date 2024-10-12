@@ -74,8 +74,7 @@ public final class FieldFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull Field value,
-                                                 @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToStringKey(@NotNull Field value, @NotNull ComparatorContext context)
   {
     return context.getCompareType().match(value.getName().compareTo(context.getStringKeyValue()))
         ? EQUIVALENT : MISMATCH;

@@ -69,8 +69,7 @@ public final class MethodFormatter
 
 
   @Override
-  public @NotNull ConfigKey.MatchResult compareToStringKey(@NotNull Method value,
-                                                           @NotNull ComparatorContext context)
+  public @NotNull ConfigKey.MatchResult compareToStringKey(@NotNull Method value, @NotNull ComparatorContext context)
   {
     return context.getCompareType().match(value.getName().compareTo(context.getStringKeyValue()))
         ? EQUIVALENT : MISMATCH;

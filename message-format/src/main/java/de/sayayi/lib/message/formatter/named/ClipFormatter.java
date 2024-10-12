@@ -30,8 +30,7 @@ import static java.lang.Math.max;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class ClipFormatter extends AbstractParameterFormatter<Object>
-    implements NamedParameterFormatter
+public final class ClipFormatter extends AbstractParameterFormatter<Object> implements NamedParameterFormatter
 {
   @Override
   public @NotNull String getName() {
@@ -50,8 +49,7 @@ public final class ClipFormatter extends AbstractParameterFormatter<Object>
 
     s = s.trim();
 
-    final int maxSize =
-        (int)max(context.getConfigValueNumber("clip-size").orElse(64), 8);
+    final int maxSize = (int)max(context.getConfigValueNumber("clip-size").orElse(64), 8);
 
     return s.length() <= maxSize ? text : noSpaceText(s.substring(0, maxSize - 3).trim() + "...");
   }

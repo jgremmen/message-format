@@ -99,8 +99,7 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
    * @param messageFactory  message factory, not {@code null}
    * @param publisher       message publisher, not {@code null}
    */
-  public AsmAnnotationAdopter(@NotNull MessageFactory messageFactory,
-                              @NotNull MessagePublisher publisher) {
+  public AsmAnnotationAdopter(@NotNull MessageFactory messageFactory, @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);
   }
 
@@ -183,10 +182,8 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
     {
       return new AnnotationVisitor(ASM_API) {
         @Override
-        public AnnotationVisitor visitAnnotation(String name, String descriptor)
-        {
-          return MESSAGE_DEF_DESCRIPTOR.equals(descriptor)
-              ? new MessageDefAnnotationVisitor() : null;
+        public AnnotationVisitor visitAnnotation(String name, String descriptor) {
+          return MESSAGE_DEF_DESCRIPTOR.equals(descriptor) ? new MessageDefAnnotationVisitor() : null;
         }
       };
     }
@@ -250,10 +247,8 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
     {
       return new AnnotationVisitor(ASM_API) {
         @Override
-        public AnnotationVisitor visitAnnotation(String name, String descriptor)
-        {
-          return TEMPLATE_DEF_DESCRIPTOR.equals(descriptor)
-              ? new TemplateDefAnnotationVisitor() : null;
+        public AnnotationVisitor visitAnnotation(String name, String descriptor) {
+          return TEMPLATE_DEF_DESCRIPTOR.equals(descriptor) ? new TemplateDefAnnotationVisitor() : null;
         }
       };
     }

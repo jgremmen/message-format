@@ -32,8 +32,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 public final class InetAddressFormatter extends AbstractSingleTypeParameterFormatter<InetAddress>
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context,
-                                   @NotNull InetAddress inetAddress)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull InetAddress inetAddress)
   {
     switch(context.getConfigValueString("inet").orElse("ip"))
     {

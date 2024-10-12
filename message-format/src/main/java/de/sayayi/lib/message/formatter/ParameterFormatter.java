@@ -271,8 +271,7 @@ public interface ParameterFormatter
      * @since 0.9.2
      */
     @Contract(pure = true)
-    default @NotNull MatchResult compareToBoolKey(@NotNull T value,
-                                                  @NotNull ComparatorContext context) {
+    default @NotNull MatchResult compareToBoolKey(@NotNull T value, @NotNull ComparatorContext context) {
       return MISMATCH;
     }
 
@@ -286,8 +285,7 @@ public interface ParameterFormatter
      * @since 0.9.2
      */
     @Contract(pure = true)
-    default @NotNull MatchResult compareToNumberKey(@NotNull T value,
-                                                    @NotNull ComparatorContext context) {
+    default @NotNull MatchResult compareToNumberKey(@NotNull T value, @NotNull ComparatorContext context) {
       return MISMATCH;
     }
 
@@ -301,8 +299,7 @@ public interface ParameterFormatter
      * @since 0.9.2
      */
     @Contract(pure = true)
-    default @NotNull MatchResult compareToStringKey(@NotNull T value,
-                                                    @NotNull ComparatorContext context) {
+    default @NotNull MatchResult compareToStringKey(@NotNull T value, @NotNull ComparatorContext context) {
       return MISMATCH;
     }
   }

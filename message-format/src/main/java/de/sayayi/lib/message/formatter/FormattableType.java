@@ -146,7 +146,6 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
   public int compareTo(@NotNull FormattableType o)
   {
     int cmp = Integer.compare(order, o.order);
-
     if (cmp == 0)
     {
       // make comparison deterministic if order values are equal
