@@ -18,6 +18,7 @@ package de.sayayi.lib.message.parser;
 import de.sayayi.lib.antlr4.AbstractAntlr4Parser;
 import de.sayayi.lib.antlr4.AbstractVocabulary;
 import de.sayayi.lib.antlr4.syntax.GenericSyntaxErrorFormatter;
+import de.sayayi.lib.antlr4.walker.Walker;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.exception.MessageParserException;
@@ -47,6 +48,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
+import static de.sayayi.lib.antlr4.walker.Walker.WALK_EXIT_RULES_HEAP;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAGE;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.TEMPLATE;
 import static de.sayayi.lib.message.parser.MessageLexer.BOOL;
@@ -77,6 +79,7 @@ import static de.sayayi.lib.message.parser.MessageParser.*;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
+import static java.lang.Long.parseLong;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collector.Characteristics.IDENTITY_FINISH;
@@ -115,8 +118,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    * @throws MessageParserException  in case the message could not be parsed
    */
   @Contract(pure = true)
-  public @NotNull Message.WithSpaces compileMessage(
-      @NotNull @Language("MessageFormat") String text) {
+  public @NotNull Message.WithSpaces compileMessage(@NotNull @Language("MessageFormat") String text) {
     return compileMessage(text, false);
   }
 
@@ -131,21 +133,18 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    * @throws MessageParserException  in case the template could not be parsed
    */
   @Contract(pure = true)
-  public @NotNull Message.WithSpaces compileTemplate(
-      @NotNull @Language("MessageFormat") String text) {
+  public @NotNull Message.WithSpaces compileTemplate(@NotNull @Language("MessageFormat") String text) {
     return compileMessage(text, true);
   }
 
 
   @Contract(pure = true)
-  private @NotNull Message.WithSpaces compileMessage(
-      @NotNull @Language("MessageFormat") String text, boolean template)
+  private @NotNull Message.WithSpaces compileMessage(@NotNull @Language("MessageFormat") String text, boolean template)
   {
     final Listener listener = new Listener(template);
 
     try {
-      return parse(new Lexer(text),
-          lexer -> new Parser(listener.tokenStream = new BufferedTokenStream(lexer)),
+      return parse(new Lexer(text), lexer -> new Parser(listener.tokenStream = new BufferedTokenStream(lexer)),
           Parser::message, listener, ctx -> requireNonNull(ctx.messageWithSpaces));
     } catch(MessageParserException ex) {
       throw ex.withType(template ? TEMPLATE : MESSAGE);
@@ -154,9 +153,9 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   @Override
-  protected @NotNull RuntimeException createException(
-      @NotNull Token startToken, @NotNull Token stopToken, @NotNull String formattedMessage,
-      @NotNull String errorMsg, Exception cause) {
+  protected @NotNull RuntimeException createException(@NotNull Token startToken, @NotNull Token stopToken,
+                                                      @NotNull String formattedMessage, @NotNull String errorMsg,
+                                                      Exception cause) {
     return new MessageParserException(errorMsg, formattedMessage, cause);
   }
 
@@ -195,7 +194,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
 
-  private final class Listener extends MessageParserBaseListener
+  private final class Listener extends MessageParserBaseListener implements WalkerSupplier
   {
     private final boolean template;
     private TokenStream tokenStream;
@@ -203,6 +202,12 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
     private Listener(boolean template) {
       this.template = template;
+    }
+
+
+    @Override
+    public @NotNull Walker getWalker() {
+      return WALK_EXIT_RULES_HEAP;
     }
 
 
@@ -414,8 +419,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
     final Collector<TemplateParameterDelegateContext,Map<String,String>,Map<String,String>>
         TEMPLATE_PARAMETER_DELEGATE_COLLECTOR = new Collector<>() {
-      @Override public Supplier<Map<String, String>> supplier() { return HashMap::new; }
-      @Override public BinaryOperator<Map<String, String>> combiner() { return foldCombiner(); }
+      @Override public Supplier<Map<String,String>> supplier() { return HashMap::new; }
+      @Override public BinaryOperator<Map<String,String>> combiner() { return foldCombiner(); }
       @Override public Set<Characteristics> characteristics() { return Set.of(UNORDERED); }
 
       @Override
@@ -431,7 +436,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
       @Override
-      public Function<Map<String, String>, Map<String, String>> finisher() {
+      public Function<Map<String,String>,Map<String,String>> finisher() {
         return identity();
       }
     };
@@ -440,7 +445,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitTemplatePart(TemplatePartContext ctx)
     {
-      ctx.part = new TemplatePart(ctx.simpleString().string,
+      ctx.part = new TemplatePart(
+          ctx.simpleString().string,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
           ctx.configNamedElement().stream().collect(TEMPLATE_NAMED_PARAMETER_COLLECTOR),
@@ -459,19 +465,19 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitParameterConfigElement(ParameterConfigElementContext ctx)
     {
-      final ConfigNamedElementContext cpec = ctx.configNamedElement();
+      final ConfigNamedElementContext configNamedElementContext = ctx.configNamedElement();
 
-      if (cpec != null)
+      if (configNamedElementContext != null)
       {
-        ctx.configKeys = List.of(cpec.configKey);
-        ctx.configValue = cpec.configValue;
+        ctx.configKeys = List.of(configNamedElementContext.configKey);
+        ctx.configValue = configNamedElementContext.configValue;
       }
       else
       {
-        final ConfigMapElementContext cmec = ctx.configMapElement();
+        final ConfigMapElementContext configMapElementContext = ctx.configMapElement();
 
-        ctx.configKeys = cmec.configKeys;
-        ctx.configValue = cmec.configValue;
+        ctx.configKeys = configMapElementContext.configKeys;
+        ctx.configValue = configMapElementContext.configValue;
       }
     }
 
@@ -496,8 +502,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitConfigNamedBool(ConfigNamedBoolContext ctx)
     {
       ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
-      ctx.configValue = parseBoolean(ctx.BOOL().getText())
-          ? ConfigValueBool.TRUE : ConfigValueBool.FALSE;
+      ctx.configValue = parseBoolean(ctx.BOOL().getText()) ? ConfigValueBool.TRUE : ConfigValueBool.FALSE;
     }
 
 
@@ -505,7 +510,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitConfigNamedNumber(ConfigNamedNumberContext ctx)
     {
       ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
-      ctx.configValue = new ConfigValueNumber(Long.parseLong(ctx.NUMBER().getText()));
+      ctx.configValue = new ConfigValueNumber(parseLong(ctx.NUMBER().getText()));
     }
 
 
@@ -531,7 +536,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       ctx.configKeys = ctx
           .configMapKey()
           .stream()
-          .map(cmkc -> cmkc.configKey)
+          .map(configMapKeyContext -> configMapKeyContext.configKey)
           .collect(toList());
     }
 
@@ -555,18 +560,14 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitConfigMapKeyNumber(ConfigMapKeyNumberContext ctx)
-    {
-      ctx.configKey = new ConfigKeyNumber(ctx.relationalOperatorOptional().cmp,
-          Long.parseLong(ctx.NUMBER().getText()));
+    public void exitConfigMapKeyNumber(ConfigMapKeyNumberContext ctx) {
+      ctx.configKey = new ConfigKeyNumber(ctx.relationalOperatorOptional().cmp, parseLong(ctx.NUMBER().getText()));
     }
 
 
     @Override
-    public void exitConfigMapKeyString(ConfigMapKeyStringContext ctx)
-    {
-      ctx.configKey = new ConfigKeyString(ctx.relationalOperatorOptional().cmp,
-          ctx.quotedString().string);
+    public void exitConfigMapKeyString(ConfigMapKeyStringContext ctx) {
+      ctx.configKey = new ConfigKeyString(ctx.relationalOperatorOptional().cmp, ctx.quotedString().string);
     }
 
 
