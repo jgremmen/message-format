@@ -70,10 +70,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
   public MessageSupportImpl(@NotNull FormatterService formatterService, @NotNull MessageFactory messageFactory)
   {
-    this.formatterService = requireNonNull(formatterService,
-        "formatterService must not be null");
-    this.messageFactory = requireNonNull(messageFactory,
-        "messageFactory must not be null");
+    this.formatterService = requireNonNull(formatterService, "formatterService must not be null");
+    this.messageFactory = requireNonNull(messageFactory, "messageFactory must not be null");
 
     messageAccessor = new Accessor();
     locale = Locale.getDefault();
@@ -130,8 +128,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(
-      @NotNull String name, @NotNull Message.WithSpaces value)
+  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
+                                                                       @NotNull Message.WithSpaces value)
   {
     if (requireNonNull(name, "name must not be null").isEmpty())
       throw new IllegalArgumentException("name must not be empty");
@@ -168,8 +166,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name,
-                                                         @NotNull Message template)
+  public @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name, @NotNull Message template)
   {
     if (requireNonNull(name, "name must not be null").isEmpty())
       throw new IllegalArgumentException("name must not be empty");
@@ -211,10 +208,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
         // templates
         for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
-        {
-          addTemplate(requireNonNull(dataStream.readString()),
-              packHelper.unpackMessageWithSpaces(dataStream));
-        }
+          addTemplate(requireNonNull(dataStream.readString()), packHelper.unpackMessageWithSpaces(dataStream));
       }
     }
 
@@ -223,8 +217,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public void exportMessages(@NotNull OutputStream stream, boolean compress,
-                             Predicate<String> messageCodeFilter) throws IOException
+  public void exportMessages(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
+      throws IOException
   {
     try(final PackOutputStream dataStream = new PackOutputStream(stream, compress)) {
       final Set<String> messageCodes = new TreeSet<>(messages.keySet());
@@ -459,8 +453,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    public @NotNull <X extends Exception> X formattedException(
-        @NotNull ExceptionConstructor<X> constructor) {
+    public @NotNull <X extends Exception> X formattedException(@NotNull ExceptionConstructor<X> constructor) {
       return constructor.construct(format());
     }
 
@@ -555,7 +548,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public @NotNull Set<String> findMissingTemplates(Predicate<String> messageCodeFilter)
     {
-      return messages.values()
+      return messages
+          .values()
           .stream()
           .filter(message -> messageCodeFilter == null || messageCodeFilter.test(message.getCode()))
           .flatMap(message -> message.getTemplateNames().stream())
@@ -667,8 +661,13 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    public @NotNull Map<String,Object> clone() throws CloneNotSupportedException {
-      return (ParameterMap)super.clone();
+    public @NotNull Map<String,Object> clone()
+    {
+      try {
+        return (ParameterMap)super.clone();
+      } catch(CloneNotSupportedException ex) {
+        throw new RuntimeException(ex);  // will never happen
+      }
     }
 
 
@@ -690,6 +689,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
           final Object value = parameters[offset + 1];
           final Object thatValue = that.get(key);
 
+          //noinspection ConstantValue
           if (value == null)
           {
             if (thatValue != null || !that.containsKey(key))
@@ -705,8 +705,17 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    public int hashCode() {
-      return Arrays.hashCode(parameters);
+    @SuppressWarnings("ConstantValue")
+    public int hashCode()
+    {
+      int hash = 0;
+      Object value;
+
+      // respect map hashcode contract!
+      for(int offset = 0, length = parameters.length; offset < length; offset += 2)
+        hash += parameters[offset].hashCode() ^ ((value = parameters[offset + 1]) == null ? 0 : value.hashCode());
+
+      return hash;
     }
 
 
@@ -760,7 +769,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public @NotNull Iterator<Entry<String,Object>> iterator()
     {
-      return new Iterator<Entry<String,Object>>() {
+      return new Iterator<>() {
         int offset = 0;
 
         @Override
@@ -787,7 +796,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public Spliterator<Entry<String,Object>> spliterator()
     {
-      return new Spliterator<Entry<String,Object>>() {
+      return new Spliterator<>() {
         int offset = 0;
 
         @Override
@@ -854,12 +863,6 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public @NotNull Set<Entry<String,Object>> clone() throws CloneNotSupportedException {
       return (ParameterEntrySet)super.clone();
-    }
-
-
-    @Override
-    public int hashCode() {
-      return Arrays.hashCode(parameters);
     }
 
 

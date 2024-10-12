@@ -237,8 +237,12 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
 
 
     @Override
-    public int hashCode() {
-      return SortedArrayMap.this.hashCode() * 31 + offset;
+    public int hashCode()
+    {
+      final Object key = array[offset];
+      final Object value = array[offset + 1];
+
+      return (key == null ? 0 : key.hashCode()) ^ (value == null ? 0 : value.hashCode());
     }
 
 
