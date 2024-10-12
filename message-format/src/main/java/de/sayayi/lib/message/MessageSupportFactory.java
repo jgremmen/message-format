@@ -22,8 +22,9 @@ import de.sayayi.lib.message.internal.MessageSupportImpl;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.InputStream;
-import java.util.Locale;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.function.Predicate;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 
@@ -47,10 +48,6 @@ public final class MessageSupportFactory
   /**
    * Returns a shared instance of the message support.
    * <p>
-   * Even though the returned instance implements
-   * {@link ConfigurableMessageSupport ConfigurableMessageSupport}, it cannot be configured;
-   * all methods from this interface will throw an {@link UnsupportedOperationException}.
-   * <p>
    * The shared message support is backed by the shared instance of the default formatter service
    * ({@link DefaultFormatterService#getSharedInstance()}). This means that changes (eg. adding
    * new formatters) to the formatting service will reflect in formatting operations of the
@@ -62,7 +59,7 @@ public final class MessageSupportFactory
   {
     synchronized($LOCK) {
       if (SHARED == null)
-        SHARED = new SharedMessageSupport();
+        SHARED = seal(create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE));
 
       return SHARED;
     }
@@ -82,71 +79,78 @@ public final class MessageSupportFactory
    * @return  new configurable message support instance, never {@code null}
    */
   @Contract(value = "_, _ -> new")
-  public static @NotNull ConfigurableMessageSupport create(
-      @NotNull FormatterService formatterService,
-      @NotNull MessageFactory messageFactory) {
+  public static @NotNull ConfigurableMessageSupport create(@NotNull FormatterService formatterService,
+                                                           @NotNull MessageFactory messageFactory) {
     return new MessageSupportImpl(formatterService, messageFactory);
+  }
+
+
+  /**
+   * Seals off a message support instance by asserting that the message support does not implement
+   * {@link ConfigurableMessageSupport} and thus is not modifiable using the returned instance.
+   * <p>
+   * If the given {@code messageSupport} does not implement {@link ConfigurableMessageSupport} then it is returned
+   * unmodified. Otherwise, a {@link MessageSupport} wrapper is returned which is backed by the given
+   * {@code messageSupport}, so changes to the configurable message support always reflect in the returned instance.
+   *
+   * @param messageSupport  message support to seal, not {@code null}
+   * @return  sealed message support, never {@code null}
+   *
+   * @since 0.11.1
+   */
+  @Contract(pure = true)
+  public static @NotNull MessageSupport seal(@NotNull MessageSupport messageSupport)
+  {
+    return messageSupport instanceof ConfigurableMessageSupport
+        ? new MessageSupportDelegate(messageSupport)
+        : messageSupport;
   }
 
 
 
 
   /**
-   * Message support implementation for shared usage that cannot be configured.
+   * Message support delegator
+   *
+   * @since 0.11.1
    */
-  private static final class SharedMessageSupport extends MessageSupportImpl
+  private static final class MessageSupportDelegate implements MessageSupport
   {
-    private SharedMessageSupport() {
-      super(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+    private final MessageSupport delegate;
+
+
+    private MessageSupportDelegate(@NotNull MessageSupport delegate) {
+      this.delegate = delegate;
     }
 
 
     @Override
-    public @NotNull ConfigurableMessageSupport setLocale(@NotNull Locale locale) {
-      throw new UnsupportedOperationException("setLocale");
+    public @NotNull MessageAccessor getMessageAccessor() {
+      return delegate.getMessageAccessor();
     }
 
 
     @Override
-    public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, boolean value) {
-      throw new UnsupportedOperationException("setDefaultParameterConfig");
+    public @NotNull MessageConfigurer<Message.WithCode> code(@NotNull String code) {
+      return delegate.code(code);
     }
 
 
     @Override
-    public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, long value) {
-      throw new UnsupportedOperationException("setDefaultParameterConfig");
+    public @NotNull MessageConfigurer<Message> message(@NotNull String message) {
+      return delegate.message(message);
     }
 
 
     @Override
-    public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, @NotNull String value) {
-      throw new UnsupportedOperationException("setDefaultParameterConfig");
+    public @NotNull <M extends Message> MessageConfigurer<M> message(@NotNull M message) {
+      return delegate.message(message);
     }
 
-
     @Override
-    public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(
-        @NotNull String name, @NotNull Message.WithSpaces value) {
-      throw new UnsupportedOperationException("setDefaultParameterConfig");
-    }
-
-
-    @Override
-    public @NotNull ConfigurableMessageSupport addMessage(@NotNull Message.WithCode message) {
-      throw new UnsupportedOperationException("addMessage");
-    }
-
-
-    @Override
-    public @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name, @NotNull Message template) {
-      throw new UnsupportedOperationException("addTemplate");
-    }
-
-
-    @Override
-    public @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream... packStreams) {
-      throw new UnsupportedOperationException("importMessages");
+    public void exportMessages(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
+        throws IOException {
+      delegate.exportMessages(stream, compress, messageCodeFilter);
     }
   }
 }
