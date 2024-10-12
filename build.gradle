@@ -23,9 +23,9 @@ allprojects {
   apply plugin: 'base'
 
   group = 'de.sayayi.lib'
-  version = '0.11.0'
+  version = '0.11.1-SNAPSHOT'
 
-  ext.jetbrainsAnnotationsVersion = '25.0.0'
+  ext.jetbrainsAnnotationsVersion = '[24.0,26.1)'
   ext.junitVersion = '5.11.+'
   ext.lombokVersion = '1.18.+'
   ext.mockitoVersion = '5.14.1'
