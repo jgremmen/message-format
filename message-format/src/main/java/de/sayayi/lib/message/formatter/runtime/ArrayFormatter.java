@@ -50,7 +50,7 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.for
 
 /**
  * <p>
- * <table border="1" cellpadding="3">
+ * <table border="1">
  *   <tr><th>&nbsp;array&nbsp;</th><th>&nbsp;sep-last&nbsp;</th><th>&nbsp;max-size&nbsp;</th><th>&nbsp;sep-more&nbsp;</th><th>&nbsp;result&nbsp;</th></tr>
  *   <tr><td>[]</td><td>n/a</td><td>0</td><td>n/a</td><td>''</td></tr>
  *   <tr><td>[A,B,C]</td><td>'&nbsp;and'</td><td>(undefined)</td><td>n/a</td><td>'A, B and C'</td></tr>
