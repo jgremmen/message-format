@@ -46,7 +46,6 @@ buildscript {
 
 
 include 'message-format'
-include 'message-format-jodatime'
 include 'message-format-spring'
 include 'message-gradle-plugin'
 

@@ -23,7 +23,7 @@ allprojects {
   apply plugin: 'base'
 
   group = 'de.sayayi.lib'
-  version = '0.11.1-SNAPSHOT'
+  version = '0.12.0-SNAPSHOT'
 
   ext.jetbrainsAnnotationsVersion = '[24.0,26.1)'
   ext.junitVersion = '5.11.+'
@@ -60,7 +60,6 @@ tasks.register('releaseAll') {
   description = 'Release all publications to Maven and Gradle Plugin repository.'
 
   dependsOn ':message-format:publishMsgformatPublicationToMavenCentralRepository'
-  dependsOn ':message-format-jodatime:publishJodatimePublicationToMavenCentralRepository'
   dependsOn ':message-format-spring:publishSpringPublicationToMavenCentralRepository'
 
   dependsOn ':message-gradle-plugin:publishGradlePluginPublicationToMavenCentralRepository'
@@ -73,7 +72,6 @@ tasks.register('releaseAllTemp') {
   description = 'Release all publications to temporary Maven repository.'
 
   dependsOn ':message-format:publishMsgformatPublicationToMavenTempRepository'
-  dependsOn ':message-format-jodatime:publishJodatimePublicationToMavenTempRepository'
   dependsOn ':message-format-spring:publishSpringPublicationToMavenTempRepository'
 
   dependsOn ':message-gradle-plugin:publishGradlePluginPublicationToMavenTempRepository'

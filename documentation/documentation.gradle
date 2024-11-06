@@ -31,7 +31,6 @@ dependencies {
     }
   }
 
-  runtimeOnly project(':message-format-jodatime')
   runtimeOnly project(':message-format-spring')
 
   runtimeOnly "org.projectlombok:lombok:${lombokVersion}"
@@ -57,8 +56,6 @@ libdocs {
         "${rootDir}/gradle/javadocs/antlr4-runtime"
     linksOffline 'https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/0.5.0/',
         "${rootDir}/gradle/javadocs/antlr4-runtime-ext"
-    linksOffline 'https://javadoc.io/doc/joda-time/joda-time/2.13.0/',
-        "${rootDir}/gradle/javadocs/joda-time"
     linksOffline "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
         "${rootDir}/gradle/javadocs/message-format"
     linksOffline 'https://javadoc.io/doc/org.springframework/spring-core/5.3.39/',

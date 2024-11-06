@@ -33,7 +33,6 @@
     <item name="Typed Formatters">
       <item name="Array" link="fmt-array.html"/>
       <item name="Date" link="fmt-date.html"/>
-      <item name="Date (joda-time)" link="fmt-date-joda-time.html"/>
     </item>
   </group>
 
