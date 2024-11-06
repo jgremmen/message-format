@@ -27,6 +27,7 @@ import de.sayayi.lib.message.internal.TextJoiner;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.ParameterPart;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
+import de.sayayi.lib.message.util.SpacesUtil;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -48,6 +49,22 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.for
 
 
 /**
+ * <p>
+ * <table border="1" cellpadding="3">
+ *   <tr><th>&nbsp;array&nbsp;</th><th>&nbsp;sep-last&nbsp;</th><th>&nbsp;max-size&nbsp;</th><th>&nbsp;sep-more&nbsp;</th><th>&nbsp;result&nbsp;</th></tr>
+ *   <tr><td>[]</td><td>n/a</td><td>0</td><td>n/a</td><td>''</td></tr>
+ *   <tr><td>[A,B,C]</td><td>'&nbsp;and'</td><td>(undefined)</td><td>n/a</td><td>'A, B and C'</td></tr>
+ *   <tr><td>[A,B,C]</td><td>n/a</td><td>2</td><td>'...'</td><td>'A, B, ...'</td></tr>
+ *   <tr><td>[A,B,C]</td><td>'&nbsp;and'</td><td>2</td><td>(undefined)</td><td>'A and B'</td></tr>
+ *   <tr><td>[A,B,C]</td><td>'&nbsp;and'</td><td>1</td><td>(undefined)</td><td>'A'</td></tr>
+ *   <tr><td>[A,B,C]</td><td>'&nbsp;and'</td><td>0</td><td>(undefined)</td><td>''</td></tr>
+ *   <tr><td>[A,B,C]</td><td>n/a</td><td>0</td><td>'...'</td><td>'...'</td></tr>
+ *   <tr><td>[A,B,C]</td><td>(undefined)</td><td>(undefined)</td><td>n/a</td><td>'A, B, C'</td></tr>
+ *   <tr><td>[A,B,C]</td><td>(undefined)</td><td>2</td><td>(undefined)</td><td>'A, B'</td></tr>
+ *   <tr><td>[A,B,C]</td><td>(undefined)</td><td>1</td><td>(undefined)</td><td>'A'</td></tr>
+ *   <tr><td>[A,B,C]</td><td>(undefined)</td><td>0</td><td>(undefined)</td><td>''</td></tr>
+ * </table>
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
@@ -63,25 +80,36 @@ public final class ArrayFormatter extends AbstractParameterFormatter<Object>
   @SuppressWarnings("DuplicatedCode")
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object array)
   {
-    final Text separator = spacedText(context
-        .getConfigValueString("list-sep").orElse(", "));
-    final Text lastSeparator = spacedText(context
-        .getConfigValueString("list-sep-last")
-        .orElseGet(separator::getTextWithSpaces));
+    final Text separator = spacedText(context.getConfigValueString("list-sep").orElse(", "));
+    final String separatorMore = context.getConfigValueString("list-sep-more").orElse(null);
+    final boolean hasSeparatorMore = separatorMore != null && !SpacesUtil.isTrimmedEmpty(separatorMore);
 
     final TextJoiner joiner = new TextJoiner();
-    boolean first = true;
+    int n = (int)context.getConfigValueNumber("list-max-size").orElse(Integer.MAX_VALUE);
+    final Iterator<Text> iterator = new TextIterator(context, array);
 
-    for(final Iterator<Text> iterator = new TextIterator(context, array); iterator.hasNext();)
+    if (n == 0 && iterator.hasNext() && hasSeparatorMore)
+      joiner.add(noSpaceText(separatorMore));
+    else
     {
-      final Text text = iterator.next();
+      for(boolean first = true; iterator.hasNext() && !(n == 0 && !hasSeparatorMore);)
+      {
+        final Text text = iterator.next();
+        final boolean lastElement = !iterator.hasNext() || n == 0 || (n == 1 && !hasSeparatorMore);
 
-      if (first)
-        first = false;
-      else
-        joiner.add(iterator.hasNext() ? separator : lastSeparator);
+        if (first)
+          first = false;
+        else if (lastElement && !hasSeparatorMore)
+        {
+          joiner.add(spacedText(context
+              .getConfigValueString("list-sep-last")
+              .orElseGet(separator::getTextWithSpaces)));
+        }
+        else
+          joiner.add(separator);
 
-      joiner.add(text);
+        joiner.add(n-- == 0 ? spacedText(separatorMore) : text);
+      }
     }
 
     return joiner.asNoSpaceText();

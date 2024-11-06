@@ -31,10 +31,14 @@ import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
@@ -48,12 +52,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ArrayFormatterTest extends AbstractFormatterTest
 {
   @Test
+  @DisplayName("Formattable types")
   void testFormattableTypes() {
     assertFormatterForType(new ArrayFormatter(), Object[].class);
   }
 
 
   @Test
+  @DisplayName("Native boolean array")
   void testBooleanArray()
   {
     val formatterService = createFormatterService(new ArrayFormatter(), new BoolFormatter());
@@ -107,6 +113,7 @@ class ArrayFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Native int array")
   void testIntegerArray()
   {
     val formatterService = createFormatterService(new ArrayFormatter());
@@ -153,6 +160,7 @@ class ArrayFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Object array")
   void testObjectArray()
   {
     val registry = createFormatterService(
@@ -175,6 +183,7 @@ class ArrayFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Empty or null array")
   void testEmptyOrNullArray()
   {
     val messageSupport = MessageSupportFactory.create(
@@ -189,6 +198,7 @@ class ArrayFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Separator spaces")
   void testSeparator()
   {
     val messageSupport = MessageSupportFactory.create(
@@ -203,5 +213,48 @@ class ArrayFormatterTest extends AbstractFormatterTest
         .message("%{c,list-sep:'.'}")
         .with("c", new long[] { 1, 2, 3, 4, 5 })
         .format());
+  }
+
+
+  private static Stream<Arguments> crossTableParameters()
+  {
+    return Stream.of(
+        Arguments.of("Empty array with max size 0", new String[0], null, 0, null, ""),
+        Arguments.of("Array with last separator", new String[] { "A", "B", "C" }, " and ", null, null, "A, B and C"),
+        Arguments.of("Array with max size 2 and more separator", new String[] { "A", "B", "C" }, null, 2, "...", "A, B, ..."),
+        Arguments.of("Array with max size 2 and last separator", new String[] { "A", "B", "C" }, " and ", 2, null, "A and B"),
+        Arguments.of("Array with max size 1 and last separator", new String[] { "A", "B", "C" }, " and ", 1, null, "A"),
+        Arguments.of("Non-empty array with max size 0 and last separator", new String[] { "A", "B", "C" }, null, 0, null, ""),
+        Arguments.of("Non-empty array with max size 0 and more separator", new String[] { "A", "B", "C" }, null, 0, "...", "..."),
+        Arguments.of("Array without last and more separators", new String[] { "A", "B", "C" }, null, null, null, "A, B, C"),
+        Arguments.of("Array with max size 2", new String[] { "A", "B", "C" }, null, 2, null, "A, B"),
+        Arguments.of("Array with max size 1", new String[] { "A", "B", "C" }, null, 1, null, "A"),
+        Arguments.of("Non-empty array with max size 0", new String[] { "A", "B", "C" }, null, 0, null, ""),
+        Arguments.of("Array with empty element and max size 2", new String[] { "A", "", "C", "D" }, null, 2, null, "A, C")
+    );
+  }
+
+
+  @DisplayName("Max size, last and more separator")
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("crossTableParameters")
+  void crossTable(@NotNull String name, Object array, String listSepLast, Integer listMaxSize, String listSepMore,
+                  @NotNull String result)
+  {
+    val messageFormat = new StringBuilder("%{array");
+    if (listSepLast != null)
+      messageFormat.append(",list-sep-last:\"").append(listSepLast).append('"');
+    if (listMaxSize != null)
+      messageFormat.append(",list-max-size:").append(listMaxSize);
+    if (listSepMore != null)
+      messageFormat.append(",list-sep-more:\"").append(listSepMore).append('"');
+    messageFormat.append("}");
+
+    val message = MessageSupportFactory
+        .create(createFormatterService(new ArrayFormatter()), NO_CACHE_INSTANCE)
+        .message(messageFormat.toString())
+        .with("array", array);
+
+    assertEquals(result, message.format());
   }
 }
