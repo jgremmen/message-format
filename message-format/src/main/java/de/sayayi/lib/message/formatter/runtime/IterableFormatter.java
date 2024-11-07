@@ -40,20 +40,21 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.for
 public final class IterableFormatter extends AbstractListFormatter<Iterable<?>>
 {
   @Override
-  protected @NotNull Iterator<Text> createIterator(@NotNull FormatterContext context, @NotNull Iterable<?> value) {
-    return new TextIterator(context, value);
+  protected @NotNull Iterator<Text> createIterator(@NotNull FormatterContext context,
+                                                   @NotNull Iterable<?> iterable) {
+    return new TextIterator(context, iterable);
   }
 
 
   @Override
-  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object iterable)
   {
-    if (value instanceof Collection)
-      return OptionalLong.of(((Collection<?>)value).size());
+    if (iterable instanceof Collection)
+      return OptionalLong.of(((Collection<?>)iterable).size());
 
     long size = 0;
 
-    for(Object ignored: (Iterable<?>)value)
+    for(Object ignored: (Iterable<?>)iterable)
       size++;
 
     return OptionalLong.of(size);
@@ -61,12 +62,12 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>>
 
 
   @Override
-  public @NotNull MatchResult compareToEmptyKey(Iterable<?> value, @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToEmptyKey(Iterable<?> iterable, @NotNull ComparatorContext context)
   {
     return forEmptyKey(context.getCompareType(),
-        value instanceof Collection
-            ? ((Collection<?>)value).isEmpty()
-            : value == null || !value.iterator().hasNext());
+        iterable instanceof Collection
+            ? ((Collection<?>)iterable).isEmpty()
+            : iterable == null || !iterable.iterator().hasNext());
   }
 
 

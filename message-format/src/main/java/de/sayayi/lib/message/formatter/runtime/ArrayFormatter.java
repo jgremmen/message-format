@@ -74,8 +74,8 @@ public final class ArrayFormatter extends AbstractListFormatter<Object>
 
 
   @Override
-  public @NotNull MatchResult compareToEmptyKey(Object value, @NotNull ComparatorContext context) {
-    return forEmptyKey(context.getCompareType(), value == null || getLength(value) == 0);
+  public @NotNull MatchResult compareToEmptyKey(Object array, @NotNull ComparatorContext context) {
+    return forEmptyKey(context.getCompareType(), array == null || getLength(array) == 0);
   }
 
 

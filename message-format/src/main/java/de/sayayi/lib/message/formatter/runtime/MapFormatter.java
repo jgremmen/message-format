@@ -52,8 +52,7 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>>
 
   static
   {
-    final ParameterConfig nullConfig = new ParameterConfig(
-        Map.of(new ConfigKeyNull(EQ), new ConfigValueString("(null)")));
+    ParameterConfig nullConfig = new ParameterConfig(Map.of(new ConfigKeyNull(EQ), new ConfigValueString("(null)")));
 
     // default map-kv: %{key,null:'(null)'}=%{value,null:'(null)'}
     DEFAULT_KEY_VALUE_MESSAGE = new CompoundMessage(List.of(
@@ -71,14 +70,14 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>>
 
 
   @Override
-  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value) {
-    return OptionalLong.of(((Map<?,?>)value).size());
+  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object map) {
+    return OptionalLong.of(((Map<?,?>)map).size());
   }
 
 
   @Override
-  public @NotNull MatchResult compareToEmptyKey(Map<?,?> value, @NotNull ComparatorContext context) {
-    return forEmptyKey(context.getCompareType(), value == null || value.isEmpty());
+  public @NotNull MatchResult compareToEmptyKey(Map<?,?> map, @NotNull ComparatorContext context) {
+    return forEmptyKey(context.getCompareType(), map == null || map.isEmpty());
   }
 
 

@@ -65,6 +65,8 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
   protected static final Message.WithSpaces DEFAULT_VALUE_MESSAGE =
       new CompoundMessage(List.of(new ParameterPart("value")));
 
+  protected static final String DEFAULT_SEPARATOR = ", ";
+
   protected static final String CONFIG_MAX_SIZE = "list-max-size";
   protected static final String CONFIG_SEPARATOR = "list-sep";
   protected static final String CONFIG_SEPARATOR_LAST = "list-sep-last";
@@ -75,13 +77,13 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
 
   @Override
   @SuppressWarnings("DuplicatedCode")
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull T array)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull T list)
   {
-    final Text separator = spacedText(context.getConfigValueString(CONFIG_SEPARATOR).orElse(", "));
+    final Text separator = spacedText(context.getConfigValueString(CONFIG_SEPARATOR).orElse(DEFAULT_SEPARATOR));
     final String moreValue = context.getConfigValueString(CONFIG_VALUE_MORE).orElse(null);
     final boolean hasMoreValue = moreValue != null && !isTrimmedEmpty(moreValue);
     final TextJoiner joiner = new TextJoiner();
-    final Iterator<Text> iterator = createIterator(context, array);
+    final Iterator<Text> iterator = createIterator(context, list);
 
     int n = (int)context.getConfigValueNumber(CONFIG_MAX_SIZE).orElse(Integer.MAX_VALUE);
 
@@ -119,14 +121,14 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
 
 
 
-  protected static final class ValueParameters implements Parameters
+  public static final class ValueParameters implements Parameters
   {
     private final Locale locale;
     private final String parameterName;
     Object value;
 
 
-    ValueParameters(@NotNull Locale locale, @NotNull String parameterName)
+    public ValueParameters(@NotNull Locale locale, @NotNull String parameterName)
     {
       this.locale = locale;
       this.parameterName = parameterName;
@@ -153,7 +155,7 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
 
     @Override
     public String toString() {
-      return "Parameters(locale='" + locale + "',{value=" + value + "})";
+      return "Parameters(locale=" + locale + ",{value=" + value + "})";
     }
   }
 }
