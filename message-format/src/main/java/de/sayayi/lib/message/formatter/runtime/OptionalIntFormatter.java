@@ -56,25 +56,28 @@ public final class OptionalIntFormatter
 
   @Override
   @SuppressWarnings("OptionalAssignedToNull")
-  public @NotNull MatchResult compareToEmptyKey(OptionalInt value, @NotNull ComparatorContext context) {
-    return forEmptyKey(context.getCompareType(), value == null || value.isEmpty());
+  public @NotNull MatchResult compareToEmptyKey(OptionalInt optionalInt, @NotNull ComparatorContext context) {
+    return forEmptyKey(context.getCompareType(), optionalInt == null || optionalInt.isEmpty());
   }
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull OptionalInt value, @NotNull ComparatorContext context) {
-    return value.isPresent() ? context.matchForObject(value.getAsInt(), int.class) : MISMATCH;
+  public @NotNull MatchResult compareToBoolKey(@NotNull OptionalInt optionalInt,
+                                               @NotNull ComparatorContext context) {
+    return optionalInt.isPresent() ? context.matchForObject(optionalInt.getAsInt(), int.class) : MISMATCH;
   }
 
 
   @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull OptionalInt value, @NotNull ComparatorContext context) {
-    return value.isPresent() ? context.matchForObject(value.getAsInt(), int.class) : MISMATCH;
+  public @NotNull MatchResult compareToNumberKey(@NotNull OptionalInt optionalInt,
+                                                 @NotNull ComparatorContext context) {
+    return optionalInt.isPresent() ? context.matchForObject(optionalInt.getAsInt(), int.class) : MISMATCH;
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull OptionalInt value, @NotNull ComparatorContext context) {
-    return value.isPresent() ? context.matchForObject(value.getAsInt(), int.class) : MISMATCH;
+  public @NotNull MatchResult compareToStringKey(@NotNull OptionalInt optionalInt,
+                                                 @NotNull ComparatorContext context) {
+    return optionalInt.isPresent() ? context.matchForObject(optionalInt.getAsInt(), int.class) : MISMATCH;
   }
 }

@@ -56,25 +56,37 @@ public final class OptionalDoubleFormatter
 
   @Override
   @SuppressWarnings("OptionalAssignedToNull")
-  public @NotNull MatchResult compareToEmptyKey(OptionalDouble value, @NotNull ComparatorContext context) {
-    return forEmptyKey(context.getCompareType(), value == null || value.isEmpty());
+  public @NotNull MatchResult compareToEmptyKey(OptionalDouble optionalDouble, @NotNull ComparatorContext context) {
+    return forEmptyKey(context.getCompareType(), optionalDouble == null || optionalDouble.isEmpty());
   }
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull OptionalDouble value, @NotNull ComparatorContext context) {
-    return value.isPresent() ? context.matchForObject(value.getAsDouble(), double.class) : MISMATCH;
+  public @NotNull MatchResult compareToBoolKey(@NotNull OptionalDouble optionalDouble,
+                                               @NotNull ComparatorContext context)
+  {
+    return optionalDouble.isPresent()
+        ? context.matchForObject(optionalDouble.getAsDouble(), double.class)
+        : MISMATCH;
   }
 
 
   @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull OptionalDouble value, @NotNull ComparatorContext context) {
-    return value.isPresent() ? context.matchForObject(value.getAsDouble(), double.class) : MISMATCH;
+  public @NotNull MatchResult compareToNumberKey(@NotNull OptionalDouble optionalDouble,
+                                                 @NotNull ComparatorContext context)
+  {
+    return optionalDouble.isPresent()
+        ? context.matchForObject(optionalDouble.getAsDouble(), double.class)
+        : MISMATCH;
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull OptionalDouble value, @NotNull ComparatorContext context) {
-    return value.isPresent() ? context.matchForObject(value.getAsDouble(), double.class) : MISMATCH;
+  public @NotNull MatchResult compareToStringKey(@NotNull OptionalDouble optionalDouble,
+                                                 @NotNull ComparatorContext context)
+  {
+    return optionalDouble.isPresent()
+        ? context.matchForObject(optionalDouble.getAsDouble(), double.class)
+        : MISMATCH;
   }
 }

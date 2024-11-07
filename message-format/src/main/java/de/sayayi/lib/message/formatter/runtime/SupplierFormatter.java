@@ -44,8 +44,8 @@ public final class SupplierFormatter
 
 
   @Override
-  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value) {
-    return context.size(((Supplier<?>)value).get());
+  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object supplier) {
+    return context.size(((Supplier<?>)supplier).get());
   }
 
 
@@ -56,19 +56,19 @@ public final class SupplierFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull Supplier<?> value, @NotNull ComparatorContext context) {
-    return context.matchForObject(value.get());
+  public @NotNull MatchResult compareToBoolKey(@NotNull Supplier<?> supplier, @NotNull ComparatorContext context) {
+    return context.matchForObject(supplier.get());
   }
 
 
   @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull Supplier<?> value, @NotNull ComparatorContext context) {
-    return context.matchForObject(value.get());
+  public @NotNull MatchResult compareToNumberKey(@NotNull Supplier<?> supplier, @NotNull ComparatorContext context) {
+    return context.matchForObject(supplier.get());
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull Supplier<?> value, @NotNull ComparatorContext context) {
-    return context.matchForObject(value.get());
+  public @NotNull MatchResult compareToStringKey(@NotNull Supplier<?> supplier, @NotNull ComparatorContext context) {
+    return context.matchForObject(supplier.get());
   }
 }

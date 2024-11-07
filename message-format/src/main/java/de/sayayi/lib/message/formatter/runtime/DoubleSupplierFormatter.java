@@ -48,19 +48,22 @@ public final class DoubleSupplierFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull DoubleSupplier value, @NotNull ComparatorContext context) {
-    return context.matchForObject(value.getAsDouble(), double.class);
+  public @NotNull MatchResult compareToBoolKey(@NotNull DoubleSupplier doubleSupplier,
+                                               @NotNull ComparatorContext context) {
+    return context.matchForObject(doubleSupplier.getAsDouble(), double.class);
   }
 
 
   @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull DoubleSupplier value, @NotNull ComparatorContext context) {
-    return context.matchForObject(value.getAsDouble(), double.class);
+  public @NotNull MatchResult compareToNumberKey(@NotNull DoubleSupplier doubleSupplier,
+                                                 @NotNull ComparatorContext context) {
+    return context.matchForObject(doubleSupplier.getAsDouble(), double.class);
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull DoubleSupplier value, @NotNull ComparatorContext context) {
-    return context.matchForObject(value.getAsDouble(), double.class);
+  public @NotNull MatchResult compareToStringKey(@NotNull DoubleSupplier doubleSupplier,
+                                                 @NotNull ComparatorContext context) {
+    return context.matchForObject(doubleSupplier.getAsDouble(), double.class);
   }
 }

@@ -56,25 +56,28 @@ public final class OptionalLongFormatter
 
   @Override
   @SuppressWarnings("OptionalAssignedToNull")
-  public @NotNull MatchResult compareToEmptyKey(OptionalLong value, @NotNull ComparatorContext context) {
-    return forEmptyKey(context.getCompareType(), value == null || value.isEmpty());
+  public @NotNull MatchResult compareToEmptyKey(OptionalLong optionalLong, @NotNull ComparatorContext context) {
+    return forEmptyKey(context.getCompareType(), optionalLong == null || optionalLong.isEmpty());
   }
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull OptionalLong value, @NotNull ComparatorContext context) {
-    return value.isPresent() ? context.matchForObject(value.getAsLong(), long.class) : MISMATCH;
+  public @NotNull MatchResult compareToBoolKey(@NotNull OptionalLong optionalLong,
+                                               @NotNull ComparatorContext context) {
+    return optionalLong.isPresent() ? context.matchForObject(optionalLong.getAsLong(), long.class) : MISMATCH;
   }
 
 
   @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull OptionalLong value, @NotNull ComparatorContext context) {
-    return value.isPresent() ? context.matchForObject(value.getAsLong(), long.class) : MISMATCH;
+  public @NotNull MatchResult compareToNumberKey(@NotNull OptionalLong optionalLong,
+                                                 @NotNull ComparatorContext context) {
+    return optionalLong.isPresent() ? context.matchForObject(optionalLong.getAsLong(), long.class) : MISMATCH;
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull OptionalLong value, @NotNull ComparatorContext context) {
-    return value.isPresent() ? context.matchForObject(value.getAsLong(), long.class) : MISMATCH;
+  public @NotNull MatchResult compareToStringKey(@NotNull OptionalLong optionalLong,
+                                                 @NotNull ComparatorContext context) {
+    return optionalLong.isPresent() ? context.matchForObject(optionalLong.getAsLong(), long.class) : MISMATCH;
   }
 }

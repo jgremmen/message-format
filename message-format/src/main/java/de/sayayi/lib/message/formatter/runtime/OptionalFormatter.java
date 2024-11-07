@@ -51,9 +51,9 @@ public final class OptionalFormatter extends AbstractSingleTypeParameterFormatte
 
 
   @Override
-  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object optional)
   {
-    return ((Optional<?>)value)
+    return ((Optional<?>)optional)
         .map(context::size)
         .orElseGet(OptionalLong::empty);
   }
@@ -67,38 +67,38 @@ public final class OptionalFormatter extends AbstractSingleTypeParameterFormatte
 
   @Override
   @SuppressWarnings("OptionalAssignedToNull")
-  public @NotNull MatchResult compareToNullKey(Optional<?> value, @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToNullKey(Optional<?> optional, @NotNull ComparatorContext context)
   {
-    return value == null || value.isEmpty()
+    return optional == null || optional.isEmpty()
         ? forNullKey(context.getCompareType(), true)
-        : context.matchForObject(value.get());
+        : context.matchForObject(optional.get());
   }
 
 
   @Override
   @SuppressWarnings("OptionalAssignedToNull")
-  public @NotNull MatchResult compareToEmptyKey(Optional<?> value, @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToEmptyKey(Optional<?> optional, @NotNull ComparatorContext context)
   {
-    return value == null || value.isEmpty()
+    return optional == null || optional.isEmpty()
         ? forEmptyKey(context.getCompareType(), true)
-        : context.matchForObject(value.get());
+        : context.matchForObject(optional.get());
   }
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull Optional<?> value, @NotNull ComparatorContext context) {
-    return value.map(context::matchForObject).orElse(MISMATCH);
+  public @NotNull MatchResult compareToBoolKey(@NotNull Optional<?> optional, @NotNull ComparatorContext context) {
+    return optional.map(context::matchForObject).orElse(MISMATCH);
   }
 
 
   @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull Optional<?> value, @NotNull ComparatorContext context) {
-    return value.map(context::matchForObject).orElse(MISMATCH);
+  public @NotNull MatchResult compareToNumberKey(@NotNull Optional<?> optional, @NotNull ComparatorContext context) {
+    return optional.map(context::matchForObject).orElse(MISMATCH);
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull Optional<?> value, @NotNull ComparatorContext context) {
-    return value.map(context::matchForObject).orElse(MISMATCH);
+  public @NotNull MatchResult compareToStringKey(@NotNull Optional<?> optional, @NotNull ComparatorContext context) {
+    return optional.map(context::matchForObject).orElse(MISMATCH);
   }
 }

@@ -48,19 +48,22 @@ public final class IntSupplierFormatter
 
 
   @Override
-  public @NotNull MatchResult compareToBoolKey(@NotNull IntSupplier value, @NotNull ComparatorContext context) {
-    return context.matchForObject(value.getAsInt(), int.class);
+  public @NotNull MatchResult compareToBoolKey(@NotNull IntSupplier intSupplier,
+                                               @NotNull ComparatorContext context) {
+    return context.matchForObject(intSupplier.getAsInt(), int.class);
   }
 
 
   @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull IntSupplier value, @NotNull ComparatorContext context) {
-    return context.matchForObject(value.getAsInt(), int.class);
+  public @NotNull MatchResult compareToNumberKey(@NotNull IntSupplier intSupplier,
+                                                 @NotNull ComparatorContext context) {
+    return context.matchForObject(intSupplier.getAsInt(), int.class);
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull IntSupplier value, @NotNull ComparatorContext context) {
-    return context.matchForObject(value.getAsInt(), int.class);
+  public @NotNull MatchResult compareToStringKey(@NotNull IntSupplier intSupplier,
+                                                 @NotNull ComparatorContext context) {
+    return context.matchForObject(intSupplier.getAsInt(), int.class);
   }
 }
