@@ -39,8 +39,7 @@ public final class EnumFormatter extends AbstractMultiSelectFormatter<Enum<?>> i
     super("enum", "name", true);
 
     register("name", this::formatEnumName);
-    register("ord", this::formatEnumOrdinal);
-    register("ordinal", this::formatEnumOrdinal);
+    register(new String[] { "ord", "ordinal" }, this::formatEnumOrdinal);
   }
 
 

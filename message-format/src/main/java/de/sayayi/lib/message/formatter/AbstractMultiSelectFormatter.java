@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -47,7 +48,7 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
   protected AbstractMultiSelectFormatter(@NotNull String configKey, String defaultConfigKeyIfAbsent,
                                          boolean delegateOnMismatch)
   {
-    this.configKey = configKey;
+    this.configKey = requireNonNull(configKey);
     this.defaultConfigKeyIfAbsent = defaultConfigKeyIfAbsent;
     this.delegateOnMismatch = delegateOnMismatch;
 
@@ -55,8 +56,15 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
   }
 
 
+  protected void register(@NotNull String[] configKeys, @NotNull MultiSelectFunction<T> function)
+  {
+    for(String configKey: requireNonNull(configKeys))
+      register(configKey, function);
+  }
+
+
   protected void register(@NotNull String configKey, @NotNull MultiSelectFunction<T> function) {
-    multiSelectFunctionMap.put(configKey, function);
+    multiSelectFunctionMap.put(requireNonNull(configKey), requireNonNull(function));
   }
 
 

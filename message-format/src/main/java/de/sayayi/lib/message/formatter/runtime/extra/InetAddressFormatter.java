@@ -15,13 +15,12 @@
  */
 package de.sayayi.lib.message.formatter.runtime.extra;
 
-import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractMultiSelectFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
-import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetAddress;
+import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
@@ -29,29 +28,20 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 /**
  * @author Jeroen Gremmen
  */
-public final class InetAddressFormatter extends AbstractSingleTypeParameterFormatter<InetAddress>
+public final class InetAddressFormatter extends AbstractMultiSelectFormatter<InetAddress>
 {
-  @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull InetAddress inetAddress)
+  public InetAddressFormatter()
   {
-    switch(context.getConfigValueString("inet").orElse("ip"))
-    {
-      case "name":
-        return noSpaceText(inetAddress.getHostName());
+    super("inet", "ip", true);
 
-      case "fqdn":
-        return noSpaceText(inetAddress.getCanonicalHostName());
-
-      case "ip":
-        return noSpaceText(inetAddress.getHostAddress());
-    }
-
-    return context.delegateToNextFormatter();
+    register("name", (context,inetAddress) -> noSpaceText(inetAddress.getHostName()));
+    register("fqdn", (context,inetAddress) -> noSpaceText(inetAddress.getCanonicalHostName()));
+    register("ip", (context,inetAddress) -> noSpaceText(inetAddress.getHostAddress()));
   }
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
-    return new FormattableType(InetAddress.class);
+  public @NotNull Set<FormattableType> getFormattableTypes() {
+    return Set.of(new FormattableType(InetAddress.class));
   }
 }

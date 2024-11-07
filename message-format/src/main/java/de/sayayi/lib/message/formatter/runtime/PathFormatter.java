@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractMultiSelectFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
@@ -39,85 +39,65 @@ import static java.util.OptionalLong.empty;
 /**
  * @author Jeroen Gremmen
  */
-public final class PathFormatter extends AbstractParameterFormatter<Object> implements SizeQueryable
+public final class PathFormatter extends AbstractMultiSelectFormatter<Object> implements SizeQueryable
 {
-  @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  public PathFormatter()
   {
-    Path path = valueToPath(value);
+    super("path", "path", true);
 
-    switch(context.getConfigValueString("path").orElse("path"))
-    {
-      case "real-path":
-        try {
-          path = path.toRealPath();
-          break;
-        } catch(IOException ignore) {
-        }
-        // fall through
-
-      case "absolute-path":
-        path = path.toAbsolutePath();
-        break;
-
-      case "name":
-        path = path.getFileName();
-        break;
-
-      case "normalized-path":
-        path = path.normalize();
-        break;
-
-      case "path":
-        break;
-
-      case "parent":
-        path = path.getParent();
-        break;
-
-      case "root":
-        path = path.getRoot();
-        break;
-
-      case "ext":
-      case "extension":
-        return formatValue_extension(context, path);
-
-      default:
-        return context.delegateToNextFormatter();
-    }
-
-    return path == null ? emptyText() : noSpaceText(path.toString());
+    register("real-path", (context,value) -> formatPathRealPath(toPath(value)));
+    register("absolute-path", (context,value) -> formatPathAbsolutePath(toPath(value)));
+    register("name", (context,value) -> toText(toPath(value).getFileName()));
+    register(new String[] { "normalize", "normalized-path" }, (context,value) -> toText(toPath(value).normalize()));
+    register("path", (context,value) -> toText(toPath(value)));
+    register("parent", (context,value) -> toText(toPath(value).getParent()));
+    register("root", (context,value) -> toText(toPath(value).getRoot()));
+    register(new String[] { "ext", "extension" }, (context,value) -> formatPathExtension(context, toPath(value)));
   }
 
 
-  @SuppressWarnings("DuplicatedCode")
-  private @NotNull Text formatValue_extension(@NotNull FormatterContext context, @NotNull Path path)
+  private @NotNull Text formatPathRealPath(@NotNull Path path)
+  {
+    try {
+      return toText(path.toRealPath());
+    } catch(IOException ignore) {
+    }
+
+    return formatPathAbsolutePath(path);
+  }
+
+
+  private @NotNull Text formatPathAbsolutePath(@NotNull Path path) {
+    return toText(path.toAbsolutePath());
+  }
+
+
+  private @NotNull Text formatPathExtension(@NotNull FormatterContext context, @NotNull Path path)
   {
     path = path.getFileName();
     if (path == null)
       return nullText();
 
     final String name = path.toString();
-    final int dotidx = name.lastIndexOf('.');
-    if (dotidx == -1)
+    final int dotIndex = name.lastIndexOf('.');
+    if (dotIndex == -1)
       return emptyText();
 
-    final String extension = name.substring(dotidx + 1);
+    final String extension = name.substring(dotIndex + 1);
 
     return formatUsingMappedString(context, extension, true).orElseGet(() -> noSpaceText(extension));
   }
 
 
   @Override
-  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object fileOrPath)
   {
-    final Path path = valueToPath(value);
+    final Path path = toPath(fileOrPath);
 
     if (isRegularFile(path))
     {
       try {
-        return OptionalLong.of(Files.size((Path)value));
+        return OptionalLong.of(Files.size(path));
       } catch(IOException ignored) {
       }
     }
@@ -139,7 +119,13 @@ public final class PathFormatter extends AbstractParameterFormatter<Object> impl
 
 
   @Contract(pure = true)
-  private static Path valueToPath(@NotNull Object value) {
-    return value instanceof File ? ((File)value).toPath() : (Path)value;
+  private static Path toPath(@NotNull Object fileOrPath) {
+    return fileOrPath instanceof File ? ((File)fileOrPath).toPath() : (Path)fileOrPath;
+  }
+
+
+  @Contract(pure = true)
+  private static @NotNull Text toText(Path path) {
+    return path == null ? emptyText() : noSpaceText(path.toString());
   }
 }

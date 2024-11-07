@@ -38,7 +38,7 @@ public final class LocaleFormatter extends AbstractMultiSelectFormatter<Locale>
     super("locale", "name", true);
 
     register("country", this::formatLocaleCountry);
-    register("language", this::formatLocaleLanguage);
+    register(new String[] { "lang", "language" }, this::formatLocaleLanguage);
     register("name", this::formatLocaleDisplayName);
     register("script", this::formatLocaleScript);
     register("variant", this::formatLocaleVariant);

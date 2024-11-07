@@ -15,13 +15,12 @@
  */
 package de.sayayi.lib.message.formatter.runtime.extra;
 
-import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractMultiSelectFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
-import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.security.Key;
+import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
@@ -30,29 +29,20 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class KeyFormatter extends AbstractSingleTypeParameterFormatter<Key>
+public final class KeyFormatter extends AbstractMultiSelectFormatter<Key>
 {
-  @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Key key)
+  public KeyFormatter()
   {
-    switch(context.getConfigValueString("key").orElse(""))
-    {
-      case "algorithm":
-        return noSpaceText(key.getAlgorithm());
+    super("key", true);
 
-      case "format":
-        return noSpaceText(key.getFormat());
-
-      case "encoded":
-        return context.format(key.getEncoded(), byte[].class, true);
-    }
-
-    return context.delegateToNextFormatter();
+    register("algorithm", (context,key) -> noSpaceText(key.getAlgorithm()));
+    register("format", (context,key) -> noSpaceText(key.getFormat()));
+    register("encoded", (context,key) -> context.format(key.getEncoded(), byte[].class, true));
   }
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
-    return new FormattableType(Key.class);
+  public @NotNull Set<FormattableType> getFormattableTypes() {
+    return Set.of(new FormattableType(Key.class));
   }
 }
