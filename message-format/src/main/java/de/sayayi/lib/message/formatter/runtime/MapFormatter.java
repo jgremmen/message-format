@@ -18,11 +18,8 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
-import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.NoSpaceTextPart;
@@ -32,27 +29,25 @@ import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.part.parameter.key.ConfigKeyNull;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import de.sayayi.lib.message.util.SupplierDelegate;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_ORDER;
-import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
+import static java.util.Collections.emptyIterator;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class MapFormatter
-    extends AbstractSingleTypeParameterFormatter<Map<?,?>>
-    implements SizeQueryable, ConfigKeyComparator<Map<?,?>>
+public final class MapFormatter extends AbstractListFormatter<Map<?,?>>
 {
   private static final Message.WithSpaces DEFAULT_KEY_VALUE_MESSAGE;
-  private static final Set<String> KEY_VALUE_PARAMETER_NAMES = Set.of("key", "value");
 
 
   static
@@ -70,38 +65,8 @@ public final class MapFormatter
 
 
   @Override
-  @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Map<?,?> map)
-  {
-    if (map.isEmpty())
-      return emptyText();
-
-    final Message.WithSpaces kvMessage = context
-        .getConfigValueMessage("map-kv")
-        .orElse(DEFAULT_KEY_VALUE_MESSAGE);
-    final Supplier<String> thisString = SupplierDelegate.of(() -> context
-        .getConfigValueString("map-this")
-        .map(String::trim)
-        .orElse("(this map)"));
-
-    final MessageAccessor messageAccessor = context.getMessageAccessor();
-    final KeyValueParameters parameters = new KeyValueParameters(messageAccessor.getLocale());
-
-    return context.format(map
-        .entrySet()
-        .stream()
-        .map(entry -> {
-          parameters.key = fixValue(map, entry.getKey(), thisString);
-          parameters.value = fixValue(map, entry.getValue(), thisString);
-
-          return kvMessage.format(messageAccessor, parameters);
-        })
-        .toArray(String[]::new), String[].class);
-  }
-
-
-  private Object fixValue(@NotNull Map<?,?> map, Object value, @NotNull Supplier<String> thisString) {
-    return value == map ? thisString.get() : value;
+  protected @NotNull Iterator<Text> createIterator(@NotNull FormatterContext context, @NotNull Map<?,?> map) {
+    return map.isEmpty() ? emptyIterator() : new TextIterator(context, map);
   }
 
 
@@ -112,16 +77,91 @@ public final class MapFormatter
 
 
   @Override
-  public @NotNull FormattableType getFormattableType()
-  {
-    // map implements iterable, so make sure it has a higher precedence than IterableFormatter
-    return new FormattableType(Map.class, DEFAULT_ORDER - 5);
+  public @NotNull MatchResult compareToEmptyKey(Map<?,?> value, @NotNull ComparatorContext context) {
+    return forEmptyKey(context.getCompareType(), value == null || value.isEmpty());
   }
 
 
   @Override
-  public @NotNull MatchResult compareToEmptyKey(Map<?,?> value, @NotNull ComparatorContext context) {
-    return forEmptyKey(context.getCompareType(), value == null || value.isEmpty());
+  public @NotNull Set<FormattableType> getFormattableTypes()
+  {
+    // map implements iterable, so make sure it has a higher precedence than IterableFormatter
+    return Set.of(new FormattableType(Map.class, DEFAULT_ORDER - 5));
+  }
+
+
+
+
+  private static final class TextIterator implements Iterator<Text>
+  {
+    private final MessageAccessor messageAccessor;
+    private final KeyValueParameters parameters;
+    private final Supplier<Text> thisText;
+    private final Map<?,?> map;
+    private final Iterator<Entry<?,?>> iterator;
+    private final Message.WithSpaces keyValueMessage;
+    private Text nextText;
+
+
+    @SuppressWarnings("unchecked")
+    private TextIterator(@NotNull FormatterContext context, @NotNull Map<?,?> map)
+    {
+      this.map = map;
+
+      //noinspection rawtypes
+      iterator = (Iterator)map.entrySet().iterator();
+      messageAccessor = context.getMessageAccessor();
+
+      keyValueMessage = context
+          .getConfigValueMessage("map-kv")
+          .orElse(DEFAULT_KEY_VALUE_MESSAGE);
+      parameters = new KeyValueParameters(context.getLocale());
+
+      thisText = SupplierDelegate.of(() ->
+          noSpaceText(context.getConfigValueString("map-this")
+              .orElse("(this map)")));
+
+      prepareNextText();
+    }
+
+
+    private void prepareNextText()
+    {
+      Text text;
+
+      for(nextText = null; nextText == null && iterator.hasNext();)
+      {
+        final Entry<?,?> entry = iterator.next();
+
+        parameters.key = fixValue(entry.getKey());
+        parameters.value = fixValue(entry.getValue());
+
+        if (!(text = noSpaceText(keyValueMessage.format(messageAccessor, parameters))).isEmpty())
+          nextText = text;
+      }
+    }
+
+
+    @Override
+    public boolean hasNext() {
+      return nextText != null;
+    }
+
+
+    @Override
+    public Text next()
+    {
+      final Text text = nextText;
+
+      prepareNextText();
+
+      return text;
+    }
+
+
+    private Object fixValue(Object value) {
+      return value == map ? thisText.get() : value;
+    }
   }
 
 
@@ -153,7 +193,7 @@ public final class MapFormatter
 
     @Override
     public @NotNull Set<String> getParameterNames() {
-      return KEY_VALUE_PARAMETER_NAMES;
+      return Set.of("key", "value");
     }
 
 
