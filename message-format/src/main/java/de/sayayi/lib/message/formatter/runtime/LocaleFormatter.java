@@ -15,13 +15,14 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractMultiSelectFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
+import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
@@ -30,37 +31,51 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class LocaleFormatter extends AbstractSingleTypeParameterFormatter<Locale>
+public final class LocaleFormatter extends AbstractMultiSelectFormatter<Locale>
 {
-  @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Locale locale)
+  public LocaleFormatter()
   {
-    switch(context.getConfigValueString("locale").orElse("name"))
-    {
-      case "country":
-        return formatUsingMappedString(context, locale.getCountry(), true)
-            .orElseGet(() -> noSpaceText(locale.getDisplayCountry(context.getLocale())));
+    super("locale", "name", true);
 
-      case "language":
-        return formatUsingMappedString(context, locale.getLanguage(), true)
-            .orElseGet(() -> noSpaceText(locale.getDisplayLanguage(context.getLocale())));
+    register("country", this::formatLocaleCountry);
+    register("language", this::formatLocaleLanguage);
+    register("name", this::formatLocaleDisplayName);
+    register("script", this::formatLocaleScript);
+    register("variant", this::formatLocaleVariant);
+  }
 
-      case "name":
-        return noSpaceText(locale.getDisplayName(context.getLocale()));
 
-      case "script":
-        return noSpaceText(locale.getDisplayScript(context.getLocale()));
+  private @NotNull Text formatLocaleCountry(@NotNull FormatterContext context, @NotNull Locale locale)
+  {
+    return formatUsingMappedString(context, locale.getCountry(), true)
+        .orElseGet(() -> noSpaceText(locale.getDisplayCountry(context.getLocale())));
+  }
 
-      case "variant":
-        return noSpaceText(locale.getDisplayVariant(context.getLocale()));
-    }
 
-    return context.delegateToNextFormatter();
+  private @NotNull Text formatLocaleLanguage(@NotNull FormatterContext context, @NotNull Locale locale)
+  {
+    return formatUsingMappedString(context, locale.getLanguage(), true)
+        .orElseGet(() -> noSpaceText(locale.getDisplayLanguage(context.getLocale())));
+  }
+
+
+  private @NotNull Text formatLocaleDisplayName(@NotNull FormatterContext context, @NotNull Locale locale) {
+    return noSpaceText(locale.getDisplayName(context.getLocale()));
+  }
+
+
+  private @NotNull Text formatLocaleScript(@NotNull FormatterContext context, @NotNull Locale locale) {
+    return noSpaceText(locale.getDisplayScript(context.getLocale()));
+  }
+
+
+  private @NotNull Text formatLocaleVariant(@NotNull FormatterContext context, @NotNull Locale locale) {
+    return noSpaceText(locale.getDisplayVariant(context.getLocale()));
   }
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
-    return new FormattableType(Locale.class);
+  public @NotNull Set<FormattableType> getFormattableTypes() {
+    return Set.of(new FormattableType(Locale.class));
   }
 }

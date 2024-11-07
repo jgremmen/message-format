@@ -15,13 +15,15 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
+import de.sayayi.lib.message.formatter.AbstractMultiSelectFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.*;
@@ -30,50 +32,51 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Def
 /**
  * @author Jeroen Gremmen
  */
-public final class EnumFormatter
-    extends AbstractSingleTypeParameterFormatter<Enum<?>>
-    implements ConfigKeyComparator<Enum<?>>
+public final class EnumFormatter extends AbstractMultiSelectFormatter<Enum<?>> implements ConfigKeyComparator<Enum<?>>
 {
-  @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Enum<?> value)
+  public EnumFormatter()
   {
-    switch(context.getConfigValueString("enum").orElse("name"))
-    {
-      case "ordinal":
-      case "ord": {
-        final int ordinal = value.ordinal();
+    super("enum", "name", true);
 
-        return formatUsingMappedNumber(context, ordinal, true)
-            .orElseGet(() -> context.format(ordinal, int.class, true));
-      }
+    register("name", this::formatEnumName);
+    register("ord", this::formatEnumOrdinal);
+    register("ordinal", this::formatEnumOrdinal);
+  }
 
-      case "name": {
-        final String name = value.name();
 
-        return formatUsingMappedString(context, name, true).orElseGet(() -> noSpaceText(name));
-      }
-    }
+  private @NotNull Text formatEnumOrdinal(@NotNull FormatterContext context, @NotNull Enum<?> enumValue)
+  {
+    final int ordinal = enumValue.ordinal();
 
-    return context.delegateToNextFormatter();
+    return formatUsingMappedNumber(context, ordinal, true)
+        .orElseGet(() -> context.format(ordinal, int.class));
+  }
+
+
+  private @NotNull Text formatEnumName(@NotNull FormatterContext context, @NotNull Enum<?> enumValue)
+  {
+    final String name = enumValue.name();
+
+    return formatUsingMappedString(context, name, true).orElseGet(() -> noSpaceText(name));
   }
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
-    return new FormattableType(Enum.class);
-  }
-
-
-  @Override
-  public @NotNull MatchResult compareToNumberKey(@NotNull Enum<?> value, @NotNull ComparatorContext context)
+  public @NotNull MatchResult compareToNumberKey(@NotNull Enum<?> enumValue, @NotNull ComparatorContext context)
   {
     return context.getCompareType()
-        .match(Long.compare(value.ordinal(), context.getNumberKeyValue())) ? LENIENT : MISMATCH;
+        .match(Long.compare(enumValue.ordinal(), context.getNumberKeyValue())) ? LENIENT : MISMATCH;
   }
 
 
   @Override
-  public @NotNull MatchResult compareToStringKey(@NotNull Enum<?> value, @NotNull ComparatorContext context) {
-    return context.getCompareType().match(value.name().compareTo(context.getStringKeyValue())) ? EXACT : MISMATCH;
+  public @NotNull MatchResult compareToStringKey(@NotNull Enum<?> enumValue, @NotNull ComparatorContext context) {
+    return context.getCompareType().match(enumValue.name().compareTo(context.getStringKeyValue())) ? EXACT : MISMATCH;
+  }
+
+
+  @Override
+  public @NotNull Set<FormattableType> getFormattableTypes() {
+    return Set.of(new FormattableType(Enum.class));
   }
 }
