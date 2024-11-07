@@ -58,7 +58,7 @@ import static de.sayayi.lib.message.util.SpacesUtil.isTrimmedEmpty;
  * @author Jeroen Gremmen
  * @since 0.12.0
  */
-abstract class AbstractListFormatter<T> extends AbstractParameterFormatter<T>
+public abstract class AbstractListFormatter<T> extends AbstractParameterFormatter<T>
     implements SizeQueryable, ConfigKeyComparator<T>
 {
   // default list-value: %{value}

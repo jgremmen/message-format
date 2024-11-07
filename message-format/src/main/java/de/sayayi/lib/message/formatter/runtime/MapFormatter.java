@@ -38,6 +38,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.function.Supplier;
 
+import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_ORDER;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
@@ -111,8 +112,10 @@ public final class MapFormatter
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
-    return new FormattableType(Map.class);
+  public @NotNull FormattableType getFormattableType()
+  {
+    // map implements iterable, so make sure it has a higher precedence than IterableFormatter
+    return new FormattableType(Map.class, DEFAULT_ORDER - 5);
   }
 
 
