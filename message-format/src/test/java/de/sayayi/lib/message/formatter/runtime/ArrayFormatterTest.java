@@ -221,12 +221,12 @@ class ArrayFormatterTest extends AbstractFormatterTest
     return Stream.of(
         Arguments.of("Empty array with max size 0", new String[0], null, 0, null, ""),
         Arguments.of("Array with last separator", new String[] { "A", "B", "C" }, " and ", null, null, "A, B and C"),
-        Arguments.of("Array with max size 2 and more separator", new String[] { "A", "B", "C" }, null, 2, "...", "A, B, ..."),
+        Arguments.of("Array with max size 2 and more value", new String[] { "A", "B", "C" }, null, 2, "...", "A, B, ..."),
         Arguments.of("Array with max size 2 and last separator", new String[] { "A", "B", "C" }, " and ", 2, null, "A and B"),
         Arguments.of("Array with max size 1 and last separator", new String[] { "A", "B", "C" }, " and ", 1, null, "A"),
         Arguments.of("Non-empty array with max size 0 and last separator", new String[] { "A", "B", "C" }, null, 0, null, ""),
-        Arguments.of("Non-empty array with max size 0 and more separator", new String[] { "A", "B", "C" }, null, 0, "...", "..."),
-        Arguments.of("Array without last and more separators", new String[] { "A", "B", "C" }, null, null, null, "A, B, C"),
+        Arguments.of("Non-empty array with max size 0 and more value", new String[] { "A", "B", "C" }, null, 0, "...", "..."),
+        Arguments.of("Array without last separator and more value", new String[] { "A", "B", "C" }, null, null, null, "A, B, C"),
         Arguments.of("Array with max size 2", new String[] { "A", "B", "C" }, null, 2, null, "A, B"),
         Arguments.of("Array with max size 1", new String[] { "A", "B", "C" }, null, 1, null, "A"),
         Arguments.of("Non-empty array with max size 0", new String[] { "A", "B", "C" }, null, 0, null, ""),
@@ -235,10 +235,10 @@ class ArrayFormatterTest extends AbstractFormatterTest
   }
 
 
-  @DisplayName("Max size, last and more separator")
+  @DisplayName("Max size, last separator and more value")
   @ParameterizedTest(name = "{0}")
   @MethodSource("crossTableParameters")
-  void crossTable(@NotNull String name, Object array, String listSepLast, Integer listMaxSize, String listSepMore,
+  void crossTable(@NotNull String name, Object array, String listSepLast, Integer listMaxSize, String listValueMore,
                   @NotNull String result)
   {
     val messageFormat = new StringBuilder("%{array");
@@ -246,8 +246,8 @@ class ArrayFormatterTest extends AbstractFormatterTest
       messageFormat.append(",list-sep-last:\"").append(listSepLast).append('"');
     if (listMaxSize != null)
       messageFormat.append(",list-max-size:").append(listMaxSize);
-    if (listSepMore != null)
-      messageFormat.append(",list-sep-more:\"").append(listSepMore).append('"');
+    if (listValueMore != null)
+      messageFormat.append(",list-value-more:\"").append(listValueMore).append('"');
     messageFormat.append("}");
 
     val message = MessageSupportFactory

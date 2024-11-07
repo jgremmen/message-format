@@ -17,24 +17,16 @@ package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
-import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
-import de.sayayi.lib.message.internal.CompoundMessage;
-import de.sayayi.lib.message.internal.TextJoiner;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.ParameterPart;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
-import de.sayayi.lib.message.util.SpacesUtil;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
-import java.util.List;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicIntegerArray;
@@ -44,14 +36,13 @@ import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
 
 
 /**
  * <p>
  * <table border="1">
- *   <tr><th>&nbsp;array&nbsp;</th><th>&nbsp;sep-last&nbsp;</th><th>&nbsp;max-size&nbsp;</th><th>&nbsp;sep-more&nbsp;</th><th>&nbsp;result&nbsp;</th></tr>
+ *   <tr><th>&nbsp;array&nbsp;</th><th>&nbsp;sep-last&nbsp;</th><th>&nbsp;max-size&nbsp;</th><th>&nbsp;value-more&nbsp;</th><th>&nbsp;result&nbsp;</th></tr>
  *   <tr><td>[]</td><td>n/a</td><td>0</td><td>n/a</td><td>''</td></tr>
  *   <tr><td>[A,B,C]</td><td>'&nbsp;and'</td><td>(undefined)</td><td>n/a</td><td>'A, B and C'</td></tr>
  *   <tr><td>[A,B,C]</td><td>n/a</td><td>2</td><td>'...'</td><td>'A, B, ...'</td></tr>
@@ -68,51 +59,11 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.for
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class ArrayFormatter extends AbstractParameterFormatter<Object>
-    implements SizeQueryable, ConfigKeyComparator<Object>
+public final class ArrayFormatter extends AbstractListFormatter<Object>
 {
-  // default list-value: %{value}
-  private static final Message.WithSpaces DEFAULT_VALUE_MESSAGE =
-      new CompoundMessage(List.of(new ParameterPart("value")));
-
-
   @Override
-  @SuppressWarnings("DuplicatedCode")
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object array)
-  {
-    final Text separator = spacedText(context.getConfigValueString("list-sep").orElse(", "));
-    final String separatorMore = context.getConfigValueString("list-sep-more").orElse(null);
-    final boolean hasSeparatorMore = separatorMore != null && !SpacesUtil.isTrimmedEmpty(separatorMore);
-
-    final TextJoiner joiner = new TextJoiner();
-    int n = (int)context.getConfigValueNumber("list-max-size").orElse(Integer.MAX_VALUE);
-    final Iterator<Text> iterator = new TextIterator(context, array);
-
-    if (n == 0 && iterator.hasNext() && hasSeparatorMore)
-      joiner.add(noSpaceText(separatorMore));
-    else
-    {
-      for(boolean first = true; iterator.hasNext() && !(n == 0 && !hasSeparatorMore);)
-      {
-        final Text text = iterator.next();
-        final boolean lastElement = !iterator.hasNext() || n == 0 || (n == 1 && !hasSeparatorMore);
-
-        if (first)
-          first = false;
-        else if (lastElement && !hasSeparatorMore)
-        {
-          joiner.add(spacedText(context
-              .getConfigValueString("list-sep-last")
-              .orElseGet(separator::getTextWithSpaces)));
-        }
-        else
-          joiner.add(separator);
-
-        joiner.add(n-- == 0 ? spacedText(separatorMore) : text);
-      }
-    }
-
-    return joiner.asNoSpaceText();
+  protected @NotNull Iterator<Text> createIterator(@NotNull FormatterContext context, @NotNull Object value) {
+    return new TextIterator(context, value);
   }
 
 
@@ -122,33 +73,9 @@ public final class ArrayFormatter extends AbstractParameterFormatter<Object>
   }
 
 
-  @Contract(pure = true)
-  private int getLength(@NotNull Object array)
-  {
-    if (array instanceof AtomicIntegerArray)
-      return ((AtomicIntegerArray)array).length();
-    else if (array instanceof AtomicLongArray)
-      return ((AtomicLongArray)array).length();
-    else if (array instanceof AtomicReferenceArray)
-      return ((AtomicReferenceArray<?>)array).length();
-    else
-      return Array.getLength(array);
-  }
-
-
-  @Contract(pure = true)
-  private static @NotNull IntFunction<Object> createGetter(@NotNull Object array)
-  {
-    if (array instanceof AtomicIntegerArray)
-      return ((AtomicIntegerArray)array)::get;
-
-    if (array instanceof AtomicLongArray)
-      return ((AtomicLongArray)array)::get;
-
-    if (array instanceof AtomicReferenceArray)
-      return ((AtomicReferenceArray<?>)array)::get;
-
-    return index -> Array.get(array, index);
+  @Override
+  public @NotNull MatchResult compareToEmptyKey(Object value, @NotNull ComparatorContext context) {
+    return forEmptyKey(context.getCompareType(), value == null || getLength(value) == 0);
   }
 
 
@@ -170,9 +97,35 @@ public final class ArrayFormatter extends AbstractParameterFormatter<Object>
   }
 
 
-  @Override
-  public @NotNull MatchResult compareToEmptyKey(Object value, @NotNull ComparatorContext context) {
-    return forEmptyKey(context.getCompareType(), value == null || getLength(value) == 0);
+  @Contract(pure = true)
+  private static int getLength(@NotNull Object array)
+  {
+    if (array instanceof AtomicIntegerArray)
+      return ((AtomicIntegerArray)array).length();
+
+    if (array instanceof AtomicLongArray)
+      return ((AtomicLongArray)array).length();
+
+    if (array instanceof AtomicReferenceArray)
+      return ((AtomicReferenceArray<?>)array).length();
+
+    return Array.getLength(array);
+  }
+
+
+  @Contract(pure = true)
+  private static @NotNull IntFunction<Object> createGetter(@NotNull Object array)
+  {
+    if (array instanceof AtomicIntegerArray)
+      return ((AtomicIntegerArray)array)::get;
+
+    if (array instanceof AtomicLongArray)
+      return ((AtomicLongArray)array)::get;
+
+    if (array instanceof AtomicReferenceArray)
+      return ((AtomicReferenceArray<?>)array)::get;
+
+    return index -> Array.get(array, index);
   }
 
 
@@ -199,13 +152,13 @@ public final class ArrayFormatter extends AbstractParameterFormatter<Object>
       getter = createGetter(array);
 
       valueMessage = context
-          .getConfigValueMessage("list-value")
+          .getConfigValueMessage(CONFIG_VALUE)
           .orElse(DEFAULT_VALUE_MESSAGE);
 
       parameters = new ValueParameters(context.getLocale(), "value");
       thisText = SupplierDelegate.of(() -> noSpaceText(
-          context.getConfigValueString("list-this").orElse("(this array)")));
-      length = Array.getLength(array);
+          context.getConfigValueString(CONFIG_THIS).orElse("(this array)")));
+      length = getLength(array);
 
       prepareNextText();
     }

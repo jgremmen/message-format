@@ -17,71 +17,31 @@ package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
-import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
-import de.sayayi.lib.message.internal.CompoundMessage;
-import de.sayayi.lib.message.internal.TextJoiner;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.ParameterPart;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.util.SupplierDelegate;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.OptionalLong;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
 
 
 /**
  * @author Jeroen Gremmen
  */
-public final class IterableFormatter
-    extends AbstractSingleTypeParameterFormatter<Iterable<?>>
-    implements SizeQueryable, ConfigKeyComparator<Iterable<?>>
+public final class IterableFormatter extends AbstractListFormatter<Iterable<?>>
 {
-  // default list-value: %{value}
-  private static final Message.WithSpaces DEFAULT_VALUE_MESSAGE =
-      new CompoundMessage(List.of(new ParameterPart("value")));
-
-
   @Override
-  @Contract(pure = true)
-  @SuppressWarnings("DuplicatedCode")
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Iterable<?> iterable)
-  {
-    final Text separator = spacedText(context
-        .getConfigValueString("list-sep")
-        .orElse(", "));
-    final Text lastSeparator = spacedText(context
-        .getConfigValueString("list-sep-last")
-        .orElseGet(separator::getTextWithSpaces));
-
-    final TextJoiner joiner = new TextJoiner();
-    boolean first = true;
-
-    for(final Iterator<Text> iterator = new TextIterator(context, iterable); iterator.hasNext();)
-    {
-      final Text text = iterator.next();
-
-      if (first)
-        first = false;
-      else
-        joiner.add(iterator.hasNext() ? separator : lastSeparator);
-
-      joiner.add(text);
-    }
-
-    return joiner.asNoSpaceText();
+  protected @NotNull Iterator<Text> createIterator(@NotNull FormatterContext context, @NotNull Iterable<?> value) {
+    return new TextIterator(context, value);
   }
 
 
@@ -101,18 +61,18 @@ public final class IterableFormatter
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
-    return new FormattableType(Iterable.class);
-  }
-
-
-  @Override
   public @NotNull MatchResult compareToEmptyKey(Iterable<?> value, @NotNull ComparatorContext context)
   {
     return forEmptyKey(context.getCompareType(),
         value instanceof Collection
             ? ((Collection<?>)value).isEmpty()
             : value == null || !value.iterator().hasNext());
+  }
+
+
+  @Override
+  public @NotNull Set<FormattableType> getFormattableTypes() {
+    return Set.of(new FormattableType(Iterable.class));
   }
 
 
@@ -137,12 +97,12 @@ public final class IterableFormatter
       messageAccessor = context.getMessageAccessor();
 
       valueMessage = context
-          .getConfigValueMessage("list-value")
+          .getConfigValueMessage(CONFIG_VALUE)
           .orElse(DEFAULT_VALUE_MESSAGE);
 
       parameters = new ValueParameters(context.getLocale(), "value");
       thisText = SupplierDelegate.of(() ->
-          noSpaceText(context.getConfigValueString("list-this")
+          noSpaceText(context.getConfigValueString(CONFIG_THIS)
               .orElse("(this collection)")));
 
       prepareNextText();
