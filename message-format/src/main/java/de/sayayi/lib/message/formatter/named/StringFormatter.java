@@ -27,6 +27,7 @@ import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueBool;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
@@ -76,6 +77,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   }
 
 
+  @Contract(pure = true)
   private @NotNull String valueAsString(@NotNull MessageAccessor messageAccessor, @NotNull Object value)
   {
     if (value instanceof char[])
@@ -87,11 +89,28 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
 
     final ConfigValue cv = messageAccessor.getDefaultParameterConfig("ignore-default-tostring");
 
-    if (cv != null && cv.getType() == BOOL && ((ConfigValueBool)cv).booleanValue() &&
-        (value.getClass().getName() + '@' + toHexString(value.hashCode())).equals(string))
+    if (cv != null && cv.getType() == BOOL && ((ConfigValueBool)cv).booleanValue() && isDefaultToString(value))
       string = "";
 
     return string;
+  }
+
+
+  @Contract(pure = true)
+  @SuppressWarnings("RedundantIfStatement")
+  private boolean isDefaultToString(@NotNull Object value)
+  {
+    final String string = value.toString();
+    final Class<?> valueClass = value.getClass();
+    final String fqClassName = valueClass.getName();
+
+    if ((fqClassName + '@' + toHexString(value.hashCode())).equals(string))
+      return true;
+
+    if (fqClassName.contains("$$Lambda$"))
+      return true;
+
+    return false;
   }
 
 
