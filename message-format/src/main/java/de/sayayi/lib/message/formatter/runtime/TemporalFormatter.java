@@ -22,9 +22,6 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
@@ -35,6 +32,9 @@ import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.time.format.DateTimeFormatter.*;
 import static java.time.format.FormatStyle.*;
+import static java.time.temporal.ChronoField.*;
+import static java.util.Map.entry;
+import static java.util.Map.ofEntries;
 import static java.util.Objects.requireNonNull;
 
 
@@ -43,36 +43,36 @@ import static java.util.Objects.requireNonNull;
  */
 public final class TemporalFormatter extends AbstractParameterFormatter<Temporal>
 {
-  private static final Map<String,String> STYLE = Map.ofEntries(
-      Map.entry("short", "SS"),
-      Map.entry("medium", "MM"),
-      Map.entry("long", "LL"),
-      Map.entry("full", "FF"),
-      Map.entry("date", "M-"),
-      Map.entry("time", "-M"));
+  private static final Map<String,String> STYLE = ofEntries(
+      entry("short", "SS"),
+      entry("medium", "MM"),
+      entry("long", "LL"),
+      entry("full", "FF"),
+      entry("date", "M-"),
+      entry("time", "-M"));
 
-  private static final Map<String,DateTimeFormatter> FORMATTER = Map.ofEntries(
-      Map.entry("SS", ofLocalizedDateTime(SHORT, SHORT)),
-      Map.entry("S-", ofLocalizedDate(SHORT)),
-      Map.entry("-S", ofLocalizedTime(SHORT)),
+  private static final Map<String,DateTimeFormatter> FORMATTER = ofEntries(
+      entry("SS", ofLocalizedDateTime(SHORT, SHORT)),
+      entry("S-", ofLocalizedDate(SHORT)),
+      entry("-S", ofLocalizedTime(SHORT)),
 
-      Map.entry("MM", ofLocalizedDateTime(MEDIUM, MEDIUM)),
-      Map.entry("M-", ofLocalizedDate(MEDIUM)),
-      Map.entry("-M", ofLocalizedTime(MEDIUM)),
+      entry("MM", ofLocalizedDateTime(MEDIUM, MEDIUM)),
+      entry("M-", ofLocalizedDate(MEDIUM)),
+      entry("-M", ofLocalizedTime(MEDIUM)),
 
-      Map.entry("LL", ofLocalizedDateTime(LONG, LONG)),
-      Map.entry("LM", ofLocalizedDateTime(LONG, MEDIUM)),
-      Map.entry("L-", ofLocalizedDate(LONG)),
-      Map.entry("-L", ofLocalizedTime(LONG)),
+      entry("LL", ofLocalizedDateTime(LONG, LONG)),
+      entry("LM", ofLocalizedDateTime(LONG, MEDIUM)),
+      entry("L-", ofLocalizedDate(LONG)),
+      entry("-L", ofLocalizedTime(LONG)),
 
-      Map.entry("FF", ofLocalizedDateTime(FULL, FULL)),
-      Map.entry("F-", ofLocalizedDate(FULL)),
-      Map.entry("-F", ofLocalizedTime(FULL)));
+      entry("FF", ofLocalizedDateTime(FULL, FULL)),
+      entry("F-", ofLocalizedDate(FULL)),
+      entry("-F", ofLocalizedTime(FULL)));
 
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Temporal value)
+  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Temporal temporal)
   {
     final String format = context.getConfigValueString("date").orElse(null);
     final DateTimeFormatter formatter;
@@ -83,40 +83,31 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
     {
       final char[] style = (format == null ? "MM" : STYLE.get(format)).toCharArray();
 
-      if (value instanceof LocalDate)
-        style[1] = '-';
-      else if (value instanceof LocalTime)
+      if (!temporal.isSupported(YEAR) &&
+          !temporal.isSupported(DAY_OF_MONTH) &&
+          !temporal.isSupported(DAY_OF_WEEK) &&
+          !temporal.isSupported(INSTANT_SECONDS))
         style[0] = '-';
+
+      if (!temporal.isSupported(HOUR_OF_DAY) &&
+          !temporal.isSupported(MILLI_OF_DAY) &&
+          !temporal.isSupported(INSTANT_SECONDS))
+        style[1] = '-';
 
       if ((formatter = FORMATTER.get(new String(style))) == null)
         return emptyText();
     }
 
-    String text = formatter
+    return noSpaceText(formatter
         .withZone(ZoneId.systemDefault())
         .withLocale(context.getLocale())
-        .format(value).trim();
-/*
-    // strip trailing timezone for local time
-    if (value instanceof LocalTime && ("long".equals(format) || "full".equals(format)))
-    {
-      int idx = text.lastIndexOf(' ');
-      if (idx > 0)
-        text = text.substring(0, idx);
-    }
-*/
-    return noSpaceText(text);
+        .format(temporal));
   }
 
 
   @Override
   @Contract(value = "-> new", pure = true)
-  public @NotNull Set<FormattableType> getFormattableTypes()
-  {
-    return Set.of(
-        new FormattableType(LocalDate.class),
-        new FormattableType(LocalTime.class),
-        new FormattableType(LocalDateTime.class),
-        new FormattableType(Temporal.class));
+  public @NotNull Set<FormattableType> getFormattableTypes() {
+    return Set.of(new FormattableType(Temporal.class));
   }
 }
