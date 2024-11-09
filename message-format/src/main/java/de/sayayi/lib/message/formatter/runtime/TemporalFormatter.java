@@ -28,7 +28,6 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,40 +41,33 @@ import static java.util.Objects.requireNonNull;
 /**
  * @author Jeroen Gremmen
  */
-public final class Java8DateTimeFormatter extends AbstractParameterFormatter<Temporal>
+public final class TemporalFormatter extends AbstractParameterFormatter<Temporal>
 {
-  private static final Map<String,String> STYLE = new HashMap<>();
-  private static final Map<String,DateTimeFormatter> FORMATTER = new HashMap<>();
+  private static final Map<String,String> STYLE = Map.ofEntries(
+      Map.entry("short", "SS"),
+      Map.entry("medium", "MM"),
+      Map.entry("long", "LL"),
+      Map.entry("full", "FF"),
+      Map.entry("date", "M-"),
+      Map.entry("time", "-M"));
 
-  static
-  {
-    STYLE.put(null, "MM");
-    STYLE.put("short", "SS");
-    STYLE.put("medium", "MM");
-    STYLE.put("long", "LL");
-    STYLE.put("full", "FF");
-    STYLE.put("date", "M-");
-    STYLE.put("time", "-M");
+  private static final Map<String,DateTimeFormatter> FORMATTER = Map.ofEntries(
+      Map.entry("SS", ofLocalizedDateTime(SHORT, SHORT)),
+      Map.entry("S-", ofLocalizedDate(SHORT)),
+      Map.entry("-S", ofLocalizedTime(SHORT)),
 
-    FORMATTER.put("SS", ofLocalizedDateTime(SHORT, SHORT));
-    FORMATTER.put("S-", ofLocalizedDate(SHORT));
-    FORMATTER.put("-S", ofLocalizedTime(SHORT));
+      Map.entry("MM", ofLocalizedDateTime(MEDIUM, MEDIUM)),
+      Map.entry("M-", ofLocalizedDate(MEDIUM)),
+      Map.entry("-M", ofLocalizedTime(MEDIUM)),
 
-    FORMATTER.put("MM", ofLocalizedDateTime(MEDIUM, MEDIUM));
-    FORMATTER.put("M-", ofLocalizedDate(MEDIUM));
-    FORMATTER.put("-M", ofLocalizedTime(MEDIUM));
+      Map.entry("LL", ofLocalizedDateTime(LONG, LONG)),
+      Map.entry("LM", ofLocalizedDateTime(LONG, MEDIUM)),
+      Map.entry("L-", ofLocalizedDate(LONG)),
+      Map.entry("-L", ofLocalizedTime(LONG)),
 
-    FORMATTER.put("LL", ofLocalizedDateTime(LONG, LONG));
-    FORMATTER.put("LM", ofLocalizedDateTime(LONG, MEDIUM));
-    FORMATTER.put("L-", ofLocalizedDate(LONG));
-    FORMATTER.put("-L", ofLocalizedTime(LONG));
-
-    FORMATTER.put("FF", ofLocalizedDateTime(FULL, FULL));
-    FORMATTER.put("F-", ofLocalizedDate(FULL));
-    FORMATTER.put("-F", ofLocalizedTime(FULL));
-
-    FORMATTER.put("--", null);
-  }
+      Map.entry("FF", ofLocalizedDateTime(FULL, FULL)),
+      Map.entry("F-", ofLocalizedDate(FULL)),
+      Map.entry("-F", ofLocalizedTime(FULL)));
 
 
   @Override
@@ -85,11 +77,11 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter<Tem
     final String format = context.getConfigValueString("date").orElse(null);
     final DateTimeFormatter formatter;
 
-    if (!STYLE.containsKey(format))
+    if (format != null && !STYLE.containsKey(format))
       formatter = ofPattern(requireNonNull(format));
     else
     {
-      final char[] style = STYLE.get(format).toCharArray();
+      final char[] style = (format == null ? "MM" : STYLE.get(format)).toCharArray();
 
       if (value instanceof LocalDate)
         style[1] = '-';
@@ -104,7 +96,7 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter<Tem
         .withZone(ZoneId.systemDefault())
         .withLocale(context.getLocale())
         .format(value).trim();
-
+/*
     // strip trailing timezone for local time
     if (value instanceof LocalTime && ("long".equals(format) || "full".equals(format)))
     {
@@ -112,7 +104,7 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter<Tem
       if (idx > 0)
         text = text.substring(0, idx);
     }
-
+*/
     return noSpaceText(text);
   }
 
@@ -124,6 +116,7 @@ public final class Java8DateTimeFormatter extends AbstractParameterFormatter<Tem
     return Set.of(
         new FormattableType(LocalDate.class),
         new FormattableType(LocalTime.class),
-        new FormattableType(LocalDateTime.class));
+        new FormattableType(LocalDateTime.class),
+        new FormattableType(Temporal.class));
   }
 }

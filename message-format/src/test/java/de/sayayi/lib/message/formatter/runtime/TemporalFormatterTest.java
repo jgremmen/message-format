@@ -42,8 +42,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jeroen Gremmen
  */
-@DisplayName("Java 8 date/time formatter")
-class Java8DateTimeFormatterTest extends AbstractFormatterTest
+@DisplayName("Temporal formatter")
+class TemporalFormatterTest extends AbstractFormatterTest
 {
   @BeforeAll
   static void init() {
@@ -54,9 +54,9 @@ class Java8DateTimeFormatterTest extends AbstractFormatterTest
   @Test
   void testFormattableTypes()
   {
-    assertFormatterForType(new Java8DateTimeFormatter(), LocalDate.class);
-    assertFormatterForType(new Java8DateTimeFormatter(), LocalTime.class);
-    assertFormatterForType(new Java8DateTimeFormatter(), LocalDateTime.class);
+    assertFormatterForType(new TemporalFormatter(), LocalDate.class);
+    assertFormatterForType(new TemporalFormatter(), LocalTime.class);
+    assertFormatterForType(new TemporalFormatter(), LocalDateTime.class);
   }
 
 
@@ -64,7 +64,7 @@ class Java8DateTimeFormatterTest extends AbstractFormatterTest
   void testLocalDate()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new Java8DateTimeFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new TemporalFormatter()), NO_CACHE_INSTANCE)
         .setLocale(GERMANY)
         .getMessageAccessor();
     val date = LocalDate.of(1972, 8, 17);
@@ -94,7 +94,7 @@ class Java8DateTimeFormatterTest extends AbstractFormatterTest
   void testLocalTime()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new Java8DateTimeFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new TemporalFormatter()), NO_CACHE_INSTANCE)
         .setLocale(GERMANY)
         .getMessageAccessor();
     val time = LocalTime.of(16, 34, 11, 672000000);
@@ -103,9 +103,9 @@ class Java8DateTimeFormatterTest extends AbstractFormatterTest
         Map.of(new ConfigKeyName("date"), new ConfigValueString("short"))));
     assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
         Map.of(new ConfigKeyName("date"), new ConfigValueString("medium"))));
-    assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
+    assertEquals(new TextPart("16:34:11 MEZ"), format(messageAccessor, time,
         Map.of(new ConfigKeyName("date"), new ConfigValueString("long"))));
-    assertEquals(new TextPart("16:34:11 Mitteleuropäische"), format(messageAccessor, time,
+    assertEquals(new TextPart("16:34:11 Mitteleuropäische Zeit"), format(messageAccessor, time,
         Map.of(new ConfigKeyName("date"), new ConfigValueString("full"))));
     assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
         Map.of(new ConfigKeyName("date"), new ConfigValueString("time"))));
@@ -119,7 +119,7 @@ class Java8DateTimeFormatterTest extends AbstractFormatterTest
   void testDateTime()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new Java8DateTimeFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new TemporalFormatter()), NO_CACHE_INSTANCE)
         .setLocale(UK)
         .getMessageAccessor();
     val datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
@@ -150,7 +150,7 @@ class Java8DateTimeFormatterTest extends AbstractFormatterTest
   void testCustomPattern()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new Java8DateTimeFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new TemporalFormatter()), NO_CACHE_INSTANCE)
         .setLocale(FRANCE)
         .getMessageAccessor();
     val datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
@@ -171,7 +171,7 @@ class Java8DateTimeFormatterTest extends AbstractFormatterTest
   void testFormatter()
   {
     val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new Java8DateTimeFormatter()), NO_CACHE_INSTANCE);
+        .create(createFormatterService(new TemporalFormatter()), NO_CACHE_INSTANCE);
 
     assertEquals("17 aug. 1972 16:45 14:23:01 2019-02-19 feb.", messageSupport
         .message("%{a} %{b,date:'short'} %{c,date:'time'} %{c,date:'yyyy-MM-dd MMM'}")
