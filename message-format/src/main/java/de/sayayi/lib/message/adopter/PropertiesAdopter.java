@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 
 
@@ -84,11 +83,11 @@ public class PropertiesAdopter extends AbstractMessageAdopter
   {
     final Map<String,Map<Locale,String>> localizedMessagesByCode = new HashMap<>();
 
-    for(Entry<Locale,Properties> entry: properties.entrySet())
+    for(var entry: properties.entrySet())
     {
       final Locale locale = entry.getKey();
 
-      for(Entry<Object,Object> localizedProperty: entry.getValue().entrySet())
+      for(var localizedProperty: entry.getValue().entrySet())
       {
         localizedMessagesByCode
             .computeIfAbsent(localizedProperty.getKey().toString(), k -> new HashMap<>())

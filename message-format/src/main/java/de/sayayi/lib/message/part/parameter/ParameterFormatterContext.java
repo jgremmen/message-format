@@ -146,7 +146,7 @@ public final class ParameterFormatterContext extends AbstractParameterConfigAcce
     {
       OptionalLong result;
 
-      for(ParameterFormatter formatter: messageAccessor.getFormatters(value.getClass()))
+      for(var formatter: messageAccessor.getFormatters(value.getClass()))
         if (formatter instanceof SizeQueryable &&
             (result = ((SizeQueryable)formatter).size(this, value)).isPresent())
           return result;

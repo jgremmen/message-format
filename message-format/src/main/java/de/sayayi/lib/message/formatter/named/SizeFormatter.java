@@ -52,7 +52,8 @@ public final class SizeFormatter implements NamedParameterFormatter
     {
       final long size = optionalSize.getAsLong();
 
-      return context.getConfigMapMessage(size, NUMBER_TYPE, true)
+      return context
+          .getConfigMapMessage(size, NUMBER_TYPE, true)
           .map(context::format)
           .orElseGet(() -> context.format(size, long.class));
     }

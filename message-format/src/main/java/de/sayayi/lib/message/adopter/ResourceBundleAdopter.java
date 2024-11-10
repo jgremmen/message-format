@@ -71,11 +71,11 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
   {
     final Map<String,Map<Locale,String>> localizedMessagesByCode = new HashMap<>();
 
-    for(ResourceBundle resourceBundle: resourceBundles)
+    for(var resourceBundle: resourceBundles)
     {
       final Locale locale = resourceBundle.getLocale();
 
-      for(String code: resourceBundle.keySet())
+      for(var code: resourceBundle.keySet())
       {
         localizedMessagesByCode
             .computeIfAbsent(code, k -> new HashMap<>())
@@ -127,13 +127,13 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
     if (classLoader == null)
       classLoader = getClass().getClassLoader();
 
-    for(Locale locale: locales)
+    for(var locale: locales)
     {
       try {
         final ResourceBundle resourceBundle = getBundle(bundleBaseName, locale, classLoader);
         final Locale foundLocale = resourceBundle.getLocale();
 
-        for(String code: resourceBundle.keySet())
+        for(var code: resourceBundle.keySet())
         {
           localizedMessagesByCode
               .computeIfAbsent(code, k -> new HashMap<>())

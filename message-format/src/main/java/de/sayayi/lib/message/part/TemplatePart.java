@@ -197,13 +197,13 @@ public final class TemplatePart implements Template
     packStream.writeSmallVar(defaultParameterMap.size());
     packStream.writeSmallVar(parameterDelegateMap.size());
 
-    for(final Entry<String,ConfigValue> defaultParameter: defaultParameterMap)
+    for(var defaultParameter: defaultParameterMap)
     {
       packStream.writeString(defaultParameter.getKey());
       PackHelper.pack(defaultParameter.getValue(), packStream);
     }
 
-    for(final Entry<String,String> parameterDelegate: parameterDelegateMap)
+    for(var parameterDelegate: parameterDelegateMap)
     {
       packStream.writeString(parameterDelegate.getKey());
       packStream.writeString(parameterDelegate.getValue());

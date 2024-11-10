@@ -314,9 +314,9 @@ public abstract class MessageFormatPackTask extends DefaultTask
     try {
       final AsmAnnotationAdopter adopter = new AsmAnnotationAdopter(messageSupport);
 
-      for(final File classFile: getSources().getAsFileTree().matching(CLASS_FILES).getFiles())
+      for(var classFile: getSources().getAsFileTree().matching(CLASS_FILES).getFiles())
       {
-        logger.debug("Scanning " + classFile.getAbsolutePath());
+        logger.debug("Scanning {}", classFile.getAbsolutePath());
         currentClassName.set(getClassName(classFile));
         adopter.adopt(classFile);
       }
@@ -386,7 +386,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
     {
       match = false;
 
-      for(final String regex: includeRegexFilters)
+      for(var regex: includeRegexFilters)
         if (code.matches(regex))
         {
           match = true;
@@ -395,7 +395,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
     }
 
     if (match)
-      for(final String regex: excludeRegexFilters)
+      for(var regex: excludeRegexFilters)
         if (code.matches(regex))
         {
           match = false;
@@ -449,7 +449,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
       final String valueAsIs = ((String)value).toUpperCase(ROOT);
       final String valueUnderscore = valueAsIs.replace('-', '_');
 
-      for(final DuplicateMsgStrategy ds: DuplicateMsgStrategy.values())
+      for(var ds: DuplicateMsgStrategy.values())
         if (ds.name().equals(valueAsIs) ||
             ds.name().equals(valueUnderscore))
           return ds;

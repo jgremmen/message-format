@@ -131,7 +131,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       namedFormatters.put(format, namedParameterFormatter);
     }
 
-    for(FormattableType formattableType: formatter.getFormattableTypes())
+    for(var formattableType: formatter.getFormattableTypes())
       addFormatterForType(formattableType, formatter);
   }
 
@@ -195,7 +195,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   @Contract(mutates = "param2")
   private static void addInterfaceTypes(@NotNull Class<?> type, @NotNull Set<Class<?>> collectedTypes)
   {
-    for(final Class<?> interfaceType: type.getInterfaces())
+    for(var interfaceType: type.getInterfaces())
       if (!collectedTypes.contains(interfaceType))
       {
         collectedTypes.add(interfaceType);

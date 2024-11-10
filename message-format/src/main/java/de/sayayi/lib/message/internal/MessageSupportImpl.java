@@ -199,7 +199,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
     final PackHelper packHelper = new PackHelper();
 
-    for(final InputStream packStream: packStreams)
+    for(var packStream: packStreams)
     {
       try(final PackInputStream dataStream = new PackInputStream(packStream)) {
         // messages
@@ -220,7 +220,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   public void exportMessages(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
       throws IOException
   {
-    try(final PackOutputStream dataStream = new PackOutputStream(stream, compress)) {
+    try(var dataStream = new PackOutputStream(stream, compress)) {
       final Set<String> messageCodes = new TreeSet<>(messages.keySet());
       final Set<String> templateNames = new TreeSet<>();
 
@@ -230,7 +230,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
       // pack all filtered messages
       dataStream.writeUnsignedShort(messageCodes.size());
-      for(final String code: messageCodes)
+      for(var code: messageCodes)
       {
         final Message message = messages.get(code);
 
@@ -241,7 +241,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
       // pack all required templates
       templateNames.removeIf(templateName -> !templates.containsKey(templateName));
       dataStream.writeUnsignedShort(templateNames.size());
-      for(final String templateName: templateNames)
+      for(var templateName: templateNames)
       {
         dataStream.writeString(templateName);
         PackHelper.pack(templates.get(templateName), dataStream);

@@ -43,7 +43,7 @@ public final class ClipFormatter extends AbstractParameterFormatter<Object> impl
   {
     final Text text = context.format(value);
 
-    String s = text.getText();
+    var s = text.getText();
     if (s == null)
       return nullText();
 

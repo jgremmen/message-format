@@ -107,7 +107,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull ClassLoader classLoader, @NotNull Set<String> packageNames)
   {
     try {
-      for(String packageName: packageNames)
+      for(var packageName: packageNames)
         adopt_scan(classLoader, packageName);
     } catch(Exception ex) {
       throw new MessageAdopterException("failed to scan class path for messages and templates", ex);
@@ -119,11 +119,11 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
   private void adopt_scan(@NotNull ClassLoader classLoader, @NotNull String packageName) throws Exception
   {
-    String classPathPrefix = packageName.replace('.', '/');
+    var classPathPrefix = packageName.replace('.', '/');
     if (!classPathPrefix.endsWith("/"))
       classPathPrefix = classPathPrefix + '/';
 
-    for(final Enumeration<URL> urls = classLoader.getResources(classPathPrefix); urls.hasMoreElements();)
+    for(var urls = classLoader.getResources(classPathPrefix); urls.hasMoreElements();)
     {
       final URL url = urls.nextElement();
 
@@ -149,7 +149,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     {
       final Path baseDirectoryPath = baseDirectory.toPath();
 
-      for(File file: files)
+      for(var file: files)
         if (file.isDirectory())
           adopt_scan_directory(baseDirectory, file);
         else
@@ -159,7 +159,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
           if (classNamePath.endsWith(".class") && scan_checkVisited(classNamePath))
           {
-            try(InputStream classInputStream = newInputStream(file.toPath())) {
+            try(var classInputStream = newInputStream(file.toPath())) {
               parseClass(classInputStream);
             }
           }
@@ -191,7 +191,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     }
 
     try {
-      for(Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements();)
+      for(var entries = zipFile.entries(); entries.hasMoreElements();)
       {
         final ZipEntry zipEntry = entries.nextElement();
         final String classPathName = zipEntry.getName();
@@ -200,7 +200,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
             classPathName.startsWith(classPathPrefix) &&
             scan_checkVisited(classPathName))
         {
-          try(InputStream classInputStream = zipFile.getInputStream(zipEntry)) {
+          try(var classInputStream = zipFile.getInputStream(zipEntry)) {
             parseClass(classInputStream);
           }
         }

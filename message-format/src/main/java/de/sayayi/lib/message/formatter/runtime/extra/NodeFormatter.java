@@ -104,14 +104,14 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
   {
     int index = 1;
 
-    for(Node n = node; (n = n.getPreviousSibling()) != null;)
+    for(var n = node; (n = n.getPreviousSibling()) != null;)
       if (n instanceof Element && name.equals(n.getNodeName()))
         index++;
 
     boolean indexed = index > 1;
 
     if (!indexed)
-      for(Node n = node; (n = n.getNextSibling()) != null;)
+      for(var n = node; (n = n.getNextSibling()) != null;)
         if (n instanceof Element && (indexed = name.equals(n.getNodeName())))
           break;
 

@@ -40,7 +40,7 @@ public abstract class AbstractFormatterTest
 {
   protected void assertFormatterForType(ParameterFormatter formatter, Class<?> type)
   {
-    for(FormattableType formattableType: formatter.getFormattableTypes())
+    for(val formattableType: formatter.getFormattableTypes())
       if (formattableType.getType().isAssignableFrom(type))
         return;
 

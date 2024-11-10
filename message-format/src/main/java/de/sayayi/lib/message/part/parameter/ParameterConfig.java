@@ -81,7 +81,7 @@ public final class ParameterConfig
     ConfigKey key;
     int keyTypeMask = 0;
 
-    for(final Entry<ConfigKey,ConfigValue> entry: map.entrySet())
+    for(var entry: map.entrySet())
     {
       ConfigKey.Type keyType;
 
@@ -233,11 +233,11 @@ public final class ParameterConfig
   {
     final Set<String> templateNames = new TreeSet<>();
 
-    for(final ConfigValue configValue: config.values())
+    for(var configValue: config.values())
       if (configValue instanceof ConfigValueMessage)
         templateNames.addAll(((ConfigValueMessage)configValue).asObject().getTemplateNames());
 
-    for(final ConfigValue configValue: mapValues)
+    for(var configValue: mapValues)
       if (configValue instanceof ConfigValueMessage)
         templateNames.addAll(((ConfigValueMessage)configValue).asObject().getTemplateNames());
 
@@ -277,7 +277,7 @@ public final class ParameterConfig
     final StringJoiner s = new StringJoiner(",", "{", "}");
 
     // config
-    for(final Entry<String,ConfigValue> configEntry: config.entrySet())
+    for(var configEntry: config.entrySet())
       s.add(configEntry.getKey() + '=' + configEntry.getValue());
 
     // map

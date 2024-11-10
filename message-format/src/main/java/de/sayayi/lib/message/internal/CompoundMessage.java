@@ -78,7 +78,7 @@ public final class CompoundMessage implements Message.WithSpaces
   {
     final TextJoiner message = new TextJoiner();
 
-    for(MessagePart messagePart: messageParts)
+    for(var messagePart: messageParts)
       message.add(format(messageAccessor, parameters, messagePart));
 
     return message.asSpacedText();
@@ -135,7 +135,7 @@ public final class CompoundMessage implements Message.WithSpaces
   {
     final Set<String> templateNames = new TreeSet<>();
 
-    for(final MessagePart messagePart: messageParts)
+    for(var messagePart: messageParts)
     {
       if (messagePart instanceof TemplatePart)
         templateNames.add(((TemplatePart)messagePart).getName());
@@ -188,7 +188,7 @@ public final class CompoundMessage implements Message.WithSpaces
   {
     packStream.writeSmallVar(messageParts.length);
 
-    for(final MessagePart part: messageParts)
+    for(var part: messageParts)
       PackHelper.pack(part, packStream);
   }
 

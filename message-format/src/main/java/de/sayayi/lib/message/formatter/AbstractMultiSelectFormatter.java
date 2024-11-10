@@ -58,7 +58,7 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
 
   protected void register(@NotNull String[] configKeys, @NotNull MultiSelectFunction<T> function)
   {
-    for(String configKey: requireNonNull(configKeys))
+    for(var configKey: requireNonNull(configKeys))
       register(configKey, function);
   }
 

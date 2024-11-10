@@ -127,7 +127,7 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
     {
       final MessageAccessor accessor = messageSupport.getMessageAccessor();
 
-      for(String code: resolvable.getCodes())
+      for(var code: resolvable.getCodes())
         if (accessor.hasMessageWithCode(code))
           return getMessage(code, resolvable.getArguments(), locale);
     }

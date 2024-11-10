@@ -52,7 +52,7 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>>
 
   static
   {
-    ParameterConfig nullConfig = new ParameterConfig(Map.of(new ConfigKeyNull(EQ), new ConfigValueString("(null)")));
+    var nullConfig = new ParameterConfig(Map.of(new ConfigKeyNull(EQ), new ConfigValueString("(null)")));
 
     // default map-kv: %{key,null:'(null)'}=%{value,null:'(null)'}
     DEFAULT_KEY_VALUE_MESSAGE = new CompoundMessage(List.of(

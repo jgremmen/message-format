@@ -35,7 +35,6 @@ import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.value.*;
 import de.sayayi.lib.message.util.SpacesUtil;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
@@ -226,7 +225,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       {
         final List<MessagePart> parts = new ArrayList<>();
 
-        for(final ParseTree part: ctx.children)
+        for(var part: ctx.children)
         {
           if (part instanceof ParameterPartContext)
             parts.add(((ParameterPartContext)part).part);
@@ -285,7 +284,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       final char[] text = new char[chNodes.size()];
       int n = 0;
 
-      for(final TerminalNode chNode: chNodes)
+      for(var chNode: chNodes)
       {
         final String chText = chNode.getText();
         char ch = chText.charAt(0);
@@ -354,7 +353,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       public BiConsumer<Map<ConfigKey,ConfigValue>,ParameterConfigElementContext> accumulator()
       {
         return (map,cec) -> {
-          for(ConfigKey key: cec.configKeys)
+          for(var key: cec.configKeys)
           {
             if (map.containsKey(key))
             {

@@ -24,7 +24,6 @@ import org.objectweb.asm.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +69,7 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
   {
     int api = ASM6;  // lowest supported version
 
-    for(Field field: Opcodes.class.getDeclaredFields())
+    for(var field: Opcodes.class.getDeclaredFields())
       if (field.getName().matches("ASM[0-9]+"))
       {
         try {

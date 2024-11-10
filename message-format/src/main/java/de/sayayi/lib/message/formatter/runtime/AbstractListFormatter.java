@@ -91,7 +91,7 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
       joiner.add(noSpaceText(moreValue));
     else
     {
-      for(boolean first = true; iterator.hasNext() && !(n == 0 && !hasMoreValue);)
+      for(var first = true; iterator.hasNext() && !(n == 0 && !hasMoreValue);)
       {
         final Text text = iterator.next();
         final boolean lastElement = !iterator.hasNext() || n == 0 || (n == 1 && !hasMoreValue);

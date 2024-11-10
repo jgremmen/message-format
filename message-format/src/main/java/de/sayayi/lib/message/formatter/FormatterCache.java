@@ -86,7 +86,7 @@ final class FormatterCache
     final Node prevNode = node.prev;
     assert prevNode != null;
 
-    for(Node n = prevNode; n != null; n = n.prev)
+    for(var n = prevNode; n != null; n = n.prev)
       n.countNext--;
 
     prevNode.next = node.next;
@@ -119,7 +119,7 @@ final class FormatterCache
       final Node prevNode = tail.prev;
       assert prevNode != null;
 
-      for(Node n = prevNode; n != null; n = n.prev)
+      for(var n = prevNode; n != null; n = n.prev)
         n.countNext--;
 
       prevNode.next = null;
@@ -185,7 +185,7 @@ final class FormatterCache
   {
     final StringBuilder s = new StringBuilder("[");
 
-    for(Node n = head; n != null; n = n.next)
+    for(var n = head; n != null; n = n.next)
     {
       if (n != head)
         s.append(", ");

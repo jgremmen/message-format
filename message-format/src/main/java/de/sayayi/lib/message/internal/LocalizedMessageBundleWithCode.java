@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import static java.util.Collections.unmodifiableMap;
@@ -92,7 +91,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
     int match = -1;
     Message message = null;
 
-    for(final Entry<Locale,Message> entry: localizedMessages.entrySet())
+    for(var entry: localizedMessages.entrySet())
     {
       final Locale keyLocale = entry.getKey();
       final Message localizedMessage = entry.getValue();
@@ -167,7 +166,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
     if (!localizedMessages.keySet().equals(lm.keySet()))
       return false;
 
-    for(final Entry<Locale,Message> entry: localizedMessages.entrySet())
+    for(var entry: localizedMessages.entrySet())
       if (!entry.getValue().isSame(lm.get(entry.getKey())))
         return false;
 
@@ -213,7 +212,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
     packStream.writeSmallVar(localizedMessages.size());
     packStream.writeString(getCode());
 
-    for(final Entry<Locale,Message> entry: localizedMessages.entrySet())
+    for(var entry: localizedMessages.entrySet())
     {
       packStream.writeString(entry.getKey().toLanguageTag());
       PackHelper.pack(entry.getValue(), packStream);
