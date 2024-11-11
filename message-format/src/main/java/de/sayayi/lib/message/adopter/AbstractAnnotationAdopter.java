@@ -65,7 +65,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-@SuppressWarnings({"DuplicatedCode", "UnusedReturnValue", "unused", "UnknownLanguage"})
+@SuppressWarnings({"UnusedReturnValue", "UnknownLanguage"})
 public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 {
   private static final Set<String> ZIP_PROTOCOLS = Set.of("zip", "jar", "war");

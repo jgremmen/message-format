@@ -111,7 +111,6 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
 
 
 
-  @SuppressWarnings("DuplicatedCode")
   private final class MainClassVisitor extends ClassVisitor
   {
     private MainClassVisitor() {

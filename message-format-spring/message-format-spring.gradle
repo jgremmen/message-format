@@ -32,6 +32,7 @@ dependencies {
     exclude module: 'spring-jcl'
   }
 
+  //noinspection DependencyNotationArgument
   testImplementation project(':message-format').sourceSets.test.output
 }
 

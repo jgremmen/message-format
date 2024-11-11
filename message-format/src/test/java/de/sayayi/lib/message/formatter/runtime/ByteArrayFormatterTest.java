@@ -52,7 +52,7 @@ public class ByteArrayFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  @SuppressWarnings({"ConvertToBasicLatin", "SpellCheckingInspection"})
+  @SuppressWarnings("ConvertToBasicLatin")
   void testEncodedByteArray()
   {
     val formatterService = createFormatterService(new ByteArrayFormatter(), new ArrayFormatter());

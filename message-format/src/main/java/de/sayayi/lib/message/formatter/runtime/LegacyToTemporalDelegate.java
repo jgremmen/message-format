@@ -22,6 +22,7 @@ import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.attribute.FileTime;
 import java.time.temporal.Temporal;
 import java.util.Calendar;
 import java.util.Date;
@@ -60,6 +61,8 @@ public final class LegacyToTemporalDelegate implements ParameterFormatter
       value = ((java.sql.Date)value).toLocalDate();  // sql.Date has no instant
     else if (value instanceof Date)
       value = ((Date)value).toInstant();
+    else if (value instanceof FileTime)
+      value = ((FileTime)value).toInstant();
     else
       value = ((Calendar)value).toInstant();
 
@@ -72,6 +75,7 @@ public final class LegacyToTemporalDelegate implements ParameterFormatter
   {
     return Set.of(
         new FormattableType(Calendar.class),
-        new FormattableType(Date.class));
+        new FormattableType(Date.class),
+        new FormattableType(FileTime.class));
   }
 }

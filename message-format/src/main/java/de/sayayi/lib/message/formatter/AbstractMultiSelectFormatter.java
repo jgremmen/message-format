@@ -40,8 +40,8 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
   private final Map<String,MultiSelectFunction<T>> multiSelectFunctionMap;
 
 
-  protected AbstractMultiSelectFormatter(@NotNull String configKey, boolean delegateOnMismatch) {
-    this(configKey, null, delegateOnMismatch);
+  protected AbstractMultiSelectFormatter(@NotNull String configKey) {
+    this(configKey, null, true);
   }
 
 

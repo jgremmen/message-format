@@ -72,7 +72,7 @@ class BoolFormatterTest extends AbstractFormatterTest
     assertEquals(noSpaceText("falsch"), format(messageAccessor, 0.0d, map, "bool"));
     assertEquals(noSpaceText("wahr"), format(messageAccessor, -0.0001f, map, "bool"));
     assertEquals(noSpaceText("wahr"), format(messageAccessor, -4, map, "bool"));
-    assertEquals(nullText(), format(messageAccessor, (Object)null, map, "bool"));
+    assertEquals(nullText(), format(messageAccessor, null, map, "bool"));
   }
 
 

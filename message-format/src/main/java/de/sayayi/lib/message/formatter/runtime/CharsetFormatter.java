@@ -31,7 +31,7 @@ public final class CharsetFormatter extends AbstractMultiSelectFormatter<Charset
 {
   public CharsetFormatter()
   {
-    super("charset", true);
+    super("charset");
 
     register(new String[] { "display", "display-name" },
         (context,charset) -> context.format(charset.displayName(context.getLocale())));

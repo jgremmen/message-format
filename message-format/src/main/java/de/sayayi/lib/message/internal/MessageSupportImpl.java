@@ -226,7 +226,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
       // filter message codes
       if (messageCodeFilter != null)
-        messageCodes.removeIf(code -> !messageCodeFilter.test(code));
+        messageCodes.removeIf(messageCodeFilter.negate());
 
       // pack all filtered messages
       dataStream.writeUnsignedShort(messageCodes.size());

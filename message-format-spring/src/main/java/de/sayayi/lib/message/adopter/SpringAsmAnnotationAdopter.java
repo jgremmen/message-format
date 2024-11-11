@@ -110,7 +110,6 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
 
 
 
-  @SuppressWarnings("DuplicatedCode")
   private final class MainClassVisitor extends ClassVisitor
   {
     private MainClassVisitor() {
@@ -152,7 +151,6 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
 
 
 
-  @SuppressWarnings("DuplicatedCode")
   private final class MessageMethodVisitor extends MethodVisitor
   {
     private MessageMethodVisitor() {

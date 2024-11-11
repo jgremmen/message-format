@@ -31,7 +31,7 @@ public final class MapEntryFormatter extends AbstractMultiSelectFormatter<Entry<
 {
   public MapEntryFormatter()
   {
-    super("entry", true);
+    super("entry");
 
     register("key", (context,entry) -> context.format(entry.getKey()));
     register("value", (context,entry) -> context.format(entry.getValue()));

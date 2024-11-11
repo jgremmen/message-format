@@ -33,7 +33,6 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 public final class URLFormatter extends AbstractSingleTypeParameterFormatter<URL>
 {
   @Override
-  @SuppressWarnings("DuplicatedCode")
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull URL url)
   {
     switch(context.getConfigValueString("url").orElse("external"))

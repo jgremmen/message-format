@@ -31,7 +31,7 @@ class MessageSupportPackTest
 
 
   @BeforeAll
-  @MessageDef(code = "MSG-001", text = "")  // empty message with code
+  @MessageDef(code = "MSG-001")  // empty message with code
   @MessageDef(code = "MSG-002", text = "Not empty")
   @MessageDef(code = "MSG-003", texts = {
       @Text(locale = "en", text = "English"),

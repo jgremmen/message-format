@@ -35,7 +35,7 @@ def javaxCacheApiVersion = '1.1.1'
 
 configurations {
   antlr4 {
-    visible = false;
+    visible = false
   }
 
   api.setExtendsFrom([])

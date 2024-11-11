@@ -76,7 +76,6 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
 
 
   @Override
-  @SuppressWarnings("DuplicatedCode")
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull T list)
   {
     final Text separator = spacedText(context.getConfigValueString(CONFIG_SEPARATOR).orElse(DEFAULT_SEPARATOR));

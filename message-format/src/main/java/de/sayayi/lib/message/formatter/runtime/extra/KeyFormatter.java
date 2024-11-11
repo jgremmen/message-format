@@ -33,7 +33,7 @@ public final class KeyFormatter extends AbstractMultiSelectFormatter<Key>
 {
   public KeyFormatter()
   {
-    super("key", true);
+    super("key");
 
     register("algorithm", (context,key) -> noSpaceText(key.getAlgorithm()));
     register("format", (context,key) -> noSpaceText(key.getFormat()));
