@@ -26,12 +26,10 @@ import org.jetbrains.annotations.NotNull;
  * @author Jeroen Gremmen
  * @since 0.9.2
  */
-public abstract class AbstractConfigKeyComparator<T>
-    extends AbstractSingleTypeParameterFormatter<T>
-    implements ConfigKeyComparator<T>
+public abstract class AbstractConfigKeyComparator<T> implements ConfigKeyComparator<T>
 {
   @Override
-  protected final @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull T value) {
+  public final @NotNull Text format(@NotNull FormatterContext context, Object value) {
     return context.delegateToNextFormatter();
   }
 }

@@ -76,7 +76,7 @@ public final class CompoundMessage implements Message.WithSpaces
   public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
       throws MessageFormatException
   {
-    final TextJoiner message = new TextJoiner();
+    var message = new TextJoiner();
 
     for(var messagePart: messageParts)
       message.add(format(messageAccessor, parameters, messagePart));
@@ -133,7 +133,7 @@ public final class CompoundMessage implements Message.WithSpaces
   @Override
   public @NotNull Set<String> getTemplateNames()
   {
-    final Set<String> templateNames = new TreeSet<>();
+    var templateNames = new TreeSet<String>();
 
     for(var messagePart: messageParts)
     {
@@ -208,7 +208,7 @@ public final class CompoundMessage implements Message.WithSpaces
   public static @NotNull Message.WithSpaces unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
-    final List<MessagePart> parts = new ArrayList<>();
+    var parts = new ArrayList<MessagePart>();
 
     for(int n = 0, l = packStream.readSmallVar(); n < l; n++)
       parts.add(unpack.unpackMessagePart(packStream));

@@ -23,9 +23,7 @@ import de.sayayi.lib.message.formatter.ParameterFormatter.DefaultFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueBool;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -69,9 +67,10 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
     if (value == null)
       return formatNull(context);
 
-    final String string = valueAsString(context.getMessageAccessor(), value);
+    var string = valueAsString(context.getMessageAccessor(), value);
 
-    return context.getConfigMapMessage(string, STRING_KEY_TYPES)
+    return context
+        .getConfigMapMessage(string, STRING_KEY_TYPES)
         .map(context::format)
         .orElseGet(() -> noSpaceText(string));
   }
@@ -80,17 +79,15 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   @Contract(pure = true)
   private @NotNull String valueAsString(@NotNull MessageAccessor messageAccessor, @NotNull Object value)
   {
-    if (value instanceof char[])
-      return new String((char[])value);
-    else if (value instanceof String)
-      return (String)value;
+    var string = asString(value);
 
-    String string = value.toString();
+    if (!(value instanceof CharSequence) && !(value instanceof char[]))
+    {
+      var cv = messageAccessor.getDefaultParameterConfig("ignore-default-tostring");
 
-    final ConfigValue cv = messageAccessor.getDefaultParameterConfig("ignore-default-tostring");
-
-    if (cv != null && cv.getType() == BOOL && ((ConfigValueBool)cv).booleanValue() && isDefaultToString(value))
-      string = "";
+      if (cv != null && cv.getType() == BOOL && ((ConfigValueBool)cv).booleanValue() && isDefaultToString(value))
+        string = "";
+    }
 
     return string;
   }
@@ -100,11 +97,9 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   @SuppressWarnings("RedundantIfStatement")
   private boolean isDefaultToString(@NotNull Object value)
   {
-    final String string = value.toString();
-    final Class<?> valueClass = value.getClass();
-    final String fqClassName = valueClass.getName();
+    var fqClassName = value.getClass().getName();
 
-    if ((fqClassName + '@' + toHexString(value.hashCode())).equals(string))
+    if ((fqClassName + '@' + toHexString(value.hashCode())).equals(value.toString()))
       return true;
 
     if (fqClassName.contains("$$Lambda$"))
@@ -138,7 +133,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   @Override
   public @NotNull MatchResult compareToEmptyKey(Object value, @NotNull ComparatorContext context)
   {
-    final CompareType compareType = context.getCompareType();
+    var compareType = context.getCompareType();
 
     if (value == null)
       return forEmptyKey(compareType, true);
@@ -146,7 +141,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
     if (value instanceof char[])
       return forEmptyKey(compareType, ((char[])value).length == 0);
 
-    final String string = String.valueOf(value);
+    var string = String.valueOf(value);
     if (string.isEmpty())
       return forEmptyKey(compareType, true);
 
@@ -162,8 +157,8 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   {
     if (context.getCompareType().match(0))
     {
-      final String string = value instanceof char[] ? new String((char[]) value) : String.valueOf(value);
-      final boolean bool = context.getBoolKeyValue();
+      var string = asString(value);
+      var bool = context.getBoolKeyValue();
 
       if (("true".equals(string) && bool) ||
           ("false".equals(string) && !bool))
@@ -182,8 +177,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   public @NotNull MatchResult compareToNumberKey(@NotNull Object value, @NotNull ComparatorContext context)
   {
     try {
-      final String string = value instanceof char[] ? new String((char[]) value) : String.valueOf(value);
-      final int cmp = new BigDecimal(string).compareTo(BigDecimal.valueOf(context.getNumberKeyValue()));
+      var cmp = new BigDecimal(asString(value)).compareTo(BigDecimal.valueOf(context.getNumberKeyValue()));
 
       if (context.getCompareType().match(cmp))
         return EQUIVALENT;
@@ -197,12 +191,13 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull Object value, @NotNull ComparatorContext context)
   {
-    final String string = value instanceof char[] ? new String((char[]) value) : String.valueOf(value);
-    final CompareType compareType = context.getCompareType();
-    final Collator collator = Collator.getInstance(context.getLocale());
-    final String stringKeyValue = context.getStringKeyValue();
+    var collator = Collator.getInstance(context.getLocale());
 
     collator.setDecomposition(CANONICAL_DECOMPOSITION);
+
+    var compareType = context.getCompareType();
+    var stringKeyValue = context.getStringKeyValue();
+    var string = asString(value);
 
     // match exact comparison
     collator.setStrength(IDENTICAL);
@@ -215,5 +210,11 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
       return LENIENT;
 
     return MISMATCH;
+  }
+
+
+  @Contract(pure = true)
+  private static String asString(@NotNull Object value) {
+    return value instanceof char[] ? new String((char[])value) : String.valueOf(value);
   }
 }

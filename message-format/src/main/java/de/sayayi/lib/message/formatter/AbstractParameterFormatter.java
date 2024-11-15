@@ -15,8 +15,8 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.TextPartFactory;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
@@ -24,6 +24,21 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.EMPTY_NULL_TYPE
 
 
 /**
+ * This class provides a basic formatter implementation that handles empty and {@code null} values and is suitable for
+ * most parameter formatters.
+ * <p>
+ * Method {@link #format(FormatterContext, Object)} takes care of mapping {@code null} and empty values. It does
+ * so for both the value to be formatted and the formatted text returned by
+ * {@link #formatValue(FormatterContext, Object)}.
+ * <p>
+ * If a {@code null} or empty value is matched in the parameter configuration (e.g.
+ * {@code %{val,null:'no text',empty:'empty text'} }) the associated message is returned.
+ * If no match was found for {@code null} then {@link TextPartFactory#nullText() nullText()} is returned.
+ * <p>
+ * Non-{@code null} values are delegated to {@link #formatValue(FormatterContext, Object)}. The returned text will
+ * be matched against {@code null} and empty parameter configuration entries and is replaced by the best matching
+ * message found.
+ *
  * @param <T>  parameter type
  *
  * @author Jeroen Gremmen
@@ -36,7 +51,7 @@ public abstract class AbstractParameterFormatter<T> implements ParameterFormatte
   public final @NotNull Text format(@NotNull FormatterContext context, Object value)
   {
     // handle empty, !empty, null and !null first
-    final Message.WithSpaces msg = context
+    var msg = context
         .getConfigMapMessage(value, EMPTY_NULL_TYPE)
         .orElse(null);
 
@@ -47,7 +62,7 @@ public abstract class AbstractParameterFormatter<T> implements ParameterFormatte
       return nullText();
 
     //noinspection unchecked
-    final Text text = formatValue(context, (T)value);
+    var text = formatValue(context, (T)value);
 
     // handle empty, !empty, null and !null for result
     return context
