@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.SingletonParameters;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.util.SupplierDelegate;
@@ -83,7 +84,7 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>>
   {
     private final MessageAccessor messageAccessor;
     private final Message.WithSpaces valueMessage;
-    private final ValueParameters parameters;
+    private final SingletonParameters parameters;
     private final Supplier<Text> thisText;
     private final Iterable<?> iterable;
     private final Iterator<?> iterator;
@@ -101,7 +102,7 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>>
           .getConfigValueMessage(CONFIG_VALUE)
           .orElse(DEFAULT_VALUE_MESSAGE);
 
-      parameters = new ValueParameters(context.getLocale(), "value");
+      parameters = new SingletonParameters(context.getLocale(), "value");
       thisText = SupplierDelegate.of(() ->
           noSpaceText(context.getConfigValueString(CONFIG_THIS)
               .orElse("(this collection)")));
@@ -114,9 +115,10 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>>
     {
       for(nextText = null; nextText == null && iterator.hasNext();)
       {
-        final Text text = (parameters.value = iterator.next()) == iterable
+        var value = iterator.next();
+        var text = value == iterable
             ? thisText.get()
-            : noSpaceText(valueMessage.format(messageAccessor, parameters));
+            : noSpaceText(valueMessage.format(messageAccessor, parameters.setValue(value)));
 
         if (!text.isEmpty())
           nextText = text;
@@ -133,7 +135,7 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>>
     @Override
     public Text next()
     {
-      final Text text = nextText;
+      var text = nextText;
 
       prepareNextText();
 

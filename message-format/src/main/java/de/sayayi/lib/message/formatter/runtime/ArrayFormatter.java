@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.SingletonParameters;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.util.SupplierDelegate;
@@ -136,7 +137,7 @@ public final class ArrayFormatter extends AbstractListFormatter<Object>
     private final MessageAccessor messageAccessor;
     private final IntFunction<Object> getter;
     private final Message.WithSpaces valueMessage;
-    private final ValueParameters parameters;
+    private final SingletonParameters parameters;
     private final Supplier<Text> thisText;
     private final Object array;
     private final int length;
@@ -155,7 +156,7 @@ public final class ArrayFormatter extends AbstractListFormatter<Object>
           .getConfigValueMessage(CONFIG_VALUE)
           .orElse(DEFAULT_VALUE_MESSAGE);
 
-      parameters = new ValueParameters(context.getLocale(), "value");
+      parameters = new SingletonParameters(context.getLocale(), "value");
       thisText = SupplierDelegate.of(() -> noSpaceText(
           context.getConfigValueString(CONFIG_THIS).orElse("(this array)")));
       length = getLength(array);
@@ -168,9 +169,10 @@ public final class ArrayFormatter extends AbstractListFormatter<Object>
     {
       for(nextText = null; nextText == null && idx < length;)
       {
-        final Text text = (parameters.value = getter.apply(idx++)) == array
+        var value = getter.apply(idx++);
+        var text = value == array
             ? thisText.get()
-            : noSpaceText(valueMessage.format(messageAccessor, parameters));
+            : noSpaceText(valueMessage.format(messageAccessor, parameters.setValue(value)));
 
         if (!text.isEmpty())
           nextText = text;
@@ -187,7 +189,7 @@ public final class ArrayFormatter extends AbstractListFormatter<Object>
     @Override
     public Text next()
     {
-      final Text text = nextText;
+      var text = nextText;
 
       prepareNextText();
 

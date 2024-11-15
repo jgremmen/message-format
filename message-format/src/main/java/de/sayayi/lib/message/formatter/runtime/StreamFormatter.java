@@ -15,10 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.SingletonParameters;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,17 +38,14 @@ public final class StreamFormatter extends AbstractListFormatter<Stream<?>>
   @Override
   protected @NotNull Iterator<Text> createIterator(@NotNull FormatterContext context, @NotNull Stream<?> stream)
   {
-    final MessageAccessor messageAccessor = context.getMessageAccessor();
-    final Message.WithSpaces valueMessage = context
+    var messageAccessor = context.getMessageAccessor();
+    var valueMessage = context
         .getConfigValueMessage(CONFIG_VALUE)
         .orElse(DEFAULT_VALUE_MESSAGE);
-    final ValueParameters parameters = new ValueParameters(context.getLocale(), "value");
+    var parameters = new SingletonParameters(context.getLocale(), "value");
 
     return stream
-        .map(object -> {
-          parameters.value = object;
-          return noSpaceText(valueMessage.format(messageAccessor, parameters));
-        })
+        .map(object -> noSpaceText(valueMessage.format(messageAccessor, parameters.setValue(object))))
         .filter(t -> !t.isEmpty())
         .iterator();
   }

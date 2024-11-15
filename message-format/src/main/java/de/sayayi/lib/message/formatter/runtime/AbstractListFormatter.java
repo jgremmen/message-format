@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
@@ -30,12 +29,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
 import static de.sayayi.lib.message.util.SpacesUtil.isTrimmedEmpty;
+import static java.lang.Integer.MAX_VALUE;
 
 
 /**
@@ -78,26 +76,26 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull T list)
   {
-    final Text separator = spacedText(context.getConfigValueString(CONFIG_SEPARATOR).orElse(DEFAULT_SEPARATOR));
-    final String moreValue = context.getConfigValueString(CONFIG_VALUE_MORE).orElse(null);
-    final boolean hasMoreValue = moreValue != null && !isTrimmedEmpty(moreValue);
-    final TextJoiner joiner = new TextJoiner();
-    final Iterator<Text> iterator = createIterator(context, list);
+    var moreValue = context.getConfigValueString(CONFIG_VALUE_MORE).orElse(null);
+    var hasMoreValue = moreValue != null && !isTrimmedEmpty(moreValue);
+    var joiner = new TextJoiner();
+    var iterator = createIterator(context, list);
 
-    int n = (int)context.getConfigValueNumber(CONFIG_MAX_SIZE).orElse(Integer.MAX_VALUE);
+    int n = (int)context.getConfigValueNumber(CONFIG_MAX_SIZE).orElse(MAX_VALUE);
 
     if (n == 0 && iterator.hasNext() && hasMoreValue)
       joiner.add(noSpaceText(moreValue));
     else
     {
+      var separator = spacedText(context.getConfigValueString(CONFIG_SEPARATOR).orElse(DEFAULT_SEPARATOR));
+
       for(var first = true; iterator.hasNext() && !(n == 0 && !hasMoreValue);)
       {
-        final Text text = iterator.next();
-        final boolean lastElement = !iterator.hasNext() || n == 0 || (n == 1 && !hasMoreValue);
+        var text = iterator.next();
 
         if (first)
           first = false;
-        else if (lastElement && !hasMoreValue)
+        else if (!hasMoreValue && (!iterator.hasNext() || n == 1))
         {
           joiner.add(spacedText(context
               .getConfigValueString(CONFIG_SEPARATOR_LAST)
@@ -116,45 +114,4 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
 
   @Contract(pure = true)
   protected abstract @NotNull Iterator<Text> createIterator(@NotNull FormatterContext context, @NotNull T value);
-
-
-
-
-  public static final class ValueParameters implements Parameters
-  {
-    private final Locale locale;
-    private final String parameterName;
-    Object value;
-
-
-    public ValueParameters(@NotNull Locale locale, @NotNull String parameterName)
-    {
-      this.locale = locale;
-      this.parameterName = parameterName;
-    }
-
-
-    @Override
-    public @NotNull Locale getLocale() {
-      return locale;
-    }
-
-
-    @Override
-    public Object getParameterValue(@NotNull String parameter) {
-      return parameterName.equals(parameter) ? value : null;
-    }
-
-
-    @Override
-    public @NotNull Set<String> getParameterNames() {
-      return Set.of(parameterName);
-    }
-
-
-    @Override
-    public String toString() {
-      return "Parameters(locale=" + locale + ",{value=" + value + "})";
-    }
-  }
 }
