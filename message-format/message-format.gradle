@@ -29,7 +29,7 @@ description = 'Message Format Library'
 def antlrVersion = '[4.13.0,4.14)'
 def antlrExtVersion = '[0.5,0.6)'
 def asmVersion = '[9.0,10.0)'
-def ehcacheVersion = '[3.10,3.11)'
+def caffeineJCacheVersion = '3.1.8'
 def javaxCacheApiVersion = '1.1.1'
 
 
@@ -69,9 +69,7 @@ dependencies {
 
   // test
   testImplementation gradleTestKit()
-  testImplementation("org.ehcache:ehcache:${ehcacheVersion}") {
-    exclude module: 'jaxb-runtime'
-  }
+  testImplementation "com.github.ben-manes.caffeine:jcache:${caffeineJCacheVersion}"
 
   antlr4 "org.antlr:antlr4:${antlrVersion}"
 }

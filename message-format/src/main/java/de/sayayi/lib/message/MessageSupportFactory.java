@@ -147,6 +147,7 @@ public final class MessageSupportFactory
       return delegate.message(message);
     }
 
+
     @Override
     public void exportMessages(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
         throws IOException {

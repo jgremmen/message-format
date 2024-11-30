@@ -49,7 +49,7 @@ public final class JCacheMessagePartNormalizer implements MessagePartNormalizer
   public <T extends MessagePart> @NotNull T normalize(@NotNull T part)
   {
     //noinspection unchecked
-    T cachedPart = (T)cache.get(requireNonNull(part, "part must not be null"));
+    var cachedPart = (T)cache.get(requireNonNull(part, "part must not be null"));
     if (cachedPart != null)
       return cachedPart;
 
