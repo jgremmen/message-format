@@ -136,7 +136,7 @@ public final class TextPart implements Text
     if (!(o instanceof Text))
       return false;
 
-    final Text that = (Text)o;
+    var that = (Text)o;
 
     return spaceBefore == that.isSpaceBefore() &&
            spaceAfter == that.isSpaceAfter() &&
@@ -154,7 +154,7 @@ public final class TextPart implements Text
   @Contract(pure = true)
   public String toString()
   {
-    final StringBuilder s = new StringBuilder("Text(");
+    var s = new StringBuilder("Text(");
 
     if (text == null)
       s.append("null");
@@ -202,9 +202,9 @@ public final class TextPart implements Text
    */
   public static @NotNull Text unpack(@NotNull PackInputStream packStream) throws IOException
   {
-    final boolean spaceBefore = packStream.readBoolean();
-    final boolean spaceAfter = packStream.readBoolean();
-    final String text = packStream.readString();
+    var spaceBefore = packStream.readBoolean();
+    var spaceAfter = packStream.readBoolean();
+    var text = packStream.readString();
 
     return text == null && !spaceBefore && !spaceAfter
         ? Text.NULL

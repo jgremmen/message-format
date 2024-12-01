@@ -46,7 +46,7 @@ abstract class AbstractParameterConfigAccessor implements ParameterConfigAccesso
   @Override
   public @NotNull Optional<ConfigValue> getConfigValue(@NotNull String name)
   {
-    final ConfigValue configValue = parameterConfig.getConfigValue(name);
+    var configValue = parameterConfig.getConfigValue(name);
 
     return configValue != null
         ? Optional.of(configValue)
@@ -57,8 +57,7 @@ abstract class AbstractParameterConfigAccessor implements ParameterConfigAccesso
   @Override
   public @NotNull Optional<String> getConfigValueString(@NotNull String name)
   {
-    ConfigValue configValue = parameterConfig.getConfigValue(name);
-
+    var configValue = parameterConfig.getConfigValue(name);
     if (configValue instanceof ConfigValueString)
       return Optional.of(((ConfigValueString)configValue).stringValue());
 
@@ -73,8 +72,7 @@ abstract class AbstractParameterConfigAccessor implements ParameterConfigAccesso
   @Override
   public @NotNull OptionalLong getConfigValueNumber(@NotNull String name)
   {
-    ConfigValue configValue = parameterConfig.getConfigValue(name);
-
+    var configValue = parameterConfig.getConfigValue(name);
     if (configValue instanceof ConfigValueNumber)
       return OptionalLong.of(((ConfigValueNumber)configValue).longValue());
 
@@ -89,8 +87,7 @@ abstract class AbstractParameterConfigAccessor implements ParameterConfigAccesso
   @Override
   public @NotNull Optional<Boolean> getConfigValueBool(@NotNull String name)
   {
-    ConfigValue configValue = parameterConfig.getConfigValue(name);
-
+    var configValue = parameterConfig.getConfigValue(name);
     if (configValue instanceof ConfigValueBool)
       return Optional.of(((ConfigValueBool)configValue).booleanValue());
 
@@ -105,7 +102,7 @@ abstract class AbstractParameterConfigAccessor implements ParameterConfigAccesso
   @Override
   public @NotNull Optional<Message.WithSpaces> getConfigValueMessage(@NotNull String name)
   {
-    ConfigValue configValue = parameterConfig.getConfigValue(name);
+    var configValue = parameterConfig.getConfigValue(name);
     if (configValue == null)
       configValue = messageAccessor.getDefaultParameterConfig(name);
 

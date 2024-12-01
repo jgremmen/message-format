@@ -72,7 +72,7 @@ public final class SpacesUtil
     if (s == null)
       return null;
 
-    final char[] val = s.toCharArray();
+    var val = s.toCharArray();
     int endIndex = val.length;
     int startIdx = 0;
 
@@ -119,7 +119,7 @@ public final class SpacesUtil
   @SuppressWarnings("DuplicatedCode")
   public static boolean isTrimmedEmpty(@NotNull String s)
   {
-    final char[] val = s.toCharArray();
+    var val = s.toCharArray();
     int endIndex = val.length;
     int startIdx = 0;
 

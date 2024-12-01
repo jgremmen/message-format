@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.part.parameter.key;
 
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,9 +53,9 @@ public enum OrderedConfigKeySorter implements Comparator<OrderedConfigKeySorter.
   @Contract(pure = true)
   private int configKeyToOrder(@NotNull OrderedConfigKey orderedConfigKey)
   {
-    final ConfigKey configKey = orderedConfigKey.configKey;
-    final CompareType compareType = configKey.getCompareType();
-    final ConfigKey.Type keyType = configKey.getType();
+    var configKey = orderedConfigKey.configKey;
+    var compareType = configKey.getCompareType();
+    var keyType = configKey.getType();
 
     if (keyType == NULL && compareType == EQ)
       return 0;  // =null

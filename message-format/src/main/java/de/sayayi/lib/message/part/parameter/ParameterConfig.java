@@ -36,7 +36,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.Map.Entry;
 
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.MISMATCH;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
@@ -76,7 +75,7 @@ public final class ParameterConfig
   {
     config = new TreeMap<>();
 
-    final List<OrderedConfigKey> mapKeyList = new ArrayList<>();
+    var mapKeyList = new ArrayList<OrderedConfigKey>();
     ConfigValue mapNullValue = null;
     ConfigKey key;
     int keyTypeMask = 0;
@@ -98,7 +97,7 @@ public final class ParameterConfig
 
     mapKeyList.sort(OrderedConfigKeySorter.INSTANCE);
 
-    final int mapLength = mapKeyList.size();
+    var mapLength = mapKeyList.size();
     mapKeys = new ConfigKey[mapLength];
     mapValues = new ConfigValue[mapLength];
 
@@ -150,8 +149,7 @@ public final class ParameterConfig
   public Message.WithSpaces getMessage(@NotNull MessageAccessor messageAccessor, Object key, @NotNull Locale locale,
                                        @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault)
   {
-    ConfigValue configValue = getMessage_findMappedValue(messageAccessor, locale, key, keyTypes);
-
+    var configValue = getMessage_findMappedValue(messageAccessor, locale, key, keyTypes);
     if (configValue == null)
     {
       if (includeDefault && defaultValue != null &&
@@ -173,16 +171,15 @@ public final class ParameterConfig
   {
     ConfigValue bestMatch = null;
 
-    final ConfigKeyComparatorContext comparatorContext = new ConfigKeyComparatorContext(messageAccessor, locale);
-    final ParameterFormatter[] formatters =
-        messageAccessor.getFormatters(value == null ? Object.class : value.getClass());
+    var comparatorContext = new ConfigKeyComparatorContext(messageAccessor, locale);
+    var formatters = messageAccessor.getFormatters(value == null ? Object.class : value.getClass());
 
     MatchResult bestMatchResult = MISMATCH;
 
     for(int n = 0, l = mapKeys.length; n < l; n++)
       if (keyTypes.contains((comparatorContext.configKey = mapKeys[n]).getType()))
       {
-        final MatchResult matchResult = findBestMatch(comparatorContext, formatters, value);
+        var matchResult = findBestMatch(comparatorContext, formatters, value);
 
         if (MatchResult.compare(matchResult, bestMatchResult) > 0)
         {
@@ -199,17 +196,16 @@ public final class ParameterConfig
   private static @NotNull MatchResult findBestMatch(@NotNull ComparatorContext context,
                                                     @NotNull ParameterFormatter[] formatters, Object value)
   {
-    final ConfigKey.Type keyType = context.getKeyType();
+    var keyType = context.getKeyType();
     MatchResult bestMatchResult = MISMATCH;
 
     for(int i = 0, l = formatters.length - 1; i <= l; i++)
     {
-      final ParameterFormatter formatter = formatters[i];
-
+      var formatter = formatters[i];
       if (formatter instanceof ConfigKeyComparator &&
           !(i > 0 && i == l && formatter instanceof DefaultFormatter))
       {
-        final MatchResult matchResult = value != null || keyType == NULL || keyType == EMPTY
+        var matchResult = value != null || keyType == NULL || keyType == EMPTY
             ? keyType.compareValueToKey((ConfigKeyComparator)formatter, value, context)
             : MISMATCH;
 
@@ -231,7 +227,7 @@ public final class ParameterConfig
   @Contract(pure = true)
   public @NotNull Set<String> getTemplateNames()
   {
-    final Set<String> templateNames = new TreeSet<>();
+    var templateNames = new TreeSet<String>();
 
     for(var configValue: config.values())
       if (configValue instanceof ConfigValueMessage)
@@ -251,7 +247,7 @@ public final class ParameterConfig
     if (!(o instanceof ParameterConfig))
       return false;
 
-    final ParameterConfig that = (ParameterConfig)o;
+    var that = (ParameterConfig)o;
 
     return
         hasKeyType == that.hasKeyType &&
@@ -274,7 +270,7 @@ public final class ParameterConfig
   @Contract(pure = true)
   public String toString()
   {
-    final StringJoiner s = new StringJoiner(",", "{", "}");
+    var s = new StringJoiner(",", "{", "}");
 
     // config
     for(var configEntry: config.entrySet())
@@ -299,7 +295,7 @@ public final class ParameterConfig
     packStream.writeSmallVar(config.size() + mapKeys.length + (defaultValue == null ? 0 : 1));
 
     // config
-    for(final Entry<String,ConfigValue> configEntry: config.entrySet())
+    for(var configEntry: config.entrySet())
     {
       PackHelper.pack(new ConfigKeyName(configEntry.getKey()), packStream);
       PackHelper.pack(configEntry.getValue(), packStream);
@@ -326,7 +322,7 @@ public final class ParameterConfig
   public static @NotNull ParameterConfig unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
-    final Map<ConfigKey,ConfigValue> map = new LinkedHashMap<>();
+    var map = new LinkedHashMap<ConfigKey,ConfigValue>();
 
     for(int n = 0, size = packStream.readSmallVar(); n < size; n++)
       map.put(unpack.unpackMapKey(packStream), unpack.unpackMapValue(packStream));

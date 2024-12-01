@@ -107,7 +107,7 @@ public final class NoSpaceTextPart implements Text
     if (!(o instanceof Text))
       return false;
 
-    final Text that = (Text)o;
+    var that = (Text)o;
 
     return !that.isSpaceBefore() && !that.isSpaceAfter() && text.equals(that.getText());
   }
@@ -153,7 +153,7 @@ public final class NoSpaceTextPart implements Text
    */
   public static @NotNull Text unpack(@NotNull PackInputStream packStream) throws IOException
   {
-    final String text = requireNonNull(packStream.readString());
+    var text = requireNonNull(packStream.readString());
     return text.isEmpty() ? Text.EMPTY : new NoSpaceTextPart(text);
   }
 }

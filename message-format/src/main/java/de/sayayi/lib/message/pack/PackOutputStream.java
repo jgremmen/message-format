@@ -128,7 +128,7 @@ public final class PackOutputStream implements Closeable
     {
       forceByteAlignment();
 
-      final byte[] bytes = new byte[utflen];
+      var bytes = new byte[utflen];
 
       for(int i = 0, count = 0; i < strlen; i++)
       {

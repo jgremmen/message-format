@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.part;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.pack.PackHelper;
@@ -128,7 +127,7 @@ public final class TemplatePart implements Template
   @Override
   public @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
   {
-    final Message message = messageAccessor.getTemplateByName(name);
+    var message = messageAccessor.getTemplateByName(name);
 
     return addSpaces(message != null
         ? noSpaceText(message.format(messageAccessor, new ParameterAdapter(parameters)))
@@ -143,7 +142,7 @@ public final class TemplatePart implements Template
     if (!(o instanceof Template))
       return false;
 
-    final Template that = (Template)o;
+    var that = (Template)o;
 
     return spaceBefore == that.isSpaceBefore() &&
            spaceAfter == that.isSpaceAfter() &&
@@ -161,7 +160,7 @@ public final class TemplatePart implements Template
   @Contract(pure = true)
   public String toString()
   {
-    final StringBuilder s = new StringBuilder("Template(name=").append(name);
+    var s = new StringBuilder("Template(name=").append(name);
 
     if (spaceBefore && spaceAfter)
       s.append(",space-around");
@@ -245,8 +244,8 @@ public final class TemplatePart implements Template
   {
     // v1 = spaceBefore, spaceAfter, name
 
-    final boolean spaceBefore = packStream.readBoolean();
-    final boolean spaceAfter = packStream.readBoolean();
+    var spaceBefore = packStream.readBoolean();
+    var spaceAfter = packStream.readBoolean();
 
     return new TemplatePart(requireNonNull(packStream.readString()), spaceBefore, spaceAfter, emptyMap(), emptyMap());
   }
@@ -257,9 +256,9 @@ public final class TemplatePart implements Template
   {
     // v2 = spaceBefore, spaceAfter, def. param map (size + key/value-pairs), name
 
-    final boolean spaceBefore = packStream.readBoolean();
-    final boolean spaceAfter = packStream.readBoolean();
-    final Map<String,ConfigValue> defaultParameterMap = new HashMap<>();
+    var spaceBefore = packStream.readBoolean();
+    var spaceAfter = packStream.readBoolean();
+    var defaultParameterMap = new HashMap<String,ConfigValue>();
 
     for(int n = 0, size = packStream.readSmallVar(); n < size; n++)
     {
@@ -279,13 +278,13 @@ public final class TemplatePart implements Template
     // v3 = spaceBefore, spaceAfter, size default param map, size parameter delegate map,
     // param map key/value-pairs), param delegate map key/value-pairs, name
 
-    final boolean spaceBefore = packStream.readBoolean();
-    final boolean spaceAfter = packStream.readBoolean();
+    var spaceBefore = packStream.readBoolean();
+    var spaceAfter = packStream.readBoolean();
 
-    final int defaultParameterMapSize = packStream.readSmallVar();
-    final int parameterDelegateMapSize = packStream.readSmallVar();
+    var defaultParameterMapSize = packStream.readSmallVar();
+    var parameterDelegateMapSize = packStream.readSmallVar();
 
-    final Map<String,ConfigValue> defaultParameterMap = new HashMap<>();
+    var defaultParameterMap = new HashMap<String,ConfigValue>();
     for(int n = 0; n < defaultParameterMapSize; n++)
     {
       defaultParameterMap.put(
@@ -293,7 +292,7 @@ public final class TemplatePart implements Template
           unpack.unpackMapValue(packStream));
     }
 
-    final Map<String,String> parameterDelegateMap = new HashMap<>();
+    var parameterDelegateMap = new HashMap<String,String>();
     for(int n = 0; n < parameterDelegateMapSize; n++)
     {
       parameterDelegateMap.put(
@@ -327,7 +326,7 @@ public final class TemplatePart implements Template
     @Override
     public @NotNull Set<String> getParameterNames()
     {
-      final TreeSet<String> names = new TreeSet<>();
+      var names = new TreeSet<String>();
 
       defaultParameterMap.forEach(defaultParameter -> names.add(defaultParameter.getKey()));
 
@@ -338,14 +337,14 @@ public final class TemplatePart implements Template
     @Override
     public Object getParameterValue(@NotNull String parameter)
     {
-      final String delegatedParameter = parameterDelegateMap.findValue(parameter);
+      var delegatedParameter = parameterDelegateMap.findValue(parameter);
       if (delegatedParameter != null)
         parameter = delegatedParameter;
 
-      Object value = parameters.getParameterValue(parameter);
+      var value = parameters.getParameterValue(parameter);
       if (value == null)
       {
-        final ConfigValue templateConfigValue = defaultParameterMap.findValue(parameter);
+        var templateConfigValue = defaultParameterMap.findValue(parameter);
         if (templateConfigValue != null)
           value = templateConfigValue.asObject();
       }

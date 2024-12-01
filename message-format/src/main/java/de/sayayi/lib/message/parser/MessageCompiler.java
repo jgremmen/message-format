@@ -140,7 +140,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   @Contract(pure = true)
   private @NotNull Message.WithSpaces compileMessage(@NotNull @Language("MessageFormat") String text, boolean template)
   {
-    final Listener listener = new Listener(template);
+    var listener = new Listener(template);
 
     try {
       return parse(new Lexer(text), lexer -> new Parser(listener.tokenStream = new BufferedTokenStream(lexer)),
@@ -223,7 +223,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         ctx.messageWithSpaces = EmptyMessage.INSTANCE;
       else
       {
-        final List<MessagePart> parts = new ArrayList<>();
+        var parts = new ArrayList<MessagePart>();
 
         for(var part: ctx.children)
         {
@@ -240,7 +240,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           }
         }
 
-        final int partCount = parts.size();
+        var partCount = parts.size();
 
         if (partCount == 0)
           ctx.messageWithSpaces = EmptyMessage.INSTANCE;
@@ -260,7 +260,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     {
       if (messagePart instanceof TextPart)
       {
-        final TextPart textPart = (TextPart)messagePart;
+        var textPart = (TextPart)messagePart;
         return "".equals(textPart.getText()) && textPart.isSpaceAround();
       }
 
@@ -280,13 +280,13 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitText(TextContext ctx)
     {
-      final List<TerminalNode> chNodes = ctx.CH();
-      final char[] text = new char[chNodes.size()];
+      var chNodes = ctx.CH();
+      var text = new char[chNodes.size()];
       int n = 0;
 
       for(var chNode: chNodes)
       {
-        final String chText = chNode.getText();
+        var chText = chNode.getText();
         char ch = chText.charAt(0);
 
         if (ch == '\\')
@@ -316,7 +316,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitQuotedString(QuotedStringContext ctx)
     {
-      final TextContext text = ctx.text();
+      var text = ctx.text();
       ctx.string = text == null ? "" : text.characters;
     }
 
@@ -324,7 +324,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitSimpleString(SimpleStringContext ctx)
     {
-      final NameOrKeywordContext nameOrKeyword = ctx.nameOrKeyword();
+      var nameOrKeyword = ctx.nameOrKeyword();
       ctx.string = nameOrKeyword != null ? nameOrKeyword.name : ctx.quotedString().string;
     }
 
@@ -332,7 +332,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitForceQuotedMessage(ForceQuotedMessageContext ctx)
     {
-      final QuotedMessageContext quotedMessage = ctx.quotedMessage();
+      var quotedMessage = ctx.quotedMessage();
       if (quotedMessage != null)
         ctx.messageWithSpaces = quotedMessage.messageWithSpaces;
       else
@@ -376,9 +376,9 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitParameterPart(ParameterPartContext ctx)
     {
-      final Map<ConfigKey,ConfigValue> mapElements =
+      var mapElements =
           ctx.parameterConfigElement().stream().collect(PARAMETER_CONFIG_COLLECTOR);
-      final ForceQuotedMessageContext forceQuotedMessage = ctx.forceQuotedMessage();
+      var forceQuotedMessage = ctx.forceQuotedMessage();
       if (forceQuotedMessage != null)
         mapElements.put(null, new ConfigValueMessage(forceQuotedMessage.messageWithSpaces));
 
@@ -464,8 +464,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitParameterConfigElement(ParameterConfigElementContext ctx)
     {
-      final ConfigNamedElementContext configNamedElementContext = ctx.configNamedElement();
-
+      var configNamedElementContext = ctx.configNamedElement();
       if (configNamedElementContext != null)
       {
         ctx.configKeys = List.of(configNamedElementContext.configKey);
@@ -573,7 +572,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitRelationalOperatorOptional(RelationalOperatorOptionalContext ctx)
     {
-      final RelationalOperatorContext relationalOperator = ctx.relationalOperator();
+      var relationalOperator = ctx.relationalOperator();
       ctx.cmp = relationalOperator == null ? CompareType.EQ : relationalOperator.cmp;
     }
 
@@ -581,8 +580,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitRelationalOperator(RelationalOperatorContext ctx)
     {
-      final EqualOperatorContext equalOperator = ctx.equalOperator();
-
+      var equalOperator = ctx.equalOperator();
       if (equalOperator != null)
         ctx.cmp = equalOperator.cmp;
       else
@@ -610,7 +608,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitEqualOperatorOptional(EqualOperatorOptionalContext ctx)
     {
-      final EqualOperatorContext equalOperator = ctx.equalOperator();
+      var equalOperator = ctx.equalOperator();
       ctx.cmp = equalOperator == null ? CompareType.EQ : equalOperator.cmp;
     }
 
@@ -631,8 +629,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     {
       if (i >= 0)
       {
-        final Token token = tokenStream.get(i);
-
+        var token = tokenStream.get(i);
         if (token.getType() != EOF)
         {
           final String text = token.getText();

@@ -40,11 +40,11 @@ public final class PackInputStream implements Closeable
 
   public PackInputStream(@NotNull InputStream stream) throws IOException
   {
-    final byte[] header = new byte[PACK_HEADER.length];
+    var header = new byte[PACK_HEADER.length];
     if (stream.read(header) != header.length || !Arrays.equals(header, PACK_HEADER))
       throw new IOException("pack stream has wrong header; possibly not a message pack");
 
-    final int zv = stream.read();
+    var zv = stream.read();
     if ((zv & 0b0100_0000) == 0)
       throw new IOException("malformed message pack version");
 

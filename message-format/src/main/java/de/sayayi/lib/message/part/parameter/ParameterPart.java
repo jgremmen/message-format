@@ -17,7 +17,6 @@ package de.sayayi.lib.message.part.parameter;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.pack.PackHelper;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
@@ -147,7 +146,7 @@ public final class ParameterPart implements Parameter
   @Contract(pure = true)
   public @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
   {
-    final FormatterContext context = new ParameterFormatterContext(messageAccessor, parameters,
+    var context = new ParameterFormatterContext(messageAccessor, parameters,
         parameters.getParameterValue(name), null, format, paramConfig);
 
     return addSpaces(context.delegateToNextFormatter(), spaceBefore, spaceAfter);
@@ -160,7 +159,7 @@ public final class ParameterPart implements Parameter
     if (!(o instanceof Parameter))
       return false;
 
-    final Parameter that = (Parameter)o;
+    var that = (Parameter)o;
 
     return
         name.equals(that.getName()) &&
@@ -181,7 +180,7 @@ public final class ParameterPart implements Parameter
   @Contract(pure = true)
   public String toString()
   {
-    final StringBuilder s = new StringBuilder("Parameter(name=").append(name);
+    var s = new StringBuilder("Parameter(name=").append(name);
 
     if (format != null)
       s.append(",format=").append(format);
@@ -234,10 +233,10 @@ public final class ParameterPart implements Parameter
   public static @NotNull ParameterPart unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
-    final boolean spaceBefore = packStream.readBoolean();
-    final boolean spaceAfter = packStream.readBoolean();
-    final String format = packStream.readString();
-    final String name = requireNonNull(packStream.readString());
+    var spaceBefore = packStream.readBoolean();
+    var spaceAfter = packStream.readBoolean();
+    var format = packStream.readString();
+    var name = requireNonNull(packStream.readString());
 
     return new ParameterPart(name, format, spaceBefore, spaceAfter, ParameterConfig.unpack(unpack, packStream));
   }

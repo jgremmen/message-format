@@ -45,14 +45,14 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
   {
     if ((size = map != null ? map.size() : 0) > 0)
     {
-      final List<K> keyList = new ArrayList<>(map.keySet());
+      var keyList = new ArrayList<>(map.keySet());
       keyList.sort(nullsFirst(naturalOrder()));
 
       array = new Object[size * 2];
 
       for(int n = 0; n < size; n++)
       {
-        final K key = keyList.get(n);
+        var key = keyList.get(n);
 
         array[n * 2 + 0] = key;
         array[n * 2 + 1] = map.get(key);
@@ -88,8 +88,8 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
     {
       for(int low = hasNullKey ? 1 : 0, high = size - 1; low <= high;)
       {
-        final int mid = (low + high) >>> 1;
-        final int cmp = ((K)array[mid * 2]).compareTo(key);
+        var mid = (low + high) >>> 1;
+        var cmp = ((K)array[mid * 2]).compareTo(key);
 
         if (cmp < 0)
           low = mid + 1;
@@ -110,7 +110,7 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
   @SuppressWarnings("unchecked")
   public @NotNull K[] getKeys(@NotNull Class<K> keyType)
   {
-    final K[] keys = (K[])Array.newInstance(keyType, size);
+    var keys = (K[])Array.newInstance(keyType, size);
 
     for(int n = 0; n < size; n++)
       keys[n] = (K)array[n * 2];
@@ -225,7 +225,7 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
     {
       if (o instanceof Entry)
       {
-        final Entry<?,?> entry = (Entry<?,?>)o;
+        var entry = (Entry<?,?>)o;
 
         return
             Objects.equals(array[offset], entry.getKey()) &&
@@ -239,8 +239,8 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
     @Override
     public int hashCode()
     {
-      final Object key = array[offset];
-      final Object value = array[offset + 1];
+      var key = array[offset];
+      var value = array[offset + 1];
 
       return (key == null ? 0 : key.hashCode()) ^ (value == null ? 0 : value.hashCode());
     }
