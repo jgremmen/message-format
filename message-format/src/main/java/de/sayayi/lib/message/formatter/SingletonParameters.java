@@ -31,7 +31,7 @@ public final class SingletonParameters implements Parameters
 {
   private final Locale locale;
   private final String parameterName;
-  Object value;
+  private Object value;
 
 
   public SingletonParameters(@NotNull Locale locale, @NotNull String parameterName)
