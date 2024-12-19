@@ -18,6 +18,8 @@ package de.sayayi.lib.message.part;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.SpacesAware;
+import de.sayayi.lib.message.internal.part.NoSpaceTextPart;
+import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -82,7 +84,7 @@ public interface MessagePart extends SpacesAware
     /**
      * Returns the name for this parameter.
      *
-     * @return  parameter name, never {@code null}
+     * @return  parameter name, never empty or {@code null}
      */
     @Contract(pure = true)
     @NotNull String getName();
@@ -91,7 +93,7 @@ public interface MessagePart extends SpacesAware
     /**
      * Returns the optional format for this parameter.
      *
-     * @return  format
+     * @return  named formatter name or {@code null}
      */
     @Contract(pure = true)
     String getFormat();
@@ -103,8 +105,7 @@ public interface MessagePart extends SpacesAware
      * @return  parameter configuration, never {@code null}
      */
     @Contract(pure = true)
-    @NotNull
-    ParameterConfig getParamConfig();
+    @NotNull ParameterConfig getParamConfig();
 
 
     /**
