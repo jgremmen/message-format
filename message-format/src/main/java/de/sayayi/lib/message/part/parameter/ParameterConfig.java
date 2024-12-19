@@ -33,12 +33,14 @@ import de.sayayi.lib.message.part.parameter.value.ConfigValueMessage;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.IOException;
 import java.util.*;
 
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.MISMATCH;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 
 
@@ -77,13 +79,12 @@ public final class ParameterConfig
 
     var mapKeyList = new ArrayList<OrderedConfigKey>();
     ConfigValue mapNullValue = null;
+    ConfigKey.Type keyType;
     ConfigKey key;
     int keyTypeMask = 0;
 
     for(var entry: map.entrySet())
     {
-      ConfigKey.Type keyType;
-
       if ((key = entry.getKey()) == null)
         mapNullValue = entry.getValue();
       else if ((keyType = key.getType()) != NAME)
@@ -95,6 +96,7 @@ public final class ParameterConfig
         config.put(((ConfigKeyName)key).getName(), entry.getValue());
     }
 
+    mapKeyList.trimToSize();
     mapKeyList.sort(OrderedConfigKeySorter.INSTANCE);
 
     var mapLength = mapKeyList.size();
@@ -136,6 +138,13 @@ public final class ParameterConfig
   @Contract(pure = true)
   public boolean hasMessageWithKeyType(@NotNull ConfigKey.Type keyType) {
     return (hasKeyType & (1 << keyType.ordinal())) != 0;
+  }
+
+
+  @Contract(pure = true)
+  @Unmodifiable
+  public @NotNull Map<String,ConfigValue> getConfig() {
+    return unmodifiableMap(config);
   }
 
 
@@ -225,6 +234,7 @@ public final class ParameterConfig
    * @return  unmodifiable set of all referenced template names, never {@code null}
    */
   @Contract(pure = true)
+  @Unmodifiable
   public @NotNull Set<String> getTemplateNames()
   {
     var templateNames = new TreeSet<String>();
