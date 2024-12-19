@@ -22,11 +22,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Set;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -63,7 +63,7 @@ public class IterableFormatterTest extends AbstractFormatterTest
         .message("%{c,null:null,empty:empty}");
 
     assertEquals("null", message.with("c", null).format());
-    assertEquals("empty", message.with("c", emptySet()).format());
+    assertEquals("empty", message.with("c", Set.of()).format());
   }
 
 

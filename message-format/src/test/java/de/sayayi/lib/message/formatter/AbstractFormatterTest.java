@@ -29,7 +29,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.fail;
 
 
@@ -50,21 +49,21 @@ public abstract class AbstractFormatterTest
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value) {
-    return format(messageContext, new NoParameters(messageContext.getLocale()), value, emptyMap(), null);
+    return format(messageContext, new NoParameters(messageContext.getLocale()), value, Map.of(), null);
   }
 
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
                                         @NotNull String format) {
-    return format(messageContext, new NoParameters(messageContext.getLocale()), value, emptyMap(), format);
+    return format(messageContext, new NoParameters(messageContext.getLocale()), value, Map.of(), format);
   }
 
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext,
                                         @NotNull Parameters parameters, Object value) {
-    return format(messageContext, parameters, value, emptyMap(), null);
+    return format(messageContext, parameters, value, Map.of(), null);
   }
 
 

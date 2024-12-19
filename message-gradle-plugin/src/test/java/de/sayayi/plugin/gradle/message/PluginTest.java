@@ -39,7 +39,6 @@ import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.nio.file.Files.*;
-import static java.util.Collections.emptySet;
 import static java.util.Objects.requireNonNull;
 import static org.gradle.testkit.runner.TaskOutcome.FAILED;
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS;
@@ -100,8 +99,8 @@ class PluginTest
     assertTrue(packFile.isFile() && packFile.canRead());
 
     val pack = readMessagePack(packFile);
-    assertEquals(emptySet(), pack.getMessageCodes());
-    assertEquals(emptySet(), pack.getTemplateNames());
+    assertEquals(Set.of(), pack.getMessageCodes());
+    assertEquals(Set.of(), pack.getTemplateNames());
   }
 
 
@@ -125,7 +124,7 @@ class PluginTest
 
     val pack = readMessagePack(packFile);
     assertEquals(4, pack.getMessageCodes().size());
-    assertEquals(emptySet(), pack.getTemplateNames());
+    assertEquals(Set.of(), pack.getTemplateNames());
   }
 
 
@@ -158,7 +157,7 @@ class PluginTest
 
     val pack = readMessagePack(packFile);
     assertEquals(Set.of("MSG-INNER1"), pack.getMessageCodes());
-    assertEquals(emptySet(), pack.getTemplateNames());
+    assertEquals(Set.of(), pack.getTemplateNames());
   }
 
 

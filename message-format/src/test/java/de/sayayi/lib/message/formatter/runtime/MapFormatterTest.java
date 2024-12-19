@@ -28,7 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static java.util.Locale.UK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -91,7 +90,7 @@ class MapFormatterTest extends AbstractFormatterTest
     val messageSupport = MessageSupportFactory
         .create(createFormatterService(new MapFormatter(), new ArrayFormatter()), NO_CACHE_INSTANCE)
         .setLocale(UK);
-    val parameters = Map.of("map", (Object)emptyMap());
+    val parameters = Map.<String,Object>of("map", Map.of());
 
     assertEquals("", messageSupport.message("%{map}").with(parameters).format());
     assertEquals("empty", messageSupport.message("%{map,empty:empty}").with(parameters).format());

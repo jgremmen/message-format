@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.joining;
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,7 +38,7 @@ class SortedArrayMapTest
   @DisplayName("Empty map")
   void testEmptyMap()
   {
-    val map = new SortedArrayMap<String,Integer>(emptyMap());
+    val map = new SortedArrayMap<String,Integer>(Map.of());
 
     assertTrue(map.isEmpty());
     assertEquals(0, map.size());

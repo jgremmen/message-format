@@ -105,8 +105,8 @@ public class MessageFormatException extends MessageException
       1 | 1 | 1 | 1 | failed to format parameter 'p' in template 't' for message with code 'c' and locale 'l'
      */
 
-    final StringBuilder msg = new StringBuilder("failed to format");
-    final int n =
+    var msg = new StringBuilder("failed to format");
+    var n =
         (code != null && !isGeneratedCode(code) ? 0b1000 : 0b0000) +
         (template != null && !isGeneratedCode(template) ? 0b0100 : 0b0000) +
         (locale != null ? 0b0010 : 0b0000) +

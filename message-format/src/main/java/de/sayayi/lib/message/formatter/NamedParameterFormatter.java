@@ -20,8 +20,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-import static java.util.Collections.emptySet;
-
 
 /**
  * Parameter formatter implementing this interface can be selected by specifying the formatter
@@ -72,6 +70,6 @@ public interface NamedParameterFormatter extends ParameterFormatter
    */
   @Override
   default @NotNull Set<FormattableType> getFormattableTypes() {
-    return emptySet();
+    return Set.of();
   }
 }

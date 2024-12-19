@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static org.springframework.expression.spel.SpelMessage.VARIABLE_ASSIGNMENT_NOT_SUPPORTED;
 
@@ -149,7 +148,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object>
 
     @Override
     public @NotNull List<ConstructorResolver> getConstructorResolvers() {
-      return emptyList();
+      return List.of();
     }
 
 

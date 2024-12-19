@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Locale;
 import java.util.Set;
 
-import static java.util.Collections.emptySet;
 import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
 
@@ -72,7 +71,7 @@ public final class NoParameters implements Parameters
 
   @Override
   public @NotNull Set<String> getParameterNames() {
-    return emptySet();
+    return Set.of();
   }
 
 

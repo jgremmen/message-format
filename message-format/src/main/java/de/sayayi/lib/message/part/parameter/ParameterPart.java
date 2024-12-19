@@ -25,10 +25,10 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
-import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 
 
@@ -75,7 +75,7 @@ public final class ParameterPart implements Parameter
    * @param spaceAfter   adds a trailing space to this parameter
    */
   public ParameterPart(@NotNull String name, boolean spaceBefore, boolean spaceAfter) {
-    this(name, null, spaceBefore, spaceAfter, new ParameterConfig(emptyMap()));
+    this(name, null, spaceBefore, spaceAfter, new ParameterConfig(Map.of()));
   }
 
 
