@@ -17,8 +17,8 @@ package de.sayayi.lib.message.part.parameter.value;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.pack.PackInputStream;
-import de.sayayi.lib.message.pack.PackOutputStream;
+import de.sayayi.lib.message.internal.pack.PackInputStream;
+import de.sayayi.lib.message.internal.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

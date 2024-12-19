@@ -1,4 +1,4 @@
-package de.sayayi.lib.message.pack;
+package de.sayayi.lib.message.internal.pack;
 
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;

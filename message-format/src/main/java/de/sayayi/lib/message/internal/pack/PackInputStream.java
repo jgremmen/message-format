@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.pack;
+package de.sayayi.lib.message.internal.pack;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 
-import static de.sayayi.lib.message.pack.PackOutputStream.PACK_HEADER;
+import static de.sayayi.lib.message.internal.pack.PackOutputStream.PACK_HEADER;
 import static java.lang.Integer.bitCount;
 
 
