@@ -50,7 +50,6 @@ import java.util.stream.Collector;
 import static de.sayayi.lib.antlr4.walker.Walker.WALK_EXIT_RULES_HEAP;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAGE;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.TEMPLATE;
-import static de.sayayi.lib.message.internal.parser.MessageLexer.*;
 import static de.sayayi.lib.message.internal.parser.MessageParser.*;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
