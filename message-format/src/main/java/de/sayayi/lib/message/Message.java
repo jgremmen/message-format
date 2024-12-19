@@ -22,10 +22,13 @@ import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import static java.util.Collections.unmodifiableSet;
 
 
 /**
@@ -112,7 +115,7 @@ public interface Message
 
       @Override
       public @NotNull Set<String> getParameterNames() {
-        return parameterValues.keySet();
+        return unmodifiableSet(parameterValues.keySet());
       }
     });
   }
@@ -141,6 +144,7 @@ public interface Message
    * @since 0.8.0
    */
   @Contract(pure = true)
+  @Unmodifiable
   @NotNull Set<String> getTemplateNames();
 
 
@@ -227,6 +231,7 @@ public interface Message
      * @return  unmodifiable set of all available locales, never {@code null}
      */
     @Contract(pure = true)
+    @Unmodifiable
     @NotNull Set<Locale> getLocales();
 
 
@@ -236,6 +241,7 @@ public interface Message
      * @return  unmodifiable map of all messages keyed by locale, never {@code null}
      */
     @Contract(pure = true)
+    @Unmodifiable
     @NotNull Map<Locale,Message> getLocalizedMessages();
   }
 
@@ -276,6 +282,7 @@ public interface Message
      * @return  set with all data names, never {@code null}
      */
     @Contract(pure = true)
+    @Unmodifiable
     @NotNull Set<String> getParameterNames();
   }
 }

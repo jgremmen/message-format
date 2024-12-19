@@ -22,6 +22,8 @@ import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -147,6 +149,7 @@ public interface MessageSupport
      * @return  unmodifiable parameter map, never {@code null}
      */
     @Contract(pure = true)
+    @Unmodifiable
     @NotNull Map<String,Object> getParameters();
 
 
@@ -735,6 +738,7 @@ public interface MessageSupport
      * @return  unmodifiable set with all message codes, never {@code null}
      */
     @Contract(value = "-> new", pure = true)
+    @UnmodifiableView
     @NotNull Set<String> getMessageCodes();
 
 
@@ -831,6 +835,7 @@ public interface MessageSupport
      * @return  unmodifiable set with all template names, never {@code null}
      */
     @Contract(value = "-> new", pure = true)
+    @UnmodifiableView
     @NotNull Set<String> getTemplateNames();
 
 

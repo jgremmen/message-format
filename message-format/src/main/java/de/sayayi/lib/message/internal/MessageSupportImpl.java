@@ -28,6 +28,8 @@ import de.sayayi.lib.message.internal.pack.PackOutputStream;
 import de.sayayi.lib.message.part.parameter.value.*;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -342,6 +344,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
+    @Unmodifiable
     public @NotNull Map<String,Object> getParameters() {
       return new ParameterMap(this);
     }
@@ -496,12 +499,14 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
+    @UnmodifiableView
     public @NotNull Set<String> getMessageCodes() {
       return unmodifiableSet(messages.keySet());
     }
 
 
     @Override
+    @UnmodifiableView
     public @NotNull Set<String> getTemplateNames() {
       return unmodifiableSet(templates.keySet());
     }
