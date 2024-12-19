@@ -219,7 +219,7 @@ public final class ParameterPart implements Parameter
 
 
   /**
-   * @param unpack     unpacker instance, not {@code null}
+   * @param unpack      unpacker instance, not {@code null}
    * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked parameter part, never {@code null}
