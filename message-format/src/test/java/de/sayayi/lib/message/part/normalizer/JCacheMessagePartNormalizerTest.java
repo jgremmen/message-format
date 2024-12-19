@@ -37,7 +37,7 @@ import static org.junit.platform.commons.util.ReflectionUtils.tryToReadFieldValu
 @DisplayName("JCache message part normalizer")
 class JCacheMessagePartNormalizerTest
 {
-  private static MessagePartNormalizer resolver;
+  private static MessagePartNormalizer normalizer;
 
 
   @BeforeAll
@@ -52,14 +52,15 @@ class JCacheMessagePartNormalizerTest
 
     val cache = cacheManager.createCache("message-part-cache", config);
 
-    resolver = new JCacheMessagePartNormalizer(cache);
+    normalizer = new JCacheMessagePartNormalizer(cache);
   }
 
 
   @Test
-  void testCache() throws Exception
+  @DisplayName("Normalized message parts")
+  void testNormalized() throws Exception
   {
-    val msg = new MessageFactory(resolver).parseMessage("this is %{a,number} and %{b}this is %{b}");
+    val msg = new MessageFactory(normalizer).parseMessage("this is %{a,number} and %{b}this is %{b}");
     val parts = (MessagePart[])
         tryToReadFieldValue(CompoundMessage.class, "messageParts", (CompoundMessage)msg).get();
 

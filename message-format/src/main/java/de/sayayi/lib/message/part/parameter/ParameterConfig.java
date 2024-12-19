@@ -158,7 +158,7 @@ public final class ParameterConfig
   public Message.WithSpaces getMessage(@NotNull MessageAccessor messageAccessor, Object key, @NotNull Locale locale,
                                        @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault)
   {
-    var configValue = getMessage_findMappedValue(messageAccessor, locale, key, keyTypes);
+    var configValue = findMappedValue(messageAccessor, locale, key, keyTypes);
     if (configValue == null)
     {
       if (includeDefault && defaultValue != null &&
@@ -175,8 +175,8 @@ public final class ParameterConfig
 
 
   @Contract(pure = true)
-  private ConfigValue getMessage_findMappedValue(@NotNull MessageAccessor messageAccessor, @NotNull Locale locale,
-                                                 Object value, @NotNull Set<ConfigKey.Type> keyTypes)
+  private ConfigValue findMappedValue(@NotNull MessageAccessor messageAccessor, @NotNull Locale locale,
+                                      Object value, @NotNull Set<ConfigKey.Type> keyTypes)
   {
     ConfigValue bestMatch = null;
 

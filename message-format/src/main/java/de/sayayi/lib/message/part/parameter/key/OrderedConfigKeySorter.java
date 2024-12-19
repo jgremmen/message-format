@@ -42,18 +42,17 @@ public enum OrderedConfigKeySorter implements Comparator<OrderedConfigKeySorter.
   @Override
   public int compare(OrderedConfigKey k1, OrderedConfigKey k2)
   {
-    int cmp = Integer.compare(configKeyToOrder(k1), configKeyToOrder(k2));
+    int cmp = Integer.compare(configKeyToOrder(k1.configKey), configKeyToOrder(k2.configKey));
     if (cmp == 0)
-      cmp = Integer.compare(k1.getOrder(), k2.getOrder());
+      cmp = Integer.compare(k1.order, k2.order);
 
     return cmp;
   }
 
 
   @Contract(pure = true)
-  private int configKeyToOrder(@NotNull OrderedConfigKey orderedConfigKey)
+  private int configKeyToOrder(@NotNull ConfigKey configKey)
   {
-    var configKey = orderedConfigKey.configKey;
     var compareType = configKey.getCompareType();
     var keyType = configKey.getType();
 
@@ -88,12 +87,6 @@ public enum OrderedConfigKeySorter implements Comparator<OrderedConfigKeySorter.
     {
       this.order = order;
       this.configKey = configKey;
-    }
-
-
-    @Contract(pure = true)
-    public int getOrder() {
-      return order;
     }
 
 
