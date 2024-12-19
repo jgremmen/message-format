@@ -19,7 +19,6 @@ import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueNumber;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import org.jetbrains.annotations.NotNull;
@@ -59,14 +58,14 @@ public final class BitsFormatter extends AbstractParameterFormatter<Object>
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    final int bitCount = detectBitCount(context, value);
+    var bitCount = detectBitCount(context, value);
     return bitCount > 0 ? noSpaceText(format(bitCount, value)) : emptyText();
   }
 
 
   private int detectBitCount(@NotNull FormatterContext context, @NotNull Object value)
   {
-    final ConfigValue configValue = context.getConfigValue("bits").orElse(null);
+    var configValue = context.getConfigValue("bits").orElse(null);
 
     if (configValue instanceof ConfigValueString && "auto".equals(configValue.asObject()))
       return autoDetectBitCount(value);
@@ -84,10 +83,10 @@ public final class BitsFormatter extends AbstractParameterFormatter<Object>
 
   private int autoDetectBitCount(Object value)
   {
-    // auto detect for big integer in range 0..Long.MAX_VALUE
+    // autodetect for big integer in range 0..Long.MAX_VALUE
     if (value instanceof BigInteger)
     {
-      final BigInteger i = (BigInteger)value;
+      var i = (BigInteger)value;
 
       if (BigInteger.ZERO.equals(i))
         return 1;
@@ -95,11 +94,11 @@ public final class BitsFormatter extends AbstractParameterFormatter<Object>
         return 64 - Long.numberOfLeadingZeros(i.longValue());
     }
 
-    // auto detect for numbers of type byte, short, integer or long
+    // autodetect for numbers of type byte, short, integer or long
     if (value instanceof Byte || value instanceof Short || value instanceof Integer ||
         value instanceof Long)
     {
-      final long l = ((Number)value).longValue();
+      var l = ((Number)value).longValue();
 
       if (l == 0L)
         return 1;
@@ -132,7 +131,7 @@ public final class BitsFormatter extends AbstractParameterFormatter<Object>
 
   private String format(int bitCount, Object value)
   {
-    final char[] bits = new char[bitCount];
+    var bits = new char[bitCount];
 
     if (value instanceof BigInteger && bitCount > 64)
       formatBigInteger(bits, (BigInteger)value);

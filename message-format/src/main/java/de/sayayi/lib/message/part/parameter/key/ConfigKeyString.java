@@ -98,7 +98,7 @@ public final class ConfigKeyString implements ConfigKey
     if (!(o instanceof ConfigKeyString))
       return false;
 
-    final ConfigKeyString that = (ConfigKeyString)o;
+    var that = (ConfigKeyString)o;
 
     return compareType == that.compareType && string.equals(that.string);
   }
@@ -143,9 +143,7 @@ public final class ConfigKeyString implements ConfigKey
    *
    * @hidden
    */
-  public static @NotNull ConfigKeyString unpack(@NotNull PackInputStream packStream) throws IOException
-  {
-    return new ConfigKeyString(packStream.readEnum(CompareType.class),
-        requireNonNull(packStream.readString()));
+  public static @NotNull ConfigKeyString unpack(@NotNull PackInputStream packStream) throws IOException {
+    return new ConfigKeyString(packStream.readEnum(CompareType.class), requireNonNull(packStream.readString()));
   }
 }

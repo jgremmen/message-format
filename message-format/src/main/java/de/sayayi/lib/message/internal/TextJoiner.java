@@ -68,7 +68,7 @@ public final class TextJoiner
   {
     insertSpaceBefore |= text.isSpaceBefore();
 
-    String s = text.getText();
+    var s = text.getText();
     if (s != null && !s.isEmpty())
     {
       if (insertSpaceBefore)

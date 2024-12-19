@@ -45,7 +45,7 @@ public final class EnumFormatter extends AbstractMultiSelectFormatter<Enum<?>> i
 
   private @NotNull Text formatEnumOrdinal(@NotNull FormatterContext context, @NotNull Enum<?> enumValue)
   {
-    final int ordinal = enumValue.ordinal();
+    var ordinal = enumValue.ordinal();
 
     return formatUsingMappedNumber(context, ordinal, true)
         .orElseGet(() -> context.format(ordinal, int.class));
@@ -54,7 +54,7 @@ public final class EnumFormatter extends AbstractMultiSelectFormatter<Enum<?>> i
 
   private @NotNull Text formatEnumName(@NotNull FormatterContext context, @NotNull Enum<?> enumValue)
   {
-    final String name = enumValue.name();
+    var name = enumValue.name();
 
     return formatUsingMappedString(context, name, true).orElseGet(() -> noSpaceText(name));
   }

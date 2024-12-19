@@ -34,12 +34,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import java.net.*;
+import java.net.JarURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
@@ -125,14 +126,14 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
     for(var urls = classLoader.getResources(classPathPrefix); urls.hasMoreElements();)
     {
-      final URL url = urls.nextElement();
+      var url = urls.nextElement();
 
       if (ZIP_PROTOCOLS.contains(url.getProtocol()))
         adopt_scan_zipEntries(url, classPathPrefix);
       else
       {
-        final String directory = url.getFile();
-        final File baseDirectory = new File(directory.endsWith(classPathPrefix)
+        var directory = url.getFile();
+        var baseDirectory = new File(directory.endsWith(classPathPrefix)
             ? directory.substring(0, directory.length() - classPathPrefix.length()) : directory);
 
         if (baseDirectory.isDirectory())
@@ -144,17 +145,17 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
   private void adopt_scan_directory(@NotNull File baseDirectory, @NotNull File directory) throws IOException
   {
-    final File[] files = directory.listFiles();
+    var files = directory.listFiles();
     if (files != null)
     {
-      final Path baseDirectoryPath = baseDirectory.toPath();
+      var baseDirectoryPath = baseDirectory.toPath();
 
       for(var file: files)
         if (file.isDirectory())
           adopt_scan_directory(baseDirectory, file);
         else
         {
-          final String classNamePath = baseDirectoryPath
+          var classNamePath = baseDirectoryPath
               .relativize(file.toPath()).toString().replace('\\', '/');
 
           if (classNamePath.endsWith(".class") && scan_checkVisited(classNamePath))
@@ -170,14 +171,14 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
   private void adopt_scan_zipEntries(@NotNull URL zipUrl, @NotNull String classPathPrefix) throws IOException
   {
-    final URLConnection con = zipUrl.openConnection();
+    var con = zipUrl.openConnection();
     final ZipFile zipFile;
 
     if (con instanceof JarURLConnection)
       zipFile = ((JarURLConnection)con).getJarFile();
     else
     {
-      final String urlFile = zipUrl.getFile();
+      var urlFile = zipUrl.getFile();
       try {
         int separatorIndex = urlFile.indexOf("*/");
         if (separatorIndex == -1)
@@ -193,8 +194,8 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     try {
       for(var entries = zipFile.entries(); entries.hasMoreElements();)
       {
-        final ZipEntry zipEntry = entries.nextElement();
-        final String classPathName = zipEntry.getName();
+        var zipEntry = entries.nextElement();
+        var classPathName = zipEntry.getName();
 
         if (classPathName.endsWith(".class") &&
             classPathName.startsWith(classPathPrefix) &&
@@ -242,11 +243,11 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    */
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull File classFile)
   {
-    final Path classPath = classFile.toPath().toAbsolutePath();
+    var classPath = classFile.toPath().toAbsolutePath();
 
     if (!indexedClasses.contains(classPath.toString()))
     {
-      try(final InputStream inputStream = Files.newInputStream(classPath)) {
+      try(var inputStream = Files.newInputStream(classPath)) {
         parseClass(inputStream);
         indexedClasses.add(classPath.toString());
       } catch(Exception ex) {
@@ -269,17 +270,16 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    */
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull Class<?> type)
   {
-    final String typeName = type.getName();
+    var typeName = type.getName();
 
     if (!indexedClasses.contains(typeName))
     {
-      final ClassLoader classLoader = type.getClassLoader();
-
+      var classLoader = type.getClassLoader();
       if (classLoader != null)
       {
-        final String classResourceName = typeName.replace('.', '/') + ".class";
+        var classResourceName = typeName.replace('.', '/') + ".class";
 
-        try(final InputStream inputStream = classLoader.getResourceAsStream(classResourceName)) {
+        try(var inputStream = classLoader.getResourceAsStream(classResourceName)) {
           parseClass(requireNonNull(inputStream));
           indexedClasses.add(typeName);
         } catch(Exception ex) {
@@ -304,12 +304,12 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    */
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull MessageDef messageDef)
   {
-    final Text[] texts = messageDef.texts();
-    final String code = messageDef.code();
+    var texts = messageDef.texts();
+    var code = messageDef.code();
 
     if (texts.length == 0)
     {
-      @Language("MessageFormat") final String text = messageDef.text();
+      @Language("MessageFormat") var text = messageDef.text();
 
       messagePublisher.addMessage(text.isEmpty()
           ? new EmptyMessageWithCode(code)
@@ -317,12 +317,11 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     }
     else
     {
-      final Map<Locale,String> localizedTexts = new LinkedHashMap<>();
+      var localizedTexts = new LinkedHashMap<Locale,String>();
 
-      for(final Text text: texts)
+      for(var text: texts)
       {
-        final String value = text.locale().isEmpty() &&
-            text.text().isEmpty() ? text.value() : text.text();
+        var value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
 
         localizedTexts.compute(forLanguageTag(text.locale()), (locale,mappedValue) -> {
           if (mappedValue == null || mappedValue.equals(value))
@@ -353,12 +352,12 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    */
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull TemplateDef templateDef)
   {
-    final Text[] texts = templateDef.texts();
-    final String name = templateDef.name();
+    var texts = templateDef.texts();
+    var name = templateDef.name();
 
     if (texts.length == 0)
     {
-      @Language("MessageFormat") final String text = templateDef.text();
+      @Language("MessageFormat") var text = templateDef.text();
 
       messagePublisher.addTemplate(name, text.isEmpty()
           ? EmptyMessage.INSTANCE
@@ -366,11 +365,11 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     }
     else
     {
-      final Map<Locale,String> localizedTexts = new LinkedHashMap<>();
+      var localizedTexts = new LinkedHashMap<Locale,String>();
 
-      for(final Text text: texts)
+      for(var text: texts)
       {
-        final String value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
+        var value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
 
         localizedTexts.compute(forLanguageTag(text.locale()), (locale, mappedValue) -> {
           if (mappedValue == null || mappedValue.equals(value))

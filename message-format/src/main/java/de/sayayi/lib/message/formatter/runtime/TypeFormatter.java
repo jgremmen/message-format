@@ -68,7 +68,7 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
 
   private static String toString_class(@NotNull Class<?> type, @NotNull String typeFormat)
   {
-    final StringBuilder arraySuffix = new StringBuilder();
+    var arraySuffix = new StringBuilder();
 
     while(type.isArray())
     {
@@ -79,11 +79,12 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
     if (typeFormat.indexOf('c') >= 0 || type.isPrimitive())
       return type.getSimpleName() + arraySuffix;
 
-    final String name = type.getName();
-    final String formattedClass = (typeFormat.indexOf('j') >= 0 && name.startsWith("java.lang.")) ||
-                                  (typeFormat.indexOf('u') >= 0 && name.startsWith("java.util."))
-        ? name.substring(10)
-        : name;
+    var name = type.getName();
+    var formattedClass =
+        (typeFormat.indexOf('j') >= 0 && name.startsWith("java.lang.")) ||
+        (typeFormat.indexOf('u') >= 0 && name.startsWith("java.util."))
+            ? name.substring(10)
+            : name;
 
     return formattedClass.replaceAll("\\$[0-9]*", ".") + arraySuffix;
   }
@@ -92,9 +93,9 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
   private static String toString_parameterized(@NotNull ParameterizedType parameterizedType,
                                                @NotNull String typeFormat)
   {
-    final StringBuilder formattedType = new StringBuilder();
-    final Type ownerType = parameterizedType.getOwnerType();
-    final Type rawType = parameterizedType.getRawType();
+    var formattedType = new StringBuilder();
+    var ownerType = parameterizedType.getOwnerType();
+    var rawType = parameterizedType.getRawType();
 
     withOwnerType: {
       if (ownerType != null)
@@ -103,7 +104,7 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
 
         if (ownerType instanceof ParameterizedType && rawType instanceof Class)
         {
-          final Class<?> ownerRawType = (Class<?>)((ParameterizedType)ownerType).getRawType();
+          var ownerRawType = (Class<?>)((ParameterizedType)ownerType).getRawType();
           formattedType.append(((Class<?>)rawType).getName()
               .replace(ownerRawType.getName() + "$", ""));
           break withOwnerType;
@@ -113,8 +114,8 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
       formattedType.append(toString(rawType, typeFormat));
     }
 
-    final Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-    if (actualTypeArguments != null && actualTypeArguments.length > 0)
+    var actualTypeArguments = parameterizedType.getActualTypeArguments();
+    if (actualTypeArguments.length > 0)
     {
       formattedType.append(Arrays.stream(actualTypeArguments)
           .map(t -> toString(t, typeFormat))
@@ -130,13 +131,13 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
     if (typeFormat.indexOf('v') < 0)
       return typeVariable.getName();
 
-    final StringBuilder formattedTypeVariable = new StringBuilder();
+    var formattedTypeVariable = new StringBuilder();
     formattedTypeVariable.append('<').append(typeVariable.getName());
 
-    final Type[] bounds = typeVariable.getBounds();
-    if (bounds != null && bounds.length > 0)
+    var bounds = typeVariable.getBounds();
+    if (bounds.length > 0)
     {
-      final String typeFormat0 = typeFormat.replace("T", "");
+      var typeFormat0 = typeFormat.replace("T", "");
 
       formattedTypeVariable.append(" extends ").append(Arrays.stream(bounds)
           .map(t -> toString(t, typeFormat0))
@@ -149,15 +150,15 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
 
   private static String toString_wildcard(@NotNull WildcardType wildcardType, @NotNull String typeFormat)
   {
-    final StringBuilder formattedWildcardType = new StringBuilder();
-    final Type[] lowerBounds = wildcardType.getLowerBounds();
-    Type[] bounds = lowerBounds;
+    var formattedWildcardType = new StringBuilder();
+    var lowerBounds = wildcardType.getLowerBounds();
+    var bounds = lowerBounds;
 
     if (lowerBounds.length > 0)
       formattedWildcardType.append("? super ");
     else
     {
-      Type[] upperBounds = wildcardType.getUpperBounds();
+      var upperBounds = wildcardType.getUpperBounds();
       if (upperBounds.length == 0 || upperBounds[0].equals(Object.class))
         return "?";
 

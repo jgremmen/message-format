@@ -123,7 +123,7 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
 
     if (value instanceof String)
     {
-      final String s = (String)value;
+      var s = (String)value;
 
       if ("true".equals(s))
         return Optional.of(TRUE);

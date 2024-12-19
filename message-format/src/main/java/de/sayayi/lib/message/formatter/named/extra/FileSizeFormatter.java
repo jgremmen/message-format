@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter.named.extra;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
@@ -71,9 +70,9 @@ public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Number value)
   {
-    final long size = value.longValue();
-    int scale = normalizeScale(context.getConfigValueNumber("scale").orElse(1));
-    final StringBuilder s = new StringBuilder();
+    var size = value.longValue();
+    var scale = normalizeScale(context.getConfigValueNumber("scale").orElse(1));
+    var s = new StringBuilder();
     final int unitIndex;
 
     if (size <= 0)
@@ -91,8 +90,8 @@ public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
           .format((double)size / POW10[unitIndex * 3]));
     }
 
-    final String unit = UNITS[unitIndex];
-    final Message.WithSpaces unitMessage = context
+    var unit = UNITS[unitIndex];
+    var unitMessage = context
         .getConfigMapMessage(unit, ConfigKey.STRING_TYPE)
         .orElse(null);
 

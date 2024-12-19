@@ -120,16 +120,16 @@ public final class PackInputStream implements Closeable
 
     forceByteAlignment();
 
-    final byte[] bytes = new byte[utflen];
+    var bytes = new byte[utflen];
     if (stream.read(bytes) != utflen)
       throw new EOFException("unexpected end of pack stream while reading utf string");
 
-    final char[] chars = new char[utflen];
+    var chars = new char[utflen];
     int charIdx = 0;
 
     for(int count = 0; count < utflen;)
     {
-      final int c = (int)bytes[count] & 0xff;
+      var c = (int)bytes[count] & 0xff;
 
       switch(c >> 4)
       {
@@ -152,7 +152,7 @@ public final class PackInputStream implements Closeable
           if ((count += 2) > utflen)
             throw new UTFDataFormatException("malformed input: partial character at end");
 
-          final int char2 = bytes[count - 1];
+          var char2 = bytes[count - 1];
           if ((char2 & 0b1100_0000) != 0b1000_0000)
             throw new UTFDataFormatException("malformed input around byte " + count);
 
@@ -165,8 +165,8 @@ public final class PackInputStream implements Closeable
           if ((count += 3) > utflen)
             throw new UTFDataFormatException("malformed input: partial character at end");
 
-          final int char2 = bytes[count - 2];
-          final int char3 = bytes[count - 1];
+          var char2 = bytes[count - 2];
+          var char3 = bytes[count - 1];
           if ((char2 & 0b1100_0000) != 0b1000_0000 || (char3 & 0b1100_0000) != 0b1000_0000)
             throw new UTFDataFormatException("malformed input around byte " + (count - 1));
 
@@ -207,7 +207,7 @@ public final class PackInputStream implements Closeable
    */
   public int readSmallVar() throws IOException
   {
-    final int v4 = readSmall(4);
+    var v4 = readSmall(4);
 
     if ((v4 & 0b1000) == 0)  // 0vvv
       return v4;
@@ -229,7 +229,7 @@ public final class PackInputStream implements Closeable
   {
     assertData();
 
-    final int bitsRemaining = bit + 1 - bitWidth;
+    var bitsRemaining = bit + 1 - bitWidth;
 
     if (bitsRemaining > 0)
     {

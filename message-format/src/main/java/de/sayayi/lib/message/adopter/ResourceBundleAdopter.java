@@ -58,7 +58,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
   @Contract(pure = true)
   public void adopt(@NotNull ResourceBundle resourceBundle)
   {
-    final Locale locale = resourceBundle.getLocale();
+    var locale = resourceBundle.getLocale();
 
     resourceBundle.keySet().forEach(
         code -> messagePublisher.addMessage(messageFactory
@@ -69,11 +69,11 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
   @Contract(pure = true)
   public void adopt(@NotNull Collection<ResourceBundle> resourceBundles)
   {
-    final Map<String,Map<Locale,String>> localizedMessagesByCode = new HashMap<>();
+    var localizedMessagesByCode = new HashMap<String,Map<Locale,String>>();
 
     for(var resourceBundle: resourceBundles)
     {
-      final Locale locale = resourceBundle.getLocale();
+      var locale = resourceBundle.getLocale();
 
       for(var code: resourceBundle.keySet())
       {
@@ -116,7 +116,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
   protected void adopt(@NotNull String bundleBaseName, Locale[] locales, ClassLoader classLoader,
                        boolean throwOnMissingResourceBundle)
   {
-    final Map<String,Map<Locale,String>> localizedMessagesByCode = new HashMap<>();
+    var localizedMessagesByCode = new HashMap<String,Map<Locale,String>>();
 
     if (locales == null)
     {
@@ -130,8 +130,8 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
     for(var locale: locales)
     {
       try {
-        final ResourceBundle resourceBundle = getBundle(bundleBaseName, locale, classLoader);
-        final Locale foundLocale = resourceBundle.getLocale();
+        var resourceBundle = getBundle(bundleBaseName, locale, classLoader);
+        var foundLocale = resourceBundle.getLocale();
 
         for(var code: resourceBundle.keySet())
         {

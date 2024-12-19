@@ -119,7 +119,7 @@ public final class TextMessage implements Message.WithSpaces
   @Contract(pure = true)
   public String toString()
   {
-    final StringBuilder s = new StringBuilder("TextMessage(text=").append(textPart.getText());
+    var s = new StringBuilder("TextMessage(text=").append(textPart.getText());
 
     if (textPart.isSpaceBefore() && textPart.isSpaceAfter())
       s.append(",space-around");
@@ -162,8 +162,8 @@ public final class TextMessage implements Message.WithSpaces
    */
   public static @NotNull Message.WithSpaces unpack(@NotNull PackInputStream packStream) throws IOException
   {
-    final boolean spaceBefore = packStream.readBoolean();
-    final boolean spaceAfter = packStream.readBoolean();
+    var spaceBefore = packStream.readBoolean();
+    var spaceAfter = packStream.readBoolean();
 
     return new TextMessage(new TextPart(packStream.readString(), spaceBefore, spaceAfter));
   }

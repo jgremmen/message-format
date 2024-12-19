@@ -53,8 +53,8 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
     if (node instanceof Document)
       node = null;
 
-    final XPathBuilder path = new XPathBuilder();
-    boolean firstStep = true;
+    var path = new XPathBuilder();
+    var firstStep = true;
 
     while(node != null)
     {
@@ -63,8 +63,8 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
       else
         path.add('/');
 
-      final short type = node.getNodeType();
-      final String name = node.getNodeName();
+      var type = node.getNodeType();
+      var name = node.getNodeName();
 
       if (type == ATTRIBUTE_NODE)
       {
@@ -150,7 +150,7 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
     @Contract(value = "_ -> this", mutates = "this")
     public @NotNull XPathBuilder add(@NotNull String s)
     {
-      final int n = s.length();
+      var n = s.length();
       if (n > 0)
       {
         assureCapacity(n);
@@ -165,9 +165,9 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
     {
       if (idx < n)
       {
-        final int oldLength = xpath.length;
-        final int increment = max(16, n - idx + 8);
-        final char[] newXPath = new char[oldLength + increment];
+        var oldLength = xpath.length;
+        var increment = max(16, n - idx + 8);
+        var newXPath = new char[oldLength + increment];
 
         arraycopy(xpath, 0, newXPath, increment, oldLength);
 

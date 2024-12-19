@@ -44,8 +44,8 @@ public final class FieldFormatter
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Field field)
   {
-    final StringBuilder formattedField = new StringBuilder();
-    final String format = context.getConfigValueString("field").orElse("juMTN");
+    var formattedField = new StringBuilder();
+    var format = context.getConfigValueString("field").orElse("juMTN");
 
     // c = short class
     // j = no java.lang. prefix

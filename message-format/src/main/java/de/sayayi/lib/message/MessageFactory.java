@@ -29,7 +29,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 
 import static de.sayayi.lib.message.parser.normalizer.MessagePartNormalizer.PASS_THROUGH;
@@ -135,7 +134,7 @@ public class MessageFactory
         return new EmptyMessageWithCode(code);
 
       case 1: {
-        final Entry<Locale,String> entry = localizedTexts.entrySet().iterator().next();
+        var entry = localizedTexts.entrySet().iterator().next();
 
         try {
           return parseMessage(code, entry.getValue());
@@ -145,7 +144,7 @@ public class MessageFactory
       }
 
       default: {
-        final Map<Locale,Message> localizedMessages = new HashMap<>();
+        var localizedMessages = new HashMap<Locale,Message>();
 
         localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) -> {
           try {
@@ -185,7 +184,7 @@ public class MessageFactory
         return EmptyMessage.INSTANCE;
 
       case 1: {
-        final Entry<Locale,String> entry = localizedTexts.entrySet().iterator().next();
+        var entry = localizedTexts.entrySet().iterator().next();
 
         try {
           return parseTemplate(entry.getValue());
@@ -195,7 +194,7 @@ public class MessageFactory
       }
 
       default: {
-        final Map<Locale,Message> localizedMessages = new HashMap<>();
+        var localizedMessages = new HashMap<Locale,Message>();
 
         localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) -> {
           try {
@@ -224,7 +223,7 @@ public class MessageFactory
   {
     if (requireNonNull(message, "message must not be null") instanceof Message.WithCode)
     {
-      final Message.WithCode messageWithCode = (Message.WithCode)message;
+      var messageWithCode = (Message.WithCode)message;
 
       if (code.equals(messageWithCode.getCode()))
         return messageWithCode;
@@ -247,10 +246,10 @@ public class MessageFactory
   @Contract(pure = true)
   protected @NotNull String generateCode(@NotNull String prefix)
   {
-    final byte[] hashBytes = new byte[6];
+    var hashBytes = new byte[6];
     RANDOM.nextBytes(hashBytes);
 
-    final String hash = Long.toString(0x1000000000000L |
+    var hash = Long.toString(0x1000000000000L |
         ((hashBytes[0] & 0xffL) << 40) |
         ((hashBytes[1] & 0xffL) << 32) |
         ((hashBytes[2] & 0xffL) << 24) |

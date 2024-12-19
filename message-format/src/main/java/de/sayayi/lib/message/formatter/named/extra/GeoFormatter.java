@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
@@ -74,10 +73,10 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Number number)
   {
-    final Format fmt = getFormat(context);
-    final StringBuilder s = new StringBuilder();
-    final double v = number.doubleValue();
-    final double[] dms = dmsSplitter(fmt, v);
+    var fmt = getFormat(context);
+    var s = new StringBuilder();
+    var v = number.doubleValue();
+    var dms = dmsSplitter(fmt, v);
 
     if (!fmt.hasLoLa() && v < 0.0 && (dms[0] > 0 || dms[1] > 0 || dms[2] > 0))
       s.append('-');
@@ -88,7 +87,7 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
 
     if (fmt.hasMinutes())
     {
-      final Locale locale = context.getLocale();
+      var locale = context.getLocale();
 
       s.append(formatMinOrSec(locale, dms[1], fmt.minuteDigits, fmt.zeroPadMinutes)).append('\'');
       if (fmt.separatorAfterMinute)
@@ -124,8 +123,8 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
 
   private @NotNull Format getFormat(@NotNull FormatterContext context)
   {
-    String formatString = context.getConfigValueString("geo").orElse("dms");
-    Format format = FORMAT.get(formatString);
+    var formatString = context.getConfigValueString("geo").orElse("dms");
+    var format = FORMAT.get(formatString);
 
     return format == null ? parseFormatString(formatString) : format;
   }
@@ -138,7 +137,7 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   @Contract(pure = true)
   static double[] dmsSplitter(@NotNull Format fmt, double v)
   {
-    long millis = round(Math.abs(v) * DEGREE_MILLIS);
+    var millis = round(Math.abs(v) * DEGREE_MILLIS);
 
     if (!fmt.hasSeconds())
     {
@@ -146,10 +145,10 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
         return new double[] { (int)((millis + DEGREE_MILLIS / 2) / DEGREE_MILLIS), 0.0, 0.0 };
 
       // round value to the number of minute digits
-      final int factor = MINUTE_MILLIS / 1000 * DIGIT_FACTOR[fmt.minuteDigits];
+      var factor = MINUTE_MILLIS / 1000 * DIGIT_FACTOR[fmt.minuteDigits];
       millis = (millis + factor / 2) / factor * factor;
 
-      final int degree = (int)(millis / DEGREE_MILLIS);
+      var degree = (int)(millis / DEGREE_MILLIS);
 
       return new double[] {
           degree, (millis - degree * DEGREE_MILLIS) / (double)MINUTE_MILLIS, 0.0
@@ -157,12 +156,12 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
     }
 
     // round value to the number of second digits
-    final int factor = DIGIT_FACTOR[fmt.secondDigits];
+    var factor = DIGIT_FACTOR[fmt.secondDigits];
     millis = ((millis + factor / 2) / factor) * factor;
 
-    final long degree = millis / DEGREE_MILLIS;
+    var degree = millis / DEGREE_MILLIS;
     millis -= degree * DEGREE_MILLIS;
-    final long minute = millis / MINUTE_MILLIS;
+    var minute = millis / MINUTE_MILLIS;
     millis -= minute * MINUTE_MILLIS;
 
     return new double[] { degree, minute, millis / 1000.0 };
@@ -173,7 +172,7 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   private @NotNull String formatMinOrSec(@NotNull Locale locale, double d, int digits, boolean zeroPadding)
   {
     //noinspection MalformedFormatString
-    String s = String.format(locale, "%." + digits + 'f', d);
+    var s = String.format(locale, "%." + digits + 'f', d);
 
     if (zeroPadding && d < 10.0)
       s = "0" + s;
@@ -199,8 +198,8 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   @Contract(pure = true)
   static @NotNull Format parseFormatString(@NotNull String formatString)
   {
-    final Matcher matcher = PATTERN_FORMAT.matcher(formatString.trim());
-    final Format format = new Format();
+    var matcher = PATTERN_FORMAT.matcher(formatString.trim());
+    var format = new Format();
 
     if (matcher.matches())
     {
@@ -211,11 +210,11 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
       format.zeroPadMinutes = matcher.group(2) != null;
       format.zeroPadSeconds = matcher.group(5) != null;
 
-      final String minuteFormat = matcher.group(3);
+      var minuteFormat = matcher.group(3);
       if (minuteFormat != null)
         format.minuteDigits = "m".equals(minuteFormat) ? 0 : minuteFormat.length();
 
-      final String secondsFormat = matcher.group(6);
+      var secondsFormat = matcher.group(6);
       if (secondsFormat != null)
       {
         if (minuteFormat == null)

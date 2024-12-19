@@ -21,8 +21,6 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.OptionalLong;
-
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.NUMBER_TYPE;
 
 
@@ -46,11 +44,10 @@ public final class SizeFormatter implements NamedParameterFormatter
     if (value == null)
       return formatNull(context);
 
-    final OptionalLong optionalSize = context.size(value);
-
+    var optionalSize = context.size(value);
     if (optionalSize.isPresent())
     {
-      final long size = optionalSize.getAsLong();
+      var size = optionalSize.getAsLong();
 
       return context
           .getConfigMapMessage(size, NUMBER_TYPE, true)

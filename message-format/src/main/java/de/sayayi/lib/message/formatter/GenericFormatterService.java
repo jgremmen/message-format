@@ -121,8 +121,8 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
     if (formatter instanceof NamedParameterFormatter)
     {
-      final NamedParameterFormatter namedParameterFormatter = (NamedParameterFormatter)formatter;
-      final String format = namedParameterFormatter.getName();
+      var namedParameterFormatter = (NamedParameterFormatter)formatter;
+      var format = namedParameterFormatter.getName();
 
       //noinspection ConstantValue
       if (format == null || format.isEmpty())
@@ -143,12 +143,12 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
     if (format != null)
     {
-      final NamedParameterFormatter namedFormatter = namedFormatters.get(format);
+      var namedFormatter = namedFormatters.get(format);
       if (namedFormatter != null && namedFormatter.canFormat(type))
         return new ParameterFormatter[] { namedFormatter };
     }
 
-    final ParameterFormatter[] formatters = formatterCache.lookup(type, t ->
+    var formatters = formatterCache.lookup(type, t ->
         streamTypes(t)
             .map(typeFormatters::get)
             .filter(Objects::nonNull)
@@ -165,11 +165,11 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   @Contract(pure = true)
   private @NotNull Stream<Class<?>> streamTypes(@NotNull Class<?> type)
   {
-    final Set<Class<?>> collectedTypes = new HashSet<>();
+    var collectedTypes = new HashSet<Class<?>>();
 
     if (!typeFormatters.containsKey(type))
     {
-      final boolean isArray = type.isArray();
+      var isArray = type.isArray();
 
       // if no formatter for this primitive (array) type exists, continue collecting using its wrapper type
       if (type.isPrimitive() || (isArray && type.getComponentType().isPrimitive()))
@@ -231,7 +231,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       if (!(o instanceof PrioritizedFormatter))
         return false;
 
-      final PrioritizedFormatter that = (PrioritizedFormatter)o;
+      var that = (PrioritizedFormatter)o;
 
       return order == that.order && formatter.equals(that.formatter);
     }

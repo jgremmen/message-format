@@ -81,11 +81,11 @@ public class PropertiesAdopter extends AbstractMessageAdopter
   @Contract(pure = true)
   public void adopt(@NotNull Map<Locale,Properties> properties)
   {
-    final Map<String,Map<Locale,String>> localizedMessagesByCode = new HashMap<>();
+    var localizedMessagesByCode = new HashMap<String,Map<Locale,String>>();
 
     for(var entry: properties.entrySet())
     {
-      final Locale locale = entry.getKey();
+      var locale = entry.getKey();
 
       for(var localizedProperty: entry.getValue().entrySet())
       {

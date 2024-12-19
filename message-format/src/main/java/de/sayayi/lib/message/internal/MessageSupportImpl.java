@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
@@ -183,7 +182,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   {
     requireNonNull(packResources, "packResources must not be null");
 
-    final List<InputStream> packStreams = new ArrayList<>();
+    var packStreams = new ArrayList<InputStream>();
 
     while(packResources.hasMoreElements())
       packStreams.add(packResources.nextElement().openStream());
@@ -197,11 +196,11 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   {
     requireNonNull(packStreams, "packStreams must not be null");
 
-    final PackHelper packHelper = new PackHelper();
+    var packHelper = new PackHelper();
 
     for(var packStream: packStreams)
     {
-      try(final PackInputStream dataStream = new PackInputStream(packStream)) {
+      try(var dataStream = new PackInputStream(packStream)) {
         // messages
         for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
           addMessage(packHelper.unpackMessageWithCode(dataStream));
@@ -221,8 +220,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
       throws IOException
   {
     try(var dataStream = new PackOutputStream(stream, compress)) {
-      final Set<String> messageCodes = new TreeSet<>(messages.keySet());
-      final Set<String> templateNames = new TreeSet<>();
+      var messageCodes = new TreeSet<>(messages.keySet());
+      var templateNames = new TreeSet<String>();
 
       // filter message codes
       if (messageCodeFilter != null)
@@ -232,7 +231,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
       dataStream.writeUnsignedShort(messageCodes.size());
       for(var code: messageCodes)
       {
-        final Message message = messages.get(code);
+        var message = messages.get(code);
 
         templateNames.addAll(message.getTemplateNames());
         PackHelper.pack(message, dataStream);
@@ -256,7 +255,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     if (requireNonNull(code, "code must not be null").isEmpty())
       throw new IllegalArgumentException("code must not be empty");
 
-    final Message.WithCode message = messages.get(code);
+    var message = messages.get(code);
     if (message == null)
       throw new IllegalArgumentException("unknown message code '" + code + "'");
 
@@ -281,8 +280,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
   protected boolean failOnDuplicateMessage(@NotNull Message.WithCode message)
   {
-    final String code = message.getCode();
-    final Message tm = messages.get(code);
+    var code = message.getCode();
+    var tm = messages.get(code);
 
     if (tm != null)
     {
@@ -301,8 +300,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
   protected boolean failOnDuplicateTemplate(@NotNull String name, @NotNull Message template)
   {
-    final Message ttm = templates.get(name);
-
+    var ttm = templates.get(name);
     if (ttm != null)
     {
       if (!ttm.isSame(template))
@@ -363,8 +361,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
       if (!requireNonNull(parameter, "parameter must not be null").isEmpty())
         for(int low = 0, high = parameterCount - 1; low <= high;)
         {
-          final int mid = (low + high) >>> 1;
-          final int cmp = parameter.compareTo((String)parameters[mid * 2]);
+          var mid = (low + high) >>> 1;
+          var cmp = parameter.compareTo((String)parameters[mid * 2]);
 
           if (cmp < 0)
             high = mid - 1;
@@ -372,7 +370,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
             low = mid + 1;
           else
           {
-            final int offset = mid * 2;
+            var offset = mid * 2;
             arraycopy(parameters, offset + 2, parameters, offset, --parameterCount * 2 - offset);
             break;
           }
@@ -393,8 +391,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
         for(int high = parameterCount - 1; low <= high;)
         {
-          final int mid = (low + high) >>> 1;
-          final int cmp = parameter.compareTo((String)parameters[mid * 2]);
+          var mid = (low + high) >>> 1;
+          var cmp = parameter.compareTo((String)parameters[mid * 2]);
 
           if (cmp < 0)
             high = mid - 1;
@@ -410,7 +408,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
         if (parameterCount * 2 == parameters.length)
           parameters = copyOf(parameters, parameterCount * 2 + 16);
 
-        final int offset = low * 2;
+        var offset = low * 2;
         arraycopy(parameters, offset, parameters, offset + 2, parameterCount++ * 2 - offset);
 
         parameters[offset] = parameter;
@@ -439,7 +437,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     public @NotNull Supplier<String> formatSupplier()
     {
       // as formatting is deferred, make sure we're using a copy of the parameters
-      final Parameters parameters = new MessageParameters(this);
+      var parameters = new MessageParameters(this);
 
       return SupplierDelegate.of(() -> getMessage().format(messageAccessor, parameters));
     }
@@ -463,7 +461,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
         @NotNull ExceptionConstructorWithCause<X> constructor, Throwable cause)
     {
       // as formatting is deferred, make sure we're using a copy of the parameters
-      final Parameters parameters = new MessageParameters(this);
+      var parameters = new MessageParameters(this);
 
       return SupplierDelegate.of(() -> constructor.construct(getMessage().format(messageAccessor, parameters), cause));
     }
@@ -474,7 +472,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
         @NotNull ExceptionConstructor<X> constructor)
     {
       // as formatting is deferred, make sure we're using a copy of the parameters
-      final Parameters parameters = new MessageParameters(this);
+      var parameters = new MessageParameters(this);
 
       return () -> constructor.construct(getMessage().format(messageAccessor, parameters));
     }
@@ -619,8 +617,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
       if (key instanceof String)
         for(int low = 0, high = parameters.length - 2; low <= high;)
         {
-          final int mid = ((low + high) >>> 1) & 0xfffe;
-          final int cmp = ((String)key).compareTo((String)parameters[mid]);
+          var mid = ((low + high) >>> 1) & 0xfffe;
+          var cmp = ((String)key).compareTo((String)parameters[mid]);
 
           if (cmp < 0)
             high = mid - 2;
@@ -679,15 +677,15 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
         if (!(o instanceof Map))
           return false;
 
-        final Map<?,?> that = (Map<?,?>)o;
+        var that = (Map<?,?>)o;
         if (size() != that.size())
           return false;
 
         for(int offset = 0, length = parameters.length; offset < length; offset += 2)
         {
-          final Object key = parameters[offset];
-          final Object value = parameters[offset + 1];
-          final Object thatValue = that.get(key);
+          var key = parameters[offset];
+          var value = parameters[offset + 1];
+          var thatValue = that.get(key);
 
           //noinspection ConstantValue
           if (value == null)
@@ -722,11 +720,11 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public String toString()
     {
-      final int length = parameters.length;
+      var length = parameters.length;
       if (length == 0)
         return "{}";
 
-      final StringBuilder sb = new StringBuilder("{");
+      var sb = new StringBuilder("{");
 
       for(int offset = 0; offset < length; offset += 2)
       {
@@ -783,8 +781,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
           if (!hasNext())
             throw new NoSuchElementException();
 
-          final Entry<String,Object> entry =
-              new SimpleImmutableEntry<>((String)parameters[offset], parameters[offset + 1]);
+          var entry = new SimpleImmutableEntry<>((String)parameters[offset], parameters[offset + 1]);
           offset += 2;
 
           return entry;
@@ -794,7 +791,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    public Spliterator<Entry<String,Object>> spliterator()
+    public @NotNull Spliterator<Entry<String,Object>> spliterator()
     {
       return new Spliterator<>() {
         int offset = 0;
@@ -847,7 +844,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    public boolean removeIf(Predicate<? super Entry<String,Object>> filter) {
+    public boolean removeIf(@NotNull Predicate<? super Entry<String,Object>> filter) {
       throw new UnsupportedOperationException("removeIf");
     }
 
@@ -869,11 +866,11 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public String toString()
     {
-      final int length = parameters.length;
+      var length = parameters.length;
       if (length == 0)
         return "[]";
 
-      final StringBuilder sb = new StringBuilder("[");
+      var sb = new StringBuilder("[");
 
       for(int offset = 0; offset < length; offset += 2)
       {

@@ -400,7 +400,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       public BiConsumer<Map<String,ConfigValue>,ConfigNamedElementContext> accumulator()
       {
         return (map,cpec) -> {
-          final String name = cpec.configKey.getName();
+          var name = cpec.configKey.getName();
 
           if (map.containsKey(name))
             syntaxError(cpec, "duplicate template default parameter '" + name + "'");
@@ -632,7 +632,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         var token = tokenStream.get(i);
         if (token.getType() != EOF)
         {
-          final String text = token.getText();
+          var text = token.getText();
           return !SpacesUtil.isEmpty(text) && isSpaceChar(text.charAt(0));
         }
       }

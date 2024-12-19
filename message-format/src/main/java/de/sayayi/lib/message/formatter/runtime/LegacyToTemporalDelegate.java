@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
@@ -48,7 +47,7 @@ public final class LegacyToTemporalDelegate implements ParameterFormatter
     if (value == null)
     {
       // handle empty, !empty, null and !null first
-      final Message.WithSpaces msg = context
+      var msg = context
           .getConfigMapMessage(null, EMPTY_NULL_TYPE)
           .orElse(null);
 

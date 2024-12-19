@@ -72,7 +72,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
       throws MessageFormatException
   {
-    final Locale locale = parameters.getLocale();
+    var locale = parameters.getLocale();
 
     try {
       return findMessageByLocale(locale).formatAsText(messageAccessor, parameters);
@@ -85,16 +85,16 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   @Contract(pure = true)
   private @NotNull Message findMessageByLocale(@NotNull Locale locale)
   {
-    final String searchLanguage = locale.getLanguage();
-    final String searchCountry = locale.getCountry();
+    var searchLanguage = locale.getLanguage();
+    var searchCountry = locale.getCountry();
 
     int match = -1;
     Message message = null;
 
     for(var entry: localizedMessages.entrySet())
     {
-      final Locale keyLocale = entry.getKey();
-      final Message localizedMessage = entry.getValue();
+      var keyLocale = entry.getKey();
+      var localizedMessage = entry.getValue();
 
       if (match == -1 && (keyLocale == null || keyLocale.getLanguage().isEmpty()))
       {
@@ -160,7 +160,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
     if (!(message instanceof LocaleAware))
       return false;
 
-    final Map<Locale,Message> lm = ((LocaleAware)message).getLocalizedMessages();
+    var lm = ((LocaleAware)message).getLocalizedMessages();
 
     if (!localizedMessages.keySet().equals(lm.keySet()))
       return false;
@@ -179,7 +179,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
     if (!(o instanceof LocalizedMessageBundleWithCode))
       return false;
 
-    final LocalizedMessageBundleWithCode that = (LocalizedMessageBundleWithCode)o;
+    var that = (LocalizedMessageBundleWithCode)o;
 
     return code.equals(that.code) && localizedMessages.equals(that.localizedMessages);
   }
@@ -234,9 +234,9 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   public static @NotNull Message.WithCode unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
-    final int messageCount = packStream.readSmallVar();
-    final String code = requireNonNull(packStream.readString());
-    final Map<Locale,Message> messages = new HashMap<>();
+    var messageCount = packStream.readSmallVar();
+    var code = requireNonNull(packStream.readString());
+    var messages = new HashMap<Locale,Message>();
 
     for(int n = 0; n < messageCount; n++)
     {

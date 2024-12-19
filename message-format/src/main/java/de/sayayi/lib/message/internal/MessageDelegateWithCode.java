@@ -97,7 +97,7 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
     if (!(o instanceof MessageDelegateWithCode))
       return false;
 
-    final MessageDelegateWithCode that = (MessageDelegateWithCode)o;
+    var that = (MessageDelegateWithCode)o;
 
     return code.equals(that.code) && message.equals(that.message);
   }

@@ -15,14 +15,12 @@
  */
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -63,13 +61,13 @@ public final class NumberFormatter
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Number number)
   {
     // check configuration map for match
-    final Message.WithSpaces msg = context
+    var msg = context
         .getConfigMapMessage(number, NUMBER_TYPE)
         .orElse(null);
     if (msg != null)
       return context.format(msg);
 
-    final String format = context
+    var format = context
         .getConfigValueString("number")
         .orElse(null);
 
@@ -90,7 +88,7 @@ public final class NumberFormatter
 
   private @NotNull NumberFormat getFormatter(String format, Parameters parameters)
   {
-    final Locale locale = parameters.getLocale();
+    var locale = parameters.getLocale();
 
     if ("integer".equals(format))
       return NumberFormat.getIntegerInstance(locale);
@@ -148,8 +146,8 @@ public final class NumberFormatter
   @Override
   public @NotNull MatchResult compareToNumberKey(@NotNull Number number, @NotNull ComparatorContext context)
   {
-    final long numberKeyValue = context.getNumberKeyValue();
-    final CompareType compareType = context.getCompareType();
+    var numberKeyValue = context.getNumberKeyValue();
+    var compareType = context.getCompareType();
 
     if (number instanceof Byte || number instanceof Short ||
         number instanceof Integer || number instanceof Long)
@@ -174,12 +172,12 @@ public final class NumberFormatter
     else if (value instanceof Double || value instanceof Float)
       value = BigDecimal.valueOf(value.doubleValue());
 
-    final CompareType compareType = context.getCompareType();
-    final String string = context.getStringKeyValue();
+    var compareType = context.getCompareType();
+    var string = context.getStringKeyValue();
 
     if (value instanceof BigInteger)
     {
-      final BigInteger bigint = (BigInteger)value;
+      var bigint = (BigInteger)value;
 
       try {
         return compareType.match(bigint.compareTo(new BigInteger(string))) ? EQUIVALENT : MISMATCH;

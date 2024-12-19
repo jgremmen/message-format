@@ -58,8 +58,8 @@ final class MessageParameters implements Parameters
   {
     for(int low = 0, high = parameters.length - 2; low <= high;)
     {
-      final int mid = ((low + high) >>> 1) & 0xfffe;
-      final int cmp = parameter.compareTo((String)parameters[mid]);
+      var mid = ((low + high) >>> 1) & 0xfffe;
+      var cmp = parameter.compareTo((String)parameters[mid]);
 
       if (cmp < 0)
         high = mid - 2;
@@ -85,7 +85,7 @@ final class MessageParameters implements Parameters
     if (!(o instanceof Parameters))
       return false;
 
-    final MessageParameters that = (MessageParameters)o;
+    var that = (MessageParameters)o;
 
     return locale.equals(that.locale) && Arrays.equals(parameters, that.parameters);
   }
@@ -100,7 +100,7 @@ final class MessageParameters implements Parameters
   @Override
   public String toString()
   {
-    final StringBuilder s = new StringBuilder("Parameters(locale='").append(locale).append("',{");
+    var s = new StringBuilder("Parameters(locale='").append(locale).append("',{");
 
     for(int n = 0, l = parameters.length; n < l; n += 2)
     {
@@ -142,8 +142,8 @@ final class MessageParameters implements Parameters
       if (o instanceof String)
         for(int low = 0, high = parameters.length - 2; low <= high;)
         {
-          final int mid = ((low + high) >>> 1) & 0xfffe;
-          final int cmp = ((String)o).compareTo((String)parameters[mid]);
+          var mid = ((low + high) >>> 1) & 0xfffe;
+          var cmp = ((String)o).compareTo((String)parameters[mid]);
 
           if (cmp < 0)
             high = mid - 2;
@@ -201,7 +201,7 @@ final class MessageParameters implements Parameters
 
 
     @Override
-    public Spliterator<String> spliterator()
+    public @NotNull Spliterator<String> spliterator()
     {
       return parameters.length == 0
           ? emptySpliterator()
@@ -215,7 +215,7 @@ final class MessageParameters implements Parameters
       if (isEmpty())
         return "[]";
 
-      final StringBuilder s = new StringBuilder("[");
+      var s = new StringBuilder("[");
 
       for(int n = 0, l = parameters.length; n < l; n += 2)
       {

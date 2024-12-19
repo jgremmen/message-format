@@ -99,7 +99,7 @@ public final class PackOutputStream implements Closeable
       return;
     }
 
-    final int strlen = str.length();
+    var strlen = str.length();
     int utflen = 0;
 
     for(int i = 0; i < strlen; i++)
@@ -183,7 +183,7 @@ public final class PackOutputStream implements Closeable
     if (value >= (1 << bitWidth))
       throw new IllegalArgumentException("value " + value + " occupies more than " + bitWidth + " bits");
 
-    final int bitsRemaining = bit + 1 - bitWidth;
+    var bitsRemaining = bit + 1 - bitWidth;
 
     if (bitsRemaining > 0)
     {
@@ -215,7 +215,7 @@ public final class PackOutputStream implements Closeable
   {
     if (bit < 7)
     {
-      final int bitsLeft = bit + 1 - bitWidth;
+      var bitsLeft = bit + 1 - bitWidth;
 
       b |= (byte)((byte)(value >>> -bitsLeft) & ((1 << (bit + 1)) - 1));
       stream.write(b);

@@ -112,7 +112,7 @@ public class MessageParserException extends MessageException
       1 |  0  | 1 | M |  failed to parse message with code 'c' for locale 'l'
     */
 
-    final StringBuilder msg = new StringBuilder();
+    final var msg = new StringBuilder();
     final int n =
         (code != null && !isGeneratedCode(code) ? 0b100 : 0b000) +
         (template != null && !isGeneratedCode(template) ? 0b010 : 0b000) +

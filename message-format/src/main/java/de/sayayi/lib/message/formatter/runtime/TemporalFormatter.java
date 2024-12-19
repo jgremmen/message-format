@@ -74,14 +74,14 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Temporal temporal)
   {
-    final String format = context.getConfigValueString("date").orElse(null);
+    var format = context.getConfigValueString("date").orElse(null);
     final DateTimeFormatter formatter;
 
     if (format != null && !STYLE.containsKey(format))
       formatter = ofPattern(requireNonNull(format));
     else
     {
-      final char[] style = (format == null ? "MM" : STYLE.get(format)).toCharArray();
+      var style = (format == null ? "MM" : STYLE.get(format)).toCharArray();
 
       if (!temporal.isSupported(YEAR) &&
           !temporal.isSupported(DAY_OF_MONTH) &&

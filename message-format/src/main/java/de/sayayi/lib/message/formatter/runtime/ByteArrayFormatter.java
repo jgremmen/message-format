@@ -27,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
-import java.util.Optional;
 import java.util.OptionalLong;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_PRIMITIVE_OR_ARRAY_ORDER;
@@ -52,14 +51,14 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
   @SneakyThrows(UnsupportedEncodingException.class)
   public @NotNull Text formatValue(@NotNull FormatterContext context, byte @NotNull [] byteArray)
   {
-    final Optional<String> bytesConfig = context.getConfigValueString("bytes");
+    var bytesConfig = context.getConfigValueString("bytes");
     if (bytesConfig.isEmpty())
       return context.delegateToNextFormatter();
 
     if (byteArray.length == 0)
       return emptyText();
 
-    final String bytes = bytesConfig.get();
+    var bytes = bytesConfig.get();
     if ("base64".equals(bytes))
       return noSpaceText(Base64.getEncoder().encodeToString(byteArray));
     else if ("base64-lf".equals(bytes))

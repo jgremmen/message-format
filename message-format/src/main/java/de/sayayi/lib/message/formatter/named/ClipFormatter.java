@@ -41,7 +41,7 @@ public final class ClipFormatter extends AbstractParameterFormatter<Object> impl
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    final Text text = context.format(value);
+    var text = context.format(value);
 
     var s = text.getText();
     if (s == null)
@@ -49,7 +49,7 @@ public final class ClipFormatter extends AbstractParameterFormatter<Object> impl
 
     s = s.trim();
 
-    final int maxSize = (int)max(context.getConfigValueNumber("clip-size").orElse(64), 8);
+    var maxSize = (int)max(context.getConfigValueNumber("clip-size").orElse(64), 8);
 
     return s.length() <= maxSize ? text : noSpaceText(s.substring(0, maxSize - 3).trim() + "...");
   }

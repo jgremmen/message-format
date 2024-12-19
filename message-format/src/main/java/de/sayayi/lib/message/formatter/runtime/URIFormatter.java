@@ -53,7 +53,7 @@ public final class URIFormatter extends AbstractSingleTypeParameterFormatter<URI
         return noSpaceText(uri.getPath());
 
       case "port": {
-        final int port = uri.getPort();
+        var port = uri.getPort();
 
         return formatUsingMappedNumber(context, port, true)
             .orElseGet(() -> port == -1 ? emptyText() : noSpaceText(Integer.toString(port)));

@@ -130,7 +130,7 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>>
 
       for(nextText = null; nextText == null && iterator.hasNext();)
       {
-        final Entry<?,?> entry = iterator.next();
+        var entry = iterator.next();
 
         parameters.key = fixValue(entry.getKey());
         parameters.value = fixValue(entry.getValue());
@@ -150,7 +150,7 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>>
     @Override
     public Text next()
     {
-      final Text text = nextText;
+      var text = nextText;
 
       prepareNextText();
 

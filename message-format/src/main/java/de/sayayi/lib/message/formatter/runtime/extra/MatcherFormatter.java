@@ -19,12 +19,10 @@ import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueNumber;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
 import java.util.regex.Matcher;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
@@ -42,11 +40,11 @@ public final class MatcherFormatter extends AbstractSingleTypeParameterFormatter
   {
     if (matcher.matches())
     {
-      final Optional<ConfigValue> matcherConfig = context.getConfigValue("matcher");
+      var matcherConfig = context.getConfigValue("matcher");
       if (matcherConfig.isEmpty())
         return formatValue_groupNumber(matcher, 0);
 
-      final ConfigValue cv = matcherConfig.get();
+      var cv = matcherConfig.get();
 
       switch(cv.getType())
       {
