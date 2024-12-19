@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parser.normalizer;
+package de.sayayi.lib.message.part.normalizer;
 
 import de.sayayi.lib.message.part.MessagePart;
 import org.jetbrains.annotations.NotNull;
@@ -46,9 +46,9 @@ public final class JCacheMessagePartNormalizer implements MessagePartNormalizer
    * @return message part
    */
   @Override
+  @SuppressWarnings("unchecked")
   public <T extends MessagePart> @NotNull T normalize(@NotNull T part)
   {
-    //noinspection unchecked
     var cachedPart = (T)cache.get(requireNonNull(part, "part must not be null"));
     if (cachedPart != null)
       return cachedPart;

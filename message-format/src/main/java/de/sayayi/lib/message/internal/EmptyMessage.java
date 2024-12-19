@@ -25,9 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Set;
 
-import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
-import static java.util.Collections.emptySet;
-
 
 /**
  * Message implementation, representing an empty text without leading/trailing spaces.
@@ -56,7 +53,7 @@ public final class EmptyMessage implements Message.WithSpaces
   @Override
   public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
       throws MessageFormatException {
-    return EMPTY;
+    return Text.EMPTY;
   }
 
 
@@ -95,13 +92,13 @@ public final class EmptyMessage implements Message.WithSpaces
 
   @Override
   public @NotNull MessagePart[] getMessageParts() {
-    return new MessagePart[] { EMPTY };
+    return new MessagePart[] { Text.EMPTY };
   }
 
 
   @Override
   public @NotNull Set<String> getTemplateNames() {
-    return emptySet();
+    return Set.of();
   }
 
 

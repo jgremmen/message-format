@@ -1,4 +1,4 @@
-package de.sayayi.lib.message.internal;
+package de.sayayi.lib.message.part;
 
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;

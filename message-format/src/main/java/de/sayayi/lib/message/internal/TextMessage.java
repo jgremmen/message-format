@@ -18,19 +18,17 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.exception.MessageFormatException;
+import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.pack.PackInputStream;
 import de.sayayi.lib.message.pack.PackOutputStream;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
-
-import static java.util.Collections.emptySet;
 
 
 /**
@@ -89,7 +87,7 @@ public final class TextMessage implements Message.WithSpaces
 
   @Override
   public @NotNull Set<String> getTemplateNames() {
-    return emptySet();
+    return Set.of();
   }
 
 

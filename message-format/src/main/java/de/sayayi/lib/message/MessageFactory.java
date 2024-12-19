@@ -20,8 +20,8 @@ import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.internal.MessageDelegateWithCode;
-import de.sayayi.lib.message.parser.MessageCompiler;
-import de.sayayi.lib.message.parser.normalizer.MessagePartNormalizer;
+import de.sayayi.lib.message.internal.parser.MessageCompiler;
+import de.sayayi.lib.message.part.normalizer.MessagePartNormalizer;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
-import static de.sayayi.lib.message.parser.normalizer.MessagePartNormalizer.PASS_THROUGH;
+import static de.sayayi.lib.message.part.normalizer.MessagePartNormalizer.PASS_THROUGH;
 import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
 

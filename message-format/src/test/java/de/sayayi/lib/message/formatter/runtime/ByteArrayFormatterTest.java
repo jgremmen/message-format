@@ -18,7 +18,7 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.named.SizeFormatter;
-import de.sayayi.lib.message.part.TextPart;
+import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;
@@ -32,7 +32,6 @@ import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyMap;
 import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
@@ -141,7 +140,7 @@ public class ByteArrayFormatterTest extends AbstractFormatterTest
         .getMessageAccessor();
 
     assertEquals(new TextPart("71, 114, -61, -74, -61, -97, 101"),
-        format(messageAccessor, "Größe".getBytes(UTF_8), emptyMap()));
+        format(messageAccessor, "Größe".getBytes(UTF_8), Map.of()));
   }
 
 

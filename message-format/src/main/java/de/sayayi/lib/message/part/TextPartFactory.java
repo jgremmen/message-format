@@ -15,6 +15,8 @@
  */
 package de.sayayi.lib.message.part;
 
+import de.sayayi.lib.message.internal.part.NoSpaceTextPart;
+import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

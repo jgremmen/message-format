@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parser;
+package de.sayayi.lib.message.internal.parser;
 
 import lombok.val;
 import org.antlr.v4.runtime.CharStreams;
@@ -21,8 +21,8 @@ import org.antlr.v4.runtime.Token;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static de.sayayi.lib.message.parser.MessageLexer.CH;
-import static de.sayayi.lib.message.parser.MessageLexer.P_START;
+import static de.sayayi.lib.message.internal.parser.MessageLexer.CH;
+import static de.sayayi.lib.message.internal.parser.MessageLexer.P_START;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 

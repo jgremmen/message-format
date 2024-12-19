@@ -17,6 +17,7 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.exception.MessageFormatException;
+import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -40,6 +41,14 @@ import java.util.Set;
  */
 public interface Message
 {
+  /**
+   * Empty message.
+   *
+   * @since 0.12.0
+   */
+  Message.WithSpaces EMPTY = EmptyMessage.INSTANCE;
+
+
   /**
    * Formats the message based on the message parameters provided.
    *

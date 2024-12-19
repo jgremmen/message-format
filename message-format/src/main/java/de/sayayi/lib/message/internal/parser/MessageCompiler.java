@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.parser;
+package de.sayayi.lib.message.internal.parser;
 
 import de.sayayi.lib.antlr4.AbstractAntlr4Parser;
 import de.sayayi.lib.antlr4.AbstractVocabulary;
@@ -25,9 +25,9 @@ import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.TextMessage;
+import de.sayayi.lib.message.internal.part.TemplatePart;
+import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.part.TemplatePart;
-import de.sayayi.lib.message.part.TextPart;
 import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import de.sayayi.lib.message.part.parameter.ParameterPart;
 import de.sayayi.lib.message.part.parameter.key.*;
@@ -50,31 +50,8 @@ import java.util.stream.Collector;
 import static de.sayayi.lib.antlr4.walker.Walker.WALK_EXIT_RULES_HEAP;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAGE;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.TEMPLATE;
-import static de.sayayi.lib.message.parser.MessageLexer.BOOL;
-import static de.sayayi.lib.message.parser.MessageLexer.COLON;
-import static de.sayayi.lib.message.parser.MessageLexer.COMMA;
-import static de.sayayi.lib.message.parser.MessageLexer.EMPTY;
-import static de.sayayi.lib.message.parser.MessageLexer.EQ;
-import static de.sayayi.lib.message.parser.MessageLexer.GT;
-import static de.sayayi.lib.message.parser.MessageLexer.GTE;
-import static de.sayayi.lib.message.parser.MessageLexer.LT;
-import static de.sayayi.lib.message.parser.MessageLexer.LTE;
-import static de.sayayi.lib.message.parser.MessageLexer.NAME;
-import static de.sayayi.lib.message.parser.MessageLexer.NE;
-import static de.sayayi.lib.message.parser.MessageLexer.NULL;
-import static de.sayayi.lib.message.parser.MessageLexer.NUMBER;
-import static de.sayayi.lib.message.parser.MessageLexer.P_END;
-import static de.sayayi.lib.message.parser.MessageLexer.P_START;
-import static de.sayayi.lib.message.parser.MessageParser.CH;
-import static de.sayayi.lib.message.parser.MessageParser.DQ_END;
-import static de.sayayi.lib.message.parser.MessageParser.DQ_START;
-import static de.sayayi.lib.message.parser.MessageParser.L_PAREN;
-import static de.sayayi.lib.message.parser.MessageParser.R_PAREN;
-import static de.sayayi.lib.message.parser.MessageParser.SQ_END;
-import static de.sayayi.lib.message.parser.MessageParser.SQ_START;
-import static de.sayayi.lib.message.parser.MessageParser.TPL_END;
-import static de.sayayi.lib.message.parser.MessageParser.TPL_START;
-import static de.sayayi.lib.message.parser.MessageParser.*;
+import static de.sayayi.lib.message.internal.parser.MessageLexer.*;
+import static de.sayayi.lib.message.internal.parser.MessageParser.*;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;

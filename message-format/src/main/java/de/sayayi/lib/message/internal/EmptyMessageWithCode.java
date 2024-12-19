@@ -29,8 +29,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 
-import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
-import static java.util.Collections.emptySet;
 import static java.util.Objects.requireNonNull;
 
 
@@ -62,19 +60,19 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
   @Override
   public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
       throws MessageFormatException {
-    return EMPTY;
+    return Text.EMPTY;
   }
 
 
   @Override
   public @NotNull MessagePart[] getMessageParts() {
-    return new MessagePart[] { EMPTY };
+    return new MessagePart[] { Text.EMPTY };
   }
 
 
   @Override
   public @NotNull Set<String> getTemplateNames() {
-    return emptySet();
+    return Set.of();
   }
 
 

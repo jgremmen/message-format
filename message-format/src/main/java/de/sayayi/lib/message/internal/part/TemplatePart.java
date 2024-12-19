@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.part;
+package de.sayayi.lib.message.internal.part;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
@@ -33,7 +33,6 @@ import java.util.Map.Entry;
 import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
@@ -247,7 +246,7 @@ public final class TemplatePart implements Template
     var spaceBefore = packStream.readBoolean();
     var spaceAfter = packStream.readBoolean();
 
-    return new TemplatePart(requireNonNull(packStream.readString()), spaceBefore, spaceAfter, emptyMap(), emptyMap());
+    return new TemplatePart(requireNonNull(packStream.readString()), spaceBefore, spaceAfter, Map.of(), Map.of());
   }
 
 
@@ -268,7 +267,7 @@ public final class TemplatePart implements Template
     }
 
     return new TemplatePart(requireNonNull(packStream.readString()),
-        spaceBefore, spaceAfter, defaultParameterMap, emptyMap());
+        spaceBefore, spaceAfter, defaultParameterMap, Map.of());
   }
 
 

@@ -17,8 +17,8 @@ package de.sayayi.lib.message.formatter.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
+import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.TextPart;
 import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import lombok.val;

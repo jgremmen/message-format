@@ -15,9 +15,9 @@
  */
 package de.sayayi.lib.message.formatter.named;
 
+import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
-import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import org.jetbrains.annotations.Contract;
@@ -51,6 +51,6 @@ public final class ChoiceFormatter implements NamedParameterFormatter
   {
     return context.format(context
         .getConfigMapMessage(value, KEY_TYPES, true)
-        .orElse(EmptyMessage.INSTANCE));
+        .orElse(Message.WithSpaces.EMPTY));
   }
 }

@@ -17,10 +17,10 @@ package de.sayayi.lib.message.pack;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.internal.*;
+import de.sayayi.lib.message.internal.part.NoSpaceTextPart;
+import de.sayayi.lib.message.internal.part.TemplatePart;
+import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.part.NoSpaceTextPart;
-import de.sayayi.lib.message.part.TemplatePart;
-import de.sayayi.lib.message.part.TextPart;
 import de.sayayi.lib.message.part.parameter.ParameterPart;
 import de.sayayi.lib.message.part.parameter.key.*;
 import de.sayayi.lib.message.part.parameter.value.*;

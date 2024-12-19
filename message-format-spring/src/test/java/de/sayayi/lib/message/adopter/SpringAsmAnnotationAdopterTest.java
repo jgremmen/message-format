@@ -21,7 +21,7 @@ import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.MessageDefs;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
-import de.sayayi.lib.message.parser.normalizer.LRUMessagePartNormalizer;
+import de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
