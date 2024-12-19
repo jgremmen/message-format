@@ -49,7 +49,7 @@ public final class MessageSupportFactory
    * Returns a shared instance of the message support.
    * <p>
    * The shared message support is backed by the shared instance of the default formatter service
-   * ({@link DefaultFormatterService#getSharedInstance()}). This means that changes (eg. adding
+   * ({@link DefaultFormatterService#getSharedInstance()}). This means that changes (e.g. adding
    * new formatters) to the formatting service will reflect in formatting operations of the
    * shared message support.
    *

@@ -282,10 +282,10 @@ public interface ConfigKey
       /** null match */
       NULL,
 
-      /** same value meaning (eg. 0 = false, "yes" = "Yes") */
+      /** same value meaning (e.g. 0 = false, "yes" = "Yes") */
       LENIENT,
 
-      /** same value but different type (eg. 4 = "4") */
+      /** same value but different type (e.g. 4 = "4") */
       EQUIVALENT,
 
       /** exact match (type equality) */

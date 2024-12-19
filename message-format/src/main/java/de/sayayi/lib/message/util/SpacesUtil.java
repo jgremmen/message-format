@@ -107,7 +107,7 @@ public final class SpacesUtil
   /**
    * Tells if a string is empty.
    * <p>
-   * A string is considered empty if it has zero length or it contains spaces only.
+   * A string is considered empty if it has zero length, or it contains spaces only.
    *
    * @param s  string, not {@code null}
    *

@@ -158,12 +158,12 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * This property accepts various formats:
    * <ul>
    *   <li>
-   *     {@link DuplicateMsgStrategy} enum value (eg. {@link DuplicateMsgStrategy#FAIL FAIL})
+   *     {@link DuplicateMsgStrategy} enum value (e.g. {@link DuplicateMsgStrategy#FAIL FAIL})
    *   </li>
    *   <li>
    *     Strategy string. The string is converted to uppercase, dashes are translated to
    *     underscores and the resulting strategy name is matched against
-   *     {@link DuplicateMsgStrategy} (eg. {@code 'override-and-warn'} matches
+   *     {@link DuplicateMsgStrategy} (e.g. {@code 'override-and-warn'} matches
    *     {@link DuplicateMsgStrategy#OVERRIDE_AND_WARN OVERRIDE_AND_WARN})
    *   </li>
    * </ul>
@@ -181,7 +181,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Property containing a boolean stating whether or not to validate referenced templates. The
+   * Property containing a boolean stating whether to validate referenced templates. The
    * default value resolves to {@code true}.
    * <p>
    * If the property resolves to {@code true} the task will check whether all referenced
@@ -251,12 +251,11 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   /**
    * Provide the task with an action that allows for querying the scanned messages and templates.
-   * This action is invoked just before the messages and templates are written to the packed
-   * message file.
+   * This action is invoked just before the messages and templates are written to the packed message file.
    * <p>
    * Here's an example of how to use this action.<br>
    * Let's say all message codes start with a prefix
-   * {@code MSG-} followed by a 4-digit number (eg. {@code MSG-0318}). The action could then be
+   * {@code MSG-} followed by a 4-digit number (e.g. {@code MSG-0318}). The action could then be
    * used to output the next 10 available message codes:
    * <pre>
    *   action {

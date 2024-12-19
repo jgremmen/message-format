@@ -41,8 +41,7 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 public @interface Text
 {
   /**
-   * Message locale, either the language code (eg. de, es) or the language with country
-   * (eg. de_DE, fr_CA).
+   * Message locale, either the language code (e.g. de, es) or the language with country (e.g. de_DE, fr_CA).
    * <p>
    * The default value corresponds to {@link java.util.Locale#ROOT} which will match any locale
    * used for formatting this message.
@@ -66,8 +65,7 @@ public @interface Text
   /**
    * Not localized message text.
    * <p>
-   * This value is used only if {@code locale} and {@code text} are not set. Otherwise its value
-   * is ignored.
+   * This value is used only if {@code locale} and {@code text} are not set, otherwise its value is ignored.
    *
    * @return  message text
    */

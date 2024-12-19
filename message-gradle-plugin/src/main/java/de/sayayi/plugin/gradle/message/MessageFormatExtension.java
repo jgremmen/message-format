@@ -110,12 +110,12 @@ public abstract class MessageFormatExtension
    * This property accepts various formats:
    * <ul>
    *   <li>
-   *     {@link DuplicateMsgStrategy} enum value (eg. {@link DuplicateMsgStrategy#FAIL FAIL})
+   *     {@link DuplicateMsgStrategy} enum value (e.g. {@link DuplicateMsgStrategy#FAIL FAIL})
    *   </li>
    *   <li>
    *     Duplicate strategy string. The string is converted to uppercase, dashes are translated to
    *     underscores and the resulting strategy name is matched against
-   *     {@link DuplicateMsgStrategy} (eg. {@code 'override-and-warn'} matches
+   *     {@link DuplicateMsgStrategy} (e.g. {@code 'override-and-warn'} matches
    *     {@link DuplicateMsgStrategy#OVERRIDE_AND_WARN OVERRIDE_AND_WARN})
    *   </li>
    * </ul>
@@ -132,11 +132,11 @@ public abstract class MessageFormatExtension
 
 
   /**
-   * Property containing a boolean stating whether or not to validate referenced templates. The
+   * Property containing a boolean stating whether to validate referenced templates. The
    * default value resolves to {@code true}.
    * <p>
    * If the property resolves to {@code true} the task will check whether all referenced
-   * templates (including nested tempates) are available and included in the packed message file.
+   * templates (including nested templates) are available and included in the packed message file.
    * <p>
    * If the property resolves to {@code false} no checks are performed. This may lead to a
    * situation where a message cannot be formatted if the referenced template is missing from

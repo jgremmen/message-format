@@ -116,7 +116,7 @@ public interface FormatterContext extends Parameters, ParameterConfigAccessor
    * <p>
    * The last formatter from the list, which is usually the formatter associated with type
    * {@code Object}, must not delegate to the next formatter or a {@code NoSuchElementException}
-   * is thrown. By default the {@code Object} formatter is a string formatter, which will never
+   * is thrown. By default, the {@code Object} formatter is a string formatter, which will never
    * delegate. However, if this formatter is redefined, it must never delegate formatting.
    * <p>
    * A named-only formatter never has a next formatter it can delegate to.

@@ -25,7 +25,8 @@ import static java.lang.System.arraycopy;
 /**
  * The formatter cache is a fixed size cache for storing a sorted list of parameter formatters for each value type.
  * <p>
- * The cache prioritizes frequently used value types and drops least used ones as soon as the cache size is exhausted.
+ * The cache prioritizes frequently used value types and drops the least used ones as soon as the cache size
+ * is exhausted.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

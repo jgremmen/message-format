@@ -104,7 +104,7 @@ public interface MessageSupport
 
 
   /**
-   * Pack all messages (optionally filtering them using a {@code messageCodeFilter} from this
+   * Pack all messages (optionally filtering them using a {@code messageCodeFilter}) from this
    * bundle into a compact binary representation. This way a message support can be prepared once
    * and loaded very quickly by importing the packed messages at runtime.
    * <p>
