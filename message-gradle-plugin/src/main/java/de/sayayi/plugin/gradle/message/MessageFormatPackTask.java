@@ -32,7 +32,6 @@ import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.logging.LogLevel;
-import org.gradle.api.logging.Logger;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
 import org.gradle.api.tasks.util.PatternFilterable;
@@ -42,7 +41,6 @@ import org.objectweb.asm.ClassReader;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -292,7 +290,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   @TaskAction
   public void pack()
   {
-    final ConfigurableMessageSupport messageSupport = MessageSupportFactory
+    var messageSupport = MessageSupportFactory
         .create(new GenericFormatterService(), NO_CACHE_INSTANCE);
 
     configureDuplicatesStrategy(messageSupport);
@@ -306,12 +304,12 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void pack_scanMessages(@NotNull ConfigurableMessageSupport messageSupport)
   {
-    final Logger logger = getLogger();
+    var logger = getLogger();
 
     logger.info("Scanning classes for messages and templates");
 
     try {
-      final AsmAnnotationAdopter adopter = new AsmAnnotationAdopter(messageSupport);
+      var adopter = new AsmAnnotationAdopter(messageSupport);
 
       for(var classFile: getSources().getAsFileTree().matching(CLASS_FILES).getFiles())
       {
@@ -331,10 +329,10 @@ public abstract class MessageFormatPackTask extends DefaultTask
     {
       getLogger().debug("Validating referenced templates");
 
-      final List<String> missingTemplateNames = new ArrayList<>(messageSupport
+      var missingTemplateNames = new ArrayList<>(messageSupport
           .getMessageAccessor()
           .findMissingTemplates(this::messageCodeFilter));
-      final int count = missingTemplateNames.size();
+      var count = missingTemplateNames.size();
 
       switch(count)
       {
@@ -362,14 +360,14 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void pack_write(@NotNull MessageSupport messageSupport)
   {
-    final File packFile = getPackFile().getAsFile();
+    var packFile = getPackFile().getAsFile();
     getLogger().debug("Writing message pack: " + packFile.getAbsolutePath());
 
     // create parent directory
     //noinspection ResultOfMethodCallIgnored
     packFile.getParentFile().mkdirs();
 
-    try(final OutputStream packOutputStream = newOutputStream(packFile.toPath())) {
+    try(var packOutputStream = newOutputStream(packFile.toPath())) {
       messageSupport.exportMessages(packOutputStream, getCompress().get(), this::messageCodeFilter);
     } catch(IOException ex) {
       throw new GradleException("Failed to write message pack", ex);
@@ -379,19 +377,15 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private boolean messageCodeFilter(@NotNull String code)
   {
-    boolean match = true;
+    var match = includeRegexFilters.isEmpty();
 
-    if (!includeRegexFilters.isEmpty())
-    {
-      match = false;
-
+    if (!match)
       for(var regex: includeRegexFilters)
         if (code.matches(regex))
         {
           match = true;
           break;
         }
-    }
 
     if (match)
       for(var regex: excludeRegexFilters)
@@ -435,7 +429,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   @Contract(pure = true)
   private @NotNull DuplicateMsgStrategy configureDuplicatesStrategy_toEnum()
   {
-    Object value = getDuplicateMsgStrategy().get();
+    var value = getDuplicateMsgStrategy().get();
 
     if (value instanceof DuplicateMsgStrategy)
       return (DuplicateMsgStrategy)value;
@@ -445,8 +439,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
     if (value instanceof String)
     {
-      final String valueAsIs = ((String)value).toUpperCase(ROOT);
-      final String valueUnderscore = valueAsIs.replace('-', '_');
+      var valueAsIs = ((String)value).toUpperCase(ROOT);
+      var valueUnderscore = valueAsIs.replace('-', '_');
 
       for(var ds: DuplicateMsgStrategy.values())
         if (ds.name().equals(valueAsIs) ||
@@ -460,10 +454,10 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void configureDuplicateFailStrategy(@NotNull ConfigurableMessageSupport messageSupport)
   {
-    final MessageAccessor messageAccessor = messageSupport.getMessageAccessor();
+    var messageAccessor = messageSupport.getMessageAccessor();
 
     messageSupport.setMessageFilter(message -> {
-      final String code = message.getCode();
+      var code = message.getCode();
 
       if (!messageAccessor.hasMessageWithCode(code))
         return true;
@@ -486,10 +480,10 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void configureDuplicateIgnoreStrategy(@NotNull ConfigurableMessageSupport messageSupport, boolean warn)
   {
-    final MessageAccessor messageAccessor = messageSupport.getMessageAccessor();
+    var messageAccessor = messageSupport.getMessageAccessor();
 
     messageSupport.setMessageFilter(message -> {
-      final String code = message.getCode();
+      var code = message.getCode();
 
       if (!messageAccessor.hasMessageWithCode(code))
         return true;
@@ -512,10 +506,10 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void configureDuplicateOverrideStrategy(@NotNull ConfigurableMessageSupport messageSupport, boolean warn)
   {
-    final MessageAccessor messageAccessor = messageSupport.getMessageAccessor();
+    var messageAccessor = messageSupport.getMessageAccessor();
 
     messageSupport.setMessageFilter(message -> {
-      final String code = message.getCode();
+      var code = message.getCode();
 
       if (warn && messageAccessor.hasMessageWithCode(code))
       {
@@ -544,7 +538,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private @NotNull String logDuplicateMessage(@NotNull LogLevel level, @NotNull String code)
   {
-    final String msg = "Duplicate message code '" + code + "' in class " + currentClassName.get();
+    var msg = "Duplicate message code '" + code + "' in class " + currentClassName.get();
 
     getLogger().log(level, msg);
 
@@ -554,7 +548,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private @NotNull String logDuplicateTemplate(@NotNull LogLevel level, @NotNull String name)
   {
-    final String msg = "Duplicate template name '" + name + "' in class " + currentClassName.get();
+    var msg = "Duplicate template name '" + name + "' in class " + currentClassName.get();
 
     getLogger().log(level, msg);
 
@@ -566,9 +560,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   private @NotNull String getClassName(@NotNull File classFile)
   {
     try {
-      return new ClassReader(newInputStream(classFile.toPath()))
-          .getClassName()
-          .replace('/', '.');
+      return new ClassReader(newInputStream(classFile.toPath())).getClassName().replace('/', '.');
     } catch(IOException ex) {
       throw new GradleException("Failed to read class name from " + classFile, ex);
     }

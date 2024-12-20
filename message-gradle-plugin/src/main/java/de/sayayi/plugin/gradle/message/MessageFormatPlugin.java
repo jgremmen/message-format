@@ -17,13 +17,9 @@ package de.sayayi.plugin.gradle.message;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.file.ProjectLayout;
-import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.plugins.JavaBasePlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
-import org.gradle.api.plugins.PluginContainer;
 import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.TaskContainer;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.plugin.gradle.message.DuplicateMsgStrategy.IGNORE_AND_WARN;
@@ -34,6 +30,7 @@ import static org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
+@SuppressWarnings("unused")
 public class MessageFormatPlugin implements Plugin<Project>
 {
   /** Plugin extension name */
@@ -44,21 +41,20 @@ public class MessageFormatPlugin implements Plugin<Project>
   public void apply(Project project)
   {
     // provide java base plugin (for main/java)
-    final PluginContainer plugins = project.getPlugins();
+    var plugins = project.getPlugins();
     if (!plugins.hasPlugin(JavaBasePlugin.class))
       project.apply(objectConfiguration -> objectConfiguration.plugin(JavaBasePlugin.class));
 
     // create extension and set conventions
-    final ExtensionContainer extensions = project.getExtensions();
-    final MessageFormatExtension messageFormatExtension =
-        extensions.create(EXTENSION, MessageFormatExtension.class);
+    var extensions = project.getExtensions();
+    var messageFormatExtension = extensions.create(EXTENSION, MessageFormatExtension.class);
 
     messageFormatExtension.getPackFilename().convention("message.pack");
     messageFormatExtension.getCompress().convention(false);
     messageFormatExtension.getDuplicateMsgStrategy().convention(IGNORE_AND_WARN);
     messageFormatExtension.getValidateReferencedTemplates().convention(true);
 
-    final SourceSet mainJavaSourceSet = extensions
+    var mainJavaSourceSet = extensions
         .getByType(JavaPluginExtension.class)
         .getSourceSets()
         .getByName(MAIN_SOURCE_SET_NAME);
@@ -74,8 +70,8 @@ public class MessageFormatPlugin implements Plugin<Project>
                                 @NotNull MessageFormatExtension extension,
                                 @NotNull SourceSet mainSourceSet)
   {
-    final TaskContainer tasks = project.getTasks();
-    final ProjectLayout layout = project.getLayout();
+    var tasks = project.getTasks();
+    var layout = project.getLayout();
 
     tasks.register("messageFormatPack", MessageFormatPackTask.class, packTask -> {
       packTask.setGroup("build");
