@@ -64,7 +64,6 @@ dependencies {
   }
   implementation "org.antlr:antlr4-runtime:${antlrVersion}"
 
-  optionalImplementation "javax.cache:cache-api:${javaxCacheApiVersion}"
   optionalImplementation "org.ow2.asm:asm:${asmVersion}"
 
   // test
