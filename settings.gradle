@@ -31,9 +31,6 @@ pluginManagement {
 }
 
 
-def withDocumentation = 'true' == System.getProperty('documentation')
-
-
 buildscript {
   repositories {
     gradlePluginPortal()
@@ -49,7 +46,7 @@ include 'message-format'
 include 'message-format-spring'
 include 'message-gradle-plugin'
 
-if (withDocumentation)
+if ('true' == System.getProperty('documentation'))
   include 'documentation'
 
 
