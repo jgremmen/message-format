@@ -36,7 +36,7 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * })
  * </pre></blockquote>
  *
- * @see de.sayayi.lib.message.adopter.AsmAnnotationAdopter AsmAnnotationAdopter
+ * @see de.sayayi.lib.message.adopter.AbstractAnnotationAdopter AbstractAnnotationAdopter
  *
  * @author Jeroen Gremmen
  * @since 0.1.0 (renamed in 0.3.0)

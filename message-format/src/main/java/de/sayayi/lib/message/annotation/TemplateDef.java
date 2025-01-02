@@ -33,7 +33,7 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * &#x40;TemplateDef(name = "ex-msg", text = "%{ex,!empty:': %{ex}'}")
  * </pre></blockquote>
  *
- * @see de.sayayi.lib.message.adopter.AsmAnnotationAdopter AsmAnnotationAdopter
+ * @see de.sayayi.lib.message.adopter.AbstractAnnotationAdopter AbstractAnnotationAdopter
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
