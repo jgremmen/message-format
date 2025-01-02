@@ -33,7 +33,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static java.util.Arrays.*;
 import static java.util.Collections.unmodifiableSet;
@@ -145,16 +147,6 @@ public final class CompoundMessage implements Message.WithSpaces
     }
 
     return unmodifiableSet(templateNames);
-  }
-
-
-  @Override
-  public boolean isSame(@NotNull Message message)
-  {
-    if (message instanceof MessageDelegateWithCode)
-      message = ((MessageDelegateWithCode)message).getMessage();
-
-    return !(message instanceof LocaleAware) && Arrays.equals(getMessageParts(), message.getMessageParts());
   }
 
 

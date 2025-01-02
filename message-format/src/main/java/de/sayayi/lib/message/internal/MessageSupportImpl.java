@@ -27,6 +27,7 @@ import de.sayayi.lib.message.internal.pack.PackInputStream;
 import de.sayayi.lib.message.internal.pack.PackOutputStream;
 import de.sayayi.lib.message.part.parameter.value.*;
 import de.sayayi.lib.message.util.SupplierDelegate;
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -664,13 +665,9 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    public @NotNull Map<String,Object> clone()
-    {
-      try {
-        return (ParameterMap)super.clone();
-      } catch(CloneNotSupportedException ex) {
-        throw new RuntimeException(ex);  // will never happen
-      }
+    @SneakyThrows(CloneNotSupportedException.class)
+    public @NotNull Map<String,Object> clone() {
+      return (ParameterMap)super.clone();
     }
 
 
@@ -863,7 +860,8 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    public @NotNull Set<Entry<String,Object>> clone() throws CloneNotSupportedException {
+    @SneakyThrows(CloneNotSupportedException.class)
+    public @NotNull Set<Entry<String,Object>> clone() {
       return (ParameterEntrySet)super.clone();
     }
 

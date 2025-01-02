@@ -18,12 +18,14 @@ package de.sayayi.lib.message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.internal.EmptyMessage;
+import de.sayayi.lib.message.internal.MessageDelegateWithCode;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -122,17 +124,16 @@ public interface Message
 
 
   /**
-   * Returns the message parts that when concatenated are equivalent to this message.
+   * Returns the message parts that, when concatenated, are equivalent to this message.
    * <p>
    * Messages that implement ({@link LocaleAware LocaleAware}) are not required to return a
-   * sensible value. It is even valid to throw an exception like
-   * {@code UnsupportedOperationException}.
+   * sensible value. It is even valid to throw an exception like {@code UnsupportedOperationException}.
    *
    * @return  message parts, never {@code null}
    *
    * @since 0.8.0
    */
-  @Contract(pure = true)
+  @Contract(value = "-> new", pure = true)
   @NotNull MessagePart[] getMessageParts();
 
 
@@ -168,7 +169,13 @@ public interface Message
    * @since 0.8.0
    */
   @Contract(pure = true)
-  boolean isSame(@NotNull Message message);
+  default boolean isSame(@NotNull Message message)
+  {
+    if (message instanceof MessageDelegateWithCode)
+      message = ((MessageDelegateWithCode)message).getMessage();
+
+    return !(message instanceof LocaleAware) && Arrays.equals(getMessageParts(), message.getMessageParts());
+  }
 
 
 

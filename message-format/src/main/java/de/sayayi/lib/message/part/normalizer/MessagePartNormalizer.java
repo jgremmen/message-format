@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Jeroen Gremmen
  * @since 0.6.0
  */
+@FunctionalInterface
 public interface MessagePartNormalizer
 {
   /**

@@ -26,7 +26,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -73,16 +72,6 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
   @Override
   public @NotNull Set<String> getTemplateNames() {
     return Set.of();
-  }
-
-
-  @Override
-  public boolean isSame(@NotNull Message message)
-  {
-    if (message instanceof MessageDelegateWithCode)
-      message = ((MessageDelegateWithCode)message).getMessage();
-
-    return !(message instanceof LocaleAware) && Arrays.equals(getMessageParts(), message.getMessageParts());
   }
 
 

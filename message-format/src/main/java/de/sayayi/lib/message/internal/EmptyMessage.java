@@ -22,7 +22,6 @@ import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Set;
 
 
@@ -99,16 +98,6 @@ public final class EmptyMessage implements Message.WithSpaces
   @Override
   public @NotNull Set<String> getTemplateNames() {
     return Set.of();
-  }
-
-
-  @Override
-  public boolean isSame(@NotNull Message message)
-  {
-    if (message instanceof MessageDelegateWithCode)
-      message = ((MessageDelegateWithCode)message).getMessage();
-
-    return !(message instanceof LocaleAware) && Arrays.equals(getMessageParts(), message.getMessageParts());
   }
 
 
