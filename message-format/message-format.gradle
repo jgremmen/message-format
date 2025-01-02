@@ -29,8 +29,6 @@ description = 'Message Format Library'
 def antlrVersion = '[4.13.0,4.14)'
 def antlrExtVersion = '[0.5,0.6)'
 def asmVersion = '[9.0,10.0)'
-def caffeineJCacheVersion = '3.1.8'
-def javaxCacheApiVersion = '1.1.1'
 
 
 configurations {
@@ -68,7 +66,6 @@ dependencies {
 
   // test
   testImplementation gradleTestKit()
-  testImplementation "com.github.ben-manes.caffeine:jcache:${caffeineJCacheVersion}"
 
   antlr4 "org.antlr:antlr4:${antlrVersion}"
 }
@@ -103,6 +100,13 @@ jar {
 }
 
 
+def resolvedJetbrainsAnnotationsVersion = configurations
+    .compileClasspath
+    .resolvedConfiguration
+    .resolvedArtifacts
+    .find { it.name == 'annotations' }
+    .moduleVersion.id.version
+
 def resolvedAntlrVersion = configurations
     .compileClasspath
     .resolvedConfiguration
@@ -121,20 +125,15 @@ def resolvedAntlrExtVersion = configurations
 javadoc {
   (options as StandardJavadocDocletOptions).with {
     linksOffline(
+        "https://javadoc.io/doc/org.jetbrains/annotations/${resolvedJetbrainsAnnotationsVersion}/",
+        "${rootDir}/gradle/javadocs/jetbrains-annotations")
+    linksOffline(
         "https://javadoc.io/doc/org.antlr/antlr4-runtime/${resolvedAntlrVersion}/",
         "${rootDir}/gradle/javadocs/antlr4-runtime")
     linksOffline(
         "https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/${resolvedAntlrExtVersion}/",
         "${rootDir}/gradle/javadocs/antlr4-runtime-ext")
-    linksOffline(
-        "https://javadoc.io/doc/javax.cache/cache-api/${javaxCacheApiVersion}/",
-        "${rootDir}/gradle/javadocs/javax-cache")
   }
-
-  exclude '**/parser/MessageLexer.java'
-  exclude '**/parser/MessageParser*.java'
-  exclude '**/pack/*.java'
-  exclude '**/*Impl.java'
 }
 
 
