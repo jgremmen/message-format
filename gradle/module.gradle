@@ -20,16 +20,11 @@ afterEvaluate {
     title "${project.description} ${version}"
 
     (options as StandardJavadocDocletOptions).with {
-      linksOffline(
-          "https://javadoc.io/doc/org.jetbrains/annotations/${jetbrainsAnnotationsVersion}/",
-          "${rootDir}/gradle/javadocs/jetbrains-annotations")
-
       encoding 'UTF-8'
 
       group('Core', [
           'de.sayayi.lib.message',
           'de.sayayi.lib.message.exception',
-          'de.sayayi.lib.message.parser*',
           'de.sayayi.lib.message.part*'
       ])
       group('Adopters', [
@@ -39,14 +34,14 @@ afterEvaluate {
       group('Formatters', [
           'de.sayayi.lib.message.formatter*'
       ])
-      group('Internal', [
-          'de.sayayi.lib.message.internal*',
+      group('Util', [
           'de.sayayi.lib.message.util'
       ])
 
       noQualifiers 'java.util', 'java.lang'
 
       addStringOption('Xdoclint:none', '-quiet')
+      addStringOption('-show-module-contents', 'api')
     }
 
     failOnError false
