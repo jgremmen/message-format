@@ -19,7 +19,7 @@
 plugins {
   id 'antlr'
   id 'idea'
-  id 'de.sayayi.plugin.gradle.libapi' version '1.0-SNAPSHOT'
+  //id 'de.sayayi.plugin.gradle.libapi' version '1.0-SNAPSHOT'
 }
 
 
@@ -28,7 +28,6 @@ description = 'Message Format Library'
 
 def antlrVersion = '[4.13.0,4.14)'
 def antlrExtVersion = '[0.5,0.6)'
-def asmVersion = '[9.0,10.0)'
 
 
 configurations {
@@ -44,13 +43,6 @@ configurations {
 }
 
 
-java {
-  registerFeature('optional') {
-    usingSourceSet sourceSets.main
-  }
-}
-
-
 dependencies {
   // main
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
@@ -61,8 +53,6 @@ dependencies {
     exclude group: 'org.antlr'
   }
   implementation "org.antlr:antlr4-runtime:${antlrVersion}"
-
-  optionalImplementation "org.ow2.asm:asm:${asmVersion}"
 
   // test
   testImplementation gradleTestKit()
@@ -119,9 +109,6 @@ publishing {
   publications {
 
     msgformat(MavenPublication) {
-      suppressPomMetadataWarningsFor 'optionalApiElements'
-      suppressPomMetadataWarningsFor 'optionalRuntimeElements'
-
       from components.java
 
       pom {

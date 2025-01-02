@@ -1,12 +1,7 @@
 package de.sayayi.lib.message.internal.pack;
 
 import de.sayayi.lib.message.MessageSupport;
-import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.adopter.AsmAnnotationAdopter;
-import de.sayayi.lib.message.annotation.MessageDef;
-import de.sayayi.lib.message.annotation.TemplateDef;
-import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import lombok.val;
 import org.junit.jupiter.api.*;
@@ -14,6 +9,8 @@ import org.junit.jupiter.api.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Locale;
+import java.util.Map;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,25 +28,25 @@ class MessageSupportPackTest
 
 
   @BeforeAll
-  @MessageDef(code = "MSG-001")  // empty message with code
-  @MessageDef(code = "MSG-002", text = "Not empty")
-  @MessageDef(code = "MSG-003", texts = {
-      @Text(locale = "en", text = "English"),
-      @Text(locale = "de", text = "Deutsch")
-  })
-  @MessageDef(code = "MSG-004", text = "Compound parameter %{n} and template %[tpl]")
-  @MessageDef(code = "MSG-005", text =
-      "%{n,true:yes,64:'2^6','name':'name',null:'val %{n1}',empty:'empty',:'xyz'}")
-  @MessageDef(code = "MSG-006", text = "%{n,name:-128,check:false,str:'string',msg:'msg %{p}'}")
-  @MessageDef(code = "MSG-007", text = "^°!§$%&/()=?ßüöäÖÄÜ@€«∑®†Ω¨⁄øπ@∆ª©ƒ∂‚å¥≈ç√∫~∞…")
-  @TemplateDef(name = "exception", text = "%{ex,!empty:': %{ex}'}")
-  @MessageDef(code = "MSG-008", text = "Something went wrong%[exception,withStack:true]")
   static void initMessageSupport()
   {
-    messageSupport = MessageSupportFactory.create(new GenericFormatterService(), NO_CACHE_INSTANCE);
+    var cms =
+        MessageSupportFactory.create(new GenericFormatterService(), NO_CACHE_INSTANCE);
+    var messageFactory = cms.getMessageAccessor().getMessageFactory();
 
-    new AsmAnnotationAdopter((ConfigurableMessageSupport)messageSupport)
-        .adopt(MessageSupportPackTest.class);
+    cms.addMessage("MSG-001", "");
+    cms.addMessage("MSG-002", "Not empty");
+    cms.addMessage(messageFactory.parseMessage("MSG-003", Map.of(
+        Locale.forLanguageTag("en"), "English",
+        Locale.forLanguageTag("de"), "Deutsch")));
+    cms.addMessage("MSG-004", "Compound parameter %{n} and template %[tpl]");
+    cms.addMessage("MSG-005", "%{n,true:yes,64:'2^6','name':'name',null:'val %{n1}',empty:'empty',:'xyz'}");
+    cms.addMessage("MSG-006", "%{n,name:-128,check:false,str:'string',msg:'msg %{p}'}");
+    cms.addMessage("MSG-007", "^°!§$%&/()=?ßüöäÖÄÜ@€«∑®†Ω¨⁄øπ@∆ª©ƒ∂‚å¥≈ç√∫~∞…");
+    cms.addTemplate("exception", messageFactory.parseTemplate("%{ex,!empty:': %{ex}'}"));
+    cms.addMessage("MSG-008", "Something went wrong%[exception,withStack:true]");
+
+    messageSupport = cms;
   }
 
 

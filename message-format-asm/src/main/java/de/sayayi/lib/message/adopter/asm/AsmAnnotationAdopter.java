@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.adopter;
+package de.sayayi.lib.message.adopter.asm;
 
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
+import de.sayayi.lib.message.adopter.AbstractAnnotationAdopter;
 import de.sayayi.lib.message.annotation.*;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.*;
@@ -53,7 +54,7 @@ import static org.objectweb.asm.Type.getDescriptor;
  * @since 0.8.0
  */
 @SuppressWarnings("unused")
-public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
+public final class AsmAnnotationAdopter extends AbstractAnnotationAdopter
 {
   private static final String MESSAGE_DEFS_DESCRIPTOR = getDescriptor(MessageDefs.class);
   private static final String MESSAGE_DEF_DESCRIPTOR = getDescriptor(MessageDef.class);

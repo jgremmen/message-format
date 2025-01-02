@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.adopter;
+package de.sayayi.lib.message.adopter.asm;
 
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupportFactory;

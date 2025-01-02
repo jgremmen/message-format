@@ -16,7 +16,7 @@
 
 plugins {
   id 'java-gradle-plugin'
-  id 'com.gradle.plugin-publish' version '1.2.1'
+  id 'com.gradle.plugin-publish' version '1.3.0'
 }
 
 
@@ -30,7 +30,10 @@ dependencies {
   api gradleApi()
 
   implementation project(':message-format')
-  implementation "org.ow2.asm:asm:${asmVersion}"
+  implementation project(':message-format-asm')
+
+  // message-format-asm includes the 'asm' library but it's not transitive available (due to module-info?)
+  compileOnly "org.ow2.asm:asm:${asmVersion}"
 }
 
 
