@@ -15,7 +15,7 @@
  */
 
 plugins {
-  id 'de.sayayi.plugin.gradle.libapi' version '1.0-SNAPSHOT'
+  //id 'de.sayayi.plugin.gradle.libapi' version '1.0-SNAPSHOT'
 }
 
 
@@ -48,6 +48,9 @@ javadoc {
     linksOffline(
         "https://javadoc.io/doc/org.springframework/spring-core/${resolveVersion('spring-core')}/",
         "${rootDir}/gradle/javadocs/spring-core")
+    linksOffline(
+        "https://javadoc.io/doc/org.springframework/spring-context/${resolveVersion('spring-context')}/",
+        "${rootDir}/gradle/javadocs/spring-context")
     linksOffline(
         "https://javadoc.io/doc/org.springframework/spring-expression/${resolveVersion('spring-expression')}/",
         "${rootDir}/gradle/javadocs/spring-expression")

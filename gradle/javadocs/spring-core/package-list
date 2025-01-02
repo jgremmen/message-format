@@ -2,3 +2,4 @@ org.springframework.asm
 org.springframework.core
 org.springframework.core.convert
 org.springframework.core.io
+org.springframework.util
