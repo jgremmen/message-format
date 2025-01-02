@@ -67,7 +67,7 @@ public class AsmAnnotationAdopter extends AbstractAnnotationAdopter
 
   static
   {
-    int api = ASM6;  // lowest supported version
+    var api = ASM6;  // lowest supported version
 
     for(var field: Opcodes.class.getDeclaredFields())
       if (field.getName().matches("ASM[0-9]+"))

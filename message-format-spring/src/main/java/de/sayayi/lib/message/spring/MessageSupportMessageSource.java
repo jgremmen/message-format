@@ -47,8 +47,7 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
   }
 
 
-  public MessageSupportMessageSource(@NotNull String parameterPrefix,
-                                     @NotNull MessageSupport messageSupport) {
+  public MessageSupportMessageSource(@NotNull String parameterPrefix, @NotNull MessageSupport messageSupport) {
     this(parameterPrefix, messageSupport, null);
   }
 
@@ -76,8 +75,7 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
 
 
   @Override
-  public String getMessage(@NotNull String code, Object[] args, String defaultMessage,
-                           @NotNull Locale locale)
+  public String getMessage(@NotNull String code, Object[] args, String defaultMessage, @NotNull Locale locale)
   {
     if (messageSupport.getMessageAccessor().hasMessageWithCode(code))
       return getMessage(code, args, locale);
@@ -120,8 +118,7 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
 
 
   @Override
-  public @NotNull String getMessage(@NotNull MessageSourceResolvable resolvable,
-                                    @NotNull Locale locale)
+  public @NotNull String getMessage(@NotNull MessageSourceResolvable resolvable, @NotNull Locale locale)
       throws NoSuchMessageException
   {
     final String[] codes = resolvable.getCodes();

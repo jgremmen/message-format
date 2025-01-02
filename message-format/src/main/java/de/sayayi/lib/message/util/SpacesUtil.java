@@ -65,7 +65,7 @@ public final class SpacesUtil
    *
    * @see #isSpaceChar(char)
    */
-  @Contract(value = "null -> null", pure = true)
+  @Contract(value = "null -> null; !null -> !null", pure = true)
   @SuppressWarnings("DuplicatedCode")
   public static String trimSpaces(String s)
   {

@@ -30,7 +30,6 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
@@ -71,8 +70,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object>
    * @param conversionService  type conversion service, not {@code null}
    * @param resourceLoader     resource loader (usually the application context), not {@code null}
    */
-  public SpELFormatter(@NotNull ConversionService conversionService,
-                       @NotNull ResourceLoader resourceLoader) {
+  public SpELFormatter(@NotNull ConversionService conversionService, @NotNull ResourceLoader resourceLoader) {
     this(conversionService, requireNonNull(resourceLoader.getClassLoader()));
   }
 
@@ -83,8 +81,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object>
    * @param conversionService  type conversion service, not {@code null}
    * @param classLoader        class loader, not {@code null}
    */
-  public SpELFormatter(@NotNull ConversionService conversionService,
-                       @NotNull ClassLoader classLoader)
+  public SpELFormatter(@NotNull ConversionService conversionService, @NotNull ClassLoader classLoader)
   {
     typeConverter = new StandardTypeConverter(conversionService);
     spelExpressionParser = new SpelExpressionParser(
@@ -102,8 +99,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object>
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    final Optional<String> spelExpr = context.getConfigValueString("spel-expr");
-
+    var spelExpr = context.getConfigValueString("spel-expr");
     if (spelExpr.isPresent())
     {
       value = spelExpressionParser
