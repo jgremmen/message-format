@@ -92,11 +92,11 @@ public final class TextPartFactory
    * <ul>
    *   <li>
    *     if {@code addSpaceBefore} is {@code true} a leading space will be added.
-   *     If the text alread had a leading space, no changes are made
+   *     If the text already had a leading space, no changes are made
    *   </li>
    *   <li>
    *     if {@code addSpaceAfter} is {@code true} a trailing space will be added.
-   *     If the text alread had a trailing space, no changes are made
+   *     If the text already had a trailing space, no changes are made
    *   </li>
    * </ul>
    *
