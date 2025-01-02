@@ -28,6 +28,7 @@ import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import org.intellij.lang.annotations.Language;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -39,6 +40,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.jar.JarFile;
 import java.util.zip.ZipException;
@@ -105,6 +107,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    *
    * @throws MessageParserException  in case the template could not be parsed
    */
+  @Contract(value = "_, _ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull ClassLoader classLoader, @NotNull Set<String> packageNames)
   {
     try {
@@ -240,10 +243,13 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * @return  this annotation adopter instance, never {@code null}
    *
    * @throws MessageParserException  in case the template could not be parsed
+   *
+   * @since 0.12.0
    */
-  public @NotNull AbstractAnnotationAdopter adopt(@NotNull File classFile)
+  @Contract(value = "_ -> this")
+  public @NotNull AbstractAnnotationAdopter adopt(@NotNull Path classFile)
   {
-    var classPath = classFile.toPath().toAbsolutePath();
+    var classPath = classFile.toAbsolutePath();
 
     if (!indexedClasses.contains(classPath.toString()))
     {
@@ -260,6 +266,23 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
+   * Adopt messages for the given {@code classFile}.
+   *
+   * @param classFile  location of the class file to analyse for messages, not {@code null}
+   *
+   * @return  this annotation adopter instance, never {@code null}
+   *
+   * @throws MessageParserException  in case the template could not be parsed
+   */
+  @Contract(value = "_ -> this")
+  public @NotNull AbstractAnnotationAdopter adopt(@NotNull File classFile)
+  {
+    adopt(classFile.toPath());
+    return this;
+  }
+
+
+  /**
    * Adopt messages for the given {@code type}.
    *
    * @param type  type to analyse for messages, not {@code null}
@@ -268,6 +291,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    *
    * @throws MessageParserException  in case the template could not be parsed
    */
+  @Contract(value = "_ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull Class<?> type)
   {
     var typeName = type.getName();
@@ -302,6 +326,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * @throws DuplicateMessageException  if different messages are provided for the same locale
    * @throws MessageParserException     in case the template could not be parsed
    */
+  @Contract(value = "_ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull MessageDef messageDef)
   {
     var texts = messageDef.texts();
@@ -350,6 +375,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    *                                     same locale
    * @throws MessageParserException      in case the template could not be parsed
    */
+  @Contract(value = "_ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull TemplateDef templateDef)
   {
     var texts = templateDef.texts();

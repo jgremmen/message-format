@@ -41,6 +41,7 @@ import org.objectweb.asm.ClassReader;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +53,7 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.Locale.ROOT;
 import static org.gradle.api.logging.LogLevel.ERROR;
 import static org.gradle.api.logging.LogLevel.WARN;
+import static org.gradle.api.tasks.PathSensitivity.RELATIVE;
 
 
 /**
@@ -61,6 +63,7 @@ import static org.gradle.api.logging.LogLevel.WARN;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
+@CacheableTask
 public abstract class MessageFormatPackTask extends DefaultTask
 {
   private static final Action<PatternFilterable> CLASS_FILES =
@@ -89,7 +92,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
    *
    * @return  destination directory parameter
    */
-  @Internal  // part of task output
+  @Internal("tracked via packFile")  // part of task output
   public abstract DirectoryProperty getDestinationDir();
 
 
@@ -98,7 +101,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
    *
    * @return  packed message file name
    */
-  @Internal  // part of task output
+  @Internal("tracked via packFile")
   public abstract Property<String> getPackFilename();
 
 
@@ -145,6 +148,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * @see #sourceSet(SourceSet)
    */
   @InputFiles
+  @IgnoreEmptyDirectories
+  @PathSensitive(RELATIVE)
   public abstract ConfigurableFileCollection getSources();
 
 
@@ -183,7 +188,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * default value resolves to {@code true}.
    * <p>
    * If the property resolves to {@code true} the task will check whether all referenced
-   * templates (including nested tempates) are available and included in the packed message file.
+   * templates (including nested templates) are available and included in the packed message file.
    * <p>
    * If the property resolves to {@code false} no checks are performed. This may lead to a
    * situation where a message cannot be formatted if the referenced template is missing from
@@ -280,6 +285,9 @@ public abstract class MessageFormatPackTask extends DefaultTask
     if (action == null)
       throw new InvalidUserDataException("Action must not be null!");
 
+    if (this.action != null)
+      getLogger().warn("Previous message format pack action will be overwritten!");
+
     this.action = action;
   }
 
@@ -310,13 +318,25 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
     try {
       var adopter = new AsmAnnotationAdopter(messageSupport);
+      var trace = logger.isTraceEnabled();
 
-      for(var classFile: getSources().getAsFileTree().matching(CLASS_FILES).getFiles())
-      {
-        logger.debug("Scanning {}", classFile.getAbsolutePath());
-        currentClassName.set(getClassName(classFile));
-        adopter.adopt(classFile);
-      }
+      getSources()
+          .getAsFileTree()
+          .matching(CLASS_FILES)
+          .getFiles()
+          .stream()
+          .map(File::toPath)
+          .forEach(classPath -> {
+            var className = getClassName(classPath);
+
+            if (trace)
+              logger.trace("Scanning class {}, path {}", className, classPath);
+            else
+              logger.debug("Scanning class {}", className);
+
+            currentClassName.set(className);
+            adopter.adopt(classPath);
+          });
     } catch(Exception ex) {
       throw new GradleException("Failed to scan messages", ex);
     }
@@ -360,14 +380,10 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void pack_write(@NotNull MessageSupport messageSupport)
   {
-    var packFile = getPackFile().getAsFile();
-    getLogger().debug("Writing message pack: " + packFile.getAbsolutePath());
+    var packFile = getPackFile().getAsFile().toPath();
+    getLogger().info("Writing message pack: {}", packFile);
 
-    // create parent directory
-    //noinspection ResultOfMethodCallIgnored
-    packFile.getParentFile().mkdirs();
-
-    try(var packOutputStream = newOutputStream(packFile.toPath())) {
+    try(var packOutputStream = newOutputStream(packFile)) {
       messageSupport.exportMessages(packOutputStream, getCompress().get(), this::messageCodeFilter);
     } catch(IOException ex) {
       throw new GradleException("Failed to write message pack", ex);
@@ -448,7 +464,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
           return ds;
     }
 
-    throw new GradleException("Unknown duplicates strategy: " + value);
+    throw new InvalidUserDataException("Unknown duplicates strategy: " + value);
   }
 
 
@@ -557,12 +573,12 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   @Contract(pure = true)
-  private @NotNull String getClassName(@NotNull File classFile)
+  private @NotNull String getClassName(@NotNull Path classPath)
   {
     try {
-      return new ClassReader(newInputStream(classFile.toPath())).getClassName().replace('/', '.');
+      return new ClassReader(newInputStream(classPath)).getClassName().replace('/', '.');
     } catch(IOException ex) {
-      throw new GradleException("Failed to read class name from " + classFile, ex);
+      throw new GradleException("Failed to read class name from " + classPath, ex);
     }
   }
 }

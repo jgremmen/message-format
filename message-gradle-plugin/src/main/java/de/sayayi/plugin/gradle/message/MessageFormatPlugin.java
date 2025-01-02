@@ -87,8 +87,7 @@ public class MessageFormatPlugin implements Plugin<Project>
       // settings
       packTask.getCompress().convention(extension.getCompress());
       packTask.getDuplicateMsgStrategy().convention(extension.getDuplicateMsgStrategy());
-      packTask.getValidateReferencedTemplates()
-          .convention(extension.getValidateReferencedTemplates());
+      packTask.getValidateReferencedTemplates().convention(extension.getValidateReferencedTemplates());
 
       packTask.include(extension.getIncludeRegexFilters().toArray(String[]::new));
       packTask.exclude(extension.getExcludeRegexFilters().toArray(String[]::new));
