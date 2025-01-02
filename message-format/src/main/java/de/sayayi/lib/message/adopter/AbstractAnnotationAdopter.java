@@ -407,7 +407,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * {@code MessageDef} annotation implementation.
    */
   @SuppressWarnings("ClassExplicitlyAnnotation")
-  static final class MessageDefImpl implements MessageDef
+  protected static final class MessageDefImpl implements MessageDef
   {
     private final @NotNull String code;
     @Language("MessageFormat")
@@ -415,7 +415,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     private final @NotNull Text[] texts;
 
 
-    MessageDefImpl(@NotNull String code, String text, @NotNull Text[] texts)
+    public MessageDefImpl(@NotNull String code, String text, @NotNull Text[] texts)
     {
       this.code = code.trim();
       this.text = text == null ? "" : text.trim();
@@ -463,7 +463,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * @since 0.8.0
    */
   @SuppressWarnings("ClassExplicitlyAnnotation")
-  static final class TemplateDefImpl implements TemplateDef
+  protected static final class TemplateDefImpl implements TemplateDef
   {
     private final @NotNull String name;
     @Language("MessageFormat")
@@ -472,7 +472,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
     @SuppressWarnings("ConstantValue")
-    TemplateDefImpl(@NotNull String name, String text, @NotNull Text[] texts)
+    public TemplateDefImpl(@NotNull String name, String text, @NotNull Text[] texts)
     {
       if ((this.name = name == null ? "" : name.trim()).isEmpty())
         throw new IllegalArgumentException("name must not be empty");
@@ -521,7 +521,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * @author Jeroen Gremmen
    */
   @SuppressWarnings("ClassExplicitlyAnnotation")
-  static final class TextImpl implements Text
+  protected static final class TextImpl implements Text
   {
     private final @NotNull String locale;
     @Language("MessageFormat")
@@ -530,7 +530,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     private final @NotNull String value;
 
 
-    TextImpl(String locale, String text, String value)
+    public TextImpl(String locale, String text, String value)
     {
       this.locale = locale == null ? "" : locale.trim();
       this.text = text == null ? "" : text.trim();

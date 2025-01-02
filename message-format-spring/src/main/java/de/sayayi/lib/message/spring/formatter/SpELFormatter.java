@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.formatter.spring;
+package de.sayayi.lib.message.spring.formatter;
 
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
@@ -39,7 +39,7 @@ import static org.springframework.expression.spel.SpelMessage.VARIABLE_ASSIGNMEN
 
 /**
  * @author Jeroen Gremmen
- * @since 0.8.3
+ * @since 0.8.3  (refactored in 0.12.0)
  */
 public final class SpELFormatter extends AbstractParameterFormatter<Object>
     implements NamedParameterFormatter

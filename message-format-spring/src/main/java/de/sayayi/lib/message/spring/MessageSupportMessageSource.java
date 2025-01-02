@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message;
+package de.sayayi.lib.message.spring;
 
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupport.MessageConfigurer;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +32,7 @@ import static org.springframework.util.ObjectUtils.isEmpty;
 
 /**
  * @author Jeroen Gremmen
- * @since 0.9.2
+ * @since 0.9.2  (refactored in 0.12.0)
  */
 public class MessageSupportMessageSource implements HierarchicalMessageSource
 {

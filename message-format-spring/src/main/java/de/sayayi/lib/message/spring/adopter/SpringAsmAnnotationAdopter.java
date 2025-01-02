@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.adopter;
+package de.sayayi.lib.message.spring.adopter;
 
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
+import de.sayayi.lib.message.adopter.AbstractAnnotationAdopter;
 import de.sayayi.lib.message.annotation.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.asm.AnnotationVisitor;
@@ -55,7 +56,7 @@ import static org.springframework.asm.Type.getDescriptor;
  * therefore requires a dependency with library {@code org.springframework:spring-core:5.3.+}.
  *
  * @author Jeroen Gremmen
- * @since 0.8.0
+ * @since 0.8.0  (refactored in 0.12.0)
  */
 @SuppressWarnings("unused")
 public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
