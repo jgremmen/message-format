@@ -100,38 +100,16 @@ jar {
 }
 
 
-def resolvedJetbrainsAnnotationsVersion = configurations
-    .compileClasspath
-    .resolvedConfiguration
-    .resolvedArtifacts
-    .find { it.name == 'annotations' }
-    .moduleVersion.id.version
-
-def resolvedAntlrVersion = configurations
-    .compileClasspath
-    .resolvedConfiguration
-    .resolvedArtifacts
-    .find { it.name == 'antlr4-runtime' }
-    .moduleVersion.id.version
-
-def resolvedAntlrExtVersion = configurations
-    .compileClasspath
-    .resolvedConfiguration
-    .resolvedArtifacts
-    .find { it.name == 'antlr4-runtime-ext' }
-    .moduleVersion.id.version
-
-
 javadoc {
   (options as StandardJavadocDocletOptions).with {
     linksOffline(
-        "https://javadoc.io/doc/org.jetbrains/annotations/${resolvedJetbrainsAnnotationsVersion}/",
+        "https://javadoc.io/doc/org.jetbrains/annotations/${resolveVersion('annotations')}/",
         "${rootDir}/gradle/javadocs/jetbrains-annotations")
     linksOffline(
-        "https://javadoc.io/doc/org.antlr/antlr4-runtime/${resolvedAntlrVersion}/",
+        "https://javadoc.io/doc/org.antlr/antlr4-runtime/${resolveVersion('antlr4-runtime')}/",
         "${rootDir}/gradle/javadocs/antlr4-runtime")
     linksOffline(
-        "https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/${resolvedAntlrExtVersion}/",
+        "https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/${resolveVersion('antlr4-runtime-ext')}/",
         "${rootDir}/gradle/javadocs/antlr4-runtime-ext")
   }
 }

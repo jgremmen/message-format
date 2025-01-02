@@ -35,6 +35,16 @@ dependencies {
 }
 
 
+ext.resolveVersion = { artifactName ->
+    configurations
+        .compileClasspath
+        .resolvedConfiguration
+        .resolvedArtifacts
+        .find { it.name == artifactName }
+        .moduleVersion.id.version
+}
+
+
 java {
   withJavadocJar()
   withSourcesJar()

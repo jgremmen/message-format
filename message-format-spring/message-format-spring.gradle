@@ -37,24 +37,19 @@ dependencies {
 }
 
 
-def resolvedSpringVersion = configurations
-    .compileClasspath
-    .resolvedConfiguration
-    .resolvedArtifacts
-    .find { it.name == 'spring-expression' }
-    .moduleVersion.id.version
-
-
 javadoc {
   (options as StandardJavadocDocletOptions).with {
     linksOffline(
         "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
         "${rootDir}/gradle/javadocs/message-format")
     linksOffline(
-        "https://javadoc.io/doc/org.springframework/spring-core/${resolvedSpringVersion}/",
+        "https://javadoc.io/doc/org.jetbrains/annotations/${resolveVersion('annotations')}/",
+        "${rootDir}/gradle/javadocs/jetbrains-annotations")
+    linksOffline(
+        "https://javadoc.io/doc/org.springframework/spring-core/${resolveVersion('spring-core')}/",
         "${rootDir}/gradle/javadocs/spring-core")
     linksOffline(
-        "https://javadoc.io/doc/org.springframework/spring-expression/${resolvedSpringVersion}/",
+        "https://javadoc.io/doc/org.springframework/spring-expression/${resolveVersion('spring-expression')}/",
         "${rootDir}/gradle/javadocs/spring-expression")
   }
 }

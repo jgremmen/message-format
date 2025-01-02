@@ -42,7 +42,7 @@ javadoc {
         "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
         "${rootDir}/gradle/javadocs/message-format")
     linksOffline(
-        "https://javadoc.io/doc/org.jetbrains/annotations/${jetbrainsAnnotationsVersion}/",
+        "https://javadoc.io/doc/org.jetbrains/annotations/${resolveVersion('annotations')}/",
         "${rootDir}/gradle/javadocs/jetbrains-annotations")
     linksOffline(
         "https://docs.gradle.org/${gradle.gradleVersion}/javadoc/",
