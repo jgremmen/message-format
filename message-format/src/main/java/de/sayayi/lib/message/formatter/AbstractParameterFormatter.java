@@ -48,6 +48,7 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.EMPTY_NULL_TYPE
 public abstract class AbstractParameterFormatter<T> implements ParameterFormatter
 {
   @Override
+  @SuppressWarnings("unchecked")
   public final @NotNull Text format(@NotNull FormatterContext context, Object value)
   {
     // handle empty, !empty, null and !null first
@@ -61,7 +62,6 @@ public abstract class AbstractParameterFormatter<T> implements ParameterFormatte
     if (value == null)
       return nullText();
 
-    //noinspection unchecked
     var text = formatValue(context, (T)value);
 
     // handle empty, !empty, null and !null for result

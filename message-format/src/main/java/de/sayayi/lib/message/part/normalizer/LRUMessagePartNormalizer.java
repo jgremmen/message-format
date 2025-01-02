@@ -51,6 +51,7 @@ public final class LRUMessagePartNormalizer implements MessagePartNormalizer
 
   @Override
   @Contract(mutates = "this")
+  @SuppressWarnings("unchecked")
   public <T extends MessagePart> @NotNull T normalize(@NotNull T part)
   {
     requireNonNull(part, "part must not be null");
@@ -84,7 +85,6 @@ public final class LRUMessagePartNormalizer implements MessagePartNormalizer
       parts[0] = cachedPart;
     }
 
-    //noinspection unchecked
     return (T)cachedPart;
   }
 
