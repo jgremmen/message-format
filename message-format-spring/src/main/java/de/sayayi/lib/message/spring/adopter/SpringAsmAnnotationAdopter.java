@@ -21,10 +21,7 @@ import de.sayayi.lib.message.MessageSupport.MessagePublisher;
 import de.sayayi.lib.message.adopter.AbstractAnnotationAdopter;
 import de.sayayi.lib.message.annotation.*;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.asm.AnnotationVisitor;
-import org.springframework.asm.ClassReader;
-import org.springframework.asm.ClassVisitor;
-import org.springframework.asm.MethodVisitor;
+import org.springframework.asm.*;
 import org.springframework.core.io.ResourceLoader;
 
 import java.io.IOException;
@@ -35,7 +32,6 @@ import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 import static org.springframework.asm.Opcodes.ACC_SYNTHETIC;
-import static org.springframework.asm.SpringAsmInfo.ASM_VERSION;
 import static org.springframework.asm.Type.getDescriptor;
 
 
@@ -58,7 +54,6 @@ import static org.springframework.asm.Type.getDescriptor;
  * @author Jeroen Gremmen
  * @since 0.8.0  (refactored in 0.12.0)
  */
-@SuppressWarnings("unused")
 public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
 {
   private static final String MESSAGE_DEFS_DESCRIPTOR = getDescriptor(MessageDefs.class);
@@ -66,6 +61,22 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
   private static final String TEMPLATE_DEFS_DESCRIPTOR = getDescriptor(TemplateDefs.class);
   private static final String TEMPLATE_DEF_DESCRIPTOR = getDescriptor(TemplateDef.class);
   private static final String TEXT_DESCRIPTOR = getDescriptor(Text.class);
+
+  /** Highest supported ASM Api version */
+  private static final int ASM_API;
+
+
+  static
+  {
+    var api = SpringAsmInfo.ASM_VERSION;
+
+    try {
+      api = SpringAsmInfo.class.getDeclaredField("ASM_VERSION").getInt(null);
+    } catch(ReflectiveOperationException ignored) {
+    }
+
+    ASM_API = api;
+  }
 
 
   /**
@@ -114,7 +125,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
   private final class MainClassVisitor extends ClassVisitor
   {
     private MainClassVisitor() {
-      super(ASM_VERSION);
+      super(ASM_API);
     }
 
 
@@ -155,7 +166,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
   private final class MessageMethodVisitor extends MethodVisitor
   {
     private MessageMethodVisitor() {
-      super(ASM_VERSION);
+      super(ASM_API);
     }
 
 
@@ -171,14 +182,14 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
   private final class MessageDefsAnnotationVisitor extends AnnotationVisitor
   {
     private MessageDefsAnnotationVisitor() {
-      super(ASM_VERSION);
+      super(ASM_API);
     }
 
 
     @Override
     public AnnotationVisitor visitArray(String name)
     {
-      return new AnnotationVisitor(ASM_VERSION) {
+      return new AnnotationVisitor(ASM_API) {
         @Override
         public AnnotationVisitor visitAnnotation(String name, String descriptor) {
           return MESSAGE_DEF_DESCRIPTOR.equals(descriptor) ? new MessageDefAnnotationVisitor() : null;
@@ -198,7 +209,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
 
 
     private MessageDefAnnotationVisitor() {
-      super(ASM_VERSION);
+      super(ASM_API);
     }
 
 
@@ -215,7 +226,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
     @Override
     public AnnotationVisitor visitArray(String name)
     {
-      return new AnnotationVisitor(ASM_VERSION) {
+      return new AnnotationVisitor(ASM_API) {
         @Override
         public AnnotationVisitor visitAnnotation(String name, String descriptor) {
           return TEXT_DESCRIPTOR.equals(descriptor) ? new TextAnnotationVisitor(texts) : null;
@@ -236,14 +247,14 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
   private final class TemplateDefsAnnotationVisitor extends AnnotationVisitor
   {
     private TemplateDefsAnnotationVisitor() {
-      super(ASM_VERSION);
+      super(ASM_API);
     }
 
 
     @Override
     public AnnotationVisitor visitArray(String name)
     {
-      return new AnnotationVisitor(ASM_VERSION) {
+      return new AnnotationVisitor(ASM_API) {
         @Override
         public AnnotationVisitor visitAnnotation(String name, String descriptor) {
           return TEMPLATE_DEF_DESCRIPTOR.equals(descriptor) ? new TemplateDefAnnotationVisitor() : null;
@@ -263,7 +274,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
 
 
     private TemplateDefAnnotationVisitor() {
-      super(ASM_VERSION);
+      super(ASM_API);
     }
 
 
@@ -280,7 +291,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
     @Override
     public AnnotationVisitor visitArray(String name)
     {
-      return new AnnotationVisitor(ASM_VERSION) {
+      return new AnnotationVisitor(ASM_API) {
         @Override
         public AnnotationVisitor visitAnnotation(String name, String descriptor) {
           return TEXT_DESCRIPTOR.equals(descriptor) ? new TextAnnotationVisitor(texts) : null;
@@ -308,7 +319,8 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
 
     private TextAnnotationVisitor(List<Text> inheritedTexts)
     {
-      super(ASM_VERSION);
+      super(ASM_API);
+
       this.inheritedTexts = inheritedTexts;
     }
 
