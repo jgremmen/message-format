@@ -43,6 +43,7 @@ buildscript {
 
 
 include 'message-format'
+include 'message-format-annotations'
 include 'message-format-asm'
 include 'message-format-spring'
 include 'message-gradle-plugin'

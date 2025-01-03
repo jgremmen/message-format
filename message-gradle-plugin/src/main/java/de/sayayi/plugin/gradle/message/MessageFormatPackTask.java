@@ -19,7 +19,7 @@ import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.adopter.asm.AsmAnnotationAdopter;
+import de.sayayi.lib.message.asm.adopter.AsmAnnotationAdopter;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.GenericFormatterService;

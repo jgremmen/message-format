@@ -10,7 +10,6 @@ module de.sayayi.lib.message {
 
   exports de.sayayi.lib.message;
   exports de.sayayi.lib.message.adopter;
-  exports de.sayayi.lib.message.annotation;
   exports de.sayayi.lib.message.exception;
   exports de.sayayi.lib.message.formatter;
   exports de.sayayi.lib.message.formatter.named;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.adopter.asm;
+package de.sayayi.lib.message.asm.adopter;
 
 import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.Message.WithCode;

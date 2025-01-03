@@ -13,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.adopter;
+package de.sayayi.lib.message.annotation;
 
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
-import de.sayayi.lib.message.annotation.MessageDef;
-import de.sayayi.lib.message.annotation.TemplateDef;
-import de.sayayi.lib.message.annotation.Text;
+import de.sayayi.lib.message.adopter.AbstractMessageAdopter;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.exception.MessageAdopterException;
 import de.sayayi.lib.message.exception.MessageParserException;
-import de.sayayi.lib.message.internal.EmptyMessage;
-import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -52,8 +48,7 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * This abstract class defines various methods for adopting messages and templates defined by
- * annotations.
+ * This abstract class defines various methods for adopting messages and templates defined by annotations.
  * <p>
  * Messages are analysed per class (see {@link #parseClass(InputStream)}). If there is a
  * requirement to select a part of the messages provided by a class, the message support must
@@ -66,7 +61,7 @@ import static java.util.Objects.requireNonNull;
  * synthesized/mocked annotations.
  *
  * @author Jeroen Gremmen
- * @since 0.8.0
+ * @since 0.8.0  (refactored in 0.12.0)
  */
 @SuppressWarnings({"UnusedReturnValue", "UnknownLanguage"})
 public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
@@ -333,13 +328,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     var code = messageDef.code();
 
     if (texts.length == 0)
-    {
-      @Language("MessageFormat") var text = messageDef.text();
-
-      messagePublisher.addMessage(text.isEmpty()
-          ? new EmptyMessageWithCode(code)
-          : messageFactory.parseMessage(code, text));
-    }
+      messagePublisher.addMessage(messageFactory.parseMessage(code, messageDef.text()));
     else
     {
       var localizedTexts = new LinkedHashMap<Locale,String>();
@@ -382,13 +371,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     var name = templateDef.name();
 
     if (texts.length == 0)
-    {
-      @Language("MessageFormat") var text = templateDef.text();
-
-      messagePublisher.addTemplate(name, text.isEmpty()
-          ? EmptyMessage.INSTANCE
-          : messageFactory.parseTemplate(text));
-    }
+      messagePublisher.addTemplate(name, messageFactory.parseTemplate(templateDef.text()));
     else
     {
       var localizedTexts = new LinkedHashMap<Locale,String>();

@@ -28,6 +28,7 @@ def asmVersion = '[9.0,10.0)'
 
 dependencies {
   api gradleApi()
+  api project(':message-format-annotations')
 
   implementation project(':message-format')
   implementation project(':message-format-asm')
@@ -38,10 +39,10 @@ dependencies {
 
 
 tasks.named('test', Test) {
-  dependsOn ':message-format:jar'
+  dependsOn ':message-format-annotations:jar'
 
   // is there a better way to do this?
-  systemProperty 'MF_JAR', project(':message-format').jar.archiveFile.asFile.get().absolutePath
+  systemProperty 'MFA_JAR', project(':message-format-annotations').jar.archiveFile.asFile.get().absolutePath
 }
 
 

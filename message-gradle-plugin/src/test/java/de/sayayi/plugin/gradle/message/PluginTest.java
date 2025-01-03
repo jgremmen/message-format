@@ -251,7 +251,7 @@ class PluginTest
         "  id 'de.sayayi.plugin.gradle.message'",
         "}",
         "dependencies {",
-        "  implementation files('" + System.getProperty("MF_JAR") + "')",
+        "  implementation files('" + System.getProperty("MFA_JAR") + "')",
         "}"
     ));
 

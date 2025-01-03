@@ -18,7 +18,6 @@ package de.sayayi.lib.message.spring.adopter;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
-import de.sayayi.lib.message.adopter.AbstractAnnotationAdopter;
 import de.sayayi.lib.message.annotation.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.asm.*;

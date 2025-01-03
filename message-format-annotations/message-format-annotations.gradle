@@ -19,20 +19,11 @@ plugins {
 }
 
 
-description = 'Message Format Library (asm adopter)'
-
-
-def asmVersion = '[9.0,10.0)'
+description = 'Message Format Library (annotations)'
 
 
 dependencies {
   implementation project(':message-format')
-  implementation project(':message-format-annotations')
-
-  implementation "org.ow2.asm:asm:${asmVersion}"
-
-  //noinspection DependencyNotationArgument
-  testImplementation project(':message-format').sourceSets.test.output
 }
 
 
@@ -51,7 +42,7 @@ javadoc {
 publishing {
   publications {
 
-    asm(MavenPublication) {
+    annotations(MavenPublication) {
       from components.java
 
       pom {
@@ -88,5 +79,5 @@ publishing {
 
 
 signing {
-  sign publishing.publications.asm
+  sign publishing.publications.annotations
 }

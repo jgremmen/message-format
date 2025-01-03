@@ -27,6 +27,7 @@ def springVersion = '[5.0,6.0)'
 
 dependencies {
   implementation project(':message-format')
+  implementation project(':message-format-annotations')
 
   implementation("org.springframework:spring-context:${springVersion}") {
     exclude module: 'spring-jcl'
