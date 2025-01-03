@@ -26,10 +26,10 @@ def asmVersion = '[9.0,10.0)'
 
 
 dependencies {
-  implementation project(':message-format')
   implementation project(':message-format-annotations')
-
   implementation "org.ow2.asm:asm:${asmVersion}"
+
+  compileOnly project(':message-format')
 
   //noinspection DependencyNotationArgument
   testImplementation project(':message-format').sourceSets.test.output

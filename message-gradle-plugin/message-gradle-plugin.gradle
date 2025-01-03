@@ -28,12 +28,12 @@ def asmVersion = '[9.0,10.0)'
 
 dependencies {
   api gradleApi()
-  api project(':message-format-annotations')
 
-  implementation project(':message-format')
   implementation project(':message-format-asm')
 
-  // message-format-asm includes the 'asm' library but it's not transitive available (due to module-info?)
+  compileOnly project(':message-format')
+  compileOnly project(':message-format-annotations')
+
   compileOnly "org.ow2.asm:asm:${asmVersion}"
 }
 
