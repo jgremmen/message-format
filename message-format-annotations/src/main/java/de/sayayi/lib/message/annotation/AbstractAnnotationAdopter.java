@@ -360,8 +360,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    *
    * @return  this annotation adopter instance, never {@code null}
    *
-   * @throws DuplicateTemplateException  if different template messages are provided for the
-   *                                     same locale
+   * @throws DuplicateTemplateException  if different template messages are provided for the same locale
    * @throws MessageParserException      in case the template could not be parsed
    */
   @Contract(value = "_ -> this")

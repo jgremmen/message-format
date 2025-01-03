@@ -31,8 +31,8 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * For example:
  * <blockquote><pre>
  * &#x40;MessageDef(code = "MSG-001", texts = {
- *   &#x40;Text(locale = "en", text = "%{r,size,1:'1 result',:'%{r,size} results'} found"),
- *   &#x40;Text(locale = "de", text = "%{r,size,1:'1 Ergebnis',:'%{r,size} Ergebnisse'} gefunden")
+ *   &#x40;Text(locale = "en", text = "%{r,size,1:'1 result',:'%{r,size,0:no} results'} found"),
+ *   &#x40;Text(locale = "de", text = "%{r,size,1:'1 Ergebnis',:'%{r,size,0:keine} Ergebnisse'} gefunden")
  * })
  * </pre></blockquote>
  *
@@ -44,7 +44,7 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 @Target({ ANNOTATION_TYPE, METHOD, TYPE })
 @Retention(CLASS)
 @Repeatable(MessageDefs.class)
-@SuppressWarnings("UnknownLanguage")
+@SuppressWarnings({"UnknownLanguage", "GrazieInspection"})
 public @interface MessageDef
 {
   /**
