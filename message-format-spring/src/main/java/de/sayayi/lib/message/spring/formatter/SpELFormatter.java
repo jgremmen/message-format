@@ -40,8 +40,7 @@ import static org.springframework.expression.spel.SpelMessage.VARIABLE_ASSIGNMEN
  * @author Jeroen Gremmen
  * @since 0.8.3  (refactored in 0.12.0)
  */
-public final class SpELFormatter extends AbstractParameterFormatter<Object>
-    implements NamedParameterFormatter
+public final class SpELFormatter extends AbstractParameterFormatter<Object> implements NamedParameterFormatter
 {
   private static final OperatorOverloader OPERATOR_OVERLOADER = new StandardOperatorOverloader();
   private static final TypeComparator TYPE_COMPARATOR = new StandardTypeComparator();

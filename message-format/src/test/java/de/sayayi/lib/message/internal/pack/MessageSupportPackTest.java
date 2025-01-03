@@ -73,7 +73,8 @@ class MessageSupportPackTest
 
     for(val messageCode: messageCodes)
     {
-      assertEquals(messageAccessor.getMessageByCode(messageCode),
+      assertEquals(
+          messageAccessor.getMessageByCode(messageCode),
           messageAccessorCloned.getMessageByCode(messageCode));
     }
   }

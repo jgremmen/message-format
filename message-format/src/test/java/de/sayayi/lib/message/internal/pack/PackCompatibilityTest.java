@@ -60,8 +60,7 @@ class PackCompatibilityTest
   @EnabledIfSystemProperty(named = "test-pack-compat", matches = "true",
                            disabledReason = "Message pack compatibility tests not required")
   void testCompatibility(@NotNull String version, @NotNull String className, boolean pluginRepo,
-                         @NotNull String gradleVersion, int messageCount, int templateCount)
-      throws IOException
+                         @NotNull String gradleVersion, int messageCount, int templateCount) throws IOException
   {
     writeSettingsGradle(pluginRepo, version);
     writeGradleProperties();
