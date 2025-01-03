@@ -1,6 +1,7 @@
 module de.sayayi.lib.message.spring {
 
-  requires de.sayayi.lib.message;
+  requires transitive de.sayayi.lib.message;
+
   requires spring.core;
   requires spring.context;
   requires spring.expression;
