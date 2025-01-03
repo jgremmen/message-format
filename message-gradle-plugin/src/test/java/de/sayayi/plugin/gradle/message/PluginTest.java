@@ -33,6 +33,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -68,11 +69,7 @@ class PluginTest
 
     write(new File(testProjectDir, "gradle.properties").toPath(), List.of(""));
 
-    write(new File(testProjectDir, "build.gradle").toPath(), List.of(
-        "plugins {",
-        "  id 'java'",
-        "  id 'de.sayayi.plugin.gradle.message'",
-        "}"));
+    writeBuildGradle(List.of());
 
     buildDir = new File(testProjectDir, "build");
     javaDir = new File(testProjectDir, "src/main/java");
@@ -132,14 +129,11 @@ class PluginTest
   @DisplayName("Pack task with filtered message codes")
   void testWithFilteredSource() throws IOException
   {
-    write(new File(testProjectDir, "build.gradle").toPath(), List.of(
-        "plugins {",
-        "  id 'java'",
-        "  id 'de.sayayi.plugin.gradle.message'",
-        "}",
+    writeBuildGradle(List.of(
         "messageFormat {",
         "  include '.*INNER.*'",
-        "}"));
+        "}"
+    ));
 
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
@@ -179,12 +173,7 @@ class PluginTest
   void testDuplicateMessage(@NotNull String duplicateMsgStrategy, boolean success)
       throws IOException
   {
-    write(new File(testProjectDir, "build.gradle").toPath(), List.of(
-        "plugins {",
-        "  id 'java'",
-        "  id 'de.sayayi.plugin.gradle.message'",
-        "}",
-        "messageFormat.duplicateMsgStrategy = '" + duplicateMsgStrategy + "'"));
+    writeBuildGradle(List.of("messageFormat.duplicateMsgStrategy = '" + duplicateMsgStrategy + "'"));
 
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
@@ -210,16 +199,13 @@ class PluginTest
   @DisplayName("Jar task with messageFormatPack dependency")
   void testJar() throws IOException
   {
-    write(new File(testProjectDir, "build.gradle").toPath(), List.of(
-        "plugins {",
-        "  id 'java'",
-        "  id 'de.sayayi.plugin.gradle.message'",
-        "}",
+    writeBuildGradle(List.of(
         "jar {",
         "  from messageFormatPack {",
         "    into 'META-INF'",
         "  }",
-        "}"));
+        "}"
+    ));
 
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
@@ -254,5 +240,23 @@ class PluginTest
     return messageSupport
         .importMessages(newInputStream(pack.toPath()))
         .getMessageAccessor();
+  }
+
+
+  private void writeBuildGradle(List<String> lines) throws IOException
+  {
+    var gradleLines = new ArrayList<>(List.of(
+        "plugins {",
+        "  id 'java'",
+        "  id 'de.sayayi.plugin.gradle.message'",
+        "}",
+        "dependencies {",
+        "  implementation files('" + System.getProperty("MF_JAR") + "')",
+        "}"
+    ));
+
+    gradleLines.addAll(lines);
+
+    write(new File(testProjectDir, "build.gradle").toPath(), gradleLines);
   }
 }

@@ -37,6 +37,14 @@ dependencies {
 }
 
 
+tasks.named('test', Test) {
+  dependsOn ':message-format:jar'
+
+  // is there a better way to do this?
+  systemProperty 'MF_JAR', project(':message-format').jar.archiveFile.asFile.get().absolutePath
+}
+
+
 javadoc {
   title "${project.description} ${version}"
 
