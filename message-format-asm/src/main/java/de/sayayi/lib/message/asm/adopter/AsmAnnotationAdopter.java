@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Math.max;
+import static org.objectweb.asm.ClassReader.*;
 import static org.objectweb.asm.Opcodes.ACC_SYNTHETIC;
 import static org.objectweb.asm.Opcodes.ASM6;
 import static org.objectweb.asm.Type.getDescriptor;
@@ -105,7 +106,7 @@ public final class AsmAnnotationAdopter extends AbstractAnnotationAdopter
 
   @Override
   protected void parseClass(@NotNull InputStream classInputStream) throws IOException {
-    new ClassReader(classInputStream).accept(new MainClassVisitor(), 0);
+    new ClassReader(classInputStream).accept(new MainClassVisitor(), SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
   }
 
 

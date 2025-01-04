@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
+import static org.springframework.asm.ClassReader.*;
 import static org.springframework.asm.Opcodes.ACC_SYNTHETIC;
 import static org.springframework.asm.Type.getDescriptor;
 
@@ -115,7 +116,7 @@ public final class SpringAsmAnnotationAdopter extends AbstractAnnotationAdopter
 
   @Override
   protected void parseClass(@NotNull InputStream classInputStream) throws IOException {
-    new ClassReader(classInputStream).accept(new MainClassVisitor(), 0);
+    new ClassReader(classInputStream).accept(new MainClassVisitor(), SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
   }
 
 
