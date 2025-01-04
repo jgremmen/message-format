@@ -87,6 +87,7 @@ public enum ConfigKeyBool implements ConfigKey
    *
    * @hidden
    */
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeBoolean(bool);
   }
@@ -103,6 +104,7 @@ public enum ConfigKeyBool implements ConfigKey
    *
    * @hidden
    */
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public static @NotNull ConfigKeyBool unpack(@NotNull PackInputStream packStream) throws IOException {
     return packStream.readBoolean() ? TRUE : FALSE;
   }

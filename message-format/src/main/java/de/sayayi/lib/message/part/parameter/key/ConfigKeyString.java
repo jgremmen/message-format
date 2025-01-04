@@ -125,6 +125,7 @@ public final class ConfigKeyString implements ConfigKey
    *
    * @hidden
    */
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeEnum(compareType);
@@ -143,6 +144,7 @@ public final class ConfigKeyString implements ConfigKey
    *
    * @hidden
    */
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public static @NotNull ConfigKeyString unpack(@NotNull PackInputStream packStream) throws IOException {
     return new ConfigKeyString(packStream.readEnum(CompareType.class), requireNonNull(packStream.readString()));
   }

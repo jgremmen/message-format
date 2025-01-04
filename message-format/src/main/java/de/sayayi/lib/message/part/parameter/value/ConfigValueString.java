@@ -120,6 +120,7 @@ public final class ConfigValueString implements ConfigValue
    *
    * @hidden
    */
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeString(string);
   }
@@ -136,6 +137,7 @@ public final class ConfigValueString implements ConfigValue
    *
    * @hidden
    */
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public static @NotNull ConfigValueString unpack(@NotNull PackInputStream packStream) throws IOException {
     return new ConfigValueString(requireNonNull(packStream.readString()));
   }

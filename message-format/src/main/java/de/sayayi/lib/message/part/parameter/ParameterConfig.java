@@ -300,6 +300,7 @@ public final class ParameterConfig
   /**
    * @hidden
    */
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeSmallVar(config.size() + mapKeys.length + (defaultValue == null ? 0 : 1));
@@ -329,6 +330,7 @@ public final class ParameterConfig
   /**
    * @hidden
    */
+  @SuppressWarnings("ClassEscapesDefinedScope")
   public static @NotNull ParameterConfig unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
