@@ -58,7 +58,7 @@ public final class TextPart implements Text
 
 
   /**
-   * Constructs a text part.
+   * Constructs a text part with optional leading/trailing space.
    *
    * @param text            text or {@code null}
    * @param addSpaceBefore  {@code true} if the part has a leading space,
