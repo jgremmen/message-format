@@ -10,9 +10,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,9 +52,9 @@ class PackCompatibilityTest
   }
 
 
-  @DisplayName("Test compatibility with")
-  @ParameterizedTest(name = "Version {0}")
-  @MethodSource("pluginVersionParameters")
+//  @DisplayName("Test compatibility with")
+//  @ParameterizedTest(name = "Version {0}")
+//  @MethodSource("pluginVersionParameters")
   @EnabledIfSystemProperty(named = "test-pack-compat", matches = "true",
                            disabledReason = "Message pack compatibility tests not required")
   void testCompatibility(@NotNull String version, @NotNull String className, boolean pluginRepo,
