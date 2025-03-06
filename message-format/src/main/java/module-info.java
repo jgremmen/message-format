@@ -24,4 +24,5 @@ module de.sayayi.lib.message {
   exports de.sayayi.lib.message.util;
 
   uses de.sayayi.lib.message.formatter.ParameterFormatter;
+
 }
