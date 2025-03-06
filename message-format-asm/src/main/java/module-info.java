@@ -7,4 +7,5 @@ module de.sayayi.lib.message.asm {
   requires static org.jetbrains.annotations;
 
   exports de.sayayi.lib.message.asm.adopter;
+
 }

@@ -5,4 +5,5 @@ module de.sayayi.lib.message.annotations {
   requires static org.jetbrains.annotations;
 
   exports de.sayayi.lib.message.annotation;
+
 }

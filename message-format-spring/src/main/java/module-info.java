@@ -12,4 +12,5 @@ module de.sayayi.lib.message.spring {
   exports de.sayayi.lib.message.spring;
   exports de.sayayi.lib.message.spring.adopter;
   exports de.sayayi.lib.message.spring.formatter;
+
 }
