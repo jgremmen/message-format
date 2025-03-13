@@ -150,8 +150,9 @@ signing {
 
 
 clean.doLast {
-  fileTree("${projectDir}/src/main").matching {
-    include 'antlr/*.tokens'
+  fileTree("${projectDir}/src").matching {
+    include 'main/antlr/*.tokens'
+    include 'test/resources/*-SNAPSHOT.mfp'
   }.files.forEach({ it.delete() })
 
   file("${projectDir}/src/main/antlr/gen").deleteDir()
@@ -163,4 +164,15 @@ idea {
   module {
     resourceDirs += file('src/main/antlr')
   }
+}
+
+
+tasks.register('generate-compatibility-export', JavaExec) {
+  group = 'verification'
+  description = 'Export pre-defined set of messages for compatibility test'
+
+  mainClass = 'de.sayayi.lib.message.internal.pack.PackCompatibilityTest'
+  classpath = sourceSets.test.runtimeClasspath
+
+  args "${projectDir}/src/test/resources/messages-${version}.mfp"
 }
