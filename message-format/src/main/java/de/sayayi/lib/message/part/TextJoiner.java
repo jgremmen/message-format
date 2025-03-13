@@ -91,7 +91,7 @@ public final class TextJoiner
    *
    * @return  this text joiner, never {@code null}
    */
-  @Contract(mutates = "this")
+  @Contract(value = "_ -> this", mutates = "this")
   public @NotNull TextJoiner addNoSpace(@NotNull Text text) {
     return add(noSpaceText(text.getText()));
   }
@@ -104,7 +104,7 @@ public final class TextJoiner
    *
    * @return  this text joiner, never {@code null}
    */
-  @Contract(mutates = "this")
+  @Contract(value = "_ -> this", mutates = "this")
   public @NotNull TextJoiner addNoSpace(String text) {
     return add(noSpaceText(text));
   }
@@ -117,7 +117,7 @@ public final class TextJoiner
    *
    * @return  this text joiner, never {@code null}
    */
-  @Contract(mutates = "this")
+  @Contract(value = "_ -> this", mutates = "this")
   public @NotNull TextJoiner addWithSpace(String text) {
     return add(spacedText(text));
   }
