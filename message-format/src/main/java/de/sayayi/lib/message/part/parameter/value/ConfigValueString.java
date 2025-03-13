@@ -36,7 +36,7 @@ public final class ConfigValueString implements ConfigValue
   /** Configuration value string. */
   private final @NotNull String string;
 
-  private transient Message.WithSpaces message;
+  private transient volatile Message.WithSpaces message;
 
 
   public ConfigValueString(@NotNull String string) {
@@ -79,8 +79,7 @@ public final class ConfigValueString implements ConfigValue
   }
 
 
-  @NotNull
-  public synchronized Message.WithSpaces asMessage(@NotNull MessageFactory messageFactory)
+  public @NotNull Message.WithSpaces asMessage(@NotNull MessageFactory messageFactory)
   {
     if (message == null)
     {
