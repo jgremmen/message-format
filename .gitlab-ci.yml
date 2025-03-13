@@ -27,6 +27,7 @@ build:
     name: "message-format-artifacts"
     paths:
       - message-format/.build/libs/*.jar
+      - message-format-annotations/.build/libs/*.jar
       - message-format-asm/.build/libs/*.jar
       - message-format-spring/.build/libs/*.jar
       - message-gradle-plugin/.build/libs/*.jar
