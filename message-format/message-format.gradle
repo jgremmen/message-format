@@ -56,6 +56,7 @@ dependencies {
 
   // test
   testImplementation gradleTestKit()
+  testImplementation 'org.springframework:spring-core:[5.0,6.0)'
 
   antlr4 "org.antlr:antlr4:${antlrVersion}"
 }

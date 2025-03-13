@@ -9,6 +9,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.util.MimeType;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,9 +18,14 @@ import java.util.Properties;
 import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.Integer.parseInt;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.Files.*;
+import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.util.MimeTypeUtils.parseMimeType;
 
 
 /**
@@ -30,6 +36,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DisplayName("Message pack backward compatibility")
 class PackCompatibilityTest
 {
+  private static final MimeType MIME_TYPE = new MimeType("application", "x-message-format-pack");
+
+
   private static Stream<Arguments> versionParameters()
   {
     return Stream.of(
@@ -48,7 +57,10 @@ class PackCompatibilityTest
     var cms = MessageSupportFactory.create(new DefaultFormatterService(), NO_CACHE_INSTANCE);
 
     // mime type
-    assertEquals("application/x-message-format-pack+gzip", probeContentType(messagePackPath));
+    var mimeType = parseMimeType(probeContentType(messagePackPath));
+    assertTrue(mimeType.isCompatibleWith(MIME_TYPE));
+    assertEquals(expectedVersion, parseInt(requireNonNull(mimeType.getParameter("version"))));
+    assertTrue(parseBoolean(requireNonNull(mimeType.getParameter("compress"))));
 
     // pack version
     try(var stream = new PackInputStream(newInputStream(messagePackPath))) {

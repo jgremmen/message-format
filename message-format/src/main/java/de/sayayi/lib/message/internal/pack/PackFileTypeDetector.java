@@ -22,12 +22,16 @@ public final class PackFileTypeDetector extends FileTypeDetector
   {
     try(var packStream = newInputStream(path)) {
       var magicLength = PACK_HEADER.length;
-      var header = new byte[magicLength + 1];
+      var header = new byte[magicLength + 2];
 
-      if (packStream.read(header) == magicLength + 1 &&
+      if (packStream.read(header) == magicLength + 2 &&
           (header[magicLength] & 0b0101_1011) == 0b0101_1011 &&
           Arrays.equals(PACK_HEADER, 0, magicLength, header, 0, magicLength))
-        return (header[magicLength] & 0b1000_0000) != 0 ? MIME_TYPE + "+gzip" : MIME_TYPE;
+      {
+        return MIME_TYPE +
+            ";version=" + (header[magicLength + 1] & 0xff) +
+            ";compress=" + ((header[magicLength] & 0b1000_0000) != 0);
+      }
     } catch(Exception ignored) {
     }
 
