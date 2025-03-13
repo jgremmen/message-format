@@ -71,6 +71,24 @@ public class PropertiesAdopter extends AbstractMessageAdopter
 
 
   /**
+   * Adopt templates from properties.
+   * <p>
+   * Each key from the properties object is used as the template name,
+   * the value is parsed as a template.
+   *
+   * @param properties  template properties, not {@code null}
+   *
+   * @since 0.20.0
+   */
+  @Contract(pure = true)
+  public void adoptTemplates(@NotNull Properties properties)
+  {
+    properties.forEach((code,message) ->
+        messagePublisher.addTemplate(code.toString(), messageFactory.parseTemplate(message.toString())));
+  }
+
+
+  /**
    * Adopt messages from localized properties.
    * <p>
    * Each key from the properties object is used as the message code,
