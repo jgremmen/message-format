@@ -385,6 +385,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         };
       }
 
+
       @Override
       public Function<Map<String,ConfigValue>,Map<String,ConfigValue>> finisher() {
         return identity();

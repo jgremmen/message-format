@@ -58,7 +58,7 @@ public final class TemplatePart implements Template
 
   /**
    * Default parameter map. If a parameter which is referenced in the template message is not
-   * provided during formatting, a default value form this map is used, if available.
+   * provided during formatting, a default value from this map is used, if available.
    * <p>
    * The map is optimized to require the least amount of space.
    */
