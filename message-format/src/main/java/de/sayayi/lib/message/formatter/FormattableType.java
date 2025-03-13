@@ -42,8 +42,6 @@ import static java.util.Objects.requireNonNull;
  */
 public final class FormattableType implements Comparable<FormattableType>, Serializable
 {
-  private static final long serialVersionUID = 800L;
-
   /**
    * Default order value. If a formattable type has no explicit order, this default value will be
    * used instead.
