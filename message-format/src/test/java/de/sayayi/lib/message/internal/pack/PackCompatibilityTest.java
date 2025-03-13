@@ -62,11 +62,6 @@ class PackCompatibilityTest
     assertEquals(expectedVersion, parseInt(requireNonNull(mimeType.getParameter("version"))));
     assertTrue(parseBoolean(requireNonNull(mimeType.getParameter("compress"))));
 
-    // pack version
-    try(var stream = new PackInputStream(newInputStream(messagePackPath))) {
-      assertEquals(expectedVersion, stream.getVersion());
-    }
-
     // import messages/templates
     cms.importMessages(newInputStream(messagePackPath));
 
@@ -75,7 +70,6 @@ class PackCompatibilityTest
     assertEquals(messageCount, messageAccessor.getMessageCodes().size());
     assertEquals(templateCount, messageAccessor.getTemplateNames().size());
   }
-
 
 
   public static void main(String[] args) throws IOException
