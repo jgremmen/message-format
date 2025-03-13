@@ -74,7 +74,7 @@ class PluginTest
     buildDir = new File(testProjectDir, "build");
     javaDir = new File(testProjectDir, "src/main/java");
     testPackageDir = new File(javaDir, "test");
-    packFile = new File(buildDir, "messageFormatPack/message.pack");
+    packFile = new File(buildDir, "messageFormatPack/messages.mfp");
 
     createDirectories(testPackageDir.toPath());
   }

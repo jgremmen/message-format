@@ -11,6 +11,7 @@ out/
 /message-format/src/main/gen/
 /message-format/src/main/generated/
 *.tokens
+*-SNAPSHOT.mfp
 
 *.iml
 .DS_Store

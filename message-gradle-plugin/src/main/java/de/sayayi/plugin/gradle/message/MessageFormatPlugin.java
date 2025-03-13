@@ -49,7 +49,7 @@ public class MessageFormatPlugin implements Plugin<Project>
     var extensions = project.getExtensions();
     var messageFormatExtension = extensions.create(EXTENSION, MessageFormatExtension.class);
 
-    messageFormatExtension.getPackFilename().convention("message.pack");
+    messageFormatExtension.getPackFilename().convention("messages.mfp");
     messageFormatExtension.getCompress().convention(false);
     messageFormatExtension.getDuplicateMsgStrategy().convention(IGNORE_AND_WARN);
     messageFormatExtension.getValidateReferencedTemplates().convention(true);
