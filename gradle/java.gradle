@@ -95,9 +95,6 @@ tasks.withType(JavaCompile).configureEach {
 
 
 tasks.withType(Test).configureEach {
-  if (System.getProperty('test-pack-compat') == 'true')
-    jvmArgs '-Dtest-pack-compat=true'
-
   javaLauncher = javaToolchains.launcherFor {
     languageVersion = JavaLanguageVersion.of(11)
   }
