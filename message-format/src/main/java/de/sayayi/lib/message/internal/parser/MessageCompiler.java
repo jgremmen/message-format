@@ -517,13 +517,13 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
     @Override
     public void exitConfigMapKeyNull(ConfigMapKeyNullContext ctx) {
-      ctx.configKey = new ConfigKeyNull(ctx.equalOperatorOptional().cmp);
+      ctx.configKey = ctx.equalOperatorOptional().cmp == CompareType.EQ ? ConfigKeyNull.EQ : ConfigKeyNull.NE;
     }
 
 
     @Override
     public void exitConfigMapKeyEmpty(ConfigMapKeyEmptyContext ctx) {
-      ctx.configKey = new ConfigKeyEmpty(ctx.equalOperatorOptional().cmp);
+      ctx.configKey = ctx.equalOperatorOptional().cmp == CompareType.EQ ? ConfigKeyEmpty.EQ : ConfigKeyEmpty.NE;
     }
 
 

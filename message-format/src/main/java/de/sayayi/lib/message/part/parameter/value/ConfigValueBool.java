@@ -29,20 +29,11 @@ import java.io.IOException;
  */
 public enum ConfigValueBool implements ConfigValue
 {
-  /** Config value representing {@code false}. */
-  FALSE(false),
+  /** Boolean config value representing {@code false}. */
+  FALSE,
 
-  /** Config value representing {@code true}. */
-  TRUE(true);
-
-
-  /** Configuration value boolean. */
-  private final boolean bool;
-
-
-  ConfigValueBool(boolean bool) {
-    this.bool = bool;
-  }
+  /** Boolean config value representing {@code true}. */
+  TRUE;
 
 
   /**
@@ -65,7 +56,7 @@ public enum ConfigValueBool implements ConfigValue
    */
   @Contract(pure = true)
   public boolean booleanValue() {
-    return bool;
+    return this == TRUE;
   }
 
 
@@ -76,13 +67,13 @@ public enum ConfigValueBool implements ConfigValue
    */
   @Override
   public @NotNull Boolean asObject() {
-    return bool;
+    return booleanValue();
   }
 
 
   @Override
   public String toString() {
-    return Boolean.toString(bool);
+    return Boolean.toString(booleanValue());
   }
 
 
@@ -95,9 +86,9 @@ public enum ConfigValueBool implements ConfigValue
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeBoolean(bool);
+  public void pack(@SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackOutputStream packStream)
+      throws IOException {
+    packStream.writeBoolean(booleanValue());
   }
 
 
@@ -112,8 +103,8 @@ public enum ConfigValueBool implements ConfigValue
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public static @NotNull ConfigValueBool unpack(@NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigValueBool unpack(
+      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackInputStream packStream) throws IOException {
     return packStream.readBoolean() ? TRUE : FALSE;
   }
 }

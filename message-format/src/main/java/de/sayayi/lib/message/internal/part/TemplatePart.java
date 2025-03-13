@@ -224,59 +224,6 @@ public final class TemplatePart implements Template
   public static @NotNull Template unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
-    switch(packStream.getVersion())
-    {
-      case 1:
-        return unpack_v1(packStream);
-
-      case 2:
-        return unpack_v2(unpack, packStream);
-
-      case 3:
-      default:
-        return unpack_v3(unpack, packStream);
-    }
-  }
-
-
-  private static @NotNull Template unpack_v1(@NotNull PackInputStream packStream) throws IOException
-  {
-    // v1 = spaceBefore, spaceAfter, name
-
-    var spaceBefore = packStream.readBoolean();
-    var spaceAfter = packStream.readBoolean();
-
-    return new TemplatePart(requireNonNull(packStream.readString()), spaceBefore, spaceAfter, Map.of(), Map.of());
-  }
-
-
-  private static @NotNull Template unpack_v2(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
-      throws IOException
-  {
-    // v2 = spaceBefore, spaceAfter, def. param map (size + key/value-pairs), name
-
-    var spaceBefore = packStream.readBoolean();
-    var spaceAfter = packStream.readBoolean();
-    var defaultParameterMap = new HashMap<String,ConfigValue>();
-
-    for(int n = 0, size = packStream.readSmallVar(); n < size; n++)
-    {
-      defaultParameterMap.put(
-          requireNonNull(packStream.readString()),
-          unpack.unpackMapValue(packStream));
-    }
-
-    return new TemplatePart(requireNonNull(packStream.readString()),
-        spaceBefore, spaceAfter, defaultParameterMap, Map.of());
-  }
-
-
-  private static @NotNull Template unpack_v3(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
-      throws IOException
-  {
-    // v3 = spaceBefore, spaceAfter, size default param map, size parameter delegate map,
-    // param map key/value-pairs), param delegate map key/value-pairs, name
-
     var spaceBefore = packStream.readBoolean();
     var spaceAfter = packStream.readBoolean();
 

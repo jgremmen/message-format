@@ -21,40 +21,23 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
-
 
 /**
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
-public final class ConfigKeyNull implements ConfigKey
+public enum ConfigKeyNull implements ConfigKey
 {
-  /** Configuration null key comparison type. */
-  private final @NotNull CompareType compareType;
+  /** Null config key with compare type {@link de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType#EQ EQ}. */
+  EQ,
 
-
-  /**
-   * Constructs a null configuration key with the given {@code compareType}.
-   *
-   * @param compareType  comparison type for the empty key, only
-   *                     {@link de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType#EQ EQ} and
-   *                     {@link de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType#NE NE}
-   *                     are allowed
-   */
-  public ConfigKeyNull(@NotNull CompareType compareType)
-  {
-    if (compareType != EQ && compareType != NE)
-      throw new IllegalArgumentException("compareType must be EQ or NE");
-
-    this.compareType = compareType;
-  }
+  /** Null config key with compare type {@link de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType#NE NE}. */
+  NE;
 
 
   @Override
   public @NotNull CompareType getCompareType() {
-    return compareType;
+    return this == EQ ? CompareType.EQ : CompareType.NE;
   }
 
 
@@ -70,20 +53,8 @@ public final class ConfigKeyNull implements ConfigKey
 
 
   @Override
-  public boolean equals(Object o) {
-    return o instanceof ConfigKeyNull && compareType == ((ConfigKeyNull)o).compareType;
-  }
-
-
-  @Override
-  public int hashCode() {
-    return 59 + compareType.hashCode();
-  }
-
-
-  @Override
   public String toString() {
-    return compareType.asPrefix() + "null";
+    return getCompareType().asPrefix() + "null";
   }
 
 
@@ -96,9 +67,9 @@ public final class ConfigKeyNull implements ConfigKey
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeEnum(compareType);
+  public void pack(@SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackOutputStream packStream)
+      throws IOException {
+    packStream.writeBoolean(this == EQ);
   }
 
 
@@ -113,8 +84,8 @@ public final class ConfigKeyNull implements ConfigKey
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public static @NotNull ConfigKeyNull unpack(@NotNull PackInputStream packStream) throws IOException {
-    return new ConfigKeyNull(packStream.readEnum(CompareType.class));
+  public static @NotNull ConfigKeyNull unpack(
+      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackInputStream packStream) throws IOException {
+    return packStream.readBoolean() ? EQ : NE;
   }
 }

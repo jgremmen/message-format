@@ -21,7 +21,7 @@ build:
   tags:
     - docker
   script:
-    - ./gradlew clean build -Dtest-pack-compat=true
+    - ./gradlew clean build
 #    - ./gradlew docs -Ddocumentation=true
   artifacts:
     name: "message-format-artifacts"

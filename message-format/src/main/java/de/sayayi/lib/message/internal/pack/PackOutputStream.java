@@ -27,14 +27,14 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 
 
 /**
- * signature = %{msg} z1vvvvvv  (z = gzip, v = version)
+ * signature = %{msg} z1011011 vvvvvvvv  (z = gzip, v = version)
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
 public final class PackOutputStream implements Closeable
 {
-  public static final int PACK_VERSION = 3;
+  public static final int PACK_VERSION = 1;
   static final byte[] PACK_HEADER = "%{msg}".getBytes(US_ASCII);
 
   private final @NotNull OutputStream stream;
@@ -45,7 +45,8 @@ public final class PackOutputStream implements Closeable
   public PackOutputStream(@NotNull OutputStream stream, boolean compress) throws IOException
   {
     stream.write(PACK_HEADER);
-    stream.write((compress ? 0b1100_0000 : 0b0100_0000) + (PACK_VERSION & 0b0011_1111));
+    stream.write(compress ? 0b1101_1011 : 0b0101_1011);
+    stream.write(PACK_VERSION);
 
     this.stream = compress ? new GZIPOutputStream(stream) : stream;
   }

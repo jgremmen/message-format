@@ -37,7 +37,6 @@ import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_ORDER;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
 import static java.util.Collections.emptyIterator;
 
@@ -52,7 +51,7 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>>
 
   static
   {
-    var nullConfig = new ParameterConfig(Map.of(new ConfigKeyNull(EQ), new ConfigValueString("(null)")));
+    var nullConfig = new ParameterConfig(Map.of(ConfigKeyNull.EQ, new ConfigValueString("(null)")));
 
     // default map-kv: %{key,null:'(null)'}=%{value,null:'(null)'}
     DEFAULT_KEY_VALUE_MESSAGE = new CompoundMessage(List.of(

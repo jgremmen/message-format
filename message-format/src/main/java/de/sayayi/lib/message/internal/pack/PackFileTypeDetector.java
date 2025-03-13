@@ -25,7 +25,7 @@ public final class PackFileTypeDetector extends FileTypeDetector
       var header = new byte[magicLength + 1];
 
       if (packStream.read(header) == magicLength + 1 &&
-          (header[magicLength] & 0b0100_0000) != 0 &&
+          (header[magicLength] & 0b0101_1011) == 0b0101_1011 &&
           Arrays.equals(PACK_HEADER, 0, magicLength, header, 0, magicLength))
         return (header[magicLength] & 0b1000_0000) != 0 ? MIME_TYPE + "+gzip" : MIME_TYPE;
     } catch(Exception ignored) {

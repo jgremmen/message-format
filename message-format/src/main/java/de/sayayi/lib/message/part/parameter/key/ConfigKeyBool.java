@@ -29,25 +29,11 @@ import java.io.IOException;
  */
 public enum ConfigKeyBool implements ConfigKey
 {
-  /** Config key representing {@code false}. */
-  FALSE(false),
+  /** Boolean config key representing {@code false}. */
+  FALSE,
 
-  /** Config key representing {@code true}. */
-  TRUE(true);
-
-
-  private static final long serialVersionUID = 800L;
-
-  /** Configuration key boolean. */
-  private final boolean bool;
-
-
-  /**
-   * Constructs a bool configuration key.
-   */
-  ConfigKeyBool(boolean bool) {
-    this.bool = bool;
-  }
+  /** Boolean config key representing {@code true}. */
+  TRUE;
 
 
   /**
@@ -57,7 +43,7 @@ public enum ConfigKeyBool implements ConfigKey
    */
   @Contract(pure = true)
   public boolean isBool() {
-    return bool;
+    return this == TRUE;
   }
 
 
@@ -74,7 +60,7 @@ public enum ConfigKeyBool implements ConfigKey
 
   @Override
   public String toString() {
-    return Boolean.toString(bool);
+    return Boolean.toString(isBool());
   }
 
 
@@ -87,9 +73,9 @@ public enum ConfigKeyBool implements ConfigKey
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeBoolean(bool);
+  public void pack(@SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackOutputStream packStream)
+      throws IOException {
+    packStream.writeBoolean(isBool());
   }
 
 
@@ -104,8 +90,8 @@ public enum ConfigKeyBool implements ConfigKey
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public static @NotNull ConfigKeyBool unpack(@NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigKeyBool unpack(
+      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackInputStream packStream) throws IOException {
     return packStream.readBoolean() ? TRUE : FALSE;
   }
 }

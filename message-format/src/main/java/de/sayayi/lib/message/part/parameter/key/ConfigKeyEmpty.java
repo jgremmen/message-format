@@ -21,9 +21,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
-
 
 /**
  * The empty configuration key represents values which are considered empty by their associated
@@ -32,32 +29,18 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
-public final class ConfigKeyEmpty implements ConfigKey
+public enum ConfigKeyEmpty implements ConfigKey
 {
-  /** Configuration empty key comparison type. */
-  private final @NotNull CompareType compareType;
+  /** Empty config key with compare type {@link de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType#EQ EQ}. */
+  EQ,
 
-
-  /**
-   * Constructs the empty configuration key with the given {@code compareType}.
-   *
-   * @param compareType  comparison type for the empty key, only
-   *                     {@link de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType#EQ EQ} and
-   *                     {@link de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType#NE NE}
-   *                     are allowed
-   */
-  public ConfigKeyEmpty(@NotNull CompareType compareType)
-  {
-    if (compareType != EQ && compareType != NE)
-      throw new IllegalArgumentException("compareType must be EQ or NE");
-
-    this.compareType = compareType;
-  }
+  /** Empty config key with compare type {@link de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType#NE NE}. */
+  NE;
 
 
   @Override
   public @NotNull CompareType getCompareType() {
-    return compareType;
+    return this == EQ ? CompareType.EQ : CompareType.NE;
   }
 
 
@@ -73,20 +56,8 @@ public final class ConfigKeyEmpty implements ConfigKey
 
 
   @Override
-  public boolean equals(Object o) {
-    return o instanceof ConfigKeyEmpty && compareType == ((ConfigKeyEmpty)o).compareType;
-  }
-
-
-  @Override
-  public int hashCode() {
-    return 59 + compareType.hashCode();
-  }
-
-
-  @Override
   public String toString() {
-    return compareType.asPrefix() + "empty";
+    return getCompareType().asPrefix() + "empty";
   }
 
 
@@ -99,9 +70,9 @@ public final class ConfigKeyEmpty implements ConfigKey
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeEnum(compareType);
+  public void pack(@SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackOutputStream packStream)
+      throws IOException {
+    packStream.writeBoolean(this == EQ);
   }
 
 
@@ -116,8 +87,8 @@ public final class ConfigKeyEmpty implements ConfigKey
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public static @NotNull ConfigKeyEmpty unpack(@NotNull PackInputStream packStream) throws IOException {
-    return new ConfigKeyEmpty(packStream.readEnum(CompareType.class));
+  public static @NotNull ConfigKeyEmpty unpack(
+      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackInputStream packStream) throws IOException {
+    return packStream.readBoolean() ? EQ : NE;
   }
 }
