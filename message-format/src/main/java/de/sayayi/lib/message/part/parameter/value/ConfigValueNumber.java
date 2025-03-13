@@ -119,8 +119,8 @@ public final class ConfigValueNumber implements ConfigValue
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public void pack(@NotNull PackOutputStream packStream) throws IOException {
+  public void pack(@SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackOutputStream packStream)
+      throws IOException {
     packStream.writeLong(number);
   }
 
@@ -136,8 +136,8 @@ public final class ConfigValueNumber implements ConfigValue
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public static @NotNull ConfigValueNumber unpack(@NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigValueNumber unpack(
+      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackInputStream packStream) throws IOException {
     return new ConfigValueNumber(packStream.readLong());
   }
 }

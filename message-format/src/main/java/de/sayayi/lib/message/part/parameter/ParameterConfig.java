@@ -330,9 +330,9 @@ public final class ParameterConfig
   /**
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public static @NotNull ParameterConfig unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
-      throws IOException
+  public static @NotNull ParameterConfig unpack(
+      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackHelper unpack,
+      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackInputStream packStream) throws IOException
   {
     var map = new LinkedHashMap<ConfigKey,ConfigValue>();
 

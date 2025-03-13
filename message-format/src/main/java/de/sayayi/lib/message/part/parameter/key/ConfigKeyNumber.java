@@ -87,7 +87,7 @@ public final class ConfigKeyNumber implements ConfigKey
     if (!(o instanceof ConfigKeyNumber))
       return false;
 
-    final ConfigKeyNumber that = (ConfigKeyNumber)o;
+    var that = (ConfigKeyNumber)o;
 
     return number == that.number && compareType == that.compareType;
   }
@@ -114,8 +114,8 @@ public final class ConfigKeyNumber implements ConfigKey
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public void pack(@NotNull PackOutputStream packStream) throws IOException
+  public void pack(@SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackOutputStream packStream)
+      throws IOException
   {
     packStream.writeEnum(compareType);
     packStream.writeLong(number);
@@ -133,8 +133,8 @@ public final class ConfigKeyNumber implements ConfigKey
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public static @NotNull ConfigKeyNumber unpack(@NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigKeyNumber unpack(
+      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackInputStream packStream) throws IOException {
     return new ConfigKeyNumber(packStream.readEnum(CompareType.class), packStream.readLong());
   }
 }

@@ -90,8 +90,8 @@ public final class ConfigValueMessage implements ConfigValue
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public void pack(@NotNull PackOutputStream packStream) throws IOException {
+  public void pack(@SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackOutputStream packStream)
+      throws IOException {
     PackHelper.pack(message, packStream);
   }
 
@@ -108,9 +108,9 @@ public final class ConfigValueMessage implements ConfigValue
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public static @NotNull ConfigValueMessage unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
-      throws IOException {
+  public static @NotNull ConfigValueMessage unpack(
+      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackHelper unpack,
+      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackInputStream packStream) throws IOException {
     return new ConfigValueMessage(unpack.unpackMessageWithSpaces(packStream));
   }
 }

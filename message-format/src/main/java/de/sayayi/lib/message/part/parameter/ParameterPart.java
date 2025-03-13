@@ -207,8 +207,8 @@ public final class ParameterPart implements Parameter
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public void pack(@NotNull PackOutputStream packStream) throws IOException
+  public void pack(@SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackOutputStream packStream)
+      throws IOException
   {
     packStream.writeBoolean(spaceBefore);
     packStream.writeBoolean(spaceAfter);
@@ -231,9 +231,9 @@ public final class ParameterPart implements Parameter
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public static @NotNull ParameterPart unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
-      throws IOException
+  public static @NotNull ParameterPart unpack(
+      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackHelper unpack,
+      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackInputStream packStream) throws IOException
   {
     var spaceBefore = packStream.readBoolean();
     var spaceAfter = packStream.readBoolean();

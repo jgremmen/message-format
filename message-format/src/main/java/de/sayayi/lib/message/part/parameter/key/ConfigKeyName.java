@@ -96,8 +96,8 @@ public final class ConfigKeyName implements ConfigKey
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public void pack(@NotNull PackOutputStream packStream) throws IOException {
+  public void pack(@SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackOutputStream packStream)
+      throws IOException {
     packStream.writeString(name);
   }
 
@@ -113,8 +113,8 @@ public final class ConfigKeyName implements ConfigKey
    *
    * @hidden
    */
-  @SuppressWarnings("ClassEscapesDefinedScope")
-  public static @NotNull ConfigKeyName unpack(@NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigKeyName unpack(
+      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackInputStream packStream) throws IOException {
     return new ConfigKeyName(requireNonNull(packStream.readString()));
   }
 }
