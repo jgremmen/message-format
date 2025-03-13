@@ -47,7 +47,7 @@ tasks.named('test', Test) {
 
 
 javadoc {
-  title "${project.description} ${version}"
+  title = "${project.description} ${version}"
 
   (options as StandardJavadocDocletOptions).with {
     linksOffline(
@@ -69,7 +69,7 @@ javadoc {
     addStringOption('Xdoclint:none', '-quiet')
   }
 
-  failOnError false
+  failOnError = false
 }
 
 

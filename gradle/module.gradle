@@ -17,7 +17,7 @@
 
 afterEvaluate {
   javadoc {
-    title "${project.description} ${version}"
+    title = "${project.description} ${version}"
 
     (options as StandardJavadocDocletOptions).with {
       encoding 'UTF-8'
@@ -44,6 +44,6 @@ afterEvaluate {
       addStringOption('-show-module-contents', 'api')
     }
 
-    failOnError false
+    failOnError = false
   }
 }
