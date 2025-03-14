@@ -42,13 +42,15 @@ public final class PackInputStream implements Closeable
   {
     var header = new byte[PACK_HEADER.length];
     if (stream.read(header) != header.length || !Arrays.equals(header, PACK_HEADER))
-      throw new IOException("pack stream has wrong header; possibly not a message pack");
+      throw new IOException("pack stream has wrong header; possibly not a message format pack");
 
     var zv = stream.read();
     if ((zv & 0b01011011) != 0b01011011)
       throw new IOException("pack stream has wrong compression marker");
 
     version = stream.read() & 0xff;
+    if (version == 0 || version == 255)
+      throw new IOException("pack stream has unsupported version");
 
     this.stream = (zv & 0b1000_0000) != 0 ? new GZIPInputStream(stream) : stream;
   }
