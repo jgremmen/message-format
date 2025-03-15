@@ -176,7 +176,7 @@ final class MessageParameters implements Parameters
 
 
     @Override
-    public boolean removeIf(Predicate<? super String> filter) {
+    public boolean removeIf(@NotNull Predicate<? super String> filter) {
       throw new UnsupportedOperationException("removeIf");
     }
 
