@@ -110,13 +110,18 @@ public final class TextPartFactory
   @Contract(value = "_, false, false -> param1", pure = true)
   public static @NotNull Text addSpaces(@NotNull Text text, boolean addSpaceBefore, boolean addSpaceAfter)
   {
-    var textSpaceBefore = text.isSpaceBefore();
-    var textSpaceAfter = text.isSpaceAfter();
+    if (addSpaceBefore || addSpaceAfter)
+    {
+      var textSpaceBefore = text.isSpaceBefore();
+      var textSpaceAfter = text.isSpaceAfter();
 
-    addSpaceBefore |= textSpaceBefore;
-    addSpaceAfter |= textSpaceAfter;
+      addSpaceBefore |= textSpaceBefore;
+      addSpaceAfter |= textSpaceAfter;
 
-    return addSpaceBefore == textSpaceBefore && addSpaceAfter == textSpaceAfter
-        ? text : new TextPart(text.getText(), addSpaceBefore, addSpaceAfter);
+      if (addSpaceBefore != textSpaceBefore || addSpaceAfter != textSpaceAfter)
+        return new TextPart(text.getText(), addSpaceBefore, addSpaceAfter);
+    }
+
+    return text;
   }
 }
