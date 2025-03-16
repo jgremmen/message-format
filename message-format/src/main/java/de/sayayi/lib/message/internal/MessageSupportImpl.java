@@ -501,15 +501,13 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    @UnmodifiableView
-    public @NotNull Set<String> getMessageCodes() {
+    public @NotNull @UnmodifiableView Set<String> getMessageCodes() {
       return unmodifiableSet(messages.keySet());
     }
 
 
     @Override
-    @UnmodifiableView
-    public @NotNull Set<String> getTemplateNames() {
+    public @NotNull @UnmodifiableView Set<String> getTemplateNames() {
       return unmodifiableSet(templates.keySet());
     }
 

@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
 public interface MessagePart extends SpacesAware
 {
   /**
-   * Message part containing text only, optionally decorated with leading/trailing space.
+   * Message part representing text only, optionally decorated with leading/trailing space.
    */
   interface Text extends MessagePart
   {
@@ -77,7 +77,7 @@ public interface MessagePart extends SpacesAware
 
 
   /**
-   * Message part containing a parameter to be evaluated during formatting.
+   * Message part representing a parameter to be evaluated during formatting.
    */
   interface Parameter extends MessagePart
   {
@@ -124,7 +124,7 @@ public interface MessagePart extends SpacesAware
 
 
   /**
-   * Message part containing a template reference to be evaluated during formatting.
+   * Message part representing a template reference to be evaluated during formatting.
    *
    * @see MessageAccessor#getTemplateByName(String)
    *

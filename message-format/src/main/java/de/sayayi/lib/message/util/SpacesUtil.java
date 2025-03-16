@@ -22,7 +22,7 @@ import static java.lang.Character.*;
 
 
 /**
- * This class contains various methods regarding spaces in strings.
+ * This class contains various methods related to spaces in strings.
  *
  * @author Jeroen Gremmen
  * @since 0.6.4
