@@ -22,7 +22,6 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
-import java.util.OptionalLong;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -48,12 +47,6 @@ public final class StreamFormatter extends AbstractListFormatter<Stream<?>>
         .map(object -> noSpaceText(valueMessage.format(messageAccessor, parameters.setValue(object))))
         .filter(t -> !t.isEmpty())
         .iterator();
-  }
-
-
-  @Override
-  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object stream) {
-    return OptionalLong.of(((Stream<?>)stream).count());
   }
 
 

@@ -20,6 +20,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.part.NoSpaceTextPart;
 import de.sayayi.lib.message.part.MessagePart.Text;
@@ -44,7 +45,7 @@ import static java.util.Collections.emptyIterator;
 /**
  * @author Jeroen Gremmen
  */
-public final class MapFormatter extends AbstractListFormatter<Map<?,?>>
+public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implements SizeQueryable
 {
   private static final Message.WithSpaces DEFAULT_KEY_VALUE_MESSAGE;
 

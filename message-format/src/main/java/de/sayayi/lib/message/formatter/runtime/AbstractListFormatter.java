@@ -19,7 +19,6 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
-import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextJoiner;
@@ -56,8 +55,7 @@ import static java.lang.Integer.MAX_VALUE;
  * @author Jeroen Gremmen
  * @since 0.12.0
  */
-public abstract class AbstractListFormatter<T> extends AbstractParameterFormatter<T>
-    implements SizeQueryable, ConfigKeyComparator<T>
+public abstract class AbstractListFormatter<T> extends AbstractParameterFormatter<T> implements ConfigKeyComparator<T>
 {
   // default list-value: %{value}
   protected static final Message.WithSpaces DEFAULT_VALUE_MESSAGE =

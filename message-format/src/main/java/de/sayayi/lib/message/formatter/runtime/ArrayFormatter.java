@@ -19,6 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
+import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.formatter.SingletonParameters;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
@@ -60,7 +61,7 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.for
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class ArrayFormatter extends AbstractListFormatter<Object>
+public final class ArrayFormatter extends AbstractListFormatter<Object> implements SizeQueryable
 {
   @Override
   protected @NotNull Iterator<Text> createIterator(@NotNull FormatterContext context, @NotNull Object value) {
