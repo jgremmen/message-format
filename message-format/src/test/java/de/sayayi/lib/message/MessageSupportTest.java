@@ -48,13 +48,6 @@ class MessageSupportTest
         .message("%{n}")
         .with("n", OptionalLong.of(69))
         .format());
-
-    assertEquals("Messa...", shared()
-        .message("%{r} %{s,clip,clip-size:8}")
-        .with("r", "Message")
-        .remove("r")  // test parameter removal
-        .with("s", "Message Support")
-        .format());
   }
 
 

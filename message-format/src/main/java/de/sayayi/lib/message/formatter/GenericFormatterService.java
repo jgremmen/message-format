@@ -20,6 +20,7 @@ import de.sayayi.lib.message.formatter.named.StringFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +28,7 @@ import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT;
 import static java.util.Arrays.copyOf;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 
 
@@ -45,6 +47,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
   private final @NotNull Map<String,NamedParameterFormatter> namedFormatters = new ConcurrentHashMap<>();
   private final @NotNull Map<Class<?>,List<PrioritizedFormatter>> typeFormatters = new ConcurrentHashMap<>();
+  private final @NotNull Map<String,PostFormatter> postFormatters = new HashMap<>();
   private final @NotNull FormatterCache formatterCache;
 
 
@@ -138,6 +141,15 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   @Override
+  public void addPostFormatter(@NotNull PostFormatter postFormatter)
+  {
+    postFormatters.put(
+        requireNonNull(postFormatter.getParameterName()),
+        requireNonNull(postFormatter, "post-formatter must not be null"));
+  }
+
+
+  @Override
   public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type)
   {
     requireNonNull(type, "type must not be null");
@@ -202,6 +214,12 @@ public class GenericFormatterService implements FormatterService.WithRegistry
         collectedTypes.add(interfaceType);
         addInterfaceTypes(interfaceType, collectedTypes);
       }
+  }
+
+
+  @Override
+  public @NotNull @UnmodifiableView Map<String,PostFormatter> getPostFormatters() {
+    return unmodifiableMap(postFormatters);
   }
 
 

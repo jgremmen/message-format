@@ -18,6 +18,9 @@ package de.sayayi.lib.message.formatter;
 import de.sayayi.lib.message.formatter.named.StringFormatter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
+
+import java.util.Map;
 
 
 /**
@@ -26,7 +29,6 @@ import org.jetbrains.annotations.NotNull;
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
-@FunctionalInterface
 public interface FormatterService
 {
   /**
@@ -45,6 +47,13 @@ public interface FormatterService
    */
   @Contract(value = "_, _ -> new", pure = true)
   @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type);
+
+
+  /**
+   * @since 0.20.0
+   */
+  @Contract(pure = true)
+  @NotNull @UnmodifiableView Map<String,PostFormatter> getPostFormatters();
 
 
 
@@ -82,5 +91,11 @@ public interface FormatterService
      */
     @Contract(mutates = "this")
     void addFormatter(@NotNull ParameterFormatter formatter);
+
+
+    /**
+     * @since 0.20.0
+     */
+    void addPostFormatter(@NotNull PostFormatter postFormatter);
   }
 }

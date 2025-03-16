@@ -79,18 +79,33 @@ public class DefaultFormatterService extends GenericFormatterService
    * Adds the default formatters for this service.
    */
   @SuppressWarnings("WeakerAccess")
-  protected void addDefaultFormatters() {
-    addFormattersFromService();
+  protected void addDefaultFormatters()
+  {
+    addParameterFormattersFromService();
+    addPostFormattersFromService();
   }
 
 
   /**
    * Adds all parameter formatters on the classpath which are defined as a service.
    */
-  protected void addFormattersFromService()
+  protected void addParameterFormattersFromService()
   {
     ServiceLoader
         .load(ParameterFormatter.class, classLoader)
         .forEach(this::addFormatter);
+  }
+
+
+  /**
+   * Adds all post-formatters on the classpath which are defined as a service.
+   *
+   * @since 0.20.0
+   */
+  protected void addPostFormattersFromService()
+  {
+    ServiceLoader
+        .load(PostFormatter.class, classLoader)
+        .forEach(this::addPostFormatter);
   }
 }

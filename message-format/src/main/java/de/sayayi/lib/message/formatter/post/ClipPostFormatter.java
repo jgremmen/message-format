@@ -13,44 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.formatter.named;
+package de.sayayi.lib.message.formatter.post;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.PostFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
-import static java.lang.Math.max;
 
 
 /**
  * @author Jeroen Gremmen
- * @since 0.8.0
+ * @since 0.20.0
  */
-public final class ClipFormatter extends AbstractParameterFormatter<Object> implements NamedParameterFormatter
+public final class ClipPostFormatter implements PostFormatter
 {
   @Override
-  public @NotNull String getName() {
+  public @NotNull String getParameterName() {
     return "clip";
   }
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull Text postFormat(@NotNull FormatterContext context, @NotNull Text text)
   {
-    var text = context.format(value);
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    var maxSize = (int)context.getConfigValueNumber("clip").getAsLong();
 
-    var s = text.getText();
-    if (s == null)
-      return nullText();
+    if (maxSize > 0)
+    {
+      var ellipsis = (boolean)context.getConfigValueBool("clip-ellipsis").orElse(true);
+      if (ellipsis && maxSize < 7)
+        maxSize = 7;
 
-    s = s.trim();
+      var s = text.getText();
+      if (s.length() > maxSize)
+      {
+        return noSpaceText(ellipsis
+            ? s.substring(0, maxSize - 3).trim() + "..."
+            : s.substring(0, maxSize));
+      }
+    }
 
-    var maxSize = (int)max(context.getConfigValueNumber("clip-size").orElse(64), 8);
-
-    return s.length() <= maxSize ? text : noSpaceText(s.substring(0, maxSize - 3).trim() + "...");
+    return text;
   }
 }

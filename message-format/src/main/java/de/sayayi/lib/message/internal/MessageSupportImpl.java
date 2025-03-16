@@ -22,6 +22,7 @@ import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
+import de.sayayi.lib.message.formatter.PostFormatter;
 import de.sayayi.lib.message.internal.pack.PackHelper;
 import de.sayayi.lib.message.internal.pack.PackInputStream;
 import de.sayayi.lib.message.internal.pack.PackOutputStream;
@@ -546,6 +547,12 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type) {
       return formatterService.getFormatters(format, type);
+    }
+
+
+    @Override
+    public @NotNull @UnmodifiableView Map<String,PostFormatter> getPostFormatters() {
+      return formatterService.getPostFormatters();
     }
 
 

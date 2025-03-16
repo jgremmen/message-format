@@ -21,8 +21,10 @@ import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.formatter.PostFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -30,6 +32,7 @@ import java.util.*;
 import static de.sayayi.lib.message.formatter.ParameterFormatter.NULL_TYPE;
 import static de.sayayi.lib.message.part.MessagePart.Text.NULL;
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
+import static java.util.Comparator.comparing;
 import static java.util.Optional.ofNullable;
 
 
@@ -107,7 +110,7 @@ public final class ParameterFormatterContext extends AbstractParameterConfigAcce
     if (parameterFormatterIndex == parameterFormatters.length)
       throw new NoSuchElementException();
 
-    return parameterFormatters[parameterFormatterIndex++].format(this, value);
+    return postFormat(parameterFormatters[parameterFormatterIndex++].format(this, value));
   }
 
 
@@ -136,6 +139,40 @@ public final class ParameterFormatterContext extends AbstractParameterConfigAcce
             message.formatAsText(messageAccessor, parameters),
             message.isSpaceBefore(),
             message.isSpaceAfter());
+  }
+
+
+  @Contract(pure = true)
+  private @NotNull Text postFormat(@NotNull Text text)
+  {
+    final Map<String,PostFormatter> postFormatters;
+
+    if (!text.isEmpty() && !(postFormatters = messageAccessor.getPostFormatters()).isEmpty())
+    {
+      var matchingPostFormatters = new ArrayList<PostFormatter>();
+      PostFormatter postFormatter;
+
+      for(var parameterName: parameterConfig.getConfigNames())
+        if ((postFormatter = postFormatters.get(parameterName)) != null)
+          matchingPostFormatters.add(postFormatter);
+
+      var matchCount = matchingPostFormatters.size();
+      if (matchCount != 0)
+      {
+        if (matchCount > 1)
+          matchingPostFormatters.sort(comparing(PostFormatter::getOrder));
+
+        var modifiedText = text;
+
+        for(var mpf: matchingPostFormatters)
+          if ((modifiedText = mpf.postFormat(this, modifiedText)).isEmpty())
+            break;
+
+        text = addSpaces(modifiedText, text.isSpaceBefore(), text.isSpaceAfter());
+      }
+    }
+
+    return text;
   }
 
 

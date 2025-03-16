@@ -40,7 +40,6 @@ import java.util.*;
 
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.MISMATCH;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
-import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 
 
@@ -141,10 +140,16 @@ public final class ParameterConfig
   }
 
 
+  /**
+   * Returns a set of config names defined in the parameter configuration map.
+   *
+   * @return  unmodifiable set of config names, never {@code null}
+   *
+   * @since 0.20.0
+   */
   @Contract(pure = true)
-  @Unmodifiable
-  public @NotNull Map<String,ConfigValue> getConfig() {
-    return unmodifiableMap(config);
+  public @NotNull @Unmodifiable Set<String> getConfigNames() {
+    return unmodifiableSet(config.keySet());
   }
 
 

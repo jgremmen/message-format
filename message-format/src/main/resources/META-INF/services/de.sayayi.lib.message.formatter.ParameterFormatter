@@ -1,6 +1,5 @@
 de.sayayi.lib.message.formatter.named.BoolFormatter
 de.sayayi.lib.message.formatter.named.ChoiceFormatter
-de.sayayi.lib.message.formatter.named.ClipFormatter
 de.sayayi.lib.message.formatter.named.SizeFormatter
 de.sayayi.lib.message.formatter.named.StringFormatter
 de.sayayi.lib.message.formatter.runtime.ArrayFormatter
