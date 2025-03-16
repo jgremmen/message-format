@@ -33,6 +33,7 @@ import java.util.Set;
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_ORDER;
 import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static java.nio.file.Files.isRegularFile;
+import static java.nio.file.Files.probeContentType;
 import static java.util.OptionalLong.empty;
 
 
@@ -53,9 +54,11 @@ public final class PathFormatter extends AbstractMultiSelectFormatter<Object> im
     register("parent", (context,value) -> toText(toPath(value).getParent()));
     register("root", (context,value) -> toText(toPath(value).getRoot()));
     register(new String[] { "ext", "extension" }, (context,value) -> formatPathExtension(context, toPath(value)));
+    register("mimetype", ((context, value) -> formatPathMimeType(toPath(value))));
   }
 
 
+  @Contract(pure = true)
   private @NotNull Text formatPathRealPath(@NotNull Path path)
   {
     try {
@@ -67,11 +70,13 @@ public final class PathFormatter extends AbstractMultiSelectFormatter<Object> im
   }
 
 
+  @Contract(pure = true)
   private @NotNull Text formatPathAbsolutePath(@NotNull Path path) {
     return toText(path.toAbsolutePath());
   }
 
 
+  @Contract(pure = true)
   private @NotNull Text formatPathExtension(@NotNull FormatterContext context, @NotNull Path path)
   {
     path = path.getFileName();
@@ -86,6 +91,21 @@ public final class PathFormatter extends AbstractMultiSelectFormatter<Object> im
     var extension = name.substring(dotIndex + 1);
 
     return formatUsingMappedString(context, extension, true).orElseGet(() -> noSpaceText(extension));
+  }
+
+
+  @Contract(pure = true)
+  private @NotNull Text formatPathMimeType(@NotNull Path path)
+  {
+    if (isRegularFile(path))
+    {
+      try {
+        return noSpaceText(probeContentType(path));
+      } catch(IOException ignored) {
+      }
+    }
+
+    return nullText();
   }
 
 
