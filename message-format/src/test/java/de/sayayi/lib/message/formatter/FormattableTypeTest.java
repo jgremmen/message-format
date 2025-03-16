@@ -21,8 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_ORDER;
-import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_PRIMITIVE_OR_ARRAY_ORDER;
+import static de.sayayi.lib.message.formatter.FormattableType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -45,6 +44,7 @@ class FormattableTypeTest
     assertThrows(IllegalArgumentException.class, () -> new FormattableType(Object.class, 64));
 
     assertEquals(127, new FormattableType(Object.class).getOrder());
+    assertEquals(127, DEFAULT.getOrder());
     assertEquals(DEFAULT_PRIMITIVE_OR_ARRAY_ORDER, new FormattableType(long.class).getOrder());
     assertEquals(DEFAULT_ORDER, new FormattableType(Map.class).getOrder());
   }

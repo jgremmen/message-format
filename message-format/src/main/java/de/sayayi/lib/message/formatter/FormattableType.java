@@ -43,6 +43,12 @@ import static java.util.Objects.requireNonNull;
 public final class FormattableType implements Comparable<FormattableType>, Serializable
 {
   /**
+   * Default formattable type matching every Object.
+   */
+  public static final FormattableType DEFAULT = new FormattableType(Object.class);
+
+
+  /**
    * Default order value. If a formattable type has no explicit order, this default value will be
    * used instead.
    *

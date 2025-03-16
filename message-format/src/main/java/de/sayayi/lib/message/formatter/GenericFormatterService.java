@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
+import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT;
 import static java.util.Arrays.copyOf;
 import static java.util.Objects.requireNonNull;
 
@@ -92,7 +93,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   {
     formatterCache = new FormatterCache(formatterCacheSize);
 
-    addFormatterForType(new FormattableType(Object.class), new StringFormatter());
+    addFormatterForType(DEFAULT, new StringFormatter());
   }
 
 
