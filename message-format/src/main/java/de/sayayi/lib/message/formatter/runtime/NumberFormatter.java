@@ -52,8 +52,7 @@ public final class NumberFormatter
     extends AbstractParameterFormatter<Number>
     implements ConfigKeyComparator<Number>
 {
-  private static final Map<Locale,DecimalFormatSymbols> FORMAT_SYMBOLS_CACHE =
-      new ConcurrentHashMap<>();
+  private static final Map<Locale,DecimalFormatSymbols> FORMAT_SYMBOLS_CACHE = new ConcurrentHashMap<>();
 
 
   @Override

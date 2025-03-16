@@ -25,7 +25,6 @@ import java.util.Set;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-@SuppressWarnings("WeakerAccess")
 public abstract class AbstractSingleTypeParameterFormatter<T> extends AbstractParameterFormatter<T>
 {
   @Override

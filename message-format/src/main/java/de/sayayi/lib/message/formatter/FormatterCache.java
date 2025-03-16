@@ -69,7 +69,7 @@ final class FormatterCache
       var node = (Node)typeFormatters[idx * 2 + 1];
 
       // move to head?
-      // start moving if we're at 75% of the total capacity and the node is located in the lower 25%
+      // start moving if we've reached 75% of the total capacity and the node is located in the lower 25%
       if (node != head && typeCount >= capacity * 3 / 4 && node.countNext < typeCount / 4)
         moveNodeToHead(node);
 
