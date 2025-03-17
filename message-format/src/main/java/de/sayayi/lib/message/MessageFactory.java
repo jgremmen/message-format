@@ -231,11 +231,9 @@ public class MessageFactory
 
     if (message instanceof MessageDelegateWithCode)
       message = ((MessageDelegateWithCode)message).getMessage();
-    else if (message instanceof LocalizedMessageBundleWithCode)
-    {
-      return new LocalizedMessageBundleWithCode(code,
-          ((LocalizedMessageBundleWithCode)message).getLocalizedMessages());
-    }
+
+    if (message instanceof Message.LocaleAware)
+      return new LocalizedMessageBundleWithCode(code, ((Message.LocaleAware)message).getLocalizedMessages());
     else if (message instanceof EmptyMessage || message instanceof EmptyMessageWithCode)
       return new EmptyMessageWithCode(code);
 
