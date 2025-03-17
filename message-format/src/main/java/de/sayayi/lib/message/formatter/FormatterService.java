@@ -53,7 +53,7 @@ public interface FormatterService
    * @since 0.20.0
    */
   @Contract(pure = true)
-  @NotNull @UnmodifiableView Map<String,PostFormatter> getPostFormatters();
+  @NotNull @UnmodifiableView Map<String,ParameterPostFormatter> getParameterPostFormatters();
 
 
 
@@ -96,6 +96,6 @@ public interface FormatterService
     /**
      * @since 0.20.0
      */
-    void addPostFormatter(@NotNull PostFormatter postFormatter);
+    void addParameterPostFormatter(@NotNull ParameterPostFormatter parameterPostFormatter);
   }
 }

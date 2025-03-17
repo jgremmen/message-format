@@ -47,7 +47,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
   private final @NotNull Map<String,NamedParameterFormatter> namedFormatters = new ConcurrentHashMap<>();
   private final @NotNull Map<Class<?>,List<PrioritizedFormatter>> typeFormatters = new ConcurrentHashMap<>();
-  private final @NotNull Map<String,PostFormatter> postFormatters = new HashMap<>();
+  private final @NotNull Map<String,ParameterPostFormatter> parameterPostFormatters = new HashMap<>();
   private final @NotNull FormatterCache formatterCache;
 
 
@@ -141,11 +141,11 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   @Override
-  public void addPostFormatter(@NotNull PostFormatter postFormatter)
+  public void addParameterPostFormatter(@NotNull ParameterPostFormatter parameterPostFormatter)
   {
-    postFormatters.put(
-        requireNonNull(postFormatter.getParameterName()),
-        requireNonNull(postFormatter, "post-formatter must not be null"));
+    parameterPostFormatters.put(
+        requireNonNull(parameterPostFormatter.getParameterName()),
+        requireNonNull(parameterPostFormatter, "parameterPostFormatter must not be null"));
   }
 
 
@@ -218,8 +218,8 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   @Override
-  public @NotNull @UnmodifiableView Map<String,PostFormatter> getPostFormatters() {
-    return unmodifiableMap(postFormatters);
+  public @NotNull @UnmodifiableView Map<String, ParameterPostFormatter> getParameterPostFormatters() {
+    return unmodifiableMap(parameterPostFormatters);
   }
 
 

@@ -21,7 +21,7 @@ import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
-import de.sayayi.lib.message.formatter.PostFormatter;
+import de.sayayi.lib.message.formatter.ParameterPostFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import org.jetbrains.annotations.Contract;
@@ -145,22 +145,22 @@ public final class ParameterFormatterContext extends AbstractParameterConfigAcce
   @Contract(pure = true)
   private @NotNull Text postFormat(@NotNull Text text)
   {
-    final Map<String,PostFormatter> postFormatters;
+    final Map<String,ParameterPostFormatter> parameterPostFormatters;
 
-    if (!text.isEmpty() && !(postFormatters = messageAccessor.getPostFormatters()).isEmpty())
+    if (!text.isEmpty() && !(parameterPostFormatters = messageAccessor.getParameterPostFormatters()).isEmpty())
     {
-      var matchingPostFormatters = new ArrayList<PostFormatter>();
-      PostFormatter postFormatter;
+      var matchingPostFormatters = new ArrayList<ParameterPostFormatter>();
+      ParameterPostFormatter parameterPostFormatter;
 
       for(var parameterName: parameterConfig.getConfigNames())
-        if ((postFormatter = postFormatters.get(parameterName)) != null)
-          matchingPostFormatters.add(postFormatter);
+        if ((parameterPostFormatter = parameterPostFormatters.get(parameterName)) != null)
+          matchingPostFormatters.add(parameterPostFormatter);
 
       var matchCount = matchingPostFormatters.size();
       if (matchCount != 0)
       {
         if (matchCount > 1)
-          matchingPostFormatters.sort(comparing(PostFormatter::getOrder));
+          matchingPostFormatters.sort(comparing(ParameterPostFormatter::getOrder));
 
         var modifiedText = text;
 

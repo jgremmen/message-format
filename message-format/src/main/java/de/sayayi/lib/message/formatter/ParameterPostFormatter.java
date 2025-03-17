@@ -21,12 +21,12 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
- * A post formatter takes care of modifying the result of a formatted parameter value.
+ * A parameter post formatter takes care of modifying the result of a formatted parameter value.
  *
  * @author Jeroen Gremmen
  * @since 0.20.0
  */
-public interface PostFormatter
+public interface ParameterPostFormatter
 {
   @Contract(pure = true)
   @NotNull String getParameterName();

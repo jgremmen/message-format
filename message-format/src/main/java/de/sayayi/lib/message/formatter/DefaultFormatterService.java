@@ -82,7 +82,7 @@ public class DefaultFormatterService extends GenericFormatterService
   protected void addDefaultFormatters()
   {
     addParameterFormattersFromService();
-    addPostFormattersFromService();
+    addParameterPostFormattersFromService();
   }
 
 
@@ -102,10 +102,10 @@ public class DefaultFormatterService extends GenericFormatterService
    *
    * @since 0.20.0
    */
-  protected void addPostFormattersFromService()
+  protected void addParameterPostFormattersFromService()
   {
     ServiceLoader
-        .load(PostFormatter.class, classLoader)
-        .forEach(this::addPostFormatter);
+        .load(ParameterPostFormatter.class, classLoader)
+        .forEach(this::addParameterPostFormatter);
   }
 }

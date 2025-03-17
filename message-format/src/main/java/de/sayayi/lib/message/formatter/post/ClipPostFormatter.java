@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.formatter.post;
 
 import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.formatter.PostFormatter;
+import de.sayayi.lib.message.formatter.ParameterPostFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +27,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * @author Jeroen Gremmen
  * @since 0.20.0
  */
-public final class ClipPostFormatter implements PostFormatter
+public final class ClipPostFormatter implements ParameterPostFormatter
 {
   @Override
   public @NotNull String getParameterName() {

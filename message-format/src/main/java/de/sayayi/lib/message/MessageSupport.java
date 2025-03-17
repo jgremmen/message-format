@@ -18,7 +18,7 @@ package de.sayayi.lib.message;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
-import de.sayayi.lib.message.formatter.PostFormatter;
+import de.sayayi.lib.message.formatter.ParameterPostFormatter;
 import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
@@ -800,7 +800,7 @@ public interface MessageSupport
      * @since 0.20.0
      */
     @Contract(pure = true)
-    @NotNull @UnmodifiableView Map<String,PostFormatter> getPostFormatters();
+    @NotNull @UnmodifiableView Map<String,ParameterPostFormatter> getParameterPostFormatters();
 
 
     /**
