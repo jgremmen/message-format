@@ -1,8 +1,11 @@
 package de.sayayi.lib.message.internal.pack;
 
+import de.sayayi.lib.message.MessageSupport;
+import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.adopter.PropertiesAdopter;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -39,6 +42,28 @@ class PackCompatibilityTest
   private static final MimeType MIME_TYPE = new MimeType("application", "x-message-format-pack");
 
 
+  private static MessageSupport MESSAGE_SUPPORT;
+
+
+  @BeforeAll
+  static void init() throws IOException
+  {
+    MESSAGE_SUPPORT = MessageSupportFactory.create(new DefaultFormatterService(), NO_CACHE_INSTANCE);
+
+    var properties = new Properties();
+    var adopter = new PropertiesAdopter((ConfigurableMessageSupport)MESSAGE_SUPPORT);
+
+    properties.load(
+        new InputStreamReader(newInputStream(Path.of("src/test/resources/template.properties")), ISO_8859_1));
+    adopter.adoptTemplates(properties);
+
+    properties.clear();
+    properties.load(
+        new InputStreamReader(newInputStream(Path.of("src/test/resources/message.properties")), ISO_8859_1));
+    adopter.adopt(properties);
+  }
+
+
   private static Stream<Arguments> versionParameters()
   {
     return Stream.of(
@@ -66,27 +91,34 @@ class PackCompatibilityTest
     cms.importMessages(newInputStream(messagePackPath));
 
     var messageAccessor = cms.getMessageAccessor();
+    var expectedMessageAccessor = MESSAGE_SUPPORT.getMessageAccessor();
 
     assertEquals(messageCount, messageAccessor.getMessageCodes().size());
     assertEquals(templateCount, messageAccessor.getTemplateNames().size());
+
+    // check templates
+    for(var templateName: messageAccessor.getTemplateNames())
+    {
+      assertEquals(
+          expectedMessageAccessor.getTemplateByName(templateName),
+          messageAccessor.getTemplateByName(templateName),
+          "Template mismatch for '" + templateName + "'");
+    }
+
+    // check messages
+    for(var messageCode: messageAccessor.getMessageCodes())
+    {
+      assertEquals(
+          expectedMessageAccessor.getMessageByCode(messageCode),
+          messageAccessor.getMessageByCode(messageCode),
+          "Message mismatch for '" + messageCode + "'");
+    }
   }
 
 
   public static void main(String[] args) throws IOException
   {
-    var cms = MessageSupportFactory.create(new DefaultFormatterService(), NO_CACHE_INSTANCE);
-    var properties = new Properties();
-    var adopter =  new PropertiesAdopter(cms);
-
-    properties.load(
-        new InputStreamReader(newInputStream(Path.of("src/test/resources/template.properties")), ISO_8859_1));
-    adopter.adoptTemplates(properties);
-
-    properties.clear();
-    properties.load(
-        new InputStreamReader(newInputStream(Path.of("src/test/resources/message.properties")), ISO_8859_1));
-    adopter.adopt(properties);
-
-    cms.exportMessages(newOutputStream(Path.of(args[0])));
+    init();
+    MESSAGE_SUPPORT.exportMessages(newOutputStream(Path.of(args[0])));
   }
 }
