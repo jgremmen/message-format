@@ -17,6 +17,11 @@
 description = 'Message Format Library Projects'
 
 
+wrapper {
+  distributionType = Wrapper.DistributionType.ALL
+}
+
+
 allprojects {
   layout.buildDirectory = '.build'
 
