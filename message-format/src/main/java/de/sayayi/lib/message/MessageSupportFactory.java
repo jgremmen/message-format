@@ -94,6 +94,7 @@ public final class MessageSupportFactory
    * {@code messageSupport}, so changes to the configurable message support always reflect in the returned instance.
    *
    * @param messageSupport  message support to seal, not {@code null}
+   *
    * @return  sealed message support, never {@code null}
    *
    * @since 0.11.1

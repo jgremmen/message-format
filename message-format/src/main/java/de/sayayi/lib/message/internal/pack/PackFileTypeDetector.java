@@ -9,6 +9,8 @@ import static java.nio.file.Files.newInputStream;
 
 
 /**
+ * File type detector for message format packs.
+ *
  * @author Jeroen Gremmen
  * @since 0.12.1
  */
