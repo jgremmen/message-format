@@ -26,10 +26,7 @@ import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import static de.sayayi.lib.message.part.normalizer.MessagePartNormalizer.PASS_THROUGH;
 import static java.util.Locale.ROOT;
@@ -170,7 +167,7 @@ public class MessageFactory
    * @throws MessageParserException  in case the template could not be parsed
    */
   @Contract(value = "_ -> new", pure = true)
-  public @NotNull Message parseTemplate(@NotNull @Language("MessageFormat") String text) {
+  public @NotNull Message.WithSpaces parseTemplate(@NotNull @Language("MessageFormat") String text) {
     return messageCompiler.compileTemplate(text);
   }
 
@@ -184,7 +181,7 @@ public class MessageFactory
         return EmptyMessage.INSTANCE;
 
       case 1: {
-        var entry = localizedTexts.entrySet().iterator().next();
+        final var entry = localizedTexts.entrySet().iterator().next();
 
         try {
           return parseTemplate(entry.getValue());
@@ -194,7 +191,7 @@ public class MessageFactory
       }
 
       default: {
-        var localizedMessages = new HashMap<Locale,Message>();
+        final var localizedMessages = new HashMap<Locale,Message>();
 
         localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) -> {
           try {
@@ -223,13 +220,14 @@ public class MessageFactory
   {
     if (requireNonNull(message, "message must not be null") instanceof Message.WithCode)
     {
-      var messageWithCode = (Message.WithCode)message;
+      final var messageWithCode = (Message.WithCode)message;
 
       if (code.equals(messageWithCode.getCode()))
         return messageWithCode;
     }
 
-    if (message instanceof MessageDelegateWithCode)
+    // unwrap message
+    while(message instanceof MessageDelegateWithCode)
       message = ((MessageDelegateWithCode)message).getMessage();
 
     if (message instanceof Message.LocaleAware)
@@ -238,29 +236,6 @@ public class MessageFactory
       return new EmptyMessageWithCode(code);
 
     return new MessageDelegateWithCode(code, message);
-  }
-
-
-  /**
-   * Strips code from the given {@code message}. If the code could not be stripped, the same message instance is
-   * returned.
-   *
-   * @param message  message, not {@code null}
-   *
-   * @return  message without code, if possible, never {@code null}
-   *
-   * @since 0.20.0
-   */
-  @Contract(pure = true)
-  public @NotNull Message withoutCode(@NotNull Message message)
-  {
-    if (message instanceof EmptyMessageWithCode)
-      return EmptyMessage.INSTANCE;
-
-    if (message instanceof MessageDelegateWithCode)
-      return withoutCode(((MessageDelegateWithCode)message).getMessage());
-
-    return message;
   }
 
 
@@ -293,5 +268,67 @@ public class MessageFactory
   @Contract(pure = true)
   public static boolean isGeneratedCode(String code) {
     return code != null && code.matches("(MSG|TPL)\\[[0-9A-Z-]+]");
+  }
+
+
+  /**
+   * Checks whether messages {@code m1} and {@code m2} are the same. Messages are
+   * considered "the same" when the message parts of both messages are identical.
+   * <p>
+   * {@link Message.LocaleAware LocaleAware} messages are "the same" when both locale and associated
+   * message are identical for all locales provided by this message.
+   * <p>
+   * Identical messages with different codes ({@link Message.WithCode WithCode}) are still considered the
+   * same as only the message part is compared.
+   *
+   * @param m1  message 1 to compare, not {@code null}
+   * @param m2  message 2 to compare, not {@code null}
+   *
+   * @return  {@code true} if both messages are identical, {@code false} otherwise
+   *
+   * @see Message#isSame(Message)
+   *
+   * @since 0.20.0
+   */
+  @Contract(pure = true)
+  public static boolean isSame(@NotNull Message m1, @NotNull Message m2)
+  {
+    // unwrap m1
+    while(m1 instanceof MessageDelegateWithCode)
+      m1 = ((MessageDelegateWithCode)m1).getMessage();
+
+    // unwrap m2
+    while(m2 instanceof MessageDelegateWithCode)
+      m2 = ((MessageDelegateWithCode)m2).getMessage();
+
+    if (m1 == m2)
+      return true;
+
+    final var la1 = m1 instanceof Message.LocaleAware;
+    final var la2 = m2 instanceof Message.LocaleAware;
+
+    return la1 && la2
+        ? isSame((Message.LocaleAware)m1, (Message.LocaleAware)m2)
+        : !la1 && !la2 && Arrays.equals(m1.getMessageParts(), m2.getMessageParts());
+  }
+
+
+  @Contract(pure = true)
+  private static boolean isSame(@NotNull Message.LocaleAware m1, @NotNull Message.LocaleAware m2)
+  {
+    if (m1 != m2)
+    {
+      final var lm1 = m1.getLocalizedMessages();
+      final var lm2 = m2.getLocalizedMessages();
+
+      if (!lm1.keySet().equals(lm2.keySet()))
+        return false;
+
+      for(var entry: lm1.entrySet())
+        if (!entry.getValue().isSame(lm2.get(entry.getKey())))
+          return false;
+    }
+
+    return true;
   }
 }

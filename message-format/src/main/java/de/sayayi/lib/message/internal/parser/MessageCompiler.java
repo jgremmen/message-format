@@ -18,6 +18,7 @@ package de.sayayi.lib.message.internal.parser;
 import de.sayayi.lib.antlr4.AbstractAntlr4Parser;
 import de.sayayi.lib.antlr4.AbstractVocabulary;
 import de.sayayi.lib.antlr4.syntax.GenericSyntaxErrorFormatter;
+import de.sayayi.lib.antlr4.syntax.SyntaxErrorFormatter;
 import de.sayayi.lib.antlr4.walker.Walker;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
@@ -72,12 +73,15 @@ import static org.antlr.v4.runtime.Token.EOF;
 @SuppressWarnings("UnknownLanguage")
 public final class MessageCompiler extends AbstractAntlr4Parser
 {
+  private static final SyntaxErrorFormatter SYNTAX_ERROR_FORMATTER =
+      new GenericSyntaxErrorFormatter(1, 0, 0 ,2);
+
   private final @NotNull MessageFactory messageFactory;
 
 
   public MessageCompiler(@NotNull MessageFactory messageFactory)
   {
-    super(ErrorFormatter.INSTANCE);
+    super(SYNTAX_ERROR_FORMATTER);
 
     this.messageFactory = requireNonNull(messageFactory, "messageFactory must not be null");
   }
@@ -195,13 +199,14 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitMessage0(Message0Context ctx)
     {
-      if (ctx.children == null)
+      var children = ctx.children;
+      if (children == null || children.isEmpty())
         ctx.messageWithSpaces = EmptyMessage.INSTANCE;
       else
       {
         var parts = new ArrayList<MessagePart>();
 
-        for(var part: ctx.children)
+        for(var part: children)
         {
           if (part instanceof ParameterPartContext)
             parts.add(((ParameterPartContext)part).part);
@@ -216,12 +221,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           }
         }
 
-        var partCount = parts.size();
+        final MessagePart part0;
 
-        if (partCount == 0)
-          ctx.messageWithSpaces = EmptyMessage.INSTANCE;
-        else if (partCount == 1 && parts.get(0) instanceof TextPart)
-          ctx.messageWithSpaces = new TextMessage((TextPart)parts.get(0));
+        if (parts.size() == 1 && (part0 = parts.get(0)) instanceof TextPart)
+          ctx.messageWithSpaces = new TextMessage((TextPart)part0);
         else
         {
           parts.removeIf(this::exitMessage0_isRedundantTextPart);
@@ -237,7 +240,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       if (messagePart instanceof TextPart)
       {
         var textPart = (TextPart)messagePart;
-        return "".equals(textPart.getText()) && textPart.isSpaceAround();
+        return textPart.isEmpty() && textPart.isSpaceAround();
       }
 
       return false;
@@ -354,6 +357,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     {
       var mapElements =
           ctx.parameterConfigElement().stream().collect(PARAMETER_CONFIG_COLLECTOR);
+
       var forceQuotedMessage = ctx.forceQuotedMessage();
       if (forceQuotedMessage != null)
         mapElements.put(null, new ConfigValueMessage(forceQuotedMessage.messageWithSpaces));
@@ -449,7 +453,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       }
       else
       {
-        final ConfigMapElementContext configMapElementContext = ctx.configMapElement();
+        var configMapElementContext = ctx.configMapElement();
 
         ctx.configKeys = configMapElementContext.configKeys;
         ctx.configValue = configMapElementContext.configValue;
@@ -623,21 +627,6 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   private static <K,V> BinaryOperator<Map<K,V>> foldCombiner() {
     return (map1,map2) -> { map1.putAll(map2); return map1; };
   }
-
-
-
-
-  private static final class ErrorFormatter extends GenericSyntaxErrorFormatter
-  {
-    private static final ErrorFormatter INSTANCE = new ErrorFormatter();
-
-
-    private ErrorFormatter() {
-      super(1, 0, 0, 2);
-    }
-  }
-
-
 
 
   private static final Vocabulary VOCABULARY = new AbstractVocabulary() {

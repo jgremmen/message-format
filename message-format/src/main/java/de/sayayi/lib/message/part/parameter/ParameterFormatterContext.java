@@ -114,34 +114,6 @@ public final class ParameterFormatterContext extends AbstractParameterConfigAcce
   }
 
 
-  @Override
-  public @NotNull Text format(Object value, Class<?> type, boolean propagateFormat)
-  {
-    return new ParameterFormatterContext(messageAccessor, parameters, value, type,
-        propagateFormat ? format : null, parameterConfig).delegateToNextFormatter();
-  }
-
-
-  @Override
-  public @NotNull Text format(Object value, Class<?> type, String format)
-  {
-    return new ParameterFormatterContext(messageAccessor, parameters, value, type, format, parameterConfig)
-        .delegateToNextFormatter();
-  }
-
-
-  @Override
-  public @NotNull Text format(Message.WithSpaces message)
-  {
-    return message == null
-        ? NULL
-        : addSpaces(
-            message.formatAsText(messageAccessor, parameters),
-            message.isSpaceBefore(),
-            message.isSpaceAfter());
-  }
-
-
   @Contract(pure = true)
   private @NotNull Text postFormat(@NotNull Text text)
   {
@@ -173,6 +145,34 @@ public final class ParameterFormatterContext extends AbstractParameterConfigAcce
     }
 
     return text;
+  }
+
+
+  @Override
+  public @NotNull Text format(Object value, Class<?> type, boolean propagateFormat)
+  {
+    return new ParameterFormatterContext(messageAccessor, parameters, value, type,
+        propagateFormat ? format : null, parameterConfig).delegateToNextFormatter();
+  }
+
+
+  @Override
+  public @NotNull Text format(Object value, Class<?> type, String format)
+  {
+    return new ParameterFormatterContext(messageAccessor, parameters, value, type, format, parameterConfig)
+        .delegateToNextFormatter();
+  }
+
+
+  @Override
+  public @NotNull Text format(Message.WithSpaces message)
+  {
+    return message == null
+        ? NULL
+        : addSpaces(
+            message.formatAsText(messageAccessor, parameters),
+            message.isSpaceBefore(),
+            message.isSpaceAfter());
   }
 
 
