@@ -22,10 +22,6 @@ import de.sayayi.lib.message.internal.MessageSupportImpl;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.function.Predicate;
-
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 
 
@@ -59,7 +55,7 @@ public final class MessageSupportFactory
   {
     synchronized($LOCK) {
       if (SHARED == null)
-        SHARED = seal(create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE));
+        SHARED = create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE).seal();
 
       return SHARED;
     }
@@ -82,77 +78,5 @@ public final class MessageSupportFactory
   public static @NotNull ConfigurableMessageSupport create(@NotNull FormatterService formatterService,
                                                            @NotNull MessageFactory messageFactory) {
     return new MessageSupportImpl(formatterService, messageFactory);
-  }
-
-
-  /**
-   * Seals off a message support instance by asserting that the message support does not implement
-   * {@link ConfigurableMessageSupport} and thus is not modifiable using the returned instance.
-   * <p>
-   * If the given {@code messageSupport} does not implement {@link ConfigurableMessageSupport} then it is returned
-   * unmodified. Otherwise, a {@link MessageSupport} wrapper is returned which is backed by the given
-   * {@code messageSupport}, so changes to the configurable message support always reflect in the returned instance.
-   *
-   * @param messageSupport  message support to seal, not {@code null}
-   *
-   * @return  sealed message support, never {@code null}
-   *
-   * @since 0.11.1
-   */
-  @Contract(pure = true)
-  public static @NotNull MessageSupport seal(@NotNull MessageSupport messageSupport)
-  {
-    return messageSupport instanceof ConfigurableMessageSupport
-        ? new MessageSupportDelegate(messageSupport)
-        : messageSupport;
-  }
-
-
-
-
-  /**
-   * Message support delegator
-   *
-   * @since 0.11.1
-   */
-  private static final class MessageSupportDelegate implements MessageSupport
-  {
-    private final MessageSupport delegate;
-
-
-    private MessageSupportDelegate(@NotNull MessageSupport delegate) {
-      this.delegate = delegate;
-    }
-
-
-    @Override
-    public @NotNull MessageAccessor getMessageAccessor() {
-      return delegate.getMessageAccessor();
-    }
-
-
-    @Override
-    public @NotNull MessageConfigurer<Message.WithCode> code(@NotNull String code) {
-      return delegate.code(code);
-    }
-
-
-    @Override
-    public @NotNull MessageConfigurer<Message> message(@NotNull String message) {
-      return delegate.message(message);
-    }
-
-
-    @Override
-    public @NotNull <M extends Message> MessageConfigurer<M> message(@NotNull M message) {
-      return delegate.message(message);
-    }
-
-
-    @Override
-    public void exportMessages(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
-        throws IOException {
-      delegate.exportMessages(stream, compress, messageCodeFilter);
-    }
   }
 }

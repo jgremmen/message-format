@@ -13,7 +13,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static de.sayayi.lib.message.MessageSupportFactory.seal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -47,7 +46,7 @@ class MessageSupportPackTest
     cms.addTemplate("exception", messageFactory.parseTemplate("%{ex,!empty:': %{ex}'}"));
     cms.addMessage("MSG-008", "Something went wrong%[exception,withStack:true]");
 
-    messageSupport = seal(cms);
+    messageSupport = cms.seal();
   }
 
 

@@ -712,6 +712,48 @@ public interface MessageSupport
      */
     @Contract(value = "_ -> this", mutates = "this")
     @NotNull ConfigurableMessageSupport setTemplateFilter(@NotNull TemplateFilter templateFilter);
+
+
+    /**
+     * Seals off this message support instance by returning a wrapper that does not implement
+     * {@link ConfigurableMessageSupport} and thus is not modifiable. The returned {@link MessageSupport} wrapper
+     * is backed by this configurable message support, so changes always reflect in the returned instance.
+     *
+     * @return  sealed message support, never {@code null}
+     *
+     * @since 0.20.0
+     */
+    @Contract(value = "-> new", pure = true)
+    default @NotNull MessageSupport seal()
+    {
+      return new MessageSupport() {
+        @Override
+        public @NotNull MessageAccessor getMessageAccessor() {
+          return ConfigurableMessageSupport.this.getMessageAccessor();
+        }
+
+        @Override
+        public @NotNull MessageConfigurer<Message.WithCode> code(@NotNull String code) {
+          return ConfigurableMessageSupport.this.code(code);
+        }
+
+        @Override
+        public @NotNull MessageConfigurer<Message> message(@NotNull String message) {
+          return ConfigurableMessageSupport.this.message(message);
+        }
+
+        @Override
+        public @NotNull <M extends Message> MessageConfigurer<M> message(@NotNull M message) {
+          return ConfigurableMessageSupport.this.message(message);
+        }
+
+        @Override
+        public void exportMessages(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
+            throws IOException {
+          ConfigurableMessageSupport.this.exportMessages(stream, compress, messageCodeFilter);
+        }
+      };
+    }
   }
 
 
