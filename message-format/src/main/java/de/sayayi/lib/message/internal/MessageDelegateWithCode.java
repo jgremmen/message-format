@@ -86,12 +86,6 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
 
 
   @Override
-  public boolean isSame(@NotNull Message message) {
-    return this.message.isSame(message);
-  }
-
-
-  @Override
   public boolean equals(Object o)
   {
     if (!(o instanceof MessageDelegateWithCode))

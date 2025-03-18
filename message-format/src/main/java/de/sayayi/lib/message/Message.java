@@ -18,14 +18,12 @@ package de.sayayi.lib.message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.internal.EmptyMessage;
-import de.sayayi.lib.message.internal.MessageDelegateWithCode;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -129,7 +127,7 @@ public interface Message
    * Messages that implement ({@link LocaleAware LocaleAware}) are not required to return a
    * sensible value. It is even valid to throw an exception like {@code UnsupportedOperationException}.
    *
-   * @return  message parts, never {@code null}
+   * @return  message parts, never empty or {@code null}
    *
    * @since 0.8.0
    */
@@ -169,22 +167,30 @@ public interface Message
    * @since 0.8.0
    */
   @Contract(pure = true)
-  default boolean isSame(@NotNull Message message)
-  {
-    if (message instanceof MessageDelegateWithCode)
-      message = ((MessageDelegateWithCode)message).getMessage();
-
-    return !(message instanceof LocaleAware) && Arrays.equals(getMessageParts(), message.getMessageParts());
+  default boolean isSame(@NotNull Message message) {
+    return MessageFactory.isSame(this, message);
   }
 
 
 
 
   /**
-   * A message class implementing this interface provides information about leading/trailing
-   * spaces.
+   * A message class implementing this interface provides information about leading/trailing spaces.
    */
-  interface WithSpaces extends Message, SpacesAware {
+  interface WithSpaces extends Message, SpacesAware
+  {
+    @Override
+    default boolean isSpaceBefore() {
+      return getMessageParts()[0].isSpaceBefore();
+    }
+
+
+    @Override
+    default boolean isSpaceAfter()
+    {
+      final var messageParts = getMessageParts();
+      return messageParts[messageParts.length - 1].isSpaceAfter();
+    }
   }
 
 
@@ -250,6 +256,13 @@ public interface Message
     @Contract(pure = true)
     @Unmodifiable
     @NotNull Map<Locale,Message> getLocalizedMessages();
+
+
+    @Override
+    @Contract("-> fail")
+    default @NotNull MessagePart[] getMessageParts() {
+      throw new UnsupportedOperationException("getMessageParts");
+    }
   }
 
 

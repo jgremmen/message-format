@@ -22,7 +22,6 @@ import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.internal.pack.PackHelper;
 import de.sayayi.lib.message.internal.pack.PackInputStream;
 import de.sayayi.lib.message.internal.pack.PackOutputStream;
-import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -135,12 +134,6 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
 
   @Override
-  public @NotNull MessagePart[] getMessageParts() {
-    throw new UnsupportedOperationException("getMessageParts");
-  }
-
-
-  @Override
   public @NotNull Set<String> getTemplateNames()
   {
     return localizedMessages
@@ -148,28 +141,6 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
         .stream()
         .flatMap(message -> message.getTemplateNames().stream())
         .collect(toUnmodifiableSet());
-  }
-
-
-  @Override
-  public boolean isSame(@NotNull Message message)
-  {
-    if (message instanceof MessageDelegateWithCode)
-      message = ((MessageDelegateWithCode)message).getMessage();
-
-    if (!(message instanceof LocaleAware))
-      return false;
-
-    var lm = ((LocaleAware)message).getLocalizedMessages();
-
-    if (!localizedMessages.keySet().equals(lm.keySet()))
-      return false;
-
-    for(var entry: localizedMessages.entrySet())
-      if (!entry.getValue().isSame(lm.get(entry.getKey())))
-        return false;
-
-    return true;
   }
 
 
