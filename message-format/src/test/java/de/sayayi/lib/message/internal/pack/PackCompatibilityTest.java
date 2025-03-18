@@ -99,18 +99,16 @@ class PackCompatibilityTest
     // check templates
     for(var templateName: messageAccessor.getTemplateNames())
     {
-      assertEquals(
-          expectedMessageAccessor.getTemplateByName(templateName),
-          messageAccessor.getTemplateByName(templateName),
+      assertTrue(
+          expectedMessageAccessor.getTemplateByName(templateName).isSame(messageAccessor.getTemplateByName(templateName)),
           "Template mismatch for '" + templateName + "'");
     }
 
     // check messages
     for(var messageCode: messageAccessor.getMessageCodes())
     {
-      assertEquals(
-          expectedMessageAccessor.getMessageByCode(messageCode),
-          messageAccessor.getMessageByCode(messageCode),
+      assertTrue(
+          expectedMessageAccessor.getMessageByCode(messageCode).isSame(messageAccessor.getMessageByCode(messageCode)),
           "Message mismatch for '" + messageCode + "'");
     }
   }
