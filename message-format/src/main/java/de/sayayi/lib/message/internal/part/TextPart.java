@@ -119,12 +119,6 @@ public final class TextPart implements Text
 
 
   @Override
-  public boolean isSpaceAround() {
-    return spaceBefore && spaceAfter;
-  }
-
-
-  @Override
   public boolean isEmpty() {
     return SpacesUtil.isEmpty(text);
   }

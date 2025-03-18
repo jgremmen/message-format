@@ -78,17 +78,6 @@ public final class EmptyMessage implements Message.WithSpaces
   }
 
 
-  /**
-   * {@inheritDoc}
-   *
-   * @return  always {@code false}
-   */
-  @Override
-  public boolean isSpaceAround() {
-    return false;
-  }
-
-
   @Override
   public @NotNull MessagePart[] getMessageParts() {
     return new MessagePart[] { Text.EMPTY };

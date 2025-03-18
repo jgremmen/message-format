@@ -52,5 +52,7 @@ public interface SpacesAware
    * @since 0.8.0
    */
   @Contract(pure = true)
-  boolean isSpaceAround();
+  default boolean isSpaceAround() {
+    return isSpaceBefore() && isSpaceAfter();
+  }
 }

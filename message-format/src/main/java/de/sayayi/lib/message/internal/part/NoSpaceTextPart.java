@@ -90,17 +90,6 @@ public final class NoSpaceTextPart implements Text
   }
 
 
-  /**
-   * {@inheritDoc}
-   *
-   * @return  always {@code false}
-   */
-  @Override
-  public boolean isSpaceAround() {
-    return false;
-  }
-
-
   @Override
   public boolean equals(Object o)
   {

@@ -66,12 +66,6 @@ public final class TextMessage implements Message.WithSpaces
 
 
   @Override
-  public boolean isSpaceAround() {
-    return textPart.isSpaceAround();
-  }
-
-
-  @Override
   public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
       throws MessageFormatException {
     return textPart;
@@ -108,7 +102,7 @@ public final class TextMessage implements Message.WithSpaces
   {
     var s = new StringBuilder("TextMessage(text=").append(textPart.getText());
 
-    if (textPart.isSpaceBefore() && textPart.isSpaceAfter())
+    if (textPart.isSpaceAround())
       s.append(",space-around");
     else if (textPart.isSpaceBefore())
       s.append(",space-before");

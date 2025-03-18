@@ -118,12 +118,6 @@ public final class TemplatePart implements Template
 
 
   @Override
-  public boolean isSpaceAround() {
-    return spaceBefore && spaceAfter;
-  }
-
-
-  @Override
   public @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
   {
     var message = messageAccessor.getTemplateByName(name);

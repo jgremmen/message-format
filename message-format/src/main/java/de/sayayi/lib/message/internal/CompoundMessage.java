@@ -128,12 +128,6 @@ public final class CompoundMessage implements Message.WithSpaces
 
 
   @Override
-  public boolean isSpaceAround() {
-    return isSpaceBefore() && isSpaceAfter();
-  }
-
-
-  @Override
   public @NotNull MessagePart[] getMessageParts() {
     return copyOf(messageParts, messageParts.length);
   }
