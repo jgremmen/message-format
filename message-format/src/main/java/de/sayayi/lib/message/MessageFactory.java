@@ -241,6 +241,29 @@ public class MessageFactory
   }
 
 
+  /**
+   * Strips code from the given {@code message}. If the code could not be stripped, the same message instance is
+   * returned.
+   *
+   * @param message  message, not {@code null}
+   *
+   * @return  message without code, if possible, never {@code null}
+   *
+   * @since 0.20.0
+   */
+  @Contract(pure = true)
+  public @NotNull Message withoutCode(@NotNull Message message)
+  {
+    if (message instanceof EmptyMessageWithCode)
+      return EmptyMessage.INSTANCE;
+
+    if (message instanceof MessageDelegateWithCode)
+      return withoutCode(((MessageDelegateWithCode)message).getMessage());
+
+    return message;
+  }
+
+
   @Contract(pure = true)
   protected @NotNull String generateCode(@NotNull String prefix)
   {
