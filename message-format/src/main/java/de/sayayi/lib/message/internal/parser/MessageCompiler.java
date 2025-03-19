@@ -266,7 +266,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       for(var chNode: chNodes)
       {
         var chText = chNode.getText();
-        char ch = chText.charAt(0);
+        var ch = chText.charAt(0);
 
         if (ch == '\\')
         {
@@ -333,15 +333,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       {
         return (map,cec) -> {
           for(var key: cec.configKeys)
-          {
-            if (map.containsKey(key))
+            if (map.put(key, cec.configValue) != null)
             {
               syntaxError(cec, "duplicate config element " + key + " for parameter '" +
                   ((ParameterPartContext)cec.parent).name.string + '\'');
             }
-
-            map.put(key, cec.configValue);
-          }
         };
       }
 
@@ -362,8 +358,12 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       if (forceQuotedMessage != null)
         mapElements.put(null, new ConfigValueMessage(forceQuotedMessage.messageWithSpaces));
 
+      var name = ctx.name.string;
+      if (name.isEmpty())
+        syntaxError(ctx.name, "parameter name must not be empty");
+
       ctx.part = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(
-          ctx.name.string, ctx.format == null ? null : ctx.format.name,
+          name, ctx.format == null ? null : ctx.format.name,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
           new ParameterConfig(mapElements)));
