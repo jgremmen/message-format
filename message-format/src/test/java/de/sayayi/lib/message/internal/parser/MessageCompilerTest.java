@@ -419,4 +419,41 @@ class MessageCompilerTest
     assertEquals("template name must not be empty", mpe.getErrorMessage());
     assertEquals(MESSAGE, mpe.getType());
   }
+
+
+  @Test
+  @DisplayName("Template with parameter delegate")
+  void testTemplateWithParameterDelegate()
+  {
+    assertArrayEquals(
+        new MessagePart[] { new TemplatePart("pq", false, true,
+            Map.of(), Map.of("a", "b", "c", "d")) },
+        COMPILER.compileMessage("%[pq,a=b,c=d] ").getMessageParts());
+
+    var mpe = assertThrowsExactly(
+        MessageParserException.class,
+        () -> COMPILER.compileMessage("%[ xyz, a=b, a=c ]"));
+    assertEquals("duplicate template parameter delegate 'a'", mpe.getErrorMessage());
+    assertEquals(MESSAGE, mpe.getType());
+  }
+
+
+  @Test
+  @DisplayName("Template with default parameter values")
+  void testTemplateWithDefaultParameterValues()
+  {
+    assertArrayEquals(
+        new MessagePart[] { new TemplatePart("pq", false, true,
+            Map.of(
+                "a", ConfigValueBool.TRUE,
+                "c", new ConfigValueString("C")
+            ), Map.of()) },
+        COMPILER.compileMessage("%[pq,a:true,c:'C'] ").getMessageParts());
+
+    var mpe = assertThrowsExactly(
+        MessageParserException.class,
+        () -> COMPILER.compileMessage("%[ xyz, a:true, a:false ]"));
+    assertEquals("duplicate template default parameter 'a'", mpe.getErrorMessage());
+    assertEquals(MESSAGE, mpe.getType());
+  }
 }
