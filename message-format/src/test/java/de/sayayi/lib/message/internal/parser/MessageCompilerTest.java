@@ -33,6 +33,7 @@ import java.util.Map;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAGE;
 import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.*;
+import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -316,5 +317,27 @@ class MessageCompilerTest
             )))
         },
         COMPILER.compileMessage("%{ p, >= -987654321:\" msg 7\" }").getMessageParts());
+  }
+
+
+  @Test
+  @DisplayName("Parameter with default map value")
+  void testParameterWithDefaultMapValue()
+  {
+    assertArrayEquals(
+        new MessagePart[] {
+            new ParameterPart("p", new ParameterConfig(singletonMap(
+                null, new ConfigValueMessage(COMPILER.compileMessage("test"))
+            )))
+        },
+        COMPILER.compileMessage("%{ p, :test }").getMessageParts());
+
+    assertArrayEquals(
+        new MessagePart[] {
+            new ParameterPart("p", new ParameterConfig(singletonMap(
+                null, new ConfigValueMessage(COMPILER.compileMessage(" %{n} items"))
+            )))
+        },
+        COMPILER.compileMessage("%{ p, :' %{n} items' }").getMessageParts());
   }
 }
