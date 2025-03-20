@@ -17,6 +17,7 @@ package de.sayayi.lib.message.internal.parser;
 
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.exception.MessageParserException;
+import de.sayayi.lib.message.internal.part.TemplatePart;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer;
 import de.sayayi.lib.message.part.parameter.ParameterConfig;
@@ -321,6 +322,68 @@ class MessageCompilerTest
 
 
   @Test
+  @DisplayName("Parameter with string configuration key")
+  void testParameterWithStringKey()
+  {
+    assertArrayEquals(
+        new MessagePart[] {
+            new ParameterPart("p", new ParameterConfig(Map.of(
+                new ConfigKeyString(EQ, "AA"), new ConfigValueString("msg1")
+            )))
+        },
+        COMPILER.compileMessage("%{ p, 'AA':msg1 }").getMessageParts());
+
+    assertArrayEquals(
+        new MessagePart[] {
+            new ParameterPart("p", new ParameterConfig(Map.of(
+                new ConfigKeyString(EQ, "B"), new ConfigValueMessage(COMPILER.compileMessage(" msg 2 "))
+            )))
+        },
+        COMPILER.compileMessage("%{ p, = 'B':\" msg 2 \" }").getMessageParts());
+
+    assertArrayEquals(
+        new MessagePart[] {
+            new ParameterPart("p", new ParameterConfig(Map.of(
+                new ConfigKeyString(LT, "CC"), new ConfigValueString("msg3")
+            )))
+        },
+        COMPILER.compileMessage("%{ p, < 'CC':msg3 }").getMessageParts());
+
+    assertArrayEquals(
+        new MessagePart[] {
+            new ParameterPart("p", new ParameterConfig(Map.of(
+                new ConfigKeyString(LTE, "D"), new ConfigValueString("msg4")
+            )))
+        },
+        COMPILER.compileMessage("%{ p,<='D':msg4 }").getMessageParts());
+
+    assertArrayEquals(
+        new MessagePart[] {
+            new ParameterPart("p", new ParameterConfig(Map.of(
+                new ConfigKeyString(NE, "EE"), new ConfigValueString("msg5")
+            )))
+        },
+        COMPILER.compileMessage("%{ p,<>'EE':msg5 }").getMessageParts());
+
+    assertArrayEquals(
+        new MessagePart[] {
+            new ParameterPart("p", new ParameterConfig(Map.of(
+                new ConfigKeyString(GT, "FFF"), new ConfigValueString("msg6")
+            )))
+        },
+        COMPILER.compileMessage("%{ p,>'FFF':msg6 }").getMessageParts());
+
+    assertArrayEquals(
+        new MessagePart[] {
+            new ParameterPart("p", new ParameterConfig(Map.of(
+                new ConfigKeyString(GTE, "GG"), new ConfigValueMessage(COMPILER.compileMessage(" msg 7"))
+            )))
+        },
+        COMPILER.compileMessage("%{ p, >= \"GG\":\" msg 7\" }").getMessageParts());
+  }
+
+
+  @Test
   @DisplayName("Parameter with default map value")
   void testParameterWithDefaultMapValue()
   {
@@ -339,5 +402,21 @@ class MessageCompilerTest
             )))
         },
         COMPILER.compileMessage("%{ p, :' %{n} items' }").getMessageParts());
+  }
+
+
+  @Test
+  @DisplayName("Template with name only")
+  void testTemplateWithNameOnly()
+  {
+    assertArrayEquals(
+        new MessagePart[] { new TemplatePart("pq", false, true, Map.of(), Map.of()) },
+        COMPILER.compileMessage("%[pq] ").getMessageParts());
+
+    var mpe = assertThrowsExactly(
+        MessageParserException.class,
+        () -> COMPILER.compileMessage("%[ '' ]"));
+    assertEquals("template name must not be empty", mpe.getErrorMessage());
+    assertEquals(MESSAGE, mpe.getType());
   }
 }

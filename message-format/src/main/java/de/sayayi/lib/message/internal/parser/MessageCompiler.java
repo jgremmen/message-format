@@ -425,8 +425,12 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitTemplatePart(TemplatePartContext ctx)
     {
+      var name = ctx.simpleString().string;
+      if (name.isEmpty())
+        syntaxError(ctx.simpleString(), "template name must not be empty");
+
       ctx.part = new TemplatePart(
-          ctx.simpleString().string,
+          name,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
           ctx.configNamedElement().stream().collect(TEMPLATE_NAMED_PARAMETER_COLLECTOR),
