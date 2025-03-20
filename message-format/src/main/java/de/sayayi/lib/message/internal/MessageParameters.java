@@ -82,12 +82,28 @@ final class MessageParameters implements Parameters
   @Override
   public boolean equals(Object o)
   {
-    if (!(o instanceof Parameters))
+    if (this == o)
+      return true;
+    else if (!(o instanceof Parameters))
       return false;
 
-    var that = (MessageParameters)o;
+    var that = (Parameters)o;
 
-    return locale.equals(that.locale) && Arrays.equals(parameters, that.parameters);
+    if (!locale.equals(that.getLocale()))
+      return false;
+
+    var thatParameterNames = that.getParameterNames();
+
+    for(int n = 0; n < parameters.length; n += 2)
+    {
+      var parameterName = (String)parameters[n];
+
+      if (!thatParameterNames.contains(parameterName) ||
+          !Objects.equals(parameters[n + 1], that.getParameterValue(parameterName)))
+        return false;
+    }
+
+    return true;
   }
 
 

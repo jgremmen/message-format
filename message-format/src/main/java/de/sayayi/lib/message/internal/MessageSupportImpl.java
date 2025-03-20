@@ -330,7 +330,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     int parameterCount;
 
 
-    private Configurer(@NotNull Supplier<M> message)
+    Configurer(@NotNull Supplier<M> message)
     {
       this.message = message;
 
