@@ -21,14 +21,14 @@ import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer;
 import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import de.sayayi.lib.message.part.parameter.ParameterPart;
+import de.sayayi.lib.message.part.parameter.key.ConfigKeyEmpty;
 import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
+import de.sayayi.lib.message.part.parameter.key.ConfigKeyNull;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueBool;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueMessage;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueNumber;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.Map;
 
@@ -44,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @since 0.20.0
  */
 @DisplayName("Message compiler")
+@TestMethodOrder(MethodOrderer.DisplayName.class)
 class MessageCompilerTest
 {
   private static MessageCompiler COMPILER;
@@ -146,6 +147,14 @@ class MessageCompilerTest
     assertArrayEquals(
         new MessagePart[] {
             new ParameterPart("p", new ParameterConfig(Map.of(
+                new ConfigKeyName("charset"), ConfigValueBool.TRUE
+            )))
+        },
+        COMPILER.compileMessage("%{ p, charset:true }").getMessageParts());
+
+    assertArrayEquals(
+        new MessagePart[] {
+            new ParameterPart("p", new ParameterConfig(Map.of(
                 new ConfigKeyName("clip"), new ConfigValueNumber(-5)
             )))
         },
@@ -180,5 +189,49 @@ class MessageCompilerTest
         () -> COMPILER.compileMessage("%{ p1, msg:yes, msg:no }").getMessageParts());
     assertEquals("duplicate config element msg for parameter 'p1'", mpe.getErrorMessage());
     assertEquals(MESSAGE, mpe.getType());
+  }
+
+
+  @Test
+  @DisplayName("Parameter with 'null' configuration key")
+  void testParameterWithNullKey()
+  {
+    assertArrayEquals(
+        new MessagePart[] {
+            new ParameterPart("p", new ParameterConfig(Map.of(
+                ConfigKeyNull.EQ, new ConfigValueString("msg")
+            )))
+        },
+        COMPILER.compileMessage("%{ p, =null:msg }").getMessageParts());
+
+    assertArrayEquals(
+        new MessagePart[] {
+            new ParameterPart("p", new ParameterConfig(Map.of(
+                ConfigKeyNull.NE, new ConfigValueMessage(COMPILER.compileMessage("msg %{n}"))
+            )))
+        },
+        COMPILER.compileMessage("%{ p, !null:'msg %{n}' }").getMessageParts());
+  }
+
+
+  @Test
+  @DisplayName("Parameter with 'empty' configuration key")
+  void testParameterWithEmptyKey()
+  {
+    assertArrayEquals(
+        new MessagePart[] {
+            new ParameterPart("p", new ParameterConfig(Map.of(
+                ConfigKeyEmpty.EQ, new ConfigValueString("msg")
+            )))
+        },
+        COMPILER.compileMessage("%{ p, empty:msg }").getMessageParts());
+
+    assertArrayEquals(
+        new MessagePart[] {
+            new ParameterPart("p", new ParameterConfig(Map.of(
+                ConfigKeyEmpty.NE, new ConfigValueMessage(COMPILER.compileMessage("msg %{n}"))
+            )))
+        },
+        COMPILER.compileMessage("%{ p, <>empty:'msg %{n}' }").getMessageParts());
   }
 }
