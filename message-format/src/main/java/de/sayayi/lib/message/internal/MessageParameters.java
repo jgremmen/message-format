@@ -108,8 +108,14 @@ final class MessageParameters implements Parameters
 
 
   @Override
-  public int hashCode() {
-    return Arrays.hashCode(parameters) * 59 + locale.hashCode();
+  public int hashCode()
+  {
+    var hash = locale.hashCode();
+
+    for(Object parameter: parameters)
+      hash += parameter.hashCode();
+
+    return hash;
   }
 
 

@@ -269,6 +269,8 @@ public interface Message
 
 
   /**
+   * Interface providing locale and parameters to be used for formatting a message.
+   *
    * @since 0.8.0
    */
   interface Parameters
@@ -304,5 +306,18 @@ public interface Message
     @Contract(pure = true)
     @Unmodifiable
     @NotNull Set<String> getParameterNames();
+
+
+    /**
+     * Returns the hash code value for this parameters instance.
+     * <p>
+     * The hash code of a parameters instance is defined to be the sum of the hash codes of the locale,
+     * the parameter name strings and the parameter values. This ensures that {@code p1.equals(p2)}
+     * implies that {@code p1.hashCode() == p2.hashCode()} for any two parameter instances
+     * {@code p1} and {@code p2}, as required by the general contract of {@link Object#hashCode}.
+     *
+     * @return  the hash code value for this parameters instance
+     */
+    int hashCode();
   }
 }

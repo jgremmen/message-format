@@ -103,4 +103,19 @@ class MessageParametersTest
 
     assertNotEquals(parameters, otherParameters);
   }
+
+
+  @Test
+  @DisplayName("HashCode")
+  void testHashCode()
+  {
+    val otherMap = Map.of(
+        "o", OptionalInt.empty(),
+        "B", 45,
+        "C", true,
+        "A", "Hello");
+
+    assertEquals(parameters.hashCode(), otherMap.entrySet().stream()
+        .mapToInt(e -> e.getKey().hashCode() + e.getValue().hashCode()).sum() + ITALIAN.hashCode());
+  }
 }
