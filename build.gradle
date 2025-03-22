@@ -17,11 +17,6 @@
 description = 'Message Format Library Projects'
 
 
-wrapper {
-  distributionType = Wrapper.DistributionType.ALL
-}
-
-
 allprojects {
   layout.buildDirectory = '.build'
 
@@ -49,14 +44,17 @@ allprojects {
 }
 
 
+def gradleDirectory = rootProject.layout.projectDirectory.dir('gradle')
+
+
 configure(subprojects.findAll { it.name.startsWith('message-format') }) {
-  apply from: "${rootDir}/gradle/module.gradle"
+  apply from: gradleDirectory.file('module.gradle')
 }
 
 
 configure(subprojects.findAll { it.name != 'documentation' }) {
-  apply from: "${rootDir}/gradle/java.gradle"
-  apply from: "${rootDir}/gradle/publish.gradle"
+  apply from: gradleDirectory.file('java.gradle')
+  apply from: gradleDirectory.file('publish.gradle')
 }
 
 
@@ -85,4 +83,9 @@ tasks.register('releaseAllTemp') {
 
   dependsOn ':message-gradle-plugin:publishGradlePluginPublicationToMavenTempRepository'
   dependsOn ':message-gradle-plugin:publishMessageFormatPluginMarkerMavenPublicationToMavenTempRepository'
+}
+
+
+wrapper {
+  distributionType = Wrapper.DistributionType.ALL
 }
