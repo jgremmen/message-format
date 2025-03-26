@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 public interface ParameterPostFormatter
 {
   @Contract(pure = true)
-  @NotNull String getParameterName();
+  @NotNull String getParameterConfigName();
 
 
   /**

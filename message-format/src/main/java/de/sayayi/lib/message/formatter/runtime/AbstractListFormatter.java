@@ -25,9 +25,11 @@ import de.sayayi.lib.message.part.TextJoiner;
 import de.sayayi.lib.message.part.parameter.ParameterPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
@@ -112,4 +114,10 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
 
   @Contract(pure = true)
   protected abstract @NotNull Iterator<Text> createIterator(@NotNull FormatterContext context, @NotNull T value);
+
+
+  @Override
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
+    return Set.of(CONFIG_MAX_SIZE, CONFIG_SEPARATOR, CONFIG_SEPARATOR_LAST, CONFIG_VALUE, CONFIG_VALUE_MORE, CONFIG_THIS);
+  }
 }

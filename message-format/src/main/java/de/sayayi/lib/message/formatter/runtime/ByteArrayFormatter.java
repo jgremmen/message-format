@@ -24,10 +24,12 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.OptionalLong;
+import java.util.Set;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_PRIMITIVE_OR_ARRAY_ORDER;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
@@ -85,5 +87,11 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
   @Override
   public @NotNull MatchResult compareToEmptyKey(byte[] value, @NotNull ComparatorContext context) {
     return forEmptyKey(context.getCompareType(), value == null || value.length == 0);
+  }
+
+
+  @Override
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
+    return Set.of("bytes");
   }
 }

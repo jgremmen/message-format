@@ -21,6 +21,7 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -109,5 +110,11 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
   @Contract(value = "-> new", pure = true)
   public @NotNull Set<FormattableType> getFormattableTypes() {
     return Set.of(new FormattableType(Temporal.class));
+  }
+
+
+  @Override
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
+    return Set.of("date");
   }
 }

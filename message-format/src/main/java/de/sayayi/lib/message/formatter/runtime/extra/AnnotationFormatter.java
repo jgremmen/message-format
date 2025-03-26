@@ -20,11 +20,13 @@ import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -76,6 +78,12 @@ public final class AnnotationFormatter extends AbstractSingleTypeParameterFormat
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(Annotation.class);
+  }
+
+  
+  @Override
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
+    return Set.of("annotation");
   }
 
 

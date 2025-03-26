@@ -31,6 +31,7 @@ import de.sayayi.lib.message.part.parameter.key.ConfigKeyNull;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -86,6 +87,12 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
   {
     // map implements iterable, so make sure it has a higher precedence than IterableFormatter
     return Set.of(new FormattableType(Map.class, DEFAULT_ORDER - 5));
+  }
+
+
+  @Override
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
+    return Set.of(CONFIG_MAX_SIZE, CONFIG_SEPARATOR, CONFIG_SEPARATOR_LAST, CONFIG_VALUE_MORE, "map-kv", "map-this");
   }
 
 

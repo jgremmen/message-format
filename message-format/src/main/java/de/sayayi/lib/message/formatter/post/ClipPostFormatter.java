@@ -30,7 +30,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 public final class ClipPostFormatter implements ParameterPostFormatter
 {
   @Override
-  public @NotNull String getParameterName() {
+  public @NotNull String getParameterConfigName() {
     return "clip";
   }
 

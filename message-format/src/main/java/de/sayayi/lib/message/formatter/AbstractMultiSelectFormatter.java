@@ -18,9 +18,11 @@ package de.sayayi.lib.message.formatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.util.Objects.requireNonNull;
@@ -35,7 +37,7 @@ import static java.util.Objects.requireNonNull;
 public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterFormatter<T>
 {
   private final String configKey;
-  private final String defaultConfigKeyIfAbsent;
+  private final String defaultConfigValueForAbsentKey;
   private final boolean delegateOnMismatch;
   private final Map<String,MultiSelectFunction<T>> multiSelectFunctionMap;
 
@@ -45,11 +47,11 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
   }
 
 
-  protected AbstractMultiSelectFormatter(@NotNull String configKey, String defaultConfigKeyIfAbsent,
+  protected AbstractMultiSelectFormatter(@NotNull String configKey, String defaultConfigValueForAbsentKey,
                                          boolean delegateOnMismatch)
   {
     this.configKey = requireNonNull(configKey);
-    this.defaultConfigKeyIfAbsent = defaultConfigKeyIfAbsent;
+    this.defaultConfigValueForAbsentKey = defaultConfigValueForAbsentKey;
     this.delegateOnMismatch = delegateOnMismatch;
 
     multiSelectFunctionMap = new HashMap<>();
@@ -63,8 +65,8 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
   }
 
 
-  protected void register(@NotNull String configKey, @NotNull MultiSelectFunction<T> function) {
-    multiSelectFunctionMap.put(requireNonNull(configKey), requireNonNull(function));
+  protected void register(@NotNull String configValue, @NotNull MultiSelectFunction<T> function) {
+    multiSelectFunctionMap.put(requireNonNull(configValue), requireNonNull(function));
   }
 
 
@@ -72,7 +74,7 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
   protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull T value)
   {
     var function = multiSelectFunctionMap
-        .get(context.getConfigValueString(configKey).orElse(defaultConfigKeyIfAbsent));
+        .get(context.getConfigValueString(configKey).orElse(defaultConfigValueForAbsentKey));
 
     if (function != null)
       return function.apply(context, value);
@@ -87,6 +89,12 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
   @SuppressWarnings("unused")
   protected Text formatMultiSelectMismatch(@NotNull FormatterContext context, @NotNull T value) {
     return nullText();
+  }
+
+
+  @Override
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
+    return Set.of(configKey);
   }
 
 

@@ -20,8 +20,10 @@ import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.net.URL;
+import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
@@ -80,5 +82,11 @@ public final class URLFormatter extends AbstractSingleTypeParameterFormatter<URL
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(URL.class);
+  }
+
+
+  @Override
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
+    return Set.of("url");
   }
 }

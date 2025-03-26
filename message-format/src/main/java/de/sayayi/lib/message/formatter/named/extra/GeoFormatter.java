@@ -21,10 +21,12 @@ import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
@@ -127,6 +129,12 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
     var format = FORMAT.get(formatString);
 
     return format == null ? parseFormatString(formatString) : format;
+  }
+
+
+  @Override
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
+    return Set.of("geo", "geo-w", "geo-e", "geo-n", "geo-s");
   }
 
 

@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.formatter;
 
+import de.sayayi.lib.message.exception.MessageException;
 import de.sayayi.lib.message.formatter.ParameterFormatter.DefaultFormatter;
 import de.sayayi.lib.message.formatter.named.StringFormatter;
 import org.jetbrains.annotations.Contract;
@@ -29,6 +30,7 @@ import java.util.stream.Stream;
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT;
 import static java.util.Arrays.copyOf;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 
 
@@ -47,6 +49,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
   private final @NotNull Map<String,NamedParameterFormatter> namedFormatters = new ConcurrentHashMap<>();
   private final @NotNull Map<Class<?>,List<PrioritizedFormatter>> typeFormatters = new ConcurrentHashMap<>();
+  private final @NotNull Set<String> parameterConfigNames = new TreeSet<>();
   private final @NotNull Map<String,ParameterPostFormatter> parameterPostFormatters = new HashMap<>();
   private final @NotNull FormatterCache formatterCache;
 
@@ -113,6 +116,27 @@ public class GenericFormatterService implements FormatterService.WithRegistry
             type -> new ArrayList<>(4))
         .add(new PrioritizedFormatter(formattableType.getOrder(), formatter));
 
+    var formatterConfigNames = new TreeSet<>(formatter.getParameterConfigNames());
+    parameterConfigNames.addAll(formatterConfigNames);
+
+    formatterConfigNames.retainAll(parameterPostFormatters.keySet());
+
+    switch(formatterConfigNames.size())
+    {
+      case 0:
+        break;
+
+      case 1:
+        throw new MessageException("formatter " + formattableType.getType() +
+            " has a parameter configuration name " + toDisplayNameList(formatterConfigNames) +
+            " which is in conflict with a registered post formatter");
+
+      default:
+        throw new MessageException("formatter " + formattableType.getType() +
+            " has parameter configuration names which are in conflict with registered post formatters " +
+            toDisplayNameList(formatterConfigNames));
+    }
+
     formatterCache.clear();
   }
 
@@ -141,11 +165,20 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   @Override
+  @MustBeInvokedByOverriders
   public void addParameterPostFormatter(@NotNull ParameterPostFormatter parameterPostFormatter)
   {
+    var parameterConfigName = requireNonNull(parameterPostFormatter.getParameterConfigName());
+
     parameterPostFormatters.put(
-        requireNonNull(parameterPostFormatter.getParameterName()),
+        parameterConfigName,
         requireNonNull(parameterPostFormatter, "parameterPostFormatter must not be null"));
+
+    if (parameterConfigNames.contains(parameterConfigName))
+    {
+      throw new MessageException("parameter post formatter '" + parameterConfigName +
+          "' is in conflict with a registered parameter formatter");
+    }
   }
 
 
@@ -218,8 +251,32 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   @Override
-  public @NotNull @UnmodifiableView Map<String, ParameterPostFormatter> getParameterPostFormatters() {
+  public @UnmodifiableView @NotNull Map<String,ParameterPostFormatter> getParameterPostFormatters() {
     return unmodifiableMap(parameterPostFormatters);
+  }
+
+
+  @Override
+  public @UnmodifiableView @NotNull Set<String> getParameterConfigNames() {
+    return unmodifiableSet(parameterConfigNames);
+  }
+
+
+  @Contract(pure = true)
+  protected @NotNull String toDisplayNameList(@NotNull Set<String> configNames)
+  {
+    var s = new StringBuilder();
+    var names = configNames.toArray(String[]::new);
+
+    for(int n = 0, count = names.length; n < count; n++)
+    {
+      if (n > 0)
+        s.append(n == count - 1 ? " and " : ", ");
+
+      s.append('\'').append(names[n]).append('\'');
+    }
+
+    return s.toString();
   }
 
 

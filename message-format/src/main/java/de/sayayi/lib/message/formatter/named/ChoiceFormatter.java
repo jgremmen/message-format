@@ -22,6 +22,7 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -52,5 +53,11 @@ public final class ChoiceFormatter implements NamedParameterFormatter
     return context.format(context
         .getConfigMapMessage(value, KEY_TYPES, true)
         .orElse(Message.WithSpaces.EMPTY));
+  }
+
+
+  @Override
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
+    return Set.of("choice");
   }
 }

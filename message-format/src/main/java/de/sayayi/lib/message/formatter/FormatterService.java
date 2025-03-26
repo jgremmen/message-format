@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -53,7 +54,18 @@ public interface FormatterService
    * @since 0.20.0
    */
   @Contract(pure = true)
-  @NotNull @UnmodifiableView Map<String,ParameterPostFormatter> getParameterPostFormatters();
+  @UnmodifiableView @NotNull Map<String,ParameterPostFormatter> getParameterPostFormatters();
+
+
+  /**
+   * Return the accumulated set of parameter configuration names for all registered parameter formatters.
+   *
+   * @return  all known parameter config names, never {@code null}
+   *
+   * @since 0.20.0
+   */
+  @Contract(pure = true)
+  @UnmodifiableView @NotNull Set<String> getParameterConfigNames();
 
 
 

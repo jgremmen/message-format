@@ -24,6 +24,7 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -120,6 +121,12 @@ public final class NumberFormatter
         new FormattableType(long.class),
         new FormattableType(float.class),
         new FormattableType(double.class));
+  }
+
+
+  @Override
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
+    return Set.of("number");
   }
 
 

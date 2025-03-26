@@ -21,9 +21,11 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.lang.reflect.*;
 import java.util.Arrays;
+import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.stream.Collectors.joining;
@@ -177,5 +179,11 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(Type.class);
+  }
+
+
+  @Override
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
+    return Set.of("type");
   }
 }

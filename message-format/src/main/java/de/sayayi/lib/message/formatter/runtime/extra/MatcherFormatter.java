@@ -22,7 +22,9 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueNumber;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
+import java.util.Set;
 import java.util.regex.Matcher;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
@@ -81,5 +83,11 @@ public final class MatcherFormatter extends AbstractSingleTypeParameterFormatter
   @Override
   public @NotNull FormattableType getFormattableType() {
     return new FormattableType(Matcher.class);
+  }
+
+
+  @Override
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
+    return Set.of("matcher");
   }
 }

@@ -22,8 +22,10 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueNumber;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.math.BigInteger;
+import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
@@ -153,5 +155,11 @@ public final class BitsFormatter extends AbstractParameterFormatter<Object>
   {
     for(int n = bits.length; --n >= 0; value = value.shiftRight(1))
       bits[n] = value.testBit(0) ? '1' : '0';
+  }
+
+
+  @Override
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
+    return Set.of("bits");
   }
 }

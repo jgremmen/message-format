@@ -27,6 +27,7 @@ import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueBool;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.math.BigDecimal;
 import java.text.Collator;
@@ -127,6 +128,12 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
     return Set.of(
         new FormattableType(CharSequence.class),
         new FormattableType(char[].class));
+  }
+
+
+  @Override
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
+    return Set.of("ignore-default-tostring");
   }
 
 

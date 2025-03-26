@@ -21,6 +21,7 @@ import de.sayayi.lib.message.part.parameter.ParameterConfigAccessor;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -199,6 +200,23 @@ public interface ParameterFormatter
    */
   @Contract(pure = true)
   @NotNull Set<FormattableType> getFormattableTypes();
+
+
+  /**
+   * Returns a set of parameter configuration names, which are used/recognized by this formatter.
+   * <p>
+   * The formatter service will use this information to detect overlapping configuration key names.
+   *
+   * @return  a set with parameter configuration names.
+   *
+   * @see ParameterPostFormatter#getParameterConfigName()
+   *
+   * @since 0.20.0
+   */
+  @Contract(pure = true)
+  default @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
+    return Set.of();
+  }
 
 
 
