@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.exception.MessageException;
+import de.sayayi.lib.message.exception.FormatterServiceException;
 import de.sayayi.lib.message.formatter.ParameterFormatter.DefaultFormatter;
 import de.sayayi.lib.message.formatter.named.StringFormatter;
 import org.jetbrains.annotations.Contract;
@@ -108,7 +108,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   public void addFormatterForType(@NotNull FormattableType formattableType, @NotNull ParameterFormatter formatter)
   {
     if (formattableType.getType() == Object.class && !(formatter instanceof DefaultFormatter))
-      throw new IllegalArgumentException("formatter associated with Object must implement DefaultFormatter interface");
+      throw new FormatterServiceException("formatter associated with Object must implement DefaultFormatter interface");
 
     typeFormatters
         .computeIfAbsent(
@@ -127,12 +127,12 @@ public class GenericFormatterService implements FormatterService.WithRegistry
         break;
 
       case 1:
-        throw new MessageException("formatter " + formattableType.getType() +
+        throw new FormatterServiceException("formatter " + formattableType.getType() +
             " has a parameter configuration name " + toDisplayNameList(formatterConfigNames) +
             " which is in conflict with a registered post formatter");
 
       default:
-        throw new MessageException("formatter " + formattableType.getType() +
+        throw new FormatterServiceException("formatter " + formattableType.getType() +
             " has parameter configuration names which are in conflict with registered post formatters " +
             toDisplayNameList(formatterConfigNames));
     }
@@ -154,7 +154,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
       //noinspection ConstantValue
       if (format == null || format.isEmpty())
-        throw new IllegalArgumentException("formatter name must not be empty");
+        throw new FormatterServiceException("formatter name must not be empty");
 
       namedFormatters.put(format, namedParameterFormatter);
     }
@@ -176,7 +176,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
     if (parameterConfigNames.contains(parameterConfigName))
     {
-      throw new MessageException("parameter post formatter '" + parameterConfigName +
+      throw new FormatterServiceException("parameter post formatter '" + parameterConfigName +
           "' is in conflict with a registered parameter formatter");
     }
   }
