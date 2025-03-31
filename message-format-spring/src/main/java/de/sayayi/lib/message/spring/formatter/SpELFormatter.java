@@ -34,23 +34,24 @@ import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 import static org.springframework.expression.spel.SpelMessage.VARIABLE_ASSIGNMENT_NOT_SUPPORTED;
+import static org.springframework.expression.spel.support.DataBindingPropertyAccessor.forReadOnlyAccess;
 
 
 /**
  * @author Jeroen Gremmen
  * @since 0.8.3  (refactored in 0.12.0)
  */
+@SuppressWarnings("SpellCheckingInspection")
 public final class SpELFormatter extends AbstractParameterFormatter<Object> implements NamedParameterFormatter
 {
   private static final OperatorOverloader OPERATOR_OVERLOADER = new StandardOperatorOverloader();
   private static final TypeComparator TYPE_COMPARATOR = new StandardTypeComparator();
-  private static final TypeLocator TYPE_LOCATOR = new StandardTypeLocator();
   private static final List<MethodResolver> METHOD_RESOLVERS = List.of(new ReflectiveMethodResolver());
-  private static final List<PropertyAccessor> PROPERTY_ACCESSORS =
-      List.of(DataBindingPropertyAccessor.forReadOnlyAccess());
+  private static final List<PropertyAccessor> PROPERTY_ACCESSORS = List.of(forReadOnlyAccess());
 
   private final SpelExpressionParser spelExpressionParser;
   private final TypeConverter typeConverter;
+  private final TypeLocator typeLocator;
 
 
   /**
@@ -58,8 +59,9 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
    */
   public SpELFormatter()
   {
-    typeConverter = new StandardTypeConverter();
     spelExpressionParser = new SpelExpressionParser();
+    typeConverter = new StandardTypeConverter();
+    typeLocator = new StandardTypeLocator();
   }
 
 
@@ -82,9 +84,9 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
    */
   public SpELFormatter(@NotNull ConversionService conversionService, @NotNull ClassLoader classLoader)
   {
+    spelExpressionParser = new SpelExpressionParser(new SpelParserConfiguration(null, classLoader));
     typeConverter = new StandardTypeConverter(conversionService);
-    spelExpressionParser = new SpelExpressionParser(
-        new SpelParserConfiguration(null, classLoader));
+    typeLocator = new StandardTypeLocator(classLoader);
   }
 
 
@@ -106,8 +108,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
           .getValue(new ParameterEvaluationContext(context, value));
     }
 
-    return context.format(value, null,
-        context.getConfigValueString("spel-format").orElse(null));
+    return context.format(value, null, context.getConfigValueString("spel-format").orElse(null));
   }
 
 
@@ -119,8 +120,6 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
     private final TypedValue value;
 
 
-
-
     private ParameterEvaluationContext(@NotNull FormatterContext context, @NotNull Object value)
     {
       this.context = context;
@@ -129,8 +128,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
 
 
     @Override
-    public @NotNull TypedValue assignVariable(@NotNull String name,
-                                              @NotNull Supplier<TypedValue> valueSupplier) {
+    public @NotNull TypedValue assignVariable(@NotNull String name, @NotNull Supplier<TypedValue> valueSupplier) {
       throw new SpelEvaluationException(VARIABLE_ASSIGNMENT_NOT_SUPPORTED, "#" + name);
     }
 
@@ -185,7 +183,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
 
     @Override
     public @NotNull TypeLocator getTypeLocator() {
-      return TYPE_LOCATOR;
+      return typeLocator;
     }
 
 
