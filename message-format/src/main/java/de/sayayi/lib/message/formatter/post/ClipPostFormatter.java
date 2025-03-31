@@ -36,11 +36,10 @@ public final class ClipPostFormatter implements ParameterPostFormatter
 
 
   @Override
+  @SuppressWarnings("OptionalGetWithoutIsPresent")
   public @NotNull Text postFormat(@NotNull FormatterContext context, @NotNull Text text)
   {
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     var maxSize = (int)context.getConfigValueNumber("clip").getAsLong();
-
     if (maxSize > 0)
     {
       var ellipsis = (boolean)context.getConfigValueBool("clip-ellipsis").orElse(true);
@@ -48,7 +47,7 @@ public final class ClipPostFormatter implements ParameterPostFormatter
         maxSize = 7;
 
       var s = text.getText();
-      if (s.length() > maxSize)
+      if (s != null && s.length() > maxSize)
       {
         return noSpaceText(ellipsis
             ? s.substring(0, maxSize - 3).trim() + "..."
