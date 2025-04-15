@@ -28,6 +28,7 @@ description = 'Message Format Library'
 
 def antlrVersion = '[4.13.0,4.14)'
 def antlrExtVersion = '[0.5,0.6)'
+def packVersion = '[0.1,0.2)'
 
 
 configurations {
@@ -53,6 +54,8 @@ dependencies {
     exclude group: 'org.antlr'
   }
   implementation "org.antlr:antlr4-runtime:${antlrVersion}"
+
+  implementation "de.sayayi.lib:pack:${packVersion}"
 
   // test
   testImplementation gradleTestKit()
