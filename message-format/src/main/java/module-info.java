@@ -7,6 +7,7 @@ module de.sayayi.lib.message {
 
   requires static java.xml;
   requires static lombok;
+  requires static org.apache.tika.core;
   requires static org.jetbrains.annotations;
 
   exports de.sayayi.lib.message;
@@ -28,4 +29,7 @@ module de.sayayi.lib.message {
   uses de.sayayi.lib.message.formatter.ParameterFormatter;
   uses de.sayayi.lib.message.formatter.ParameterPostFormatter;
 
+  // internal service implementations
+  provides java.nio.file.spi.FileTypeDetector with de.sayayi.lib.message.internal.pack.PackFileTypeDetector;
+  provides org.apache.tika.detect.Detector with de.sayayi.lib.message.internal.pack.PackTikaDetector;
 }
