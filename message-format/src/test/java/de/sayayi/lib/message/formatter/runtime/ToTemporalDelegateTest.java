@@ -1,6 +1,6 @@
 package de.sayayi.lib.message.formatter.runtime;
 
-import de.sayayi.lib.message.MessageSupport;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
@@ -22,19 +22,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Jeroen Gremmen
- * @since 0.12.0
+ * @since 0.12.0  (renamed in 0.20.0)
  */
-@DisplayName("Legacy temporal delegate")
-class LegacyToTemporalDelegateTest extends AbstractFormatterTest
+@DisplayName("Temporal delegate")
+class ToTemporalDelegateTest extends AbstractFormatterTest
 {
-  private MessageSupport.MessageAccessor messageAccessor;
+  private MessageAccessor messageAccessor;
 
 
   @BeforeEach
   void init()
   {
     messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter(), new LegacyToTemporalDelegate()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new TemporalFormatter(), new ToTemporalDelegate()), NO_CACHE_INSTANCE)
         .setLocale(GERMANY)
         .getMessageAccessor();
   }

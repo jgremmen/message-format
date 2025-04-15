@@ -22,6 +22,10 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.attribute.FileTime;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.temporal.Temporal;
 import java.util.Calendar;
 import java.util.Date;
@@ -37,9 +41,9 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.EMPTY_NULL_TYPE
  * {@link Temporal} or more specific formatter is required.
  *
  * @author Jeroen Gremmen
- * @since 0.12.0
+ * @since 0.12.0  (renamed in 0.20.0)
  */
-public final class LegacyToTemporalDelegate implements ParameterFormatter
+public final class ToTemporalDelegate implements ParameterFormatter
 {
   @Override
   public @NotNull Text format(@NotNull FormatterContext context, Object value)
@@ -54,10 +58,16 @@ public final class LegacyToTemporalDelegate implements ParameterFormatter
       return msg != null ? context.format(msg) : nullText();
     }
 
+    // java.sql.Time has no instant
     if (value instanceof java.sql.Time)
-      value = ((java.sql.Time)value).toLocalTime();  // sql.Time has no instant
-    else if (value instanceof java.sql.Date)
-      value = ((java.sql.Date)value).toLocalDate();  // sql.Date has no instant
+      return context.format(((java.sql.Time)value).toLocalTime(), LocalTime.class);
+
+    // java.sql.Date has no instant
+    if (value instanceof java.sql.Date)
+      return context.format(((java.sql.Date)value).toLocalDate(), LocalDate.class);
+
+    if (value instanceof Clock)
+      value = ((Clock)value).instant();
     else if (value instanceof Date)
       value = ((Date)value).toInstant();
     else if (value instanceof FileTime)
@@ -65,7 +75,7 @@ public final class LegacyToTemporalDelegate implements ParameterFormatter
     else
       value = ((Calendar)value).toInstant();
 
-    return context.format(value);
+    return context.format(value, Instant.class);
   }
 
 
@@ -74,6 +84,7 @@ public final class LegacyToTemporalDelegate implements ParameterFormatter
   {
     return Set.of(
         new FormattableType(Calendar.class),
+        new FormattableType(Clock.class),
         new FormattableType(Date.class),
         new FormattableType(FileTime.class));
   }
