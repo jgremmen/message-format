@@ -15,21 +15,21 @@
  */
 package de.sayayi.lib.message.internal.pack;
 
-import de.sayayi.lib.pack.detector.AbstractFileTypeDetector;
+import de.sayayi.lib.pack.detector.AbstractTikaDetector;
 
 import static de.sayayi.lib.message.internal.pack.PackSupport.MIME_TYPE;
 import static de.sayayi.lib.message.internal.pack.PackSupport.PACK_CONFIG;
 
 
 /**
- * File type detector for message format packs.
+ * Tika detector for message format packs.
  *
  * @author Jeroen Gremmen
- * @since 0.12.1
+ * @since 0.20.0
  */
-public final class PackFileTypeDetector extends AbstractFileTypeDetector
+public final class PackTikaDetector extends AbstractTikaDetector
 {
-  public PackFileTypeDetector() {
+  public PackTikaDetector() {
     super(PACK_CONFIG, MIME_TYPE);
   }
 }

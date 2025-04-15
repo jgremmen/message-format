@@ -24,6 +24,9 @@ import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.parameter.ParameterPart;
 import de.sayayi.lib.message.part.parameter.key.*;
 import de.sayayi.lib.message.part.parameter.value.*;
+import de.sayayi.lib.pack.PackConfig;
+import de.sayayi.lib.pack.PackInputStream;
+import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -39,8 +42,21 @@ import static java.util.function.Function.identity;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class PackHelper
+public final class PackSupport
 {
+  /** Pack version */
+  public static final int VERSION = 1;
+
+  /** Pack mime type */
+  public static final String MIME_TYPE = "application/x-message-format-pack";
+
+  public static final PackConfig PACK_CONFIG = new PackConfig
+      .Builder()
+      .withMagic("%{msg}")
+      .withVersionRange(1, 100)
+      .withCompressionSupport(true)
+      .build();
+
   private static final int MAP_KEY_BOOL_ID = 0;
   private static final int MAP_KEY_EMPTY_ID = 1;
   private static final int MAP_KEY_NAME_ID = 2;

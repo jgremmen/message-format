@@ -23,11 +23,11 @@ import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterPostFormatter;
-import de.sayayi.lib.message.internal.pack.PackHelper;
-import de.sayayi.lib.message.internal.pack.PackInputStream;
-import de.sayayi.lib.message.internal.pack.PackOutputStream;
+import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.part.parameter.value.*;
 import de.sayayi.lib.message.util.SupplierDelegate;
+import de.sayayi.lib.pack.PackInputStream;
+import de.sayayi.lib.pack.PackOutputStream;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -46,6 +46,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static de.sayayi.lib.message.internal.pack.PackSupport.PACK_CONFIG;
+import static de.sayayi.lib.message.internal.pack.PackSupport.VERSION;
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.copyOf;
 import static java.util.Collections.unmodifiableSet;
@@ -200,11 +202,14 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   {
     requireNonNull(packStreams, "packStreams must not be null");
 
-    var packHelper = new PackHelper();
+    var packHelper = new PackSupport();
 
     for(var packStream: packStreams)
     {
-      try(var dataStream = new PackInputStream(packStream)) {
+      try(var dataStream = new PackInputStream(PACK_CONFIG, packStream)) {
+        if (dataStream.getVersion().isEmpty())
+          throw new IllegalArgumentException("packStream has no version");
+
         // messages
         for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
           addMessage(packHelper.unpackMessageWithCode(dataStream));
@@ -223,7 +228,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   public void exportMessages(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
       throws IOException
   {
-    try(var dataStream = new PackOutputStream(stream, compress)) {
+    try(var dataStream = new PackOutputStream(PACK_CONFIG, VERSION, compress, stream)) {
       var messageCodes = new TreeSet<>(messages.keySet());
       var templateNames = new TreeSet<String>();
 
@@ -238,7 +243,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
         var message = messages.get(code);
 
         templateNames.addAll(message.getTemplateNames());
-        PackHelper.pack(message, dataStream);
+        PackSupport.pack(message, dataStream);
       }
 
       // pack all required templates
@@ -247,7 +252,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
       for(var templateName: templateNames)
       {
         dataStream.writeString(templateName);
-        PackHelper.pack(templates.get(templateName), dataStream);
+        PackSupport.pack(templates.get(templateName), dataStream);
       }
     }
   }

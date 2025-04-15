@@ -15,8 +15,8 @@
  */
 package de.sayayi.lib.message.part.parameter.key;
 
-import de.sayayi.lib.message.internal.pack.PackInputStream;
-import de.sayayi.lib.message.internal.pack.PackOutputStream;
+import de.sayayi.lib.pack.PackInputStream;
+import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -125,8 +125,7 @@ public final class ConfigKeyString implements ConfigKey
    *
    * @hidden
    */
-  public void pack(@SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackOutputStream packStream)
-      throws IOException
+  public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeEnum(compareType);
     packStream.writeString(string);
@@ -144,8 +143,7 @@ public final class ConfigKeyString implements ConfigKey
    *
    * @hidden
    */
-  public static @NotNull ConfigKeyString unpack(
-      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigKeyString unpack(@NotNull PackInputStream packStream) throws IOException {
     return new ConfigKeyString(packStream.readEnum(CompareType.class), requireNonNull(packStream.readString()));
   }
 }

@@ -17,8 +17,8 @@ package de.sayayi.lib.message.part.parameter.value;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.internal.pack.PackInputStream;
-import de.sayayi.lib.message.internal.pack.PackOutputStream;
+import de.sayayi.lib.pack.PackInputStream;
+import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -119,8 +119,7 @@ public final class ConfigValueString implements ConfigValue
    *
    * @hidden
    */
-  public void pack(@SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackOutputStream packStream)
-      throws IOException {
+  public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeString(string);
   }
 
@@ -136,8 +135,7 @@ public final class ConfigValueString implements ConfigValue
    *
    * @hidden
    */
-  public static @NotNull ConfigValueString unpack(
-      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigValueString unpack(@NotNull PackInputStream packStream) throws IOException {
     return new ConfigValueString(requireNonNull(packStream.readString()));
   }
 }

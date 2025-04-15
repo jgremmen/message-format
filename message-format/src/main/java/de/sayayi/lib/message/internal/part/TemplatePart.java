@@ -17,12 +17,12 @@ package de.sayayi.lib.message.internal.part;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.internal.pack.PackHelper;
-import de.sayayi.lib.message.internal.pack.PackInputStream;
-import de.sayayi.lib.message.internal.pack.PackOutputStream;
+import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.part.MessagePart.Template;
 import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import de.sayayi.lib.message.util.SortedArrayMap;
+import de.sayayi.lib.pack.PackInputStream;
+import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -192,7 +192,7 @@ public final class TemplatePart implements Template
     for(var defaultParameter: defaultParameterMap)
     {
       packStream.writeString(defaultParameter.getKey());
-      PackHelper.pack(defaultParameter.getValue(), packStream);
+      PackSupport.pack(defaultParameter.getValue(), packStream);
     }
 
     for(var parameterDelegate: parameterDelegateMap)
@@ -215,7 +215,7 @@ public final class TemplatePart implements Template
    *
    * @hidden
    */
-  public static @NotNull Template unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
+  public static @NotNull Template unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
     var spaceBefore = packStream.readBoolean();

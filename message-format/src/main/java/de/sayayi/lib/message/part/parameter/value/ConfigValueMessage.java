@@ -16,9 +16,9 @@
 package de.sayayi.lib.message.part.parameter.value;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.internal.pack.PackHelper;
-import de.sayayi.lib.message.internal.pack.PackInputStream;
-import de.sayayi.lib.message.internal.pack.PackOutputStream;
+import de.sayayi.lib.message.internal.pack.PackSupport;
+import de.sayayi.lib.pack.PackInputStream;
+import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -90,9 +90,8 @@ public final class ConfigValueMessage implements ConfigValue
    *
    * @hidden
    */
-  public void pack(@SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackOutputStream packStream)
-      throws IOException {
-    PackHelper.pack(message, packStream);
+  public void pack(@NotNull PackOutputStream packStream) throws IOException {
+    PackSupport.pack(message, packStream);
   }
 
 
@@ -109,8 +108,8 @@ public final class ConfigValueMessage implements ConfigValue
    * @hidden
    */
   public static @NotNull ConfigValueMessage unpack(
-      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackHelper unpack,
-      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackInputStream packStream) throws IOException {
+      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackSupport unpack,
+      @NotNull PackInputStream packStream) throws IOException {
     return new ConfigValueMessage(unpack.unpackMessageWithSpaces(packStream));
   }
 }

@@ -1,6 +1,7 @@
 module de.sayayi.lib.message {
 
   requires de.sayayi.lib.antlr;
+  requires de.sayayi.lib.pack;
   requires org.antlr.antlr4.runtime;
   requires java.sql;
 

@@ -18,11 +18,11 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.exception.MessageFormatException;
-import de.sayayi.lib.message.internal.pack.PackHelper;
-import de.sayayi.lib.message.internal.pack.PackInputStream;
-import de.sayayi.lib.message.internal.pack.PackOutputStream;
+import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.pack.PackInputStream;
+import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -121,7 +121,7 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeString(getCode());
-    PackHelper.pack(message, packStream);
+    PackSupport.pack(message, packStream);
   }
 
 
@@ -137,7 +137,7 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
    *
    * @hidden
    */
-  public static @NotNull Message.WithCode unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
+  public static @NotNull Message.WithCode unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
       throws IOException {
     return new MessageDelegateWithCode(requireNonNull(packStream.readString()), unpack.unpackMessage(packStream));
   }

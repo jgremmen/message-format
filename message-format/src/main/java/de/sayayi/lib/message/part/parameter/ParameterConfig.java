@@ -21,9 +21,7 @@ import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.ComparatorContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.ParameterFormatter.DefaultFormatter;
-import de.sayayi.lib.message.internal.pack.PackHelper;
-import de.sayayi.lib.message.internal.pack.PackInputStream;
-import de.sayayi.lib.message.internal.pack.PackOutputStream;
+import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.part.parameter.key.*;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.part.parameter.key.OrderedConfigKeySorter.OrderedConfigKey;
@@ -31,6 +29,8 @@ import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import de.sayayi.lib.message.part.parameter.value.ConfigValue.Type;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueMessage;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.pack.PackInputStream;
+import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -305,29 +305,28 @@ public final class ParameterConfig
   /**
    * @hidden
    */
-  public void pack(@SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackOutputStream packStream)
-      throws IOException
+  public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeSmallVar(config.size() + mapKeys.length + (defaultValue == null ? 0 : 1));
 
     // config
     for(var configEntry: config.entrySet())
     {
-      PackHelper.pack(new ConfigKeyName(configEntry.getKey()), packStream);
-      PackHelper.pack(configEntry.getValue(), packStream);
+      PackSupport.pack(new ConfigKeyName(configEntry.getKey()), packStream);
+      PackSupport.pack(configEntry.getValue(), packStream);
     }
 
     // map
     for(int n = 0, l = mapKeys.length; n < l; n++)
     {
-      PackHelper.pack(mapKeys[n], packStream);
-      PackHelper.pack(mapValues[n], packStream);
+      PackSupport.pack(mapKeys[n], packStream);
+      PackSupport.pack(mapValues[n], packStream);
     }
 
     if (defaultValue != null)
     {
-      PackHelper.pack((ConfigKey)null, packStream);
-      PackHelper.pack(defaultValue, packStream);
+      PackSupport.pack((ConfigKey)null, packStream);
+      PackSupport.pack(defaultValue, packStream);
     }
   }
 
@@ -336,8 +335,8 @@ public final class ParameterConfig
    * @hidden
    */
   public static @NotNull ParameterConfig unpack(
-      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackHelper unpack,
-      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackInputStream packStream) throws IOException
+      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackSupport unpack,
+      @NotNull PackInputStream packStream) throws IOException
   {
     var map = new LinkedHashMap<ConfigKey,ConfigValue>();
 

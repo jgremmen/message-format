@@ -19,15 +19,15 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.SpacesAware;
 import de.sayayi.lib.message.exception.MessageFormatException;
-import de.sayayi.lib.message.internal.pack.PackHelper;
-import de.sayayi.lib.message.internal.pack.PackInputStream;
-import de.sayayi.lib.message.internal.pack.PackOutputStream;
+import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.internal.part.TemplatePart;
 import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextJoiner;
 import de.sayayi.lib.message.part.parameter.ParameterPart;
+import de.sayayi.lib.pack.PackInputStream;
+import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -182,7 +182,7 @@ public final class CompoundMessage implements Message.WithSpaces
     packStream.writeSmallVar(messageParts.length);
 
     for(var part: messageParts)
-      PackHelper.pack(part, packStream);
+      PackSupport.pack(part, packStream);
   }
 
 
@@ -198,7 +198,7 @@ public final class CompoundMessage implements Message.WithSpaces
    *
    * @hidden
    */
-  public static @NotNull Message.WithSpaces unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
+  public static @NotNull Message.WithSpaces unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
     var parts = new ArrayList<MessagePart>();

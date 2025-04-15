@@ -17,10 +17,10 @@ package de.sayayi.lib.message.part.parameter;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.internal.pack.PackHelper;
-import de.sayayi.lib.message.internal.pack.PackInputStream;
-import de.sayayi.lib.message.internal.pack.PackOutputStream;
+import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.part.MessagePart.Parameter;
+import de.sayayi.lib.pack.PackInputStream;
+import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -201,8 +201,7 @@ public final class ParameterPart implements Parameter
    *
    * @hidden
    */
-  public void pack(@SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackOutputStream packStream)
-      throws IOException
+  public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeBoolean(spaceBefore);
     packStream.writeBoolean(spaceAfter);
@@ -226,8 +225,8 @@ public final class ParameterPart implements Parameter
    * @hidden
    */
   public static @NotNull ParameterPart unpack(
-      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackHelper unpack,
-      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackInputStream packStream) throws IOException
+      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackSupport unpack,
+      @NotNull PackInputStream packStream) throws IOException
   {
     var spaceBefore = packStream.readBoolean();
     var spaceAfter = packStream.readBoolean();

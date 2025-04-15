@@ -19,10 +19,10 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.exception.MessageFormatException;
-import de.sayayi.lib.message.internal.pack.PackHelper;
-import de.sayayi.lib.message.internal.pack.PackInputStream;
-import de.sayayi.lib.message.internal.pack.PackOutputStream;
+import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.pack.PackInputStream;
+import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -185,7 +185,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
     for(var entry: localizedMessages.entrySet())
     {
       packStream.writeString(entry.getKey().toLanguageTag());
-      PackHelper.pack(entry.getValue(), packStream);
+      PackSupport.pack(entry.getValue(), packStream);
     }
   }
 
@@ -202,7 +202,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
    *
    * @hidden
    */
-  public static @NotNull Message.WithCode unpack(@NotNull PackHelper unpack, @NotNull PackInputStream packStream)
+  public static @NotNull Message.WithCode unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
     var messageCount = packStream.readSmallVar();

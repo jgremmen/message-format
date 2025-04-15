@@ -15,9 +15,9 @@
  */
 package de.sayayi.lib.message.internal.part;
 
-import de.sayayi.lib.message.internal.pack.PackInputStream;
-import de.sayayi.lib.message.internal.pack.PackOutputStream;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.pack.PackInputStream;
+import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
