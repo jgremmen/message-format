@@ -69,6 +69,7 @@ def grammarOutputDirectory = layout.buildDirectory
     .dir('generated-src/antlr/main/de/sayayi/lib/message/internal/parser').get().asFile
 
 generateGrammarSource {
+  //noinspection GroovyAccessibility
   antlrClasspath = configurations.antlr4
   outputDirectory = grammarOutputDirectory
 
