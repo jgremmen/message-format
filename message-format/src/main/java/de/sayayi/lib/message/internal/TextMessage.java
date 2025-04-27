@@ -27,7 +27,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Set;
 
 
 /**
@@ -75,12 +74,6 @@ public final class TextMessage implements Message.WithSpaces
   @Override
   public @NotNull MessagePart[] getMessageParts() {
     return new MessagePart[] { textPart };
-  }
-
-
-  @Override
-  public @NotNull Set<String> getTemplateNames() {
-    return Set.of();
   }
 
 

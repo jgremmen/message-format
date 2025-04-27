@@ -25,6 +25,7 @@ import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.IOException;
 import java.util.Set;
@@ -80,6 +81,7 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
 
 
   @Override
+  @Unmodifiable
   public @NotNull Set<String> getTemplateNames() {
     return message.getTemplateNames();
   }

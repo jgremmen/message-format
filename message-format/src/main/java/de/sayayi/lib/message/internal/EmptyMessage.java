@@ -22,8 +22,6 @@ import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
-
 
 /**
  * Message implementation, representing an empty text without leading/trailing spaces.
@@ -81,12 +79,6 @@ public final class EmptyMessage implements Message.WithSpaces
   @Override
   public @NotNull MessagePart[] getMessageParts() {
     return new MessagePart[] { Text.EMPTY };
-  }
-
-
-  @Override
-  public @NotNull Set<String> getTemplateNames() {
-    return Set.of();
   }
 
 

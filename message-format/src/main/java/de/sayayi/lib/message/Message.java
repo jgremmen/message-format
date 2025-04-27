@@ -144,7 +144,9 @@ public interface Message
    */
   @Contract(pure = true)
   @Unmodifiable
-  @NotNull Set<String> getTemplateNames();
+  default @NotNull Set<String> getTemplateNames() {
+    return Set.of();
+  }
 
 
   /**

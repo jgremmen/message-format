@@ -25,6 +25,7 @@ import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -134,6 +135,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
 
   @Override
+  @Unmodifiable
   public @NotNull Set<String> getTemplateNames()
   {
     return localizedMessages
