@@ -181,12 +181,22 @@ public interface Message
    */
   interface WithSpaces extends Message, SpacesAware
   {
+    /**
+     * Tells if the message has a leading space.
+     *
+     * @return  {@code true} if the message has a leading space, {@code false} otherwise
+     */
     @Override
     default boolean isSpaceBefore() {
       return getMessageParts()[0].isSpaceBefore();
     }
 
 
+    /**
+     * Tells if the message has a trailing space.
+     *
+     * @return  {@code true} if the message has a trailing space, {@code false} otherwise
+     */
     @Override
     default boolean isSpaceAfter()
     {
@@ -311,9 +321,9 @@ public interface Message
 
 
     /**
-     * Returns the hash code value for this parameters instance.
+     * Returns the hash code value for this parameter's instance.
      * <p>
-     * The hash code of a parameters instance is defined to be the sum of the hash codes of the locale,
+     * The hash code of a parameter's instance is defined to be the sum of the hash codes of the locale,
      * the parameter name strings and the parameter values. This ensures that {@code p1.equals(p2)}
      * implies that {@code p1.hashCode() == p2.hashCode()} for any two parameter instances
      * {@code p1} and {@code p2}, as required by the general contract of {@link Object#hashCode}.
