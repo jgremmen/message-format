@@ -38,7 +38,7 @@ import static org.springframework.asm.Type.getDescriptor;
 /**
  * This class defines various methods for adopting messages and templates defined by annotations.
  * <p>
- * Messages are analysed per class (see {@link #parseClass(InputStream)}). If there is a
+ * Messages are analyzed per class (see {@link #parseClass(InputStream)}). If there is a
  * requirement to select a part of the messages provided by a class, the message support must
  * be configured with an appropriate
  * {@link de.sayayi.lib.message.MessageSupport.MessageFilter MessageFilter} or
@@ -48,7 +48,7 @@ import static org.springframework.asm.Type.getDescriptor;
  * ({@link #adopt(MessageDef)} and {@link #adopt(TemplateDef)}) are available for analyzing
  * synthesized/mocked annotations.
  * <p>
- * The scanned classes are analysed using the ASM library bundled with Spring. Using this class
+ * The scanned classes are analyzed using the ASM library bundled with Spring. Using this class
  * therefore requires a dependency with library {@code org.springframework:spring-core:5.3.+}.
  *
  * @author Jeroen Gremmen

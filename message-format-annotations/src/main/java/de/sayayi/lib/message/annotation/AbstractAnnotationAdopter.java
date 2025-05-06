@@ -35,7 +35,6 @@ import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.jar.JarFile;
@@ -50,7 +49,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * This abstract class defines various methods for adopting messages and templates defined by annotations.
  * <p>
- * Messages are analysed per class (see {@link #parseClass(InputStream)}). If there is a
+ * Messages are analyzed per class (see {@link #parseClass(InputStream)}). If there is a
  * requirement to select a part of the messages provided by a class, the message support must
  * be configured with an appropriate
  * {@link de.sayayi.lib.message.MessageSupport.MessageFilter MessageFilter} or
@@ -233,7 +232,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   /**
    * Adopt messages for the given {@code classFile}.
    *
-   * @param classFile  location of the class file to analyse for messages, not {@code null}
+   * @param classFile  location of the class file to analyze for messages, not {@code null}
    *
    * @return  this annotation adopter instance, never {@code null}
    *
@@ -248,7 +247,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
     if (!indexedClasses.contains(classPath.toString()))
     {
-      try(var inputStream = Files.newInputStream(classPath)) {
+      try(var inputStream = newInputStream(classPath)) {
         parseClass(inputStream);
         indexedClasses.add(classPath.toString());
       } catch(Exception ex) {
@@ -280,7 +279,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   /**
    * Adopt messages for the given {@code type}.
    *
-   * @param type  type to analyse for messages, not {@code null}
+   * @param type  type to analyze for messages, not {@code null}
    *
    * @return  this annotation adopter instance, never {@code null}
    *
@@ -341,7 +340,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
           if (mappedValue == null || mappedValue.equals(value))
             return value;
 
-          // if message text differs from previous definition -> throw
+          // if a message text differs from the previous definition-> throw
           throw new DuplicateMessageException(code, "different message definition for same locale '" + locale + "'");
         });
       }
@@ -402,7 +401,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   /**
    * Scan contents of class provided by {@code classInputStream}.
    *
-   * @param classInputStream  input stream of class file, not {@code null}
+   * @param classInputStream  input stream of a class file, not {@code null}
    *
    * @throws IOException  in case of an I/O exception
    */
