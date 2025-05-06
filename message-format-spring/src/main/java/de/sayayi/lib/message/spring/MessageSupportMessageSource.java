@@ -17,7 +17,6 @@ package de.sayayi.lib.message.spring;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport;
-import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupport.MessageConfigurer;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.HierarchicalMessageSource;
@@ -27,6 +26,7 @@ import org.springframework.context.NoSuchMessageException;
 
 import java.util.Locale;
 
+import static java.lang.Character.isLetter;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
 
@@ -43,7 +43,7 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
 
 
   public MessageSupportMessageSource(@NotNull MessageSupport messageSupport) {
-    this("p", messageSupport, null);
+    this(messageSupport, null);
   }
 
 
@@ -52,10 +52,18 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
   }
 
 
+  protected MessageSupportMessageSource(@NotNull MessageSupport messageSupport, MessageSource parentMessageSource) {
+    this("p", messageSupport, parentMessageSource);
+  }
+
+
   protected MessageSupportMessageSource(@NotNull String parameterPrefix,
                                         @NotNull MessageSupport messageSupport,
                                         MessageSource parentMessageSource)
   {
+    if (parameterPrefix.isBlank() || !isLetter(parameterPrefix.charAt(0)))
+      throw new IllegalArgumentException("parameterPrefix must start with a letter");
+
     this.parameterPrefix = parameterPrefix;
     this.messageSupport = messageSupport;
     this.parentMessageSource = parentMessageSource;
@@ -121,10 +129,10 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
   public @NotNull String getMessage(@NotNull MessageSourceResolvable resolvable, @NotNull Locale locale)
       throws NoSuchMessageException
   {
-    final String[] codes = resolvable.getCodes();
+    final var codes = resolvable.getCodes();
     if (codes != null)
     {
-      final MessageAccessor accessor = messageSupport.getMessageAccessor();
+      final var accessor = messageSupport.getMessageAccessor();
 
       for(var code: resolvable.getCodes())
         if (accessor.hasMessageWithCode(code))
@@ -134,7 +142,7 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
     if (parentMessageSource != null)
       return parentMessageSource.getMessage(resolvable, locale);
 
-    final String defaultMessage = resolvable.getDefaultMessage();
+    final var defaultMessage = resolvable.getDefaultMessage();
     if (defaultMessage == null)
       throw new NoSuchMessageException(isEmpty(codes) ? "" : codes[codes.length - 1], locale);
 

@@ -30,7 +30,6 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.*;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 import static org.springframework.expression.spel.SpelMessage.VARIABLE_ASSIGNMENT_NOT_SUPPORTED;
@@ -128,12 +127,6 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
 
 
     @Override
-    public @NotNull TypedValue assignVariable(@NotNull String name, @NotNull Supplier<TypedValue> valueSupplier) {
-      throw new SpelEvaluationException(VARIABLE_ASSIGNMENT_NOT_SUPPORTED, "#" + name);
-    }
-
-
-    @Override
     public BeanResolver getBeanResolver() {
       return null;
     }
@@ -195,6 +188,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
 
     @Override
     public void setVariable(@NotNull String name, Object value) {
+      throw new SpelEvaluationException(VARIABLE_ASSIGNMENT_NOT_SUPPORTED, "#" + name);
     }
   }
 }
