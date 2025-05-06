@@ -28,6 +28,8 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
+ * This class represents a string configuration value.
+ *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
@@ -79,6 +81,13 @@ public final class ConfigValueString implements ConfigValue
   }
 
 
+  /**
+   * Returns the parsed string value as a message.
+   *
+   * @param messageFactory  message factory instance, not {@code null}
+   *
+   * @return  string value parsed as a message, never {@code null}
+   */
   public @NotNull Message.WithSpaces asMessage(@NotNull MessageFactory messageFactory)
   {
     if (message == null)

@@ -27,6 +27,8 @@ import static java.lang.Integer.MIN_VALUE;
 
 
 /**
+ * This class represents a numeric configuration value.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
