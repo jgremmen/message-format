@@ -28,7 +28,7 @@ allprojects {
   ext.jetbrainsAnnotationsVersion = '[24.0,26.1)'
   ext.junitVersion = '5.12.+'
   ext.lombokVersion = '1.18.+'
-  ext.mockitoVersion = '5.16.+'
+  ext.mockitoVersion = '5.17.+'
 
   repositories {
     maven {
