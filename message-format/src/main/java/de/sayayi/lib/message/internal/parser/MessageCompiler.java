@@ -215,7 +215,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           else
           {
             if (template)
-              syntaxError((TemplatePartContext)part, "no nested template allowed");
+            {
+              syntaxError("no nested template allowed")
+                  .with(part)
+                  .report();
+            }
 
             parts.add(((TemplatePartContext)part).part);
           }
@@ -335,8 +339,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           for(var key: cec.configKeys)
             if (map.put(key, cec.configValue) != null)
             {
-              syntaxError(cec, "duplicate config element " + key + " for parameter '" +
-                  ((ParameterPartContext)cec.parent).name.string + '\'');
+              syntaxError("duplicate config element " + key + " for parameter '" +
+                  ((ParameterPartContext)cec.parent).name.string + '\'')
+                  .with(cec)
+                  .report();
             }
         };
       }
@@ -360,7 +366,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
       var name = ctx.name.string;
       if (name.isEmpty())
-        syntaxError(ctx.name, "parameter name must not be empty");
+      {
+        syntaxError("parameter name must not be empty")
+            .with(ctx.name)
+            .report();
+      }
 
       ctx.part = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(
           name, ctx.format == null ? null : ctx.format.name,
@@ -383,7 +393,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           var name = cpec.configKey.getName();
 
           if (map.containsKey(name))
-            syntaxError(cpec, "duplicate template default parameter '" + name + "'");
+          {
+            syntaxError("duplicate template default parameter '" + name + "'")
+                .with(cpec)
+                .report();
+          }
 
           map.put(name, cpec.configValue);
         };
@@ -408,7 +422,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       {
         return (map,tpdc) -> {
           if (map.containsKey(tpdc.parameter))
-            syntaxError(tpdc, "duplicate template parameter delegate '" + tpdc.parameter + "'");
+          {
+            syntaxError("duplicate template parameter delegate '" + tpdc.parameter + "'")
+                .with(tpdc)
+                .report();
+          }
 
           map.put(tpdc.parameter, tpdc.delegatedParameter);
         };
@@ -427,7 +445,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     {
       var name = ctx.simpleString().string;
       if (name.isEmpty())
-        syntaxError(ctx.simpleString(), "template name must not be empty");
+      {
+        syntaxError("template name must not be empty")
+            .with(ctx.simpleString())
+            .report();
+      }
 
       ctx.part = new TemplatePart(
           name,
