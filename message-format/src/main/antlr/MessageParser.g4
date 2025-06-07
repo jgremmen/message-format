@@ -71,11 +71,19 @@ forceQuotedMessage returns [Message.WithSpaces messageWithSpaces]
 
 parameterPart returns [ParameterPart part]
         : P_START
-          name=simpleString
-          (COMMA format=nameOrKeyword)?
+          parameterName
+          (COMMA parameterFormat)?
           (COMMA parameterConfigElement)*
           (COMMA COLON forceQuotedMessage)?
           P_END
+        ;
+
+parameterName returns [String name]
+        : simpleString
+        ;
+
+parameterFormat returns [String format]
+        : nameOrKeyword
         ;
 
 parameterConfigElement returns [List<ConfigKey> configKeys, ConfigValue configValue]
@@ -85,9 +93,13 @@ parameterConfigElement returns [List<ConfigKey> configKeys, ConfigValue configVa
 
 templatePart returns [TemplatePart part]
         : TPL_START
-          name=simpleString
+          templateName
           (COMMA (configNamedElement | templateParameterDelegate))*
           TPL_END
+        ;
+
+templateName returns [String name]
+        : simpleString
         ;
 
 templateParameterDelegate returns [String parameter, String delegatedParameter]

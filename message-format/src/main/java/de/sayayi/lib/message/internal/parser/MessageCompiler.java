@@ -36,6 +36,7 @@ import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.value.*;
 import de.sayayi.lib.message.util.SpacesUtil;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
@@ -88,7 +89,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   /**
-   * Compile the given message {@code text} into a spaces aware message object.
+   * Compile the given message {@code text} into a space-aware message object.
    *
    * @param text  message text, not {@code null}
    *
@@ -103,7 +104,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   /**
-   * Compile the given template {@code text} into a spaces aware message object.
+   * Compile the given template {@code text} into a space-aware message object.
    *
    * @param text  template text, not {@code null}
    *
@@ -120,7 +121,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   @Contract(pure = true)
   private @NotNull Message.WithSpaces compileMessage(@NotNull @Language("MessageFormat") String text, boolean template)
   {
-    var listener = new Listener(template);
+    final var listener = new Listener(template);
 
     try {
       return parse(new Lexer(text), lexer -> new Parser(listener.tokenStream = new BufferedTokenStream(lexer)),
@@ -136,6 +137,80 @@ public final class MessageCompiler extends AbstractAntlr4Parser
                                                       @NotNull String formattedMessage, @NotNull String errorMsg,
                                                       Exception cause) {
     return new MessageParserException(errorMsg, formattedMessage, cause);
+  }
+
+
+  @Override
+  protected @NotNull String createTokenRecognitionMessage(@NotNull org.antlr.v4.runtime.Lexer lexer,
+                                                          @NotNull String text, boolean hasEOF) {
+    return "message syntax error at " + (hasEOF ? getEOFTokenDisplayText() : getQuotedDisplayText(text));
+  }
+
+
+  @Override
+  protected @NotNull String createNoViableAlternativeMessage(@NotNull org.antlr.v4.runtime.Parser parser,
+                                                             @NotNull Token startToken,
+                                                             @NotNull Token offendingToken)
+  {
+    if (isEOFToken(startToken))
+      return "incomplete message format";
+
+    final var parserRuleContext = parser.getRuleContext();
+
+    if (parserRuleContext instanceof ConfigMapElementContext)
+      return "syntax error in message parameter map element at " + getTokenDisplayText(parser, offendingToken);
+
+    return "message syntax error at " +
+        getQuotedDisplayText(parser.getInputStream().getText(startToken, offendingToken));
+  }
+
+
+  private static final IntervalSet IVS_NAME = new IntervalSet(SQ_START, DQ_START, BOOL, NAME, NULL, EMPTY);
+  private static final IntervalSet IVS_PARAMETER_CLOSE = new IntervalSet(COMMA, P_END);
+
+  @Override
+  protected @NotNull String createInputMismatchMessage(@NotNull org.antlr.v4.runtime.Parser parser,
+                                                       @NotNull IntervalSet expectedTokens,
+                                                       Token mismatchLocationNearToken)
+  {
+    final var parserRuleContext = parser.getRuleContext();
+
+    if (IVS_NAME.equals(expectedTokens))
+    {
+      if (parserRuleContext instanceof SimpleStringContext &&
+          parserRuleContext.parent instanceof ParameterNameContext)
+        return "missing parameter name at " + getTokenDisplayText(parser, mismatchLocationNearToken);
+
+      if (parserRuleContext instanceof ForceQuotedMessageContext &&
+          parserRuleContext.parent instanceof ParameterPartContext)
+      {
+        if (isEOFToken(mismatchLocationNearToken))
+          return "pre-mature end of message parameter reached; missing default message";
+        else
+          return "missing default message in parameter at " + getTokenDisplayText(parser, mismatchLocationNearToken);
+      }
+
+      return "missing string or name in parameter at " + getTokenDisplayText(parser, mismatchLocationNearToken);
+    }
+
+    if (IVS_PARAMETER_CLOSE.equals(expectedTokens) && parserRuleContext instanceof ParameterPartContext)
+      return "end of message parameter expected at " + getTokenDisplayText(parser, mismatchLocationNearToken);
+
+    return super.createInputMismatchMessage(parser, expectedTokens, mismatchLocationNearToken);
+  }
+
+
+  @Override
+  protected @NotNull String createUnwantedTokenMessage(@NotNull org.antlr.v4.runtime.Parser parser,
+                                                       @NotNull Token unwantedToken,
+                                                       @NotNull IntervalSet expectedTokens)
+  {
+    final var ctx = parser.getContext();
+
+    if (isEOFToken(unwantedToken) && ctx instanceof ParameterPartContext)
+      return "pre-mature end of message parameter reached; missing '}'";
+
+    return super.createUnwantedTokenMessage(parser, unwantedToken, expectedTokens);
   }
 
 
@@ -340,7 +415,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
             if (map.put(key, cec.configValue) != null)
             {
               syntaxError("duplicate config element " + key + " for parameter '" +
-                  ((ParameterPartContext)cec.parent).name.string + '\'')
+                  ((ParameterPartContext)cec.parent).parameterName().name + '\'')
                   .with(cec)
                   .report();
             }
@@ -364,19 +439,33 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       if (forceQuotedMessage != null)
         mapElements.put(null, new ConfigValueMessage(forceQuotedMessage.messageWithSpaces));
 
-      var name = ctx.name.string;
+      var name = ctx.parameterName().name;
       if (name.isEmpty())
       {
         syntaxError("parameter name must not be empty")
-            .with(ctx.name)
+            .with(ctx.parameterName())
             .report();
       }
 
+      var parameterFormat = ctx.parameterFormat();
+
       ctx.part = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(
-          name, ctx.format == null ? null : ctx.format.name,
+          name, parameterFormat == null ? null : parameterFormat.format,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
           new ParameterConfig(mapElements)));
+    }
+
+
+    @Override
+    public void exitParameterName(ParameterNameContext ctx) {
+      ctx.name = ctx.simpleString().string;
+    }
+
+
+    @Override
+    public void exitParameterFormat(ParameterFormatContext ctx) {
+      ctx.format = ctx.nameOrKeyword().name;
     }
 
 
@@ -443,11 +532,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitTemplatePart(TemplatePartContext ctx)
     {
-      var name = ctx.simpleString().string;
+      var name = ctx.templateName().name;
       if (name.isEmpty())
       {
         syntaxError("template name must not be empty")
-            .with(ctx.simpleString())
+            .with(ctx.templateName())
             .report();
       }
 
@@ -457,6 +546,12 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
           ctx.configNamedElement().stream().collect(TEMPLATE_NAMED_PARAMETER_COLLECTOR),
           ctx.templateParameterDelegate().stream().collect(TEMPLATE_PARAMETER_DELEGATE_COLLECTOR));
+    }
+
+
+    @Override
+    public void exitTemplateName(TemplateNameContext ctx) {
+      ctx.name = ctx.simpleString().string;
     }
 
 

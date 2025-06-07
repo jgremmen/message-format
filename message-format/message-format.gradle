@@ -27,7 +27,7 @@ description = 'Message Format Library'
 
 
 def antlrVersion = '[4.13.0,4.14)'
-def antlrExtVersion = '[0.5.3,0.6)'
+def antlrExtVersion = '[0.6,0.7)'
 def packVersion = '[0.1,0.2)'
 
 
