@@ -159,6 +159,19 @@ public final class ParameterConfig
   }
 
 
+  /**
+   * Returns the default value from the parameter configuration map.
+
+   * @return  default configuration value or {@code null} if no default value has been defined
+   *
+   * @since 0.20.0
+   */
+  @Contract(pure = true)
+  public ConfigValue getDefaultValue() {
+    return defaultValue;
+  }
+
+
   @Contract(pure = true)
   public Message.WithSpaces getMessage(@NotNull MessageAccessor messageAccessor, Object key, @NotNull Locale locale,
                                        @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault)
