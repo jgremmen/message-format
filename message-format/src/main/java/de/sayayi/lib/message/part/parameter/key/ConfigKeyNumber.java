@@ -22,6 +22,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
+import static de.sayayi.lib.message.internal.pack.PackSupport.packLongVar;
+import static de.sayayi.lib.message.internal.pack.PackSupport.unpackLongVar;
 import static java.util.Objects.requireNonNull;
 
 
@@ -39,7 +41,7 @@ public final class ConfigKeyNumber implements ConfigKey
 
 
   /**
-   * Constructs a configuration key number with comparison type.
+   * Constructs a configuration key number with a comparison type.
    *
    * @param compareType  configuration key comparison type, not {@code null}
    * @param number       configuration key number
@@ -87,7 +89,7 @@ public final class ConfigKeyNumber implements ConfigKey
     if (!(o instanceof ConfigKeyNumber))
       return false;
 
-    var that = (ConfigKeyNumber)o;
+    final var that = (ConfigKeyNumber)o;
 
     return number == that.number && compareType == that.compareType;
   }
@@ -117,7 +119,7 @@ public final class ConfigKeyNumber implements ConfigKey
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeEnum(compareType);
-    packStream.writeLong(number);
+    packLongVar(number, packStream);
   }
 
 
@@ -132,7 +134,13 @@ public final class ConfigKeyNumber implements ConfigKey
    *
    * @hidden
    */
-  public static @NotNull ConfigKeyNumber unpack(@NotNull PackInputStream packStream) throws IOException {
-    return new ConfigKeyNumber(packStream.readEnum(CompareType.class), packStream.readLong());
+  public static @NotNull ConfigKeyNumber unpack(@NotNull PackInputStream packStream) throws IOException
+  {
+    final var compareType = packStream.readEnum(CompareType.class);
+    final var number = packStream.getVersion().orElseThrow() == 1
+        ? packStream.readLong()
+        : unpackLongVar(packStream);
+
+    return new ConfigKeyNumber(compareType, number);
   }
 }

@@ -67,7 +67,8 @@ class PackCompatibilityTest
   private static Stream<Arguments> versionParameters()
   {
     return Stream.of(
-        Arguments.of("0.20.0", 1, 8, 2)
+        Arguments.of("0.20.0", 1, 8, 2),
+        Arguments.of("0.20.1", 2, 9, 2)
     );
   }
 

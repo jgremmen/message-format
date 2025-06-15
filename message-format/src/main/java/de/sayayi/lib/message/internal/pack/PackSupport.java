@@ -27,6 +27,7 @@ import de.sayayi.lib.message.part.parameter.value.*;
 import de.sayayi.lib.pack.PackConfig;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -45,7 +46,7 @@ import static java.util.function.Function.identity;
 public final class PackSupport
 {
   /** Pack version */
-  public static final int VERSION = 1;
+  public static final int VERSION = 2;
 
   /** Pack mime type */
   public static final String MIME_TYPE = "application/x-message-format-pack";
@@ -89,6 +90,7 @@ public final class PackSupport
   private final Map<Message.WithSpaces,Message.WithSpaces> messagesWithSpaces = new HashMap<>();
 
 
+  @Contract(mutates = "param2,io")
   public static void pack(@NotNull Message message, @NotNull PackOutputStream packStream) throws IOException
   {
     if (message instanceof EmptyMessage)
@@ -126,6 +128,7 @@ public final class PackSupport
   }
 
 
+  @Contract(mutates = "param1,io")
   public @NotNull Message.WithSpaces unpackMessageWithSpaces(@NotNull PackInputStream packStream) throws IOException
   {
     final Message.WithSpaces message;
@@ -151,6 +154,7 @@ public final class PackSupport
   }
 
 
+  @Contract(mutates = "param1,io")
   public @NotNull Message.WithCode unpackMessageWithCode(@NotNull PackInputStream packStream) throws IOException
   {
     switch(packStream.readSmall(3))
@@ -169,6 +173,7 @@ public final class PackSupport
   }
 
 
+  @Contract(mutates = "param1,io")
   public @NotNull Message unpackMessage(@NotNull PackInputStream packStream) throws IOException
   {
     final Message.WithSpaces message;
@@ -203,6 +208,7 @@ public final class PackSupport
   }
 
 
+  @Contract(mutates = "param2,io")
   public static void pack(@NotNull MessagePart messagePart, @NotNull PackOutputStream packStream) throws IOException
   {
     if (messagePart instanceof ParameterPart)
@@ -230,6 +236,7 @@ public final class PackSupport
   }
 
 
+  @Contract(mutates = "param1,io")
   public @NotNull MessagePart unpackMessagePart(@NotNull PackInputStream packStream) throws IOException
   {
     final MessagePart messagePart;
@@ -260,6 +267,7 @@ public final class PackSupport
   }
 
 
+  @Contract(mutates = "param2,io")
   public static void pack(ConfigKey configKey, @NotNull PackOutputStream packStream) throws IOException
   {
     if (configKey == null)
@@ -299,6 +307,7 @@ public final class PackSupport
   }
 
 
+  @Contract(mutates = "param1,io")
   public ConfigKey unpackMapKey(@NotNull PackInputStream packStream) throws IOException
   {
     final ConfigKey configKey;
@@ -341,6 +350,7 @@ public final class PackSupport
   }
 
 
+  @Contract(mutates = "param2,io")
   public static void pack(@NotNull ConfigValue configValue, @NotNull PackOutputStream packStream) throws IOException
   {
     if (configValue instanceof ConfigValueBool)
@@ -368,6 +378,7 @@ public final class PackSupport
   }
 
 
+  @Contract(mutates = "param1,io")
   public @NotNull ConfigValue unpackMapValue(@NotNull PackInputStream packStream) throws IOException
   {
     final ConfigValue configValue;
@@ -395,5 +406,113 @@ public final class PackSupport
     }
 
     return mapValues.computeIfAbsent(configValue, identity());
+  }
+
+
+  @Contract(mutates = "param2,io")
+  public static void packLongVar(long value, @NotNull PackOutputStream packStream) throws IOException
+  {
+    /*
+      00     -> 0..7  (3 bit)
+      01     -> -1..-8  (3 bit)
+      100    -> 8..135  (7 bit)
+      101    -> -9..-1032  (10 bit)
+      110    -> 136..1159  (10 bit)
+      1110   -> 1160..132231  (17 bit)
+      11110  -> 132232..9223372036854775807  (63 bit)
+      111110 -> -1033..-132104  (17 bit)
+      111111 -> -132105..-9223372036854775808  (63 bit)
+     */
+
+    if (value >= 0)
+    {
+      if (value < 8)  // 0..7
+        packStream.writeSmall((int)value, 5);
+      else if (value < 136)  // 8..135
+      {
+        packStream.writeSmall(0b100, 3);
+        packStream.writeSmall((int)value - 8, 7);
+      }
+      else if (value < 1160)  // 136..1159
+      {
+        packStream.writeSmall(0b110, 3);
+        packStream.writeLarge(value - 136, 10);
+      }
+      else if (value < 132232)  // 1160..132231
+      {
+        packStream.writeSmall(0b1110, 4);
+        packStream.writeLarge(value - 1160, 17);
+      }
+      else  // 132232..9223372036854775807
+      {
+        packStream.writeSmall(0b11110, 5);
+        packStream.writeLarge(value - 132232, 63);
+      }
+    }
+    else
+    {
+      if (value >= -8)  // -8..-1
+      {
+        packStream.writeSmall(0b01, 2);
+        packStream.writeSmall((int)value + 8, 3);
+      }
+      else if (value >= -1032)  // -1032..-9
+      {
+        packStream.writeSmall(0b101, 3);
+        packStream.writeLarge(value + 1032, 10);
+      }
+      else if (value >= -132104)  // -132104..-1033
+      {
+        packStream.writeSmall(0b111110, 6);
+        packStream.writeLarge(value + 132104, 17);
+      }
+      else  // -9223372036854775808..-132105
+      {
+        packStream.writeSmall(0b111111, 6);
+        packStream.writeLarge(-(value + 132105), 63);
+      }
+    }
+  }
+
+
+  @Contract(mutates = "param1,io")
+  public static long unpackLongVar(@NotNull PackInputStream packStream) throws IOException
+  {
+    final var value = packStream.readSmall(5);
+
+    // 00 -> 0..7  (3 bit)
+    if ((value & 0b11000) == 0b00000)
+      return value;
+
+    // 01 -> -1..-8  (3 bit)
+    if ((value & 0b11000) == 0b01000)
+      return (value & 0b00111) - 8;
+
+    // 100 -> 8..135  (7 bit)
+    if ((value & 0b11100) == 0b10000)
+      return ((value & 0b00011) << 5) + packStream.readSmall(5) + 8;
+
+    // 101 -> -9..-1032  (10 bit)
+    if ((value & 0b11100) == 0b10100)
+      return ((value & 0b00011) << 8) + packStream.readSmall(8) - 1032;
+
+    // 110 -> 136..1159  (10 bit)
+    if ((value & 0b11100) == 0b11000)
+      return ((value & 0b00011) << 8) + packStream.readSmall(8) + 136;
+
+    // 1110 -> 1160..132231  (17 bit)
+    if ((value & 0b11110) == 0b11100)
+      return ((value & 0b00001) << 16) + packStream.readLarge(16) + 1160;
+
+    // 11110 -> 132232..9223372036854775807  (63 bit)
+    if (value == 0b11110)
+      return packStream.readLarge(63) + 132232L;
+
+    // 111110 -> -1033..-132104  (17 bit)
+    if (!packStream.readBoolean())
+      return packStream.readLarge(17) - 132104L;
+
+    // 111111 -> -132105..-9223372036854775808  (63 bit)
+    return -packStream.readLarge(63) - 132105L;
   }
 }

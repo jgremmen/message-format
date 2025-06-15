@@ -22,6 +22,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
+import static de.sayayi.lib.message.internal.pack.PackSupport.packLongVar;
+import static de.sayayi.lib.message.internal.pack.PackSupport.unpackLongVar;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.MIN_VALUE;
 
@@ -122,7 +124,7 @@ public final class ConfigValueNumber implements ConfigValue
    * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeLong(number);
+    packLongVar(number, packStream);
   }
 
 
@@ -137,7 +139,12 @@ public final class ConfigValueNumber implements ConfigValue
    *
    * @hidden
    */
-  public static @NotNull ConfigValueNumber unpack(@NotNull PackInputStream packStream) throws IOException {
-    return new ConfigValueNumber(packStream.readLong());
+  public static @NotNull ConfigValueNumber unpack(@NotNull PackInputStream packStream) throws IOException
+  {
+    final var number = packStream.getVersion().orElseThrow() == 1
+        ? packStream.readLong()
+        : unpackLongVar(packStream);
+
+    return new ConfigValueNumber(number);
   }
 }
