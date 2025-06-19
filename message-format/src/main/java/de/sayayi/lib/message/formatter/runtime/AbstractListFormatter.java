@@ -76,22 +76,22 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull T list)
   {
-    var moreValue = context.getConfigValueString(CONFIG_VALUE_MORE).orElse(null);
-    var hasMoreValue = moreValue != null && !isTrimmedEmpty(moreValue);
-    var joiner = new TextJoiner();
-    var iterator = createIterator(context, list);
+    final var moreValue = context.getConfigValueString(CONFIG_VALUE_MORE).orElse(null);
+    final var hasMoreValue = moreValue != null && !isTrimmedEmpty(moreValue);
+    final var joiner = new TextJoiner();
+    final var iterator = createIterator(context, list);
 
-    int n = (int)context.getConfigValueNumber(CONFIG_MAX_SIZE).orElse(MAX_VALUE);
+    var n = (int)context.getConfigValueNumber(CONFIG_MAX_SIZE).orElse(MAX_VALUE);
 
     if (n == 0 && iterator.hasNext() && hasMoreValue)
       joiner.add(noSpaceText(moreValue));
     else
     {
-      var separator = spacedText(context.getConfigValueString(CONFIG_SEPARATOR).orElse(DEFAULT_SEPARATOR));
+      final var separator = spacedText(context.getConfigValueString(CONFIG_SEPARATOR).orElse(DEFAULT_SEPARATOR));
 
       for(var first = true; iterator.hasNext() && !(n == 0 && !hasMoreValue);)
       {
-        var text = iterator.next();
+        final var text = iterator.next();
 
         if (first)
           first = false;
