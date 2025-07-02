@@ -45,7 +45,7 @@ public class MessageFactory
   /**
    * Shared message factory without any caching capabilities.
    * <p>
-   * This message factory will suffice in most cases. However, if you have a large amount of
+   * This message factory will suffice in most cases. However, if you have a large number of
    * messages, it is better to construct a message factory with an appropriate
    * {@link MessagePartNormalizer}.
    */
