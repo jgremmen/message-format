@@ -32,6 +32,10 @@ if (snapshot)
         name = 'mavenCentralSnapshot'
         url = 'https://central.sonatype.com/repository/maven-snapshots/'
 
+        mavenContent {
+          snapshotsOnly()
+        }
+
         credentials {
           username = rootProject.findProperty('mavenCentralPortalUsername')
           password = rootProject.findProperty('mavenCentralPortalPassword')
