@@ -122,3 +122,14 @@ tasks.named('publishToProjectLocalRepository') {
 tasks.named('zipMavenCentralPortalPublication') {
   dependsOn 'publishMessageFormatPluginMarkerMavenPublicationToProjectLocalRepository'
 }
+
+
+ext.releaseTask.configure {
+  if (snapshot) {
+    dependsOn ':message-gradle-plugin:publishGradlePluginPublicationToMavenCentralSnapshotRepository'
+    dependsOn ':message-gradle-plugin:publishMessageFormatPluginMarkerMavenPublicationToMavenCentralSnapshotRepository'
+  }
+  else {
+    dependsOn ':message-gradle-plugin:publishPlugins'
+  }
+}

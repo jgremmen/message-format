@@ -18,7 +18,6 @@ description = 'Message Format Library Projects'
 
 
 def gradleDirectory = layout.projectDirectory.dir('gradle')
-def snapshot = version.toString().endsWith('-SNAPSHOT')
 
 
 allprojects {
@@ -39,11 +38,14 @@ configure(subprojects.findAll {name.startsWith('message-') }) {
 }
 
 
+def snapshot = version.toString().endsWith('-SNAPSHOT')
+
+
 tasks.register('releaseAllDryRun', Sync) {
   group = 'release'
   description = 'Release all artifacts to temporary Maven repository.'
 
-  into rootProject.layout.buildDirectory.dir('repository')
+  into layout.buildDirectory.dir('repository')
 
   configure(subprojects) { subproject ->
     def publishTask = subproject.tasks.named('publishToProjectLocalRepository')
@@ -58,23 +60,16 @@ tasks.register(snapshot ? 'releaseAllSnapshots' : 'releaseAll') {
   description = snapshot
       ? 'Release all snapshot artifacts to Maven Central Repository.'
       : 'Release final artifacts to Maven Central repository.'
+
+  inputs.property('snapshot', snapshot)
+
+  dependsOn ':message-format:releaseMessageFormatArtifacts'
+  dependsOn ':message-format-annotations:releaseMessageFormatAnnotationsArtifacts'
+  dependsOn ':message-format-asm:releaseMessageFormatAsmArtifacts'
+  dependsOn ':message-format-spring:releaseMessageFormatSpringArtifacts'
+
+  dependsOn ':message-gradle-plugin:releaseMessageGradlePluginArtifacts'
 }
-
-
-/*
-tasks.register('releaseAll') {
-  group = 'release'
-  description = 'Release all publications to Maven and Gradle Plugin repository.'
-
-  dependsOn ':message-format:publishMsgformatPublicationToMavenCentralRepository'
-  dependsOn ':message-format-annotations:publishAnnotationsPublicationToMavenCentralRepository'
-  dependsOn ':message-format-asm:publishAsmPublicationToMavenCentralRepository'
-  dependsOn ':message-format-spring:publishSpringPublicationToMavenCentralRepository'
-
-  dependsOn ':message-gradle-plugin:publishGradlePluginPublicationToMavenCentralRepository'
-  dependsOn ':message-gradle-plugin:publishPlugins'
-}
-*/
 
 
 clean {

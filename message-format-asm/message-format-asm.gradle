@@ -73,3 +73,10 @@ publishing {
 signing {
   sign publishing.publications.asm
 }
+
+
+ext.releaseTask.configure {
+  if (snapshot) {
+    dependsOn ':message-format-asm:publishAsmPublicationToMavenCentralSnapshotRepository'
+  }
+}

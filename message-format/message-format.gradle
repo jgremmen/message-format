@@ -143,6 +143,13 @@ publishOnCentral {
 }
 
 
+ext.releaseTask.configure {
+  if (snapshot) {
+    dependsOn ':message-format:publishCorePublicationToMavenCentralSnapshotRepository'
+  }
+}
+
+
 clean {
   delete layout.projectDirectory.dir('src/main/antlr/gen')
   delete layout.projectDirectory.dir('src/main/gen')

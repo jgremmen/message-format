@@ -65,3 +65,10 @@ publishing {
 signing {
   sign publishing.publications.annotations
 }
+
+
+ext.releaseTask.configure {
+  if (snapshot) {
+    dependsOn ':message-format-annotations:publishAnnotationsPublicationToMavenCentralSnapshotRepository'
+  }
+}

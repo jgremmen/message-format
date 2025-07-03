@@ -21,7 +21,7 @@ build:
   tags:
     - docker
   script:
-    - ./gradlew clean build
+    - ./gradlew clean build releaseAllDryRun
 #    - ./gradlew docs -Ddocumentation=true
   artifacts:
     name: "message-format-artifacts"
