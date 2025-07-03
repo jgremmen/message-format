@@ -77,6 +77,6 @@ signing {
 
 ext.releaseTask.configure {
   if (snapshot) {
-    dependsOn ':message-format-asm:publishAsmPublicationToMavenCentralSnapshotRepository'
+    dependsOn 'publishAsmPublicationToMavenCentralSnapshotRepository'
   }
 }

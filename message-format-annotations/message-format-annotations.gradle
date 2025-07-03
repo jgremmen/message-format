@@ -69,6 +69,6 @@ signing {
 
 ext.releaseTask.configure {
   if (snapshot) {
-    dependsOn ':message-format-annotations:publishAnnotationsPublicationToMavenCentralSnapshotRepository'
+    dependsOn 'publishAnnotationsPublicationToMavenCentralSnapshotRepository'
   }
 }

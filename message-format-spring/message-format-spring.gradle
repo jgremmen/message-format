@@ -89,6 +89,6 @@ signing {
 
 ext.releaseTask.configure {
   if (snapshot) {
-    dependsOn ':message-format-spring:publishSpringPublicationToMavenCentralSnapshotRepository'
+    dependsOn 'publishSpringPublicationToMavenCentralSnapshotRepository'
   }
 }
