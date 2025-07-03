@@ -1,0 +1,32 @@
+[versions]
+# message format version
+message-format = '0.20.1-SNAPSHOT'
+
+antlr4 = '[4.13.0,4.14)'
+antlr4-ext = '[0.6,0.7)'
+asm = '[9.0,10.0)'
+jetbrains-annotations = '[24.0,26.1)'
+junit = '5.13.+'
+lombok =  '1.18.+'
+mockito = '5.18.+'
+pack = '[0.1.3,0.2)'
+spring = '[5.0,6.0)'
+
+[libraries]
+antlr4 = { module = 'org.antlr:antlr4', version.ref = "antlr4" }
+antlr4-runtime = { module = 'org.antlr:antlr4-runtime', version.ref = 'antlr4' }
+antlr4-ext-runtime = { module = 'de.sayayi.lib:antlr4-runtime-ext', version.ref = 'antlr4-ext' }
+asm = { module = 'org.ow2.asm:asm', version.ref = 'asm' }
+jetbrains-annotations = { module = 'org.jetbrains:annotations', version.ref = 'jetbrains-annotations' }
+lombok = { module = 'org.projectlombok:lombok', version.ref = 'lombok' }
+mockito-core = { module = 'org.mockito:mockito-core', version.ref = 'mockito' }
+pack = { module = 'de.sayayi.lib:pack', version.ref = 'pack' }
+spring-core = { module = 'org.springframework:spring-core', version.ref = 'spring' }
+spring-context = { module = 'org.springframework:spring-context', version.ref = 'spring' }
+
+[bundles]
+antlr4-runtime = [ 'antlr4-runtime', 'antlr4-ext-runtime' ]
+mockito-test = [ 'mockito-core' ]
+
+[plugins]
+publish-gradle-plugin = { id = 'com.gradle.plugin-publish', version = '1.3.1' }

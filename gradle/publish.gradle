@@ -14,33 +14,56 @@
  * limitations under the License.
  */
 
-apply plugin: 'maven-publish'
 apply plugin: 'signing'
+apply plugin: 'org.danilopianini.publish-on-central'
 
 
-def snapshot = version.toString().endsWith('-SNAPSHOT')
-def tmpRepositoryDirectory = rootProject.layout.buildDirectory
-    .dir('repository').get()
-    .dir(snapshot ? 'snapshot' : 'release')
-    .asFile
+ext.snapshot = version.toString().endsWith('-SNAPSHOT')
 
-publishing {
-  repositories {
-    maven {
-      name = 'mavenTemp'
-      url = tmpRepositoryDirectory
-    }
 
-    maven {
-      name = 'mavenCentral'
-      url = snapshot
-          ? 'https://oss.sonatype.org/content/repositories/snapshots'
-          : 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+zipMavenCentralPortalPublication.dependsOn publishOSSRHPublicationToProjectLocalRepository
 
-      credentials {
-        username = rootProject.findProperty('mavenCentral.username')
-        password = rootProject.findProperty('mavenCentral.password')
+
+if (snapshot)
+{
+  publishing {
+    repositories {
+      maven {
+        name = 'mavenCentralSnapshot'
+        url = 'https://central.sonatype.com/repository/maven-snapshots/'
+
+        credentials {
+          username = rootProject.findProperty('mavenCentral.username')
+          password = rootProject.findProperty('mavenCentral.password')
+        }
       }
     }
   }
+}
+
+
+publishOnCentral {
+  repoOwner = 'jgremmen'
+  projectLongName = "${description}"
+  projectDescription = 'Highly configurable message format library supporting message definition through annotations'
+  licenseName = 'Apache License, Version 2.0'
+  licenseUrl = 'https://www.apache.org/licenses/LICENSE-2.0'
+}
+
+
+tasks.register('publishToProjectLocalRepository') {
+  group = PublishingPlugin.PUBLISH_TASK_GROUP
+  description = 'Create a local repository with releasable artifacts.'
+
+  dependsOn publishOSSRHPublicationToProjectLocalRepository
+
+  outputs.dir layout.buildDirectory.dir('project-local-repository')
+}
+
+
+ext.releaseTask = tasks.register(GUtil.toLowerCamelCase("release-${project.name}-artifacts")) {
+  group = 'release'
+  description = "Release ${project.name} ${snapshot ? 'snapshot ' : ''}artifacts to Maven Central Repository."
+
+  dependsOn 'publishToProjectLocalRepository'
 }

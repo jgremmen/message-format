@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-plugins {
-  //id 'de.sayayi.plugin.gradle.libapi' version '1.0-SNAPSHOT'
-}
+//file:noinspection DependencyNotationArgument
+//file:noinspection GroovyAssignabilityCheck
 
 
 description = 'Message Format Library (Spring adopter and formatter)'
-
-
-def springVersion = '[5.0,6.0)'
 
 
 dependencies {
   implementation project(':message-format')
   implementation project(':message-format-annotations')
 
-  implementation("org.springframework:spring-context:${springVersion}") {
-    exclude module: 'spring-jcl'
-  }
+  implementation libs.spring.context
 
   //noinspection DependencyNotationArgument
   testImplementation project(':message-format').sourceSets.test.output
@@ -40,6 +34,13 @@ dependencies {
 
 javadoc {
   (options as StandardJavadocDocletOptions).with {
+    group('Adopters', [
+        'de.sayayi.lib.message.spring.adopter',
+    ])
+    group('Formatters', [
+        'de.sayayi.lib.message.spring.formatter'
+    ])
+
     linksOffline(
         "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
         "${rootDir}/gradle/javadocs/message-format")
@@ -66,18 +67,7 @@ publishing {
       from components.java
 
       pom {
-        name = project.description
-        description = 'Highly configurable message format library supporting message definition through annotations'
-        url = 'https://github.com/jgremmen/message-format'
         inceptionYear = '2023'
-
-        licenses {
-          license {
-            name = 'Apache License, Version 2.0'
-            url = 'https://www.apache.org/licenses/LICENSE-2.0'
-            distribution = 'repo'
-          }
-        }
 
         developers {
           developer {
@@ -85,12 +75,6 @@ publishing {
             name = 'Jeroen Gremmen'
             email = 'jeroen.gremmen@sayayi.de'
           }
-        }
-
-        scm {
-          connection = 'scm:git:git://github.com/jgremmen/message-format.git'
-          developerConnection = 'scm:git:git://github.com/jgremmen/message-format.git'
-          url = 'https://github.com/jgremmen/message-format'
         }
       }
     }

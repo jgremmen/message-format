@@ -17,47 +17,51 @@
 description = 'Message Format Library Projects'
 
 
+def gradleDirectory = layout.projectDirectory.dir('gradle')
+def snapshot = version.toString().endsWith('-SNAPSHOT')
+
+
 allprojects {
+  group = 'de.sayayi.lib'
+  version = libs.versions.message.format.get()
+
   layout.buildDirectory = '.build'
 
   apply plugin: 'base'
-
-  group = 'de.sayayi.lib'
-  version = '0.20.1-SNAPSHOT'
-
-  ext.jetbrainsAnnotationsVersion = '[24.0,26.1)'
-  ext.junitVersion = '5.13.+'
-  ext.lombokVersion = '1.18.+'
-  ext.mockitoVersion = '5.18.+'
-
-  repositories {
-    maven {
-      url = 'https://oss.sonatype.org/content/repositories/snapshots/'
-      mavenContent {
-        includeGroup 'de.sayayi.lib'
-        snapshotsOnly()
-      }
-    }
-
-    mavenCentral()
-  }
+  apply from: gradleDirectory.file('repositories.gradle')
 }
 
 
-def gradleDirectory = rootProject.layout.projectDirectory.dir('gradle')
-
-
-configure(subprojects.findAll { it.name.startsWith('message-format') }) {
-  apply from: gradleDirectory.file('module.gradle')
-}
-
-
-configure(subprojects.findAll { it.name != 'documentation' }) {
-  apply from: gradleDirectory.file('java.gradle')
+configure(subprojects.findAll {name.startsWith('message-') }) {
+  apply from: gradleDirectory.file('java-library.gradle')
+  apply from: gradleDirectory.file('javadoc.gradle')
   apply from: gradleDirectory.file('publish.gradle')
 }
 
 
+tasks.register('releaseAllDryRun', Sync) {
+  group = 'release'
+  description = 'Release all artifacts to temporary Maven repository.'
+
+  into rootProject.layout.buildDirectory.dir('repository')
+
+  configure(subprojects) { subproject ->
+    def publishTask = subproject.tasks.named('publishToProjectLocalRepository')
+    if (publishTask != null)
+      from publishTask
+  }
+}
+
+
+tasks.register(snapshot ? 'releaseAllSnapshots' : 'releaseAll') {
+  group = 'release'
+  description = snapshot
+      ? 'Release all snapshot artifacts to Maven Central Repository.'
+      : 'Release final artifacts to Maven Central repository.'
+}
+
+
+/*
 tasks.register('releaseAll') {
   group = 'release'
   description = 'Release all publications to Maven and Gradle Plugin repository.'
@@ -70,19 +74,11 @@ tasks.register('releaseAll') {
   dependsOn ':message-gradle-plugin:publishGradlePluginPublicationToMavenCentralRepository'
   dependsOn ':message-gradle-plugin:publishPlugins'
 }
+*/
 
 
-tasks.register('releaseAllTemp') {
-  group = 'release'
-  description = 'Release all publications to temporary Maven repository.'
-
-  dependsOn ':message-format:publishMsgformatPublicationToMavenTempRepository'
-  dependsOn ':message-format-annotations:publishAnnotationsPublicationToMavenTempRepository'
-  dependsOn ':message-format-asm:publishAsmPublicationToMavenTempRepository'
-  dependsOn ':message-format-spring:publishSpringPublicationToMavenTempRepository'
-
-  dependsOn ':message-gradle-plugin:publishGradlePluginPublicationToMavenTempRepository'
-  dependsOn ':message-gradle-plugin:publishMessageFormatPluginMarkerMavenPublicationToMavenTempRepository'
+clean {
+  delete layout.projectDirectory.dir('build')
 }
 
 
