@@ -48,8 +48,10 @@ if (snapshot)
 
 publishOnCentral {
   repoOwner = 'jgremmen'
+
   projectLongName = "${description}"
   projectDescription = 'Highly configurable message format library supporting message definition through annotations'
+
   licenseName = 'Apache License, Version 2.0'
   licenseUrl = 'https://www.apache.org/licenses/LICENSE-2.0'
 }
