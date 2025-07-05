@@ -1,6 +1,6 @@
 [versions]
 # message format version
-message-format = '0.20.1-SNAPSHOT'
+message-format = '0.20.1'
 
 antlr4 = '[4.13.0,4.14)'
 antlr4-ext = '[0.6,0.7)'
