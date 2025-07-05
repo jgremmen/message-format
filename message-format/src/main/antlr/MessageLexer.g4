@@ -112,7 +112,7 @@ EMPTY
         : 'empty'
         ;
 P_NAME
-        : DashedName -> type(NAME)
+        : Name -> type(NAME)
         ;
 P_NUMBER
         : Number -> type(NUMBER)
@@ -175,7 +175,7 @@ T_NUMBER
         : Number -> type(NUMBER)
         ;
 T_NAME
-        : DashedName -> type(NAME)
+        : Name -> type(NAME)
         ;
 T_SQ_START
         : '\'' -> pushMode(TEXT1), type(SQ_START)
@@ -203,12 +203,8 @@ fragment CtrlChar
         : [\u0000-\u001f]
         ;
 
-fragment DashedName
-        : Name ('-' Name)*
-        ;
-
 fragment Name
-        : NameStartChar NameChar*
+        : NameStartChar NameChar* ('-' NameChar+)*
         ;
 
 fragment NameChar
