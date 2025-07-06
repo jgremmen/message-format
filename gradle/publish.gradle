@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-apply plugin: 'signing'
+//file:noinspection GroovyAssignabilityCheck
+
+
 apply plugin: 'org.danilopianini.publish-on-central'
 
 
@@ -49,11 +51,30 @@ if (snapshot)
 publishOnCentral {
   repoOwner = 'jgremmen'
 
-  projectLongName = "${description}"
+  afterEvaluate {
+    projectLongName = "${project.description}"
+  }
   projectDescription = 'Highly configurable message format library supporting message definition through annotations'
 
   licenseName = 'Apache License, Version 2.0'
   licenseUrl = 'https://www.apache.org/licenses/LICENSE-2.0'
+}
+
+
+publishing {
+  publications {
+    withType(MavenPublication).configureEach {
+      pom {
+        developers {
+          developer {
+            id = 'jgremmen'
+            name = 'Jeroen Gremmen'
+            email = 'jeroen.gremmen@sayayi.de'
+          }
+        }
+      }
+    }
+  }
 }
 
 
@@ -81,4 +102,9 @@ ext.releaseTask = tasks.register(GUtil.toLowerCamelCase("release-${project.name}
     dependsOn 'validateMavenCentralPortalPublication'
     dependsOn 'releaseMavenCentralPortalPublication'
   }
+}
+
+
+tasks.named('zipMavenCentralPortalPublication') {
+  mustRunAfter 'publishToProjectLocalRepository'
 }

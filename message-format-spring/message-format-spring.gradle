@@ -62,33 +62,17 @@ javadoc {
 
 publishing {
   publications {
-
-    spring(MavenPublication) {
-      from components.java
-
+    withType(MavenPublication).configureEach {
       pom {
         inceptionYear = '2023'
-
-        developers {
-          developer {
-            id = 'jgremmen'
-            name = 'Jeroen Gremmen'
-            email = 'jeroen.gremmen@sayayi.de'
-          }
-        }
       }
     }
   }
 }
 
 
-signing {
-  sign publishing.publications.spring
-}
-
-
 ext.releaseTask.configure {
   if (snapshot) {
-    dependsOn 'publishSpringPublicationToMavenCentralSnapshotRepository'
+    dependsOn ':message-format-spring:publishOSSRHPublicationToMavenCentralSnapshotRepository'
   }
 }

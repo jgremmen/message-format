@@ -88,29 +88,13 @@ gradlePlugin {
 
 publishing {
   publications {
-    gradlePlugin(MavenPublication) {
-      from components.java
-
+    withType(MavenPublication).configureEach {
       pom {
-        name = 'Java Message Format Gradle Plugin'
-        description = 'Gradle Plugin'
+        description = 'Gradle Plugin to scan the class path, pre-compile and pack message and template formats into a single file.'
         inceptionYear = '2023'
-
-        developers {
-          developer {
-            id = 'jgremmen'
-            name = 'Jeroen Gremmen'
-            email = 'jeroen.gremmen@sayayi.de'
-          }
-        }
       }
     }
   }
-}
-
-
-signing {
-  sign publishing.publications.gradlePlugin
 }
 
 
@@ -126,7 +110,7 @@ tasks.named('zipMavenCentralPortalPublication') {
 
 ext.releaseTask.configure {
   if (snapshot) {
-    dependsOn ':message-gradle-plugin:publishGradlePluginPublicationToMavenCentralSnapshotRepository'
+    dependsOn ':message-gradle-plugin:publishOSSRHPublicationToMavenCentralSnapshotRepository'
     dependsOn ':message-gradle-plugin:publishMessageFormatPluginMarkerMavenPublicationToMavenCentralSnapshotRepository'
   }
   else {

@@ -110,41 +110,25 @@ javadoc {
 }
 
 
+publishOnCentral {
+  projectDescription = 'Highly configurable message format library supporting message definition through annotations'
+}
+
+
 publishing {
   publications {
-
-    core(MavenPublication) {
-      from components.java
-
+    withType(MavenPublication).configureEach {
       pom {
         inceptionYear = '2019'
-
-        developers {
-          developer {
-            id = 'jgremmen'
-            name = 'Jeroen Gremmen'
-            email = 'jeroen.gremmen@sayayi.de'
-          }
-        }
       }
     }
   }
 }
 
 
-signing {
-  sign publishing.publications.core
-}
-
-
-publishOnCentral {
-  projectDescription = 'Highly configurable message format library supporting message definition through annotations'
-}
-
-
 ext.releaseTask.configure {
   if (snapshot) {
-    dependsOn 'publishCorePublicationToMavenCentralSnapshotRepository'
+    dependsOn ':message-format:publishOSSRHPublicationToMavenCentralSnapshotRepository'
   }
 }
 

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 //file:noinspection GroovyAssignabilityCheck
 
 
@@ -42,33 +43,17 @@ javadoc {
 
 publishing {
   publications {
-
-    annotations(MavenPublication) {
-      from components.java
-
+    withType(MavenPublication).configureEach {
       pom {
         inceptionYear = '2025'
-
-        developers {
-          developer {
-            id = 'jgremmen'
-            name = 'Jeroen Gremmen'
-            email = 'jeroen.gremmen@sayayi.de'
-          }
-        }
       }
     }
   }
 }
 
 
-signing {
-  sign publishing.publications.annotations
-}
-
-
 ext.releaseTask.configure {
   if (snapshot) {
-    dependsOn 'publishAnnotationsPublicationToMavenCentralSnapshotRepository'
+    dependsOn ':message-format-annotations:publishOSSRHPublicationToMavenCentralSnapshotRepository'
   }
 }

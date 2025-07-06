@@ -50,33 +50,17 @@ javadoc {
 
 publishing {
   publications {
-
-    asm(MavenPublication) {
-      from components.java
-
+    withType(MavenPublication).configureEach {
       pom {
         inceptionYear = '2025'
-
-        developers {
-          developer {
-            id = 'jgremmen'
-            name = 'Jeroen Gremmen'
-            email = 'jeroen.gremmen@sayayi.de'
-          }
-        }
       }
     }
   }
 }
 
 
-signing {
-  sign publishing.publications.asm
-}
-
-
 ext.releaseTask.configure {
   if (snapshot) {
-    dependsOn 'publishAsmPublicationToMavenCentralSnapshotRepository'
+    dependsOn ':message-format-asm:publishOSSRHPublicationToMavenCentralSnapshotRepository'
   }
 }
