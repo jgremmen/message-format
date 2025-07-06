@@ -21,8 +21,7 @@ build:
   tags:
     - docker
   script:
-    - ./gradlew clean build releaseAllDryRun -Psigning.keyId=$SIGNING_KEY_ID -Psigning.password=$SIGNING_PASSWORD -Psigning.secretKeyRingFile=/var/lib/pgp/0F69E7AAD65F2E81-keys.asc
-#    - ./gradlew docs -Ddocumentation=true
+    - ./gradlew clean releaseAllDryRun -Psigning.keyId="$SIGNING_KEY_ID" -Psigning.password="$SIGNING_PASSWORD" -Psigning.secretKeyRingFile=/var/lib/pgp/0F69E7AAD65F2E81-keys.asc
   artifacts:
     name: "message-format-artifacts"
     paths:
