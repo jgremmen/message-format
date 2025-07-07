@@ -122,6 +122,16 @@ public class MessageFactory
   }
 
 
+  /**
+   * Parse the localized messages {@code localizedTexts} into a {@link Message} instance.
+   *
+   * @param code            message code, not {@code null}
+   * @param localizedTexts  a map containing message formats, keyed by locale, not {@code null}
+   *
+   * @return  message with code instance, never {@code null}
+   *
+   * @throws MessageParserException  in case one of the messages could not be parsed
+   */
   @Contract(value = "_, _ -> new", pure = true)
   public @NotNull Message.WithCode parseMessage(@NotNull String code, @NotNull Map<Locale,String> localizedTexts)
   {
@@ -172,6 +182,15 @@ public class MessageFactory
   }
 
 
+  /**
+   * Parse the localized template messages {@code localizedTexts} into a {@link Message} instance.
+   *
+   * @param localizedTexts  a map containing template message formats, keyed by locale, not {@code null}
+   *
+   * @return  template message instance, never {@code null}
+   *
+   * @throws MessageParserException  in case one of the template messages could not be parsed
+   */
   @Contract(pure = true)
   public @NotNull Message parseTemplate(@NotNull Map<Locale,String> localizedTexts)
   {
