@@ -72,6 +72,9 @@ tasks.register(snapshot ? 'releaseAllSnapshots' : 'releaseAll') {
 }
 
 
+apply from: 'gradle/changelog.gradle'
+
+
 clean {
   delete layout.projectDirectory.dir('build')
 }
