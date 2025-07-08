@@ -46,9 +46,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static de.sayayi.lib.message.internal.pack.PackSupport.MIME_TYPE;
 import static de.sayayi.plugin.gradle.message.DuplicateMsgStrategy.IGNORE_AND_WARN;
-import static java.nio.file.Files.newInputStream;
-import static java.nio.file.Files.newOutputStream;
+import static java.nio.file.Files.*;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Locale.ROOT;
 import static org.gradle.api.logging.LogLevel.ERROR;
@@ -71,7 +71,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private final List<String> includeRegexFilters = new ArrayList<>();
   private final List<String> excludeRegexFilters = new ArrayList<>();
-  private Action<MessageAccessor> action = null;
+  private final List<Action<MessageAccessor>> actionList = new ArrayList<>();
 
   private final ThreadLocal<String> currentClassName = new ThreadLocal<>();
 
@@ -277,6 +277,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
    *       println String.join(" ", unusedCodes)
    *   }
    * </pre>
+   * If multiple actions are provided, they are executed in the order of definition.
    *
    * @param action  custom action, not {@code null}
    */
@@ -285,10 +286,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
     if (action == null)
       throw new InvalidUserDataException("Action must not be null!");
 
-    if (this.action != null)
-      getLogger().warn("Previous message format pack action will be overwritten!");
-
-    this.action = action;
+    actionList.add(action);
   }
 
 
@@ -373,8 +371,9 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void pack_action(@NotNull MessageSupport messageSupport)
   {
-    if (action != null)
-      action.execute(messageSupport.getMessageAccessor());
+    final var messageAccessor = messageSupport.getMessageAccessor();
+
+    actionList.forEach(action -> action.execute(messageAccessor));
   }
 
 
@@ -383,8 +382,13 @@ public abstract class MessageFormatPackTask extends DefaultTask
     var packFile = getPackFile().getAsFile().toPath();
     getLogger().info("Writing message pack: {}", packFile);
 
-    try(var packOutputStream = newOutputStream(packFile)) {
-      messageSupport.exportMessages(packOutputStream, getCompress().get(), this::messageCodeFilter);
+    try {
+      try(var packOutputStream = newOutputStream(packFile)) {
+        messageSupport.exportMessages(packOutputStream, getCompress().get(), this::messageCodeFilter);
+      }
+
+      if (!probeContentType(packFile).startsWith(MIME_TYPE))
+        throw new IOException("Message pack header corrupt");
     } catch(IOException ex) {
       throw new GradleException("Failed to write message pack", ex);
     }
