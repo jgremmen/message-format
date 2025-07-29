@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Custom Highlight.js Example</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body>
+        <pre>
+          <code class="language-message-format">
+            Name key type \'\"\%\{\[\u005b %{p,richtig:true,falsch:false,size:-678764782,text:'text',message:'msg %{m}'}.
+          </code>
+        </pre>
+        <script type="module">
+            import mfFunction from './message-format.js';
+            hljs.registerLanguage('message-format', mfFunction);
+            hljs.highlightAll();
+        </script>
+    </body>
+</html>
