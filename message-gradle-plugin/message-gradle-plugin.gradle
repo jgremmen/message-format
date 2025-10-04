@@ -44,6 +44,11 @@ tasks.named('test', Test) {
 
   // is there a better way to do this?
   systemProperty 'MFA_JAR', project(':message-format-annotations').jar.archiveFile.asFile.get().absolutePath
+
+  // GradleRunner requires java 17
+  javaLauncher = javaToolchains.launcherFor {
+    languageVersion = JavaLanguageVersion.of(17)
+  }
 }
 
 
