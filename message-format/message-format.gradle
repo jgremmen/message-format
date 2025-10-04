@@ -57,8 +57,7 @@ generateGrammarSource {
   //noinspection GroovyAccessibility
   antlrClasspath = configurations.antlr4
   outputDirectory = grammarOutputDirectory
-
-  arguments += [ '-package', 'de.sayayi.lib.message.internal.parser' ]
+  packageName = 'de.sayayi.lib.message.internal.parser'
 }
 
 compileJava.dependsOn generateGrammarSource
