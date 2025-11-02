@@ -94,3 +94,17 @@ allprojects {
     }
   }
 }
+
+
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    // Add the specific Bouncy Castle modules you need (e.g., for PGP operations)
+    classpath 'org.bouncycastle:bcprov-jdk18on:1.77'  // Core provider
+    classpath 'org.bouncycastle:bcpg-jdk18on:1.77'   // PGP module (key for your exception)
+    classpath 'org.bouncycastle:bcutil-jdk18on:1.77' // Utilities, if needed
+    // Add bctls-jdk18on or others if your use case requires them
+  }
+}

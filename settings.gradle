@@ -38,6 +38,11 @@ buildscript {
   }
 
   dependencies {
+    // Add the specific Bouncy Castle modules you need (e.g., for PGP operations)
+    classpath 'org.bouncycastle:bcprov-jdk18on:1.77'  // Core provider
+    classpath 'org.bouncycastle:bcpg-jdk18on:1.77'   // PGP module (key for your exception)
+    classpath 'org.bouncycastle:bcutil-jdk18on:1.77' // Utilities, if needed
+
     classpath 'com.adarshr:gradle-test-logger-plugin:4.0.0'
     classpath 'org.danilopianini.publish-on-central:org.danilopianini.publish-on-central.gradle.plugin:9.1.5'
     classpath 'se.bjurr.gitchangelog:git-changelog-gradle-plugin:3.1.1'
