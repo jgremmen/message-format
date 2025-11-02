@@ -5,7 +5,7 @@ stages:
   - build
 
 variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.internal.publish.checksums.verify=false"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.daemon.performance.logging=false"
   GRADLE_USER_HOME: ".gradle-cache"
 
 before_script:
