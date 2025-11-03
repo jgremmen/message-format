@@ -21,6 +21,7 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static java.lang.Math.max;
 
 
 /**
@@ -36,23 +37,26 @@ public final class ClipPostFormatter implements ParameterPostFormatter
 
 
   @Override
-  @SuppressWarnings("OptionalGetWithoutIsPresent")
+  @SuppressWarnings({"OptionalGetWithoutIsPresent", "UnnecessaryUnicodeEscape"})
   public @NotNull Text postFormat(@NotNull FormatterContext context, @NotNull Text text)
   {
     var maxSize = (int)context.getConfigValueNumber("clip").getAsLong();
     if (maxSize > 0)
     {
-      var ellipsis = (boolean)context.getConfigValueBool("clip-ellipsis").orElse(true);
-      if (ellipsis && maxSize < 7)
-        maxSize = 7;
+      final var string = text.getText();
 
-      var s = text.getText();
-      if (s != null && s.length() > maxSize)
+      if (context.getConfigValueBool("clip-suffix").orElse(true))
       {
-        return noSpaceText(ellipsis
-            ? s.substring(0, maxSize - 3).trim() + "..."
-            : s.substring(0, maxSize));
+        final var suffixText = context.getConfigValueString("clip-suffix-text").orElse("\u2026");
+        final var suffixTextLength = suffixText.length();
+
+        maxSize = max(maxSize, max(4, suffixTextLength + 1) + suffixTextLength);
+
+        if (string.length() > maxSize)
+          return noSpaceText(string.substring(0, maxSize - suffixTextLength).trim() + suffixText);
       }
+      else if (string.length() > maxSize)
+        return noSpaceText(string.substring(0, maxSize));
     }
 
     return text;

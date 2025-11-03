@@ -23,6 +23,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static java.lang.Math.PI;
 import static java.util.Locale.GERMANY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -31,9 +32,70 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jeroen Gremmen
  */
 @DisplayName("'clip' post-formatter")
+@SuppressWarnings("UnnecessaryUnicodeEscape")
 class ClipPostFormatterTest extends AbstractFormatterTest
 {
   private static final String TEXT = "This is a very long text which is going to be clipped at a specific length";
+
+
+  @Test
+  @DisplayName("Clip without ellipsis")
+  void testClipNoEllipsis()
+  {
+    val messageSupport = MessageSupportFactory
+        .create(new DefaultFormatterService(), NO_CACHE_INSTANCE)
+        .setDefaultParameterConfig("clip-suffix", false)
+        .setLocale(GERMANY);
+
+    assertEquals(
+        "",
+        messageSupport
+            .message("%{v,clip:64}")
+            .with("v", "")
+            .format());
+
+    assertEquals(
+        TEXT,
+        messageSupport
+            .message("%{v,clip:-4}")
+            .with("v", TEXT)
+            .format());
+
+    assertEquals(
+        TEXT.substring(0, 64),
+        messageSupport
+            .message("%{v,clip:64}")
+            .with("v", TEXT)
+            .format());
+
+    assertEquals(
+        TEXT.substring(0, 9),
+        messageSupport
+            .message("%{v,clip:10}")
+            .with("v", TEXT)
+            .format());
+
+    assertEquals(
+        TEXT.substring(0, 1),
+        messageSupport
+            .message("%{v,clip:1}")
+            .with("v", TEXT)
+            .format());
+
+    assertEquals(
+        TEXT,
+        messageSupport
+            .message("%{v,clip:0}")
+            .with("v", TEXT)
+            .format());
+
+    assertEquals(
+        "3,1415926535",
+        messageSupport
+            .message("%{v,number:'#.##################',clip:12}")
+            .with("v", PI)
+            .format());
+  }
 
 
   @Test
@@ -44,28 +106,28 @@ class ClipPostFormatterTest extends AbstractFormatterTest
         .create(new DefaultFormatterService(), NO_CACHE_INSTANCE);
 
     assertEquals(
-        TEXT.substring(0, 61) + "...",
+        TEXT.substring(0, 63) + "\u2026",
         messageSupport
             .message("%{v,clip:64}")
             .with("v", TEXT)
             .format());
 
     assertEquals(
-        "This is...",
+        "This is\u2026",
         messageSupport
-            .message("%{v,clip:10}")
+            .message("%{v,clip:9}")
             .with("v", TEXT)
             .format());
 
     assertEquals(
-        "This...",
+        "This i\u2026",
         messageSupport
-            .message("%{v,clip:8}")
+            .message("%{v,clip:7}")
             .with("v", TEXT)
             .format());
 
     assertEquals(
-        "This...",
+        "This\u2026",
         messageSupport
             .message("%{v,clip:2}")
             .with("v", TEXT)
@@ -89,24 +151,34 @@ class ClipPostFormatterTest extends AbstractFormatterTest
         .setLocale(GERMANY);
 
     assertEquals(
-        TEXT,
+        "3,141592653\u2026",
         messageSupport
-            .message("%{v,clip-ellipsis:false}")
-            .with("v", TEXT)
+            .message("%{v,number:'#.##################',clip:12,clip-suffix:true}")
+            .with("v", PI)
             .format());
 
     assertEquals(
         "3,1415926535",
         messageSupport
-            .message("%{v,number:'#.##################',clip:12,clip-ellipsis:false}")
-            .with("v", Math.PI)
+            .message("%{v,number:'#.##################',clip:12,clip-suffix:false}")
+            .with("v", PI)
             .format());
+  }
+
+
+  @Test
+  @DisplayName("Clip with custom suffix")
+  void testClipCustomSuffix()
+  {
+    val messageSupport = MessageSupportFactory
+        .create(new DefaultFormatterService(), NO_CACHE_INSTANCE)
+        .setLocale(GERMANY);
 
     assertEquals(
-        "3,1415926...",
+        "3,14159 usw.",
         messageSupport
-            .message("%{v,number:'#.##################',clip:12,clip-ellipsis:true}")
-            .with("v", Math.PI)
+            .message("%{v,number:'#.##################',clip:12,clip-suffix-text:' usw.'}")
+            .with("v", PI)
             .format());
   }
 }
