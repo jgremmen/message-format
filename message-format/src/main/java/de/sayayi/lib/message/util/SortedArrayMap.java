@@ -184,6 +184,7 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
   }
 
 
+  @Contract(pure = true)
   public @NotNull Stream<Entry<K,V>> stream() {
     return StreamSupport.stream(spliterator(), false);
   }
