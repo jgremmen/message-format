@@ -31,7 +31,7 @@ import static org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME;
  * @since 0.8.0
  */
 @SuppressWarnings("unused")
-public class MessageFormatPlugin implements Plugin<Project>
+public class MessageFormatPlugin implements Plugin<@NotNull Project>
 {
   /** Plugin extension name */
   public static final String EXTENSION = "messageFormat";

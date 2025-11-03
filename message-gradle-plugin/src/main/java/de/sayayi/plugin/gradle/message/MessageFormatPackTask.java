@@ -66,12 +66,12 @@ import static org.gradle.api.tasks.PathSensitivity.RELATIVE;
 @CacheableTask
 public abstract class MessageFormatPackTask extends DefaultTask
 {
-  private static final Action<PatternFilterable> CLASS_FILES =
+  private static final Action<@NotNull PatternFilterable> CLASS_FILES =
       patternFilterable -> patternFilterable.include("**/*.class");
 
   private final List<String> includeRegexFilters = new ArrayList<>();
   private final List<String> excludeRegexFilters = new ArrayList<>();
-  private final List<Action<MessageAccessor>> actionList = new ArrayList<>();
+  private final List<Action<@NotNull MessageAccessor>> actionList = new ArrayList<>();
 
   private final ThreadLocal<String> currentClassName = new ThreadLocal<>();
 
@@ -102,7 +102,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * @return  packed message file name
    */
   @Internal("tracked via packFile")
-  public abstract Property<String> getPackFilename();
+  public abstract Property<@NotNull String> getPackFilename();
 
 
   /**
@@ -180,7 +180,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * @see DuplicateMsgStrategy
    */
   @Input
-  public abstract Property<Object> getDuplicateMsgStrategy();
+  public abstract Property<@NotNull Object> getDuplicateMsgStrategy();
 
 
   /**
@@ -197,7 +197,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * @return  validate referenced templates property, never {@code null}
    */
   @Input
-  public abstract Property<Boolean> getValidateReferencedTemplates();
+  public abstract Property<@NotNull Boolean> getValidateReferencedTemplates();
 
 
   /**
@@ -206,7 +206,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * @return  compress property, never {@code null}
    */
   @Input
-  public abstract Property<Boolean> getCompress();
+  public abstract Property<@NotNull Boolean> getCompress();
 
 
   /**
@@ -281,7 +281,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
    *
    * @param action  custom action, not {@code null}
    */
-  public void action(Action<MessageAccessor> action)
+  public void action(Action<@NotNull MessageAccessor> action)
   {
     if (action == null)
       throw new InvalidUserDataException("Action must not be null!");

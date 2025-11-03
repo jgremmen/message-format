@@ -18,6 +18,7 @@ package de.sayayi.plugin.gradle.message;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.SourceSet;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +75,7 @@ public abstract class MessageFormatExtension
    *
    * @return  pack filename property, never {@code null}
    */
-  public abstract Property<String> getPackFilename();
+  public abstract Property<@NotNull String> getPackFilename();
 
 
   /**
@@ -83,7 +84,7 @@ public abstract class MessageFormatExtension
    *
    * @return  compress property, never {@code null}
    */
-  public abstract Property<Boolean> getCompress();
+  public abstract Property<@NotNull Boolean> getCompress();
 
 
   /**
@@ -128,7 +129,7 @@ public abstract class MessageFormatExtension
    *
    * @see DuplicateMsgStrategy
    */
-  public abstract Property<Object> getDuplicateMsgStrategy();
+  public abstract Property<@NotNull Object> getDuplicateMsgStrategy();
 
 
   /**
@@ -144,7 +145,7 @@ public abstract class MessageFormatExtension
    *
    * @return  validate referenced templates property, never {@code null}
    */
-  public abstract Property<Boolean> getValidateReferencedTemplates();
+  public abstract Property<@NotNull Boolean> getValidateReferencedTemplates();
 
 
   /**
