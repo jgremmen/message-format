@@ -37,45 +37,25 @@ public final class URLFormatter extends AbstractSingleTypeParameterFormatter<URL
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull URL url)
   {
-    switch(context.getConfigValueString("url").orElse("external"))
-    {
-      case "authority":
-        return noSpaceText(url.getAuthority());
-
-      case "external":
-        return noSpaceText(url.toExternalForm());
-
-      case "file":
-        return noSpaceText(url.getFile());
-
-      case "host":
-        return noSpaceText(url.getHost());
-
-      case "path":
-        return noSpaceText(url.getPath());
-
-      case "port": {
-        var port = url.getPort() == -1 ? url.getDefaultPort() : url.getPort();
-
-        return formatUsingMappedNumber(context, port, true)
+    return switch(context.getConfigValueString("url").orElse("external")) {
+      case "authority" -> noSpaceText(url.getAuthority());
+      case "external" -> noSpaceText(url.toExternalForm());
+      case "file" -> noSpaceText(url.getFile());
+      case "host" -> noSpaceText(url.getHost());
+      case "path" -> noSpaceText(url.getPath());
+      case "port" -> {
+        final var port = url.getPort() == -1 ? url.getDefaultPort() : url.getPort();
+        yield formatUsingMappedNumber(context, port, true)
             .orElseGet(() -> port == -1 ? emptyText() : noSpaceText(Integer.toString(port)));
       }
+      case "query" -> noSpaceText(url.getQuery());
+      case "protocol" -> formatUsingMappedString(context, url.getProtocol(), true)
+          .orElseGet(() -> noSpaceText(url.getProtocol()));
+      case "user-info" -> noSpaceText(url.getUserInfo());
+      case "ref" -> noSpaceText(url.getRef());
 
-      case "query":
-        return noSpaceText(url.getQuery());
-
-      case "protocol":
-        return formatUsingMappedString(context, url.getProtocol(), true)
-            .orElseGet(() -> noSpaceText(url.getProtocol()));
-
-      case "user-info":
-        return noSpaceText(url.getUserInfo());
-
-      case "ref":
-        return noSpaceText(url.getRef());
-    }
-
-    return context.delegateToNextFormatter();
+      default -> context.delegateToNextFormatter();
+    };
   }
 
 

@@ -113,7 +113,7 @@ public class MessageParserException extends MessageException
     */
 
     final var msg = new StringBuilder();
-    final int n =
+    final var n =
         (code != null && !isGeneratedCode(code) ? 0b100 : 0b000) +
         (template != null && !isGeneratedCode(template) ? 0b010 : 0b000) +
         (locale != null ? 0b001 : 0b000);

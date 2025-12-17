@@ -157,19 +157,13 @@ public final class PackSupport
   @Contract(mutates = "param1,io")
   public @NotNull Message.WithCode unpackMessageWithCode(@NotNull PackInputStream packStream) throws IOException
   {
-    switch(packStream.readSmall(3))
-    {
-      case MESSAGE_EMPTY_WITH_CODE:
-        return EmptyMessageWithCode.unpack(packStream);
+    return switch(packStream.readSmall(3)) {
+      case MESSAGE_EMPTY_WITH_CODE -> EmptyMessageWithCode.unpack(packStream);
+      case MESSAGE_LOCALIZED_BUNDLE_WITH_CODE -> LocalizedMessageBundleWithCode.unpack(this, packStream);
+      case MESSAGE_DELEGATE_WITH_CODE -> MessageDelegateWithCode.unpack(this, packStream);
 
-      case MESSAGE_LOCALIZED_BUNDLE_WITH_CODE:
-        return LocalizedMessageBundleWithCode.unpack(this, packStream);
-
-      case MESSAGE_DELEGATE_WITH_CODE:
-        return MessageDelegateWithCode.unpack(this, packStream);
-    }
-
-    throw new IllegalStateException("message with code expected");
+      default -> throw new IllegalStateException("message with code expected");
+    };
   }
 
 
@@ -239,29 +233,14 @@ public final class PackSupport
   @Contract(mutates = "param1,io")
   public @NotNull MessagePart unpackMessagePart(@NotNull PackInputStream packStream) throws IOException
   {
-    final MessagePart messagePart;
+    final var messagePart = switch(packStream.readSmall(2)) {
+      case PART_NO_SPACE_TEXT_ID -> NoSpaceTextPart.unpack(packStream);
+      case PART_PARAMETER_ID -> ParameterPart.unpack(this, packStream);
+      case PART_TEXT_ID -> TextPart.unpack(packStream);
+      case PART_TEMPLATE_ID -> TemplatePart.unpack(this, packStream);
 
-    switch(packStream.readSmall(2))
-    {
-      case PART_NO_SPACE_TEXT_ID:
-        messagePart = NoSpaceTextPart.unpack(packStream);
-        break;
-
-      case PART_PARAMETER_ID:
-        messagePart = ParameterPart.unpack(this, packStream);
-        break;
-
-      case PART_TEXT_ID:
-        messagePart = TextPart.unpack(packStream);
-        break;
-
-      case PART_TEMPLATE_ID:
-        messagePart = TemplatePart.unpack(this, packStream);
-        break;
-
-      default:
-        throw new IllegalStateException("message part expected");
-    }
+      default -> throw new IllegalStateException("message part expected");
+    };
 
     return messageParts.computeIfAbsent(messagePart, identity());
   }
@@ -310,41 +289,17 @@ public final class PackSupport
   @Contract(mutates = "param1,io")
   public ConfigKey unpackMapKey(@NotNull PackInputStream packStream) throws IOException
   {
-    final ConfigKey configKey;
+    final var configKey = switch(packStream.readSmall(3)) {
+      case MAP_KEY_BOOL_ID -> ConfigKeyBool.unpack(packStream);
+      case MAP_KEY_EMPTY_ID -> ConfigKeyEmpty.unpack(packStream);
+      case MAP_KEY_NAME_ID -> ConfigKeyName.unpack(packStream);
+      case MAP_KEY_NULL_ID -> ConfigKeyNull.unpack(packStream);
+      case MAP_KEY_NUMBER_ID -> ConfigKeyNumber.unpack(packStream);
+      case MAP_KEY_STRING_ID -> ConfigKeyString.unpack(packStream);
+      case MAP_KEY_DEFAULT_ID -> null;
 
-    switch(packStream.readSmall(3))
-    {
-      case MAP_KEY_BOOL_ID:
-        configKey = ConfigKeyBool.unpack(packStream);
-        break;
-
-      case MAP_KEY_EMPTY_ID:
-        configKey = ConfigKeyEmpty.unpack(packStream);
-        break;
-
-      case MAP_KEY_NAME_ID:
-        configKey = ConfigKeyName.unpack(packStream);
-        break;
-
-      case MAP_KEY_NULL_ID:
-        configKey = ConfigKeyNull.unpack(packStream);
-        break;
-
-      case MAP_KEY_NUMBER_ID:
-        configKey = ConfigKeyNumber.unpack(packStream);
-        break;
-
-      case MAP_KEY_STRING_ID:
-        configKey = ConfigKeyString.unpack(packStream);
-        break;
-
-      case MAP_KEY_DEFAULT_ID:
-        configKey = null;
-        break;
-
-      default:
-        throw new IllegalStateException("map key expected");
-    }
+      default -> throw new IllegalStateException("map key expected");
+    };
 
     return mapKeys.computeIfAbsent(configKey, identity());
   }
@@ -381,29 +336,14 @@ public final class PackSupport
   @Contract(mutates = "param1,io")
   public @NotNull ConfigValue unpackMapValue(@NotNull PackInputStream packStream) throws IOException
   {
-    final ConfigValue configValue;
+    final var configValue = switch(packStream.readSmall(2)) {
+      case MAP_VALUE_BOOL_ID -> ConfigValueBool.unpack(packStream);
+      case MAP_VALUE_MESSAGE_ID -> ConfigValueMessage.unpack(this, packStream);
+      case MAP_VALUE_NUMBER_ID -> ConfigValueNumber.unpack(packStream);
+      case MAP_VALUE_STRING_ID -> ConfigValueString.unpack(packStream);
 
-    switch(packStream.readSmall(2))
-    {
-      case MAP_VALUE_BOOL_ID:
-        configValue = ConfigValueBool.unpack(packStream);
-        break;
-
-      case MAP_VALUE_MESSAGE_ID:
-        configValue = ConfigValueMessage.unpack(this, packStream);
-        break;
-
-      case MAP_VALUE_NUMBER_ID:
-        configValue = ConfigValueNumber.unpack(packStream);
-        break;
-
-      case MAP_VALUE_STRING_ID:
-        configValue = ConfigValueString.unpack(packStream);
-        break;
-
-      default:
-        throw new IllegalStateException("map value expected");
-    }
+      default -> throw new IllegalStateException("map value expected");
+    };
 
     return mapValues.computeIfAbsent(configValue, identity());
   }

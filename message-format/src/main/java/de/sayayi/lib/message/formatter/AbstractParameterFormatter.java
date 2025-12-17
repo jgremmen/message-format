@@ -52,7 +52,7 @@ public abstract class AbstractParameterFormatter<T> implements ParameterFormatte
   public final @NotNull Text format(@NotNull FormatterContext context, Object value)
   {
     // handle empty, !empty, null and !null first
-    var msg = context
+    final var msg = context
         .getConfigMapMessage(value, EMPTY_NULL_TYPE)
         .orElse(null);
 
@@ -62,11 +62,11 @@ public abstract class AbstractParameterFormatter<T> implements ParameterFormatte
     if (value == null)
       return nullText();
 
-    var text = formatValue(context, (T)value);
+    final var text = formatValue(context, (T)value);
 
     // handle empty, !empty, null and !null for result
     return context
-        .getConfigMapMessage(text.getText(), EMPTY_NULL_TYPE)
+        .getConfigMapMessage(text.text(), EMPTY_NULL_TYPE)
         .map(context::format)
         .orElse(text);
   }

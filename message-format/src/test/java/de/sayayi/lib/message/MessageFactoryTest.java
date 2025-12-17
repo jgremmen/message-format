@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message;
 
-import de.sayayi.lib.message.Message.WithCode;
 import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.EmptyMessage;
@@ -34,7 +33,7 @@ public class MessageFactoryTest
   @Test
   public void testParseString()
   {
-    Message.WithSpaces msg = NO_CACHE_INSTANCE.parseMessage("this is %{test}");
+    var msg = NO_CACHE_INSTANCE.parseMessage("this is %{test}");
     assertInstanceOf(CompoundMessage.class, msg);
   }
 
@@ -42,11 +41,11 @@ public class MessageFactoryTest
   @Test
   public void testWithCode()
   {
-    WithCode msgWithCode1 = NO_CACHE_INSTANCE.withCode("ABC", EmptyMessage.INSTANCE);
+    var msgWithCode1 = NO_CACHE_INSTANCE.withCode("ABC", EmptyMessage.INSTANCE);
     assertEquals("ABC", msgWithCode1.getCode());
     assertInstanceOf(EmptyMessageWithCode.class, msgWithCode1);
 
-    WithCode msgWithCode2 = NO_CACHE_INSTANCE.withCode("ABC", new EmptyMessageWithCode("DEF"));
+    var msgWithCode2 = NO_CACHE_INSTANCE.withCode("ABC", new EmptyMessageWithCode("DEF"));
     assertEquals("ABC", msgWithCode2.getCode());
     assertInstanceOf(EmptyMessageWithCode.class, msgWithCode2);
   }

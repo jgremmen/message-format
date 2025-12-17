@@ -17,7 +17,6 @@ package de.sayayi.lib.message.internal.parser;
 
 import lombok.val;
 import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.Token;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +38,7 @@ public class MessageTokenizerTest
     val lexer = createFor("hi  \\u0021%{");
 
     // h
-    Token token = lexer.nextToken();
+    var token = lexer.nextToken();
     assertEquals("h", token.getText());
     assertEquals(CH, token.getType());
 

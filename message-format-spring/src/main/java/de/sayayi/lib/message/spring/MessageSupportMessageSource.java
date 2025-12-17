@@ -116,7 +116,7 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
     }
 
     if (args != null)
-      for(int n = 0; n < args.length; n++)
+      for(var n = 0; n < args.length; n++)
         msg.with(parameterPrefix + (n + 1), args[n]);
 
     return msg

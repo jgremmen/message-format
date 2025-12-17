@@ -56,11 +56,11 @@ public final class LRUMessagePartNormalizer implements MessagePartNormalizer
   {
     requireNonNull(part, "part must not be null");
 
-    int n = -1;
+    var n = -1;
     MessagePart cachedPart = null;
 
     if (parts != null)
-      for(int i = 0; i < size; i++)
+      for(var i = 0; i < size; i++)
         if ((cachedPart = parts[i]).equals(part))
         {
           n = i;

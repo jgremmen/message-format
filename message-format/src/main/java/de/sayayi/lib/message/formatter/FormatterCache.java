@@ -157,9 +157,9 @@ final class FormatterCache
 
   private int findTypeIndex(@NotNull Class<?> type)
   {
-    var typeName = type.getName();
-    int low = 0;
-    int high = typeCount - 1;
+    final var typeName = type.getName();
+    var low = 0;
+    var high = typeCount - 1;
 
     while(low <= high)
     {
@@ -184,7 +184,7 @@ final class FormatterCache
   @Override
   public String toString()
   {
-    var s = new StringBuilder("[");
+    final var s = new StringBuilder("[");
 
     for(var n = head; n != null; n = n.next)
     {
@@ -220,7 +220,7 @@ final class FormatterCache
     @Override
     public String toString()
     {
-      var name = type.getCanonicalName();
+      final var name = type.getCanonicalName();
 
       return countNext + ":(" + (name == null ? type.toString() : name) + ')';
     }

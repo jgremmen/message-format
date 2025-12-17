@@ -161,7 +161,7 @@ class MessageParserExceptionTest
   void testParseFailure(String code, Locale locale, @NotNull Type type,
                         @Language("MessageFormat") @NotNull String parseString, @NotNull String msg)
   {
-    final int n =
+    final var n =
         (type == TEMPLATE ? 0b010 : 0b000) +
         (code != null ? 0b100 : 0b000) +
         (locale != null ? 0b001 : 0b000);

@@ -86,7 +86,7 @@ tasks.withType(Jar).configureEach {
 
 tasks.withType(JavaCompile).configureEach {
   javaCompiler = javaToolchains.compilerFor {
-    languageVersion = JavaLanguageVersion.of(11)
+    languageVersion = JavaLanguageVersion.of(17)
   }
 
   options.encoding = 'UTF-8'
@@ -95,7 +95,7 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.withType(Test).configureEach {
   javaLauncher = javaToolchains.launcherFor {
-    languageVersion = JavaLanguageVersion.of(11)
+    languageVersion = JavaLanguageVersion.of(17)
   }
 
   defaultCharacterEncoding = 'UTF-8'
@@ -103,14 +103,14 @@ tasks.withType(Test).configureEach {
 
 
 compileJava {
-  sourceCompatibility = 11
-  targetCompatibility = 11
+  sourceCompatibility = 17
+  targetCompatibility = 17
 }
 
 
 compileTestJava {
-  sourceCompatibility = 11
-  targetCompatibility = 11
+  sourceCompatibility = 17
+  targetCompatibility = 17
 }
 
 

@@ -74,7 +74,7 @@ public final class BitsFormatter extends AbstractParameterFormatter<Object>
 
     if (configValue instanceof ConfigValueNumber)
     {
-      int bits = ((ConfigValueNumber)configValue).intValue();
+      var bits = ((ConfigValueNumber)configValue).intValue();
       if (bits > 0 && bits <= 1024)
         return bits;
     }
@@ -86,19 +86,16 @@ public final class BitsFormatter extends AbstractParameterFormatter<Object>
   private int autoDetectBitCount(Object value)
   {
     // autodetect for big integer in range 0..Long.MAX_VALUE
-    if (value instanceof BigInteger)
+    if (value instanceof BigInteger bigInteger)
     {
-      var i = (BigInteger)value;
-
-      if (BigInteger.ZERO.equals(i))
+      if (BigInteger.ZERO.equals(bigInteger))
         return 1;
-      else if (i.signum() == 1 && i.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) <= 0)
-        return 64 - Long.numberOfLeadingZeros(i.longValue());
+      else if (bigInteger.signum() == 1 && bigInteger.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) <= 0)
+        return 64 - Long.numberOfLeadingZeros(bigInteger.longValue());
     }
 
     // autodetect for numbers of type byte, short, integer or long
-    if (value instanceof Byte || value instanceof Short || value instanceof Integer ||
-        value instanceof Long)
+    if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long)
     {
       var l = ((Number)value).longValue();
 
@@ -146,14 +143,14 @@ public final class BitsFormatter extends AbstractParameterFormatter<Object>
 
   private void formatLong(char[] bits, long value)
   {
-    for(int n = bits.length; --n >= 0; value >>= 1)
+    for(var n = bits.length; --n >= 0; value >>= 1)
       bits[n] = (char)('0' + (value & 1));
   }
 
 
   private void formatBigInteger(char[] bits, BigInteger value)
   {
-    for(int n = bits.length; --n >= 0; value = value.shiftRight(1))
+    for(var n = bits.length; --n >= 0; value = value.shiftRight(1))
       bits[n] = value.testBit(0) ? '1' : '0';
   }
 

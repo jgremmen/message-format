@@ -147,10 +147,9 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   {
     requireNonNull(formatter, "formatter must not be null");
 
-    if (formatter instanceof NamedParameterFormatter)
+    if (formatter instanceof NamedParameterFormatter namedParameterFormatter)
     {
-      var namedParameterFormatter = (NamedParameterFormatter)formatter;
-      var format = namedParameterFormatter.getName();
+      final var format = namedParameterFormatter.getName();
 
       //noinspection ConstantValue
       if (format == null || format.isEmpty())
@@ -168,7 +167,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   @MustBeInvokedByOverriders
   public void addParameterPostFormatter(@NotNull ParameterPostFormatter parameterPostFormatter)
   {
-    var parameterConfigName = requireNonNull(parameterPostFormatter.getParameterConfigName());
+    final var parameterConfigName = requireNonNull(parameterPostFormatter.getParameterConfigName());
 
     parameterPostFormatters.put(
         parameterConfigName,
@@ -211,11 +210,11 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   @Contract(pure = true)
   private @NotNull Stream<Class<?>> streamTypes(@NotNull Class<?> type)
   {
-    var collectedTypes = new HashSet<Class<?>>();
+    final var collectedTypes = new HashSet<Class<?>>();
 
     if (!typeFormatters.containsKey(type))
     {
-      var isArray = type.isArray();
+      final var isArray = type.isArray();
 
       // if no formatter for this primitive (array) type exists, continue collecting using its wrapper type
       if (type.isPrimitive() || (isArray && type.getComponentType().isPrimitive()))
@@ -265,8 +264,8 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   @Contract(pure = true)
   protected @NotNull String toDisplayNameList(@NotNull Set<String> configNames)
   {
-    var s = new StringBuilder();
-    var names = configNames.toArray(String[]::new);
+    final var s = new StringBuilder();
+    final var names = configNames.toArray(String[]::new);
 
     for(int n = 0, count = names.length; n < count; n++)
     {
@@ -282,19 +281,9 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
 
-  private static final class PrioritizedFormatter implements Comparable<PrioritizedFormatter>
+  private record PrioritizedFormatter(int order, @NotNull ParameterFormatter formatter)
+      implements Comparable<PrioritizedFormatter>
   {
-    private final int order;
-    private final @NotNull ParameterFormatter formatter;
-
-
-    private PrioritizedFormatter(int order, @NotNull ParameterFormatter formatter)
-    {
-      this.order = order;
-      this.formatter = formatter;
-    }
-
-
     @Override
     public int compareTo(@NotNull PrioritizedFormatter o) {
       return Integer.compare(order, o.order);
@@ -302,25 +291,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
     @Override
-    public boolean equals(Object o)
-    {
-      if (!(o instanceof PrioritizedFormatter))
-        return false;
-
-      var that = (PrioritizedFormatter)o;
-
-      return order == that.order && formatter.equals(that.formatter);
-    }
-
-
-    @Override
-    public int hashCode() {
-      return formatter.hashCode() * 31 + order;
-    }
-
-
-    @Override
-    public String toString() {
+    public @NotNull String toString() {
       return "PrioritizedFormatter(order=" + order + ",formatter=" + formatter + ')';
     }
   }

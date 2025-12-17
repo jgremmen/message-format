@@ -177,7 +177,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     {
       var urlFile = zipUrl.getFile();
       try {
-        int separatorIndex = urlFile.indexOf("*/");
+        var separatorIndex = urlFile.indexOf("*/");
         if (separatorIndex == -1)
           separatorIndex = urlFile.indexOf("!/");
 
@@ -408,170 +408,142 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   protected abstract void parseClass(@NotNull InputStream classInputStream) throws IOException;
 
 
+  /**
+     * {@code MessageDef} annotation implementation.
+     */
+    @SuppressWarnings("ClassExplicitlyAnnotation")
+    protected record MessageDefImpl(@NotNull String code, @Language("MessageFormat") @NotNull String text,
+                                    @NotNull Text[] texts) implements MessageDef {
+      protected MessageDefImpl(@NotNull String code, String text, @NotNull Text[] texts) {
+        this.code = code.trim();
+        this.text = text == null ? "" : text.trim();
+        this.texts = texts;
+      }
+
+
+      @Override
+      public String code() {
+        return code;
+      }
+
+
+      @Override
+      public String text() {
+        return text;
+      }
+
+
+      @Override
+      public Text[] texts() {
+        return texts;
+      }
+
+
+      @Override
+      public Class<? extends Annotation> annotationType() {
+        return MessageDef.class;
+      }
+
+
+      @Override
+      public String toString() {
+        return "MessageDef(code=" + code + ",text=" + text + ",texts=" + Arrays.toString(texts) + ')';
+      }
+    }
 
 
   /**
-   * {@code MessageDef} annotation implementation.
-   */
-  @SuppressWarnings("ClassExplicitlyAnnotation")
-  protected static final class MessageDefImpl implements MessageDef
-  {
-    private final @NotNull String code;
-    @Language("MessageFormat")
-    private final @NotNull String text;
-    private final @NotNull Text[] texts;
-
-
-    public MessageDefImpl(@NotNull String code, String text, @NotNull Text[] texts)
-    {
-      this.code = code.trim();
-      this.text = text == null ? "" : text.trim();
-      this.texts = texts;
-    }
-
-
-    @Override
-    public String code() {
-      return code;
-    }
-
-
-    @Override
-    public String text() {
-      return text;
-    }
-
-
-    @Override
-    public Text[] texts() {
-      return texts;
-    }
-
-
-    @Override
-    public Class<? extends Annotation> annotationType() {
-      return MessageDef.class;
-    }
-
-
-    @Override
-    public String toString() {
-      return "MessageDef(code=" + code + ",text=" + text + ",texts=" + Arrays.toString(texts) + ')';
-    }
-  }
-
-
-
-
-  /**
-   *  {@code TemplateDef} annotation implementation.
+   * {@code TemplateDef} annotation implementation.
    *
    * @author Jeroen Gremmen
    * @since 0.8.0
    */
-  @SuppressWarnings("ClassExplicitlyAnnotation")
-  protected static final class TemplateDefImpl implements TemplateDef
-  {
-    private final @NotNull String name;
-    @Language("MessageFormat")
-    private final @NotNull String text;
-    private final @NotNull Text[] texts;
+    @SuppressWarnings("ClassExplicitlyAnnotation")
+    protected record TemplateDefImpl(@NotNull String name, @Language("MessageFormat") @NotNull String text,
+                                     @NotNull Text[] texts) implements TemplateDef {
+      @SuppressWarnings("ConstantValue")
+      protected TemplateDefImpl(@NotNull String name, String text, @NotNull Text[] texts) {
+        if ((this.name = name == null ? "" : name.trim()).isEmpty())
+          throw new IllegalArgumentException("name must not be empty");
+
+        this.text = text == null ? "" : text.trim();
+        this.texts = texts;
+      }
 
 
-    @SuppressWarnings("ConstantValue")
-    public TemplateDefImpl(@NotNull String name, String text, @NotNull Text[] texts)
-    {
-      if ((this.name = name == null ? "" : name.trim()).isEmpty())
-        throw new IllegalArgumentException("name must not be empty");
+      @Override
+      public String name() {
+        return name;
+      }
 
-      this.text = text == null ? "" : text.trim();
-      this.texts = texts;
+
+      @Override
+      public String text() {
+        return text;
+      }
+
+
+      @Override
+      public Text[] texts() {
+        return texts;
+      }
+
+
+      @Override
+      public Class<? extends Annotation> annotationType() {
+        return TemplateDef.class;
+      }
+
+
+      @Override
+      public String toString() {
+        return "TemplateDef(name=" + name + ",text=" + text + ",texts=" + Arrays.toString(texts) + ')';
+      }
     }
-
-
-    @Override
-    public String name() {
-      return name;
-    }
-
-
-    @Override
-    public String text() {
-      return text;
-    }
-
-
-    @Override
-    public Text[] texts() {
-      return texts;
-    }
-
-
-    @Override
-    public Class<? extends Annotation> annotationType() {
-      return TemplateDef.class;
-    }
-
-
-    @Override
-    public String toString() {
-      return "TemplateDef(name=" + name + ",text=" + text + ",texts=" + Arrays.toString(texts) + ')';
-    }
-  }
-
-
 
 
   /**
-   * {@code Text} annotation implementation.
-   *
-   * @author Jeroen Gremmen
-   */
-  @SuppressWarnings("ClassExplicitlyAnnotation")
-  protected static final class TextImpl implements Text
-  {
-    private final @NotNull String locale;
-    @Language("MessageFormat")
-    private final @NotNull String text;
-    @Language("MessageFormat")
-    private final @NotNull String value;
+     * {@code Text} annotation implementation.
+     *
+     * @author Jeroen Gremmen
+     */
+    @SuppressWarnings("ClassExplicitlyAnnotation")
+    protected record TextImpl(@NotNull String locale, @Language("MessageFormat") @NotNull String text,
+                              @Language("MessageFormat") @NotNull String value) implements Text {
+      protected TextImpl(String locale, String text, String value) {
+        this.locale = locale == null ? "" : locale.trim();
+        this.text = text == null ? "" : text.trim();
+        this.value = value == null ? "" : value.trim();
+      }
 
 
-    public TextImpl(String locale, String text, String value)
-    {
-      this.locale = locale == null ? "" : locale.trim();
-      this.text = text == null ? "" : text.trim();
-      this.value = value == null ? "" : value.trim();
+      @Override
+      public String locale() {
+        return locale;
+      }
+
+
+      @Override
+      public String text() {
+        return text;
+      }
+
+
+      @Override
+      public String value() {
+        return value;
+      }
+
+
+      @Override
+      public Class<? extends Annotation> annotationType() {
+        return Text.class;
+      }
+
+
+      @Override
+      public String toString() {
+        return "Text(locale=" + locale + ",text=" + text + ",value=" + value + ')';
+      }
     }
-
-
-    @Override
-    public String locale() {
-      return locale;
-    }
-
-
-    @Override
-    public String text() {
-      return text;
-    }
-
-
-    @Override
-    public String value() {
-      return value;
-    }
-
-
-    @Override
-    public Class<? extends Annotation> annotationType() {
-      return Text.class;
-    }
-
-
-    @Override
-    public String toString() {
-      return "Text(locale=" + locale + ",text=" + text + ",value=" + value + ')';
-    }
-  }
 }

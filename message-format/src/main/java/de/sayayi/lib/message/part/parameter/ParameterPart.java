@@ -140,7 +140,7 @@ public final class ParameterPart implements Parameter
   @Contract(pure = true)
   public @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
   {
-    var context = new ParameterFormatterContext(messageAccessor, parameters,
+    final var context = new ParameterFormatterContext(messageAccessor, parameters,
         parameters.getParameterValue(name), null, format, paramConfig);
 
     return addSpaces(context.delegateToNextFormatter(), spaceBefore, spaceAfter);
@@ -150,12 +150,7 @@ public final class ParameterPart implements Parameter
   @Override
   public boolean equals(Object o)
   {
-    if (!(o instanceof Parameter))
-      return false;
-
-    var that = (Parameter)o;
-
-    return
+    return o instanceof Parameter that &&
         name.equals(that.getName()) &&
         Objects.equals(format, that.getFormat()) &&
         spaceBefore == that.isSpaceBefore() &&
@@ -174,7 +169,7 @@ public final class ParameterPart implements Parameter
   @Contract(pure = true)
   public String toString()
   {
-    var s = new StringBuilder("Parameter(name=").append(name);
+    final var s = new StringBuilder("Parameter(name=").append(name);
 
     if (format != null)
       s.append(",format=").append(format);
@@ -228,10 +223,10 @@ public final class ParameterPart implements Parameter
       @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackSupport unpack,
       @NotNull PackInputStream packStream) throws IOException
   {
-    var spaceBefore = packStream.readBoolean();
-    var spaceAfter = packStream.readBoolean();
-    var format = packStream.readString();
-    var name = requireNonNull(packStream.readString());
+    final var spaceBefore = packStream.readBoolean();
+    final var spaceAfter = packStream.readBoolean();
+    final var format = packStream.readString();
+    final var name = requireNonNull(packStream.readString());
 
     return new ParameterPart(name, format, spaceBefore, spaceAfter, ParameterConfig.unpack(unpack, packStream));
   }

@@ -72,9 +72,9 @@ public final class SpacesUtil
     if (s == null)
       return null;
 
-    var val = s.toCharArray();
-    int endIndex = val.length;
-    int startIdx = 0;
+    final var val = s.toCharArray();
+    var endIndex = val.length;
+    var startIdx = 0;
 
     while(startIdx < endIndex && isSpaceChar(val[startIdx]))
       startIdx++;
@@ -119,9 +119,9 @@ public final class SpacesUtil
   @SuppressWarnings("DuplicatedCode")
   public static boolean isTrimmedEmpty(@NotNull String s)
   {
-    var val = s.toCharArray();
-    int endIndex = val.length;
-    int startIdx = 0;
+    final var val = s.toCharArray();
+    var endIndex = val.length;
+    var startIdx = 0;
 
     while(startIdx < endIndex && isSpaceChar(val[startIdx]))
       startIdx++;

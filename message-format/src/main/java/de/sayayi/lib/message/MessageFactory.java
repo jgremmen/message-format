@@ -261,10 +261,10 @@ public class MessageFactory
   @Contract(pure = true)
   protected @NotNull String generateCode(@NotNull String prefix)
   {
-    var hashBytes = new byte[6];
+    final var hashBytes = new byte[6];
     RANDOM.nextBytes(hashBytes);
 
-    var hash = Long.toString(0x1000000000000L |
+    final var hash = Long.toString(0x1000000000000L |
         ((hashBytes[0] & 0xffL) << 40) |
         ((hashBytes[1] & 0xffL) << 32) |
         ((hashBytes[2] & 0xffL) << 24) |
@@ -328,7 +328,7 @@ public class MessageFactory
 
     return la1 && la2
         ? isSame((Message.LocaleAware)m1, (Message.LocaleAware)m2)
-        : !la1 && !la2 && Arrays.equals(m1.getMessageParts(), m2.getMessageParts());
+        : !la1 && !la2 && Arrays.equals(m1.messageParts(), m2.messageParts());
   }
 
 

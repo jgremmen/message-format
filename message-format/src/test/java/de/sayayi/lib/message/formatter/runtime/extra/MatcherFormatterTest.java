@@ -55,8 +55,8 @@ class MatcherFormatterTest extends AbstractFormatterTest
   @Test
   void testFormatGroupNumber()
   {
-    final Pattern pattern = Pattern.compile("[vV]?(?<major>\\d+)(\\.(?<minor>\\d+))?");
-    final Matcher matcher = pattern.matcher("v5.12");
+    final var pattern = Pattern.compile("[vV]?(?<major>\\d+)(\\.(?<minor>\\d+))?");
+    final var matcher = pattern.matcher("v5.12");
 
     assertEquals("v5.12", context.message("%{m,matcher:0}")
         .with("m", matcher).format());
@@ -77,8 +77,8 @@ class MatcherFormatterTest extends AbstractFormatterTest
   @Test
   void testFormatGroupName()
   {
-    final Pattern pattern = Pattern.compile("[vV]?(?<major>\\d+)(\\.(?<minor>\\d+))?");
-    final Matcher matcher = pattern.matcher("v5.12");
+    final var pattern = Pattern.compile("[vV]?(?<major>\\d+)(\\.(?<minor>\\d+))?");
+    final var matcher = pattern.matcher("v5.12");
 
     assertEquals("5", context.message("%{m,matcher:'major'}")
         .with("m", matcher).format());
@@ -95,8 +95,8 @@ class MatcherFormatterTest extends AbstractFormatterTest
   @Test
   void testFormat()
   {
-    final Pattern pattern = Pattern.compile("[vV]?(?<major>\\d+)(\\.(?<minor>\\d+))?");
-    final Matcher matcher = pattern.matcher("v4.999");
+    final var pattern = Pattern.compile("[vV]?(?<major>\\d+)(\\.(?<minor>\\d+))?");
+    final var matcher = pattern.matcher("v4.999");
 
     assertEquals("v4.999", context.message("%{m}").with("m", matcher).format());
   }

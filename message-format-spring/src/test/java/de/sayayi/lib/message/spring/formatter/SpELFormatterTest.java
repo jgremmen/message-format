@@ -44,7 +44,7 @@ class SpELFormatterTest extends AbstractFormatterTest
   @BeforeAll
   static void init()
   {
-    final DefaultFormatterService formatterService = new DefaultFormatterService();
+    final var formatterService = new DefaultFormatterService();
 
     formatterService.addFormatter(new SpELFormatter(
         new DefaultConversionService(), SpELFormatterTest.class.getClassLoader()));

@@ -112,14 +112,14 @@ public final class TextPartFactory
   {
     if (addSpaceBefore || addSpaceAfter)
     {
-      var textSpaceBefore = text.isSpaceBefore();
-      var textSpaceAfter = text.isSpaceAfter();
+      final var textSpaceBefore = text.isSpaceBefore();
+      final var textSpaceAfter = text.isSpaceAfter();
 
       addSpaceBefore |= textSpaceBefore;
       addSpaceAfter |= textSpaceAfter;
 
       if (addSpaceBefore != textSpaceBefore || addSpaceAfter != textSpaceAfter)
-        return new TextPart(text.getText(), addSpaceBefore, addSpaceAfter);
+        return new TextPart(text.text(), addSpaceBefore, addSpaceAfter);
     }
 
     return text;

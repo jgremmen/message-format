@@ -73,7 +73,7 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull T value)
   {
-    var function = multiSelectFunctionMap
+    final var function = multiSelectFunctionMap
         .get(context.getConfigValueString(configKey).orElse(defaultConfigValueForAbsentKey));
 
     if (function != null)

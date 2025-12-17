@@ -314,15 +314,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Contract(pure = true)
-    private boolean exitMessage0_isRedundantTextPart(@NotNull MessagePart messagePart)
-    {
-      if (messagePart instanceof TextPart)
-      {
-        var textPart = (TextPart)messagePart;
-        return textPart.isEmpty() && textPart.isSpaceAround();
-      }
-
-      return false;
+    private boolean exitMessage0_isRedundantTextPart(@NotNull MessagePart messagePart) {
+      return messagePart instanceof TextPart textPart && textPart.isEmpty() && textPart.isSpaceAround();
     }
 
 
@@ -338,13 +331,13 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitText(TextContext ctx)
     {
-      var chNodes = ctx.CH();
-      var text = new char[chNodes.size()];
-      int n = 0;
+      final var chNodes = ctx.CH();
+      final var text = new char[chNodes.size()];
+      var n = 0;
 
       for(var chNode: chNodes)
       {
-        var chText = chNode.getText();
+        final var chText = chNode.getText();
         var ch = chText.charAt(0);
 
         if (ch == '\\')
@@ -432,7 +425,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitParameterPart(ParameterPartContext ctx)
     {
-      var mapElements =
+      final var mapElements =
           ctx.parameterConfigElement().stream().collect(PARAMETER_CONFIG_COLLECTOR);
 
       var forceQuotedMessage = ctx.forceQuotedMessage();
@@ -447,7 +440,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
             .report();
       }
 
-      var parameterFormat = ctx.parameterFormat();
+      final var parameterFormat = ctx.parameterFormat();
 
       ctx.part = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(
           name, parameterFormat == null ? null : parameterFormat.format,
@@ -479,7 +472,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       public BiConsumer<Map<String,ConfigValue>,ConfigNamedElementContext> accumulator()
       {
         return (map,cpec) -> {
-          var name = cpec.configKey.getName();
+          final var name = cpec.configKey.getName();
 
           if (map.containsKey(name))
           {

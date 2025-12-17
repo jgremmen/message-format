@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.asm.adopter;
 
 import de.sayayi.lib.message.Message.LocaleAware;
-import de.sayayi.lib.message.Message.WithCode;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.NoParameters;
@@ -69,7 +68,7 @@ public class MessageDefAnnotationTest
   })
   void testMultiMessageAnnotation()
   {
-    WithCode msg = messageSupport.code("T4").getMessage();
+    var msg = messageSupport.code("T4").getMessage();
 
     assertEquals("T4", msg.getCode());
     assertFalse(msg instanceof LocaleAware);

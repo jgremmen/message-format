@@ -102,7 +102,7 @@ public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
       s.append(' ');
 
     return noSpaceText(s
-        .append(unitMessage == null ? unit : context.format(unitMessage).getText())
+        .append(unitMessage == null ? unit : context.format(unitMessage).text())
         .toString());
   }
 
@@ -119,7 +119,7 @@ public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
 
   private static int log1000(long n)
   {
-    for(int i = (POW10.length - 1) / 3; i >= 0; i--)
+    for(var i = (POW10.length - 1) / 3; i >= 0; i--)
       if (n >= POW10[i * 3])
         return i;
 

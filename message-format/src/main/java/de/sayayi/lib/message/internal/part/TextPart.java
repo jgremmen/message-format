@@ -84,7 +84,7 @@ public final class TextPart implements Text
 
 
   @Override
-  public String getText() {
+  public String text() {
     return text;
   }
 
@@ -127,14 +127,10 @@ public final class TextPart implements Text
   @Override
   public boolean equals(Object o)
   {
-    if (!(o instanceof Text))
-      return false;
-
-    var that = (Text)o;
-
-    return spaceBefore == that.isSpaceBefore() &&
-           spaceAfter == that.isSpaceAfter() &&
-           Objects.equals(text, that.getText());
+    return o instanceof Text that &&
+        spaceBefore == that.isSpaceBefore() &&
+        spaceAfter == that.isSpaceAfter() &&
+        Objects.equals(text, that.text());
   }
 
 
@@ -148,7 +144,7 @@ public final class TextPart implements Text
   @Contract(pure = true)
   public String toString()
   {
-    var s = new StringBuilder("Text(");
+    final var s = new StringBuilder("Text(");
 
     if (text == null)
       s.append("null");
@@ -196,9 +192,9 @@ public final class TextPart implements Text
    */
   public static @NotNull Text unpack(@NotNull PackInputStream packStream) throws IOException
   {
-    var spaceBefore = packStream.readBoolean();
-    var spaceAfter = packStream.readBoolean();
-    var text = packStream.readString();
+    final var spaceBefore = packStream.readBoolean();
+    final var spaceAfter = packStream.readBoolean();
+    final var text = packStream.readString();
 
     return text == null && !spaceBefore && !spaceAfter
         ? Text.NULL

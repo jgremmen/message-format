@@ -397,9 +397,9 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
         throw new IllegalArgumentException("parameter must not be empty");
 
       setValue: {
-        int low = 0;
+        var low = 0;
 
-        for(int high = parameterCount - 1; low <= high;)
+        for(var high = parameterCount - 1; low <= high;)
         {
           var mid = (low + high) >>> 1;
           var cmp = parameter.compareTo((String)parameters[mid * 2]);
@@ -686,10 +686,9 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     {
       if (this != o)
       {
-        if (!(o instanceof Map))
+        if (!(o instanceof Map<?, ?> that))
           return false;
 
-        var that = (Map<?,?>)o;
         if (size() != that.size())
           return false;
 
@@ -718,7 +717,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @SuppressWarnings("ConstantValue")
     public int hashCode()
     {
-      int hash = 0;
+      var hash = 0;
       Object value;
 
       // respect map hashcode contract!
@@ -738,7 +737,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
       var sb = new StringBuilder("{");
 
-      for(int offset = 0; offset < length; offset += 2)
+      for(var offset = 0; offset < length; offset += 2)
       {
         if (offset > 0)
           sb.append(", ");
@@ -885,7 +884,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
       var sb = new StringBuilder("[");
 
-      for(int offset = 0; offset < length; offset += 2)
+      for(var offset = 0; offset < length; offset += 2)
       {
         if (offset > 0)
           sb.append(", ");

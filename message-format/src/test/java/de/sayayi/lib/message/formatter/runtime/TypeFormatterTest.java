@@ -20,7 +20,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -102,7 +101,7 @@ class TypeFormatterTest
     assertEquals("Map<K, V>", TypeFormatter.toString(method.getGenericReturnType(), "u"));
     assertEquals("Map<K, V>", TypeFormatter.toString(method.getGenericReturnType(), "c"));
 
-    final Type arg0 = method.getGenericParameterTypes()[0];
+    final var arg0 = method.getGenericParameterTypes()[0];
     assertEquals("java.util.Map<? extends K, ? extends V>", TypeFormatter.toString(arg0, ""));
     assertEquals("Map<? extends K, ? extends V>", TypeFormatter.toString(arg0, "u"));
     assertEquals("Map<? extends K, ? extends V>", TypeFormatter.toString(arg0, "c"));

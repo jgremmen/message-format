@@ -102,13 +102,13 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
   @Contract(pure = true)
   private static @NotNull OptionalInt determineElementIndex(@NotNull Node node, @NotNull String name)
   {
-    int index = 1;
+    var index = 1;
 
     for(var n = node; (n = n.getPreviousSibling()) != null;)
       if (n instanceof Element && name.equals(n.getNodeName()))
         index++;
 
-    boolean indexed = index > 1;
+    var indexed = index > 1;
 
     if (!indexed)
       for(var n = node; (n = n.getNextSibling()) != null;)

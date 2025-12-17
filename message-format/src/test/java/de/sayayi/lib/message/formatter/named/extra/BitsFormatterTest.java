@@ -46,7 +46,7 @@ class BitsFormatterTest extends AbstractFormatterTest
   @Test
   void testFormatterConfig()
   {
-    final BitsFormatter formatter = new BitsFormatter();
+    final var formatter = new BitsFormatter();
 
     assertTrue(formatter.getFormattableTypes().isEmpty());
     assertEquals("bits", formatter.getName());

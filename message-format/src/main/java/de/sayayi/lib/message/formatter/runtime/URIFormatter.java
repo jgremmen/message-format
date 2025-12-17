@@ -37,42 +37,24 @@ public final class URIFormatter extends AbstractSingleTypeParameterFormatter<URI
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull URI uri)
   {
-    switch(context.getConfigValueString("uri").orElse("default"))
-    {
-      case "default":
-        return noSpaceText(uri.toString());
-
-      case "authority":
-        return noSpaceText(uri.getAuthority());
-
-      case "fragment":
-        return noSpaceText(uri.getFragment());
-
-      case "host":
-        return noSpaceText(uri.getHost());
-
-      case "path":
-        return noSpaceText(uri.getPath());
-
-      case "port": {
-        var port = uri.getPort();
-
-        return formatUsingMappedNumber(context, port, true)
+    return switch(context.getConfigValueString("uri").orElse("default")) {
+      case "default" -> noSpaceText(uri.toString());
+      case "authority" -> noSpaceText(uri.getAuthority());
+      case "fragment" -> noSpaceText(uri.getFragment());
+      case "host" -> noSpaceText(uri.getHost());
+      case "path" -> noSpaceText(uri.getPath());
+      case "port" -> {
+        final var port = uri.getPort();
+        yield formatUsingMappedNumber(context, port, true)
             .orElseGet(() -> port == -1 ? emptyText() : noSpaceText(Integer.toString(port)));
       }
+      case "query" -> noSpaceText(uri.getQuery());
+      case "scheme" -> formatUsingMappedString(context, uri.getScheme(), true)
+          .orElseGet(() -> noSpaceText(uri.getScheme()));
+      case "user-info" -> noSpaceText(uri.getUserInfo());
 
-      case "query":
-        return noSpaceText(uri.getQuery());
-
-      case "scheme":
-        return formatUsingMappedString(context, uri.getScheme(), true)
-            .orElseGet(() -> noSpaceText(uri.getScheme()));
-
-      case "user-info":
-        return noSpaceText(uri.getUserInfo());
-    }
-
-    return context.delegateToNextFormatter();
+      default -> context.delegateToNextFormatter();
+    };
   }
 
 

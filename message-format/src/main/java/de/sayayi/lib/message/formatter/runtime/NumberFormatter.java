@@ -159,11 +159,11 @@ public final class NumberFormatter
         number instanceof Integer || number instanceof Long)
       return compareType.match(Long.compare(number.longValue(), numberKeyValue)) ? EXACT : MISMATCH;
 
-    if (number instanceof BigInteger)
-      return compareType.match(((BigInteger)number).compareTo(BigInteger.valueOf(numberKeyValue))) ? EXACT : MISMATCH;
+    if (number instanceof BigInteger bigInteger)
+      return compareType.match(bigInteger.compareTo(BigInteger.valueOf(numberKeyValue))) ? EXACT : MISMATCH;
 
-    if (number instanceof BigDecimal)
-      return compareType.match(((BigDecimal)number).compareTo(BigDecimal.valueOf(numberKeyValue))) ? EXACT : MISMATCH;
+    if (number instanceof BigDecimal bigDecimal)
+      return compareType.match(bigDecimal.compareTo(BigDecimal.valueOf(numberKeyValue))) ? EXACT : MISMATCH;
 
     return compareType.match(Double.compare(number.doubleValue(), numberKeyValue)) ? EXACT : MISMATCH;
   }
@@ -181,21 +181,19 @@ public final class NumberFormatter
     var compareType = context.getCompareType();
     var string = context.getStringKeyValue();
 
-    if (value instanceof BigInteger)
+    if (value instanceof BigInteger bigInteger)
     {
-      var bigint = (BigInteger)value;
-
       try {
-        return compareType.match(bigint.compareTo(new BigInteger(string))) ? EQUIVALENT : MISMATCH;
+        return compareType.match(bigInteger.compareTo(new BigInteger(string))) ? EQUIVALENT : MISMATCH;
       } catch(NumberFormatException ex) {
-        value = new BigDecimal(bigint);
+        value = new BigDecimal(bigInteger);
       }
     }
 
-    if (value instanceof BigDecimal)
+    if (value instanceof BigDecimal bigDecimal)
     {
       try {
-        return compareType.match(((BigDecimal)value).compareTo(new BigDecimal(string))) ? EQUIVALENT : MISMATCH;
+        return compareType.match(bigDecimal.compareTo(new BigDecimal(string))) ? EQUIVALENT : MISMATCH;
       } catch(NumberFormatException ignored) {
       }
     }

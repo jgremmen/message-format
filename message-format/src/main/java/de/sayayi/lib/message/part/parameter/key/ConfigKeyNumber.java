@@ -28,46 +28,33 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
+ * @param compareType Configuration number key comparison type.
+ * @param number      Configuration key number.
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
-public final class ConfigKeyNumber implements ConfigKey
-{
-  /** Configuration number key comparison type. */
-  private final @NotNull CompareType compareType;
-
-  /** Configuration key number. */
-  private final long number;
-
-
+public record ConfigKeyNumber(@NotNull CompareType compareType, long number) implements ConfigKey {
   /**
    * Constructs a configuration key number with a comparison type.
    *
-   * @param compareType  configuration key comparison type, not {@code null}
-   * @param number       configuration key number
-   *
+   * @param compareType configuration key comparison type, not {@code null}
+   * @param number      configuration key number
    * @since 0.4.0 (made public in 0.10.0)
    */
-  public ConfigKeyNumber(@NotNull CompareType compareType, long number)
-  {
+  public ConfigKeyNumber(@NotNull CompareType compareType, long number) {
     this.compareType = requireNonNull(compareType, "compareType must not be null");
     this.number = number;
-  }
-
-
-  @Override
-  public @NotNull CompareType getCompareType() {
-    return compareType;
   }
 
 
   /**
    * Returns the config key number value.
    *
-   * @return  config key number value
+   * @return config key number value
    */
+  @Override
   @Contract(pure = true)
-  public long getNumber() {
+  public long number() {
     return number;
   }
 
@@ -75,7 +62,7 @@ public final class ConfigKeyNumber implements ConfigKey
   /**
    * {@inheritDoc}
    *
-   * @return  always {@link Type#NUMBER Type#NUMBER}
+   * @return always {@link Type#NUMBER Type#NUMBER}
    */
   @Override
   public @NotNull Type getType() {
@@ -84,14 +71,8 @@ public final class ConfigKeyNumber implements ConfigKey
 
 
   @Override
-  public boolean equals(Object o)
-  {
-    if (!(o instanceof ConfigKeyNumber))
-      return false;
-
-    final var that = (ConfigKeyNumber)o;
-
-    return number == that.number && compareType == that.compareType;
+  public boolean equals(Object o) {
+    return o instanceof ConfigKeyNumber that && number == that.number && compareType == that.compareType;
   }
 
 
@@ -108,34 +89,25 @@ public final class ConfigKeyNumber implements ConfigKey
 
 
   /**
-   * @param packStream  data output pack target
-   *
-   * @throws IOException  if an I/O error occurs
-   *
-   * @since 0.8.0
-   *
+   * @param packStream data output pack target
+   * @throws IOException if an I/O error occurs
    * @hidden
+   * @since 0.8.0
    */
-  public void pack(@NotNull PackOutputStream packStream) throws IOException
-  {
+  public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeEnum(compareType);
     packLongVar(number, packStream);
   }
 
 
   /**
-   * @param packStream  source data input, not {@code null}
-   *
-   * @return  unpacked number map key, never {@code null}
-   *
-   * @throws IOException  if an I/O error occurs
-   *
-   * @since 0.8.0
-   *
+   * @param packStream source data input, not {@code null}
+   * @return unpacked number map key, never {@code null}
+   * @throws IOException if an I/O error occurs
    * @hidden
+   * @since 0.8.0
    */
-  public static @NotNull ConfigKeyNumber unpack(@NotNull PackInputStream packStream) throws IOException
-  {
+  public static @NotNull ConfigKeyNumber unpack(@NotNull PackInputStream packStream) throws IOException {
     final var compareType = packStream.readEnum(CompareType.class);
     final var number = packStream.getVersion().orElseThrow() == 1
         ? packStream.readLong()

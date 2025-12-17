@@ -132,14 +132,10 @@ public final class TemplatePart implements Template
   @Override
   public boolean equals(Object o)
   {
-    if (!(o instanceof Template))
-      return false;
-
-    var that = (Template)o;
-
-    return spaceBefore == that.isSpaceBefore() &&
-           spaceAfter == that.isSpaceAfter() &&
-           name.equals(that.getName());
+    return o instanceof Template that &&
+        spaceBefore == that.isSpaceBefore() &&
+        spaceAfter == that.isSpaceAfter() &&
+        name.equals(that.getName());
   }
 
 
@@ -218,22 +214,22 @@ public final class TemplatePart implements Template
   public static @NotNull Template unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
-    var spaceBefore = packStream.readBoolean();
-    var spaceAfter = packStream.readBoolean();
+    final var spaceBefore = packStream.readBoolean();
+    final var spaceAfter = packStream.readBoolean();
 
-    var defaultParameterMapSize = packStream.readSmallVar();
-    var parameterDelegateMapSize = packStream.readSmallVar();
+    final var defaultParameterMapSize = packStream.readSmallVar();
+    final var parameterDelegateMapSize = packStream.readSmallVar();
 
-    var defaultParameterMap = new HashMap<String,ConfigValue>();
-    for(int n = 0; n < defaultParameterMapSize; n++)
+    final var defaultParameterMap = new HashMap<String,ConfigValue>();
+    for(var n = 0; n < defaultParameterMapSize; n++)
     {
       defaultParameterMap.put(
           requireNonNull(packStream.readString()),
           unpack.unpackMapValue(packStream));
     }
 
-    var parameterDelegateMap = new HashMap<String,String>();
-    for(int n = 0; n < parameterDelegateMapSize; n++)
+    final var parameterDelegateMap = new HashMap<String,String>();
+    for(var n = 0; n < parameterDelegateMapSize; n++)
     {
       parameterDelegateMap.put(
           requireNonNull(packStream.readString()),

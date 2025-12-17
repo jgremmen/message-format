@@ -94,7 +94,7 @@ final class MessageParameters implements Parameters
 
     var thatParameterNames = that.getParameterNames();
 
-    for(int n = 0; n < parameters.length; n += 2)
+    for(var n = 0; n < parameters.length; n += 2)
     {
       var parameterName = (String)parameters[n];
 
@@ -112,7 +112,7 @@ final class MessageParameters implements Parameters
   {
     var hash = locale.hashCode();
 
-    for(Object parameter: parameters)
+    for(var parameter: parameters)
       hash += parameter.hashCode();
 
     return hash;
@@ -277,7 +277,7 @@ final class MessageParameters implements Parameters
       if (!hasNext())
         throw new NoSuchElementException("parameter name iterator out of bounds");
 
-      final String name = (String)parameters[n];
+      final var name = (String)parameters[n];
       n += 2;
 
       return name;

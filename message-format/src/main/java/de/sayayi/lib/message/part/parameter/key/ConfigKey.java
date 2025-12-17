@@ -68,7 +68,7 @@ public interface ConfigKey
    * @since 0.8.4
    */
   @Contract(pure = true)
-  default @NotNull CompareType getCompareType() {
+  default @NotNull CompareType compareType() {
     return EQ;
   }
 
@@ -178,34 +178,28 @@ public interface ConfigKey
      */
     public boolean match(int signum)
     {
-      switch(this)
-      {
-        case EQ:   return signum == 0;
-        case NE:   return signum != 0;
-        case LT:   return signum < 0;
-        case LTE:  return signum <= 0;
-        case GT:   return signum > 0;
-        case GTE:  return signum >= 0;
-      }
-
-      return false;
+      return switch(this) {
+        case EQ -> signum == 0;
+        case NE -> signum != 0;
+        case LT -> signum < 0;
+        case LTE -> signum <= 0;
+        case GT -> signum > 0;
+        case GTE -> signum >= 0;
+      };
     }
 
 
     @Override
     public String toString()
     {
-      switch(this)
-      {
-        case EQ:  return "=";
-        case GT:  return ">";
-        case GTE: return ">=";
-        case LT:  return "<";
-        case LTE: return "<=";
-        case NE:  return "<>";
-      }
-
-      return name();
+      return switch(this) {
+        case EQ -> "=";
+        case GT -> ">";
+        case GTE -> ">=";
+        case LT -> "<";
+        case LTE -> "<=";
+        case NE -> "<>";
+      };
     }
 
 

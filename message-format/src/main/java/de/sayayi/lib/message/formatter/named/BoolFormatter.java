@@ -121,17 +121,15 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
     if (value instanceof Boolean)
       return Optional.of((Boolean)value);
 
-    if (value instanceof String)
+    if (value instanceof String string)
     {
-      var s = (String)value;
-
-      if ("true".equals(s))
+      if ("true".equals(string))
         return Optional.of(TRUE);
-      else if ("false".equals(s))
+      else if ("false".equals(string))
         return Optional.of(FALSE);
 
       try {
-        value = new BigDecimal(s);
+        value = new BigDecimal(string);
       } catch(NumberFormatException ignored) {
       }
     }

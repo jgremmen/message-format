@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.exception;
 
-import de.sayayi.lib.message.MessageSupport;
+import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
+import de.sayayi.lib.message.MessageSupport.MessageFilter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,8 +28,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Jeroen Gremmen
  * @since 0.8.0
  *
- * @see de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport#setMessageFilter(MessageSupport.MessageFilter)
- *      ConfigurableMessageSupport#setMessageFilter(MessageFilter)
+ * @see ConfigurableMessageSupport#setMessageFilter(MessageFilter)
  */
 public final class DuplicateMessageException extends MessageException
 {

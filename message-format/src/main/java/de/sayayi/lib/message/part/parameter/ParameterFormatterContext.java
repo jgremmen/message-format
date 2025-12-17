@@ -121,7 +121,7 @@ public final class ParameterFormatterContext extends AbstractParameterConfigAcce
 
     if (!text.isEmpty() && !(parameterPostFormatters = messageAccessor.getParameterPostFormatters()).isEmpty())
     {
-      var matchingPostFormatters = new ArrayList<ParameterPostFormatter>();
+      final var matchingPostFormatters = new ArrayList<ParameterPostFormatter>();
       ParameterPostFormatter parameterPostFormatter;
 
       for(var parameterName: parameterConfig.getConfigNames())

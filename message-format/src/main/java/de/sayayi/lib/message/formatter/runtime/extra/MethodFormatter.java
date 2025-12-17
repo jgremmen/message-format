@@ -45,22 +45,14 @@ public final class MethodFormatter
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Method method)
   {
-    switch(context.getConfigValueString("method").orElse("default"))
-    {
-      case "name":
-        return noSpaceText(method.getName());
+    return switch(context.getConfigValueString("method").orElse("default")) {
+      case "name" -> noSpaceText(method.getName());
+      case "class" -> noSpaceText(TypeFormatter.toString(method.getDeclaringClass(), "Cju"));
+      case "return-type" -> noSpaceText(TypeFormatter.toString(method.getGenericReturnType(), "Cju"));
+      case "default" -> noSpaceText(method.toString());
 
-      case "class":
-        return noSpaceText(TypeFormatter.toString(method.getDeclaringClass(), "Cju"));
-
-      case "return-type":
-        return noSpaceText(TypeFormatter.toString(method.getGenericReturnType(), "Cju"));
-
-      case "default":
-        return noSpaceText(method.toString());
-    }
-
-    return context.delegateToNextFormatter();
+      default -> context.delegateToNextFormatter();
+    };
   }
 
 

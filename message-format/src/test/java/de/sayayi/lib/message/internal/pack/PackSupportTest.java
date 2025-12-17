@@ -50,7 +50,7 @@ class PackSupportTest
 
     System.arraycopy(THRESHOLD_VALUES, 0, numbers, 0, THRESHOLD_VALUES.length);
 
-    for(int n = THRESHOLD_VALUES.length; n < numbers.length; n++)
+    for(var n = THRESHOLD_VALUES.length; n < numbers.length; n++)
     {
       final var pct = random.nextInt(100);
 

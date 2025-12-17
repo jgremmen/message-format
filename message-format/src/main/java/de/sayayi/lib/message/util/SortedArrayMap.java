@@ -45,12 +45,12 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
   {
     if ((size = map != null ? map.size() : 0) > 0)
     {
-      var keyList = new ArrayList<>(map.keySet());
+      final var keyList = new ArrayList<>(map.keySet());
       keyList.sort(nullsFirst(naturalOrder()));
 
       array = new Object[size * 2];
 
-      for(int n = 0; n < size; n++)
+      for(var n = 0; n < size; n++)
       {
         var key = keyList.get(n);
 
@@ -112,7 +112,7 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
   {
     var keys = (K[])Array.newInstance(keyType, size);
 
-    for(int n = 0; n < size; n++)
+    for(var n = 0; n < size; n++)
       keys[n] = (K)array[n * 2];
 
     return keys;
@@ -224,24 +224,18 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
     @Override
     public boolean equals(Object o)
     {
-      if (o instanceof Entry)
-      {
-        var entry = (Entry<?,?>)o;
-
-        return
-            Objects.equals(array[offset], entry.getKey()) &&
-            Objects.equals(array[offset + 1], entry.getValue());
-      }
-
-      return false;
+      return
+          o instanceof Entry<?, ?> entry &&
+          Objects.equals(array[offset], entry.getKey()) &&
+          Objects.equals(array[offset + 1], entry.getValue());
     }
 
 
     @Override
     public int hashCode()
     {
-      var key = array[offset];
-      var value = array[offset + 1];
+      final var key = array[offset];
+      final var value = array[offset + 1];
 
       return (key == null ? 0 : key.hashCode()) ^ (value == null ? 0 : value.hashCode());
     }

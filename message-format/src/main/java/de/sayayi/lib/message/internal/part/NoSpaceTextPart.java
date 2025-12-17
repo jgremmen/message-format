@@ -30,29 +30,19 @@ import static java.util.Objects.requireNonNull;
 /**
  * Text message part without leading and trailing spaces.
  *
+ * @param text Text without leading/trailing spaces.
  * @author Jeroen Gremmen
  * @since 0.5.0
  */
-public final class NoSpaceTextPart implements Text
-{
-  /** Text without leading/trailing spaces. */
-  private final @NotNull String text;
-
-
+public record NoSpaceTextPart(@NotNull String text) implements Text {
   /**
    * Constructs a text part without leading/trailing spaces. If {@code text} contains leading
    * and/or trailing spaces, they will be removed.
    *
-   * @param text  text, not {@code null}
+   * @param text text, not {@code null}
    */
   public NoSpaceTextPart(@NotNull String text) {
     this.text = trimSpaces(requireNonNull(text, "text must not be null"));
-  }
-
-
-  @Override
-  public @NotNull String getText() {
-    return text;
   }
 
 
@@ -71,7 +61,7 @@ public final class NoSpaceTextPart implements Text
   /**
    * {@inheritDoc}
    *
-   * @return  always {@code false}
+   * @return always {@code false}
    */
   @Override
   public boolean isSpaceBefore() {
@@ -82,7 +72,7 @@ public final class NoSpaceTextPart implements Text
   /**
    * {@inheritDoc}
    *
-   * @return  always {@code false}
+   * @return always {@code false}
    */
   @Override
   public boolean isSpaceAfter() {
@@ -91,14 +81,8 @@ public final class NoSpaceTextPart implements Text
 
 
   @Override
-  public boolean equals(Object o)
-  {
-    if (!(o instanceof Text))
-      return false;
-
-    var that = (Text)o;
-
-    return !that.isSpaceBefore() && !that.isSpaceAfter() && text.equals(that.getText());
+  public boolean equals(Object o) {
+    return o instanceof Text that && !that.isSpaceBefore() && !that.isSpaceAfter() && text.equals(that.text());
   }
 
 
@@ -116,13 +100,10 @@ public final class NoSpaceTextPart implements Text
 
 
   /**
-   * @param packStream  data output pack target
-   *
-   * @throws IOException  if an I/O error occurs
-   *
-   * @since 0.8.0
-   *
+   * @param packStream data output pack target
+   * @throws IOException if an I/O error occurs
    * @hidden
+   * @since 0.8.0
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeString(text);
@@ -130,18 +111,13 @@ public final class NoSpaceTextPart implements Text
 
 
   /**
-   * @param packStream  source data input, not {@code null}
-   *
-   * @return  unpacked no-space text part, never {@code null}
-   *
-   * @throws IOException  if an I/O error occurs
-   *
-   * @since 0.8.0
-   *
+   * @param packStream source data input, not {@code null}
+   * @return unpacked no-space text part, never {@code null}
+   * @throws IOException if an I/O error occurs
    * @hidden
+   * @since 0.8.0
    */
-  public static @NotNull Text unpack(@NotNull PackInputStream packStream) throws IOException
-  {
+  public static @NotNull Text unpack(@NotNull PackInputStream packStream) throws IOException {
     var text = requireNonNull(packStream.readString());
     return text.isEmpty() ? Text.EMPTY : new NoSpaceTextPart(text);
   }

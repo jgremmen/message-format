@@ -80,7 +80,7 @@ public final class ParameterConfig
     ConfigValue mapNullValue = null;
     ConfigKey.Type keyType;
     ConfigKey key;
-    int keyTypeMask = 0;
+    var keyTypeMask = 0;
 
     for(var entry: map.entrySet())
     {
@@ -102,7 +102,7 @@ public final class ParameterConfig
     mapKeys = new ConfigKey[mapLength];
     mapValues = new ConfigValue[mapLength];
 
-    for(int n = 0; n < mapLength; n++)
+    for(var n = 0; n < mapLength; n++)
     {
       mapKeys[n] = mapKeyList.get(n).getConfigKey();
       mapValues[n] = map.get(mapKeys[n]);
@@ -272,12 +272,7 @@ public final class ParameterConfig
   @Override
   public boolean equals(Object o)
   {
-    if (!(o instanceof ParameterConfig))
-      return false;
-
-    var that = (ParameterConfig)o;
-
-    return
+    return o instanceof ParameterConfig that &&
         hasKeyType == that.hasKeyType &&
         config.equals(that.config) &&
         Arrays.equals(mapKeys, that.mapKeys) &&
@@ -298,14 +293,14 @@ public final class ParameterConfig
   @Contract(pure = true)
   public String toString()
   {
-    var s = new StringJoiner(",", "{", "}");
+    final var s = new StringJoiner(",", "{", "}");
 
     // config
     for(var configEntry: config.entrySet())
       s.add(configEntry.getKey() + '=' + configEntry.getValue());
 
     // map
-    for(int n = 0; n < mapKeys.length; n++)
+    for(var n = 0; n < mapKeys.length; n++)
       s.add(mapKeys[n].toString() + ':' + mapValues[n]);
 
     if (defaultValue != null)
@@ -351,7 +346,7 @@ public final class ParameterConfig
       @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackSupport unpack,
       @NotNull PackInputStream packStream) throws IOException
   {
-    var map = new LinkedHashMap<ConfigKey,ConfigValue>();
+    final var map = new LinkedHashMap<ConfigKey,ConfigValue>();
 
     for(int n = 0, size = packStream.readSmallVar(); n < size; n++)
       map.put(unpack.unpackMapKey(packStream), unpack.unpackMapValue(packStream));
@@ -378,7 +373,7 @@ public final class ParameterConfig
 
     @Override
     public @NotNull ConfigKey.CompareType getCompareType() {
-      return configKey.getCompareType();
+      return configKey.compareType();
     }
 
 
@@ -396,7 +391,7 @@ public final class ParameterConfig
 
     @Override
     public long getNumberKeyValue() {
-      return ((ConfigKeyNumber)configKey).getNumber();
+      return ((ConfigKeyNumber)configKey).number();
     }
 
 

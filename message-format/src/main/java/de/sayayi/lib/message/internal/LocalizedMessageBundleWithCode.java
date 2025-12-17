@@ -88,7 +88,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
     var searchLanguage = locale.getLanguage();
     var searchCountry = locale.getCountry();
 
-    int match = -1;
+    var match = -1;
     Message message = null;
 
     for(var entry: localizedMessages.entrySet())
@@ -149,10 +149,8 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   @Override
   public boolean equals(Object o)
   {
-    if (!(o instanceof LocalizedMessageBundleWithCode))
+    if (!(o instanceof LocalizedMessageBundleWithCode that))
       return false;
-
-    var that = (LocalizedMessageBundleWithCode)o;
 
     return code.equals(that.code) && localizedMessages.equals(that.localizedMessages);
   }
@@ -211,7 +209,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
     var code = requireNonNull(packStream.readString());
     var messages = new HashMap<Locale,Message>();
 
-    for(int n = 0; n < messageCount; n++)
+    for(var n = 0; n < messageCount; n++)
     {
       messages.put(
           forLanguageTag(requireNonNull(packStream.readString())),

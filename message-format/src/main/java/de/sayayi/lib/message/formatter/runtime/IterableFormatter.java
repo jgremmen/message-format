@@ -54,7 +54,7 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> 
     if (iterable instanceof Collection)
       return OptionalLong.of(((Collection<?>)iterable).size());
 
-    long size = 0;
+    var size = 0L;
 
     for(var ignored: (Iterable<?>)iterable)
       size++;

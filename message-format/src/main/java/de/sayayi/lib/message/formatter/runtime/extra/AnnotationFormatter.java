@@ -87,38 +87,20 @@ public final class AnnotationFormatter extends AbstractSingleTypeParameterFormat
   }
 
 
+  private record AnnotationField(Class<? extends Annotation> annotationType, String field) {
+      private AnnotationField(@NotNull Class<? extends Annotation> annotationType, @NotNull String field) {
+        this.annotationType = annotationType;
+        this.field = field;
+      }
 
 
-  private static final class AnnotationField
-  {
-    private final Class<? extends Annotation> annotationType;
-    private final String field;
+      @Override
+      public boolean equals(Object o) {
+        return
+            this == o ||
+                o instanceof AnnotationField that && annotationType == that.annotationType && field.equals(that.field);
+      }
 
 
-    public AnnotationField(@NotNull Class<? extends Annotation> annotationType, @NotNull String field)
-    {
-      this.annotationType = annotationType;
-      this.field = field;
-    }
-
-
-    @Override
-    public boolean equals(Object o)
-    {
-      if (this == o)
-        return true;
-      if (!(o instanceof AnnotationField))
-        return false;
-
-      var that = (AnnotationField)o;
-
-      return annotationType == that.annotationType && field.equals(that.field);
-    }
-
-
-    @Override
-    public int hashCode() {
-      return annotationType.hashCode() * 31 + field.hashCode();
-    }
   }
 }
