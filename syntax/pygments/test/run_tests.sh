@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -9,28 +9,28 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-echo "${YELLOW}Building Docker image...${NC}"
+printf "${YELLOW}Building Docker image...${NC}\n"
 docker build -t messageformat-lexer-test -f syntax/pygments/test/Dockerfile . || {
-    echo "${RED}Failed to build Docker image!${NC}"
+    printf "${RED}Failed to build Docker image!${NC}\n"
     exit 1
 }
 
-echo ""
-echo "${YELLOW}Running tests...${NC}"
-echo ""
+printf "\n"
+printf "${YELLOW}Running tests...${NC}\n"
+printf "\n"
 
-if [[ "$1" == "--interactive" || "$1" == "-i" ]]; then
-    echo "${YELLOW}Starting interactive shell...${NC}"
+if [ "$1" = "--interactive" ] || [ "$1" = "-i" ]; then
+    printf "${YELLOW}Starting interactive shell...${NC}\n"
     docker run --rm -it messageformat-lexer-test /bin/bash
 else
     docker run --rm messageformat-lexer-test
     EXIT_CODE=$?
 
-    echo ""
+    printf "\n"
     if [ $EXIT_CODE -eq 0 ]; then
-        echo "${GREEN}✓ All tests passed!${NC}"
+        printf "${GREEN}✓ All tests passed!${NC}\n"
     else
-        echo "${RED}✗ Tests failed!${NC}"
+        printf "${RED}✗ Tests failed!${NC}\n"
     fi
 
     exit $EXIT_CODE

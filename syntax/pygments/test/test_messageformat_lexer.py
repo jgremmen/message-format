@@ -9,7 +9,7 @@ from pygments.token import (
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from syntax.pygments.messageformat_lexer import MessageFormatLexer
+from syntax.pygments.message_format import MessageFormatLexer
 
 
 def tokenize(code):
@@ -69,7 +69,8 @@ class TestMessageProperties:
         param_markers = get_tokens_by_type(tokens, Punctuation.Special)
         assert len(param_markers) >= 4, "Should have opening and closing markers for both parameters"
         assert has_token_type(tokens, String.Delimiter)
-        assert has_token_type(tokens, Name)
+        # Should have Name.Variable (for 'p' and 'm') and Name.Function (for 'message')
+        assert has_token_type(tokens, Name.Variable) or has_token_type(tokens, Name.Function)
 
     def test_msg005_negative_number(self):
         """MSG-005: Negative numbers."""
@@ -124,8 +125,10 @@ class TestTemplateProperties:
         tokens = tokenize(message)
 
         assert has_token_type(tokens, Punctuation.Special)
+        # The '1' is a config element (number key), should be Number.Integer
         number_tokens = get_tokens_by_type(tokens, Number.Integer)
-        assert any('1' in t[1] for t in number_tokens)
+        assert len(number_tokens) >= 1, "Should have at least one number token"
+        assert any('1' == t[1] for t in number_tokens), "Should find the number 1"
         assert has_token_type(tokens, String)
 
 
@@ -170,7 +173,8 @@ class TestEdgeCases:
         """Test names with hyphens."""
         tokens = tokenize("%[ex-colon]")
 
-        name_tokens = get_tokens_by_type(tokens, Name)
+        # In templates, names are Name.Class
+        name_tokens = get_tokens_by_type(tokens, Name.Class)
         name_values = [t[1] for t in name_tokens]
         assert 'ex-colon' in name_values, "Should recognize hyphenated name"
 
@@ -178,9 +182,19 @@ class TestEdgeCases:
         """Test names with underscores."""
         tokens = tokenize("%{my_name}")
 
-        name_tokens = get_tokens_by_type(tokens, Name)
+        # In parameters, first name is Name.Variable
+        name_tokens = get_tokens_by_type(tokens, Name.Variable)
         name_values = [t[1] for t in name_tokens]
         assert 'my_name' in name_values, "Should recognize name with underscore"
+
+    def test_all_operators_individually(self):
+        """Test each operator individually."""
+        operators = ['<', '<=', '>', '>=', '=', '!', '<>']
+
+        for op in operators:
+            message = f"%{{p,{op}5:test}}"
+            tokens = tokenize(message)
+            assert has_token_type(tokens, Operator), f"Should recognize operator {op}"
 
     def test_lexer_registration(self):
         """Test that lexer can be retrieved by alias."""
@@ -191,6 +205,98 @@ class TestEdgeCases:
         assert '*.mfp' in lexer.filenames
 
 
+class TestParserStructures:
+    """Test parser-aware context tracking based on MessageParser.g4."""
+
+    def test_parameter_name_context(self):
+        """Test that first name in parameter is highlighted as Name.Variable."""
+        message = "%{userName}"
+        tokens = tokenize(message)
+
+        var_tokens = get_tokens_by_type(tokens, Name.Variable)
+        assert len(var_tokens) >= 1
+        assert any('userName' in t[1] for t in var_tokens)
+
+    def test_parameter_format_context(self):
+        """Test that second name in parameter is highlighted as Name.Function."""
+        message = "%{value,number}"
+        tokens = tokenize(message)
+
+        var_tokens = get_tokens_by_type(tokens, Name.Variable)
+        func_tokens = get_tokens_by_type(tokens, Name.Function)
+
+        assert len(var_tokens) >= 1
+        assert any('value' in t[1] for t in var_tokens)
+        assert len(func_tokens) >= 1
+        assert any('number' in t[1] for t in func_tokens)
+
+    def test_template_name_context(self):
+        """Test that first name in template is highlighted as Name.Class."""
+        message = "%[errorTemplate]"
+        tokens = tokenize(message)
+
+        class_tokens = get_tokens_by_type(tokens, Name.Class)
+        assert len(class_tokens) >= 1
+        assert any('errorTemplate' in t[1] for t in class_tokens)
+
+    def test_named_config_elements(self):
+        """Test named config elements (name:value)."""
+        message = "%{p,level:high}"
+        tokens = tokenize(message)
+
+        # Should have config attribute names
+        attr_tokens = get_tokens_by_type(tokens, Name.Attribute)
+        assert len(attr_tokens) >= 1
+
+    def test_template_parameter_delegation(self):
+        """Test template parameter delegation (param=delegated)."""
+        message = "%[template,param=delegated]"
+        tokens = tokenize(message)
+
+        # Should have Name.Class for template name
+        class_tokens = get_tokens_by_type(tokens, Name.Class)
+        assert any('template' in t[1] for t in class_tokens)
+
+        # Should have = operator
+        assert has_token_type(tokens, Operator)
+
+        # Should have Name.Attribute for param names
+        attr_tokens = get_tokens_by_type(tokens, Name.Attribute)
+        assert len(attr_tokens) >= 1
+
+    def test_keywords_as_names(self):
+        """Test that keywords can be used as parameter/template names per nameOrKeyword rule."""
+        test_cases = [
+            ("%{null}", Name.Variable),
+            ("%{empty}", Name.Variable),
+            ("%[null]", Name.Class),
+            ("%[empty]", Name.Class),
+        ]
+
+        for message, expected_type in test_cases:
+            tokens = tokenize(message)
+            typed_tokens = get_tokens_by_type(tokens, expected_type)
+            assert len(typed_tokens) >= 1, f"Should recognize keyword as name in {message}"
+
+    def test_complex_parameter_structure(self):
+        """Test complete parameter structure: name, format, configs."""
+        message = "%{count,number,<10:'few',>=10:'many'}"
+        tokens = tokenize(message)
+
+        # Should have Name.Variable for parameter name
+        var_tokens = get_tokens_by_type(tokens, Name.Variable)
+        assert any('count' in t[1] for t in var_tokens)
+
+        # Should have Name.Function for format
+        func_tokens = get_tokens_by_type(tokens, Name.Function)
+        assert any('number' in t[1] for t in func_tokens)
+
+        # Should have operators
+        assert has_token_type(tokens, Operator)
+
+        # Should have strings
+        assert has_token_type(tokens, String)
+
+
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])
-

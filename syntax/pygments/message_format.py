@@ -7,6 +7,12 @@
 
     Based on MessageLexer.g4 and MessageParser.g4 from the message-format library.
 
+    Implements parser-aware context tracking to distinguish between:
+    - Parameter names (first position in %{...}) -> Name.Variable
+    - Format names (second position in parameters) -> Name.Function
+    - Template names (first position in %[...]) -> Name.Class
+    - Config keys (in name:value patterns) -> Name.Attribute
+
     :copyright: Copyright 2020 Jeroen Gremmen
     :license: Apache License 2.0
 """
@@ -25,6 +31,13 @@ class MessageFormatLexer(RegexLexer):
 
     MessageFormat is a powerful message formatting library that supports
     parameters (%{...}), templates (%[...]), and localized messages.
+
+    This lexer implements context-aware highlighting based on both
+    MessageLexer.g4 and MessageParser.g4, distinguishing between:
+    - Parameter names (first position in %{...})
+    - Format names (second position in parameters)
+    - Template names (first position in %[...])
+    - Config keys (in name:value patterns)
 
     .. versionadded:: 2.15
     """
@@ -69,17 +82,78 @@ class MessageFormatLexer(RegexLexer):
             (r'.', Text),
         ],
 
+        # Parameter mode - first position is parameter name (Name.Variable)
         'parameter': [
             # Parameter end: } -> pop back
             (r'\}', Punctuation.Special, '#pop'),
 
-            # Comma and colon
-            (r',', Punctuation),
-            (r':', Punctuation),
+            # First comma transitions to format state
+            (r',', Punctuation, 'parameter-format'),
 
-            # Parentheses
+            # Colon before comma means no format (go to config state)
+            (r':', Punctuation, 'parameter-config'),
+
+            # Single quoted string -> push to singlequote mode
+            (r"'", String.Delimiter, 'singlequote'),
+
+            # Double quoted string -> push to doublequote mode
+            (r'"', String.Delimiter, 'doublequote'),
+
+            # Parameter name (first position) - highlighted as Name.Variable
+            # Keywords can be parameter names per nameOrKeyword rule
+            (r'\b(?:true|false)\b', Name.Variable),
+            (r'\bnull\b', Name.Variable),
+            (r'\bempty\b', Name.Variable),
+            (_name, Name.Variable),
+
+            # Whitespace (ignored/skipped)
+            (r'[ \t\u0000-\u001f]+', Text),
+        ],
+
+        # After first comma: format name (Name.Function) OR config elements
+        'parameter-format': [
+            (r'\}', Punctuation.Special, ('#pop', '#pop')),
+            (r',', Punctuation, ('#pop', 'parameter-config')),
+            (r':', Punctuation, ('#pop', 'parameter-config')),
+
+            # If we see an operator, this isn't a format, transition to config
+            (r'<=', Operator, ('#pop', 'parameter-config')),
+            (r'>=', Operator, ('#pop', 'parameter-config')),
+            (r'<>', Operator, ('#pop', 'parameter-config')),
+            (r'<', Operator, ('#pop', 'parameter-config')),
+            (r'>', Operator, ('#pop', 'parameter-config')),
+            (r'=', Operator, ('#pop', 'parameter-config')),
+            (r'!', Operator, ('#pop', 'parameter-config')),
+
+            # If we see a number, this is config (not a format)
+            (r'-?[0-9]+', Number.Integer, ('#pop', 'parameter-config')),
+
+            # If we see a parenthesis, this is config (grouped keys)
+            (r'\(', Punctuation, ('#pop', 'parameter-config')),
+
+            (r"'", String.Delimiter, 'singlequote'),
+            (r'"', String.Delimiter, 'doublequote'),
+
+            # Format name - highlighted as Name.Function
+            (r'\b(?:true|false)\b', Name.Function),
+            (r'\bnull\b', Name.Function),
+            (r'\bempty\b', Name.Function),
+            (_name, Name.Function),
+
+            (r'[ \t\u0000-\u001f]+', Text),
+        ],
+
+        # Config elements: key:value or operators with values
+        'parameter-config': [
+            (r'\}', Punctuation.Special, ('#pop', '#pop')),
+            (r',', Punctuation),
+
+            # Parentheses for grouped map keys
             (r'\(', Punctuation),
             (r'\)', Punctuation),
+
+            # Colon (for name:value patterns)
+            (r':', Punctuation),
 
             # Keywords
             (r'\b(?:true|false)\b', Keyword.Constant),
@@ -95,47 +169,64 @@ class MessageFormatLexer(RegexLexer):
             (r'=', Operator),
             (r'!', Operator),
 
-            # Number
+            # Numbers
             (r'-?[0-9]+', Number.Integer),
 
-            # Single quoted string -> push to singlequote mode
+            # Strings
             (r"'", String.Delimiter, 'singlequote'),
-
-            # Double quoted string -> push to doublequote mode
             (r'"', String.Delimiter, 'doublequote'),
 
-            # Name (must come after keywords)
-            (_name, Name),
+            # Config key names - highlighted as Name.Attribute
+            (_name, Name.Attribute),
 
-            # Whitespace (ignored/skipped)
             (r'[ \t\u0000-\u001f]+', Text),
         ],
 
+        # Template mode - first position is template name (Name.Class)
         'template': [
             # Template end: ] -> pop back
             (r'\]', Punctuation.Special, '#pop'),
 
-            # Comma, colon, equals
+            # First comma transitions to template config state
+            (r',', Punctuation, 'template-config'),
+
+            # Strings
+            (r"'", String.Delimiter, 'singlequote'),
+            (r'"', String.Delimiter, 'doublequote'),
+
+            # Template name (first position) - highlighted as Name.Class
+            (r'\b(?:true|false)\b', Name.Class),
+            (r'\bnull\b', Name.Class),
+            (r'\bempty\b', Name.Class),
+            (_name, Name.Class),
+
+            (r'[ \t\u0000-\u001f]+', Text),
+        ],
+
+        # Template config: named configs or parameter delegation (param=delegated)
+        'template-config': [
+            (r'\]', Punctuation.Special, ('#pop', '#pop')),
             (r',', Punctuation),
             (r':', Punctuation),
+
+            # Equals for parameter delegation (param=delegated)
             (r'=', Operator),
 
             # Keywords
             (r'\b(?:true|false)\b', Keyword.Constant),
+            (r'\bnull\b', Keyword.Constant),
+            (r'\bempty\b', Keyword.Constant),
 
-            # Number
+            # Numbers
             (r'-?[0-9]+', Number.Integer),
 
-            # Single quoted string -> push to singlequote mode
+            # Strings
             (r"'", String.Delimiter, 'singlequote'),
-
-            # Double quoted string -> push to doublequote mode
             (r'"', String.Delimiter, 'doublequote'),
 
-            # Name
-            (_name, Name),
+            # Config names - highlighted as Name.Attribute
+            (_name, Name.Attribute),
 
-            # Whitespace (ignored/skipped)
             (r'[ \t\u0000-\u001f]+', Text),
         ],
 
@@ -189,4 +280,3 @@ class MessageFormatLexer(RegexLexer):
             (r'\\', String),
         ],
     }
-

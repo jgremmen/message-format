@@ -1,104 +1,159 @@
-# Pygments Lexer für MessageFormat - Finaler Plan
+# Pygments Lexer for MessageFormat - Final Plan
 
-## Übersicht
+## Overview
 
-Ein Pygments-Lexer wird erstellt, der Syntax-Highlighting für die MessageFormat-Sprache gemäß MessageParser.g4 und MessageLexer.g4 durchführt. Der Lexer implementiert vollständig rekursives State-Stack-Management mit Latin-Extended-Unicode-Support und folgt der ANTLR-Grammatik so präzise wie möglich.
+A Pygments lexer is created that performs syntax highlighting for the MessageFormat language according to **BOTH MessageParser.g4 AND MessageLexer.g4**. The lexer implements fully recursive state-stack management with Latin-Extended Unicode support and follows the ANTLR grammar as precisely as possible.
 
-## Implementierungsschritte
+## Key Requirements from MessageParser.g4
 
-### 1. Erstelle `syntax/pygments/messageformat_lexer.py`
+The parser grammar defines structural patterns that influence syntax highlighting:
 
-Implementiere `RegexLexer` mit folgenden Eigenschaften:
+1. **Parameter Structure** (line 70-79):
+   - Format: `%{parameterName, parameterFormat, configElement*, :defaultMessage}`
+   - First name after `%{` is the parameter name
+   - Second name (after first comma) is the format name
+   - Remaining elements are config keys/values
+   - Optional default message after `,:`
 
-**Lexer-Metadaten:**
+2. **Template Structure** (line 95-100):
+   - Format: `%[templateName, namedConfig|parameterDelegate, ...]`
+   - First name after `%[` is the template name
+   - Following elements can be named configs or parameter delegates (`param=delegated`)
+
+3. **Config Elements** (line 108-127):
+   - **Named configs**: `name:value` (where value can be BOOL, NUMBER, string, or quoted message)
+   - **Map configs**: `key:value` or `(key1,key2,...):value`
+   - Keys can have optional operators before them
+
+4. **Context-Aware Tokens**:
+   - `nameOrKeyword` (line 157): NAME, BOOL, NULL, EMPTY can all act as names in certain contexts
+   - This means keywords can be used as parameter/template names
+
+5. **Quoted Contexts**:
+   - `quotedMessage`: Full messages within quotes (can contain parameters/templates)
+   - `quotedString`: Simple text within quotes
+   - Both single and double quotes supported
+
+## Implementation Steps
+
+### 1. Create `syntax/pygments/message_format.py`
+
+Implement `RegexLexer` with the following properties, incorporating insights from **both MessageLexer.g4 and MessageParser.g4**:
+
+**Lexer Metadata:**
 - `name = "Message Format"`
 - `aliases = ["msgfmt", "message-format"]`
 - `filenames = ["*.mfp"]`
 
-**State-Management:**
-- Vollständig rekursiver State-Stack mit States: `root`, `parameter`, `template`, `singlequote`, `doublequote`
-- Verwendet `#push` und `#pop` für verschachtelte Strukturen
-- Unterstützt beliebige Verschachtelungstiefe (Parameter in Strings, Strings in Parametern, etc.)
+**State Management:**
+- Fully recursive state stack with states: `root`, `parameter`, `template`, `singlequote`, `doublequote`
+- Uses `#push` and `#pop` for nested structures
+- Supports unlimited nesting depth (parameters in strings, strings in parameters, etc.)
 
-**Name-Pattern (gemäß MessageLexer.g4 Zeilen 206-217):**
+**Parser-Aware Enhancements:**
+- Track position within parameter/template to provide context-aware highlighting
+- Distinguish between parameter names, format names, and config keys
+- Recognize named config patterns (`name:value`)
+- Support parameter delegation syntax (`param=delegated`) in templates
+- Handle comma-colon pattern (`,:`before default messages)
+
+**Name Pattern (according to MessageLexer.g4 lines 206-217):**
 - NameStartChar: `[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF]`
-- NameChar: `[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF_]` (mit Underscore gemäß Zeile 211)
-- Vollständiger Name mit Hyphens: `[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF][a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF_]*(-[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF_]+)*`
+- NameChar: `[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF_]` (with underscore according to line 211)
+- Complete name with hyphens: `[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF][a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF_]*(-[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF_]+)*`
 
-**Character-Fragment (gemäß MessageLexer.g4 Zeilen 218-223):**
+**Character Fragment (according to MessageLexer.g4 lines 218-223):**
 
-Approximation der Unicode-Kategorien mit Latin-Extended-Zeichensätzen:
-- Whitespace: `[ \t\u00A0]+` (Unicode Zs approximiert)
-- Letters: `[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF]` (Unicode L approximiert)
-- Numbers: `[0-9]` (Unicode N approximiert)
-- Punctuation: `[!\"#$%&'()*+,\-./:;<=>?@\[\\\]^_\`{|}~¡-¿]` (Unicode P approximiert)
-- Symbols: `[×÷±°§¶†‡•‰€£¥]` (Unicode S approximiert)
+Approximation of Unicode categories with Latin-Extended character sets:
+- Whitespace: `[ \t\u00A0]+` (Unicode Zs approximated)
+- Letters: `[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF]` (Unicode L approximated)
+- Numbers: `[0-9]` (Unicode N approximated)
+- Punctuation: `[!\"#$%&'()*+,\-./:;<=>?@\[\\\]^_\`{|}~¡-¿]` (Unicode P approximated)
+- Symbols: `[×÷±°§¶†‡•‰€£¥]` (Unicode S approximated)
 
-**Control-Chars (Zeile 203):**
+**Control Characters (line 203):**
 - Pattern: `[\u0000-\u001f]+`
 - Token: `Token.Whitespace`
 
-**Escape-Sequenzen (Zeilen 225-227):**
-- Unicode-Escape: `\\u[0-9a-fA-F]{4}`
-- Character-Escape: `\\["'%{\\[]`
+**Escape Sequences (lines 225-227):**
+- Unicode escape: `\\u[0-9a-fA-F]{4}`
+- Character escape: `\\["'%{\\[]`
 - Token: `Token.String.Escape`
 
-**Whitespace in Parameter/Template-Modes:**
-- Gemäß MessageLexer.g4 Zeilen 127 und 185 werden Whitespaces geskippt
-- Im Pygments-Lexer: Nicht matchen (ignorieren)
+**Whitespace in Parameter/Template Modes:**
+- According to MessageLexer.g4 lines 127 and 185, whitespaces are skipped
+- In Pygments lexer: Do not match (ignore)
 
-**Number-Pattern (Zeile 220):**
+**Number Pattern (line 220):**
 - Pattern: `-?[0-9]+`
-- Keine Längenbeschränkung (beliebig lange Integers erlaubt)
+- No length restriction (arbitrarily long integers allowed)
 - Token: `Number.Integer`
 
-**Token-Mapping:**
+**Token Mapping (with Parser Context):**
+
+Basic tokens:
 - Keywords (`true`, `false`, `null`, `empty`) → `Keyword.Constant`
-- Numbers (negative/positive Integers beliebiger Länge) → `Number.Integer`
-- Operatoren (`<>`, `!`, `<`, `<=`, `>`, `>=`, `=`) → `Operator`
+- Numbers (negative/positive integers of arbitrary length) → `Number.Integer`
+- Operators (`<>`, `!`, `<`, `<=`, `>`, `>=`, `=`) → `Operator`
 - Delimiters (`,`, `:`, `(`, `)`) → `Punctuation`
-- Parameter-Start/End (`%{`, `}`) und Template-Start/End (`%[`, `]`) → `Punctuation.Special`
-- Quote-Zeichen (`'`, `"`) → `String.Delimiter`
-- String-Content → `String`
-- Names → `Name`
+- Parameter start/end (`%{`, `}`) and template start/end (`%[`, `]`) → `Punctuation.Special`
+- Quote characters (`'`, `"`) → `String.Delimiter`
+- String content → `String`
 - Regular text (CH) → `Text`
 
-### 2. Erstelle `syntax/pygments/test/test_messageformat_lexer.py`
+Context-aware tokens (based on MessageParser.g4):
+- **Parameter name** (first name after `%{`) → `Name.Variable` 
+- **Format name** (second name in parameter, after first comma) → `Name.Function`
+- **Template name** (first name after `%[`) → `Name.Class`
+- **Config key names** (in `name:value` patterns) → `Name.Attribute`
+- **Generic names** (other contexts) → `Name`
 
-Pytest-Tests mit gebündelten Test-Cases:
+Note: While Pygments lexers cannot fully implement parser-level context awareness, the lexer should attempt to distinguish these contexts where possible using state tracking.
+
+### 2. Create `syntax/pygments/test/test_message_format.py`
+
+Pytest tests with bundled test cases:
 
 **Test 1: `test_message_properties`**
-- Parametrisierter Test mit allen 9 MSG-Beispielen aus `message.properties`
-- MSG-001: Leere Message
-- MSG-002: Einfacher Text
-- MSG-003: Sonderzeichen und Escape-Sequenzen (`\\uD83D`, `\\uDE00`)
-- MSG-004: Enum-Keys mit verschiedenen Operatoren (`empty`, `!empty`, `=null`, `!null`, `true`, `false`)
-- MSG-005: Named-Keys mit verschachtelten Parametern (`'msg %{m}'`), negative Zahlen (`-678764782`)
-- MSG-006: Number-Keys mit relationalen Operatoren (`<10`, `<=20`, `=30`, `>1999`, `>=200`, `!25`)
-- MSG-007: String-Keys mit relationalen Operatoren (`<'A'`, `>'Z'`)
+- Parametrized test with all 9 MSG examples from `message.properties`
+- MSG-001: Empty message
+- MSG-002: Simple text
+- MSG-003: Special characters and escape sequences (`\\uD83D`, `\\uDE00`)
+- MSG-004: Enum keys with various operators (`empty`, `!empty`, `=null`, `!null`, `true`, `false`)
+- MSG-005: Named keys with nested parameters (`'msg %{m}'`), negative numbers (`-678764782`)
+- MSG-006: Number keys with relational operators (`<10`, `<=20`, `=30`, `>1999`, `>=200`, `!25`)
+- MSG-007: String keys with relational operators (`<'A'`, `>'Z'`)
 - MSG-008: Templates (`%[result,n=count,p:true]`, `%[ex-colon]`)
-- MSG-009: Extreme Integer-Werte (`-9223372036854775808`, `9223372036854775807`)
+- MSG-009: Extreme integer values (`-9223372036854775808`, `9223372036854775807`)
 
 **Test 2: `test_template_properties`**
-- Beide Beispiele aus `template.properties`:
+- Both examples from `template.properties`:
   - `ex-colon=%{ex,!empty:': %{ex}'}`
   - `result=%{n,1:'1 result',:'%{n} results'}`
 
 **Test 3: `test_edge_cases`**
-- Verschachtelte Strukturen (mehrere Ebenen)
-- Alle Escape-Sequenzen (`\\u`, `\\"`, `\\'`, `\\%`, `\\{`, `\\[`, `\\\\`)
-- Hyphenated Names (`ex-colon`, `my-name`, `test-123`)
-- Alle Operatoren einzeln
-- Leere Strings (`''`, `""`)
-- Control-Chars
-- Namen mit Underscores (`my_name`, `test_123`)
+- Nested structures (multiple levels)
+- All escape sequences (`\\u`, `\\"`, `\\'`, `\\%`, `\\{`, `\\[`, `\\\\`)
+- Hyphenated names (`ex-colon`, `my-name`, `test-123`)
+- All operators individually
+- Empty strings (`''`, `""`)
+- Control characters
+- Names with underscores (`my_name`, `test_123`)
+
+**Test 4: `test_parser_structures`** (NEW - based on MessageParser.g4)
+- Parameter structure: `%{name,format,key:value,:default}`
+- Template parameter delegation: `%[template,param=delegated]`
+- Named config elements: `name:true`, `name:123`, `name:'text'`
+- Map config elements: `(key1,key2):value`
+- Comma-colon default pattern: `,:default message`
+- Keywords as names (`%{null}`, `%{empty}`, `%{true}`)
 
 **Assertions:**
-- Verwende `list(lex(code, MessageFormatLexer()))` für Token-Sequenzen
-- Prüfe Token-Typen und optional Token-Werte
-- Beispiel: `assert tokens[0] == (Token.Punctuation.Special, '%{')`
+- Use `list(lex(code, MessageFormatLexer()))` for token sequences
+- Check token types and optionally token values
+- Example: `assert tokens[0] == (Token.Punctuation.Special, '%{')`
 
-### 3. Erstelle `syntax/pygments/test/Dockerfile`
+### 3. Create `syntax/pygments/test/Dockerfile`
 
 ```dockerfile
 FROM python:3.11-slim
@@ -110,22 +165,22 @@ RUN pip install --no-cache-dir pygments pytest
 WORKDIR /app
 
 # Copy lexer and tests
-COPY ../messageformat_lexer.py /app/syntax/pygments/messageformat_lexer.py
-COPY test_messageformat_lexer.py /app/syntax/pygments/test/test_messageformat_lexer.py
+COPY ../message_format.py /app/syntax/pygments/message_format.py
+COPY test_message_format.py /app/syntax/pygments/test/test_message_format.py
 
 # Set PYTHONPATH so imports work
 ENV PYTHONPATH=/app
 
 # Run tests by default
-CMD ["pytest", "-v", "/app/syntax/pygments/test/test_messageformat_lexer.py"]
+CMD ["pytest", "-v", "/app/syntax/pygments/test/test_message_format.py"]
 ```
 
-### 4. Erstelle `syntax/pygments/test/run_tests.sh`
+### 4. Create `syntax/pygments/test/run_tests.sh`
 
-Executable Shell-Script (`#!/bin/zsh`, `chmod +x`):
+Executable shell script (`#!/usr/bin/env bash`, `chmod +x`):
 
 ```bash
-#!/bin/zsh
+#!/usr/bin/env bash
 
 # Navigate to project root
 cd "$(dirname "$0")/../../.."
@@ -155,9 +210,9 @@ else
 fi
 ```
 
-### 5. Erstelle `syntax/pygments/README.md`
+### 5. Create `syntax/pygments/README.md`
 
-Dokumentation mit folgenden Sections:
+Documentation with the following sections:
 
 **Requirements:**
 - Python 3.7+
@@ -165,54 +220,62 @@ Dokumentation mit folgenden Sections:
 
 **Implementation Decisions:**
 
-1. **Vollständig rekursives State-Stack-Management**
-   - Implementiert via `#push`/`#pop` für unbegrenzte Verschachtelung
-   - Unterstützt Parameter in Strings, Strings in Parametern, Templates in Strings, etc.
-   - Mimic des ANTLR `pushMode`/`popMode`-Verhaltens
+1. **Fully Recursive State-Stack Management**
+   - Implemented via `#push`/`#pop` for unlimited nesting
+   - Supports parameters in strings, strings in parameters, templates in strings, etc.
+   - Mimics ANTLR's `pushMode`/`popMode` behavior
 
-2. **Unicode-Approximation**
-   - ANTLR verwendet `\p{L}`, `\p{N}`, `\p{P}`, `\p{S}`, `\p{Zs}` (Unicode-Kategorien)
-   - Python regex unterstützt diese nicht nativ
-   - Approximation mit Latin-Extended-Zeichensätzen:
-     - `\u00C0-\u024F`: Latin Extended-A und -B
+2. **Parser-Aware Context Tracking (NEW)**
+   - Based on MessageParser.g4 structural patterns
+   - Distinguishes parameter names, format names, and template names
+   - Recognizes named config patterns (`name:value`)
+   - Handles parameter delegation (`param=delegated`)
+   - Detects comma-colon default patterns (`,:`before default messages)
+   - Note: Limited context awareness due to lexer constraints
+
+3. **Unicode Approximation**
+   - ANTLR uses `\p{L}`, `\p{N}`, `\p{P}`, `\p{S}`, `\p{Zs}` (Unicode categories)
+   - Python regex doesn't natively support these
+   - Approximation with Latin-Extended character sets:
+     - `\u00C0-\u024F`: Latin Extended-A and -B
      - `\u1E00-\u1EFF`: Latin Extended Additional
-   - Keine Unterstriche in NameStartChar (nur in NameChar)
+   - No underscores in NameStartChar (only in NameChar)
 
-3. **NameChar inkludiert Underscore**
-   - Gemäß MessageLexer.g4 Zeile 211
-   - NameStartChar darf KEINEN Underscore enthalten
-   - NameChar darf Underscore, Zahlen und Letters enthalten
+4. **NameChar Includes Underscore**
+   - According to MessageLexer.g4 line 211
+   - NameStartChar may NOT contain underscore
+   - NameChar may contain underscore, digits, and letters
 
-4. **Hyphenated-Names**
-   - Gemäß MessageLexer.g4 Zeile 206
+5. **Hyphenated Names**
+   - According to MessageLexer.g4 line 206
    - Pattern: `NameStartChar NameChar* (-NameChar+)*`
-   - Beispiele: `ex-colon`, `my-name-123`
+   - Examples: `ex-colon`, `my-name-123`
 
-5. **Keine Integer-Längen-Limitierung**
+6. **No Integer Length Limitation**
    - Pattern: `-?[0-9]+`
-   - Beliebig lange Integers wie `9223372036854775807` werden unterstützt
-   - Keine zusätzliche Validierung
+   - Arbitrarily long integers like `9223372036854775807` are supported
+   - No additional validation
 
-6. **Whitespace in Parameter/Template-Modes**
-   - ANTLR skippt Whitespaces (Zeilen 127, 185)
-   - Pygments-Implementierung: Whitespace wird nicht explizit gematcht (ignoriert)
+7. **Whitespace in Parameter/Template Modes**
+   - ANTLR skips whitespaces (lines 127, 185)
+   - Pygments implementation: Whitespace not explicitly matched (ignored)
 
-7. **Control-Chars als Whitespace-Token**
-   - ANTLR skippt `[\u0000-\u001f]`
-   - Pygments matcht diese als `Token.Whitespace` für bessere Debugging-Sichtbarkeit
+8. **Control Characters as Whitespace Token**
+   - ANTLR skips `[\u0000-\u001f]`
+   - Pygments matches these as `Token.Whitespace` for better debugging visibility
 
-8. **Escape-Sequenzen separat hervorgehoben**
-   - Unicode-Escape: `\\uXXXX` mit 4 Hex-Digits
-   - Character-Escape: `\"`, `\'`, `\%`, `\{`, `\[`, `\\`
+9. **Escape Sequences Separately Highlighted**
+   - Unicode escape: `\\uXXXX` with 4 hex digits
+   - Character escape: `\"`, `\'`, `\%`, `\{`, `\[`, `\\`
    - Token: `Token.String.Escape`
 
-9. **Error-Handling**
-   - Best-effort-Matching ohne explizite Error-Tokens
-   - Permissives Verhalten wie typisch bei Pygments-Lexern
+10. **Error Handling**
+    - Best-effort matching without explicit error tokens
+    - Permissive behavior typical for Pygments lexers
 
-**Vollständige Token-Mapping-Tabelle:**
+**Complete Token Mapping Table:**
 
-| ANTLR Token | Pygments Token | Beispiel |
+| ANTLR Token | Pygments Token | Example |
 |-------------|----------------|----------|
 | `P_START`, `TPL_START` | `Punctuation.Special` | `%{`, `%[` |
 | `P_END`, `TPL_END` | `Punctuation.Special` | `}`, `]` |
@@ -232,33 +295,43 @@ Dokumentation mit folgenden Sections:
 | `GTE` | `Operator` | `>=` |
 | `SQ_START`, `SQ_END` | `String.Delimiter` | `'` |
 | `DQ_START`, `DQ_END` | `String.Delimiter` | `"` |
-| `CH` (in quotes) | `String` | Text in Strings |
-| `CH` (root) | `Text` | Regulärer Text |
+| `CH` (in quotes) | `String` | Text in strings |
+| `CH` (root) | `Text` | Regular text |
 | `EscapeSequence` | `String.Escape` | `\\uD83D`, `\\'` |
 | `CTRL_CHAR` | `Whitespace` | `\u0000-\u001f` |
 
+**Context-Aware Token Extensions (from MessageParser.g4):**
+
+| Parser Context | Token Enhancement | Example |
+|----------------|-------------------|---------|
+| `parameterName` (first after `%{`) | `Name.Variable` | `%{userName}` |
+| `parameterFormat` (second in param) | `Name.Function` | `%{value,number}` |
+| `templateName` (first after `%[`) | `Name.Class` | `%[errorTemplate]` |
+| `configNamedElement` key | `Name.Attribute` | `level:high` |
+| `templateParameterDelegate` | `Name` + `Operator` + `Name` | `param=delegated` |
+
 **Usage:**
 
-1. **Programmatisch:**
+1. **Programmatically:**
 
 ```python
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
-from syntax.pygments.messageformat_lexer import MessageFormatLexer
+from syntax.pygments.message_format import MessageFormatLexer
 
 code = "Hello %{name}!"
 result = highlight(code, MessageFormatLexer(), HtmlFormatter())
 print(result)
 ```
 
-2. **CLI mit pygmentize:**
+2. **CLI with pygmentize:**
 
 ```bash
 pygmentize -l msgfmt file.mfp
 pygmentize -l message-format file.mfp
 ```
 
-3. **Installation als Custom-Lexer:**
+3. **Installation as Custom Lexer:**
 
 In `setup.py`:
 
@@ -270,26 +343,26 @@ setup(
     packages=['syntax.pygments'],
     entry_points={
         'pygments.lexers': [
-            'msgfmt = syntax.pygments.messageformat_lexer:MessageFormatLexer',
+            'msgfmt = syntax.pygments.message_format:MessageFormatLexer',
         ],
     },
 )
 ```
 
-Nach Installation mit `pip install .` ist der Lexer systemweit verfügbar.
+After installation with `pip install .`, the lexer is available system-wide.
 
-4. **Sphinx-Integration:**
+4. **Sphinx Integration:**
 
 In `conf.py`:
 
 ```python
-from syntax.pygments.messageformat_lexer import MessageFormatLexer
+from syntax.pygments.message_format import MessageFormatLexer
 from sphinx.highlighting import lexers
 
 lexers['msgfmt'] = MessageFormatLexer()
 ```
 
-Verwendung in RST/Markdown:
+Usage in RST/Markdown:
 
 ```rst
 .. code-block:: msgfmt
@@ -299,36 +372,36 @@ Verwendung in RST/Markdown:
 
 **Testing:**
 
-1. **Lokal mit pytest:**
+1. **Locally with pytest:**
 
 ```bash
 cd syntax/pygments
-pytest test/test_messageformat_lexer.py -v
+pytest test/test_message_format.py -v
 ```
 
-2. **Mit Docker:**
+2. **With Docker:**
 
 ```bash
 ./syntax/pygments/test/run_tests.sh
 ```
 
-3. **Interaktiv (für Debugging):**
+3. **Interactive (for debugging):**
 
 ```bash
 ./syntax/pygments/test/run_tests.sh --interactive
 ```
 
-Dies öffnet eine Shell im Docker-Container, wo man manuell Tests ausführen oder den Lexer testen kann.
+This opens a shell in the Docker container where you can manually run tests or try the lexer.
 
 **Examples:**
 
-Beispiel aus `message.properties`:
+Example from `message.properties`:
 
 ```
 MSG-005=Name key type %{p,richtig:true,falsch:false,size:-678764782,text:'text',message:'msg %{m}'}.
 ```
 
-Erwartete Token-Sequenz:
+Expected token sequence:
 - `Name key type ` → `Text`
 - `%{` → `Punctuation.Special`
 - `p` → `Name`
@@ -337,7 +410,7 @@ Erwartete Token-Sequenz:
 - `:` → `Punctuation`
 - `true` → `Keyword.Constant`
 - `,` → `Punctuation`
-- ... (weitere Tokens)
+- ... (more tokens)
 - `'` → `String.Delimiter`
 - `msg ` → `String`
 - `%{` → `Punctuation.Special`
@@ -347,24 +420,35 @@ Erwartete Token-Sequenz:
 - `}` → `Punctuation.Special`
 - `.` → `Text`
 
-## Implementierungsentscheidungen - Zusammenfassung
+## Implementation Decisions - Summary
 
-1. **Latin-Extended Unicode statt vollständiger Unicode-Support** - Vereinfachung für bessere Kompatibilität
-2. **State-Stack vollständig rekursiv** - Exakte Nachbildung des ANTLR-Verhaltens
-3. **NameChar mit Underscore, NameStartChar ohne** - Gemäß Grammatik-Spezifikation
-4. **Hyphenated Names unterstützt** - Wie in der Grammatik definiert
-5. **Keine Integer-Limitierung** - Beliebig lange Zahlen erlaubt
-6. **Whitespace in Parameter/Template ignoriert** - Wie in ANTLR geskippt
-7. **Control-Chars als Whitespace-Token** - Für Debugging-Sichtbarkeit
-8. **Escape-Sequenzen separat highlighted** - Bessere visuelle Unterscheidung
-9. **Best-effort Error-Handling** - Permissiver Lexer ohne explizite Error-Tokens
-10. **Gebündelte Test-Cases** - Effiziente Test-Organisation mit pytest parametrize
+1. **Latin-Extended Unicode instead of full Unicode support** - Simplification for better compatibility
+2. **State-stack fully recursive** - Exact replication of ANTLR behavior
+3. **NameChar with underscore, NameStartChar without** - According to grammar specification
+4. **Hyphenated names supported** - As defined in the grammar
+5. **No integer limitation** - Arbitrarily long numbers allowed
+6. **Whitespace in parameter/template ignored** - As skipped in ANTLR
+7. **Control chars as whitespace token** - For debugging visibility
+8. **Escape sequences separately highlighted** - Better visual distinction
+9. **Best-effort error handling** - Permissive lexer without explicit error tokens
+10. **Bundled test cases** - Efficient test organization with pytest parametrize
+11. **Parser-aware context tracking (NEW)** - Attempts to distinguish parameter names, format names, template names, and config keys based on position
 
-## Referenzen
+## Note on Lexer Limitations
+
+Pygments lexers have inherent limitations compared to full parsers:
+
+- **Cannot fully track parser-level context** - A lexer processes tokens sequentially without the full parse tree that a parser maintains
+- **Should attempt to distinguish contexts where possible using state tracking** - The implementation uses state substates to approximate parser context
+- **Best-effort approach with limited lookahead** - State transitions are based on the next token type, not full lookahead of the entire structure
+- **May not always correctly identify context in complex nested structures** - Deeply nested or unusual patterns may not always be highlighted with perfect context awareness
+
+This is a reasonable compromise between full parser implementation and lexer simplicity. The implementation provides meaningful context-aware highlighting for the vast majority of real-world MessageFormat usage patterns while maintaining the performance and simplicity expected of a Pygments lexer.
+
+## References
 
 - **MessageLexer.g4**: `/Users/jeroen/projects/message-format/message-format/src/main/antlr/MessageLexer.g4`
 - **MessageParser.g4**: `/Users/jeroen/projects/message-format/message-format/src/main/antlr/MessageParser.g4`
-- **Test-Daten**: `/Users/jeroen/projects/message-format/message-format/src/test/resources/message.properties`
-- **Template-Daten**: `/Users/jeroen/projects/message-format/message-format/src/test/resources/template.properties`
-- **Pygments Dokumentation**: https://pygments.org/docs/lexerdevelopment/
-
+- **Test Data**: `/Users/jeroen/projects/message-format/message-format/src/test/resources/message.properties`
+- **Template Data**: `/Users/jeroen/projects/message-format/message-format/src/test/resources/template.properties`
+- **Pygments Documentation**: https://pygments.org/docs/lexerdevelopment/
