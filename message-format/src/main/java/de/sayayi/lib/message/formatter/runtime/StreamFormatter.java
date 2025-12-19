@@ -37,11 +37,11 @@ public final class StreamFormatter extends AbstractListFormatter<Stream<?>>
   @Override
   protected @NotNull Iterator<Text> createIterator(@NotNull FormatterContext context, @NotNull Stream<?> stream)
   {
-    var messageAccessor = context.getMessageAccessor();
-    var valueMessage = context
+    final var messageAccessor = context.getMessageAccessor();
+    final var valueMessage = context
         .getConfigValueMessage(CONFIG_VALUE)
         .orElse(DEFAULT_VALUE_MESSAGE);
-    var parameters = new SingletonParameters(context.getLocale(), "value");
+    final var parameters = new SingletonParameters(context.getLocale(), "value");
 
     return stream
         .map(object -> noSpaceText(valueMessage.format(messageAccessor, parameters.setValue(object))))

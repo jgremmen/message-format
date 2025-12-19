@@ -16,6 +16,8 @@
 package de.sayayi.lib.message.formatter;
 
 import java.util.ServiceLoader;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -26,7 +28,7 @@ import java.util.ServiceLoader;
  */
 public class DefaultFormatterService extends GenericFormatterService
 {
-  private static final Object $LOCK = new Object[0];
+  private static final Lock $LOCK = new ReentrantLock();
 
   private static FormatterService INSTANCE = null;
 
@@ -45,12 +47,15 @@ public class DefaultFormatterService extends GenericFormatterService
    */
   public static FormatterService getSharedInstance()
   {
-    synchronized($LOCK) {
+    $LOCK.lock();
+    try {
       if (INSTANCE == null)
         INSTANCE = new DefaultFormatterService();
-
-      return INSTANCE;
+    } finally {
+      $LOCK.unlock();
     }
+
+    return INSTANCE;
   }
 
 

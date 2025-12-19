@@ -46,8 +46,8 @@ public final class AnnotationFormatter extends AbstractSingleTypeParameterFormat
       if (fieldName.isEmpty())
         break formatByField;
 
-      var annotationType = annotation.annotationType();
-      var key = new AnnotationField(annotationType, fieldName);
+      final var annotationType = annotation.annotationType();
+      final var key = new AnnotationField(annotationType, fieldName);
 
       Method method;
 
@@ -87,20 +87,8 @@ public final class AnnotationFormatter extends AbstractSingleTypeParameterFormat
   }
 
 
-  private record AnnotationField(Class<? extends Annotation> annotationType, String field) {
-      private AnnotationField(@NotNull Class<? extends Annotation> annotationType, @NotNull String field) {
-        this.annotationType = annotationType;
-        this.field = field;
-      }
 
 
-      @Override
-      public boolean equals(Object o) {
-        return
-            this == o ||
-                o instanceof AnnotationField that && annotationType == that.annotationType && field.equals(that.field);
-      }
-
-
+  private record AnnotationField(@NotNull Class<? extends Annotation> annotationType, @NotNull String field) {
   }
 }

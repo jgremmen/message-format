@@ -102,32 +102,26 @@ public final class ArrayFormatter extends AbstractListFormatter<Object> implemen
   @Contract(pure = true)
   private static int getLength(@NotNull Object array)
   {
-    if (array instanceof AtomicIntegerArray)
-      return ((AtomicIntegerArray)array).length();
+    return switch(array) {
+      case AtomicIntegerArray atomicIntegerArray -> atomicIntegerArray.length();
+      case AtomicLongArray atomicLongArray -> atomicLongArray.length();
+      case AtomicReferenceArray<?> atomicReferenceArray -> atomicReferenceArray.length();
 
-    if (array instanceof AtomicLongArray)
-      return ((AtomicLongArray)array).length();
-
-    if (array instanceof AtomicReferenceArray)
-      return ((AtomicReferenceArray<?>)array).length();
-
-    return Array.getLength(array);
+      default -> Array.getLength(array);
+    };
   }
 
 
   @Contract(pure = true)
   private static @NotNull IntFunction<Object> createGetter(@NotNull Object array)
   {
-    if (array instanceof AtomicIntegerArray)
-      return ((AtomicIntegerArray)array)::get;
+    return switch(array) {
+      case AtomicIntegerArray atomicIntegerArray -> atomicIntegerArray::get;
+      case AtomicLongArray atomicLongArray -> atomicLongArray::get;
+      case AtomicReferenceArray<?> atomicReferenceArray -> atomicReferenceArray::get;
 
-    if (array instanceof AtomicLongArray)
-      return ((AtomicLongArray)array)::get;
-
-    if (array instanceof AtomicReferenceArray)
-      return ((AtomicReferenceArray<?>)array)::get;
-
-    return index -> Array.get(array, index);
+      default -> index -> Array.get(array, index);
+    };
   }
 
 

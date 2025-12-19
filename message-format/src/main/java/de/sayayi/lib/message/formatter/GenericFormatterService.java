@@ -116,7 +116,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
             type -> new ArrayList<>(4))
         .add(new PrioritizedFormatter(formattableType.getOrder(), formatter));
 
-    var formatterConfigNames = new TreeSet<>(formatter.getParameterConfigNames());
+    final var formatterConfigNames = new TreeSet<>(formatter.getParameterConfigNames());
     parameterConfigNames.addAll(formatterConfigNames);
 
     formatterConfigNames.retainAll(parameterPostFormatters.keySet());
@@ -193,7 +193,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
         return new ParameterFormatter[] { namedFormatter };
     }
 
-    var formatters = formatterCache.lookup(type, t ->
+    final var formatters = formatterCache.lookup(type, t ->
         streamTypes(t)
             .map(typeFormatters::get)
             .filter(Objects::nonNull)
@@ -279,20 +279,25 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
-
-
-  private record PrioritizedFormatter(int order, @NotNull ParameterFormatter formatter)
-      implements Comparable<PrioritizedFormatter>
-  {
-    @Override
-    public int compareTo(@NotNull PrioritizedFormatter o) {
-      return Integer.compare(order, o.order);
-    }
+  private record PrioritizedFormatter(int order,
+                                      @NotNull ParameterFormatter formatter) implements Comparable<PrioritizedFormatter> {
 
 
     @Override
-    public @NotNull String toString() {
-      return "PrioritizedFormatter(order=" + order + ",formatter=" + formatter + ')';
+      public int compareTo(@NotNull PrioritizedFormatter o) {
+        return Integer.compare(order, o.order);
+      }
+
+
+      @Override
+      public boolean equals(Object o) {
+        return o instanceof PrioritizedFormatter that && order == that.order && formatter.equals(that.formatter);
+      }
+
+
+    @Override
+      public String toString() {
+        return "PrioritizedFormatter(order=" + order + ",formatter=" + formatter + ')';
+      }
     }
-  }
 }

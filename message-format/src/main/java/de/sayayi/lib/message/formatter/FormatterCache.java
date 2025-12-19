@@ -61,7 +61,7 @@ final class FormatterCache
   synchronized @NotNull ParameterFormatter[] lookup(@NotNull Class<?> type,
                                                     @NotNull Function<Class<?>,ParameterFormatter[]> buildFormatters)
   {
-    var idx = findTypeIndex(type);
+    final var idx = findTypeIndex(type);
     final ParameterFormatter[] formatters;
 
     if (idx >= 0)
@@ -84,7 +84,7 @@ final class FormatterCache
 
   private void moveNodeToHead(@NotNull Node node)
   {
-    var prevNode = node.prev;
+    final var prevNode = node.prev;
     assert prevNode != null;
 
     for(var n = prevNode; n != null; n = n.prev)
@@ -111,13 +111,13 @@ final class FormatterCache
     // if capacity has been reached -> remove tail
     if (typeCount == capacity)
     {
-      var typeOffset = findTypeIndex(tail.type) * 2;
+      final var typeOffset = findTypeIndex(tail.type) * 2;
 
       arraycopy(typeFormatters, typeOffset + 2, typeFormatters, typeOffset,
           (capacity - 1) * 2 - typeOffset);
       typeCount--;
 
-      var prevNode = tail.prev;
+      final var prevNode = tail.prev;
       assert prevNode != null;
 
       for(var n = prevNode; n != null; n = n.prev)
@@ -127,7 +127,7 @@ final class FormatterCache
       tail = prevNode;
     }
 
-    var node = new Node(type, formatters);
+    final var node = new Node(type, formatters);
     final int insertOffset;
 
     if (head != null)
@@ -163,13 +163,13 @@ final class FormatterCache
 
     while(low <= high)
     {
-      var mid = (low + high) >>> 1;
-      var midClass = (Class<?>)typeFormatters[mid * 2];
+      final var mid = (low + high) >>> 1;
+      final var midClass = (Class<?>)typeFormatters[mid * 2];
 
       if (midClass == type)
         return mid;
 
-      var midValCmp = midClass.getName().compareTo(typeName);
+      final var midValCmp = midClass.getName().compareTo(typeName);
 
       if (midValCmp < 0)
         low = mid + 1;

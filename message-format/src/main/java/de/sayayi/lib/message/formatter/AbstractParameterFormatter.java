@@ -66,7 +66,7 @@ public abstract class AbstractParameterFormatter<T> implements ParameterFormatte
 
     // handle empty, !empty, null and !null for result
     return context
-        .getConfigMapMessage(text.text(), EMPTY_NULL_TYPE)
+        .getConfigMapMessage(text.getText(), EMPTY_NULL_TYPE)
         .map(context::format)
         .orElse(text);
   }

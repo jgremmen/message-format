@@ -84,7 +84,7 @@ public final class TextPart implements Text
 
 
   @Override
-  public String text() {
+  public String getText() {
     return text;
   }
 
@@ -130,7 +130,7 @@ public final class TextPart implements Text
     return o instanceof Text that &&
         spaceBefore == that.isSpaceBefore() &&
         spaceAfter == that.isSpaceAfter() &&
-        Objects.equals(text, that.text());
+        Objects.equals(text, that.getText());
   }
 
 

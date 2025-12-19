@@ -66,7 +66,7 @@ public interface Message
   default @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
       throws MessageFormatException
   {
-    var text = formatAsText(messageAccessor, parameters);
+    final var text = formatAsText(messageAccessor, parameters);
     return text.isEmpty() ? "" : text.getText();
   }
 

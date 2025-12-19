@@ -123,14 +123,14 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
     for(var urls = classLoader.getResources(classPathPrefix); urls.hasMoreElements();)
     {
-      var url = urls.nextElement();
+      final var url = urls.nextElement();
 
       if (ZIP_PROTOCOLS.contains(url.getProtocol()))
         adopt_scan_zipEntries(url, classPathPrefix);
       else
       {
-        var directory = url.getFile();
-        var baseDirectory = new File(directory.endsWith(classPathPrefix)
+        final var directory = url.getFile();
+        final var baseDirectory = new File(directory.endsWith(classPathPrefix)
             ? directory.substring(0, directory.length() - classPathPrefix.length()) : directory);
 
         if (baseDirectory.isDirectory())
@@ -145,7 +145,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     var files = directory.listFiles();
     if (files != null)
     {
-      var baseDirectoryPath = baseDirectory.toPath();
+      final var baseDirectoryPath = baseDirectory.toPath();
 
       for(var file: files)
         if (file.isDirectory())
@@ -168,14 +168,14 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
   private void adopt_scan_zipEntries(@NotNull URL zipUrl, @NotNull String classPathPrefix) throws IOException
   {
-    var con = zipUrl.openConnection();
+    final var con = zipUrl.openConnection();
     final ZipFile zipFile;
 
     if (con instanceof JarURLConnection)
       zipFile = ((JarURLConnection)con).getJarFile();
     else
     {
-      var urlFile = zipUrl.getFile();
+      final var urlFile = zipUrl.getFile();
       try {
         var separatorIndex = urlFile.indexOf("*/");
         if (separatorIndex == -1)
@@ -191,8 +191,8 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     try {
       for(var entries = zipFile.entries(); entries.hasMoreElements();)
       {
-        var zipEntry = entries.nextElement();
-        var classPathName = zipEntry.getName();
+        final var zipEntry = entries.nextElement();
+        final var classPathName = zipEntry.getName();
 
         if (classPathName.endsWith(".class") &&
             classPathName.startsWith(classPathPrefix) &&
@@ -243,7 +243,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   @Contract(value = "_ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull Path classFile)
   {
-    var classPath = classFile.toAbsolutePath();
+    final var classPath = classFile.toAbsolutePath();
 
     if (!indexedClasses.contains(classPath.toString()))
     {
@@ -288,14 +288,14 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   @Contract(value = "_ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull Class<?> type)
   {
-    var typeName = type.getName();
+    final var typeName = type.getName();
 
     if (!indexedClasses.contains(typeName))
     {
       var classLoader = type.getClassLoader();
       if (classLoader != null)
       {
-        var classResourceName = typeName.replace('.', '/') + ".class";
+        final var classResourceName = typeName.replace('.', '/') + ".class";
 
         try(var inputStream = classLoader.getResourceAsStream(classResourceName)) {
           parseClass(requireNonNull(inputStream));
@@ -323,18 +323,18 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   @Contract(value = "_ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull MessageDef messageDef)
   {
-    var texts = messageDef.texts();
-    var code = messageDef.code();
+    final var texts = messageDef.texts();
+    final var code = messageDef.code();
 
     if (texts.length == 0)
       messagePublisher.addMessage(messageFactory.parseMessage(code, messageDef.text()));
     else
     {
-      var localizedTexts = new LinkedHashMap<Locale,String>();
+      final var localizedTexts = new LinkedHashMap<Locale,String>();
 
       for(var text: texts)
       {
-        var value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
+        final var value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
 
         localizedTexts.compute(forLanguageTag(text.locale()), (locale,mappedValue) -> {
           if (mappedValue == null || mappedValue.equals(value))
@@ -365,18 +365,18 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   @Contract(value = "_ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull TemplateDef templateDef)
   {
-    var texts = templateDef.texts();
-    var name = templateDef.name();
+    final var texts = templateDef.texts();
+    final var name = templateDef.name();
 
     if (texts.length == 0)
       messagePublisher.addTemplate(name, messageFactory.parseTemplate(templateDef.text()));
     else
     {
-      var localizedTexts = new LinkedHashMap<Locale,String>();
+      final var localizedTexts = new LinkedHashMap<Locale,String>();
 
       for(var text: texts)
       {
-        var value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
+        final var value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
 
         localizedTexts.compute(forLanguageTag(text.locale()), (locale, mappedValue) -> {
           if (mappedValue == null || mappedValue.equals(value))
@@ -408,48 +408,35 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   protected abstract void parseClass(@NotNull InputStream classInputStream) throws IOException;
 
 
+
+
   /**
-     * {@code MessageDef} annotation implementation.
-     */
-    @SuppressWarnings("ClassExplicitlyAnnotation")
-    protected record MessageDefImpl(@NotNull String code, @Language("MessageFormat") @NotNull String text,
-                                    @NotNull Text[] texts) implements MessageDef {
-      protected MessageDefImpl(@NotNull String code, String text, @NotNull Text[] texts) {
-        this.code = code.trim();
-        this.text = text == null ? "" : text.trim();
-        this.texts = texts;
-      }
-
-
-      @Override
-      public String code() {
-        return code;
-      }
-
-
-      @Override
-      public String text() {
-        return text;
-      }
-
-
-      @Override
-      public Text[] texts() {
-        return texts;
-      }
-
-
-      @Override
-      public Class<? extends Annotation> annotationType() {
-        return MessageDef.class;
-      }
-
-
-      @Override
-      public String toString() {
-        return "MessageDef(code=" + code + ",text=" + text + ",texts=" + Arrays.toString(texts) + ')';
-      }
+   * {@code MessageDef} annotation implementation.
+   */
+  @SuppressWarnings("ClassExplicitlyAnnotation")
+  protected record MessageDefImpl(@NotNull String code, @Language("MessageFormat") @NotNull String text,
+                                  @NotNull Text[] texts) implements MessageDef
+  {
+    public MessageDefImpl(@NotNull String code, String text, @NotNull Text[] texts) {
+      this.code = code.trim();
+      this.text = text == null ? "" : text.trim();
+      this.texts = texts;
     }
+
+
+    @Override
+    public Class<? extends Annotation> annotationType() {
+      return MessageDef.class;
+    }
+
+
+    @Override
+    public @NotNull String toString() {
+      return "MessageDef(code=" + code + ",text=" + text + ",texts=" + Arrays.toString(texts) + ')';
+    }
+  }
+
+
 
 
   /**
@@ -458,92 +445,62 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * @author Jeroen Gremmen
    * @since 0.8.0
    */
-    @SuppressWarnings("ClassExplicitlyAnnotation")
-    protected record TemplateDefImpl(@NotNull String name, @Language("MessageFormat") @NotNull String text,
-                                     @NotNull Text[] texts) implements TemplateDef {
-      @SuppressWarnings("ConstantValue")
-      protected TemplateDefImpl(@NotNull String name, String text, @NotNull Text[] texts) {
-        if ((this.name = name == null ? "" : name.trim()).isEmpty())
-          throw new IllegalArgumentException("name must not be empty");
+  @SuppressWarnings("ClassExplicitlyAnnotation")
+  protected record TemplateDefImpl(@NotNull String name, @Language("MessageFormat") @NotNull String text,
+                                   @NotNull Text[] texts) implements TemplateDef
+  {
+    @SuppressWarnings("ConstantValue")
+    public TemplateDefImpl(@NotNull String name, String text, @NotNull Text[] texts)
+    {
+      if ((this.name = name == null ? "" : name.trim()).isEmpty())
+        throw new IllegalArgumentException("name must not be empty");
 
-        this.text = text == null ? "" : text.trim();
-        this.texts = texts;
-      }
-
-
-      @Override
-      public String name() {
-        return name;
-      }
-
-
-      @Override
-      public String text() {
-        return text;
-      }
-
-
-      @Override
-      public Text[] texts() {
-        return texts;
-      }
-
-
-      @Override
-      public Class<? extends Annotation> annotationType() {
-        return TemplateDef.class;
-      }
-
-
-      @Override
-      public String toString() {
-        return "TemplateDef(name=" + name + ",text=" + text + ",texts=" + Arrays.toString(texts) + ')';
-      }
+      this.text = text == null ? "" : text.trim();
+      this.texts = texts;
     }
+
+
+    @Override
+    public Class<? extends Annotation> annotationType() {
+      return TemplateDef.class;
+    }
+
+
+    @Override
+    public @NotNull String toString() {
+      return "TemplateDef(name=" + name + ",text=" + text + ",texts=" + Arrays.toString(texts) + ')';
+    }
+  }
+
+
 
 
   /**
-     * {@code Text} annotation implementation.
-     *
-     * @author Jeroen Gremmen
-     */
-    @SuppressWarnings("ClassExplicitlyAnnotation")
-    protected record TextImpl(@NotNull String locale, @Language("MessageFormat") @NotNull String text,
-                              @Language("MessageFormat") @NotNull String value) implements Text {
-      protected TextImpl(String locale, String text, String value) {
-        this.locale = locale == null ? "" : locale.trim();
-        this.text = text == null ? "" : text.trim();
-        this.value = value == null ? "" : value.trim();
-      }
-
-
-      @Override
-      public String locale() {
-        return locale;
-      }
-
-
-      @Override
-      public String text() {
-        return text;
-      }
-
-
-      @Override
-      public String value() {
-        return value;
-      }
-
-
-      @Override
-      public Class<? extends Annotation> annotationType() {
-        return Text.class;
-      }
-
-
-      @Override
-      public String toString() {
-        return "Text(locale=" + locale + ",text=" + text + ",value=" + value + ')';
-      }
+   * {@code Text} annotation implementation.
+   *
+   * @author Jeroen Gremmen
+   */
+  @SuppressWarnings("ClassExplicitlyAnnotation")
+  protected record TextImpl(@NotNull String locale, @Language("MessageFormat") @NotNull String text,
+                            @Language("MessageFormat") @NotNull String value) implements Text
+  {
+    public TextImpl(String locale, String text, String value)
+    {
+      this.locale = locale == null ? "" : locale.trim();
+      this.text = text == null ? "" : text.trim();
+      this.value = value == null ? "" : value.trim();
     }
+
+
+    @Override
+    public Class<? extends Annotation> annotationType() {
+      return Text.class;
+    }
+
+
+    @Override
+    public @NotNull String toString() {
+      return "Text(locale=" + locale + ",text=" + text + ",value=" + value + ')';
+    }
+  }
 }

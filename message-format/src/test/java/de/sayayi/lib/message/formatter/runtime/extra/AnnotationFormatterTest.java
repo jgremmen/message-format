@@ -36,7 +36,7 @@ class AnnotationFormatterTest extends AbstractFormatterTest
         .getDeclaredMethod("testAnnotation").getAnnotation(MyAnnotation.class);
 
     assertEquals('@' + getClass().getName() +
-        "$MyAnnotation(value=56, name=\"Annotation\", chars={'A', 'b', 'C'})", context
+        ".MyAnnotation(value=56, name=\"Annotation\", chars={'A', 'b', 'C'})", context
         .message("%{ann}")
         .with("ann", annotation)
         .format());

@@ -137,7 +137,7 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
 
       for(nextText = null; nextText == null && iterator.hasNext();)
       {
-        var entry = iterator.next();
+        final var entry = iterator.next();
 
         parameters.key = fixValue(entry.getKey());
         parameters.value = fixValue(entry.getValue());
@@ -157,7 +157,7 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
     @Override
     public Text next()
     {
-      var text = nextText;
+      final var text = nextText;
 
       prepareNextText();
 

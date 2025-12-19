@@ -49,28 +49,21 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
     // j = no java.lang. prefix
     // u = no java.util. prefix
 
-    if (type instanceof Class)
-      return toString_class((Class<?>)type, typeFormat);
+    return switch(type) {
+      case Class<?> clazz -> toString_class(clazz, typeFormat);
+      case GenericArrayType genericArrayType -> toString(genericArrayType.getGenericComponentType(), typeFormat) + "[]";
+      case ParameterizedType parameterizedType -> toString_parameterized(parameterizedType, typeFormat);
+      case TypeVariable<?> typeVariable -> toString_typeVariable(typeVariable, typeFormat);
+      case WildcardType wildcardType -> toString_wildcard(wildcardType, typeFormat);
 
-    if (type instanceof GenericArrayType)
-      return toString(((GenericArrayType)type).getGenericComponentType(), typeFormat) + "[]";
-
-    if (type instanceof ParameterizedType)
-      return toString_parameterized((ParameterizedType)type, typeFormat);
-
-    if (type instanceof TypeVariable)
-      return toString_typeVariable((TypeVariable<?>)type, typeFormat);
-
-    if (type instanceof WildcardType)
-      return toString_wildcard((WildcardType)type, typeFormat);
-
-    return type.toString();
+      default -> type.toString();
+    };
   }
 
 
   private static String toString_class(@NotNull Class<?> type, @NotNull String typeFormat)
   {
-    var arraySuffix = new StringBuilder();
+    final var arraySuffix = new StringBuilder();
 
     while(type.isArray())
     {
@@ -81,8 +74,8 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
     if (typeFormat.indexOf('c') >= 0 || type.isPrimitive())
       return type.getSimpleName() + arraySuffix;
 
-    var name = type.getName();
-    var formattedClass =
+    final var name = type.getName();
+    final var formattedClass =
         (typeFormat.indexOf('j') >= 0 && name.startsWith("java.lang.")) ||
         (typeFormat.indexOf('u') >= 0 && name.startsWith("java.util."))
             ? name.substring(10)
@@ -95,20 +88,19 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
   private static String toString_parameterized(@NotNull ParameterizedType parameterizedType,
                                                @NotNull String typeFormat)
   {
-    var formattedType = new StringBuilder();
-    var ownerType = parameterizedType.getOwnerType();
-    var rawType = parameterizedType.getRawType();
+    final var formattedType = new StringBuilder();
+    final var ownerType = parameterizedType.getOwnerType();
+    final var rawType = parameterizedType.getRawType();
 
     withOwnerType: {
       if (ownerType != null)
       {
         formattedType.append(toString(ownerType, typeFormat)).append(".");
 
-        if (ownerType instanceof ParameterizedType && rawType instanceof Class)
+        if (ownerType instanceof ParameterizedType && rawType instanceof Class<?> clazz)
         {
-          var ownerRawType = (Class<?>)((ParameterizedType)ownerType).getRawType();
-          formattedType.append(((Class<?>)rawType).getName()
-              .replace(ownerRawType.getName() + "$", ""));
+          final var ownerRawType = (Class<?>)((ParameterizedType)ownerType).getRawType();
+          formattedType.append(clazz.getName().replace(ownerRawType.getName() + "$", ""));
           break withOwnerType;
         }
       }
@@ -133,13 +125,12 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
     if (typeFormat.indexOf('v') < 0)
       return typeVariable.getName();
 
-    var formattedTypeVariable = new StringBuilder();
-    formattedTypeVariable.append('<').append(typeVariable.getName());
+    final var formattedTypeVariable = new StringBuilder("<").append(typeVariable.getName());
+    final var bounds = typeVariable.getBounds();
 
-    var bounds = typeVariable.getBounds();
     if (bounds.length > 0)
     {
-      var typeFormat0 = typeFormat.replace("T", "");
+      final var typeFormat0 = typeFormat.replace("T", "");
 
       formattedTypeVariable.append(" extends ").append(Arrays.stream(bounds)
           .map(t -> toString(t, typeFormat0))
@@ -152,8 +143,8 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
 
   private static String toString_wildcard(@NotNull WildcardType wildcardType, @NotNull String typeFormat)
   {
-    var formattedWildcardType = new StringBuilder();
-    var lowerBounds = wildcardType.getLowerBounds();
+    final var formattedWildcardType = new StringBuilder();
+    final var lowerBounds = wildcardType.getLowerBounds();
     var bounds = lowerBounds;
 
     if (lowerBounds.length > 0)

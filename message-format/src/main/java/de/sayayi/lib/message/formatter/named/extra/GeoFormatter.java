@@ -75,10 +75,10 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Number number)
   {
-    var fmt = getFormat(context);
-    var s = new StringBuilder();
-    var v = number.doubleValue();
-    var dms = dmsSplitter(fmt, v);
+    final var fmt = getFormat(context);
+    final var s = new StringBuilder();
+    final var v = number.doubleValue();
+    final var dms = dmsSplitter(fmt, v);
 
     if (!fmt.hasLoLa() && v < 0.0 && (dms[0] > 0 || dms[1] > 0 || dms[2] > 0))
       s.append('-');
@@ -89,7 +89,7 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
 
     if (fmt.hasMinutes())
     {
-      var locale = context.getLocale();
+      final var locale = context.getLocale();
 
       s.append(formatMinOrSec(locale, dms[1], fmt.minuteDigits, fmt.zeroPadMinutes)).append('\'');
       if (fmt.separatorAfterMinute)
@@ -125,8 +125,8 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
 
   private @NotNull Format getFormat(@NotNull FormatterContext context)
   {
-    var formatString = context.getConfigValueString("geo").orElse("dms");
-    var format = FORMAT.get(formatString);
+    final var formatString = context.getConfigValueString("geo").orElse("dms");
+    final var format = FORMAT.get(formatString);
 
     return format == null ? parseFormatString(formatString) : format;
   }
@@ -153,7 +153,7 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
         return new double[] { (int)((millis + DEGREE_MILLIS / 2) / DEGREE_MILLIS), 0.0, 0.0 };
 
       // round value to the number of minute digits
-      var factor = MINUTE_MILLIS / 1000 * DIGIT_FACTOR[fmt.minuteDigits];
+      final var factor = MINUTE_MILLIS / 1000 * DIGIT_FACTOR[fmt.minuteDigits];
       millis = (millis + factor / 2) / factor * factor;
 
       var degree = (int)(millis / DEGREE_MILLIS);
@@ -206,8 +206,8 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   @Contract(pure = true)
   static @NotNull Format parseFormatString(@NotNull String formatString)
   {
-    var matcher = PATTERN_FORMAT.matcher(formatString.trim());
-    var format = new Format();
+    final var matcher = PATTERN_FORMAT.matcher(formatString.trim());
+    final var format = new Format();
 
     if (matcher.matches())
     {

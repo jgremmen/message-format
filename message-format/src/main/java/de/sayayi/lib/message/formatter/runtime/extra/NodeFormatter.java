@@ -53,18 +53,17 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
     if (node instanceof Document)
       node = null;
 
-    var path = new XPathBuilder();
-    var firstStep = true;
+    final var path = new XPathBuilder();
 
-    while(node != null)
+    for(var firstStep = true; node != null;)
     {
       if (firstStep)
         firstStep = false;
       else
         path.add('/');
 
-      var type = node.getNodeType();
-      var name = node.getNodeName();
+      final var type = node.getNodeType();
+      final var name = node.getNodeName();
 
       if (type == ATTRIBUTE_NODE)
       {

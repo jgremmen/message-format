@@ -29,7 +29,8 @@ description = 'Message Format Library'
 
 configurations {
   antlr4 {
-    visible = false
+    canBeConsumed = false
+    canBeResolved = true
   }
 
   api.setExtendsFrom([])

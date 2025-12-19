@@ -60,14 +60,14 @@ public final class BitsFormatter extends AbstractParameterFormatter<Object>
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
   {
-    var bitCount = detectBitCount(context, value);
+    final var bitCount = detectBitCount(context, value);
     return bitCount > 0 ? noSpaceText(format(bitCount, value)) : emptyText();
   }
 
 
   private int detectBitCount(@NotNull FormatterContext context, @NotNull Object value)
   {
-    var configValue = context.getConfigValue("bits").orElse(null);
+    final var configValue = context.getConfigValue("bits").orElse(null);
 
     if (configValue instanceof ConfigValueString && "auto".equals(configValue.asObject()))
       return autoDetectBitCount(value);
@@ -97,7 +97,7 @@ public final class BitsFormatter extends AbstractParameterFormatter<Object>
     // autodetect for numbers of type byte, short, integer or long
     if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long)
     {
-      var l = ((Number)value).longValue();
+      final var l = ((Number)value).longValue();
 
       if (l == 0L)
         return 1;
@@ -115,22 +115,19 @@ public final class BitsFormatter extends AbstractParameterFormatter<Object>
 
   private int detectBitCountByRange(Object value)
   {
-    if (value instanceof Byte)
-      return 8;
-    else if (value instanceof Short)
-      return 16;
-    else if (value instanceof Integer)
-      return 32;
-    else if (value instanceof Long)
-      return 64;
-
-    return 0;
+    return switch(value) {
+      case Byte b -> 8;
+      case Short i -> 16;
+      case Integer i -> 32;
+      case Long l -> 64;
+      case null, default -> 0;
+    };
   }
 
 
   private String format(int bitCount, Object value)
   {
-    var bits = new char[bitCount];
+    final var bits = new char[bitCount];
 
     if (value instanceof BigInteger && bitCount > 64)
       formatBigInteger(bits, (BigInteger)value);

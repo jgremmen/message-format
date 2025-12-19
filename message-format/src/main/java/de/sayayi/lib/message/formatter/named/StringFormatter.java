@@ -68,7 +68,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
     if (value == null)
       return formatNull(context);
 
-    var string = valueAsString(context.getMessageAccessor(), value);
+    final var string = valueAsString(context.getMessageAccessor(), value);
 
     return context
         .getConfigMapMessage(string, STRING_KEY_TYPES)
@@ -84,7 +84,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
 
     if (!(value instanceof CharSequence) && !(value instanceof char[]))
     {
-      var cv = messageAccessor.getDefaultParameterConfig("ignore-default-tostring");
+      final var cv = messageAccessor.getDefaultParameterConfig("ignore-default-tostring");
 
       if (cv != null && cv.getType() == BOOL && ((ConfigValueBool)cv).booleanValue() && isDefaultToString(value))
         string = "";
@@ -98,7 +98,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   @SuppressWarnings("RedundantIfStatement")
   private boolean isDefaultToString(@NotNull Object value)
   {
-    var fqClassName = value.getClass().getName();
+    final var fqClassName = value.getClass().getName();
 
     if ((fqClassName + '@' + toHexString(value.hashCode())).equals(value.toString()))
       return true;
@@ -113,12 +113,12 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   @Override
   public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value)
   {
-    if (value instanceof char[])
-      return OptionalLong.of(((char[])value).length);
-    else if (value instanceof CharSequence)
-      return OptionalLong.of(((CharSequence)value).length());
-    else
-      return OptionalLong.empty();
+    return switch(value) {
+      case char[] chars -> OptionalLong.of(chars.length);
+      case CharSequence charSequence -> OptionalLong.of(charSequence.length());
+
+      default -> OptionalLong.empty();
+    };
   }
 
 
@@ -140,7 +140,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   @Override
   public @NotNull MatchResult compareToEmptyKey(Object value, @NotNull ComparatorContext context)
   {
-    var compareType = context.getCompareType();
+    final var compareType = context.getCompareType();
 
     if (value == null)
       return forEmptyKey(compareType, true);
@@ -164,8 +164,8 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   {
     if (context.getCompareType().match(0))
     {
-      var string = asString(value);
-      var bool = context.getBoolKeyValue();
+      final var string = asString(value);
+      final var bool = context.getBoolKeyValue();
 
       if (("true".equals(string) && bool) ||
           ("false".equals(string) && !bool))
@@ -184,7 +184,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   public @NotNull MatchResult compareToNumberKey(@NotNull Object value, @NotNull ComparatorContext context)
   {
     try {
-      var cmp = new BigDecimal(asString(value)).compareTo(BigDecimal.valueOf(context.getNumberKeyValue()));
+      final var cmp = new BigDecimal(asString(value)).compareTo(BigDecimal.valueOf(context.getNumberKeyValue()));
 
       if (context.getCompareType().match(cmp))
         return EQUIVALENT;
@@ -198,13 +198,13 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull Object value, @NotNull ComparatorContext context)
   {
-    var collator = Collator.getInstance(context.getLocale());
+    final var collator = Collator.getInstance(context.getLocale());
 
     collator.setDecomposition(CANONICAL_DECOMPOSITION);
 
-    var compareType = context.getCompareType();
-    var stringKeyValue = context.getStringKeyValue();
-    var string = asString(value);
+    final var compareType = context.getCompareType();
+    final var stringKeyValue = context.getStringKeyValue();
+    final var string = asString(value);
 
     // match exact comparison
     collator.setStrength(IDENTICAL);

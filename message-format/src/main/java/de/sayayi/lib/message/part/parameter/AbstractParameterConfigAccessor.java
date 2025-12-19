@@ -46,7 +46,7 @@ abstract class AbstractParameterConfigAccessor implements ParameterConfigAccesso
   @Override
   public @NotNull Optional<ConfigValue> getConfigValue(@NotNull String name)
   {
-    var configValue = parameterConfig.getConfigValue(name);
+    final var configValue = parameterConfig.getConfigValue(name);
 
     return configValue != null
         ? Optional.of(configValue)
@@ -57,45 +57,33 @@ abstract class AbstractParameterConfigAccessor implements ParameterConfigAccesso
   @Override
   public @NotNull Optional<String> getConfigValueString(@NotNull String name)
   {
-    var configValue = parameterConfig.getConfigValue(name);
-    if (configValue instanceof ConfigValueString)
-      return Optional.of(((ConfigValueString)configValue).stringValue());
-
-    configValue = messageAccessor.getDefaultParameterConfig(name);
-
-    return configValue instanceof ConfigValueString
-        ? Optional.of(((ConfigValueString)configValue).asObject())
-        : Optional.empty();
+    return parameterConfig.getConfigValue(name) instanceof ConfigValueString cvs
+        ? Optional.of(cvs.stringValue())
+        : messageAccessor.getDefaultParameterConfig(name) instanceof ConfigValueString cvs
+            ? Optional.of(cvs.stringValue())
+            : Optional.empty();
   }
 
 
   @Override
   public @NotNull OptionalLong getConfigValueNumber(@NotNull String name)
   {
-    var configValue = parameterConfig.getConfigValue(name);
-    if (configValue instanceof ConfigValueNumber)
-      return OptionalLong.of(((ConfigValueNumber)configValue).longValue());
-
-    configValue = messageAccessor.getDefaultParameterConfig(name);
-
-    return configValue instanceof ConfigValueNumber
-        ? OptionalLong.of(((ConfigValueNumber)configValue).asObject())
-        : OptionalLong.empty();
+    return parameterConfig.getConfigValue(name) instanceof ConfigValueNumber cvn
+        ? OptionalLong.of(cvn.longValue())
+        : messageAccessor.getDefaultParameterConfig(name) instanceof ConfigValueNumber cvn
+            ? OptionalLong.of(cvn.longValue())
+            : OptionalLong.empty();
   }
 
 
   @Override
   public @NotNull Optional<Boolean> getConfigValueBool(@NotNull String name)
   {
-    var configValue = parameterConfig.getConfigValue(name);
-    if (configValue instanceof ConfigValueBool)
-      return Optional.of(((ConfigValueBool)configValue).booleanValue());
-
-    configValue = messageAccessor.getDefaultParameterConfig(name);
-
-    return configValue instanceof ConfigValueBool
-        ? Optional.of(((ConfigValueBool)configValue).asObject())
-        : Optional.empty();
+    return parameterConfig.getConfigValue(name) instanceof ConfigValueBool cvb
+        ? Optional.of(cvb.booleanValue())
+        : messageAccessor.getDefaultParameterConfig(name) instanceof ConfigValueBool cvb
+            ? Optional.of(cvb.booleanValue())
+            : Optional.empty();
   }
 
 

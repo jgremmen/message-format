@@ -119,7 +119,7 @@ public final class TextPartFactory
       addSpaceAfter |= textSpaceAfter;
 
       if (addSpaceBefore != textSpaceBefore || addSpaceAfter != textSpaceAfter)
-        return new TextPart(text.text(), addSpaceBefore, addSpaceAfter);
+        return new TextPart(text.getText(), addSpaceBefore, addSpaceAfter);
     }
 
     return text;

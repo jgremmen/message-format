@@ -53,8 +53,8 @@ public enum OrderedConfigKeySorter implements Comparator<OrderedConfigKeySorter.
   @Contract(pure = true)
   private int configKeyToOrder(@NotNull ConfigKey configKey)
   {
-    var compareType = configKey.compareType();
-    var keyType = configKey.getType();
+    final var compareType = configKey.getCompareType();
+    final var keyType = configKey.getType();
 
     if (keyType == NULL && compareType == EQ)
       return 0;  // =null

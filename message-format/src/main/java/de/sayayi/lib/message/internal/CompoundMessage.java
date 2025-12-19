@@ -49,11 +49,16 @@ import static java.util.Objects.requireNonNull;
  * During formatting each part is rendered and concatenated. Spaces between rendered parts are
  * inserted based on {@link SpacesAware#isSpaceBefore()} and {@link SpacesAware#isSpaceAfter()}.
  *
- * @param messageParts Message parts, not empty
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public record CompoundMessage(@NotNull MessagePart[] messageParts) implements Message.WithSpaces {
+@SuppressWarnings("ClassCanBeRecord")
+public final class CompoundMessage implements Message.WithSpaces
+{
+  /** Message parts, not empty */
+  private final @NotNull MessagePart[] messageParts;
+
+
   /**
    * Construct a compound message based on the given message {@code parts}.
    * <p>
@@ -61,9 +66,10 @@ public record CompoundMessage(@NotNull MessagePart[] messageParts) implements Me
    * {@link TextPart TextPart}, it is better to use
    * {@link EmptyMessage} or {@link TextMessage} in that case.
    *
-   * @param messageParts message parts, not {@code null} and not empty
+   * @param messageParts  message parts, not {@code null} and not empty
    */
-  public CompoundMessage(@NotNull List<MessagePart> messageParts) {
+  public CompoundMessage(@NotNull List<MessagePart> messageParts)
+  {
     if (requireNonNull(messageParts, "parts must not be null").isEmpty())
       throw new IllegalArgumentException("parts must not be empty");
 
@@ -73,10 +79,11 @@ public record CompoundMessage(@NotNull MessagePart[] messageParts) implements Me
 
   @Override
   public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
-      throws MessageFormatException {
+      throws MessageFormatException
+  {
     final var message = new TextJoiner();
 
-    for (var messagePart : messageParts)
+    for(var messagePart: messageParts)
       message.add(format(messageAccessor, parameters, messagePart));
 
     return message.asSpacedText();
@@ -86,24 +93,27 @@ public record CompoundMessage(@NotNull MessagePart[] messageParts) implements Me
   @Contract(pure = true)
   private @NotNull Text format(@NotNull MessageAccessor messageAccessor,
                                @NotNull Parameters parameters,
-                               @NotNull MessagePart messagePart) {
-    if (messagePart instanceof ParameterPart parameterPart) {
+                               @NotNull MessagePart messagePart)
+  {
+    if (messagePart instanceof ParameterPart parameterPart)
+    {
       try {
         return parameterPart.getText(messageAccessor, parameters);
-      } catch (Exception ex) {
+      } catch(Exception ex) {
         throw MessageFormatException.of(ex).withParameter(parameterPart.getName());
       }
     }
 
-    if (messagePart instanceof TemplatePart templatePart) {
+    if (messagePart instanceof TemplatePart templatePart)
+    {
       try {
         return templatePart.getText(messageAccessor, parameters);
-      } catch (Exception ex) {
+      } catch(Exception ex) {
         throw MessageFormatException.of(ex).withTemplate(templatePart.getName());
       }
     }
 
-    return (Text) messagePart;
+    return (Text)messagePart;
   }
 
 
@@ -120,21 +130,23 @@ public record CompoundMessage(@NotNull MessagePart[] messageParts) implements Me
 
 
   @Override
-  public @NotNull MessagePart[] messageParts() {
+  public @NotNull MessagePart[] getMessageParts() {
     return copyOf(messageParts, messageParts.length);
   }
 
 
   @Override
   @Unmodifiable
-  public @NotNull Set<String> getTemplateNames() {
+  public @NotNull Set<String> getTemplateNames()
+  {
     final var templateNames = new TreeSet<String>();
 
-    for (var messagePart : messageParts) {
+    for(var messagePart: messageParts)
+    {
       if (messagePart instanceof TemplatePart)
-        templateNames.add(((TemplatePart) messagePart).getName());
+        templateNames.add(((TemplatePart)messagePart).getName());
       else if (messagePart instanceof ParameterPart)
-        templateNames.addAll(((ParameterPart) messagePart).getParamConfig().getTemplateNames());
+        templateNames.addAll(((ParameterPart)messagePart).getParamConfig().getTemplateNames());
     }
 
     return unmodifiableSet(templateNames);
@@ -143,7 +155,7 @@ public record CompoundMessage(@NotNull MessagePart[] messageParts) implements Me
 
   @Override
   public boolean equals(Object o) {
-    return o instanceof CompoundMessage && deepEquals(messageParts, ((CompoundMessage) o).messageParts);
+    return o instanceof CompoundMessage && deepEquals(messageParts, ((CompoundMessage)o).messageParts);
   }
 
 
@@ -160,32 +172,41 @@ public record CompoundMessage(@NotNull MessagePart[] messageParts) implements Me
 
 
   /**
-   * @param packStream data output pack target
-   * @throws IOException if an I/O error occurs
-   * @hidden
+   * @param packStream  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs
+   *
    * @since 0.8.0
+   *
+   * @hidden
    */
-  public void pack(@NotNull PackOutputStream packStream) throws IOException {
+  public void pack(@NotNull PackOutputStream packStream) throws IOException
+  {
     packStream.writeSmallVar(messageParts.length);
 
-    for (var part : messageParts)
+    for(var part: messageParts)
       PackSupport.pack(part, packStream);
   }
 
 
   /**
-   * @param unpack     unpacker instance, not {@code null}
-   * @param packStream source data input, not {@code null}
-   * @return unpacked parameterized message, never {@code null}
-   * @throws IOException if an I/O error occurs
-   * @hidden
+   * @param unpack      unpacker instance, not {@code null}
+   * @param packStream  source data input, not {@code null}
+   *
+   * @return  unpacked parameterized message, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs
+   *
    * @since 0.8.0
+   *
+   * @hidden
    */
   public static @NotNull Message.WithSpaces unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
-      throws IOException {
+      throws IOException
+  {
     final var parts = new ArrayList<MessagePart>();
 
-    for (int n = 0, l = packStream.readSmallVar(); n < l; n++)
+    for(int n = 0, l = packStream.readSmallVar(); n < l; n++)
       parts.add(unpack.unpackMessagePart(packStream));
 
     return new CompoundMessage(parts);

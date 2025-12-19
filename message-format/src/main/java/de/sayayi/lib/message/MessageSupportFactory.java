@@ -22,6 +22,9 @@ import de.sayayi.lib.message.internal.MessageSupportImpl;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 
 
@@ -33,7 +36,7 @@ import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
  */
 public final class MessageSupportFactory
 {
-  private static final Object $LOCK = new Object[0];
+  private static final Lock $LOCK = new ReentrantLock();
   private static MessageSupport SHARED = null;
 
 
@@ -53,12 +56,15 @@ public final class MessageSupportFactory
    */
   public static @NotNull MessageSupport shared()
   {
-    synchronized($LOCK) {
+    $LOCK.lock();
+    try {
       if (SHARED == null)
         SHARED = create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE).seal();
-
-      return SHARED;
+    } finally {
+      $LOCK.unlock();
     }
+
+    return SHARED;
   }
 
 
