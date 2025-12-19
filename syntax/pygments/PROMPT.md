@@ -46,9 +46,10 @@ Implement `RegexLexer` with the following properties, incorporating insights fro
 - `filenames = ["*.mfp"]`
 
 **State Management:**
-- Fully recursive state stack with states: `root`, `parameter`, `template`, `singlequote`, `doublequote`
+- Fully recursive state stack with 8 states: `root`, `parameter`, `parameter-format`, `parameter-config`, `template`, `template-config`, `single-quote`, `double-quote`
 - Uses `#push` and `#pop` for nested structures
 - Supports unlimited nesting depth (parameters in strings, strings in parameters, etc.)
+- Parser-aware substates for context-sensitive token types
 
 **Parser-Aware Enhancements:**
 - Track position within parameter/template to provide context-aware highlighting
@@ -177,7 +178,9 @@ CMD ["pytest", "-v", "/app/syntax/pygments/test/test_message_format.py"]
 
 ### 4. Create `syntax/pygments/test/run_tests.sh`
 
-Executable shell script (`#!/usr/bin/env bash`, `chmod +x`):
+Executable shell script (`#!/usr/bin/env bash`, `chmod +x`).
+
+**Note:** Uses bash-compatible syntax (not zsh-specific) for cross-platform compatibility (Linux/macOS).
 
 ```bash
 #!/usr/bin/env bash

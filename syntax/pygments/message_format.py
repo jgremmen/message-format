@@ -93,11 +93,11 @@ class MessageFormatLexer(RegexLexer):
             # Colon before comma means no format (go to config state)
             (r':', Punctuation, 'parameter-config'),
 
-            # Single quoted string -> push to singlequote mode
-            (r"'", String.Delimiter, 'singlequote'),
+            # Single quoted string -> push to single-quote mode
+            (r"'", String.Delimiter, 'single-quote'),
 
-            # Double quoted string -> push to doublequote mode
-            (r'"', String.Delimiter, 'doublequote'),
+            # Double quoted string -> push to double-quote mode
+            (r'"', String.Delimiter, 'double-quote'),
 
             # Parameter name (first position) - highlighted as Name.Variable
             # Keywords can be parameter names per nameOrKeyword rule
@@ -131,8 +131,8 @@ class MessageFormatLexer(RegexLexer):
             # If we see a parenthesis, this is config (grouped keys)
             (r'\(', Punctuation, ('#pop', 'parameter-config')),
 
-            (r"'", String.Delimiter, 'singlequote'),
-            (r'"', String.Delimiter, 'doublequote'),
+            (r"'", String.Delimiter, 'single-quote'),
+            (r'"', String.Delimiter, 'double-quote'),
 
             # Format name - highlighted as Name.Function
             (r'\b(?:true|false)\b', Name.Function),
@@ -173,8 +173,8 @@ class MessageFormatLexer(RegexLexer):
             (r'-?[0-9]+', Number.Integer),
 
             # Strings
-            (r"'", String.Delimiter, 'singlequote'),
-            (r'"', String.Delimiter, 'doublequote'),
+            (r"'", String.Delimiter, 'single-quote'),
+            (r'"', String.Delimiter, 'double-quote'),
 
             # Config key names - highlighted as Name.Attribute
             (_name, Name.Attribute),
@@ -191,8 +191,8 @@ class MessageFormatLexer(RegexLexer):
             (r',', Punctuation, 'template-config'),
 
             # Strings
-            (r"'", String.Delimiter, 'singlequote'),
-            (r'"', String.Delimiter, 'doublequote'),
+            (r"'", String.Delimiter, 'single-quote'),
+            (r'"', String.Delimiter, 'double-quote'),
 
             # Template name (first position) - highlighted as Name.Class
             (r'\b(?:true|false)\b', Name.Class),
@@ -221,8 +221,8 @@ class MessageFormatLexer(RegexLexer):
             (r'-?[0-9]+', Number.Integer),
 
             # Strings
-            (r"'", String.Delimiter, 'singlequote'),
-            (r'"', String.Delimiter, 'doublequote'),
+            (r"'", String.Delimiter, 'single-quote'),
+            (r'"', String.Delimiter, 'double-quote'),
 
             # Config names - highlighted as Name.Attribute
             (_name, Name.Attribute),
@@ -230,7 +230,7 @@ class MessageFormatLexer(RegexLexer):
             (r'[ \t\u0000-\u001f]+', Text),
         ],
 
-        'singlequote': [
+        'single-quote': [
             # Single quote end -> pop back
             (r"'", String.Delimiter, '#pop'),
 
@@ -255,7 +255,7 @@ class MessageFormatLexer(RegexLexer):
             (r'\\', String),
         ],
 
-        'doublequote': [
+        'double-quote': [
             # Double quote end -> pop back
             (r'"', String.Delimiter, '#pop'),
 
