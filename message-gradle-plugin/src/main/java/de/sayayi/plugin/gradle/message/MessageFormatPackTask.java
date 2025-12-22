@@ -358,7 +358,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
           break;
 
         case 1:
-          throw new GradleException("Missing message template: " + missingTemplateNames.get(0));
+          throw new GradleException("Missing message template: " + missingTemplateNames.getFirst());
 
         default:
           throw new GradleException("Missing message templates: " +

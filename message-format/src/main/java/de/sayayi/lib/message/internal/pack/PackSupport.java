@@ -93,37 +93,30 @@ public final class PackSupport
   @Contract(mutates = "param2,io")
   public static void pack(@NotNull Message message, @NotNull PackOutputStream packStream) throws IOException
   {
-    if (message instanceof EmptyMessage)
-      packStream.writeSmall(MESSAGE_EMPTY, 3);
-    else if (message instanceof EmptyMessageWithCode)
-    {
-      packStream.writeSmall(MESSAGE_EMPTY_WITH_CODE, 3);
-      ((EmptyMessageWithCode)message).pack(packStream);
-    }
-    else if (message instanceof LocalizedMessageBundleWithCode)
-    {
-      packStream.writeSmall(MESSAGE_LOCALIZED_BUNDLE_WITH_CODE, 3);
-      ((LocalizedMessageBundleWithCode)message).pack(packStream);
-    }
-    else if (message instanceof MessageDelegateWithCode)
-    {
-      packStream.writeSmall(MESSAGE_DELEGATE_WITH_CODE, 3);
-      ((MessageDelegateWithCode)message).pack(packStream);
-    }
-    else if (message instanceof CompoundMessage)
-    {
-      packStream.writeSmall(MESSAGE_COMPOUND, 3);
-      ((CompoundMessage)message).pack(packStream);
-    }
-    else if (message instanceof TextMessage)
-    {
-      packStream.writeSmall(MESSAGE_TEXT, 3);
-      ((TextMessage)message).pack(packStream);
-    }
-    else
-    {
-      throw new IllegalArgumentException("unknown message type " +
-          message.getClass().getSimpleName());
+    switch(message) {
+      case EmptyMessage emptyMessage -> packStream.writeSmall(MESSAGE_EMPTY, 3);
+      case EmptyMessageWithCode emptyMessageWithCode -> {
+        packStream.writeSmall(MESSAGE_EMPTY_WITH_CODE, 3);
+        emptyMessageWithCode.pack(packStream);
+      }
+      case LocalizedMessageBundleWithCode localizedMessageBundleWithCode -> {
+        packStream.writeSmall(MESSAGE_LOCALIZED_BUNDLE_WITH_CODE, 3);
+        localizedMessageBundleWithCode.pack(packStream);
+      }
+      case MessageDelegateWithCode messageDelegateWithCode -> {
+        packStream.writeSmall(MESSAGE_DELEGATE_WITH_CODE, 3);
+        messageDelegateWithCode.pack(packStream);
+      }
+      case CompoundMessage compoundMessage -> {
+        packStream.writeSmall(MESSAGE_COMPOUND, 3);
+        compoundMessage.pack(packStream);
+      }
+      case TextMessage textMessage -> {
+        packStream.writeSmall(MESSAGE_TEXT, 3);
+        textMessage.pack(packStream);
+      }
+
+      default -> throw new IllegalArgumentException("unknown message type " + message.getClass().getSimpleName());
     }
   }
 
@@ -205,28 +198,27 @@ public final class PackSupport
   @Contract(mutates = "param2,io")
   public static void pack(@NotNull MessagePart messagePart, @NotNull PackOutputStream packStream) throws IOException
   {
-    if (messagePart instanceof ParameterPart)
-    {
-      packStream.writeSmall(PART_PARAMETER_ID, 2);
-      ((ParameterPart)messagePart).pack(packStream);
+    switch(messagePart) {
+      case ParameterPart parameterPart -> {
+        packStream.writeSmall(PART_PARAMETER_ID, 2);
+        parameterPart.pack(packStream);
+      }
+      case NoSpaceTextPart noSpaceTextPart -> {
+        packStream.writeSmall(PART_NO_SPACE_TEXT_ID, 2);
+        noSpaceTextPart.pack(packStream);
+      }
+      case TextPart textPart -> {
+        packStream.writeSmall(PART_TEXT_ID, 2);
+        textPart.pack(packStream);
+      }
+      case TemplatePart templatePart -> {
+        packStream.writeSmall(PART_TEMPLATE_ID, 2);
+        templatePart.pack(packStream);
+      }
+
+      default ->
+          throw new IllegalArgumentException("unknown message part type " + messagePart.getClass().getSimpleName());
     }
-    else if (messagePart instanceof NoSpaceTextPart)
-    {
-      packStream.writeSmall(PART_NO_SPACE_TEXT_ID, 2);
-      ((NoSpaceTextPart)messagePart).pack(packStream);
-    }
-    else if (messagePart instanceof TextPart)
-    {
-      packStream.writeSmall(PART_TEXT_ID, 2);
-      ((TextPart)messagePart).pack(packStream);
-    }
-    else if (messagePart instanceof TemplatePart)
-    {
-      packStream.writeSmall(PART_TEMPLATE_ID, 2);
-      ((TemplatePart)messagePart).pack(packStream);
-    }
-    else
-      throw new IllegalArgumentException("unknown message part type " + messagePart.getClass().getSimpleName());
   }
 
 
@@ -249,40 +241,35 @@ public final class PackSupport
   @Contract(mutates = "param2,io")
   public static void pack(ConfigKey configKey, @NotNull PackOutputStream packStream) throws IOException
   {
-    if (configKey == null)
-      packStream.writeSmall(MAP_KEY_DEFAULT_ID, 3);
-    else if (configKey instanceof ConfigKeyBool)
-    {
-      packStream.writeSmall(MAP_KEY_BOOL_ID, 3);
-      ((ConfigKeyBool)configKey).pack(packStream);
+    switch(configKey) {
+      case null -> packStream.writeSmall(MAP_KEY_DEFAULT_ID, 3);
+      case ConfigKeyBool configKeyBool -> {
+        packStream.writeSmall(MAP_KEY_BOOL_ID, 3);
+        configKeyBool.pack(packStream);
+      }
+      case ConfigKeyEmpty configKeyEmpty -> {
+        packStream.writeSmall(MAP_KEY_EMPTY_ID, 3);
+        configKeyEmpty.pack(packStream);
+      }
+      case ConfigKeyName configKeyName -> {
+        packStream.writeSmall(MAP_KEY_NAME_ID, 3);
+        configKeyName.pack(packStream);
+      }
+      case ConfigKeyNull configKeyNull -> {
+        packStream.writeSmall(MAP_KEY_NULL_ID, 3);
+        configKeyNull.pack(packStream);
+      }
+      case ConfigKeyNumber configKeyNumber -> {
+        packStream.writeSmall(MAP_KEY_NUMBER_ID, 3);
+        configKeyNumber.pack(packStream);
+      }
+      case ConfigKeyString configKeyString -> {
+        packStream.writeSmall(MAP_KEY_STRING_ID, 3);
+        configKeyString.pack(packStream);
+      }
+
+      default -> throw new IllegalArgumentException("unknown map key type " + configKey.getClass().getSimpleName());
     }
-    else if (configKey instanceof ConfigKeyEmpty)
-    {
-      packStream.writeSmall(MAP_KEY_EMPTY_ID, 3);
-      ((ConfigKeyEmpty)configKey).pack(packStream);
-    }
-    else if (configKey instanceof ConfigKeyName)
-    {
-      packStream.writeSmall(MAP_KEY_NAME_ID, 3);
-      ((ConfigKeyName)configKey).pack(packStream);
-    }
-    else if (configKey instanceof ConfigKeyNull)
-    {
-      packStream.writeSmall(MAP_KEY_NULL_ID, 3);
-      ((ConfigKeyNull)configKey).pack(packStream);
-    }
-    else if (configKey instanceof ConfigKeyNumber)
-    {
-      packStream.writeSmall(MAP_KEY_NUMBER_ID, 3);
-      ((ConfigKeyNumber)configKey).pack(packStream);
-    }
-    else if (configKey instanceof ConfigKeyString)
-    {
-      packStream.writeSmall(MAP_KEY_STRING_ID, 3);
-      ((ConfigKeyString)configKey).pack(packStream);
-    }
-    else
-      throw new IllegalArgumentException("unknown map key type " + configKey.getClass().getSimpleName());
   }
 
 
@@ -308,28 +295,26 @@ public final class PackSupport
   @Contract(mutates = "param2,io")
   public static void pack(@NotNull ConfigValue configValue, @NotNull PackOutputStream packStream) throws IOException
   {
-    if (configValue instanceof ConfigValueBool)
-    {
-      packStream.writeSmall(MAP_VALUE_BOOL_ID, 2);
-      ((ConfigValueBool)configValue).pack(packStream);
+    switch(configValue) {
+      case ConfigValueBool configValueBool -> {
+        packStream.writeSmall(MAP_VALUE_BOOL_ID, 2);
+        configValueBool.pack(packStream);
+      }
+      case ConfigValueMessage configValueMessage -> {
+        packStream.writeSmall(MAP_VALUE_MESSAGE_ID, 2);
+        configValueMessage.pack(packStream);
+      }
+      case ConfigValueNumber configValueNumber -> {
+        packStream.writeSmall(MAP_VALUE_NUMBER_ID, 2);
+        configValueNumber.pack(packStream);
+      }
+      case ConfigValueString configValueString -> {
+        packStream.writeSmall(MAP_VALUE_STRING_ID, 2);
+        configValueString.pack(packStream);
+      }
+
+      default -> throw new IllegalArgumentException("unknown map value type " + configValue.getClass().getSimpleName());
     }
-    else if (configValue instanceof ConfigValueMessage)
-    {
-      packStream.writeSmall(MAP_VALUE_MESSAGE_ID, 2);
-      ((ConfigValueMessage)configValue).pack(packStream);
-    }
-    else if (configValue instanceof ConfigValueNumber)
-    {
-      packStream.writeSmall(MAP_VALUE_NUMBER_ID, 2);
-      ((ConfigValueNumber)configValue).pack(packStream);
-    }
-    else if (configValue instanceof ConfigValueString)
-    {
-      packStream.writeSmall(MAP_VALUE_STRING_ID, 2);
-      ((ConfigValueString)configValue).pack(packStream);
-    }
-    else
-      throw new IllegalArgumentException("unknown map value type " + configValue.getClass().getSimpleName());
   }
 
 

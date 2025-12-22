@@ -151,7 +151,7 @@ public class MessageFactory
       }
 
       default: {
-        var localizedMessages = new HashMap<Locale,Message>();
+        final var localizedMessages = new HashMap<Locale,Message>();
 
         localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) -> {
           try {
@@ -328,7 +328,7 @@ public class MessageFactory
 
     return la1 && la2
         ? isSame((Message.LocaleAware)m1, (Message.LocaleAware)m2)
-        : !la1 && !la2 && Arrays.equals(m1.messageParts(), m2.messageParts());
+        : !la1 && !la2 && Arrays.equals(m1.getMessageParts(), m2.getMessageParts());
   }
 
 

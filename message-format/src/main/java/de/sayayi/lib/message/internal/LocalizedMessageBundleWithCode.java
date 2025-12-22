@@ -85,16 +85,16 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   @Contract(pure = true)
   private @NotNull Message findMessageByLocale(@NotNull Locale locale)
   {
-    var searchLanguage = locale.getLanguage();
-    var searchCountry = locale.getCountry();
+    final var searchLanguage = locale.getLanguage();
+    final var searchCountry = locale.getCountry();
 
     var match = -1;
     Message message = null;
 
     for(var entry: localizedMessages.entrySet())
     {
-      var keyLocale = entry.getKey();
-      var localizedMessage = entry.getValue();
+      final var keyLocale = entry.getKey();
+      final var localizedMessage = entry.getValue();
 
       if (match == -1 && (keyLocale == null || keyLocale.getLanguage().isEmpty()))
       {
@@ -149,10 +149,9 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   @Override
   public boolean equals(Object o)
   {
-    if (!(o instanceof LocalizedMessageBundleWithCode that))
-      return false;
-
-    return code.equals(that.code) && localizedMessages.equals(that.localizedMessages);
+    return o instanceof LocalizedMessageBundleWithCode that &&
+        code.equals(that.code) &&
+        localizedMessages.equals(that.localizedMessages);
   }
 
 
@@ -205,9 +204,9 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   public static @NotNull Message.WithCode unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
-    var messageCount = packStream.readSmallVar();
-    var code = requireNonNull(packStream.readString());
-    var messages = new HashMap<Locale,Message>();
+    final var messageCount = packStream.readSmallVar();
+    final var code = requireNonNull(packStream.readString());
+    final var messages = new HashMap<Locale,Message>();
 
     for(var n = 0; n < messageCount; n++)
     {

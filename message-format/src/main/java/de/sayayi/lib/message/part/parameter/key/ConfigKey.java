@@ -68,7 +68,7 @@ public interface ConfigKey
    * @since 0.8.4
    */
   @Contract(pure = true)
-  default @NotNull CompareType compareType() {
+  default @NotNull CompareType getCompareType() {
     return EQ;
   }
 

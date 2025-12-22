@@ -88,14 +88,8 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
 
 
   @Override
-  public boolean equals(Object o)
-  {
-    if (!(o instanceof MessageDelegateWithCode))
-      return false;
-
-    var that = (MessageDelegateWithCode)o;
-
-    return code.equals(that.code) && message.equals(that.message);
+  public boolean equals(Object o) {
+    return o instanceof MessageDelegateWithCode that && code.equals(that.code) && message.equals(that.message);
   }
 
 

@@ -83,12 +83,13 @@ public final class PathFormatter extends AbstractMultiSelectFormatter<Object> im
     if (path == null)
       return nullText();
 
-    var name = path.toString();
-    var dotIndex = name.lastIndexOf('.');
+    final var name = path.toString();
+    final var dotIndex = name.lastIndexOf('.');
+
     if (dotIndex == -1)
       return emptyText();
 
-    var extension = name.substring(dotIndex + 1);
+    final var extension = name.substring(dotIndex + 1);
 
     return formatUsingMappedString(context, extension, true).orElseGet(() -> noSpaceText(extension));
   }
@@ -112,7 +113,7 @@ public final class PathFormatter extends AbstractMultiSelectFormatter<Object> im
   @Override
   public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object fileOrPath)
   {
-    var path = toPath(fileOrPath);
+    final var path = toPath(fileOrPath);
 
     if (isRegularFile(path))
     {

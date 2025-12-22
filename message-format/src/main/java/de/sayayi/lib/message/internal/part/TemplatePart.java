@@ -149,7 +149,7 @@ public final class TemplatePart implements Template
   @Contract(pure = true)
   public String toString()
   {
-    var s = new StringBuilder("Template(name=").append(name);
+    final var s = new StringBuilder("Template(name=").append(name);
 
     if (spaceBefore && spaceAfter)
       s.append(",space-around");
@@ -262,7 +262,7 @@ public final class TemplatePart implements Template
     @Override
     public @NotNull Set<String> getParameterNames()
     {
-      var names = new TreeSet<String>();
+      final var names = new TreeSet<String>();
 
       defaultParameterMap.forEach(defaultParameter -> names.add(defaultParameter.getKey()));
 

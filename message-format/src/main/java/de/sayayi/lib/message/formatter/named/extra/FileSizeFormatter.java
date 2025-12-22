@@ -72,10 +72,10 @@ public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Number value)
   {
-    var size = value.longValue();
-    var scale = normalizeScale(context.getConfigValueNumber("scale").orElse(1));
-    var s = new StringBuilder();
+    final var size = value.longValue();
+    final var s = new StringBuilder();
     final int unitIndex;
+    var scale = normalizeScale(context.getConfigValueNumber("scale").orElse(1));
 
     if (size <= 0)
     {
@@ -92,8 +92,8 @@ public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
           .format((double)size / POW10[unitIndex * 3]));
     }
 
-    var unit = UNITS[unitIndex];
-    var unitMessage = context
+    final var unit = UNITS[unitIndex];
+    final var unitMessage = context
         .getConfigMapMessage(unit, ConfigKey.STRING_TYPE)
         .orElse(null);
 
@@ -102,7 +102,7 @@ public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
       s.append(' ');
 
     return noSpaceText(s
-        .append(unitMessage == null ? unit : context.format(unitMessage).text())
+        .append(unitMessage == null ? unit : context.format(unitMessage).getText())
         .toString());
   }
 

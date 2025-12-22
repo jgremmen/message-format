@@ -225,7 +225,7 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
     public boolean equals(Object o)
     {
       return
-          o instanceof Entry<?, ?> entry &&
+          o instanceof Entry<?,?> entry &&
           Objects.equals(array[offset], entry.getKey()) &&
           Objects.equals(array[offset + 1], entry.getValue());
     }

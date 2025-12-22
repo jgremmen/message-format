@@ -41,20 +41,20 @@ public class MessageFormatPlugin implements Plugin<@NotNull Project>
   public void apply(Project project)
   {
     // provide java base plugin (for main/java)
-    var plugins = project.getPlugins();
+    final var plugins = project.getPlugins();
     if (!plugins.hasPlugin(JavaBasePlugin.class))
       project.apply(objectConfiguration -> objectConfiguration.plugin(JavaBasePlugin.class));
 
     // create extension and set conventions
-    var extensions = project.getExtensions();
-    var messageFormatExtension = extensions.create(EXTENSION, MessageFormatExtension.class);
+    final var extensions = project.getExtensions();
+    final var messageFormatExtension = extensions.create(EXTENSION, MessageFormatExtension.class);
 
     messageFormatExtension.getPackFilename().convention("messages.mfp");
     messageFormatExtension.getCompress().convention(false);
     messageFormatExtension.getDuplicateMsgStrategy().convention(IGNORE_AND_WARN);
     messageFormatExtension.getValidateReferencedTemplates().convention(true);
 
-    var mainJavaSourceSet = extensions
+    final var mainJavaSourceSet = extensions
         .getByType(JavaPluginExtension.class)
         .getSourceSets()
         .getByName(MAIN_SOURCE_SET_NAME);
@@ -70,8 +70,8 @@ public class MessageFormatPlugin implements Plugin<@NotNull Project>
                                 @NotNull MessageFormatExtension extension,
                                 @NotNull SourceSet mainSourceSet)
   {
-    var tasks = project.getTasks();
-    var layout = project.getLayout();
+    final var tasks = project.getTasks();
+    final var layout = project.getLayout();
 
     tasks.register("messageFormatPack", MessageFormatPackTask.class, packTask -> {
       packTask.setGroup("build");

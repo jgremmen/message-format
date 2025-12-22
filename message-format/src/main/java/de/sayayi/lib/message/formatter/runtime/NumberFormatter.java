@@ -61,13 +61,13 @@ public final class NumberFormatter
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Number number)
   {
     // check configuration map for match
-    var msg = context
+    final var msg = context
         .getConfigMapMessage(number, NUMBER_TYPE)
         .orElse(null);
     if (msg != null)
       return context.format(msg);
 
-    var format = context
+    final var format = context
         .getConfigValueString("number")
         .orElse(null);
 
@@ -88,7 +88,7 @@ public final class NumberFormatter
 
   private @NotNull NumberFormat getFormatter(String format, Parameters parameters)
   {
-    var locale = parameters.getLocale();
+    final var locale = parameters.getLocale();
 
     if ("integer".equals(format))
       return NumberFormat.getIntegerInstance(locale);
@@ -152,8 +152,8 @@ public final class NumberFormatter
   @Override
   public @NotNull MatchResult compareToNumberKey(@NotNull Number number, @NotNull ComparatorContext context)
   {
-    var numberKeyValue = context.getNumberKeyValue();
-    var compareType = context.getCompareType();
+    final var numberKeyValue = context.getNumberKeyValue();
+    final var compareType = context.getCompareType();
 
     if (number instanceof Byte || number instanceof Short ||
         number instanceof Integer || number instanceof Long)
@@ -178,8 +178,8 @@ public final class NumberFormatter
     else if (value instanceof Double || value instanceof Float)
       value = BigDecimal.valueOf(value.doubleValue());
 
-    var compareType = context.getCompareType();
-    var string = context.getStringKeyValue();
+    final var compareType = context.getCompareType();
+    final var string = context.getStringKeyValue();
 
     if (value instanceof BigInteger bigInteger)
     {

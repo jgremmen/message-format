@@ -46,7 +46,7 @@ public final class MatcherFormatter extends AbstractSingleTypeParameterFormatter
       if (matcherConfig.isEmpty())
         return formatValue_groupNumber(matcher, 0);
 
-      var cv = matcherConfig.get();
+      final var cv = matcherConfig.get();
 
       switch(cv.getType())
       {

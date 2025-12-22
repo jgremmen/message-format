@@ -279,7 +279,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         ctx.messageWithSpaces = EmptyMessage.INSTANCE;
       else
       {
-        var parts = new ArrayList<MessagePart>();
+        final var parts = new ArrayList<MessagePart>();
 
         for(var part: children)
         {
@@ -302,7 +302,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
         final MessagePart part0;
 
-        if (parts.size() == 1 && (part0 = parts.get(0)) instanceof TextPart)
+        if (parts.size() == 1 && (part0 = parts.getFirst()) instanceof TextPart)
           ctx.messageWithSpaces = new TextMessage((TextPart)part0);
         else
         {
@@ -367,7 +367,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitQuotedString(QuotedStringContext ctx)
     {
-      var text = ctx.text();
+      final var text = ctx.text();
       ctx.string = text == null ? "" : text.characters;
     }
 
@@ -375,7 +375,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitSimpleString(SimpleStringContext ctx)
     {
-      var nameOrKeyword = ctx.nameOrKeyword();
+      final var nameOrKeyword = ctx.nameOrKeyword();
       ctx.string = nameOrKeyword != null ? nameOrKeyword.name : ctx.quotedString().string;
     }
 
@@ -667,7 +667,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitRelationalOperatorOptional(RelationalOperatorOptionalContext ctx)
     {
-      var relationalOperator = ctx.relationalOperator();
+      final var relationalOperator = ctx.relationalOperator();
       ctx.cmp = relationalOperator == null ? CompareType.EQ : relationalOperator.cmp;
     }
 
@@ -679,23 +679,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       if (equalOperator != null)
         ctx.cmp = equalOperator.cmp;
       else
-        switch(((TerminalNode)ctx.getChild(0)).getSymbol().getType())
-        {
-          case LTE:
-            ctx.cmp = CompareType.LTE;
-            break;
-
-          case LT:
-            ctx.cmp = CompareType.LT;
-            break;
-
-          case GT:
-            ctx.cmp = CompareType.GT;
-            break;
-
-          case GTE:
-            ctx.cmp = CompareType.GTE;
-            break;
+        switch(((TerminalNode)ctx.getChild(0)).getSymbol().getType()) {
+          case LTE -> ctx.cmp = CompareType.LTE;
+          case LT -> ctx.cmp = CompareType.LT;
+          case GT -> ctx.cmp = CompareType.GT;
+          case GTE -> ctx.cmp = CompareType.GTE;
         }
     }
 
@@ -703,7 +691,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitEqualOperatorOptional(EqualOperatorOptionalContext ctx)
     {
-      var equalOperator = ctx.equalOperator();
+      final var equalOperator = ctx.equalOperator();
       ctx.cmp = equalOperator == null ? CompareType.EQ : equalOperator.cmp;
     }
 
@@ -727,7 +715,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         var token = tokenStream.get(i);
         if (token.getType() != EOF)
         {
-          var text = token.getText();
+          final var text = token.getText();
           return !SpacesUtil.isEmpty(text) && isSpaceChar(text.charAt(0));
         }
       }

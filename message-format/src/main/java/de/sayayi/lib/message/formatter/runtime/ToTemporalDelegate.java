@@ -46,12 +46,13 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.EMPTY_NULL_TYPE
 public final class ToTemporalDelegate implements ParameterFormatter
 {
   @Override
+  @SuppressWarnings("IfCanBeSwitch")
   public @NotNull Text format(@NotNull FormatterContext context, Object value)
   {
     if (value == null)
     {
       // handle empty, !empty, null and !null first
-      var msg = context
+      final var msg = context
           .getConfigMapMessage(null, EMPTY_NULL_TYPE)
           .orElse(null);
 

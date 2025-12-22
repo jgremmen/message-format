@@ -58,8 +58,8 @@ final class MessageParameters implements Parameters
   {
     for(int low = 0, high = parameters.length - 2; low <= high;)
     {
-      var mid = ((low + high) >>> 1) & 0xfffe;
-      var cmp = parameter.compareTo((String)parameters[mid]);
+      final var mid = ((low + high) >>> 1) & 0xfffe;
+      final var cmp = parameter.compareTo((String)parameters[mid]);
 
       if (cmp < 0)
         high = mid - 2;
@@ -92,11 +92,11 @@ final class MessageParameters implements Parameters
     if (!locale.equals(that.getLocale()))
       return false;
 
-    var thatParameterNames = that.getParameterNames();
+    final var thatParameterNames = that.getParameterNames();
 
     for(var n = 0; n < parameters.length; n += 2)
     {
-      var parameterName = (String)parameters[n];
+      final var parameterName = (String)parameters[n];
 
       if (!thatParameterNames.contains(parameterName) ||
           !Objects.equals(parameters[n + 1], that.getParameterValue(parameterName)))
@@ -122,7 +122,7 @@ final class MessageParameters implements Parameters
   @Override
   public String toString()
   {
-    var s = new StringBuilder("Parameters(locale='").append(locale).append("',{");
+    final var s = new StringBuilder("Parameters(locale='").append(locale).append("',{");
 
     for(int n = 0, l = parameters.length; n < l; n += 2)
     {
@@ -164,8 +164,8 @@ final class MessageParameters implements Parameters
       if (o instanceof String)
         for(int low = 0, high = parameters.length - 2; low <= high;)
         {
-          var mid = ((low + high) >>> 1) & 0xfffe;
-          var cmp = ((String)o).compareTo((String)parameters[mid]);
+          final var mid = ((low + high) >>> 1) & 0xfffe;
+          final var cmp = ((String)o).compareTo((String)parameters[mid]);
 
           if (cmp < 0)
             high = mid - 2;
@@ -237,7 +237,7 @@ final class MessageParameters implements Parameters
       if (isEmpty())
         return "[]";
 
-      var s = new StringBuilder("[");
+      final var s = new StringBuilder("[");
 
       for(int n = 0, l = parameters.length; n < l; n += 2)
       {

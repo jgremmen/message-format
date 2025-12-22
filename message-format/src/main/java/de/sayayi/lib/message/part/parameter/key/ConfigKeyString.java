@@ -30,6 +30,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
+@SuppressWarnings("ClassCanBeRecord")
 public final class ConfigKeyString implements ConfigKey
 {
   /** Configuration string key comparison type. */
@@ -93,14 +94,8 @@ public final class ConfigKeyString implements ConfigKey
 
 
   @Override
-  public boolean equals(Object o)
-  {
-    if (!(o instanceof ConfigKeyString))
-      return false;
-
-    var that = (ConfigKeyString)o;
-
-    return compareType == that.compareType && string.equals(that.string);
+  public boolean equals(Object o) {
+    return o instanceof ConfigKeyString that && compareType == that.compareType && string.equals(that.string);
   }
 
 

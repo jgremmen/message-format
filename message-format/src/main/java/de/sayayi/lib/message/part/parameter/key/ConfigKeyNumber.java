@@ -28,33 +28,47 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * @param compareType Configuration number key comparison type.
- * @param number      Configuration key number.
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
-public record ConfigKeyNumber(@NotNull CompareType compareType, long number) implements ConfigKey {
+@SuppressWarnings("ClassCanBeRecord")
+public final class ConfigKeyNumber implements ConfigKey
+{
+  /** Configuration number key comparison type. */
+  private final @NotNull CompareType compareType;
+
+  /** Configuration key number. */
+  private final long number;
+
+
   /**
    * Constructs a configuration key number with a comparison type.
    *
-   * @param compareType configuration key comparison type, not {@code null}
-   * @param number      configuration key number
+   * @param compareType  configuration key comparison type, not {@code null}
+   * @param number       configuration key number
+   *
    * @since 0.4.0 (made public in 0.10.0)
    */
-  public ConfigKeyNumber(@NotNull CompareType compareType, long number) {
+  public ConfigKeyNumber(@NotNull CompareType compareType, long number)
+  {
     this.compareType = requireNonNull(compareType, "compareType must not be null");
     this.number = number;
+  }
+
+
+  @Override
+  public @NotNull CompareType getCompareType() {
+    return compareType;
   }
 
 
   /**
    * Returns the config key number value.
    *
-   * @return config key number value
+   * @return  config key number value
    */
-  @Override
   @Contract(pure = true)
-  public long number() {
+  public long getNumber() {
     return number;
   }
 
@@ -62,7 +76,7 @@ public record ConfigKeyNumber(@NotNull CompareType compareType, long number) imp
   /**
    * {@inheritDoc}
    *
-   * @return always {@link Type#NUMBER Type#NUMBER}
+   * @return  always {@link Type#NUMBER Type#NUMBER}
    */
   @Override
   public @NotNull Type getType() {
@@ -89,25 +103,34 @@ public record ConfigKeyNumber(@NotNull CompareType compareType, long number) imp
 
 
   /**
-   * @param packStream data output pack target
-   * @throws IOException if an I/O error occurs
-   * @hidden
+   * @param packStream  data output pack target
+   *
+   * @throws IOException  if an I/O error occurs
+   *
    * @since 0.8.0
+   *
+   * @hidden
    */
-  public void pack(@NotNull PackOutputStream packStream) throws IOException {
+  public void pack(@NotNull PackOutputStream packStream) throws IOException
+  {
     packStream.writeEnum(compareType);
     packLongVar(number, packStream);
   }
 
 
   /**
-   * @param packStream source data input, not {@code null}
-   * @return unpacked number map key, never {@code null}
-   * @throws IOException if an I/O error occurs
-   * @hidden
+   * @param packStream  source data input, not {@code null}
+   *
+   * @return  unpacked number map key, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs
+   *
    * @since 0.8.0
+   *
+   * @hidden
    */
-  public static @NotNull ConfigKeyNumber unpack(@NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigKeyNumber unpack(@NotNull PackInputStream packStream) throws IOException
+  {
     final var compareType = packStream.readEnum(CompareType.class);
     final var number = packStream.getVersion().orElseThrow() == 1
         ? packStream.readLong()

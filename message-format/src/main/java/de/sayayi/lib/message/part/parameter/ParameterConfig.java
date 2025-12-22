@@ -373,7 +373,7 @@ public final class ParameterConfig
 
     @Override
     public @NotNull ConfigKey.CompareType getCompareType() {
-      return configKey.compareType();
+      return configKey.getCompareType();
     }
 
 
@@ -391,7 +391,7 @@ public final class ParameterConfig
 
     @Override
     public long getNumberKeyValue() {
-      return ((ConfigKeyNumber)configKey).number();
+      return ((ConfigKeyNumber)configKey).getNumber();
     }
 
 
