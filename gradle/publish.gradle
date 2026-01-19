@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
+import org.gradle.util.internal.TextUtil
+
+
 apply plugin: 'org.danilopianini.publish-on-central'
-
-
-static String toLowerCamelCase(String str) {
-  return str.replaceAll(/[-_](\w)/) { it[1].toUpperCase() }
-}
 
 
 ext.snapshot = version.toString().endsWith('-SNAPSHOT')
@@ -90,7 +88,7 @@ tasks.register('publishToProjectLocalRepository') {
 }
 
 
-ext.releaseTask = tasks.register(toLowerCamelCase("release-${project.name}-artifacts")) {
+ext.releaseTask = tasks.register(TextUtil.toLowerCamelCase("release-${project.name}-artifacts")) {
   group = 'release'
   description = "Release ${project.name} ${snapshot ? 'snapshot ' : ''}artifacts to Maven Central Repository."
 
