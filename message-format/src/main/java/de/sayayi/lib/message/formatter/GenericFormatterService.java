@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT;
+import static de.sayayi.lib.message.util.MessageUtil.isKebabCaseName;
 import static java.util.Arrays.copyOf;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
@@ -149,13 +150,18 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
     if (formatter instanceof NamedParameterFormatter namedParameterFormatter)
     {
-      final var format = namedParameterFormatter.getName();
+      final var formatterName = namedParameterFormatter.getName();
 
       //noinspection ConstantValue
-      if (format == null || format.isEmpty())
+      if (formatterName == null || formatterName.isEmpty())
         throw new FormatterServiceException("formatter name must not be empty");
+      else if (!isKebabCaseName(formatterName))
+      {
+        throw new FormatterServiceException("formatter name '" + formatterName +
+            "' must match the kebab case naming convention");
+      }
 
-      namedFormatters.put(format, namedParameterFormatter);
+      namedFormatters.put(formatterName, namedParameterFormatter);
     }
 
     for(var formattableType: formatter.getFormattableTypes())
@@ -279,25 +285,20 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
-  private record PrioritizedFormatter(int order,
-                                      @NotNull ParameterFormatter formatter) implements Comparable<PrioritizedFormatter> {
 
 
+  private record PrioritizedFormatter(int order, @NotNull ParameterFormatter formatter)
+      implements Comparable<PrioritizedFormatter>
+  {
     @Override
-      public int compareTo(@NotNull PrioritizedFormatter o) {
-        return Integer.compare(order, o.order);
-      }
-
-
-      @Override
-      public boolean equals(Object o) {
-        return o instanceof PrioritizedFormatter that && order == that.order && formatter.equals(that.formatter);
-      }
-
-
-    @Override
-      public String toString() {
-        return "PrioritizedFormatter(order=" + order + ",formatter=" + formatter + ')';
-      }
+    public int compareTo(@NotNull PrioritizedFormatter o) {
+      return Integer.compare(order, o.order);
     }
+
+
+    @Override
+    public @NotNull String toString() {
+      return "PrioritizedFormatter(order=" + order + ",formatter=" + formatter + ')';
+    }
+  }
 }

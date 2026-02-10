@@ -53,6 +53,7 @@ import static de.sayayi.lib.antlr4.walker.Walker.WALK_EXIT_RULES_HEAP;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAGE;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.TEMPLATE;
 import static de.sayayi.lib.message.internal.parser.MessageParser.*;
+import static de.sayayi.lib.message.util.MessageUtil.isKebabCaseName;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
@@ -457,8 +458,14 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitParameterFormat(ParameterFormatContext ctx) {
-      ctx.format = ctx.nameOrKeyword().name;
+    public void exitParameterFormat(ParameterFormatContext ctx)
+    {
+      if (!isKebabCaseName(ctx.format = ctx.nameOrKeyword().name))
+      {
+        syntaxError("parameter format must match the kebab case naming convention")
+            .with(ctx)
+            .report();
+      }
     }
 
 

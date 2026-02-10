@@ -83,7 +83,7 @@ parameterName returns [String name]
         ;
 
 parameterFormat returns [String format]
-        : nameOrKeyword
+        : nameOrKeyword  // kebab-case format
         ;
 
 parameterConfigElement returns [List<ConfigKey> configKeys, ConfigValue configValue]
