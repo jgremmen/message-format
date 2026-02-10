@@ -68,7 +68,7 @@ class LocaleFormatterTest extends AbstractFormatterTest
   {
     val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new LocaleFormatter()), NO_CACHE_INSTANCE)
-        .setLocale(new Locale("es", "ES"))
+        .setLocale(Locale.forLanguageTag("es-ES"))
         .getMessageAccessor();
 
     assertEquals(noSpaceText("inglés"), format(messageAccessor, UK,
@@ -85,7 +85,7 @@ class LocaleFormatterTest extends AbstractFormatterTest
   {
     val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new LocaleFormatter()), NO_CACHE_INSTANCE)
-        .setLocale(new Locale("nl", "BE"))
+        .setLocale(Locale.forLanguageTag("nl-BE"))
         .getMessageAccessor();
 
     assertEquals(noSpaceText("Engels (Verenigd Koninkrijk)"), format(messageAccessor, UK));

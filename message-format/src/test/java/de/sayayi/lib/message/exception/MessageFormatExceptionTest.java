@@ -110,9 +110,9 @@ class MessageFormatExceptionTest
             "failed to format template 'flow' for message with code 'MFP1'"),
         Arguments.of("MFP2", "age-range", null, "ABC",
             "failed to format parameter 'ABC' in template 'age-range' for message with code 'MFP2'"),
-        Arguments.of("MFP3", "test", new Locale("nl", "BE"), null,
+        Arguments.of("MFP3", "test", Locale.forLanguageTag("nl-BE"), null,
             "failed to format template 'test' for message with code 'MFP3' and locale Dutch (Belgium)"),
-        Arguments.of("MFP4", "bool", new Locale("fr", "CH"), "j",
+        Arguments.of("MFP4", "bool", Locale.forLanguageTag("fr-CH"), "j",
             "failed to format parameter 'j' in template 'bool' for message with code 'MFP4' and locale French (Switzerland)")
     );
   }
@@ -150,7 +150,7 @@ class MessageFormatExceptionTest
         MessageFormatException.of(null)
             .withCode("MSG[5JJRMZBVNJ-30UO]")
             .withParameter("q")
-            .withLocale(new Locale("nl", "NL"))
+            .withLocale(Locale.forLanguageTag("nl-NL"))
             .getMessage());
   }
 
@@ -187,7 +187,7 @@ class MessageFormatExceptionTest
     assertEquals("failed to format message for locale German (Germany)",
         assertThrowsExactly(MessageFormatException.class, () -> MESSAGE_SUPPORT
             .message(new LocalizedMessageBundleWithCode("MSG[ABC]",
-                Map.of(new Locale("de", "CH"), THROWING_MESSAGE)))
+                Map.of(Locale.forLanguageTag("de-CH"), THROWING_MESSAGE)))
             .locale(GERMANY)
             .format())
             .getMessage());
@@ -314,7 +314,7 @@ class MessageFormatExceptionTest
     assertEquals("failed to format message with code 'MSG-003' and locale Chinese (Taiwan)",
         assertThrowsExactly(MessageFormatException.class, () -> MESSAGE_SUPPORT
             .message(new LocalizedMessageBundleWithCode("MSG-003",
-                Map.of(new Locale("de", "CH"), THROWING_MESSAGE)))
+                Map.of(Locale.forLanguageTag("de-CH"), THROWING_MESSAGE)))
             .locale(TRADITIONAL_CHINESE)
             .format())
             .getMessage());
@@ -375,13 +375,13 @@ class MessageFormatExceptionTest
     val lmMap = new HashMap<Locale,String>();
 
     lmMap.put(GERMANY, "%{n,throw}");
-    lmMap.put(new Locale("nl", ""), "%[tpl]");
+    lmMap.put(Locale.forLanguageTag("nl"), "%[tpl]");
 
     assertEquals("failed to format template 'tpl' for message with code 'MFP3' and locale Dutch (Belgium)",
         assertThrowsExactly(MessageFormatException.class, () -> MESSAGE_SUPPORT
             .message(MESSAGE_SUPPORT.getMessageAccessor().getMessageFactory()
                 .parseMessage("MFP3", lmMap))
-            .locale(new Locale("nl", "BE"))
+            .locale(Locale.forLanguageTag("nl-BE"))
             .format())
             .getMessage());
   }
@@ -403,7 +403,7 @@ class MessageFormatExceptionTest
         assertThrowsExactly(MessageFormatException.class, () -> MESSAGE_SUPPORT
             .message(MESSAGE_SUPPORT.getMessageAccessor().getMessageFactory()
                 .parseMessage("MFP4", lmMap))
-            .locale(new Locale("fr", "CH"))
+            .locale(Locale.forLanguageTag("fr-CH"))
             .format())
             .getMessage());
   }

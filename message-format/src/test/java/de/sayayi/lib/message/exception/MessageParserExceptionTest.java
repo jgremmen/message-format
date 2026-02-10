@@ -116,7 +116,7 @@ class MessageParserExceptionTest
     assertEquals("failed to parse message for locale Dutch (Netherlands): ERROR\nSYNTAX",
         new MessageParserException("ERROR", "SYNTAX", null)
             .withCode("MSG[5JJRMZBVNJ-30UO]")
-            .withLocale(new Locale("nl", "NL"))
+            .withLocale(Locale.forLanguageTag("nl-NL"))
             .getMessage());
   }
 
@@ -129,7 +129,7 @@ class MessageParserExceptionTest
     assertEquals("failed to parse template for locale Dutch (Netherlands): ERROR\nSYNTAX",
         new MessageParserException("ERROR", "SYNTAX", null)
             .withTemplate("TPL[5JJRMZBVNJ-30UO]")
-            .withLocale(new Locale("nl", "NL"))
+            .withLocale(Locale.forLanguageTag("nl-NL"))
             .getMessage());
   }
 
