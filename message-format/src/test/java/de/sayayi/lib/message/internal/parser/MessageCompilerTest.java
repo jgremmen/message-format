@@ -406,7 +406,7 @@ class MessageCompilerTest
     var mpe = assertThrowsExactly(
         MessageParserException.class,
         () -> COMPILER.compileMessage("%[ '' ]"));
-    assertEquals("template name must not be empty", mpe.getErrorMessage());
+    assertEquals("missing template name at \"'\"", mpe.getErrorMessage());
     assertEquals(MESSAGE, mpe.getType());
   }
 

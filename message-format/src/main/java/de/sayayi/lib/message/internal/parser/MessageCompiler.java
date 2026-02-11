@@ -54,7 +54,7 @@ import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAG
 import static de.sayayi.lib.message.exception.MessageParserException.Type.TEMPLATE;
 import static de.sayayi.lib.message.internal.parser.MessageParser.*;
 import static de.sayayi.lib.message.util.MessageUtil.isKebabCaseName;
-import static de.sayayi.lib.message.util.MessageUtil.isLowerCamelCaseName;
+import static de.sayayi.lib.message.util.MessageUtil.isKebabOrLowerCamelCaseName;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
@@ -175,9 +175,14 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     final var parserRuleContext = parser.getRuleContext();
 
     if (parserRuleContext instanceof NameOrKeywordContext &&
-        parserRuleContext.parent instanceof ParameterNameContext &&
         new IntervalSet(BOOL, NAME, NULL, EMPTY).equals(expectedTokens))
-      return "missing parameter name at " + getTokenDisplayText(parser, mismatchLocationNearToken);
+    {
+      if (parserRuleContext.parent instanceof ParameterNameContext)
+        return "missing parameter name at " + getTokenDisplayText(parser, mismatchLocationNearToken);
+
+      if (parserRuleContext.parent instanceof TemplateNameContext)
+        return "missing template name at " + getTokenDisplayText(parser, mismatchLocationNearToken);
+    }
 
     if (new IntervalSet(SQ_START, DQ_START, BOOL, NAME, NULL, EMPTY).equals(expectedTokens))
     {
@@ -454,9 +459,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitParameterName(ParameterNameContext ctx)
     {
-      ctx.name = ctx.nameOrKeyword().name;
-
-      if (!isLowerCamelCaseName(ctx.name) && !isKebabCaseName(ctx.name))
+      if (!isKebabOrLowerCamelCaseName(ctx.name = ctx.nameOrKeyword().name))
       {
         syntaxError("parameter name must match the camel- or kebab-case naming convention")
             .with(ctx)
@@ -558,8 +561,14 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitTemplateName(TemplateNameContext ctx) {
-      ctx.name = ctx.simpleString().string;
+    public void exitTemplateName(TemplateNameContext ctx)
+    {
+      if (!isKebabCaseName(ctx.name = ctx.nameOrKeyword().name))
+      {
+        syntaxError("template name must match the kebab case naming convention")
+            .with(ctx)
+            .report();
+      }
     }
 
 
@@ -609,7 +618,16 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitConfigNamedBool(ConfigNamedBoolContext ctx)
     {
-      ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
+      final var name = ctx.NAME().getText();
+
+      if (!isKebabCaseName(name))
+      {
+        syntaxError("config name for boolean value must match the kebab case naming convention")
+            .with(ctx.NAME())
+            .report();
+      }
+
+      ctx.configKey = new ConfigKeyName(name);
       ctx.configValue = parseBoolean(ctx.BOOL().getText()) ? ConfigValueBool.TRUE : ConfigValueBool.FALSE;
     }
 
@@ -617,7 +635,16 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitConfigNamedNumber(ConfigNamedNumberContext ctx)
     {
-      ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
+      final var name = ctx.NAME().getText();
+
+      if (!isKebabCaseName(name))
+      {
+        syntaxError("config name for numerical value must match the kebab case naming convention")
+            .with(ctx.NAME())
+            .report();
+      }
+
+      ctx.configKey = new ConfigKeyName(name);
       ctx.configValue = new ConfigValueNumber(parseLong(ctx.NUMBER().getText()));
     }
 
@@ -625,7 +652,16 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitConfigNamedMessage(ConfigNamedMessageContext ctx)
     {
-      ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
+      final var name = ctx.NAME().getText();
+
+      if (!isKebabCaseName(name))
+      {
+        syntaxError("config name for message value must match the kebab case naming convention")
+            .with(ctx.NAME())
+            .report();
+      }
+
+      ctx.configKey = new ConfigKeyName(name);
       ctx.configValue = new ConfigValueMessage(ctx.quotedMessage().messageWithSpaces);
     }
 
@@ -633,7 +669,16 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitConfigNamedString(ConfigNamedStringContext ctx)
     {
-      ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
+      final var name = ctx.NAME().getText();
+
+      if (!isKebabCaseName(name))
+      {
+        syntaxError("config name for string value must match the kebab case naming convention")
+            .with(ctx.NAME())
+            .report();
+      }
+
+      ctx.configKey = new ConfigKeyName(name);
       ctx.configValue = new ConfigValueString(ctx.simpleString().string);
     }
 

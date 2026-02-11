@@ -24,9 +24,7 @@ options {
 
 @header {
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.internal.part.TemplatePart;
-import de.sayayi.lib.message.internal.part.TextPart;
-import de.sayayi.lib.message.part.parameter.ParameterPart;
+import de.sayayi.lib.message.part.MessagePart.*;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
 import de.sayayi.lib.message.part.parameter.value.ConfigValue;
@@ -41,7 +39,7 @@ message0 returns [Message.WithSpaces messageWithSpaces]
         : (textPart | parameterPart | templatePart)*
         ;
 
-textPart returns [TextPart part]
+textPart returns [Text part]
         : text
         ;
 
@@ -69,7 +67,7 @@ forceQuotedMessage returns [Message.WithSpaces messageWithSpaces]
         | simpleString
         ;
 
-parameterPart returns [ParameterPart part]
+parameterPart returns [Parameter part]
         : P_START
           parameterName
           (COMMA parameterFormat)?
@@ -91,7 +89,7 @@ parameterConfigElement returns [List<ConfigKey> configKeys, ConfigValue configVa
         | configMapElement
         ;
 
-templatePart returns [TemplatePart part]
+templatePart returns [Template part]
         : TPL_START
           templateName
           (COMMA (configNamedElement | templateParameterDelegate))*
@@ -99,7 +97,7 @@ templatePart returns [TemplatePart part]
         ;
 
 templateName returns [String name]
-        : simpleString
+        : nameOrKeyword  // kebab-case format
         ;
 
 templateParameterDelegate returns [String parameter, String delegatedParameter]
