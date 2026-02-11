@@ -97,17 +97,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] { new ParameterPart("test-id", false, false) },
-        COMPILER.compileMessage("%{ 'test-id' }").getMessageParts());
-
-    assertArrayEquals(
-        new MessagePart[] { new ParameterPart(",,,", true, false) },
-        COMPILER.compileMessage(" %{ \",,,\" }").getMessageParts());
-
-    var mpe = assertThrowsExactly(
-        MessageParserException.class,
-        () -> COMPILER.compileMessage("%{ \"\" }"));
-    assertEquals("parameter name must not be empty", mpe.getErrorMessage());
-    assertEquals(MESSAGE, mpe.getType());
+        COMPILER.compileMessage("%{ test-id }").getMessageParts());
   }
 
 

@@ -204,13 +204,12 @@ fragment CtrlChar
         ;
 
 fragment Name
-        : NameStartChar NameChar* ('-' NameChar+)*
+        : NameStartChar NameChar* ([_-] NameChar+)*
         ;
 
 fragment NameChar
         : NameStartChar
         | [\p{N}]  // Unicode N (number)
-        | '_'
         ;
 
 fragment NameStartChar

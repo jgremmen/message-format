@@ -53,6 +53,8 @@ import static de.sayayi.lib.antlr4.walker.Walker.WALK_EXIT_RULES_HEAP;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAGE;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.TEMPLATE;
 import static de.sayayi.lib.message.internal.parser.MessageParser.*;
+import static de.sayayi.lib.message.util.MessageUtil.isKebabCaseName;
+import static de.sayayi.lib.message.util.MessageUtil.isLowerCamelCaseName;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
@@ -165,9 +167,6 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   }
 
 
-  private static final IntervalSet IVS_NAME = new IntervalSet(SQ_START, DQ_START, BOOL, NAME, NULL, EMPTY);
-  private static final IntervalSet IVS_PARAMETER_CLOSE = new IntervalSet(COMMA, P_END);
-
   @Override
   protected @NotNull String createInputMismatchMessage(@NotNull org.antlr.v4.runtime.Parser parser,
                                                        @NotNull IntervalSet expectedTokens,
@@ -175,12 +174,13 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   {
     final var parserRuleContext = parser.getRuleContext();
 
-    if (IVS_NAME.equals(expectedTokens))
-    {
-      if (parserRuleContext instanceof SimpleStringContext &&
-          parserRuleContext.parent instanceof ParameterNameContext)
-        return "missing parameter name at " + getTokenDisplayText(parser, mismatchLocationNearToken);
+    if (parserRuleContext instanceof NameOrKeywordContext &&
+        parserRuleContext.parent instanceof ParameterNameContext &&
+        new IntervalSet(BOOL, NAME, NULL, EMPTY).equals(expectedTokens))
+      return "missing parameter name at " + getTokenDisplayText(parser, mismatchLocationNearToken);
 
+    if (new IntervalSet(SQ_START, DQ_START, BOOL, NAME, NULL, EMPTY).equals(expectedTokens))
+    {
       if (parserRuleContext instanceof ForceQuotedMessageContext &&
           parserRuleContext.parent instanceof ParameterPartContext)
       {
@@ -193,7 +193,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       return "missing string or name in parameter at " + getTokenDisplayText(parser, mismatchLocationNearToken);
     }
 
-    if (IVS_PARAMETER_CLOSE.equals(expectedTokens) && parserRuleContext instanceof ParameterPartContext)
+    if (parserRuleContext instanceof ParameterPartContext &&
+        new IntervalSet(COMMA, P_END).equals(expectedTokens))
       return "end of message parameter expected at " + getTokenDisplayText(parser, mismatchLocationNearToken);
 
     return super.createInputMismatchMessage(parser, expectedTokens, mismatchLocationNearToken);
@@ -451,14 +452,28 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitParameterName(ParameterNameContext ctx) {
-      ctx.name = ctx.simpleString().string;
+    public void exitParameterName(ParameterNameContext ctx)
+    {
+      ctx.name = ctx.nameOrKeyword().name;
+
+      if (!isLowerCamelCaseName(ctx.name) && !isKebabCaseName(ctx.name))
+      {
+        syntaxError("parameter name must match the camel- or kebab-case naming convention")
+            .with(ctx)
+            .report();
+      }
     }
 
 
     @Override
-    public void exitParameterFormat(ParameterFormatContext ctx) {
-      ctx.format = ctx.nameOrKeyword().name;
+    public void exitParameterFormat(ParameterFormatContext ctx)
+    {
+      if (!isKebabCaseName(ctx.format = ctx.nameOrKeyword().name))
+      {
+        syntaxError("parameter format must match the kebab case naming convention")
+            .with(ctx)
+            .report();
+      }
     }
 
 
