@@ -91,7 +91,7 @@ parameterConfigElement returns [List<ConfigKey> configKeys, ConfigValue configVa
         | configMapElement
         ;
 
-templatePart returns [TemplatePart part]
+templatePart returns [Template part]
         : TPL_START
           templateName
           (COMMA (configNamedElement | templateParameterDelegate))*
@@ -99,7 +99,7 @@ templatePart returns [TemplatePart part]
         ;
 
 templateName returns [String name]
-        : simpleString
+        : nameOrKeyword  // kebab-case format
         ;
 
 templateParameterDelegate returns [String parameter, String delegatedParameter]

@@ -67,7 +67,7 @@ public class TemplateTest
 
     // akkusativ plural
     assertEquals("Ich gebe dem Mann die Bücher", messageSupport
-        .message("Ich gebe dem Mann %['buch',fall:akk]")
+        .message("Ich gebe dem Mann %[buch,fall:akk]")
         .with("collection", List.of("Buch 1", "Buch 2"))
         .format());
   }

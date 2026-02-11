@@ -175,9 +175,14 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     final var parserRuleContext = parser.getRuleContext();
 
     if (parserRuleContext instanceof NameOrKeywordContext &&
-        parserRuleContext.parent instanceof ParameterNameContext &&
         new IntervalSet(BOOL, NAME, NULL, EMPTY).equals(expectedTokens))
-      return "missing parameter name at " + getTokenDisplayText(parser, mismatchLocationNearToken);
+    {
+      if (parserRuleContext.parent instanceof ParameterNameContext)
+        return "missing parameter name at " + getTokenDisplayText(parser, mismatchLocationNearToken);
+
+      if (parserRuleContext.parent instanceof TemplateNameContext)
+        return "missing template name at " + getTokenDisplayText(parser, mismatchLocationNearToken);
+    }
 
     if (new IntervalSet(SQ_START, DQ_START, BOOL, NAME, NULL, EMPTY).equals(expectedTokens))
     {
@@ -556,8 +561,14 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitTemplateName(TemplateNameContext ctx) {
-      ctx.name = ctx.simpleString().string;
+    public void exitTemplateName(TemplateNameContext ctx)
+    {
+      if (!isKebabCaseName(ctx.name = ctx.nameOrKeyword().name))
+      {
+        syntaxError("template name must match the kebab case naming convention")
+            .with(ctx)
+            .report();
+      }
     }
 
 
