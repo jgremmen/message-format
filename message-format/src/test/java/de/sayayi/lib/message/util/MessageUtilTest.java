@@ -20,8 +20,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import static de.sayayi.lib.message.util.MessageUtil.isKebabCaseName;
-import static de.sayayi.lib.message.util.MessageUtil.isLowerCamelCaseName;
+import static de.sayayi.lib.message.util.MessageUtil.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -249,5 +248,143 @@ class MessageUtilTest
     assertFalse(isLowerCamelCaseName("Test123"));
     assertFalse(isLowerCamelCaseName("test_Case"));
     assertFalse(isLowerCamelCaseName("test-Case"));
+  }
+
+
+  @Test
+  @DisplayName("valid kebab- or lower camel-case names")
+  void testIsKebabOrLowerCamelCaseNameValid()
+  {
+    // Simple single word (valid for both)
+    assertTrue(isKebabOrLowerCamelCaseName("word"));
+    assertTrue(isKebabOrLowerCamelCaseName("a"));
+    assertTrue(isKebabOrLowerCamelCaseName("test"));
+    assertTrue(isKebabOrLowerCamelCaseName("variable"));
+
+    // Valid kebab-case names
+    assertTrue(isKebabOrLowerCamelCaseName("kebab-case"));
+    assertTrue(isKebabOrLowerCamelCaseName("hello-world"));
+    assertTrue(isKebabOrLowerCamelCaseName("my-variable-name"));
+    assertTrue(isKebabOrLowerCamelCaseName("a-b"));
+    assertTrue(isKebabOrLowerCamelCaseName("one-two-three-four"));
+    assertTrue(isKebabOrLowerCamelCaseName("test-123"));
+    assertTrue(isKebabOrLowerCamelCaseName("var-2"));
+    assertTrue(isKebabOrLowerCamelCaseName("a1-b2-c3"));
+    assertTrue(isKebabOrLowerCamelCaseName("api-v2-endpoint"));
+
+    // Valid lower camel-case names
+    assertTrue(isKebabOrLowerCamelCaseName("camelCase"));
+    assertTrue(isKebabOrLowerCamelCaseName("helloWorld"));
+    assertTrue(isKebabOrLowerCamelCaseName("myVariableName"));
+    assertTrue(isKebabOrLowerCamelCaseName("aB"));
+    assertTrue(isKebabOrLowerCamelCaseName("oneTwoThreeFour"));
+    assertTrue(isKebabOrLowerCamelCaseName("test123"));
+    assertTrue(isKebabOrLowerCamelCaseName("var2"));
+    assertTrue(isKebabOrLowerCamelCaseName("a1B2C3"));
+    assertTrue(isKebabOrLowerCamelCaseName("apiV2Endpoint"));
+
+    // With digits (valid for both)
+    assertTrue(isKebabOrLowerCamelCaseName("test123"));
+    assertTrue(isKebabOrLowerCamelCaseName("abc123"));
+    assertTrue(isKebabOrLowerCamelCaseName("version1"));
+    assertTrue(isKebabOrLowerCamelCaseName("v1Alpha"));
+    assertTrue(isKebabOrLowerCamelCaseName("v1-alpha"));
+
+    // Complex valid examples
+    assertTrue(isKebabOrLowerCamelCaseName("thisIsALongLowerCamelCaseName"));
+    assertTrue(isKebabOrLowerCamelCaseName("this-is-a-long-kebab-case-name"));
+    assertTrue(isKebabOrLowerCamelCaseName("userId123"));
+    assertTrue(isKebabOrLowerCamelCaseName("user-id-123"));
+  }
+
+
+  @Test
+  @DisplayName("invalid kebab- or lower camel-case names")
+  @SuppressWarnings("SpellCheckingInspection")
+  void testIsKebabOrLowerCamelCaseNameInvalid()
+  {
+    // Empty string
+    assertFalse(isKebabOrLowerCamelCaseName(""));
+
+    // Starting with uppercase (PascalCase)
+    assertFalse(isKebabOrLowerCamelCaseName("Word"));
+    assertFalse(isKebabOrLowerCamelCaseName("CamelCase"));
+    assertFalse(isKebabOrLowerCamelCaseName("HelloWorld"));
+    assertFalse(isKebabOrLowerCamelCaseName("Kebab-case"));
+    assertFalse(isKebabOrLowerCamelCaseName("Hello-world"));
+    assertFalse(isKebabOrLowerCamelCaseName("PascalCase"));
+
+    // Starting with hyphen
+    assertFalse(isKebabOrLowerCamelCaseName("-word"));
+    assertFalse(isKebabOrLowerCamelCaseName("-kebab-case"));
+    assertFalse(isKebabOrLowerCamelCaseName("-test"));
+
+    // Starting with digit
+    assertFalse(isKebabOrLowerCamelCaseName("1word"));
+    assertFalse(isKebabOrLowerCamelCaseName("123test"));
+    assertFalse(isKebabOrLowerCamelCaseName("9-lives"));
+    assertFalse(isKebabOrLowerCamelCaseName("9lives"));
+    assertFalse(isKebabOrLowerCamelCaseName("42answer"));
+
+    // Ending with hyphen (kebab-case specific)
+    assertFalse(isKebabOrLowerCamelCaseName("word-"));
+    assertFalse(isKebabOrLowerCamelCaseName("kebab-case-"));
+    assertFalse(isKebabOrLowerCamelCaseName("test-"));
+    assertFalse(isKebabOrLowerCamelCaseName("a-"));
+
+    // Consecutive hyphens (kebab-case specific)
+    assertFalse(isKebabOrLowerCamelCaseName("kebab--case"));
+    assertFalse(isKebabOrLowerCamelCaseName("hello--world"));
+    assertFalse(isKebabOrLowerCamelCaseName("test--123"));
+    assertFalse(isKebabOrLowerCamelCaseName("a--b"));
+    assertFalse(isKebabOrLowerCamelCaseName("one---two"));
+
+    // Uppercase in kebab-case (mixing formats)
+    assertFalse(isKebabOrLowerCamelCaseName("kebab-Case"));
+    assertFalse(isKebabOrLowerCamelCaseName("kebAb-case"));
+    assertFalse(isKebabOrLowerCamelCaseName("mixed-Case-name"));
+    assertFalse(isKebabOrLowerCamelCaseName("test-Name"));
+
+    // With underscores
+    assertFalse(isKebabOrLowerCamelCaseName("snake_case"));
+    assertFalse(isKebabOrLowerCamelCaseName("hello_world"));
+    assertFalse(isKebabOrLowerCamelCaseName("test_name"));
+    assertFalse(isKebabOrLowerCamelCaseName("test_Case"));
+
+    // With spaces
+    assertFalse(isKebabOrLowerCamelCaseName("hello world"));
+    assertFalse(isKebabOrLowerCamelCaseName("test name"));
+    assertFalse(isKebabOrLowerCamelCaseName("a b"));
+
+    // With special characters
+    assertFalse(isKebabOrLowerCamelCaseName("test.name"));
+    assertFalse(isKebabOrLowerCamelCaseName("test@name"));
+    assertFalse(isKebabOrLowerCamelCaseName("test$name"));
+    assertFalse(isKebabOrLowerCamelCaseName("test#name"));
+    assertFalse(isKebabOrLowerCamelCaseName("test!"));
+    assertFalse(isKebabOrLowerCamelCaseName("test?"));
+    assertFalse(isKebabOrLowerCamelCaseName("test/name"));
+    assertFalse(isKebabOrLowerCamelCaseName("test\\name"));
+    assertFalse(isKebabOrLowerCamelCaseName("test:name"));
+    assertFalse(isKebabOrLowerCamelCaseName("test;name"));
+    assertFalse(isKebabOrLowerCamelCaseName("test,name"));
+
+    // Just hyphens or digits
+    assertFalse(isKebabOrLowerCamelCaseName("-"));
+    assertFalse(isKebabOrLowerCamelCaseName("--"));
+    assertFalse(isKebabOrLowerCamelCaseName("123"));
+    assertFalse(isKebabOrLowerCamelCaseName("42"));
+
+    // All uppercase
+    assertFalse(isKebabOrLowerCamelCaseName("UPPERCASE"));
+    assertFalse(isKebabOrLowerCamelCaseName("UPPER"));
+
+    // Mixed invalid cases
+    assertFalse(isKebabOrLowerCamelCaseName("Test-"));
+    assertFalse(isKebabOrLowerCamelCaseName("-Test"));
+    assertFalse(isKebabOrLowerCamelCaseName("test--case-"));
+    assertFalse(isKebabOrLowerCamelCaseName("-test-case"));
+    assertFalse(isKebabOrLowerCamelCaseName("Test123"));
+    assertFalse(isKebabOrLowerCamelCaseName("test-Case"));
   }
 }

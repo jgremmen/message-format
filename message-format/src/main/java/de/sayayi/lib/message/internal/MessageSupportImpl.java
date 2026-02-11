@@ -48,6 +48,7 @@ import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.internal.pack.PackSupport.PACK_CONFIG;
 import static de.sayayi.lib.message.internal.pack.PackSupport.VERSION;
+import static de.sayayi.lib.message.util.MessageUtil.isKebabOrLowerCamelCaseName;
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.copyOf;
 import static java.util.Collections.unmodifiableSet;
@@ -395,6 +396,11 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     {
       if (requireNonNull(parameter, "parameter must not be null").isEmpty())
         throw new IllegalArgumentException("parameter must not be empty");
+      else if (!isKebabOrLowerCamelCaseName(parameter))
+      {
+        throw new IllegalArgumentException("parameter name '" + parameter +
+            "' must match the camel- or kebab-case naming convention");
+      }
 
       setValue: {
         var low = 0;

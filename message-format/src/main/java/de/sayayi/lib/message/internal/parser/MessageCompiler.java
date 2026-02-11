@@ -54,7 +54,7 @@ import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAG
 import static de.sayayi.lib.message.exception.MessageParserException.Type.TEMPLATE;
 import static de.sayayi.lib.message.internal.parser.MessageParser.*;
 import static de.sayayi.lib.message.util.MessageUtil.isKebabCaseName;
-import static de.sayayi.lib.message.util.MessageUtil.isLowerCamelCaseName;
+import static de.sayayi.lib.message.util.MessageUtil.isKebabOrLowerCamelCaseName;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
@@ -454,9 +454,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitParameterName(ParameterNameContext ctx)
     {
-      ctx.name = ctx.nameOrKeyword().name;
-
-      if (!isLowerCamelCaseName(ctx.name) && !isKebabCaseName(ctx.name))
+      if (!isKebabOrLowerCamelCaseName(ctx.name = ctx.nameOrKeyword().name))
       {
         syntaxError("parameter name must match the camel- or kebab-case naming convention")
             .with(ctx)

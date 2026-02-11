@@ -54,9 +54,9 @@ class MessageParametersTest
     configurer
         .locale(ITALIAN)
         .with("o", OptionalInt.empty())
-        .with("B", 45)
-        .with("C", true)
-        .with("A", "Hello");
+        .with("b", 45)
+        .with("c", true)
+        .with("a", "Hello");
 
     parameters = new MessageParameters(configurer);
   }
@@ -68,13 +68,13 @@ class MessageParametersTest
   {
     assertEquals(ITALIAN, parameters.getLocale());
 
-    assertEquals("Hello", parameters.getParameterValue("A"));
-    assertEquals(45, parameters.getParameterValue("B"));
-    assertEquals(true, parameters.getParameterValue("C"));
+    assertEquals("Hello", parameters.getParameterValue("a"));
+    assertEquals(45, parameters.getParameterValue("b"));
+    assertEquals(true, parameters.getParameterValue("c"));
     assertEquals(OptionalInt.empty(), parameters.getParameterValue("o"));
     assertNull(parameters.getParameterValue("XYZ"));
 
-    assertEquals(Set.of("o", "A", "B", "C"), parameters.getParameterNames());
+    assertEquals(Set.of("o", "a", "b", "c"), parameters.getParameterNames());
 
     //noinspection ResultOfMethodCallIgnored
     parameters.toString();
@@ -88,9 +88,9 @@ class MessageParametersTest
     val otherParameters = mock(Parameters.class);
     val otherMap = Map.of(
         "o", OptionalInt.empty(),
-        "B", 45,
-        "C", true,
-        "A", "Hello");
+        "b", 45,
+        "c", true,
+        "a", "Hello");
 
     when(otherParameters.getLocale()).thenReturn(ITALIAN);
     when(otherParameters.getParameterNames()).thenReturn(otherMap.keySet());
@@ -111,9 +111,9 @@ class MessageParametersTest
   {
     val otherMap = Map.of(
         "o", OptionalInt.empty(),
-        "B", 45,
-        "C", true,
-        "A", "Hello");
+        "b", 45,
+        "c", true,
+        "a", "Hello");
 
     assertEquals(parameters.hashCode(), otherMap.entrySet().stream()
         .mapToInt(e -> e.getKey().hashCode() + e.getValue().hashCode()).sum() + ITALIAN.hashCode());
