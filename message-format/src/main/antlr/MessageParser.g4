@@ -79,7 +79,7 @@ parameterPart returns [ParameterPart part]
         ;
 
 parameterName returns [String name]
-        : simpleString
+        : nameOrKeyword  // camel-case or kebab-case format
         ;
 
 parameterFormat returns [String format]

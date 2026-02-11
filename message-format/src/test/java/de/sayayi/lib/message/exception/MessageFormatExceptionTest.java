@@ -353,13 +353,13 @@ class MessageFormatExceptionTest
 
 
   @Test
-  @DisplayName("format: failed to format parameter 'ABC' in template 'age-range' for message with code 'MFP2'")
+  @DisplayName("format: failed to format parameter 'abc' in template 'age-range' for message with code 'MFP2'")
   void testFormat1101()
   {
     MESSAGE_SUPPORT.addTemplate("age-range", MESSAGE_SUPPORT.getMessageAccessor()
-        .getMessageFactory().parseMessage("%{ABC,throw}"));
+        .getMessageFactory().parseMessage("%{abc,throw}"));
 
-    assertEquals("failed to format parameter 'ABC' in template 'age-range' for message with code 'MFP2'",
+    assertEquals("failed to format parameter 'abc' in template 'age-range' for message with code 'MFP2'",
         assertThrowsExactly(MessageFormatException.class, () -> MESSAGE_SUPPORT
             .message(MESSAGE_SUPPORT.getMessageAccessor().getMessageFactory()
                 .parseMessage("MFP2", "%[age-range]"))

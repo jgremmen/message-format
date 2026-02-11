@@ -18,8 +18,7 @@ package de.sayayi.lib.message.util;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import static java.lang.Character.isDigit;
-import static java.lang.Character.isLowerCase;
+import static java.lang.Character.*;
 
 
 /**
@@ -37,11 +36,11 @@ public final class MessageUtil
    * Check whether {@code name} is a valid kebab-case name.
    * A valid kebab-case name must satisfy the following conditions:
    * <ul>
-   * <li> It must not be empty.
-   * <li> It must start with a lowercase letter.
-   * <li> It must not end with a hyphen ('-').
-   * <li> It must not contain consecutive hyphens ('--').
-   * <li> It must only contain lowercase letters, digits, and hyphens ('-').
+   *   <li> It must not be empty.
+   *   <li> It must start with a lowercase letter.
+   *   <li> It must not end with a hyphen ('-').
+   *   <li> It must not contain consecutive hyphens ('--').
+   *   <li> It must only contain lowercase letters, digits, and hyphens ('-').
    * </ul>
    *
    * @param name  the name to check, not {@code null}
@@ -66,6 +65,40 @@ public final class MessageUtil
       }
       else if (!isLowerCase(cp) && !isDigit(cp))
         return false;
+
+    return true;
+  }
+
+
+  /**
+   * Check whether {@code name} is a valid lower camel-case name.
+   * A valid lower camel case name must satisfy the following conditions:
+   * <ul>
+   *   <li> It must not be empty.
+   *   <li> It must start with a lowercase letter.
+   *   <li> It must only contain letters and digits.
+   * </ul>
+   *
+   * @param name  the name to check, not {@code null}
+   *
+   * @return  {@code true} if {@code name} is a valid lower camel-case name,
+   *          {@code false} otherwise
+   */
+  @Contract(pure = true)
+  public static boolean isLowerCamelCaseName(@NotNull String name)
+  {
+    final var length = name.length();
+
+    if (length == 0 || !isLowerCase(name.codePointAt(0)))
+      return false;
+
+    for(var idx = 1; idx < length; idx++)
+    {
+      final var cp = name.codePointAt(idx);
+
+      if (!isLetter(cp) && !isDigit(cp))
+        return false;
+    }
 
     return true;
   }
