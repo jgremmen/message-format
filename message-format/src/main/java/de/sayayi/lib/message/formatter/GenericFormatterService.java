@@ -117,27 +117,19 @@ public class GenericFormatterService implements FormatterService.WithRegistry
             type -> new ArrayList<>(4))
         .add(new PrioritizedFormatter(formattableType.getOrder(), formatter));
 
-    final var formatterConfigNames = new TreeSet<>(formatter.getParameterConfigNames());
-    parameterConfigNames.addAll(formatterConfigNames);
+    for(var parameterConfigName: formatter.getParameterConfigNames())
+      if (!isKebabCaseName(parameterConfigName))
+      {
+        final var formatterName = formatter instanceof NamedParameterFormatter namedParameterFormatter
+            ? '\'' + namedParameterFormatter.getName() + '\''
+            : formatter.getClass().getSimpleName();
 
-    formatterConfigNames.retainAll(parameterPostFormatters.keySet());
-
-    switch(formatterConfigNames.size())
-    {
-      case 0:
-        break;
-
-      case 1:
-        throw new FormatterServiceException("formatter " + formattableType.getType() +
-            " has a parameter configuration name " + toDisplayNameList(formatterConfigNames) +
-            " which is in conflict with a registered post formatter");
-
-      default:
-        throw new FormatterServiceException("formatter " + formattableType.getType() +
-            " has parameter configuration names which are in conflict with registered post formatters " +
-            toDisplayNameList(formatterConfigNames));
-    }
-
+        throw new FormatterServiceException("parameter configuration name '" + parameterConfigName +
+            "' for formatter " + formatterName + " does not match the kebab case naming convention");
+      }
+      else
+        parameterConfigNames.add(parameterConfigName);
+  
     formatterCache.clear();
   }
 
@@ -264,24 +256,6 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   @Override
   public @UnmodifiableView @NotNull Set<String> getParameterConfigNames() {
     return unmodifiableSet(parameterConfigNames);
-  }
-
-
-  @Contract(pure = true)
-  protected @NotNull String toDisplayNameList(@NotNull Set<String> configNames)
-  {
-    final var s = new StringBuilder();
-    final var names = configNames.toArray(String[]::new);
-
-    for(int n = 0, count = names.length; n < count; n++)
-    {
-      if (n > 0)
-        s.append(n == count - 1 ? " and " : ", ");
-
-      s.append('\'').append(names[n]).append('\'');
-    }
-
-    return s.toString();
   }
 
 

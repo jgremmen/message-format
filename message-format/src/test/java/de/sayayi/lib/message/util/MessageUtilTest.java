@@ -16,7 +16,9 @@
 package de.sayayi.lib.message.util;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import static de.sayayi.lib.message.util.MessageUtil.isKebabCaseName;
 import static de.sayayi.lib.message.util.MessageUtil.isLowerCamelCaseName;
@@ -30,10 +32,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+@DisplayName("Message utils")
 class MessageUtilTest
 {
   @Test
-  @DisplayName("Valid kebab-case names")
+  @DisplayName("valid kebab-case names")
   void testIsKebabCaseNameValid()
   {
     // Simple single word
@@ -67,7 +71,7 @@ class MessageUtilTest
 
 
   @Test
-  @DisplayName("Invalid kebab-case names")
+  @DisplayName("invalid kebab-case names")
   @SuppressWarnings("SpellCheckingInspection")
   void testIsKebabCaseNameInvalid()
   {
@@ -140,7 +144,7 @@ class MessageUtilTest
 
 
   @Test
-  @DisplayName("Valid lower camel-case names")
+  @DisplayName("valid lower camel-case names")
   void testIsLowerCamelCaseNameValid()
   {
     // Simple single word
@@ -181,7 +185,7 @@ class MessageUtilTest
 
 
   @Test
-  @DisplayName("Invalid lower camel-case names")
+  @DisplayName("invalid lower camel-case names")
   void testIsLowerCamelCaseNameInvalid()
   {
     // Empty string

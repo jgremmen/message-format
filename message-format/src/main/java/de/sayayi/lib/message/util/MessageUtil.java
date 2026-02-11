@@ -102,4 +102,74 @@ public final class MessageUtil
 
     return true;
   }
+
+
+  /**
+   * Check whether {@code name} is either a valid kebab-case or lower camel-case name.
+   * This method combines the logic of {@link #isKebabCaseName(String)} and
+   * {@link #isLowerCamelCaseName(String)} in a single pass for optimal performance.
+   * <p>
+   * A valid kebab-case name must satisfy the following conditions:
+   * <ul>
+   *   <li> It must not be empty.
+   *   <li> It must start with a lowercase letter.
+   *   <li> It must not end with a hyphen ('-').
+   *   <li> It must not contain consecutive hyphens ('--').
+   *   <li> It must only contain lowercase letters, digits, and hyphens ('-').
+   * </ul>
+   * <p>
+   * A valid lower camel case name must satisfy the following conditions:
+   * <ul>
+   *   <li> It must not be empty.
+   *   <li> It must start with a lowercase letter.
+   *   <li> It must only contain letters and digits.
+   * </ul>
+   *
+   * @param name  the name to check, not {@code null}
+   *
+   * @return  {@code true} if {@code name} is either a valid kebab-case or lower camel-case name,
+   *          {@code false} otherwise
+   */
+  @Contract(pure = true)
+  public static boolean isKebabOrLowerCamelCaseName(@NotNull String name)
+  {
+    final var length = name.length();
+
+    if (length == 0 || !isLowerCase(name.codePointAt(0)))
+      return false;
+
+    var hasHyphen = false;
+    var hasUppercase = false;
+
+    for(int idx = 1, cp; idx < length; idx++)
+    {
+      if ((cp = name.codePointAt(idx)) == '-')
+      {
+        // If we've seen uppercase before it's camel case in which hyphens are not allowed
+        if (hasUppercase)
+          return false;
+
+        hasHyphen = true;
+
+        // Kebab-case cannot end with hyphen and cannot have consecutive hyphens
+        if (idx == length - 1 || name.charAt(idx + 1) == '-')
+          return false;
+      }
+      else if (!isLowerCase(cp) && !isDigit(cp))
+      {
+        if (isLetter(cp))
+        {
+          // If we've seen a hyphen before it's kebab case in which uppercase/titlecase letters are not allowed
+          if (hasHyphen)
+            return false;
+
+          hasUppercase = true;
+        }
+        else
+          return false;
+      }
+    }
+
+    return true;
+  }
 }

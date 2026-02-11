@@ -609,7 +609,16 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitConfigNamedBool(ConfigNamedBoolContext ctx)
     {
-      ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
+      final var name = ctx.NAME().getText();
+
+      if (!isKebabCaseName(name))
+      {
+        syntaxError("config name for boolean value must match the kebab case naming convention")
+            .with(ctx.NAME())
+            .report();
+      }
+
+      ctx.configKey = new ConfigKeyName(name);
       ctx.configValue = parseBoolean(ctx.BOOL().getText()) ? ConfigValueBool.TRUE : ConfigValueBool.FALSE;
     }
 
@@ -617,7 +626,16 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitConfigNamedNumber(ConfigNamedNumberContext ctx)
     {
-      ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
+      final var name = ctx.NAME().getText();
+
+      if (!isKebabCaseName(name))
+      {
+        syntaxError("config name for numerical value must match the kebab case naming convention")
+            .with(ctx.NAME())
+            .report();
+      }
+
+      ctx.configKey = new ConfigKeyName(name);
       ctx.configValue = new ConfigValueNumber(parseLong(ctx.NUMBER().getText()));
     }
 
@@ -625,7 +643,16 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitConfigNamedMessage(ConfigNamedMessageContext ctx)
     {
-      ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
+      final var name = ctx.NAME().getText();
+
+      if (!isKebabCaseName(name))
+      {
+        syntaxError("config name for message value must match the kebab case naming convention")
+            .with(ctx.NAME())
+            .report();
+      }
+
+      ctx.configKey = new ConfigKeyName(name);
       ctx.configValue = new ConfigValueMessage(ctx.quotedMessage().messageWithSpaces);
     }
 
@@ -633,7 +660,16 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitConfigNamedString(ConfigNamedStringContext ctx)
     {
-      ctx.configKey = new ConfigKeyName(ctx.NAME().getText());
+      final var name = ctx.NAME().getText();
+
+      if (!isKebabCaseName(name))
+      {
+        syntaxError("config name for string value must match the kebab case naming convention")
+            .with(ctx.NAME())
+            .report();
+      }
+
+      ctx.configKey = new ConfigKeyName(name);
       ctx.configValue = new ConfigValueString(ctx.simpleString().string);
     }
 

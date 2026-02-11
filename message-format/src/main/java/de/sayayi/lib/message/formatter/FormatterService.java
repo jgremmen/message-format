@@ -94,7 +94,7 @@ public interface FormatterService
      * The formatter will be registered for all formattable types, returned by
      * {@link ParameterFormatter#getFormattableTypes()}.
      * <p>
-     * If the formatter implements {@link NamedParameterFormatter}, it will aditionally be registered as a named
+     * If the formatter implements {@link NamedParameterFormatter}, it will additionally be registered as a named
      * parameter with the name returned by {@link NamedParameterFormatter#getName()}.
      *
      * @param formatter  parameter formatter, not {@code null}
