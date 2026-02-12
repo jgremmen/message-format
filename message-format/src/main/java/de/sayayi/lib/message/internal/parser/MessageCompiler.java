@@ -26,11 +26,11 @@ import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.TextMessage;
-import de.sayayi.lib.message.internal.part.TemplatePart;
-import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
+import de.sayayi.lib.message.internal.part.template.TemplatePart;
+import de.sayayi.lib.message.internal.part.text.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.parameter.ParameterConfig;
-import de.sayayi.lib.message.part.parameter.ParameterPart;
 import de.sayayi.lib.message.part.parameter.key.*;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.value.*;
@@ -581,6 +581,25 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
+    public void exitPostFormatPart(PostFormatPartContext ctx)
+    {
+      //TODO implement
+    }
+
+
+    @Override
+    public void exitPostFormatName(PostFormatNameContext ctx)
+    {
+      if (!isKebabCaseName(ctx.name = ctx.nameOrKeyword().name))
+      {
+        syntaxError("post-format name must match the kebab case naming convention")
+            .with(ctx)
+            .report();
+      }
+    }
+
+
+    @Override
     public void exitParameterConfigElement(ParameterConfigElementContext ctx)
     {
       var configNamedElementContext = ctx.configNamedElement();
@@ -817,6 +836,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       add(SQ_START, "'", "SQ_START");
       add(TPL_START, "'%['", "TPL_START");
       add(TPL_END, "']'", "TPL_END");
+      add(PF_START, "'%('", "PF_START");
+      add(PF_END, "')'", "PF_END");
       add(L_PAREN, "'('", "L_PAREN");
       add(R_PAREN, "')'", "R_PAREN");
     }

@@ -36,7 +36,7 @@ message returns [Message.WithSpaces messageWithSpaces]
         ;
 
 message0 returns [Message.WithSpaces messageWithSpaces]
-        : (textPart | parameterPart | templatePart)*
+        : (textPart | parameterPart | templatePart | postFormatPart)*
         ;
 
 textPart returns [Text part]
@@ -77,7 +77,7 @@ parameterPart returns [Parameter part]
         ;
 
 parameterName returns [String name]
-        : nameOrKeyword  // camel-case or kebab-case format
+        : nameOrKeyword  // kebab- or lower camel-case format
         ;
 
 parameterFormat returns [String format]
@@ -102,6 +102,18 @@ templateName returns [String name]
 
 templateParameterDelegate returns [String parameter, String delegatedParameter]
         : simpleString EQ simpleString
+        ;
+
+postFormatPart returns [PostFormat part]
+        : PF_START
+          postFormatName
+          COMMA quotedMessage
+          (COMMA configNamedElement)*
+          PF_END
+        ;
+
+postFormatName returns [String name]
+        : nameOrKeyword  // kebab-case format
         ;
 
 configMapElement returns [List<ConfigKey> configKeys, ConfigValue configValue]

@@ -17,11 +17,11 @@ package de.sayayi.lib.message.internal.parser;
 
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.exception.MessageParserException;
-import de.sayayi.lib.message.internal.part.TemplatePart;
+import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
+import de.sayayi.lib.message.internal.part.template.TemplatePart;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer;
 import de.sayayi.lib.message.part.parameter.ParameterConfig;
-import de.sayayi.lib.message.part.parameter.ParameterPart;
 import de.sayayi.lib.message.part.parameter.key.*;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueBool;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueMessage;

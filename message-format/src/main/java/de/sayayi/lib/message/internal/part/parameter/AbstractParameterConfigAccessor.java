@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.part.parameter;
+package de.sayayi.lib.message.internal.part.parameter;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.part.parameter.ParameterConfig;
+import de.sayayi.lib.message.part.parameter.ParameterConfigAccessor;
 import de.sayayi.lib.message.part.parameter.value.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +31,7 @@ import static java.util.Optional.ofNullable;
 /**
  * @since 0.8.4  (extracted from ParameterFormatterContext)
  */
-abstract class AbstractParameterConfigAccessor implements ParameterConfigAccessor
+public abstract class AbstractParameterConfigAccessor implements ParameterConfigAccessor
 {
   protected final @NotNull MessageAccessor messageAccessor;
   protected final @NotNull ParameterConfig parameterConfig;

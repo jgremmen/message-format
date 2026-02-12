@@ -28,7 +28,8 @@ import org.jetbrains.annotations.NotNull;
  *
  * @see ParameterConfig
  */
-public interface ConfigValue
+public sealed interface ConfigValue
+    permits ConfigValueBool, ConfigValueString, ConfigValueNumber, ConfigValueMessage
 {
   /**
    * Return the config value type.

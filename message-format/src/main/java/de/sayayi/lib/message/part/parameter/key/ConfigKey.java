@@ -35,7 +35,8 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
  *
  * @see ParameterConfig
  */
-public interface ConfigKey
+public sealed interface ConfigKey
+    permits ConfigKeyNull, ConfigKeyEmpty, ConfigKeyName, ConfigKeyBool, ConfigKeyString, ConfigKeyNumber
 {
   /** Map key type {@code empty}. */
   Set<Type> EMPTY_TYPE = Set.of(Type.EMPTY);

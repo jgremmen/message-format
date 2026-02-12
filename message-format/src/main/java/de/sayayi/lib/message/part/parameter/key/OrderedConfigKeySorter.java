@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.part.parameter.key;
 
+import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +30,7 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
 /**
  * This sorter sorts parameter configuration keys.
  *
- * @see de.sayayi.lib.message.part.parameter.ParameterConfig#ParameterConfig(Map)
+ * @see ParameterConfig#ParameterConfig(Map)
  *
  * @author Jeroen Gremmen
  * @since 0.8.4

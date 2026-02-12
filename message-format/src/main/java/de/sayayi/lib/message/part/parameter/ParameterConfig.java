@@ -22,6 +22,7 @@ import de.sayayi.lib.message.formatter.ParameterFormatter.ComparatorContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.ParameterFormatter.DefaultFormatter;
 import de.sayayi.lib.message.internal.pack.PackSupport;
+import de.sayayi.lib.message.internal.part.parameter.AbstractParameterConfigAccessor;
 import de.sayayi.lib.message.part.parameter.key.*;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.part.parameter.key.OrderedConfigKeySorter.OrderedConfigKey;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal.part;
+package de.sayayi.lib.message.internal.part.text;
 
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.pack.PackInputStream;

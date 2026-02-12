@@ -15,11 +15,12 @@
  */
 package de.sayayi.lib.message.part;
 
+import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.SpacesAware;
-import de.sayayi.lib.message.internal.part.NoSpaceTextPart;
-import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.internal.part.text.NoSpaceTextPart;
+import de.sayayi.lib.message.internal.part.text.TextPart;
 import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +34,39 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface MessagePart extends SpacesAware
 {
+  /**
+   * Returns the post formatted text with optional leading/trailing spaces.
+   *
+   * @param messageAccessor  message support instance, not {@code null}
+   * @param parameters       formatting parameters, not {@code null}
+   *
+   * @return  formatted text, never {@code null}
+   */
+  @Contract(pure = true)
+  @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters);
+
+
+
+
+  /**
+   * Message part with a name, like parameter or template.
+   *
+   * @since 0.21.0
+   */
+  interface NamedMessagePart extends MessagePart
+  {
+    /**
+     * Returns the name for this message part.
+     *
+     * @return  name, never empty or {@code null}
+     */
+    @Contract(pure = true)
+    @NotNull String getName();
+  }
+
+
+
+
   /**
    * Message part representing text only, optionally decorated with leading/trailing space.
    */
@@ -71,6 +105,12 @@ public interface MessagePart extends SpacesAware
      */
     @Contract(pure = true)
     boolean isEmpty();
+
+
+    @Override
+    default @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters) {
+      return this;
+    }
   }
 
 
@@ -79,21 +119,13 @@ public interface MessagePart extends SpacesAware
   /**
    * Message part representing a parameter to be evaluated during formatting.
    */
-  interface Parameter extends MessagePart
+  interface Parameter extends NamedMessagePart
   {
     /**
-     * Returns the name for this parameter.
+     * Returns the name of the preferred formatter for this parameter.
      *
-     * @return  parameter name, never empty or {@code null}
-     */
-    @Contract(pure = true)
-    @NotNull String getName();
-
-
-    /**
-     * Returns the optional format for this parameter.
-     *
-     * @return  named formatter name or {@code null}
+     * @return  formatter name or {@code null} if the formatter should be determined by the parameter value type
+     *          or the default formatter
      */
     @Contract(pure = true)
     String getFormat();
@@ -106,18 +138,6 @@ public interface MessagePart extends SpacesAware
      */
     @Contract(pure = true)
     @NotNull ParameterConfig getParamConfig();
-
-
-    /**
-     * Returns the formatted parameter as text with optional leading/trailing spaces.
-     *
-     * @param messageAccessor  message support instance, not {@code null}
-     * @param parameters       formatting parameters, not {@code null}
-     *
-     * @return  formatted parameter as text part, never {@code null}
-     */
-    @Contract(pure = true)
-    @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters);
   }
 
 
@@ -130,26 +150,31 @@ public interface MessagePart extends SpacesAware
    *
    * @since 0.8.0
    */
-  interface Template extends MessagePart
+  interface Template extends NamedMessagePart {
+  }
+
+
+
+
+  /**
+   * @since 0.21.0
+   */
+  interface PostFormat extends NamedMessagePart
   {
     /**
-     * Returns the name of this template.
+     * Returns the message to be post formatted.
      *
-     * @return  template name, never {@code null}
+     * @return  message, never {@code null}
      */
-    @Contract(pure = true)
-    @NotNull String getName();
+    @NotNull Message.WithSpaces getMessage();
 
 
     /**
-     * Returns the formatted template as text with optional leading/trailing spaces.
+     * Returns the configuration settings for this post format.
      *
-     * @param messageAccessor  message support instance, not {@code null}
-     * @param parameters       formatting parameters, not {@code null}
-     *
-     * @return  formatted template as text part, never {@code null}
+     * @return  parameter configuration, never {@code null}
      */
     @Contract(pure = true)
-    @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters);
+    @NotNull ParameterConfig getParamConfig();
   }
 }
