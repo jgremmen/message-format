@@ -25,7 +25,6 @@ import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import de.sayayi.lib.message.part.parameter.key.*;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
-import de.sayayi.lib.message.part.parameter.key.OrderedConfigKeySorter.OrderedConfigKey;
 import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import de.sayayi.lib.message.part.parameter.value.ConfigValue.Type;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueMessage;
@@ -105,7 +104,7 @@ public final class ParameterConfigImpl implements ParameterConfig
 
     for(var n = 0; n < mapLength; n++)
     {
-      mapKeys[n] = mapKeyList.get(n).getConfigKey();
+      mapKeys[n] = mapKeyList.get(n).configKey();
       mapValues[n] = map.get(mapKeys[n]);
     }
 
@@ -318,10 +317,7 @@ public final class ParameterConfigImpl implements ParameterConfig
   }
 
 
-  /**
-   * @hidden
-   */
-  public void pack(@NotNull PackOutputStream packStream) throws IOException
+  void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeSmallVar(config.size() + mapKeys.length + (defaultValue == null ? 0 : 1));
 
@@ -347,12 +343,8 @@ public final class ParameterConfigImpl implements ParameterConfig
   }
 
 
-  /**
-   * @hidden
-   */
-  public static @NotNull ParameterConfigImpl unpack(
-      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackSupport unpack,
-      @NotNull PackInputStream packStream) throws IOException
+  static @NotNull ParameterConfigImpl unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
+      throws IOException
   {
     final var map = new LinkedHashMap<ConfigKey,ConfigValue>();
 

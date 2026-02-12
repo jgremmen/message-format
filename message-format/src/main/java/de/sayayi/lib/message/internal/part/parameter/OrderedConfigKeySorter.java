@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.part.parameter.key;
+package de.sayayi.lib.message.internal.part.parameter;
 
+import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +32,7 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
  * @author Jeroen Gremmen
  * @since 0.8.4
  */
-public enum OrderedConfigKeySorter implements Comparator<OrderedConfigKeySorter.OrderedConfigKey>
+enum OrderedConfigKeySorter implements Comparator<OrderedConfigKey>
 {
   INSTANCE;
 
@@ -39,16 +40,16 @@ public enum OrderedConfigKeySorter implements Comparator<OrderedConfigKeySorter.
   @Override
   public int compare(OrderedConfigKey k1, OrderedConfigKey k2)
   {
-    var cmp = Integer.compare(configKeyToOrder(k1.configKey), configKeyToOrder(k2.configKey));
+    var cmp = Integer.compare(configKeyToOrder(k1.configKey()), configKeyToOrder(k2.configKey()));
     if (cmp == 0)
-      cmp = Integer.compare(k1.order, k2.order);
+      cmp = Integer.compare(k1.order(), k2.order());
 
     return cmp;
   }
 
 
   @Contract(pure = true)
-  private int configKeyToOrder(@NotNull ConfigKey configKey)
+  private static int configKeyToOrder(@NotNull ConfigKey configKey)
   {
     final var compareType = configKey.getCompareType();
     final var keyType = configKey.getType();
@@ -69,27 +70,5 @@ public enum OrderedConfigKeySorter implements Comparator<OrderedConfigKeySorter.
       return 6;  // !null
 
     return 7;  // (default)
-  }
-
-
-
-
-  public static final class OrderedConfigKey
-  {
-    private final int order;
-    private final @NotNull ConfigKey configKey;
-
-
-    public OrderedConfigKey(int order, @NotNull ConfigKey configKey)
-    {
-      this.order = order;
-      this.configKey = configKey;
-    }
-
-
-    @Contract(pure = true)
-    public @NotNull ConfigKey getConfigKey() {
-      return configKey;
-    }
   }
 }

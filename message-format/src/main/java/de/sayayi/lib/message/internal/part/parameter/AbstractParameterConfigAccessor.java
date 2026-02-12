@@ -31,7 +31,7 @@ import static java.util.Optional.ofNullable;
 /**
  * @since 0.8.4  (extracted from ParameterFormatterContext)
  */
-public abstract class AbstractParameterConfigAccessor implements ParameterConfigAccessor
+abstract class AbstractParameterConfigAccessor implements ParameterConfigAccessor
 {
   protected final @NotNull MessageAccessor messageAccessor;
   protected final @NotNull ParameterConfig parameterConfig;
