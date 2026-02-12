@@ -15,12 +15,10 @@
  */
 package de.sayayi.lib.message.part.parameter.key;
 
-import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
-import java.util.Map;
 
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
 import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
@@ -29,8 +27,6 @@ import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
 
 /**
  * This sorter sorts parameter configuration keys.
- *
- * @see ParameterConfig#ParameterConfig(Map)
  *
  * @author Jeroen Gremmen
  * @since 0.8.4

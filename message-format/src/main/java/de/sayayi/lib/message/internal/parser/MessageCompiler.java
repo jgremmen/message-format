@@ -26,11 +26,11 @@ import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.TextMessage;
+import de.sayayi.lib.message.internal.part.parameter.ParameterConfigImpl;
 import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
 import de.sayayi.lib.message.internal.part.template.TemplatePart;
 import de.sayayi.lib.message.internal.part.text.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import de.sayayi.lib.message.part.parameter.key.*;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
 import de.sayayi.lib.message.part.parameter.value.*;
@@ -452,7 +452,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           name, parameterFormat == null ? null : parameterFormat.format,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
-          new ParameterConfig(mapElements)));
+          new ParameterConfigImpl(mapElements)));
     }
 
 

@@ -17,11 +17,11 @@ package de.sayayi.lib.message.internal.parser;
 
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.exception.MessageParserException;
+import de.sayayi.lib.message.internal.part.parameter.ParameterConfigImpl;
 import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
 import de.sayayi.lib.message.internal.part.template.TemplatePart;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer;
-import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import de.sayayi.lib.message.part.parameter.key.*;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueBool;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueMessage;
@@ -106,7 +106,7 @@ class MessageCompilerTest
   @DisplayName("Parameter format")
   void testParameterFormat()
   {
-    var emptyParameterConfig = new ParameterConfig(Map.of());
+    var emptyParameterConfig = new ParameterConfigImpl(Map.of());
 
     assertArrayEquals(
         new MessagePart[] {
@@ -129,7 +129,7 @@ class MessageCompilerTest
   {
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyName("charset"), ConfigValueBool.FALSE
             )))
         },
@@ -137,7 +137,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyName("charset"), ConfigValueBool.TRUE
             )))
         },
@@ -145,7 +145,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyName("clip"), new ConfigValueNumber(-5)
             )))
         },
@@ -153,7 +153,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyName("default"), new ConfigValueString("yes")
             )))
         },
@@ -161,7 +161,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyName("default"), new ConfigValueString("no")
             )))
         },
@@ -169,7 +169,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyName("msg"), new ConfigValueMessage(COMPILER.compileMessage(" %{q}"))
             )))
         },
@@ -189,7 +189,7 @@ class MessageCompilerTest
   {
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 ConfigKeyNull.EQ, new ConfigValueString("msg")
             )))
         },
@@ -197,7 +197,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 ConfigKeyNull.NE, new ConfigValueMessage(COMPILER.compileMessage("msg %{n}"))
             )))
         },
@@ -211,7 +211,7 @@ class MessageCompilerTest
   {
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 ConfigKeyEmpty.EQ, new ConfigValueString("msg")
             )))
         },
@@ -219,7 +219,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 ConfigKeyEmpty.NE, new ConfigValueMessage(COMPILER.compileMessage("msg %{n}"))
             )))
         },
@@ -233,7 +233,7 @@ class MessageCompilerTest
   {
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 ConfigKeyBool.TRUE, new ConfigValueString("msg")
             )))
         },
@@ -241,7 +241,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 ConfigKeyBool.FALSE, new ConfigValueMessage(COMPILER.compileMessage("msg %{n}"))
             )))
         },
@@ -255,7 +255,7 @@ class MessageCompilerTest
   {
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyNumber(EQ, 16), new ConfigValueString("msg1")
             )))
         },
@@ -263,7 +263,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyNumber(EQ, -16), new ConfigValueMessage(COMPILER.compileMessage(" msg 2 "))
             )))
         },
@@ -271,7 +271,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyNumber(LT, 1000), new ConfigValueString("msg3")
             )))
         },
@@ -279,7 +279,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyNumber(LTE, 0), new ConfigValueString("msg4")
             )))
         },
@@ -287,7 +287,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyNumber(NE, 1), new ConfigValueString("msg5")
             )))
         },
@@ -295,7 +295,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyNumber(GT, 123456789), new ConfigValueString("msg6")
             )))
         },
@@ -303,7 +303,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyNumber(GTE, -987654321), new ConfigValueMessage(COMPILER.compileMessage(" msg 7"))
             )))
         },
@@ -317,7 +317,7 @@ class MessageCompilerTest
   {
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyString(EQ, "AA"), new ConfigValueString("msg1")
             )))
         },
@@ -325,7 +325,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyString(EQ, "B"), new ConfigValueMessage(COMPILER.compileMessage(" msg 2 "))
             )))
         },
@@ -333,7 +333,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyString(LT, "CC"), new ConfigValueString("msg3")
             )))
         },
@@ -341,7 +341,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyString(LTE, "D"), new ConfigValueString("msg4")
             )))
         },
@@ -349,7 +349,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyString(NE, "EE"), new ConfigValueString("msg5")
             )))
         },
@@ -357,7 +357,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyString(GT, "FFF"), new ConfigValueString("msg6")
             )))
         },
@@ -365,7 +365,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(Map.of(
+            new ParameterPart("p", new ParameterConfigImpl(Map.of(
                 new ConfigKeyString(GTE, "GG"), new ConfigValueMessage(COMPILER.compileMessage(" msg 7"))
             )))
         },
@@ -379,7 +379,7 @@ class MessageCompilerTest
   {
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(singletonMap(
+            new ParameterPart("p", new ParameterConfigImpl(singletonMap(
                 null, new ConfigValueMessage(COMPILER.compileMessage("test"))
             )))
         },
@@ -387,7 +387,7 @@ class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new ParameterConfig(singletonMap(
+            new ParameterPart("p", new ParameterConfigImpl(singletonMap(
                 null, new ConfigValueMessage(COMPILER.compileMessage(" %{n} items"))
             )))
         },

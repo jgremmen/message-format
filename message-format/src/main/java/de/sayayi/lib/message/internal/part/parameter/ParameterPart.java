@@ -48,7 +48,7 @@ public final class ParameterPart implements Parameter
   private final String format;
 
   /** parameter configuration. */
-  private final @NotNull ParameterConfig paramConfig;
+  private final @NotNull ParameterConfigImpl paramConfig;
 
   /** tells whether the parameter has a leading space. */
   private final boolean spaceBefore;
@@ -76,7 +76,7 @@ public final class ParameterPart implements Parameter
    * @param spaceAfter   adds a trailing space to this parameter
    */
   public ParameterPart(@NotNull String name, boolean spaceBefore, boolean spaceAfter) {
-    this(name, null, spaceBefore, spaceAfter, new ParameterConfig(Map.of()));
+    this(name, null, spaceBefore, spaceAfter, new ParameterConfigImpl(Map.of()));
   }
 
 
@@ -86,13 +86,13 @@ public final class ParameterPart implements Parameter
    * @param name         parameter name, not {@code null} or empty
    * @param paramConfig  parameter configuration, not {@code null}
    */
-  public ParameterPart(@NotNull String name, @NotNull ParameterConfig paramConfig) {
+  public ParameterPart(@NotNull String name, @NotNull ParameterConfigImpl paramConfig) {
     this(name, null, false, false, paramConfig);
   }
 
 
   public ParameterPart(@NotNull String name, String format, boolean spaceBefore, boolean spaceAfter,
-                       @NotNull ParameterConfig paramConfig)
+                       @NotNull ParameterConfigImpl paramConfig)
   {
     if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
       throw new IllegalArgumentException("name must not be empty");
@@ -220,15 +220,14 @@ public final class ParameterPart implements Parameter
    *
    * @hidden
    */
-  public static @NotNull ParameterPart unpack(
-      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackSupport unpack,
-      @NotNull PackInputStream packStream) throws IOException
+  public static @NotNull ParameterPart unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
+      throws IOException
   {
     final var spaceBefore = packStream.readBoolean();
     final var spaceAfter = packStream.readBoolean();
     final var format = packStream.readString();
     final var name = requireNonNull(packStream.readString());
 
-    return new ParameterPart(name, format, spaceBefore, spaceAfter, ParameterConfig.unpack(unpack, packStream));
+    return new ParameterPart(name, format, spaceBefore, spaceAfter, ParameterConfigImpl.unpack(unpack, packStream));
   }
 }

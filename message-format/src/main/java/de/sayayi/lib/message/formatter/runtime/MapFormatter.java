@@ -22,10 +22,10 @@ import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.CompoundMessage;
+import de.sayayi.lib.message.internal.part.parameter.ParameterConfigImpl;
 import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
 import de.sayayi.lib.message.internal.part.text.NoSpaceTextPart;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
 import de.sayayi.lib.message.part.parameter.key.ConfigKeyNull;
 import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
@@ -53,7 +53,7 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
 
   static
   {
-    var nullConfig = new ParameterConfig(Map.of(ConfigKeyNull.EQ, new ConfigValueString("(null)")));
+    var nullConfig = new ParameterConfigImpl(Map.of(ConfigKeyNull.EQ, new ConfigValueString("(null)")));
 
     // default map-kv: %{key,null:'(null)'}=%{value,null:'(null)'}
     DEFAULT_KEY_VALUE_MESSAGE = new CompoundMessage(List.of(
