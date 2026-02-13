@@ -32,77 +32,44 @@ import static java.lang.Integer.MIN_VALUE;
 /**
  * This class represents a numeric configuration value.
  *
+ * @param longValue  configuration value number.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class ConfigValueNumber implements NumberValue
+public record ConfigValueNumber(long longValue) implements NumberValue
 {
-  /** Configuration value number. */
-  private final long number;
-
-
-  public ConfigValueNumber(long number) {
-    this.number = number;
-  }
-
-
   /**
    * Return the number as int.
    * <p>
    * If the number is larger than the integer range, the returned value is either
    * {@code 4294967295} for positive values or {@code −4294967296} for negative values.
    *
-   * @return  number as int
-   *
+   * @return number as int
    * @since 0.8.0
    */
   @Override
   public int intValue() {
-    return number < MIN_VALUE ? MIN_VALUE : number > MAX_VALUE ? MAX_VALUE : (int)number;
-  }
-
-
-  /**
-   * Return the number as long.
-   *
-   * @return  number as long
-   *
-   * @since 0.8.0
-   */
-  @Override
-  public long longValue() {
-    return number;
+    return longValue < MIN_VALUE ? MIN_VALUE : longValue > MAX_VALUE ? MAX_VALUE : (int)longValue;
   }
 
 
   /**
    * Returns the number value.
    *
-   * @return  number, never {@code null}
+   * @return number, never {@code null}
    */
   @Override
   @Contract(pure = true)
   public @NotNull Long asObject() {
-    return number;
-  }
-
-
-  @Override
-  public boolean equals(Object o) {
-    return o instanceof ConfigValueNumber && this.number == ((ConfigValueNumber)o).number;
-  }
-
-
-  @Override
-  public int hashCode() {
-    return 59 + Long.hashCode(number);
+    return longValue;
   }
 
 
   @Override
   @Contract(pure = true)
-  public String toString() {
-    return Long.toString(number);
+  public @NotNull String toString() {
+    return Long.toString(longValue);
   }
 
 
@@ -116,7 +83,7 @@ public final class ConfigValueNumber implements NumberValue
    * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packLongVar(number, packStream);
+    packLongVar(longValue, packStream);
   }
 
 

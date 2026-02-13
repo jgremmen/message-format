@@ -30,23 +30,15 @@ import static java.util.Objects.requireNonNull;
 /**
  * This class represents a message configuration value.
  *
+ * @param messageValue  configuration value message.
+ *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
-public final class ConfigValueMessage implements MessageValue
+public record ConfigValueMessage(@NotNull Message.WithSpaces messageValue) implements MessageValue
 {
-  /** Configuration value message. */
-  private final @NotNull Message.WithSpaces message;
-
-
-  public ConfigValueMessage(@NotNull Message.WithSpaces message) {
-    this.message = requireNonNull(message, "message must not be null");
-  }
-
-
-  @Override
-  public @NotNull Message.WithSpaces messageValue() {
-    return message;
+  public ConfigValueMessage(@NotNull Message.WithSpaces messageValue) {
+    this.messageValue = requireNonNull(messageValue, "message must not be null");
   }
 
 
@@ -62,20 +54,8 @@ public final class ConfigValueMessage implements MessageValue
 
 
   @Override
-  public boolean equals(Object o) {
-    return o instanceof ConfigValueMessage && message.equals(((ConfigValueMessage)o).message);
-  }
-
-
-  @Override
-  public int hashCode() {
-    return 59 + message.hashCode();
-  }
-
-
-  @Override
-  public String toString() {
-    return message.toString();
+  public @NotNull String toString() {
+    return messageValue.toString();
   }
 
 
@@ -89,7 +69,7 @@ public final class ConfigValueMessage implements MessageValue
    * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    PackSupport.pack(message, packStream);
+    PackSupport.pack(messageValue, packStream);
   }
 
 
