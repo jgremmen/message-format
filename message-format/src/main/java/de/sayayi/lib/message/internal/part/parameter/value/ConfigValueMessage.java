@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.part.parameter.value;
+package de.sayayi.lib.message.internal.part.parameter.value;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.internal.pack.PackSupport;
+import de.sayayi.lib.message.part.parameter.ConfigValue.MessageValue;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +33,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
-public final class ConfigValueMessage implements ConfigValue
+public final class ConfigValueMessage implements MessageValue
 {
   /** Configuration value message. */
   private final @NotNull Message.WithSpaces message;
@@ -43,14 +44,9 @@ public final class ConfigValueMessage implements ConfigValue
   }
 
 
-  /**
-   * {@inheritDoc}
-   *
-   * @return  always {@link Type#MESSAGE Type#MESSAGE}
-   */
   @Override
-  public @NotNull Type getType() {
-    return Type.MESSAGE;
+  public @NotNull Message.WithSpaces messageValue() {
+    return message;
   }
 
 
@@ -61,7 +57,7 @@ public final class ConfigValueMessage implements ConfigValue
    */
   @Override
   public @NotNull Message.WithSpaces asObject() {
-    return message;
+    return messageValue();
   }
 
 
@@ -109,9 +105,8 @@ public final class ConfigValueMessage implements ConfigValue
    *
    * @hidden
    */
-  public static @NotNull ConfigValueMessage unpack(
-      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackSupport unpack,
-      @NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigValueMessage unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
+      throws IOException {
     return new ConfigValueMessage(unpack.unpackMessageWithSpaces(packStream));
   }
 }

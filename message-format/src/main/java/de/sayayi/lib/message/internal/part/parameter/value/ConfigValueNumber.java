@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.part.parameter.key;
+package de.sayayi.lib.message.internal.part.parameter.value;
 
+import de.sayayi.lib.message.part.parameter.ConfigValue.NumberValue;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -24,81 +25,84 @@ import java.io.IOException;
 
 import static de.sayayi.lib.message.internal.pack.PackSupport.packLongVar;
 import static de.sayayi.lib.message.internal.pack.PackSupport.unpackLongVar;
-import static java.util.Objects.requireNonNull;
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Integer.MIN_VALUE;
 
 
 /**
+ * This class represents a numeric configuration value.
+ *
  * @author Jeroen Gremmen
- * @since 0.4.0 (renamed in 0.8.0)
+ * @since 0.8.0
  */
-@SuppressWarnings("ClassCanBeRecord")
-public final class ConfigKeyNumber implements ConfigKey
+public final class ConfigValueNumber implements NumberValue
 {
-  /** Configuration number key comparison type. */
-  private final @NotNull CompareType compareType;
-
-  /** Configuration key number. */
+  /** Configuration value number. */
   private final long number;
 
 
-  /**
-   * Constructs a configuration key number with a comparison type.
-   *
-   * @param compareType  configuration key comparison type, not {@code null}
-   * @param number       configuration key number
-   *
-   * @since 0.4.0 (made public in 0.10.0)
-   */
-  public ConfigKeyNumber(@NotNull CompareType compareType, long number)
-  {
-    this.compareType = requireNonNull(compareType, "compareType must not be null");
+  public ConfigValueNumber(long number) {
     this.number = number;
   }
 
 
+  /**
+   * Return the number as int.
+   * <p>
+   * If the number is larger than the integer range, the returned value is either
+   * {@code 4294967295} for positive values or {@code −4294967296} for negative values.
+   *
+   * @return  number as int
+   *
+   * @since 0.8.0
+   */
   @Override
-  public @NotNull CompareType getCompareType() {
-    return compareType;
+  public int intValue() {
+    return number < MIN_VALUE ? MIN_VALUE : number > MAX_VALUE ? MAX_VALUE : (int)number;
   }
 
 
   /**
-   * Returns the config key number value.
+   * Return the number as long.
    *
-   * @return  config key number value
+   * @return  number as long
+   *
+   * @since 0.8.0
    */
-  @Contract(pure = true)
-  public long getNumber() {
+  @Override
+  public long longValue() {
     return number;
   }
 
 
   /**
-   * {@inheritDoc}
+   * Returns the number value.
    *
-   * @return  always {@link Type#NUMBER Type#NUMBER}
+   * @return  number, never {@code null}
    */
   @Override
-  public @NotNull Type getType() {
-    return Type.NUMBER;
+  @Contract(pure = true)
+  public @NotNull Long asObject() {
+    return number;
   }
 
 
   @Override
   public boolean equals(Object o) {
-    return o instanceof ConfigKeyNumber that && number == that.number && compareType == that.compareType;
+    return o instanceof ConfigValueNumber && this.number == ((ConfigValueNumber)o).number;
   }
 
 
   @Override
   public int hashCode() {
-    return (59 + Long.hashCode(number)) * 59 + compareType.hashCode();
+    return 59 + Long.hashCode(number);
   }
 
 
   @Override
+  @Contract(pure = true)
   public String toString() {
-    return compareType.asPrefix() + number;
+    return Long.toString(number);
   }
 
 
@@ -111,9 +115,7 @@ public final class ConfigKeyNumber implements ConfigKey
    *
    * @hidden
    */
-  public void pack(@NotNull PackOutputStream packStream) throws IOException
-  {
-    packStream.writeEnum(compareType);
+  public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packLongVar(number, packStream);
   }
 
@@ -121,7 +123,7 @@ public final class ConfigKeyNumber implements ConfigKey
   /**
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked number map key, never {@code null}
+   * @return  unpacked number map value, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -129,13 +131,12 @@ public final class ConfigKeyNumber implements ConfigKey
    *
    * @hidden
    */
-  public static @NotNull ConfigKeyNumber unpack(@NotNull PackInputStream packStream) throws IOException
+  public static @NotNull ConfigValueNumber unpack(@NotNull PackInputStream packStream) throws IOException
   {
-    final var compareType = packStream.readEnum(CompareType.class);
     final var number = packStream.getVersion().orElseThrow() == 1
         ? packStream.readLong()
         : unpackLongVar(packStream);
 
-    return new ConfigKeyNumber(compareType, number);
+    return new ConfigValueNumber(number);
   }
 }

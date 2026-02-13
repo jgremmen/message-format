@@ -21,7 +21,7 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.runtime.TypeFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
+import de.sayayi.lib.message.part.parameter.ConfigKey;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -30,8 +30,8 @@ import java.lang.reflect.Method;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.EQUIVALENT;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.MISMATCH;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult.Defined.EQUIVALENT;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult.Defined.MISMATCH;
 
 
 /**

@@ -19,7 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.part.MessagePart.Template;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue;
+import de.sayayi.lib.message.part.parameter.ConfigValue;
 import de.sayayi.lib.message.util.SortedArrayMap;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
@@ -62,7 +62,7 @@ public final class TemplatePart implements Template
    * <p>
    * The map is optimized to require the least amount of space.
    */
-  private final SortedArrayMap<String,ConfigValue> defaultParameterMap;
+  private final SortedArrayMap<String,ConfigValue<?>> defaultParameterMap;
 
   /**
    * Parameter delegate map. If a parameter is referenced in the template message the parameter
@@ -85,7 +85,7 @@ public final class TemplatePart implements Template
    * @param parameterDelegates  parameter delegate map, not {@code null}
    */
   public TemplatePart(@NotNull String name, boolean spaceBefore, boolean spaceAfter,
-                      @NotNull Map<String,ConfigValue> defaultParameters,
+                      @NotNull Map<String,ConfigValue<?>> defaultParameters,
                       @NotNull Map<String,String> parameterDelegates)
   {
     if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
@@ -220,7 +220,7 @@ public final class TemplatePart implements Template
     final var defaultParameterMapSize = packStream.readSmallVar();
     final var parameterDelegateMapSize = packStream.readSmallVar();
 
-    final var defaultParameterMap = new HashMap<String,ConfigValue>();
+    final var defaultParameterMap = new HashMap<String,ConfigValue<?>>();
     for(var n = 0; n < defaultParameterMapSize; n++)
     {
       defaultParameterMap.put(

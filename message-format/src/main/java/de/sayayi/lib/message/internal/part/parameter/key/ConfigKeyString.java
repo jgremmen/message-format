@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.part.parameter.key;
+package de.sayayi.lib.message.internal.part.parameter.key;
 
+import de.sayayi.lib.message.part.parameter.ConfigKey;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.CompareType.EQ;
 import static java.util.Objects.requireNonNull;
 
 

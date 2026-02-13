@@ -28,12 +28,17 @@ import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.TextMessage;
 import de.sayayi.lib.message.internal.part.parameter.ParameterConfigImpl;
 import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
+import de.sayayi.lib.message.internal.part.parameter.key.*;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueBool;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueMessage;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueNumber;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueString;
 import de.sayayi.lib.message.internal.part.template.TemplatePart;
 import de.sayayi.lib.message.internal.part.text.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.part.parameter.key.*;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
-import de.sayayi.lib.message.part.parameter.value.*;
+import de.sayayi.lib.message.part.parameter.ConfigKey;
+import de.sayayi.lib.message.part.parameter.ConfigKey.CompareType;
+import de.sayayi.lib.message.part.parameter.ConfigValue;
 import de.sayayi.lib.message.util.SpacesUtil;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -400,14 +405,14 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final Collector<ParameterConfigElementContext,Map<ConfigKey,ConfigValue>,Map<ConfigKey,ConfigValue>>
+    final Collector<ParameterConfigElementContext,Map<ConfigKey,ConfigValue<?>>,Map<ConfigKey,ConfigValue<?>>>
         PARAMETER_CONFIG_COLLECTOR = new Collector<>() {
-      @Override public Supplier<Map<ConfigKey,ConfigValue>> supplier() { return LinkedHashMap::new; }
-      @Override public BinaryOperator<Map<ConfigKey,ConfigValue>> combiner() { return foldCombiner(); }
+      @Override public Supplier<Map<ConfigKey,ConfigValue<?>>> supplier() { return LinkedHashMap::new; }
+      @Override public BinaryOperator<Map<ConfigKey,ConfigValue<?>>> combiner() { return foldCombiner(); }
       @Override public Set<Characteristics> characteristics() { return Set.of(IDENTITY_FINISH); }
 
       @Override
-      public BiConsumer<Map<ConfigKey,ConfigValue>,ParameterConfigElementContext> accumulator()
+      public BiConsumer<Map<ConfigKey,ConfigValue<?>>,ParameterConfigElementContext> accumulator()
       {
         return (map,cec) -> {
           for(var key: cec.configKeys)
@@ -422,7 +427,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       }
 
       @Override
-      public Function<Map<ConfigKey,ConfigValue>,Map<ConfigKey,ConfigValue>> finisher() {
+      public Function<Map<ConfigKey,ConfigValue<?>>,Map<ConfigKey,ConfigValue<?>>> finisher() {
         return identity();
       }
     };
@@ -480,14 +485,14 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final Collector<ConfigNamedElementContext,Map<String,ConfigValue>,Map<String,ConfigValue>>
+    final Collector<ConfigNamedElementContext,Map<String,ConfigValue<?>>,Map<String,ConfigValue<?>>>
         TEMPLATE_NAMED_PARAMETER_COLLECTOR = new Collector<>() {
-      @Override public Supplier<Map<String,ConfigValue>> supplier() { return TreeMap::new; }
-      @Override public BinaryOperator<Map<String,ConfigValue>> combiner() { return foldCombiner(); }
+      @Override public Supplier<Map<String,ConfigValue<?>>> supplier() { return TreeMap::new; }
+      @Override public BinaryOperator<Map<String,ConfigValue<?>>> combiner() { return foldCombiner(); }
       @Override public Set<Characteristics> characteristics() { return Set.of(UNORDERED); }
 
       @Override
-      public BiConsumer<Map<String,ConfigValue>,ConfigNamedElementContext> accumulator()
+      public BiConsumer<Map<String,ConfigValue<?>>,ConfigNamedElementContext> accumulator()
       {
         return (map,cpec) -> {
           final var name = cpec.configKey.getName();
@@ -505,7 +510,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
       @Override
-      public Function<Map<String,ConfigValue>,Map<String,ConfigValue>> finisher() {
+      public Function<Map<String,ConfigValue<?>>,Map<String,ConfigValue<?>>> finisher() {
         return identity();
       }
     };

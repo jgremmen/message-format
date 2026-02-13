@@ -25,9 +25,9 @@ options {
 @header {
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.part.MessagePart.*;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
-import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue;
+import de.sayayi.lib.message.part.parameter.ConfigKey;
+import de.sayayi.lib.message.part.parameter.ConfigValue;
+import de.sayayi.lib.message.internal.part.parameter.key.ConfigKeyName;
 }
 
 
@@ -84,7 +84,7 @@ parameterFormat returns [String format]
         : nameOrKeyword  // kebab-case format
         ;
 
-parameterConfigElement returns [List<ConfigKey> configKeys, ConfigValue configValue]
+parameterConfigElement returns [List<ConfigKey> configKeys, ConfigValue<?> configValue]
         : configNamedElement
         | configMapElement
         ;
@@ -116,12 +116,12 @@ postFormatName returns [String name]
         : nameOrKeyword  // kebab-case format
         ;
 
-configMapElement returns [List<ConfigKey> configKeys, ConfigValue configValue]
+configMapElement returns [List<ConfigKey> configKeys, ConfigValue<?> configValue]
         : configMapKeys COLON quotedMessage  #configMapMessage
         | configMapKeys COLON simpleString   #configMapString
         ;
 
-configNamedElement returns [ConfigKeyName configKey, ConfigValue configValue]
+configNamedElement returns [ConfigKeyName configKey, ConfigValue<?> configValue]
         : NAME COLON BOOL           #configNamedBool
         | NAME COLON NUMBER         #configNamedNumber
         | NAME COLON simpleString   #configNamedString

@@ -21,7 +21,7 @@ import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
+import de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -34,7 +34,7 @@ import java.util.Set;
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_PRIMITIVE_OR_ARRAY_ORDER;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult.forEmptyKey;
 import static java.nio.charset.Charset.isSupported;
 import static java.util.Base64.getMimeEncoder;
 

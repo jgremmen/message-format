@@ -18,10 +18,10 @@ package de.sayayi.lib.message.formatter.named;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
-import de.sayayi.lib.message.part.parameter.key.ConfigKeyBool;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue;
-import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.internal.part.parameter.key.ConfigKeyBool;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.part.parameter.ConfigKey;
+import de.sayayi.lib.message.part.parameter.ConfigValue;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,7 +64,7 @@ class BoolFormatterTest extends AbstractFormatterTest
         .setLocale("de-DE")
         .getMessageAccessor();
 
-    val map = new HashMap<ConfigKey,ConfigValue>();
+    val map = new HashMap<ConfigKey,ConfigValue<?>>();
     map.put(ConfigKeyBool.TRUE, new ConfigValueString("wahr"));
     map.put(ConfigKeyBool.FALSE, new ConfigValueString("falsch"));
 

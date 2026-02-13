@@ -17,9 +17,13 @@ package de.sayayi.lib.message.internal.part.parameter;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.part.parameter.ConfigValue;
+import de.sayayi.lib.message.part.parameter.ConfigValue.BoolValue;
+import de.sayayi.lib.message.part.parameter.ConfigValue.MessageValue;
+import de.sayayi.lib.message.part.parameter.ConfigValue.NumberValue;
+import de.sayayi.lib.message.part.parameter.ConfigValue.StringValue;
 import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import de.sayayi.lib.message.part.parameter.ParameterConfigAccessor;
-import de.sayayi.lib.message.part.parameter.value.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -46,7 +50,7 @@ abstract class AbstractParameterConfigAccessor implements ParameterConfigAccesso
 
 
   @Override
-  public @NotNull Optional<ConfigValue> getConfigValue(@NotNull String name)
+  public @NotNull Optional<ConfigValue<?>> getConfigValue(@NotNull String name)
   {
     final var configValue = parameterConfig.getConfigValue(name);
 
@@ -59,9 +63,9 @@ abstract class AbstractParameterConfigAccessor implements ParameterConfigAccesso
   @Override
   public @NotNull Optional<String> getConfigValueString(@NotNull String name)
   {
-    return parameterConfig.getConfigValue(name) instanceof ConfigValueString cvs
+    return parameterConfig.getConfigValue(name) instanceof StringValue cvs
         ? Optional.of(cvs.stringValue())
-        : messageAccessor.getDefaultParameterConfig(name) instanceof ConfigValueString cvs
+        : messageAccessor.getDefaultParameterConfig(name) instanceof StringValue cvs
             ? Optional.of(cvs.stringValue())
             : Optional.empty();
   }
@@ -70,9 +74,9 @@ abstract class AbstractParameterConfigAccessor implements ParameterConfigAccesso
   @Override
   public @NotNull OptionalLong getConfigValueNumber(@NotNull String name)
   {
-    return parameterConfig.getConfigValue(name) instanceof ConfigValueNumber cvn
+    return parameterConfig.getConfigValue(name) instanceof NumberValue cvn
         ? OptionalLong.of(cvn.longValue())
-        : messageAccessor.getDefaultParameterConfig(name) instanceof ConfigValueNumber cvn
+        : messageAccessor.getDefaultParameterConfig(name) instanceof NumberValue cvn
             ? OptionalLong.of(cvn.longValue())
             : OptionalLong.empty();
   }
@@ -81,9 +85,9 @@ abstract class AbstractParameterConfigAccessor implements ParameterConfigAccesso
   @Override
   public @NotNull Optional<Boolean> getConfigValueBool(@NotNull String name)
   {
-    return parameterConfig.getConfigValue(name) instanceof ConfigValueBool cvb
+    return parameterConfig.getConfigValue(name) instanceof BoolValue cvb
         ? Optional.of(cvb.booleanValue())
-        : messageAccessor.getDefaultParameterConfig(name) instanceof ConfigValueBool cvb
+        : messageAccessor.getDefaultParameterConfig(name) instanceof BoolValue cvb
             ? Optional.of(cvb.booleanValue())
             : Optional.empty();
   }
@@ -96,10 +100,10 @@ abstract class AbstractParameterConfigAccessor implements ParameterConfigAccesso
     if (configValue == null)
       configValue = messageAccessor.getDefaultParameterConfig(name);
 
-    if (configValue instanceof ConfigValueMessage)
-      return Optional.of(((ConfigValueMessage)configValue).asObject());
-    else if (configValue instanceof ConfigValueString)
-      return Optional.of(((ConfigValueString)configValue).asMessage(messageAccessor.getMessageFactory()));
+    if (configValue instanceof MessageValue messageValue)
+      return Optional.of(messageValue.messageValue());
+    else if (configValue instanceof StringValue stringValue)
+      return Optional.of(stringValue.asMessage(messageAccessor.getMessageFactory()));
 
     return Optional.empty();
   }

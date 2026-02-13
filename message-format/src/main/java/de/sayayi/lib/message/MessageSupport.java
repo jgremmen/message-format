@@ -19,7 +19,7 @@ import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterPostFormatter;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue;
+import de.sayayi.lib.message.part.parameter.ConfigValue;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -859,7 +859,7 @@ public interface MessageSupport
      * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, Message.WithSpaces)
      */
     @Contract(pure = true)
-    ConfigValue getDefaultParameterConfig(@NotNull String name);
+    ConfigValue<?> getDefaultParameterConfig(@NotNull String name);
 
 
     /**

@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.part.parameter.value;
+package de.sayayi.lib.message.internal.part.parameter.value;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.part.parameter.ConfigValue.StringValue;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -33,7 +34,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
-public final class ConfigValueString implements ConfigValue
+public final class ConfigValueString implements StringValue
 {
   /** Configuration value string. */
   private final @NotNull String string;
@@ -47,23 +48,13 @@ public final class ConfigValueString implements ConfigValue
 
 
   /**
-   * {@inheritDoc}
-   *
-   * @return  always {@link Type#STRING Type#STRING}
-   */
-  @Override
-  public @NotNull Type getType() {
-    return Type.STRING;
-  }
-
-
-  /**
    * Return the string value.
    *
    * @return  string, never {@code null}
    *
    * @since 0.8.0
    */
+  @Override
   public @NotNull String stringValue() {
     return string;
   }
@@ -88,6 +79,7 @@ public final class ConfigValueString implements ConfigValue
    *
    * @return  string value parsed as a message, never {@code null}
    */
+  @Override
   public @NotNull Message.WithSpaces asMessage(@NotNull MessageFactory messageFactory)
   {
     if (message == null)

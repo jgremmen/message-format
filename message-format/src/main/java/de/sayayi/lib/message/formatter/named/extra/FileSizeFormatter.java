@@ -19,7 +19,7 @@ import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
+import de.sayayi.lib.message.part.parameter.ConfigKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 

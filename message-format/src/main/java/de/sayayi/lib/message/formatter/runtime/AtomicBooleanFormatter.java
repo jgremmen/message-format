@@ -20,7 +20,7 @@ import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
+import de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;

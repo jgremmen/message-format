@@ -23,8 +23,8 @@ import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.formatter.ParameterPostFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.parameter.ConfigKey;
 import de.sayayi.lib.message.part.parameter.ParameterConfig;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

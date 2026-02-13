@@ -19,8 +19,8 @@ import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.value.ConfigValueNumber;
-import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.part.parameter.ConfigValue.NumberValue;
+import de.sayayi.lib.message.part.parameter.ConfigValue.StringValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -69,12 +69,12 @@ public final class BitsFormatter extends AbstractParameterFormatter<Object>
   {
     final var configValue = context.getConfigValue("bits").orElse(null);
 
-    if (configValue instanceof ConfigValueString && "auto".equals(configValue.asObject()))
+    if (configValue instanceof StringValue && "auto".equals(configValue.asObject()))
       return autoDetectBitCount(value);
 
-    if (configValue instanceof ConfigValueNumber)
+    if (configValue instanceof NumberValue numberValue)
     {
-      var bits = ((ConfigValueNumber)configValue).intValue();
+      var bits = numberValue.intValue();
       if (bits > 0 && bits <= 1024)
         return bits;
     }
@@ -113,6 +113,7 @@ public final class BitsFormatter extends AbstractParameterFormatter<Object>
   }
 
 
+  @SuppressWarnings("unused")
   private int detectBitCountByRange(Object value)
   {
     return switch(value) {

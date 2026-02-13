@@ -24,7 +24,11 @@ import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterPostFormatter;
 import de.sayayi.lib.message.internal.pack.PackSupport;
-import de.sayayi.lib.message.part.parameter.value.*;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueBool;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueMessage;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueNumber;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.part.parameter.ConfigValue;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
@@ -64,7 +68,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 {
   private final @NotNull FormatterService formatterService;
   private final @NotNull MessageFactory messageFactory;
-  private final @NotNull Map<String,ConfigValue> defaultParameterConfig = new TreeMap<>();
+  private final @NotNull Map<String, ConfigValue<?>> defaultParameterConfig = new TreeMap<>();
   private final @NotNull Map<String,Message.WithCode> messages = new TreeMap<>();
   private final @NotNull Map<String,Message> templates = new TreeMap<>();
   private final @NotNull MessageAccessor messageAccessor;
@@ -548,7 +552,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    public ConfigValue getDefaultParameterConfig(@NotNull String name) {
+    public ConfigValue<?> getDefaultParameterConfig(@NotNull String name) {
       return defaultParameterConfig.get(name);
     }
 

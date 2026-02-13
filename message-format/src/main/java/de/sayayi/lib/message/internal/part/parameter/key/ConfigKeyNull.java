@@ -13,69 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.part.parameter.value;
+package de.sayayi.lib.message.internal.part.parameter.key;
 
+import de.sayayi.lib.message.part.parameter.ConfigKey;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
 
 /**
- * This class represents a boolean configuration value.
- *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
-public enum ConfigValueBool implements ConfigValue
+public enum ConfigKeyNull implements ConfigKey
 {
-  /** Boolean config value representing {@code false}. */
-  FALSE,
+  /** Null config key with compare type {@link ConfigKey.CompareType#EQ EQ}. */
+  EQ,
 
-  /** Boolean config value representing {@code true}. */
-  TRUE;
+  /** Null config key with compare type {@link ConfigKey.CompareType#NE NE}. */
+  NE;
+
+
+  @Override
+  public @NotNull CompareType getCompareType() {
+    return this == EQ ? CompareType.EQ : CompareType.NE;
+  }
 
 
   /**
    * {@inheritDoc}
    *
-   * @return  always {@link Type#BOOL Type#BOOL}
+   * @return  always {@link Type#NULL Type#NULL}
    */
   @Override
   public @NotNull Type getType() {
-    return Type.BOOL;
-  }
-
-
-  /**
-   * Return the number as boolean.
-   *
-   * @return  number as boolean
-   *
-   * @since 0.8.0
-   */
-  @Contract(pure = true)
-  public boolean booleanValue() {
-    return this == TRUE;
-  }
-
-
-  /**
-   * Returns the boolean value.
-   *
-   * @return  boolean, never {@code null}
-   */
-  @Override
-  public @NotNull Boolean asObject() {
-    return booleanValue();
+    return Type.NULL;
   }
 
 
   @Override
   public String toString() {
-    return Boolean.toString(booleanValue());
+    return getCompareType().asPrefix() + "null";
   }
 
 
@@ -89,14 +69,14 @@ public enum ConfigValueBool implements ConfigValue
    * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeBoolean(booleanValue());
+    packStream.writeBoolean(this == EQ);
   }
 
 
   /**
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked boolean map value, never {@code null}
+   * @return  unpacked null map key, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -104,7 +84,7 @@ public enum ConfigValueBool implements ConfigValue
    *
    * @hidden
    */
-  public static @NotNull ConfigValueBool unpack(@NotNull PackInputStream packStream) throws IOException {
-    return packStream.readBoolean() ? TRUE : FALSE;
+  public static @NotNull ConfigKeyNull unpack(@NotNull PackInputStream packStream) throws IOException {
+    return packStream.readBoolean() ? EQ : NE;
   }
 }

@@ -20,13 +20,13 @@ import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
+import de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.*;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult.Defined.*;
 
 
 /**

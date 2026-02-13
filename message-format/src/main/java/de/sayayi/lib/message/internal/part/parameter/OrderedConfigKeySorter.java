@@ -15,15 +15,15 @@
  */
 package de.sayayi.lib.message.internal.part.parameter;
 
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
+import de.sayayi.lib.message.part.parameter.ConfigKey;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.NE;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.CompareType.EQ;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.CompareType.NE;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.Type.*;
 
 
 /**

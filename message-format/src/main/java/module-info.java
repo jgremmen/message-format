@@ -22,8 +22,6 @@ module de.sayayi.lib.message {
   exports de.sayayi.lib.message.part;
   exports de.sayayi.lib.message.part.normalizer;
   exports de.sayayi.lib.message.part.parameter;
-  exports de.sayayi.lib.message.part.parameter.key;
-  exports de.sayayi.lib.message.part.parameter.value;
   exports de.sayayi.lib.message.util;
 
   uses de.sayayi.lib.message.formatter.ParameterFormatter;

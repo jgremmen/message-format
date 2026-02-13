@@ -22,13 +22,15 @@ import de.sayayi.lib.message.formatter.ParameterFormatter.ComparatorContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.ParameterFormatter.DefaultFormatter;
 import de.sayayi.lib.message.internal.pack.PackSupport;
+import de.sayayi.lib.message.internal.part.parameter.key.ConfigKeyBool;
+import de.sayayi.lib.message.internal.part.parameter.key.ConfigKeyName;
+import de.sayayi.lib.message.internal.part.parameter.key.ConfigKeyNumber;
+import de.sayayi.lib.message.internal.part.parameter.key.ConfigKeyString;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueMessage;
+import de.sayayi.lib.message.part.parameter.ConfigKey;
+import de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult;
+import de.sayayi.lib.message.part.parameter.ConfigValue;
 import de.sayayi.lib.message.part.parameter.ParameterConfig;
-import de.sayayi.lib.message.part.parameter.key.*;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue.Type;
-import de.sayayi.lib.message.part.parameter.value.ConfigValueMessage;
-import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -38,8 +40,8 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.io.IOException;
 import java.util.*;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.MISMATCH;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult.Defined.MISMATCH;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.Type.*;
 import static java.util.Collections.unmodifiableSet;
 
 
@@ -52,16 +54,16 @@ import static java.util.Collections.unmodifiableSet;
 public final class ParameterConfigImpl implements ParameterConfig
 {
   /** map containing the parameter configuration values keyed by configuration name. */
-  private final @NotNull Map<String,ConfigValue> config;
+  private final @NotNull Map<String,ConfigValue<?>> config;
 
   /** Array containing the sorted mapped message keys (null, empty, bool, number and string). */
   private final @NotNull ConfigKey[] mapKeys;
 
   /** Array containing the mapped message corresponding to the map key at the same index. */
-  private final @NotNull ConfigValue[] mapValues;
+  private final @NotNull ConfigValue<?>[] mapValues;
 
   /** Default message. */
-  private final ConfigValue defaultValue;
+  private final ConfigValue<?> defaultValue;
 
   /** Bitmask for {@link ConfigKey.Type} stating which keys map to a message. */
   private final byte hasKeyType;
@@ -72,12 +74,12 @@ public final class ParameterConfigImpl implements ParameterConfig
    *
    * @param map  message parameter config map, not {@code null}
    */
-  public ParameterConfigImpl(@NotNull Map<ConfigKey,ConfigValue> map)
+  public ParameterConfigImpl(@NotNull Map<ConfigKey,ConfigValue<?>> map)
   {
     config = new TreeMap<>();
 
     var mapKeyList = new ArrayList<OrderedConfigKey>();
-    ConfigValue mapNullValue = null;
+    ConfigValue<?> mapNullValue = null;
     ConfigKey.Type keyType;
     ConfigKey key;
     var keyTypeMask = 0;
@@ -158,7 +160,7 @@ public final class ParameterConfigImpl implements ParameterConfig
 
   @Override
   @Contract(pure = true)
-  public ConfigValue getConfigValue(@NotNull String name) {
+  public ConfigValue<?> getConfigValue(@NotNull String name) {
     return config.get(name);
   }
 
@@ -172,7 +174,7 @@ public final class ParameterConfigImpl implements ParameterConfig
    */
   @Override
   @Contract(pure = true)
-  public ConfigValue getDefaultValue() {
+  public ConfigValue<?> getDefaultValue() {
     return defaultValue;
   }
 
@@ -192,17 +194,17 @@ public final class ParameterConfigImpl implements ParameterConfig
         return null;
     }
 
-    return configValue.getType() == Type.STRING
-        ? ((ConfigValueString)configValue).asMessage(messageAccessor.getMessageFactory())
+    return configValue instanceof ConfigValue.StringValue stringValue
+        ? stringValue.asMessage(messageAccessor.getMessageFactory())
         : (Message.WithSpaces)configValue.asObject();
   }
 
 
   @Contract(pure = true)
-  private ConfigValue findMappedValue(@NotNull MessageAccessor messageAccessor, @NotNull Locale locale,
-                                      Object value, @NotNull Set<ConfigKey.Type> keyTypes)
+  private ConfigValue<?> findMappedValue(@NotNull MessageAccessor messageAccessor, @NotNull Locale locale,
+                                         Object value, @NotNull Set<ConfigKey.Type> keyTypes)
   {
-    ConfigValue bestMatch = null;
+    ConfigValue<?> bestMatch = null;
 
     var comparatorContext = new ConfigKeyComparatorContext(messageAccessor, locale);
     var formatters = messageAccessor.getFormatters(value == null ? Object.class : value.getClass());
@@ -346,7 +348,7 @@ public final class ParameterConfigImpl implements ParameterConfig
   static @NotNull ParameterConfigImpl unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
-    final var map = new LinkedHashMap<ConfigKey,ConfigValue>();
+    final var map = new LinkedHashMap<ConfigKey,ConfigValue<?>>();
 
     for(int n = 0, size = packStream.readSmallVar(); n < size; n++)
       map.put(unpack.unpackMapKey(packStream), unpack.unpackMapValue(packStream));

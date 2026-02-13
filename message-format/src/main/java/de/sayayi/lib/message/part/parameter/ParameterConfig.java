@@ -17,8 +17,6 @@ package de.sayayi.lib.message.part.parameter;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -70,7 +68,7 @@ public interface ParameterConfig
 
 
   @Contract(pure = true)
-  ConfigValue getConfigValue(@NotNull String name);
+  ConfigValue<?> getConfigValue(@NotNull String name);
 
 
   /**
@@ -81,7 +79,7 @@ public interface ParameterConfig
    * @since 0.20.0
    */
   @Contract(pure = true)
-  ConfigValue getDefaultValue();
+  ConfigValue<?> getDefaultValue();
 
 
   @Contract(pure = true)

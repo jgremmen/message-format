@@ -21,8 +21,8 @@ import de.sayayi.lib.message.NoParameters;
 import de.sayayi.lib.message.internal.part.parameter.ParameterConfigImpl;
 import de.sayayi.lib.message.internal.part.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue;
+import de.sayayi.lib.message.part.parameter.ConfigKey;
+import de.sayayi.lib.message.part.parameter.ConfigValue;
 import lombok.val;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -69,7 +69,7 @@ public abstract class AbstractFormatterTest
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
-                                        @NotNull Map<ConfigKey,ConfigValue> map)
+                                        @NotNull Map<ConfigKey,ConfigValue<?>> map)
   {
     return format(messageContext, new NoParameters(messageContext.getLocale()), value, map, null);
   }
@@ -77,7 +77,7 @@ public abstract class AbstractFormatterTest
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
-                                        @NotNull Map<ConfigKey,ConfigValue> map,
+                                        @NotNull Map<ConfigKey,ConfigValue<?>> map,
                                         @NotNull String format) {
     return format(messageContext, new NoParameters(messageContext.getLocale()), value, map, format);
   }
@@ -86,7 +86,7 @@ public abstract class AbstractFormatterTest
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext,
                                         @NotNull Parameters parameters, Object value,
-                                        @NotNull Map<ConfigKey,ConfigValue> map,
+                                        @NotNull Map<ConfigKey,ConfigValue<?>> map,
                                         String format)
   {
     return new ParameterFormatterContext(messageContext, parameters, value, null, format,

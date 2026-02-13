@@ -21,7 +21,7 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.NUMBER_TYPE;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.NUMBER_TYPE;
 
 
 /**

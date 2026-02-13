@@ -16,7 +16,10 @@
 package de.sayayi.lib.message.part.parameter.value;
 
 import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue.Type;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueBool;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueMessage;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueNumber;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueString;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -37,7 +40,6 @@ class ConfigValueTest
   {
     val bool = value ? ConfigValueBool.TRUE : ConfigValueBool.FALSE;
 
-    assertEquals(Type.BOOL, bool.getType());
     assertEquals(value, bool.booleanValue());
     assertEquals(value, bool.asObject());
   }
@@ -48,7 +50,6 @@ class ConfigValueTest
   {
     val number = new ConfigValueNumber(1234);
 
-    assertEquals(Type.NUMBER, number.getType());
     assertEquals(1234, number.longValue());
     assertEquals(1234, number.intValue());
     assertEquals(Long.valueOf(1234), number.asObject());
@@ -66,7 +67,6 @@ class ConfigValueTest
 
     val string = new ConfigValueString("Hello %{s}");
 
-    assertEquals(Type.STRING, string.getType());
     assertEquals("Hello %{s}", string.stringValue());
     assertEquals("Hello %{s}", string.asObject());
 
@@ -88,7 +88,6 @@ class ConfigValueTest
 
     val message = new ConfigValueMessage(msg);
 
-    assertEquals(Type.MESSAGE, message.getType());
     assertEquals(messageFactory.parseMessage("%{a, bool } %{ s }."), message.asObject());
     assertEquals(
         message.asObject(),

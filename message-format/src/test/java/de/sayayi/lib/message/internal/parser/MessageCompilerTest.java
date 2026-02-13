@@ -19,21 +19,21 @@ import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.part.parameter.ParameterConfigImpl;
 import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
+import de.sayayi.lib.message.internal.part.parameter.key.*;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueBool;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueMessage;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueNumber;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueString;
 import de.sayayi.lib.message.internal.part.template.TemplatePart;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer;
-import de.sayayi.lib.message.part.parameter.key.*;
-import de.sayayi.lib.message.part.parameter.value.ConfigValueBool;
-import de.sayayi.lib.message.part.parameter.value.ConfigValueMessage;
-import de.sayayi.lib.message.part.parameter.value.ConfigValueNumber;
-import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
 import org.junit.jupiter.api.*;
 
 import java.util.Map;
 
 import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAGE;
 import static de.sayayi.lib.message.part.TextPartFactory.*;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.*;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.CompareType.*;
 import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.*;
 
