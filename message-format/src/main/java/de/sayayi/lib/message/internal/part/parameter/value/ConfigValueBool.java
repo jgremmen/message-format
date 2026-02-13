@@ -76,8 +76,6 @@ public enum ConfigValueBool implements BoolValue
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeBoolean(booleanValue());
@@ -92,8 +90,6 @@ public enum ConfigValueBool implements BoolValue
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
   public static @NotNull ConfigValueBool unpack(@NotNull PackInputStream packStream) throws IOException {
     return packStream.readBoolean() ? TRUE : FALSE;

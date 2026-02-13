@@ -65,8 +65,6 @@ public record ConfigValueMessage(@NotNull Message.WithSpaces messageValue) imple
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
     PackSupport.pack(messageValue, packStream);
@@ -82,8 +80,6 @@ public record ConfigValueMessage(@NotNull Message.WithSpaces messageValue) imple
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
   public static @NotNull ConfigValueMessage unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
       throws IOException {
