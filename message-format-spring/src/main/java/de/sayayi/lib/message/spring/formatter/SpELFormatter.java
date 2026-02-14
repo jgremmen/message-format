@@ -21,6 +21,7 @@ import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.expression.*;
@@ -30,6 +31,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.*;
 
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 import static org.springframework.expression.spel.SpelMessage.VARIABLE_ASSIGNMENT_NOT_SUPPORTED;
@@ -108,6 +110,12 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
     }
 
     return context.format(value, null, context.getConfigValueString("spel-format").orElse(null));
+  }
+
+
+  @Override
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
+    return Set.of("spel-expr", "spel-format");
   }
 
 
