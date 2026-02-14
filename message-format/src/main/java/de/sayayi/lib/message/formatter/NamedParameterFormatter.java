@@ -72,4 +72,21 @@ public interface NamedParameterFormatter extends ParameterFormatter
   default @NotNull Set<FormattableType> getFormattableTypes() {
     return Set.of();
   }
+
+
+  /**
+   * Tells whether this formatter should be automatically applied if the parameter configuration contains one or
+   * more config names.
+   *
+   * @return  {@code true} if this formatter should be automatically applied if the parameter configuration contains
+   *          one or more config names, {@code false} otherwise
+   *
+   * @see ParameterFormatter#getParameterConfigNames()
+   *
+   * @since 0.21.0
+   */
+  @Contract(pure = true)
+  default boolean autoApplyOnNamedConfigParameter() {
+    return false;
+  }
 }

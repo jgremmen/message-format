@@ -37,7 +37,7 @@ public final class KeyFormatter extends AbstractMultiSelectFormatter<Key>
 
     register("algorithm", (context,key) -> noSpaceText(key.getAlgorithm()));
     register("format", (context,key) -> noSpaceText(key.getFormat()));
-    register("encoded", (context,key) -> context.format(key.getEncoded(), byte[].class, true));
+    register("encoded", (context,key) -> context.format(key.getEncoded(), byte[].class));
   }
 
 

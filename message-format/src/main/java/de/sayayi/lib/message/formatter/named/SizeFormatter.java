@@ -52,7 +52,7 @@ public final class SizeFormatter implements NamedParameterFormatter
       return context
           .getConfigMapMessage(size, NUMBER_TYPE, true)
           .map(context::format)
-          .orElseGet(() -> context.format(size, long.class));
+          .orElseGet(() -> context.format(size, long.class, null, null));
     }
     else
       return formatEmpty(context);

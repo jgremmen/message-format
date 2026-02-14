@@ -137,11 +137,11 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
     if (value instanceof Number)
       return convertNumberToBool((Number)value);
 
-    if (value instanceof OptionalInt && ((OptionalInt)value).isPresent())
-      return Optional.of(((OptionalInt)value).getAsInt() != 0);
+    if (value instanceof OptionalInt optionalInt && optionalInt.isPresent())
+      return Optional.of(optionalInt.getAsInt() != 0);
 
-    if (value instanceof OptionalLong && ((OptionalLong)value).isPresent())
-      return Optional.of(((OptionalLong)value).getAsLong() != 0);
+    if (value instanceof OptionalLong optionalLong && optionalLong.isPresent())
+      return Optional.of(optionalLong.getAsLong() != 0);
 
     return Optional.empty();
   }

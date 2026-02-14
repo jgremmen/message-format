@@ -18,18 +18,20 @@ package de.sayayi.lib.message.formatter;
 import de.sayayi.lib.message.exception.FormatterServiceException;
 import de.sayayi.lib.message.formatter.ParameterFormatter.DefaultFormatter;
 import de.sayayi.lib.message.formatter.named.StringFormatter;
+import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT;
 import static de.sayayi.lib.message.util.MessageUtil.isKebabCaseName;
-import static java.util.Arrays.copyOf;
+import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
@@ -48,8 +50,11 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
   private static final @NotNull Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
 
-  private final @NotNull Map<String,NamedParameterFormatter> namedFormatters = new ConcurrentHashMap<>();
-  private final @NotNull Map<Class<?>,List<PrioritizedFormatter>> typeFormatters = new ConcurrentHashMap<>();
+  private final Lock $lock = new ReentrantLock();
+
+  private final @NotNull Map<String,NamedParameterFormatter> namedFormatters = new TreeMap<>();
+  private final @NotNull Map<String,NamedParameterFormatter> configNameToNamedFormatterMap = new TreeMap<>();
+  private final @NotNull Map<Class<?>,List<PrioritizedFormatter>> typeFormatters = new HashMap<>();
   private final @NotNull Set<String> parameterConfigNames = new TreeSet<>();
   private final @NotNull Map<String,ParameterPostFormatter> parameterPostFormatters = new HashMap<>();
   private final @NotNull FormatterCache formatterCache;
@@ -140,24 +145,49 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   {
     requireNonNull(formatter, "formatter must not be null");
 
-    if (formatter instanceof NamedParameterFormatter namedParameterFormatter)
-    {
-      final var formatterName = namedParameterFormatter.getName();
-
-      //noinspection ConstantValue
-      if (formatterName == null || formatterName.isEmpty())
-        throw new FormatterServiceException("formatter name must not be empty");
-      else if (!isKebabCaseName(formatterName))
+    $lock.lock();
+    try {
+      if (formatter instanceof NamedParameterFormatter namedParameterFormatter)
       {
-        throw new FormatterServiceException("formatter name '" + formatterName +
-            "' must match the kebab case naming convention");
+        final var formatterName = namedParameterFormatter.getName();
+
+        //noinspection ConstantValue
+        if (formatterName == null || formatterName.isEmpty())
+          throw new FormatterServiceException("formatter name must not be empty");
+        else if (!isKebabCaseName(formatterName))
+        {
+          throw new FormatterServiceException("formatter name '" + formatterName +
+              "' must match the kebab case naming convention");
+        }
+
+        namedFormatters.put(formatterName, namedParameterFormatter);
+
+        if (namedParameterFormatter.autoApplyOnNamedConfigParameter())
+          addAutoApplyNamedFormatter(namedParameterFormatter);
       }
 
-      namedFormatters.put(formatterName, namedParameterFormatter);
+      for(var formattableType: formatter.getFormattableTypes())
+        addFormatterForType(formattableType, formatter);
+    } finally {
+      $lock.unlock();
     }
+  }
 
-    for(var formattableType: formatter.getFormattableTypes())
-      addFormatterForType(formattableType, formatter);
+
+  private void addAutoApplyNamedFormatter(@NotNull NamedParameterFormatter namedParameterFormatter)
+  {
+    for(var parameterConfigName: namedParameterFormatter.getParameterConfigNames())
+    {
+      final var existingNamedFormatter =
+          configNameToNamedFormatterMap.put(parameterConfigName, namedParameterFormatter);
+
+      if (existingNamedFormatter != null && !existingNamedFormatter.equals(namedParameterFormatter))
+      {
+        throw new FormatterServiceException("parameter config name '" + parameterConfigName +
+            "' for formatter '" + namedParameterFormatter.getName() + "' is in conflict with formatter '" +
+            existingNamedFormatter.getName() + '\'');
+      }
+    }
   }
 
 
@@ -180,28 +210,46 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   @Override
-  public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type)
+  public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type,
+                                                     ParameterConfig parameterConfig)
   {
     requireNonNull(type, "type must not be null");
 
-    if (format != null)
-    {
-      var namedFormatter = namedFormatters.get(format);
-      if (namedFormatter != null && namedFormatter.canFormat(type))
-        return new ParameterFormatter[] { namedFormatter };
+    $lock.lock();
+    try {
+      if (format != null)
+      {
+        var namedFormatter = namedFormatters.get(format);
+        if (namedFormatter != null && namedFormatter.canFormat(type))
+          return new ParameterFormatter[] { namedFormatter };
+      }
+
+      final var formatters = new LinkedHashSet<ParameterFormatter>();
+
+      if (!configNameToNamedFormatterMap.isEmpty())
+        for(var parameterConfigName: parameterConfig.getConfigNames())
+        {
+          var namedFormatter = configNameToNamedFormatterMap.get(parameterConfigName);
+          if (namedFormatter != null && namedFormatter.canFormat(type))
+            formatters.add(namedFormatter);
+        }
+
+      final var formattersByType = formatterCache.lookup(type, t ->
+          streamTypes(t)
+              .map(typeFormatters::get)
+              .filter(Objects::nonNull)
+              .flatMap(Collection::stream)
+              .sorted()
+              .map(pf -> pf.formatter)
+              .distinct()
+              .toArray(ParameterFormatter[]::new));
+
+      formatters.addAll(asList(formattersByType));
+
+      return formatters.toArray(new ParameterFormatter[0]);
+    } finally {
+      $lock.unlock();
     }
-
-    final var formatters = formatterCache.lookup(type, t ->
-        streamTypes(t)
-            .map(typeFormatters::get)
-            .filter(Objects::nonNull)
-            .flatMap(Collection::stream)
-            .sorted()
-            .map(pf -> pf.formatter)
-            .distinct()
-            .toArray(ParameterFormatter[]::new));
-
-    return copyOf(formatters, formatters.length, ParameterFormatter[].class);
   }
 
 

@@ -29,7 +29,7 @@ public final class ThrowableFormatter extends AbstractSingleTypeParameterFormatt
 {
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Throwable throwable) {
-    return context.format(throwable.getLocalizedMessage(), String.class, true);
+    return context.format(throwable.getLocalizedMessage(), String.class);
   }
 
 

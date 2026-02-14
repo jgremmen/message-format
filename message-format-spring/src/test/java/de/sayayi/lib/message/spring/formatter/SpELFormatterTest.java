@@ -55,6 +55,7 @@ class SpELFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Extract value from bean with optional format selector")
+  @SuppressWarnings("SpellCheckingInspection")
   void testFormat()
   {
     val map = new TreeMap<String,Integer>();
@@ -63,7 +64,7 @@ class SpELFormatterTest extends AbstractFormatterTest
     map.put("D", -8);
 
     assertEquals("34", messageSupport
-        .message("%{map,format:spel,spel-expr:'entrySet().toArray()[1].value'}")
+        .message("%{map,spel-expr:'entrySet().toArray()[1].value'}")
         .with("map", map)
         .format());
 
@@ -73,7 +74,7 @@ class SpELFormatterTest extends AbstractFormatterTest
         .format());
 
     assertEquals("negative", messageSupport
-        .message("%{map,format:spel,spel-expr:'entrySet().toArray()[2].value',spel-format:choice,<0:negative}")
+        .message("%{map,spel-expr:'entrySet().toArray()[2].value',spel-format:choice,<0:negative}")
         .with("map", map)
         .format());
   }

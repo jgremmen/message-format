@@ -151,17 +151,17 @@ class GeoFormatterTest extends AbstractFormatterTest
     parameters.put("lon", dms(4, 48));
 
     assertEquals("coordinates 4\u00b048'0\"E, 51\u00b034'9\"N", messageSupport
-        .message("coordinates %{lon,format:geo,geo:longitude}, %{lat,format:geo,geo:latitude}")
+        .message("coordinates %{lon,geo:longitude}, %{lat,geo:latitude}")
         .with(parameters)
         .format());
 
     assertEquals("coordinates 4\u00b048.0' E, 51\u00b034'9.000\"N", messageSupport
-        .message("coordinates %{lon,format:geo,geo:'dM LO'}, %{lat,format:geo,geo:long-latitude}")
+        .message("coordinates %{lon,geo:'dM LO'}, %{lat,geo:long-latitude}")
         .with(parameters)
         .format());
 
     assertEquals("51\u00b034'09\"N", messageSupport
-        .message("%{lat,format:geo,geo:'d0m0sLA'}")
+        .message("%{lat,geo:'d0m0sLA'}")
         .with(parameters)
         .format());
 

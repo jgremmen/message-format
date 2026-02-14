@@ -43,7 +43,7 @@ public final class OptionalDoubleFormatter
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull OptionalDouble optionalDouble)
   {
     return optionalDouble.isPresent()
-        ? context.format(optionalDouble.getAsDouble(), double.class, true)
+        ? context.format(optionalDouble.getAsDouble(), double.class)
         : emptyText();
   }
 

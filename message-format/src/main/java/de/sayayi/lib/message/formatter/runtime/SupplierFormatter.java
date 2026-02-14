@@ -39,7 +39,7 @@ public final class SupplierFormatter
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Supplier<?> supplier) {
-    return context.format(supplier.get(), true);
+    return context.format(supplier.get());
   }
 
 

@@ -37,7 +37,7 @@ public final class LongSupplierFormatter
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull LongSupplier longSupplier) {
-    return context.format(longSupplier.getAsLong(), long.class, true);
+    return context.format(longSupplier.getAsLong(), long.class);
   }
 
 

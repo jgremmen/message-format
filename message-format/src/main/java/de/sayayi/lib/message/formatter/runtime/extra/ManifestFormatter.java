@@ -34,9 +34,9 @@ public final class ManifestFormatter extends AbstractMultiSelectFormatter<Manife
     super("manifest", "main-attrs" , true);
 
     register(new String[] { "main-attrs", "main-attributes" },
-        (context,manifest) -> context.format(manifest.getMainAttributes(), true));
+        (context,manifest) -> context.format(manifest.getMainAttributes()));
     register("entries",
-        (context,manifest) -> context.format(manifest.getEntries(), true));
+        (context,manifest) -> context.format(manifest.getEntries()));
   }
 
 

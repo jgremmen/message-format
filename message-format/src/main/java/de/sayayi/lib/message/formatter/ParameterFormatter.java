@@ -400,6 +400,7 @@ public interface ParameterFormatter
    * Qualifies a parameter formatter for being assigned to type {@code Object}.
    *
    * @see GenericFormatterService#addFormatterForType(FormattableType, ParameterFormatter)
+   *
    * @since 0.8.4
    */
   interface DefaultFormatter extends ConfigKeyComparator<Object> {

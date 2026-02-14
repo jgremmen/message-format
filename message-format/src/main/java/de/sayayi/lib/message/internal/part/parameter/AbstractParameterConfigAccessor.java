@@ -50,6 +50,12 @@ abstract class AbstractParameterConfigAccessor implements ParameterConfigAccesso
 
 
   @Override
+  public @NotNull ParameterConfig getParameterConfig() {
+    return parameterConfig;
+  }
+
+
+  @Override
   public @NotNull Optional<ConfigValue<?>> getConfigValue(@NotNull String name)
   {
     final var configValue = parameterConfig.getConfigValue(name);
