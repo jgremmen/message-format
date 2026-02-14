@@ -49,7 +49,7 @@ class MessageSupportMessageSourceTest
         .create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
     messageSupport.addMessage("spring.message.1",
-        "you have %{p1,choice,1:'a single result',:'%{p1} results'}");
+        "you have %{p1,format:choice,1:'a single result',:'%{p1} results'}");
     messageSupport.addMessage("spring.message.2",
         "hello%{p1,!empty:' %{p1}',empty:'!'}");
     messageSupport.addMessage("spring.message.3",

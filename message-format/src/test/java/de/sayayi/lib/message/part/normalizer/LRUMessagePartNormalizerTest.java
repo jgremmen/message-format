@@ -82,7 +82,8 @@ class LRUMessagePartNormalizerTest
   void testCache() throws Exception
   {
     val resolver = new LRUMessagePartNormalizer(10);
-    val msg = new MessageFactory(resolver).parseMessage("this is %{a,number} and %{b}this is %{b}");
+    val msg = new MessageFactory(resolver)
+        .parseMessage("this is %{a,format:number} and %{b}this is %{b}");
     val parts = (MessagePart[])
         tryToReadFieldValue(CompoundMessage.class, "messageParts", (CompoundMessage)msg).get();
 

@@ -180,7 +180,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     final var parserRuleContext = parser.getRuleContext();
 
     if (parserRuleContext instanceof NameOrKeywordContext &&
-        new IntervalSet(BOOL, NAME, NULL, EMPTY).equals(expectedTokens))
+        new IntervalSet(BOOL, NAME, NULL, EMPTY, FORMAT).equals(expectedTokens))
     {
       if (parserRuleContext.parent instanceof ParameterNameContext)
         return "missing parameter name at " + getTokenDisplayText(parser, mismatchLocationNearToken);
@@ -189,7 +189,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         return "missing template name at " + getTokenDisplayText(parser, mismatchLocationNearToken);
     }
 
-    if (new IntervalSet(SQ_START, DQ_START, BOOL, NAME, NULL, EMPTY).equals(expectedTokens))
+    if (new IntervalSet(SQ_START, DQ_START, BOOL, NAME, NULL, EMPTY, FORMAT).equals(expectedTokens))
     {
       if (parserRuleContext instanceof ForceQuotedMessageContext &&
           parserRuleContext.parent instanceof ParameterPartContext)
@@ -439,22 +439,24 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       final var mapElements =
           ctx.parameterConfigElement().stream().collect(PARAMETER_CONFIG_COLLECTOR);
 
-      var forceQuotedMessage = ctx.forceQuotedMessage();
+      final var forceQuotedMessage = ctx.forceQuotedMessage();
       if (forceQuotedMessage != null)
         mapElements.put(null, new ConfigValueMessage(forceQuotedMessage.messageWithSpaces));
 
-      var name = ctx.parameterName().name;
-      if (name.isEmpty())
-      {
-        syntaxError("parameter name must not be empty")
-            .with(ctx.parameterName())
-            .report();
-      }
-
       final var parameterFormat = ctx.parameterFormat();
+      final var format = switch(parameterFormat.size()) {
+        case 0 -> null;
+        case 1 -> parameterFormat.getFirst().format;
+        default -> {
+          syntaxError("parameter format can occur only once")
+              .with(parameterFormat.get(1))
+              .report();
+          yield null;  // never reached
+        }
+      };
 
       ctx.part = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(
-          name, parameterFormat == null ? null : parameterFormat.format,
+          ctx.parameterName().name, format,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
           new ParameterConfigImpl(mapElements)));

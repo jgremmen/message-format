@@ -84,7 +84,7 @@ class BoolFormatterTest extends AbstractFormatterTest
         .setLocale(ENGLISH);
 
     assertEquals("false true 1234 true no 3.14", messageSupport
-        .message("%{a} %{b} %{c} %{c,bool} %{d,bool,true:'yes',false:'no'} %{e}")
+        .message("%{a} %{b} %{c} %{c,format:bool} %{d,format:bool,true:'yes',false:'no'} %{e}")
         .with("a", FALSE)
         .with("b", TRUE)
         .with("c", Integer.valueOf(1234))
@@ -101,7 +101,7 @@ class BoolFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE)
         .setLocale(GERMAN);
 
-    val msg = messageSupport.message("%{b,bool,null:'<unknown>',true:'yes',false:'no'}").getMessage();
+    val msg = messageSupport.message("%{b,format:bool,null:'<unknown>',true:'yes',false:'no'}").getMessage();
 
     assertEquals("<unknown>", messageSupport.message(msg).with("b", null).format());
     assertEquals("yes", messageSupport.message(msg).with("b", true).format());
@@ -127,7 +127,7 @@ class BoolFormatterTest extends AbstractFormatterTest
         .format());
 
     assertEquals("", messageSupport
-        .message("%{b,bool}")
+        .message("%{b,format:bool}")
         .with("b", null)
         .format());
 
@@ -151,7 +151,7 @@ class BoolFormatterTest extends AbstractFormatterTest
         .format());
 
     assertEquals("empty", messageSupport
-        .message("%{b,bool,empty:empty,!empty:'not empty'}")
+        .message("%{b,format:bool,empty:empty,!empty:'not empty'}")
         .with("b", "very true")
         .format());
   }
@@ -175,7 +175,7 @@ class BoolFormatterTest extends AbstractFormatterTest
         .with("b", Optional.of(false))
         .format());
 
-    message = messageSupport.message("%{b,bool,true:true,false:false}");
+    message = messageSupport.message("%{b,format:bool,true:true,false:false}");
 
     // int value
     assertEquals("true", message
@@ -248,7 +248,7 @@ class BoolFormatterTest extends AbstractFormatterTest
     val messageSupport = MessageSupportFactory
         .create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
 
-    val message = messageSupport.message("%{b,bool,'false':false,'True':'True'}");
+    val message = messageSupport.message("%{b,format:bool,'false':false,'True':'True'}");
 
     assertEquals("true", message.with("b", TRUE).format());
     assertEquals("true", message.with("b", "true").format());

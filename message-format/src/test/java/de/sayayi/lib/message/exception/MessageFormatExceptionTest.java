@@ -173,7 +173,7 @@ class MessageFormatExceptionTest
   {
     assertEquals("failed to format message parameter 'p'",
         assertThrowsExactly(MessageFormatException.class, () -> MESSAGE_SUPPORT
-            .message("%{p,throw}")
+            .message("%{p,format:throw}")
             .with("p", new NullPointerException())
             .format())
             .getMessage());
@@ -200,7 +200,7 @@ class MessageFormatExceptionTest
   {
     val lmMap = new HashMap<Locale,String>();
 
-    lmMap.put(GERMANY, "%{n,throw}");
+    lmMap.put(GERMANY, "%{n,format:throw}");
     lmMap.put(ENGLISH, "%{e}");
 
     assertEquals("failed to format message parameter 'n' for locale German",
@@ -230,7 +230,7 @@ class MessageFormatExceptionTest
   void testFormat0101()
   {
     MESSAGE_SUPPORT.addTemplate("msg-with-default", MESSAGE_SUPPORT.getMessageAccessor()
-        .getMessageFactory().parseMessage("%{m,throw}"));
+        .getMessageFactory().parseMessage("%{m,format:throw}"));
 
     assertEquals("failed to format parameter 'm' in template 'msg-with-default'",
         assertThrowsExactly(MessageFormatException.class, () -> MESSAGE_SUPPORT
@@ -246,7 +246,7 @@ class MessageFormatExceptionTest
   {
     val lmMap = new HashMap<Locale,String>();
 
-    lmMap.put(GERMANY, "%{n,throw}");
+    lmMap.put(GERMANY, "%{n,format:throw}");
     lmMap.put(ENGLISH, "%[tpl]");
 
     assertEquals("failed to format template 'tpl' for locale English (United Kingdom)",
@@ -263,11 +263,11 @@ class MessageFormatExceptionTest
   void testFormat0111()
   {
     MESSAGE_SUPPORT.addTemplate("name", MESSAGE_SUPPORT.getMessageAccessor()
-        .getMessageFactory().parseMessage("%{p,throw}"));
+        .getMessageFactory().parseMessage("%{p,format:throw}"));
 
     val lmMap = new HashMap<Locale,String>();
 
-    lmMap.put(GERMANY, "%{n,throw}");
+    lmMap.put(GERMANY, "%{n,format:throw}");
     lmMap.put(ITALIAN, "%[name]");
 
     assertEquals("failed to format parameter 'p' in template 'name' for locale Italian (Italy)",
@@ -297,7 +297,7 @@ class MessageFormatExceptionTest
   @DisplayName("format: failed to format parameter 'number' for message with code 'MSG-002'")
   void testFormat1001()
   {
-    MESSAGE_SUPPORT.addMessage("MSG-002", "%{number,throw}");
+    MESSAGE_SUPPORT.addMessage("MSG-002", "%{number,format:throw}");
 
     assertEquals("failed to format parameter 'number' for message with code 'MSG-002'",
         assertThrowsExactly(MessageFormatException.class, () -> MESSAGE_SUPPORT
@@ -327,8 +327,8 @@ class MessageFormatExceptionTest
   {
     val lmMap = new HashMap<Locale,String>();
 
-    lmMap.put(GERMANY, "%{n,throw}");
-    lmMap.put(ENGLISH, "%{flag,throw}");
+    lmMap.put(GERMANY, "%{n,format:throw}");
+    lmMap.put(ENGLISH, "%{flag,format:throw}");
 
     assertEquals("failed to format parameter 'flag' for message with code 'MSG-004' and locale English (United States)",
         assertThrowsExactly(MessageFormatException.class, () -> MESSAGE_SUPPORT
@@ -357,7 +357,7 @@ class MessageFormatExceptionTest
   void testFormat1101()
   {
     MESSAGE_SUPPORT.addTemplate("age-range", MESSAGE_SUPPORT.getMessageAccessor()
-        .getMessageFactory().parseMessage("%{abc,throw}"));
+        .getMessageFactory().parseMessage("%{abc,format:throw}"));
 
     assertEquals("failed to format parameter 'abc' in template 'age-range' for message with code 'MFP2'",
         assertThrowsExactly(MessageFormatException.class, () -> MESSAGE_SUPPORT
@@ -374,7 +374,7 @@ class MessageFormatExceptionTest
   {
     val lmMap = new HashMap<Locale,String>();
 
-    lmMap.put(GERMANY, "%{n,throw}");
+    lmMap.put(GERMANY, "%{n,format:throw}");
     lmMap.put(Locale.forLanguageTag("nl"), "%[tpl]");
 
     assertEquals("failed to format template 'tpl' for message with code 'MFP3' and locale Dutch (Belgium)",
@@ -392,11 +392,11 @@ class MessageFormatExceptionTest
   void testFormat1111()
   {
     MESSAGE_SUPPORT.addTemplate("bool", MESSAGE_SUPPORT.getMessageAccessor()
-        .getMessageFactory().parseMessage("%{j,throw}"));
+        .getMessageFactory().parseMessage("%{j,format:throw}"));
 
     val lmMap = new HashMap<Locale,String>();
 
-    lmMap.put(GERMANY, "%{n,throw}");
+    lmMap.put(GERMANY, "%{n,format:throw}");
     lmMap.put(FRANCE, "%[bool]");
 
     assertEquals("failed to format parameter 'j' in template 'bool' for message with code 'MFP4' and locale French (Switzerland)",

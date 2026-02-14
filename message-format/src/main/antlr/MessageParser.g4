@@ -70,8 +70,7 @@ forceQuotedMessage returns [Message.WithSpaces messageWithSpaces]
 parameterPart returns [Parameter part]
         : P_START
           parameterName
-          (COMMA parameterFormat)?
-          (COMMA parameterConfigElement)*
+          (COMMA (parameterConfigElement | parameterFormat))*
           (COMMA COLON forceQuotedMessage)?
           P_END
         ;
@@ -81,7 +80,7 @@ parameterName returns [String name]
         ;
 
 parameterFormat returns [String format]
-        : nameOrKeyword  // kebab-case format
+        : FORMAT COLON nameOrKeyword  // kebab-case format
         ;
 
 parameterConfigElement returns [List<ConfigKey> configKeys, ConfigValue<?> configValue]
@@ -167,4 +166,5 @@ nameOrKeyword returns [String name]
         | BOOL
         | NULL
         | EMPTY
+        | FORMAT
         ;

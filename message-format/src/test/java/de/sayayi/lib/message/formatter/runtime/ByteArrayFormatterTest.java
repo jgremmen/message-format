@@ -154,7 +154,7 @@ public class ByteArrayFormatterTest extends AbstractFormatterTest
             new ByteArrayFormatter()),
         NO_CACHE_INSTANCE);
 
-    assertEquals("2", messageSupport.message("%{c,size}")
+    assertEquals("2", messageSupport.message("%{c,format:size}")
         .with("c", new byte[] { 'a', 'b' }).format());
   }
 }

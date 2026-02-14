@@ -98,7 +98,7 @@ class MessageSupportTest
   {
     val exception = assertThrowsExactly(IOException.class, () -> {
       val supplier = shared()
-          .message("%{b,bool,true:yes,false:no}")
+          .message("%{b,format:bool,true:yes,false:no}")
           .with("b", BigInteger.valueOf(-5000))
           .formattedExceptionSupplier(msg -> new IOException("answer = " + msg));
 

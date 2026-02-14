@@ -112,13 +112,13 @@ class MessageCompilerTest
         new MessagePart[] {
             new ParameterPart("p", "bool", false, false, emptyParameterConfig)
         },
-        COMPILER.compileMessage("%{ p, bool }").getMessageParts());
+        COMPILER.compileMessage("%{ p, format:bool }").getMessageParts());
 
     assertArrayEquals(
         new MessagePart[] {
             new ParameterPart("p", "null", false, false, emptyParameterConfig)
         },
-        COMPILER.compileMessage("%{p,null}").getMessageParts());
+        COMPILER.compileMessage("%{p,format:null}").getMessageParts());
   }
 
 

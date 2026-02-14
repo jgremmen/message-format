@@ -115,12 +115,12 @@ class StringFormatterTest extends AbstractFormatterTest
         new DefaultFormatterService(), NO_CACHE_INSTANCE);
 
     assertEquals("exact", messageSupport
-        .message("%{text,choice,'Süd':'exact'}")
+        .message("%{text,format:choice,'Süd':'exact'}")
         .with("text", "Süd")
         .format());
 
     assertEquals("lenient", messageSupport
-        .message("%{text,choice,'SUD':'lenient'}")
+        .message("%{text,format:choice,'SUD':'lenient'}")
         .with("text", "Süd")
         .format());
   }

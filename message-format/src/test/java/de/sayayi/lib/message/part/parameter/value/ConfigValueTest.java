@@ -84,13 +84,13 @@ class ConfigValueTest
     assertThrows(Exception.class, () -> new ConfigValueMessage(null));
 
     val messageFactory = MessageFactory.NO_CACHE_INSTANCE;
-    val msg = messageFactory.parseMessage("%{a,bool} %{s}.");
+    val msg = messageFactory.parseMessage("%{a,format:bool} %{s}.");
 
     val message = new ConfigValueMessage(msg);
 
-    assertEquals(messageFactory.parseMessage("%{a, bool } %{ s }."), message.asObject());
+    assertEquals(messageFactory.parseMessage("%{a, format:bool } %{ s }."), message.asObject());
     assertEquals(
         message.asObject(),
-        new ConfigValueString("%{a, bool } %{ s }.").asMessage(messageFactory));
+        new ConfigValueString("%{a, format:bool } %{ s }.").asMessage(messageFactory));
   }
 }

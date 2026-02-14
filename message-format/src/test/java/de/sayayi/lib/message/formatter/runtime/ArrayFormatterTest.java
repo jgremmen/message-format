@@ -155,7 +155,7 @@ class ArrayFormatterTest extends AbstractFormatterTest
 
     assertEquals(new TextPart("0x40, 0xda, 0x2e"),
         format(messageAccessor, new int[] { 64, 218, 46 },
-            Map.of(new ConfigKeyName("list-value"), new ConfigValueString("%{value,hex}"))));
+            Map.of(new ConfigKeyName("list-value"), new ConfigValueString("%{value,format:hex}"))));
   }
 
 

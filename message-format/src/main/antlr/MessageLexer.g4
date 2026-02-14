@@ -120,6 +120,9 @@ NULL
 EMPTY
         : 'empty'
         ;
+FORMAT
+        : 'format'
+        ;
 P_NAME
         : Name -> type(NAME)
         ;

@@ -48,9 +48,9 @@ public class TemplateTest
 
     // Template 'buch', requiring parameter 'collection' and 'fall'
     configurableMessageSupport.addTemplate("buch",
-        messageFactory.parseTemplate("%{collection,size," +
-            "<>1:'%{fall,choice,'nom':'die Bücher','gen':'der Bücher','dat':'den Büchern','akk':'die Bücher'}'," +
-            "1:'%{fall,choice,'nom':'das Buch','gen':'des Buches','dat':'dem Buch','akk':'das Buch'}'}"));
+        messageFactory.parseTemplate("%{collection,format:size," +
+            "<>1:'%{fall,format:choice,'nom':'die Bücher','gen':'der Bücher','dat':'den Büchern','akk':'die Bücher'}'," +
+            "1:'%{fall,format:choice,'nom':'das Buch','gen':'des Buches','dat':'dem Buch','akk':'das Buch'}'}"));
 
     messageSupport = configurableMessageSupport;
   }

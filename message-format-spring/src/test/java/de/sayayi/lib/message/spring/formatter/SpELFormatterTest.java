@@ -63,17 +63,17 @@ class SpELFormatterTest extends AbstractFormatterTest
     map.put("D", -8);
 
     assertEquals("34", messageSupport
-        .message("%{map,spel,spel-expr:'entrySet().toArray()[1].value'}")
+        .message("%{map,format:spel,spel-expr:'entrySet().toArray()[1].value'}")
         .with("map", map)
         .format());
 
     assertEquals("no", messageSupport
-        .message("%{map,spel,spel-expr:'entrySet().toArray()[0].value',spel-format:bool,false:no}")
+        .message("%{map,format:spel,spel-expr:'entrySet().toArray()[0].value',spel-format:bool,false:no}")
         .with("map", map)
         .format());
 
     assertEquals("negative", messageSupport
-        .message("%{map,spel,spel-expr:'entrySet().toArray()[2].value',spel-format:choice,<0:negative}")
+        .message("%{map,format:spel,spel-expr:'entrySet().toArray()[2].value',spel-format:choice,<0:negative}")
         .with("map", map)
         .format());
   }

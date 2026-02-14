@@ -226,10 +226,7 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
       if (secondsFormat != null)
       {
         if (minuteFormat == null)
-        {
-          throw new IllegalArgumentException("missing minute specification in geo format: " +
-              formatString);
-        }
+          throw new IllegalArgumentException("missing minute specification in geo format: " + formatString);
 
         format.minuteDigits = 0;  // reduce precision for minutes
         format.secondDigits = "s".equals(secondsFormat) ? 0 : secondsFormat.length();
