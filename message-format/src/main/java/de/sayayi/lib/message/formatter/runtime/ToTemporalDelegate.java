@@ -32,7 +32,7 @@ import java.util.Date;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.EMPTY_NULL_TYPE;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.EMPTY_NULL_TYPE;
 
 
 /**

@@ -22,13 +22,12 @@ import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.internal.CompoundMessage;
-import de.sayayi.lib.message.internal.part.NoSpaceTextPart;
+import de.sayayi.lib.message.internal.part.parameter.ParameterConfigImpl;
+import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.internal.part.text.NoSpaceTextPart;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.ParameterConfig;
-import de.sayayi.lib.message.part.parameter.ParameterPart;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
-import de.sayayi.lib.message.part.parameter.key.ConfigKeyNull;
-import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -38,8 +37,9 @@ import java.util.Map.Entry;
 import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_ORDER;
+import static de.sayayi.lib.message.internal.part.parameter.key.ConfigKeyNull.EQ;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult.forEmptyKey;
 import static java.util.Collections.emptyIterator;
 
 
@@ -53,7 +53,7 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
 
   static
   {
-    var nullConfig = new ParameterConfig(Map.of(ConfigKeyNull.EQ, new ConfigValueString("(null)")));
+    var nullConfig = new ParameterConfigImpl(Map.of(EQ, new ConfigValueString("(null)")));
 
     // default map-kv: %{key,null:'(null)'}=%{value,null:'(null)'}
     DEFAULT_KEY_VALUE_MESSAGE = new CompoundMessage(List.of(

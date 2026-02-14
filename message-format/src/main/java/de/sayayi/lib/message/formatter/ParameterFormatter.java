@@ -17,8 +17,8 @@ package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextPartFactory;
+import de.sayayi.lib.message.part.parameter.ConfigKey;
 import de.sayayi.lib.message.part.parameter.ParameterConfigAccessor;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -30,12 +30,12 @@ import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.*;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.MISMATCH;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forNullKey;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.NUMBER;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.STRING;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.*;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult.Defined.MISMATCH;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult.forEmptyKey;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult.forNullKey;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.Type.NUMBER;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.Type.STRING;
 import static java.util.Optional.empty;
 
 

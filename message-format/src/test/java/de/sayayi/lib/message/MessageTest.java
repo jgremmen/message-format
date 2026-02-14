@@ -46,10 +46,10 @@ public class MessageTest
   {
     val texts = new HashMap<Locale,String>();
 
-    texts.put(UK, "%{n} %{n,choice,1:'colour', :'colours'}.");
-    texts.put(Locale.forLanguageTag("nl-NL"), "%{n} %{n,choice,1 : 'kleur',: 'kleuren'}.");
-    texts.put(Locale.GERMAN, "%{n} %{n,choice,1: 'Farbe', :'Farben'}.");
-    texts.put(Locale.US, "%{n} %{n,choice,1:'color', :'colors'}.");
+    texts.put(UK, "%{n} %{n,format:choice,1:'colour', :'colours'}.");
+    texts.put(Locale.forLanguageTag("nl-NL"), "%{n} %{n, format:choice,1 : 'kleur',: 'kleuren'}.");
+    texts.put(Locale.GERMAN, "%{n} %{n,format:choice,1: 'Farbe', :'Farben'}.");
+    texts.put(Locale.US, "%{n} %{n,format:choice,1:'color', :'colors'}.");
 
     val msg = NO_CACHE_INSTANCE.parseMessage(texts);
     val messageSupport = MessageSupportFactory.shared();
@@ -65,7 +65,7 @@ public class MessageTest
   void testCompareType()
   {
     val messageSupport = MessageSupportFactory.shared();
-    val m = messageSupport.message("%{n,choice,<0:'negative',>0:'positive',:'zero'}").getMessage();
+    val m = messageSupport.message("%{n,format:choice,<0:'negative',>0:'positive',:'zero'}").getMessage();
 
     assertEquals("negative",
         messageSupport.message(m).locale(UK).with("n", -1).format());

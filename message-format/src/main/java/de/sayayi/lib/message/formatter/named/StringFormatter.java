@@ -22,9 +22,9 @@ import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.DefaultFormatter;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
-import de.sayayi.lib.message.part.parameter.value.ConfigValueBool;
+import de.sayayi.lib.message.part.parameter.ConfigKey;
+import de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult;
+import de.sayayi.lib.message.part.parameter.ConfigValue.BoolValue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -35,10 +35,9 @@ import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.*;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
-import static de.sayayi.lib.message.part.parameter.value.ConfigValue.Type.BOOL;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.CompareType.EQ;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult.Defined.*;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult.forEmptyKey;
 import static java.lang.Integer.toHexString;
 import static java.text.Collator.*;
 
@@ -82,13 +81,12 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   {
     var string = asString(value);
 
-    if (!(value instanceof CharSequence) && !(value instanceof char[]))
-    {
-      final var cv = messageAccessor.getDefaultParameterConfig("ignore-default-tostring");
-
-      if (cv != null && cv.getType() == BOOL && ((ConfigValueBool)cv).booleanValue() && isDefaultToString(value))
-        string = "";
-    }
+    if (!(value instanceof CharSequence) &&
+        !(value instanceof char[]) &&
+        messageAccessor.getDefaultParameterConfig("ignore-default-tostring") instanceof BoolValue boolValue &&
+        boolValue.booleanValue() &&
+        isDefaultToString(value))
+      string = "";
 
     return string;
   }

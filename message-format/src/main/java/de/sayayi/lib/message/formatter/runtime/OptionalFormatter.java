@@ -22,16 +22,16 @@ import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextPartFactory;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult;
+import de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.OptionalLong;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.Defined.MISMATCH;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forEmptyKey;
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.MatchResult.forNullKey;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult.Defined.MISMATCH;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult.forEmptyKey;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.MatchResult.forNullKey;
 
 
 /**

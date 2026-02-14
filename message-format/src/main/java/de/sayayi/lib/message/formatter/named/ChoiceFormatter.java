@@ -19,15 +19,14 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
+import de.sayayi.lib.message.part.parameter.ConfigKey;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.Type.*;
+import static de.sayayi.lib.message.part.parameter.ConfigKey.Type.*;
 
 
 /**
@@ -53,11 +52,5 @@ public final class ChoiceFormatter implements NamedParameterFormatter
     return context.format(context
         .getConfigMapMessage(value, KEY_TYPES, true)
         .orElse(Message.WithSpaces.EMPTY));
-  }
-
-
-  @Override
-  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
-    return Set.of("choice");
   }
 }

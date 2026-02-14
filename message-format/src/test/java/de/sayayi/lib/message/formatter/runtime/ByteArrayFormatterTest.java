@@ -18,9 +18,9 @@ package de.sayayi.lib.message.formatter.runtime;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.AbstractFormatterTest;
 import de.sayayi.lib.message.formatter.named.SizeFormatter;
-import de.sayayi.lib.message.internal.part.TextPart;
-import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
-import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.internal.part.parameter.key.ConfigKeyName;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.internal.part.text.TextPart;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -154,7 +154,7 @@ public class ByteArrayFormatterTest extends AbstractFormatterTest
             new ByteArrayFormatter()),
         NO_CACHE_INSTANCE);
 
-    assertEquals("2", messageSupport.message("%{c,size}")
+    assertEquals("2", messageSupport.message("%{c,format:size}")
         .with("c", new byte[] { 'a', 'b' }).format());
   }
 }

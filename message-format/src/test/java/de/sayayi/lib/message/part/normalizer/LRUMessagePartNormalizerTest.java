@@ -17,7 +17,7 @@ package de.sayayi.lib.message.part.normalizer;
 
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.internal.CompoundMessage;
-import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.internal.part.text.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
@@ -82,7 +82,8 @@ class LRUMessagePartNormalizerTest
   void testCache() throws Exception
   {
     val resolver = new LRUMessagePartNormalizer(10);
-    val msg = new MessageFactory(resolver).parseMessage("this is %{a,number} and %{b}this is %{b}");
+    val msg = new MessageFactory(resolver)
+        .parseMessage("this is %{a,format:number} and %{b}this is %{b}");
     val parts = (MessagePart[])
         tryToReadFieldValue(CompoundMessage.class, "messageParts", (CompoundMessage)msg).get();
 

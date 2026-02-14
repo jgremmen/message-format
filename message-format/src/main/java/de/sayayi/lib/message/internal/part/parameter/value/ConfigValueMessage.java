@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.part.parameter.value;
+package de.sayayi.lib.message.internal.part.parameter.value;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.internal.pack.PackSupport;
+import de.sayayi.lib.message.part.parameter.ConfigValue.MessageValue;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.NotNull;
@@ -29,28 +30,15 @@ import static java.util.Objects.requireNonNull;
 /**
  * This class represents a message configuration value.
  *
+ * @param messageValue  configuration value message.
+ *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
-public final class ConfigValueMessage implements ConfigValue
+public record ConfigValueMessage(@NotNull Message.WithSpaces messageValue) implements MessageValue
 {
-  /** Configuration value message. */
-  private final @NotNull Message.WithSpaces message;
-
-
-  public ConfigValueMessage(@NotNull Message.WithSpaces message) {
-    this.message = requireNonNull(message, "message must not be null");
-  }
-
-
-  /**
-   * {@inheritDoc}
-   *
-   * @return  always {@link Type#MESSAGE Type#MESSAGE}
-   */
-  @Override
-  public @NotNull Type getType() {
-    return Type.MESSAGE;
+  public ConfigValueMessage(@NotNull Message.WithSpaces messageValue) {
+    this.messageValue = requireNonNull(messageValue, "message must not be null");
   }
 
 
@@ -61,25 +49,13 @@ public final class ConfigValueMessage implements ConfigValue
    */
   @Override
   public @NotNull Message.WithSpaces asObject() {
-    return message;
+    return messageValue();
   }
 
 
   @Override
-  public boolean equals(Object o) {
-    return o instanceof ConfigValueMessage && message.equals(((ConfigValueMessage)o).message);
-  }
-
-
-  @Override
-  public int hashCode() {
-    return 59 + message.hashCode();
-  }
-
-
-  @Override
-  public String toString() {
-    return message.toString();
+  public @NotNull String toString() {
+    return messageValue.toString();
   }
 
 
@@ -89,11 +65,9 @@ public final class ConfigValueMessage implements ConfigValue
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    PackSupport.pack(message, packStream);
+    PackSupport.pack(messageValue, packStream);
   }
 
 
@@ -106,12 +80,9 @@ public final class ConfigValueMessage implements ConfigValue
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
-  public static @NotNull ConfigValueMessage unpack(
-      @SuppressWarnings("ClassEscapesDefinedScope") @NotNull PackSupport unpack,
-      @NotNull PackInputStream packStream) throws IOException {
+  public static @NotNull ConfigValueMessage unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
+      throws IOException {
     return new ConfigValueMessage(unpack.unpackMessageWithSpaces(packStream));
   }
 }

@@ -125,7 +125,7 @@ class MapFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(
             new MapFormatter(), new ArrayFormatter(), new BoolFormatter()),
             NO_CACHE_INSTANCE)
-        .message("%{map,map-kv:'%{key,bool}:%{value}',list-sep:' / '}");
+        .message("%{map,map-kv:'%{key,format:bool}:%{value}',list-sep:' / '}");
 
     val map = new LinkedHashMap<Integer,Integer>();
     map.put(10, 1);

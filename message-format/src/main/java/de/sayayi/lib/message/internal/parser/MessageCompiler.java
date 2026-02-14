@@ -26,14 +26,19 @@ import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.TextMessage;
-import de.sayayi.lib.message.internal.part.TemplatePart;
-import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.internal.part.parameter.ParameterConfigImpl;
+import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
+import de.sayayi.lib.message.internal.part.parameter.key.*;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueBool;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueMessage;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueNumber;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.internal.part.template.TemplatePart;
+import de.sayayi.lib.message.internal.part.text.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.part.parameter.ParameterConfig;
-import de.sayayi.lib.message.part.parameter.ParameterPart;
-import de.sayayi.lib.message.part.parameter.key.*;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType;
-import de.sayayi.lib.message.part.parameter.value.*;
+import de.sayayi.lib.message.part.parameter.ConfigKey;
+import de.sayayi.lib.message.part.parameter.ConfigKey.CompareType;
+import de.sayayi.lib.message.part.parameter.ConfigValue;
 import de.sayayi.lib.message.util.SpacesUtil;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -175,7 +180,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     final var parserRuleContext = parser.getRuleContext();
 
     if (parserRuleContext instanceof NameOrKeywordContext &&
-        new IntervalSet(BOOL, NAME, NULL, EMPTY).equals(expectedTokens))
+        new IntervalSet(BOOL, NAME, NULL, EMPTY, FORMAT).equals(expectedTokens))
     {
       if (parserRuleContext.parent instanceof ParameterNameContext)
         return "missing parameter name at " + getTokenDisplayText(parser, mismatchLocationNearToken);
@@ -184,7 +189,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         return "missing template name at " + getTokenDisplayText(parser, mismatchLocationNearToken);
     }
 
-    if (new IntervalSet(SQ_START, DQ_START, BOOL, NAME, NULL, EMPTY).equals(expectedTokens))
+    if (new IntervalSet(SQ_START, DQ_START, BOOL, NAME, NULL, EMPTY, FORMAT).equals(expectedTokens))
     {
       if (parserRuleContext instanceof ForceQuotedMessageContext &&
           parserRuleContext.parent instanceof ParameterPartContext)
@@ -400,14 +405,14 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final Collector<ParameterConfigElementContext,Map<ConfigKey,ConfigValue>,Map<ConfigKey,ConfigValue>>
+    final Collector<ParameterConfigElementContext,Map<ConfigKey,ConfigValue<?>>,Map<ConfigKey,ConfigValue<?>>>
         PARAMETER_CONFIG_COLLECTOR = new Collector<>() {
-      @Override public Supplier<Map<ConfigKey,ConfigValue>> supplier() { return LinkedHashMap::new; }
-      @Override public BinaryOperator<Map<ConfigKey,ConfigValue>> combiner() { return foldCombiner(); }
+      @Override public Supplier<Map<ConfigKey,ConfigValue<?>>> supplier() { return LinkedHashMap::new; }
+      @Override public BinaryOperator<Map<ConfigKey,ConfigValue<?>>> combiner() { return foldCombiner(); }
       @Override public Set<Characteristics> characteristics() { return Set.of(IDENTITY_FINISH); }
 
       @Override
-      public BiConsumer<Map<ConfigKey,ConfigValue>,ParameterConfigElementContext> accumulator()
+      public BiConsumer<Map<ConfigKey,ConfigValue<?>>,ParameterConfigElementContext> accumulator()
       {
         return (map,cec) -> {
           for(var key: cec.configKeys)
@@ -422,7 +427,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       }
 
       @Override
-      public Function<Map<ConfigKey,ConfigValue>,Map<ConfigKey,ConfigValue>> finisher() {
+      public Function<Map<ConfigKey,ConfigValue<?>>,Map<ConfigKey,ConfigValue<?>>> finisher() {
         return identity();
       }
     };
@@ -434,25 +439,27 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       final var mapElements =
           ctx.parameterConfigElement().stream().collect(PARAMETER_CONFIG_COLLECTOR);
 
-      var forceQuotedMessage = ctx.forceQuotedMessage();
+      final var forceQuotedMessage = ctx.forceQuotedMessage();
       if (forceQuotedMessage != null)
         mapElements.put(null, new ConfigValueMessage(forceQuotedMessage.messageWithSpaces));
 
-      var name = ctx.parameterName().name;
-      if (name.isEmpty())
-      {
-        syntaxError("parameter name must not be empty")
-            .with(ctx.parameterName())
-            .report();
-      }
-
       final var parameterFormat = ctx.parameterFormat();
+      final var format = switch(parameterFormat.size()) {
+        case 0 -> null;
+        case 1 -> parameterFormat.getFirst().format;
+        default -> {
+          syntaxError("parameter format can occur only once")
+              .with(parameterFormat.get(1))
+              .report();
+          yield null;  // never reached
+        }
+      };
 
       ctx.part = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(
-          name, parameterFormat == null ? null : parameterFormat.format,
+          ctx.parameterName().name, format,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
-          new ParameterConfig(mapElements)));
+          new ParameterConfigImpl(mapElements)));
     }
 
 
@@ -480,14 +487,14 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final Collector<ConfigNamedElementContext,Map<String,ConfigValue>,Map<String,ConfigValue>>
+    final Collector<ConfigNamedElementContext,Map<String,ConfigValue<?>>,Map<String,ConfigValue<?>>>
         TEMPLATE_NAMED_PARAMETER_COLLECTOR = new Collector<>() {
-      @Override public Supplier<Map<String,ConfigValue>> supplier() { return TreeMap::new; }
-      @Override public BinaryOperator<Map<String,ConfigValue>> combiner() { return foldCombiner(); }
+      @Override public Supplier<Map<String,ConfigValue<?>>> supplier() { return TreeMap::new; }
+      @Override public BinaryOperator<Map<String,ConfigValue<?>>> combiner() { return foldCombiner(); }
       @Override public Set<Characteristics> characteristics() { return Set.of(UNORDERED); }
 
       @Override
-      public BiConsumer<Map<String,ConfigValue>,ConfigNamedElementContext> accumulator()
+      public BiConsumer<Map<String,ConfigValue<?>>,ConfigNamedElementContext> accumulator()
       {
         return (map,cpec) -> {
           final var name = cpec.configKey.getName();
@@ -505,7 +512,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
       @Override
-      public Function<Map<String,ConfigValue>,Map<String,ConfigValue>> finisher() {
+      public Function<Map<String,ConfigValue<?>>,Map<String,ConfigValue<?>>> finisher() {
         return identity();
       }
     };
@@ -577,6 +584,25 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     {
       ctx.parameter = ((SimpleStringContext)ctx.getChild(0)).string;
       ctx.delegatedParameter = ((SimpleStringContext)ctx.getChild(2)).string;
+    }
+
+
+    @Override
+    public void exitPostFormatPart(PostFormatPartContext ctx)
+    {
+      //TODO implement
+    }
+
+
+    @Override
+    public void exitPostFormatName(PostFormatNameContext ctx)
+    {
+      if (!isKebabCaseName(ctx.name = ctx.nameOrKeyword().name))
+      {
+        syntaxError("post-format name must match the kebab case naming convention")
+            .with(ctx)
+            .report();
+      }
     }
 
 
@@ -817,6 +843,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       add(SQ_START, "'", "SQ_START");
       add(TPL_START, "'%['", "TPL_START");
       add(TPL_END, "']'", "TPL_END");
+      add(PF_START, "'%('", "PF_START");
+      add(PF_END, "')'", "PF_END");
       add(L_PAREN, "'('", "L_PAREN");
       add(R_PAREN, "')'", "R_PAREN");
     }

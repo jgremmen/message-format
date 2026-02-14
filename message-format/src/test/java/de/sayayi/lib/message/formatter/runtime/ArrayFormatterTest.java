@@ -21,12 +21,12 @@ import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.formatter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.named.BoolFormatter;
-import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.internal.part.parameter.key.ConfigKeyName;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.internal.part.text.TextPart;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
-import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue;
-import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.part.parameter.ConfigKey;
+import de.sayayi.lib.message.part.parameter.ConfigValue;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
@@ -67,14 +67,14 @@ class ArrayFormatterTest extends AbstractFormatterTest
         .setLocale("de-DE")
         .getMessageAccessor();
 
-    val map = Map.<ConfigKey,ConfigValue>of(
+    val map = Map.<ConfigKey,ConfigValue<?>>of(
         new ConfigKeyName("list-value"),
         new ConfigValueString("%{value,true:wahr,false:falsch}"));
 
     assertEquals(new TextPart("wahr, falsch, wahr"),
         format(messageAccessor, new boolean[] { true, false, true }, map));
 
-    val booleanMap = Map.<ConfigKey,ConfigValue>of(
+    val booleanMap = Map.<ConfigKey,ConfigValue<?>>of(
         new ConfigKeyName("list-value"),
         new ConfigValueString("%{value,true:YES,false:NO}"));
 
@@ -155,7 +155,7 @@ class ArrayFormatterTest extends AbstractFormatterTest
 
     assertEquals(new TextPart("0x40, 0xda, 0x2e"),
         format(messageAccessor, new int[] { 64, 218, 46 },
-            Map.of(new ConfigKeyName("list-value"), new ConfigValueString("%{value,hex}"))));
+            Map.of(new ConfigKeyName("list-value"), new ConfigValueString("%{value,format:hex}"))));
   }
 
 
@@ -171,7 +171,7 @@ class ArrayFormatterTest extends AbstractFormatterTest
         .setLocale("de-DE")
         .getMessageAccessor();
 
-    val map = new HashMap<ConfigKey, ConfigValue>();
+    val map = new HashMap<ConfigKey, ConfigValue<?>>();
     map.put(new ConfigKeyName("list-value"),
         new ConfigValueString("%{value,number:'0000',true:wahr,false:falsch}"));
 

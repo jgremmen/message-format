@@ -46,7 +46,7 @@ class SizeFormatterTest extends AbstractFormatterTest
             new ArrayFormatter(), new MapFormatter()), NO_CACHE_INSTANCE)
         .setLocale(UK);
     val message = messageSupport
-        .message("%{c,size} %{c,size,0:'empty',1:'singleton',:'multiple'}").getMessage();
+        .message("%{c,format:size} %{c,format:size,0:'empty',1:'singleton',:'multiple'}").getMessage();
 
     assertEquals("0 empty", messageSupport.message(message)
         .with("c", List.of()).format());
@@ -66,6 +66,6 @@ class SizeFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(new SizeFormatter()), NO_CACHE_INSTANCE)
         .setLocale(UK);
 
-    assertEquals("", messageSupport.message("%{c,size}").with("c", true).format());
+    assertEquals("", messageSupport.message("%{c,format:size}").with("c", true).format());
   }
 }

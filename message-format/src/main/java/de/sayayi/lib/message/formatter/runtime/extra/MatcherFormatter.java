@@ -19,8 +19,8 @@ import de.sayayi.lib.message.formatter.AbstractSingleTypeParameterFormatter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.parameter.value.ConfigValueNumber;
-import de.sayayi.lib.message.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.part.parameter.ConfigValue.NumberValue;
+import de.sayayi.lib.message.part.parameter.ConfigValue.StringValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -48,14 +48,10 @@ public final class MatcherFormatter extends AbstractSingleTypeParameterFormatter
 
       final var cv = matcherConfig.get();
 
-      switch(cv.getType())
-      {
-        case NUMBER:
-          return formatValue_groupNumber(matcher, ((ConfigValueNumber)cv).intValue());
-
-        case STRING:
-          return formatValue_groupName(matcher, ((ConfigValueString)cv).stringValue());
-      }
+      if (cv instanceof NumberValue numberValue)
+        return formatValue_groupNumber(matcher, numberValue.intValue());
+      else if (cv instanceof StringValue stringValue)
+        return formatValue_groupName(matcher, stringValue.stringValue());
     }
 
     return emptyText();

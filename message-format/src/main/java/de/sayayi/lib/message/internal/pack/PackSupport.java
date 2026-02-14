@@ -17,13 +17,18 @@ package de.sayayi.lib.message.internal.pack;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.internal.*;
-import de.sayayi.lib.message.internal.part.NoSpaceTextPart;
-import de.sayayi.lib.message.internal.part.TemplatePart;
-import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
+import de.sayayi.lib.message.internal.part.parameter.key.*;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueBool;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueMessage;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueNumber;
+import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.internal.part.template.TemplatePart;
+import de.sayayi.lib.message.internal.part.text.NoSpaceTextPart;
+import de.sayayi.lib.message.internal.part.text.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.part.parameter.ParameterPart;
-import de.sayayi.lib.message.part.parameter.key.*;
-import de.sayayi.lib.message.part.parameter.value.*;
+import de.sayayi.lib.message.part.parameter.ConfigKey;
+import de.sayayi.lib.message.part.parameter.ConfigValue;
 import de.sayayi.lib.pack.PackConfig;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
@@ -85,7 +90,7 @@ public final class PackSupport
 
 
   private final Map<ConfigKey,ConfigKey> mapKeys = new HashMap<>();
-  private final Map<ConfigValue,ConfigValue> mapValues = new HashMap<>();
+  private final Map<ConfigValue<?>,ConfigValue<?>> mapValues = new HashMap<>();
   private final Map<MessagePart,MessagePart> messageParts = new HashMap<>();
   private final Map<Message.WithSpaces,Message.WithSpaces> messagesWithSpaces = new HashMap<>();
 
@@ -293,7 +298,7 @@ public final class PackSupport
 
 
   @Contract(mutates = "param2,io")
-  public static void pack(@NotNull ConfigValue configValue, @NotNull PackOutputStream packStream) throws IOException
+  public static void pack(@NotNull ConfigValue<?> configValue, @NotNull PackOutputStream packStream) throws IOException
   {
     switch(configValue) {
       case ConfigValueBool configValueBool -> {
@@ -319,7 +324,7 @@ public final class PackSupport
 
 
   @Contract(mutates = "param1,io")
-  public @NotNull ConfigValue unpackMapValue(@NotNull PackInputStream packStream) throws IOException
+  public @NotNull ConfigValue<?> unpackMapValue(@NotNull PackInputStream packStream) throws IOException
   {
     final var configValue = switch(packStream.readSmall(2)) {
       case MAP_VALUE_BOOL_ID -> ConfigValueBool.unpack(packStream);

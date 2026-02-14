@@ -25,9 +25,9 @@ options {
 @header {
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.part.MessagePart.*;
-import de.sayayi.lib.message.part.parameter.key.ConfigKey;
-import de.sayayi.lib.message.part.parameter.key.ConfigKeyName;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue;
+import de.sayayi.lib.message.part.parameter.ConfigKey;
+import de.sayayi.lib.message.part.parameter.ConfigValue;
+import de.sayayi.lib.message.internal.part.parameter.key.ConfigKeyName;
 }
 
 
@@ -36,7 +36,7 @@ message returns [Message.WithSpaces messageWithSpaces]
         ;
 
 message0 returns [Message.WithSpaces messageWithSpaces]
-        : (textPart | parameterPart | templatePart)*
+        : (textPart | parameterPart | templatePart | postFormatPart)*
         ;
 
 textPart returns [Text part]
@@ -70,21 +70,20 @@ forceQuotedMessage returns [Message.WithSpaces messageWithSpaces]
 parameterPart returns [Parameter part]
         : P_START
           parameterName
-          (COMMA parameterFormat)?
-          (COMMA parameterConfigElement)*
+          (COMMA (parameterConfigElement | parameterFormat))*
           (COMMA COLON forceQuotedMessage)?
           P_END
         ;
 
 parameterName returns [String name]
-        : nameOrKeyword  // camel-case or kebab-case format
+        : nameOrKeyword  // kebab- or lower camel-case format
         ;
 
 parameterFormat returns [String format]
-        : nameOrKeyword  // kebab-case format
+        : FORMAT COLON nameOrKeyword  // kebab-case format
         ;
 
-parameterConfigElement returns [List<ConfigKey> configKeys, ConfigValue configValue]
+parameterConfigElement returns [List<ConfigKey> configKeys, ConfigValue<?> configValue]
         : configNamedElement
         | configMapElement
         ;
@@ -104,12 +103,24 @@ templateParameterDelegate returns [String parameter, String delegatedParameter]
         : simpleString EQ simpleString
         ;
 
-configMapElement returns [List<ConfigKey> configKeys, ConfigValue configValue]
+postFormatPart returns [PostFormat part]
+        : PF_START
+          postFormatName
+          COMMA quotedMessage
+          (COMMA configNamedElement)*
+          PF_END
+        ;
+
+postFormatName returns [String name]
+        : nameOrKeyword  // kebab-case format
+        ;
+
+configMapElement returns [List<ConfigKey> configKeys, ConfigValue<?> configValue]
         : configMapKeys COLON quotedMessage  #configMapMessage
         | configMapKeys COLON simpleString   #configMapString
         ;
 
-configNamedElement returns [ConfigKeyName configKey, ConfigValue configValue]
+configNamedElement returns [ConfigKeyName configKey, ConfigValue<?> configValue]
         : NAME COLON BOOL           #configNamedBool
         | NAME COLON NUMBER         #configNamedNumber
         | NAME COLON simpleString   #configNamedString
@@ -155,4 +166,5 @@ nameOrKeyword returns [String name]
         | BOOL
         | NULL
         | EMPTY
+        | FORMAT
         ;

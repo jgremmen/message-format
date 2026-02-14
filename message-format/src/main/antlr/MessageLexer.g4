@@ -39,6 +39,9 @@ P_START
 TPL_START
         : TemplateStart -> pushMode(TEMPLATE)
         ;
+PF_START
+        : PostFormatStart -> pushMode(POST_FORMAT)
+        ;
 CH
         : Character
         ;
@@ -56,6 +59,9 @@ P_START1
         ;
 TPL_START1
         : TemplateStart -> pushMode(TEMPLATE), type(TPL_START)
+        ;
+PF_START1
+        : PostFormatStart -> pushMode(POST_FORMAT), type(PF_START)
         ;
 SQ_END
         : '\'' -> popMode
@@ -77,6 +83,9 @@ P_START2
         ;
 TPL_START2
         : TemplateStart -> pushMode(TEMPLATE), type(TPL_START)
+        ;
+PF_START2
+        : PostFormatStart -> pushMode(POST_FORMAT), type(PF_START)
         ;
 DQ_END
         : '"' -> popMode
@@ -110,6 +119,9 @@ NULL
         ;
 EMPTY
         : 'empty'
+        ;
+FORMAT
+        : 'format'
         ;
 P_NAME
         : Name -> type(NAME)
@@ -189,6 +201,45 @@ T_WS
 
 
 
+// ------------------ In post format mode ------------------
+mode POST_FORMAT;
+
+PF_END
+        : ')' -> popMode
+        ;
+PF_COMMA
+        : ',' -> type(COMMA)
+        ;
+PF_COLON
+        : ':' -> type(COLON)
+        ;
+PF_NULL
+        : 'null' -> type(NULL)
+        ;
+PF_EMPTY
+        : 'empty' -> type(EMPTY)
+        ;
+PF_BOOL
+        : ('true' | 'false') -> type(BOOL)
+        ;
+PF_NUMBER
+        : Number -> type(NUMBER)
+        ;
+PF_NAME
+        : Name -> type(NAME)
+        ;
+PF_SQ_START
+        : '\'' -> pushMode(TEXT1), type(SQ_START)
+        ;
+PF_DQ_START
+        : '"' -> pushMode(TEXT2), type(DQ_START)
+        ;
+PF_WS
+        : (CtrlChar | ' ')+ -> skip
+        ;
+
+
+
 // ------------------ Fragments ------------------
 
 fragment ParamStart
@@ -198,6 +249,10 @@ fragment ParamStart
 fragment TemplateStart
         : '%['
         ;
+
+fragment PostFormatStart
+        : '%('
+        ;  // %(clip,"text to clip",size:5,suffix:"…")
 
 fragment CtrlChar
         : [\u0000-\u001f]

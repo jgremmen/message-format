@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.part.parameter;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.part.parameter.value.ConfigValue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +41,7 @@ public interface ParameterConfigAccessor
    * @return  optional instance representing the found value, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull Optional<ConfigValue> getConfigValue(@NotNull String name);
+  @NotNull Optional<ConfigValue<?>> getConfigValue(@NotNull String name);
 
 
   /**

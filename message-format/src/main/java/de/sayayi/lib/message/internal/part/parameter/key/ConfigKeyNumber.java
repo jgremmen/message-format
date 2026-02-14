@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.part.parameter.key;
+package de.sayayi.lib.message.internal.part.parameter.key;
 
+import de.sayayi.lib.message.part.parameter.ConfigKey;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -22,7 +23,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static de.sayayi.lib.message.part.parameter.key.ConfigKey.CompareType.EQ;
+import static de.sayayi.lib.message.internal.pack.PackSupport.packLongVar;
+import static de.sayayi.lib.message.internal.pack.PackSupport.unpackLongVar;
 import static java.util.Objects.requireNonNull;
 
 
@@ -31,37 +33,27 @@ import static java.util.Objects.requireNonNull;
  * @since 0.4.0 (renamed in 0.8.0)
  */
 @SuppressWarnings("ClassCanBeRecord")
-public final class ConfigKeyString implements ConfigKey
+public final class ConfigKeyNumber implements ConfigKey
 {
-  /** Configuration string key comparison type. */
+  /** Configuration number key comparison type. */
   private final @NotNull CompareType compareType;
 
-  /** Configuration key string. */
-  private final @NotNull String string;
+  /** Configuration key number. */
+  private final long number;
 
 
   /**
-   * Constructs a configuration key string.
-   *
-   * @param string  configuration key string, not {@code null}
-   *
-   * @since 0.10.0
-   */
-  public ConfigKeyString(@NotNull String string) {
-    this(EQ, string);
-  }
-
-
-  /**
-   * Constructs a configuration key string with comparison type.
+   * Constructs a configuration key number with a comparison type.
    *
    * @param compareType  configuration key comparison type, not {@code null}
-   * @param string  configuration key string, not {@code null}
+   * @param number       configuration key number
+   *
+   * @since 0.4.0 (made public in 0.10.0)
    */
-  public ConfigKeyString(@NotNull CompareType compareType, @NotNull String string)
+  public ConfigKeyNumber(@NotNull CompareType compareType, long number)
   {
     this.compareType = requireNonNull(compareType, "compareType must not be null");
-    this.string = requireNonNull(string, "string must not be null");
+    this.number = number;
   }
 
 
@@ -72,42 +64,42 @@ public final class ConfigKeyString implements ConfigKey
 
 
   /**
-   * Returns the config key string value.
+   * Returns the config key number value.
    *
-   * @return  config key string value, never {@code null}
+   * @return  config key number value
    */
   @Contract(pure = true)
-  public @NotNull String getString() {
-    return string;
+  public long getNumber() {
+    return number;
   }
 
 
   /**
    * {@inheritDoc}
    *
-   * @return  always {@link Type#STRING Type#STRING}
+   * @return  always {@link Type#NUMBER Type#NUMBER}
    */
   @Override
   public @NotNull Type getType() {
-    return Type.STRING;
+    return Type.NUMBER;
   }
 
 
   @Override
   public boolean equals(Object o) {
-    return o instanceof ConfigKeyString that && compareType == that.compareType && string.equals(that.string);
+    return o instanceof ConfigKeyNumber that && number == that.number && compareType == that.compareType;
   }
 
 
   @Override
   public int hashCode() {
-    return (59 + compareType.hashCode()) * 59 + string.hashCode();
+    return (59 + Long.hashCode(number)) * 59 + compareType.hashCode();
   }
 
 
   @Override
   public String toString() {
-    return compareType.asPrefix() + '\'' + string.replace("'", "\\'") + '\'';
+    return compareType.asPrefix() + number;
   }
 
 
@@ -123,14 +115,14 @@ public final class ConfigKeyString implements ConfigKey
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeEnum(compareType);
-    packStream.writeString(string);
+    packLongVar(number, packStream);
   }
 
 
   /**
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked string map key, never {@code null}
+   * @return  unpacked number map key, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -138,7 +130,13 @@ public final class ConfigKeyString implements ConfigKey
    *
    * @hidden
    */
-  public static @NotNull ConfigKeyString unpack(@NotNull PackInputStream packStream) throws IOException {
-    return new ConfigKeyString(packStream.readEnum(CompareType.class), requireNonNull(packStream.readString()));
+  public static @NotNull ConfigKeyNumber unpack(@NotNull PackInputStream packStream) throws IOException
+  {
+    final var compareType = packStream.readEnum(CompareType.class);
+    final var number = packStream.getVersion().orElseThrow() == 1
+        ? packStream.readLong()
+        : unpackLongVar(packStream);
+
+    return new ConfigKeyNumber(compareType, number);
   }
 }
