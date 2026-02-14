@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.formatter.named.StringFormatter;
+import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -33,21 +34,22 @@ import java.util.Set;
 public interface FormatterService
 {
   /**
-   * Returns a list of parameter formatters for the given {@code format} and {@code type}.
+   * Returns a list of parameter formatters for the given {@code format}, {@code type} and {@code parameterConfig}.
    * <p>
    * Implementing classes must make sure that for any combination of {@code format} and {@code type}
    * this function always returns at least 1 formatter. A good choice for a default formatter would
    * be {@link StringFormatter}.
    *
-   * @param format  name of the formatter or {@code null}
-   * @param type    type of the value to format
+   * @param format           name of the formatter or {@code null}
+   * @param type             type of the value to format
+   * @param parameterConfig  parameter config
    *
    * @return  array of prioritized parameter formatters, never {@code null} and never empty
    *
    * @see GenericFormatterService
    */
-  @Contract(value = "_, _ -> new", pure = true)
-  @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type);
+  @Contract(value = "_, _, _ -> new", pure = true)
+  @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, ParameterConfig parameterConfig);
 
 
   /**

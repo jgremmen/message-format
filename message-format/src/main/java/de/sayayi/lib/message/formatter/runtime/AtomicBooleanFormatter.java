@@ -35,7 +35,7 @@ public final class AtomicBooleanFormatter
 {
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull AtomicBoolean atomicBoolean) {
-    return context.format(atomicBoolean.get(), boolean.class, true);
+    return context.format(atomicBoolean.get(), boolean.class);
   }
 
 

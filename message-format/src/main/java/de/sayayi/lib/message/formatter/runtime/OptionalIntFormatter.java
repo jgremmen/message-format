@@ -43,7 +43,7 @@ public final class OptionalIntFormatter
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull OptionalInt optionalInt)
   {
     return optionalInt.isPresent()
-        ? context.format(optionalInt.getAsInt(), int.class, true)
+        ? context.format(optionalInt.getAsInt(), int.class)
         : emptyText();
   }
 

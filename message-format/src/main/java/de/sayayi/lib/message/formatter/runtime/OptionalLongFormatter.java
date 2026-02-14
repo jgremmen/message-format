@@ -43,7 +43,7 @@ public final class OptionalLongFormatter
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull OptionalLong optionalLong)
   {
     return optionalLong.isPresent()
-        ? context.format(optionalLong.getAsLong(), long.class, true)
+        ? context.format(optionalLong.getAsLong(), long.class)
         : emptyText();
   }
 

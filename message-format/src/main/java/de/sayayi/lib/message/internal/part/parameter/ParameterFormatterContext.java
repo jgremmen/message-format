@@ -64,7 +64,7 @@ public final class ParameterFormatterContext extends AbstractParameterConfigAcce
     if (type == null)
       type = value == null ? NULL_TYPE : value.getClass();
 
-    parameterFormatters = messageAccessor.getFormatters(format, type);
+    parameterFormatters = messageAccessor.getFormatters(format, type, parameterConfig);
   }
 
 
@@ -150,18 +150,28 @@ public final class ParameterFormatterContext extends AbstractParameterConfigAcce
 
 
   @Override
-  public @NotNull Text format(Object value, Class<?> type, boolean propagateFormat)
+  public @NotNull Text format(Object value)
   {
-    return new ParameterFormatterContext(messageAccessor, parameters, value, type,
-        propagateFormat ? format : null, parameterConfig).delegateToNextFormatter();
+    // propagate current format and parameter config to the next formatter
+    return new ParameterFormatterContext(messageAccessor, parameters, value, null, format, parameterConfig)
+        .delegateToNextFormatter();
   }
 
 
   @Override
-  public @NotNull Text format(Object value, Class<?> type, String format)
+  public @NotNull Text format(Object value, @NotNull Class<?> type)
   {
+    // propagate current format and parameter config to the next formatter
     return new ParameterFormatterContext(messageAccessor, parameters, value, type, format, parameterConfig)
         .delegateToNextFormatter();
+  }
+
+
+  @Override
+  public @NotNull Text format(Object value, Class<?> type, String format, ParameterConfig parameterConfig)
+  {
+    return new ParameterFormatterContext(messageAccessor, parameters, value, type, format,
+        parameterConfig == null ? this.parameterConfig : parameterConfig).delegateToNextFormatter();
   }
 
 
@@ -184,7 +194,7 @@ public final class ParameterFormatterContext extends AbstractParameterConfigAcce
     {
       OptionalLong result;
 
-      for(var formatter: messageAccessor.getFormatters(value.getClass()))
+      for(var formatter: messageAccessor.getFormatters(value.getClass(), parameterConfig))
         if (formatter instanceof SizeQueryable &&
             (result = ((SizeQueryable)formatter).size(this, value)).isPresent())
           return result;

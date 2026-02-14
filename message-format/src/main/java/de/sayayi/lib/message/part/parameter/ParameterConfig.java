@@ -17,6 +17,7 @@ package de.sayayi.lib.message.part.parameter;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.internal.part.parameter.EmptyParameterConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -33,6 +34,14 @@ import java.util.Set;
  */
 public interface ParameterConfig
 {
+  /**
+   * An empty parameter configuration map.
+   *
+   * @since 0.21.0
+   */
+  ParameterConfig EMPTY_CONFIG = EmptyParameterConfig.INSTANCE;
+
+
   /**
    * Tells whether the parameter configuration contains any values.
    *
@@ -96,4 +105,17 @@ public interface ParameterConfig
   @Contract(pure = true)
   @Unmodifiable
   @NotNull Set<String> getTemplateNames();
+
+
+  /**
+   * Returns a new parameter configuration which is the same as this parameter configuration but without
+   * the given config names.
+   *
+   * @param configNames  config names to exclude, not {@code null}
+   *
+   * @return  new parameter configuration without the given config names, never {@code null}
+   *
+   * @since 0.21.0
+   */
+  @NotNull ParameterConfig excludeConfigByName(@NotNull Set<String> configNames);
 }

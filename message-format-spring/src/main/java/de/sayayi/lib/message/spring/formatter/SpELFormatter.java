@@ -45,6 +45,8 @@ import static org.springframework.expression.spel.support.DataBindingPropertyAcc
 @SuppressWarnings("SpellCheckingInspection")
 public final class SpELFormatter extends AbstractParameterFormatter<Object> implements NamedParameterFormatter
 {
+  private static final Set<String> PARAMETER_CONFIG_NAMES = Set.of("spel-expr", "spel-format");
+
   private static final OperatorOverloader OPERATOR_OVERLOADER = new StandardOperatorOverloader();
   private static final TypeComparator TYPE_COMPARATOR = new StandardTypeComparator();
   private static final List<MethodResolver> METHOD_RESOLVERS = List.of(new ReflectiveMethodResolver());
@@ -109,13 +111,20 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
           .getValue(new ParameterEvaluationContext(context, value));
     }
 
-    return context.format(value, null, context.getConfigValueString("spel-format").orElse(null));
+    return context.format(value, null, context.getConfigValueString("spel-format").orElse(null),
+        context.getParameterConfig().excludeConfigByName(PARAMETER_CONFIG_NAMES));
   }
 
 
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
-    return Set.of("spel-expr", "spel-format");
+    return PARAMETER_CONFIG_NAMES;
+  }
+
+
+  @Override
+  public boolean autoApplyOnNamedConfigParameter() {
+    return true;
   }
 
 

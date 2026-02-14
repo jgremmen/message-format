@@ -39,7 +39,7 @@ public final class PrincipalFormatter
 {
   @Override
   protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Principal principal) {
-    return context.format(principal.getName(), String.class, true);
+    return context.format(principal.getName(), String.class);
   }
 
 

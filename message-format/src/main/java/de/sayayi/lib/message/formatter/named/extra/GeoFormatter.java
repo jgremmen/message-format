@@ -138,6 +138,12 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   }
 
 
+  @Override
+  public boolean autoApplyOnNamedConfigParameter() {
+    return true;
+  }
+
+
   private static final int[] DIGIT_FACTOR = new int[] { 1000, 100, 10, 1 };
   private static final int DEGREE_MILLIS = 3600000;
   private static final int MINUTE_MILLIS = 60000;

@@ -29,6 +29,7 @@ import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueMessage;
 import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueNumber;
 import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueString;
 import de.sayayi.lib.message.part.parameter.ConfigValue;
+import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
@@ -558,8 +559,9 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type) {
-      return formatterService.getFormatters(format, type);
+    public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type,
+                                                       ParameterConfig parameterConfig) {
+      return formatterService.getFormatters(format, type, parameterConfig);
     }
 
 

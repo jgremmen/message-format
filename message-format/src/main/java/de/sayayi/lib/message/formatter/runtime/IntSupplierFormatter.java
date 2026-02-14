@@ -37,7 +37,7 @@ public final class IntSupplierFormatter
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull IntSupplier intSupplier) {
-    return context.format(intSupplier.getAsInt(), int.class, true);
+    return context.format(intSupplier.getAsInt(), int.class);
   }
 
 

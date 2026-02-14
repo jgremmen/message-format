@@ -40,7 +40,7 @@ public final class ReferenceFormatter
 {
   @Override
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Reference<?> reference) {
-    return context.format(reference.get(), true);
+    return context.format(reference.get());
   }
 
 

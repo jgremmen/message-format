@@ -31,6 +31,17 @@ import java.util.OptionalLong;
 public interface ParameterConfigAccessor
 {
   /**
+   * Returns the parameter configuration.
+   *
+   * @return  parameter configuration, never {@code null}
+   *
+   * @since 0.21.0
+   */
+  @Contract(pure = true)
+  @NotNull ParameterConfig getParameterConfig();
+
+
+  /**
    * Gets a configuration value for named key {@code name}.
    * <p>
    * The value is taken from the parameter configuration map. If no such key is found the

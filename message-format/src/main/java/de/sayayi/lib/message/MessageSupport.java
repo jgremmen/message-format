@@ -20,6 +20,7 @@ import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.ParameterPostFormatter;
 import de.sayayi.lib.message.part.parameter.ConfigValue;
+import de.sayayi.lib.message.part.parameter.ParameterConfig;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -809,33 +810,40 @@ public interface MessageSupport
 
 
     /**
-     * Returns the best matching formatter for the given {@code type}.
+     * Returns a prioritized list of matching formatter for the given {@code type}.
+     * <p>
+     * If {@code parameterConfig} is provided and contains a configuration name for a named formatter, the
+     * named formatter takes precedence over the type based formatter.
      *
-     * @param type  type, never {@code null}
+     * @param type             type, never {@code null}
+     * @param parameterConfig  parameter configuration
      *
-     * @return  unmodifiable list of formatters for the given {@code type},
+     * @return  prioritized list of formatters for the given {@code type} and {@code parameterConfig},
      *          never {@code null} and never empty
      */
-    @Contract(value = "_ -> new", pure = true)
-    default @NotNull ParameterFormatter[] getFormatters(@NotNull Class<?> type) {
-      return getFormatters(null, type);
+    @Contract(value = "_, _ -> new", pure = true)
+    default @NotNull ParameterFormatter[] getFormatters(@NotNull Class<?> type, ParameterConfig parameterConfig) {
+      return getFormatters(null, type, parameterConfig);
     }
 
 
     /**
-     * Returns a prioritized list of matching formatter for the given {@code format} and
-     * {@code type}
+     * Returns a prioritized list of matching formatter for the given {@code format} and {@code type}.
      * <p>
      * If {@code format} matches a named formatter it always takes precedence over {@code type}.
+     * <p>
+     * If {@code parameterConfig} is provided and contains a configuration name for a named formatter, the
+     * named formatter takes precedence over the type based formatter.
      *
-     * @param format  formatter name
-     * @param type    type, never {@code null}
+     * @param format           formatter name
+     * @param type             type, never {@code null}
+     * @param parameterConfig  parameter configuration
      *
-     * @return  unmodifiable prioritized list of formatters for the given {@code format} and
-     *          {@code type}, never {@code null} and never empty
+     * @return  prioritized list of formatters for the given {@code format}, {@code type} and {@code parameterConfig},
+     *          never {@code null} and never empty
      */
-    @Contract(value = "_, _ -> new", pure = true)
-    @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type);
+    @Contract(value = "_, _, _ -> new", pure = true)
+    @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, ParameterConfig parameterConfig);
 
 
     /**

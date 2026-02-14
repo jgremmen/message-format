@@ -69,6 +69,17 @@ public final class ParameterConfigImpl implements ParameterConfig
   private final byte hasKeyType;
 
 
+  private ParameterConfigImpl(@NotNull TreeMap<String,ConfigValue<?>> config, @NotNull ConfigKey[] mapKeys,
+                              @NotNull ConfigValue<?>[] mapValues, ConfigValue<?> defaultValue, byte hasKeyType)
+  {
+    this.config = config;
+    this.mapKeys = mapKeys;
+    this.mapValues = mapValues;
+    this.defaultValue = defaultValue;
+    this.hasKeyType = hasKeyType;
+  }
+
+
   /**
    * Create a message parameter config instance with the given {@code map}.
    *
@@ -112,6 +123,19 @@ public final class ParameterConfigImpl implements ParameterConfig
 
     this.defaultValue = mapNullValue;
     this.hasKeyType = (byte)keyTypeMask;
+  }
+
+
+  @Override
+  public @NotNull ParameterConfig excludeConfigByName(@NotNull Set<String> configNames)
+  {
+    if (configNames.isEmpty())
+      return this;
+
+    final var modifiedConfig = new TreeMap<>(config);
+    modifiedConfig.keySet().removeAll(configNames);
+
+    return new ParameterConfigImpl(modifiedConfig, mapKeys, mapValues, defaultValue, hasKeyType);
   }
 
 
@@ -207,7 +231,8 @@ public final class ParameterConfigImpl implements ParameterConfig
     ConfigValue<?> bestMatch = null;
 
     var comparatorContext = new ConfigKeyComparatorContext(messageAccessor, locale);
-    var formatters = messageAccessor.getFormatters(value == null ? Object.class : value.getClass());
+    var formatters = messageAccessor
+        .getFormatters(value == null ? Object.class : value.getClass(), this);
 
     MatchResult bestMatchResult = MISMATCH;
 
@@ -412,14 +437,16 @@ public final class ParameterConfigImpl implements ParameterConfig
     @Override
     public @NotNull MatchResult matchForObject(Object value)
     {
-      return findBestMatch(this,
-          messageAccessor.getFormatters(value == null ? Object.class : value.getClass()), value);
+      return findBestMatch(this, messageAccessor
+          .getFormatters(value == null ? Object.class : value.getClass(), ParameterConfigImpl.this), value);
     }
 
 
     @Override
-    public @NotNull <T> MatchResult matchForObject(@NotNull T value, @NotNull Class<T> valueType) {
-      return findBestMatch(this, messageAccessor.getFormatters(valueType), value);
+    public @NotNull <T> MatchResult matchForObject(@NotNull T value, @NotNull Class<T> valueType)
+    {
+      return findBestMatch(this, messageAccessor
+          .getFormatters(valueType, ParameterConfigImpl.this), value);
     }
   }
 }

@@ -134,67 +134,36 @@ public interface FormatterContext extends Parameters, ParameterConfigAccessor
    * @return  formatted text, never {@code null}
    */
   @Contract(pure = true)
-  default @NotNull Text format(Object value) {
-    return format(value, null, false);
-  }
-
-
-  /**
-   * Format the given {@code value} using its type and the current format designator
-   * (if available and if {@code propagateFormat = true}).
-   *
-   * @param value            value to format
-   * @param propagateFormat  propagate parameter format designator if {@code true}, ignore format
-   *                         designator if this parameter is {@code false}
-   *
-   * @return  formatted text, never {@code null}
-   */
-  @Contract(pure = true)
-  default @NotNull Text format(Object value, boolean propagateFormat) {
-    return format(value, null, propagateFormat);
-  }
+  @NotNull Text format(Object value);
 
 
   /**
    * Format the given {@code value} using {@code type}.
    *
    * @param value  value to format
-   * @param type   value type or {@code null}
+   * @param type   value type
    *
    * @return  formatted text, never {@code null}
    */
   @Contract(pure = true)
-  default @NotNull Text format(Object value, @NotNull Class<?> type) {
-    return format(value, type, false);
-  }
+  @NotNull Text format(Object value, @NotNull Class<?> type);
 
 
   /**
-   * Format the given {@code value} using {@code type} and the current format designator
-   * (if available and if {@code propagateFormat = true}).
+   * Format the given {@code value} using {@code type}, {@code format} and {@code parameterConfig}.
+   * <p>
+   * If {@code type} is {@code null}, it will be determined by analyzing {@code value}.
+   * If {@code parameterConfig} is null, the current parameter configuration map is used.
    *
    * @param value            value to format
-   * @param type             value type or {@code null}
-   * @param propagateFormat  propagate parameter format designator if {@code true}, ignore format
-   *                         designator if this parameter is {@code false}
+   * @param type             value type
+   * @param format           formatter name
+   * @param parameterConfig  parameter config instance
    *
    * @return  formatted text, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull Text format(Object value, Class<?> type, boolean propagateFormat);
-
-
-  /**
-   * Format the given {@code value} using {@code type} and {@code format}.
-   *
-   * @param value   value to format
-   * @param type    value type or {@code null}
-   * @param format  formatter name
-   *
-   * @return  formatted text, never {@code null}
-   */
-  @Contract(pure = true)
-  @NotNull Text format(Object value, Class<?> type, String format);
+  @NotNull Text format(Object value, Class<?> type, String format, ParameterConfig parameterConfig);
 
 
   /**

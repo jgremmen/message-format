@@ -45,7 +45,7 @@ public final class OptionalFormatter extends AbstractSingleTypeParameterFormatte
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Optional<?> optional)
   {
     return optional
-        .map(o -> context.format(o, true))
+        .map(context::format)
         .orElseGet(TextPartFactory::emptyText);
   }
 

@@ -37,7 +37,7 @@ public final class DoubleSupplierFormatter
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull DoubleSupplier doubleSupplier) {
-    return context.format(doubleSupplier.getAsDouble(), double.class, true);
+    return context.format(doubleSupplier.getAsDouble(), double.class);
   }
 
 

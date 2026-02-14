@@ -37,7 +37,7 @@ public final class BooleanSupplierFormatter
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull BooleanSupplier booleanSupplier) {
-    return context.format(booleanSupplier.getAsBoolean(), boolean.class, true);
+    return context.format(booleanSupplier.getAsBoolean(), boolean.class);
   }
 
 

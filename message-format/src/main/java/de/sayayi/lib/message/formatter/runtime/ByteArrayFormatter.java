@@ -68,7 +68,7 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
 
     return context.format(bytes.isEmpty() || !isSupported(bytes)
         ? new String(byteArray)
-        : new String(byteArray, bytes), String.class, true);
+        : new String(byteArray, bytes), String.class);
   }
 
 
