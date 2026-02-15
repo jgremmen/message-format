@@ -99,6 +99,15 @@ tasks.withType(Test).configureEach {
   }
 
   defaultCharacterEncoding = 'UTF-8'
+
+  // Disable class data sharing to avoid bootstrap classpath warning from Lombok
+  jvmArgs '-Xshare:off'
+
+  doFirst {
+    def byteBuddyAgent = configurations.testRuntimeClasspath.find { it.name.contains('byte-buddy-agent') }
+    if (byteBuddyAgent)
+      jvmArgs "-javaagent:${byteBuddyAgent.absolutePath}"
+  }
 }
 
 
