@@ -17,10 +17,10 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
-import de.sayayi.lib.message.formatter.ParameterPostFormatter;
-import de.sayayi.lib.message.part.parameter.ConfigValue;
-import de.sayayi.lib.message.part.parameter.ParameterConfig;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
+import de.sayayi.lib.message.formatter.post.PostFormatter;
+import de.sayayi.lib.message.part.config.ConfigValue;
+import de.sayayi.lib.message.part.config.PartConfig;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -815,15 +815,15 @@ public interface MessageSupport
      * If {@code parameterConfig} is provided and contains a configuration name for a named formatter, the
      * named formatter takes precedence over the type based formatter.
      *
-     * @param type             type, never {@code null}
-     * @param parameterConfig  parameter configuration
+     * @param type        type, never {@code null}
+     * @param partConfig  message part configuration
      *
      * @return  prioritized list of formatters for the given {@code type} and {@code parameterConfig},
      *          never {@code null} and never empty
      */
     @Contract(value = "_, _ -> new", pure = true)
-    default @NotNull ParameterFormatter[] getFormatters(@NotNull Class<?> type, ParameterConfig parameterConfig) {
-      return getFormatters(null, type, parameterConfig);
+    default @NotNull ParameterFormatter[] getFormatters(@NotNull Class<?> type, PartConfig partConfig) {
+      return getFormatters(null, type, partConfig);
     }
 
 
@@ -835,22 +835,28 @@ public interface MessageSupport
      * If {@code parameterConfig} is provided and contains a configuration name for a named formatter, the
      * named formatter takes precedence over the type based formatter.
      *
-     * @param format           formatter name
-     * @param type             type, never {@code null}
-     * @param parameterConfig  parameter configuration
+     * @param format      formatter name
+     * @param type        type, never {@code null}
+     * @param partConfig  message part configuration
      *
      * @return  prioritized list of formatters for the given {@code format}, {@code type} and {@code parameterConfig},
      *          never {@code null} and never empty
      */
     @Contract(value = "_, _, _ -> new", pure = true)
-    @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, ParameterConfig parameterConfig);
+    @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, PartConfig partConfig);
 
 
     /**
-     * @since 0.20.0
+     * Returns the post formatter associated with {@code postFormatterName}.
+     *
+     * @param postFormatterName  post formatter name, not {@code null}
+     *
+     * @return  post formatter or {@code null} if no post formatter with this name exists
+     *
+     * @since 0.21.0
      */
     @Contract(pure = true)
-    @NotNull @UnmodifiableView Map<String,ParameterPostFormatter> getParameterPostFormatters();
+    PostFormatter getPostFormatter(@NotNull String postFormatterName);
 
 
     /**

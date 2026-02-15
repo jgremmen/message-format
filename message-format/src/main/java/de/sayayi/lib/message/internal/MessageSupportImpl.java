@@ -21,15 +21,15 @@ import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.FormatterService;
-import de.sayayi.lib.message.formatter.ParameterFormatter;
-import de.sayayi.lib.message.formatter.ParameterPostFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
+import de.sayayi.lib.message.formatter.post.PostFormatter;
 import de.sayayi.lib.message.internal.pack.PackSupport;
-import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueBool;
-import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueMessage;
-import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueNumber;
-import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueString;
-import de.sayayi.lib.message.part.parameter.ConfigValue;
-import de.sayayi.lib.message.part.parameter.ParameterConfig;
+import de.sayayi.lib.message.internal.part.config.value.ConfigValueBool;
+import de.sayayi.lib.message.internal.part.config.value.ConfigValueMessage;
+import de.sayayi.lib.message.internal.part.config.value.ConfigValueNumber;
+import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
+import de.sayayi.lib.message.part.config.ConfigValue;
+import de.sayayi.lib.message.part.config.PartConfig;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
@@ -559,15 +559,14 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type,
-                                                       ParameterConfig parameterConfig) {
-      return formatterService.getFormatters(format, type, parameterConfig);
+    public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, PartConfig partConfig) {
+      return formatterService.getFormatters(format, type, partConfig);
     }
 
 
     @Override
-    public @NotNull @UnmodifiableView Map<String,ParameterPostFormatter> getParameterPostFormatters() {
-      return formatterService.getParameterPostFormatters();
+    public PostFormatter getPostFormatter(@NotNull String postFormatterName) {
+      return formatterService.getPostFormatters().get(postFormatterName);
     }
 
 

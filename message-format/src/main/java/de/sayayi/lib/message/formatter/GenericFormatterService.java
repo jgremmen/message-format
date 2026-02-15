@@ -16,9 +16,12 @@
 package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.exception.FormatterServiceException;
-import de.sayayi.lib.message.formatter.ParameterFormatter.DefaultFormatter;
-import de.sayayi.lib.message.formatter.named.StringFormatter;
-import de.sayayi.lib.message.part.parameter.ParameterConfig;
+import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.DefaultFormatter;
+import de.sayayi.lib.message.formatter.parameter.named.StringFormatter;
+import de.sayayi.lib.message.formatter.post.PostFormatter;
+import de.sayayi.lib.message.part.config.PartConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
@@ -52,11 +55,11 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
   private final Lock $lock = new ReentrantLock();
 
-  private final @NotNull Map<String,NamedParameterFormatter> namedFormatters = new TreeMap<>();
+  private final @NotNull Map<String, NamedParameterFormatter> namedFormatters = new TreeMap<>();
   private final @NotNull Map<String,NamedParameterFormatter> configNameToNamedFormatterMap = new TreeMap<>();
   private final @NotNull Map<Class<?>,List<PrioritizedFormatter>> typeFormatters = new HashMap<>();
   private final @NotNull Set<String> parameterConfigNames = new TreeSet<>();
-  private final @NotNull Map<String,ParameterPostFormatter> parameterPostFormatters = new HashMap<>();
+  private final @NotNull Map<String,PostFormatter> postFormatters = new HashMap<>();
   private final @NotNull FormatterCache formatterCache;
 
 
@@ -193,25 +196,22 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
   @Override
   @MustBeInvokedByOverriders
-  public void addParameterPostFormatter(@NotNull ParameterPostFormatter parameterPostFormatter)
+  public void addPostFormatter(@NotNull PostFormatter postFormatter)
   {
-    final var parameterConfigName = requireNonNull(parameterPostFormatter.getParameterConfigName());
-
-    parameterPostFormatters.put(
-        parameterConfigName,
-        requireNonNull(parameterPostFormatter, "parameterPostFormatter must not be null"));
-
-    if (parameterConfigNames.contains(parameterConfigName))
+    final var postFormatterName = requireNonNull(postFormatter.getName());
+    if (!isKebabCaseName(postFormatterName))
     {
-      throw new FormatterServiceException("parameter post formatter '" + parameterConfigName +
-          "' is in conflict with a registered parameter formatter");
+      throw new FormatterServiceException("name '" + postFormatterName + "' for post formatter " +
+          postFormatter.getClass().getSimpleName() + " does not match the kebab case naming convention");
     }
+
+    if (postFormatters.put(postFormatterName, postFormatter) != null)
+      throw new FormatterServiceException("post formatter '" + postFormatter + "' has already been registered");
   }
 
 
   @Override
-  public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type,
-                                                     ParameterConfig parameterConfig)
+  public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, PartConfig config)
   {
     requireNonNull(type, "type must not be null");
 
@@ -227,7 +227,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       final var formatters = new LinkedHashSet<ParameterFormatter>();
 
       if (!configNameToNamedFormatterMap.isEmpty())
-        for(var parameterConfigName: parameterConfig.getConfigNames())
+        for(var parameterConfigName: config.getConfigNames())
         {
           var namedFormatter = configNameToNamedFormatterMap.get(parameterConfigName);
           if (namedFormatter != null && namedFormatter.canFormat(type))
@@ -296,8 +296,8 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   @Override
-  public @UnmodifiableView @NotNull Map<String,ParameterPostFormatter> getParameterPostFormatters() {
-    return unmodifiableMap(parameterPostFormatters);
+  public @UnmodifiableView @NotNull Map<String,PostFormatter> getPostFormatters() {
+    return unmodifiableMap(postFormatters);
   }
 
 

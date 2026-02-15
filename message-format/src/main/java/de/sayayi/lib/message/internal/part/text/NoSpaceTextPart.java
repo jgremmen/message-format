@@ -58,6 +58,12 @@ public final class NoSpaceTextPart implements Text
 
 
   @Override
+  public @NotNull String getTextNotNull() {
+    return text;
+  }
+
+
+  @Override
   public @NotNull String getTextWithSpaces() {
     return text;
   }

@@ -21,7 +21,7 @@ import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.SpacesAware;
 import de.sayayi.lib.message.internal.part.text.NoSpaceTextPart;
 import de.sayayi.lib.message.internal.part.text.TextPart;
-import de.sayayi.lib.message.part.parameter.ParameterConfig;
+import de.sayayi.lib.message.part.config.PartConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -83,9 +83,24 @@ public interface MessagePart extends SpacesAware
      * Returns the trimmed text for this message part.
      *
      * @return  trimmed text or {@code null}
+     *
+     * @see #getTextNotNull()
      */
     @Contract(pure = true)
     String getText();
+
+
+    /**
+     * Returns the trimmed text for this message part.
+     *
+     * @return  trimmed text, never {@code null}
+     *
+     * @see #getText()
+     *
+     * @since 0.21.0
+     */
+    @Contract(pure = true)
+    @NotNull String getTextNotNull();
 
 
     /**
@@ -137,7 +152,7 @@ public interface MessagePart extends SpacesAware
      * @return  parameter configuration, never {@code null}
      */
     @Contract(pure = true)
-    @NotNull ParameterConfig getParamConfig();
+    @NotNull PartConfig getConfig();
   }
 
 
@@ -172,9 +187,9 @@ public interface MessagePart extends SpacesAware
     /**
      * Returns the configuration settings for this post format.
      *
-     * @return  parameter configuration, never {@code null}
+     * @return  post format configuration, never {@code null}
      */
     @Contract(pure = true)
-    @NotNull ParameterConfig getParamConfig();
+    @NotNull PartConfig getConfig();
   }
 }

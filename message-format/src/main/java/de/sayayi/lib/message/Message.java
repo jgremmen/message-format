@@ -64,10 +64,8 @@ public interface Message
    */
   @Contract(pure = true)
   default @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
-      throws MessageFormatException
-  {
-    final var text = formatAsText(messageAccessor, parameters);
-    return text.isEmpty() ? "" : text.getText();
+      throws MessageFormatException {
+    return formatAsText(messageAccessor, parameters).getTextNotNull();
   }
 
 

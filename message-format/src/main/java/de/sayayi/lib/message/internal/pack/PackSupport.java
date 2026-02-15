@@ -17,18 +17,19 @@ package de.sayayi.lib.message.internal.pack;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.internal.*;
+import de.sayayi.lib.message.internal.part.config.key.*;
+import de.sayayi.lib.message.internal.part.config.value.ConfigValueBool;
+import de.sayayi.lib.message.internal.part.config.value.ConfigValueMessage;
+import de.sayayi.lib.message.internal.part.config.value.ConfigValueNumber;
+import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
 import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
-import de.sayayi.lib.message.internal.part.parameter.key.*;
-import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueBool;
-import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueMessage;
-import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueNumber;
-import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.internal.part.post.PostFormatterPart;
 import de.sayayi.lib.message.internal.part.template.TemplatePart;
 import de.sayayi.lib.message.internal.part.text.NoSpaceTextPart;
 import de.sayayi.lib.message.internal.part.text.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.part.parameter.ConfigKey;
-import de.sayayi.lib.message.part.parameter.ConfigValue;
+import de.sayayi.lib.message.part.config.ConfigKey;
+import de.sayayi.lib.message.part.config.ConfigValue;
 import de.sayayi.lib.pack.PackConfig;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
@@ -51,7 +52,7 @@ import static java.util.function.Function.identity;
 public final class PackSupport
 {
   /** Pack version */
-  public static final int VERSION = 2;
+  public static final int VERSION = 3;
 
   /** Pack mime type */
   public static final String MIME_TYPE = "application/x-message-format-pack";
@@ -80,6 +81,7 @@ public final class PackSupport
   private static final int PART_PARAMETER_ID = 1;
   private static final int PART_TEXT_ID = 2;
   private static final int PART_TEMPLATE_ID = 3;
+  private static final int PART_POST_FORMAT_ID = 4;  // >= version 3
 
   private static final int MESSAGE_EMPTY = 0;
   private static final int MESSAGE_EMPTY_WITH_CODE = 1;
@@ -205,20 +207,24 @@ public final class PackSupport
   {
     switch(messagePart) {
       case ParameterPart parameterPart -> {
-        packStream.writeSmall(PART_PARAMETER_ID, 2);
+        packStream.writeSmall(PART_PARAMETER_ID, 3);
         parameterPart.pack(packStream);
       }
       case NoSpaceTextPart noSpaceTextPart -> {
-        packStream.writeSmall(PART_NO_SPACE_TEXT_ID, 2);
+        packStream.writeSmall(PART_NO_SPACE_TEXT_ID, 3);
         noSpaceTextPart.pack(packStream);
       }
       case TextPart textPart -> {
-        packStream.writeSmall(PART_TEXT_ID, 2);
+        packStream.writeSmall(PART_TEXT_ID, 3);
         textPart.pack(packStream);
       }
       case TemplatePart templatePart -> {
-        packStream.writeSmall(PART_TEMPLATE_ID, 2);
+        packStream.writeSmall(PART_TEMPLATE_ID, 3);
         templatePart.pack(packStream);
+      }
+      case PostFormatterPart postFormatterPart -> {
+        packStream.writeSmall(PART_POST_FORMAT_ID, 3);
+        postFormatterPart.pack(packStream);
       }
 
       default ->
@@ -228,13 +234,16 @@ public final class PackSupport
 
 
   @Contract(mutates = "param1,io")
+  @SuppressWarnings("OptionalGetWithoutIsPresent")
   public @NotNull MessagePart unpackMessagePart(@NotNull PackInputStream packStream) throws IOException
   {
-    final var messagePart = switch(packStream.readSmall(2)) {
+    final var bitWidth = packStream.getVersion().getAsInt() < 3 ? 2 : 3;
+    final var messagePart = switch(packStream.readSmall(bitWidth)) {
       case PART_NO_SPACE_TEXT_ID -> NoSpaceTextPart.unpack(packStream);
       case PART_PARAMETER_ID -> ParameterPart.unpack(this, packStream);
       case PART_TEXT_ID -> TextPart.unpack(packStream);
       case PART_TEMPLATE_ID -> TemplatePart.unpack(this, packStream);
+      case PART_POST_FORMAT_ID -> PostFormatterPart.unpack(this, packStream);
 
       default -> throw new IllegalStateException("message part expected");
     };

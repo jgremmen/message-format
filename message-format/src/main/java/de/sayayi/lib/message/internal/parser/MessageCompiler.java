@@ -26,19 +26,20 @@ import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.TextMessage;
-import de.sayayi.lib.message.internal.part.parameter.ParameterConfigImpl;
+import de.sayayi.lib.message.internal.part.config.PartConfigImpl;
+import de.sayayi.lib.message.internal.part.config.key.*;
+import de.sayayi.lib.message.internal.part.config.value.ConfigValueBool;
+import de.sayayi.lib.message.internal.part.config.value.ConfigValueMessage;
+import de.sayayi.lib.message.internal.part.config.value.ConfigValueNumber;
+import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
 import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
-import de.sayayi.lib.message.internal.part.parameter.key.*;
-import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueBool;
-import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueMessage;
-import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueNumber;
-import de.sayayi.lib.message.internal.part.parameter.value.ConfigValueString;
+import de.sayayi.lib.message.internal.part.post.PostFormatterPart;
 import de.sayayi.lib.message.internal.part.template.TemplatePart;
 import de.sayayi.lib.message.internal.part.text.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.part.parameter.ConfigKey;
-import de.sayayi.lib.message.part.parameter.ConfigKey.CompareType;
-import de.sayayi.lib.message.part.parameter.ConfigValue;
+import de.sayayi.lib.message.part.config.ConfigKey;
+import de.sayayi.lib.message.part.config.ConfigKey.CompareType;
+import de.sayayi.lib.message.part.config.ConfigValue;
 import de.sayayi.lib.message.util.SpacesUtil;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -48,10 +49,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 import static de.sayayi.lib.antlr4.walker.Walker.WALK_EXIT_RULES_HEAP;
@@ -65,9 +62,6 @@ import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
 import static java.lang.Long.parseLong;
 import static java.util.Objects.requireNonNull;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collector.Characteristics.IDENTITY_FINISH;
-import static java.util.stream.Collector.Characteristics.UNORDERED;
 import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.Token.EOF;
 
@@ -298,6 +292,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
             parts.add(((ParameterPartContext)part).part);
           else if (part instanceof TextPartContext)
             parts.add(((TextPartContext)part).part);
+          else if (part instanceof PostFormatPartContext)
+            parts.add(((PostFormatPartContext)part).part);
           else
           {
             if (template)
@@ -406,29 +402,18 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     final Collector<ParameterConfigElementContext,Map<ConfigKey,ConfigValue<?>>,Map<ConfigKey,ConfigValue<?>>>
-        PARAMETER_CONFIG_COLLECTOR = new Collector<>() {
-      @Override public Supplier<Map<ConfigKey,ConfigValue<?>>> supplier() { return LinkedHashMap::new; }
-      @Override public BinaryOperator<Map<ConfigKey,ConfigValue<?>>> combiner() { return foldCombiner(); }
-      @Override public Set<Characteristics> characteristics() { return Set.of(IDENTITY_FINISH); }
-
+        PARAMETER_CONFIG_COLLECTOR = new AbstractMapCollector<>(LinkedHashMap::new) {
       @Override
-      public BiConsumer<Map<ConfigKey,ConfigValue<?>>,ParameterConfigElementContext> accumulator()
+      protected void accumulator(@NotNull Map<ConfigKey,ConfigValue<?>> map, @NotNull ParameterConfigElementContext context)
       {
-        return (map,cec) -> {
-          for(var key: cec.configKeys)
-            if (map.put(key, cec.configValue) != null)
-            {
-              syntaxError("duplicate config element " + key + " for parameter '" +
-                  ((ParameterPartContext)cec.parent).parameterName().name + '\'')
-                  .with(cec)
-                  .report();
-            }
-        };
-      }
-
-      @Override
-      public Function<Map<ConfigKey,ConfigValue<?>>,Map<ConfigKey,ConfigValue<?>>> finisher() {
-        return identity();
+        for(var key: context.configKeys)
+          if (map.put(key, context.configValue) != null)
+          {
+            syntaxError("duplicate config element " + key + " for parameter '" +
+                ((ParameterPartContext)context.parent).parameterName().name + '\'')
+                .with(context)
+                .report();
+          }
       }
     };
 
@@ -459,7 +444,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           ctx.parameterName().name, format,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
-          new ParameterConfigImpl(mapElements)));
+          new PartConfigImpl(mapElements)));
     }
 
 
@@ -488,61 +473,30 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     final Collector<ConfigNamedElementContext,Map<String,ConfigValue<?>>,Map<String,ConfigValue<?>>>
-        TEMPLATE_NAMED_PARAMETER_COLLECTOR = new Collector<>() {
-      @Override public Supplier<Map<String,ConfigValue<?>>> supplier() { return TreeMap::new; }
-      @Override public BinaryOperator<Map<String,ConfigValue<?>>> combiner() { return foldCombiner(); }
-      @Override public Set<Characteristics> characteristics() { return Set.of(UNORDERED); }
-
+        TEMPLATE_NAMED_PARAMETER_COLLECTOR = new AbstractMapCollector<>(TreeMap::new) {
       @Override
-      public BiConsumer<Map<String,ConfigValue<?>>,ConfigNamedElementContext> accumulator()
-      {
-        return (map,cpec) -> {
-          final var name = cpec.configKey.getName();
-
-          if (map.containsKey(name))
-          {
-            syntaxError("duplicate template default parameter '" + name + "'")
-                .with(cpec)
-                .report();
-          }
-
-          map.put(name, cpec.configValue);
-        };
-      }
-
-
-      @Override
-      public Function<Map<String,ConfigValue<?>>,Map<String,ConfigValue<?>>> finisher() {
-        return identity();
+      protected void accumulator(@NotNull Map<String,ConfigValue<?>> map, @NotNull ConfigNamedElementContext context) {
+        if (map.put(context.configKey.getName(), context.configValue) != null)
+        {
+          syntaxError("duplicate template default parameter '" + context.configKey + "'")
+              .with(context)
+              .report();
+        }
       }
     };
 
 
     final Collector<TemplateParameterDelegateContext,Map<String,String>,Map<String,String>>
-        TEMPLATE_PARAMETER_DELEGATE_COLLECTOR = new Collector<>() {
-      @Override public Supplier<Map<String,String>> supplier() { return HashMap::new; }
-      @Override public BinaryOperator<Map<String,String>> combiner() { return foldCombiner(); }
-      @Override public Set<Characteristics> characteristics() { return Set.of(UNORDERED); }
-
+        TEMPLATE_PARAMETER_DELEGATE_COLLECTOR = new AbstractMapCollector<>(HashMap::new) {
       @Override
-      public BiConsumer<Map<String,String>,TemplateParameterDelegateContext> accumulator()
+      protected void accumulator(@NotNull Map<String,String> map, @NotNull TemplateParameterDelegateContext context)
       {
-        return (map,tpdc) -> {
-          if (map.containsKey(tpdc.parameter))
-          {
-            syntaxError("duplicate template parameter delegate '" + tpdc.parameter + "'")
-                .with(tpdc)
-                .report();
-          }
-
-          map.put(tpdc.parameter, tpdc.delegatedParameter);
-        };
-      }
-
-
-      @Override
-      public Function<Map<String,String>,Map<String,String>> finisher() {
-        return identity();
+        if (map.put(context.parameter, context.delegatedParameter) != null)
+        {
+          syntaxError("duplicate template parameter delegate '" + context.parameter + "'")
+              .with(context)
+              .report();
+        }
       }
     };
 
@@ -550,16 +504,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitTemplatePart(TemplatePartContext ctx)
     {
-      var name = ctx.templateName().name;
-      if (name.isEmpty())
-      {
-        syntaxError("template name must not be empty")
-            .with(ctx.templateName())
-            .report();
-      }
-
       ctx.part = new TemplatePart(
-          name,
+          ctx.templateName().name,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
           ctx.configNamedElement().stream().collect(TEMPLATE_NAMED_PARAMETER_COLLECTOR),
@@ -587,10 +533,31 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    final Collector<ConfigNamedElementContext,Map<ConfigKey,ConfigValue<?>>,Map<ConfigKey,ConfigValue<?>>>
+        POST_FORMAT_CONFIG_COLLECTOR = new AbstractMapCollector<>(LinkedHashMap::new) {
+      @Override
+      protected void accumulator(@NotNull Map<ConfigKey,ConfigValue<?>> map, @NotNull ConfigNamedElementContext context)
+      {
+        if (map.put(context.configKey, context.configValue) != null)
+        {
+          syntaxError("duplicate config name " + context.configKey + " for post formatter '" +
+              ((PostFormatPartContext)context.parent).postFormatName().name + '\'')
+              .with(context)
+              .report();
+        }
+      }
+    };
+
+
     @Override
     public void exitPostFormatPart(PostFormatPartContext ctx)
     {
-      //TODO implement
+      ctx.part = new PostFormatterPart(
+          ctx.postFormatName().name,
+          ctx.quotedMessage().messageWithSpaces,
+          isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
+          isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
+          new PartConfigImpl(ctx.configNamedElement().stream().collect(POST_FORMAT_CONFIG_COLLECTOR)));
     }
 
 
@@ -808,12 +775,6 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
       return false;
     }
-  }
-
-
-  @Contract(pure = true)
-  private static <K,V> BinaryOperator<Map<K,V>> foldCombiner() {
-    return (map1,map2) -> { map1.putAll(map2); return map1; };
   }
 
 
