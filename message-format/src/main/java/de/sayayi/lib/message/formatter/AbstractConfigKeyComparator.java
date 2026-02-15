@@ -15,7 +15,8 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.formatter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.FormatterContext;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 

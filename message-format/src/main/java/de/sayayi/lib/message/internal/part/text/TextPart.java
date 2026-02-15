@@ -90,6 +90,12 @@ public final class TextPart implements Text
 
 
   @Override
+  public @NotNull String getTextNotNull() {
+    return text == null ? "" : text;
+  }
+
+
+  @Override
   public @NotNull String getTextWithSpaces()
   {
     return isEmpty()

@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.formatter;
 
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;

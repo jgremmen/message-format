@@ -19,7 +19,7 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.part.MessagePart.Template;
-import de.sayayi.lib.message.part.parameter.ConfigValue;
+import de.sayayi.lib.message.part.config.ConfigValue;
 import de.sayayi.lib.message.util.SortedArrayMap;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;

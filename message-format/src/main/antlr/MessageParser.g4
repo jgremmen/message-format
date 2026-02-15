@@ -25,9 +25,9 @@ options {
 @header {
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.part.MessagePart.*;
-import de.sayayi.lib.message.part.parameter.ConfigKey;
-import de.sayayi.lib.message.part.parameter.ConfigValue;
-import de.sayayi.lib.message.internal.part.parameter.key.ConfigKeyName;
+import de.sayayi.lib.message.part.config.ConfigKey;
+import de.sayayi.lib.message.part.config.ConfigValue;
+import de.sayayi.lib.message.internal.part.config.key.ConfigKeyName;
 }
 
 

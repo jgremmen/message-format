@@ -1,0 +1,71 @@
+/*
+ * Copyright 2022 Jeroen Gremmen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.sayayi.lib.message.formatter.parameter.named;
+
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.parameter.runtime.ArrayFormatter;
+import de.sayayi.lib.message.formatter.parameter.runtime.IterableFormatter;
+import de.sayayi.lib.message.formatter.parameter.runtime.MapFormatter;
+import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
+import lombok.val;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
+
+import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static java.util.Locale.UK;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+
+/**
+ * @author Jeroen Gremmen
+ */
+@DisplayName("'size' formatter")
+class SizeFormatterTest extends AbstractFormatterTest
+{
+  @Test
+  void testFormat()
+  {
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new SizeFormatter(), new IterableFormatter(),
+            new ArrayFormatter(), new MapFormatter()), NO_CACHE_INSTANCE)
+        .setLocale(UK);
+    val message = messageSupport
+        .message("%{c,format:size} %{c,format:size,0:'empty',1:'singleton',:'multiple'}").getMessage();
+
+    assertEquals("0 empty", messageSupport.message(message)
+        .with("c", List.of()).format());
+
+    assertEquals("1 singleton", messageSupport.message(message)
+        .with("c", Map.of("a", "b")).format());
+
+    assertEquals("4 multiple", messageSupport.message(message)
+        .with("c", new int[] { 4, -45, 8, 1 }).format());
+  }
+
+
+  @Test
+  void testFormatNoSizeQueryable()
+  {
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new SizeFormatter()), NO_CACHE_INSTANCE)
+        .setLocale(UK);
+
+    assertEquals("", messageSupport.message("%{c,format:size}").with("c", true).format());
+  }
+}

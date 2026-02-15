@@ -18,8 +18,9 @@ package de.sayayi.lib.message.internal.part.parameter;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.internal.pack.PackSupport;
+import de.sayayi.lib.message.internal.part.config.PartConfigImpl;
 import de.sayayi.lib.message.part.MessagePart.Parameter;
-import de.sayayi.lib.message.part.parameter.ParameterConfig;
+import de.sayayi.lib.message.part.config.PartConfig;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -48,7 +49,7 @@ public final class ParameterPart implements Parameter
   private final String format;
 
   /** parameter configuration. */
-  private final @NotNull ParameterConfigImpl paramConfig;
+  private final @NotNull PartConfigImpl config;
 
   /** tells whether the parameter has a leading space. */
   private final boolean spaceBefore;
@@ -76,7 +77,7 @@ public final class ParameterPart implements Parameter
    * @param spaceAfter   adds a trailing space to this parameter
    */
   public ParameterPart(@NotNull String name, boolean spaceBefore, boolean spaceAfter) {
-    this(name, null, spaceBefore, spaceAfter, new ParameterConfigImpl(Map.of()));
+    this(name, null, spaceBefore, spaceAfter, new PartConfigImpl(Map.of()));
   }
 
 
@@ -84,21 +85,21 @@ public final class ParameterPart implements Parameter
    * Construct a parameter part with the given parameter {@code name} and parameter configuration.
    *
    * @param name         parameter name, not {@code null} or empty
-   * @param paramConfig  parameter configuration, not {@code null}
+   * @param config  parameter configuration, not {@code null}
    */
-  public ParameterPart(@NotNull String name, @NotNull ParameterConfigImpl paramConfig) {
-    this(name, null, false, false, paramConfig);
+  public ParameterPart(@NotNull String name, @NotNull PartConfigImpl config) {
+    this(name, null, false, false, config);
   }
 
 
   public ParameterPart(@NotNull String name, String format, boolean spaceBefore, boolean spaceAfter,
-                       @NotNull ParameterConfigImpl paramConfig)
+                       @NotNull PartConfigImpl config)
   {
     if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
       throw new IllegalArgumentException("name must not be empty");
 
     this.format = "".equals(format) ? null : format;
-    this.paramConfig = requireNonNull(paramConfig, "paramConfig must not be null");
+    this.config = requireNonNull(config, "paramConfig must not be null");
     this.spaceBefore = spaceBefore;
     this.spaceAfter = spaceAfter;
   }
@@ -120,8 +121,8 @@ public final class ParameterPart implements Parameter
 
   @Override
   @Contract(pure = true)
-  public @NotNull ParameterConfig getParamConfig() {
-    return paramConfig;
+  public @NotNull PartConfig getConfig() {
+    return config;
   }
 
 
@@ -141,8 +142,8 @@ public final class ParameterPart implements Parameter
   @Contract(pure = true)
   public @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
   {
-    final var context = new ParameterFormatterContext(messageAccessor, parameters,
-        parameters.getParameterValue(name), null, format, paramConfig);
+    final var context = new ParameterFormatterContextImpl(messageAccessor, parameters,
+        parameters.getParameterValue(name), null, format, config);
 
     return addSpaces(context.delegateToNextFormatter(), spaceBefore, spaceAfter);
   }
@@ -156,7 +157,7 @@ public final class ParameterPart implements Parameter
         Objects.equals(format, that.getFormat()) &&
         spaceBefore == that.isSpaceBefore() &&
         spaceAfter == that.isSpaceAfter() &&
-        paramConfig.equals(that.getParamConfig());
+        config.equals(that.getConfig());
   }
 
 
@@ -174,8 +175,8 @@ public final class ParameterPart implements Parameter
 
     if (format != null)
       s.append(",format=").append(format);
-    if (!paramConfig.isEmpty())
-      s.append(",map=").append(paramConfig);
+    if (!config.isEmpty())
+      s.append(",map=").append(config);
 
     if (spaceBefore && spaceAfter)
       s.append(",space-around");
@@ -204,7 +205,7 @@ public final class ParameterPart implements Parameter
     packStream.writeString(format);
     packStream.writeString(name);
 
-    paramConfig.pack(packStream);
+    config.pack(packStream);
   }
 
 
@@ -228,6 +229,6 @@ public final class ParameterPart implements Parameter
     final var format = packStream.readString();
     final var name = requireNonNull(packStream.readString());
 
-    return new ParameterPart(name, format, spaceBefore, spaceAfter, ParameterConfigImpl.unpack(unpack, packStream));
+    return new ParameterPart(name, format, spaceBefore, spaceAfter, PartConfigImpl.unpack(unpack, packStream));
   }
 }

@@ -15,9 +15,9 @@
  */
 package de.sayayi.lib.message.spring.formatter;
 
-import de.sayayi.lib.message.formatter.AbstractParameterFormatter;
-import de.sayayi.lib.message.formatter.FormatterContext;
-import de.sayayi.lib.message.formatter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.FormatterContext;
+import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -112,7 +112,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
     }
 
     return context.format(value, null, context.getConfigValueString("spel-format").orElse(null),
-        context.getParameterConfig().excludeConfigByName(PARAMETER_CONFIG_NAMES));
+        context.getConfig().excludeConfigByName(PARAMETER_CONFIG_NAMES));
   }
 
 

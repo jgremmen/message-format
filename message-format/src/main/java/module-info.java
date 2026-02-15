@@ -14,18 +14,20 @@ module de.sayayi.lib.message {
   exports de.sayayi.lib.message.adopter;
   exports de.sayayi.lib.message.exception;
   exports de.sayayi.lib.message.formatter;
-  exports de.sayayi.lib.message.formatter.named;
-  exports de.sayayi.lib.message.formatter.named.extra;
+  exports de.sayayi.lib.message.formatter.parameter;
+  exports de.sayayi.lib.message.formatter.parameter.named;
+  exports de.sayayi.lib.message.formatter.parameter.named.extra;
+  exports de.sayayi.lib.message.formatter.parameter.runtime;
+  exports de.sayayi.lib.message.formatter.parameter.runtime.extra;
   exports de.sayayi.lib.message.formatter.post;
-  exports de.sayayi.lib.message.formatter.runtime;
-  exports de.sayayi.lib.message.formatter.runtime.extra;
+  exports de.sayayi.lib.message.formatter.post.runtime;
   exports de.sayayi.lib.message.part;
+  exports de.sayayi.lib.message.part.config;
   exports de.sayayi.lib.message.part.normalizer;
-  exports de.sayayi.lib.message.part.parameter;
   exports de.sayayi.lib.message.util;
 
-  uses de.sayayi.lib.message.formatter.ParameterFormatter;
-  uses de.sayayi.lib.message.formatter.ParameterPostFormatter;
+  uses de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
+  uses de.sayayi.lib.message.formatter.post.PostFormatter;
 
   // internal service implementations
   provides java.nio.file.spi.FileTypeDetector with de.sayayi.lib.message.internal.pack.PackFileTypeDetector;

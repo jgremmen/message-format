@@ -15,6 +15,9 @@
  */
 package de.sayayi.lib.message.formatter;
 
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
+import de.sayayi.lib.message.formatter.post.PostFormatter;
+
 import java.util.ServiceLoader;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -87,7 +90,7 @@ public class DefaultFormatterService extends GenericFormatterService
   protected void addDefaultFormatters()
   {
     addParameterFormattersFromService();
-    addParameterPostFormattersFromService();
+    addPostFormattersFromService();
   }
 
 
@@ -107,10 +110,10 @@ public class DefaultFormatterService extends GenericFormatterService
    *
    * @since 0.20.0
    */
-  protected void addParameterPostFormattersFromService()
+  protected void addPostFormattersFromService()
   {
     ServiceLoader
-        .load(ParameterPostFormatter.class, classLoader)
-        .forEach(this::addParameterPostFormatter);
+        .load(PostFormatter.class, classLoader)
+        .forEach(this::addPostFormatter);
   }
 }

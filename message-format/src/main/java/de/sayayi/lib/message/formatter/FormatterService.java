@@ -15,8 +15,11 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.formatter.named.StringFormatter;
-import de.sayayi.lib.message.part.parameter.ParameterConfig;
+import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.named.StringFormatter;
+import de.sayayi.lib.message.formatter.post.PostFormatter;
+import de.sayayi.lib.message.part.config.PartConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -34,29 +37,29 @@ import java.util.Set;
 public interface FormatterService
 {
   /**
-   * Returns a list of parameter formatters for the given {@code format}, {@code type} and {@code parameterConfig}.
+   * Returns a list of parameter formatters for the given {@code format}, {@code type} and {@code config}.
    * <p>
    * Implementing classes must make sure that for any combination of {@code format} and {@code type}
    * this function always returns at least 1 formatter. A good choice for a default formatter would
    * be {@link StringFormatter}.
    *
-   * @param format           name of the formatter or {@code null}
-   * @param type             type of the value to format
-   * @param parameterConfig  parameter config
+   * @param format  name of the formatter or {@code null}
+   * @param type    type of the value to format
+   * @param config  message part config
    *
    * @return  array of prioritized parameter formatters, never {@code null} and never empty
    *
    * @see GenericFormatterService
    */
   @Contract(value = "_, _, _ -> new", pure = true)
-  @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, ParameterConfig parameterConfig);
+  @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, PartConfig config);
 
 
   /**
-   * @since 0.20.0
+   * @since 0.21.0
    */
   @Contract(pure = true)
-  @UnmodifiableView @NotNull Map<String,ParameterPostFormatter> getParameterPostFormatters();
+  @UnmodifiableView @NotNull Map<String,PostFormatter> getPostFormatters();
 
 
   /**
@@ -108,8 +111,8 @@ public interface FormatterService
 
 
     /**
-     * @since 0.20.0
+     * @since 0.21.0
      */
-    void addParameterPostFormatter(@NotNull ParameterPostFormatter parameterPostFormatter);
+    void addPostFormatter(@NotNull PostFormatter postFormatter);
   }
 }

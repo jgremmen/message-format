@@ -21,6 +21,7 @@ import de.sayayi.lib.message.SpacesAware;
 import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
+import de.sayayi.lib.message.internal.part.post.PostFormatterPart;
 import de.sayayi.lib.message.internal.part.template.TemplatePart;
 import de.sayayi.lib.message.internal.part.text.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
@@ -95,25 +96,36 @@ public final class CompoundMessage implements Message.WithSpaces
                                @NotNull Parameters parameters,
                                @NotNull MessagePart messagePart)
   {
-    if (messagePart instanceof ParameterPart parameterPart)
+    switch(messagePart)
     {
-      try {
-        return parameterPart.getText(messageAccessor, parameters);
-      } catch(Exception ex) {
-        throw MessageFormatException.of(ex).withParameter(parameterPart.getName());
+      case ParameterPart parameterPart -> {
+        try {
+          return parameterPart.getText(messageAccessor, parameters);
+        } catch(Exception ex) {
+          throw MessageFormatException.of(ex).withParameter(parameterPart.getName());
+        }
+      }
+
+      case PostFormatterPart postFormatterPart -> {
+        try {
+          return postFormatterPart.getText(messageAccessor, parameters);
+        } catch(Exception ex) {
+          throw MessageFormatException.of(ex);
+        }
+      }
+
+      case TemplatePart templatePart -> {
+        try {
+          return templatePart.getText(messageAccessor, parameters);
+        } catch(Exception ex) {
+          throw MessageFormatException.of(ex).withTemplate(templatePart.getName());
+        }
+      }
+
+      default -> {
+        return (Text)messagePart;
       }
     }
-
-    if (messagePart instanceof TemplatePart templatePart)
-    {
-      try {
-        return templatePart.getText(messageAccessor, parameters);
-      } catch(Exception ex) {
-        throw MessageFormatException.of(ex).withTemplate(templatePart.getName());
-      }
-    }
-
-    return (Text)messagePart;
   }
 
 
@@ -146,7 +158,9 @@ public final class CompoundMessage implements Message.WithSpaces
       if (messagePart instanceof TemplatePart)
         templateNames.add(((TemplatePart)messagePart).getName());
       else if (messagePart instanceof ParameterPart)
-        templateNames.addAll(((ParameterPart)messagePart).getParamConfig().getTemplateNames());
+        templateNames.addAll(((ParameterPart)messagePart).getConfig().getTemplateNames());
+      else if (messagePart instanceof PostFormatterPart)
+        templateNames.addAll(((PostFormatterPart)messagePart).getConfig().getTemplateNames());
     }
 
     return unmodifiableSet(templateNames);
