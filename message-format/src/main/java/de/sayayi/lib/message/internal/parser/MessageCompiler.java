@@ -677,15 +677,26 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitMapKeyNull(MapKeyNullContext ctx) {
-      ctx.key = ctx.equalOperatorOptional().cmp == CompareType.EQ ? MapKeyNull.EQ : MapKeyNull.NE;
+    public void exitMapKeyNull(MapKeyNullContext ctx)
+    {
+      final var equalOperator = ctx.equalOperator();
+
+      ctx.key = equalOperator == null || equalOperator.cmp == CompareType.EQ
+          ? MapKeyNull.EQ
+          : MapKeyNull.NE;
     }
 
 
     @Override
-    public void exitMapKeyEmpty(MapKeyEmptyContext ctx) {
-      ctx.key = ctx.equalOperatorOptional().cmp == CompareType.EQ ? MapKeyEmpty.EQ : MapKeyEmpty.NE;
+    public void exitMapKeyEmpty(MapKeyEmptyContext ctx)
+    {
+      final var equalOperator = ctx.equalOperator();
+
+      ctx.key = equalOperator == null || equalOperator.cmp == CompareType.EQ
+          ? MapKeyEmpty.EQ
+          : MapKeyEmpty.NE;
     }
+
 
     @Override
     public void exitMapKeyBool(MapKeyBoolContext ctx) {
@@ -694,22 +705,24 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitMapKeyNumber(MapKeyNumberContext ctx) {
-      ctx.key = new MapKeyNumber(ctx.relationalOperatorOptional().cmp, parseLong(ctx.NUMBER().getText()));
-    }
-
-
-    @Override
-    public void exitMapKeyString(MapKeyStringContext ctx) {
-      ctx.key = new MapKeyString(ctx.relationalOperatorOptional().cmp, ctx.quotedString().string);
-    }
-
-
-    @Override
-    public void exitRelationalOperatorOptional(RelationalOperatorOptionalContext ctx)
+    public void exitMapKeyNumber(MapKeyNumberContext ctx)
     {
       final var relationalOperator = ctx.relationalOperator();
-      ctx.cmp = relationalOperator == null ? CompareType.EQ : relationalOperator.cmp;
+
+      ctx.key = new MapKeyNumber(
+          relationalOperator == null ? CompareType.EQ : relationalOperator.cmp,
+          parseLong(ctx.NUMBER().getText()));
+    }
+
+
+    @Override
+    public void exitMapKeyString(MapKeyStringContext ctx)
+    {
+      final var relationalOperator = ctx.relationalOperator();
+
+      ctx.key = new MapKeyString(
+          relationalOperator == null ? CompareType.EQ : relationalOperator.cmp,
+          ctx.quotedString().string);
     }
 
 
@@ -726,14 +739,6 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           case GT -> ctx.cmp = CompareType.GT;
           case GTE -> ctx.cmp = CompareType.GTE;
         }
-    }
-
-
-    @Override
-    public void exitEqualOperatorOptional(EqualOperatorOptionalContext ctx)
-    {
-      final var equalOperator = ctx.equalOperator();
-      ctx.cmp = equalOperator == null ? CompareType.EQ : equalOperator.cmp;
     }
 
 
@@ -777,6 +782,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       add(DQ_END, "\"", "DQ_END");
       add(DQ_START, "\"", "DQ_START");
       add(EMPTY, "'empty'", "EMPTY");
+      add(FORMAT, "'format'", "FORMAT");
       add(EQ, "'='", "EQ");
       add(GT, "'>'", "GT");
       add(GTE, "'>='", "GTE");

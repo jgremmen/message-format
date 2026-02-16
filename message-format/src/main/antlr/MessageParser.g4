@@ -127,15 +127,11 @@ mapKeys returns [List<MapKey> keys]
         ;
 
 mapKey returns [MapKey key]
-        : equalOperatorOptional NULL               #mapKeyNull
-        | equalOperatorOptional EMPTY              #mapKeyEmpty
-        | BOOL                                     #mapKeyBool
-        | relationalOperatorOptional NUMBER        #mapKeyNumber
-        | relationalOperatorOptional quotedString  #mapKeyString
-        ;
-
-relationalOperatorOptional returns [MapKey.CompareType cmp]
-        : relationalOperator?
+        : equalOperator? NULL               #mapKeyNull
+        | equalOperator? EMPTY              #mapKeyEmpty
+        | BOOL                              #mapKeyBool
+        | relationalOperator? NUMBER        #mapKeyNumber
+        | relationalOperator? quotedString  #mapKeyString
         ;
 
 relationalOperator returns [MapKey.CompareType cmp]
@@ -144,10 +140,6 @@ relationalOperator returns [MapKey.CompareType cmp]
         | LT
         | GT
         | GTE
-        ;
-
-equalOperatorOptional returns [MapKey.CompareType cmp]
-        : equalOperator?
         ;
 
 equalOperator returns [MapKey.CompareType cmp]
