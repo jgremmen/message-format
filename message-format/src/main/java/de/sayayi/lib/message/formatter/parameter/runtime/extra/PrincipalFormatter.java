@@ -17,16 +17,16 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey.MatchResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.security.Principal;
 
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.Defined.EQUIVALENT;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.Defined.MISMATCH;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.EQUIVALENT;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
 
 
 /**
@@ -38,7 +38,7 @@ public final class PrincipalFormatter
     implements ConfigKeyComparator<Principal>
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Principal principal) {
+  protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Principal principal) {
     return context.format(principal.getName(), String.class);
   }
 

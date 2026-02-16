@@ -18,11 +18,11 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormattableType;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.formatter.parameter.SingletonParameters;
+import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey.MatchResult;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,8 +32,8 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import static de.sayayi.lib.message.part.MapKey.MatchResult.forEmptyKey;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.forEmptyKey;
 
 
 /**
@@ -42,14 +42,14 @@ import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.forEmptyKe
 public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> implements SizeQueryable
 {
   @Override
-  protected @NotNull Iterator<Text> createIterator(@NotNull FormatterContext context,
+  protected @NotNull Iterator<Text> createIterator(@NotNull ParameterFormatterContext context,
                                                    @NotNull Iterable<?> iterable) {
     return new TextIterator(context, iterable);
   }
 
 
   @Override
-  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object iterable)
+  public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object iterable)
   {
     if (iterable instanceof Collection)
       return OptionalLong.of(((Collection<?>)iterable).size());
@@ -92,7 +92,7 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> 
     private Text nextText;
 
 
-    private TextIterator(@NotNull FormatterContext context, @NotNull Iterable<?> iterable)
+    private TextIterator(@NotNull ParameterFormatterContext context, @NotNull Iterable<?> iterable)
     {
       this.iterable = iterable;
 

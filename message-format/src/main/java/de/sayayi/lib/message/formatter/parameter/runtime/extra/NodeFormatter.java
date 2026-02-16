@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +43,7 @@ import static org.w3c.dom.Node.ELEMENT_NODE;
 public final class NodeFormatter extends AbstractParameterFormatter<Node>
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Node node) {
+  protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Node node) {
     return noSpaceText(toXPath(node));
   }
 

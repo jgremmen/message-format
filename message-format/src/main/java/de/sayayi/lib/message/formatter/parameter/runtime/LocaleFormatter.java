@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractMultiSelectFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,31 +45,31 @@ public final class LocaleFormatter extends AbstractMultiSelectFormatter<Locale>
   }
 
 
-  private @NotNull Text formatLocaleCountry(@NotNull FormatterContext context, @NotNull Locale locale)
+  private @NotNull Text formatLocaleCountry(@NotNull ParameterFormatterContext context, @NotNull Locale locale)
   {
     return formatUsingMappedString(context, locale.getCountry(), true)
         .orElseGet(() -> noSpaceText(locale.getDisplayCountry(context.getLocale())));
   }
 
 
-  private @NotNull Text formatLocaleLanguage(@NotNull FormatterContext context, @NotNull Locale locale)
+  private @NotNull Text formatLocaleLanguage(@NotNull ParameterFormatterContext context, @NotNull Locale locale)
   {
     return formatUsingMappedString(context, locale.getLanguage(), true)
         .orElseGet(() -> noSpaceText(locale.getDisplayLanguage(context.getLocale())));
   }
 
 
-  private @NotNull Text formatLocaleDisplayName(@NotNull FormatterContext context, @NotNull Locale locale) {
+  private @NotNull Text formatLocaleDisplayName(@NotNull ParameterFormatterContext context, @NotNull Locale locale) {
     return noSpaceText(locale.getDisplayName(context.getLocale()));
   }
 
 
-  private @NotNull Text formatLocaleScript(@NotNull FormatterContext context, @NotNull Locale locale) {
+  private @NotNull Text formatLocaleScript(@NotNull ParameterFormatterContext context, @NotNull Locale locale) {
     return noSpaceText(locale.getDisplayScript(context.getLocale()));
   }
 
 
-  private @NotNull Text formatLocaleVariant(@NotNull FormatterContext context, @NotNull Locale locale) {
+  private @NotNull Text formatLocaleVariant(@NotNull ParameterFormatterContext context, @NotNull Locale locale) {
     return noSpaceText(locale.getDisplayVariant(context.getLocale()));
   }
 

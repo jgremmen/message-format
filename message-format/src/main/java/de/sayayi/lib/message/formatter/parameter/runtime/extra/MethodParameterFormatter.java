@@ -17,11 +17,11 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.formatter.parameter.runtime.TypeFormatter;
+import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -29,9 +29,9 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.lang.reflect.Parameter;
 import java.util.Set;
 
+import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.EQUIVALENT;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.Defined.EQUIVALENT;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.Defined.MISMATCH;
 
 
 /**
@@ -44,7 +44,7 @@ public final class MethodParameterFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Parameter parameter)
+  public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Parameter parameter)
   {
     return switch(context.getConfigValueString("parameter").orElse("default")) {
       case "name" -> noSpaceText(parameter.getName());

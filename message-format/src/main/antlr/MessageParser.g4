@@ -25,9 +25,8 @@ options {
 @header {
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.part.MessagePart.*;
-import de.sayayi.lib.message.part.config.ConfigKey;
-import de.sayayi.lib.message.part.config.ConfigValue;
-import de.sayayi.lib.message.internal.part.config.key.ConfigKeyName;
+import de.sayayi.lib.message.part.MapKey;
+import de.sayayi.lib.message.part.TypedValue;
 }
 
 
@@ -62,16 +61,11 @@ simpleString returns [String string]
         | quotedString
         ;
 
-forceQuotedMessage returns [Message.WithSpaces messageWithSpaces]
-        : quotedMessage
-        | simpleString
-        ;
-
 parameterPart returns [Parameter part]
         : P_START
           parameterName
-          (COMMA (parameterConfigElement | parameterFormat))*
-          (COMMA COLON forceQuotedMessage)?
+          (COMMA (configDefinition | mapEntry | parameterFormat))*
+          (COMMA mapEntryDefault)?
           P_END
         ;
 
@@ -83,15 +77,10 @@ parameterFormat returns [String format]
         : FORMAT COLON nameOrKeyword  // kebab-case format
         ;
 
-parameterConfigElement returns [List<ConfigKey> configKeys, ConfigValue<?> configValue]
-        : configNamedElement
-        | configMapElement
-        ;
-
 templatePart returns [Template part]
         : TPL_START
           templateName
-          (COMMA (configNamedElement | templateParameterDelegate))*
+          (COMMA (configDefinition | templateParameterDelegate))*
           TPL_END
         ;
 
@@ -107,7 +96,7 @@ postFormatPart returns [PostFormat part]
         : PF_START
           postFormatName
           COMMA quotedMessage
-          (COMMA configNamedElement)*
+          (COMMA configDefinition)*
           PF_END
         ;
 
@@ -115,36 +104,41 @@ postFormatName returns [String name]
         : nameOrKeyword  // kebab-case format
         ;
 
-configMapElement returns [List<ConfigKey> configKeys, ConfigValue<?> configValue]
-        : configMapKeys COLON quotedMessage  #configMapMessage
-        | configMapKeys COLON simpleString   #configMapString
+configDefinition returns [String name, TypedValue<?> value]
+        : NAME COLON BOOL           #configDefinitionBool
+        | NAME COLON NUMBER         #configDefinitionNumber
+        | NAME COLON simpleString   #configDefinitionString
+        | NAME COLON quotedMessage  #configDefinitionMessage
         ;
 
-configNamedElement returns [ConfigKeyName configKey, ConfigValue<?> configValue]
-        : NAME COLON BOOL           #configNamedBool
-        | NAME COLON NUMBER         #configNamedNumber
-        | NAME COLON simpleString   #configNamedString
-        | NAME COLON quotedMessage  #configNamedMessage
+mapEntry returns [List<MapKey> keys, TypedValue<?> value]
+        : mapKeys COLON quotedMessage  #mapEntryMessage
+        | mapKeys COLON simpleString   #mapEntryString
         ;
 
-configMapKeys returns [List<ConfigKey> configKeys]
-        : configMapKey
-        | L_PAREN configMapKey (COMMA configMapKey)+ R_PAREN
+mapEntryDefault returns [Message.WithSpaces messageWithSpaces]
+        : COLON quotedMessage
+        | COLON simpleString
         ;
 
-configMapKey returns [ConfigKey configKey]
-        : equalOperatorOptional NULL               #configMapKeyNull
-        | equalOperatorOptional EMPTY              #configMapKeyEmpty
-        | BOOL                                     #configMapKeyBool
-        | relationalOperatorOptional NUMBER        #configMapKeyNumber
-        | relationalOperatorOptional quotedString  #configMapKeyString
+mapKeys returns [List<MapKey> keys]
+        : mapKey
+        | L_PAREN mapKey (COMMA mapKey)+ R_PAREN
         ;
 
-relationalOperatorOptional returns [ConfigKey.CompareType cmp]
+mapKey returns [MapKey key]
+        : equalOperatorOptional NULL               #mapKeyNull
+        | equalOperatorOptional EMPTY              #mapKeyEmpty
+        | BOOL                                     #mapKeyBool
+        | relationalOperatorOptional NUMBER        #mapKeyNumber
+        | relationalOperatorOptional quotedString  #mapKeyString
+        ;
+
+relationalOperatorOptional returns [MapKey.CompareType cmp]
         : relationalOperator?
         ;
 
-relationalOperator returns [ConfigKey.CompareType cmp]
+relationalOperator returns [MapKey.CompareType cmp]
         : equalOperator
         | LTE
         | LT
@@ -152,11 +146,11 @@ relationalOperator returns [ConfigKey.CompareType cmp]
         | GTE
         ;
 
-equalOperatorOptional returns [ConfigKey.CompareType cmp]
+equalOperatorOptional returns [MapKey.CompareType cmp]
         : equalOperator?
         ;
 
-equalOperator returns [ConfigKey.CompareType cmp]
+equalOperator returns [MapKey.CompareType cmp]
         : EQ
         | NE
         ;

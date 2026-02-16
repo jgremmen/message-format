@@ -17,10 +17,10 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey.MatchResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -34,7 +34,7 @@ public final class AtomicBooleanFormatter
     implements ConfigKeyComparator<AtomicBoolean>
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull AtomicBoolean atomicBoolean) {
+  public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull AtomicBoolean atomicBoolean) {
     return context.format(atomicBoolean.get(), boolean.class);
   }
 

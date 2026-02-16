@@ -61,7 +61,7 @@ public @NotNull Text format(@NotNull FormatterContext context,
 }
 ----
 
-Various helper methods from `AbstractParameterFormatter` have been moved to `FormatterContext`.
+Various helper methods from `AbstractParameterFormatter` have been moved to `ParameterFormatterContext`.
 
 
 == Named Formatters _bits_, _filesize_ and _geo_

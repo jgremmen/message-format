@@ -21,9 +21,12 @@ import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.SpacesAware;
 import de.sayayi.lib.message.internal.part.text.NoSpaceTextPart;
 import de.sayayi.lib.message.internal.part.text.TextPart;
-import de.sayayi.lib.message.part.config.PartConfig;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
+
+import java.util.Locale;
+import java.util.Set;
 
 
 /**
@@ -152,7 +155,16 @@ public interface MessagePart extends SpacesAware
      * @return  parameter configuration, never {@code null}
      */
     @Contract(pure = true)
-    @NotNull PartConfig getConfig();
+    @NotNull MessagePart.Config getConfig();
+
+
+    /**
+     * Returns the map for this parameter.
+     *
+     * @return  parameter map, never {@code null}
+     */
+    @Contract(pure = true)
+    @NotNull MessagePart.Map getMap();
   }
 
 
@@ -190,6 +202,119 @@ public interface MessagePart extends SpacesAware
      * @return  post format configuration, never {@code null}
      */
     @Contract(pure = true)
-    @NotNull PartConfig getConfig();
+    @NotNull MessagePart.Config getConfig();
+  }
+
+
+
+
+  /**
+   * This class represents the message part configuration.
+   *
+   * @since 0.21.0
+   */
+  interface Config
+  {
+    /**
+     * Tells whether the configuration contains any values.
+     *
+     * @return  {@code false} if the configuration contains at least 1 value, {@code true} otherwise
+     */
+    @Contract(pure = true)
+    boolean isEmpty();
+
+
+    /**
+     * Returns a set of config names defined in the configuration map.
+     *
+     * @return  unmodifiable set of config names, never {@code null}
+     *
+     * @since 0.20.0
+     */
+    @Contract(pure = true)
+    @NotNull @Unmodifiable
+    Set<String> getConfigNames();
+
+
+    @Contract(pure = true)
+    TypedValue<?> getConfigValue(@NotNull String name);
+
+
+    /**
+     * Returns a set of template names referenced in all message values which are available in
+     * the message part configuration.
+     *
+     * @return  unmodifiable set of all referenced template names, never {@code null}
+     */
+    @Contract(pure = true)
+    @Unmodifiable
+    @NotNull Set<String> getTemplateNames();
+
+
+    /**
+     * Returns a new configuration which is the same as this configuration but without the given config names.
+     *
+     * @param configNames  config names to exclude, not {@code null}
+     *
+     * @return  new configuration without the given config names, never {@code null}
+     *
+     * @since 0.21.0
+     */
+    @NotNull MessagePart.Config excludeConfigByName(@NotNull Set<String> configNames);
+  }
+
+
+
+
+  /**
+   * This class represents the message part map.
+   *
+   * @since 0.21.0
+   */
+  interface Map
+  {
+    /**
+     * Tells whether the map contains any values.
+     *
+     * @return  {@code false} if the map contains at least 1 value, {@code true} otherwise
+     */
+    @Contract(pure = true)
+    boolean isEmpty();
+
+
+    /**
+     * Tells whether the map contains a message entry with the given {@code keyType}.
+     *
+     * @param keyType  entry key type to look for, not {@code null}
+     *
+     * @return  {@code true} if the map contains a message with the given key type, {@code false} otherwise
+     */
+    @Contract(pure = true)
+    boolean hasMessageWithKeyType(@NotNull MapKey.Type keyType);
+
+
+    /**
+     * Returns the default value from the map.
+
+     * @return  default value or {@code null} if no default value has been defined
+     */
+    @Contract(pure = true)
+    TypedValue<?> getDefaultValue();
+
+
+    @Contract(pure = true)
+    Message.WithSpaces getMessage(@NotNull MessageAccessor messageAccessor, Object key, @NotNull Locale locale,
+                                  @NotNull Set<MapKey.Type> keyTypes, boolean includeDefault,
+                                  MessagePart.Config config);
+
+
+    /**
+     * Returns a set of template names referenced in all message values which are available in the map.
+     *
+     * @return  unmodifiable set of all referenced template names, never {@code null}
+     */
+    @Contract(pure = true)
+    @Unmodifiable
+    @NotNull Set<String> getTemplateNames();
   }
 }

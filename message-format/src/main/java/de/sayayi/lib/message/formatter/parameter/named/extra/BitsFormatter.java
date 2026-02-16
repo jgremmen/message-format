@@ -16,11 +16,11 @@
 package de.sayayi.lib.message.formatter.parameter.named.extra;
 
 import de.sayayi.lib.message.formatter.parameter.AbstractParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigValue.NumberValue;
-import de.sayayi.lib.message.part.config.ConfigValue.StringValue;
+import de.sayayi.lib.message.part.TypedValue.NumberValue;
+import de.sayayi.lib.message.part.TypedValue.StringValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -58,14 +58,14 @@ public final class BitsFormatter extends AbstractParameterFormatter<Object>
 
 
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Object value)
   {
     final var bitCount = detectBitCount(context, value);
     return bitCount > 0 ? noSpaceText(format(bitCount, value)) : emptyText();
   }
 
 
-  private int detectBitCount(@NotNull FormatterContext context, @NotNull Object value)
+  private int detectBitCount(@NotNull ParameterFormatterContext context, @NotNull Object value)
   {
     final var configValue = context.getConfigValue("bits").orElse(null);
 

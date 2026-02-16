@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.post;
 
-import de.sayayi.lib.message.part.config.PartConfigAccessor;
+import de.sayayi.lib.message.part.ConfigAccessor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +28,7 @@ import java.util.Locale;
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
-public interface PostFormatterContext extends PartConfigAccessor
+public interface PostFormatterContext extends ConfigAccessor
 {
   /**
    * Tells for which locale the message must be formatted.

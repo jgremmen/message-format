@@ -21,7 +21,7 @@ import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.DefaultFormatter;
 import de.sayayi.lib.message.formatter.parameter.named.StringFormatter;
 import de.sayayi.lib.message.formatter.post.PostFormatter;
-import de.sayayi.lib.message.part.config.PartConfig;
+import de.sayayi.lib.message.part.MessagePart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
@@ -211,7 +211,8 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   @Override
-  public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, PartConfig config)
+  public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type,
+                                                     MessagePart.Config config)
   {
     requireNonNull(type, "type must not be null");
 

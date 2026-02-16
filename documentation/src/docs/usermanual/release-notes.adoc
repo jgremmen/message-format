@@ -16,7 +16,7 @@ _Release date: t.b.d._
 
 * Add named formatter xref:formatters_named.adoc#clip[`clip`]
 * More detailed formatter configuration keys
-* Introduce `FormatterContext` for `ParameterFormatter#format(...)` method
+* Introduce `ParameterFormatterContext` for `ParameterFormatter#format(...)` method
 * Add order support for Formattable types so formatters can be prioritized if a parameter value matches
   multiple formatters
 * A parameter formatter can delegate formatting to the next (based on formattable type priority) formatter

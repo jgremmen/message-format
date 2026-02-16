@@ -17,8 +17,8 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractMultiSelectFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -77,7 +77,7 @@ public final class PathFormatter extends AbstractMultiSelectFormatter<Object> im
 
 
   @Contract(pure = true)
-  private @NotNull Text formatPathExtension(@NotNull FormatterContext context, @NotNull Path path)
+  private @NotNull Text formatPathExtension(@NotNull ParameterFormatterContext context, @NotNull Path path)
   {
     path = path.getFileName();
     if (path == null)
@@ -111,7 +111,7 @@ public final class PathFormatter extends AbstractMultiSelectFormatter<Object> im
 
 
   @Override
-  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object fileOrPath)
+  public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object fileOrPath)
   {
     final var path = toPath(fileOrPath);
 

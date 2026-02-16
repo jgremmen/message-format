@@ -13,49 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal.part.config.value;
+package de.sayayi.lib.message.internal.part.map.key;
 
-import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.internal.pack.PackSupport;
-import de.sayayi.lib.message.part.config.ConfigValue.MessageValue;
+import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static java.util.Objects.requireNonNull;
-
 
 /**
- * This class represents a message configuration value.
- *
- * @param messageValue  configuration value message.
+ * The empty configuration key represents values which are considered empty by their associated
+ * parameter formatter.
  *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
-public record ConfigValueMessage(@NotNull Message.WithSpaces messageValue) implements MessageValue
+public enum MapKeyEmpty implements MapKey
 {
-  public ConfigValueMessage(@NotNull Message.WithSpaces messageValue) {
-    this.messageValue = requireNonNull(messageValue, "message must not be null");
+  /** Empty config key with compare type {@link MapKey.CompareType#EQ EQ}. */
+  EQ,
+
+  /** Empty config key with compare type {@link MapKey.CompareType#NE NE}. */
+  NE;
+
+
+  @Override
+  public @NotNull CompareType getCompareType() {
+    return this == EQ ? CompareType.EQ : CompareType.NE;
   }
 
 
   /**
-   * Returns the message with spaces.
+   * {@inheritDoc}
    *
-   * @return  message with spaces, never {@code null}
+   * @return  always {@link Type#EMPTY Type#EMPTY}
    */
   @Override
-  public @NotNull Message.WithSpaces asObject() {
-    return messageValue();
+  public @NotNull Type getType() {
+    return Type.EMPTY;
   }
 
 
   @Override
-  public @NotNull String toString() {
-    return messageValue.toString();
+  public String toString() {
+    return getCompareType().asPrefix() + "empty";
   }
 
 
@@ -65,24 +68,26 @@ public record ConfigValueMessage(@NotNull Message.WithSpaces messageValue) imple
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
+   *
+   * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    PackSupport.pack(messageValue, packStream);
+    packStream.writeBoolean(this == EQ);
   }
 
 
   /**
-   * @param unpack      unpacker instance, not {@code null}
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked message map value, never {@code null}
+   * @return  unpacked empty map key, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
+   *
+   * @hidden
    */
-  public static @NotNull ConfigValueMessage unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
-      throws IOException {
-    return new ConfigValueMessage(unpack.unpackMessageWithSpaces(packStream));
+  public static @NotNull MapKeyEmpty unpack(@NotNull PackInputStream packStream) throws IOException {
+    return packStream.readBoolean() ? EQ : NE;
   }
 }

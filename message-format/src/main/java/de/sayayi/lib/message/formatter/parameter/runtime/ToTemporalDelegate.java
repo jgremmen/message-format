@@ -16,8 +16,8 @@
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,8 +31,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 
+import static de.sayayi.lib.message.part.MapKey.EMPTY_NULL_TYPE;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
-import static de.sayayi.lib.message.part.config.ConfigKey.EMPTY_NULL_TYPE;
 
 
 /**
@@ -47,13 +47,13 @@ public final class ToTemporalDelegate implements ParameterFormatter
 {
   @Override
   @SuppressWarnings("IfCanBeSwitch")
-  public @NotNull Text format(@NotNull FormatterContext context, Object value)
+  public @NotNull Text format(@NotNull ParameterFormatterContext context, Object value)
   {
     if (value == null)
     {
       // handle empty, !empty, null and !null first
       final var msg = context
-          .getConfigMapMessage(null, EMPTY_NULL_TYPE)
+          .getMapMessage(null, EMPTY_NULL_TYPE)
           .orElse(null);
 
       return msg != null ? context.format(msg) : nullText();

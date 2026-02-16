@@ -13,49 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal.part.config.key;
+package de.sayayi.lib.message.internal.part.typedvalue;
 
-import de.sayayi.lib.message.part.config.ConfigKey;
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.internal.pack.PackSupport;
+import de.sayayi.lib.message.part.TypedValue.MessageValue;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
+import static java.util.Objects.requireNonNull;
+
 
 /**
+ * This class represents a message configuration value.
+ *
+ * @param messageValue  configuration value message.
+ *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
-public enum ConfigKeyNull implements ConfigKey
+public record TypedValueMessage(@NotNull Message.WithSpaces messageValue) implements MessageValue
 {
-  /** Null config key with compare type {@link ConfigKey.CompareType#EQ EQ}. */
-  EQ,
-
-  /** Null config key with compare type {@link ConfigKey.CompareType#NE NE}. */
-  NE;
-
-
-  @Override
-  public @NotNull CompareType getCompareType() {
-    return this == EQ ? CompareType.EQ : CompareType.NE;
+  public TypedValueMessage(@NotNull Message.WithSpaces messageValue) {
+    this.messageValue = requireNonNull(messageValue, "message must not be null");
   }
 
 
   /**
-   * {@inheritDoc}
+   * Returns the message with spaces.
    *
-   * @return  always {@link Type#NULL Type#NULL}
+   * @return  message with spaces, never {@code null}
    */
   @Override
-  public @NotNull Type getType() {
-    return Type.NULL;
+  public @NotNull Message.WithSpaces asObject() {
+    return messageValue();
   }
 
 
   @Override
-  public String toString() {
-    return getCompareType().asPrefix() + "null";
+  public @NotNull String toString() {
+    return messageValue.toString();
   }
 
 
@@ -65,26 +65,24 @@ public enum ConfigKeyNull implements ConfigKey
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeBoolean(this == EQ);
+    PackSupport.pack(messageValue, packStream);
   }
 
 
   /**
+   * @param unpack      unpacker instance, not {@code null}
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked null map key, never {@code null}
+   * @return  unpacked message map value, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
-  public static @NotNull ConfigKeyNull unpack(@NotNull PackInputStream packStream) throws IOException {
-    return packStream.readBoolean() ? EQ : NE;
+  public static @NotNull TypedValueMessage unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
+      throws IOException {
+    return new TypedValueMessage(unpack.unpackMessageWithSpaces(packStream));
   }
 }

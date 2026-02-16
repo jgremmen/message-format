@@ -21,10 +21,11 @@ import de.sayayi.lib.message.NoParameters;
 import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
-import de.sayayi.lib.message.internal.part.config.PartConfigImpl;
+import de.sayayi.lib.message.internal.part.config.MessagePartConfig;
+import de.sayayi.lib.message.internal.part.map.MessagePartMap;
+import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.part.config.ConfigKey;
-import de.sayayi.lib.message.part.config.ConfigValue;
+import de.sayayi.lib.message.part.TypedValue;
 import lombok.val;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -51,48 +52,51 @@ public abstract class AbstractFormatterTest
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value) {
-    return format(messageContext, new NoParameters(messageContext.getLocale()), value, Map.of(), null);
+    return format(messageContext, new NoParameters(messageContext.getLocale()), value, Map.of(), Map.of(), null);
   }
 
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
                                         @NotNull String format) {
-    return format(messageContext, new NoParameters(messageContext.getLocale()), value, Map.of(), format);
+    return format(messageContext, new NoParameters(messageContext.getLocale()), value, Map.of(), Map.of(), format);
   }
 
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext,
                                         @NotNull Parameters parameters, Object value) {
-    return format(messageContext, parameters, value, Map.of(), null);
+    return format(messageContext, parameters, value, Map.of(), Map.of(), null);
   }
 
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
-                                        @NotNull Map<ConfigKey,ConfigValue<?>> map)
+                                        @NotNull Map<String, TypedValue<?>> config,
+                                        @NotNull Map<MapKey, TypedValue<?>> map)
   {
-    return format(messageContext, new NoParameters(messageContext.getLocale()), value, map, null);
+    return format(messageContext, new NoParameters(messageContext.getLocale()), value, config, map, null);
   }
 
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
-                                        @NotNull Map<ConfigKey,ConfigValue<?>> map,
+                                        @NotNull Map<String, TypedValue<?>> config,
+                                        @NotNull Map<MapKey, TypedValue<?>> map,
                                         @NotNull String format) {
-    return format(messageContext, new NoParameters(messageContext.getLocale()), value, map, format);
+    return format(messageContext, new NoParameters(messageContext.getLocale()), value, config, map, format);
   }
 
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext,
                                         @NotNull Parameters parameters, Object value,
-                                        @NotNull Map<ConfigKey,ConfigValue<?>> map,
+                                        @NotNull Map<String, TypedValue<?>> config,
+                                        @NotNull Map<MapKey, TypedValue<?>> map,
                                         String format)
   {
     return new ParameterFormatterContextImpl(messageContext, parameters, value, null, format,
-        new PartConfigImpl(map)).delegateToNextFormatter();
+        new MessagePartConfig(config), new MessagePartMap(map)).delegateToNextFormatter();
   }
 
 

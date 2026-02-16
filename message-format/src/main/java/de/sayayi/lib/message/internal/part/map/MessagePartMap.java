@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jeroen Gremmen
+ * Copyright 2026 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal.part.config;
+package de.sayayi.lib.message.internal.part.map;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
@@ -22,15 +22,15 @@ import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ComparatorCo
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.DefaultFormatter;
 import de.sayayi.lib.message.internal.pack.PackSupport;
-import de.sayayi.lib.message.internal.part.config.key.ConfigKeyBool;
-import de.sayayi.lib.message.internal.part.config.key.ConfigKeyName;
-import de.sayayi.lib.message.internal.part.config.key.ConfigKeyNumber;
-import de.sayayi.lib.message.internal.part.config.key.ConfigKeyString;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueMessage;
-import de.sayayi.lib.message.part.config.ConfigKey;
-import de.sayayi.lib.message.part.config.ConfigKey.MatchResult;
-import de.sayayi.lib.message.part.config.ConfigValue;
-import de.sayayi.lib.message.part.config.PartConfig;
+import de.sayayi.lib.message.internal.part.config.BaseConfigAccessor;
+import de.sayayi.lib.message.internal.part.map.key.MapKeyBool;
+import de.sayayi.lib.message.internal.part.map.key.MapKeyNumber;
+import de.sayayi.lib.message.internal.part.map.key.MapKeyString;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
+import de.sayayi.lib.message.part.MapKey;
+import de.sayayi.lib.message.part.MapKey.MatchResult;
+import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -40,44 +40,34 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.io.IOException;
 import java.util.*;
 
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.Defined.MISMATCH;
-import static de.sayayi.lib.message.part.config.ConfigKey.Type.*;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
+import static de.sayayi.lib.message.part.MapKey.Type.EMPTY;
+import static de.sayayi.lib.message.part.MapKey.Type.NULL;
 import static java.util.Collections.unmodifiableSet;
 
 
 /**
- * This class represents the message parameter configuration map.
+ * This class represents the message part map.
  *
  * @author Jeroen Gremmen
- * @since 0.4.0
+ * @since 0.21.0
  */
-public final class PartConfigImpl implements PartConfig
+public final class MessagePartMap implements MessagePart.Map
 {
-  /** map containing the parameter configuration values keyed by configuration name. */
-  private final @NotNull Map<String,ConfigValue<?>> config;
+  public static final MessagePartMap EMPTY_MAP = new MessagePartMap(Map.of());
+
 
   /** Array containing the sorted mapped message keys (null, empty, bool, number and string). */
-  private final @NotNull ConfigKey[] mapKeys;
+  private final @NotNull MapKey[] mapKeys;
 
   /** Array containing the mapped message corresponding to the map key at the same index. */
-  private final @NotNull ConfigValue<?>[] mapValues;
+  private final @NotNull TypedValue<?>[] mapValues;
 
   /** Default message. */
-  private final ConfigValue<?> defaultValue;
+  private final TypedValue<?> defaultValue;
 
-  /** Bitmask for {@link ConfigKey.Type} stating which keys map to a message. */
+  /** Bitmask for {@link MapKey.Type} stating which keys map to a message. */
   private final byte hasKeyType;
-
-
-  private PartConfigImpl(@NotNull TreeMap<String,ConfigValue<?>> config, @NotNull ConfigKey[] mapKeys,
-                         @NotNull ConfigValue<?>[] mapValues, ConfigValue<?> defaultValue, byte hasKeyType)
-  {
-    this.config = config;
-    this.mapKeys = mapKeys;
-    this.mapValues = mapValues;
-    this.defaultValue = defaultValue;
-    this.hasKeyType = hasKeyType;
-  }
 
 
   /**
@@ -85,57 +75,39 @@ public final class PartConfigImpl implements PartConfig
    *
    * @param map  message parameter config map, not {@code null}
    */
-  public PartConfigImpl(@NotNull Map<ConfigKey,ConfigValue<?>> map)
+  public MessagePartMap(@NotNull Map<MapKey,TypedValue<?>> map)
   {
-    config = new TreeMap<>();
-
-    var mapKeyList = new ArrayList<OrderedConfigKey>();
-    ConfigValue<?> mapNullValue = null;
-    ConfigKey.Type keyType;
-    ConfigKey key;
+    final var mapKeyList = new ArrayList<OrderedConfigKey>();
+    TypedValue<?> mapNullValue = null;
+    MapKey key;
     var keyTypeMask = 0;
 
     for(var entry: map.entrySet())
     {
       if ((key = entry.getKey()) == null)
         mapNullValue = entry.getValue();
-      else if ((keyType = key.getType()) != NAME)
+      else
       {
         mapKeyList.add(new OrderedConfigKey(mapKeyList.size(), key));
-        keyTypeMask |= 1 << keyType.ordinal();
+        keyTypeMask |= 1 << key.getType().ordinal();
       }
-      else
-        config.put(((ConfigKeyName)key).getName(), entry.getValue());
     }
 
     mapKeyList.trimToSize();
     mapKeyList.sort(OrderedConfigKey.SORTER);
 
-    var mapLength = mapKeyList.size();
-    mapKeys = new ConfigKey[mapLength];
-    mapValues = new ConfigValue[mapLength];
+    final var mapLength = mapKeyList.size();
+    mapKeys = new MapKey[mapLength];
+    mapValues = new TypedValue[mapLength];
 
     for(var n = 0; n < mapLength; n++)
     {
-      mapKeys[n] = mapKeyList.get(n).configKey();
+      mapKeys[n] = mapKeyList.get(n).mapKey();
       mapValues[n] = map.get(mapKeys[n]);
     }
 
     this.defaultValue = mapNullValue;
     this.hasKeyType = (byte)keyTypeMask;
-  }
-
-
-  @Override
-  public @NotNull PartConfig excludeConfigByName(@NotNull Set<String> configNames)
-  {
-    if (configNames.isEmpty())
-      return this;
-
-    final var modifiedConfig = new TreeMap<>(config);
-    modifiedConfig.keySet().removeAll(configNames);
-
-    return new PartConfigImpl(modifiedConfig, mapKeys, mapValues, defaultValue, hasKeyType);
   }
 
 
@@ -148,7 +120,7 @@ public final class PartConfigImpl implements PartConfig
   @Override
   @Contract(pure = true)
   public boolean isEmpty() {
-    return config.isEmpty() && mapValues.length == 0 && defaultValue == null;
+    return mapValues.length == 0 && defaultValue == null;
   }
 
 
@@ -163,29 +135,8 @@ public final class PartConfigImpl implements PartConfig
    */
   @Override
   @Contract(pure = true)
-  public boolean hasMessageWithKeyType(@NotNull ConfigKey.Type keyType) {
+  public boolean hasMessageWithKeyType(@NotNull MapKey.Type keyType) {
     return (hasKeyType & (1 << keyType.ordinal())) != 0;
-  }
-
-
-  /**
-   * Returns a set of config names defined in the parameter configuration map.
-   *
-   * @return  unmodifiable set of config names, never {@code null}
-   *
-   * @since 0.20.0
-   */
-  @Override
-  @Contract(pure = true)
-  public @NotNull @Unmodifiable Set<String> getConfigNames() {
-    return unmodifiableSet(config.keySet());
-  }
-
-
-  @Override
-  @Contract(pure = true)
-  public ConfigValue<?> getConfigValue(@NotNull String name) {
-    return config.get(name);
   }
 
 
@@ -198,7 +149,7 @@ public final class PartConfigImpl implements PartConfig
    */
   @Override
   @Contract(pure = true)
-  public ConfigValue<?> getDefaultValue() {
+  public TypedValue<?> getDefaultValue() {
     return defaultValue;
   }
 
@@ -206,9 +157,10 @@ public final class PartConfigImpl implements PartConfig
   @Override
   @Contract(pure = true)
   public Message.WithSpaces getMessage(@NotNull MessageAccessor messageAccessor, Object key, @NotNull Locale locale,
-                                       @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault)
+                                       @NotNull Set<MapKey.Type> keyTypes, boolean includeDefault,
+                                       MessagePart.Config config)
   {
-    var configValue = findMappedValue(messageAccessor, locale, key, keyTypes);
+    var configValue = findMappedValue(messageAccessor, locale, key, keyTypes, config);
     if (configValue == null)
     {
       if (includeDefault && defaultValue != null &&
@@ -218,26 +170,26 @@ public final class PartConfigImpl implements PartConfig
         return null;
     }
 
-    return configValue instanceof ConfigValue.StringValue stringValue
+    return configValue instanceof TypedValue.StringValue stringValue
         ? stringValue.asMessage(messageAccessor.getMessageFactory())
         : (Message.WithSpaces)configValue.asObject();
   }
 
 
   @Contract(pure = true)
-  private ConfigValue<?> findMappedValue(@NotNull MessageAccessor messageAccessor, @NotNull Locale locale,
-                                         Object value, @NotNull Set<ConfigKey.Type> keyTypes)
+  private TypedValue<?> findMappedValue(@NotNull MessageAccessor messageAccessor, @NotNull Locale locale,
+                                        Object value, @NotNull Set<MapKey.Type> keyTypes, MessagePart.Config config)
   {
-    ConfigValue<?> bestMatch = null;
+    TypedValue<?> bestMatch = null;
 
-    var comparatorContext = new ConfigKeyComparatorContext(messageAccessor, locale);
-    var formatters = messageAccessor
-        .getFormatters(value == null ? Object.class : value.getClass(), this);
+    final var comparatorContext = new ConfigKeyComparatorContext(messageAccessor, locale, config);
+    final var formatters = messageAccessor
+        .getFormatters(value == null ? Object.class : value.getClass(), config);
 
     MatchResult bestMatchResult = MISMATCH;
 
     for(int n = 0, l = mapKeys.length; n < l; n++)
-      if (keyTypes.contains((comparatorContext.configKey = mapKeys[n]).getType()))
+      if (keyTypes.contains((comparatorContext.mapKey = mapKeys[n]).getType()))
       {
         var matchResult = findBestMatch(comparatorContext, formatters, value);
 
@@ -291,13 +243,9 @@ public final class PartConfigImpl implements PartConfig
   {
     var templateNames = new TreeSet<String>();
 
-    for(var configValue: config.values())
-      if (configValue instanceof ConfigValueMessage)
-        templateNames.addAll(((ConfigValueMessage)configValue).asObject().getTemplateNames());
-
     for(var configValue: mapValues)
-      if (configValue instanceof ConfigValueMessage)
-        templateNames.addAll(((ConfigValueMessage)configValue).asObject().getTemplateNames());
+      if (configValue instanceof TypedValueMessage)
+        templateNames.addAll(((TypedValueMessage)configValue).asObject().getTemplateNames());
 
     return unmodifiableSet(templateNames);
   }
@@ -306,9 +254,8 @@ public final class PartConfigImpl implements PartConfig
   @Override
   public boolean equals(Object o)
   {
-    return o instanceof PartConfigImpl that &&
+    return o instanceof MessagePartMap that &&
         hasKeyType == that.hasKeyType &&
-        config.equals(that.config) &&
         Arrays.equals(mapKeys, that.mapKeys) &&
         Arrays.equals(mapValues, that.mapValues) &&
         Objects.equals(defaultValue, that.defaultValue);
@@ -316,10 +263,8 @@ public final class PartConfigImpl implements PartConfig
 
 
   @Override
-  public int hashCode()
-  {
-    return (((config.hashCode() * 59) + Objects.hashCode(defaultValue)) * 59 +
-        Arrays.hashCode(mapKeys)) * 59 + Arrays.hashCode(mapValues);
+  public int hashCode() {
+    return (Objects.hashCode(defaultValue) * 59 + Arrays.hashCode(mapKeys)) * 59 + Arrays.hashCode(mapValues);
   }
 
 
@@ -328,10 +273,6 @@ public final class PartConfigImpl implements PartConfig
   public String toString()
   {
     final var s = new StringJoiner(",", "{", "}");
-
-    // config
-    for(var configEntry: config.entrySet())
-      s.add(configEntry.getKey() + '=' + configEntry.getValue());
 
     // map
     for(var n = 0; n < mapKeys.length; n++)
@@ -346,85 +287,81 @@ public final class PartConfigImpl implements PartConfig
 
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.writeSmallVar(config.size() + mapKeys.length + (defaultValue == null ? 0 : 1));
+    packStream.writeSmallVar(mapKeys.length);
 
-    // config
-    for(var configEntry: config.entrySet())
-    {
-      PackSupport.pack(new ConfigKeyName(configEntry.getKey()), packStream);
-      PackSupport.pack(configEntry.getValue(), packStream);
-    }
-
-    // map
     for(int n = 0, l = mapKeys.length; n < l; n++)
     {
       PackSupport.pack(mapKeys[n], packStream);
       PackSupport.pack(mapValues[n], packStream);
     }
 
-    if (defaultValue != null)
-    {
-      PackSupport.pack((ConfigKey)null, packStream);
+    final var hasDefaultValue = defaultValue != null;
+    packStream.writeBoolean(hasDefaultValue);
+
+    if (hasDefaultValue)
       PackSupport.pack(defaultValue, packStream);
-    }
   }
 
 
-  public static @NotNull PartConfigImpl unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
+  public static @NotNull MessagePartMap unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
-    final var map = new LinkedHashMap<ConfigKey,ConfigValue<?>>();
+    final var map = new LinkedHashMap<MapKey,TypedValue<?>>();
 
     for(int n = 0, size = packStream.readSmallVar(); n < size; n++)
-      map.put(unpack.unpackMapKey(packStream), unpack.unpackMapValue(packStream));
+      map.put(unpack.unpackMapKey(packStream), unpack.unpackTypedValue(packStream));
 
-    return new PartConfigImpl(map);
+    if (packStream.readBoolean())
+      map.put(null, unpack.unpackTypedValue(packStream));
+
+    return new MessagePartMap(map);
   }
 
 
 
 
-  private final class ConfigKeyComparatorContext extends BasePartConfigAccessor implements ComparatorContext
+  private static final class ConfigKeyComparatorContext extends BaseConfigAccessor implements ComparatorContext
   {
     private final Locale locale;
-    private ConfigKey configKey;
+    private MapKey mapKey;
 
 
-    private ConfigKeyComparatorContext(@NotNull MessageAccessor messageAccessor, @NotNull Locale locale)
+    private ConfigKeyComparatorContext(@NotNull MessageAccessor messageAccessor, @NotNull Locale locale,
+                                       MessagePart.Config config)
     {
-      super(messageAccessor, PartConfigImpl.this);
+      super(messageAccessor, config);
 
       this.locale = locale;
     }
 
 
     @Override
-    public @NotNull ConfigKey.CompareType getCompareType() {
-      return configKey.getCompareType();
+    public @NotNull MapKey.CompareType getCompareType() {
+      return mapKey.getCompareType();
     }
 
 
     @Override
-    public @NotNull ConfigKey.Type getKeyType() {
-      return configKey.getType();
+    public @NotNull MapKey.Type getKeyType() {
+      return mapKey.getType();
     }
 
 
     @Override
     public boolean getBoolKeyValue() {
-      return ((ConfigKeyBool)configKey).isBool();
+      return ((MapKeyBool) mapKey).isBool();
     }
 
 
     @Override
     public long getNumberKeyValue() {
-      return ((ConfigKeyNumber)configKey).getNumber();
+      return ((MapKeyNumber) mapKey).getNumber();
     }
 
 
     @Override
     public @NotNull String getStringKeyValue() {
-      return ((ConfigKeyString)configKey).getString();
+      return ((MapKeyString) mapKey).getString();
     }
 
 
@@ -438,15 +375,13 @@ public final class PartConfigImpl implements PartConfig
     public @NotNull MatchResult matchForObject(Object value)
     {
       return findBestMatch(this, messageAccessor
-          .getFormatters(value == null ? Object.class : value.getClass(), PartConfigImpl.this), value);
+          .getFormatters(value == null ? Object.class : value.getClass(), config), value);
     }
 
 
     @Override
-    public @NotNull <T> MatchResult matchForObject(@NotNull T value, @NotNull Class<T> valueType)
-    {
-      return findBestMatch(this, messageAccessor
-          .getFormatters(valueType, PartConfigImpl.this), value);
+    public @NotNull <T> MatchResult matchForObject(@NotNull T value, @NotNull Class<T> valueType) {
+      return findBestMatch(this, messageAccessor.getFormatters(valueType, config), value);
     }
   }
 }

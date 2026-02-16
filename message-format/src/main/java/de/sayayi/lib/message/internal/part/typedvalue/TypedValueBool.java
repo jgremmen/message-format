@@ -13,52 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal.part.config.key;
+package de.sayayi.lib.message.internal.part.typedvalue;
 
-import de.sayayi.lib.message.part.config.ConfigKey;
+import de.sayayi.lib.message.part.TypedValue.BoolValue;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
 
 /**
- * The empty configuration key represents values which are considered empty by their associated
- * parameter formatter.
+ * This class represents a boolean configuration value.
  *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
-public enum ConfigKeyEmpty implements ConfigKey
+public enum TypedValueBool implements BoolValue
 {
-  /** Empty config key with compare type {@link ConfigKey.CompareType#EQ EQ}. */
-  EQ,
+  /** Boolean config value representing {@code false}. */
+  FALSE,
 
-  /** Empty config key with compare type {@link ConfigKey.CompareType#NE NE}. */
-  NE;
+  /** Boolean config value representing {@code true}. */
+  TRUE;
 
 
+  /**
+   * Return the number as boolean.
+   *
+   * @return  number as boolean
+   *
+   * @since 0.8.0
+   */
   @Override
-  public @NotNull CompareType getCompareType() {
-    return this == EQ ? CompareType.EQ : CompareType.NE;
+  @Contract(pure = true)
+  public boolean booleanValue() {
+    return this == TRUE;
   }
 
 
   /**
-   * {@inheritDoc}
+   * Returns the boolean value.
    *
-   * @return  always {@link Type#EMPTY Type#EMPTY}
+   * @return  boolean, never {@code null}
    */
   @Override
-  public @NotNull Type getType() {
-    return Type.EMPTY;
+  public @NotNull Boolean asObject() {
+    return booleanValue();
   }
 
 
   @Override
   public String toString() {
-    return getCompareType().asPrefix() + "empty";
+    return Boolean.toString(booleanValue());
   }
 
 
@@ -68,26 +76,22 @@ public enum ConfigKeyEmpty implements ConfigKey
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeBoolean(this == EQ);
+    packStream.writeBoolean(booleanValue());
   }
 
 
   /**
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked empty map key, never {@code null}
+   * @return  unpacked boolean map value, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
-  public static @NotNull ConfigKeyEmpty unpack(@NotNull PackInputStream packStream) throws IOException {
-    return packStream.readBoolean() ? EQ : NE;
+  public static @NotNull TypedValueBool unpack(@NotNull PackInputStream packStream) throws IOException {
+    return packStream.readBoolean() ? TRUE : FALSE;
   }
 }

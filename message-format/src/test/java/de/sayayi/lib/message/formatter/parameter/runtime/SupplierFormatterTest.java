@@ -17,9 +17,8 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.parameter.named.BoolFormatter;
-import de.sayayi.lib.message.internal.part.config.key.ConfigKeyName;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,6 +61,6 @@ class SupplierFormatterTest extends AbstractFormatterTest
 
     assertEquals(noSpaceText("1,234,567,890"),
         format(messageAccessor, (LongSupplier)() -> 1234567890L,
-            Map.of(new ConfigKeyName("number"), new ConfigValueString("###,###,###,###"))));
+            Map.of("number", new TypedValueString("###,###,###,###")), Map.of()));
   }
 }

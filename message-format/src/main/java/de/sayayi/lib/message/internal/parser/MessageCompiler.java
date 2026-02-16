@@ -26,20 +26,21 @@ import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.TextMessage;
-import de.sayayi.lib.message.internal.part.config.PartConfigImpl;
-import de.sayayi.lib.message.internal.part.config.key.*;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueBool;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueMessage;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueNumber;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
+import de.sayayi.lib.message.internal.part.config.MessagePartConfig;
+import de.sayayi.lib.message.internal.part.map.MessagePartMap;
+import de.sayayi.lib.message.internal.part.map.key.*;
 import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
 import de.sayayi.lib.message.internal.part.post.PostFormatterPart;
 import de.sayayi.lib.message.internal.part.template.TemplatePart;
 import de.sayayi.lib.message.internal.part.text.TextPart;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueBool;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
+import de.sayayi.lib.message.part.MapKey;
+import de.sayayi.lib.message.part.MapKey.CompareType;
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.part.config.ConfigKey;
-import de.sayayi.lib.message.part.config.ConfigKey.CompareType;
-import de.sayayi.lib.message.part.config.ConfigValue;
+import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.message.util.SpacesUtil;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -62,7 +63,6 @@ import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
 import static java.lang.Long.parseLong;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.Token.EOF;
 
 
@@ -158,7 +158,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
     final var parserRuleContext = parser.getRuleContext();
 
-    if (parserRuleContext instanceof ConfigMapElementContext)
+    if (parserRuleContext instanceof MapEntryDefaultContext && isEOFToken(offendingToken))
+      return "pre-mature end of message parameter reached; missing default message";
+
+    if (parserRuleContext instanceof MapEntryContext)
       return "syntax error in message parameter map element at " + getTokenDisplayText(parser, offendingToken);
 
     return "message syntax error at " +
@@ -185,7 +188,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
     if (new IntervalSet(SQ_START, DQ_START, BOOL, NAME, NULL, EMPTY, FORMAT).equals(expectedTokens))
     {
-      if (parserRuleContext instanceof ForceQuotedMessageContext &&
+      if (parserRuleContext instanceof MapEntryDefaultContext &&
           parserRuleContext.parent instanceof ParameterPartContext)
       {
         if (isEOFToken(mismatchLocationNearToken))
@@ -277,6 +280,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
+    @SuppressWarnings("IfCanBeSwitch")
     public void exitMessage0(Message0Context ctx)
     {
       var children = ctx.children;
@@ -387,27 +391,29 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    @Override
-    public void exitForceQuotedMessage(ForceQuotedMessageContext ctx)
-    {
-      var quotedMessage = ctx.quotedMessage();
-      if (quotedMessage != null)
-        ctx.messageWithSpaces = quotedMessage.messageWithSpaces;
-      else
-      {
-        //noinspection LanguageMismatch
-        ctx.messageWithSpaces = messageFactory.parseMessage(ctx.simpleString().string);
-      }
-    }
-
-
-    final Collector<ParameterConfigElementContext,Map<ConfigKey,ConfigValue<?>>,Map<ConfigKey,ConfigValue<?>>>
-        PARAMETER_CONFIG_COLLECTOR = new AbstractMapCollector<>(LinkedHashMap::new) {
+    final Collector<ConfigDefinitionContext,Map<String, TypedValue<?>>,Map<String, TypedValue<?>>>
+        PARAMETER_CONFIG_DEFINITION_COLLECTOR = new AbstractMapCollector<>(TreeMap::new) {
       @Override
-      protected void accumulator(@NotNull Map<ConfigKey,ConfigValue<?>> map, @NotNull ParameterConfigElementContext context)
+      protected void accumulator(@NotNull Map<String, TypedValue<?>> map, @NotNull ConfigDefinitionContext context)
       {
-        for(var key: context.configKeys)
-          if (map.put(key, context.configValue) != null)
+        if (map.put(context.name, context.value) != null)
+        {
+          syntaxError("duplicate config name " + context.name + " for parameter '" +
+              ((ParameterPartContext)context.parent).parameterName().name + '\'')
+              .with(context)
+              .report();
+        }
+      }
+    };
+
+
+    final Collector<MapEntryContext,Map<MapKey, TypedValue<?>>,Map<MapKey, TypedValue<?>>>
+        PARAMETER_MAP_ENTRY_COLLECTOR = new AbstractMapCollector<>(LinkedHashMap::new) {
+      @Override
+      protected void accumulator(@NotNull Map<MapKey, TypedValue<?>> map, @NotNull MapEntryContext context)
+      {
+        for(var key: context.keys)
+          if (map.put(key, context.value) != null)
           {
             syntaxError("duplicate config element " + key + " for parameter '" +
                 ((ParameterPartContext)context.parent).parameterName().name + '\'')
@@ -421,12 +427,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitParameterPart(ParameterPartContext ctx)
     {
-      final var mapElements =
-          ctx.parameterConfigElement().stream().collect(PARAMETER_CONFIG_COLLECTOR);
+      final var mapElements = ctx.mapEntry().stream().collect(PARAMETER_MAP_ENTRY_COLLECTOR);
+      final var mapEntryDefault = ctx.mapEntryDefault();
 
-      final var forceQuotedMessage = ctx.forceQuotedMessage();
-      if (forceQuotedMessage != null)
-        mapElements.put(null, new ConfigValueMessage(forceQuotedMessage.messageWithSpaces));
+      if (mapEntryDefault != null)
+        mapElements.put(null, new TypedValueMessage(mapEntryDefault.messageWithSpaces));
 
       final var parameterFormat = ctx.parameterFormat();
       final var format = switch(parameterFormat.size()) {
@@ -444,7 +449,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           ctx.parameterName().name, format,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
-          new PartConfigImpl(mapElements)));
+          new MessagePartConfig(ctx.configDefinition().stream().collect(PARAMETER_CONFIG_DEFINITION_COLLECTOR)),
+          new MessagePartMap(mapElements)));
     }
 
 
@@ -472,13 +478,13 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final Collector<ConfigNamedElementContext,Map<String,ConfigValue<?>>,Map<String,ConfigValue<?>>>
-        TEMPLATE_NAMED_PARAMETER_COLLECTOR = new AbstractMapCollector<>(TreeMap::new) {
+    final Collector<ConfigDefinitionContext,Map<String, TypedValue<?>>,Map<String, TypedValue<?>>>
+        TEMPLATE_CONFIG_DEFINITION_COLLECTOR = new AbstractMapCollector<>(TreeMap::new) {
       @Override
-      protected void accumulator(@NotNull Map<String,ConfigValue<?>> map, @NotNull ConfigNamedElementContext context) {
-        if (map.put(context.configKey.getName(), context.configValue) != null)
+      protected void accumulator(@NotNull Map<String, TypedValue<?>> map, @NotNull ConfigDefinitionContext context) {
+        if (map.put(context.name, context.value) != null)
         {
-          syntaxError("duplicate template default parameter '" + context.configKey + "'")
+          syntaxError("duplicate template default parameter '" + context.name + "'")
               .with(context)
               .report();
         }
@@ -508,7 +514,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           ctx.templateName().name,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
-          ctx.configNamedElement().stream().collect(TEMPLATE_NAMED_PARAMETER_COLLECTOR),
+          ctx.configDefinition().stream().collect(TEMPLATE_CONFIG_DEFINITION_COLLECTOR),
           ctx.templateParameterDelegate().stream().collect(TEMPLATE_PARAMETER_DELEGATE_COLLECTOR));
     }
 
@@ -533,14 +539,14 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final Collector<ConfigNamedElementContext,Map<ConfigKey,ConfigValue<?>>,Map<ConfigKey,ConfigValue<?>>>
-        POST_FORMAT_CONFIG_COLLECTOR = new AbstractMapCollector<>(LinkedHashMap::new) {
+    final Collector<ConfigDefinitionContext,Map<String, TypedValue<?>>,Map<String, TypedValue<?>>>
+        POST_FORMAT_CONFIG_DEFINITION_COLLECTOR = new AbstractMapCollector<>(TreeMap::new) {
       @Override
-      protected void accumulator(@NotNull Map<ConfigKey,ConfigValue<?>> map, @NotNull ConfigNamedElementContext context)
+      protected void accumulator(@NotNull Map<String, TypedValue<?>> map, @NotNull ConfigDefinitionContext context)
       {
-        if (map.put(context.configKey, context.configValue) != null)
+        if (map.put(context.name, context.value) != null)
         {
-          syntaxError("duplicate config name " + context.configKey + " for post formatter '" +
+          syntaxError("duplicate config name " + context.name + " for post formatter '" +
               ((PostFormatPartContext)context.parent).postFormatName().name + '\'')
               .with(context)
               .report();
@@ -557,7 +563,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           ctx.quotedMessage().messageWithSpaces,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
-          new PartConfigImpl(ctx.configNamedElement().stream().collect(POST_FORMAT_CONFIG_COLLECTOR)));
+          new MessagePartConfig(ctx.configDefinition().stream().collect(POST_FORMAT_CONFIG_DEFINITION_COLLECTOR)));
     }
 
 
@@ -574,146 +580,128 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
-    public void exitParameterConfigElement(ParameterConfigElementContext ctx)
+    public void exitMapEntryMessage(MapEntryMessageContext ctx)
     {
-      var configNamedElementContext = ctx.configNamedElement();
-      if (configNamedElementContext != null)
-      {
-        ctx.configKeys = List.of(configNamedElementContext.configKey);
-        ctx.configValue = configNamedElementContext.configValue;
-      }
+      ctx.keys = ctx.mapKeys().keys;
+      ctx.value = new TypedValueMessage(ctx.quotedMessage().messageWithSpaces);
+    }
+
+
+    @Override
+    public void exitMapEntryString(MapEntryStringContext ctx)
+    {
+      ctx.keys = ctx.mapKeys().keys;
+      ctx.value = new TypedValueString(ctx.simpleString().string);
+    }
+
+
+    @Override
+    public void exitMapEntryDefault(MapEntryDefaultContext ctx)
+    {
+      var quotedMessage = ctx.quotedMessage();
+      if (quotedMessage != null)
+        ctx.messageWithSpaces = quotedMessage.messageWithSpaces;
       else
       {
-        var configMapElementContext = ctx.configMapElement();
-
-        ctx.configKeys = configMapElementContext.configKeys;
-        ctx.configValue = configMapElementContext.configValue;
+        //noinspection LanguageMismatch
+        ctx.messageWithSpaces = messageFactory.parseMessage(ctx.simpleString().string);
       }
     }
 
 
     @Override
-    public void exitConfigMapMessage(ConfigMapMessageContext ctx)
+    public void exitConfigDefinitionBool(ConfigDefinitionBoolContext ctx)
     {
-      ctx.configKeys = ctx.configMapKeys().configKeys;
-      ctx.configValue = new ConfigValueMessage(ctx.quotedMessage().messageWithSpaces);
-    }
-
-
-    @Override
-    public void exitConfigMapString(ConfigMapStringContext ctx)
-    {
-      ctx.configKeys = ctx.configMapKeys().configKeys;
-      ctx.configValue = new ConfigValueString(ctx.simpleString().string);
-    }
-
-
-    @Override
-    public void exitConfigNamedBool(ConfigNamedBoolContext ctx)
-    {
-      final var name = ctx.NAME().getText();
-
-      if (!isKebabCaseName(name))
+      if (!isKebabCaseName(ctx.name = ctx.NAME().getText()))
       {
         syntaxError("config name for boolean value must match the kebab case naming convention")
             .with(ctx.NAME())
             .report();
       }
 
-      ctx.configKey = new ConfigKeyName(name);
-      ctx.configValue = parseBoolean(ctx.BOOL().getText()) ? ConfigValueBool.TRUE : ConfigValueBool.FALSE;
+      ctx.value = parseBoolean(ctx.BOOL().getText()) ? TypedValueBool.TRUE : TypedValueBool.FALSE;
     }
 
 
     @Override
-    public void exitConfigNamedNumber(ConfigNamedNumberContext ctx)
+    public void exitConfigDefinitionNumber(ConfigDefinitionNumberContext ctx)
     {
-      final var name = ctx.NAME().getText();
-
-      if (!isKebabCaseName(name))
+      if (!isKebabCaseName(ctx.name = ctx.NAME().getText()))
       {
         syntaxError("config name for numerical value must match the kebab case naming convention")
             .with(ctx.NAME())
             .report();
       }
 
-      ctx.configKey = new ConfigKeyName(name);
-      ctx.configValue = new ConfigValueNumber(parseLong(ctx.NUMBER().getText()));
+      ctx.value = new TypedValueNumber(parseLong(ctx.NUMBER().getText()));
     }
 
 
     @Override
-    public void exitConfigNamedMessage(ConfigNamedMessageContext ctx)
+    public void exitConfigDefinitionMessage(ConfigDefinitionMessageContext ctx)
     {
-      final var name = ctx.NAME().getText();
-
-      if (!isKebabCaseName(name))
+      if (!isKebabCaseName(ctx.name = ctx.NAME().getText()))
       {
         syntaxError("config name for message value must match the kebab case naming convention")
             .with(ctx.NAME())
             .report();
       }
 
-      ctx.configKey = new ConfigKeyName(name);
-      ctx.configValue = new ConfigValueMessage(ctx.quotedMessage().messageWithSpaces);
+      ctx.value = new TypedValueMessage(ctx.quotedMessage().messageWithSpaces);
     }
 
 
     @Override
-    public void exitConfigNamedString(ConfigNamedStringContext ctx)
+    public void exitConfigDefinitionString(ConfigDefinitionStringContext ctx)
     {
-      final var name = ctx.NAME().getText();
-
-      if (!isKebabCaseName(name))
+      if (!isKebabCaseName(ctx.name = ctx.NAME().getText()))
       {
         syntaxError("config name for string value must match the kebab case naming convention")
             .with(ctx.NAME())
             .report();
       }
 
-      ctx.configKey = new ConfigKeyName(name);
-      ctx.configValue = new ConfigValueString(ctx.simpleString().string);
+      ctx.value = new TypedValueString(ctx.simpleString().string);
     }
 
 
     @Override
-    public void exitConfigMapKeys(ConfigMapKeysContext ctx)
+    public void exitMapKeys(MapKeysContext ctx)
     {
-      ctx.configKeys = ctx
-          .configMapKey()
+      ctx.keys = ctx
+          .mapKey()
           .stream()
-          .map(configMapKeyContext -> configMapKeyContext.configKey)
-          .collect(toList());
+          .map(configMapKeyContext -> configMapKeyContext.key)
+          .toList();
     }
 
 
     @Override
-    public void exitConfigMapKeyNull(ConfigMapKeyNullContext ctx) {
-      ctx.configKey = ctx.equalOperatorOptional().cmp == CompareType.EQ ? ConfigKeyNull.EQ : ConfigKeyNull.NE;
+    public void exitMapKeyNull(MapKeyNullContext ctx) {
+      ctx.key = ctx.equalOperatorOptional().cmp == CompareType.EQ ? MapKeyNull.EQ : MapKeyNull.NE;
     }
 
 
     @Override
-    public void exitConfigMapKeyEmpty(ConfigMapKeyEmptyContext ctx) {
-      ctx.configKey = ctx.equalOperatorOptional().cmp == CompareType.EQ ? ConfigKeyEmpty.EQ : ConfigKeyEmpty.NE;
+    public void exitMapKeyEmpty(MapKeyEmptyContext ctx) {
+      ctx.key = ctx.equalOperatorOptional().cmp == CompareType.EQ ? MapKeyEmpty.EQ : MapKeyEmpty.NE;
+    }
+
+    @Override
+    public void exitMapKeyBool(MapKeyBoolContext ctx) {
+      ctx.key = parseBoolean(ctx.BOOL().getText()) ? MapKeyBool.TRUE : MapKeyBool.FALSE;
     }
 
 
     @Override
-    public void exitConfigMapKeyBool(ConfigMapKeyBoolContext ctx) {
-      ctx.configKey = parseBoolean(ctx.BOOL().getText()) ? ConfigKeyBool.TRUE : ConfigKeyBool.FALSE;
+    public void exitMapKeyNumber(MapKeyNumberContext ctx) {
+      ctx.key = new MapKeyNumber(ctx.relationalOperatorOptional().cmp, parseLong(ctx.NUMBER().getText()));
     }
 
 
     @Override
-    public void exitConfigMapKeyNumber(ConfigMapKeyNumberContext ctx) {
-      ctx.configKey = new ConfigKeyNumber(ctx.relationalOperatorOptional().cmp, parseLong(ctx.NUMBER().getText()));
-    }
-
-
-    @Override
-    public void exitConfigMapKeyString(ConfigMapKeyStringContext ctx) {
-      ctx.configKey = new ConfigKeyString(ctx.relationalOperatorOptional().cmp, ctx.quotedString().string);
+    public void exitMapKeyString(MapKeyStringContext ctx) {
+      ctx.key = new MapKeyString(ctx.relationalOperatorOptional().cmp, ctx.quotedString().string);
     }
 
 

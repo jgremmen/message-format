@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal.part.config.key;
+package de.sayayi.lib.message.internal.part.map.key;
 
-import de.sayayi.lib.message.part.config.ConfigKey;
+import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -23,8 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static de.sayayi.lib.message.internal.pack.PackSupport.packLongVar;
-import static de.sayayi.lib.message.internal.pack.PackSupport.unpackLongVar;
+import static de.sayayi.lib.message.part.MapKey.CompareType.EQ;
 import static java.util.Objects.requireNonNull;
 
 
@@ -33,27 +32,37 @@ import static java.util.Objects.requireNonNull;
  * @since 0.4.0 (renamed in 0.8.0)
  */
 @SuppressWarnings("ClassCanBeRecord")
-public final class ConfigKeyNumber implements ConfigKey
+public final class MapKeyString implements MapKey
 {
-  /** Configuration number key comparison type. */
+  /** Configuration string key comparison type. */
   private final @NotNull CompareType compareType;
 
-  /** Configuration key number. */
-  private final long number;
+  /** Configuration key string. */
+  private final @NotNull String string;
 
 
   /**
-   * Constructs a configuration key number with a comparison type.
+   * Constructs a configuration key string.
+   *
+   * @param string  configuration key string, not {@code null}
+   *
+   * @since 0.10.0
+   */
+  public MapKeyString(@NotNull String string) {
+    this(EQ, string);
+  }
+
+
+  /**
+   * Constructs a configuration key string with comparison type.
    *
    * @param compareType  configuration key comparison type, not {@code null}
-   * @param number       configuration key number
-   *
-   * @since 0.4.0 (made public in 0.10.0)
+   * @param string  configuration key string, not {@code null}
    */
-  public ConfigKeyNumber(@NotNull CompareType compareType, long number)
+  public MapKeyString(@NotNull CompareType compareType, @NotNull String string)
   {
     this.compareType = requireNonNull(compareType, "compareType must not be null");
-    this.number = number;
+    this.string = requireNonNull(string, "string must not be null");
   }
 
 
@@ -64,42 +73,42 @@ public final class ConfigKeyNumber implements ConfigKey
 
 
   /**
-   * Returns the config key number value.
+   * Returns the config key string value.
    *
-   * @return  config key number value
+   * @return  config key string value, never {@code null}
    */
   @Contract(pure = true)
-  public long getNumber() {
-    return number;
+  public @NotNull String getString() {
+    return string;
   }
 
 
   /**
    * {@inheritDoc}
    *
-   * @return  always {@link Type#NUMBER Type#NUMBER}
+   * @return  always {@link Type#STRING Type#STRING}
    */
   @Override
   public @NotNull Type getType() {
-    return Type.NUMBER;
+    return Type.STRING;
   }
 
 
   @Override
   public boolean equals(Object o) {
-    return o instanceof ConfigKeyNumber that && number == that.number && compareType == that.compareType;
+    return o instanceof MapKeyString that && compareType == that.compareType && string.equals(that.string);
   }
 
 
   @Override
   public int hashCode() {
-    return (59 + Long.hashCode(number)) * 59 + compareType.hashCode();
+    return (59 + compareType.hashCode()) * 59 + string.hashCode();
   }
 
 
   @Override
   public String toString() {
-    return compareType.asPrefix() + number;
+    return compareType.asPrefix() + '\'' + string.replace("'", "\\'") + '\'';
   }
 
 
@@ -115,14 +124,14 @@ public final class ConfigKeyNumber implements ConfigKey
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeEnum(compareType);
-    packLongVar(number, packStream);
+    packStream.writeString(string);
   }
 
 
   /**
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked number map key, never {@code null}
+   * @return  unpacked string map key, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -130,13 +139,7 @@ public final class ConfigKeyNumber implements ConfigKey
    *
    * @hidden
    */
-  public static @NotNull ConfigKeyNumber unpack(@NotNull PackInputStream packStream) throws IOException
-  {
-    final var compareType = packStream.readEnum(CompareType.class);
-    final var number = packStream.getVersion().orElseThrow() == 1
-        ? packStream.readLong()
-        : unpackLongVar(packStream);
-
-    return new ConfigKeyNumber(compareType, number);
+  public static @NotNull MapKeyString unpack(@NotNull PackInputStream packStream) throws IOException {
+    return new MapKeyString(packStream.readEnum(CompareType.class), requireNonNull(packStream.readString()));
   }
 }

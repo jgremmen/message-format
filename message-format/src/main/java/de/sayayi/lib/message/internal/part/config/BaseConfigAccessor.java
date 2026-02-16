@@ -17,13 +17,13 @@ package de.sayayi.lib.message.internal.part.config;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.part.config.ConfigValue;
-import de.sayayi.lib.message.part.config.ConfigValue.BoolValue;
-import de.sayayi.lib.message.part.config.ConfigValue.MessageValue;
-import de.sayayi.lib.message.part.config.ConfigValue.NumberValue;
-import de.sayayi.lib.message.part.config.ConfigValue.StringValue;
-import de.sayayi.lib.message.part.config.PartConfig;
-import de.sayayi.lib.message.part.config.PartConfigAccessor;
+import de.sayayi.lib.message.part.ConfigAccessor;
+import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.TypedValue;
+import de.sayayi.lib.message.part.TypedValue.BoolValue;
+import de.sayayi.lib.message.part.TypedValue.MessageValue;
+import de.sayayi.lib.message.part.TypedValue.NumberValue;
+import de.sayayi.lib.message.part.TypedValue.StringValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -35,42 +35,42 @@ import static java.util.Optional.ofNullable;
 /**
  * @since 0.8.4  (extracted from ParameterFormatterContext)
  */
-public class BasePartConfigAccessor implements PartConfigAccessor
+public class BaseConfigAccessor implements ConfigAccessor
 {
   protected final @NotNull MessageAccessor messageAccessor;
-  protected final @NotNull PartConfig partConfig;
+  protected final @NotNull MessagePart.Config config;
 
 
-  public BasePartConfigAccessor(@NotNull MessageAccessor messageAccessor, @NotNull PartConfig partConfig)
+  public BaseConfigAccessor(@NotNull MessageAccessor messageAccessor, @NotNull MessagePart.Config config)
   {
     this.messageAccessor = messageAccessor;
-    this.partConfig = partConfig;
+    this.config = config;
   }
 
 
   @Override
-  public @NotNull PartConfig getConfig() {
-    return partConfig;
+  public @NotNull MessagePart.Config getConfig() {
+    return config;
   }
 
 
   @Override
-  public @NotNull Optional<ConfigValue<?>> getConfigValue(@NotNull String name)
+  public @NotNull Optional<TypedValue<?>> getConfigValue(@NotNull String name)
   {
-    final var configValue = partConfig.getConfigValue(name);
+    final var configValue = config.getConfigValue(name);
 
     return configValue != null
         ? Optional.of(configValue)
-        : ofNullable(messageAccessor.getDefaultParameterConfig(name));
+        : ofNullable(messageAccessor.getDefaultConfig(name));
   }
 
 
   @Override
   public @NotNull Optional<String> getConfigValueString(@NotNull String name)
   {
-    return partConfig.getConfigValue(name) instanceof StringValue cvs
+    return config.getConfigValue(name) instanceof StringValue cvs
         ? Optional.of(cvs.stringValue())
-        : messageAccessor.getDefaultParameterConfig(name) instanceof StringValue cvs
+        : messageAccessor.getDefaultConfig(name) instanceof StringValue cvs
             ? Optional.of(cvs.stringValue())
             : Optional.empty();
   }
@@ -79,9 +79,9 @@ public class BasePartConfigAccessor implements PartConfigAccessor
   @Override
   public @NotNull OptionalLong getConfigValueNumber(@NotNull String name)
   {
-    return partConfig.getConfigValue(name) instanceof NumberValue cvn
+    return config.getConfigValue(name) instanceof NumberValue cvn
         ? OptionalLong.of(cvn.longValue())
-        : messageAccessor.getDefaultParameterConfig(name) instanceof NumberValue cvn
+        : messageAccessor.getDefaultConfig(name) instanceof NumberValue cvn
             ? OptionalLong.of(cvn.longValue())
             : OptionalLong.empty();
   }
@@ -90,9 +90,9 @@ public class BasePartConfigAccessor implements PartConfigAccessor
   @Override
   public @NotNull Optional<Boolean> getConfigValueBool(@NotNull String name)
   {
-    return partConfig.getConfigValue(name) instanceof BoolValue cvb
+    return config.getConfigValue(name) instanceof BoolValue cvb
         ? Optional.of(cvb.booleanValue())
-        : messageAccessor.getDefaultParameterConfig(name) instanceof BoolValue cvb
+        : messageAccessor.getDefaultConfig(name) instanceof BoolValue cvb
             ? Optional.of(cvb.booleanValue())
             : Optional.empty();
   }
@@ -101,9 +101,9 @@ public class BasePartConfigAccessor implements PartConfigAccessor
   @Override
   public @NotNull Optional<Message.WithSpaces> getConfigValueMessage(@NotNull String name)
   {
-    var configValue = partConfig.getConfigValue(name);
+    var configValue = config.getConfigValue(name);
     if (configValue == null)
-      configValue = messageAccessor.getDefaultParameterConfig(name);
+      configValue = messageAccessor.getDefaultConfig(name);
 
     if (configValue instanceof MessageValue messageValue)
       return Optional.of(messageValue.messageValue());

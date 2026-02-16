@@ -17,16 +17,14 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.FormattableType;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.formatter.parameter.named.BoolFormatter;
-import de.sayayi.lib.message.internal.part.config.key.ConfigKeyName;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import de.sayayi.lib.message.internal.part.text.TextPart;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey;
-import de.sayayi.lib.message.part.config.ConfigValue;
+import de.sayayi.lib.message.part.TypedValue;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
@@ -67,24 +65,22 @@ class ArrayFormatterTest extends AbstractFormatterTest
         .setLocale("de-DE")
         .getMessageAccessor();
 
-    val map = Map.<ConfigKey,ConfigValue<?>>of(
-        new ConfigKeyName("list-value"),
-        new ConfigValueString("%{value,true:wahr,false:falsch}"));
+    val map = Map.<String, TypedValue<?>>of(
+        "list-value", new TypedValueString("%{value,true:wahr,false:falsch}"));
 
     assertEquals(new TextPart("wahr, falsch, wahr"),
-        format(messageAccessor, new boolean[] { true, false, true }, map));
+        format(messageAccessor, new boolean[] { true, false, true }, map, Map.of()));
 
-    val booleanMap = Map.<ConfigKey,ConfigValue<?>>of(
-        new ConfigKeyName("list-value"),
-        new ConfigValueString("%{value,true:YES,false:NO}"));
+    val booleanMap = Map.<String, TypedValue<?>>of(
+        "list-value", new TypedValueString("%{value,true:YES,false:NO}"));
 
     assertEquals(new TextPart("NO, YES"),
-        format(messageAccessor, new boolean[] { false, true }, booleanMap));
+        format(messageAccessor, new boolean[] { false, true }, booleanMap, Map.of()));
     assertEquals(TextPart.EMPTY, format(messageAccessor, new boolean[0]));
 
     formatterService.addFormatter(new NamedParameterFormatter() {
       @Override
-      public @NotNull Text format(@NotNull FormatterContext context, Object value) {
+      public @NotNull Text format(@NotNull ParameterFormatterContext context, Object value) {
         return value == null ? nullText() : new TextPart((Boolean)value ? "1" : "0");
       }
 
@@ -124,12 +120,12 @@ class ArrayFormatterTest extends AbstractFormatterTest
     assertEquals(new TextPart("12, -7, 99"), format(messageAccessor, new int[] { 12, -7, 99 }));
 
     assertEquals(new TextPart("1, -7, 248"), format(messageAccessor, new int[] { 1, -7, 248 },
-        Map.of(new ConfigKeyName("number"), new ConfigValueString("##00"))));
+        Map.of("number", new TypedValueString("##00")), Map.of()));
 
     formatterService.addFormatter(new NumberFormatter());
 
     assertEquals(new TextPart("01, -07, 248"), format(messageAccessor, new int[] { 1, -7, 248 },
-        Map.of(new ConfigKeyName("list-value"), new ConfigValueString("%{value,number:'##00'}"))));
+        Map.of("list-value", new TypedValueString("%{value,number:'##00'}")), Map.of()));
 
     formatterService.addFormatter(new NamedParameterFormatter() {
       @Override
@@ -143,7 +139,7 @@ class ArrayFormatterTest extends AbstractFormatterTest
       }
 
       @Override
-      public @NotNull Text format(@NotNull FormatterContext context, Object value) {
+      public @NotNull Text format(@NotNull ParameterFormatterContext context, Object value) {
         return value == null ? nullText() : new TextPart(String.format("0x%02x", (Integer)value));
       }
 
@@ -155,7 +151,7 @@ class ArrayFormatterTest extends AbstractFormatterTest
 
     assertEquals(new TextPart("0x40, 0xda, 0x2e"),
         format(messageAccessor, new int[] { 64, 218, 46 },
-            Map.of(new ConfigKeyName("list-value"), new ConfigValueString("%{value,format:hex}"))));
+            Map.of("list-value", new TypedValueString("%{value,format:hex}")), Map.of()));
   }
 
 
@@ -171,12 +167,11 @@ class ArrayFormatterTest extends AbstractFormatterTest
         .setLocale("de-DE")
         .getMessageAccessor();
 
-    val map = new HashMap<ConfigKey, ConfigValue<?>>();
-    map.put(new ConfigKeyName("list-value"),
-        new ConfigValueString("%{value,number:'0000',true:wahr,false:falsch}"));
+    val map = new HashMap<String, TypedValue<?>>();
+    map.put("list-value", new TypedValueString("%{value,number:'0000',true:wahr,false:falsch}"));
 
     assertEquals(new TextPart("Test, wahr, -0006"), format(messageAccessor,
-        new Object[] { "Test", true, null, -6 }, map));
+        new Object[] { "Test", true, null, -6 }, map, Map.of()));
     assertEquals(new TextPart("this, is, a, test"), format(messageAccessor,
         new Object[] { null, "this", null, "is", null, "a", null, "test" }));
   }

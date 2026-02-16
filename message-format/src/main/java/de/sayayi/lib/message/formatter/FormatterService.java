@@ -19,7 +19,7 @@ import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.named.StringFormatter;
 import de.sayayi.lib.message.formatter.post.PostFormatter;
-import de.sayayi.lib.message.part.config.PartConfig;
+import de.sayayi.lib.message.part.MessagePart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -52,7 +52,7 @@ public interface FormatterService
    * @see GenericFormatterService
    */
   @Contract(value = "_, _, _ -> new", pure = true)
-  @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, PartConfig config);
+  @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, MessagePart.Config config);
 
 
   /**

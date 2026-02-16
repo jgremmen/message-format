@@ -17,20 +17,17 @@ package de.sayayi.lib.message.formatter.parameter.named;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
-import de.sayayi.lib.message.internal.part.config.key.ConfigKeyBool;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
+import de.sayayi.lib.message.internal.part.map.key.MapKeyBool;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import de.sayayi.lib.message.part.config.ConfigKey;
-import de.sayayi.lib.message.part.config.ConfigValue;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
+import de.sayayi.lib.message.part.MapKey;
+import de.sayayi.lib.message.part.TypedValue;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
+import java.util.*;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
@@ -64,15 +61,15 @@ class BoolFormatterTest extends AbstractFormatterTest
         .setLocale("de-DE")
         .getMessageAccessor();
 
-    val map = new HashMap<ConfigKey,ConfigValue<?>>();
-    map.put(ConfigKeyBool.TRUE, new ConfigValueString("wahr"));
-    map.put(ConfigKeyBool.FALSE, new ConfigValueString("falsch"));
+    val map = new HashMap<MapKey, TypedValue<?>>();
+    map.put(MapKeyBool.TRUE, new TypedValueString("wahr"));
+    map.put(MapKeyBool.FALSE, new TypedValueString("falsch"));
 
-    assertEquals(noSpaceText("wahr"), format(messageAccessor, TRUE, map));
-    assertEquals(noSpaceText("falsch"), format(messageAccessor, 0.0d, map, "bool"));
-    assertEquals(noSpaceText("wahr"), format(messageAccessor, -0.0001f, map, "bool"));
-    assertEquals(noSpaceText("wahr"), format(messageAccessor, -4, map, "bool"));
-    assertEquals(nullText(), format(messageAccessor, null, map, "bool"));
+    assertEquals(noSpaceText("wahr"), format(messageAccessor, TRUE, Map.of(), map));
+    assertEquals(noSpaceText("falsch"), format(messageAccessor, 0.0d, Map.of(), map, "bool"));
+    assertEquals(noSpaceText("wahr"), format(messageAccessor, -0.0001f, Map.of(), map, "bool"));
+    assertEquals(noSpaceText("wahr"), format(messageAccessor, -4, Map.of(), map, "bool"));
+    assertEquals(nullText(), format(messageAccessor, null, Map.of(), map, "bool"));
   }
 
 

@@ -21,8 +21,8 @@ import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.internal.MessageDelegateWithCode;
 import lombok.val;
@@ -65,7 +65,7 @@ class MessageFormatExceptionTest
     val formatter = mock(NamedParameterFormatter.class, CALLS_REAL_METHODS);
 
     when(formatter.getName()).thenReturn("throw");
-    when(formatter.format(any(FormatterContext.class), any()))
+    when(formatter.format(any(ParameterFormatterContext.class), any()))
         .thenAnswer(invocation -> { throw new MessageFormatException(null); });
 
     formatterService.addFormatter(formatter);

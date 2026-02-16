@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.internal.part.text;
 
-import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.util.SpacesUtil;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
@@ -35,7 +35,7 @@ import static de.sayayi.lib.message.util.SpacesUtil.trimSpaces;
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
-public final class TextPart implements Text
+public final class TextPart implements MessagePart.Text
 {
   /** trimmed text string or {@code null}. */
   private final String text;

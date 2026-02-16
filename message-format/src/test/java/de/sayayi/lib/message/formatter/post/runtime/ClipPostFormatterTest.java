@@ -44,7 +44,7 @@ class ClipPostFormatterTest extends AbstractFormatterTest
   {
     val messageSupport = MessageSupportFactory
         .create(new DefaultFormatterService(), NO_CACHE_INSTANCE)
-        .setDefaultParameterConfig("clip-suffix", false)
+        .setDefaultConfig("clip-suffix", false)
         .setLocale(GERMANY);
 
     assertEquals(

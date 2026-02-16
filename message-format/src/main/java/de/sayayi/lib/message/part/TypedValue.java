@@ -13,28 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.part.config;
+package de.sayayi.lib.message.part;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueBool;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueMessage;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueNumber;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueBool;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 
 /**
- * Interface representing a typed value in a parameter configuration map.
+ * Interface representing a typed value in a configuration or map.
  *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  *
- * @see PartConfig
+ * @see MessagePart.Config
+ * @see MessagePart.Map
  */
-public sealed interface ConfigValue<T>
-    permits ConfigValue.BoolValue, ConfigValue.StringValue, ConfigValue.NumberValue, ConfigValue.MessageValue
+public sealed interface TypedValue<T>
+    permits TypedValue.BoolValue, TypedValue.StringValue, TypedValue.NumberValue, TypedValue.MessageValue
 {
   /**
    * Returns the underlying raw value object.
@@ -52,7 +53,7 @@ public sealed interface ConfigValue<T>
    *
    * @since 0.21.0
    */
-  sealed interface BoolValue extends ConfigValue<Boolean> permits ConfigValueBool
+  sealed interface BoolValue extends TypedValue<Boolean> permits TypedValueBool
   {
     /**
      * Return the number as boolean.
@@ -73,7 +74,7 @@ public sealed interface ConfigValue<T>
    *
    * @since 0.21.0
    */
-  sealed interface StringValue extends ConfigValue<String> permits ConfigValueString
+  sealed interface StringValue extends TypedValue<String> permits TypedValueString
   {
     /**
      * Returns the string value.
@@ -102,7 +103,7 @@ public sealed interface ConfigValue<T>
    *
    * @since 0.21.0
    */
-  sealed interface NumberValue extends ConfigValue<Long> permits ConfigValueNumber
+  sealed interface NumberValue extends TypedValue<Long> permits TypedValueNumber
   {
     /**
      * Return the number as int.
@@ -133,7 +134,7 @@ public sealed interface ConfigValue<T>
    *
    * @since 0.21.0
    */
-  sealed interface MessageValue extends ConfigValue<Message.WithSpaces> permits ConfigValueMessage
+  sealed interface MessageValue extends TypedValue<Message.WithSpaces> permits TypedValueMessage
   {
     /**
      * Returns the message with spaces.

@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +31,7 @@ import java.util.TimeZone;
 public final class TimeZoneFormatter extends AbstractSingleTypeParameterFormatter<TimeZone>
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull TimeZone timeZone) {
+  protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull TimeZone timeZone) {
     return context.format(timeZone.getDisplayName(context.getLocale()));
   }
 

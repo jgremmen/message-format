@@ -16,10 +16,9 @@
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.internal.part.config.key.ConfigKeyName;
-import de.sayayi.lib.message.internal.part.config.key.ConfigKeyString;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
+import de.sayayi.lib.message.internal.part.map.key.MapKeyString;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,11 +54,11 @@ class LocaleFormatterTest extends AbstractFormatterTest
         .getMessageAccessor();
 
     assertEquals(noSpaceText("États-Unis"), format(messageAccessor, US,
-        Map.of(new ConfigKeyName("locale"), new ConfigValueString("country"))));
+        Map.of("locale", new TypedValueString("country")), Map.of()));
 
-    assertEquals(noSpaceText("The Great Kingdom"), format(messageAccessor, UK, Map.of(
-        new ConfigKeyName("locale"), new ConfigValueString("country"),
-        new ConfigKeyString("GB"), new ConfigValueString("The Great Kingdom"))));
+    assertEquals(noSpaceText("The Great Kingdom"), format(messageAccessor, UK,
+        Map.of("locale", new TypedValueString("country")),
+        Map.of(new MapKeyString("GB"), new TypedValueString("The Great Kingdom"))));
   }
 
 
@@ -72,11 +71,11 @@ class LocaleFormatterTest extends AbstractFormatterTest
         .getMessageAccessor();
 
     assertEquals(noSpaceText("inglés"), format(messageAccessor, UK,
-        Map.of(new ConfigKeyName("locale"), new ConfigValueString("language"))));
+        Map.of("locale", new TypedValueString("language")), Map.of()));
 
-    assertEquals(noSpaceText("francesa"), format(messageAccessor, FRANCE, Map.of(
-        new ConfigKeyName("locale"), new ConfigValueString("language"),
-        new ConfigKeyString("fr"), new ConfigValueString("francesa"))));
+    assertEquals(noSpaceText("francesa"), format(messageAccessor, FRANCE,
+        Map.of("locale", new TypedValueString("language")),
+        Map.of(new MapKeyString("fr"), new TypedValueString("francesa"))));
   }
 
 
@@ -91,9 +90,9 @@ class LocaleFormatterTest extends AbstractFormatterTest
     assertEquals(noSpaceText("Engels (Verenigd Koninkrijk)"), format(messageAccessor, UK));
 
     assertEquals(noSpaceText("Duits"), format(messageAccessor, GERMAN,
-        Map.of(new ConfigKeyName("locale"), new ConfigValueString("name"))));
+        Map.of("locale", new TypedValueString("name")), Map.of()));
 
     assertEquals(noSpaceText("Koreaans (Zuid-Korea)"), format(messageAccessor, KOREA,
-        Map.of(new ConfigKeyName("locale"), new ConfigValueString("name"))));
+        Map.of("locale", new TypedValueString("name")), Map.of()));
   }
 }

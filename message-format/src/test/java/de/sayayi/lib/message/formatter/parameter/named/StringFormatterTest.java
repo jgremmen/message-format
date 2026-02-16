@@ -143,21 +143,21 @@ class StringFormatterTest extends AbstractFormatterTest
         .format());
 
     // default
-    messageSupport.setDefaultParameterConfig("ignore-default-tostring", false);
+    messageSupport.setDefaultConfig("ignore-default-tostring", false);
     assertEquals(objectToString, messageSupport
         .code("OBJ")
         .with("object", object)
         .format());
 
     // ignore
-    messageSupport.setDefaultParameterConfig("ignore-default-tostring", true);
+    messageSupport.setDefaultConfig("ignore-default-tostring", true);
     assertEquals("", messageSupport
         .code("OBJ")
         .with("object", object)
         .format());
 
     // ignored empty
-    messageSupport.setDefaultParameterConfig("ignore-default-tostring", true);
+    messageSupport.setDefaultConfig("ignore-default-tostring", true);
     assertEquals("(empty)", messageSupport
         .message("%{object,empty:'(empty)'}")
         .with("object", object)

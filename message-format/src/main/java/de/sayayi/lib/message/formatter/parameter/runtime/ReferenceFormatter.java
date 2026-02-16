@@ -17,18 +17,18 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey.MatchResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.Reference;
 import java.util.OptionalLong;
 
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.forEmptyKey;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.forNullKey;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.forEmptyKey;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.forNullKey;
 
 
 /**
@@ -39,13 +39,13 @@ public final class ReferenceFormatter
     implements SizeQueryable, ConfigKeyComparator<Reference<?>>
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Reference<?> reference) {
+  public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Reference<?> reference) {
     return context.format(reference.get());
   }
 
 
   @Override
-  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value) {
+  public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object value) {
     return context.size(((Reference<?>)value).get());
   }
 

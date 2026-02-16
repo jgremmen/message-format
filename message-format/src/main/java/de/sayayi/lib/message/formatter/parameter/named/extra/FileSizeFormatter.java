@@ -16,10 +16,9 @@
 package de.sayayi.lib.message.formatter.parameter.named.extra;
 
 import de.sayayi.lib.message.formatter.parameter.AbstractParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -27,6 +26,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Set;
 
+import static de.sayayi.lib.message.part.MapKey.STRING_TYPE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.lang.Boolean.FALSE;
 
@@ -70,7 +70,7 @@ public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Number value)
+  protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Number value)
   {
     final var size = value.longValue();
     final var s = new StringBuilder();
@@ -93,9 +93,7 @@ public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
     }
 
     final var unit = UNITS[unitIndex];
-    final var unitMessage = context
-        .getConfigMapMessage(unit, ConfigKey.STRING_TYPE)
-        .orElse(null);
+    final var unitMessage = context.getMapMessage(unit, STRING_TYPE).orElse(null);
 
     if ((unitMessage != null && unitMessage.isSpaceBefore()) ||
         context.getConfigValueBool("space").orElse(FALSE))

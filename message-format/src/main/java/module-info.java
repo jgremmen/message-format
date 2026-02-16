@@ -22,7 +22,6 @@ module de.sayayi.lib.message {
   exports de.sayayi.lib.message.formatter.post;
   exports de.sayayi.lib.message.formatter.post.runtime;
   exports de.sayayi.lib.message.part;
-  exports de.sayayi.lib.message.part.config;
   exports de.sayayi.lib.message.part.normalizer;
   exports de.sayayi.lib.message.util;
 

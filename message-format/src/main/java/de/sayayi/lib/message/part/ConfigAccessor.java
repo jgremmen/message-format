@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.part.config;
+package de.sayayi.lib.message.part;
 
 import de.sayayi.lib.message.Message;
 import org.jetbrains.annotations.Contract;
@@ -28,7 +28,7 @@ import java.util.OptionalLong;
  *
  * @since 0.8.4
  */
-public interface PartConfigAccessor
+public interface ConfigAccessor
 {
   /**
    * Returns the configuration.
@@ -38,7 +38,7 @@ public interface PartConfigAccessor
    * @since 0.21.0
    */
   @Contract(pure = true)
-  @NotNull PartConfig getConfig();
+  @NotNull MessagePart.Config getConfig();
 
 
   /**
@@ -52,7 +52,7 @@ public interface PartConfigAccessor
    * @return  optional instance representing the found value, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull Optional<ConfigValue<?>> getConfigValue(@NotNull String name);
+  @NotNull Optional<TypedValue<?>> getConfigValue(@NotNull String name);
 
 
   /**

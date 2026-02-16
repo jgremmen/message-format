@@ -16,9 +16,8 @@
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.internal.part.config.key.ConfigKeyName;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,9 +51,9 @@ class EnumFormatterTest extends AbstractFormatterTest
     val messageAccessor = messageSupport.getMessageAccessor();
 
     assertEquals(noSpaceText("3"), format(messageAccessor, MyEnum.DD,
-        Map.of(new ConfigKeyName("enum"), new ConfigValueString("ordinal"))));
+        Map.of("enum", new TypedValueString("ordinal")), Map.of()));
 
-    messageSupport.setDefaultParameterConfig("enum", "ordinal");
+    messageSupport.setDefaultConfig("enum", "ordinal");
     assertEquals(noSpaceText("0"), format(messageAccessor, MyEnum.AA));
   }
 

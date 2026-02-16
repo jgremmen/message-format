@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 public final class ThrowableFormatter extends AbstractSingleTypeParameterFormatter<Throwable>
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Throwable throwable) {
+  protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Throwable throwable) {
     return context.format(throwable.getLocalizedMessage(), String.class);
   }
 

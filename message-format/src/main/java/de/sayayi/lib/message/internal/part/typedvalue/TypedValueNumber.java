@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal.part.config.value;
+package de.sayayi.lib.message.internal.part.typedvalue;
 
-import de.sayayi.lib.message.part.config.ConfigValue.NumberValue;
+import de.sayayi.lib.message.part.TypedValue.NumberValue;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -37,7 +37,7 @@ import static java.lang.Integer.MIN_VALUE;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public record ConfigValueNumber(long longValue) implements NumberValue
+public record TypedValueNumber(long longValue) implements NumberValue
 {
   /**
    * Return the number as int.
@@ -94,12 +94,12 @@ public record ConfigValueNumber(long longValue) implements NumberValue
    *
    * @since 0.8.0
    */
-  public static @NotNull ConfigValueNumber unpack(@NotNull PackInputStream packStream) throws IOException
+  public static @NotNull TypedValueNumber unpack(@NotNull PackInputStream packStream) throws IOException
   {
     final var number = packStream.getVersion().orElseThrow() == 1
         ? packStream.readLong()
         : unpackLongVar(packStream);
 
-    return new ConfigValueNumber(number);
+    return new TypedValueNumber(number);
   }
 }

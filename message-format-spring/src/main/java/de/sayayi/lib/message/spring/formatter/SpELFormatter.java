@@ -16,8 +16,8 @@
 package de.sayayi.lib.message.spring.formatter;
 
 import de.sayayi.lib.message.formatter.parameter.AbstractParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -101,7 +101,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Object value)
+  protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Object value)
   {
     var spelExpr = context.getConfigValueString("spel-expr");
     if (spelExpr.isPresent())
@@ -132,11 +132,11 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
 
   private final class ParameterEvaluationContext implements EvaluationContext
   {
-    private final FormatterContext context;
+    private final ParameterFormatterContext context;
     private final TypedValue value;
 
 
-    private ParameterEvaluationContext(@NotNull FormatterContext context, @NotNull Object value)
+    private ParameterEvaluationContext(@NotNull ParameterFormatterContext context, @NotNull Object value)
     {
       this.context = context;
       this.value = new TypedValue(value);

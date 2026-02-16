@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -73,7 +73,7 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Temporal temporal)
+  public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Temporal temporal)
   {
     final var format = context.getConfigValueString("date").orElse(null);
     final DateTimeFormatter formatter;

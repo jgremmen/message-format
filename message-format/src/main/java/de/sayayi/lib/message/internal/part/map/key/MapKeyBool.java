@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal.part.config.key;
+package de.sayayi.lib.message.internal.part.map.key;
 
-import de.sayayi.lib.message.part.config.ConfigKey;
+import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -23,69 +23,45 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static java.util.Objects.requireNonNull;
-
 
 /**
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
-@SuppressWarnings("ClassCanBeRecord")
-public final class ConfigKeyName implements ConfigKey
+public enum MapKeyBool implements MapKey
 {
-  /** Configuration key name. */
-  private final @NotNull String name;
+  /** Boolean config key representing {@code false}. */
+  FALSE,
+
+  /** Boolean config key representing {@code true}. */
+  TRUE;
 
 
   /**
-   * Constructs a configuration key with {@code name}.
+   * Returns the config key boolean value.
    *
-   * @param name  configuration key name, not {@code null} or empty
-   */
-  public ConfigKeyName(@NotNull String name)
-  {
-    if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
-      throw new IllegalArgumentException("name must not be empty");
-  }
-
-
-  /**
-   * Returns the config key name.
-   *
-   * @return  config key name, never {@code null}
+   * @return  config key boolean value
    */
   @Contract(pure = true)
-  public @NotNull String getName() {
-    return name;
+  public boolean isBool() {
+    return this == TRUE;
   }
 
 
   /**
    * {@inheritDoc}
    *
-   * @return  always {@link Type#NAME Type#NAME}
+   * @return  always {@link Type#BOOL Type#BOOL}
    */
   @Override
   public @NotNull Type getType() {
-    return Type.NAME;
-  }
-
-
-  @Override
-  public boolean equals(Object o) {
-    return o instanceof ConfigKeyName && name.equals(((ConfigKeyName)o).name);
-  }
-
-
-  @Override
-  public int hashCode() {
-    return 59 + name.hashCode();
+    return Type.BOOL;
   }
 
 
   @Override
   public String toString() {
-    return name;
+    return Boolean.toString(isBool());
   }
 
 
@@ -99,14 +75,14 @@ public final class ConfigKeyName implements ConfigKey
    * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeString(name);
+    packStream.writeBoolean(isBool());
   }
 
 
   /**
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked name map key, never {@code null}
+   * @return  unpacked boolean map key, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -114,7 +90,7 @@ public final class ConfigKeyName implements ConfigKey
    *
    * @hidden
    */
-  public static @NotNull ConfigKeyName unpack(@NotNull PackInputStream packStream) throws IOException {
-    return new ConfigKeyName(requireNonNull(packStream.readString()));
+  public static @NotNull MapKeyBool unpack(@NotNull PackInputStream packStream) throws IOException {
+    return packStream.readBoolean() ? TRUE : FALSE;
   }
 }

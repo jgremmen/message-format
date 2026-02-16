@@ -18,13 +18,13 @@ package de.sayayi.lib.message.internal.part.parameter;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.SizeQueryable;
-import de.sayayi.lib.message.internal.part.config.BasePartConfigAccessor;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.internal.part.config.BaseConfigAccessor;
+import de.sayayi.lib.message.part.MapKey;
+import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey;
-import de.sayayi.lib.message.part.config.PartConfig;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -41,8 +41,10 @@ import static java.util.Optional.ofNullable;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-final class ParameterFormatterContextImpl extends BasePartConfigAccessor implements FormatterContext
+final class ParameterFormatterContextImpl extends BaseConfigAccessor
+    implements ParameterFormatterContext
 {
+  private final @NotNull MessagePart.Map map;
   private final @NotNull Parameters parameters;
   private final Object value;
   private final String format;
@@ -51,10 +53,12 @@ final class ParameterFormatterContextImpl extends BasePartConfigAccessor impleme
 
 
   ParameterFormatterContextImpl(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters,
-                                Object value, Class<?> type, String format, @NotNull PartConfig config)
+                                Object value, Class<?> type, String format, @NotNull MessagePart.Config config,
+                                @NotNull MessagePart.Map map)
   {
     super(messageAccessor, config);
 
+    this.map = map;
     this.parameters = parameters;
     this.value = value;
     this.format = format;
@@ -63,6 +67,12 @@ final class ParameterFormatterContextImpl extends BasePartConfigAccessor impleme
       type = value == null ? NULL_TYPE : value.getClass();
 
     parameterFormatters = messageAccessor.getFormatters(format, type, config);
+  }
+
+
+  @Override
+  public @NotNull MessagePart.Map getMap() {
+    return map;
   }
 
 
@@ -91,15 +101,15 @@ final class ParameterFormatterContextImpl extends BasePartConfigAccessor impleme
 
 
   @Override
-  public boolean hasConfigMapMessage(@NotNull ConfigKey.Type keyType) {
-    return partConfig.hasMessageWithKeyType(keyType);
+  public boolean hasMapMessage(@NotNull MapKey.Type keyType) {
+    return map.hasMessageWithKeyType(keyType);
   }
 
 
   @Override
-  public @NotNull Optional<Message.WithSpaces> getConfigMapMessage(
-      Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault) {
-    return ofNullable(partConfig.getMessage(messageAccessor, key, getLocale(), keyTypes, includeDefault));
+  public @NotNull Optional<Message.WithSpaces> getMapMessage(
+      Object key, @NotNull Set<MapKey.Type> keyTypes, boolean includeDefault) {
+    return ofNullable(map.getMessage(messageAccessor, key, getLocale(), keyTypes, includeDefault, config));
   }
 
 
@@ -117,7 +127,7 @@ final class ParameterFormatterContextImpl extends BasePartConfigAccessor impleme
   public @NotNull Text format(Object value)
   {
     // propagate current format and parameter config to the next formatter
-    return new ParameterFormatterContextImpl(messageAccessor, parameters, value, null, format, partConfig)
+    return new ParameterFormatterContextImpl(messageAccessor, parameters, value, null, format, config, map)
         .delegateToNextFormatter();
   }
 
@@ -126,16 +136,16 @@ final class ParameterFormatterContextImpl extends BasePartConfigAccessor impleme
   public @NotNull Text format(Object value, @NotNull Class<?> type)
   {
     // propagate current format and parameter config to the next formatter
-    return new ParameterFormatterContextImpl(messageAccessor, parameters, value, type, format, partConfig)
+    return new ParameterFormatterContextImpl(messageAccessor, parameters, value, type, format, config, map)
         .delegateToNextFormatter();
   }
 
 
   @Override
-  public @NotNull Text format(Object value, Class<?> type, String format, PartConfig config)
+  public @NotNull Text format(Object value, Class<?> type, String format, MessagePart.Config config)
   {
     return new ParameterFormatterContextImpl(messageAccessor, parameters, value, type, format,
-        config == null ? this.partConfig : config).delegateToNextFormatter();
+        config == null ? this.config : config, map).delegateToNextFormatter();
   }
 
 
@@ -158,7 +168,7 @@ final class ParameterFormatterContextImpl extends BasePartConfigAccessor impleme
     {
       OptionalLong result;
 
-      for(var formatter: messageAccessor.getFormatters(value.getClass(), partConfig))
+      for(var formatter: messageAccessor.getFormatters(value.getClass(), config))
         if (formatter instanceof SizeQueryable &&
             (result = ((SizeQueryable)formatter).size(this, value)).isPresent())
           return result;

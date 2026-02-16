@@ -19,9 +19,8 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.internal.pack.PackSupport;
-import de.sayayi.lib.message.internal.part.config.PartConfigImpl;
+import de.sayayi.lib.message.internal.part.config.MessagePartConfig;
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.part.config.PartConfig;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -49,7 +48,7 @@ public final class PostFormatterPart implements MessagePart.PostFormat
   private final @NotNull Message.WithSpaces message;
 
   /** configuration. */
-  private final @NotNull PartConfigImpl config;
+  private final @NotNull MessagePartConfig config;
 
   /** tells whether the parameter has a leading space. */
   private final boolean spaceBefore;
@@ -59,7 +58,7 @@ public final class PostFormatterPart implements MessagePart.PostFormat
 
 
   public PostFormatterPart(@NotNull String name, @NotNull Message.WithSpaces message,
-                           boolean spaceBefore, boolean spaceAfter, @NotNull PartConfigImpl config)
+                           boolean spaceBefore, boolean spaceAfter, @NotNull MessagePartConfig config)
   {
     if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
       throw new IllegalArgumentException("name must not be empty");
@@ -85,7 +84,7 @@ public final class PostFormatterPart implements MessagePart.PostFormat
 
   @Override
   @Contract(pure = true)
-  public @NotNull PartConfig getConfig() {
+  public @NotNull MessagePart.Config getConfig() {
     return config;
   }
 
@@ -190,6 +189,6 @@ public final class PostFormatterPart implements MessagePart.PostFormat
     final var name = requireNonNull(packStream.readString());
     final var message = unpack.unpackMessageWithSpaces(packStream);
 
-    return new PostFormatterPart(name, message, spaceBefore, spaceAfter, PartConfigImpl.unpack(unpack, packStream));
+    return new PostFormatterPart(name, message, spaceBefore, spaceAfter, MessagePartConfig.unpack(unpack, packStream));
   }
 }
