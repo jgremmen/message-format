@@ -18,18 +18,25 @@ package de.sayayi.lib.message.internal.part.parameter;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.internal.pack.PackSupport;
-import de.sayayi.lib.message.internal.part.config.PartConfigImpl;
-import de.sayayi.lib.message.part.MessagePart.Parameter;
-import de.sayayi.lib.message.part.config.PartConfig;
+import de.sayayi.lib.message.internal.part.config.MessagePartConfig;
+import de.sayayi.lib.message.internal.part.map.MessagePartMap;
+import de.sayayi.lib.message.internal.part.map.key.*;
+import de.sayayi.lib.message.part.MapKey;
+import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 
+import static de.sayayi.lib.message.internal.pack.PackSupport.*;
+import static de.sayayi.lib.message.internal.part.config.MessagePartConfig.EMPTY_CONFIG;
+import static de.sayayi.lib.message.internal.part.map.MessagePartMap.EMPTY_MAP;
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
 import static java.util.Objects.requireNonNull;
 
@@ -40,7 +47,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
-public final class ParameterPart implements Parameter
+public final class ParameterPart implements MessagePart.Parameter
 {
   /** parameter name. */
   private final @NotNull String name;
@@ -49,7 +56,10 @@ public final class ParameterPart implements Parameter
   private final String format;
 
   /** parameter configuration. */
-  private final @NotNull PartConfigImpl config;
+  private final @NotNull MessagePartConfig config;
+
+  /** parameter map. */
+  private final @NotNull MessagePartMap map;
 
   /** tells whether the parameter has a leading space. */
   private final boolean spaceBefore;
@@ -77,7 +87,7 @@ public final class ParameterPart implements Parameter
    * @param spaceAfter   adds a trailing space to this parameter
    */
   public ParameterPart(@NotNull String name, boolean spaceBefore, boolean spaceAfter) {
-    this(name, null, spaceBefore, spaceAfter, new PartConfigImpl(Map.of()));
+    this(name, null, spaceBefore, spaceAfter, EMPTY_CONFIG, EMPTY_MAP);
   }
 
 
@@ -87,19 +97,20 @@ public final class ParameterPart implements Parameter
    * @param name         parameter name, not {@code null} or empty
    * @param config  parameter configuration, not {@code null}
    */
-  public ParameterPart(@NotNull String name, @NotNull PartConfigImpl config) {
-    this(name, null, false, false, config);
+  public ParameterPart(@NotNull String name, @NotNull MessagePartConfig config, @NotNull MessagePartMap map) {
+    this(name, null, false, false, config, map);
   }
 
 
   public ParameterPart(@NotNull String name, String format, boolean spaceBefore, boolean spaceAfter,
-                       @NotNull PartConfigImpl config)
+                       @NotNull MessagePartConfig config, @NotNull MessagePartMap map)
   {
     if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
       throw new IllegalArgumentException("name must not be empty");
 
     this.format = "".equals(format) ? null : format;
-    this.config = requireNonNull(config, "paramConfig must not be null");
+    this.config = requireNonNull(config, "config must not be null");
+    this.map = requireNonNull(map, "map must not be null");
     this.spaceBefore = spaceBefore;
     this.spaceAfter = spaceAfter;
   }
@@ -121,8 +132,14 @@ public final class ParameterPart implements Parameter
 
   @Override
   @Contract(pure = true)
-  public @NotNull PartConfig getConfig() {
+  public @NotNull MessagePart.Config getConfig() {
     return config;
+  }
+
+
+  @Override
+  public @NotNull MessagePart.Map getMap() {
+    return map;
   }
 
 
@@ -143,7 +160,7 @@ public final class ParameterPart implements Parameter
   public @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
   {
     final var context = new ParameterFormatterContextImpl(messageAccessor, parameters,
-        parameters.getParameterValue(name), null, format, config);
+        parameters.getParameterValue(name), null, format, config, map);
 
     return addSpaces(context.delegateToNextFormatter(), spaceBefore, spaceAfter);
   }
@@ -157,7 +174,8 @@ public final class ParameterPart implements Parameter
         Objects.equals(format, that.getFormat()) &&
         spaceBefore == that.isSpaceBefore() &&
         spaceAfter == that.isSpaceAfter() &&
-        config.equals(that.getConfig());
+        config.equals(that.getConfig()) &&
+        map.equals(that.getMap());
   }
 
 
@@ -176,7 +194,9 @@ public final class ParameterPart implements Parameter
     if (format != null)
       s.append(",format=").append(format);
     if (!config.isEmpty())
-      s.append(",map=").append(config);
+      s.append(",config=").append(config);
+    if (!map.isEmpty())
+      s.append(",map=").append(map);
 
     if (spaceBefore && spaceAfter)
       s.append(",space-around");
@@ -195,8 +215,6 @@ public final class ParameterPart implements Parameter
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
@@ -206,6 +224,7 @@ public final class ParameterPart implements Parameter
     packStream.writeString(name);
 
     config.pack(packStream);
+    map.pack(packStream);
   }
 
 
@@ -218,8 +237,6 @@ public final class ParameterPart implements Parameter
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
   public static @NotNull ParameterPart unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
       throws IOException
@@ -229,6 +246,59 @@ public final class ParameterPart implements Parameter
     final var format = packStream.readString();
     final var name = requireNonNull(packStream.readString());
 
-    return new ParameterPart(name, format, spaceBefore, spaceAfter, PartConfigImpl.unpack(unpack, packStream));
+    return new ParameterPart(name, format, spaceBefore, spaceAfter,
+        MessagePartConfig.unpack(unpack, packStream),
+        MessagePartMap.unpack(unpack, packStream));
+  }
+
+
+  /**
+   * Parameter part unpacking method for backward compatibility with versions 1..2.
+   *
+   * @param unpack      unpacker instance, not {@code null}
+   * @param packStream  source data input, not {@code null}
+   *
+   * @return  unpacked parameter part, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs
+   *
+   * @since 0.21.0
+   */
+  @SuppressWarnings("DuplicatedCode")
+  public static @NotNull ParameterPart unpackV2(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
+      throws IOException
+  {
+    final var spaceBefore = packStream.readBoolean();
+    final var spaceAfter = packStream.readBoolean();
+    final var format = packStream.readString();
+    final var name = requireNonNull(packStream.readString());
+
+    final var config = new HashMap<String, TypedValue<?>>();
+    final var map = new LinkedHashMap<MapKey,TypedValue<?>>();
+
+    for(int n = 0, size = packStream.readSmallVar(); n < size; n++)
+    {
+      final var mapKeyId = packStream.readSmall(3);
+
+      if (mapKeyId == MAP_KEY_NAME_ID)
+        config.put(requireNonNull(packStream.readString()), unpack.unpackTypedValue(packStream));
+      else
+      {
+        final var mapKey = switch(mapKeyId) {
+          case MAP_KEY_BOOL_ID -> MapKeyBool.unpack(packStream);
+          case MAP_KEY_EMPTY_ID -> MapKeyEmpty.unpack(packStream);
+          case MAP_KEY_NULL_ID -> MapKeyNull.unpack(packStream);
+          case MAP_KEY_NUMBER_ID -> MapKeyNumber.unpack(packStream);
+          case MAP_KEY_STRING_ID -> MapKeyString.unpack(packStream);
+          case MAP_KEY_DEFAULT_ID -> null;
+
+          default -> throw new IllegalStateException("map key expected");
+        };
+
+        map.put(mapKey, unpack.unpackTypedValue(packStream));
+      }
+    }
+
+    return new ParameterPart(name, format, spaceBefore, spaceAfter, new MessagePartConfig(config), new MessagePartMap(map));
   }
 }

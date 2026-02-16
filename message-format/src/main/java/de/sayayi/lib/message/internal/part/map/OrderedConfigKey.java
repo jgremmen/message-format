@@ -13,34 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal.part.config;
+package de.sayayi.lib.message.internal.part.map;
 
-import de.sayayi.lib.message.part.config.ConfigKey;
+import de.sayayi.lib.message.part.MapKey;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 
-import static de.sayayi.lib.message.part.config.ConfigKey.CompareType.EQ;
-import static de.sayayi.lib.message.part.config.ConfigKey.CompareType.NE;
-import static de.sayayi.lib.message.part.config.ConfigKey.Type.*;
+import static de.sayayi.lib.message.part.MapKey.CompareType.EQ;
+import static de.sayayi.lib.message.part.MapKey.CompareType.NE;
+import static de.sayayi.lib.message.part.MapKey.Type.*;
 
 
 /**
  * This record represents a configuration key with an order for sorting.
  *
  * @param order      the order of the configuration key, used for sorting
- * @param configKey  the configuration key, not {@code null}
+ * @param mapKey  the configuration key, not {@code null}
  *
  * @since 0.21.0
  */
-record OrderedConfigKey(int order, @NotNull ConfigKey configKey)
+record OrderedConfigKey(int order, @NotNull MapKey mapKey)
 {
   static final Comparator<OrderedConfigKey> SORTER = new Comparator<>() {
     @Override
     public int compare(OrderedConfigKey k1, OrderedConfigKey k2)
     {
-      var cmp = Integer.compare(configKeyToOrder(k1.configKey()), configKeyToOrder(k2.configKey()));
+      var cmp = Integer.compare(configKeyToOrder(k1.mapKey()), configKeyToOrder(k2.mapKey()));
       if (cmp == 0)
         cmp = Integer.compare(k1.order(), k2.order());
 
@@ -49,10 +49,10 @@ record OrderedConfigKey(int order, @NotNull ConfigKey configKey)
 
 
     @Contract(pure = true)
-    private static int configKeyToOrder(@NotNull ConfigKey configKey)
+    private static int configKeyToOrder(@NotNull MapKey mapKey)
     {
-      final var compareType = configKey.getCompareType();
-      final var keyType = configKey.getType();
+      final var compareType = mapKey.getCompareType();
+      final var keyType = mapKey.getType();
 
       if (keyType == NULL && compareType == EQ)
         return 0;  // =null

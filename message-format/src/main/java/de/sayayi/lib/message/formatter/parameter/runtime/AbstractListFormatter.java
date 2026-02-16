@@ -17,8 +17,8 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.formatter.parameter.AbstractParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
 import de.sayayi.lib.message.part.MessagePart.Text;
@@ -74,7 +74,7 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
 
 
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull T list)
+  public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull T list)
   {
     final var moreValue = context.getConfigValueString(CONFIG_VALUE_MORE).orElse(null);
     final var hasMoreValue = moreValue != null && !isTrimmedEmpty(moreValue);
@@ -113,7 +113,7 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
 
 
   @Contract(pure = true)
-  protected abstract @NotNull Iterator<Text> createIterator(@NotNull FormatterContext context, @NotNull T value);
+  protected abstract @NotNull Iterator<Text> createIterator(@NotNull ParameterFormatterContext context, @NotNull T value);
 
 
   @Override

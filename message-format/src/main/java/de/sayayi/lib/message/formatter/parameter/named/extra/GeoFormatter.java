@@ -16,8 +16,8 @@
 package de.sayayi.lib.message.formatter.parameter.named.extra;
 
 import de.sayayi.lib.message.formatter.parameter.AbstractParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -73,7 +73,7 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
 
 
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Number number)
+  public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Number number)
   {
     final var fmt = getFormat(context);
     final var s = new StringBuilder();
@@ -123,7 +123,7 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   }
 
 
-  private @NotNull Format getFormat(@NotNull FormatterContext context)
+  private @NotNull Format getFormat(@NotNull ParameterFormatterContext context)
   {
     final var formatString = context.getConfigValueString("geo").orElse("dms");
     final var format = FORMAT.get(formatString);

@@ -17,19 +17,19 @@ package de.sayayi.lib.message.internal.pack;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.internal.*;
-import de.sayayi.lib.message.internal.part.config.key.*;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueBool;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueMessage;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueNumber;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
+import de.sayayi.lib.message.internal.part.map.key.*;
 import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
 import de.sayayi.lib.message.internal.part.post.PostFormatterPart;
 import de.sayayi.lib.message.internal.part.template.TemplatePart;
 import de.sayayi.lib.message.internal.part.text.NoSpaceTextPart;
 import de.sayayi.lib.message.internal.part.text.TextPart;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueBool;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
+import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.part.config.ConfigKey;
-import de.sayayi.lib.message.part.config.ConfigValue;
+import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.pack.PackConfig;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
@@ -64,13 +64,13 @@ public final class PackSupport
       .withCompressionSupport(true)
       .build();
 
-  private static final int MAP_KEY_BOOL_ID = 0;
-  private static final int MAP_KEY_EMPTY_ID = 1;
-  private static final int MAP_KEY_NAME_ID = 2;
-  private static final int MAP_KEY_NULL_ID = 3;
-  private static final int MAP_KEY_NUMBER_ID = 4;
-  private static final int MAP_KEY_STRING_ID = 5;
-  private static final int MAP_KEY_DEFAULT_ID = 6;
+  public static final int MAP_KEY_BOOL_ID = 0;
+  public static final int MAP_KEY_EMPTY_ID = 1;
+  public static final int MAP_KEY_NAME_ID = 2;  // < version 3
+  public static final int MAP_KEY_NULL_ID = 3;
+  public static final int MAP_KEY_NUMBER_ID = 4;
+  public static final int MAP_KEY_STRING_ID = 5;
+  public static final int MAP_KEY_DEFAULT_ID = 6;
 
   private static final int MAP_VALUE_BOOL_ID = 0;
   private static final int MAP_VALUE_MESSAGE_ID = 1;
@@ -91,8 +91,8 @@ public final class PackSupport
   private static final int MESSAGE_TEXT = 5;
 
 
-  private final Map<ConfigKey,ConfigKey> mapKeys = new HashMap<>();
-  private final Map<ConfigValue<?>,ConfigValue<?>> mapValues = new HashMap<>();
+  private final Map<MapKey,MapKey> mapKeys = new HashMap<>();
+  private final Map<TypedValue<?>,TypedValue<?>> mapValues = new HashMap<>();
   private final Map<MessagePart,MessagePart> messageParts = new HashMap<>();
   private final Map<Message.WithSpaces,Message.WithSpaces> messagesWithSpaces = new HashMap<>();
 
@@ -237,10 +237,12 @@ public final class PackSupport
   @SuppressWarnings("OptionalGetWithoutIsPresent")
   public @NotNull MessagePart unpackMessagePart(@NotNull PackInputStream packStream) throws IOException
   {
-    final var bitWidth = packStream.getVersion().getAsInt() < 3 ? 2 : 3;
-    final var messagePart = switch(packStream.readSmall(bitWidth)) {
+    final var version = packStream.getVersion().getAsInt();
+    final var messagePart = switch(packStream.readSmall(version < 3 ? 2 : 3)) {
       case PART_NO_SPACE_TEXT_ID -> NoSpaceTextPart.unpack(packStream);
-      case PART_PARAMETER_ID -> ParameterPart.unpack(this, packStream);
+      case PART_PARAMETER_ID -> version < 3
+          ? ParameterPart.unpackV2(this, packStream)
+          : ParameterPart.unpack(this, packStream);
       case PART_TEXT_ID -> TextPart.unpack(packStream);
       case PART_TEMPLATE_ID -> TemplatePart.unpack(this, packStream);
       case PART_POST_FORMAT_ID -> PostFormatterPart.unpack(this, packStream);
@@ -253,95 +255,91 @@ public final class PackSupport
 
 
   @Contract(mutates = "param2,io")
-  public static void pack(ConfigKey configKey, @NotNull PackOutputStream packStream) throws IOException
+  public static void pack(MapKey mapKey, @NotNull PackOutputStream packStream) throws IOException
   {
-    switch(configKey) {
+    switch(mapKey) {
       case null -> packStream.writeSmall(MAP_KEY_DEFAULT_ID, 3);
-      case ConfigKeyBool configKeyBool -> {
+      case MapKeyBool configKeyBool -> {
         packStream.writeSmall(MAP_KEY_BOOL_ID, 3);
         configKeyBool.pack(packStream);
       }
-      case ConfigKeyEmpty configKeyEmpty -> {
+      case MapKeyEmpty configKeyEmpty -> {
         packStream.writeSmall(MAP_KEY_EMPTY_ID, 3);
         configKeyEmpty.pack(packStream);
       }
-      case ConfigKeyName configKeyName -> {
-        packStream.writeSmall(MAP_KEY_NAME_ID, 3);
-        configKeyName.pack(packStream);
-      }
-      case ConfigKeyNull configKeyNull -> {
+      case MapKeyNull configKeyNull -> {
         packStream.writeSmall(MAP_KEY_NULL_ID, 3);
         configKeyNull.pack(packStream);
       }
-      case ConfigKeyNumber configKeyNumber -> {
+      case MapKeyNumber configKeyNumber -> {
         packStream.writeSmall(MAP_KEY_NUMBER_ID, 3);
         configKeyNumber.pack(packStream);
       }
-      case ConfigKeyString configKeyString -> {
+      case MapKeyString configKeyString -> {
         packStream.writeSmall(MAP_KEY_STRING_ID, 3);
         configKeyString.pack(packStream);
       }
 
-      default -> throw new IllegalArgumentException("unknown map key type " + configKey.getClass().getSimpleName());
+      default -> throw new IllegalArgumentException("unknown map key type " + mapKey.getClass().getSimpleName());
     }
   }
 
 
   @Contract(mutates = "param1,io")
-  public ConfigKey unpackMapKey(@NotNull PackInputStream packStream) throws IOException
+  @SuppressWarnings("DuplicatedCode")
+  public MapKey unpackMapKey(@NotNull PackInputStream packStream) throws IOException
   {
-    final var configKey = switch(packStream.readSmall(3)) {
-      case MAP_KEY_BOOL_ID -> ConfigKeyBool.unpack(packStream);
-      case MAP_KEY_EMPTY_ID -> ConfigKeyEmpty.unpack(packStream);
-      case MAP_KEY_NAME_ID -> ConfigKeyName.unpack(packStream);
-      case MAP_KEY_NULL_ID -> ConfigKeyNull.unpack(packStream);
-      case MAP_KEY_NUMBER_ID -> ConfigKeyNumber.unpack(packStream);
-      case MAP_KEY_STRING_ID -> ConfigKeyString.unpack(packStream);
+    final var mapKey = switch(packStream.readSmall(3)) {
+      case MAP_KEY_BOOL_ID -> MapKeyBool.unpack(packStream);
+      case MAP_KEY_EMPTY_ID -> MapKeyEmpty.unpack(packStream);
+      case MAP_KEY_NULL_ID -> MapKeyNull.unpack(packStream);
+      case MAP_KEY_NUMBER_ID -> MapKeyNumber.unpack(packStream);
+      case MAP_KEY_STRING_ID -> MapKeyString.unpack(packStream);
       case MAP_KEY_DEFAULT_ID -> null;
 
       default -> throw new IllegalStateException("map key expected");
     };
 
-    return mapKeys.computeIfAbsent(configKey, identity());
+    return mapKeys.computeIfAbsent(mapKey, identity());
   }
 
 
   @Contract(mutates = "param2,io")
-  public static void pack(@NotNull ConfigValue<?> configValue, @NotNull PackOutputStream packStream) throws IOException
+  public static void pack(@NotNull TypedValue<?> typedValue, @NotNull PackOutputStream packStream) throws IOException
   {
-    switch(configValue) {
-      case ConfigValueBool configValueBool -> {
+    switch(typedValue) {
+      case TypedValueBool configValueBool -> {
         packStream.writeSmall(MAP_VALUE_BOOL_ID, 2);
         configValueBool.pack(packStream);
       }
-      case ConfigValueMessage configValueMessage -> {
+      case TypedValueMessage configValueMessage -> {
         packStream.writeSmall(MAP_VALUE_MESSAGE_ID, 2);
         configValueMessage.pack(packStream);
       }
-      case ConfigValueNumber configValueNumber -> {
+      case TypedValueNumber configValueNumber -> {
         packStream.writeSmall(MAP_VALUE_NUMBER_ID, 2);
         configValueNumber.pack(packStream);
       }
-      case ConfigValueString configValueString -> {
+      case TypedValueString configValueString -> {
         packStream.writeSmall(MAP_VALUE_STRING_ID, 2);
         configValueString.pack(packStream);
       }
 
-      default -> throw new IllegalArgumentException("unknown map value type " + configValue.getClass().getSimpleName());
+      default -> throw new IllegalArgumentException("unknown map value type " + typedValue.getClass().getSimpleName());
     }
   }
 
 
   @Contract(mutates = "param1,io")
-  public @NotNull ConfigValue<?> unpackMapValue(@NotNull PackInputStream packStream) throws IOException
+  public @NotNull TypedValue<?> unpackTypedValue(@NotNull PackInputStream packStream) throws IOException
   {
     final var configValue = switch(packStream.readSmall(2)) {
-      case MAP_VALUE_BOOL_ID -> ConfigValueBool.unpack(packStream);
-      case MAP_VALUE_MESSAGE_ID -> ConfigValueMessage.unpack(this, packStream);
-      case MAP_VALUE_NUMBER_ID -> ConfigValueNumber.unpack(packStream);
-      case MAP_VALUE_STRING_ID -> ConfigValueString.unpack(packStream);
+      case MAP_VALUE_BOOL_ID -> TypedValueBool.unpack(packStream);
+      case MAP_VALUE_MESSAGE_ID -> TypedValueMessage.unpack(this, packStream);
+      case MAP_VALUE_NUMBER_ID -> TypedValueNumber.unpack(packStream);
+      case MAP_VALUE_STRING_ID -> TypedValueString.unpack(packStream);
 
-      default -> throw new IllegalStateException("map value expected");
+      default -> throw new IllegalStateException("typed value expected");
     };
 
     return mapValues.computeIfAbsent(configValue, identity());

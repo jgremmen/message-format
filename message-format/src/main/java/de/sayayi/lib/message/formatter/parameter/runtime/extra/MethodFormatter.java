@@ -17,11 +17,11 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.formatter.parameter.runtime.TypeFormatter;
+import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -29,9 +29,9 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.lang.reflect.Method;
 import java.util.Set;
 
+import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.EQUIVALENT;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.Defined.EQUIVALENT;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.Defined.MISMATCH;
 
 
 /**
@@ -43,7 +43,7 @@ public final class MethodFormatter
 {
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Method method)
+  public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Method method)
   {
     return switch(context.getConfigValueString("method").orElse("default")) {
       case "name" -> noSpaceText(method.getName());
@@ -69,7 +69,7 @@ public final class MethodFormatter
 
 
   @Override
-  public @NotNull ConfigKey.MatchResult compareToStringKey(@NotNull Method value, @NotNull ComparatorContext context)
+  public @NotNull MapKey.MatchResult compareToStringKey(@NotNull Method value, @NotNull ComparatorContext context)
   {
     return context.getCompareType().match(value.getName().compareTo(context.getStringKeyValue()))
         ? EQUIVALENT : MISMATCH;

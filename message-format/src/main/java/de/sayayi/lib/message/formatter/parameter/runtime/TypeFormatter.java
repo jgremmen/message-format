@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +37,7 @@ import static java.util.stream.Collectors.joining;
 public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Type>
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Type type) {
+  public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Type type) {
     return noSpaceText(toString(type, context.getConfigValueString("type").orElse("ju")));
   }
 

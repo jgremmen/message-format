@@ -16,17 +16,17 @@
 package de.sayayi.lib.message.formatter.parameter.named;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import static de.sayayi.lib.message.part.config.ConfigKey.Type.*;
+import static de.sayayi.lib.message.part.MapKey.Type.*;
 
 
 /**
@@ -35,7 +35,7 @@ import static de.sayayi.lib.message.part.config.ConfigKey.Type.*;
  */
 public final class ChoiceFormatter implements NamedParameterFormatter
 {
-  private static final Set<ConfigKey.Type> KEY_TYPES = EnumSet.of(NULL, EMPTY, BOOL, NUMBER, STRING);
+  private static final Set<MapKey.Type> KEY_TYPES = EnumSet.of(NULL, EMPTY, BOOL, NUMBER, STRING);
 
 
   @Override
@@ -47,10 +47,10 @@ public final class ChoiceFormatter implements NamedParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text format(@NotNull FormatterContext context, Object value)
+  public @NotNull Text format(@NotNull ParameterFormatterContext context, Object value)
   {
     return context.format(context
-        .getConfigMapMessage(value, KEY_TYPES, true)
+        .getMapMessage(value, KEY_TYPES, true)
         .orElse(Message.WithSpaces.EMPTY));
   }
 }

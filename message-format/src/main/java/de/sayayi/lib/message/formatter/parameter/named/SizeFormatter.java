@@ -15,13 +15,13 @@
  */
 package de.sayayi.lib.message.formatter.parameter.named;
 
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import static de.sayayi.lib.message.part.config.ConfigKey.NUMBER_TYPE;
+import static de.sayayi.lib.message.part.MapKey.NUMBER_TYPE;
 
 
 /**
@@ -39,7 +39,7 @@ public final class SizeFormatter implements NamedParameterFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text format(@NotNull FormatterContext context, Object value)
+  public @NotNull Text format(@NotNull ParameterFormatterContext context, Object value)
   {
     if (value == null)
       return formatNull(context);
@@ -50,7 +50,7 @@ public final class SizeFormatter implements NamedParameterFormatter
       var size = optionalSize.getAsLong();
 
       return context
-          .getConfigMapMessage(size, NUMBER_TYPE, true)
+          .getMapMessage(size, NUMBER_TYPE, true)
           .map(context::format)
           .orElseGet(() -> context.format(size, long.class, null, null));
     }

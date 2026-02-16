@@ -71,7 +71,7 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull T value)
+  protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull T value)
   {
     final var function = multiSelectFunctionMap
         .get(context.getConfigValueString(configKey).orElse(defaultConfigValueForAbsentKey));
@@ -87,7 +87,7 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
 
   @Contract(pure = true)
   @SuppressWarnings("unused")
-  protected Text formatMultiSelectMismatch(@NotNull FormatterContext context, @NotNull T value) {
+  protected Text formatMultiSelectMismatch(@NotNull ParameterFormatterContext context, @NotNull T value) {
     return nullText();
   }
 
@@ -102,6 +102,6 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
 
   protected interface MultiSelectFunction<T>
   {
-    @NotNull Text apply(@NotNull FormatterContext context, @NotNull T value);
+    @NotNull Text apply(@NotNull ParameterFormatterContext context, @NotNull T value);
   }
 }

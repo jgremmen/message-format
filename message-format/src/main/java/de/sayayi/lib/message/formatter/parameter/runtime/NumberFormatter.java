@@ -18,10 +18,10 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey.MatchResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -40,9 +40,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAccumulator;
 import java.util.concurrent.atomic.LongAdder;
 
+import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.*;
+import static de.sayayi.lib.message.part.MapKey.NUMBER_TYPE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.Defined.*;
-import static de.sayayi.lib.message.part.config.ConfigKey.NUMBER_TYPE;
 import static java.lang.Math.signum;
 
 
@@ -58,11 +58,11 @@ public final class NumberFormatter
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Number number)
+  public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Number number)
   {
     // check configuration map for match
     final var msg = context
-        .getConfigMapMessage(number, NUMBER_TYPE)
+        .getMapMessage(number, NUMBER_TYPE)
         .orElse(null);
     if (msg != null)
       return context.format(msg);

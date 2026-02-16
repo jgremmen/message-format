@@ -16,11 +16,11 @@
 package de.sayayi.lib.message.formatter.parameter.named;
 
 import de.sayayi.lib.message.formatter.FormattableType;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,10 +31,11 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.Set;
 
+import static de.sayayi.lib.message.part.MapKey.MatchResult;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.EXACT;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
+import static de.sayayi.lib.message.part.MapKey.Type.*;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.Defined.EXACT;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.Defined.MISMATCH;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Math.signum;
@@ -46,12 +47,7 @@ import static java.lang.Math.signum;
  */
 public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyComparator<Object>
 {
-  private static final Set<ConfigKey.Type> BOOL_KEY_TYPES = Set.of(
-      ConfigKey.Type.EMPTY,
-      ConfigKey.Type.NULL,
-      ConfigKey.Type.BOOL,
-      ConfigKey.Type.STRING
-  );
+  private static final Set<MapKey.Type> BOOL_KEY_TYPES = Set.of(EMPTY, NULL, BOOL, STRING);
 
   private static final Text[] BOOL_TEXT = new Text[] {
       noSpaceText("false"),
@@ -87,7 +83,7 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
 
   @Override
   @Contract(pure = true)
-  public @NotNull Text format(@NotNull FormatterContext context, Object value)
+  public @NotNull Text format(@NotNull ParameterFormatterContext context, Object value)
   {
     // null value -> map or return null string
     if (value == null)
@@ -102,10 +98,10 @@ public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyCo
 
 
   @Contract(pure = true)
-  private @NotNull Text formatBool(@NotNull FormatterContext context, boolean bool)
+  private @NotNull Text formatBool(@NotNull ParameterFormatterContext context, boolean bool)
   {
     return context
-        .getConfigMapMessage(bool, BOOL_KEY_TYPES)
+        .getMapMessage(bool, BOOL_KEY_TYPES)
         .map(context::format)
         .orElseGet(() -> BOOL_TEXT[bool ? 1 : 0]);
   }

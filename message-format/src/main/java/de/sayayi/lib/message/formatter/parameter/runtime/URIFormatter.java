@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -35,7 +35,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 public final class URIFormatter extends AbstractSingleTypeParameterFormatter<URI>
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull URI uri)
+  public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull URI uri)
   {
     return switch(context.getConfigValueString("uri").orElse("default")) {
       case "default" -> noSpaceText(uri.toString());

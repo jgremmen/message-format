@@ -16,10 +16,10 @@
 package de.sayayi.lib.message.part.config.value;
 
 import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueBool;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueMessage;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueNumber;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueBool;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,13 +32,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author Jeroen Gremmen
  */
-class ConfigValueTest
+class TypedValueTest
 {
   @ParameterizedTest
   @ValueSource(booleans = { false, true })
   void testBool(boolean value)
   {
-    val bool = value ? ConfigValueBool.TRUE : ConfigValueBool.FALSE;
+    val bool = value ? TypedValueBool.TRUE : TypedValueBool.FALSE;
 
     assertEquals(value, bool.booleanValue());
     assertEquals(value, bool.asObject());
@@ -48,14 +48,14 @@ class ConfigValueTest
   @Test
   void testNumber()
   {
-    val number = new ConfigValueNumber(1234);
+    val number = new TypedValueNumber(1234);
 
     assertEquals(1234, number.longValue());
     assertEquals(1234, number.intValue());
     assertEquals(Long.valueOf(1234), number.asObject());
 
-    assertEquals(Integer.MAX_VALUE, new ConfigValueNumber(Long.MAX_VALUE).intValue());
-    assertEquals(Integer.MIN_VALUE, new ConfigValueNumber(Long.MIN_VALUE).intValue());
+    assertEquals(Integer.MAX_VALUE, new TypedValueNumber(Long.MAX_VALUE).intValue());
+    assertEquals(Integer.MIN_VALUE, new TypedValueNumber(Long.MIN_VALUE).intValue());
   }
 
 
@@ -63,9 +63,9 @@ class ConfigValueTest
   void testString()
   {
     //noinspection DataFlowIssue
-    assertThrows(Exception.class, () -> new ConfigValueString(null));
+    assertThrows(Exception.class, () -> new TypedValueString(null));
 
-    val string = new ConfigValueString("Hello %{s}");
+    val string = new TypedValueString("Hello %{s}");
 
     assertEquals("Hello %{s}", string.stringValue());
     assertEquals("Hello %{s}", string.asObject());
@@ -81,16 +81,16 @@ class ConfigValueTest
   void testMessage()
   {
     //noinspection DataFlowIssue
-    assertThrows(Exception.class, () -> new ConfigValueMessage(null));
+    assertThrows(Exception.class, () -> new TypedValueMessage(null));
 
     val messageFactory = MessageFactory.NO_CACHE_INSTANCE;
     val msg = messageFactory.parseMessage("%{a,format:bool} %{s}.");
 
-    val message = new ConfigValueMessage(msg);
+    val message = new TypedValueMessage(msg);
 
     assertEquals(messageFactory.parseMessage("%{a, format:bool } %{ s }."), message.asObject());
     assertEquals(
         message.asObject(),
-        new ConfigValueString("%{a, format:bool } %{ s }.").asMessage(messageFactory));
+        new TypedValueString("%{a, format:bool } %{ s }.").asMessage(messageFactory));
   }
 }

@@ -13,30 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.part.config;
+package de.sayayi.lib.message.part;
 
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ComparatorContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
-import de.sayayi.lib.message.internal.part.config.key.*;
+import de.sayayi.lib.message.internal.part.map.key.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-import static de.sayayi.lib.message.part.config.ConfigKey.CompareType.EQ;
-import static de.sayayi.lib.message.part.config.ConfigKey.CompareType.NE;
+import static de.sayayi.lib.message.part.MapKey.CompareType.EQ;
+import static de.sayayi.lib.message.part.MapKey.CompareType.NE;
 
 
 /**
- * Interface representing a typed key in a data map.
+ * Interface representing a typed key in a map.
  *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  *
- * @see PartConfig
+ * @see MessagePart.Map
  */
-public sealed interface ConfigKey
-    permits ConfigKeyNull, ConfigKeyEmpty, ConfigKeyName, ConfigKeyBool, ConfigKeyString, ConfigKeyNumber
+public sealed interface MapKey
+    permits MapKeyNull, MapKeyEmpty, MapKeyBool, MapKeyString, MapKeyNumber
 {
   /** Map key type {@code empty}. */
   Set<Type> EMPTY_TYPE = Set.of(Type.EMPTY);
@@ -123,15 +123,6 @@ public sealed interface ConfigKey
       public @NotNull <T> MatchResult compareValueToKey(@NotNull ConfigKeyComparator<T> comparator, T value,
                                                         @NotNull ComparatorContext context) {
         return comparator.compareToEmptyKey(value, context);
-      }
-    },
-
-    /** Name key type */
-    NAME {
-      @Override
-      public @NotNull <T> MatchResult compareValueToKey(@NotNull ConfigKeyComparator<T> comparator, @NotNull T value,
-                                                        @NotNull ComparatorContext context) {
-        throw new UnsupportedOperationException("compareValueToKey");
       }
     };
 

@@ -24,12 +24,12 @@ import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.post.PostFormatter;
 import de.sayayi.lib.message.internal.pack.PackSupport;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueBool;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueMessage;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueNumber;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
-import de.sayayi.lib.message.part.config.ConfigValue;
-import de.sayayi.lib.message.part.config.PartConfig;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueBool;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
+import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
@@ -69,7 +69,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 {
   private final @NotNull FormatterService formatterService;
   private final @NotNull MessageFactory messageFactory;
-  private final @NotNull Map<String, ConfigValue<?>> defaultParameterConfig = new TreeMap<>();
+  private final @NotNull Map<String,TypedValue<?>> defaultConfig = new TreeMap<>();
   private final @NotNull Map<String,Message.WithCode> messages = new TreeMap<>();
   private final @NotNull Map<String,Message> templates = new TreeMap<>();
   private final @NotNull MessageAccessor messageAccessor;
@@ -106,46 +106,46 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, boolean value)
+  public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, boolean value)
   {
     if (requireNonNull(name, "name must not be null").isEmpty())
       throw new IllegalArgumentException("name must not be empty");
 
-    defaultParameterConfig.put(name, value ? ConfigValueBool.TRUE : ConfigValueBool.FALSE);
+    defaultConfig.put(name, value ? TypedValueBool.TRUE : TypedValueBool.FALSE);
     return this;
   }
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, long value)
+  public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, long value)
   {
     if (requireNonNull(name, "name must not be null").isEmpty())
       throw new IllegalArgumentException("name must not be empty");
 
-    defaultParameterConfig.put(name, new ConfigValueNumber(value));
+    defaultConfig.put(name, new TypedValueNumber(value));
     return this;
   }
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, @NotNull String value)
+  public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, @NotNull String value)
   {
     if (requireNonNull(name, "name must not be null").isEmpty())
       throw new IllegalArgumentException("name must not be empty");
 
-    defaultParameterConfig.put(name, new ConfigValueString(value));
+    defaultConfig.put(name, new TypedValueString(value));
     return this;
   }
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
-                                                                       @NotNull Message.WithSpaces value)
+  public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name,
+                                                              @NotNull Message.WithSpaces value)
   {
     if (requireNonNull(name, "name must not be null").isEmpty())
       throw new IllegalArgumentException("name must not be empty");
 
-    defaultParameterConfig.put(name, new ConfigValueMessage(value));
+    defaultConfig.put(name, new TypedValueMessage(value));
     return this;
   }
 
@@ -553,14 +553,15 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
     @Override
-    public ConfigValue<?> getDefaultParameterConfig(@NotNull String name) {
-      return defaultParameterConfig.get(name);
+    public TypedValue<?> getDefaultConfig(@NotNull String name) {
+      return defaultConfig.get(name);
     }
 
 
     @Override
-    public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, PartConfig partConfig) {
-      return formatterService.getFormatters(format, type, partConfig);
+    public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type,
+                                                       MessagePart.Config config) {
+      return formatterService.getFormatters(format, type, config);
     }
 
 

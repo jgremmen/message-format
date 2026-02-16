@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal.part.config.key;
+package de.sayayi.lib.message.internal.part.map.key;
 
-import de.sayayi.lib.message.part.config.ConfigKey;
+import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -28,40 +27,35 @@ import java.io.IOException;
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
-public enum ConfigKeyBool implements ConfigKey
+public enum MapKeyNull implements MapKey
 {
-  /** Boolean config key representing {@code false}. */
-  FALSE,
+  /** Null config key with compare type {@link MapKey.CompareType#EQ EQ}. */
+  EQ,
 
-  /** Boolean config key representing {@code true}. */
-  TRUE;
+  /** Null config key with compare type {@link MapKey.CompareType#NE NE}. */
+  NE;
 
 
-  /**
-   * Returns the config key boolean value.
-   *
-   * @return  config key boolean value
-   */
-  @Contract(pure = true)
-  public boolean isBool() {
-    return this == TRUE;
+  @Override
+  public @NotNull CompareType getCompareType() {
+    return this == EQ ? CompareType.EQ : CompareType.NE;
   }
 
 
   /**
    * {@inheritDoc}
    *
-   * @return  always {@link Type#BOOL Type#BOOL}
+   * @return  always {@link Type#NULL Type#NULL}
    */
   @Override
   public @NotNull Type getType() {
-    return Type.BOOL;
+    return Type.NULL;
   }
 
 
   @Override
   public String toString() {
-    return Boolean.toString(isBool());
+    return getCompareType().asPrefix() + "null";
   }
 
 
@@ -75,14 +69,14 @@ public enum ConfigKeyBool implements ConfigKey
    * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
-    packStream.writeBoolean(isBool());
+    packStream.writeBoolean(this == EQ);
   }
 
 
   /**
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked boolean map key, never {@code null}
+   * @return  unpacked null map key, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -90,7 +84,7 @@ public enum ConfigKeyBool implements ConfigKey
    *
    * @hidden
    */
-  public static @NotNull ConfigKeyBool unpack(@NotNull PackInputStream packStream) throws IOException {
-    return packStream.readBoolean() ? TRUE : FALSE;
+  public static @NotNull MapKeyNull unpack(@NotNull PackInputStream packStream) throws IOException {
+    return packStream.readBoolean() ? EQ : NE;
   }
 }

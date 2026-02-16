@@ -18,10 +18,10 @@ package de.sayayi.lib.message.formatter.parameter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
+import de.sayayi.lib.message.part.ConfigAccessor;
+import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextPartFactory;
-import de.sayayi.lib.message.part.config.ConfigKey;
-import de.sayayi.lib.message.part.config.PartConfigAccessor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -31,14 +31,14 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 
+import static de.sayayi.lib.message.part.MapKey.*;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.forEmptyKey;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.forNullKey;
+import static de.sayayi.lib.message.part.MapKey.Type.NUMBER;
+import static de.sayayi.lib.message.part.MapKey.Type.STRING;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
-import static de.sayayi.lib.message.part.config.ConfigKey.*;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.Defined.MISMATCH;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.forEmptyKey;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.forNullKey;
-import static de.sayayi.lib.message.part.config.ConfigKey.Type.NUMBER;
-import static de.sayayi.lib.message.part.config.ConfigKey.Type.STRING;
 import static java.util.Optional.empty;
 
 
@@ -72,7 +72,7 @@ public interface ParameterFormatter
    * @return  formatted parameter value, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull Text format(@NotNull FormatterContext context, Object value);
+  @NotNull Text format(@NotNull ParameterFormatterContext context, Object value);
 
 
   /**
@@ -86,10 +86,10 @@ public interface ParameterFormatter
    * @since 0.8.4
    */
   @Contract(pure = true)
-  default @NotNull Text formatNull(@NotNull FormatterContext context)
+  default @NotNull Text formatNull(@NotNull ParameterFormatterContext context)
   {
     return context
-        .getConfigMapMessage(null, EMPTY_NULL_TYPE)
+        .getMapMessage(null, EMPTY_NULL_TYPE)
         .map(context::format)
         .orElse(nullText());
   }
@@ -106,10 +106,10 @@ public interface ParameterFormatter
    * @since 0.8.4
    */
   @Contract(pure = true)
-  default @NotNull Text formatEmpty(@NotNull FormatterContext context)
+  default @NotNull Text formatEmpty(@NotNull ParameterFormatterContext context)
   {
     return context
-        .getConfigMapMessage("", EMPTY_TYPE)
+        .getMapMessage("", EMPTY_TYPE)
         .map(context::format)
         .orElse(emptyText());
   }
@@ -136,13 +136,13 @@ public interface ParameterFormatter
    * @since 0.8.4 (moved up from AbstractParameterFormatter)
    */
   @Contract(pure = true)
-  default @NotNull Optional<Text> formatUsingMappedNumber(@NotNull FormatterContext context,
+  default @NotNull Optional<Text> formatUsingMappedNumber(@NotNull ParameterFormatterContext context,
                                                           long n, boolean includeDefault)
   {
-    if (context.hasConfigMapMessage(NUMBER))
+    if (context.hasMapMessage(NUMBER))
     {
       return Optional.of(context
-          .getConfigMapMessage(n, NUMBER_TYPE, includeDefault)
+          .getMapMessage(n, NUMBER_TYPE, includeDefault)
           .map(context::format)
           .orElseGet(TextPartFactory::emptyText));
     }
@@ -172,13 +172,13 @@ public interface ParameterFormatter
    * @since 0.8.4 (moved up from AbstractParameterFormatter)
    */
   @Contract(pure = true)
-  default @NotNull Optional<Text> formatUsingMappedString(@NotNull FormatterContext context,
+  default @NotNull Optional<Text> formatUsingMappedString(@NotNull ParameterFormatterContext context,
                                                           @NotNull String s, boolean includeDefault)
   {
-    if (context.hasConfigMapMessage(STRING))
+    if (context.hasMapMessage(STRING))
     {
       return Optional.of(context
-          .getConfigMapMessage(s, STRING_TYPE, includeDefault)
+          .getMapMessage(s, STRING_TYPE, includeDefault)
           .map(context::format)
           .orElseGet(TextPartFactory::emptyText));
     }
@@ -238,7 +238,7 @@ public interface ParameterFormatter
      *          capable of determining the size, never {@code null}
      */
     @Contract(pure = true)
-    @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value);
+    @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object value);
   }
 
 
@@ -329,7 +329,7 @@ public interface ParameterFormatter
   /**
    * @since 0.8.4
    */
-  interface ComparatorContext extends PartConfigAccessor
+  interface ComparatorContext extends ConfigAccessor
   {
     /**
      * Returns the comparison type for the current configuration key.
@@ -346,7 +346,7 @@ public interface ParameterFormatter
      * @return  configuration key type, never {@code null}, {@code NAME} or {@code NULL}
      */
     @Contract(pure = true)
-    @NotNull ConfigKey.Type getKeyType();
+    @NotNull MapKey.Type getKeyType();
 
 
     /**

@@ -17,11 +17,11 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey.MatchResult;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -32,9 +32,9 @@ import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_PRIMITIVE_OR_ARRAY_ORDER;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.forEmptyKey;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.forEmptyKey;
 import static java.nio.charset.Charset.isSupported;
 import static java.util.Base64.getMimeEncoder;
 
@@ -51,7 +51,7 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
 
   @Override
   @SneakyThrows(UnsupportedEncodingException.class)
-  public @NotNull Text formatValue(@NotNull FormatterContext context, byte @NotNull [] byteArray)
+  public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, byte @NotNull [] byteArray)
   {
     var bytesConfig = context.getConfigValueString("bytes");
     if (bytesConfig.isEmpty())
@@ -79,7 +79,7 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
 
 
   @Override
-  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value) {
+  public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object value) {
     return OptionalLong.of(((byte[])value).length);
   }
 

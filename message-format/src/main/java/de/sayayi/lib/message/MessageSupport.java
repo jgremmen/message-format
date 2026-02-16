@@ -19,8 +19,8 @@ import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.post.PostFormatter;
-import de.sayayi.lib.message.part.config.ConfigValue;
-import de.sayayi.lib.message.part.config.PartConfig;
+import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.TypedValue;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -601,7 +601,7 @@ public interface MessageSupport
      * @return  configurable message support instance, never {@code null}
      */
     @Contract(value = "_, _ -> this", mutates = "this")
-    @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, boolean value);
+    @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, boolean value);
 
 
     /**
@@ -616,7 +616,7 @@ public interface MessageSupport
      * @return  configurable message support instance, never {@code null}
      */
     @Contract(value = "_, _ -> this", mutates = "this")
-    @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, long value);
+    @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, long value);
 
 
     /**
@@ -631,7 +631,7 @@ public interface MessageSupport
      * @return  configurable message support instance, never {@code null}
      */
     @Contract(value = "_, _ -> this", mutates = "this")
-    @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name, @NotNull String value);
+    @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, @NotNull String value);
 
 
     /**
@@ -646,8 +646,7 @@ public interface MessageSupport
      * @return  configurable message support instance, never {@code null}
      */
     @Contract(value = "_, _ -> this", mutates = "this")
-    @NotNull ConfigurableMessageSupport setDefaultParameterConfig(@NotNull String name,
-                                                                  @NotNull Message.WithSpaces value);
+    @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, @NotNull Message.WithSpaces value);
 
 
     /**
@@ -812,18 +811,18 @@ public interface MessageSupport
     /**
      * Returns a prioritized list of matching formatter for the given {@code type}.
      * <p>
-     * If {@code parameterConfig} is provided and contains a configuration name for a named formatter, the
+     * If {@code config} is provided and contains a configuration name for a named formatter, the
      * named formatter takes precedence over the type based formatter.
      *
-     * @param type        type, never {@code null}
-     * @param partConfig  message part configuration
+     * @param type    type, never {@code null}
+     * @param config  message part configuration
      *
      * @return  prioritized list of formatters for the given {@code type} and {@code parameterConfig},
      *          never {@code null} and never empty
      */
     @Contract(value = "_, _ -> new", pure = true)
-    default @NotNull ParameterFormatter[] getFormatters(@NotNull Class<?> type, PartConfig partConfig) {
-      return getFormatters(null, type, partConfig);
+    default @NotNull ParameterFormatter[] getFormatters(@NotNull Class<?> type, MessagePart.Config config) {
+      return getFormatters(null, type, config);
     }
 
 
@@ -832,18 +831,18 @@ public interface MessageSupport
      * <p>
      * If {@code format} matches a named formatter it always takes precedence over {@code type}.
      * <p>
-     * If {@code parameterConfig} is provided and contains a configuration name for a named formatter, the
+     * If {@code config} is provided and contains a configuration name for a named formatter, the
      * named formatter takes precedence over the type based formatter.
      *
-     * @param format      formatter name
-     * @param type        type, never {@code null}
-     * @param partConfig  message part configuration
+     * @param format  formatter name
+     * @param type    type, never {@code null}
+     * @param config  message part configuration
      *
      * @return  prioritized list of formatters for the given {@code format}, {@code type} and {@code parameterConfig},
      *          never {@code null} and never empty
      */
     @Contract(value = "_, _, _ -> new", pure = true)
-    @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, PartConfig partConfig);
+    @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, MessagePart.Config config);
 
 
     /**
@@ -867,13 +866,13 @@ public interface MessageSupport
      * @return  default configuration value, or {@code null} if no default configuration has been
      *          set for parameter {@code name}
      *
-     * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, boolean)
-     * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, long)
-     * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, String)
-     * @see ConfigurableMessageSupport#setDefaultParameterConfig(String, Message.WithSpaces)
+     * @see ConfigurableMessageSupport#setDefaultConfig(String, boolean)
+     * @see ConfigurableMessageSupport#setDefaultConfig(String, long)
+     * @see ConfigurableMessageSupport#setDefaultConfig(String, String)
+     * @see ConfigurableMessageSupport#setDefaultConfig(String, Message.WithSpaces)
      */
     @Contract(pure = true)
-    ConfigValue<?> getDefaultParameterConfig(@NotNull String name);
+    TypedValue<?> getDefaultConfig(@NotNull String name);
 
 
     /**
@@ -930,8 +929,8 @@ public interface MessageSupport
      * Returns a collection of template names, that are referenced from messages but have not
      * been published to this message support.
      * <p>
-     * The messages that are analysed can be filtered by providing a {@code messageCodeFilter}.
-     * If this parameter is {@code null} all known messages are analysed.
+     * The messages that are analyzed can be filtered by providing a {@code messageCodeFilter}.
+     * If this parameter is {@code null} all known messages are analyzed.
      *
      * @param messageCodeFilter  message code filter or {@code null} to include all messages
      *

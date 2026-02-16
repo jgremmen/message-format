@@ -16,10 +16,8 @@
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.internal.part.config.key.ConfigKeyName;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import de.sayayi.lib.message.part.config.ConfigKey;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,9 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DisplayName("File/Path formatter")
 class PathFormatterTest extends AbstractFormatterTest
 {
-  private static final ConfigKey PATH_KEY = new ConfigKeyName("path");
-
-
   @Test
   @EnabledOnOs({ OS.MAC, OS.LINUX })
   @DisplayName("Format File")
@@ -60,11 +55,11 @@ class PathFormatterTest extends AbstractFormatterTest
     assertEquals(nullText(), format(messageAccessor, null));
     assertEquals(noSpaceText("/path1/path2/filename.ext"), format(messageAccessor, f));
     assertEquals(noSpaceText("filename.ext"), format(messageAccessor, f,
-        Map.of(PATH_KEY, new ConfigValueString("name"))));
+        Map.of("path", new TypedValueString("name")), Map.of()));
     assertEquals(noSpaceText("/path1/path2"), format(messageAccessor, f,
-        Map.of(PATH_KEY, new ConfigValueString("parent"))));
+        Map.of("path", new TypedValueString("parent")), Map.of()));
     assertEquals(noSpaceText("ext"), format(messageAccessor, f,
-        Map.of(PATH_KEY, new ConfigValueString("extension"))));
+        Map.of("path", new TypedValueString("extension")), Map.of()));
   }
 
 

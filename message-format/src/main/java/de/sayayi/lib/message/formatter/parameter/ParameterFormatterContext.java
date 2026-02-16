@@ -18,28 +18,26 @@ package de.sayayi.lib.message.formatter.parameter;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.part.ConfigAccessor;
+import de.sayayi.lib.message.part.MapAccessor;
+import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey;
-import de.sayayi.lib.message.part.config.PartConfig;
-import de.sayayi.lib.message.part.config.PartConfigAccessor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
 import java.util.OptionalLong;
-import java.util.Set;
 
 
 /**
  * The formatter context provides a parameter formatter with all context information it requires
  * to format a parameter part.
  *
- * @see ParameterFormatter#format(FormatterContext, Object)
+ * @see ParameterFormatter#format(ParameterFormatterContext, Object)
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public interface FormatterContext extends Parameters, PartConfigAccessor
+public interface ParameterFormatterContext extends Parameters, ConfigAccessor, MapAccessor
 {
   /**
    * Returns the message accessor used to create this formatter context.
@@ -50,61 +48,6 @@ public interface FormatterContext extends Parameters, PartConfigAccessor
    */
   @Contract(pure = true)
   @NotNull MessageAccessor getMessageAccessor();
-
-
-  /**
-   * Tells whether the parameter configuration map contains an entry with the given {@code keyType}
-   * that maps to a message.
-   *
-   * @param keyType  entry key type to look for, not {@code null}
-   *
-   * @return  {@code true} if the map contains an entry with the given key type,
-   *          {@code false} otherwise
-   *
-   * @see PartConfig#hasMessageWithKeyType(ConfigKey.Type)
-   *      ParamConfig#hasEntryWithKeyType(ConfigKey.Type)
-   */
-  @Contract(pure = true)
-  boolean hasConfigMapMessage(@NotNull ConfigKey.Type keyType);
-
-
-  /**
-   * Gets a message for {@code key} from the parameter configuration map. The map will be
-   * probed for keys with the given {@code keyTypes} only.
-   *
-   * @param key       the key to get the message for
-   * @param keyTypes  key types to be considered when matching the {@code key}, not {@code null}
-   *
-   * @return  optional instance containing the mapped message, never {@code null}. If no matching
-   *          message is found, {@link Optional#empty()} is returned
-   */
-  @Contract(pure = true)
-  default @NotNull Optional<Message.WithSpaces> getConfigMapMessage(
-      Object key, @NotNull Set<ConfigKey.Type> keyTypes) {
-    return getConfigMapMessage(key, keyTypes, false);
-  }
-
-
-  /**
-   * Gets a message for {@code key} from the parameter configuration map. The map will be
-   * probed for keys with the given {@code keyTypes} only. If no entry for {@code key} is
-   * found the default message, if present, will be returned.
-   * <p>
-   * The default message is considered only if the parameter configuration map contains at
-   * least 1 key with a type contained in {@code keyTypes}.
-   *
-   * @param key             the key to get the message for
-   * @param keyTypes        key types to be considered when matching the {@code key},
-   *                        not {@code null}
-   * @param includeDefault  {@code true} will return the default message (if any) in case no
-   *                        matching key is found, {@code false} will not return the default message
-   *
-   * @return  optional instance containing the mapped message, never {@code null}. If no matching
-   *          message is found, {@link Optional#empty()} is returned
-   */
-  @Contract(pure = true)
-  @NotNull Optional<Message.WithSpaces> getConfigMapMessage(
-      Object key, @NotNull Set<ConfigKey.Type> keyTypes, boolean includeDefault);
 
 
   /**
@@ -163,7 +106,7 @@ public interface FormatterContext extends Parameters, PartConfigAccessor
    * @return  formatted text, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull Text format(Object value, Class<?> type, String format, PartConfig config);
+  @NotNull Text format(Object value, Class<?> type, String format, MessagePart.Config config);
 
 
   /**

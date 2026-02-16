@@ -17,10 +17,10 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigValue.NumberValue;
-import de.sayayi.lib.message.part.config.ConfigValue.StringValue;
+import de.sayayi.lib.message.part.TypedValue.NumberValue;
+import de.sayayi.lib.message.part.TypedValue.StringValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -38,7 +38,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 public final class MatcherFormatter extends AbstractSingleTypeParameterFormatter<Matcher>
 {
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Matcher matcher)
+  protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Matcher matcher)
   {
     if (matcher.matches())
     {

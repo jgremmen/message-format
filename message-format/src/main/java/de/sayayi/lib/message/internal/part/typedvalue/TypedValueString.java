@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal.part.config.value;
+package de.sayayi.lib.message.internal.part.typedvalue;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.part.config.ConfigValue.StringValue;
+import de.sayayi.lib.message.part.TypedValue.StringValue;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -34,7 +34,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
-public final class ConfigValueString implements StringValue
+public final class TypedValueString implements StringValue
 {
   /** Configuration value string. */
   private final @NotNull String string;
@@ -42,7 +42,7 @@ public final class ConfigValueString implements StringValue
   private transient volatile Message.WithSpaces message;
 
 
-  public ConfigValueString(@NotNull String string) {
+  public TypedValueString(@NotNull String string) {
     this.string = requireNonNull(string, "string must not be null");
   }
 
@@ -94,7 +94,7 @@ public final class ConfigValueString implements StringValue
 
   @Override
   public boolean equals(Object o) {
-    return o instanceof ConfigValueString && string.equals(((ConfigValueString)o).string);
+    return o instanceof TypedValueString && string.equals(((TypedValueString)o).string);
   }
 
 
@@ -132,7 +132,7 @@ public final class ConfigValueString implements StringValue
    *
    * @since 0.8.0
    */
-  public static @NotNull ConfigValueString unpack(@NotNull PackInputStream packStream) throws IOException {
-    return new ConfigValueString(requireNonNull(packStream.readString()));
+  public static @NotNull TypedValueString unpack(@NotNull PackInputStream packStream) throws IOException {
+    return new TypedValueString(requireNonNull(packStream.readString()));
   }
 }

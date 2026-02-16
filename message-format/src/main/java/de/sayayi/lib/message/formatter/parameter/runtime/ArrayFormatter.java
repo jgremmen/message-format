@@ -18,11 +18,11 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormattableType;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.formatter.parameter.SingletonParameters;
+import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey.MatchResult;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -37,8 +37,8 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
+import static de.sayayi.lib.message.part.MapKey.MatchResult.forEmptyKey;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.forEmptyKey;
 
 
 /**
@@ -64,13 +64,13 @@ import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.forEmptyKe
 public final class ArrayFormatter extends AbstractListFormatter<Object> implements SizeQueryable
 {
   @Override
-  protected @NotNull Iterator<Text> createIterator(@NotNull FormatterContext context, @NotNull Object value) {
+  protected @NotNull Iterator<Text> createIterator(@NotNull ParameterFormatterContext context, @NotNull Object value) {
     return new TextIterator(context, value);
   }
 
 
   @Override
-  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object array) {
+  public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object array) {
     return OptionalLong.of(getLength(array));
   }
 
@@ -140,7 +140,7 @@ public final class ArrayFormatter extends AbstractListFormatter<Object> implemen
     private int idx = 0;
 
 
-    private TextIterator(@NotNull FormatterContext context, @NotNull Object array)
+    private TextIterator(@NotNull ParameterFormatterContext context, @NotNull Object array)
     {
       this.array = array;
 

@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.internal.part.text;
 
-import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -34,7 +34,7 @@ import static java.util.Objects.requireNonNull;
  * @since 0.5.0
  */
 @SuppressWarnings("ClassCanBeRecord")
-public final class NoSpaceTextPart implements Text
+public final class NoSpaceTextPart implements MessagePart.Text
 {
   /** Text without leading/trailing spaces. */
   private final @NotNull String text;

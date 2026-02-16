@@ -19,15 +19,15 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormattableType;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.internal.CompoundMessage;
-import de.sayayi.lib.message.internal.part.config.PartConfigImpl;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
+import de.sayayi.lib.message.internal.part.map.MessagePartMap;
 import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
 import de.sayayi.lib.message.internal.part.text.NoSpaceTextPart;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
+import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey.MatchResult;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -37,9 +37,10 @@ import java.util.Map.Entry;
 import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_ORDER;
-import static de.sayayi.lib.message.internal.part.config.key.ConfigKeyNull.EQ;
+import static de.sayayi.lib.message.internal.part.config.MessagePartConfig.EMPTY_CONFIG;
+import static de.sayayi.lib.message.internal.part.map.key.MapKeyNull.EQ;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.forEmptyKey;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.forEmptyKey;
 import static java.util.Collections.emptyIterator;
 
 
@@ -53,25 +54,25 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
 
   static
   {
-    var nullConfig = new PartConfigImpl(Map.of(EQ, new ConfigValueString("(null)")));
+    var map = new MessagePartMap(Map.of(EQ, new TypedValueString("(null)")));
 
     // default map-kv: %{key,null:'(null)'}=%{value,null:'(null)'}
     DEFAULT_KEY_VALUE_MESSAGE = new CompoundMessage(List.of(
-        new ParameterPart("key", nullConfig),
+        new ParameterPart("key", EMPTY_CONFIG, map),
         new NoSpaceTextPart("="),
-        new ParameterPart("value", nullConfig)
+        new ParameterPart("value", EMPTY_CONFIG, map)
     ));
   }
 
 
   @Override
-  protected @NotNull Iterator<Text> createIterator(@NotNull FormatterContext context, @NotNull Map<?,?> map) {
+  protected @NotNull Iterator<Text> createIterator(@NotNull ParameterFormatterContext context, @NotNull Map<?,?> map) {
     return map.isEmpty() ? emptyIterator() : new TextIterator(context, map);
   }
 
 
   @Override
-  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object map) {
+  public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object map) {
     return OptionalLong.of(((Map<?,?>)map).size());
   }
 
@@ -110,7 +111,7 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
 
 
     @SuppressWarnings("unchecked")
-    private TextIterator(@NotNull FormatterContext context, @NotNull Map<?,?> map)
+    private TextIterator(@NotNull ParameterFormatterContext context, @NotNull Map<?,?> map)
     {
       this.map = map;
 
@@ -124,8 +125,7 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
       parameters = new KeyValueParameters(context.getLocale());
 
       thisText = SupplierDelegate.of(() ->
-          noSpaceText(context.getConfigValueString("map-this")
-              .orElse("(this map)")));
+          noSpaceText(context.getConfigValueString("map-this").orElse("(this map)")));
 
       prepareNextText();
     }

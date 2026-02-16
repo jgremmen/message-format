@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +36,7 @@ import static java.util.Objects.requireNonNull;
  * formatter) have either a {@link #DEFAULT_ORDER} or {@link #DEFAULT_PRIMITIVE_OR_ARRAY_ORDER}.
  *
  * @see GenericFormatterService
- * @see FormatterContext#delegateToNextFormatter()
+ * @see ParameterFormatterContext#delegateToNextFormatter()
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

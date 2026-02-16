@@ -18,9 +18,8 @@ package de.sayayi.lib.message.formatter.parameter.named.extra;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.NoParameters;
 import de.sayayi.lib.message.formatter.parameter.named.extra.GeoFormatter.Format;
-import de.sayayi.lib.message.internal.part.config.key.ConfigKeyName;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -114,28 +113,24 @@ class GeoFormatterTest extends AbstractFormatterTest
     // short-longitude
     assertEquals(noSpaceText("4\u00b048'E"),
         format(messageAccessor, dms(4, 48),
-            Map.of(new ConfigKeyName("geo"), new ConfigValueString("short-longitude")),
-            "geo"));
+            Map.of("geo", new TypedValueString("short-longitude")), Map.of(), "geo"));
 
     // longitude
     assertEquals(noSpaceText("19\u00b00'0\"W"),
         format(messageAccessor, -dms(18, 59, 59, 501),
-            Map.of(new ConfigKeyName("geo"), new ConfigValueString("longitude")),
-            "geo"));
+            Map.of("geo", new TypedValueString("longitude")), Map.of(), "geo"));
 
     // medium-longitude
     assertEquals(noSpaceText("18\u00b059'59,9\"E"),
         format(messageAccessor, new NoParameters(GERMANY),
             dms(18, 59, 59, 891),
-            Map.of(new ConfigKeyName("geo"), new ConfigValueString("medium-longitude")),
-            "geo"));
+            Map.of("geo", new TypedValueString("medium-longitude")), Map.of(), "geo"));
 
     // long-longitude
     assertEquals(noSpaceText("18\u00b059'59.891\"W"),
         format(messageAccessor, new NoParameters(UK),
             -dms(18, 59, 59, 891),
-            Map.of(new ConfigKeyName("geo"), new ConfigValueString("long-longitude")),
-            "geo"));
+            Map.of("geo", new TypedValueString("long-longitude")), Map.of(), "geo"));
   }
 
 

@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -35,7 +35,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 public final class URLFormatter extends AbstractSingleTypeParameterFormatter<URL>
 {
   @Override
-  public @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull URL url)
+  public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull URL url)
   {
     return switch(context.getConfigValueString("url").orElse("external")) {
       case "authority" -> noSpaceText(url.getAuthority());

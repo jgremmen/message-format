@@ -17,16 +17,16 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractMultiSelectFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey.MatchResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
+import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.*;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.Defined.*;
 
 
 /**
@@ -43,7 +43,7 @@ public final class EnumFormatter extends AbstractMultiSelectFormatter<Enum<?>> i
   }
 
 
-  private @NotNull Text formatEnumOrdinal(@NotNull FormatterContext context, @NotNull Enum<?> enumValue)
+  private @NotNull Text formatEnumOrdinal(@NotNull ParameterFormatterContext context, @NotNull Enum<?> enumValue)
   {
     final var ordinal = enumValue.ordinal();
 
@@ -52,7 +52,7 @@ public final class EnumFormatter extends AbstractMultiSelectFormatter<Enum<?>> i
   }
 
 
-  private @NotNull Text formatEnumName(@NotNull FormatterContext context, @NotNull Enum<?> enumValue)
+  private @NotNull Text formatEnumName(@NotNull ParameterFormatterContext context, @NotNull Enum<?> enumValue)
   {
     final var name = enumValue.name();
 

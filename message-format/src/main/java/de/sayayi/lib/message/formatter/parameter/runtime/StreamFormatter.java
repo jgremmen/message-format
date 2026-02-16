@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.formatter.parameter.SingletonParameters;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +35,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 public final class StreamFormatter extends AbstractListFormatter<Stream<?>>
 {
   @Override
-  protected @NotNull Iterator<Text> createIterator(@NotNull FormatterContext context, @NotNull Stream<?> stream)
+  protected @NotNull Iterator<Text> createIterator(@NotNull ParameterFormatterContext context, @NotNull Stream<?> stream)
   {
     final var messageAccessor = context.getMessageAccessor();
     final var valueMessage = context

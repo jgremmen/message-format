@@ -16,10 +16,9 @@
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.internal.part.config.key.ConfigKeyName;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import de.sayayi.lib.message.internal.part.text.TextPart;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
@@ -70,23 +69,18 @@ class TemporalFormatterTest extends AbstractFormatterTest
     val date = LocalDate.of(1972, 8, 17);
 
     assertEquals(noSpaceText("17.08.72"),
-        format(messageAccessor, date,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("short"))));
+        format(messageAccessor, date, Map.of("date", new TypedValueString("short")), Map.of()));
     assertEquals(noSpaceText("17.08.1972"),
-        format(messageAccessor, date,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("medium"))));
+        format(messageAccessor, date, Map.of("date", new TypedValueString("medium")), Map.of()));
     assertEquals(noSpaceText("17. August 1972"),
-        format(messageAccessor, date,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("long"))));
+        format(messageAccessor, date, Map.of("date", new TypedValueString("long")), Map.of()));
     assertEquals(noSpaceText("Donnerstag, 17. August 1972"),
-        format(messageAccessor, date,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("full"))));
+        format(messageAccessor, date, Map.of("date", new TypedValueString("full")), Map.of()));
     assertEquals(noSpaceText("17.08.1972"),
-        format(messageAccessor, date,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("date"))));
+        format(messageAccessor, date, Map.of("date", new TypedValueString("date")), Map.of()));
 
     assertEquals(emptyText(), format(messageAccessor, date,
-        Map.of(new ConfigKeyName("date"), new ConfigValueString("time"))));
+        Map.of("date", new TypedValueString("time")), Map.of()));
   }
 
 
@@ -100,18 +94,18 @@ class TemporalFormatterTest extends AbstractFormatterTest
     val time = LocalTime.of(16, 34, 11, 672000000);
 
     assertEquals(new TextPart("16:34"), format(messageAccessor, time,
-        Map.of(new ConfigKeyName("date"), new ConfigValueString("short"))));
+        Map.of("date", new TypedValueString("short")), Map.of()));
     assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
-        Map.of(new ConfigKeyName("date"), new ConfigValueString("medium"))));
+        Map.of("date", new TypedValueString("medium")), Map.of()));
     assertEquals(new TextPart("16:34:11 MEZ"), format(messageAccessor, time,
-        Map.of(new ConfigKeyName("date"), new ConfigValueString("long"))));
+        Map.of("date", new TypedValueString("long")), Map.of()));
     assertEquals(new TextPart("16:34:11 Mitteleuropäische Zeit"), format(messageAccessor, time,
-        Map.of(new ConfigKeyName("date"), new ConfigValueString("full"))));
+        Map.of("date", new TypedValueString("full")), Map.of()));
     assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
-        Map.of(new ConfigKeyName("date"), new ConfigValueString("time"))));
+        Map.of("date", new TypedValueString("time")), Map.of()));
 
     assertEquals(Text.EMPTY, format(messageAccessor, time,
-        Map.of(new ConfigKeyName("date"), new ConfigValueString("date"))));
+        Map.of("date", new TypedValueString("date")), Map.of()));
   }
 
 
@@ -125,24 +119,18 @@ class TemporalFormatterTest extends AbstractFormatterTest
     val datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
 
     assertEquals(new TextPart("17/08/1972, 02:40"),
-        format(messageAccessor, datetime,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("short"))));
+        format(messageAccessor, datetime, Map.of("date", new TypedValueString("short")), Map.of()));
     assertEquals(new TextPart("17 Aug 1972, 02:40:23"),
-        format(messageAccessor, datetime,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("medium"))));
+        format(messageAccessor, datetime, Map.of("date", new TypedValueString("medium")), Map.of()));
     assertEquals(new TextPart("17 August 1972, 02:40:23 CET"),
-        format(messageAccessor, datetime,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("long"))));
+        format(messageAccessor, datetime, Map.of("date", new TypedValueString("long")), Map.of()));
     assertEquals(new TextPart("Thursday, 17 August 1972, 02:40:23 Central European Standard Time"),
-        format(messageAccessor, datetime,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("full"))));
+        format(messageAccessor, datetime, Map.of("date", new TypedValueString("full")), Map.of()));
 
     assertEquals(new TextPart("17 Aug 1972"),
-        format(messageAccessor, datetime,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("date"))));
+        format(messageAccessor, datetime, Map.of("date", new TypedValueString("date")), Map.of()));
     assertEquals(new TextPart("02:40:23"),
-        format(messageAccessor, datetime,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("time"))));
+        format(messageAccessor, datetime, Map.of("date", new TypedValueString("time")), Map.of()));
   }
 
 
@@ -156,14 +144,11 @@ class TemporalFormatterTest extends AbstractFormatterTest
     val datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
 
     assertEquals(new TextPart("17 août"),
-        format(messageAccessor, datetime,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("dd MMMM"))));
+        format(messageAccessor, datetime, Map.of("date", new TypedValueString("dd MMMM")), Map.of()));
     assertEquals(new TextPart("jeu. jeudi"),
-        format(messageAccessor, datetime,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("EEE EEEE"))));
+        format(messageAccessor, datetime, Map.of("date", new TypedValueString("EEE EEEE")), Map.of()));
     assertEquals(new TextPart("02:40:23,833"),
-        format(messageAccessor, datetime,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("HH:mm:ss,SSS"))));
+        format(messageAccessor, datetime, Map.of("date", new TypedValueString("HH:mm:ss,SSS")), Map.of()));
   }
 
 

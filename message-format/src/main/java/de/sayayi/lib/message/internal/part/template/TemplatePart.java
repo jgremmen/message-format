@@ -18,8 +18,8 @@ package de.sayayi.lib.message.internal.part.template;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.internal.pack.PackSupport;
-import de.sayayi.lib.message.part.MessagePart.Template;
-import de.sayayi.lib.message.part.config.ConfigValue;
+import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.message.util.SortedArrayMap;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
@@ -27,8 +27,11 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
@@ -45,7 +48,7 @@ import static java.util.stream.Collectors.joining;
  *
  * @since 0.8.0
  */
-public final class TemplatePart implements Template
+public final class TemplatePart implements MessagePart.Template
 {
   /** template name. */
   private final @NotNull String name;
@@ -62,7 +65,7 @@ public final class TemplatePart implements Template
    * <p>
    * The map is optimized to require the least amount of space.
    */
-  private final SortedArrayMap<String,ConfigValue<?>> defaultParameterMap;
+  private final SortedArrayMap<String, TypedValue<?>> defaultParameterMap;
 
   /**
    * Parameter delegate map. If a parameter is referenced in the template message the parameter
@@ -85,8 +88,8 @@ public final class TemplatePart implements Template
    * @param parameterDelegates  parameter delegate map, not {@code null}
    */
   public TemplatePart(@NotNull String name, boolean spaceBefore, boolean spaceAfter,
-                      @NotNull Map<String,ConfigValue<?>> defaultParameters,
-                      @NotNull Map<String,String> parameterDelegates)
+                      @NotNull java.util.Map<String,TypedValue<?>> defaultParameters,
+                      @NotNull java.util.Map<String,String> parameterDelegates)
   {
     if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
       throw new IllegalArgumentException("name must not be empty");
@@ -220,12 +223,12 @@ public final class TemplatePart implements Template
     final var defaultParameterMapSize = packStream.readSmallVar();
     final var parameterDelegateMapSize = packStream.readSmallVar();
 
-    final var defaultParameterMap = new HashMap<String,ConfigValue<?>>();
+    final var defaultParameterMap = new HashMap<String, TypedValue<?>>();
     for(var n = 0; n < defaultParameterMapSize; n++)
     {
       defaultParameterMap.put(
           requireNonNull(packStream.readString()),
-          unpack.unpackMapValue(packStream));
+          unpack.unpackTypedValue(packStream));
     }
 
     final var parameterDelegateMap = new HashMap<String,String>();

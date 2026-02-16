@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -39,7 +39,7 @@ public final class AnnotationFormatter extends AbstractSingleTypeParameterFormat
 
 
   @Override
-  protected @NotNull Text formatValue(@NotNull FormatterContext context, @NotNull Annotation annotation)
+  protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Annotation annotation)
   {
     formatByField: {
       var fieldName = context.getConfigValueString("annotation").orElse("");

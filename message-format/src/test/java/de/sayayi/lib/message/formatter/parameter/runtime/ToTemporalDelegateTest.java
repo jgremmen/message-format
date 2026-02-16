@@ -2,9 +2,8 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.internal.part.config.key.ConfigKeyName;
-import de.sayayi.lib.message.internal.part.config.value.ConfigValueString;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,8 +47,7 @@ class ToTemporalDelegateTest extends AbstractFormatterTest
     val date = new Date(2024 - 1900, Calendar.NOVEMBER, 9);
 
     assertEquals(noSpaceText("09.11.2024, 00:00:00"),
-        format(messageAccessor, date,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("medium"))));
+        format(messageAccessor, date, Map.of("date", new TypedValueString("medium")), Map.of()));
   }
 
 
@@ -62,8 +60,7 @@ class ToTemporalDelegateTest extends AbstractFormatterTest
     val sqlDate = new java.sql.Date(date.getTime());
 
     assertEquals(noSpaceText("2024-11-09"),
-        format(messageAccessor, sqlDate,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("yyyy-MM-dd"))));
+        format(messageAccessor, sqlDate, Map.of("date", new TypedValueString("yyyy-MM-dd")), Map.of()));
   }
 
 
@@ -75,7 +72,6 @@ class ToTemporalDelegateTest extends AbstractFormatterTest
     val sqlTime = new java.sql.Time(23, 36, 4);
 
     assertEquals(noSpaceText("23:36"),
-        format(messageAccessor, sqlTime,
-            Map.of(new ConfigKeyName("date"), new ConfigValueString("HH:mm"))));
+        format(messageAccessor, sqlTime, Map.of("date", new TypedValueString("HH:mm")), Map.of()));
   }
 }

@@ -17,14 +17,14 @@ package de.sayayi.lib.message.formatter.parameter.named;
 
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormattableType;
-import de.sayayi.lib.message.formatter.parameter.FormatterContext;
 import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.DefaultFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.SizeQueryable;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.part.MapKey;
+import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.part.config.ConfigKey;
-import de.sayayi.lib.message.part.config.ConfigKey.MatchResult;
-import de.sayayi.lib.message.part.config.ConfigValue.BoolValue;
+import de.sayayi.lib.message.part.TypedValue.BoolValue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -34,10 +34,13 @@ import java.text.Collator;
 import java.util.OptionalLong;
 import java.util.Set;
 
+import static de.sayayi.lib.message.part.MapKey.CompareType.EQ;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.*;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.forEmptyKey;
+import static de.sayayi.lib.message.part.MapKey.Type.*;
+import static de.sayayi.lib.message.part.MapKey.Type.EMPTY;
+import static de.sayayi.lib.message.part.MapKey.Type.NULL;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.config.ConfigKey.CompareType.EQ;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.Defined.*;
-import static de.sayayi.lib.message.part.config.ConfigKey.MatchResult.forEmptyKey;
 import static java.lang.Integer.toHexString;
 import static java.text.Collator.*;
 
@@ -48,11 +51,7 @@ import static java.text.Collator.*;
  */
 public final class StringFormatter implements SizeQueryable, NamedParameterFormatter, DefaultFormatter
 {
-  private static final Set<ConfigKey.Type> STRING_KEY_TYPES = Set.of(
-      ConfigKey.Type.EMPTY,
-      ConfigKey.Type.NULL,
-      ConfigKey.Type.STRING
-  );
+  private static final Set<MapKey.Type> STRING_KEY_TYPES = Set.of(EMPTY, NULL, STRING);
 
 
   @Override
@@ -62,7 +61,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
 
 
   @Override
-  public @NotNull Text format(@NotNull FormatterContext context, Object value)
+  public @NotNull Text format(@NotNull ParameterFormatterContext context, Object value)
   {
     if (value == null)
       return formatNull(context);
@@ -70,7 +69,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
     final var string = valueAsString(context.getMessageAccessor(), value);
 
     return context
-        .getConfigMapMessage(string, STRING_KEY_TYPES)
+        .getMapMessage(string, STRING_KEY_TYPES)
         .map(context::format)
         .orElseGet(() -> noSpaceText(string));
   }
@@ -83,7 +82,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
 
     if (!(value instanceof CharSequence) &&
         !(value instanceof char[]) &&
-        messageAccessor.getDefaultParameterConfig("ignore-default-tostring") instanceof BoolValue boolValue &&
+        messageAccessor.getDefaultConfig("ignore-default-tostring") instanceof BoolValue boolValue &&
         boolValue.booleanValue() &&
         isDefaultToString(value))
       string = "";
@@ -109,7 +108,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
 
 
   @Override
-  public @NotNull OptionalLong size(@NotNull FormatterContext context, @NotNull Object value)
+  public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object value)
   {
     return switch(value) {
       case char[] chars -> OptionalLong.of(chars.length);
@@ -151,7 +150,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
       return forEmptyKey(compareType, true);
 
     if (string.trim().isEmpty() && compareType == EQ)
-      return () -> EMPTY.value() - 1;
+      return () -> Defined.EMPTY.value() - 1;
 
     return forEmptyKey(compareType, false);
   }
