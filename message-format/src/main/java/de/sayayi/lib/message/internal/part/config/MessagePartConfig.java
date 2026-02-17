@@ -41,10 +41,10 @@ public final class MessagePartConfig implements MessagePart.Config
 {
   public static final MessagePartConfig EMPTY_CONFIG = new MessagePartConfig(Map.of());
 
-  private final @NotNull Map<String, TypedValue<?>> config;
+  private final @NotNull Map<String,TypedValue<?>> config;
 
 
-  public MessagePartConfig(@NotNull Map<String, TypedValue<?>> config) {
+  public MessagePartConfig(@NotNull Map<String,TypedValue<?>> config) {
     this.config = config;
   }
 

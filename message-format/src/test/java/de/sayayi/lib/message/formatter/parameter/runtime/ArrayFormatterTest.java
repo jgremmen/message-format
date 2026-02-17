@@ -65,13 +65,13 @@ class ArrayFormatterTest extends AbstractFormatterTest
         .setLocale("de-DE")
         .getMessageAccessor();
 
-    val map = Map.<String, TypedValue<?>>of(
+    val map = Map.<String,TypedValue<?>>of(
         "list-value", new TypedValueString("%{value,true:wahr,false:falsch}"));
 
     assertEquals(new TextPart("wahr, falsch, wahr"),
         format(messageAccessor, new boolean[] { true, false, true }, map, Map.of()));
 
-    val booleanMap = Map.<String, TypedValue<?>>of(
+    val booleanMap = Map.<String,TypedValue<?>>of(
         "list-value", new TypedValueString("%{value,true:YES,false:NO}"));
 
     assertEquals(new TextPart("NO, YES"),
@@ -167,7 +167,7 @@ class ArrayFormatterTest extends AbstractFormatterTest
         .setLocale("de-DE")
         .getMessageAccessor();
 
-    val map = new HashMap<String, TypedValue<?>>();
+    val map = new HashMap<String,TypedValue<?>>();
     map.put("list-value", new TypedValueString("%{value,number:'0000',true:wahr,false:falsch}"));
 
     assertEquals(new TextPart("Test, wahr, -0006"), format(messageAccessor,

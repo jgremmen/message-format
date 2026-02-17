@@ -83,6 +83,7 @@ public class MessageFormatException extends MessageException
 
 
   @Override
+  @SuppressWarnings("GrazieStyle")
   public String getMessage()
   {
     /*
@@ -103,7 +104,7 @@ public class MessageFormatException extends MessageException
       1 | 1 | 0 | 1 | failed to format parameter 'p' in template 't' for message with code 'c'
       1 | 1 | 1 | 0 | failed to format template 't' for message with code 'c' and locale 'l'
       1 | 1 | 1 | 1 | failed to format parameter 'p' in template 't' for message with code 'c' and locale 'l'
-     */
+    */
 
     var msg = new StringBuilder("failed to format");
     var n =

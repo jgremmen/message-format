@@ -273,7 +273,7 @@ public final class ParameterPart implements MessagePart.Parameter
     final var format = packStream.readString();
     final var name = requireNonNull(packStream.readString());
 
-    final var config = new HashMap<String, TypedValue<?>>();
+    final var config = new HashMap<String,TypedValue<?>>();
     final var map = new LinkedHashMap<MapKey,TypedValue<?>>();
 
     for(int n = 0, size = packStream.readSmallVar(); n < size; n++)

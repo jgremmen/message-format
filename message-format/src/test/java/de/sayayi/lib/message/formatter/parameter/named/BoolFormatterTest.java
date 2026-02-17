@@ -61,7 +61,7 @@ class BoolFormatterTest extends AbstractFormatterTest
         .setLocale("de-DE")
         .getMessageAccessor();
 
-    val map = new HashMap<MapKey, TypedValue<?>>();
+    val map = new HashMap<MapKey,TypedValue<?>>();
     map.put(MapKeyBool.TRUE, new TypedValueString("wahr"));
     map.put(MapKeyBool.FALSE, new TypedValueString("falsch"));
 

@@ -72,8 +72,8 @@ public abstract class AbstractFormatterTest
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
-                                        @NotNull Map<String, TypedValue<?>> config,
-                                        @NotNull Map<MapKey, TypedValue<?>> map)
+                                        @NotNull Map<String,TypedValue<?>> config,
+                                        @NotNull Map<MapKey,TypedValue<?>> map)
   {
     return format(messageContext, new NoParameters(messageContext.getLocale()), value, config, map, null);
   }
@@ -81,8 +81,8 @@ public abstract class AbstractFormatterTest
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
-                                        @NotNull Map<String, TypedValue<?>> config,
-                                        @NotNull Map<MapKey, TypedValue<?>> map,
+                                        @NotNull Map<String,TypedValue<?>> config,
+                                        @NotNull Map<MapKey,TypedValue<?>> map,
                                         @NotNull String format) {
     return format(messageContext, new NoParameters(messageContext.getLocale()), value, config, map, format);
   }
@@ -91,8 +91,8 @@ public abstract class AbstractFormatterTest
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext,
                                         @NotNull Parameters parameters, Object value,
-                                        @NotNull Map<String, TypedValue<?>> config,
-                                        @NotNull Map<MapKey, TypedValue<?>> map,
+                                        @NotNull Map<String,TypedValue<?>> config,
+                                        @NotNull Map<MapKey,TypedValue<?>> map,
                                         String format)
   {
     return new ParameterFormatterContextImpl(messageContext, parameters, value, null, format,

@@ -65,7 +65,7 @@ public final class TemplatePart implements MessagePart.Template
    * <p>
    * The map is optimized to require the least amount of space.
    */
-  private final SortedArrayMap<String, TypedValue<?>> defaultParameterMap;
+  private final SortedArrayMap<String,TypedValue<?>> defaultParameterMap;
 
   /**
    * Parameter delegate map. If a parameter is referenced in the template message the parameter
@@ -223,7 +223,7 @@ public final class TemplatePart implements MessagePart.Template
     final var defaultParameterMapSize = packStream.readSmallVar();
     final var parameterDelegateMapSize = packStream.readSmallVar();
 
-    final var defaultParameterMap = new HashMap<String, TypedValue<?>>();
+    final var defaultParameterMap = new HashMap<String,TypedValue<?>>();
     for(var n = 0; n < defaultParameterMapSize; n++)
     {
       defaultParameterMap.put(

@@ -150,8 +150,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
   @Override
   protected @NotNull String createNoViableAlternativeMessage(@NotNull org.antlr.v4.runtime.Parser parser,
-                                                             @NotNull Token startToken,
-                                                             @NotNull Token offendingToken)
+                                                             @NotNull Token startToken, @NotNull Token offendingToken)
   {
     if (isEOFToken(startToken))
       return "incomplete message format";
@@ -391,10 +390,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final Collector<ConfigDefinitionContext,Map<String, TypedValue<?>>,Map<String, TypedValue<?>>>
+    final Collector<ConfigDefinitionContext,Map<String,TypedValue<?>>,Map<String,TypedValue<?>>>
         PARAMETER_CONFIG_DEFINITION_COLLECTOR = new AbstractMapCollector<>(TreeMap::new) {
       @Override
-      protected void accumulator(@NotNull Map<String, TypedValue<?>> map, @NotNull ConfigDefinitionContext context)
+      protected void accumulator(@NotNull Map<String,TypedValue<?>> map, @NotNull ConfigDefinitionContext context)
       {
         if (map.put(context.name, context.value) != null)
         {
@@ -407,10 +406,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     };
 
 
-    final Collector<MapEntryContext,Map<MapKey, TypedValue<?>>,Map<MapKey, TypedValue<?>>>
+    final Collector<MapEntryContext,Map<MapKey,TypedValue<?>>,Map<MapKey,TypedValue<?>>>
         PARAMETER_MAP_ENTRY_COLLECTOR = new AbstractMapCollector<>(LinkedHashMap::new) {
       @Override
-      protected void accumulator(@NotNull Map<MapKey, TypedValue<?>> map, @NotNull MapEntryContext context)
+      protected void accumulator(@NotNull Map<MapKey,TypedValue<?>> map, @NotNull MapEntryContext context)
       {
         for(var key: context.keys)
           if (map.put(key, context.value) != null)
@@ -478,10 +477,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final Collector<ConfigDefinitionContext,Map<String, TypedValue<?>>,Map<String, TypedValue<?>>>
+    final Collector<ConfigDefinitionContext,Map<String,TypedValue<?>>,Map<String,TypedValue<?>>>
         TEMPLATE_CONFIG_DEFINITION_COLLECTOR = new AbstractMapCollector<>(TreeMap::new) {
       @Override
-      protected void accumulator(@NotNull Map<String, TypedValue<?>> map, @NotNull ConfigDefinitionContext context) {
+      protected void accumulator(@NotNull Map<String,TypedValue<?>> map, @NotNull ConfigDefinitionContext context) {
         if (map.put(context.name, context.value) != null)
         {
           syntaxError("duplicate template default parameter '" + context.name + "'")
@@ -539,10 +538,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final Collector<ConfigDefinitionContext,Map<String, TypedValue<?>>,Map<String, TypedValue<?>>>
+    final Collector<ConfigDefinitionContext,Map<String,TypedValue<?>>,Map<String,TypedValue<?>>>
         POST_FORMAT_CONFIG_DEFINITION_COLLECTOR = new AbstractMapCollector<>(TreeMap::new) {
       @Override
-      protected void accumulator(@NotNull Map<String, TypedValue<?>> map, @NotNull ConfigDefinitionContext context)
+      protected void accumulator(@NotNull Map<String,TypedValue<?>> map, @NotNull ConfigDefinitionContext context)
       {
         if (map.put(context.name, context.value) != null)
         {
