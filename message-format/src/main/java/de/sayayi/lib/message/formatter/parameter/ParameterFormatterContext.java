@@ -35,7 +35,7 @@ import java.util.OptionalLong;
  * @see ParameterFormatter#format(ParameterFormatterContext, Object)
  *
  * @author Jeroen Gremmen
- * @since 0.8.0
+ * @since 0.21.0
  */
 public interface ParameterFormatterContext extends Parameters, ConfigAccessor, MapAccessor
 {
@@ -43,8 +43,6 @@ public interface ParameterFormatterContext extends Parameters, ConfigAccessor, M
    * Returns the message accessor used to create this formatter context.
    *
    * @return  message accessor, never {@code null}
-   *
-   * @since 0.8.0 (renamed in 0.9.2)
    */
   @Contract(pure = true)
   @NotNull MessageAccessor getMessageAccessor();

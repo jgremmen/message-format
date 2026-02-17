@@ -252,7 +252,7 @@ fragment TemplateStart
 
 fragment PostFormatStart
         : '%('
-        ;  // %(clip,"text to clip",size:5,suffix:"…")
+        ;
 
 fragment CtrlChar
         : [\u0000-\u001f]
