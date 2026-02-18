@@ -34,7 +34,7 @@ abstract class AbstractMessageWithCode implements Message.WithCode
 
 
   AbstractMessageWithCode(@NotNull String code) {
-    this.code = validateName(code, "messaqe code");
+    this.code = validateName(code, "message code");
   }
 
 
