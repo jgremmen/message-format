@@ -68,8 +68,6 @@ public enum MapKeyEmpty implements MapKey
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException {
     packStream.writeBoolean(this == EQ);
@@ -84,8 +82,6 @@ public enum MapKeyEmpty implements MapKey
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
   public static @NotNull MapKeyEmpty unpack(@NotNull PackInputStream packStream) throws IOException {
     return packStream.readBoolean() ? EQ : NE;

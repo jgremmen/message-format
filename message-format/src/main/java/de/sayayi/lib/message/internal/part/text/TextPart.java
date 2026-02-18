@@ -174,8 +174,6 @@ public final class TextPart implements MessagePart.Text
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
@@ -193,8 +191,6 @@ public final class TextPart implements MessagePart.Text
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
   public static @NotNull Text unpack(@NotNull PackInputStream packStream) throws IOException
   {

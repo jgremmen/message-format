@@ -176,8 +176,6 @@ public final class TemplatePart implements MessagePart.Template
    * @param packStream  data output pack target
    *
    * @throws IOException  if an I/O error occurs
-   *
-   * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
@@ -210,8 +208,6 @@ public final class TemplatePart implements MessagePart.Template
    * @return  unpacked template part, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
-   *
-   * @hidden
    */
   public static @NotNull Template unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
       throws IOException
