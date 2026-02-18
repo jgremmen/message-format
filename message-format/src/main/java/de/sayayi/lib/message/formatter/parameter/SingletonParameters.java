@@ -24,6 +24,8 @@ import java.util.Set;
 
 
 /**
+ * Parameters implementation for a single parameter.
+ *
  * @author Jeroen Gremmen
  * @since 0.12.0
  */
@@ -31,6 +33,7 @@ public final class SingletonParameters implements Parameters
 {
   private final Locale locale;
   private final String parameterName;
+
   private Object value;
 
 

@@ -349,19 +349,19 @@ public final class MessagePartMap implements MessagePart.Map
 
     @Override
     public boolean getBoolKeyValue() {
-      return ((MapKeyBool) mapKey).isBool();
+      return ((MapKeyBool)mapKey).isBool();
     }
 
 
     @Override
     public long getNumberKeyValue() {
-      return ((MapKeyNumber) mapKey).getNumber();
+      return ((MapKeyNumber)mapKey).getNumber();
     }
 
 
     @Override
     public @NotNull String getStringKeyValue() {
-      return ((MapKeyString) mapKey).getString();
+      return ((MapKeyString)mapKey).getString();
     }
 
 

@@ -33,6 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT;
+import static de.sayayi.lib.message.util.MessageUtil.isEmpty;
 import static de.sayayi.lib.message.util.MessageUtil.isKebabCaseName;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableMap;
@@ -154,8 +155,7 @@ public class GenericFormatterService implements FormatterService.WithRegistry
       {
         final var formatterName = namedParameterFormatter.getName();
 
-        //noinspection ConstantValue
-        if (formatterName == null || formatterName.isEmpty())
+        if (isEmpty(formatterName))
           throw new FormatterServiceException("formatter name must not be empty");
         else if (!isKebabCaseName(formatterName))
         {

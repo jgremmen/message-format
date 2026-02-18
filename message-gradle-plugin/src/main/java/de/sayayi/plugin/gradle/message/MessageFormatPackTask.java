@@ -296,7 +296,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   @TaskAction
   public void pack()
   {
-    var messageSupport = MessageSupportFactory
+    final var messageSupport = MessageSupportFactory
         .create(new GenericFormatterService(), NO_CACHE_INSTANCE);
 
     configureDuplicatesStrategy(messageSupport);
@@ -310,7 +310,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void pack_scanMessages(@NotNull ConfigurableMessageSupport messageSupport)
   {
-    var logger = getLogger();
+    final var logger = getLogger();
 
     logger.info("Scanning classes for messages and templates");
 

@@ -41,8 +41,8 @@ import static de.sayayi.lib.message.part.MapKey.Type.*;
 import static de.sayayi.lib.message.part.MapKey.Type.EMPTY;
 import static de.sayayi.lib.message.part.MapKey.Type.NULL;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static java.lang.Integer.toHexString;
 import static java.text.Collator.*;
+import static java.util.Objects.toIdentityString;
 
 
 /**
@@ -95,11 +95,10 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   @SuppressWarnings("RedundantIfStatement")
   private boolean isDefaultToString(@NotNull Object value)
   {
-    final var fqClassName = value.getClass().getName();
-
-    if ((fqClassName + '@' + toHexString(value.hashCode())).equals(value.toString()))
+    if (toIdentityString(value).equals(value.toString()))
       return true;
 
+    final var fqClassName = value.getClass().getName();
     if (fqClassName.contains("$$Lambda$"))
       return true;
 

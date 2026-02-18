@@ -38,6 +38,7 @@ import static de.sayayi.lib.message.internal.pack.PackSupport.*;
 import static de.sayayi.lib.message.internal.part.config.MessagePartConfig.EMPTY_CONFIG;
 import static de.sayayi.lib.message.internal.part.map.MessagePartMap.EMPTY_MAP;
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
+import static de.sayayi.lib.message.util.MessageUtil.validateName;
 import static java.util.Objects.requireNonNull;
 
 
@@ -105,9 +106,7 @@ public final class ParameterPart implements MessagePart.Parameter
   public ParameterPart(@NotNull String name, String format, boolean spaceBefore, boolean spaceAfter,
                        @NotNull MessagePartConfig config, @NotNull MessagePartMap map)
   {
-    if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
-      throw new IllegalArgumentException("name must not be empty");
-
+    this.name = validateName(name, "parameter name");
     this.format = "".equals(format) ? null : format;
     this.config = requireNonNull(config, "config must not be null");
     this.map = requireNonNull(map, "map must not be null");

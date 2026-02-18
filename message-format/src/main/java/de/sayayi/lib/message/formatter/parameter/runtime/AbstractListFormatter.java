@@ -33,7 +33,7 @@ import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
-import static de.sayayi.lib.message.util.SpacesUtil.isTrimmedEmpty;
+import static de.sayayi.lib.message.util.MessageUtil.isTrimmedEmpty;
 import static java.lang.Integer.MAX_VALUE;
 
 

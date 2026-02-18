@@ -18,7 +18,7 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message;
 import org.jetbrains.annotations.NotNull;
 
-import static java.util.Objects.requireNonNull;
+import static de.sayayi.lib.message.util.MessageUtil.validateName;
 
 
 /**
@@ -33,12 +33,8 @@ abstract class AbstractMessageWithCode implements Message.WithCode
   protected final @NotNull String code;
 
 
-  AbstractMessageWithCode(@NotNull String code)
-  {
-    if (requireNonNull(code, "message code must not be null").isEmpty())
-      throw new IllegalArgumentException("message code must not be empty");
-
-    this.code = code;
+  AbstractMessageWithCode(@NotNull String code) {
+    this.code = validateName(code, "messaqe code");
   }
 
 

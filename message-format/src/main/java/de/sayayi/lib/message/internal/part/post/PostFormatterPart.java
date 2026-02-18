@@ -30,6 +30,7 @@ import java.io.IOException;
 
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.util.MessageUtil.validateName;
 import static java.util.Objects.requireNonNull;
 
 
@@ -60,9 +61,7 @@ public final class PostFormatterPart implements MessagePart.PostFormat
   public PostFormatterPart(@NotNull String name, @NotNull Message.WithSpaces message,
                            boolean spaceBefore, boolean spaceAfter, @NotNull MessagePartConfig config)
   {
-    if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
-      throw new IllegalArgumentException("name must not be empty");
-
+    this.name = validateName(name, "post formatter name");
     this.message = requireNonNull(message, "message must not be null");
     this.config = requireNonNull(config, "config must not be null");
     this.spaceBefore = spaceBefore;

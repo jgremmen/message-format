@@ -36,6 +36,7 @@ import java.util.TreeSet;
 import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.util.MessageUtil.validateName;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
@@ -91,9 +92,7 @@ public final class TemplatePart implements MessagePart.Template
                       @NotNull java.util.Map<String,TypedValue<?>> defaultParameters,
                       @NotNull java.util.Map<String,String> parameterDelegates)
   {
-    if ((this.name = requireNonNull(name, "name must not be null")).isEmpty())
-      throw new IllegalArgumentException("name must not be empty");
-
+    this.name = validateName(name, "template name");
     this.spaceBefore = spaceBefore;
     this.spaceAfter = spaceAfter;
 

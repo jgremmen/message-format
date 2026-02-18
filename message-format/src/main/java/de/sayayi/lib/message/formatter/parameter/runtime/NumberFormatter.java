@@ -43,6 +43,7 @@ import java.util.concurrent.atomic.LongAdder;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.*;
 import static de.sayayi.lib.message.part.MapKey.NUMBER_TYPE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.util.MessageUtil.isEmpty;
 import static java.lang.Math.signum;
 
 
@@ -99,11 +100,8 @@ public final class NumberFormatter
     if ("currency".equals(format))
       return NumberFormat.getCurrencyInstance(locale);
 
-    if (format != null && !format.isEmpty())
-    {
-      return new DecimalFormat(format,
-          FORMAT_SYMBOLS_CACHE.computeIfAbsent(locale, DecimalFormatSymbols::new));
-    }
+    if (!isEmpty(format))
+      return new DecimalFormat(format, FORMAT_SYMBOLS_CACHE.computeIfAbsent(locale, DecimalFormatSymbols::new));
 
     return NumberFormat.getNumberInstance(locale);
   }

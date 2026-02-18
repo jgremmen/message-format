@@ -41,7 +41,6 @@ import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MapKey.CompareType;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
-import de.sayayi.lib.message.util.SpacesUtil;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -56,8 +55,7 @@ import static de.sayayi.lib.antlr4.walker.Walker.WALK_EXIT_RULES_HEAP;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAGE;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.TEMPLATE;
 import static de.sayayi.lib.message.internal.parser.MessageParser.*;
-import static de.sayayi.lib.message.util.MessageUtil.isKebabCaseName;
-import static de.sayayi.lib.message.util.MessageUtil.isKebabOrLowerCamelCaseName;
+import static de.sayayi.lib.message.util.MessageUtil.*;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
@@ -761,7 +759,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         if (token.getType() != EOF)
         {
           final var text = token.getText();
-          return !SpacesUtil.isEmpty(text) && isSpaceChar(text.charAt(0));
+          return !isEmpty(text) && isSpaceChar(text.charAt(0));
         }
       }
 

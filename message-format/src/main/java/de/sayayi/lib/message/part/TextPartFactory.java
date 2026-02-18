@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
 import static de.sayayi.lib.message.part.MessagePart.Text.NULL;
-import static de.sayayi.lib.message.util.SpacesUtil.isTrimmedEmpty;
+import static de.sayayi.lib.message.util.MessageUtil.isTrimmedEmpty;
 
 
 /**

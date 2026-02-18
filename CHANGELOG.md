@@ -7,7 +7,7 @@
 ### <svg xmlns="http://www.w3.org/2000/svg" style="vertical-align:top;" height="1em" viewBox="2 3 22 19"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C8.17,3 8.82,3.12 9.44,3.33L13,9.35L9,14.35L12,21.35V21.35M16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35L11,14.35L15.5,9.35L12.85,4.27C13.87,3.47 15.17,3 16.5,3Z"/></svg> Breaking Changes
 
 - Upgrade code base to java 21
-- Parameter formatter notation has changed from `%{p,<format>,...}` to `%{p,format:<format>,...}` 
+- Changed parameter formatter notation from `%{p,<format>,...}` to `%{p,format:<format>,...}` 
 - Force kebab-case naming style for formatter names, template names, post formatter names and parameter config keys
 - Force camel- or kebab-case naming style for parameter names
 - Various code refactorings, cleanups and quality improvements (only relevant for custom formatters)
@@ -27,4 +27,4 @@ Nothing
 
 ### <svg xmlns="http://www.w3.org/2000/svg" style="vertical-align:top;" height="1em" viewBox="4 2 18 20"><path fill="currentColor" d="M6,2A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6M6,4H13V9H18V20H6V4M8,12V14H16V12H8M8,16V18H13V16H8Z" /></svg> Documentation
 
-Nothing
+- Introducing changelog

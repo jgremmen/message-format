@@ -54,6 +54,7 @@ import java.util.function.Supplier;
 import static de.sayayi.lib.message.internal.pack.PackSupport.PACK_CONFIG;
 import static de.sayayi.lib.message.internal.pack.PackSupport.VERSION;
 import static de.sayayi.lib.message.util.MessageUtil.isKebabOrLowerCamelCaseName;
+import static de.sayayi.lib.message.util.MessageUtil.validateName;
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.copyOf;
 import static java.util.Collections.unmodifiableSet;
@@ -108,10 +109,9 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   @Override
   public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, boolean value)
   {
-    if (requireNonNull(name, "name must not be null").isEmpty())
-      throw new IllegalArgumentException("name must not be empty");
-
-    defaultConfig.put(name, value ? TypedValueBool.TRUE : TypedValueBool.FALSE);
+    defaultConfig.put(
+        validateName(name, "config name"),
+        value ? TypedValueBool.TRUE : TypedValueBool.FALSE);
     return this;
   }
 
@@ -119,10 +119,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   @Override
   public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, long value)
   {
-    if (requireNonNull(name, "name must not be null").isEmpty())
-      throw new IllegalArgumentException("name must not be empty");
-
-    defaultConfig.put(name, new TypedValueNumber(value));
+    defaultConfig.put(validateName(name, "config name"), new TypedValueNumber(value));
     return this;
   }
 
@@ -130,22 +127,15 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   @Override
   public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, @NotNull String value)
   {
-    if (requireNonNull(name, "name must not be null").isEmpty())
-      throw new IllegalArgumentException("name must not be empty");
-
-    defaultConfig.put(name, new TypedValueString(value));
+    defaultConfig.put(validateName(name, "config name"), new TypedValueString(value));
     return this;
   }
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name,
-                                                              @NotNull Message.WithSpaces value)
+  public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, @NotNull Message.WithSpaces value)
   {
-    if (requireNonNull(name, "name must not be null").isEmpty())
-      throw new IllegalArgumentException("name must not be empty");
-
-    defaultConfig.put(name, new TypedValueMessage(value));
+    defaultConfig.put(validateName(name, "config name"), new TypedValueMessage(value));
     return this;
   }
 
@@ -179,10 +169,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   @Override
   public @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name, @NotNull Message template)
   {
-    if (requireNonNull(name, "name must not be null").isEmpty())
-      throw new IllegalArgumentException("name must not be empty");
-
-    if (templateFilter.filter(name, template))
+    if (templateFilter.filter(validateName(name, "template name"), template))
       templates.put(name, requireNonNull(template));
 
     return this;
@@ -267,12 +254,9 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   @Override
   public @NotNull MessageConfigurer<Message.WithCode> code(@NotNull String code)
   {
-    if (requireNonNull(code, "code must not be null").isEmpty())
-      throw new IllegalArgumentException("code must not be empty");
-
-    var message = messages.get(code);
+    var message = messages.get(validateName(code, "message code"));
     if (message == null)
-      throw new IllegalArgumentException("unknown message code '" + code + "'");
+      throw new IllegalArgumentException("unknown message code '" + code + '\'');
 
     return new Configurer<>(() -> message);
   }
@@ -399,9 +383,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     @Override
     public @NotNull MessageConfigurer<M> with(@NotNull String parameter, Object value)
     {
-      if (requireNonNull(parameter, "parameter must not be null").isEmpty())
-        throw new IllegalArgumentException("parameter must not be empty");
-      else if (!isKebabOrLowerCamelCaseName(parameter))
+      if (!isKebabOrLowerCamelCaseName(validateName(parameter, "parameter name")))
       {
         throw new IllegalArgumentException("parameter name '" + parameter +
             "' must match the camel- or kebab-case naming convention");

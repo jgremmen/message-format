@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static de.sayayi.lib.message.util.SpacesUtil.trimSpaces;
+import static de.sayayi.lib.message.util.MessageUtil.trimSpaces;
 import static java.util.Objects.requireNonNull;
 
 

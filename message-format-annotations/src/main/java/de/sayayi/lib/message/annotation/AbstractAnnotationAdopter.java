@@ -41,6 +41,7 @@ import java.util.jar.JarFile;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import static de.sayayi.lib.message.util.MessageUtil.validateName;
 import static java.nio.file.Files.newInputStream;
 import static java.util.Locale.forLanguageTag;
 import static java.util.Objects.requireNonNull;
@@ -449,12 +450,9 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   protected record TemplateDefImpl(@NotNull String name, @Language("MessageFormat") @NotNull String text,
                                    @NotNull Text[] texts) implements TemplateDef
   {
-    @SuppressWarnings("ConstantValue")
     public TemplateDefImpl(@NotNull String name, String text, @NotNull Text[] texts)
     {
-      if ((this.name = name == null ? "" : name.trim()).isEmpty())
-        throw new IllegalArgumentException("name must not be empty");
-
+      this.name = validateName(name, "template name");
       this.text = text == null ? "" : text.trim();
       this.texts = texts;
     }

@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.internal.part.text;
 
 import de.sayayi.lib.message.part.MessagePart;
-import de.sayayi.lib.message.util.SpacesUtil;
+import de.sayayi.lib.message.util.MessageUtil;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -25,8 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.Objects;
 
-import static de.sayayi.lib.message.util.SpacesUtil.isSpaceChar;
-import static de.sayayi.lib.message.util.SpacesUtil.trimSpaces;
+import static de.sayayi.lib.message.util.MessageUtil.isSpaceChar;
+import static de.sayayi.lib.message.util.MessageUtil.trimSpaces;
 
 
 /**
@@ -68,7 +68,7 @@ public final class TextPart implements MessagePart.Text
    */
   public TextPart(String text, boolean addSpaceBefore, boolean addSpaceAfter)
   {
-    if (SpacesUtil.isEmpty(text))
+    if (MessageUtil.isEmpty(text))
     {
       this.text = text;
       this.spaceBefore = addSpaceBefore;
@@ -126,7 +126,7 @@ public final class TextPart implements MessagePart.Text
 
   @Override
   public boolean isEmpty() {
-    return SpacesUtil.isEmpty(text);
+    return MessageUtil.isEmpty(text);
   }
 
 
