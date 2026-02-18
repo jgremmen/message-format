@@ -23,7 +23,6 @@ import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
 import de.sayayi.lib.message.internal.part.post.PostFormatterPart;
 import de.sayayi.lib.message.internal.part.template.TemplatePart;
-import de.sayayi.lib.message.internal.part.text.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextJoiner;
@@ -61,18 +60,29 @@ public final class CompoundMessage implements Message.WithSpaces
 
 
   /**
-   * Construct a compound message based on the given message {@code parts}.
+   * Construct a compound message based on the given {@code messageParts}.
    * <p>
-   * At least 1 message part is required. If the sole message part is a
-   * {@link TextPart TextPart}, it is better to use
-   * {@link EmptyMessage} or {@link TextMessage} in that case.
+   * At least 1 message part is required. The message parts must not contain adjacent text parts,
+   * otherwise an {@link IllegalArgumentException} is thrown.
    *
    * @param messageParts  message parts, not {@code null} and not empty
    */
   public CompoundMessage(@NotNull List<MessagePart> messageParts)
   {
-    if (requireNonNull(messageParts, "parts must not be null").isEmpty())
+    final var length = requireNonNull(messageParts, "parts must not be null").size();
+    if (length == 0)
       throw new IllegalArgumentException("parts must not be empty");
+
+    if (length == 1 && messageParts.getFirst() instanceof MessagePart.Text)
+      throw new IllegalArgumentException("parts must not contain only a text part");
+
+    for(int n = 0; n < length; n++)
+    {
+      if (n + 1 < length &&
+          messageParts.get(n) instanceof MessagePart.Text &&
+          messageParts.get(n + 1) instanceof MessagePart.Text)
+        throw new IllegalArgumentException("parts must not contain adjacent text parts");
+    }
 
     this.messageParts = messageParts.toArray(MessagePart[]::new);
   }
@@ -154,14 +164,17 @@ public final class CompoundMessage implements Message.WithSpaces
     final var templateNames = new TreeSet<String>();
 
     for(var messagePart: messageParts)
-    {
-      if (messagePart instanceof TemplatePart)
-        templateNames.add(((TemplatePart)messagePart).getName());
-      else if (messagePart instanceof ParameterPart)
-        templateNames.addAll(((ParameterPart)messagePart).getConfig().getTemplateNames());
-      else if (messagePart instanceof PostFormatterPart)
-        templateNames.addAll(((PostFormatterPart)messagePart).getConfig().getTemplateNames());
-    }
+      switch(messagePart)
+      {
+        case TemplatePart template -> templateNames.add(template.getName());
+        case ParameterPart parameter -> {
+          templateNames.addAll(parameter.getConfig().getTemplateNames());
+          templateNames.addAll(parameter.getMap().getTemplateNames());
+        }
+        case PostFormatterPart postFormatter -> templateNames.addAll(postFormatter.getConfig().getTemplateNames());
+        default -> {
+        }
+      }
 
     return unmodifiableSet(templateNames);
   }
@@ -191,8 +204,6 @@ public final class CompoundMessage implements Message.WithSpaces
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
@@ -212,8 +223,6 @@ public final class CompoundMessage implements Message.WithSpaces
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
-   *
-   * @hidden
    */
   public static @NotNull Message.WithSpaces unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
       throws IOException
