@@ -245,13 +245,13 @@ public interface ParameterFormatter
 
 
   /**
-   * This interface allows formatters to match a value against parameter configuration map keys.
+   * This interface allows formatters to match a value against parameter map keys.
    *
    * @param <T>  type of the value this comparator is capable of comparing
    *
    * @since 0.8.4
    */
-  interface ConfigKeyComparator<T> extends ParameterFormatter
+  interface MapKeyComparator<T> extends ParameterFormatter
   {
     /**
      * @param value    value to compare against the null configuration key
@@ -404,6 +404,6 @@ public interface ParameterFormatter
    *
    * @since 0.8.4
    */
-  interface DefaultFormatter extends ConfigKeyComparator<Object> {
+  interface DefaultFormatter extends MapKeyComparator<Object> {
   }
 }

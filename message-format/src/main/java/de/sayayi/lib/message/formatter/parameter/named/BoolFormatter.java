@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.named;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MessagePart.Text;
@@ -45,7 +45,7 @@ import static java.lang.Math.signum;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public final class BoolFormatter implements NamedParameterFormatter, ConfigKeyComparator<Object>
+public final class BoolFormatter implements NamedParameterFormatter, MapKeyComparator<Object>
 {
   private static final Set<MapKey.Type> BOOL_KEY_TYPES = Set.of(EMPTY, NULL, BOOL, STRING);
 

@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.formatter.parameter.runtime.TypeFormatter;
 import de.sayayi.lib.message.part.MapKey.MatchResult;
@@ -40,7 +40,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  */
 public final class MethodParameterFormatter
     extends AbstractSingleTypeParameterFormatter<Parameter>
-    implements ConfigKeyComparator<Parameter>
+    implements MapKeyComparator<Parameter>
 {
   @Override
   @Contract(pure = true)

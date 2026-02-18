@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MapKey.MatchResult;
@@ -38,7 +38,7 @@ import static de.sayayi.lib.message.part.MapKey.MatchResult.forNullKey;
  * @author Jeroen Gremmen
  */
 public final class OptionalFormatter extends AbstractSingleTypeParameterFormatter<Optional<?>>
-    implements SizeQueryable, ConfigKeyComparator<Optional<?>>
+    implements SizeQueryable, MapKeyComparator<Optional<?>>
 {
   @Override
   @Contract(pure = true)

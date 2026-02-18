@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.part;
 
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ComparatorContext;
-import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.internal.part.map.key.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -84,7 +84,7 @@ public sealed interface MapKey
     /** String key type */
     STRING {
       @Override
-      public @NotNull <T> MatchResult compareValueToKey(@NotNull ConfigKeyComparator<T> comparator, @NotNull T value,
+      public @NotNull <T> MatchResult compareValueToKey(@NotNull MapKeyComparator<T> comparator, @NotNull T value,
                                                         @NotNull ComparatorContext context) {
         return comparator.compareToStringKey(value, context);
       }
@@ -93,7 +93,7 @@ public sealed interface MapKey
     /** Number key type */
     NUMBER {
       @Override
-      public @NotNull <T> MatchResult compareValueToKey(@NotNull ConfigKeyComparator<T> comparator, @NotNull T value,
+      public @NotNull <T> MatchResult compareValueToKey(@NotNull MapKeyComparator<T> comparator, @NotNull T value,
                                                         @NotNull ComparatorContext context) {
         return comparator.compareToNumberKey(value, context);
       }
@@ -102,7 +102,7 @@ public sealed interface MapKey
     /** Boolean key type */
     BOOL {
       @Override
-      public @NotNull <T> MatchResult compareValueToKey(@NotNull ConfigKeyComparator<T> comparator, @NotNull T value,
+      public @NotNull <T> MatchResult compareValueToKey(@NotNull MapKeyComparator<T> comparator, @NotNull T value,
                                                         @NotNull ComparatorContext context) {
         return comparator.compareToBoolKey(value, context);
       }
@@ -111,7 +111,7 @@ public sealed interface MapKey
     /** Null key type */
     NULL {
       @Override
-      public @NotNull <T> MatchResult compareValueToKey(@NotNull ConfigKeyComparator<T> comparator, T value,
+      public @NotNull <T> MatchResult compareValueToKey(@NotNull MapKeyComparator<T> comparator, T value,
                                                         @NotNull ComparatorContext context) {
         return comparator.compareToNullKey(value, context);
       }
@@ -120,7 +120,7 @@ public sealed interface MapKey
     /** Empty key type */
     EMPTY {
       @Override
-      public @NotNull <T> MatchResult compareValueToKey(@NotNull ConfigKeyComparator<T> comparator, T value,
+      public @NotNull <T> MatchResult compareValueToKey(@NotNull MapKeyComparator<T> comparator, T value,
                                                         @NotNull ComparatorContext context) {
         return comparator.compareToEmptyKey(value, context);
       }
@@ -128,7 +128,7 @@ public sealed interface MapKey
 
 
     @Contract(pure = true)
-    public abstract <T> @NotNull MatchResult compareValueToKey(@NotNull ConfigKeyComparator<T> comparator, T value,
+    public abstract <T> @NotNull MatchResult compareValueToKey(@NotNull MapKeyComparator<T> comparator, T value,
                                                                @NotNull ComparatorContext context);
   }
 
@@ -162,8 +162,7 @@ public sealed interface MapKey
     /**
      * Tells whether the comparison type matches the comparison result {@code signum}.
      *
-     * @param signum  the comparison result, essentially the result of
-     *                {@code value.compareTo(mapKey)}
+     * @param signum  the comparison result (essentially the value represented by {@code value.compareTo(mapKey)})
      *
      * @return  {@code true} if the comparison type matches the comparison result,
      *          {@code false} otherwise
@@ -208,25 +207,70 @@ public sealed interface MapKey
 
 
 
+  /**
+   * Interface representing the match result when comparing a provided value to a map key. The match result is
+   * represented by a numeric value, where higher values indicate better matches, and zero or negative values
+   * indicate mismatches.
+   *
+   * @see Defined
+   */
   @FunctionalInterface
   interface MatchResult
   {
+    /**
+     * Numeric value representing the match result. Higher values represent better matches, while zero or
+     * negative values represent mismatches.
+     *
+     * @return  numeric value of the match result
+     */
     @Contract(pure = true)
     int value();
 
 
+    /**
+     * Tells whether this match result represents a mismatch. A mismatch is represented by a value of zero or less.
+     *
+     * @return  {@code true} if this match result represents a mismatch, {@code false} otherwise
+     */
     @Contract(pure = true)
     default boolean isMismatch() {
       return value() <= 0;
     }
 
 
+    /**
+     * Match result comparator.
+     *
+     * @param r1 match result 1, not {@code null}
+     * @param r2 match result 2, not {@code null}
+     *
+     * @return  {@code -1} if {@code r1} is a worse match than {@code r2},
+     *          {@code 0} if they are equally good matches,
+     *          {@code 1} if {@code r1} is a better match than {@code r2}
+     */
     @Contract(pure = true)
     static int compare(@NotNull MatchResult r1, @NotNull MatchResult r2) {
-      return r1.value() - r2.value();
+      return Integer.compare(r1.value(), r2.value());
     }
 
 
+    /**
+     * Returns a match result for a {@code null} key. The result is determined by the given {@code compareType}
+     * and the {@code isNull} flag.
+     * <p>
+     * The logic is as follows:
+     * <ul>
+     *   <li>If the {@code compareType} is {@code EQ} and {@code isNull = true}, the result is {@code NULL}.</li>
+     *   <li>If the {@code compareType} is {@code NE} and {@code isNull = false}, the result is {@code NOT_NULL}.</li>
+     *   <li>In all other cases, the result is {@code MISMATCH}.</li>
+     * </ul>
+     *
+     * @param compareType  the comparison type to determine the match result, not {@code null}.
+     *                     Only {@code EQ} and {@code NE} are considered, other types will result in a {@code MISMATCH}.
+     * @param isNull       flag indicating whether the value being compared is null or not
+     *
+     * @return  the match result for the null key comparison, never {@code null}
+     */
     @Contract(pure = true)
     static @NotNull MatchResult forNullKey(@NotNull CompareType compareType, boolean isNull)
     {
@@ -238,6 +282,23 @@ public sealed interface MapKey
     }
 
 
+    /**
+     * Returns a match result for an {@code empty} key. The result is determined by the given {@code compareType}
+     * and the {@code isEmpty} flag.
+     * <p>
+     * The logic is as follows:
+     * <ul>
+     *   <li>If the {@code compareType} is {@code EQ} and {@code isEmpty = true}, the result is {@code EMPTY}.</li>
+     *   <li>If the {@code compareType} is {@code NE} and {@code isEmpty = false}, the result is {@code NOT_EMPTY}.</li>
+     *   <li>In all other cases, the result is {@code MISMATCH}.</li>
+     * </ul>
+     *
+     * @param compareType  the comparison type to determine the match result, not {@code null}.
+     *                     Only {@code EQ} and {@code NE} are considered, other types will result in a {@code MISMATCH}.
+     * @param isEmpty      flag indicating whether the value being compared is empty or not
+     *
+     * @return  the match result for the empty key comparison, never {@code null}
+     */
     @Contract(pure = true)
     static @NotNull MatchResult forEmptyKey(@NotNull CompareType compareType, boolean isEmpty)
     {
@@ -251,6 +312,10 @@ public sealed interface MapKey
 
 
 
+    /**
+     * Predefined match results for map key comparisons. The results are ordered by their value, with higher values
+     * representing better matches.
+     */
     enum Defined implements MatchResult
     {
       /** no match */

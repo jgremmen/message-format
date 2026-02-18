@@ -19,8 +19,8 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ComparatorContext;
-import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.DefaultFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.internal.part.config.BaseConfigAccessor;
 import de.sayayi.lib.message.internal.part.map.key.MapKeyBool;
@@ -214,11 +214,11 @@ public final class MessagePartMap implements MessagePart.Map
     for(int i = 0, l = formatters.length - 1; i <= l; i++)
     {
       var formatter = formatters[i];
-      if (formatter instanceof ConfigKeyComparator &&
+      if (formatter instanceof MapKeyComparator &&
           !(i > 0 && i == l && formatter instanceof DefaultFormatter))
       {
         var matchResult = value != null || keyType == NULL || keyType == EMPTY
-            ? keyType.compareValueToKey((ConfigKeyComparator)formatter, value, context)
+            ? keyType.compareValueToKey((MapKeyComparator)formatter, value, context)
             : MISMATCH;
 
         if (MatchResult.compare(matchResult, bestMatchResult) > 0)

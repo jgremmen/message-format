@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MapKey.MatchResult;
@@ -37,7 +37,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * @since 0.8.0
  */
 public final class CollationKeyFormatter extends AbstractSingleTypeParameterFormatter<CollationKey>
-    implements SizeQueryable, ConfigKeyComparator<CollationKey>
+    implements SizeQueryable, MapKeyComparator<CollationKey>
 {
   @Override
   @Contract(pure = true)

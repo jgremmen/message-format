@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MapKey.MatchResult;
@@ -44,7 +44,7 @@ import static java.util.Base64.getMimeEncoder;
  * @since 0.8.0
  */
 public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatter<byte[]>
-    implements SizeQueryable, ConfigKeyComparator<byte[]>
+    implements SizeQueryable, MapKeyComparator<byte[]>
 {
   private static final byte[] LINE_SEPARATOR = new byte[] { '\n' };
 

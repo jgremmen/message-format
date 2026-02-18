@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
@@ -36,7 +36,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
  */
 public final class OptionalLongFormatter
     extends AbstractSingleTypeParameterFormatter<OptionalLong>
-    implements ConfigKeyComparator<OptionalLong>
+    implements MapKeyComparator<OptionalLong>
 {
   @Override
   @Contract(pure = true)

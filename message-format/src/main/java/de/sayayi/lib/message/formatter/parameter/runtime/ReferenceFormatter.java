@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MapKey.MatchResult;
@@ -36,7 +36,7 @@ import static de.sayayi.lib.message.part.MapKey.MatchResult.forNullKey;
  */
 public final class ReferenceFormatter
     extends AbstractSingleTypeParameterFormatter<Reference<?>>
-    implements SizeQueryable, ConfigKeyComparator<Reference<?>>
+    implements SizeQueryable, MapKeyComparator<Reference<?>>
 {
   @Override
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Reference<?> reference) {

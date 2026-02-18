@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractMultiSelectFormatter;
-import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
@@ -32,7 +32,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 /**
  * @author Jeroen Gremmen
  */
-public final class EnumFormatter extends AbstractMultiSelectFormatter<Enum<?>> implements ConfigKeyComparator<Enum<?>>
+public final class EnumFormatter extends AbstractMultiSelectFormatter<Enum<?>> implements MapKeyComparator<Enum<?>>
 {
   public EnumFormatter()
   {

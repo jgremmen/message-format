@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Jeroen Gremmen
  * @since 0.9.2
  */
-public abstract class AbstractConfigKeyComparator<T> implements ConfigKeyComparator<T>
+public abstract class AbstractMapKeyComparator<T> implements MapKeyComparator<T>
 {
   @Override
   public final @NotNull Text format(@NotNull ParameterFormatterContext context, Object value) {

@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
@@ -35,7 +35,7 @@ import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
  */
 public final class PrincipalFormatter
     extends AbstractSingleTypeParameterFormatter<Principal>
-    implements ConfigKeyComparator<Principal>
+    implements MapKeyComparator<Principal>
 {
   @Override
   protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Principal principal) {

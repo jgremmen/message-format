@@ -18,7 +18,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
@@ -52,7 +52,7 @@ import static java.lang.Math.signum;
  */
 public final class NumberFormatter
     extends AbstractParameterFormatter<Number>
-    implements ConfigKeyComparator<Number>
+    implements MapKeyComparator<Number>
 {
   private static final Map<Locale,DecimalFormatSymbols> FORMAT_SYMBOLS_CACHE = new ConcurrentHashMap<>();
 

@@ -32,6 +32,14 @@ public final class MessageUtil
   private MessageUtil() {}
 
 
+  /**
+   * Validates that the specified name is not {@code null} and not empty.
+   *
+   * @param name             the name to validate, may be {@code null}
+   * @param nameDescription  the name description to use in exception messages
+   *
+   * @return  the validated name, never {@code null} or empty
+   */
   @Contract(value = "null, _ -> fail; _, _ -> param1", pure = true)
   public static @NotNull String validateName(String name, @NotNull String nameDescription)
   {
@@ -99,21 +107,6 @@ public final class MessageUtil
         : startIdx > 0 || endIndex < val.length
             ? new String(val, startIdx, endIndex - startIdx)
             : s;
-  }
-
-
-  /**
-   * Returns the trimmed variant of {@code s}. If {@code s = null} an empty string is returned.
-   *
-   * @param s  string to trim
-   *
-   * @return  trimmed string, never {@code null}
-   *
-   * @see #trimSpaces(String)
-   */
-  @Contract(pure = true)
-  public static @NotNull String trimSpacesNotNull(String s) {
-    return s == null ? "" : trimSpaces(s);
   }
 
 
@@ -272,7 +265,7 @@ public final class MessageUtil
     {
       if ((cp = name.codePointAt(idx)) == '-')
       {
-        // If we've seen uppercase before it's camel case in which hyphens are not allowed
+        // If we've seen uppercase before, it's camel case in which hyphens are not allowed
         if (hasUppercase)
           return false;
 
@@ -286,7 +279,7 @@ public final class MessageUtil
       {
         if (isLetter(cp))
         {
-          // If we've seen a hyphen before it's kebab case in which uppercase/titlecase letters are not allowed
+          // If we've seen a hyphen before, it's kebab case in which uppercase/titlecase letters are not allowed
           if (hasHyphen)
             return false;
 

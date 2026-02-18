@@ -17,7 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
-import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ConfigKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
@@ -32,7 +32,7 @@ import java.util.function.BooleanSupplier;
  */
 public final class BooleanSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<BooleanSupplier>
-    implements ConfigKeyComparator<BooleanSupplier>
+    implements MapKeyComparator<BooleanSupplier>
 {
   @Override
   @Contract(pure = true)
