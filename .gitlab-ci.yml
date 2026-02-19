@@ -1,5 +1,5 @@
 # CI script
-image: localhost:5000/sayayi-jdk:17
+image: localhost:5000/sayayi-jdk:21
 
 stages:
   - build
