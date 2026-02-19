@@ -41,6 +41,7 @@ class TestMessageProperties:
         ("MSG-007", r"String key type %{p,mychar, <'A':A, >'Z':Z, :P}"),
         ("MSG-008", r"Something went wrong while parsing %[result,n=count,p:true]%[ex-colon]"),
         ("MSG-009", r"Number value type %{p,hh:-9223372036854775808,ii:9223372036854775807}"),
+        ("MSG-010", r"Additional info: %(clip,'%{s,empty:x}',clip:34)"),
     ])
     def test_message_tokenization(self, msg_id, message):
         """Test that messages from message.properties can be tokenized without errors."""
@@ -59,7 +60,7 @@ class TestMessageProperties:
         assert has_token_type(tokens, Punctuation.Special)
         assert has_token_type(tokens, Keyword.Constant)
         assert has_token_type(tokens, Operator)
-        assert has_token_type(tokens, String.Delimiter)
+        assert has_token_type(tokens, String.Single)  # Quotes are String.Single not String.Delimiter
 
     def test_msg005_nested_parameters(self):
         """MSG-005: Nested parameters in strings."""
@@ -68,9 +69,10 @@ class TestMessageProperties:
 
         param_markers = get_tokens_by_type(tokens, Punctuation.Special)
         assert len(param_markers) >= 4, "Should have opening and closing markers for both parameters"
-        assert has_token_type(tokens, String.Delimiter)
-        # Should have Name.Variable (for 'p' and 'm') and Name.Function (for 'message')
-        assert has_token_type(tokens, Name.Variable) or has_token_type(tokens, Name.Function)
+        assert has_token_type(tokens, String.Single)  # Quotes are String.Single not String.Delimiter
+        # Should have Name.Variable (for 'p' and 'm') and Name.Attribute (for 'message')
+        assert has_token_type(tokens, Name.Variable)
+        assert has_token_type(tokens, Name.Attribute)
 
     def test_msg005_negative_number(self):
         """MSG-005: Negative numbers."""
@@ -142,8 +144,8 @@ class TestEdgeCases:
         tokens_sq = tokenize("%{p,x:''}")
         tokens_dq = tokenize('%{p,x:""}')
 
-        assert has_token_type(tokens_sq, String.Delimiter)
-        assert has_token_type(tokens_dq, String.Delimiter)
+        assert has_token_type(tokens_sq, String.Single)  # Quotes are String.Single
+        assert has_token_type(tokens_dq, String.Double)  # Quotes are String.Double
 
     def test_deeply_nested_structures(self):
         """Test deeply nested parameters in strings."""
@@ -173,8 +175,8 @@ class TestEdgeCases:
         """Test names with hyphens."""
         tokens = tokenize("%[ex-colon]")
 
-        # In templates, names are Name.Class
-        name_tokens = get_tokens_by_type(tokens, Name.Class)
+        # In templates, names are Name.Label (per tokens.md)
+        name_tokens = get_tokens_by_type(tokens, Name.Label)
         name_values = [t[1] for t in name_tokens]
         assert 'ex-colon' in name_values, "Should recognize hyphenated name"
 
@@ -218,26 +220,29 @@ class TestParserStructures:
         assert any('userName' in t[1] for t in var_tokens)
 
     def test_parameter_format_context(self):
-        """Test that second name in parameter is highlighted as Name.Function."""
-        message = "%{value,number}"
+        """Test that format name after FORMAT keyword is highlighted as Name.Function."""
+        message = "%{value,format:number}"
         tokens = tokenize(message)
 
         var_tokens = get_tokens_by_type(tokens, Name.Variable)
         func_tokens = get_tokens_by_type(tokens, Name.Function)
+        reserved_tokens = get_tokens_by_type(tokens, Keyword.Reserved)
 
         assert len(var_tokens) >= 1
         assert any('value' in t[1] for t in var_tokens)
-        assert len(func_tokens) >= 1
+        assert len(reserved_tokens) >= 1  # Should have 'format' as Keyword.Reserved
+        assert any('format' in t[1] for t in reserved_tokens)
+        assert len(func_tokens) >= 1  # Should have 'number' as Name.Function
         assert any('number' in t[1] for t in func_tokens)
 
     def test_template_name_context(self):
-        """Test that first name in template is highlighted as Name.Class."""
+        """Test that first name in template is highlighted as Name.Label."""
         message = "%[errorTemplate]"
         tokens = tokenize(message)
 
-        class_tokens = get_tokens_by_type(tokens, Name.Class)
-        assert len(class_tokens) >= 1
-        assert any('errorTemplate' in t[1] for t in class_tokens)
+        label_tokens = get_tokens_by_type(tokens, Name.Label)
+        assert len(label_tokens) >= 1
+        assert any('errorTemplate' in t[1] for t in label_tokens)
 
     def test_named_config_elements(self):
         """Test named config elements (name:value)."""
@@ -253,9 +258,9 @@ class TestParserStructures:
         message = "%[template,param=delegated]"
         tokens = tokenize(message)
 
-        # Should have Name.Class for template name
-        class_tokens = get_tokens_by_type(tokens, Name.Class)
-        assert any('template' in t[1] for t in class_tokens)
+        # Should have Name.Label for template name
+        label_tokens = get_tokens_by_type(tokens, Name.Label)
+        assert any('template' in t[1] for t in label_tokens)
 
         # Should have = operator
         assert has_token_type(tokens, Operator)
@@ -269,8 +274,8 @@ class TestParserStructures:
         test_cases = [
             ("%{null}", Name.Variable),
             ("%{empty}", Name.Variable),
-            ("%[null]", Name.Class),
-            ("%[empty]", Name.Class),
+            ("%[null]", Name.Label),  # Templates use Name.Label not Name.Class
+            ("%[empty]", Name.Label),  # Templates use Name.Label not Name.Class
         ]
 
         for message, expected_type in test_cases:
@@ -280,14 +285,18 @@ class TestParserStructures:
 
     def test_complex_parameter_structure(self):
         """Test complete parameter structure: name, format, configs."""
-        message = "%{count,number,<10:'few',>=10:'many'}"
+        message = "%{count,format:number,<10:'few',>=10:'many'}"
         tokens = tokenize(message)
 
         # Should have Name.Variable for parameter name
         var_tokens = get_tokens_by_type(tokens, Name.Variable)
         assert any('count' in t[1] for t in var_tokens)
 
-        # Should have Name.Function for format
+        # Should have Keyword.Reserved for 'format'
+        reserved_tokens = get_tokens_by_type(tokens, Keyword.Reserved)
+        assert any('format' in t[1] for t in reserved_tokens)
+
+        # Should have Name.Function for format name
         func_tokens = get_tokens_by_type(tokens, Name.Function)
         assert any('number' in t[1] for t in func_tokens)
 
@@ -296,6 +305,230 @@ class TestParserStructures:
 
         # Should have strings
         assert has_token_type(tokens, String)
+
+
+class TestPostFormat:
+    """Test post-format functionality."""
+
+    def test_msg010_post_format(self):
+        """MSG-010: Post-format with nested parameter and config."""
+        message = r"%(clip,'%{s,empty:x}',clip:34)"
+        tokens = tokenize(message)
+
+        # Should have %( as Punctuation.Special
+        special_tokens = get_tokens_by_type(tokens, Punctuation.Special)
+        assert any('%(' in t[1] for t in special_tokens), "Should recognize %( as post-format start"
+
+        # First 'clip' should be Name.Function (postFormatName)
+        func_tokens = get_tokens_by_type(tokens, Name.Function)
+        assert len(func_tokens) >= 1, "Should have postFormatName as Name.Function"
+        assert 'clip' in func_tokens[0][1], "Post-format name should be 'clip'"
+
+        # Second 'clip' should be Name.Attribute (config name)
+        attr_tokens = get_tokens_by_type(tokens, Name.Attribute)
+        assert any('clip' in t[1] for t in attr_tokens), "Config name should be Name.Attribute"
+
+        # Should have number 34
+        number_tokens = get_tokens_by_type(tokens, Number.Integer)
+        assert any('34' in t[1] for t in number_tokens), "Should recognize number in config"
+
+        # Should have nested parameter with 'empty' keyword
+        keyword_tokens = get_tokens_by_type(tokens, Keyword.Constant)
+        assert any('empty' in t[1] for t in keyword_tokens), "Should recognize 'empty' keyword"
+
+    def test_nested_post_format_in_string(self):
+        """Test nested post-format inside quoted message."""
+        message = r"'text %(fmt,'msg')'"
+        tokens = tokenize(message)
+
+        # Should have String.Single for quotes
+        assert has_token_type(tokens, String.Single)
+
+        # Should have %( inside string
+        special_tokens = get_tokens_by_type(tokens, Punctuation.Special)
+        assert any('%(' in t[1] for t in special_tokens)
+
+        # Should have Name.Function for post-format name
+        assert has_token_type(tokens, Name.Function)
+
+    def test_post_format_with_all_config_types(self):
+        """Test post-format with different configDefinition types."""
+        # Bool config
+        tokens_bool = tokenize(r"%(fmt,'msg',flag:true)")
+        assert has_token_type(tokens_bool, Keyword.Constant)
+
+        # Number config
+        tokens_num = tokenize(r"%(fmt,'msg',count:42)")
+        number_tokens = get_tokens_by_type(tokens_num, Number.Integer)
+        assert any('42' in t[1] for t in number_tokens)
+
+        # String config (simpleString)
+        tokens_str = tokenize(r"%(fmt,'msg',name:value)")
+        attr_tokens = get_tokens_by_type(tokens_str, Name.Attribute)
+        assert any('name' in t[1] for t in attr_tokens)
+
+        # Message config (quotedMessage)
+        tokens_msg = tokenize(r"%(fmt,'msg',txt:'value')")
+        assert has_token_type(tokens_msg, String.Single)
+
+
+class TestFormatKeyword:
+    """Test FORMAT keyword in parameterFormat."""
+
+    def test_msg007_format_keyword(self):
+        """MSG-007: Test format:mychar sequence."""
+        message = r"%{p,format:mychar}"
+        tokens = tokenize(message)
+
+        # Should have 'format' as Keyword.Reserved
+        reserved_tokens = get_tokens_by_type(tokens, Keyword.Reserved)
+        assert len(reserved_tokens) >= 1, "Should have FORMAT keyword"
+        assert 'format' in reserved_tokens[0][1], "FORMAT should be 'format'"
+
+        # Should have ':' as Punctuation
+        punct_tokens = get_tokens_by_type(tokens, Punctuation)
+        assert any(':' in t[1] for t in punct_tokens), "Should have colon"
+
+        # Should have 'mychar' as Name.Function
+        func_tokens = get_tokens_by_type(tokens, Name.Function)
+        assert len(func_tokens) >= 1, "Should have format name as Name.Function"
+        assert 'mychar' in func_tokens[0][1], "Format name should be 'mychar'"
+
+    def test_format_with_keyword_name(self):
+        """Test format with keyword as format name."""
+        message = r"%{p,format:null}"
+        tokens = tokenize(message)
+
+        # Should have 'format' as Keyword.Reserved
+        reserved_tokens = get_tokens_by_type(tokens, Keyword.Reserved)
+        assert 'format' in reserved_tokens[0][1]
+
+        # Should have 'null' as Name.Function (in parameterFormat context)
+        func_tokens = get_tokens_by_type(tokens, Name.Function)
+        assert any('null' in t[1] for t in func_tokens)
+
+
+class TestTemplateEnhancements:
+    """Test template-specific features."""
+
+    def test_template_name_as_label(self):
+        """Test that templateName uses Name.Label token."""
+        message = r"%[myTemplate]"
+        tokens = tokenize(message)
+
+        # Should have Name.Label for template name
+        label_tokens = get_tokens_by_type(tokens, Name.Label)
+        assert len(label_tokens) >= 1, "Should have templateName as Name.Label"
+        assert 'myTemplate' in label_tokens[0][1]
+
+    def test_template_parameter_delegate(self):
+        """Test templateParameterDelegate with simpleString = simpleString."""
+        message = r"%[tpl,param=delegated]"
+        tokens = tokenize(message)
+
+        # Should have Name.Label for template name
+        label_tokens = get_tokens_by_type(tokens, Name.Label)
+        assert 'tpl' in label_tokens[0][1]
+
+        # Should have = as Operator
+        op_tokens = get_tokens_by_type(tokens, Operator)
+        assert any('=' in t[1] for t in op_tokens)
+
+        # Should have Name.Attribute for both parameter names (approximation)
+        attr_tokens = get_tokens_by_type(tokens, Name.Attribute)
+        assert len(attr_tokens) >= 2, "Should have both delegate parameter names"
+
+    def test_template_with_keyword_as_name(self):
+        """Test template with keyword as template name."""
+        message = r"%[null,x:true]"
+        tokens = tokenize(message)
+
+        # 'null' should be Name.Label (templateName can be keyword)
+        label_tokens = get_tokens_by_type(tokens, Name.Label)
+        assert any('null' in t[1] for t in label_tokens)
+
+
+class TestMapKeysAndConfig:
+    """Test distinction between mapKeys and configDefinition."""
+
+    def test_map_keys_with_operators(self):
+        """Test mapKeys with various operators."""
+        message = r"%{p,!null:A,<10:B,>=20:C}"
+        tokens = tokenize(message)
+
+        # Should have operators
+        op_tokens = get_tokens_by_type(tokens, Operator)
+        assert any('!' in t[1] for t in op_tokens)
+        assert any('<' in t[1] for t in op_tokens)
+        assert any('>=' in t[1] for t in op_tokens)
+
+        # Should have keywords (null)
+        keyword_tokens = get_tokens_by_type(tokens, Keyword.Constant)
+        assert any('null' in t[1] for t in keyword_tokens)
+
+        # Should have numbers
+        number_tokens = get_tokens_by_type(tokens, Number.Integer)
+        assert any('10' in t[1] for t in number_tokens)
+        assert any('20' in t[1] for t in number_tokens)
+
+    def test_grouped_map_keys(self):
+        """Test grouped mapKeys with parentheses."""
+        message = r"%{p,(key1,key2):value}"
+        tokens = tokenize(message)
+
+        # Should have L_PAREN and R_PAREN
+        punct_tokens = get_tokens_by_type(tokens, Punctuation)
+        assert any('(' in t[1] for t in punct_tokens)
+        assert any(')' in t[1] for t in punct_tokens)
+
+    def test_config_definition_vs_map_keys(self):
+        """Test that configDefinition (NAME:value) is distinct from mapKeys."""
+        # configDefinition: kebab-case NAME before colon
+        message_config = r"%{p,my-config:true}"
+        tokens_config = tokenize(message_config)
+
+        # Should have Name.Attribute for config name
+        attr_tokens = get_tokens_by_type(tokens_config, Name.Attribute)
+        assert any('my-config' in t[1] for t in attr_tokens)
+
+        # mapKeys: keywords before colon
+        message_map = r"%{p,empty:value}"
+        tokens_map = tokenize(message_map)
+
+        # Should have Keyword.Constant for 'empty'
+        keyword_tokens = get_tokens_by_type(tokens_map, Keyword.Constant)
+        assert any('empty' in t[1] for t in keyword_tokens)
+
+
+class TestEdgeCasesEnhanced:
+    """Enhanced edge case testing."""
+
+    def test_format_as_parameter_name(self):
+        """Test that 'format' can be used as parameter name."""
+        message = r"%{format}"
+        tokens = tokenize(message)
+
+        # 'format' as parameterName should be Name.Variable
+        var_tokens = get_tokens_by_type(tokens, Name.Variable)
+        assert any('format' in t[1] for t in var_tokens)
+
+    def test_format_as_post_format_name(self):
+        """Test that 'format' can be used as post-format name."""
+        message = r"%(format,'msg')"
+        tokens = tokenize(message)
+
+        # 'format' as postFormatName should be Name.Function
+        func_tokens = get_tokens_by_type(tokens, Name.Function)
+        assert any('format' in t[1] for t in func_tokens)
+
+    def test_deeply_nested_with_post_format(self):
+        """Test deeply nested structures including post-format."""
+        message = r"%(outer,'%{p,'%(inner,'%{x}')}')"
+        tokens = tokenize(message)
+
+        # Should have multiple Punctuation.Special tokens
+        special_tokens = get_tokens_by_type(tokens, Punctuation.Special)
+        assert len(special_tokens) >= 6, "Should have markers for all nested structures"
 
 
 if __name__ == '__main__':
