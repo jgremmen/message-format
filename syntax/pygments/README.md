@@ -26,7 +26,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='messageformat-pygments',
-    version='1.0.0',
+    version='0.21.0',
     packages=find_packages(),
     install_requires=[
         'pygments>=2.10',
