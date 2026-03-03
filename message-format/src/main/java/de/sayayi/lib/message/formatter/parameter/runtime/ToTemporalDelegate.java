@@ -22,8 +22,8 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.attribute.FileTime;
-import java.time.Clock;
 import java.time.Instant;
+import java.time.InstantSource;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.Temporal;
@@ -67,8 +67,8 @@ public final class ToTemporalDelegate implements ParameterFormatter
     if (value instanceof java.sql.Date)
       return context.format(((java.sql.Date)value).toLocalDate(), LocalDate.class);
 
-    if (value instanceof Clock)
-      value = ((Clock)value).instant();
+    if (value instanceof InstantSource)
+      value = ((InstantSource)value).instant();
     else if (value instanceof Date)
       value = ((Date)value).toInstant();
     else if (value instanceof FileTime)
@@ -85,8 +85,8 @@ public final class ToTemporalDelegate implements ParameterFormatter
   {
     return Set.of(
         new FormattableType(Calendar.class),
-        new FormattableType(Clock.class),
         new FormattableType(Date.class),
-        new FormattableType(FileTime.class));
+        new FormattableType(FileTime.class),
+        new FormattableType(InstantSource.class));
   }
 }
