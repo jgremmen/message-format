@@ -5,12 +5,12 @@ message-format = '0.21.0-SNAPSHOT'
 antlr4 = '[4.13.0,4.14)'
 antlr4-ext = '[0.6,0.7)'
 asm = '[9.0,10.0)'
-jetbrains-annotations = '[24.0,26.1)'
+jetbrains-annotations = '[24.0,26.2)'
 junit = '6.0.+'
 lombok = '1.18.+'
-mockito = '5.21.+'
+mockito = '5.23.+'
 pack = '[0.1.3,0.2)'
-spring = '[5.0,6.0)'
+spring = '[5.0,7.0)'
 
 [libraries]
 antlr4 = { module = 'org.antlr:antlr4', version.ref = "antlr4" }
@@ -29,4 +29,4 @@ antlr4-runtime = [ 'antlr4-runtime', 'antlr4-ext-runtime' ]
 mockito-test = [ 'mockito-core' ]
 
 [plugins]
-publish-gradle-plugin = { id = 'com.gradle.plugin-publish', version = '2.0.0' }
+publish-gradle-plugin = { id = 'com.gradle.plugin-publish', version = '2.1.0' }
