@@ -38,7 +38,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
 import static de.sayayi.lib.message.part.MapKey.Type.EMPTY;
@@ -231,6 +233,14 @@ public final class MessagePartMap implements MessagePart.Map
 
 
   /**
+   * @since 0.21.0
+   */
+  public @NotNull Iterator<Entry<MapKey,TypedValue<?>>> mapEntryIterator() {
+    return new MapEntryIterator();
+  }
+
+
+  /**
    * Returns a set of template names referenced in all message values which are available in
    * the message parameter configuration.
    *
@@ -315,6 +325,57 @@ public final class MessagePartMap implements MessagePart.Map
       map.put(null, unpack.unpackTypedValue(packStream));
 
     return new MessagePartMap(map);
+  }
+
+
+
+
+  private final class MapEntryIterator implements Iterator<Entry<MapKey,TypedValue<?>>>
+  {
+    private Entry<MapKey,TypedValue<?>> nextEntry;
+    private int idx;
+
+
+    private MapEntryIterator() {
+      prepareNextEntry();
+    }
+
+
+    private void prepareNextEntry()
+    {
+      if (idx == mapKeys.length && defaultValue != null)
+      {
+        nextEntry = new SimpleEntry<>(null, defaultValue);
+        idx++;
+      }
+      else if (idx < mapKeys.length)
+      {
+        nextEntry = new SimpleEntry<>(mapKeys[idx], mapValues[idx]);
+        idx++;
+      }
+      else
+        nextEntry = null;
+    }
+
+
+    @Override
+    public boolean hasNext() {
+      return nextEntry != null;
+    }
+
+
+    @Override
+    public Entry<MapKey,TypedValue<?>> next()
+    {
+      if (nextEntry == null)
+        throw new NoSuchElementException();
+
+      final var entry = nextEntry;
+
+      prepareNextEntry();
+
+      return entry;
+    }
   }
 
 

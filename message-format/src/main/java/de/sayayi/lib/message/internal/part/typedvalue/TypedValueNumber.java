@@ -67,6 +67,12 @@ public record TypedValueNumber(long longValue) implements NumberValue
 
 
   @Override
+  public void serialize(@NotNull Context context) {
+    context.textJoiner().addNoSpace(Long.toString(longValue));
+  }
+
+
+  @Override
   @Contract(pure = true)
   public @NotNull String toString() {
     return Long.toString(longValue);

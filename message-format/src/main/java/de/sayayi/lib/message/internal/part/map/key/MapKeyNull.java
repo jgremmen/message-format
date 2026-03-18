@@ -54,6 +54,12 @@ public enum MapKeyNull implements MapKey
 
 
   @Override
+  public void serialize(@NotNull Context context) {
+    context.textJoiner().addNoSpace(getCompareType().asPrefix() + "null");
+  }
+
+
+  @Override
   public String toString() {
     return getCompareType().asPrefix() + "null";
   }

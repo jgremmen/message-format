@@ -60,6 +60,12 @@ public enum MapKeyBool implements MapKey
 
 
   @Override
+  public void serialize(@NotNull Context context) {
+    context.textJoiner().addNoSpace(Boolean.toString(isBool()));
+  }
+
+
+  @Override
   public String toString() {
     return Boolean.toString(isBool());
   }

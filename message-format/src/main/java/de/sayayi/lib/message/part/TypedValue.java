@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.part;
 
+import de.sayayi.lib.message.FormatStringSerializer;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueBool;
@@ -34,7 +35,7 @@ import org.jetbrains.annotations.NotNull;
  * @see MessagePart.Config
  * @see MessagePart.Map
  */
-public sealed interface TypedValue<T>
+public sealed interface TypedValue<T> extends FormatStringSerializer
     permits TypedValue.BoolValue, TypedValue.StringValue, TypedValue.NumberValue, TypedValue.MessageValue
 {
   /**

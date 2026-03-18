@@ -86,6 +86,12 @@ public final class MapKeyNumber implements MapKey
 
 
   @Override
+  public void serialize(@NotNull Context context) {
+    context.textJoiner().addNoSpace(compareType.asPrefix() + number);
+  }
+
+
+  @Override
   public boolean equals(Object o) {
     return o instanceof MapKeyNumber that && number == that.number && compareType == that.compareType;
   }
