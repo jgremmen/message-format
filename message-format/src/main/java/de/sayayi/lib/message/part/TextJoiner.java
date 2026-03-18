@@ -103,7 +103,9 @@ public final class TextJoiner
     {
       if (insertSpaceBefore)
         joined.append(' ');
+
       joined.append(c);
+      insertSpaceBefore = false;
     }
 
     return this;
