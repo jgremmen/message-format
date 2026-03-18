@@ -20,6 +20,7 @@ import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -177,7 +178,7 @@ public interface Message extends FormatStringSerializer
    * @since 0.21.0
    */
   @Contract(pure = true)
-  default @NotNull String asFormatString(@NotNull Charset charset)
+  default @NotNull @Language("MessageFormat") String asFormatString(@NotNull Charset charset)
   {
     final var serializerContext = new FormatStringSerializer.Context(charset);
 
