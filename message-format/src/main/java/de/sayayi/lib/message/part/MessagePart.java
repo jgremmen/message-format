@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.part;
 
+import de.sayayi.lib.message.FormatStringSerializer;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
@@ -28,6 +29,8 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.Locale;
 import java.util.Set;
 
+import static de.sayayi.lib.message.util.MessageUtil.serializeString;
+
 
 /**
  * This interface represents an immutable part of a compiled message (text, parameter or template).
@@ -35,7 +38,7 @@ import java.util.Set;
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
-public interface MessagePart extends SpacesAware
+public interface MessagePart extends SpacesAware, FormatStringSerializer
 {
   /**
    * Returns the post formatted text with optional leading/trailing spaces.
@@ -75,11 +78,14 @@ public interface MessagePart extends SpacesAware
    */
   interface Text extends MessagePart
   {
+    /** Message part representing a {@code null} value. */
+    Text NULL = new TextPart(null);
+
     /** Message part representing an empty text value. */
     Text EMPTY = new NoSpaceTextPart("");
 
-    /** Message part representing a {@code null} value. */
-    Text NULL = new TextPart(null);
+    /** Message part representing a single space. */
+    Text SPACE = new TextPart(" ");
 
 
     /**
@@ -128,6 +134,12 @@ public interface MessagePart extends SpacesAware
     @Override
     default @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters) {
       return this;
+    }
+
+
+    @Override
+    default void serialize(@NotNull Context context) {
+      serializeString(context, getTextWithSpaces());
     }
   }
 

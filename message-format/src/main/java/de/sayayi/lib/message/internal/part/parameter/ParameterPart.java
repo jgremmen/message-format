@@ -37,6 +37,7 @@ import java.util.Objects;
 import static de.sayayi.lib.message.internal.pack.PackSupport.*;
 import static de.sayayi.lib.message.internal.part.config.MessagePartConfig.EMPTY_CONFIG;
 import static de.sayayi.lib.message.internal.part.map.MessagePartMap.EMPTY_MAP;
+import static de.sayayi.lib.message.part.MessagePart.Text.SPACE;
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
 import static de.sayayi.lib.message.util.MessageUtil.validateName;
 import static java.util.Objects.requireNonNull;
@@ -162,6 +163,49 @@ public final class ParameterPart implements MessagePart.Parameter
         parameters.getParameterValue(name), null, format, config, map);
 
     return addSpaces(context.delegateToNextFormatter(), spaceBefore, spaceAfter);
+  }
+
+
+  @Override
+  public void serialize(@NotNull Context context)
+  {
+    final var textJoiner = context.textJoiner();
+
+    if (spaceBefore)
+      textJoiner.add(SPACE);
+
+    textJoiner.addNoSpace("%{");
+    textJoiner.addNoSpace(name);
+
+    if (format != null)
+    {
+      textJoiner.addNoSpace(",format:");
+      textJoiner.addNoSpace(format);
+    }
+
+    final var contextWithoutQuotes = context.withoutStringQuote();
+
+    for(var configName: config.getConfigNames())
+    {
+      textJoiner.add(',').addNoSpace(configName).add(':');
+      config.getConfigValue(configName).serialize(contextWithoutQuotes);
+    }
+
+    map.mapEntryIterator().forEachRemaining(entry -> {
+      textJoiner.add(',');
+
+      final var mapKey = entry.getKey();
+      if (mapKey != null)
+        mapKey.serialize(contextWithoutQuotes);
+
+      textJoiner.add(':');
+      entry.getValue().serialize(contextWithoutQuotes);
+    });
+
+    textJoiner.add('}');
+
+    if (spaceAfter)
+      textJoiner.add(SPACE);
   }
 
 

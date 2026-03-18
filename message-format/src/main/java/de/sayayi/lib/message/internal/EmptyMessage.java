@@ -22,6 +22,8 @@ import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.charset.Charset;
+
 
 /**
  * Message implementation, representing an empty text without leading/trailing spaces.
@@ -79,6 +81,17 @@ public final class EmptyMessage implements Message.WithSpaces
   @Override
   public @NotNull MessagePart[] getMessageParts() {
     return new MessagePart[] { Text.EMPTY };
+  }
+
+
+  @Override
+  public @NotNull String asFormatString(@NotNull Charset charset) {
+    return "";
+  }
+
+
+  @Override
+  public void serialize(@NotNull Context context) {
   }
 
 

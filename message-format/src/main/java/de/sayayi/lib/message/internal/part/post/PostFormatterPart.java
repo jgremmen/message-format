@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
+import static de.sayayi.lib.message.part.MessagePart.Text.SPACE;
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.util.MessageUtil.validateName;
@@ -116,6 +117,32 @@ public final class PostFormatterPart implements MessagePart.PostFormat
         noSpaceText(postFormatter.format(text.getTextNotNull(), new PostFormatterContextImpl(messageAccessor, config))),
         spaceBefore || text.isSpaceBefore(),
         spaceAfter || text.isSpaceAfter());
+  }
+
+
+  @Override
+  public void serialize(@NotNull Context context)
+  {
+    final var textJoiner = context.textJoiner();
+
+    if (spaceBefore)
+      textJoiner.add(SPACE);
+
+    textJoiner.addNoSpace("%(").addNoSpace(name).addNoSpace(",\"");
+    message.serialize(context.withStringQuote('"'));
+
+    final var contextWithoutQuotes = context.withoutStringQuote();
+
+    for(var configName: config.getConfigNames())
+    {
+      textJoiner.add(',').addNoSpace(configName).add(':');
+      config.getConfigValue(configName).serialize(contextWithoutQuotes);
+    }
+
+    textJoiner.add(')');
+
+    if (spaceAfter)
+      textJoiner.add(SPACE);
   }
 
 

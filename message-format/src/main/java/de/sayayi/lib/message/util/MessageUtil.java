@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.util;
 
+import de.sayayi.lib.message.FormatStringSerializer.Context;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -291,5 +292,102 @@ public final class MessageUtil
     }
 
     return true;
+  }
+
+
+  /**
+   * Check whether {@code name} is a valid name as defined by the message format lexer grammar.
+   * <p>
+   * A valid name must satisfy the following conditions:
+   * <ul>
+   *   <li> It must not be empty.
+   *   <li> It must start with a Unicode letter (category {@code \p{L}}).
+   *   <li> After the first letter, it may contain zero or more Unicode letters or numbers
+   *        (categories {@code \p{L}} or {@code \p{N}}).
+   *   <li> Optionally followed by one or more groups, each consisting of a single underscore
+   *        ({@code '_'}) or hyphen ({@code '-'}) followed by one or more Unicode letters or
+   *        numbers.
+   * </ul>
+   *
+   * @param name  the name to check, not {@code null}
+   *
+   * @return  {@code true} if {@code name} is a valid name, {@code false} otherwise
+   *
+   * @since 0.21.0
+   */
+  @Contract(pure = true)
+  public static boolean isName(@NotNull String name)
+  {
+    final var length = name.length();
+    if (length == 0)
+      return false;
+
+    // Name must start with NameStartChar: Unicode letter (\p{L})
+    var cp = name.codePointAt(0);
+    if (!isLetter(cp))
+      return false;
+
+    var idx = charCount(cp);
+
+    // Zero or more NameChar: Unicode letter (\p{L}) or Unicode number (\p{N})
+    while(idx < length && isNameChar(cp = name.codePointAt(idx)))
+      idx += charCount(cp);
+
+    // Zero or more groups of [_-] followed by one or more NameChar
+    while(idx < length)
+    {
+      cp = name.codePointAt(idx++);
+      if (cp != '_' && cp != '-')
+        return false;
+
+      if (idx >= length || !isNameChar(cp = name.codePointAt(idx)))
+        return false;
+
+      do {
+        idx += charCount(cp);
+      } while(idx < length && isNameChar(cp = name.codePointAt(idx)));
+    }
+
+    return true;
+  }
+
+
+  @Contract(pure = true)
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+  private static boolean isNameChar(int cp)
+  {
+    final var type = getType(cp);
+    return isLetter(cp) || type == DECIMAL_DIGIT_NUMBER || type == LETTER_NUMBER || type == OTHER_NUMBER;
+  }
+
+
+  public static void serializeString(@NotNull Context context, @NotNull String string)
+  {
+    final var stringCharArray = string.toCharArray();
+    final var textJoiner = context.textJoiner();
+
+    for(int i = 0, l = stringCharArray.length; i < l; i++)
+    {
+      final var ch = stringCharArray[i];
+
+      if (Character.valueOf(ch).equals(context.inStringWithQuote()))
+        textJoiner.add('\\').add(ch);
+      else if (ch == '%' && i + 1 < l && "{[(".indexOf(stringCharArray[i + 1]) >= 0)
+        textJoiner.addNoSpace("\\%");
+      else if (!isISOControl(ch) && context.canEncode(ch))
+        textJoiner.add(ch);
+      else
+        textJoiner.addNoSpace(String.format("\\u%04x", (int)ch));
+    }
+  }
+
+
+  public static void serializeQuotedString(@NotNull Context context, @NotNull String string)
+  {
+    final var quote = string.contains("'") ? '"' : '\'';
+
+    context.textJoiner().add(quote);
+    serializeString(context.withStringQuote(quote), string);
+    context.textJoiner().add(quote);
   }
 }

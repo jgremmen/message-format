@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.part;
 
+import de.sayayi.lib.message.FormatStringSerializer;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ComparatorContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.internal.part.map.key.*;
@@ -35,7 +36,7 @@ import static de.sayayi.lib.message.part.MapKey.CompareType.NE;
  *
  * @see MessagePart.Map
  */
-public sealed interface MapKey
+public sealed interface MapKey extends FormatStringSerializer
     permits MapKeyNull, MapKeyEmpty, MapKeyBool, MapKeyString, MapKeyNumber
 {
   /** Map key type {@code empty}. */

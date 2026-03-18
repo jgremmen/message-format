@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 import static de.sayayi.lib.message.part.MapKey.CompareType.EQ;
+import static de.sayayi.lib.message.util.MessageUtil.serializeQuotedString;
 import static java.util.Objects.requireNonNull;
 
 
@@ -91,6 +92,14 @@ public final class MapKeyString implements MapKey
   @Override
   public @NotNull Type getType() {
     return Type.STRING;
+  }
+
+
+  @Override
+  public void serialize(@NotNull Context context)
+  {
+    context.textJoiner().addNoSpace(compareType.asPrefix());
+    serializeQuotedString(context, string);
   }
 
 

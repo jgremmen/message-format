@@ -65,6 +65,12 @@ public enum TypedValueBool implements BoolValue
 
 
   @Override
+  public void serialize(@NotNull Context context) {
+    context.textJoiner().addNoSpace(Boolean.toString(booleanValue()));
+  }
+
+
+  @Override
   public String toString() {
     return Boolean.toString(booleanValue());
   }

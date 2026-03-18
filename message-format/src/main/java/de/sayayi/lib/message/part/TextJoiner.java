@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.part.TextPartFactory.*;
+import static de.sayayi.lib.message.util.MessageUtil.isSpaceChar;
 
 
 /**
@@ -79,6 +80,31 @@ public final class TextJoiner
     }
     else
       insertSpaceBefore |= text.isSpaceAfter();
+
+    return this;
+  }
+
+
+  /**
+   * Add character respecting leading/trailing spaces.
+   *
+   * @param c  character to add
+   *
+   * @return  this text joiner, never {@code null}
+   *
+   * @since 0.21.0
+   */
+  @Contract(value = "_ -> this", mutates = "this")
+  public @NotNull TextJoiner add(char c)
+  {
+    if (isSpaceChar(c))
+      insertSpaceBefore = true;
+    else
+    {
+      if (insertSpaceBefore)
+        joined.append(' ');
+      joined.append(c);
+    }
 
     return this;
   }

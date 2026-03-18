@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +43,7 @@ import static java.util.Collections.unmodifiableSet;
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
-public interface Message
+public interface Message extends FormatStringSerializer
 {
   /**
    * Empty message.
@@ -172,6 +173,28 @@ public interface Message
   }
 
 
+  /**
+   * @since 0.21.0
+   */
+  @Contract(pure = true)
+  default @NotNull String asFormatString(@NotNull Charset charset)
+  {
+    final var serializerContext = new FormatStringSerializer.Context(charset);
+
+    serialize(serializerContext);
+
+    return serializerContext.textJoiner().asSpacedText().getTextNotNull();
+  }
+
+
+  @Override
+  default void serialize(@NotNull Context context)
+  {
+    for(var messagePart: getMessageParts())
+      messagePart.serialize(context);
+  }
+
+
 
 
   /**
@@ -272,6 +295,13 @@ public interface Message
     @Contract("-> fail")
     default @NotNull MessagePart[] getMessageParts() {
       throw new UnsupportedOperationException("getMessageParts");
+    }
+
+
+    @Override
+    @Contract("_ -> fail")
+    default @NotNull String asFormatString(@NotNull Charset charset) {
+      throw new UnsupportedOperationException("asFormatString");
     }
   }
 

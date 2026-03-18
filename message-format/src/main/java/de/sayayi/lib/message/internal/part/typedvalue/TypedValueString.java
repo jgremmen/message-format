@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
+import static de.sayayi.lib.message.util.MessageUtil.*;
 import static java.util.Objects.requireNonNull;
 
 
@@ -89,6 +90,16 @@ public final class TypedValueString implements StringValue
     }
 
     return message;
+  }
+
+
+  @Override
+  public void serialize(@NotNull Context context)
+  {
+    if (isName(string))
+      serializeString(context, string);
+    else
+      serializeQuotedString(context, string);
   }
 
 

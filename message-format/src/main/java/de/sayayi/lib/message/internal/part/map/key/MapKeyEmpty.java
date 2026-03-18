@@ -57,6 +57,12 @@ public enum MapKeyEmpty implements MapKey
 
 
   @Override
+  public void serialize(@NotNull Context context) {
+    context.textJoiner().addNoSpace(getCompareType().asPrefix() + "empty");
+  }
+
+
+  @Override
   public String toString() {
     return getCompareType().asPrefix() + "empty";
   }

@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
+import static de.sayayi.lib.message.part.MessagePart.Text.SPACE;
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.util.MessageUtil.validateName;
@@ -128,6 +129,34 @@ public final class TemplatePart implements MessagePart.Template
         ? noSpaceText(message.format(messageAccessor, new ParameterAdapter(parameters)))
         : EMPTY,
         spaceBefore, spaceAfter);
+  }
+
+
+  @Override
+  public void serialize(@NotNull Context context)
+  {
+    final var textJoiner = context.textJoiner();
+
+    if (spaceBefore)
+      textJoiner.add(SPACE);
+
+    textJoiner.addNoSpace("%[");
+    textJoiner.addNoSpace(name);
+
+    final var contextWithoutQuotes = context.withoutStringQuote();
+
+    defaultParameterMap.iterator().forEachRemaining(defaultParameter -> {
+      textJoiner.add(',').addNoSpace(defaultParameter.getKey()).add(':');
+      defaultParameter.getValue().serialize(contextWithoutQuotes);
+    });
+
+    parameterDelegateMap.iterator().forEachRemaining(parameterDelegate ->
+        textJoiner.add(',').addNoSpace(parameterDelegate.getKey()).add('=').addNoSpace(parameterDelegate.getValue()));
+
+    textJoiner.add(']');
+
+    if (spaceAfter)
+      textJoiner.add(SPACE);
   }
 
 
