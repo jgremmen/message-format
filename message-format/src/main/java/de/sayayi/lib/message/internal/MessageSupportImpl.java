@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.net.URL;
 import java.util.*;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map.Entry;
@@ -177,39 +176,36 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
   @Override
-  public @NotNull ConfigurableMessageSupport importMessages(@NotNull Enumeration<URL> packResources) throws IOException
+  public @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream packStream,
+                                                            Consumer<Message.WithCode> messageConsumer,
+                                                            BiConsumer<String, Message.WithSpaces> templateConsumer)
+      throws IOException
   {
-    requireNonNull(packResources, "packResources must not be null");
-
-    final var packStreams = new ArrayList<InputStream>();
-
-    while(packResources.hasMoreElements())
-      packStreams.add(packResources.nextElement().openStream());
-
-    return importMessages(packStreams.toArray(InputStream[]::new));
-  }
-
-
-  @Override
-  public @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream... packStreams) throws IOException
-  {
-    requireNonNull(packStreams, "packStreams must not be null");
+    requireNonNull(packStream, "packStream must not be null");
 
     final var packHelper = new PackSupport();
 
-    for(var packStream: packStreams)
-    {
-      try(var dataStream = new PackInputStream(PACK_CONFIG, packStream)) {
-        if (dataStream.getVersion().isEmpty())
-          throw new IllegalArgumentException("packStream has no version");
+    try(var dataStream = new PackInputStream(PACK_CONFIG, packStream)) {
+      if (dataStream.getVersion().isEmpty())
+        throw new IllegalArgumentException("packStream has no version");
 
-        // messages
-        for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
-          addMessage(packHelper.unpackMessageWithCode(dataStream));
+      // messages
+      for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
+      {
+        final var message = packHelper.unpackMessageWithCode(dataStream);
 
-        // templates
-        for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
-          addTemplate(requireNonNull(dataStream.readString()), packHelper.unpackMessageWithSpaces(dataStream));
+        if (messageConsumer != null)
+          messageConsumer.accept(message);
+      }
+
+      // templates
+      for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
+      {
+        final var name = requireNonNull(dataStream.readString());
+        final var template = packHelper.unpackMessageWithSpaces(dataStream);
+
+        if (templateConsumer != null)
+          templateConsumer.accept(name, template);
       }
     }
 

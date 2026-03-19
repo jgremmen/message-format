@@ -30,8 +30,9 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -42,7 +43,6 @@ import static java.util.Locale.forLanguageTag;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-@SuppressWarnings("UnknownLanguage")
 public interface MessageSupport
 {
   /**
@@ -99,8 +99,7 @@ public interface MessageSupport
    *
    * @throws IOException  if an I/O error occurs
    *
-   * @see ConfigurableMessageSupport#importMessages(InputStream...)
-   * @see ConfigurableMessageSupport#importMessages(Enumeration)
+   * @see ConfigurableMessageSupport#importMessages(InputStream)
    */
   default void exportMessages(@NotNull OutputStream stream) throws IOException {
     exportMessages(stream, true, null);
@@ -123,8 +122,7 @@ public interface MessageSupport
    *
    * @throws IOException  if an I/O error occurs
    *
-   * @see ConfigurableMessageSupport#importMessages(InputStream...)
-   * @see ConfigurableMessageSupport#importMessages(Enumeration)
+   * @see ConfigurableMessageSupport#importMessages(InputStream)
    */
   void exportMessages(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
       throws IOException;
@@ -542,51 +540,50 @@ public interface MessageSupport
 
 
     /**
-     * Convenience method for adding multiple pack resources.
+     * Import messages and templates from a message format pack file and add them to this message
+     * support instance. The {@code packStream} is validated and all entries are iterated. Each
+     * message and template found is added to this instance.
+     * <p>
+     * The {@code packStream} is closed when this method returns, regardless of whether the
+     * import was successful or not.
      *
-     * @param packResources  enumeration of pack resources, not {@code null}
-     *
-     * @return  configurable message support instance, never {@code null}
-     *
-     * @throws IOException  if an I/O error occurs
-     *
-     * @see #importMessages(InputStream...)
-     */
-    @Contract(value = "_ -> this", mutates = "this")
-    @NotNull ConfigurableMessageSupport importMessages(@NotNull Enumeration<URL> packResources) throws IOException;
-
-
-    /**
-     * Convenience method for adding a single pack.
-     *
-     * @param packStream  pack stream, not {@code null}
+     * @param packStream  pack input stream, not {@code null}
      *
      * @return  configurable message support instance, never {@code null}
      *
-     * @throws IOException  if an I/O error occurs
+     * @throws IOException  if an I/O error occurs or the pack stream is invalid
      *
-     * @see #importMessages(InputStream...)
+     * @see #importMessages(InputStream, Consumer, BiConsumer)
      */
-    @Contract(value = "_ -> this", mutates = "this")
+    @Contract(value = "_ -> this", mutates = "this,param1,io")
     default @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream packStream) throws IOException {
-      return importMessages(new InputStream[] { packStream });
+      return importMessages(packStream, this::addMessage, this::addTemplate);
     }
 
 
     /**
-     * Import multiple packs into this message builder.
+     * Import messages and templates from a message format pack file. The {@code packStream} is
+     * validated and all entries are iterated. Each message is passed to the optional
+     * {@code messageConsumer} and each template to the optional {@code templateConsumer}.
      * <p>
-     * When importing from multiple packs, this method is preferred as it shares map key/values,
-     * message parts and messages for all packs, thus reducing the memory footprint.
+     * The {@code packStream} is closed when this method returns, regardless of whether the
+     * import was successful or not.
      *
-     * @param packStreams  array of pack streams, not {@code null}
+     * @param packStream        pack input stream, not {@code null}
+     * @param messageConsumer   consumer invoked for each message found, or {@code null}
+     * @param templateConsumer  consumer invoked for each template found, or {@code null}
      *
      * @return  configurable message support instance, never {@code null}
      *
-     * @throws IOException  if an I/O error occurs
+     * @throws IOException  if an I/O error occurs or the pack stream is invalid
+     *
+     * @since 0.21.0
      */
-    @Contract(value = "_ -> this", mutates = "this")
-    @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream... packStreams) throws IOException;
+    @Contract(value = "_, _, _ -> this", mutates = "param1,io")
+    @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream packStream,
+                                                       Consumer<Message.WithCode> messageConsumer,
+                                                       BiConsumer<String,Message.WithSpaces> templateConsumer)
+        throws IOException;
 
 
     /**
