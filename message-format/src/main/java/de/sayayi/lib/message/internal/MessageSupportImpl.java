@@ -31,7 +31,6 @@ import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.message.util.SupplierDelegate;
-import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +38,6 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.*;
@@ -170,44 +168,6 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   {
     if (templateFilter.filter(validateName(name, "template name"), template))
       templates.put(name, requireNonNull(template));
-
-    return this;
-  }
-
-
-  @Override
-  public @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream packStream,
-                                                            Consumer<Message.WithCode> messageConsumer,
-                                                            BiConsumer<String, Message.WithSpaces> templateConsumer)
-      throws IOException
-  {
-    requireNonNull(packStream, "packStream must not be null");
-
-    final var packHelper = new PackSupport();
-
-    try(var dataStream = new PackInputStream(PACK_CONFIG, packStream)) {
-      if (dataStream.getVersion().isEmpty())
-        throw new IllegalArgumentException("packStream has no version");
-
-      // messages
-      for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
-      {
-        final var message = packHelper.unpackMessageWithCode(dataStream);
-
-        if (messageConsumer != null)
-          messageConsumer.accept(message);
-      }
-
-      // templates
-      for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
-      {
-        final var name = requireNonNull(dataStream.readString());
-        final var template = packHelper.unpackMessageWithSpaces(dataStream);
-
-        if (templateConsumer != null)
-          templateConsumer.accept(name, template);
-      }
-    }
 
     return this;
   }

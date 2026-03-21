@@ -16,10 +16,20 @@
 package de.sayayi.lib.message.util;
 
 import de.sayayi.lib.message.FormatStringSerializer.Context;
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.internal.pack.PackSupport;
+import de.sayayi.lib.pack.PackInputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
+import static de.sayayi.lib.message.internal.pack.PackSupport.PACK_CONFIG;
 import static java.lang.Character.*;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -389,5 +399,55 @@ public final class MessageUtil
     context.textJoiner().add(quote);
     serializeString(context.withStringQuote(quote), string);
     context.textJoiner().add(quote);
+  }
+
+
+  /**
+   * Import messages and templates from a message format pack file. The {@code packStream} is
+   * validated and all entries are iterated. Each message is passed to the optional
+   * {@code messageConsumer} and each template to the optional {@code templateConsumer}.
+   * <p>
+   * The {@code packStream} is closed when this method returns, regardless of whether the
+   * import was successful or not.
+   *
+   * @param packStream        pack input stream, not {@code null}
+   * @param messageConsumer   consumer invoked for each message found, or {@code null}
+   * @param templateConsumer  consumer invoked for each template found, or {@code null}
+   *
+   * @throws IOException  if an I/O error occurs or the pack stream is invalid
+   *
+   * @since 0.21.0
+   */
+  @Contract(mutates = "param1,io")
+  public static void importMessages(@NotNull InputStream packStream, Consumer<Message.WithCode> messageConsumer,
+                                    BiConsumer<String, Message.WithSpaces> templateConsumer) throws IOException
+  {
+    requireNonNull(packStream, "packStream must not be null");
+
+    final var packHelper = new PackSupport();
+
+    try(var dataStream = new PackInputStream(PACK_CONFIG, packStream)) {
+      if (dataStream.getVersion().isEmpty())
+        throw new IllegalArgumentException("packStream has no version");
+
+      // messages
+      for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
+      {
+        final var message = packHelper.unpackMessageWithCode(dataStream);
+
+        if (messageConsumer != null)
+          messageConsumer.accept(message);
+      }
+
+      // templates
+      for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
+      {
+        final var name = requireNonNull(dataStream.readString());
+        final var template = packHelper.unpackMessageWithSpaces(dataStream);
+
+        if (templateConsumer != null)
+          templateConsumer.accept(name, template);
+      }
+    }
   }
 }

@@ -21,6 +21,7 @@ import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.post.PostFormatter;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
+import de.sayayi.lib.message.util.MessageUtil;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -553,37 +554,14 @@ public interface MessageSupport
      *
      * @throws IOException  if an I/O error occurs or the pack stream is invalid
      *
-     * @see #importMessages(InputStream, Consumer, BiConsumer)
+     * @see MessageUtil#importMessages(InputStream, Consumer, BiConsumer)
      */
     @Contract(value = "_ -> this", mutates = "this,param1,io")
-    default @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream packStream) throws IOException {
-      return importMessages(packStream, this::addMessage, this::addTemplate);
+    default @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream packStream) throws IOException
+    {
+      MessageUtil.importMessages(packStream, this::addMessage, this::addTemplate);
+      return this;
     }
-
-
-    /**
-     * Import messages and templates from a message format pack file. The {@code packStream} is
-     * validated and all entries are iterated. Each message is passed to the optional
-     * {@code messageConsumer} and each template to the optional {@code templateConsumer}.
-     * <p>
-     * The {@code packStream} is closed when this method returns, regardless of whether the
-     * import was successful or not.
-     *
-     * @param packStream        pack input stream, not {@code null}
-     * @param messageConsumer   consumer invoked for each message found, or {@code null}
-     * @param templateConsumer  consumer invoked for each template found, or {@code null}
-     *
-     * @return  configurable message support instance, never {@code null}
-     *
-     * @throws IOException  if an I/O error occurs or the pack stream is invalid
-     *
-     * @since 0.21.0
-     */
-    @Contract(value = "_, _, _ -> this", mutates = "param1,io")
-    @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream packStream,
-                                                       Consumer<Message.WithCode> messageConsumer,
-                                                       BiConsumer<String,Message.WithSpaces> templateConsumer)
-        throws IOException;
 
 
     /**
