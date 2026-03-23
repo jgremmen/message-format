@@ -32,7 +32,7 @@ import static java.util.Collections.unmodifiableSet;
 
 
 /**
- * This class represents the message parameter configuration map.
+ * This class represents the message parameter or post-formatter configuration map.
  *
  * @author Jeroen Gremmen
  * @since 0.4.0

@@ -24,7 +24,9 @@ import static de.sayayi.lib.message.util.MessageUtil.isSpaceChar;
 
 
 /**
- * Text and string object joiner.
+ * Text and string object joiner that accumulates {@link Text} parts, strings and characters into a single text,
+ * collapsing adjacent spaces into a single separator space. Trailing space state is tracked and carried over between
+ * consecutive {@code add} calls so that a space is only emitted when actual non-space content follows.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -36,9 +38,13 @@ public final class TextJoiner
 
 
   /**
-   * Returns the joined text parts as a text preserving leading/trailing spaces.
+   * Returns the joined text parts as a {@link Text} that preserves a trailing space. If non-space content was
+   * followed by a space (or a space-only text), the resulting text will have its
+   * {@linkplain Text#isSpaceAfter() trailing space} flag set.
    *
-   * @return  joined text optionally with leading/trailing spaces, never {@code null}
+   * @return  joined text optionally with a trailing space, never {@code null}
+   *
+   * @see #asNoSpaceText()
    */
   @Contract(pure = true)
   public @NotNull Text asSpacedText() {
@@ -47,9 +53,12 @@ public final class TextJoiner
 
 
   /**
-   * Returns the joined text parts as a text with no leading/trailing space.
+   * Returns the joined text parts as a {@link Text} with no leading or trailing space. Any pending trailing space is
+   * discarded.
    *
    * @return  joined text without leading/trailing spaces, never {@code null}
+   *
+   * @see #asSpacedText()
    */
   @Contract(pure = true)
   public @NotNull Text asNoSpaceText() {
@@ -58,7 +67,10 @@ public final class TextJoiner
 
 
   /**
-   * Add text respecting leading/trailing spaces.
+   * Adds a {@link Text} part to this joiner, respecting its leading and trailing space flags. If the text has a
+   * {@linkplain Text#isSpaceBefore() leading space} or a pending space was recorded from a previous call, a space
+   * separator is inserted before the text content. If the text content is {@code null} or empty, only the space state
+   * is accumulated without appending any characters.
    *
    * @param text  text to add, not {@code null}
    *
@@ -86,7 +98,11 @@ public final class TextJoiner
 
 
   /**
-   * Add character respecting leading/trailing spaces.
+   * Adds a single character to this joiner. If the character is a
+   * {@linkplain de.sayayi.lib.message.util.MessageUtil#isSpaceChar(char) space character}, it is not appended
+   * directly but instead recorded as a pending space that will be emitted as a single separator space before the next
+   * non-space content. Otherwise, the character is appended immediately, preceded by a separator space if one was
+   * pending.
    *
    * @param c  character to add
    *
@@ -113,7 +129,7 @@ public final class TextJoiner
 
 
   /**
-   * Add text dropping leading/trailing spaces.
+   * Adds a {@link Text} part to this joiner with its leading and trailing spaces stripped.
    *
    * @param text  text to add, not {@code null}
    *
@@ -126,7 +142,7 @@ public final class TextJoiner
 
 
   /**
-   * Add string dropping leading/trailing spaces.
+   * Adds a string to this joiner with its leading and trailing spaces stripped.
    *
    * @param text  string to add, or {@code null}
    *
@@ -139,7 +155,7 @@ public final class TextJoiner
 
 
   /**
-   * Add string respecting leading/trailing spaces.
+   * Adds a string to this joiner, preserving its leading and trailing spaces.
    *
    * @param text  string to add, or {@code null}
    *
@@ -151,6 +167,12 @@ public final class TextJoiner
   }
 
 
+  /**
+   * Returns the string representation of this joiner by delegating to
+   * {@link #asSpacedText() asSpacedText()}.{@link Object#toString() toString()}.
+   *
+   * @return  the joined text as a string, never {@code null}
+   */
   @Override
   public @NotNull String toString() {
     return asSpacedText().toString();

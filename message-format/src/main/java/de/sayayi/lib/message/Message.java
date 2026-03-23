@@ -175,6 +175,17 @@ public interface Message extends FormatStringSerializer
 
 
   /**
+   * Serializes this message into its message format string representation using the given charset for encoding checks.
+   * <p>
+   * Characters that cannot be encoded by the specified charset are serialized as Unicode escape sequences. The 
+   * resulting string is equivalent to the original format string from which this message was parsed.
+   *
+   * @param charset  charset used to determine character encodability, not {@code null}
+   *
+   * @return  the message format string representation of this message, never {@code null}
+   *
+   * @see FormatStringSerializer#serialize(FormatStringSerializer.Context)
+   *
    * @since 0.21.0
    */
   @Contract(pure = true)
@@ -188,6 +199,13 @@ public interface Message extends FormatStringSerializer
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This default implementation serializes the message by iterating over all
+   * {@linkplain #getMessageParts() message parts} and delegating to each part's
+   * {@link MessagePart#serialize(Context) serialize} method.
+   */
   @Override
   default void serialize(@NotNull Context context)
   {
@@ -292,6 +310,16 @@ public interface Message extends FormatStringSerializer
     @NotNull Map<Locale,Message> getLocalizedMessages();
 
 
+    /**
+     * Always throws {@link UnsupportedOperationException} because a locale-aware message does not have a single
+     * array of message parts. Each locale has its own associated message with its own parts.
+     *
+     * @return  never returns normally
+     *
+     * @throws UnsupportedOperationException  always
+     *
+     * @see #getLocalizedMessages()
+     */
     @Override
     @Contract("-> fail")
     default @NotNull MessagePart[] getMessageParts() {
@@ -299,6 +327,18 @@ public interface Message extends FormatStringSerializer
     }
 
 
+    /**
+     * Always throws {@link UnsupportedOperationException} because a locale-aware message does not have a single
+     * format string representation. Each locale has its own associated message with its own format string.
+     *
+     * @param charset  ignored
+     *
+     * @return  never returns normally
+     *
+     * @throws UnsupportedOperationException  always
+     *
+     * @see #getLocalizedMessages()
+     */
     @Override
     @Contract("_ -> fail")
     default @NotNull String asFormatString(@NotNull Charset charset) {

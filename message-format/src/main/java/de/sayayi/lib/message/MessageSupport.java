@@ -41,6 +41,43 @@ import static java.util.Locale.forLanguageTag;
 
 
 /**
+ * Central entry point for formatting messages.
+ * <p>
+ * A {@code MessageSupport} instance provides access to a set of published messages (identified by
+ * code) and templates, and allows preparing them for formatting using a fluent
+ * {@link MessageConfigurer} API:
+ * <pre>
+ *   String text = messageSupport
+ *       .code("welcome")
+ *       .with("name", userName)
+ *       .locale(userLocale)
+ *       .format();
+ * </pre>
+ * Messages can also be formatted from an inline format string using
+ * {@link #message(String) message(...)}.
+ * <p>
+ * Instances are created through {@link MessageSupportFactory#create(
+ * de.sayayi.lib.message.formatter.FormatterService, MessageFactory) MessageSupportFactory.create(...)}
+ * or obtained via {@link MessageSupportFactory#shared() MessageSupportFactory.shared()}. The
+ * factory returns a {@link ConfigurableMessageSupport} which can be
+ * {@linkplain ConfigurableMessageSupport#seal() sealed} to produce an immutable
+ * {@code MessageSupport}.
+ * <p>
+ * This interface also defines several nested types:
+ * <ul>
+ *   <li>{@link MessageConfigurer} &ndash; fluent builder for configuring and formatting a
+ *       message</li>
+ *   <li>{@link ConfigurableMessageSupport} &ndash; mutable extension for adding messages,
+ *       templates and default configuration</li>
+ *   <li>{@link MessageAccessor} &ndash; read-only access to messages, templates, formatters and
+ *       configuration</li>
+ *   <li>{@link MessagePublisher} &ndash; interface for registering messages and templates</li>
+ * </ul>
+ *
+ * @see MessageSupportFactory
+ * @see MessageConfigurer
+ * @see ConfigurableMessageSupport
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
@@ -131,6 +168,25 @@ public interface MessageSupport
 
 
 
+  /**
+   * Fluent configurer for preparing a {@link Message} for formatting.
+   * <p>
+   * A message configurer is obtained via {@link MessageSupport#code(String)} or
+   * {@link MessageSupport#message(String) MessageSupport.message(...)} and allows setting
+   * parameter values and locale before producing a formatted string or exception.
+   * <p>
+   * All mutating methods return {@code this} configurer to allow method chaining:
+   * <pre>
+   *   messageSupport
+   *       .code("order.confirmation")
+   *       .with("name", customerName)
+   *       .with("total", orderTotal)
+   *       .locale(userLocale)
+   *       .format();
+   * </pre>
+   *
+   * @param <M>  the message type this configurer operates on
+   */
   interface MessageConfigurer<M extends Message>
   {
     /**
@@ -901,16 +957,16 @@ public interface MessageSupport
 
 
     /**
-     * Returns a collection of template names, that are referenced from messages but have not
-     * been published to this message support.
+     * Returns a collection of template names, that are referenced from messages but have not been published to 
+     * this message support.
      * <p>
-     * The messages that are analyzed can be filtered by providing a {@code messageCodeFilter}.
-     * If this parameter is {@code null} all known messages are analyzed.
+     * The messages that are analyzed can be filtered by providing a {@code messageCodeFilter}. If this parameter 
+     * is {@code null} all known messages are analyzed.
      *
      * @param messageCodeFilter  message code filter or {@code null} to include all messages
      *
-     * @return  a collections with referenced template names, that are unknown to this
-     *          message support, never {@code null}
+     * @return  a collections with referenced template names, that are unknown to this message support, 
+     *          never {@code null}
      */
     @NotNull Set<String> findMissingTemplates(Predicate<String> messageCodeFilter);
   }
@@ -921,8 +977,7 @@ public interface MessageSupport
   /**
    * Message publisher provides methods for registering messages and templates.
    * <p>
-   * The publisher is used intensively by message adopters (see package
-   * {@code de.sayayi.lib.message.adopter}).
+   * The publisher is used intensively by message adopters (see package {@code de.sayayi.lib.message.adopter}).
    *
    * @author Jeroen Gremmen
    * @since 0.8.0
@@ -1031,8 +1086,7 @@ public interface MessageSupport
 
 
   /**
-   * Interface with a single method mimicking the standard exception constructor for a message
-   * and cause.
+   * Interface with a single method mimicking the standard exception constructor for a message and cause.
    *
    * @param <X>  exception type created by this constructor
    *

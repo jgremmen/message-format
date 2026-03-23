@@ -322,8 +322,6 @@ public final class MessageUtil
    * @param name  the name to check, not {@code null}
    *
    * @return  {@code true} if {@code name} is a valid name, {@code false} otherwise
-   *
-   * @since 0.21.0
    */
   @Contract(pure = true)
   public static boolean isName(@NotNull String name)
@@ -371,6 +369,25 @@ public final class MessageUtil
   }
 
 
+  /**
+   * Serializes a string into the format string representation by appending characters to the
+   * context's {@linkplain Context#textJoiner() text joiner}, applying the following escaping rules:
+   * <ul>
+   *   <li>The active {@linkplain Context#inStringWithQuote() string quote character} is backslash-escaped.</li>
+   *   <li>A {@code %} character followed by <code>{</code>, <code>[</code> or <code>(</code> is
+   *       backslash-escaped to prevent it from being interpreted as a parameter reference.</li>
+   *   <li>ISO control characters and characters that cannot be
+   *       {@linkplain Context#canEncode(char) encoded} by the context's charset are written as
+   *       Unicode escape sequences (e.g. <code>&#92;u00e9</code>).</li>
+   *   <li>All other characters are appended as-is.</li>
+   * </ul>
+   *
+   * @param context  the serialization context providing charset encoding, text joiner and
+   *                 string quoting information, not {@code null}
+   * @param string   the string to serialize, not {@code null}
+   *
+   * @see #serializeQuotedString(Context, String)
+   */
   public static void serializeString(@NotNull Context context, @NotNull String string)
   {
     final var stringCharArray = string.toCharArray();
@@ -392,6 +409,22 @@ public final class MessageUtil
   }
 
 
+  /**
+   * Serializes a string as a quoted string into the format string representation. The quote
+   * character is chosen automatically: if the string contains a single quote ({@code '}), a
+   * double quote ({@code "}) is used; otherwise a single quote is used.
+   * <p>
+   * The opening and closing quote characters are appended to the context's
+   * {@linkplain Context#textJoiner() text joiner}, and the string content between the quotes is
+   * serialized using {@link #serializeString(Context, String)} with the chosen quote set as the
+   * active {@linkplain Context#withStringQuote(char) string quote}.
+   *
+   * @param context  the serialization context providing charset encoding, text joiner and
+   *                 string quoting information, not {@code null}
+   * @param string   the string to serialize as a quoted string, not {@code null}
+   *
+   * @see #serializeString(Context, String)
+   */
   public static void serializeQuotedString(@NotNull Context context, @NotNull String string)
   {
     final var quote = string.contains("'") ? '"' : '\'';
@@ -415,12 +448,12 @@ public final class MessageUtil
    * @param templateConsumer  consumer invoked for each template found, or {@code null}
    *
    * @throws IOException  if an I/O error occurs or the pack stream is invalid
-   *
-   * @since 0.21.0
    */
   @Contract(mutates = "param1,io")
-  public static void importMessages(@NotNull InputStream packStream, Consumer<Message.WithCode> messageConsumer,
-                                    BiConsumer<String, Message.WithSpaces> templateConsumer) throws IOException
+  public static void importMessages(@NotNull InputStream packStream,
+                                    Consumer<Message.WithCode> messageConsumer,
+                                    BiConsumer<String,Message.WithSpaces> templateConsumer)
+      throws IOException
   {
     requireNonNull(packStream, "packStream must not be null");
 

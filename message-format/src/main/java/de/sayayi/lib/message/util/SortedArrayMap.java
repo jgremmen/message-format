@@ -30,6 +30,19 @@ import static java.util.Comparator.nullsFirst;
 
 
 /**
+ * Compact, immutable map backed by a sorted array of key-value pairs. Keys are stored in their
+ * {@linkplain Comparable natural order} (with {@code null} sorted first) and lookups are performed using binary search.
+ * <p>
+ * The map is constructed from a regular {@link Map} and stored as a flat {@code Object[]} array where even indices
+ * hold keys and odd indices hold the corresponding values. This layout minimizes memory overhead compared to
+ * node-based map implementations.
+ * <p>
+ * Instances of this class are unmodifiable: iteration and streaming are supported, but mutating operations
+ * (e.g. {@link Entry#setValue(Object)}) throw {@link UnsupportedOperationException}.
+ *
+ * @param <K>  the key type, must be {@link Comparable}
+ * @param <V>  the value type
+ *
  * @author Jeroen Gremmen
  * @since 0.9.2
  */

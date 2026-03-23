@@ -19,7 +19,15 @@ import org.jetbrains.annotations.Contract;
 
 
 /**
- * This interface denotes that a message is aware of leading and trailing spaces.
+ * This interface denotes that a message or message part is aware of leading and trailing spaces.
+ * <p>
+ * In message format strings, spaces adjacent to parameters and templates are not part of the
+ * literal text but are tracked separately. During formatting, the space information is used by the
+ * {@link de.sayayi.lib.message.part.TextJoiner TextJoiner} to insert spaces between rendered
+ * parts only when the content is non-empty, preventing unwanted whitespace in the output.
+ *
+ * @see de.sayayi.lib.message.part.MessagePart MessagePart
+ * @see Message.WithSpaces
  *
  * @author Jeroen Gremmen
  * @since 0.5.0
@@ -27,27 +35,27 @@ import org.jetbrains.annotations.Contract;
 public interface SpacesAware
 {
   /**
-   * Tells whether this message has a leading space.
+   * Tells whether this message or message part has a leading space.
    *
-   * @return  {@code true} this message has a leading space, {@code false} otherwise
+   * @return  {@code true} if there is a leading space, {@code false} otherwise
    */
   @Contract(pure = true)
   boolean isSpaceBefore();
 
 
   /**
-   * Tells whether this message has a trailing space.
+   * Tells whether this message or message part has a trailing space.
    *
-   * @return  {@code true} this message has a trailing space, {@code false} otherwise
+   * @return  {@code true} if there is a trailing space, {@code false} otherwise
    */
   @Contract(pure = true)
   boolean isSpaceAfter();
 
 
   /**
-   * Tells whether this message has a leading and trailing space.
+   * Tells whether this message or message part has both a leading and a trailing space.
    *
-   * @return  {@code true} this message has a leading and trailing space, {@code false} otherwise
+   * @return  {@code true} if there is a leading and trailing space, {@code false} otherwise
    *
    * @since 0.8.0
    */

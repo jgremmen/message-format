@@ -78,11 +78,17 @@ public sealed interface MapKey extends FormatStringSerializer
 
 
   /**
-   * Type constants for map keys.
+   * Type constants for map keys. Each type defines how a provided value is compared to a map key
+   * by delegating to the appropriate method on a {@link MapKeyComparator}.
+   *
+   * @see MapKey#getType()
    */
   enum Type
   {
-    /** String key type */
+    /**
+     * String key type. Delegates comparison to
+     * {@link MapKeyComparator#compareToStringKey(Object, ComparatorContext) compareToStringKey}.
+     */
     STRING {
       @Override
       public @NotNull <T> MatchResult compareValueToKey(@NotNull MapKeyComparator<T> comparator, @NotNull T value,
@@ -91,7 +97,10 @@ public sealed interface MapKey extends FormatStringSerializer
       }
     },
 
-    /** Number key type */
+    /**
+     * Number key type. Delegates comparison to
+     * {@link MapKeyComparator#compareToNumberKey(Object, ComparatorContext) compareToNumberKey}.
+     */
     NUMBER {
       @Override
       public @NotNull <T> MatchResult compareValueToKey(@NotNull MapKeyComparator<T> comparator, @NotNull T value,
@@ -100,7 +109,10 @@ public sealed interface MapKey extends FormatStringSerializer
       }
     },
 
-    /** Boolean key type */
+    /**
+     * Boolean key type. Delegates comparison to
+     * {@link MapKeyComparator#compareToBoolKey(Object, ComparatorContext) compareToBoolKey}.
+     */
     BOOL {
       @Override
       public @NotNull <T> MatchResult compareValueToKey(@NotNull MapKeyComparator<T> comparator, @NotNull T value,
@@ -109,7 +121,11 @@ public sealed interface MapKey extends FormatStringSerializer
       }
     },
 
-    /** Null key type */
+    /**
+     * Null key type. Delegates comparison to
+     * {@link MapKeyComparator#compareToNullKey(Object, ComparatorContext) compareToNullKey}.
+     * The {@code value} parameter may be {@code null}.
+     */
     NULL {
       @Override
       public @NotNull <T> MatchResult compareValueToKey(@NotNull MapKeyComparator<T> comparator, T value,
@@ -118,7 +134,11 @@ public sealed interface MapKey extends FormatStringSerializer
       }
     },
 
-    /** Empty key type */
+    /**
+     * Empty key type. Delegates comparison to
+     * {@link MapKeyComparator#compareToEmptyKey(Object, ComparatorContext) compareToEmptyKey}.
+     * The {@code value} parameter may be {@code null}.
+     */
     EMPTY {
       @Override
       public @NotNull <T> MatchResult compareValueToKey(@NotNull MapKeyComparator<T> comparator, T value,
@@ -128,6 +148,22 @@ public sealed interface MapKey extends FormatStringSerializer
     };
 
 
+    /**
+     * Compares the given {@code value} to a map key of this type by delegating to the appropriate comparison method
+     * on the provided {@code comparator}.
+     *
+     * @param comparator  the map key comparator that performs the actual comparison, not {@code null}
+     * @param value       the value to compare against the map key, may be {@code null} for {@link #NULL} and
+     *                    {@link #EMPTY} types
+     * @param context     the comparator context providing comparison type and configuration access, not {@code null}
+     *
+     * @param <T>         the type of the value being compared
+     *
+     * @return  the match result indicating how well the value matches the key, never {@code null}
+     *
+     * @see MapKeyComparator
+     * @see MatchResult
+     */
     @Contract(pure = true)
     public abstract <T> @NotNull MatchResult compareValueToKey(@NotNull MapKeyComparator<T> comparator, T value,
                                                                @NotNull ComparatorContext context);

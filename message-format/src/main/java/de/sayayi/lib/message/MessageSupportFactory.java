@@ -48,9 +48,8 @@ public final class MessageSupportFactory
    * Returns a shared instance of the message support.
    * <p>
    * The shared message support is backed by the shared instance of the default formatter service
-   * ({@link DefaultFormatterService#getSharedInstance()}). This means that changes (e.g. adding
-   * new formatters) to the formatting service will reflect in formatting operations of the
-   * shared message support.
+   * ({@link DefaultFormatterService#getSharedInstance()}). This means that changes (e.g. adding new formatters) to
+   * the formatting service will reflect in formatting operations of the shared message support.
    *
    * @return  shared message support instance, never {@code null}
    */
@@ -69,11 +68,10 @@ public final class MessageSupportFactory
 
 
   /**
-   * Create a new {@link MessageSupport} instance with the given {@code formatterService} and
-   * {@code messageFactory}.
+   * Create a new {@link MessageSupport} instance with the given {@code formatterService} and {@code messageFactory}.
    * <p>
-   * The returned instance is the configurable version of the message support, which allows for
-   * further configuration such as adding messages and templates.
+   * The returned instance is the configurable version of the message support, which allows for further configuration
+   * such as adding messages and templates.
    *
    * @param formatterService  formatter service, not {@code null}
    * @param messageFactory    message factory, not {@code null}

@@ -233,6 +233,12 @@ public final class MessagePartMap implements MessagePart.Map
 
 
   /**
+   * Returns an iterator over all map entries in this message part map. The iterator yields the
+   * sorted key-value entries first, followed by the default value entry (with a {@code null} key)
+   * if one is defined.
+   *
+   * @return  iterator over all map entries, never {@code null}
+   *
    * @since 0.21.0
    */
   public @NotNull Iterator<Entry<MapKey,TypedValue<?>>> mapEntryIterator() {

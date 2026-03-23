@@ -41,7 +41,7 @@ public interface MessagePartNormalizer
 
   /**
    * Normalize the given message part. The returned part may be replaced with an identical
-   * cached version in order to reduce memory load.
+   * cached version in order to reduce the memory footprint.
    *
    * @param <T>   message part implementation type
    * @param part  message part, not {@code null}
