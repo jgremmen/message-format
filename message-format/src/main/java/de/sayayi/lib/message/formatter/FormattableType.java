@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.io.Serializable;
 
@@ -81,7 +82,8 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
    * @param type   type, not {@code null}
    * @param order  order ({@code 0..127})
    */
-  public FormattableType(@NotNull Class<?> type, int order)
+  @SuppressWarnings("ConstantValue")
+  public FormattableType(@NotNull Class<?> type, @Range(from = 0, to = 127) int order)
   {
     if (type == Object.class && order != 127)
       throw new IllegalArgumentException("Object type order must be 127");
@@ -130,7 +132,7 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
    * @return  order in range {@code 0..127}
    */
   @Contract(pure = true)
-  public int getOrder() {
+  public @Range(from = 0, to = 127) int getOrder() {
     return order;
   }
 

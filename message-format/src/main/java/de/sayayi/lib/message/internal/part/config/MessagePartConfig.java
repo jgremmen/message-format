@@ -107,7 +107,7 @@ public final class MessagePartConfig implements MessagePart.Config
   @Unmodifiable
   public @NotNull Set<String> getTemplateNames()
   {
-    var templateNames = new TreeSet<String>();
+    final var templateNames = new TreeSet<String>();
 
     for(var configValue: config.values())
       if (configValue instanceof TypedValueMessage)

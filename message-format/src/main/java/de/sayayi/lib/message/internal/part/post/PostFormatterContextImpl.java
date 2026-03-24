@@ -18,7 +18,7 @@ package de.sayayi.lib.message.internal.part.post;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.post.PostFormatterContext;
 import de.sayayi.lib.message.internal.part.config.BaseConfigAccessor;
-import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.MessagePart.Config;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
@@ -32,7 +32,7 @@ import java.util.Locale;
  */
 final class PostFormatterContextImpl extends BaseConfigAccessor implements PostFormatterContext
 {
-  PostFormatterContextImpl(@NotNull MessageAccessor messageAccessor, @NotNull MessagePart.Config config) {
+  PostFormatterContextImpl(@NotNull MessageAccessor messageAccessor, @NotNull Config config) {
     super(messageAccessor, config);
   }
 

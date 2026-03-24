@@ -18,7 +18,7 @@ package de.sayayi.lib.message.internal.part.config;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.part.ConfigAccessor;
-import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.MessagePart.Config;
 import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.message.part.TypedValue.BoolValue;
 import de.sayayi.lib.message.part.TypedValue.MessageValue;
@@ -38,10 +38,10 @@ import static java.util.Optional.ofNullable;
 public class BaseConfigAccessor implements ConfigAccessor
 {
   protected final @NotNull MessageAccessor messageAccessor;
-  protected final @NotNull MessagePart.Config config;
+  protected final @NotNull Config config;
 
 
-  public BaseConfigAccessor(@NotNull MessageAccessor messageAccessor, @NotNull MessagePart.Config config)
+  public BaseConfigAccessor(@NotNull MessageAccessor messageAccessor, @NotNull Config config)
   {
     this.messageAccessor = messageAccessor;
     this.config = config;
@@ -49,7 +49,7 @@ public class BaseConfigAccessor implements ConfigAccessor
 
 
   @Override
-  public @NotNull MessagePart.Config getConfig() {
+  public @NotNull Config getConfig() {
     return config;
   }
 
