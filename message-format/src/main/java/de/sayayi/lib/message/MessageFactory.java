@@ -39,7 +39,6 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
-@SuppressWarnings("UnknownLanguage")
 public class MessageFactory
 {
   /**
@@ -75,6 +74,7 @@ public class MessageFactory
    *
    * @return  message part normalizer, never {@code null}
    */
+  @Contract(pure = true)
   public @NotNull MessagePartNormalizer getMessagePartNormalizer() {
     return messagePartNormalizer;
   }
@@ -135,22 +135,20 @@ public class MessageFactory
   @Contract(value = "_, _ -> new", pure = true)
   public @NotNull Message.WithCode parseMessage(@NotNull String code, @NotNull Map<Locale,String> localizedTexts)
   {
-    switch(requireNonNull(localizedTexts, "localizedTexts must not be null").size())
-    {
-      case 0:
-        return new EmptyMessageWithCode(code);
+    return switch(requireNonNull(localizedTexts, "localizedTexts must not be null").size()) {
+      case 0 -> new EmptyMessageWithCode(code);
 
-      case 1: {
+      case 1 -> {
         var entry = localizedTexts.entrySet().iterator().next();
 
         try {
-          return parseMessage(code, entry.getValue());
+          yield parseMessage(code, entry.getValue());
         } catch(MessageParserException ex) {
           throw ex.withLocale(entry.getKey());
         }
       }
 
-      default: {
+      default -> {
         final var localizedMessages = new HashMap<Locale,Message>();
 
         localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) -> {
@@ -161,9 +159,9 @@ public class MessageFactory
           }
         });
 
-        return new LocalizedMessageBundleWithCode(code, localizedMessages);
+        yield new LocalizedMessageBundleWithCode(code, localizedMessages);
       }
-    }
+    };
   }
 
 
@@ -194,22 +192,21 @@ public class MessageFactory
   @Contract(pure = true)
   public @NotNull Message parseTemplate(@NotNull Map<Locale,String> localizedTexts)
   {
-    switch(requireNonNull(localizedTexts, "localizedTexts must not be null").size())
+    return switch(requireNonNull(localizedTexts, "localizedTexts must not be null").size())
     {
-      case 0:
-        return EmptyMessage.INSTANCE;
+      case 0 -> EmptyMessage.INSTANCE;
 
-      case 1: {
+      case 1 -> {
         final var entry = localizedTexts.entrySet().iterator().next();
 
         try {
-          return parseTemplate(entry.getValue());
+          yield parseTemplate(entry.getValue());
         } catch(MessageParserException ex) {
           throw ex.withLocale(entry.getKey());
         }
       }
 
-      default: {
+      default -> {
         final var localizedMessages = new HashMap<Locale,Message>();
 
         localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) -> {
@@ -220,9 +217,9 @@ public class MessageFactory
           }
         });
 
-        return new LocalizedMessageBundleWithCode(generateCode("TPL"), localizedMessages);
+        yield new LocalizedMessageBundleWithCode(generateCode("TPL"), localizedMessages);
       }
-    }
+    };
   }
 
 
