@@ -33,12 +33,13 @@ import static de.sayayi.lib.message.util.MessageUtil.serializeString;
 
 
 /**
- * This interface represents an immutable part of a compiled message (text, parameter or template).
+ * This interface represents an immutable part of a compiled message (text, parameter, template or post formatter).
  *
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
-public interface MessagePart extends SpacesAware, FormatStringSerializer
+public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
+    permits MessagePart.NamedMessagePart, MessagePart.Text
 {
   /**
    * Returns the post formatted text with optional leading/trailing spaces.
@@ -59,7 +60,8 @@ public interface MessagePart extends SpacesAware, FormatStringSerializer
    *
    * @since 0.21.0
    */
-  interface NamedMessagePart extends MessagePart
+  sealed interface NamedMessagePart extends MessagePart
+      permits MessagePart.Parameter, MessagePart.Template, MessagePart.PostFormat
   {
     /**
      * Returns the name for this message part.
@@ -76,7 +78,7 @@ public interface MessagePart extends SpacesAware, FormatStringSerializer
   /**
    * Message part representing text only, optionally decorated with leading/trailing space.
    */
-  interface Text extends MessagePart
+  non-sealed interface Text extends MessagePart
   {
     /** Message part representing a {@code null} value. */
     Text NULL = new TextPart(null);
@@ -149,7 +151,7 @@ public interface MessagePart extends SpacesAware, FormatStringSerializer
   /**
    * Message part representing a parameter to be evaluated during formatting.
    */
-  interface Parameter extends NamedMessagePart
+  non-sealed interface Parameter extends NamedMessagePart
   {
     /**
      * Returns the name of the preferred formatter for this parameter.
@@ -189,7 +191,7 @@ public interface MessagePart extends SpacesAware, FormatStringSerializer
    *
    * @since 0.8.0
    */
-  interface Template extends NamedMessagePart {
+  non-sealed interface Template extends NamedMessagePart {
   }
 
 
@@ -198,13 +200,14 @@ public interface MessagePart extends SpacesAware, FormatStringSerializer
   /**
    * @since 0.21.0
    */
-  interface PostFormat extends NamedMessagePart
+  non-sealed interface PostFormat extends NamedMessagePart
   {
     /**
      * Returns the message to be post formatted.
      *
      * @return  message, never {@code null}
      */
+    @Contract(pure = true)
     @NotNull Message.WithSpaces getMessage();
 
 
@@ -272,6 +275,7 @@ public interface MessagePart extends SpacesAware, FormatStringSerializer
      *
      * @since 0.21.0
      */
+    @Contract(pure = true)
     @NotNull MessagePart.Config excludeConfigByName(@NotNull Set<String> configNames);
   }
 
