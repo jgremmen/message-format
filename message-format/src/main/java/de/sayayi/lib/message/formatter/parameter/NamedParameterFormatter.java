@@ -33,9 +33,10 @@ import java.util.Set;
 public interface NamedParameterFormatter extends ParameterFormatter
 {
   /**
-   * Tells the name of this parameter formatter
+   * Tells the name of this parameter formatter. The name must follow the kebab-case naming
+   * convention (e.g. {@code "my-formatter"}).
    *
-   * @return  parameter formatter name, never {@code null}
+   * @return  parameter formatter name in kebab-case, never {@code null}
    */
   @Contract(pure = true)
   @NotNull String getName();

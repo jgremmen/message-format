@@ -34,7 +34,22 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * Factory class for creating message instances.
+ * Factory class for creating {@link Message} instances by parsing message format strings and
+ * localized message maps.
+ * <p>
+ * The factory supports parsing both messages and templates, each in two flavours:
+ * <ul>
+ *   <li>A single format string (e.g. {@link #parseMessage(String)},
+ *       {@link #parseTemplate(String)}).</li>
+ *   <li>A locale-keyed map of format strings for locale-aware messages
+ *       (e.g. {@link #parseMessage(Map)}, {@link #parseTemplate(Map)}).</li>
+ * </ul>
+ * An explicit message code can be provided via {@link #parseMessage(String, String)} and
+ * {@link #parseMessage(String, Map)}.
+ * <p>
+ * Each factory instance is configured with a {@link MessagePartNormalizer} that is applied to
+ * parsed message parts, enabling deduplication or caching strategies for large message sets. For
+ * simple use cases the {@link #NO_CACHE_INSTANCE shared no-cache instance} is sufficient.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0
@@ -95,8 +110,20 @@ public class MessageFactory
   }
 
 
+  /**
+   * Parse localized message format texts into a {@link Message} instance with an automatically
+   * generated message code.
+   *
+   * @param localizedTexts  a map containing message formats, keyed by locale, not {@code null}
+   *
+   * @return  message instance with a generated code, never {@code null}
+   *
+   * @throws MessageParserException  in case one of the messages could not be parsed
+   *
+   * @see #parseMessage(String, Map)
+   */
   @Contract(value = "_ -> new", pure = true)
-  public @NotNull Message parseMessage(@NotNull Map<Locale,String> localizedTexts) {
+  public @NotNull Message.WithCode parseMessage(@NotNull Map<Locale,String> localizedTexts) {
     return parseMessage(generateCode("MSG"), localizedTexts);
   }
 
@@ -255,6 +282,18 @@ public class MessageFactory
   }
 
 
+  /**
+   * Generates a unique message or template code by combining the given {@code prefix} with a
+   * random base-36 hash and a monotonically increasing counter. The resulting code is
+   * upper-cased and has the form <code>PREFIX[HASH-COUNTER]</code> (e.g.
+   * {@code MSG[1A2B3C4D5E-XXXXX]}).
+   *
+   * @param prefix  code prefix (e.g. {@code "MSG"} or {@code "TPL"}), not {@code null}
+   *
+   * @return  generated unique code, never {@code null}
+   *
+   * @see #isGeneratedCode(String)
+   */
   @Contract(pure = true)
   protected @NotNull String generateCode(@NotNull String prefix)
   {

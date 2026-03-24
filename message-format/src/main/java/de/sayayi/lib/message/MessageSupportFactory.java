@@ -30,6 +30,18 @@ import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 
 /**
  * Factory class for creating {@link MessageSupport} instances.
+ * <p>
+ * Two creation strategies are available:
+ * <ul>
+ *   <li>{@link #shared()} – returns a lazily initialised, sealed singleton backed by the
+ *       {@linkplain DefaultFormatterService#getSharedInstance() shared default formatter service}
+ *       and a non-caching {@link MessageFactory}. This is convenient for simple use cases where
+ *       no custom configuration is required.</li>
+ *   <li>{@link #create(FormatterService, MessageFactory) create} – creates a new
+ *       {@link ConfigurableMessageSupport} that can be freely configured with custom formatters,
+ *       messages and templates before being {@linkplain ConfigurableMessageSupport#seal() sealed}
+ *       for use.</li>
+ * </ul>
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

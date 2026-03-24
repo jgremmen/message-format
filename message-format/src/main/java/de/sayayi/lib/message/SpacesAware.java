@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Contract;
 /**
  * This interface denotes that a message or message part is aware of leading and trailing spaces.
  * <p>
- * In message format strings, spaces adjacent to parameters and templates are not part of the
+ * In message format strings, spaces adjacent to parameters, templates and post formatters are not part of the
  * literal text but are tracked separately. During formatting, the space information is used by the
  * {@link de.sayayi.lib.message.part.TextJoiner TextJoiner} to insert spaces between rendered
  * parts only when the content is non-empty, preventing unwanted whitespace in the output.

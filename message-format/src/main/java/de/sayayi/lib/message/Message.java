@@ -34,12 +34,27 @@ import static java.util.Collections.unmodifiableSet;
 
 
 /**
- * This interface describes a message in its most generic form.
+ * This interface describes a message in its most generic form. A message is the parsed
+ * representation of a message format string and is composed of one or more
+ * {@linkplain MessagePart message parts} (literal text, parameter references, etc.).
+ * <p>
+ * A message can be {@linkplain #format(MessageAccessor, Parameters) formatted} by supplying a
+ * {@link Parameters} instance that provides the locale and parameter values. The formatted result
+ * is the concatenation of all evaluated message parts. A message can also be
+ * {@linkplain #asFormatString(Charset) serialized} back into its message format string
+ * representation.
+ * <p>
+ * Several sub-interfaces refine the message contract:
+ * <ul>
+ *   <li>{@link WithSpaces} – exposes leading and trailing space information.</li>
+ *   <li>{@link WithCode} – associates a unique code with the message.</li>
+ *   <li>{@link LocaleAware} – holds multiple locale-specific messages and selects the best
+ *       match at format time.</li>
+ * </ul>
  * <p>
  * Messages are immutable and thread safe.
  *
- * @see LocaleAware
- * @see WithCode
+ * @see MessageFactory
  *
  * @author Jeroen Gremmen
  * @since 0.1.0
@@ -249,8 +264,7 @@ public interface Message extends FormatStringSerializer
 
 
   /**
-   * A message class implementing this interface provides an additional code uniquely
-   * identifying the message.
+   * A message class implementing this interface provides an additional code uniquely identifying the message.
    */
   interface WithCode extends Message
   {
@@ -267,8 +281,7 @@ public interface Message extends FormatStringSerializer
 
 
   /**
-   * Message classes implementing this interface are capable of formatting messages for one or
-   * more locales.
+   * Message classes implementing this interface are capable of formatting messages for one or more locales.
    */
   interface LocaleAware extends Message
   {
