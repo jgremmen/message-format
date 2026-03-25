@@ -122,6 +122,67 @@ public final class MessageUtil
 
 
   /**
+   * Returns a string without leading and trailing spaces and with consecutive spaces collapsed
+   * into a single space character ({@code ' '}). This method differs from {@link String#trim()}
+   * in that it doesn't trim newlines.
+   *
+   * @param s  string to normalize, or {@code null}
+   *
+   * @return  normalized string, or {@code null} if {@code s} is {@code null}
+   *
+   * @see #isSpaceChar(char)
+   * @see #trimSpaces(String)
+   */
+  @Contract(value = "null -> null; !null -> !null", pure = true)
+  @SuppressWarnings("DuplicatedCode")
+  public static String trimAndNormalizeSpaces(String s)
+  {
+    if (s == null)
+      return null;
+
+    final var val = s.toCharArray();
+    var endIndex = val.length;
+    var startIdx = 0;
+
+    while(startIdx < endIndex && isSpaceChar(val[startIdx]))
+      startIdx++;
+
+    while(startIdx < endIndex && isSpaceChar(val[endIndex - 1]))
+      endIndex--;
+
+    if (startIdx == endIndex)
+      return "";
+
+    final var len = endIndex - startIdx;
+    final var result = new char[len];
+    var resultLen = 0;
+    var lastWasSpace = false;
+
+    for(var i = startIdx; i < endIndex; i++)
+    {
+      if (isSpaceChar(val[i]))
+      {
+        if (!lastWasSpace)
+        {
+          result[resultLen++] = ' ';
+          lastWasSpace = true;
+        }
+      }
+      else
+      {
+        result[resultLen++] = val[i];
+        lastWasSpace = false;
+      }
+    }
+
+    if (resultLen == len)
+      return startIdx == 0 && endIndex == val.length ? s : new String(val, startIdx, len);
+
+    return new String(result, 0, resultLen);
+  }
+
+
+  /**
    * Tells if a string is empty.
    * <p>
    * A string is considered empty if it has zero length, or it contains spaces only.

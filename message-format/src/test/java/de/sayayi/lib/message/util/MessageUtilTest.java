@@ -21,8 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import static de.sayayi.lib.message.util.MessageUtil.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -386,5 +385,112 @@ class MessageUtilTest
     assertFalse(isKebabOrLowerCamelCaseName("-test-case"));
     assertFalse(isKebabOrLowerCamelCaseName("Test123"));
     assertFalse(isKebabOrLowerCamelCaseName("test-Case"));
+  }
+
+
+  @Test
+  @DisplayName("normalize spaces with null and empty inputs")
+  void testTrimAndNormalizeSpacesNullAndEmpty()
+  {
+    // null returns null
+    assertNull(trimAndNormalizeSpaces(null));
+
+    // empty string returns empty
+    assertEquals("", trimAndNormalizeSpaces(""));
+
+    // spaces-only strings return empty
+    assertEquals("", trimAndNormalizeSpaces(" "));
+    assertEquals("", trimAndNormalizeSpaces("   "));
+    assertEquals("", trimAndNormalizeSpaces("\u00a0"));
+    assertEquals("", trimAndNormalizeSpaces(" \u00a0 "));
+  }
+
+
+  @Test
+  @DisplayName("normalize spaces returns same instance when unchanged")
+  void testTrimAndNormalizeSpacesSameInstance()
+  {
+    // no spaces at all → same instance
+    var s = "hello";
+    assertSame(s, trimAndNormalizeSpaces(s));
+
+    s = "a";
+    assertSame(s, trimAndNormalizeSpaces(s));
+
+    // single space between words, no leading/trailing → same instance
+    s = "hello there";
+    assertSame(s, trimAndNormalizeSpaces(s));
+
+    s = "a b c";
+    assertSame(s, trimAndNormalizeSpaces(s));
+  }
+
+
+  @Test
+  @DisplayName("normalize spaces trims leading and trailing spaces")
+  void testTrimAndNormalizeSpacesTrim()
+  {
+    assertEquals("hello", trimAndNormalizeSpaces(" hello"));
+    assertEquals("hello", trimAndNormalizeSpaces("hello "));
+    assertEquals("hello", trimAndNormalizeSpaces(" hello "));
+    assertEquals("hello", trimAndNormalizeSpaces("   hello   "));
+    assertEquals("hello", trimAndNormalizeSpaces("\u00a0hello\u00a0"));
+    assertEquals("hello there", trimAndNormalizeSpaces("  hello there  "));
+  }
+
+
+  @Test
+  @DisplayName("normalize spaces collapses consecutive spaces")
+  void testTrimAndNormalizeSpacesCollapse()
+  {
+    assertEquals("hello there", trimAndNormalizeSpaces("hello  there"));
+    assertEquals("hello there", trimAndNormalizeSpaces("hello     there"));
+    assertEquals("a b c", trimAndNormalizeSpaces("a  b  c"));
+    assertEquals("a b c d", trimAndNormalizeSpaces("a   b   c   d"));
+  }
+
+
+  @Test
+  @DisplayName("normalize spaces trims and collapses combined")
+  void testTrimAndNormalizeSpacesTrimAndCollapse()
+  {
+    assertEquals("hello there", trimAndNormalizeSpaces("  hello     there  "));
+    assertEquals("a b c", trimAndNormalizeSpaces("   a   b   c   "));
+    assertEquals("hello world foo bar", trimAndNormalizeSpaces("  hello  world  foo  bar  "));
+  }
+
+
+  @Test
+  @DisplayName("normalize spaces with unicode space characters")
+  void testTrimAndNormalizeSpacesUnicode()
+  {
+    // non-breaking space (U+00A0) is a SPACE_SEPARATOR
+    assertEquals("hello there", trimAndNormalizeSpaces("hello\u00a0\u00a0there"));
+    assertEquals("hello there", trimAndNormalizeSpaces("\u00a0hello\u00a0\u00a0there\u00a0"));
+
+    // mixed regular space and non-breaking space
+    assertEquals("hello there", trimAndNormalizeSpaces("hello \u00a0 there"));
+    assertEquals("a b", trimAndNormalizeSpaces(" \u00a0a\u00a0 \u00a0b \u00a0"));
+  }
+
+
+  @Test
+  @DisplayName("normalize spaces preserves newlines")
+  void testTrimAndNormalizeSpacesPreservesNewlines()
+  {
+    assertEquals("hello\nthere", trimAndNormalizeSpaces("hello\nthere"));
+    assertEquals("hello\nthere", trimAndNormalizeSpaces(" hello\nthere "));
+    assertEquals("hello\n\nthere", trimAndNormalizeSpaces("hello\n\nthere"));
+    assertEquals("hello\nthere", trimAndNormalizeSpaces("  hello\nthere  "));
+  }
+
+
+  @Test
+  @DisplayName("normalize spaces with single characters")
+  void testTrimAndNormalizeSpacesSingleCharacters()
+  {
+    assertEquals("a", trimAndNormalizeSpaces("a"));
+    assertEquals("a", trimAndNormalizeSpaces(" a "));
+    assertEquals("a", trimAndNormalizeSpaces("   a   "));
   }
 }

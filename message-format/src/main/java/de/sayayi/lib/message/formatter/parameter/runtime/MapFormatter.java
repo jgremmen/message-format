@@ -17,15 +17,11 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageBuilder;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
-import de.sayayi.lib.message.internal.CompoundMessage;
-import de.sayayi.lib.message.internal.part.map.MessagePartMap;
-import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
-import de.sayayi.lib.message.internal.part.text.NoSpaceTextPart;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.util.SupplierDelegate;
@@ -37,8 +33,6 @@ import java.util.Map.Entry;
 import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_ORDER;
-import static de.sayayi.lib.message.internal.part.config.MessagePartConfig.EMPTY_CONFIG;
-import static de.sayayi.lib.message.internal.part.map.key.MapKeyNull.EQ;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.forEmptyKey;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Collections.emptyIterator;
@@ -49,20 +43,13 @@ import static java.util.Collections.emptyIterator;
  */
 public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implements SizeQueryable
 {
-  private static final Message.WithSpaces DEFAULT_KEY_VALUE_MESSAGE;
-
-
-  static
-  {
-    var map = new MessagePartMap(Map.of(EQ, new TypedValueString("(null)")));
-
-    // default map-kv: %{key,null:'(null)'}=%{value,null:'(null)'}
-    DEFAULT_KEY_VALUE_MESSAGE = new CompoundMessage(List.of(
-        new ParameterPart("key", EMPTY_CONFIG, map),
-        new NoSpaceTextPart("="),
-        new ParameterPart("value", EMPTY_CONFIG, map)
-    ));
-  }
+  // default map-kv: %{key,null:'(null)'}=%{value,null:'(null)'}
+  private static final Message.WithSpaces DEFAULT_KEY_VALUE_MESSAGE = MessageBuilder
+      .create()
+      .parameter("key").mapNull().message("(null)")
+      .text("=")
+      .parameter("value").mapNull().message("(null)")
+      .build();
 
 
   @Override

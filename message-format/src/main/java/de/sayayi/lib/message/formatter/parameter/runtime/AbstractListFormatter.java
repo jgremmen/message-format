@@ -16,11 +16,10 @@
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageBuilder;
 import de.sayayi.lib.message.formatter.parameter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
-import de.sayayi.lib.message.internal.CompoundMessage;
-import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextJoiner;
 import org.jetbrains.annotations.Contract;
@@ -28,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
@@ -61,7 +59,7 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
 {
   // default list-value: %{value}
   protected static final Message.WithSpaces DEFAULT_VALUE_MESSAGE =
-      new CompoundMessage(List.of(new ParameterPart("value")));
+      MessageBuilder.create().parameter("value").build();
 
   protected static final String DEFAULT_SEPARATOR = ", ";
 

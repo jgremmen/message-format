@@ -96,6 +96,22 @@ public class MessageFactory
 
 
   /**
+   * Creates a new {@link MessageBuilder} bound to this factory instance.
+   * <p>
+   * The returned builder is <strong>not thread-safe</strong> and must not be reused after calling
+   * {@link MessageBuilder#build()} or {@link MessageBuilder#buildWithCode(String)}.
+   *
+   * @return  new message builder, never {@code null}
+   *
+   * @since 0.21.0
+   */
+  @Contract("-> new")
+  public @NotNull MessageBuilder messageBuilder() {
+    return MessageBuilder.create(this);
+  }
+
+
+  /**
    * Parse a message format text into a message instance.
    *
    * @param text  message format text, not {@code null}

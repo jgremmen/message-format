@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 import static de.sayayi.lib.message.util.MessageUtil.isSpaceChar;
-import static de.sayayi.lib.message.util.MessageUtil.trimSpaces;
+import static de.sayayi.lib.message.util.MessageUtil.trimAndNormalizeSpaces;
 
 
 /**
@@ -76,7 +76,7 @@ public final class TextPart implements MessagePart.Text
     }
     else
     {
-      this.text = trimSpaces(text);
+      this.text = trimAndNormalizeSpaces(text);
       this.spaceBefore = addSpaceBefore || isSpaceChar(text.charAt(0));
       this.spaceAfter = addSpaceAfter || isSpaceChar(text.charAt(text.length() - 1));
     }

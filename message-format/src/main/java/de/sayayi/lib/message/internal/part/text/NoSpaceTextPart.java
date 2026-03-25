@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static de.sayayi.lib.message.util.MessageUtil.trimSpaces;
+import static de.sayayi.lib.message.util.MessageUtil.trimAndNormalizeSpaces;
 import static java.util.Objects.requireNonNull;
 
 
@@ -47,7 +47,7 @@ public final class NoSpaceTextPart implements MessagePart.Text
    * @param text  text, not {@code null}
    */
   public NoSpaceTextPart(@NotNull String text) {
-    this.text = trimSpaces(requireNonNull(text, "text must not be null"));
+    this.text = trimAndNormalizeSpaces(requireNonNull(text, "text must not be null"));
   }
 
 
