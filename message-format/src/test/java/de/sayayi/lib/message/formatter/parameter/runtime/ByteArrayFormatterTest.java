@@ -17,8 +17,8 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.parameter.named.SizeFormatter;
+import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import de.sayayi.lib.message.internal.part.text.TextPart;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;

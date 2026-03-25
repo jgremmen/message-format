@@ -17,12 +17,11 @@ package de.sayayi.lib.message.internal.pack;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.internal.*;
+import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.internal.part.map.key.*;
 import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
 import de.sayayi.lib.message.internal.part.post.PostFormatterPart;
 import de.sayayi.lib.message.internal.part.template.TemplatePart;
-import de.sayayi.lib.message.internal.part.text.NoSpaceTextPart;
-import de.sayayi.lib.message.internal.part.text.TextPart;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueBool;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
@@ -40,6 +39,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
+import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 
 
@@ -77,7 +78,7 @@ public final class PackSupport
   private static final int MAP_VALUE_NUMBER_ID = 2;
   private static final int MAP_VALUE_STRING_ID = 3;
 
-  private static final int PART_NO_SPACE_TEXT_ID = 0;
+  private static final int PART_NO_SPACE_TEXT_ID = 0;  // obsolete since version 3
   private static final int PART_PARAMETER_ID = 1;
   private static final int PART_TEXT_ID = 2;
   private static final int PART_TEMPLATE_ID = 3;
@@ -210,10 +211,6 @@ public final class PackSupport
         packStream.writeSmall(PART_PARAMETER_ID, 3);
         parameterPart.pack(packStream);
       }
-      case NoSpaceTextPart noSpaceTextPart -> {
-        packStream.writeSmall(PART_NO_SPACE_TEXT_ID, 3);
-        noSpaceTextPart.pack(packStream);
-      }
       case TextPart textPart -> {
         packStream.writeSmall(PART_TEXT_ID, 3);
         textPart.pack(packStream);
@@ -239,7 +236,11 @@ public final class PackSupport
   {
     final var version = packStream.getVersion().getAsInt();
     final var messagePart = switch(packStream.readSmall(version < 3 ? 2 : 3)) {
-      case PART_NO_SPACE_TEXT_ID -> NoSpaceTextPart.unpack(packStream);
+      case PART_NO_SPACE_TEXT_ID -> {
+        // handle for backward compatibility
+        final var text = requireNonNull(packStream.readString());
+        yield text.isEmpty() ? EMPTY : new TextPart(text);
+      }
       case PART_PARAMETER_ID -> version < 3
           ? ParameterPart.unpackV2(this, packStream)
           : ParameterPart.unpack(this, packStream);

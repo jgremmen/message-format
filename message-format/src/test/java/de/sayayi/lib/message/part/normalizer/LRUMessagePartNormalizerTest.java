@@ -17,7 +17,7 @@ package de.sayayi.lib.message.part.normalizer;
 
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.internal.CompoundMessage;
-import de.sayayi.lib.message.internal.part.text.TextPart;
+import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;

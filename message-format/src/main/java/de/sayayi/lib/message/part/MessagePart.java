@@ -20,8 +20,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.SpacesAware;
-import de.sayayi.lib.message.internal.part.text.NoSpaceTextPart;
-import de.sayayi.lib.message.internal.part.text.TextPart;
+import de.sayayi.lib.message.internal.part.TextPart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -84,7 +83,7 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
     Text NULL = new TextPart(null);
 
     /** Message part representing an empty text value. */
-    Text EMPTY = new NoSpaceTextPart("");
+    Text EMPTY = new TextPart("");
 
     /** Message part representing a single space. */
     Text SPACE = new TextPart(" ");

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal.part.text;
+package de.sayayi.lib.message.internal.part;
 
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.util.MessageUtil;
@@ -150,7 +150,7 @@ public final class TextPart implements MessagePart.Text
 
   @Override
   public int hashCode() {
-    return (isEmpty() ? 0 : text.hashCode()) * 11 + (spaceBefore ? 8 : 0) + (spaceAfter ? 2 : 0);
+    return (text == null ? 0 : text.hashCode()) * 11 + (spaceBefore ? 8 : 0) + (spaceAfter ? 2 : 0);
   }
 
 
@@ -206,8 +206,9 @@ public final class TextPart implements MessagePart.Text
     final var spaceAfter = packStream.readBoolean();
     final var text = packStream.readString();
 
-    return text == null && !spaceBefore && !spaceAfter
-        ? Text.NULL
-        : new TextPart(text, spaceBefore, spaceAfter);
+    if (!spaceBefore && !spaceAfter)
+      return text == null ? Text.NULL : text.isEmpty() ? Text.EMPTY : new TextPart(text);
+    else
+      return new TextPart(text, spaceBefore, spaceAfter);
   }
 }

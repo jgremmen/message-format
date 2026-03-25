@@ -15,8 +15,7 @@
  */
 package de.sayayi.lib.message.part;
 
-import de.sayayi.lib.message.internal.part.text.NoSpaceTextPart;
-import de.sayayi.lib.message.internal.part.text.TextPart;
+import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
 import static de.sayayi.lib.message.part.MessagePart.Text.NULL;
 import static de.sayayi.lib.message.util.MessageUtil.isTrimmedEmpty;
+import static de.sayayi.lib.message.util.MessageUtil.trimSpaces;
 
 
 /**
@@ -69,7 +69,7 @@ public final class TextPartFactory
    */
   @Contract(pure = true)
   public static @NotNull Text noSpaceText(String text) {
-    return text == null ? NULL : isTrimmedEmpty(text) ? EMPTY : new NoSpaceTextPart(text);
+    return text == null ? NULL : isTrimmedEmpty(text) ? EMPTY : new TextPart(trimSpaces(text));
   }
 
 
