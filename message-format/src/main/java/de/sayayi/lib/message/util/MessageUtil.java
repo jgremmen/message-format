@@ -64,14 +64,15 @@ public final class MessageUtil
 
 
   /**
-   * Determines if the specified character is a Unicode space character. A character is considered
-   * to be a space character if and only if it is specified to be a space character by the
-   * Unicode Standard. This method returns true if the character's general category type is any of
-   * the following:
+   * Determines if the specified character is a space character. A character is considered
+   * to be a space character if its general category type is any of the following:
    * <ul>
    * <li> {@code SPACE_SEPARATOR}
    * <li> {@code PARAGRAPH_SEPARATOR}
    * </ul>
+   * or if it is a tab ({@code \t}, U+0009) or carriage return ({@code \r}, U+000D).
+   * <p>
+   * Note that newline ({@code \n}, U+000A) is <em>not</em> considered a space character.
    *
    * @param ch  the character to be tested
    *
@@ -81,8 +82,10 @@ public final class MessageUtil
    * @see Character#isSpaceChar(char)
    */
   @Contract(pure = true)
-  public static boolean isSpaceChar(char ch) {
-    return ((((1 << SPACE_SEPARATOR) | (1 << PARAGRAPH_SEPARATOR)) >> getType((int)ch)) & 1) != 0;
+  public static boolean isSpaceChar(char ch)
+  {
+    return ch == '\t' || ch == '\r' ||
+        ((((1 << SPACE_SEPARATOR) | (1 << PARAGRAPH_SEPARATOR)) >> getType((int)ch)) & 1) != 0;
   }
 
 
@@ -122,9 +125,20 @@ public final class MessageUtil
 
 
   /**
-   * Returns a string without leading and trailing spaces and with consecutive spaces collapsed
-   * into a single space character ({@code ' '}). This method differs from {@link String#trim()}
-   * in that it doesn't trim newlines.
+   * Trims and normalizes Unicode spaces in the given string. This method performs the following transformations:
+   * <ol>
+   *   <li>Removes leading and trailing Unicode {@linkplain #isSpaceChar(char) space characters}.</li>
+   *   <li>Collapses consecutive internal space characters into a single ASCII space ({@code ' '}, U+0020).</li>
+   *   <li>
+   *     Replaces any remaining Unicode space character (e.g.&#160;non-breaking space, em space) with a regular
+   *     ASCII space.
+   *   </li>
+   * </ol>
+   * <p>
+   * Characters classified as {@link Character#SPACE_SEPARATOR SPACE_SEPARATOR} or
+   * {@link Character#PARAGRAPH_SEPARATOR PARAGRAPH_SEPARATOR}, as well as tab ({@code \t}) and carriage return
+   * ({@code \r}), are considered {@linkplain #isSpaceChar(char) space characters}. Newline ({@code \n}) is left
+   * untouched.
    *
    * @param s  string to normalize, or {@code null}
    *
@@ -183,9 +197,9 @@ public final class MessageUtil
 
 
   /**
-   * Tells if a string is empty.
+   * Tells if a string is trimmed empty.
    * <p>
-   * A string is considered empty if it has zero length, or it contains spaces only.
+   * A string is considered trimmed empty if it has zero length, or it contains spaces only.
    *
    * @param s  string, not {@code null}
    *
