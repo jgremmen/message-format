@@ -49,7 +49,7 @@ public final class OptionalIntFormatter
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(OptionalInt.class);
   }
 

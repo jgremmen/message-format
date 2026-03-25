@@ -60,7 +60,7 @@ public final class URLFormatter extends AbstractSingleTypeParameterFormatter<URL
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(URL.class);
   }
 

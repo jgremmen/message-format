@@ -103,20 +103,20 @@ public final class MessageUtil
     if (s == null)
       return null;
 
-    final var val = s.toCharArray();
-    var endIndex = val.length;
+    final var stringChars = s.toCharArray();
+    var endIndex = stringChars.length;
     var startIdx = 0;
 
-    while(startIdx < endIndex && isSpaceChar(val[startIdx]))
+    while(startIdx < endIndex && isSpaceChar(stringChars[startIdx]))
       startIdx++;
 
-    while(startIdx < endIndex && isSpaceChar(val[endIndex - 1]))
+    while(startIdx < endIndex && isSpaceChar(stringChars[endIndex - 1]))
       endIndex--;
 
     return startIdx == endIndex
         ? ""
-        : startIdx > 0 || endIndex < val.length
-            ? new String(val, startIdx, endIndex - startIdx)
+        : startIdx > 0 || endIndex < stringChars.length
+            ? new String(stringChars, startIdx, endIndex - startIdx)
             : s;
   }
 
@@ -140,14 +140,14 @@ public final class MessageUtil
     if (s == null)
       return null;
 
-    final var val = s.toCharArray();
-    var endIndex = val.length;
+    final var stringChars = s.toCharArray();
+    var endIndex = stringChars.length;
     var startIdx = 0;
 
-    while(startIdx < endIndex && isSpaceChar(val[startIdx]))
+    while(startIdx < endIndex && isSpaceChar(stringChars[startIdx]))
       startIdx++;
 
-    while(startIdx < endIndex && isSpaceChar(val[endIndex - 1]))
+    while(startIdx < endIndex && isSpaceChar(stringChars[endIndex - 1]))
       endIndex--;
 
     if (startIdx == endIndex)
@@ -160,7 +160,7 @@ public final class MessageUtil
 
     for(var i = startIdx; i < endIndex; i++)
     {
-      if (isSpaceChar(val[i]))
+      if (isSpaceChar(stringChars[i]))
       {
         if (!lastWasSpace)
         {
@@ -170,13 +170,13 @@ public final class MessageUtil
       }
       else
       {
-        result[resultLen++] = val[i];
+        result[resultLen++] = stringChars[i];
         lastWasSpace = false;
       }
     }
 
     if (resultLen == len)
-      return startIdx == 0 && endIndex == val.length ? s : new String(val, startIdx, len);
+      return startIdx == 0 && endIndex == stringChars.length ? s : new String(stringChars, startIdx, len);
 
     return new String(result, 0, resultLen);
   }

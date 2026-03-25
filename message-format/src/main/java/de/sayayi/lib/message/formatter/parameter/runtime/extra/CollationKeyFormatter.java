@@ -53,7 +53,7 @@ public final class CollationKeyFormatter extends AbstractSingleTypeParameterForm
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(CollationKey.class);
   }
 

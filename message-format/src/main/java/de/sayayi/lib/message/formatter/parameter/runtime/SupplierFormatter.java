@@ -50,7 +50,7 @@ public final class SupplierFormatter
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Supplier.class);
   }
 

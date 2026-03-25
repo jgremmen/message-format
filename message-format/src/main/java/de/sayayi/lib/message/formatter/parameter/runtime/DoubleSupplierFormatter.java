@@ -42,7 +42,7 @@ public final class DoubleSupplierFormatter
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(DoubleSupplier.class);
   }
 

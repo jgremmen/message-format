@@ -98,17 +98,25 @@ public final class TextPart implements MessagePart.Text
   @Override
   public @NotNull String getTextWithSpaces()
   {
-    return isEmpty()
-        ? spaceBefore || spaceAfter
-            ? " "
-            : ""
-        : spaceBefore
-            ? !spaceAfter
-                ? ' ' + text
-                : ' ' + text + ' '
-            : spaceAfter
-                ? text + ' '
-                : text;
+    if (!spaceBefore && !spaceAfter)
+      return text == null ? "" : text;
+    else if (text == null)
+      return " ";
+
+    final var chars = text.toCharArray();
+    final var charsWithSpaces = new char[chars.length + 2];
+    int n = 0;
+
+    if (spaceBefore)
+      charsWithSpaces[n++] = ' ';
+
+    for(char ch: chars)
+      charsWithSpaces[n++] = ch;
+
+    if (spaceAfter)
+      charsWithSpaces[n++] = ' ';
+
+    return new String(charsWithSpaces, 0, n);
   }
 
 

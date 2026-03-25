@@ -34,6 +34,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 /**
  * @author Jeroen Gremmen
  */
+@Deprecated(forRemoval = true)
 public final class BitsFormatter extends AbstractParameterFormatter<Object>
     implements NamedParameterFormatter
 {

@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Jeroen Gremmen
  */
 @DisplayName("'bits' formatter")
+@SuppressWarnings("removal")
 class BitsFormatterTest extends AbstractFormatterTest
 {
   @Test

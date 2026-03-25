@@ -70,7 +70,7 @@ public final class FieldFormatter
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Field.class);
   }
 

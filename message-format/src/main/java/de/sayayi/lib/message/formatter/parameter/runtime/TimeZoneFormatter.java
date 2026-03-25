@@ -37,7 +37,7 @@ public final class TimeZoneFormatter extends AbstractSingleTypeParameterFormatte
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(TimeZone.class);
   }
 }

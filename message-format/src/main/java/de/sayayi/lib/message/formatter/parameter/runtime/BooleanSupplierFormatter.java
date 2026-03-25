@@ -42,7 +42,7 @@ public final class BooleanSupplierFormatter
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(BooleanSupplier.class);
   }
 

@@ -168,7 +168,7 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Type.class);
   }
 

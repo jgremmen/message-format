@@ -76,7 +76,7 @@ public final class AnnotationFormatter extends AbstractSingleTypeParameterFormat
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Annotation.class);
   }
 

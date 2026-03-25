@@ -40,7 +40,7 @@ public final class AtomicBooleanFormatter
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(AtomicBoolean.class);
   }
 

@@ -57,7 +57,7 @@ public final class MethodFormatter
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Method.class);
   }
 

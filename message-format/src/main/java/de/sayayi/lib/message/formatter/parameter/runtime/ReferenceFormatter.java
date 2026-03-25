@@ -51,7 +51,7 @@ public final class ReferenceFormatter
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Reference.class);
   }
 

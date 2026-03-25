@@ -73,7 +73,7 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(byte[].class, DEFAULT_PRIMITIVE_OR_ARRAY_ORDER - 10);
   }
 

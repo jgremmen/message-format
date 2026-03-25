@@ -60,7 +60,7 @@ public final class OptionalFormatter extends AbstractSingleTypeParameterFormatte
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Optional.class);
   }
 

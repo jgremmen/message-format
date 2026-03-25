@@ -77,7 +77,7 @@ public final class MatcherFormatter extends AbstractSingleTypeParameterFormatter
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Matcher.class);
   }
 

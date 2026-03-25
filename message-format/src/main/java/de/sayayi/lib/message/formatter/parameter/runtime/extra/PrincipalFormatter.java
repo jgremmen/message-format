@@ -44,7 +44,7 @@ public final class PrincipalFormatter
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Principal.class);
   }
 

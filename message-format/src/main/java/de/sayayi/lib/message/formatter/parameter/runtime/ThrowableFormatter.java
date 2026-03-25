@@ -34,7 +34,7 @@ public final class ThrowableFormatter extends AbstractSingleTypeParameterFormatt
 
 
   @Override
-  public @NotNull FormattableType getFormattableType() {
+  protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Throwable.class);
   }
 }
