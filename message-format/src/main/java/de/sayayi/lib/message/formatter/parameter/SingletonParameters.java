@@ -24,7 +24,10 @@ import java.util.Set;
 
 
 /**
- * Parameters implementation for a single parameter.
+ * A lightweight {@link Parameters} implementation that holds exactly one named parameter whose value can be updated
+ * in-place via {@link #setValue(Object)}.
+ * <p>
+ * Requesting the value of any parameter name other than the one provided at construction time will return {@code null}.
  *
  * @author Jeroen Gremmen
  * @since 0.12.0
@@ -37,6 +40,13 @@ public final class SingletonParameters implements Parameters
   private Object value;
 
 
+  /**
+   * Creates a new singleton parameters instance for the given locale and parameter name.
+   * The initial parameter value is {@code null}.
+   *
+   * @param locale         the locale to use for message formatting, not {@code null}
+   * @param parameterName  the name of the single parameter, not {@code null}
+   */
   public SingletonParameters(@NotNull Locale locale, @NotNull String parameterName)
   {
     this.locale = locale;
@@ -44,6 +54,16 @@ public final class SingletonParameters implements Parameters
   }
 
 
+  /**
+   * Sets the value for the single parameter held by this instance.
+   * <p>
+   * This method returns {@code this} to allow for a fluent usage pattern, e.g.
+   * {@code message.format(accessor, parameters.setValue(element))}.
+   *
+   * @param value  the new parameter value, may be {@code null}
+   *
+   * @return  this instance, never {@code null}
+   */
   @Contract(value = "_ -> this")
   public @NotNull SingletonParameters setValue(Object value)
   {
@@ -52,18 +72,36 @@ public final class SingletonParameters implements Parameters
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  the locale provided at construction time, never {@code null}
+   */
   @Override
   public @NotNull Locale getLocale() {
     return locale;
   }
 
 
+  /**
+   * Returns the parameter value if {@code parameter} matches the name provided at construction time, or {@code null}
+   * otherwise.
+   *
+   * @param parameter  parameter name, not {@code null}
+   *
+   * @return  the current value if the name matches, {@code null} otherwise
+   */
   @Override
   public Object getParameterValue(@NotNull String parameter) {
     return parameterName.equals(parameter) ? value : null;
   }
 
 
+  /**
+   * Returns an immutable singleton set containing the parameter name provided at construction time.
+   *
+   * @return  a singleton set with the parameter name, never {@code null}
+   */
   @Override
   public @NotNull Set<String> getParameterNames() {
     return Set.of(parameterName);

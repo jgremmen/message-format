@@ -31,9 +31,19 @@ import static de.sayayi.lib.message.util.MessageUtil.trimAndNormalizeSpaces;
 
 /**
  * Text message part with optional leading and/or trailing spaces.
+ * <p>
+ * This class implements {@link MessagePart.Text} and represents a text fragment of a compiled message. The text is
+ * always stored in a trimmed and space-normalized form (consecutive spaces collapsed into a single space). Leading
+ * and trailing space information is tracked separately via the {@code spaceBefore} and {@code spaceAfter} flags.
+ * <p>
+ * Instances of this class are immutable.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0
+ *
+ * @see MessagePart.Text
+ * @see MessageUtil#trimAndNormalizeSpaces(String)
+ * @see MessageUtil#isSpaceChar(char)
  */
 public final class TextPart implements MessagePart.Text
 {
@@ -49,8 +59,13 @@ public final class TextPart implements MessagePart.Text
 
   /**
    * Constructs a text part from the given {@code text}.
+   * <p>
+   * The text is trimmed and normalized (consecutive spaces are collapsed into a single space). If the original text
+   * has leading or trailing space characters, the corresponding space flags are set accordingly.
    *
    * @param text  text or {@code null}
+   *
+   * @see #TextPart(String, boolean, boolean)
    */
   public TextPart(String text) {
     this(text, false, false);
@@ -59,12 +74,19 @@ public final class TextPart implements MessagePart.Text
 
   /**
    * Constructs a text part with optional leading/trailing space.
+   * <p>
+   * The text is trimmed and normalized (consecutive spaces are collapsed into a single space). he effective space
+   * flags are a combination of the explicit {@code addSpaceBefore}/{@code addSpaceAfter} parameters and any
+   * leading/trailing space characters detected in the original text.
    *
    * @param text            text or {@code null}
    * @param addSpaceBefore  {@code true} if the part has a leading space,
    *                        {@code false} if the part has no leading space
    * @param addSpaceAfter   {@code true} if the part has a trailing space,
    *                        {@code false} if the part has no trailing space
+   *
+   * @see MessageUtil#trimAndNormalizeSpaces(String)
+   * @see MessageUtil#isSpaceChar(char)
    */
   public TextPart(String text, boolean addSpaceBefore, boolean addSpaceAfter)
   {
@@ -83,18 +105,37 @@ public final class TextPart implements MessagePart.Text
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  trimmed text or {@code null}
+   */
   @Override
   public String getText() {
     return text;
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  trimmed text, never {@code null}. Returns an empty string if the text is {@code null}.
+   */
   @Override
   public @NotNull String getTextNotNull() {
     return text == null ? "" : text;
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Returns the text decorated with a leading space (if {@link #isSpaceBefore()} is {@code true}) and a trailing
+   * space (if {@link #isSpaceAfter()} is {@code true}). If the text is {@code null} and at least one space flag is
+   * set, a single space is returned. If neither flag is set and the text is {@code null}, an empty string is returned.
+   *
+   * @return  text with optional surrounding spaces, never {@code null}
+   */
   @Override
   public @NotNull String getTextWithSpaces()
   {
@@ -120,24 +161,51 @@ public final class TextPart implements MessagePart.Text
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  {@code true} if this text part has a leading space, {@code false} otherwise
+   */
   @Override
   public boolean isSpaceBefore() {
     return spaceBefore;
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  {@code true} if this text part has a trailing space, {@code false} otherwise
+   */
   @Override
   public boolean isSpaceAfter() {
     return spaceAfter;
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * A text part is considered empty if the text is {@code null} or an empty string (after trimming).
+   *
+   * @return  {@code true} if this text part is empty, {@code false} otherwise
+   *
+   * @see MessageUtil#isEmpty(String)
+   */
   @Override
   public boolean isEmpty() {
     return MessageUtil.isEmpty(text);
   }
 
 
+  /**
+   * Compares this text part to the specified object. The result is {@code true} if and only if the argument is an
+   * instance of {@link Text} with the same text content, space-before and space-after flags.
+   *
+   * @param o  the object to compare this text part against
+   *
+   * @return  {@code true} if the given object is a {@link Text} equivalent to this text part, {@code false} otherwise
+   */
   @Override
   public boolean equals(Object o)
   {
@@ -148,6 +216,11 @@ public final class TextPart implements MessagePart.Text
   }
 
 
+  /**
+   * Returns a hash code for this text part, computed from the text content, space-before and space-after flags.
+   *
+   * @return  a hash code value for this text part
+   */
   @Override
   public int hashCode() {
     return (text == null ? 0 : text.hashCode()) * 11 + (spaceBefore ? 8 : 0) + (spaceAfter ? 2 : 0);
@@ -177,11 +250,17 @@ public final class TextPart implements MessagePart.Text
 
 
   /**
-   * @param packStream  data output pack target
+   * Serializes this text part to the given pack output stream.
+   * <p>
+   * The serialization order is: {@code spaceBefore}, {@code spaceAfter}, {@code text}.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
+   *
+   * @see #unpack(PackInputStream)
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
@@ -192,6 +271,13 @@ public final class TextPart implements MessagePart.Text
 
 
   /**
+   * Deserializes a {@link Text} instance from the given pack input stream.
+   * <p>
+   * The deserialization order is: {@code spaceBefore}, {@code spaceAfter}, {@code text}.
+   * <p>
+   * If no space flags are set, the well-known constants {@link Text#NULL} and {@link Text#EMPTY} are returned for
+   * {@code null} and empty text values respectively.
+   *
    * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked text part, never {@code null}
@@ -199,6 +285,8 @@ public final class TextPart implements MessagePart.Text
    * @throws IOException  if an I/O error occurs
    *
    * @since 0.8.0
+   *
+   * @see #pack(PackOutputStream)
    */
   public static @NotNull Text unpack(@NotNull PackInputStream packStream) throws IOException
   {
