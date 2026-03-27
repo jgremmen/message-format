@@ -41,7 +41,7 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 @Target({ ANNOTATION_TYPE, METHOD, TYPE })
 @Retention(CLASS)
 @Repeatable(TemplateDefs.class)
-@SuppressWarnings({"UnknownLanguage", "GrazieInspection"})
+@SuppressWarnings("GrazieInspection")
 public @interface TemplateDef
 {
   /**

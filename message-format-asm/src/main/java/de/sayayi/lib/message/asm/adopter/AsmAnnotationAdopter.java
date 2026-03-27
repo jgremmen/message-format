@@ -35,20 +35,27 @@ import static org.objectweb.asm.Type.getDescriptor;
 
 
 /**
- * This class defines various methods for adopting messages and templates defined by annotations.
+ * ASM-based annotation adopter that scans compiled class files for message and template annotations without
+ * loading the classes into the JVM.
  * <p>
- * Message annotations are analyzed per class (see {@link #parseClass(InputStream)}). If there is a
- * requirement to select a part of the messages provided by a class, the message support must
- * be configured with an appropriate
- * {@link de.sayayi.lib.message.MessageSupport.MessageFilter MessageFilter} or
+ * This adopter recognizes the following annotations (including their repeatable container forms):
+ * <ul>
+ *   <li>{@link MessageDef} / {@link MessageDefs} – message definitions</li>
+ *   <li>{@link TemplateDef} / {@link TemplateDefs} – template definitions</li>
+ * </ul>
+ * Annotations are detected on class-level as well as on non-synthetic methods.
+ * <p>
+ * Class files are analyzed with the ASM bytecode library, which means the scanned classes do not need to be on
+ * the runtime classpath.
+ * <p>
+ * If there is a requirement to select a part of the messages provided by a class, the message support must be
+ * configured with an appropriate {@link de.sayayi.lib.message.MessageSupport.MessageFilter MessageFilter} or
  * {@link de.sayayi.lib.message.MessageSupport.TemplateFilter TemplateFilter}.
  * <p>
- * Even though the annotations all have class retention, 2 adopt methods
- * ({@link #adopt(MessageDef)} and {@link #adopt(TemplateDef)}) are available for analyzing
- * synthesized/mocked annotations.
+ * In addition to class-file scanning, the {@link #adopt(MessageDef)} and {@link #adopt(TemplateDef)} methods
+ * inherited from {@link AbstractAnnotationAdopter} can be used to adopt synthesized or mocked annotations directly.
  * <p>
- * The scanned classes are analyzed using the ASM library. Using this class therefore requires a
- * dependency with library {@code org.ow2.asm:asm:9.+}.
+ * Using this class requires a dependency on the ASM library ({@code org.ow2.asm:asm:9.+}).
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -84,7 +91,8 @@ public final class AsmAnnotationAdopter extends AbstractAnnotationAdopter
 
 
   /**
-   * Create an annotation adopter for the given {@code configurableMessageSupport}.
+   * Create an ASM annotation adopter for the given {@code configurableMessageSupport}. The message factory and
+   * message publisher are both obtained from the configurable message support instance.
    *
    * @param configurableMessageSupport  configurable message support, not {@code null}
    */
@@ -94,16 +102,25 @@ public final class AsmAnnotationAdopter extends AbstractAnnotationAdopter
 
 
   /**
-   * Create an annotation adopter for the given {@code messageFactory} and {@code publisher}.
+   * Create an ASM annotation adopter for the given {@code messageFactory} and {@code publisher}. This constructor
+   * allows the message factory and message publisher to be provided independently.
    *
-   * @param messageFactory  message factory, not {@code null}
-   * @param publisher       message publisher, not {@code null}
+   * @param messageFactory  message factory used for parsing message format strings, not {@code null}
+   * @param publisher       message publisher used for publishing parsed messages and templates, not {@code null}
    */
   public AsmAnnotationAdopter(@NotNull MessageFactory messageFactory, @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);
   }
 
 
+  /**
+   * Parses the given class file input stream using the ASM {@link ClassReader}, visiting class-level and method-level
+   * annotations to detect message and template definitions. Only non-synthetic methods are visited.
+   *
+   * @param classInputStream  input stream of a class file to scan, not {@code null}
+   *
+   * @throws IOException  if an I/O error occurs while reading the class file
+   */
   @Override
   protected void parseClass(@NotNull InputStream classInputStream) throws IOException {
     new ClassReader(classInputStream).accept(new MainClassVisitor(), SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);

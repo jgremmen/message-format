@@ -37,7 +37,6 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  */
 @Target(ANNOTATION_TYPE)
 @Retention(CLASS)
-@SuppressWarnings("UnknownLanguage")
 public @interface Text
 {
   /**

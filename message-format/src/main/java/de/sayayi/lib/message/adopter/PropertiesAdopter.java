@@ -28,13 +28,21 @@ import java.util.Properties;
 
 
 /**
+ * Message adopter that reads messages and templates from {@link Properties} objects. Property keys are used as
+ * message codes or template names, and property values are parsed as message format strings.
+ * <p>
+ * For locale-aware messages, the {@link #adopt(Map)} method accepts a map of {@link Properties} keyed by
+ * {@link Locale}. Properties that share the same key across multiple locales are combined into a single localized
+ * message.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
 public class PropertiesAdopter extends AbstractMessageAdopter
 {
   /**
-   * Create a properties adopter for the given {@code configurableMessageSupport}.
+   * Create a properties adopter for the given {@code configurableMessageSupport}. The message
+   * factory and message publisher are both obtained from the configurable message support instance.
    *
    * @param configurableMessageSupport  configurable message support, not {@code null}
    */
@@ -44,10 +52,11 @@ public class PropertiesAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Create a properties adopter for the given {@code messageFactory} and {@code publisher}.
+   * Create a properties adopter for the given {@code messageFactory} and {@code publisher}. This constructor allows
+   * the message factory and message publisher to be provided independently.
    *
-   * @param messageFactory  message factory, not {@code null}
-   * @param publisher       message publisher, not {@code null}
+   * @param messageFactory  message factory used for parsing message format strings, not {@code null}
+   * @param publisher       message publisher used for publishing parsed messages and templates, not {@code null}
    */
   public PropertiesAdopter(@NotNull MessageFactory messageFactory, @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);
@@ -55,12 +64,13 @@ public class PropertiesAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt messages from properties.
-   * <p>
-   * Each key from the properties object is used as the message code,
-   * the value is parsed as a message.
+   * Adopt messages from properties. Each property key is used as the message code and its
+   * corresponding value is parsed as a message format string. The resulting messages are
+   * published to the {@linkplain MessagePublisher message publisher}.
    *
    * @param properties  message properties, not {@code null}
+   *
+   * @see #adopt(Map)
    */
   @Contract(pure = true)
   public void adopt(@NotNull Properties properties)
@@ -71,10 +81,9 @@ public class PropertiesAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt templates from properties.
-   * <p>
-   * Each key from the properties object is used as the template name,
-   * the value is parsed as a template.
+   * Adopt templates from properties. Each property key is used as the template name and its
+   * corresponding value is parsed as a template format string. The resulting templates are
+   * published to the {@linkplain MessagePublisher message publisher}.
    *
    * @param properties  template properties, not {@code null}
    *
@@ -89,14 +98,15 @@ public class PropertiesAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt messages from localized properties.
-   * <p>
-   * Each key from the properties object is used as the message code,
-   * the value is parsed as a message. If the same message code is available in multiple
-   * property objects, a single message containing multiple localized messages is created for
-   * each message code.
+   * Adopt messages from localized properties. Each property key is used as the message code and
+   * its corresponding value is parsed as a message format string. If the same message code
+   * appears in multiple locale entries, the localized values are combined into a single
+   * locale-aware message. The resulting messages are published to the
+   * {@linkplain MessagePublisher message publisher}.
    *
    * @param properties  map with property messages keyed by locale, not {@code null}
+   *
+   * @see #adopt(Properties)
    */
   @Contract(pure = true)
   public void adopt(@NotNull Map<Locale,Properties> properties)

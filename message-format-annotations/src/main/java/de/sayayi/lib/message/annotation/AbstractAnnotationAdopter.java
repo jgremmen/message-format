@@ -48,22 +48,47 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * This abstract class defines various methods for adopting messages and templates defined by annotations.
+ * Abstract base class for adopting messages and templates defined by {@link MessageDef} and {@link TemplateDef}
+ * annotations found in compiled class files.
  * <p>
- * Messages are analyzed per class (see {@link #parseClass(InputStream)}). If there is a
- * requirement to select a part of the messages provided by a class, the message support must
- * be configured with an appropriate
+ * This adopter provides multiple strategies for discovering annotated classes:
+ * <ul>
+ *   <li>
+ *     <b>Classpath scanning</b> – {@link #adopt(ClassLoader, Set)} scans one or more packages for class files and
+ *     parses every class found on the classpath (including jar, war and zip archives).
+ *   </li>
+ *   <li>
+ *     <b>Single class file</b> – {@link #adopt(Path)} and {@link #adopt(File)} accept individual class files.
+ *   </li>
+ *   <li>
+ *     <b>Loaded type</b> – {@link #adopt(Class)} uses the class loader of a loaded type to locate its class file.
+ *   </li>
+ *   <li>
+ *     <b>Annotation instances</b> – {@link #adopt(MessageDef)} and {@link #adopt(TemplateDef)} accept synthesized or
+ *     mocked annotation instances directly, even though the annotations have
+ *     {@linkplain java.lang.annotation.RetentionPolicy#CLASS CLASS} retention.
+ *   </li>
+ * </ul>
+ * <p>
+ * Messages are analyzed per class (see {@link #parseClass(InputStream)}). Each class is visited at most once;
+ * subsequent calls with the same class are silently ignored. If there is a requirement to select only a subset of the
+ * messages provided by a class, the message support must be configured with an appropriate
  * {@link de.sayayi.lib.message.MessageSupport.MessageFilter MessageFilter} or
  * {@link de.sayayi.lib.message.MessageSupport.TemplateFilter TemplateFilter}.
  * <p>
- * Even though the annotations all have class retention, 2 adopt methods
- * ({@link #adopt(MessageDef)} and {@link #adopt(TemplateDef)}) are available to analyse
- * synthesized/mocked annotations.
+ * Concrete subclasses must implement the {@link #parseClass(InputStream)} method to provide the actual bytecode
+ * analysis strategy (e.g. using the ASM library).
+ * <p>
+ * This class also contains inner record implementations ({@link MessageDefImpl}, {@link TemplateDefImpl} and
+ * {@link TextImpl}) that may be used by subclasses to construct annotation instances from parsed bytecode data.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0  (refactored in 0.12.0)
+ *
+ * @see MessageDef
+ * @see TemplateDef
  */
-@SuppressWarnings({"UnusedReturnValue", "UnknownLanguage"})
+@SuppressWarnings("UnusedReturnValue")
 public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 {
   private static final Set<String> ZIP_PROTOCOLS = Set.of("zip", "jar", "war");
@@ -72,7 +97,8 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Create an annotation adopter for the given {@code configurableMessageSupport}.
+   * Create an annotation adopter for the given {@code configurableMessageSupport}. The message factory and message
+   * publisher are both obtained from the configurable message support instance.
    *
    * @param configurableMessageSupport  configurable message support, not {@code null}
    */
@@ -82,10 +108,11 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Create an annotation adopter for the given {@code messageFactory} and {@code publisher}.
+   * Create an annotation adopter for the given {@code messageFactory} and {@code publisher}. This constructor allows
+   * the message factory and message publisher to be provided independently.
    *
-   * @param messageFactory  message factory, not {@code null}
-   * @param publisher       message publisher, not {@code null}
+   * @param messageFactory  message factory used for parsing message format strings, not {@code null}
+   * @param publisher       message publisher used for publishing parsed messages and templates, not {@code null}
    */
   protected AbstractAnnotationAdopter(@NotNull MessageFactory messageFactory, @NotNull MessagePublisher publisher) {
     super(messageFactory, publisher);
@@ -93,14 +120,17 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Scan the classpath (with the given packages) for message annotations and adopt them.
+   * Scan the classpath for class files in the given packages and adopt all message and template annotations found.
+   * The scan includes directories as well as jar, war and zip archives on the classpath. Each package is resolved
+   * using the given {@code classLoader}. Classes that have already been visited are silently skipped.
    *
-   * @param classLoader   classloader for locating classes, not {@code null}
-   * @param packageNames  package names to scan, not {@code null}
+   * @param classLoader   classloader for locating package resources on the classpath, not {@code null}
+   * @param packageNames  package names to scan (e.g. {@code "com.example.messages"}), not {@code null}
    *
-   * @return  this annotation adopter, never {@code null}
+   * @return  this annotation adopter instance, never {@code null}
    *
-   * @throws MessageParserException  in case the template could not be parsed
+   * @throws MessageAdopterException  if the classpath scan fails
+   * @throws MessageParserException   if a message or template text cannot be parsed
    */
   @Contract(value = "_, _ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull ClassLoader classLoader, @NotNull Set<String> packageNames)
@@ -231,13 +261,15 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt messages for the given {@code classFile}.
+   * Adopt messages and templates from the given class file identified by {@code classFile}. If the class file has
+   * already been visited, this method returns immediately without re-parsing.
    *
-   * @param classFile  location of the class file to analyze for messages, not {@code null}
+   * @param classFile  path to the class file to analyze for message annotations, not {@code null}
    *
    * @return  this annotation adopter instance, never {@code null}
    *
-   * @throws MessageParserException  in case the template could not be parsed
+   * @throws MessageAdopterException  if the class file cannot be read
+   * @throws MessageParserException   if a message or template text cannot be parsed
    *
    * @since 0.12.0
    */
@@ -261,13 +293,15 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt messages for the given {@code classFile}.
+   * Adopt messages and templates from the given class file identified by {@code classFile}. This method delegates to
+   * {@link #adopt(Path)} after converting the {@link File} to a {@link Path}.
    *
-   * @param classFile  location of the class file to analyse for messages, not {@code null}
+   * @param classFile  location of the class file to analyze for message annotations, not {@code null}
    *
    * @return  this annotation adopter instance, never {@code null}
    *
-   * @throws MessageParserException  in case the template could not be parsed
+   * @throws MessageAdopterException  if the class file cannot be read
+   * @throws MessageParserException   if a message or template text cannot be parsed
    */
   @Contract(value = "_ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull File classFile)
@@ -278,13 +312,16 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt messages for the given {@code type}.
+   * Adopt messages and templates from the class file of the given {@code type}. The class file is located via the
+   * type's class loader. If the type has already been visited or has no class loader (e.g. bootstrap classes), this
+   * method returns immediately.
    *
-   * @param type  type to analyze for messages, not {@code null}
+   * @param type  type to analyze for message annotations, not {@code null}
    *
    * @return  this annotation adopter instance, never {@code null}
    *
-   * @throws MessageParserException  in case the template could not be parsed
+   * @throws MessageAdopterException  if the class file cannot be read
+   * @throws MessageParserException   if a message or template text cannot be parsed
    */
   @Contract(value = "_ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull Class<?> type)
@@ -312,14 +349,16 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Publish the message defined in the given {@link MessageDef} annotation.
+   * Publish the message defined in the given {@link MessageDef} annotation. If the annotation contains multiple
+   * {@link Text} entries, they are treated as localized variants of the same message. If only a single
+   * {@linkplain MessageDef#text() text} is provided, it is used as the sole message text.
    *
    * @param messageDef  {@code MessageDef} annotation, not {@code null}
    *
    * @return  this annotation adopter instance, never {@code null}
    *
    * @throws DuplicateMessageException  if different messages are provided for the same locale
-   * @throws MessageParserException     in case the template could not be parsed
+   * @throws MessageParserException     if a message or template text cannot be parsed
    */
   @Contract(value = "_ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull MessageDef messageDef)
@@ -354,14 +393,16 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Publish the template defined in the given {@link TemplateDef} annotation.
+   * Publish the template defined in the given {@link TemplateDef} annotation. If the annotation contains multiple
+   * {@link Text} entries, they are treated as localized variants of the same template. If only a single
+   * {@linkplain TemplateDef#text() text} is provided, it is used as the sole template text.
    *
    * @param templateDef  {@code TemplateDef} annotation, not {@code null}
    *
    * @return  this annotation adopter instance, never {@code null}
    *
    * @throws DuplicateTemplateException  if different template messages are provided for the same locale
-   * @throws MessageParserException      in case the template could not be parsed
+   * @throws MessageParserException      if the template text cannot be parsed
    */
   @Contract(value = "_ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull TemplateDef templateDef)
@@ -400,11 +441,13 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Scan contents of class provided by {@code classInputStream}.
+   * Parse the contents of a class file provided by {@code classInputStream} and adopt any {@link MessageDef} and
+   * {@link TemplateDef} annotations found. Concrete subclasses implement this method to provide the actual bytecode
+   * analysis strategy.
    *
    * @param classInputStream  input stream of a class file, not {@code null}
    *
-   * @throws IOException  in case of an I/O exception
+   * @throws IOException  if an I/O error occurs while reading the class file
    */
   protected abstract void parseClass(@NotNull InputStream classInputStream) throws IOException;
 
@@ -412,7 +455,12 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * {@code MessageDef} annotation implementation.
+   * Concrete implementation of the {@link MessageDef} annotation interface, used by subclasses to construct
+   * {@code MessageDef} instances from parsed bytecode data. The {@code code} is trimmed on construction.
+   *
+   * @param code   unique message code, not {@code null}
+   * @param text   single message text (used when {@code texts} is empty), not {@code null}
+   * @param texts  localized text variants, not {@code null}
    */
   @SuppressWarnings("ClassExplicitlyAnnotation")
   protected record MessageDefImpl(@NotNull String code, @Language("MessageFormat") @NotNull String text,
@@ -441,7 +489,12 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * {@code TemplateDef} annotation implementation.
+   * Concrete implementation of the {@link TemplateDef} annotation interface, used by subclasses to construct
+   * {@code TemplateDef} instances from parsed bytecode data. The {@code name} is validated on construction.
+   *
+   * @param name   unique template name, not {@code null}
+   * @param text   single template text (used when {@code texts} is empty), not {@code null}
+   * @param texts  localized text variants, not {@code null}
    *
    * @author Jeroen Gremmen
    * @since 0.8.0
@@ -474,7 +527,12 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * {@code Text} annotation implementation.
+   * Concrete implementation of the {@link Text} annotation interface, used by subclasses to construct {@code Text}
+   * instances from parsed bytecode data. All string fields are trimmed on construction.
+   *
+   * @param locale  locale tag (e.g. {@code "en"} or {@code "de"}), not {@code null}
+   * @param text    localized message or template text, not {@code null}
+   * @param value   shorthand text value (used when both {@code locale} and {@code text} are empty), not {@code null}
    *
    * @author Jeroen Gremmen
    */
