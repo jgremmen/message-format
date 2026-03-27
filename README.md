@@ -6,14 +6,14 @@ are written as format strings where the focus is on the text itself. Variable pa
 represented by named parameters that the library resolves and formats automatically.
 
 The key idea is that a parameter should produce output that reads naturally. A list of strings
-should not render as `[ "A", "B", "C", "D" ]` — it should come out as `A, B, C and D`, or
+should not render as `[ "A", "B", "C", "D" ]`. It should come out as `A, B, C and D`, or
 `A, B, ...`, or simply `A, B, C, D`, depending on how the parameter is configured in the format
 string. The calling code just passes the value; it does not need to know or care whether that
 value is a `Collection`, a `String[]`, a `Stream`, or any other type. The library's formatter
 layer figures out how to turn the object into readable text.
 
-The library ships with formatters for all common Java types — primitives, numbers, dates and
-times (`java.time`), enums, collections, maps, `Optional`, `Path`, `URI`, `URL`, `Throwable`,
+The library ships with formatters for all common Java types, like primitives, numbers, dates and
+times (`java.time`), enums, collections, maps, `Optional`, `Path`,
 and more. When none of the built-in formatters fit, custom formatters can be registered through
 the `FormatterService` SPI. Formatters are discovered automatically via `ServiceLoader`, so
 adding a formatter to the classpath is often all that is needed.
@@ -30,7 +30,7 @@ Messages contain named parameter placeholders that are resolved and formatted at
 formatting is type-aware: the library selects a matching `ParameterFormatter` based on the runtime
 type of the value, so the calling code never needs to perform explicit conversions. A `Number`, a
 `LocalDate`, an `Enum`, a `Collection`, or any other object is each formatted into readable text
-automatically. Parameters can also be configured directly in the format string — for example, a
+automatically. Parameters can also be configured directly in the format string. For example, a
 list parameter can be told to join its elements with commas, to abbreviate after a certain number
 of items, or to insert "and" before the last element. In addition to type-based formatters, named
 formatters such as `bool`, `choice`, `size`, and `string` are available for common formatting
@@ -64,7 +64,7 @@ Messages and templates can be serialized into a compact binary pack format (`.mf
 contains pre-compiled message definitions that can be loaded into a `MessageSupport` instance at
 application startup. This is the recommended way to distribute message definitions: the Gradle
 plugin produces a single `.mfp` file during the build, and the application imports it at runtime
-with a single method call. The pack format also serves as a compatibility mechanism — older pack
+with a single method call. The pack format also provides as a compatibility mechanism, so older pack
 files can be read by newer versions of the library.
 
 ### Adopters
@@ -72,7 +72,7 @@ files can be read by newer versions of the library.
 Adopters are pluggable readers that import messages from external sources into a `MessageSupport`
 instance. The core module includes adopters for `ResourceBundle` and `Properties` files. The
 annotations module adds an adopter for `@MessageDef` / `@TemplateDef` annotations, and the ASM
-module provides a variant that works at the bytecode level — it can extract definitions from
+module provides a variant that works at the bytecode level. It can extract definitions from
 classes that are already loaded as well as from classes that are not present in the JVM. The
 Spring module contributes a Spring-aware ASM adopter that uses Spring's `ResourceLoader` for
 classpath scanning. Custom adopters can be implemented by extending `AbstractMessageAdopter`.
