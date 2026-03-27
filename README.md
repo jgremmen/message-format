@@ -120,9 +120,11 @@ String text = messageSupport
 // "42 results found"   (n = 42)
 ```
 
+<!--
 ## Documentation
 
 The full documentation is available at [lib.sayayi.de/message-format](https://lib.sayayi.de/message-format).
+-->
 
 ## License
 
