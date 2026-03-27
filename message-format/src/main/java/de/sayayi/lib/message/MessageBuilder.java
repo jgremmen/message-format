@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message;
 
-import de.sayayi.lib.message.internal.DefaultMessageBuilder;
+import de.sayayi.lib.message.internal.MessageBuilderImpl;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +58,7 @@ import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
  * @see MessageFactory#messageBuilder()
  */
 public sealed interface MessageBuilder
-    permits DefaultMessageBuilder,
+    permits MessageBuilderImpl,
             MessageBuilder.TextBuilder,
             MessageBuilder.ParameterBuilder,
             MessageBuilder.PostFormatterBuilder,
@@ -143,7 +143,7 @@ public sealed interface MessageBuilder
    */
   @Contract("-> new")
   static @NotNull MessageBuilder create() {
-    return new DefaultMessageBuilder(NO_CACHE_INSTANCE);
+    return new MessageBuilderImpl(NO_CACHE_INSTANCE);
   }
 
 
@@ -156,7 +156,7 @@ public sealed interface MessageBuilder
    */
   @Contract("_ -> new")
   static @NotNull MessageBuilder create(@NotNull MessageFactory messageFactory) {
-    return new DefaultMessageBuilder(messageFactory);
+    return new MessageBuilderImpl(messageFactory);
   }
 
 
@@ -216,7 +216,7 @@ public sealed interface MessageBuilder
    */
   sealed interface TextBuilder
       extends MessageBuilder, SpacedBuilder<TextBuilder>
-      permits DefaultMessageBuilder.TextBuilderImpl {
+      permits MessageBuilderImpl.TextBuilderImpl {
   }
 
 
@@ -229,10 +229,8 @@ public sealed interface MessageBuilder
    *
    * @since 0.21.0
    */
-  sealed interface ConfigurableBuilder<S extends ConfigurableBuilder<S>>
-      permits ParameterBuilder, PostFormatterBuilder
+  sealed interface ConfigurableBuilder<S extends ConfigurableBuilder<S>> permits ParameterBuilder, PostFormatterBuilder
   {
-
     /**
      * Adds a string configuration value.
      *
@@ -295,7 +293,7 @@ public sealed interface MessageBuilder
    */
   sealed interface ParameterBuilder
       extends MessageBuilder, SpacedBuilder<ParameterBuilder>, ConfigurableBuilder<ParameterBuilder>
-      permits DefaultMessageBuilder.ParameterBuilderImpl
+      permits MessageBuilderImpl.ParameterBuilderImpl
   {
     /**
      * Sets the formatter name for this parameter.
@@ -379,7 +377,7 @@ public sealed interface MessageBuilder
    * @since 0.21.0
    */
   sealed interface MapValueBuilder
-      permits MapEqualityBuilder, DefaultMessageBuilder.MapValueBuilderImpl
+      permits MapEqualityBuilder, MessageBuilderImpl.MapValueBuilderImpl
   {
     /**
      * Sets the map value message and returns to the enclosing parameter builder.
@@ -414,7 +412,7 @@ public sealed interface MessageBuilder
    * @since 0.21.0
    */
   sealed interface MapEqualityBuilder extends MapValueBuilder
-      permits MapRelationalBuilder, DefaultMessageBuilder.MapEqualityBuilderImpl
+      permits MapRelationalBuilder, MessageBuilderImpl.MapEqualityBuilderImpl
   {
     /**
      * Sets the key operator to "equal". This is the default and does not need to be called explicitly.
@@ -447,7 +445,7 @@ public sealed interface MessageBuilder
    * @since 0.21.0
    */
   sealed interface MapRelationalBuilder extends MapEqualityBuilder
-      permits DefaultMessageBuilder.MapRelationalBuilderImpl
+      permits MessageBuilderImpl.MapRelationalBuilderImpl
   {
     /**
      * Sets the key operator to "less than".
@@ -499,7 +497,7 @@ public sealed interface MessageBuilder
    */
   sealed interface PostFormatterBuilder
       extends MessageBuilder, SpacedBuilder<PostFormatterBuilder>, ConfigurableBuilder<PostFormatterBuilder>
-      permits DefaultMessageBuilder.PostFormatterBuilderImpl
+      permits MessageBuilderImpl.PostFormatterBuilderImpl
   {
     /**
      * Configures the inner message to be post-formatted using a nested builder callback.
@@ -526,7 +524,7 @@ public sealed interface MessageBuilder
    */
   sealed interface TemplateBuilder
       extends MessageBuilder, SpacedBuilder<TemplateBuilder>
-      permits DefaultMessageBuilder.TemplateBuilderImpl
+      permits MessageBuilderImpl.TemplateBuilderImpl
   {
     /**
      * Adds a default string parameter value for the template.

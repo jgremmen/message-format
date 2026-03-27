@@ -58,7 +58,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
-public final class DefaultMessageBuilder implements MessageBuilder
+public final class MessageBuilderImpl implements MessageBuilder
 {
   private final @NotNull MessageFactory messageFactory;
   private final @NotNull List<MessagePart> parts;
@@ -70,7 +70,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
    *
    * @param messageFactory  message factory, not {@code null}
    */
-  public DefaultMessageBuilder(@NotNull MessageFactory messageFactory)
+  public MessageBuilderImpl(@NotNull MessageFactory messageFactory)
   {
     this.messageFactory = requireNonNull(messageFactory, "messageFactory must not be null");
     this.parts = new ArrayList<>();
@@ -228,7 +228,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull Message.WithSpaces build()
     {
       flush();
-      return DefaultMessageBuilder.this.build();
+      return MessageBuilderImpl.this.build();
     }
 
 
@@ -236,7 +236,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull Message.WithCode buildWithCode(@NotNull String code)
     {
       flush();
-      return DefaultMessageBuilder.this.buildWithCode(code);
+      return MessageBuilderImpl.this.buildWithCode(code);
     }
   }
 
@@ -410,7 +410,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull TextBuilder text(@NotNull String text)
     {
       flush();
-      return DefaultMessageBuilder.this.text(text);
+      return MessageBuilderImpl.this.text(text);
     }
 
 
@@ -418,7 +418,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull ParameterBuilder parameter(@NotNull String name)
     {
       flush();
-      return DefaultMessageBuilder.this.parameter(name);
+      return MessageBuilderImpl.this.parameter(name);
     }
 
 
@@ -426,7 +426,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
     {
       flush();
-      return DefaultMessageBuilder.this.postFormatter(name);
+      return MessageBuilderImpl.this.postFormatter(name);
     }
 
 
@@ -434,7 +434,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull TemplateBuilder template(@NotNull String name)
     {
       flush();
-      return DefaultMessageBuilder.this.template(name);
+      return MessageBuilderImpl.this.template(name);
     }
 
 
@@ -442,7 +442,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull Message.WithSpaces build()
     {
       flush();
-      return DefaultMessageBuilder.this.build();
+      return MessageBuilderImpl.this.build();
     }
 
 
@@ -450,7 +450,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull Message.WithCode buildWithCode(@NotNull String code)
     {
       flush();
-      return DefaultMessageBuilder.this.buildWithCode(code);
+      return MessageBuilderImpl.this.buildWithCode(code);
     }
   }
 
@@ -495,7 +495,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     {
       requireNonNull(messageConfigurer, "messageConfigurer must not be null");
 
-      final var nestedBuilder = new DefaultMessageBuilder(messageFactory);
+      final var nestedBuilder = new MessageBuilderImpl(messageFactory);
       messageConfigurer.accept(nestedBuilder);
       innerMessage = nestedBuilder.build();
 
@@ -565,7 +565,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull TextBuilder text(@NotNull String text)
     {
       flush();
-      return DefaultMessageBuilder.this.text(text);
+      return MessageBuilderImpl.this.text(text);
     }
 
 
@@ -573,7 +573,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull ParameterBuilder parameter(@NotNull String name)
     {
       flush();
-      return DefaultMessageBuilder.this.parameter(name);
+      return MessageBuilderImpl.this.parameter(name);
     }
 
 
@@ -581,7 +581,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
     {
       flush();
-      return DefaultMessageBuilder.this.postFormatter(name);
+      return MessageBuilderImpl.this.postFormatter(name);
     }
 
 
@@ -589,7 +589,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull TemplateBuilder template(@NotNull String name)
     {
       flush();
-      return DefaultMessageBuilder.this.template(name);
+      return MessageBuilderImpl.this.template(name);
     }
 
 
@@ -597,7 +597,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull Message.WithSpaces build()
     {
       flush();
-      return DefaultMessageBuilder.this.build();
+      return MessageBuilderImpl.this.build();
     }
 
 
@@ -605,7 +605,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull Message.WithCode buildWithCode(@NotNull String code)
     {
       flush();
-      return DefaultMessageBuilder.this.buildWithCode(code);
+      return MessageBuilderImpl.this.buildWithCode(code);
     }
   }
 
@@ -714,7 +714,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull TextBuilder text(@NotNull String text)
     {
       flush();
-      return DefaultMessageBuilder.this.text(text);
+      return MessageBuilderImpl.this.text(text);
     }
 
 
@@ -722,7 +722,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull ParameterBuilder parameter(@NotNull String name)
     {
       flush();
-      return DefaultMessageBuilder.this.parameter(name);
+      return MessageBuilderImpl.this.parameter(name);
     }
 
 
@@ -730,7 +730,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
     {
       flush();
-      return DefaultMessageBuilder.this.postFormatter(name);
+      return MessageBuilderImpl.this.postFormatter(name);
     }
 
 
@@ -738,7 +738,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull TemplateBuilder template(@NotNull String name)
     {
       flush();
-      return DefaultMessageBuilder.this.template(name);
+      return MessageBuilderImpl.this.template(name);
     }
 
 
@@ -746,7 +746,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull Message.WithSpaces build()
     {
       flush();
-      return DefaultMessageBuilder.this.build();
+      return MessageBuilderImpl.this.build();
     }
 
 
@@ -754,7 +754,7 @@ public final class DefaultMessageBuilder implements MessageBuilder
     public @NotNull Message.WithCode buildWithCode(@NotNull String code)
     {
       flush();
-      return DefaultMessageBuilder.this.buildWithCode(code);
+      return MessageBuilderImpl.this.buildWithCode(code);
     }
   }
 
