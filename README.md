@@ -1,27 +1,129 @@
 # Message Format Library
 
-Introducing the "Message Format" library - a powerful and easy-to-use Java API for formatting
-messages and exceptions. With this library, developers can easily create messages that have
-placeholders for values, which are automatically formatted based on their types. The library
-includes formatters for most common Java types, and custom formatters can be easily developed and
-added.
+Message Format is a Java library for producing human-readable messages. Instead of constructing
+text by concatenating strings, format conversions, and conditional logic in Java code, messages
+are written as format strings where the focus is on the text itself. Variable parts are
+represented by named parameters that the library resolves and formats automatically.
 
-One of the key features of this library is its support for templates, which are messages that can
-be embedded in other messages. This makes it easy for developers to reuse messages throughout their
-application, saving time and reducing the risk of errors. They can also export and import messages
-and templates, making it easy to share them between projects or even between teams.
+The key idea is that a parameter should produce output that reads naturally. A list of strings
+should not render as `[ "A", "B", "C", "D" ]` — it should come out as `A, B, C and D`, or
+`A, B, ...`, or simply `A, B, C, D`, depending on how the parameter is configured in the format
+string. The calling code just passes the value; it does not need to know or care whether that
+value is a `Collection`, a `String[]`, a `Stream`, or any other type. The library's formatter
+layer figures out how to turn the object into readable text.
 
-In addition, the "Message Format" library supports localized messages, so developers can create
-messages in multiple languages and easily switch between them.
+The library ships with formatters for all common Java types — primitives, numbers, dates and
+times (`java.time`), enums, collections, maps, `Optional`, `Path`, `URI`, `URL`, `Throwable`,
+and more. When none of the built-in formatters fit, custom formatters can be registered through
+the `FormatterService` SPI. Formatters are discovered automatically via `ServiceLoader`, so
+adding a formatter to the classpath is often all that is needed.
 
-To make it even easier to use, a Gradle plugin is available that packs all messages in a single
-file, which can be imported into the application. With this plugin, developers can keep their
-messages organized and easily maintainable, while still taking advantage of all the power and
-flexibility of the "Message Format" library.
+Messages can be stored centrally in a `MessageSupport` instance, each identified by a unique code.
+Reusable fragments can be extracted into templates and embedded in other messages, keeping
+definitions concise and consistent.
 
-Overall, the "Message Format" library is a must-have tool for any Java developer who wants to
-create clear, concise, and easily maintainable messages and exceptions. Give it a try today and
-experience the difference it can make in your projects!
+## Features
 
+### Parameterized messages
 
-Please take a look at the [documentation](https://lib.sayayi.de/message-format).
+Messages contain named parameter placeholders that are resolved and formatted at runtime. The
+formatting is type-aware: the library selects a matching `ParameterFormatter` based on the runtime
+type of the value, so the calling code never needs to perform explicit conversions. A `Number`, a
+`LocalDate`, an `Enum`, a `Collection`, or any other object is each formatted into readable text
+automatically. Parameters can also be configured directly in the format string — for example, a
+list parameter can be told to join its elements with commas, to abbreviate after a certain number
+of items, or to insert "and" before the last element. In addition to type-based formatters, named
+formatters such as `bool`, `choice`, `size`, and `string` are available for common formatting
+patterns.
+
+### Locale support
+
+A message can carry multiple locale-specific variants. When the message is formatted, the library
+selects the best matching variant for the requested `Locale`, falling back through the locale
+hierarchy. This makes it straightforward to maintain multilingual applications: all translations
+for a given message code live together, and the selection logic is handled by the library.
+
+### Templates
+
+Frequently used message fragments can be defined as templates and embedded in other messages by
+reference. Templates are parsed and resolved like regular messages, including full parameter and
+locale support. This avoids duplication and provides a single place to update shared text such as
+product names, legal phrases, or recurring sentence patterns.
+
+### Annotations
+
+Messages and templates can be declared directly in Java source code using `@MessageDef` and
+`@TemplateDef` annotations. Each annotation carries a message code (or template name) and one or
+more locale-tagged format strings. Annotated classes are picked up by an adopter that extracts
+the definitions and publishes them to a `MessageSupport` instance. This keeps message definitions
+close to the code that uses them while still allowing them to be managed centrally.
+
+### Import and export
+
+Messages and templates can be serialized into a compact binary pack format (`.mfp`). A pack file
+contains pre-compiled message definitions that can be loaded into a `MessageSupport` instance at
+application startup. This is the recommended way to distribute message definitions: the Gradle
+plugin produces a single `.mfp` file during the build, and the application imports it at runtime
+with a single method call. The pack format also serves as a compatibility mechanism — older pack
+files can be read by newer versions of the library.
+
+### Adopters
+
+Adopters are pluggable readers that import messages from external sources into a `MessageSupport`
+instance. The core module includes adopters for `ResourceBundle` and `Properties` files. The
+annotations module adds an adopter for `@MessageDef` / `@TemplateDef` annotations, and the ASM
+module provides a variant that works at the bytecode level — it can extract definitions from
+classes that are already loaded as well as from classes that are not present in the JVM. The
+Spring module contributes a Spring-aware ASM adopter that uses Spring's `ResourceLoader` for
+classpath scanning. Custom adopters can be implemented by extending `AbstractMessageAdopter`.
+
+### Spring integration
+
+The `message-format-spring` module bridges Message Format into the Spring ecosystem. It provides
+`MessageSupportMessageSource`, a `HierarchicalMessageSource` implementation that delegates
+message resolution and formatting to a `MessageSupport` instance. Positional `Object[]` arguments
+from the Spring `MessageSource` API are mapped to named parameters (`p1`, `p2`, …) with a
+configurable prefix. The module also registers a `SpELFormatter` that evaluates Spring Expression
+Language expressions inside message format strings, and includes `SpringAsmAnnotationAdopter` for
+classpath scanning of annotated message definitions using Spring's resource infrastructure.
+
+### Gradle plugin
+
+The `de.sayayi.plugin.gradle.message` Gradle plugin automates message packing as part of the
+build. It scans the project's compiled classes for `@MessageDef` and `@TemplateDef` annotations,
+pre-compiles the format strings, and writes all definitions into a single `.mfp` pack file. The
+plugin provides a `messageFormat` extension for configuring the source sets to scan and the
+strategy for handling duplicate message codes. The resulting pack file is added to the project's
+resources so it is included in the final artifact automatically.
+
+## Modules
+
+| Module | Description |
+|---|---|
+| `message-format` | Core library: parsing, formatting, adopters, pack format, and the formatter SPI |
+| `message-format-annotations` | `@MessageDef`, `@TemplateDef` and related annotations |
+| `message-format-asm` | ASM-based bytecode scanner for annotation-defined messages |
+| `message-format-spring` | Spring `MessageSource` bridge, SpEL formatter, classpath scanning |
+| `message-gradle-plugin` | Gradle plugin for build-time annotation scanning and message packing |
+
+## Quick Example
+
+```java
+MessageSupport messageSupport = MessageSupportFactory.shared();
+
+String text = messageSupport
+    .message("%{n,choice,0:'no results',1:'1 result',>1:'%{n} results'} found")
+    .with("n", resultCount)
+    .format();
+// "no results found"   (n = 0)
+// "1 result found"     (n = 1)
+// "42 results found"   (n = 42)
+```
+
+## Documentation
+
+The full documentation is available at [lib.sayayi.de/message-format](https://lib.sayayi.de/message-format).
+
+## License
+
+This project is licensed under the [Apache License 2.0](LICENSE).
