@@ -48,6 +48,7 @@ import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collector;
 
@@ -59,7 +60,8 @@ import static de.sayayi.lib.message.util.MessageUtil.*;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
-import static java.lang.Long.parseLong;
+import static java.lang.Long.MAX_VALUE;
+import static java.lang.Long.MIN_VALUE;
 import static java.util.Objects.requireNonNull;
 import static org.antlr.v4.runtime.Token.EOF;
 
@@ -633,7 +635,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       if (!isKebabCaseName(ctx.name = ctx.NAME().getText()))
         syntaxError("config name for numerical value " + KEBAB_CASE_MATCH).with(ctx.NAME()).report();
 
-      ctx.value = new TypedValueNumber(parseLong(ctx.NUMBER().getText()));
+      ctx.value = new TypedValueNumber(parseLongValue(ctx.NUMBER()));
     }
 
 
@@ -703,7 +705,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
       ctx.key = new MapKeyNumber(
           relationalOperator == null ? CompareType.EQ : relationalOperator.cmp,
-          parseLong(ctx.NUMBER().getText()));
+          parseLongValue(ctx.NUMBER()));
     }
 
 
@@ -747,6 +749,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    @Contract(pure = true)
     private boolean isSpaceAtTokenIndex(int i)
     {
       if (i >= 0)
@@ -760,6 +763,21 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       }
 
       return false;
+    }
+
+
+    private long parseLongValue(@NotNull TerminalNode numberNode)
+    {
+      final var number = new BigInteger(numberNode.getText());
+
+      if (number.compareTo(BigInteger.valueOf(MIN_VALUE)) < 0 ||
+          number.compareTo(BigInteger.valueOf(MAX_VALUE)) > 0)
+      {
+        syntaxError("number value out of range").with(numberNode).report();
+        return 0;  // never reached
+      }
+
+      return number.longValue();
     }
   }
 
