@@ -493,11 +493,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitParameterName(ParameterNameContext ctx)
     {
       if (!isKebabOrLowerCamelCaseName(ctx.name = ctx.nameOrKeyword().name))
-      {
-        syntaxError("parameter name " + KEBAB_LOWER_CAMEL_CASE_MATCH)
-            .with(ctx)
-            .report();
-      }
+        syntaxError("parameter name " + KEBAB_LOWER_CAMEL_CASE_MATCH).with(ctx).report();
     }
 
 
@@ -505,11 +501,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitParameterFormat(ParameterFormatContext ctx)
     {
       if (!isKebabCaseName(ctx.format = ctx.nameOrKeyword().name))
-      {
-        syntaxError("parameter format " + KEBAB_CASE_MATCH)
-            .with(ctx)
-            .report();
-      }
+        syntaxError("parameter format " + KEBAB_CASE_MATCH).with(ctx).report();
     }
 
 
@@ -518,11 +510,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       @Override
       protected void accumulator(@NotNull Map<String,TypedValue<?>> map, @NotNull ConfigDefinitionContext context) {
         if (map.put(context.name, context.value) != null)
-        {
-          syntaxError("duplicate template default parameter '" + context.name + "'")
-              .with(context)
-              .report();
-        }
+          syntaxError("duplicate template default parameter '" + context.name + "'").with(context).report();
       }
     };
 
