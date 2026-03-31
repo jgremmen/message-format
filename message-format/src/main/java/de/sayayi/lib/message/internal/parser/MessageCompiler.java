@@ -222,9 +222,46 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
 
+  private static final Vocabulary VOCABULARY = new AbstractVocabulary() {
+    @Override
+    protected void addTokens()
+    {
+      add(BOOL, "'true' or 'false'", "BOOL");
+      add(CH, "<character>", "CH");
+      add(COLON, "':'", "COLON");
+      add(COMMA, "','", "COMMA");
+      add(DQ_END, "\"", "DQ_END");
+      add(DQ_START, "\"", "DQ_START");
+      add(EMPTY, "'empty'", "EMPTY");
+      add(FORMAT, "'format'", "FORMAT");
+      add(EQ, "'='", "EQ");
+      add(GT, "'>'", "GT");
+      add(GTE, "'>='", "GTE");
+      add(LT, "'<'", "LT");
+      add(LTE, "'<='", "LTE");
+      add(NAME, "<name>", "NAME");
+      add(NE, "'<>' or '!'", "NE");
+      add(NULL, "'null'", "NULL");
+      add(NUMBER, "<number>", "NUMBER");
+      add(P_END, "'}'", "P_END");
+      add(P_START, "'%{'", "P_START");
+      add(SQ_END, "'", "SQ_END");
+      add(SQ_START, "'", "SQ_START");
+      add(TPL_START, "'%['", "TPL_START");
+      add(TPL_END, "']'", "TPL_END");
+      add(PF_START, "'%('", "PF_START");
+      add(PF_END, "')'", "PF_END");
+      add(L_PAREN, "'('", "L_PAREN");
+      add(R_PAREN, "')'", "R_PAREN");
+    }
+  };
+
+
+
+
   private static final class Lexer extends MessageLexer
   {
-    public Lexer(@NotNull String message) {
+    private Lexer(@NotNull String message) {
       super(CharStreams.fromString(message));
     }
 
@@ -240,7 +277,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
   private static final class Parser extends MessageParser
   {
-    public Parser(@NotNull TokenStream tokenStream) {
+    private Parser(@NotNull TokenStream tokenStream) {
       super(tokenStream);
     }
 
@@ -303,11 +340,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           else
           {
             if (template)
-            {
-              syntaxError("no nested template allowed")
-                  .with(part)
-                  .report();
-            }
+              syntaxError("no nested template allowed").with(part).report();
 
             parts.add(((TemplatePartContext)part).part);
           }
@@ -780,39 +813,4 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       return number.longValue();
     }
   }
-
-
-  private static final Vocabulary VOCABULARY = new AbstractVocabulary() {
-    @Override
-    protected void addTokens()
-    {
-      add(BOOL, "'true' or 'false'", "BOOL");
-      add(CH, "<character>", "CH");
-      add(COLON, "':'", "COLON");
-      add(COMMA, "','", "COMMA");
-      add(DQ_END, "\"", "DQ_END");
-      add(DQ_START, "\"", "DQ_START");
-      add(EMPTY, "'empty'", "EMPTY");
-      add(FORMAT, "'format'", "FORMAT");
-      add(EQ, "'='", "EQ");
-      add(GT, "'>'", "GT");
-      add(GTE, "'>='", "GTE");
-      add(LT, "'<'", "LT");
-      add(LTE, "'<='", "LTE");
-      add(NAME, "<name>", "NAME");
-      add(NE, "'<>' or '!'", "NE");
-      add(NULL, "'null'", "NULL");
-      add(NUMBER, "<number>", "NUMBER");
-      add(P_END, "'}'", "P_END");
-      add(P_START, "'%{'", "P_START");
-      add(SQ_END, "'", "SQ_END");
-      add(SQ_START, "'", "SQ_START");
-      add(TPL_START, "'%['", "TPL_START");
-      add(TPL_END, "']'", "TPL_END");
-      add(PF_START, "'%('", "PF_START");
-      add(PF_END, "')'", "PF_END");
-      add(L_PAREN, "'('", "L_PAREN");
-      add(R_PAREN, "')'", "R_PAREN");
-    }
-  };
 }
