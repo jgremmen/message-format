@@ -70,7 +70,6 @@ import static org.antlr.v4.runtime.Token.EOF;
  * @author Jeroen Gremmen
  * @since 0.5.0
  */
-@SuppressWarnings("UnknownLanguage")
 public final class MessageCompiler extends AbstractAntlr4Parser
 {
   private static final SyntaxErrorFormatter SYNTAX_ERROR_FORMATTER =
@@ -255,6 +254,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
   private final class Listener extends MessageParserBaseListener implements WalkerSupplier
   {
+    private static final String KEBAB_CASE_MATCH = "must match the kebab case naming convention";
+    private static final String KEBAB_LOWER_CAMEL_CASE_MATCH =
+        "must match the kebab- or lower camel case naming convention";
+
     private final boolean template;
     private TokenStream tokenStream;
 
@@ -456,7 +459,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     {
       if (!isKebabOrLowerCamelCaseName(ctx.name = ctx.nameOrKeyword().name))
       {
-        syntaxError("parameter name must match the camel- or kebab-case naming convention")
+        syntaxError("parameter name " + KEBAB_LOWER_CAMEL_CASE_MATCH)
             .with(ctx)
             .report();
       }
@@ -468,7 +471,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     {
       if (!isKebabCaseName(ctx.format = ctx.nameOrKeyword().name))
       {
-        syntaxError("parameter format must match the kebab case naming convention")
+        syntaxError("parameter format " + KEBAB_CASE_MATCH)
             .with(ctx)
             .report();
       }
@@ -520,19 +523,31 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitTemplateName(TemplateNameContext ctx)
     {
       if (!isKebabCaseName(ctx.name = ctx.nameOrKeyword().name))
-      {
-        syntaxError("template name must match the kebab case naming convention")
-            .with(ctx)
-            .report();
-      }
+        syntaxError("template name " + KEBAB_CASE_MATCH).with(ctx).report();
     }
 
 
     @Override
     public void exitTemplateParameterDelegate(TemplateParameterDelegateContext ctx)
     {
-      ctx.parameter = ((SimpleStringContext)ctx.getChild(0)).string;
-      ctx.delegatedParameter = ((SimpleStringContext)ctx.getChild(2)).string;
+      final var parameterNames = ctx.nameOrKeyword();
+      final var leftParameter = parameterNames.get(0);
+
+      if (!isKebabOrLowerCamelCaseName(ctx.parameter = leftParameter.name))
+      {
+        syntaxError("parameter delegate: template parameter name " + KEBAB_LOWER_CAMEL_CASE_MATCH)
+            .with(leftParameter)
+            .report();
+      }
+
+      final var rightParameter = parameterNames.get(1);
+
+      if (!isKebabOrLowerCamelCaseName(ctx.delegatedParameter = rightParameter.name))
+      {
+        syntaxError("parameter delegate: target parameter name " + KEBAB_LOWER_CAMEL_CASE_MATCH)
+            .with(rightParameter)
+            .report();
+      }
     }
 
 
@@ -568,11 +583,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitPostFormatName(PostFormatNameContext ctx)
     {
       if (!isKebabCaseName(ctx.name = ctx.nameOrKeyword().name))
-      {
-        syntaxError("post-format name must match the kebab case naming convention")
-            .with(ctx)
-            .report();
-      }
+        syntaxError("post-format name " + KEBAB_CASE_MATCH).with(ctx).report();
     }
 
 
@@ -610,11 +621,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitConfigDefinitionBool(ConfigDefinitionBoolContext ctx)
     {
       if (!isKebabCaseName(ctx.name = ctx.NAME().getText()))
-      {
-        syntaxError("config name for boolean value must match the kebab case naming convention")
-            .with(ctx.NAME())
-            .report();
-      }
+        syntaxError("config name for boolean value " + KEBAB_CASE_MATCH).with(ctx.NAME()).report();
 
       ctx.value = parseBoolean(ctx.BOOL().getText()) ? TypedValueBool.TRUE : TypedValueBool.FALSE;
     }
@@ -624,11 +631,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitConfigDefinitionNumber(ConfigDefinitionNumberContext ctx)
     {
       if (!isKebabCaseName(ctx.name = ctx.NAME().getText()))
-      {
-        syntaxError("config name for numerical value must match the kebab case naming convention")
-            .with(ctx.NAME())
-            .report();
-      }
+        syntaxError("config name for numerical value " + KEBAB_CASE_MATCH).with(ctx.NAME()).report();
 
       ctx.value = new TypedValueNumber(parseLong(ctx.NUMBER().getText()));
     }
@@ -638,11 +641,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitConfigDefinitionMessage(ConfigDefinitionMessageContext ctx)
     {
       if (!isKebabCaseName(ctx.name = ctx.NAME().getText()))
-      {
-        syntaxError("config name for message value must match the kebab case naming convention")
-            .with(ctx.NAME())
-            .report();
-      }
+        syntaxError("config name for message value " + KEBAB_CASE_MATCH).with(ctx.NAME()).report();
 
       ctx.value = new TypedValueMessage(ctx.quotedMessage().messageWithSpaces);
     }
@@ -652,11 +651,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitConfigDefinitionString(ConfigDefinitionStringContext ctx)
     {
       if (!isKebabCaseName(ctx.name = ctx.NAME().getText()))
-      {
-        syntaxError("config name for string value must match the kebab case naming convention")
-            .with(ctx.NAME())
-            .report();
-      }
+        syntaxError("config name for string value " + KEBAB_CASE_MATCH).with(ctx.NAME()).report();
 
       ctx.value = new TypedValueString(ctx.simpleString().string);
     }
@@ -730,7 +725,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       if (equalOperator != null)
         ctx.cmp = equalOperator.cmp;
       else
-        switch(((TerminalNode)ctx.getChild(0)).getSymbol().getType()) {
+        switch(((TerminalNode)ctx.getChild(0)).getSymbol().getType())
+        {
           case LTE -> ctx.cmp = CompareType.LTE;
           case LT -> ctx.cmp = CompareType.LT;
           case GT -> ctx.cmp = CompareType.GT;

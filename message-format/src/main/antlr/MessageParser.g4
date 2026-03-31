@@ -89,7 +89,7 @@ templateName returns [String name]
         ;
 
 templateParameterDelegate returns [String parameter, String delegatedParameter]
-        : simpleString EQ simpleString
+        : nameOrKeyword EQ nameOrKeyword  // both in kebab- or lower camel-case format
         ;
 
 postFormatPart returns [PostFormat part]
