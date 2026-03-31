@@ -505,12 +505,18 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final Collector<ConfigDefinitionContext,Map<String,TypedValue<?>>,Map<String,TypedValue<?>>>
-        TEMPLATE_CONFIG_DEFINITION_COLLECTOR = new AbstractMapCollector<>(TreeMap::new) {
+    final Collector<TemplateParameterDefaultContext,Map<String,TypedValue<?>>,Map<String,TypedValue<?>>>
+        TEMPLATE_PARAMETER_DEFAULT_COLLECTOR = new AbstractMapCollector<>(TreeMap::new) {
       @Override
-      protected void accumulator(@NotNull Map<String,TypedValue<?>> map, @NotNull ConfigDefinitionContext context) {
-        if (map.put(context.name, context.value) != null)
-          syntaxError("duplicate template default parameter '" + context.name + "'").with(context).report();
+      protected void accumulator(@NotNull Map<String,TypedValue<?>> map,
+                                 @NotNull TemplateParameterDefaultContext context)
+      {
+        if (map.put(context.parameter, context.value) != null)
+        {
+          syntaxError("duplicate template default parameter '" + context.parameter + "'")
+              .with(context)
+              .report();
+        }
       }
     };
 
@@ -537,7 +543,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           ctx.templateName().name,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
-          ctx.configDefinition().stream().collect(TEMPLATE_CONFIG_DEFINITION_COLLECTOR),
+          ctx.templateParameterDefault().stream().collect(TEMPLATE_PARAMETER_DEFAULT_COLLECTOR),
           ctx.templateParameterDelegate().stream().collect(TEMPLATE_PARAMETER_DELEGATE_COLLECTOR));
     }
 
@@ -571,6 +577,48 @@ public final class MessageCompiler extends AbstractAntlr4Parser
             .with(rightParameter)
             .report();
       }
+    }
+
+
+    @Override
+    public void exitTemplateParameterDefaultBool(TemplateParameterDefaultBoolContext ctx)
+    {
+      if (!isKebabOrLowerCamelCaseName(ctx.parameter = ctx.nameOrKeyword().name))
+      {
+        syntaxError("parameter name for default boolean value " + KEBAB_LOWER_CAMEL_CASE_MATCH)
+            .with(ctx.nameOrKeyword())
+            .report();
+      }
+
+      ctx.value = parseBoolean(ctx.BOOL().getText()) ? TypedValueBool.TRUE : TypedValueBool.FALSE;
+    }
+
+
+    @Override
+    public void exitTemplateParameterDefaultNumber(TemplateParameterDefaultNumberContext ctx)
+    {
+      if (!isKebabOrLowerCamelCaseName(ctx.parameter = ctx.nameOrKeyword().name))
+      {
+        syntaxError("parameter name for default numerical value " + KEBAB_LOWER_CAMEL_CASE_MATCH)
+            .with(ctx.nameOrKeyword())
+            .report();
+      }
+
+      ctx.value = new TypedValueNumber(parseLongValue(ctx.NUMBER()));
+    }
+
+
+    @Override
+    public void exitTemplateParameterDefaultString(TemplateParameterDefaultStringContext ctx)
+    {
+      if (!isKebabOrLowerCamelCaseName(ctx.parameter = ctx.nameOrKeyword().name))
+      {
+        syntaxError("parameter name for default string value " + KEBAB_LOWER_CAMEL_CASE_MATCH)
+            .with(ctx.nameOrKeyword())
+            .report();
+      }
+
+      ctx.value = new TypedValueString(ctx.simpleString().string);
     }
 
 

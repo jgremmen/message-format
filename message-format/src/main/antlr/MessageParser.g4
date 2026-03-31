@@ -80,7 +80,7 @@ parameterFormat returns [String format]
 templatePart returns [Template part]
         : TPL_START
           templateName
-          (COMMA (configDefinition | templateParameterDelegate))*
+          (COMMA (templateParameterDefault | templateParameterDelegate))*
           TPL_END
         ;
 
@@ -90,6 +90,12 @@ templateName returns [String name]
 
 templateParameterDelegate returns [String parameter, String delegatedParameter]
         : nameOrKeyword EQ nameOrKeyword  // both in kebab- or lower camel-case format
+        ;
+
+templateParameterDefault returns [String parameter, TypedValue<?> value]
+        : nameOrKeyword COLON BOOL           #templateParameterDefaultBool
+        | nameOrKeyword COLON NUMBER         #templateParameterDefaultNumber
+        | nameOrKeyword COLON simpleString   #templateParameterDefaultString
         ;
 
 postFormatPart returns [PostFormat part]
