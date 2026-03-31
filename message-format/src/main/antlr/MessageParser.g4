@@ -79,7 +79,7 @@ parameterFormat returns [String format]
 
 templatePart returns [Template part]
         : TPL_START
-          templateName
+          templateName  // kebab-case format
           (COMMA (templateParameterDefault | templateParameterDelegate))*
           TPL_END
         ;
