@@ -145,13 +145,14 @@ public final class TemplatePart implements MessagePart.Template
 
     final var contextWithoutQuotes = context.withoutStringQuote();
 
+    parameterDelegateMap.iterator().forEachRemaining(parameterDelegate -> textJoiner
+        .add(',').addNoSpace(parameterDelegate.getKey()).addNoSpace("->")
+        .addNoSpace(parameterDelegate.getValue()));
+
     defaultParameterMap.iterator().forEachRemaining(defaultParameter -> {
-      textJoiner.add(',').addNoSpace(defaultParameter.getKey()).add(':');
+      textJoiner.add(',').addNoSpace(defaultParameter.getKey()).add('=');
       defaultParameter.getValue().serialize(contextWithoutQuotes);
     });
-
-    parameterDelegateMap.iterator().forEachRemaining(parameterDelegate ->
-        textJoiner.add(',').addNoSpace(parameterDelegate.getKey()).add('=').addNoSpace(parameterDelegate.getValue()));
 
     textJoiner.add(']');
 
