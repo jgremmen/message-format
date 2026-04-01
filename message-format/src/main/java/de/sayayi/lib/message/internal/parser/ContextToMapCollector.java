@@ -33,10 +33,8 @@ import static java.util.stream.Collector.Characteristics.UNORDERED;
 
 
 /**
- * Abstract {@link Collector} implementation that collects ANTLR {@link ParserRuleContext} elements into a {@link Map}.
- * <p>
- * Subclasses must implement the {@link #accumulator(Map, ParserRuleContext)} method to define how each parser rule
- * context is converted into a key-value pair and added to the map.
+ * {@link Collector} implementation that collects ANTLR {@link ParserRuleContext} elements into a {@link Map}, using a
+ * configurable accumulator function to convert each context into a key-value pair.
  * <p>
  * The collector characteristics are determined by the type of map provided by the supplier:
  * <ul>
@@ -57,20 +55,25 @@ import static java.util.stream.Collector.Characteristics.UNORDERED;
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
-abstract class AbstractMapCollector<C extends ParserRuleContext,K,V> implements Collector<C,Map<K,V>,Map<K,V>>
+final class ContextToMapCollector<C extends ParserRuleContext,K,V> implements Collector<C,Map<K,V>,Map<K,V>>
 {
   private final Supplier<Map<K,V>> supplier;
+  private final BiConsumer<@NotNull Map<K,V>,@NotNull C> accumulator;
   private final Set<Characteristics> characteristics;
 
 
   /**
-   * Creates a new map collector with the given map supplier.
+   * Creates a new map collector with the given map supplier and accumulator function.
    *
-   * @param supplier  supplier providing new mutable map instances, not {@code null}
+   * @param supplier     supplier providing new mutable map instances, not {@code null}
+   * @param accumulator  bi-consumer that processes a parser rule context and adds the resulting key-value pair to the
+   *                     map, not {@code null}
    */
-  protected AbstractMapCollector(@NotNull Supplier<Map<K,V>> supplier)
+  ContextToMapCollector(@NotNull Supplier<Map<K,V>> supplier,
+                        @NotNull BiConsumer<@NotNull Map<K,V>,@NotNull C> accumulator)
   {
     this.supplier = supplier;
+    this.accumulator = accumulator;
     this.characteristics = supplier.get() instanceof LinkedHashMap
         ? Set.of(IDENTITY_FINISH)
         : Set.of(IDENTITY_FINISH, UNORDERED);
@@ -90,24 +93,13 @@ abstract class AbstractMapCollector<C extends ParserRuleContext,K,V> implements 
 
   /**
    * {@inheritDoc}
-   * <p>
-   * The returned bi-consumer delegates to {@link #accumulator(Map, ParserRuleContext)}.
    *
-   * @return  a bi-consumer that adds a parsed context entry to the accumulating map
+   * @return  the accumulator function provided at construction time
    */
   @Override
   public BiConsumer<Map<K,V>,C> accumulator() {
-    return this::accumulator;
+    return accumulator;
   }
-
-
-  /**
-   * Processes a single parser rule context and adds the resulting key-value pair to the map.
-   *
-   * @param map      the mutable map being accumulated into, not {@code null}
-   * @param context  the parser rule context to process, not {@code null}
-   */
-  protected abstract void accumulator(@NotNull Map<K,V> map, @NotNull C context);
 
 
   /**
@@ -142,8 +134,6 @@ abstract class AbstractMapCollector<C extends ParserRuleContext,K,V> implements 
    * {@inheritDoc}
    *
    * @return an unmodifiable set of collector characteristics
-   *
-   * @see #AbstractMapCollector(Supplier)
    */
   @Override
   public Set<Characteristics> characteristics() {

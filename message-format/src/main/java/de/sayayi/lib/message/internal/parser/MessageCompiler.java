@@ -49,8 +49,10 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
-import java.util.*;
-import java.util.stream.Collector;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.TreeMap;
 
 import static de.sayayi.lib.antlr4.walker.Walker.WALK_EXIT_RULES_HEAP;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAGE;
@@ -426,37 +428,29 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final Collector<ConfigDefinitionContext,Map<String,TypedValue<?>>,Map<String,TypedValue<?>>>
-        PARAMETER_CONFIG_DEFINITION_COLLECTOR = new AbstractMapCollector<>(TreeMap::new) {
-      @Override
-      protected void accumulator(@NotNull Map<String,TypedValue<?>> map, @NotNull ConfigDefinitionContext context)
-      {
-        if (map.put(context.name, context.value) != null)
-        {
-          syntaxError("duplicate config name " + context.name + " for parameter '" +
-              ((ParameterPartContext)context.parent).parameterName().name + '\'')
-              .with(context)
-              .report();
-        }
-      }
-    };
-
-
-    final Collector<MapEntryContext,Map<MapKey,TypedValue<?>>,Map<MapKey,TypedValue<?>>>
-        PARAMETER_MAP_ENTRY_COLLECTOR = new AbstractMapCollector<>(LinkedHashMap::new) {
-      @Override
-      protected void accumulator(@NotNull Map<MapKey,TypedValue<?>> map, @NotNull MapEntryContext context)
-      {
-        for(var key: context.keys)
-          if (map.put(key, context.value) != null)
+    final ContextToMapCollector<ConfigDefinitionContext,String,TypedValue<?>> PARAMETER_CONFIG_DEFINITION_COLLECTOR =
+        new ContextToMapCollector<>(TreeMap::new, (map, context) -> {
+          if (map.put(context.name, context.value) != null)
           {
-            syntaxError("duplicate config element " + key + " for parameter '" +
+            syntaxError("duplicate config name " + context.name + " for parameter '" +
                 ((ParameterPartContext)context.parent).parameterName().name + '\'')
                 .with(context)
                 .report();
           }
-      }
-    };
+        });
+
+
+    final ContextToMapCollector<MapEntryContext,MapKey,TypedValue<?>> PARAMETER_MAP_ENTRY_COLLECTOR =
+        new ContextToMapCollector<>(LinkedHashMap::new, (map, context) -> {
+          for(var key: context.keys)
+            if (map.put(key, context.value) != null)
+            {
+              syntaxError("duplicate config element " + key + " for parameter '" +
+                  ((ParameterPartContext)context.parent).parameterName().name + '\'')
+                  .with(context)
+                  .report();
+            }
+        });
 
 
     @Override
@@ -505,35 +499,26 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final Collector<TemplateParameterDefaultContext,Map<String,TypedValue<?>>,Map<String,TypedValue<?>>>
-        TEMPLATE_PARAMETER_DEFAULT_COLLECTOR = new AbstractMapCollector<>(TreeMap::new) {
-      @Override
-      protected void accumulator(@NotNull Map<String,TypedValue<?>> map,
-                                 @NotNull TemplateParameterDefaultContext context)
-      {
-        if (map.put(context.parameter, context.value) != null)
-        {
-          syntaxError("duplicate template default parameter '" + context.parameter + "'")
-              .with(context)
-              .report();
-        }
-      }
-    };
+    final ContextToMapCollector<TemplateParameterDefaultContext,String,TypedValue<?>> TEMPLATE_PARAMETER_DEFAULT_COLLECTOR =
+        new ContextToMapCollector<>(TreeMap::new, (map, context) -> {
+          if (map.put(context.parameter, context.value) != null)
+          {
+            syntaxError("duplicate template default parameter '" + context.parameter + "'")
+                .with(context)
+                .report();
+          }
+        });
 
 
-    final Collector<TemplateParameterDelegateContext,Map<String,String>,Map<String,String>>
-        TEMPLATE_PARAMETER_DELEGATE_COLLECTOR = new AbstractMapCollector<>(HashMap::new) {
-      @Override
-      protected void accumulator(@NotNull Map<String,String> map, @NotNull TemplateParameterDelegateContext context)
-      {
-        if (map.put(context.parameter, context.delegatedParameter) != null)
-        {
-          syntaxError("duplicate template parameter delegate '" + context.parameter + "'")
-              .with(context)
-              .report();
-        }
-      }
-    };
+    final ContextToMapCollector<TemplateParameterDelegateContext,String,String> TEMPLATE_PARAMETER_DELEGATE_COLLECTOR =
+        new ContextToMapCollector<>(HashMap::new, (map, context) -> {
+          if (map.put(context.parameter, context.delegatedParameter) != null)
+          {
+            syntaxError("duplicate template parameter delegate '" + context.parameter + "'")
+                .with(context)
+                .report();
+          }
+        });
 
 
     @Override
@@ -622,20 +607,16 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final Collector<ConfigDefinitionContext,Map<String,TypedValue<?>>,Map<String,TypedValue<?>>>
-        POST_FORMAT_CONFIG_DEFINITION_COLLECTOR = new AbstractMapCollector<>(TreeMap::new) {
-      @Override
-      protected void accumulator(@NotNull Map<String,TypedValue<?>> map, @NotNull ConfigDefinitionContext context)
-      {
-        if (map.put(context.name, context.value) != null)
-        {
-          syntaxError("duplicate config name " + context.name + " for post formatter '" +
-              ((PostFormatPartContext)context.parent).postFormatName().name + '\'')
-              .with(context)
-              .report();
-        }
-      }
-    };
+    final ContextToMapCollector<ConfigDefinitionContext,String,TypedValue<?>> POST_FORMAT_CONFIG_DEFINITION_COLLECTOR =
+        new ContextToMapCollector<>(TreeMap::new, (map, context) -> {
+          if (map.put(context.name, context.value) != null)
+          {
+            syntaxError("duplicate config name " + context.name + " for post formatter '" +
+                ((PostFormatPartContext) context.parent).postFormatName().name + '\'')
+                .with(context)
+                .report();
+          }
+        });
 
 
     @Override
