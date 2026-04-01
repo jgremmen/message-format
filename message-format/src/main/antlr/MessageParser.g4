@@ -89,13 +89,13 @@ templateName returns [String name]
         ;
 
 templateParameterDelegate returns [String parameter, String delegatedParameter]
-        : nameOrKeyword EQ nameOrKeyword  // both in kebab- or lower camel-case format
+        : nameOrKeyword ARROW nameOrKeyword  // both in kebab- or lower camel-case format
         ;
 
 templateParameterDefault returns [String parameter, TypedValue<?> value]
-        : nameOrKeyword COLON BOOL           #templateParameterDefaultBool
-        | nameOrKeyword COLON NUMBER         #templateParameterDefaultNumber
-        | nameOrKeyword COLON simpleString   #templateParameterDefaultString
+        : nameOrKeyword EQ BOOL          #templateParameterDefaultBool
+        | nameOrKeyword EQ NUMBER        #templateParameterDefaultNumber
+        | nameOrKeyword EQ quotedString  #templateParameterDefaultString
         ;
 
 postFormatPart returns [PostFormat part]

@@ -408,11 +408,11 @@ class MessageCompilerTest
     assertArrayEquals(
         new MessagePart[] { new TemplatePart("pq", false, true,
             Map.of(), Map.of("a", "b", "c", "d")) },
-        COMPILER.compileMessage("%[pq,a=b,c=d] ").getMessageParts());
+        COMPILER.compileMessage("%[pq,a='b',c='d'] ").getMessageParts());
 
     var mpe = assertThrowsExactly(
         MessageParserException.class,
-        () -> COMPILER.compileMessage("%[ xyz, a=b, a=c ]"));
+        () -> COMPILER.compileMessage("%[ xyz, a->b, a->c ]"));
     assertEquals("duplicate template parameter delegate 'a'", mpe.getErrorMessage());
     assertEquals(MESSAGE, mpe.getType());
   }
@@ -428,11 +428,11 @@ class MessageCompilerTest
                 "a", TypedValueBool.TRUE,
                 "c", new TypedValueString("C")
             ), Map.of()) },
-        COMPILER.compileMessage("%[pq,a:true,c:'C'] ").getMessageParts());
+        COMPILER.compileMessage("%[pq,a=true,c='C'] ").getMessageParts());
 
     var mpe = assertThrowsExactly(
         MessageParserException.class,
-        () -> COMPILER.compileMessage("%[ xyz, a:true, a:false ]"));
+        () -> COMPILER.compileMessage("%[ xyz, a=true, a=false ]"));
     assertEquals("duplicate template default parameter 'a'", mpe.getErrorMessage());
     assertEquals(MESSAGE, mpe.getType());
   }

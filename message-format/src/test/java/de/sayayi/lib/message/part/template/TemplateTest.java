@@ -61,13 +61,13 @@ public class TemplateTest
   {
     // akkusativ singular
     assertEquals("Ich gebe dem Mann das Buch", messageSupport
-        .message("Ich gebe dem Mann %[buch,collection=col,fall:akk]")
+        .message("Ich gebe dem Mann %[buch,collection->col,fall='akk']")
         .with("col", List.of("Buch 1"))
         .format());
 
     // akkusativ plural
     assertEquals("Ich gebe dem Mann die Bücher", messageSupport
-        .message("Ich gebe dem Mann %[buch,fall:akk]")
+        .message("Ich gebe dem Mann %[buch,fall='akk']")
         .with("collection", List.of("Buch 1", "Buch 2"))
         .format());
   }

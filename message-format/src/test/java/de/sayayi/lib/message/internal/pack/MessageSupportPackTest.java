@@ -44,7 +44,7 @@ class MessageSupportPackTest
     cms.addMessage("MSG-006", "%{n,name:-128,check:false,str:'string',msg:'msg %{p}'}");
     cms.addMessage("MSG-007", "^°!§$%&/()=?ßüöäÖÄÜ@€«∑®†Ω¨⁄øπ@∆ª©ƒ∂‚å¥≈ç√∫~∞…🍀");
     cms.addTemplate("exception", messageFactory.parseTemplate("%{ex,!empty:': %{ex}'}"));
-    cms.addMessage("MSG-008", "Something went wrong%[exception,with-stack:true]");
+    cms.addMessage("MSG-008", "Something went wrong%[exception,with-stack=true]");
 
     messageSupport = cms.seal();
   }

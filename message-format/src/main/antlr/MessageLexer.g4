@@ -25,6 +25,7 @@ tokens {
     NUMBER,
     NAME,
     EQ,
+    ARROW,
     L_PAREN,
     R_PAREN
 }
@@ -174,8 +175,8 @@ TPL_END
 T_COMMA
         : ',' -> type(COMMA)
         ;
-T_COLON
-        : ':' -> type(COLON)
+T_DELEGATE
+        : '->' -> type(ARROW)
         ;
 T_EQ
         : '=' -> type(EQ)

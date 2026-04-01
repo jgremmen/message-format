@@ -603,7 +603,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
             .report();
       }
 
-      ctx.value = new TypedValueString(ctx.simpleString().string);
+      ctx.value = new TypedValueString(ctx.quotedString().string);
     }
 
 
