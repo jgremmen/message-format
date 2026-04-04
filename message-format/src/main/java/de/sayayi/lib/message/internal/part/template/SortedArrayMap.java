@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.util;
+package de.sayayi.lib.message.internal.part.template;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -46,15 +46,29 @@ import static java.util.Comparator.nullsFirst;
  * @author Jeroen Gremmen
  * @since 0.9.2
  */
-public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterable<Entry<K,V>>
+class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterable<Entry<K,V>>
 {
+  /** Flat array holding interleaved key-value pairs: {@code [k0, v0, k1, v1, ...]}. */
   private final Object[] array;
+
+  /** The number of key-value pairs in this map. */
   private final int size;
+
+  /** {@code true} if the map contains a {@code null} key (always at index 0). */
   private final boolean hasNullKey;
 
 
+  /**
+   * Creates a new sorted array map from the given map.
+   * <p>
+   * The entries are copied and sorted by their keys' {@linkplain Comparable natural order},
+   * with {@code null} keys sorted first. A {@code null} or empty map results in an empty
+   * sorted array map.
+   *
+   * @param map  the source map to copy entries from, may be {@code null}
+   */
   @SuppressWarnings("PointlessArithmeticExpression")
-  public SortedArrayMap(Map<K,V> map)
+  SortedArrayMap(Map<K,V> map)
   {
     if ((size = map != null ? map.size() : 0) > 0)
     {
@@ -81,18 +95,35 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
   }
 
 
+  /**
+   * Returns the number of key-value pairs in this map.
+   *
+   * @return the map size, never negative
+   */
   @Contract(pure = true)
   public int size() {
     return size;
   }
 
 
+  /**
+   * Returns {@code true} if this map contains no key-value pairs.
+   *
+   * @return {@code true} if the map is empty, {@code false} otherwise
+   */
   @Contract(pure = true)
   public boolean isEmpty() {
     return size == 0;
   }
 
 
+  /**
+   * Looks up the value associated with the given key using binary search.
+   *
+   * @param key  the key to search for, may be {@code null}
+   *
+   * @return the value mapped to the key, or {@code null} if the key is not present
+   */
   @Contract(pure = true)
   @SuppressWarnings("unchecked")
   public V findValue(K key)
@@ -119,6 +150,13 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
   }
 
 
+  /**
+   * Returns an array containing all keys in this map, in sorted order.
+   *
+   * @param keyType  the component type of the resulting array, not {@code null}
+   *
+   * @return a newly allocated array of all keys, never {@code null}
+   */
   @Contract(pure = true)
   @SuppressWarnings("unchecked")
   public @NotNull K[] getKeys(@NotNull Class<K> keyType)
@@ -132,6 +170,12 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Returns an iterator over the entries in this map, ordered by key. The returned
+   * {@link Entry} instances are immutable.
+   */
   @Override
   public @NotNull Iterator<Entry<K,V>> iterator()
   {
@@ -157,6 +201,13 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Returns a {@link Spliterator} over the entries in this map. The spliterator reports
+   * {@link Spliterator#ORDERED}, {@link Spliterator#DISTINCT}, {@link Spliterator#IMMUTABLE},
+   * {@link Spliterator#NONNULL}, and {@link Spliterator#SIZED} characteristics.
+   */
   @Override
   public Spliterator<Entry<K,V>> spliterator()
   {
@@ -197,6 +248,11 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
   }
 
 
+  /**
+   * Returns a sequential {@link Stream} of the entries in this map, ordered by key.
+   *
+   * @return a sequential stream of map entries, never {@code null}
+   */
   @Contract(pure = true)
   public @NotNull Stream<Entry<K,V>> stream() {
     return StreamSupport.stream(spliterator(), false);
@@ -205,12 +261,24 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
 
 
 
+  /**
+   * Immutable {@link Entry} implementation backed by the enclosing map's internal array.
+   * <p>
+   * Each delegate references a fixed offset into the flat key-value array.
+   * Calling {@link #setValue(Object)} always throws {@link UnsupportedOperationException}.
+   */
   @SuppressWarnings({"DataFlowIssue", "unchecked"})
   private final class EntryDelegate implements Entry<K,V>
   {
+    /** Offset into the flat array; the key is at {@code array[offset]} and the value at {@code array[offset + 1]}. */
     private final int offset;
 
 
+    /**
+     * Creates a new entry delegate for the entry at the given index.
+     *
+     * @param index  zero-based entry index (not the raw array offset)
+     */
     private EntryDelegate(int index) {
       offset = index * 2;
     }
@@ -228,6 +296,13 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
     }
 
 
+    /**
+     * Always throws {@link UnsupportedOperationException} as this map is immutable.
+     *
+     * @param value  ignored
+     * @return never returns normally
+     * @throws UnsupportedOperationException always
+     */
     @Override
     public V setValue(V value) {
       throw new UnsupportedOperationException("setValue");
@@ -254,6 +329,11 @@ public class SortedArrayMap<K extends Comparable<? super K>,V> implements Iterab
     }
 
 
+    /**
+     * Returns a string representation of this entry in the form {@code key=value}.
+     *
+     * @return a string representation of this entry
+     */
     @Override
     public String toString() {
       return String.valueOf(array[offset]) + '=' + array[offset + 1];
