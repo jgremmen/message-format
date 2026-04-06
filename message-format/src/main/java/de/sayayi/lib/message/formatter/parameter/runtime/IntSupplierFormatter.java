@@ -28,12 +28,25 @@ import java.util.function.IntSupplier;
 
 
 /**
+ * Parameter formatter for {@link IntSupplier} values.
+ * <p>
+ * This formatter evaluates the supplier by calling {@link IntSupplier#getAsInt()} and delegates the formatting of the
+ * resulting {@code int} value to the appropriate integer formatter.
+ * <p>
+ * Map key comparison for {@code bool}, {@code number} and {@code string} keys is also based on the evaluated integer
+ * value.
+ *
  * @author Jeroen Gremmen
  */
 public final class IntSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<IntSupplier>
     implements MapKeyComparator<IntSupplier>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Evaluates the supplier and delegates formatting of the resulting {@code int} value.
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull IntSupplier intSupplier) {
@@ -41,12 +54,18 @@ public final class IntSupplierFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link IntSupplier}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(IntSupplier.class);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToBoolKey(@NotNull IntSupplier intSupplier,
                                                @NotNull ComparatorContext context) {
@@ -54,6 +73,7 @@ public final class IntSupplierFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToNumberKey(@NotNull IntSupplier intSupplier,
                                                  @NotNull ComparatorContext context) {
@@ -61,6 +81,7 @@ public final class IntSupplierFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull IntSupplier intSupplier,
                                                  @NotNull ComparatorContext context) {

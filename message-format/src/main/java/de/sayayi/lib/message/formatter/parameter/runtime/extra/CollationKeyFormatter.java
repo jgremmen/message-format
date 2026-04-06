@@ -33,12 +33,23 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
+ * Parameter formatter for {@link CollationKey} values.
+ * <p>
+ * This formatter renders the collation key using its source string obtained from {@link CollationKey#getSourceString()}.
+ * <p>
+ * As a {@link SizeQueryable} formatter, it reports the length of the source string.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
 public final class CollationKeyFormatter extends AbstractSingleTypeParameterFormatter<CollationKey>
     implements SizeQueryable, MapKeyComparator<CollationKey>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Formats the collation key as its source string.
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull CollationKey collationKey) {
@@ -46,18 +57,29 @@ public final class CollationKeyFormatter extends AbstractSingleTypeParameterForm
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Returns the length of the source string.
+   */
   @Override
   public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object value) {
     return OptionalLong.of(((CollationKey)value).getSourceString().length());
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link CollationKey}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(CollationKey.class);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToEmptyKey(CollationKey value, @NotNull ComparatorContext context) {
     return forEmptyKey(context.getCompareType(), value == null || value.getSourceString().isEmpty());

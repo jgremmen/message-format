@@ -28,12 +28,25 @@ import java.util.function.DoubleSupplier;
 
 
 /**
+ * Parameter formatter for {@link DoubleSupplier} values.
+ * <p>
+ * This formatter evaluates the supplier by calling {@link DoubleSupplier#getAsDouble()} and delegates the formatting
+ * of the resulting {@code double} value to the appropriate number formatter.
+ * <p>
+ * Map key comparison for {@code bool}, {@code number} and {@code string} keys is also based on the evaluated double
+ * value.
+ *
  * @author Jeroen Gremmen
  */
 public final class DoubleSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<DoubleSupplier>
     implements MapKeyComparator<DoubleSupplier>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Evaluates the supplier and delegates formatting of the resulting {@code double} value.
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull DoubleSupplier doubleSupplier) {
@@ -41,12 +54,18 @@ public final class DoubleSupplierFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link DoubleSupplier}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(DoubleSupplier.class);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToBoolKey(@NotNull DoubleSupplier doubleSupplier,
                                                @NotNull ComparatorContext context) {
@@ -54,6 +73,7 @@ public final class DoubleSupplierFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToNumberKey(@NotNull DoubleSupplier doubleSupplier,
                                                  @NotNull ComparatorContext context) {
@@ -61,6 +81,7 @@ public final class DoubleSupplierFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull DoubleSupplier doubleSupplier,
                                                  @NotNull ComparatorContext context) {

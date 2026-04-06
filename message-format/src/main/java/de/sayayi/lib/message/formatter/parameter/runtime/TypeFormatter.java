@@ -32,16 +32,43 @@ import static java.util.stream.Collectors.joining;
 
 
 /**
+ * Parameter formatter for {@link Type} values (including {@link Class}).
+ * <p>
+ * This formatter renders a Java type as a human-readable string. The output is controlled by the {@code type}
+ * configuration key, which accepts a combination of the following format flags:
+ * <ul>
+ *   <li>{@code c} &ndash; use the simple class name only</li>
+ *   <li>{@code j} &ndash; omit the {@code java.lang.} package prefix</li>
+ *   <li>{@code u} &ndash; omit the {@code java.util.} package prefix</li>
+ *   <li>{@code v} &ndash; expand type variable bounds</li>
+ * </ul>
+ * <p>
+ * The default format is {@code "ju"}, which strips both the {@code java.lang.} and {@code java.util.} prefixes.
+ * The formatter handles generic types, parameterized types, type variables, wildcard types and arrays.
+ *
  * @author Jeroen Gremmen
  */
 public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Type>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Formats the type using the format flags specified by the {@code type} configuration key.
+   */
   @Override
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Type type) {
     return noSpaceText(toString(type, context.getConfigValueString("type").orElse("ju")));
   }
 
 
+  /**
+   * Converts a Java {@link Type} to a formatted string representation using the given format flags.
+   *
+   * @param type        the type to format, not {@code null}
+   * @param typeFormat  a string of format flags ({@code c}, {@code j}, {@code u}, {@code v}), not {@code null}
+   *
+   * @return  formatted type string, never {@code null}
+   */
   @Contract(pure = true)
   public static @NotNull String toString(@NotNull Type type, @NotNull String typeFormat)
   {
@@ -167,12 +194,22 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link Type}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Type.class);
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing {@code "type"}, never {@code null}
+   */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return Set.of("type");

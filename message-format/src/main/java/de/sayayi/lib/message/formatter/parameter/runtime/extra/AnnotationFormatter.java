@@ -30,6 +30,14 @@ import java.util.Set;
 
 
 /**
+ * Parameter formatter for {@link Annotation} values.
+ * <p>
+ * This formatter extracts and formats a single annotation element value. The {@code annotation} configuration key
+ * specifies the name of the annotation element (method) whose value should be formatted.
+ * <p>
+ * If the configuration key is absent, empty, or refers to a non-existent element, formatting is delegated to the next
+ * available formatter.
+ *
  * @author Jeroen Gremmen
  * @since 0.12.0
  */
@@ -38,6 +46,12 @@ public final class AnnotationFormatter extends AbstractSingleTypeParameterFormat
   private final Map<AnnotationField,Method> annotationFieldMap = new HashMap<>();
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Extracts the annotation element value specified by the {@code annotation} configuration key and formats it. If
+   * the element does not exist, formatting is delegated to the next formatter.
+   */
   @Override
   protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Annotation annotation)
   {
@@ -75,12 +89,22 @@ public final class AnnotationFormatter extends AbstractSingleTypeParameterFormat
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link Annotation}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Annotation.class);
   }
 
   
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing {@code "annotation"}, never {@code null}
+   */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return Set.of("annotation");

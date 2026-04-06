@@ -42,7 +42,16 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
+ * Parameter formatter for array values, including primitive arrays, object arrays and atomic arrays
+ * ({@link AtomicIntegerArray}, {@link AtomicLongArray}, {@link AtomicReferenceArray}).
  * <p>
+ * Each array element is formatted individually and the results are joined into a single text string. Separator,
+ * truncation and overflow behavior are controlled by the list configuration keys inherited from
+ * {@link AbstractListFormatter}.
+ * <p>
+ * As a {@link SizeQueryable} formatter, it reports the length of the array.
+ * <p>
+ * The table below illustrates how the configuration keys interact:
  * <table border="1">
  *   <tr><th>&nbsp;array&nbsp;</th><th>&nbsp;sep-last&nbsp;</th><th>&nbsp;max-size&nbsp;</th><th>&nbsp;value-more&nbsp;</th><th>&nbsp;result&nbsp;</th></tr>
  *   <tr><td>[]</td><td>n/a</td><td>0</td><td>n/a</td><td>''</td></tr>
@@ -63,24 +72,37 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  */
 public final class ArrayFormatter extends AbstractListFormatter<Object> implements SizeQueryable
 {
+  /** {@inheritDoc} */
   @Override
   protected @NotNull Iterator<Text> createIterator(@NotNull ParameterFormatterContext context, @NotNull Object value) {
     return new TextIterator(context, value);
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Returns the length of the array.
+   */
   @Override
   public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object array) {
     return OptionalLong.of(getLength(array));
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToEmptyKey(Object array, @NotNull ComparatorContext context) {
     return forEmptyKey(context.getCompareType(), array == null || getLength(array) == 0);
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing formattable types for primitive arrays, object arrays and atomic arrays,
+   *          never {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes()
   {

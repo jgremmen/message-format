@@ -32,12 +32,26 @@ import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 
 
 /**
+ * Parameter formatter for {@link OptionalDouble} values.
+ * <p>
+ * If the optional contains a value, it is unwrapped and formatting is delegated to the appropriate {@code double}
+ * formatter. If the optional is empty, it is treated as an empty value.
+ * <p>
+ * Map key comparisons for {@code bool}, {@code number} and {@code string} keys are based on the contained double
+ * value. An empty optional results in a mismatch for these key types.
+ *
  * @author Jeroen Gremmen
  */
 public final class OptionalDoubleFormatter
     extends AbstractSingleTypeParameterFormatter<OptionalDouble>
     implements MapKeyComparator<OptionalDouble>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Unwraps the optional and delegates formatting of the contained {@code double} value. Returns empty text if the
+   * optional is empty.
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull OptionalDouble optionalDouble)
@@ -48,12 +62,18 @@ public final class OptionalDoubleFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link OptionalDouble}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(OptionalDouble.class);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   @SuppressWarnings("OptionalAssignedToNull")
   public @NotNull MatchResult compareToEmptyKey(OptionalDouble optionalDouble, @NotNull ComparatorContext context) {
@@ -61,6 +81,7 @@ public final class OptionalDoubleFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToBoolKey(@NotNull OptionalDouble optionalDouble,
                                                @NotNull ComparatorContext context)
@@ -71,6 +92,7 @@ public final class OptionalDoubleFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToNumberKey(@NotNull OptionalDouble optionalDouble,
                                                  @NotNull ComparatorContext context)
@@ -81,6 +103,7 @@ public final class OptionalDoubleFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull OptionalDouble optionalDouble,
                                                  @NotNull ComparatorContext context)

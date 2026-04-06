@@ -30,10 +30,33 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
+ * Parameter formatter for {@link URI} values.
+ * <p>
+ * This formatter uses the {@code uri} configuration key to select which component of the URI to format:
+ * <ul>
+ *   <li>{@code default} (default) &ndash; the full URI string representation</li>
+ *   <li>{@code authority} &ndash; the authority component</li>
+ *   <li>{@code fragment} &ndash; the fragment component</li>
+ *   <li>{@code host} &ndash; the host name</li>
+ *   <li>{@code path} &ndash; the path component</li>
+ *   <li>{@code port} &ndash; the port number; number map keys can be used to override the output</li>
+ *   <li>{@code query} &ndash; the query string</li>
+ *   <li>{@code scheme} &ndash; the scheme; string map keys can be used to override the output</li>
+ *   <li>{@code user-info} &ndash; the user info component</li>
+ * </ul>
+ * <p>
+ * If the configuration value does not match a known option, formatting is delegated to the next available formatter.
+ *
  * @author Jeroen Gremmen
  */
 public final class URIFormatter extends AbstractSingleTypeParameterFormatter<URI>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Formats the URI component specified by the {@code uri} configuration key. If no configuration is provided, the
+   * full URI string representation is returned.
+   */
   @Override
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull URI uri)
   {
@@ -58,12 +81,22 @@ public final class URIFormatter extends AbstractSingleTypeParameterFormatter<URI
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link URI}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(URI.class);
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing {@code "uri"}, never {@code null}
+   */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return Set.of("uri");

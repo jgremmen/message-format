@@ -35,12 +35,31 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
+ * Parameter formatter for {@link Method} values.
+ * <p>
+ * This formatter uses the {@code method} configuration key to select the output format:
+ * <ul>
+ *   <li>{@code default} (default) &ndash; the method's default string representation</li>
+ *   <li>{@code name} &ndash; the method name</li>
+ *   <li>{@code class} &ndash; the declaring class</li>
+ *   <li>{@code return-type} &ndash; the method's return type</li>
+ * </ul>
+ * <p>
+ * If the configuration value does not match a known option, formatting is delegated to the next available formatter.
+ * <p>
+ * Map key comparison for {@code string} keys is based on the method name.
+ *
  * @author Jeroen Gremmen
  */
 public final class MethodFormatter
     extends AbstractSingleTypeParameterFormatter<Method>
     implements MapKeyComparator<Method>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Formats the method based on the {@code method} configuration key.
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Method method)
@@ -56,18 +75,29 @@ public final class MethodFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link Method}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Method.class);
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing {@code "method"}, never {@code null}
+   */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return Set.of("method");
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MapKey.MatchResult compareToStringKey(@NotNull Method value, @NotNull ComparatorContext context)
   {

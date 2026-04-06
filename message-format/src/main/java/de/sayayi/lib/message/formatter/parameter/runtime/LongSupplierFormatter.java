@@ -28,12 +28,24 @@ import java.util.function.LongSupplier;
 
 
 /**
+ * Parameter formatter for {@link LongSupplier} values.
+ * <p>
+ * This formatter evaluates the supplier by calling {@link LongSupplier#getAsLong()} and delegates the formatting of
+ * the resulting {@code long} value to the appropriate number formatter.
+ * <p>
+ * Map key comparison for {@code bool}, {@code number} and {@code string} keys is also based on the evaluated long value.
+ *
  * @author Jeroen Gremmen
  */
 public final class LongSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<LongSupplier>
     implements MapKeyComparator<LongSupplier>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Evaluates the supplier and delegates formatting of the resulting {@code long} value.
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull LongSupplier longSupplier) {
@@ -41,12 +53,18 @@ public final class LongSupplierFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link LongSupplier}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(LongSupplier.class);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToBoolKey(@NotNull LongSupplier longSupplier,
                                                @NotNull ComparatorContext context) {
@@ -54,6 +72,7 @@ public final class LongSupplierFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToNumberKey(@NotNull LongSupplier longSupplier,
                                                  @NotNull ComparatorContext context) {
@@ -61,6 +80,7 @@ public final class LongSupplierFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull LongSupplier longSupplier,
                                                  @NotNull ComparatorContext context) {

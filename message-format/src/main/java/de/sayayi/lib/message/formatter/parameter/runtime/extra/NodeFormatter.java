@@ -37,17 +37,34 @@ import static org.w3c.dom.Node.ELEMENT_NODE;
 
 
 /**
+ * Parameter formatter for DOM {@link Node} values, specifically {@link Element} and {@link Attr} nodes.
+ * <p>
+ * This formatter renders a DOM node as its XPath expression. Elements are represented with their positional index
+ * predicate when siblings with the same name exist, and attributes are prefixed with {@code @}.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
 public final class NodeFormatter extends AbstractParameterFormatter<Node>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Formats the DOM node as its XPath expression.
+   */
   @Override
   protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Node node) {
     return noSpaceText(toXPath(node));
   }
 
 
+  /**
+   * Converts a DOM node to its XPath expression string.
+   *
+   * @param node  the DOM node to convert, not {@code null}
+   *
+   * @return  the XPath expression, never {@code null}
+   */
   public static @NotNull String toXPath(Node node)
   {
     if (node instanceof Document)
@@ -118,6 +135,11 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing the {@link Attr} and {@link Element} formattable types, never {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes()
   {

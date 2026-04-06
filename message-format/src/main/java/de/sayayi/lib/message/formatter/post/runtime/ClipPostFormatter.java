@@ -23,17 +23,48 @@ import static java.lang.Math.max;
 
 
 /**
+ * Post formatter that clips a formatted string to a maximum length.
+ * <p>
+ * This post formatter is identified by the name {@code clip}. The maximum length is specified by the {@code clip}
+ * configuration key as a numeric value. If the string exceeds this length, it is truncated.
+ * <p>
+ * By default, a suffix (ellipsis character {@code \u2026}) is appended to the truncated string to indicate that the
+ * text has been clipped. The suffix behavior can be controlled with the following configuration keys:
+ * <ul>
+ *   <li>
+ *     {@code clip-suffix} &ndash; set to {@code false} to disable the suffix and perform a hard truncation at the
+ *     maximum length
+ *   </li>
+ *   <li>
+ *     {@code clip-suffix-text} &ndash; a custom suffix string to use instead of the default ellipsis character
+ *   </li>
+ * </ul>
+ * <p>
+ * When a suffix is used, the string is truncated so that the total length including the suffix
+ * does not exceed the configured maximum.
+ *
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
 public final class ClipPostFormatter implements PostFormatter
 {
+  /**
+   * {@inheritDoc}
+   *
+   * @return  {@code "clip"}, never {@code null}
+   */
   @Override
   public @NotNull String getName() {
     return "clip";
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Clips the given {@code string} to the maximum length specified by the {@code clip} configuration key,
+   * optionally appending a suffix to indicate truncation.
+   */
   @Override
   @SuppressWarnings("UnnecessaryUnicodeEscape")
   public @NotNull String format(@NotNull String string, @NotNull PostFormatterContext context)

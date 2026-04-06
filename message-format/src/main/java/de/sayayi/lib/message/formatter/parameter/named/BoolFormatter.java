@@ -42,6 +42,30 @@ import static java.lang.Math.signum;
 
 
 /**
+ * Named parameter formatter that converts a parameter value to a boolean representation.
+ * <p>
+ * This formatter is selected by using the name {@code bool} in a message parameter, e.g.
+ * {@code %{myParam,format:bool}}.
+ * <p>
+ * It accepts a wide range of input types and converts them to a boolean value:
+ * <ul>
+ *   <li>{@link Boolean} values are used directly</li>
+ *   <li>{@link Number} values are interpreted as {@code false} if zero, {@code true} otherwise</li>
+ *   <li>
+ *     {@link String} values {@code "true"} and {@code "false"} are recognized literally; numeric strings are parsed
+ *     and treated as numbers
+ *   </li>
+ *   <li>
+ *     {@link java.util.Optional Optional}, {@link OptionalInt} and {@link OptionalLong} are unwrapped before
+ *     conversion
+ *   </li>
+ *   <li>{@code null} values are handled separately using the null map key</li>
+ * </ul>
+ * <p>
+ * The resulting boolean value can be mapped to custom text using map keys of type {@code bool}, {@code string},
+ * {@code empty} and {@code null} in the parameter configuration. If no mapping is provided, the formatter defaults
+ * to the text {@code "true"} or {@code "false"}.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
@@ -55,6 +79,11 @@ public final class BoolFormatter implements NamedParameterFormatter, MapKeyCompa
   };
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  {@code "bool"}, never {@code null}
+   */
   @Override
   @Contract(pure = true)
   public @NotNull String getName() {
@@ -62,6 +91,12 @@ public final class BoolFormatter implements NamedParameterFormatter, MapKeyCompa
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This formatter can handle {@link Boolean}, {@link Number} (and primitive numeric types), {@link String},
+   * {@link java.util.Optional Optional}, {@link OptionalInt}, {@link OptionalLong} and {@code null} values.
+   */
   @Override
   public boolean canFormat(@NotNull Class<?> type)
   {
@@ -81,6 +116,13 @@ public final class BoolFormatter implements NamedParameterFormatter, MapKeyCompa
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Converts the given {@code value} to a boolean and formats it using the parameter map configuration. If the
+   * value is {@code null}, the null map key is used. If the value cannot be converted to a boolean, the empty map
+   * key is used.
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text format(@NotNull ParameterFormatterContext context, Object value)
@@ -162,7 +204,7 @@ public final class BoolFormatter implements NamedParameterFormatter, MapKeyCompa
   /**
    * {@inheritDoc}
    *
-   * @return  a set with supported java types for this formatter, not {@code null}
+   * @return  a set containing {@link Boolean} and {@code boolean} formattable types, never {@code null}
    */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes()
@@ -173,6 +215,7 @@ public final class BoolFormatter implements NamedParameterFormatter, MapKeyCompa
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToBoolKey(@NotNull Object value, @NotNull ComparatorContext context) {
     return context.getCompareType().match((Boolean)value == context.getBoolKeyValue() ? 0 : 1) ? EXACT : MISMATCH;

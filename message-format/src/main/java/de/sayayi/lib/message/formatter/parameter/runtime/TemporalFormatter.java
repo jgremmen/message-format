@@ -40,6 +40,25 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
+ * Parameter formatter for {@link Temporal} values (e.g. {@link java.time.LocalDate}, {@link java.time.LocalDateTime},
+ * {@link java.time.Instant}).
+ * <p>
+ * The output format is controlled by the {@code date} configuration key, which accepts the following predefined style
+ * names:
+ * <ul>
+ *   <li>{@code short} &ndash; short date and time</li>
+ *   <li>{@code medium} (default) &ndash; medium date and time</li>
+ *   <li>{@code long} &ndash; long date and time</li>
+ *   <li>{@code full} &ndash; full date and time</li>
+ *   <li>{@code date} &ndash; date only (medium style)</li>
+ *   <li>{@code time} &ndash; time only (medium style)</li>
+ * </ul>
+ * <p>
+ * Alternatively, a custom {@link DateTimeFormatter} pattern can be provided (e.g. {@code "yyyy-MM-dd"}).
+ * <p>
+ * The formatter automatically detects whether the temporal value supports date fields, time fields, or both, and
+ * adjusts the output accordingly. All formatting is locale-aware using the formatting context's locale.
+ *
  * @author Jeroen Gremmen
  */
 public final class TemporalFormatter extends AbstractParameterFormatter<Temporal>
@@ -71,6 +90,12 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
       entry("-F", ofLocalizedTime(FULL)));
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Formats the temporal value using the style or pattern specified by the {@code date} configuration key. If no
+   * configuration is provided, the medium date/time style is used.
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Temporal temporal)
@@ -106,6 +131,11 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing the {@link Temporal} formattable type, never {@code null}
+   */
   @Override
   @Contract(value = "-> new", pure = true)
   public @NotNull Set<FormattableType> getFormattableTypes() {
@@ -113,6 +143,11 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing {@code "date"}, never {@code null}
+   */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return Set.of("date");

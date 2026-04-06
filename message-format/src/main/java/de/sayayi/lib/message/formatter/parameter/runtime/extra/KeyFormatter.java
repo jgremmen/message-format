@@ -26,11 +26,27 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
+ * Parameter formatter for {@link Key} (cryptographic key) values.
+ * <p>
+ * This formatter uses the {@code key} configuration key to select which aspect of the cryptographic key to format:
+ * <ul>
+ *   <li>{@code algorithm} &ndash; the key's algorithm name</li>
+ *   <li>{@code format} &ndash; the key's encoding format name</li>
+ *   <li>{@code encoded} &ndash; the key's encoded form (as a byte array)</li>
+ * </ul>
+ * <p>
+ * If the configuration key is absent or does not match a known option, formatting is delegated to the next available
+ * formatter.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
 public final class KeyFormatter extends AbstractMultiSelectFormatter<Key>
 {
+  /**
+   * Creates a new cryptographic key formatter with the configuration key {@code key} and
+   * selection options for algorithm, format and encoded form.
+   */
   public KeyFormatter()
   {
     super("key");
@@ -41,6 +57,11 @@ public final class KeyFormatter extends AbstractMultiSelectFormatter<Key>
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing the {@link Key} formattable type, never {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes() {
     return Set.of(new FormattableType(Key.class));

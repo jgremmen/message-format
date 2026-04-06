@@ -25,11 +25,30 @@ import static de.sayayi.lib.message.part.MapKey.NUMBER_TYPE;
 
 
 /**
+ * Named parameter formatter that determines and formats the size of a parameter value.
+ * <p>
+ * This formatter is selected by using the name {@code size} in a message parameter, e.g.
+ * {@code %{myParam,format:size}}.
+ * <p>
+ * It delegates the size calculation to the {@link ParameterFormatterContext#size(Object) context}, which queries
+ * {@link de.sayayi.lib.message.formatter.parameter.ParameterFormatter.SizeQueryable SizeQueryable} formatters
+ * registered for the value's type. This means it can determine the size of any type that has a size-aware formatter,
+ * such as strings, collections, maps and arrays.
+ * <p>
+ * The resulting size value can be mapped to custom text using number map keys in the parameter configuration. If no
+ * mapping is provided, the numeric size is formatted as text. If the size cannot be determined, the empty map key
+ * is used. {@code null} values are handled separately using the null map key.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
 public final class SizeFormatter implements NamedParameterFormatter
 {
+  /**
+   * {@inheritDoc}
+   *
+   * @return  {@code "size"}, never {@code null}
+   */
   @Override
   @Contract(pure = true)
   public @NotNull String getName() {
@@ -37,6 +56,13 @@ public final class SizeFormatter implements NamedParameterFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Calculates the size of the given {@code value} and formats it. If the value is {@code null}, the null map key
+   * is used. If the size cannot be determined, the empty map key is used. Otherwise, the size is matched against
+   * number map keys or formatted as a number.
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text format(@NotNull ParameterFormatterContext context, Object value)

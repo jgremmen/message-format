@@ -37,10 +37,20 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
+ * Parameter formatter for {@link Iterable} values, including all {@link Collection} types.
+ * <p>
+ * Each element is formatted individually and the results are joined into a single text string. Separator, truncation
+ * and overflow behavior are controlled by the list configuration keys inherited from {@link AbstractListFormatter}.
+ * <p>
+ * As a {@link SizeQueryable} formatter, it reports the number of elements in the iterable. For {@link Collection}
+ * instances, the {@link Collection#size()} method is used directly; for other iterables, the elements are counted by
+ * iteration.
+ *
  * @author Jeroen Gremmen
  */
 public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> implements SizeQueryable
 {
+  /** {@inheritDoc} */
   @Override
   protected @NotNull Iterator<Text> createIterator(@NotNull ParameterFormatterContext context,
                                                    @NotNull Iterable<?> iterable) {
@@ -48,6 +58,11 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> 
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Returns the number of elements in the iterable.
+   */
   @Override
   public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object iterable)
   {
@@ -63,6 +78,7 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> 
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToEmptyKey(Iterable<?> iterable, @NotNull ComparatorContext context)
   {
@@ -73,6 +89,11 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> 
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing the {@link Iterable} formattable type, never {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes() {
     return Set.of(new FormattableType(Iterable.class));

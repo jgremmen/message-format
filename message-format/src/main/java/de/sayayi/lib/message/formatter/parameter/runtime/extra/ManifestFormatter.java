@@ -24,11 +24,27 @@ import java.util.jar.Manifest;
 
 
 /**
+ * Parameter formatter for {@link Manifest} values.
+ * <p>
+ * This formatter uses the {@code manifest} configuration key to select which part of the manifest to format:
+ * <ul>
+ *   <li>
+ *     {@code main-attrs} or {@code main-attributes} (default) &ndash; formats the main attributes of the manifest
+ *   </li>
+ *   <li>{@code entries} &ndash; formats the manifest entries map</li>
+ * </ul>
+ * <p>
+ * If the configuration value does not match a known option, formatting is delegated to the next available formatter.
+ *
  * @author Jeroen Gremmen
  * @since 0.12.0
  */
 public final class ManifestFormatter extends AbstractMultiSelectFormatter<Manifest>
 {
+  /**
+   * Creates a new manifest formatter with the configuration key {@code manifest} and selection options for main
+   * attributes and entries.
+   */
   public ManifestFormatter()
   {
     super("manifest", "main-attrs" , true);
@@ -40,6 +56,11 @@ public final class ManifestFormatter extends AbstractMultiSelectFormatter<Manife
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing the {@link Manifest} formattable type, never {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes() {
     return Set.of(new FormattableType(Manifest.class));

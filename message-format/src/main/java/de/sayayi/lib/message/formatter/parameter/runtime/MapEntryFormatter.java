@@ -24,11 +24,26 @@ import java.util.Set;
 
 
 /**
+ * Parameter formatter for {@link Entry Map.Entry} values.
+ * <p>
+ * This formatter uses the {@code entry} configuration key to select which part of the map entry to format:
+ * <ul>
+ *   <li>{@code key} &ndash; formats the entry's key</li>
+ *   <li>{@code value} &ndash; formats the entry's value</li>
+ * </ul>
+ * <p>
+ * If the configuration key is absent or does not match a known option, formatting is delegated to the next available
+ * formatter.
+ *
  * @author Jeroen Gremmen
  * @since 0.12.0
  */
 public final class MapEntryFormatter extends AbstractMultiSelectFormatter<Entry<?,?>>
 {
+  /**
+   * Creates a new map entry formatter with selection options {@code key} and {@code value}, using the configuration
+   * key {@code entry}.
+   */
   public MapEntryFormatter()
   {
     super("entry");
@@ -38,6 +53,11 @@ public final class MapEntryFormatter extends AbstractMultiSelectFormatter<Entry<
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing the {@link Entry Map.Entry} formattable type, never {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes() {
     return Set.of(new FormattableType(Entry.class));

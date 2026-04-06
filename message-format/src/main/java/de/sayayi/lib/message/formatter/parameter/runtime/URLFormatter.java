@@ -30,10 +30,37 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
+ * Parameter formatter for {@link URL} values.
+ * <p>
+ * This formatter uses the {@code url} configuration key to select which component of the URL to format:
+ * <ul>
+ *   <li>{@code external} (default) &ndash; the full external form of the URL</li>
+ *   <li>{@code authority} &ndash; the authority component</li>
+ *   <li>{@code file} &ndash; the file component</li>
+ *   <li>{@code host} &ndash; the host name</li>
+ *   <li>{@code path} &ndash; the path component</li>
+ *   <li>
+ *     {@code port} &ndash; the port number (falls back to the default port if none is specified); number map keys
+ *     can be used to override the output
+ *   </li>
+ *   <li>{@code protocol} &ndash; the protocol; string map keys can be used to override the output</li>
+ *   <li>{@code query} &ndash; the query string</li>
+ *   <li>{@code user-info} &ndash; the user info component</li>
+ *   <li>{@code ref} &ndash; the reference (fragment) component</li>
+ * </ul>
+ * <p>
+ * If the configuration value does not match a known option, formatting is delegated to the next available formatter.
+ *
  * @author Jeroen Gremmen
  */
 public final class URLFormatter extends AbstractSingleTypeParameterFormatter<URL>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Formats the URL component specified by the {@code url} configuration key. If no configuration is provided, the
+   * full external form of the URL is returned.
+   */
   @Override
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull URL url)
   {
@@ -59,12 +86,22 @@ public final class URLFormatter extends AbstractSingleTypeParameterFormatter<URL
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link URL}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(URL.class);
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing {@code "url"}, never {@code null}
+   */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return Set.of("url");

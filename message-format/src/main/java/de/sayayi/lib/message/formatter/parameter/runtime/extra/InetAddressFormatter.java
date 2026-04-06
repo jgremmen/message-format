@@ -26,10 +26,25 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
+ * Parameter formatter for {@link InetAddress} values.
+ * <p>
+ * This formatter uses the {@code inet} configuration key to select which representation of the address to format:
+ * <ul>
+ *   <li>{@code ip} (default) &ndash; the IP address string</li>
+ *   <li>{@code name} &ndash; the host name</li>
+ *   <li>{@code fqdn} &ndash; the fully qualified domain name (canonical host name)</li>
+ * </ul>
+ * <p>
+ * If the configuration value does not match a known option, formatting is delegated to the next available formatter.
+ *
  * @author Jeroen Gremmen
  */
 public final class InetAddressFormatter extends AbstractMultiSelectFormatter<InetAddress>
 {
+  /**
+   * Creates a new inet address formatter with the configuration key {@code inet} and selection options for IP address,
+   * host name and FQDN.
+   */
   public InetAddressFormatter()
   {
     super("inet", "ip", true);
@@ -40,6 +55,11 @@ public final class InetAddressFormatter extends AbstractMultiSelectFormatter<Ine
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing the {@link InetAddress} formattable type, never {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes() {
     return Set.of(new FormattableType(InetAddress.class));

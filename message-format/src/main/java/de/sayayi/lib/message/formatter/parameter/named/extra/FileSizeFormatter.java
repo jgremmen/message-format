@@ -32,9 +32,23 @@ import static java.lang.Boolean.FALSE;
 
 
 /**
+ * Named parameter formatter that formats numeric values as human-readable file sizes.
+ * <p>
+ * This formatter is selected by using the name {@code filesize} in a message parameter, e.g.
+ * {@code %{myParam,format:filesize}}.
+ * <p>
+ * It accepts numeric values representing a file size in bytes and automatically selects the appropriate unit
+ * (B, KB, MB, GB, TB, PB). The number of decimal places is controlled by the {@code scale} configuration key
+ * (0&ndash;3, default: 1).
+ * <p>
+ * String map keys in the parameter configuration can be used to override the unit labels (e.g. to provide localized
+ * unit names). A {@code space} boolean configuration key controls whether a space is inserted between the number and
+ * the unit.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
+@Deprecated(forRemoval = true)
 public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
     implements NamedParameterFormatter
 {
@@ -51,12 +65,23 @@ public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
   };
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  {@code "filesize"}, never {@code null}
+   */
   @Override
   public @NotNull String getName() {
     return "filesize";
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This formatter can handle {@link Number} types as well as primitive {@code long},
+   * {@code int} and {@code short} values and {@code null}.
+   */
   @Override
   public boolean canFormat(@NotNull Class<?> type)
   {
@@ -69,6 +94,11 @@ public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Formats the numeric value as a human-readable file size with the appropriate unit.
+   */
   @Override
   protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Number value)
   {
@@ -125,6 +155,11 @@ public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
   }
 
   
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing {@code "scale"}, never {@code null}
+   */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return Set.of("scale");

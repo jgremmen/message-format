@@ -24,7 +24,16 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
- * Formatter service providing formatters for the most common java types.
+ * Formatter service that automatically discovers and registers parameter formatters and post formatters available on
+ * the classpath via the Java {@link ServiceLoader} mechanism.
+ * <p>
+ * This service extends {@link GenericFormatterService} by loading all {@link ParameterFormatter} and
+ * {@link PostFormatter} implementations that are declared as services. A shared singleton instance is available via
+ * {@link #getSharedInstance()}.
+ * <p>
+ * Subclasses can override {@link #addDefaultFormatters()} or the individual
+ * {@link #addParameterFormattersFromService()} and {@link #addPostFormattersFromService()} methods to customize which
+ * formatters are loaded.
  *
  * @author Jeroen Gremmen
  * @since 0.4.2
@@ -36,15 +45,14 @@ public class DefaultFormatterService extends GenericFormatterService
   private static FormatterService INSTANCE = null;
 
   /**
-   * Classloader to be used to load parameter formatter service classes or {@code null} for
-   * the system class loader.
+   * Classloader to be used to load parameter formatter service classes or {@code null} for the system class loader.
    */
   protected final ClassLoader classLoader;
 
 
   /**
-   * Returns a shared instance of the default formatter service. This service includes all parameter
-   * formatters which are available as a service and accessible by the system class loader.
+   * Returns a shared instance of the default formatter service. This service includes all parameter formatters which
+   * are available as a service and accessible by the system class loader.
    *
    * @return  shared instance of the default formatter service, never {@code null}
    */
@@ -62,16 +70,32 @@ public class DefaultFormatterService extends GenericFormatterService
   }
 
 
+  /**
+   * Creates a default formatter service using the system class loader and the
+   * {@link #DEFAULT_FORMATTER_CACHE_SIZE default} cache size.
+   */
   public DefaultFormatterService() {
     this(null, DEFAULT_FORMATTER_CACHE_SIZE);
   }
 
 
+  /**
+   * Creates a default formatter service using the system class loader and the given cache size.
+   *
+   * @param formatterCacheSize  maximum number of type-to-formatter mappings to cache
+   */
   public DefaultFormatterService(int formatterCacheSize) {
     this(null, formatterCacheSize);
   }
 
 
+  /**
+   * Creates a default formatter service using the given class loader and cache size.
+   *
+   * @param classLoader         class loader used to discover service-provided formatters, or {@code null} for
+   *                            the system class loader
+   * @param formatterCacheSize  maximum number of type-to-formatter mappings to cache
+   */
   @SuppressWarnings("WeakerAccess")
   public DefaultFormatterService(ClassLoader classLoader, int formatterCacheSize)
   {
@@ -84,7 +108,13 @@ public class DefaultFormatterService extends GenericFormatterService
 
 
   /**
-   * Adds the default formatters for this service.
+   * Adds the default formatters for this service. This method is called during construction and loads both parameter
+   * formatters and post formatters via the {@link ServiceLoader}.
+   * <p>
+   * Subclasses can override this method to customize which formatters are registered.
+   *
+   * @see #addParameterFormattersFromService()
+   * @see #addPostFormattersFromService()
    */
   @SuppressWarnings("WeakerAccess")
   protected void addDefaultFormatters()
@@ -95,7 +125,8 @@ public class DefaultFormatterService extends GenericFormatterService
 
 
   /**
-   * Adds all parameter formatters on the classpath which are defined as a service.
+   * Discovers and registers all {@link ParameterFormatter} implementations available on the classpath via the
+   * {@link ServiceLoader} mechanism.
    */
   protected void addParameterFormattersFromService()
   {
@@ -106,7 +137,8 @@ public class DefaultFormatterService extends GenericFormatterService
 
 
   /**
-   * Adds all post-formatters on the classpath which are defined as a service.
+   * Discovers and registers all {@link PostFormatter} implementations available on the classpath via the
+   * {@link ServiceLoader} mechanism.
    *
    * @since 0.20.0
    */

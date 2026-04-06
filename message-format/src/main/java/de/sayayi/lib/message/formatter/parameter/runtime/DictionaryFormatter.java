@@ -36,11 +36,34 @@ import static de.sayayi.lib.message.part.MapKey.EMPTY_NULL_TYPE;
 
 
 /**
+ * Parameter formatter for {@link Dictionary} values.
+ * <p>
+ * This formatter looks up a value in the dictionary using a key provided via the {@code key} configuration entry.
+ * The key can be a boolean, number or string value. The looked-up value is then formatted using the appropriate
+ * formatter for its type.
+ * <p>
+ * If the {@code key} configuration entry is absent, formatting is delegated to the next available formatter. If the
+ * key is not found in the dictionary, the result is treated as {@code null} and the null/empty map key from the
+ * parameter configuration is used if present.
+ * <p>
+ * This formatter is registered with a higher priority than more general formatters (e.g. {@link MapFormatter}).
+ * This is necessary because some {@code Dictionary} subclasses (e.g. {@link java.util.Hashtable Hashtable}) also
+ * implement {@link java.util.Map Map}, which would otherwise cause the map formatter to be selected instead. By
+ * taking priority, this formatter gets the first chance to handle the value. When the {@code key} configuration is
+ * absent, it delegates to the next formatter, allowing the value to be formatted as a map or in any other applicable
+ * way.
+ *
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
 public final class DictionaryFormatter implements ParameterFormatter
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Looks up the value in the dictionary using the configured {@code key} and formats the result. If the {@code key}
+   * configuration entry is absent, formatting is delegated to the next formatter.
+   */
   @Override
   public @NotNull Text format(@NotNull ParameterFormatterContext context, Object _dictionary)
   {
@@ -105,6 +128,14 @@ public final class DictionaryFormatter implements ParameterFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The {@link Dictionary} type is registered with a higher priority than the default order to ensure this formatter
+   * is selected before the {@link MapFormatter} for types like {@link java.util.Hashtable Hashtable}.
+   *
+   * @return  a set containing the {@link Dictionary} formattable type, never {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
@@ -113,6 +144,11 @@ public final class DictionaryFormatter implements ParameterFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing {@code "key"}, never {@code null}
+   */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return Set.of("key");

@@ -29,11 +29,20 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
+ * Parameter formatter for {@link Stream} values.
+ * <p>
+ * Each stream element is formatted individually and the results are joined into a single text string. Separator,
+ * truncation and overflow behavior are controlled by the list configuration keys inherited from
+ * {@link AbstractListFormatter}.
+ * <p>
+ * Note that formatting a stream consumes it. The stream cannot be reused after formatting.
+ *
  * @author Jeroen Gremmen
  * @since 0.12.0
  */
 public final class StreamFormatter extends AbstractListFormatter<Stream<?>>
 {
+  /** {@inheritDoc} */
   @Override
   protected @NotNull Iterator<Text> createIterator(@NotNull ParameterFormatterContext context, @NotNull Stream<?> stream)
   {
@@ -50,6 +59,11 @@ public final class StreamFormatter extends AbstractListFormatter<Stream<?>>
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing the {@link Stream} formattable type, never {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes() {
     return Set.of(new FormattableType(Stream.class));

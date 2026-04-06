@@ -30,12 +30,25 @@ import java.util.function.Supplier;
 
 
 /**
+ * Parameter formatter for {@link Supplier} values.
+ * <p>
+ * This formatter evaluates the supplier by calling {@link Supplier#get()} and delegates the formatting of the
+ * supplied value to the formatter appropriate for its type.
+ * <p>
+ * Size queries and map key comparisons ({@code bool}, {@code number} and {@code string} keys) are also based on the
+ * supplied value.
+ *
  * @author Jeroen Gremmen
  */
 public final class SupplierFormatter
     extends AbstractSingleTypeParameterFormatter<Supplier<?>>
     implements SizeQueryable, MapKeyComparator<Supplier<?>>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Evaluates the supplier and delegates formatting of the supplied value.
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Supplier<?> supplier) {
@@ -43,30 +56,43 @@ public final class SupplierFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Returns the size of the value obtained from the supplier.
+   */
   @Override
   public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object supplier) {
     return context.size(((Supplier<?>)supplier).get());
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link Supplier}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Supplier.class);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToBoolKey(@NotNull Supplier<?> supplier, @NotNull ComparatorContext context) {
     return context.matchForObject(supplier.get());
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToNumberKey(@NotNull Supplier<?> supplier, @NotNull ComparatorContext context) {
     return context.matchForObject(supplier.get());
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull Supplier<?> supplier, @NotNull ComparatorContext context) {
     return context.matchForObject(supplier.get());

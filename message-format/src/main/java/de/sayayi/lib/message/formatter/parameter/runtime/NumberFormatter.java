@@ -48,6 +48,25 @@ import static java.lang.Math.signum;
 
 
 /**
+ * Parameter formatter for {@link Number} values and primitive numeric types.
+ * <p>
+ * The output format is controlled by the {@code number} configuration key, which accepts the following values:
+ * <ul>
+ *   <li>{@code integer} &ndash; formats the number as an integer</li>
+ *   <li>{@code percent} &ndash; formats the number as a percentage</li>
+ *   <li>{@code currency} &ndash; formats the number as a currency value</li>
+ *   <li>{@code bool} &ndash; formats the number as a boolean (zero is {@code false}, non-zero is {@code true})</li>
+ *   <li>A custom {@link DecimalFormat} pattern &ndash; formats the number using the given pattern</li>
+ * </ul>
+ * <p>
+ * If the configuration key is absent, integer types are rendered using their plain {@code toString()} representation;
+ * all other numeric types are formatted using a locale-specific number format.
+ * <p>
+ * Number map keys in the parameter configuration can be used to map specific numeric values to custom text.
+ * <p>
+ * Map key comparison supports {@code bool} keys (zero/non-zero), {@code number} keys (numeric comparison) and
+ * {@code string} keys (parsed numeric comparison).
+ *
  * @author Jeroen Gremmen
  */
 public final class NumberFormatter
@@ -57,6 +76,13 @@ public final class NumberFormatter
   private static final Map<Locale,DecimalFormatSymbols> FORMAT_SYMBOLS_CACHE = new ConcurrentHashMap<>();
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Formats the number based on the {@code number} configuration key, or using number map keys if a match is found.
+   * If no configuration is provided, integer types use their plain string representation while other types use a
+   * locale-specific number format.
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Number number)
@@ -107,6 +133,11 @@ public final class NumberFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing formattable types for {@link Number} and all primitive numeric types, never {@code null}
+   */
   @Override
   @Contract(value = "-> new", pure = true)
   public @NotNull Set<FormattableType> getFormattableTypes()
@@ -122,12 +153,18 @@ public final class NumberFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing {@code "number"}, never {@code null}
+   */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return Set.of("number");
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToBoolKey(@NotNull Number value, @NotNull ComparatorContext context)
   {
@@ -147,6 +184,7 @@ public final class NumberFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToNumberKey(@NotNull Number number, @NotNull ComparatorContext context)
   {
@@ -167,6 +205,7 @@ public final class NumberFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull Number value, @NotNull ComparatorContext context)
   {

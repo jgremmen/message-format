@@ -28,12 +28,24 @@ import java.util.function.BooleanSupplier;
 
 
 /**
+ * Parameter formatter for {@link BooleanSupplier} values.
+ * <p>
+ * This formatter evaluates the supplier by calling {@link BooleanSupplier#getAsBoolean()} and delegates the
+ * formatting of the resulting {@code boolean} value to the appropriate boolean formatter.
+ * <p>
+ * Map key comparison for {@code bool} and {@code string} keys is also based on the evaluated boolean value.
+ *
  * @author Jeroen Gremmen
  */
 public final class BooleanSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<BooleanSupplier>
     implements MapKeyComparator<BooleanSupplier>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Evaluates the supplier and delegates formatting of the resulting {@code boolean} value.
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull BooleanSupplier booleanSupplier) {
@@ -41,12 +53,18 @@ public final class BooleanSupplierFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link BooleanSupplier}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(BooleanSupplier.class);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToBoolKey(@NotNull BooleanSupplier booleanSupplier,
                                                @NotNull ComparatorContext context) {
@@ -54,6 +72,7 @@ public final class BooleanSupplierFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull BooleanSupplier booleanSupplier,
                                                  @NotNull ComparatorContext context) {

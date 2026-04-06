@@ -46,6 +46,29 @@ import static java.util.Objects.toIdentityString;
 
 
 /**
+ * Named parameter formatter that converts a parameter value to its string representation.
+ * <p>
+ * This formatter is selected by using the name {@code string} in a message parameter, e.g.
+ * {@code %{myParam,format:string}}.
+ * It also serves as the default formatter for any value type that has no specific formatter registered.
+ * <p>
+ * It handles the following input types:
+ * <ul>
+ *   <li>{@link CharSequence} values (including {@link String}) are used directly</li>
+ *   <li>{@code char[]} arrays are converted to a string</li>
+ *   <li>All other non-null values are converted using {@link String#valueOf(Object)}</li>
+ *   <li>{@code null} values are handled separately using the null map key</li>
+ * </ul>
+ * <p>
+ * The resulting string value can be mapped to custom text using map keys of type {@code string}, {@code empty} and
+ * {@code null} in the parameter configuration. If no mapping matches, the string value itself is returned as text.
+ * <p>
+ * This formatter also supports the {@code ignore-default-tostring} configuration option. When enabled, values whose
+ * {@code toString()} output matches the default {@link Object#toString()} identity string (or lambda class names)
+ * are treated as empty strings instead.
+ * <p>
+ * As a {@link SizeQueryable} formatter, it can report the length of {@link CharSequence} and {@code char[]} values.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
@@ -54,12 +77,23 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   private static final Set<MapKey.Type> STRING_KEY_TYPES = Set.of(EMPTY, NULL, STRING);
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  {@code "string"}, never {@code null}
+   */
   @Override
   public @NotNull String getName() {
     return "string";
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Converts the given {@code value} to a string and matches it against the parameter map configuration. If the value
+   * is {@code null}, the null map key is used. If no map key matches, the string value itself is returned.
+   */
   @Override
   public @NotNull Text format(@NotNull ParameterFormatterContext context, Object value)
   {
@@ -106,6 +140,12 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Returns the length of {@link CharSequence} and {@code char[]} values. For all other types, an empty result
+   * is returned.
+   */
   @Override
   public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object value)
   {
@@ -118,6 +158,11 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing {@link CharSequence} and {@code char[]} formattable types, never {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
@@ -127,12 +172,18 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing {@code "ignore-default-tostring"}, never {@code null}
+   */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return Set.of("ignore-default-tostring");
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToEmptyKey(Object value, @NotNull ComparatorContext context)
   {
@@ -155,6 +206,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToBoolKey(@NotNull Object value, @NotNull ComparatorContext context)
   {
@@ -176,6 +228,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToNumberKey(@NotNull Object value, @NotNull ComparatorContext context)
   {
@@ -191,6 +244,7 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull Object value, @NotNull ComparatorContext context)
   {

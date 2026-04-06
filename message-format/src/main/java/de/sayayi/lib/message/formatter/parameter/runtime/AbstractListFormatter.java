@@ -36,7 +36,28 @@ import static java.lang.Integer.MAX_VALUE;
 
 
 /**
+ * Base class for formatters that render a collection of elements as a joined text string.
  * <p>
+ * Subclasses (such as array, iterable and map formatters) provide an iterator over the elements; this class takes
+ * care of joining them with separators and applying optional truncation.
+ * <p>
+ * The following configuration keys control the output. Keys marked with (*) are handled by this base class; the
+ * remaining keys must be handled appropriately by the implementing subclass.
+ * <ul>
+ *   <li>{@code list-sep} (*) &ndash; separator between elements (default: {@code ", "})</li>
+ *   <li>
+ *     {@code list-sep-last} (*) &ndash; separator before the last element (e.g. {@code " and "}); if not set, the
+ *     regular separator is used
+ *   </li>
+ *   <li>{@code list-max-size} (*) &ndash; maximum number of elements to include</li>
+ *   <li>{@code list-value-more} (*) &ndash; text to append when the list is truncated (e.g. {@code "..."})</li>
+ *   <li>
+ *     {@code list-value} &ndash; message format used to format each individual element (default: {@code %{value}})
+ *   </li>
+ *   <li>{@code list-this} &ndash; message for a reference to the list value itself</li>
+ * </ul>
+ * <p>
+ * The table below illustrates how the configuration keys interact:
  * <table border="1">
  *   <tr><th>&nbsp;array&nbsp;</th><th>&nbsp;sep-last&nbsp;</th><th>&nbsp;max-size&nbsp;</th><th>&nbsp;value-more&nbsp;</th><th>&nbsp;result&nbsp;</th></tr>
  *   <tr><td>[]</td><td>n/a</td><td>0</td><td>n/a</td><td>''</td></tr>
@@ -51,6 +72,8 @@ import static java.lang.Integer.MAX_VALUE;
  *   <tr><td>[A,B,C]</td><td>(undefined)</td><td>1</td><td>(undefined)</td><td>'A'</td></tr>
  *   <tr><td>[A,B,C]</td><td>(undefined)</td><td>0</td><td>(undefined)</td><td>''</td></tr>
  * </table>
+ *
+ * @param <T>  the collection/container type handled by this formatter
  *
  * @author Jeroen Gremmen
  * @since 0.12.0
@@ -71,6 +94,12 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
   protected static final String CONFIG_THIS = "list-this";
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Iterates over the elements, formats each one and joins them with separators. Truncation and overflow text are
+   * applied based on the list configuration keys.
+   */
   @Override
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull T list)
   {
@@ -110,10 +139,23 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
   }
 
 
+  /**
+   * Creates an iterator over the formatted text representations of the elements in {@code value}.
+   *
+   * @param context  formatter context, not {@code null}
+   * @param value    the collection/container to iterate over, not {@code null}
+   *
+   * @return  an iterator over the formatted element texts, never {@code null}
+   */
   @Contract(pure = true)
   protected abstract @NotNull Iterator<Text> createIterator(@NotNull ParameterFormatterContext context, @NotNull T value);
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing the list configuration key names, never {@code null}
+   */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return Set.of(CONFIG_MAX_SIZE, CONFIG_SEPARATOR, CONFIG_SEPARATOR_LAST, CONFIG_VALUE, CONFIG_VALUE_MORE, CONFIG_THIS);

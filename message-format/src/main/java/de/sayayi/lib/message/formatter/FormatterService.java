@@ -29,19 +29,27 @@ import java.util.Set;
 
 
 /**
- * This class provides parameter formatters for all java types.
+ * Service interface for resolving parameter formatters and post formatters.
+ * <p>
+ * A formatter service provides the ability to look up the appropriate {@link ParameterFormatter} instances for a
+ * given value type, optional formatter name and parameter configuration. It also manages {@link PostFormatter}
+ * instances that perform text post-processing after formatting.
+ * <p>
+ * The {@link WithRegistry} sub-interface adds mutating methods for registering formatters.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0
+ *
+ * @see GenericFormatterService
+ * @see DefaultFormatterService
  */
 public interface FormatterService
 {
   /**
    * Returns a list of parameter formatters for the given {@code format}, {@code type} and {@code config}.
    * <p>
-   * Implementing classes must make sure that for any combination of {@code format} and {@code type}
-   * this function always returns at least 1 formatter. A good choice for a default formatter would
-   * be {@link StringFormatter}.
+   * Implementing classes must make sure that for any combination of {@code format} and {@code type} this function
+   * always returns at least 1 formatter. A good choice for a default formatter would be {@link StringFormatter}.
    *
    * @param format  name of the formatter or {@code null}
    * @param type    type of the value to format
@@ -56,6 +64,10 @@ public interface FormatterService
 
 
   /**
+   * Returns all registered post formatters, keyed by their name.
+   *
+   * @return  unmodifiable map of post formatter name to post formatter, never {@code null}
+   *
    * @since 0.21.0
    */
   @Contract(pure = true)
@@ -76,7 +88,7 @@ public interface FormatterService
 
 
   /**
-   * Add registry functionality to a formatter service.
+   * Extension of {@link FormatterService} that adds methods for registering parameter formatters and post formatters.
    */
   interface WithRegistry extends FormatterService
   {
@@ -111,6 +123,10 @@ public interface FormatterService
 
 
     /**
+     * Register a post formatter.
+     *
+     * @param postFormatter  post formatter to register, not {@code null}
+     *
      * @since 0.21.0
      */
     void addPostFormatter(@NotNull PostFormatter postFormatter);

@@ -30,6 +30,13 @@ import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
 
 
 /**
+ * Parameter formatter for {@link Principal} values.
+ * <p>
+ * This formatter extracts the principal's name using {@link Principal#getName()} and delegates the formatting to the
+ * string formatter.
+ * <p>
+ * Map key comparison for {@code string} keys is based on the principal's name.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
@@ -37,18 +44,29 @@ public final class PrincipalFormatter
     extends AbstractSingleTypeParameterFormatter<Principal>
     implements MapKeyComparator<Principal>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Formats the principal's name as a string.
+   */
   @Override
   protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Principal principal) {
     return context.format(principal.getName(), String.class);
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link Principal}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Principal.class);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull Principal value, @NotNull ComparatorContext context)
   {

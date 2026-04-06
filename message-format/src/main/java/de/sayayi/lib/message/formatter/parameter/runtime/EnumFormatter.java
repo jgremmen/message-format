@@ -30,10 +30,33 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
+ * Parameter formatter for {@link Enum} values.
+ * <p>
+ * This formatter uses the {@code enum} configuration key to select the output format:
+ * <ul>
+ *   <li>
+ *     {@code name} (default) &ndash; formats the enum constant's name; string map keys can be used to override the
+ *     output for specific names
+ *   </li>
+ *   <li>
+ *     {@code ord} or {@code ordinal} &ndash; formats the enum constant's ordinal value; number map keys can be used
+ *     to override the output for specific ordinals
+ *   </li>
+ * </ul>
+ * <p>
+ * If the configuration key is absent, the enum's name is used. If the value does not match a known option, formatting
+ * is delegated to the next available formatter.
+ * <p>
+ * Map key comparison supports {@code number} keys (compared against the ordinal) and {@code string} keys
+ * (compared against the name).
+ *
  * @author Jeroen Gremmen
  */
 public final class EnumFormatter extends AbstractMultiSelectFormatter<Enum<?>> implements MapKeyComparator<Enum<?>>
 {
+  /**
+   * Creates a new enum formatter with the configuration key {@code enum} and selection options for name and ordinal.
+   */
   public EnumFormatter()
   {
     super("enum", "name", true);
@@ -60,6 +83,7 @@ public final class EnumFormatter extends AbstractMultiSelectFormatter<Enum<?>> i
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToNumberKey(@NotNull Enum<?> enumValue, @NotNull ComparatorContext context)
   {
@@ -68,12 +92,18 @@ public final class EnumFormatter extends AbstractMultiSelectFormatter<Enum<?>> i
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull Enum<?> enumValue, @NotNull ComparatorContext context) {
     return context.getCompareType().match(enumValue.name().compareTo(context.getStringKeyValue())) ? EXACT : MISMATCH;
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing the {@link Enum} formattable type, never {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes() {
     return Set.of(new FormattableType(Enum.class));

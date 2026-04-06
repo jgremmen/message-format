@@ -32,12 +32,26 @@ import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 
 
 /**
+ * Parameter formatter for {@link OptionalLong} values.
+ * <p>
+ * If the optional contains a value, it is unwrapped and formatting is delegated to the appropriate {@code long}
+ * formatter. If the optional is empty, it is treated as an empty value.
+ * <p>
+ * Map key comparisons for {@code bool}, {@code number} and {@code string} keys are based on the contained long value.
+ * An empty optional results in a mismatch for these key types.
+ *
  * @author Jeroen Gremmen
  */
 public final class OptionalLongFormatter
     extends AbstractSingleTypeParameterFormatter<OptionalLong>
     implements MapKeyComparator<OptionalLong>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Unwraps the optional and delegates formatting of the contained {@code long} value. Returns empty text if the
+   * optional is empty.
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull OptionalLong optionalLong)
@@ -48,12 +62,18 @@ public final class OptionalLongFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link OptionalLong}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(OptionalLong.class);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   @SuppressWarnings("OptionalAssignedToNull")
   public @NotNull MatchResult compareToEmptyKey(OptionalLong optionalLong, @NotNull ComparatorContext context) {
@@ -61,6 +81,7 @@ public final class OptionalLongFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToBoolKey(@NotNull OptionalLong optionalLong,
                                                @NotNull ComparatorContext context) {
@@ -68,6 +89,7 @@ public final class OptionalLongFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToNumberKey(@NotNull OptionalLong optionalLong,
                                                  @NotNull ComparatorContext context) {
@@ -75,6 +97,7 @@ public final class OptionalLongFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull OptionalLong optionalLong,
                                                  @NotNull ComparatorContext context) {

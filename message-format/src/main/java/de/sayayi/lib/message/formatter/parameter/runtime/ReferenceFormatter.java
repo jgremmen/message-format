@@ -32,30 +32,55 @@ import static de.sayayi.lib.message.part.MapKey.MatchResult.forNullKey;
 
 
 /**
+ * Parameter formatter for {@link Reference} values (e.g. {@link java.lang.ref.WeakReference WeakReference},
+ * {@link java.lang.ref.SoftReference SoftReference}).
+ * <p>
+ * This formatter unwraps the reference by calling {@link Reference#get()} and delegates the formatting of the
+ * referenced value to the formatter appropriate for its type. If the referenced object has been garbage collected,
+ * the value is treated as {@code null}.
+ * <p>
+ * Size queries and map key comparisons are also based on the referenced value.
+ *
  * @author Jeroen Gremmen
  */
 public final class ReferenceFormatter
     extends AbstractSingleTypeParameterFormatter<Reference<?>>
     implements SizeQueryable, MapKeyComparator<Reference<?>>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Unwraps the reference and delegates formatting of the referenced value.
+   */
   @Override
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Reference<?> reference) {
     return context.format(reference.get());
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Returns the size of the value obtained from the reference.
+   */
   @Override
   public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object value) {
     return context.size(((Reference<?>)value).get());
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link Reference}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Reference.class);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToNullKey(Reference<?> value, @NotNull ComparatorContext context)
   {
@@ -65,6 +90,7 @@ public final class ReferenceFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToEmptyKey(Reference<?> value, @NotNull ComparatorContext context)
   {
@@ -74,18 +100,21 @@ public final class ReferenceFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToBoolKey(@NotNull Reference<?> value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.get());
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToNumberKey(@NotNull Reference<?> value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.get());
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull Reference<?> value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.get());

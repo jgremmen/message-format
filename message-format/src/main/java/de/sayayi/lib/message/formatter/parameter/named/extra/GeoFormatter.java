@@ -34,6 +34,40 @@ import static java.lang.Math.round;
 
 
 /**
+ * Named parameter formatter that formats numeric values as geographic coordinates in degrees, minutes and seconds
+ * (DMS) notation.
+ * <p>
+ * This formatter is selected by using the name {@code geo} in a message parameter, e.g.
+ * {@code %{myParam,format:geo}} or automatically when the {@code geo} configuration key is present.
+ * <p>
+ * It accepts {@link Number} values (including primitive {@code double} and {@code float}) representing a coordinate
+ * in decimal degrees and formats them as DMS notation.
+ * <p>
+ * The output format is controlled by the {@code geo} configuration key, which accepts either a predefined format name
+ * or a custom format pattern:
+ * <ul>
+ *   <li>
+ *     <b>Predefined longitude formats:</b> {@code short-longitude} (e.g. 12°45'E),
+ *     {@code longitude} (e.g. 12°45'3"E), {@code medium-longitude} (e.g. 12°45'2.9"E),
+ *     {@code long-longitude} (e.g. 12°45'2.581"E)
+ *   </li>
+ *   <li>
+ *     <b>Predefined latitude formats:</b> {@code short-latitude} (e.g. 12°45'S),
+ *     {@code latitude} (e.g. 12°45'3"S), {@code medium-latitude} (e.g. 12°45'2.9"S),
+ *     {@code long-latitude} (e.g. 12°45'2.581"S)
+ *   </li>
+ *   <li>
+ *     <b>Custom format pattern:</b> a pattern string following the syntax
+ *     {@code d[ ][0](m|M|MM|MMM)[ ][0](s|S|SS|SSS)[ ](LO|LA)},
+ *     where uppercase variants control the number of decimal digits for minutes/seconds,
+ *     {@code 0} enables zero-padding, {@code LO}/{@code LA} appends a compass direction and
+ *     spaces control separator characters
+ *   </li>
+ * </ul>
+ * <p>
+ * The compass direction labels can be customized using the configuration keys {@code geo-n}, {@code geo-s},
+ * {@code geo-e} and {@code geo-w}, defaulting to {@code N}, {@code S}, {@code E} and {@code W} respectively.
+ *
  * @author Jeroen Gremmen
  */
 public final class GeoFormatter extends AbstractParameterFormatter<Number> implements NamedParameterFormatter
@@ -55,12 +89,23 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  {@code "geo"}, never {@code null}
+   */
   @Override
   public @NotNull String getName() {
     return "geo";
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This formatter can handle {@link Number} types as well as primitive {@code double} and {@code float} values
+   * and {@code null}.
+   */
   @Override
   public boolean canFormat(@NotNull Class<?> type)
   {
@@ -72,6 +117,12 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Formats the numeric value as a geographic coordinate in DMS notation, using the format specified by the
+   * {@code geo} configuration key.
+   */
   @Override
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Number number)
   {
@@ -132,12 +183,23 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing {@code "geo"}, {@code "geo-w"}, {@code "geo-e"}, {@code "geo-n"}
+   *          and {@code "geo-s"}, never {@code null}
+   */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return Set.of("geo", "geo-w", "geo-e", "geo-n", "geo-s");
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  {@code true}
+   */
   @Override
   public boolean autoApplyOnNamedConfigParameter() {
     return true;

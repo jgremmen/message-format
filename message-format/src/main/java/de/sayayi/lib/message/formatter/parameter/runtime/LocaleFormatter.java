@@ -28,11 +28,32 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
+ * Parameter formatter for {@link Locale} values.
+ * <p>
+ * This formatter uses the {@code locale} configuration key to select which aspect of the locale to format:
+ * <ul>
+ *   <li>{@code name} (default) &ndash; the locale's display name</li>
+ *   <li>{@code country} &ndash; the locale's country display name</li>
+ *   <li>{@code lang} or {@code language} &ndash; the locale's language display name</li>
+ *   <li>{@code script} &ndash; the locale's script display name</li>
+ *   <li>{@code variant} &ndash; the locale's variant display name</li>
+ * </ul>
+ * <p>
+ * All display values are resolved using the formatting context's locale. For {@code country} and {@code language},
+ * string map keys in the parameter configuration can be used to override the display value.
+ * <p>
+ * If the configuration key is absent, the locale's display name is used. If the value does not match a known option,
+ * formatting is delegated to the next available formatter.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
 public final class LocaleFormatter extends AbstractMultiSelectFormatter<Locale>
 {
+  /**
+   * Creates a new locale formatter with the configuration key {@code locale} and selection
+   * options for the various locale aspects.
+   */
   public LocaleFormatter()
   {
     super("locale", "name", true);
@@ -74,6 +95,11 @@ public final class LocaleFormatter extends AbstractMultiSelectFormatter<Locale>
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing the {@link Locale} formattable type, never {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes() {
     return Set.of(new FormattableType(Locale.class));

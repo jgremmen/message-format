@@ -42,7 +42,17 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * Generic formatter service implementation.
+ * Generic implementation of the {@link FormatterService.WithRegistry} interface that manages parameter formatters,
+ * named formatters and post formatters.
+ * <p>
+ * This service resolves formatters for a given value type by walking the type hierarchy (superclasses and interfaces)
+ * and returning all matching formatters in priority order. Named formatters can be selected explicitly by name in
+ * message parameters, and some named formatters are automatically applied when their configuration key is present.
+ * <p>
+ * A {@link de.sayayi.lib.message.formatter.parameter.named.StringFormatter StringFormatter} is registered as the
+ * default fallback formatter for {@link Object}.
+ * <p>
+ * Formatter lookup results are cached for performance. The cache size can be configured via the constructor.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0 (renamed in 0.4.1)
@@ -100,10 +110,12 @@ public class GenericFormatterService implements FormatterService.WithRegistry
 
 
   /**
-   * Create a generic formatter service with the given {@code formatterCacheSize} size.
+   * Create a generic formatter service with the given {@code formatterCacheSize}.
    * <p>
    * The formatter service provides a default formatter which translates every object into a string using the
    * {@link Object#toString()} method.
+   *
+   * @param formatterCacheSize  maximum number of type-to-formatter mappings to cache
    */
   public GenericFormatterService(int formatterCacheSize)
   {
@@ -113,6 +125,14 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Formatters registered for {@link Object} must implement the {@link DefaultFormatter} interface. The formatter's
+   * parameter configuration names are validated to follow the kebab-case naming convention.
+   * <p>
+   * Registering a formatter clears the internal formatter lookup cache.
+   */
   @Override
   @MustBeInvokedByOverriders
   public void addFormatterForType(@NotNull FormattableType formattableType, @NotNull ParameterFormatter formatter)
@@ -143,6 +163,15 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * If the formatter implements {@link NamedParameterFormatter}, it is also registered by name. Named formatters that
+   * support {@linkplain NamedParameterFormatter#autoApplyOnNamedConfigParameter() auto-apply} are additionally
+   * registered to be selected automatically when their configuration key is present.
+   * <p>
+   * Formatter names and parameter configuration names are validated to follow the kebab-case naming convention.
+   */
   @Override
   @MustBeInvokedByOverriders
   public void addFormatter(@NotNull ParameterFormatter formatter)
@@ -194,6 +223,12 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The post formatter name is validated to follow the kebab-case naming convention. Duplicate registrations are not
+   * allowed and will result in a {@link FormatterServiceException}.
+   */
   @Override
   @MustBeInvokedByOverriders
   public void addPostFormatter(@NotNull PostFormatter postFormatter)
@@ -210,6 +245,21 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Resolution order:
+   * <ol>
+   *   <li>If a {@code format} name is given, the matching named formatter is returned (if it supports the type).</li>
+   *   <li>
+   *     Named formatters whose configuration key is present in {@code config} and that support the type are added.
+   *   </li>
+   *   <li>
+   *     Type-based formatters are resolved by walking the type hierarchy (superclasses and interfaces) and collected
+   *     in priority order.
+   *   </li>
+   * </ol>
+   */
   @Override
   public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, Config config)
   {
@@ -295,12 +345,14 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @UnmodifiableView @NotNull Map<String,PostFormatter> getPostFormatters() {
     return unmodifiableMap(postFormatters);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @UnmodifiableView @NotNull Set<String> getParameterConfigNames() {
     return unmodifiableSet(parameterConfigNames);

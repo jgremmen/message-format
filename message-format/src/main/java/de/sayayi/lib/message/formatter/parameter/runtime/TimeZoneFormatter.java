@@ -25,17 +25,32 @@ import java.util.TimeZone;
 
 
 /**
+ * Parameter formatter for {@link TimeZone} values.
+ * <p>
+ * This formatter renders the time zone using its locale-specific display name obtained from
+ * {@link TimeZone#getDisplayName(java.util.Locale)}.
+ *
  * @author Jeroen Gremmen
  * @since 0.12.0
  */
 public final class TimeZoneFormatter extends AbstractSingleTypeParameterFormatter<TimeZone>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Formats the time zone as its locale-specific display name.
+   */
   @Override
   protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull TimeZone timeZone) {
     return context.format(timeZone.getDisplayName(context.getLocale()));
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link TimeZone}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(TimeZone.class);

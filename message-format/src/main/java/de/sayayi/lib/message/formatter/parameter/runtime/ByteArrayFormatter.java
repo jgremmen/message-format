@@ -40,6 +40,21 @@ import static java.util.Base64.getMimeEncoder;
 
 
 /**
+ * Parameter formatter for {@code byte[]} values.
+ * <p>
+ * This formatter converts a byte array to a string representation based on the {@code bytes} configuration key:
+ * <ul>
+ *   <li>{@code base64} &ndash; encodes the bytes as a Base64 string</li>
+ *   <li>{@code base64-lf} &ndash; encodes the bytes as a MIME Base64 string with line breaks</li>
+ *   <li>A charset name (e.g. {@code UTF-8}) &ndash; decodes the bytes as a string using the given charset</li>
+ *   <li>Empty or unsupported charset &ndash; decodes the bytes using the platform default charset</li>
+ * </ul>
+ * <p>
+ * If the {@code bytes} configuration key is absent, formatting is delegated to the next available formatter
+ * (e.g. the general array formatter).
+ * <p>
+ * As a {@link SizeQueryable} formatter, it reports the length of the byte array.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
@@ -49,6 +64,12 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
   private static final byte[] LINE_SEPARATOR = new byte[] { '\n' };
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Converts the byte array to a string based on the {@code bytes} configuration key. If the key is absent,
+   * formatting is delegated to the next formatter.
+   */
   @Override
   @SneakyThrows(UnsupportedEncodingException.class)
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, byte @NotNull [] byteArray)
@@ -72,24 +93,40 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@code byte[]}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(byte[].class, DEFAULT_PRIMITIVE_OR_ARRAY_ORDER - 10);
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Returns the length of the byte array.
+   */
   @Override
   public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object value) {
     return OptionalLong.of(((byte[])value).length);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToEmptyKey(byte[] value, @NotNull ComparatorContext context) {
     return forEmptyKey(context.getCompareType(), value == null || value.length == 0);
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing {@code "bytes"}, never {@code null}
+   */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return Set.of("bytes");

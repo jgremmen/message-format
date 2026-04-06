@@ -27,30 +27,49 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
+ * Parameter formatter for {@link AtomicBoolean} values.
+ * <p>
+ * This formatter extracts the boolean value from the {@link AtomicBoolean} using {@link AtomicBoolean#get()} and
+ * delegates the formatting to the appropriate boolean formatter.
+ * <p>
+ * Map key comparison for {@code bool} and {@code string} keys is also based on the extracted boolean value.
+ *
  * @author Jeroen Gremmen
  */
 public final class AtomicBooleanFormatter
     extends AbstractSingleTypeParameterFormatter<AtomicBoolean>
     implements MapKeyComparator<AtomicBoolean>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Extracts the boolean value and delegates formatting to the boolean formatter.
+   */
   @Override
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull AtomicBoolean atomicBoolean) {
     return context.format(atomicBoolean.get(), boolean.class);
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link AtomicBoolean}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(AtomicBoolean.class);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToBoolKey(@NotNull AtomicBoolean value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.get(), boolean.class);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull AtomicBoolean value, @NotNull ComparatorContext context) {
     return context.matchForObject(value.get(), boolean.class);

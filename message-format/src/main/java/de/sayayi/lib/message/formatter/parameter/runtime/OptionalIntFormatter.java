@@ -32,12 +32,26 @@ import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 
 
 /**
+ * Parameter formatter for {@link OptionalInt} values.
+ * <p>
+ * If the optional contains a value, it is unwrapped and formatting is delegated to the appropriate {@code int}
+ * formatter. If the optional is empty, it is treated as an empty value.
+ * <p>
+ * Map key comparisons for {@code bool}, {@code number} and {@code string} keys are based on the contained int value.
+ * An empty optional results in a mismatch for these key types.
+ *
  * @author Jeroen Gremmen
  */
 public final class OptionalIntFormatter
     extends AbstractSingleTypeParameterFormatter<OptionalInt>
     implements MapKeyComparator<OptionalInt>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Unwraps the optional and delegates formatting of the contained {@code int} value. Returns empty text if the
+   * optional is empty.
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull OptionalInt optionalInt)
@@ -48,12 +62,18 @@ public final class OptionalIntFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link OptionalInt}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(OptionalInt.class);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   @SuppressWarnings("OptionalAssignedToNull")
   public @NotNull MatchResult compareToEmptyKey(OptionalInt optionalInt, @NotNull ComparatorContext context) {
@@ -61,6 +81,7 @@ public final class OptionalIntFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToBoolKey(@NotNull OptionalInt optionalInt,
                                                @NotNull ComparatorContext context) {
@@ -68,6 +89,7 @@ public final class OptionalIntFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToNumberKey(@NotNull OptionalInt optionalInt,
                                                  @NotNull ComparatorContext context) {
@@ -75,6 +97,7 @@ public final class OptionalIntFormatter
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull OptionalInt optionalInt,
                                                  @NotNull ComparatorContext context) {

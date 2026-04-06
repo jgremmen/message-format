@@ -38,10 +38,37 @@ import static java.util.OptionalLong.empty;
 
 
 /**
+ * Parameter formatter for {@link Path} and {@link File} values.
+ * <p>
+ * This formatter uses the {@code path} configuration key to select which aspect of the path to format:
+ * <ul>
+ *   <li>{@code path} (default) &ndash; the path as-is</li>
+ *   <li>{@code name} &ndash; the file name component</li>
+ *   <li>{@code parent} &ndash; the parent path</li>
+ *   <li>{@code root} &ndash; the root component</li>
+ *   <li>{@code absolute-path} &ndash; the absolute path</li>
+ *   <li>{@code real-path} &ndash; the real (resolved) path, falling back to the absolute path if resolution fails</li>
+ *   <li>{@code normalize} or {@code normalized-path} &ndash; the normalized path</li>
+ *   <li>
+ *     {@code ext} or {@code extension} &ndash; the file extension; string map keys can be used to override the
+ *     output for specific extensions
+ *   </li>
+ *   <li>{@code mimetype} &ndash; the MIME type of the file (regular files only)</li>
+ * </ul>
+ * <p>
+ * If the configuration key is absent, the path is used as-is. If the value does not match a known option, formatting
+ * is delegated to the next available formatter.
+ * <p>
+ * As a {@link SizeQueryable} formatter, it reports the file size in bytes for regular files.
+ *
  * @author Jeroen Gremmen
  */
 public final class PathFormatter extends AbstractMultiSelectFormatter<Object> implements SizeQueryable
 {
+  /**
+   * Creates a new path formatter with the configuration key {@code path} and selection options for the various
+   * path aspects.
+   */
   public PathFormatter()
   {
     super("path", "path", true);
@@ -110,6 +137,11 @@ public final class PathFormatter extends AbstractMultiSelectFormatter<Object> im
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Returns the file size in bytes for regular files, or empty if the path does not refer to a regular file.
+   */
   @Override
   public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object fileOrPath)
   {
@@ -127,6 +159,11 @@ public final class PathFormatter extends AbstractMultiSelectFormatter<Object> im
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing {@link File} and {@link Path} formattable types, never {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes()
   {

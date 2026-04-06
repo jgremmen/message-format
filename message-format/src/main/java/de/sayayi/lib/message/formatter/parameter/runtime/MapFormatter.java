@@ -39,6 +39,26 @@ import static java.util.Collections.emptyIterator;
 
 
 /**
+ * Parameter formatter for {@link Map} values.
+ * <p>
+ * Each map entry is formatted as a key-value pair and the results are joined into a single text string. Separator,
+ * truncation and overflow behavior are controlled by the list configuration keys inherited from
+ * {@link AbstractListFormatter}.
+ * <p>
+ * In addition to the inherited configuration keys, this formatter supports:
+ * <ul>
+ *   <li>
+ *     {@code map-kv} &ndash; message format used to render each entry; the parameters {@code key} and {@code value}
+ *     are available in the message (default: {@code %{key,null:'(null)'}=%{value,null:'(null)'}})
+ *   </li>
+ *   <li>
+ *     {@code map-this} &ndash; text to use when the map references itself as a key or value
+ *     (default: {@code "(this map)"})
+ *   </li>
+ * </ul>
+ * <p>
+ * As a {@link SizeQueryable} formatter, it reports the number of entries in the map.
+ *
  * @author Jeroen Gremmen
  */
 public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implements SizeQueryable
@@ -52,24 +72,40 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
       .build();
 
 
+  /** {@inheritDoc} */
   @Override
   protected @NotNull Iterator<Text> createIterator(@NotNull ParameterFormatterContext context, @NotNull Map<?,?> map) {
     return map.isEmpty() ? emptyIterator() : new TextIterator(context, map);
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Returns the number of entries in the map.
+   */
   @Override
   public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object map) {
     return OptionalLong.of(((Map<?,?>)map).size());
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToEmptyKey(Map<?,?> map, @NotNull ComparatorContext context) {
     return forEmptyKey(context.getCompareType(), map == null || map.isEmpty());
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The {@link Map} type is registered with a higher priority than the default order. As {@code Map} is an interface,
+   * concrete implementations may also match other formattable types (e.g. {@link Iterable}). The higher priority
+   * ensures that map values are handled by this formatter first.
+   *
+   * @return  a set containing the {@link Map} formattable type, never {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
@@ -78,6 +114,12 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing the list configuration key names and map-specific keys ({@code map-kv},
+   *          {@code map-this}), never {@code null}
+   */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return Set.of(CONFIG_MAX_SIZE, CONFIG_SEPARATOR, CONFIG_SEPARATOR_LAST, CONFIG_VALUE_MORE, "map-kv", "map-this");

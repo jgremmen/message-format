@@ -25,16 +25,30 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
+ * Parameter formatter for {@link Package} values.
+ * <p>
+ * This formatter renders the package using its fully qualified name obtained from {@link Package#getName()}.
+ *
  * @author Jeroen Gremmen
  */
 public final class PackageFormatter extends AbstractSingleTypeParameterFormatter<Package>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Formats the package as its fully qualified name.
+   */
   @Override
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Package value) {
     return noSpaceText(value.getName());
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link Package}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Package.class);

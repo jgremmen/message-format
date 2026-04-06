@@ -24,11 +24,25 @@ import java.util.Set;
 
 
 /**
+ * Parameter formatter for {@link Charset} values.
+ * <p>
+ * This formatter uses the {@code charset} configuration key to select the output format:
+ * <ul>
+ *   <li>{@code display} or {@code display-name} &ndash; formats the charset using its locale-specific display name</li>
+ * </ul>
+ * <p>
+ * If the configuration key is absent or does not match a known option, formatting is delegated to the next available
+ * formatter.
+ *
  * @author Jeroen Gremmen
  * @since 0.12.0
  */
 public final class CharsetFormatter extends AbstractMultiSelectFormatter<Charset>
 {
+  /**
+   * Creates a new charset formatter with the configuration key {@code charset} and
+   * the {@code display}/{@code display-name} selection options.
+   */
   public CharsetFormatter()
   {
     super("charset");
@@ -38,6 +52,11 @@ public final class CharsetFormatter extends AbstractMultiSelectFormatter<Charset
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing the {@link Charset} formattable type, never {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes() {
     return Set.of(new FormattableType(Charset.class));

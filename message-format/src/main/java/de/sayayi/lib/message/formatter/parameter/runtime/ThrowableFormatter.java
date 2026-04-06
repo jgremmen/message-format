@@ -23,16 +23,31 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
+ * Parameter formatter for {@link Throwable} values.
+ * <p>
+ * This formatter extracts the throwable's localized message using {@link Throwable#getLocalizedMessage()} and
+ * delegates the formatting to the string formatter.
+ *
  * @author Jeroen Gremmen
  */
 public final class ThrowableFormatter extends AbstractSingleTypeParameterFormatter<Throwable>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Formats the throwable's localized message as a string.
+   */
   @Override
   protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Throwable throwable) {
     return context.format(throwable.getLocalizedMessage(), String.class);
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link Throwable}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Throwable.class);

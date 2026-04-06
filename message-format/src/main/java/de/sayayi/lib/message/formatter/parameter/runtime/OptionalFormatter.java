@@ -35,11 +35,26 @@ import static de.sayayi.lib.message.part.MapKey.MatchResult.forNullKey;
 
 
 /**
+ * Parameter formatter for {@link Optional} values.
+ * <p>
+ * If the optional contains a value, it is unwrapped and formatting is delegated to the formatter appropriate for the
+ * contained value's type. If the optional is empty, it is treated as an empty value.
+ * <p>
+ * Size queries are delegated to the contained value. An empty optional has no size.
+ * <p>
+ * Map key comparisons for {@code bool}, {@code number} and {@code string} keys are based on the contained value.
+ * An empty optional results in a mismatch for these key types.
+ *
  * @author Jeroen Gremmen
  */
 public final class OptionalFormatter extends AbstractSingleTypeParameterFormatter<Optional<?>>
     implements SizeQueryable, MapKeyComparator<Optional<?>>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Unwraps the optional and delegates formatting of the contained value. Returns empty text if the optional is empty.
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Optional<?> optional)
@@ -50,6 +65,11 @@ public final class OptionalFormatter extends AbstractSingleTypeParameterFormatte
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Returns the size of the value contained in the optional, or empty if the optional has no value.
+   */
   @Override
   public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object optional)
   {
@@ -59,12 +79,18 @@ public final class OptionalFormatter extends AbstractSingleTypeParameterFormatte
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  formattable type for {@link Optional}, never {@code null}
+   */
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Optional.class);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   @SuppressWarnings("OptionalAssignedToNull")
   public @NotNull MatchResult compareToNullKey(Optional<?> optional, @NotNull ComparatorContext context)
@@ -75,6 +101,7 @@ public final class OptionalFormatter extends AbstractSingleTypeParameterFormatte
   }
 
 
+  /** {@inheritDoc} */
   @Override
   @SuppressWarnings("OptionalAssignedToNull")
   public @NotNull MatchResult compareToEmptyKey(Optional<?> optional, @NotNull ComparatorContext context)
@@ -85,18 +112,21 @@ public final class OptionalFormatter extends AbstractSingleTypeParameterFormatte
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToBoolKey(@NotNull Optional<?> optional, @NotNull ComparatorContext context) {
     return optional.map(context::matchForObject).orElse(MISMATCH);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToNumberKey(@NotNull Optional<?> optional, @NotNull ComparatorContext context) {
     return optional.map(context::matchForObject).orElse(MISMATCH);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull Optional<?> optional, @NotNull ComparatorContext context) {
     return optional.map(context::matchForObject).orElse(MISMATCH);

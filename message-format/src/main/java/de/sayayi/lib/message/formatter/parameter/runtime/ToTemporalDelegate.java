@@ -45,6 +45,12 @@ import static de.sayayi.lib.message.part.TextPartFactory.nullText;
  */
 public final class ToTemporalDelegate implements ParameterFormatter
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Converts the given date/time value to its {@link Temporal} equivalent and delegates formatting. {@code null}
+   * values are handled using the null/empty map key from the parameter configuration.
+   */
   @Override
   @SuppressWarnings("IfCanBeSwitch")
   public @NotNull Text format(@NotNull ParameterFormatterContext context, Object value)
@@ -80,6 +86,12 @@ public final class ToTemporalDelegate implements ParameterFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a set containing formattable types for {@link Calendar}, {@link Date}, {@link FileTime} and
+   *          {@link InstantSource}, never {@code null}
+   */
   @Override
   public @NotNull Set<FormattableType> getFormattableTypes()
   {
