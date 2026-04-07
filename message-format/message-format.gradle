@@ -140,6 +140,7 @@ ext.releaseTask.configure {
 clean {
   delete layout.projectDirectory.dir('src/main/antlr/gen')
   delete layout.projectDirectory.dir('src/main/gen')
+  delete layout.projectDirectory.dir('out')
 
   delete fileTree(layout.projectDirectory.dir('src')).matching {
     include 'main/antlr/*.tokens'
