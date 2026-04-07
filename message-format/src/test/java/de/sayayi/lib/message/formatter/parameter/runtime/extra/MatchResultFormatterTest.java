@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jeroen Gremmen
  */
 @DisplayName("Matcher formatter")
-class MatcherFormatterTest extends AbstractFormatterTest
+class MatchResultFormatterTest extends AbstractFormatterTest
 {
   private MessageSupport context;
 
@@ -42,13 +42,13 @@ class MatcherFormatterTest extends AbstractFormatterTest
   void init()
   {
     context = MessageSupportFactory.create(
-        createFormatterService(new MatcherFormatter()), NO_CACHE_INSTANCE);
+        createFormatterService(new MatchResultFormatter()), NO_CACHE_INSTANCE);
   }
 
 
   @Test
   void testFormattableTypes() {
-    assertFormatterForType(new MatcherFormatter(), Matcher.class);
+    assertFormatterForType(new MatchResultFormatter(), Matcher.class);
   }
 
 
