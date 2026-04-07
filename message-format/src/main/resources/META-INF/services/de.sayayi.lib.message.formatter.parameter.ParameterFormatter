@@ -24,7 +24,6 @@ de.sayayi.lib.message.formatter.parameter.runtime.OptionalIntFormatter
 de.sayayi.lib.message.formatter.parameter.runtime.OptionalLongFormatter
 de.sayayi.lib.message.formatter.parameter.runtime.PathFormatter
 de.sayayi.lib.message.formatter.parameter.runtime.ReferenceFormatter
-de.sayayi.lib.message.formatter.parameter.runtime.StreamFormatter
 de.sayayi.lib.message.formatter.parameter.runtime.SupplierFormatter
 de.sayayi.lib.message.formatter.parameter.runtime.TemporalFormatter
 de.sayayi.lib.message.formatter.parameter.runtime.ThrowableFormatter
