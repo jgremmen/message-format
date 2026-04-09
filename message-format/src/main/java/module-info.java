@@ -30,5 +30,4 @@ module de.sayayi.lib.message {
 
   // internal service implementations
   provides java.nio.file.spi.FileTypeDetector with de.sayayi.lib.message.internal.pack.PackFileTypeDetector;
-  provides org.apache.tika.detect.Detector with de.sayayi.lib.message.internal.pack.PackTikaDetector;
 }
