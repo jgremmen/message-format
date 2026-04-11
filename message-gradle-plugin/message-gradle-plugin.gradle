@@ -52,21 +52,8 @@ tasks.named('test', Test) {
 }
 
 
-javadoc {
-  (options as StandardJavadocDocletOptions).with {
-    group('Gradle Plugin', [ 'de.sayayi.plugin.gradle.message' ])
-
-    linksOffline(
-        "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
-        "${rootDir}/gradle/javadocs/message-format")
-    linksOffline(
-        "https://javadoc.io/doc/org.jetbrains/annotations/${resolveVersion('annotations')}/",
-        "${rootDir}/gradle/javadocs/jetbrains-annotations")
-    linksOffline(
-        "https://docs.gradle.org/${gradle.gradleVersion}/javadoc/",
-        "${rootDir}/gradle/javadocs/gradle")
-  }
-}
+javadoc.enabled = false
+javadocJar.enabled = false
 
 
 jar {

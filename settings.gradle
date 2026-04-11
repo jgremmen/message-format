@@ -14,23 +14,6 @@
  * limitations under the License.
  */
 
-pluginManagement {
-  repositories {
-    // plugin snapshot repository
-    maven {
-      url = 'https://artifactory.sayayi.de/artifactory/plugins-snapshot/'
-      mavenContent {
-        includeGroupByRegex 'de\\.sayayi\\.plugin\\.gradle.*'
-        snapshotsOnly()
-      }
-    }
-
-    // default gradle plugin portal
-    gradlePluginPortal()
-  }
-}
-
-
 buildscript {
   repositories {
     gradlePluginPortal()
@@ -39,7 +22,7 @@ buildscript {
 
   dependencies {
     classpath 'com.adarshr:gradle-test-logger-plugin:4.0.0'
-    classpath 'org.danilopianini.publish-on-central:org.danilopianini.publish-on-central.gradle.plugin:9.1.10'
+    classpath 'org.danilopianini.publish-on-central:org.danilopianini.publish-on-central.gradle.plugin:9.1.14'
   }
 }
 

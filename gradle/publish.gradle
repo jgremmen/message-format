@@ -26,28 +26,6 @@ ext.snapshot = version.toString().endsWith('-SNAPSHOT')
 zipMavenCentralPortalPublication.dependsOn publishOSSRHPublicationToProjectLocalRepository
 
 
-if (snapshot)
-{
-  publishing {
-    repositories {
-      maven {
-        name = 'mavenCentralSnapshot'
-        url = 'https://central.sonatype.com/repository/maven-snapshots/'
-
-        mavenContent {
-          snapshotsOnly()
-        }
-
-        credentials {
-          username = rootProject.findProperty('mavenCentralPortalUsername')
-          password = rootProject.findProperty('mavenCentralPortalPassword')
-        }
-      }
-    }
-  }
-}
-
-
 publishOnCentral {
   repoOwner = 'jgremmen'
 
@@ -71,6 +49,25 @@ publishing {
             name = 'Jeroen Gremmen'
             email = 'jeroen.gremmen@sayayi.de'
           }
+        }
+      }
+    }
+  }
+
+  if (snapshot)
+  {
+    repositories {
+      maven {
+        name = 'mavenCentralSnapshot'
+        url = 'https://central.sonatype.com/repository/maven-snapshots/'
+
+        mavenContent {
+          snapshotsOnly()
+        }
+
+        credentials {
+          username = rootProject.findProperty('mavenCentralPortalUsername')
+          password = rootProject.findProperty('mavenCentralPortalPassword')
         }
       }
     }
