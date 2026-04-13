@@ -27,6 +27,7 @@ import de.sayayi.lib.message.internal.part.map.key.MapKeyBool;
 import de.sayayi.lib.message.internal.part.map.key.MapKeyNumber;
 import de.sayayi.lib.message.internal.part.map.key.MapKeyString;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart;
@@ -95,7 +96,6 @@ public final class MessagePartMap implements MessagePart.Map
       }
     }
 
-    mapKeyList.trimToSize();
     mapKeyList.sort(OrderedConfigKey.SORTER);
 
     final var mapLength = mapKeyList.size();
@@ -142,17 +142,16 @@ public final class MessagePartMap implements MessagePart.Map
   }
 
 
-  /**
-   * Returns the default value from the parameter configuration map.
-
-   * @return  default configuration value or {@code null} if no default value has been defined
-   *
-   * @since 0.20.0
-   */
   @Override
   @Contract(pure = true)
-  public TypedValue<?> getDefaultValue() {
-    return defaultValue;
+  public Message.WithSpaces getDefaultMessage(@NotNull MessageAccessor messageAccessor, @NotNull MapKey.Type keyType)
+  {
+    if (!hasMessageWithKeyType(keyType))
+      return null;
+
+    return defaultValue instanceof TypedValueString stringValue
+        ? stringValue.asMessage(messageAccessor.getMessageFactory())
+        : (Message.WithSpaces)defaultValue.asObject();
   }
 
 

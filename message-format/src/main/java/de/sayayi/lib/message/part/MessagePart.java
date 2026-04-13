@@ -197,6 +197,9 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
 
 
   /**
+   * Message part representing a post formatter that transforms the formatted text of its contained message
+   * using a named post formatter.
+   *
    * @since 0.21.0
    */
   non-sealed interface PostFormat extends NamedMessagePart
@@ -250,6 +253,13 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
     Set<String> getConfigNames();
 
 
+    /**
+     * Returns the typed configuration value associated with the given config {@code name}.
+     *
+     * @param name  config name to look up, not {@code null}
+     *
+     * @return  the typed config value, or {@code null} if no value is associated with the given name
+     */
     @Contract(pure = true)
     TypedValue<?> getConfigValue(@NotNull String name);
 
@@ -309,14 +319,35 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
 
 
     /**
-     * Returns the default value from the map.
-
-     * @return  default value or {@code null} if no default value has been defined
+     * Returns the default message, but only if the map contains at least one non-default entry
+     * with the given {@code keyType}. If no entries for the given key type exist, the default
+     * message is not applicable and {@code null} is returned.
+     *
+     * @param messageAccessor  message accessor instance, not {@code null}
+     * @param keyType          key type to look for, not {@code null}
+     *
+     * @return  the default message, or {@code null} if there is no default or if the map has no
+     *          entries for the given key type
+     *
+     * @since 0.21.0
      */
     @Contract(pure = true)
-    TypedValue<?> getDefaultValue();
+    Message.WithSpaces getDefaultMessage(@NotNull MessageAccessor messageAccessor, @NotNull MapKey.Type keyType);
 
 
+    /**
+     * Returns the best matching message for the given {@code key} value by comparing it against
+     * the map entries using the specified key types and locale.
+     *
+     * @param messageAccessor  message accessor instance, not {@code null}
+     * @param key              the value to match against map keys, may be {@code null}
+     * @param locale           the locale to use for comparison, not {@code null}
+     * @param keyTypes         the set of key types to consider for matching, not {@code null}
+     * @param includeDefault   whether to fall back to a default message if no match is found
+     * @param config           optional configuration for the comparison, may be {@code null}
+     *
+     * @return  the best matching message, or {@code null} if no match is found
+     */
     @Contract(pure = true)
     Message.WithSpaces getMessage(@NotNull MessageAccessor messageAccessor, Object key, @NotNull Locale locale,
                                   @NotNull Set<MapKey.Type> keyTypes, boolean includeDefault,
