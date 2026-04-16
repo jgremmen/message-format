@@ -47,6 +47,15 @@ public final class ReferenceFormatter
     extends AbstractSingleTypeParameterFormatter<Reference<?>>
     implements SizeQueryable, MapKeyComparator<Reference<?>>
 {
+  @Override
+  protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, @NotNull Reference<?> value)
+  {
+    context.addClassifier("reference");
+    context.updateClassifiers(value.get());
+
+    return true;
+  }
+
   /**
    * {@inheritDoc}
    * <p>

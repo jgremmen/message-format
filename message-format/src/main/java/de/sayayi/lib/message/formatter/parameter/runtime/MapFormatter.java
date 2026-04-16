@@ -72,6 +72,15 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
       .build();
 
 
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier("map");
+
+    return true;
+  }
+
+
   /** {@inheritDoc} */
   @Override
   protected @NotNull Iterator<Text> createIterator(@NotNull ParameterFormatterContext context, @NotNull Map<?,?> map) {

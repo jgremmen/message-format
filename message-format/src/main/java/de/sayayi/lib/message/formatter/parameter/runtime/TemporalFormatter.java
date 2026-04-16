@@ -29,6 +29,7 @@ import java.time.temporal.Temporal;
 import java.util.Map;
 import java.util.Set;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_TEMPORAL;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.time.format.DateTimeFormatter.*;
@@ -88,6 +89,15 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
       entry("FF", ofLocalizedDateTime(FULL, FULL)),
       entry("F-", ofLocalizedDate(FULL)),
       entry("-F", ofLocalizedTime(FULL)));
+
+
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier(CLASSIFIER_TEMPORAL);
+
+    return true;
+  }
 
 
   /**

@@ -72,6 +72,17 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  */
 public final class ArrayFormatter extends AbstractListFormatter<Object> implements SizeQueryable
 {
+  @Override
+  @SuppressWarnings("ResultOfMethodCallIgnored")
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier("array");
+    super.updateClassifiers(context, value);
+
+    return true;
+  }
+
+
   /** {@inheritDoc} */
   @Override
   protected @NotNull Iterator<Text> createIterator(@NotNull ParameterFormatterContext context, @NotNull Object value) {

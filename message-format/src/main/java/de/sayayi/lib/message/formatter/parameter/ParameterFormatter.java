@@ -20,6 +20,7 @@ import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.part.ConfigAccessor;
 import de.sayayi.lib.message.part.MapKey;
+import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextPartFactory;
 import org.jetbrains.annotations.Contract;
@@ -61,6 +62,15 @@ public interface ParameterFormatter
    * @see NamedParameterFormatter#canFormat(Class)
    */
   Class<?> NULL_TYPE = new Object() {}.getClass();
+
+
+  /**
+   * @since 0.21.0
+   */
+  @Contract(mutates = "param1")
+  default boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value) {
+    return false;
+  }
 
 
   /**
@@ -136,8 +146,8 @@ public interface ParameterFormatter
    * @since 0.8.4 (moved up from AbstractParameterFormatter)
    */
   @Contract(pure = true)
-  default @NotNull Optional<Text> formatUsingMappedNumber(@NotNull ParameterFormatterContext context,
-                                                          long n, boolean includeDefault)
+  default @NotNull Optional<Text> formatUsingMappedNumber(@NotNull ParameterFormatterContext context, long n,
+                                                          boolean includeDefault)
   {
     if (context.hasMapMessage(NUMBER))
     {
@@ -392,6 +402,42 @@ public interface ParameterFormatter
 
     @Contract(pure = true)
     @NotNull <T> MatchResult matchForObject(T value, @NotNull Class<T> valueType);
+  }
+
+
+
+
+  /**
+   * @since 0.21.0
+   */
+  interface ClassifierContext extends ConfigAccessor
+  {
+    String CLASSIFIER_BOOL = "bool";
+    String CLASSIFIER_ENUM = "enum";
+    String CLASSIFIER_LIST = "list";
+    String CLASSIFIER_NULL = "null";
+    String CLASSIFIER_NUMBER = "number";
+    String CLASSIFIER_STRING = "string";
+    String CLASSIFIER_TEMPORAL = "temporal";
+
+
+    void addClassifier(@NotNull String classifier);
+
+
+    @Contract(pure = true)
+    @NotNull Set<String> getClassifiers();
+
+
+    /**
+     *
+     * @return  true = done, false = continue with next formatter
+     */
+    boolean updateClassifiers(Object value, @NotNull MessagePart.Config config);
+
+
+    default boolean updateClassifiers(Object value) {
+      return updateClassifiers(value, getConfig());
+    }
   }
 
 

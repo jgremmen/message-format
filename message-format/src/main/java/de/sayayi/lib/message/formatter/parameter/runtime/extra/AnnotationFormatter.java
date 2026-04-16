@@ -46,6 +46,15 @@ public final class AnnotationFormatter extends AbstractSingleTypeParameterFormat
   private final Map<AnnotationField,Method> annotationFieldMap = new HashMap<>();
 
 
+  @Override
+  protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, @NotNull Annotation value)
+  {
+    context.addClassifier("annotation");
+
+    return true;
+  }
+
+
   /**
    * {@inheritDoc}
    * <p>

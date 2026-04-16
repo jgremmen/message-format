@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.Iterator;
 import java.util.Set;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_LIST;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
 import static de.sayayi.lib.message.util.MessageUtil.isTrimmedEmpty;
@@ -92,6 +93,15 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
   protected static final String CONFIG_VALUE = "list-value";
   protected static final String CONFIG_VALUE_MORE = "list-value-more";
   protected static final String CONFIG_THIS = "list-this";
+
+
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier(CLASSIFIER_LIST);
+
+    return true;
+  }
 
 
   /**

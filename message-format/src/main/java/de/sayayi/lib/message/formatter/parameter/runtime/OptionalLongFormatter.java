@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.OptionalLong;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_NUMBER;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.forEmptyKey;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
@@ -46,6 +47,17 @@ public final class OptionalLongFormatter
     extends AbstractSingleTypeParameterFormatter<OptionalLong>
     implements MapKeyComparator<OptionalLong>
 {
+  @Override
+  protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, @NotNull OptionalLong value)
+  {
+    context.addClassifier("optional");
+    if (value.isPresent())
+      context.addClassifier(CLASSIFIER_NUMBER);
+
+    return true;
+  }
+
+
   /**
    * {@inheritDoc}
    * <p>

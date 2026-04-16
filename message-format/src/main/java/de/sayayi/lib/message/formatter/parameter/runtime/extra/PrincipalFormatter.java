@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.security.Principal;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_STRING;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.EQUIVALENT;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
 
@@ -44,6 +45,15 @@ public final class PrincipalFormatter
     extends AbstractSingleTypeParameterFormatter<Principal>
     implements MapKeyComparator<Principal>
 {
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier(CLASSIFIER_STRING);
+
+    return true;
+  }
+
+
   /**
    * {@inheritDoc}
    * <p>

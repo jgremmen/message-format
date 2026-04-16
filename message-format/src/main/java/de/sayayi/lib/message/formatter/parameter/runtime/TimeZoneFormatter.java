@@ -23,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.TimeZone;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_STRING;
+
 
 /**
  * Parameter formatter for {@link TimeZone} values.
@@ -35,6 +37,16 @@ import java.util.TimeZone;
  */
 public final class TimeZoneFormatter extends AbstractSingleTypeParameterFormatter<TimeZone>
 {
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier("timezone");
+    context.addClassifier(CLASSIFIER_STRING);
+
+    return true;
+  }
+
+
   /**
    * {@inheritDoc}
    * <p>

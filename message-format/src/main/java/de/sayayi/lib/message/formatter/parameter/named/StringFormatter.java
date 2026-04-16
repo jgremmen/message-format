@@ -34,6 +34,7 @@ import java.text.Collator;
 import java.util.OptionalLong;
 import java.util.Set;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_STRING;
 import static de.sayayi.lib.message.part.MapKey.CompareType.EQ;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.*;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.forEmptyKey;
@@ -85,6 +86,15 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   @Override
   public @NotNull String getName() {
     return "string";
+  }
+
+
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier(CLASSIFIER_STRING);
+
+    return true;
   }
 
 

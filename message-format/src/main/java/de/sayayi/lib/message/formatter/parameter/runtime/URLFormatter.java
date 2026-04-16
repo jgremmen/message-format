@@ -25,6 +25,8 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.net.URL;
 import java.util.Set;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_NUMBER;
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_STRING;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
@@ -55,6 +57,26 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  */
 public final class URLFormatter extends AbstractSingleTypeParameterFormatter<URL>
 {
+  @Override
+  protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, @NotNull URL value)
+  {
+    context.addClassifier("url");
+
+    switch(context.getConfigValueString("url").orElse("external"))
+    {
+      case "authority", "external", "file", "host", "path", "query", "protocol", "user-info", "ref" ->
+          context.addClassifier(CLASSIFIER_STRING);
+      case "port" -> context.addClassifier(CLASSIFIER_NUMBER);
+
+      default -> {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
   /**
    * {@inheritDoc}
    * <p>

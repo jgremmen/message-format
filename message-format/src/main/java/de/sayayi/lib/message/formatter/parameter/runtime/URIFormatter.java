@@ -25,6 +25,8 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.net.URI;
 import java.util.Set;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_NUMBER;
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_STRING;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
@@ -51,6 +53,26 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  */
 public final class URIFormatter extends AbstractSingleTypeParameterFormatter<URI>
 {
+  @Override
+  protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, @NotNull URI value)
+  {
+    context.addClassifier("uri");
+
+    switch(context.getConfigValueString("uri").orElse("default"))
+    {
+      case "default", "authority", "fragment", "host", "path", "query", "scheme", "user-info" ->
+          context.addClassifier(CLASSIFIER_STRING);
+      case "port" -> context.addClassifier(CLASSIFIER_NUMBER);
+
+      default -> {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
   /**
    * {@inheritDoc}
    * <p>

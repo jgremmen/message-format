@@ -25,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_BOOL;
+
 
 /**
  * Parameter formatter for {@link AtomicBoolean} values.
@@ -40,6 +42,15 @@ public final class AtomicBooleanFormatter
     extends AbstractSingleTypeParameterFormatter<AtomicBoolean>
     implements MapKeyComparator<AtomicBoolean>
 {
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier(CLASSIFIER_BOOL);
+
+    return true;
+  }
+
+
   /**
    * {@inheritDoc}
    * <p>

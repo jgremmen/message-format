@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_ENUM;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.*;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
@@ -54,6 +55,15 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  */
 public final class EnumFormatter extends AbstractMultiSelectFormatter<Enum<?>> implements MapKeyComparator<Enum<?>>
 {
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier(CLASSIFIER_ENUM);
+
+    return true;
+  }
+
+
   /**
    * Creates a new enum formatter with the configuration key {@code enum} and selection options for name and ordinal.
    */

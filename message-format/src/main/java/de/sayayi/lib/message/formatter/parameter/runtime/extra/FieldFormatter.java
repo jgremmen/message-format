@@ -58,6 +58,16 @@ public final class FieldFormatter
     extends AbstractSingleTypeParameterFormatter<Field>
     implements MapKeyComparator<Field>
 {
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier("field");
+    context.addClassifier(ClassifierContext.CLASSIFIER_STRING);
+
+    return true;
+  }
+
+
   /**
    * {@inheritDoc}
    * <p>

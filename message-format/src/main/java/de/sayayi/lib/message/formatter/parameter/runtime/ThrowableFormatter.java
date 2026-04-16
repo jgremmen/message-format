@@ -21,6 +21,8 @@ import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_STRING;
+
 
 /**
  * Parameter formatter for {@link Throwable} values.
@@ -32,6 +34,16 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class ThrowableFormatter extends AbstractSingleTypeParameterFormatter<Throwable>
 {
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier("throwable");
+    context.addClassifier(CLASSIFIER_STRING);
+
+    return true;
+  }
+
+
   /**
    * {@inheritDoc}
    * <p>

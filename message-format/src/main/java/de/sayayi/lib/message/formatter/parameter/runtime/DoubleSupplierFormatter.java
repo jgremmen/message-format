@@ -26,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.DoubleSupplier;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_NUMBER;
+
 
 /**
  * Parameter formatter for {@link DoubleSupplier} values.
@@ -42,6 +44,16 @@ public final class DoubleSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<DoubleSupplier>
     implements MapKeyComparator<DoubleSupplier>
 {
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier("supplier");
+    context.addClassifier(CLASSIFIER_NUMBER);
+
+    return true;
+  }
+
+
   /**
    * {@inheritDoc}
    * <p>

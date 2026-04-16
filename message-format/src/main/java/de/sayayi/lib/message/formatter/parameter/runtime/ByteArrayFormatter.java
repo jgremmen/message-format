@@ -32,6 +32,7 @@ import java.util.OptionalLong;
 import java.util.Set;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_PRIMITIVE_OR_ARRAY_ORDER;
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_STRING;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.forEmptyKey;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
@@ -62,6 +63,21 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
     implements SizeQueryable, MapKeyComparator<byte[]>
 {
   private static final byte[] LINE_SEPARATOR = new byte[] { '\n' };
+
+
+  @Override
+  protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, byte @NotNull [] value)
+  {
+    context.addClassifier("array");
+
+    if (context.getConfigValueString("bytes").isEmpty())
+      return false;
+    else
+    {
+      context.addClassifier(CLASSIFIER_STRING);
+      return true;
+    }
+  }
 
 
   /**

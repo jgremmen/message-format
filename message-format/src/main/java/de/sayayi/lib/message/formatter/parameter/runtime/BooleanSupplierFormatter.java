@@ -26,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BooleanSupplier;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_BOOL;
+
 
 /**
  * Parameter formatter for {@link BooleanSupplier} values.
@@ -41,6 +43,16 @@ public final class BooleanSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<BooleanSupplier>
     implements MapKeyComparator<BooleanSupplier>
 {
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier("supplier");
+    context.addClassifier(CLASSIFIER_BOOL);
+
+    return true;
+  }
+
+
   /**
    * {@inheritDoc}
    * <p>

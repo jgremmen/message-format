@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAccumulator;
 import java.util.concurrent.atomic.LongAdder;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_NUMBER;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.*;
 import static de.sayayi.lib.message.part.MapKey.NUMBER_TYPE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
@@ -74,6 +75,15 @@ public final class NumberFormatter
     implements MapKeyComparator<Number>
 {
   private static final Map<Locale,DecimalFormatSymbols> FORMAT_SYMBOLS_CACHE = new ConcurrentHashMap<>();
+
+
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier(CLASSIFIER_NUMBER);
+
+    return true;
+  }
 
 
   /**

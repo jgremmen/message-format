@@ -40,6 +40,22 @@ import java.util.Set;
  */
 public abstract class AbstractSingleTypeParameterFormatter<T> extends AbstractParameterFormatter<T>
 {
+  @Override
+  @SuppressWarnings("unchecked")
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value) {
+    return updateTypedClassifiers(context, (T)value);
+  }
+
+
+  /**
+   * @since 0.21.0
+   */
+  @Contract(pure = true)
+  protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, @NotNull T value) {
+    return false;
+  }
+
+
   /**
    * Returns a singleton set containing the {@link FormattableType} returned by
    * {@link #getFormattableType()}.

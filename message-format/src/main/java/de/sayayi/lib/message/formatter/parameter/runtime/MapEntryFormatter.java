@@ -53,6 +53,25 @@ public final class MapEntryFormatter extends AbstractMultiSelectFormatter<Entry<
   }
 
 
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object entry)
+  {
+    context.addClassifier("map-entry");
+
+    switch(context.getConfigValueString("entry").orElse(""))
+    {
+      case "key" -> context.updateClassifiers(((Entry<?,?>)entry).getKey());
+      case "value" -> context.updateClassifiers(((Entry<?,?>)entry).getValue());
+
+      default -> {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
   /**
    * {@inheritDoc}
    *

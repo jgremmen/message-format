@@ -85,6 +85,15 @@ public final class PathFormatter extends AbstractMultiSelectFormatter<Object> im
   }
 
 
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier("path");
+
+    return true;
+  }
+
+
   @Contract(pure = true)
   private @NotNull Text formatPathRealPath(@NotNull Path path)
   {

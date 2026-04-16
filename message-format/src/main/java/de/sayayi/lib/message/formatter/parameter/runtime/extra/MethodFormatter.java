@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.lang.reflect.Method;
 import java.util.Set;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_STRING;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.EQUIVALENT;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
@@ -55,6 +56,25 @@ public final class MethodFormatter
     extends AbstractSingleTypeParameterFormatter<Method>
     implements MapKeyComparator<Method>
 {
+  @Override
+  protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, @NotNull Method value)
+  {
+    context.addClassifier("method");
+
+    switch(context.getConfigValueString("method").orElse("default"))
+    {
+      case "default", "name", "class", "return-type" -> {
+        context.addClassifier(CLASSIFIER_STRING);
+        return true;
+      }
+
+      default -> {
+        return false;
+      }
+    }
+  }
+
+
   /**
    * {@inheritDoc}
    * <p>

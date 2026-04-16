@@ -19,19 +19,23 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.SizeQueryable;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.internal.part.config.BaseConfigAccessor;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.MessagePart.Config;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_NULL;
 import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.NULL_TYPE;
 import static de.sayayi.lib.message.part.MessagePart.Text.NULL;
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
 
@@ -41,8 +45,7 @@ import static java.util.Optional.ofNullable;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-final class ParameterFormatterContextImpl extends BaseConfigAccessor
-    implements ParameterFormatterContext
+final class ParameterFormatterContextImpl extends BaseConfigAccessor implements ParameterFormatterContext
 {
   private final @NotNull MessagePart.Map map;
   private final @NotNull Parameters parameters;
@@ -53,7 +56,7 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor
 
 
   ParameterFormatterContextImpl(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters,
-                                Object value, Class<?> type, String format, @NotNull MessagePart.Config config,
+                                Object value, Class<?> type, String format, @NotNull Config config,
                                 @NotNull MessagePart.Map map)
   {
     super(messageAccessor, config);
@@ -142,7 +145,7 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor
 
 
   @Override
-  public @NotNull Text format(Object value, Class<?> type, String format, MessagePart.Config config)
+  public @NotNull Text format(Object value, Class<?> type, String format, Config config)
   {
     return new ParameterFormatterContextImpl(messageAccessor, parameters, value, type, format,
         config == null ? this.config : config, map).delegateToNextFormatter();
@@ -175,5 +178,56 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor
     }
 
     return OptionalLong.empty();
+  }
+
+
+  @Override
+  public @NotNull Set<String> getClassifiers(Object value, Config config)
+  {
+    final var context = new InternalClassifierContext(config == null ? this.config : config);
+
+    if (!context.updateClassifiers(value))
+      context.addClassifier(CLASSIFIER_NULL);
+
+    return context.getClassifiers();
+  }
+
+
+
+
+  private final class InternalClassifierContext extends BaseConfigAccessor implements ClassifierContext
+  {
+    private final Set<String> classifiers = new LinkedHashSet<>();
+
+
+    private InternalClassifierContext(@NotNull Config config) {
+      super(ParameterFormatterContextImpl.this.messageAccessor, config);
+    }
+
+
+    @Override
+    public void addClassifier(@NotNull String classifier) {
+      classifiers.add(requireNonNull(classifier, "classifier must not be null"));
+    }
+
+
+    @Override
+    public @NotNull Set<String> getClassifiers() {
+      return classifiers;
+    }
+
+
+    @Override
+    public boolean updateClassifiers(Object value, @NotNull Config config)
+    {
+      if (value != null)
+      {
+        for(var formatter: messageAccessor.getFormatters(value.getClass(), config))
+          if (formatter.updateClassifiers(this, value))
+            break;
+      }
+
+      return !classifiers.isEmpty();
+    }
   }
 }

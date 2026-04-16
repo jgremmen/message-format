@@ -31,6 +31,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_TEMPORAL;
 import static de.sayayi.lib.message.part.MapKey.EMPTY_NULL_TYPE;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 
@@ -45,6 +46,15 @@ import static de.sayayi.lib.message.part.TextPartFactory.nullText;
  */
 public final class ToTemporalDelegate implements ParameterFormatter
 {
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.updateClassifiers(CLASSIFIER_TEMPORAL);
+
+    return true;
+  }
+
+
   /**
    * {@inheritDoc}
    * <p>

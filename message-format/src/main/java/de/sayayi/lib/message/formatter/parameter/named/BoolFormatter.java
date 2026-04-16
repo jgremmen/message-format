@@ -31,6 +31,7 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.Set;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_BOOL;
 import static de.sayayi.lib.message.part.MapKey.MatchResult;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.EXACT;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
@@ -88,6 +89,15 @@ public final class BoolFormatter implements NamedParameterFormatter, MapKeyCompa
   @Contract(pure = true)
   public @NotNull String getName() {
     return "bool";
+  }
+
+
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier(CLASSIFIER_BOOL);
+
+    return true;
   }
 
 

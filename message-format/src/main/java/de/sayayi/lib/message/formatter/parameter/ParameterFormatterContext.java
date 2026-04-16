@@ -20,12 +20,13 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.part.ConfigAccessor;
 import de.sayayi.lib.message.part.MapAccessor;
-import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.MessagePart.Config;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.OptionalLong;
+import java.util.Set;
 
 
 /**
@@ -104,7 +105,7 @@ public interface ParameterFormatterContext extends Parameters, ConfigAccessor, M
    * @return  formatted text, never {@code null}
    */
   @Contract(pure = true)
-  @NotNull Text format(Object value, Class<?> type, String format, MessagePart.Config config);
+  @NotNull Text format(Object value, Class<?> type, String format, Config config);
 
 
   /**
@@ -129,4 +130,11 @@ public interface ParameterFormatterContext extends Parameters, ConfigAccessor, M
    */
   @Contract(pure = true)
   @NotNull OptionalLong size(Object value);
+
+
+  /**
+   * @since 0.21.0
+   */
+  @Contract(pure = true)
+  @NotNull Set<String> getClassifiers(Object value, Config config);
 }

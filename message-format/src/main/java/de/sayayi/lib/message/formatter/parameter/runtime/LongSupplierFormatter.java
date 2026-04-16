@@ -26,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.LongSupplier;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_NUMBER;
+
 
 /**
  * Parameter formatter for {@link LongSupplier} values.
@@ -41,6 +43,16 @@ public final class LongSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<LongSupplier>
     implements MapKeyComparator<LongSupplier>
 {
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier("supplier");
+    context.addClassifier(CLASSIFIER_NUMBER);
+
+    return true;
+  }
+
+
   /**
    * {@inheritDoc}
    * <p>

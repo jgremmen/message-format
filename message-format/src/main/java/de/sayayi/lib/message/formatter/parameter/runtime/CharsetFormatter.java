@@ -22,6 +22,8 @@ import org.jetbrains.annotations.NotNull;
 import java.nio.charset.Charset;
 import java.util.Set;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_STRING;
+
 
 /**
  * Parameter formatter for {@link Charset} values.
@@ -49,6 +51,22 @@ public final class CharsetFormatter extends AbstractMultiSelectFormatter<Charset
 
     register(new String[] { "display", "display-name" },
         (context,charset) -> context.format(charset.displayName(context.getLocale())));
+  }
+
+
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier("charset");
+
+    return switch(context.getConfigValueString("charset").orElse("")) {
+      case "display", "display-name" -> {
+        context.addClassifier(CLASSIFIER_STRING);
+        yield true;
+      }
+
+      default -> false;
+    };
   }
 
 

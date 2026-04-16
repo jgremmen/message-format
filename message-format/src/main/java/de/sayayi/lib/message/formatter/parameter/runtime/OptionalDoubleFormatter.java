@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.OptionalDouble;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_NUMBER;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.forEmptyKey;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
@@ -46,6 +47,17 @@ public final class OptionalDoubleFormatter
     extends AbstractSingleTypeParameterFormatter<OptionalDouble>
     implements MapKeyComparator<OptionalDouble>
 {
+  @Override
+  protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, @NotNull OptionalDouble value)
+  {
+    context.addClassifier("optional");
+    if (value.isPresent())
+      context.addClassifier(CLASSIFIER_NUMBER);
+
+    return true;
+  }
+
+
   /**
    * {@inheritDoc}
    * <p>

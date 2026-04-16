@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Locale;
 import java.util.Set;
 
+import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_STRING;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
@@ -63,6 +64,22 @@ public final class LocaleFormatter extends AbstractMultiSelectFormatter<Locale>
     register("name", this::formatLocaleDisplayName);
     register("script", this::formatLocaleScript);
     register("variant", this::formatLocaleVariant);
+  }
+
+
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier("locale");
+
+    return switch(context.getConfigValueString("locale").orElse("name")) {
+      case "country", "language", "lang", "name", "script", "variant" -> {
+        context.addClassifier(CLASSIFIER_STRING);
+        yield true;
+      }
+
+      default -> false;
+    };
   }
 
 
