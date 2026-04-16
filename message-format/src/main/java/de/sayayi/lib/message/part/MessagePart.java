@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 import static de.sayayi.lib.message.util.MessageUtil.serializeString;
@@ -321,18 +322,19 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
     /**
      * Returns the default message, but only if the map contains at least one non-default entry
      * with the given {@code keyType}. If no entries for the given key type exist, the default
-     * message is not applicable and {@code null} is returned.
+     * message is not applicable and an empty optional is returned.
      *
      * @param messageAccessor  message accessor instance, not {@code null}
      * @param keyType          key type to look for, not {@code null}
      *
-     * @return  the default message, or {@code null} if there is no default or if the map has no
-     *          entries for the given key type
+     * @return  an optional containing the default message, or empty if there is no default or if
+     *          the map has no entries for the given key type
      *
      * @since 0.21.0
      */
     @Contract(pure = true)
-    Message.WithSpaces getDefaultMessage(@NotNull MessageAccessor messageAccessor, @NotNull MapKey.Type keyType);
+    @NotNull Optional<Message.WithSpaces> getDefaultMessage(@NotNull MessageAccessor messageAccessor,
+                                                            @NotNull MapKey.Type keyType);
 
 
     /**
