@@ -3,7 +3,7 @@
 message-format = '0.21.0-SNAPSHOT'
 
 antlr4 = '[4.13.0,4.14)'
-antlr4-ext = '[0.6,0.7)'
+antlr4-ext = '[0.6,0.8)'
 asm = '[9.0,10.0)'
 jetbrains-annotations = '[24.0,26.2)'
 junit = '6.0.+'
