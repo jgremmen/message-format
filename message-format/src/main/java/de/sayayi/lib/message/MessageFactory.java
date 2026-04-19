@@ -25,31 +25,43 @@ import de.sayayi.lib.message.part.normalizer.MessagePartNormalizer;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.security.SecureRandom;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static de.sayayi.lib.message.part.normalizer.MessagePartNormalizer.PASS_THROUGH;
+import static java.lang.Math.clamp;
 import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
 
 
 /**
- * Factory class for creating {@link Message} instances by parsing message format strings and
- * localized message maps.
+ * Factory class for creating {@link Message} instances by parsing message format strings and localized message maps.
  * <p>
  * The factory supports parsing both messages and templates, each in two flavours:
  * <ul>
- *   <li>A single format string (e.g. {@link #parseMessage(String)},
- *       {@link #parseTemplate(String)}).</li>
- *   <li>A locale-keyed map of format strings for locale-aware messages
- *       (e.g. {@link #parseMessage(Map)}, {@link #parseTemplate(Map)}).</li>
+ *   <li>A single format string (e.g. {@link #parseMessage(String)}, {@link #parseTemplate(String)}).</li>
+ *   <li>
+ *     A locale-keyed map of format strings for locale-aware messages (e.g. {@link #parseMessage(Map)},
+ *     {@link #parseTemplate(Map)}).
+ *   </li>
  * </ul>
  * An explicit message code can be provided via {@link #parseMessage(String, String)} and
  * {@link #parseMessage(String, Map)}.
  * <p>
- * Each factory instance is configured with a {@link MessagePartNormalizer} that is applied to
- * parsed message parts, enabling deduplication or caching strategies for large message sets. For
- * simple use cases the {@link #NO_CACHE_INSTANCE shared no-cache instance} is sufficient.
+ * Each factory instance is configured with a {@link MessagePartNormalizer} that is applied to parsed message parts,
+ * enabling deduplication or caching strategies for large message sets. For simple use cases the
+ * {@link #NO_CACHE_INSTANCE shared no-cache instance} is sufficient.
+ * <p>
+ * Optionally, a message cache can be enabled via {@link #MessageFactory(MessagePartNormalizer, int)} to avoid
+ * repeated parsing of the same message format string. When the cache reaches its configured maximum size, the least
+ * recently used entry is evicted. See {@link #parseMessage(String)} for details.
+ * <p>
+ * This class is <strong>thread-safe</strong>. All public methods can be called concurrently from multiple threads.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0
@@ -59,28 +71,63 @@ public class MessageFactory
   /**
    * Shared message factory without any caching capabilities.
    * <p>
-   * This message factory will suffice in most cases. However, if you have a large number of
-   * messages, it is better to construct a message factory with an appropriate
-   * {@link MessagePartNormalizer}.
+   * This message factory will suffice in most cases. However, if you have a large number of messages, it is better
+   * to construct a message factory with an appropriate {@link MessagePartNormalizer}.
    */
   public static final MessageFactory NO_CACHE_INSTANCE = new MessageFactory(PASS_THROUGH);
 
-  private static final Random RANDOM = new Random();
-  private static int CODE_ID = 0;
+  private static final SecureRandom RANDOM = new SecureRandom();
+  private static final AtomicInteger CODE_ID = new AtomicInteger();
 
   private final @NotNull MessagePartNormalizer messagePartNormalizer;
   final MessageCompiler messageCompiler;
 
+  private final @Nullable Map<String,Message.WithSpaces> messageCache;
+  private final @Nullable Lock cacheLock;
+
 
   /**
-   * Construct a new message factory with the given {@code messagePartNormalizer}.
+   * Construct a new message factory with the given {@code messagePartNormalizer} and no message cache.
    *
    * @param messagePartNormalizer  message part normalizer instance, never {@code null}
    */
-  public MessageFactory(@NotNull MessagePartNormalizer messagePartNormalizer)
+  public MessageFactory(@NotNull MessagePartNormalizer messagePartNormalizer) {
+    this(messagePartNormalizer, 0);
+  }
+
+
+  /**
+   * Construct a new message factory with the given {@code messagePartNormalizer} and a message cache of the given
+   * {@code messageCacheSize}.
+   * <p>
+   * When the cache is full, the least recently used message is evicted before adding a new one.
+   * A {@code messageCacheSize} of {@code 0} or less disables caching.
+   *
+   * @param messagePartNormalizer  message part normalizer instance, never {@code null}
+   * @param messageCacheSize       maximum number of cached messages, or {@code 0} to disable caching
+   *
+   * @since 0.21.0
+   */
+  public MessageFactory(@NotNull MessagePartNormalizer messagePartNormalizer, int messageCacheSize)
   {
     this.messagePartNormalizer = messagePartNormalizer;
     messageCompiler = new MessageCompiler(this);
+
+    if (messageCacheSize > 0)
+    {
+      messageCache = new LinkedHashMap<>(clamp(messageCacheSize, 16, 64), 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String,Message.WithSpaces> eldest) {
+          return size() > messageCacheSize;
+        }
+      };
+      cacheLock = new ReentrantLock();
+    }
+    else
+    {
+      messageCache = null;
+      cacheLock = null;
+    }
   }
 
 
@@ -113,6 +160,10 @@ public class MessageFactory
 
   /**
    * Parse a message format text into a message instance.
+   * <p>
+   * If this factory was created with a message cache (see {@link #MessageFactory(MessagePartNormalizer, int)}),
+   * previously parsed messages are returned from the cache. When the cache is full, the least recently used entry
+   * is evicted.
    *
    * @param text  message format text, not {@code null}
    *
@@ -120,15 +171,25 @@ public class MessageFactory
    *
    * @throws MessageParserException  in case the message could not be parsed
    */
-  @Contract(value = "_ -> new", pure = true)
-  public @NotNull Message.WithSpaces parseMessage(@NotNull @Language("MessageFormat") String text) {
-    return messageCompiler.compileMessage(text);
+  @Contract(pure = true)
+  public @NotNull Message.WithSpaces parseMessage(@NotNull @Language("MessageFormat") String text)
+  {
+    if (cacheLock == null)
+      return messageCompiler.compileMessage(text);
+
+    cacheLock.lock();
+    try {
+      //noinspection DataFlowIssue
+      return messageCache.computeIfAbsent(text, messageCompiler::compileMessage);
+    }
+    finally {
+      cacheLock.unlock();
+    }
   }
 
 
   /**
-   * Parse localized message format texts into a {@link Message} instance with an automatically
-   * generated message code.
+   * Parse localized message format texts into a {@link Message} instance with an automatically generated message code.
    *
    * @param localizedTexts  a map containing message formats, keyed by locale, not {@code null}
    *
@@ -324,7 +385,8 @@ public class MessageFactory
         ((hashBytes[4] & 0xffL) << 8) |
          (hashBytes[5] & 0xffL), 36);
 
-    return (prefix + '[' + hash + '-' + Integer.toString(++CODE_ID | 0x20000, 36) + ']').toUpperCase(ROOT);
+    return (prefix + '[' + hash + '-' + Integer.toString(CODE_ID.incrementAndGet() | 0x20000, 36) + ']')
+        .toUpperCase(ROOT);
   }
 
 
@@ -343,14 +405,14 @@ public class MessageFactory
 
 
   /**
-   * Checks whether messages {@code m1} and {@code m2} are the same. Messages are
-   * considered "the same" when the message parts of both messages are identical.
+   * Checks whether messages {@code m1} and {@code m2} are the same. Messages are considered "the same" when the
+   * message parts of both messages are identical.
    * <p>
-   * {@link Message.LocaleAware LocaleAware} messages are "the same" when both locale and associated
-   * message are identical for all locales provided by this message.
+   * {@link Message.LocaleAware LocaleAware} messages are "the same" when both locale and associated message are
+   * identical for all locales provided by this message.
    * <p>
-   * Identical messages with different codes ({@link Message.WithCode WithCode}) are still considered the
-   * same as only the message part is compared.
+   * Identical messages with different codes ({@link Message.WithCode WithCode}) are still considered the same as only
+   * the message part is compared.
    *
    * @param m1  message 1 to compare, not {@code null}
    * @param m2  message 2 to compare, not {@code null}

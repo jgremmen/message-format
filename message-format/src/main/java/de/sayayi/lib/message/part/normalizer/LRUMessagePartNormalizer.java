@@ -19,6 +19,7 @@ import de.sayayi.lib.message.part.MessagePart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import static java.lang.Math.clamp;
 import static java.lang.Math.min;
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.copyOf;
@@ -95,7 +96,7 @@ public final class LRUMessagePartNormalizer implements MessagePartNormalizer
     {
       parts = parts == null
           ? new MessagePart[min(8, maxSize)]
-          : copyOf(parts, min(Math.max(size * 2, 8), maxSize));
+          : copyOf(parts, clamp(size * 2L, 8, maxSize));
     }
   }
 }
