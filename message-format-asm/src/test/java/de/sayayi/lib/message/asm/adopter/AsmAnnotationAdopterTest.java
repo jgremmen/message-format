@@ -51,7 +51,7 @@ public final class AsmAnnotationAdopterTest
   @MessageDef(code = "M2", texts = @Text("Method message 2"))
   void testScan()
   {
-    val messageFactory = new MessageFactory(new LRUMessagePartNormalizer(10));
+    val messageFactory = new MessageFactory(LRUMessagePartNormalizer.create(10));
     val messageSupport = MessageSupportFactory.create(new DefaultFormatterService(), messageFactory);
 
     new AsmAnnotationAdopter(NO_CACHE_INSTANCE, messageSupport).adopt(

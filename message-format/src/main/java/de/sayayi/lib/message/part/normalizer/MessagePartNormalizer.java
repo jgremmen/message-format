@@ -20,15 +20,19 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
+ * A normalizer for {@link MessagePart} instances. Implementations can be used to deduplicate or cache message parts
+ * in order to reduce the overall memory footprint.
+ *
  * @author Jeroen Gremmen
  * @since 0.6.0
+ *
+ * @see LRUMessagePartNormalizer
  */
 @FunctionalInterface
 public interface MessagePartNormalizer
 {
   /**
-   * Implementation that does not normalize message parts. Message parts are passed through
-   * without modification.
+   * Implementation that does not normalize message parts. Message parts are passed through without modification.
    *
    * @since 0.8.0
    */
@@ -40,13 +44,13 @@ public interface MessagePartNormalizer
 
 
   /**
-   * Normalize the given message part. The returned part may be replaced with an identical
-   * cached version in order to reduce the memory footprint.
+   * Normalize the given message part. The returned part may be replaced with an identical cached version in order
+   * to reduce the memory footprint.
    *
    * @param <T>   message part implementation type
    * @param part  message part, not {@code null}
    *
-   * @return  message part
+   * @return  normalized message part, never {@code null}
    */
   <T extends MessagePart> @NotNull T normalize(@NotNull T part);
 }

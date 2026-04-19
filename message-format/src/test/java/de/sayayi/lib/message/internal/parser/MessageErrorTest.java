@@ -23,7 +23,7 @@ public class MessageErrorTest
 
   @BeforeAll
   static void init() {
-    COMPILER = new MessageCompiler(new MessageFactory(new LRUMessagePartNormalizer(64)));
+    COMPILER = new MessageCompiler(new MessageFactory(LRUMessagePartNormalizer.create(64)));
     //COMPILER.compileMessage("%{p,:");
   }
 

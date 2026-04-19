@@ -37,7 +37,7 @@ class LRUMessagePartNormalizerTest
   @DisplayName("normalize without eviction")
   void testNoEviction()
   {
-    val cache = new LRUMessagePartNormalizer(4);
+    val cache = LRUMessagePartNormalizer.create(4);
     val mp1 = new TextPart("mp1");
     val mp2 = new TextPart("mp2");
     val mp3 = new TextPart("mp3");
@@ -56,7 +56,7 @@ class LRUMessagePartNormalizerTest
   @DisplayName("normalize with eviction")
   void testWithEviction()
   {
-    val cache = new LRUMessagePartNormalizer(4);
+    val cache = LRUMessagePartNormalizer.create(4);
     val mp1 = new TextPart("mp1");
     val mp2 = new TextPart("mp2");
     val mp3 = new TextPart("mp3");
@@ -81,7 +81,7 @@ class LRUMessagePartNormalizerTest
   @DisplayName("validate normalization on message parsing")
   void testCache() throws Exception
   {
-    val resolver = new LRUMessagePartNormalizer(10);
+    val resolver = LRUMessagePartNormalizer.create(10);
     val msg = new MessageFactory(resolver)
         .parseMessage("this is %{a,format:number} and %{b}this is %{b}");
     val parts = (MessagePart[])

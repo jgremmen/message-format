@@ -133,7 +133,7 @@ class MessageFactoryTest
   {
     final var THREAD_COUNT = 8;
 
-    final var factory = new MessageFactory(new LRUMessagePartNormalizer(64), 16);
+    final var factory = new MessageFactory(LRUMessagePartNormalizer.create(64), 16);
     final var barrier = new CyclicBarrier(THREAD_COUNT);
     final var errors = new ArrayList<Throwable>();
     final var threads = new Thread[THREAD_COUNT];
