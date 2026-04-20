@@ -33,9 +33,7 @@ import java.nio.charset.Charset;
  */
 public final class EmptyMessage implements Message.WithSpaces
 {
-  /**
-   * Empty message instance.
-   */
+  /** Empty message instance. */
   public static final Message.WithSpaces INSTANCE = new EmptyMessage();
 
 

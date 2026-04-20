@@ -34,7 +34,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static de.sayayi.lib.message.part.normalizer.MessagePartNormalizer.PASS_THROUGH;
-import static java.lang.Math.clamp;
 import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
 
@@ -42,7 +41,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Factory class for creating {@link Message} instances by parsing message format strings and localized message maps.
  * <p>
- * The factory supports parsing both messages and templates, each in two flavours:
+ * The factory supports parsing both messages and templates, each in two flavors:
  * <ul>
  *   <li>A single format string (e.g. {@link #parseMessage(String)}, {@link #parseTemplate(String)}).</li>
  *   <li>
@@ -115,7 +114,7 @@ public class MessageFactory
 
     if (messageCacheSize > 0)
     {
-      messageCache = new LinkedHashMap<>(clamp(messageCacheSize, 16, 64), 0.75f, true) {
+      messageCache = new LinkedHashMap<>(32, 0.75f, true) {
         @Override
         protected boolean removeEldestEntry(Map.Entry<String,Message.WithSpaces> eldest) {
           return size() > messageCacheSize;

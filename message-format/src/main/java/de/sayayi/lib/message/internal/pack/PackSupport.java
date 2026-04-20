@@ -101,8 +101,9 @@ public final class PackSupport
   @Contract(mutates = "param2,io")
   public static void pack(@NotNull Message message, @NotNull PackOutputStream packStream) throws IOException
   {
-    switch(message) {
-      case EmptyMessage emptyMessage -> packStream.writeSmall(MESSAGE_EMPTY, 3);
+    switch(message)
+    {
+      case EmptyMessage ignored -> packStream.writeSmall(MESSAGE_EMPTY, 3);
       case EmptyMessageWithCode emptyMessageWithCode -> {
         packStream.writeSmall(MESSAGE_EMPTY_WITH_CODE, 3);
         emptyMessageWithCode.pack(packStream);
@@ -206,7 +207,8 @@ public final class PackSupport
   @Contract(mutates = "param2,io")
   public static void pack(@NotNull MessagePart messagePart, @NotNull PackOutputStream packStream) throws IOException
   {
-    switch(messagePart) {
+    switch(messagePart)
+    {
       case ParameterPart parameterPart -> {
         packStream.writeSmall(PART_PARAMETER_ID, 3);
         parameterPart.pack(packStream);
@@ -258,7 +260,8 @@ public final class PackSupport
   @Contract(mutates = "param2,io")
   public static void pack(MapKey mapKey, @NotNull PackOutputStream packStream) throws IOException
   {
-    switch(mapKey) {
+    switch(mapKey)
+    {
       case null -> packStream.writeSmall(MAP_KEY_DEFAULT_ID, 3);
       case MapKeyBool configKeyBool -> {
         packStream.writeSmall(MAP_KEY_BOOL_ID, 3);
@@ -308,7 +311,8 @@ public final class PackSupport
   @Contract(mutates = "param2,io")
   public static void pack(@NotNull TypedValue<?> typedValue, @NotNull PackOutputStream packStream) throws IOException
   {
-    switch(typedValue) {
+    switch(typedValue)
+    {
       case TypedValueBool configValueBool -> {
         packStream.writeSmall(MAP_VALUE_BOOL_ID, 2);
         configValueBool.pack(packStream);

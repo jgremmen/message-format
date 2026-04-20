@@ -156,14 +156,14 @@ public final class LRUMessagePartNormalizer
   @SuppressWarnings("ClassCanBeRecord")
   private static final class Large implements MessagePartNormalizer
   {
-    private final LinkedHashMap<MessagePart, MessagePart> cache;
+    private final LinkedHashMap<MessagePart,MessagePart> cache;
 
 
     private Large(int maxSize)
     {
       cache = new LinkedHashMap<>(clamp(maxSize, 16, 64), 0.75f, true) {
         @Override
-        protected boolean removeEldestEntry(Map.Entry<MessagePart, MessagePart> eldest) {
+        protected boolean removeEldestEntry(Map.Entry<MessagePart,MessagePart> eldest) {
           return size() > maxSize;
         }
       };
