@@ -23,9 +23,6 @@ apply plugin: 'org.danilopianini.publish-on-central'
 ext.snapshot = version.toString().endsWith('-SNAPSHOT')
 
 
-zipMavenCentralPortalPublication.dependsOn publishOSSRHPublicationToProjectLocalRepository
-
-
 publishOnCentral {
   repoOwner = 'jgremmen'
 
@@ -36,6 +33,9 @@ publishOnCentral {
 
   licenseName = 'Apache License, Version 2.0'
   licenseUrl = 'https://www.apache.org/licenses/LICENSE-2.0'
+
+  projectUrl = 'https://github.com/jgremmen/message-format'
+  scmConnection = 'scm:git:git://github.com/jgremmen/message-format.git'
 }
 
 
@@ -85,6 +85,11 @@ tasks.register('publishToProjectLocalRepository') {
 }
 
 
+tasks.named('zipMavenCentralPortalPublication') {
+  mustRunAfter 'publishToProjectLocalRepository'
+}
+
+
 ext.releaseTask = tasks.register(TextUtil.toLowerCamelCase("release-${project.name}-artifacts")) {
   group = 'release'
   description = "Release ${project.name} ${snapshot ? 'snapshot ' : ''}artifacts to Maven Central Repository."
@@ -93,7 +98,9 @@ ext.releaseTask = tasks.register(TextUtil.toLowerCamelCase("release-${project.na
 
   dependsOn 'publishToProjectLocalRepository'
 
-  if (!snapshot)
+  if (snapshot)
+    dependsOn 'publishOSSRHPublicationToMavenCentralSnapshotRepository'
+  else
   {
     dependsOn 'zipMavenCentralPortalPublication'
     dependsOn 'validateMavenCentralPortalPublication'
@@ -102,6 +109,7 @@ ext.releaseTask = tasks.register(TextUtil.toLowerCamelCase("release-${project.na
 }
 
 
-tasks.named('zipMavenCentralPortalPublication') {
-  mustRunAfter 'publishToProjectLocalRepository'
+tasks.configureEach {
+  if (name.endsWith('ToMavenLocal') || (snapshot && name.contains('MavenCentralPortal')))
+    group = null
 }
