@@ -28,7 +28,9 @@ import de.sayayi.lib.message.internal.MessageDelegateWithCode;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -53,7 +55,8 @@ import static org.mockito.Mockito.when;
  * @since 0.8.0
  */
 @DisplayName("Message format exception")
-class MessageFormatExceptionTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class MessageFormatExceptionTest
 {
   private static final MessageSupport.ConfigurableMessageSupport MESSAGE_SUPPORT;
   private static final Message THROWING_MESSAGE;

@@ -3,9 +3,7 @@ package de.sayayi.lib.message.internal.parser;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
@@ -16,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
  * @since 0.20.0
  */
 @DisplayName("Message lexer/parser errors")
-public class MessageErrorTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class MessageErrorTest
 {
   private static MessageCompiler COMPILER;
 

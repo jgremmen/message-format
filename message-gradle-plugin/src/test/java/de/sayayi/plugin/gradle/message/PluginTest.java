@@ -22,9 +22,7 @@ import lombok.val;
 import org.gradle.testkit.runner.GradleRunner;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -52,7 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 0.8.0
  */
 @DisplayName("Message format Gradle plugin")
-class PluginTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class PluginTest
 {
   @TempDir File testProjectDir;
   File buildDir;

@@ -18,7 +18,9 @@ package de.sayayi.lib.message.internal.pack;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,7 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 0.20.1
  */
 @DisplayName("Pack support")
-class PackSupportTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class PackSupportTest
 {
   private static final long[] THRESHOLD_VALUES = new long[] {
       0, 7, -1, -8, 8, 135, -9, -1032, 136, 1159, 1160, 132231, 132232, 9223372036854775807L,

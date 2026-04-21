@@ -22,7 +22,9 @@ import de.sayayi.lib.message.formatter.parameter.runtime.MapFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jeroen Gremmen
  */
 @DisplayName("'size' formatter")
-class SizeFormatterTest extends AbstractFormatterTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class SizeFormatterTest extends AbstractFormatterTest
 {
   @Test
   void testFormat()

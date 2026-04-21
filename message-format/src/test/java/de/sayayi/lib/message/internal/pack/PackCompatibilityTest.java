@@ -35,9 +35,9 @@ import static org.springframework.util.MimeTypeUtils.parseMimeType;
  * @author Jeroen Gremmen
  * @since 0.9.1
  */
-@TestMethodOrder(MethodOrderer.DisplayName.class)
 @DisplayName("Message pack backward compatibility")
-class PackCompatibilityTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class PackCompatibilityTest
 {
   private static final MimeType MIME_TYPE = new MimeType("application", "x-message-format-pack");
 

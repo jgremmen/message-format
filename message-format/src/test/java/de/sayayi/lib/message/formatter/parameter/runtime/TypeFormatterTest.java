@@ -17,7 +17,9 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -30,7 +32,8 @@ import static org.junit.platform.commons.util.ReflectionUtils.findMethod;
  * @author Jeroen Gremmen
  */
 @DisplayName("Type formatter")
-class TypeFormatterTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class TypeFormatterTest
 {
   @Test
   void testToStringNative()

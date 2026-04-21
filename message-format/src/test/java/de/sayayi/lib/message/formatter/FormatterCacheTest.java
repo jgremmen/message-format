@@ -19,7 +19,9 @@ import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.runtime.ArrayFormatter;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +36,8 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Jeroen Gremmen
  */
 @DisplayName("Formatter cache")
-class FormatterCacheTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class FormatterCacheTest
 {
   @Test
   @DisplayName("Cache entry reorganization on lookup")

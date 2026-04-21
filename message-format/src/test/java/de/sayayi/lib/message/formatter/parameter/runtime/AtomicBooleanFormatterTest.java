@@ -19,7 +19,9 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -33,16 +35,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jeroen Gremmen
  */
 @DisplayName("AtomicBoolean formatter")
-class AtomicBooleanFormatterTest extends AbstractFormatterTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class AtomicBooleanFormatterTest extends AbstractFormatterTest
 {
   @Test
-  public void testFormattableTypes() {
+  void testFormattableTypes() {
     assertFormatterForType(new AtomicBooleanFormatter(), AtomicBoolean.class);
   }
 
 
   @Test
-  public void testFormat()
+  void testFormat()
   {
     val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new AtomicBooleanFormatter()), NO_CACHE_INSTANCE)

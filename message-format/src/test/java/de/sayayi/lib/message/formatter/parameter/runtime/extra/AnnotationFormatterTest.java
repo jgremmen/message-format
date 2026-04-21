@@ -4,7 +4,9 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
@@ -17,7 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @DisplayName("Annotation formatter")
-class AnnotationFormatterTest extends AbstractFormatterTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class AnnotationFormatterTest extends AbstractFormatterTest
 {
   @Test
   void testFormattableTypes() {

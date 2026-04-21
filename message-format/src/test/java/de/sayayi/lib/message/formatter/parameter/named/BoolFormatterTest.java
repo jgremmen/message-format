@@ -24,7 +24,9 @@ import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.TypedValue;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -43,7 +45,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jeroen Gremmen
  */
 @DisplayName("'bool' formatter")
-class BoolFormatterTest extends AbstractFormatterTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class BoolFormatterTest extends AbstractFormatterTest
 {
   @Test
   void testFormattableTypes()

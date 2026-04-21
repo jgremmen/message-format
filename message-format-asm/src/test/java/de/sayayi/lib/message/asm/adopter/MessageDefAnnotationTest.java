@@ -24,9 +24,7 @@ import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import lombok.val;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -42,7 +40,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Jeroen Gremmen
  */
 @DisplayName("@MessageDef annotations")
-public class MessageDefAnnotationTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class MessageDefAnnotationTest
 {
   private static MessageSupport messageSupport;
 

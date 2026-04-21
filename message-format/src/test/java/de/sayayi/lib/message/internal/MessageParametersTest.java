@@ -18,9 +18,7 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import lombok.val;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.Map;
 import java.util.OptionalInt;
@@ -40,7 +38,8 @@ import static org.mockito.Mockito.when;
  * @since 0.20.0
  */
 @DisplayName("Message parameters")
-class MessageParametersTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class MessageParametersTest
 {
   private MessageParameters parameters;
 

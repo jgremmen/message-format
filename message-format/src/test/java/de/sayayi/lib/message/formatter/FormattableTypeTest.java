@@ -17,7 +17,9 @@ package de.sayayi.lib.message.formatter;
 
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.Map;
 
@@ -30,7 +32,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * @since 0.8.0
  */
 @DisplayName("Formattable type")
-class FormattableTypeTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class FormattableTypeTest
 {
   @Test
   @DisplayName("Check constructors")

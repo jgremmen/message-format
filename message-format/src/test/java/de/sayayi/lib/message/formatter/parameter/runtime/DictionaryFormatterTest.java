@@ -21,7 +21,9 @@ import de.sayayi.lib.message.formatter.parameter.named.StringFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -38,7 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 0.21.0
  */
 @DisplayName("Dictionary formatter")
-class DictionaryFormatterTest extends AbstractFormatterTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class DictionaryFormatterTest extends AbstractFormatterTest
 {
   private final MessageSupport messageSupport = MessageSupportFactory
       .create(createFormatterService(

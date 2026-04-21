@@ -17,7 +17,9 @@ package de.sayayi.lib.message.internal.part.template;
 
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +34,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Jeroen Gremmen
  * @since 0.9.2
  */
-class SortedArrayMapTest
+@DisplayName("Sorted array-backed map with null-first key ordering")
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class SortedArrayMapTest
 {
   @Test
   @DisplayName("Empty map")

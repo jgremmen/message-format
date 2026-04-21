@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @DisplayName("Message compiler")
 @TestMethodOrder(MethodOrderer.DisplayName.class)
-class MessageCompilerTest
+final class MessageCompilerTest
 {
   private static MessageCompiler COMPILER;
 

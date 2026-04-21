@@ -19,7 +19,9 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.List;
 import java.util.Set;
@@ -34,16 +36,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jeroen Gremmen
  */
 @DisplayName("Iterable formatter")
-public class IterableFormatterTest extends AbstractFormatterTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class IterableFormatterTest extends AbstractFormatterTest
 {
   @Test
-  public void testFormattableTypes() {
+  void testFormattableTypes() {
     assertFormatterForType(new IterableFormatter(), Iterable.class);
   }
 
 
   @Test
-  public void testObjectArray()
+  void testObjectArray()
   {
     val messageAccessor = MessageSupportFactory
         .create(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE)
@@ -56,7 +59,7 @@ public class IterableFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testEmptyOrNullCollection()
+  void testEmptyOrNullCollection()
   {
     val message = MessageSupportFactory
         .create(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE)
@@ -68,7 +71,7 @@ public class IterableFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testSeparator()
+  void testSeparator()
   {
     val messageSupport = MessageSupportFactory
         .create(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE);

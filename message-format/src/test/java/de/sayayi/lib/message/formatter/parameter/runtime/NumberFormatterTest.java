@@ -19,7 +19,9 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.lang.Math.PI;
@@ -32,7 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 0.9.1
  */
 @DisplayName("Number formatter")
-class NumberFormatterTest extends AbstractFormatterTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class NumberFormatterTest extends AbstractFormatterTest
 {
   @Test
   void testFormattableTypes()

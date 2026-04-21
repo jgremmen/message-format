@@ -21,7 +21,9 @@ import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
 import de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.ArrayList;
 import java.util.concurrent.CyclicBarrier;
@@ -35,8 +37,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Jeroen Gremmen
  */
 @DisplayName("MessageFactory")
+@TestMethodOrder(MethodOrderer.DisplayName.class)
 @SuppressWarnings("ResultOfMethodCallIgnored")
-class MessageFactoryTest
+final class MessageFactoryTest
 {
   @Test
   @DisplayName("Parse message format string into CompoundMessage")

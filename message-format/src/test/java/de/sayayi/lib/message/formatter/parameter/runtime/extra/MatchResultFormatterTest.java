@@ -18,9 +18,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,7 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jeroen Gremmen
  */
 @DisplayName("Matcher formatter")
-class MatchResultFormatterTest extends AbstractFormatterTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class MatchResultFormatterTest extends AbstractFormatterTest
 {
   private MessageSupport context;
 

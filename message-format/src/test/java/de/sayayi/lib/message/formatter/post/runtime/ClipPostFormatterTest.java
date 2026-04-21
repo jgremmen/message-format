@@ -20,7 +20,9 @@ import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.lang.Math.PI;
@@ -32,8 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jeroen Gremmen
  */
 @DisplayName("'clip' post-formatter")
+@TestMethodOrder(MethodOrderer.DisplayName.class)
 @SuppressWarnings("UnnecessaryUnicodeEscape")
-class ClipPostFormatterTest extends AbstractFormatterTest
+final class ClipPostFormatterTest extends AbstractFormatterTest
 {
   private static final String TEXT = "This is a very long text which is going to be clipped at a specific length";
 

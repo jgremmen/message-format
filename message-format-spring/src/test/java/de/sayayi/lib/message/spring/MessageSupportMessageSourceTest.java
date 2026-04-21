@@ -18,9 +18,7 @@ package de.sayayi.lib.message.spring;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import lombok.val;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -37,7 +35,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Jeroen Gremmen
  * @since 0.9.2
  */
-class MessageSupportMessageSourceTest
+@DisplayName("Spring MessageSource backed by MessageSupport")
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class MessageSupportMessageSourceTest
 {
   private MessageSource messageSource;
 

@@ -20,9 +20,7 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.core.convert.support.DefaultConversionService;
 
 import java.util.TreeMap;
@@ -36,7 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 0.8.3
  */
 @DisplayName("Spring expression language formatter")
-class SpELFormatterTest extends AbstractFormatterTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class SpELFormatterTest extends AbstractFormatterTest
 {
   private static MessageSupport messageSupport;
 
@@ -55,7 +54,6 @@ class SpELFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Extract value from bean with optional format selector")
-  @SuppressWarnings("SpellCheckingInspection")
   void testFormat()
   {
     val map = new TreeMap<String,Integer>();

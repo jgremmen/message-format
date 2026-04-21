@@ -21,7 +21,9 @@ import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.Locale;
 import java.util.Map;
@@ -37,7 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 0.8.0
  */
 @DisplayName("Locale formatter")
-class LocaleFormatterTest extends AbstractFormatterTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class LocaleFormatterTest extends AbstractFormatterTest
 {
   @Test
   void testFormattableTypes() {

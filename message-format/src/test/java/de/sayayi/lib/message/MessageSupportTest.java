@@ -17,7 +17,9 @@ package de.sayayi.lib.message;
 
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -38,7 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
  * @since 0.8.0
  */
 @DisplayName("Message support interface")
-class MessageSupportTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class MessageSupportTest
 {
   @Test
   @DisplayName("Immediate message formatting")

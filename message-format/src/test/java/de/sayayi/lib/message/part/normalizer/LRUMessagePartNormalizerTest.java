@@ -21,7 +21,9 @@ import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.platform.commons.util.ReflectionUtils.tryToReadFieldValue;
@@ -31,7 +33,8 @@ import static org.junit.platform.commons.util.ReflectionUtils.tryToReadFieldValu
  * @author Jeroen Gremmen
  */
 @DisplayName("LRU message part normalizer")
-class LRUMessagePartNormalizerTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class LRUMessagePartNormalizerTest
 {
   @Test
   @DisplayName("normalize without eviction")

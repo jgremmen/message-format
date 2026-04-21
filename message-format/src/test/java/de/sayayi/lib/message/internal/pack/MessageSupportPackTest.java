@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jeroen Gremmen
  * @since 0.8.1
  */
-@TestMethodOrder(MethodOrderer.DisplayName.class)
 @DisplayName("Pack/unpack various messages to/from stream")
-class MessageSupportPackTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class MessageSupportPackTest
 {
   private static MessageSupport messageSupport;
 

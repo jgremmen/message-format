@@ -18,7 +18,9 @@ package de.sayayi.lib.message.internal.parser;
 import lombok.val;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import static de.sayayi.lib.message.internal.parser.MessageLexer.CH;
 import static de.sayayi.lib.message.internal.parser.MessageLexer.P_START;
@@ -29,11 +31,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jeroen Gremmen
  */
 @DisplayName("Message format lexer")
-public class MessageTokenizerTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class MessageTokenizerTest
 {
   @Test
   @SuppressWarnings("UnnecessaryUnicodeEscape")
-  public void testDefaultMode()
+  void testDefaultMode()
   {
     val lexer = createFor("hi  \\u0021%{");
 

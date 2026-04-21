@@ -2,7 +2,9 @@ package de.sayayi.lib.message.part;
 
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
@@ -10,7 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @DisplayName("Text joiner")
-class TextJoinerTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class TextJoinerTest
 {
   @Test
   @DisplayName("Join 'String' instances")

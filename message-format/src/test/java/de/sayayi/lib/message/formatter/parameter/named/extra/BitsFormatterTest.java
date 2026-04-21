@@ -23,7 +23,9 @@ import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.math.BigInteger;
 import java.util.Map;
@@ -40,8 +42,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Jeroen Gremmen
  */
 @DisplayName("'bits' formatter")
+@TestMethodOrder(MethodOrderer.DisplayName.class)
 @SuppressWarnings("removal")
-class BitsFormatterTest extends AbstractFormatterTest
+final class BitsFormatterTest extends AbstractFormatterTest
 {
   @Test
   void testFormatterConfig()

@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @DisplayName("Message/template parse exception")
 @TestMethodOrder(OrderAnnotation.class)
-class MessageParserExceptionTest
+final class MessageParserExceptionTest
 {
   private static Stream<Arguments> testGetMessage_parameters()
   {

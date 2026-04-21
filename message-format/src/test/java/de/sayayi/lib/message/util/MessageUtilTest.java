@@ -30,9 +30,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
-@TestMethodOrder(MethodOrderer.DisplayName.class)
 @DisplayName("Message utils")
-class MessageUtilTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class MessageUtilTest
 {
   @Test
   @DisplayName("valid kebab-case names")

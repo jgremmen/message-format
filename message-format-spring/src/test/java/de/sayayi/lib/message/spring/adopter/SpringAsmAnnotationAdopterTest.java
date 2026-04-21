@@ -24,7 +24,9 @@ import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.Set;
 
@@ -37,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 0.8.3
  */
 @DisplayName("Spring ASM annotation adopter")
+@TestMethodOrder(MethodOrderer.DisplayName.class)
 @MessageDefs({
     @MessageDef(code = "CLASS", texts = {
         @Text(locale = "de", text = "Deutsch"),
@@ -44,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     })
 })
 @SuppressWarnings("SimplifiableAnnotation")
-public final class SpringAsmAnnotationAdopterTest
+final class SpringAsmAnnotationAdopterTest
 {
   @Test
   @DisplayName("Scan messages")

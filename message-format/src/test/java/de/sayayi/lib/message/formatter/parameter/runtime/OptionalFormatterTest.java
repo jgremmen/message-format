@@ -20,7 +20,9 @@ import de.sayayi.lib.message.formatter.parameter.named.StringFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.Optional;
 
@@ -34,7 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 0.8.4
  */
 @DisplayName("Optional formatter")
-class OptionalFormatterTest extends AbstractFormatterTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class OptionalFormatterTest extends AbstractFormatterTest
 {
   @Test
   void testEmptyNull()

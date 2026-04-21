@@ -5,9 +5,7 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -24,7 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 0.12.0  (renamed in 0.20.0)
  */
 @DisplayName("Temporal delegate")
-class ToTemporalDelegateTest extends AbstractFormatterTest
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+final class ToTemporalDelegateTest extends AbstractFormatterTest
 {
   private MessageAccessor messageAccessor;
 
