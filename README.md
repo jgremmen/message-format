@@ -106,14 +106,14 @@ resources so it is included in the final artifact automatically.
 
 ## Modules
 
-| Module | Description |
-|---|---|
-| `message-format` | Core library: parsing, formatting, adopters, pack format, and the formatter SPI |
-| `message-format-annotations` | `@MessageDef`, `@TemplateDef` and related annotations |
-| `message-format-asm` | ASM-based bytecode scanner for annotation-defined messages |
-| `message-format-log4j` | Log4j integration: `MessageFactory` using message-format syntax |
-| `message-format-spring` | Spring `MessageSource` bridge, SpEL formatter, classpath scanning |
-| `message-gradle-plugin` | Gradle plugin for build-time annotation scanning and message packing |
+| Module                                                                                                  | Description |
+|---------------------------------------------------------------------------------------------------------|---|
+| message-format&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format/0.20.1)              | Core library: parsing, formatting, adopters, pack format, and the formatter SPI |
+| message-format-annotations&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-annotations/0.20.1) | `@MessageDef`, `@TemplateDef` and related annotations |
+| message-format-asm&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-asm/0.20.1)               | ASM-based bytecode scanner for annotation-defined messages |
+| message-format-log4j&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-log4j/0.21.0)           | Log4j integration: `MessageFactory` using message-format syntax |
+| message-format-spring&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-spring/0.20.1)         | Spring `MessageSource` bridge, SpEL formatter, classpath scanning |
+| message-gradle-plugin                                                                                  | Gradle plugin for build-time annotation scanning and message packing |
 
 ## Quick Example
 
