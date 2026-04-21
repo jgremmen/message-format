@@ -17,8 +17,9 @@
 /**
  * Internal implementations of the core message format interfaces, including
  * {@link de.sayayi.lib.message.Message Message},
- * {@link de.sayayi.lib.message.MessageSupport MessageSupport} and
- * {@link de.sayayi.lib.message.MessageFactory MessageFactory}.
+ * {@link de.sayayi.lib.message.MessageSupport MessageSupport},
+ * {@link de.sayayi.lib.message.MessageFactory MessageFactory} and
+ * {@link de.sayayi.lib.message.MessageBuilder MessageBuilder}.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

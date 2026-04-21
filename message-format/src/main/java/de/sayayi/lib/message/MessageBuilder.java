@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message;
 
-import de.sayayi.lib.message.internal.MessageBuilderImpl;
+import de.sayayi.lib.message.internal.InternalMessageBuilder;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +58,7 @@ import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
  * @see MessageFactory#messageBuilder()
  */
 public sealed interface MessageBuilder
-    permits MessageBuilderImpl,
+    permits InternalMessageBuilder,
             MessageBuilder.TextBuilder,
             MessageBuilder.ParameterBuilder,
             MessageBuilder.PostFormatterBuilder,
@@ -143,7 +143,7 @@ public sealed interface MessageBuilder
    */
   @Contract("-> new")
   static @NotNull MessageBuilder create() {
-    return new MessageBuilderImpl(NO_CACHE_INSTANCE);
+    return new InternalMessageBuilder(NO_CACHE_INSTANCE);
   }
 
 
@@ -156,7 +156,7 @@ public sealed interface MessageBuilder
    */
   @Contract("_ -> new")
   static @NotNull MessageBuilder create(@NotNull MessageFactory messageFactory) {
-    return new MessageBuilderImpl(messageFactory);
+    return new InternalMessageBuilder(messageFactory);
   }
 
 
@@ -171,7 +171,8 @@ public sealed interface MessageBuilder
    */
   @SuppressWarnings("UnusedReturnValue")
   sealed interface SpacedBuilder<S extends SpacedBuilder<S>>
-      permits TextBuilder, ParameterBuilder, PostFormatterBuilder, TemplateBuilder
+      permits TextBuilder, ParameterBuilder, PostFormatterBuilder, TemplateBuilder,
+              InternalMessageBuilder.AbstractSpacedBuilder
   {
     /**
      * Adds a leading space to this message part.
@@ -216,7 +217,7 @@ public sealed interface MessageBuilder
    */
   sealed interface TextBuilder
       extends MessageBuilder, SpacedBuilder<TextBuilder>
-      permits MessageBuilderImpl.TextBuilderImpl {
+      permits InternalMessageBuilder.TextBuilderImpl {
   }
 
 
@@ -229,7 +230,8 @@ public sealed interface MessageBuilder
    *
    * @since 0.21.0
    */
-  sealed interface ConfigurableBuilder<S extends ConfigurableBuilder<S>> permits ParameterBuilder, PostFormatterBuilder
+  sealed interface ConfigurableBuilder<S extends ConfigurableBuilder<S>>
+      permits ParameterBuilder, PostFormatterBuilder, InternalMessageBuilder.AbstractConfigurableBuilder
   {
     /**
      * Adds a string configuration value.
@@ -293,7 +295,7 @@ public sealed interface MessageBuilder
    */
   sealed interface ParameterBuilder
       extends MessageBuilder, SpacedBuilder<ParameterBuilder>, ConfigurableBuilder<ParameterBuilder>
-      permits MessageBuilderImpl.ParameterBuilderImpl
+      permits InternalMessageBuilder.ParameterBuilderImpl
   {
     /**
      * Sets the formatter name for this parameter.
@@ -377,7 +379,7 @@ public sealed interface MessageBuilder
    * @since 0.21.0
    */
   sealed interface MapValueBuilder
-      permits MapEqualityBuilder, MessageBuilderImpl.MapValueBuilderImpl
+      permits MapEqualityBuilder, InternalMessageBuilder.MapValueBuilderImpl
   {
     /**
      * Sets the map value message and returns to the enclosing parameter builder.
@@ -412,7 +414,7 @@ public sealed interface MessageBuilder
    * @since 0.21.0
    */
   sealed interface MapEqualityBuilder extends MapValueBuilder
-      permits MapRelationalBuilder, MessageBuilderImpl.MapEqualityBuilderImpl
+      permits MapRelationalBuilder, InternalMessageBuilder.MapEqualityBuilderImpl
   {
     /**
      * Sets the key operator to "equal". This is the default and does not need to be called explicitly.
@@ -445,7 +447,7 @@ public sealed interface MessageBuilder
    * @since 0.21.0
    */
   sealed interface MapRelationalBuilder extends MapEqualityBuilder
-      permits MessageBuilderImpl.MapRelationalBuilderImpl
+      permits InternalMessageBuilder.MapRelationalBuilderImpl
   {
     /**
      * Sets the key operator to "less than".
@@ -497,7 +499,7 @@ public sealed interface MessageBuilder
    */
   sealed interface PostFormatterBuilder
       extends MessageBuilder, SpacedBuilder<PostFormatterBuilder>, ConfigurableBuilder<PostFormatterBuilder>
-      permits MessageBuilderImpl.PostFormatterBuilderImpl
+      permits InternalMessageBuilder.PostFormatterBuilderImpl
   {
     /**
      * Configures the inner message to be post-formatted using a nested builder callback.
@@ -524,7 +526,7 @@ public sealed interface MessageBuilder
    */
   sealed interface TemplateBuilder
       extends MessageBuilder, SpacedBuilder<TemplateBuilder>
-      permits MessageBuilderImpl.TemplateBuilderImpl
+      permits InternalMessageBuilder.TemplateBuilderImpl
   {
     /**
      * Adds a default string parameter value for the template.
