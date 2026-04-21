@@ -41,12 +41,8 @@ dependencies {
   // main
   annotationProcessor libs.lombok
 
-  implementation(libs.bundles.antlr4.runtime) {
-    exclude group: 'org.jetbrains'
-  }
-  implementation(libs.pack) {
-    exclude group: 'org.jetbrains'
-  }
+  implementation libs.bundles.antlr4.runtime
+  implementation libs.pack
 
   // test
   testImplementation libs.spring.core
