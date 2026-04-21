@@ -130,6 +130,7 @@ public final class PostFormatterPart implements MessagePart.PostFormat
 
     textJoiner.addNoSpace("%(").addNoSpace(name).addNoSpace(",\"");
     message.serialize(context.withStringQuote('"'));
+    textJoiner.add('"');
 
     final var contextWithoutQuotes = context.withoutStringQuote();
 
