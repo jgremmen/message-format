@@ -68,7 +68,8 @@ final class PackCompatibilityTest
   {
     return Stream.of(
         Arguments.of("0.20.0", 1, 8, 2),
-        Arguments.of("0.20.1", 2, 9, 2)
+        Arguments.of("0.20.1", 2, 9, 2),
+        Arguments.of("0.21.0", 3, 10, 2)
     );
   }
 
