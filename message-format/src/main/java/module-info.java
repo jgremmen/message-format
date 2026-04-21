@@ -56,8 +56,8 @@
  * @see de.sayayi.lib.message.MessageSupport
  * @see de.sayayi.lib.message.MessageFactory
  */
-module de.sayayi.lib.message {
-
+module de.sayayi.lib.message
+{
   requires de.sayayi.lib.antlr;
   requires de.sayayi.lib.pack;
   requires org.antlr.antlr4.runtime;

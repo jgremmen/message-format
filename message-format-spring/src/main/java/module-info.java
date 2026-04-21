@@ -1,5 +1,5 @@
-module de.sayayi.lib.message.spring {
-
+module de.sayayi.lib.message.spring
+{
   requires transitive de.sayayi.lib.message;
   requires transitive de.sayayi.lib.message.annotations;
 
@@ -12,5 +12,4 @@ module de.sayayi.lib.message.spring {
   exports de.sayayi.lib.message.spring;
   exports de.sayayi.lib.message.spring.adopter;
   exports de.sayayi.lib.message.spring.formatter;
-
 }
