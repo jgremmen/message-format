@@ -1,0 +1,67 @@
+/*
+ * Copyright 2026 Jeroen Gremmen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+//file:noinspection DependencyNotationArgument
+
+
+description = 'Message Format Library (log4j formatter)'
+
+
+dependencies {
+  implementation project(':message-format')
+  implementation libs.log4j.api
+
+  //noinspection DependencyNotationArgument
+  testImplementation project(':message-format').sourceSets.test.output
+  testImplementation libs.log4j.core
+}
+
+
+javadoc {
+  (options as StandardJavadocDocletOptions).with {
+    group('Log4j', [
+        'de.sayayi.lib.message.log4j',
+    ])
+
+    linksOffline(
+        "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
+        "${rootDir}/gradle/javadocs/message-format")
+    linksOffline(
+        "https://javadoc.io/doc/org.jetbrains/annotations/${resolveVersion('annotations')}/",
+        "${rootDir}/gradle/javadocs/jetbrains-annotations")
+    linksOffline(
+        "https://javadoc.io/doc/org.apache.logging.log4j/log4j-api/${resolveVersion('log4j-api')}/",
+        "${rootDir}/gradle/javadocs/log4j-api")
+  }
+}
+
+
+publishing {
+  publications {
+    withType(MavenPublication).configureEach {
+      pom {
+        inceptionYear = '2026'
+      }
+    }
+  }
+}
+
+
+ext.releaseTask.configure {
+  if (snapshot) {
+    dependsOn ':message-format-log4j:publishOSSRHPublicationToMavenCentralSnapshotRepository'
+  }
+}

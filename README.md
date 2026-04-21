@@ -77,6 +77,15 @@ classes that are already loaded as well as from classes that are not present in 
 Spring module contributes a Spring-aware ASM adopter that uses Spring's `ResourceLoader` for
 classpath scanning. Custom adopters can be implemented by extending `AbstractMessageAdopter`.
 
+### Log4j integration
+
+The `message-format-log4j` module integrates Message Format with Apache Log4j. It provides
+`Log4jMessageFactory`, a Log4j `MessageFactory` implementation that uses message-format syntax
+for formatting log messages. Parameters passed to the logger are made available in the message
+template as `p1`, `p2`, etc. If the message string does not contain message-format placeholders
+but uses Log4j-style `{}` placeholders, the factory can optionally fall back to Log4j's
+`ParameterizedMessage` for backward compatibility.
+
 ### Spring integration
 
 The `message-format-spring` module bridges Message Format into the Spring ecosystem. It provides
@@ -103,6 +112,7 @@ resources so it is included in the final artifact automatically.
 | `message-format` | Core library: parsing, formatting, adopters, pack format, and the formatter SPI |
 | `message-format-annotations` | `@MessageDef`, `@TemplateDef` and related annotations |
 | `message-format-asm` | ASM-based bytecode scanner for annotation-defined messages |
+| `message-format-log4j` | Log4j integration: `MessageFactory` using message-format syntax |
 | `message-format-spring` | Spring `MessageSource` bridge, SpEL formatter, classpath scanning |
 | `message-gradle-plugin` | Gradle plugin for build-time annotation scanning and message packing |
 
