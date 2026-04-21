@@ -19,8 +19,7 @@ Formatters are discovered automatically via `ServiceLoader`, so adding a formatt
 is often all that is needed.
 
 Messages can be stored centrally in a `MessageSupport` instance, each identified by a unique code.
-Reusable fragments can be extracted into templates and embedded in other messages, keeping
-definitions concise and consistent.
+Reusable fragments can be extracted into templates and embedded in other messages.
 
 ## Features
 
