@@ -32,7 +32,7 @@ type of the value, so the calling code never needs to perform explicit conversio
 automatically. Parameters can also be configured directly in the format string. For example, a
 list parameter can be told to join its elements with commas, to abbreviate after a certain number
 of items, or to insert "and" before the last element. In addition to type-based formatters, named
-formatters such as `bool`, `choice`, `size`, and `string` are available for common formatting
+formatters such as `bool`, `choice`, `size` and `string` are available for common formatting
 patterns.
 
 ### Locale support
