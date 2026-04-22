@@ -17,6 +17,7 @@ package de.sayayi.lib.message.util;
 
 import de.sayayi.lib.message.FormatStringSerializer.Context;
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.internal.pack.PackFileTypeDetector;
 import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.pack.PackInputStream;
 import org.jetbrains.annotations.Contract;
@@ -24,9 +25,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static de.sayayi.lib.message.internal.pack.PackSupport.MIME_TYPE;
 import static de.sayayi.lib.message.internal.pack.PackSupport.PACK_CONFIG;
 import static java.lang.Character.*;
 import static java.util.Objects.requireNonNull;
@@ -507,6 +510,32 @@ public final class MessageUtil
     context.textJoiner().add(quote);
     serializeString(context.withStringQuote(quote), string);
     context.textJoiner().add(quote);
+  }
+
+
+  /**
+   * Tells whether the file at the given {@code path} is a message format pack file.
+   * <p>
+   * This method is useful in environments where the {@link PackFileTypeDetector} service implementation is not
+   * installed or active. For example, due to classloader separation in plugin frameworks such as IntelliJ IDEA. It
+   * bypasses the {@link java.nio.file.Files#probeContentType(Path) Files.probeContentType()} SPI mechanism and
+   * directly probes the file content instead.
+   *
+   * @param path  the path to the file to check, not {@code null}
+   *
+   * @return  {@code true} if the file is a message format pack file, {@code false} otherwise
+   *
+   * @since 0.21.1
+   */
+  @Contract(pure = true)
+  public static boolean isMessageFormatPack(@NotNull Path path)
+  {
+    try {
+      final var mimetype = new PackFileTypeDetector().probeContentType(path);
+      return mimetype != null && mimetype.startsWith(MIME_TYPE);
+    } catch(Exception ex) {
+      return false;
+    }
   }
 
 
