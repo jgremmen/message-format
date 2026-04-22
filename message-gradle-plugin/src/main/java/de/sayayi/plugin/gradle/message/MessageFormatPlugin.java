@@ -27,18 +27,35 @@ import static org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME;
 
 
 /**
+ * Gradle plugin that provides the {@code messageFormat} extension and registers the
+ * {@link MessageFormatPackTask messageFormatPack} task for scanning and packing message format definitions found in
+ * compiled classes.
+ * <p>
+ * The plugin automatically applies the {@link JavaBasePlugin} if not already present and configures the
+ * {@link MessageFormatExtension} with sensible defaults. The {@code main} source set is used as the default source for
+ * class scanning.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
+ *
+ * @see MessageFormatExtension
+ * @see MessageFormatPackTask
  */
 @SuppressWarnings("unused")
 public class MessageFormatPlugin implements Plugin<@NotNull Project>
 {
-  /** Plugin extension name */
+  /** Plugin extension name: {@value} */
   public static final String EXTENSION = "messageFormat";
 
 
+  /**
+   * Applies the plugin to the given {@code project} by registering the {@link MessageFormatExtension messageFormat}
+   * extension and the {@link MessageFormatPackTask messageFormatPack} task.
+   *
+   * @param project  the Gradle project to apply this plugin to, never {@code null}
+   */
   @Override
-  public void apply(Project project)
+  public void apply(@NotNull Project project)
   {
     // provide java base plugin (for main/java)
     final var plugins = project.getPlugins();
@@ -66,6 +83,14 @@ public class MessageFormatPlugin implements Plugin<@NotNull Project>
   }
 
 
+  /**
+   * Registers the {@code messageFormatPack} task and wires it to the extension properties
+   * and the main source set output.
+   *
+   * @param project        the Gradle project, never {@code null}
+   * @param extension      the message format extension providing the configuration, never {@code null}
+   * @param mainSourceSet  the main source set whose output the task depends on, never {@code null}
+   */
   private void registerPackTask(@NotNull Project project,
                                 @NotNull MessageFormatExtension extension,
                                 @NotNull SourceSet mainSourceSet)

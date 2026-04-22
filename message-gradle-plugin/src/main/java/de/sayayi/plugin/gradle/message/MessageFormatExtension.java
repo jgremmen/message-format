@@ -25,10 +25,16 @@ import java.util.List;
 
 
 /**
- * Gradle extension {@code messageFormat}
+ * Gradle extension {@code messageFormat} for configuring the {@link MessageFormatPackTask messageFormatPack} task.
+ * <p>
+ * This extension allows configuring the pack filename, compression, duplicate message handling strategy, template
+ * validation, source sets to scan and include/exclude filters for message codes.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
+ *
+ * @see MessageFormatPlugin
+ * @see MessageFormatPackTask
  */
 public abstract class MessageFormatExtension
 {
@@ -37,9 +43,8 @@ public abstract class MessageFormatExtension
 
 
   /**
-   * Return a list of regular expressions which will be matched against each message code.
-   * If it matches, the message will be included in the packed message file. If it doesn't match
-   * the message is skipped.
+   * Return a list of regular expressions which will be matched against each message code. If it matches, the message
+   * will be included in the packed message file. If it doesn't match the message is skipped.
    * <p>
    * If the list is empty, all messages are included, unless they're explicitly excluded.
    *
@@ -55,9 +60,8 @@ public abstract class MessageFormatExtension
 
 
   /**
-   * Return a list of regular expressions which will be matched against each message code.
-   * If it matches, the message will be excluded from the packed message file. If it doesn't match
-   * the message is included.
+   * Return a list of regular expressions which will be matched against each message code. If it matches, the message
+   * will be excluded from the packed message file. If it doesn't match the message is included.
    *
    * @return  list of regular expressions for message exclusion, never {@code null}
    *
@@ -71,16 +75,17 @@ public abstract class MessageFormatExtension
 
 
   /**
-   * Return the pack filename property. The default value is {@code message.pack}
+   * Return the pack filename property. The default value is {@code messages.mfp}.
    *
    * @return  pack filename property, never {@code null}
+   *
+   * @since 0.8.0
    */
   public abstract Property<@NotNull String> getPackFilename();
 
 
   /**
-   * Compress property stating whether the message pack must be compressed or not.
-   * The default value is {@code false}.
+   * Compress property stating whether the message pack must be compressed or not. The default value is {@code false}.
    *
    * @return  compress property, never {@code null}
    */
@@ -90,11 +95,10 @@ public abstract class MessageFormatExtension
   /**
    * Returns a collection of source files to scan for message and template annotations.
    * <p>
-   * There's no restriction on what kind of files are in the collection. Only class
-   * ({@code *.class}) files will be used for annotation scanning.
+   * There's no restriction on what kind of files are in the collection. Only class ({@code *.class}) files will be
+   * used for annotation scanning.
    * <p>
-   * The default value is the output of the {@code main/java} source set, which contains all
-   * compiled java classes.
+   * The default value is the output of the {@code main/java} source set, which contains all compiled java classes.
    *
    * @return  class files to be scanned for messages and templates, never {@code null}
    *
@@ -104,9 +108,8 @@ public abstract class MessageFormatExtension
 
 
   /**
-   * Property containing the strategy to use in case a duplicate message code or template name
-   * (with different message definition) is found. The default strategy is
-   * {@link DuplicateMsgStrategy#IGNORE_AND_WARN IGNORE_AND_WARN}.
+   * Property containing the strategy to use in case a duplicate message code or template name (with different message
+   * definition) is found. The default strategy is {@link DuplicateMsgStrategy#IGNORE_AND_WARN IGNORE_AND_WARN}.
    * <p>
    * This property accepts various formats:
    * <ul>
@@ -114,16 +117,15 @@ public abstract class MessageFormatExtension
    *     {@link DuplicateMsgStrategy} enum value (e.g. {@link DuplicateMsgStrategy#FAIL FAIL})
    *   </li>
    *   <li>
-   *     Duplicate strategy string. The string is converted to uppercase, dashes are translated to
-   *     underscores and the resulting strategy name is matched against
-   *     {@link DuplicateMsgStrategy} (e.g. {@code 'override-and-warn'} matches
-   *     {@link DuplicateMsgStrategy#OVERRIDE_AND_WARN OVERRIDE_AND_WARN})
+   *     Duplicate strategy string. The string is converted to uppercase, dashes are translated to underscores and the
+   *     resulting strategy name is matched against {@link DuplicateMsgStrategy} (e.g. {@code 'override-and-warn'}
+   *     matches {@link DuplicateMsgStrategy#OVERRIDE_AND_WARN OVERRIDE_AND_WARN})
    *   </li>
    * </ul>
    * <p>
-   * A duplicate is either a message with an already known message code or a template with
-   * an already known template name and a different message definition. This means that if the
-   * same message or template is encountered twice, it is not considered a duplicate.
+   * A duplicate is either a message with an already known message code or a template with an already known template
+   * name and a different message definition. This means that if the same message or template is encountered twice, it
+   * is not considered a duplicate.
    *
    * @return  duplicate message strategy property, never {@code null}
    *
@@ -133,15 +135,14 @@ public abstract class MessageFormatExtension
 
 
   /**
-   * Property containing a boolean stating whether to validate referenced templates. The
-   * default value resolves to {@code true}.
+   * Property containing a boolean stating whether to validate referenced templates. The default value resolves to
+   * {@code true}.
    * <p>
-   * If the property resolves to {@code true} the task will check whether all referenced
-   * templates (including nested templates) are available and included in the packed message file.
+   * If the property resolves to {@code true} the task will check whether all referenced templates (including nested
+   * templates) are available and included in the packed message file.
    * <p>
-   * If the property resolves to {@code false} no checks are performed. This may lead to a
-   * situation where a message cannot be formatted if the referenced template is missing from
-   * the message support.
+   * If the property resolves to {@code false} no checks are performed. This may lead to a situation where a message
+   * cannot be formatted if the referenced template is missing from the message support.
    *
    * @return  validate referenced templates property, never {@code null}
    */
@@ -152,6 +153,10 @@ public abstract class MessageFormatExtension
    * Include messages that match the given regular expressions.
    *
    * @param regex  array of regular expressions, not {@code null}
+   *
+   * @see #getIncludeRegexFilters()
+   *
+   * @since 0.8.0
    */
   public void include(String... regex) {
     includeRegexFilter.addAll(List.of(regex));
@@ -162,6 +167,10 @@ public abstract class MessageFormatExtension
    * Exclude messages that match the given regular expressions.
    *
    * @param regex  array of regular expressions, not {@code null}
+   *
+   * @see #getExcludeRegexFilters()
+   *
+   * @since 0.8.0
    */
   public void exclude(String... regex) {
     excludeRegexFilter.addAll(List.of(regex));

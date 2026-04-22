@@ -17,9 +17,8 @@ package de.sayayi.plugin.gradle.message;
 
 
 /**
- * Strategy for handling duplicate message codes and template names.
- * Duplicate messages are messages with the same message code or template name but with different
- * message text definitions.
+ * Strategy for handling duplicate message codes and template names. Duplicate messages are messages with the same
+ * message code or template name but with different message text definitions.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

@@ -57,11 +57,14 @@ import static org.gradle.api.tasks.PathSensitivity.RELATIVE;
 
 
 /**
- * Gradle task for scanning messages and templates in classes and packing them into a single
- * file which can be imported into a {@link MessageSupport.ConfigurableMessageSupport}.
+ * Gradle task for scanning messages and templates in classes and packing them into a single file which can be
+ * imported into a {@link MessageSupport.ConfigurableMessageSupport}.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
+ *
+ * @see MessageFormatPlugin
+ * @see MessageFormatExtension
  */
 @CacheableTask
 public abstract class MessageFormatPackTask extends DefaultTask
@@ -90,7 +93,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   /**
    * Parameter containing the destination directory where the packed message file is stored.
    *
-   * @return  destination directory parameter
+   * @return  destination directory parameter, never {@code null}
    */
   @Internal("tracked via packFile")  // part of task output
   public abstract DirectoryProperty getDestinationDir();
@@ -99,16 +102,15 @@ public abstract class MessageFormatPackTask extends DefaultTask
   /**
    * Parameter containing the packed message file name.
    *
-   * @return  packed message file name
+   * @return  packed message file name, never {@code null}
    */
   @Internal("tracked via packFile")
   public abstract Property<@NotNull String> getPackFilename();
 
 
   /**
-   * Return a list of regular expressions which will be matched against each message code.
-   * If it matches, the message will be included in the packed message file. If it doesn't match
-   * the message is skipped.
+   * Return a list of regular expressions which will be matched against each message code. If it matches, the message
+   * will be included in the packed message file. If it doesn't match the message is skipped.
    * <p>
    * If the list is empty, all messages are included, unless they're explicitly excluded.
    *
@@ -123,9 +125,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Return a list of regular expressions which will be matched against each message code.
-   * If it matches, the message will be excluded from the packed message file. If it doesn't match
-   * the message is included.
+   * Return a list of regular expressions which will be matched against each message code. If it matches, the message
+   * will be excluded from the packed message file. If it doesn't match the message is included.
    *
    * @return  list of regular expressions for message exclusion, never {@code null}
    *
@@ -140,8 +141,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
   /**
    * Returns a collection of source files to scan for message and template annotations.
    * <p>
-   * There's no restriction on what kind of files are in the collection. This task will only
-   * use and scan class ({@code *.class}) files.
+   * There's no restriction on what kind of files are in the collection. This task will only use and scan class
+   * ({@code *.class}) files.
    *
    * @return  collection of source files to scan for messages and templates, never {@code null}
    *
@@ -154,9 +155,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Property containing the strategy to use in case a duplicate message code or template name
-   * (with different message definition) is found. The default strategy is
-   * {@link DuplicateMsgStrategy#IGNORE_AND_WARN IGNORE_AND_WARN}.
+   * Property containing the strategy to use in case a duplicate message code or template name (with different message
+   * definition) is found. The default strategy is {@link DuplicateMsgStrategy#IGNORE_AND_WARN IGNORE_AND_WARN}.
    * <p>
    * This property accepts various formats:
    * <ul>
@@ -164,16 +164,15 @@ public abstract class MessageFormatPackTask extends DefaultTask
    *     {@link DuplicateMsgStrategy} enum value (e.g. {@link DuplicateMsgStrategy#FAIL FAIL})
    *   </li>
    *   <li>
-   *     Strategy string. The string is converted to uppercase, dashes are translated to
-   *     underscores and the resulting strategy name is matched against
-   *     {@link DuplicateMsgStrategy} (e.g. {@code 'override-and-warn'} matches
+   *     Strategy string. The string is converted to uppercase, dashes are translated to underscores and the resulting
+   *     strategy name is matched against {@link DuplicateMsgStrategy} (e.g. {@code 'override-and-warn'} matches
    *     {@link DuplicateMsgStrategy#OVERRIDE_AND_WARN OVERRIDE_AND_WARN})
    *   </li>
    * </ul>
    * <p>
-   * A duplicate is either a message with an already known message code or a template with
-   * an already known template name and a different message definition. This means that if the
-   * same message or template is encountered twice, it is not considered a duplicate.
+   * A duplicate is either a message with an already known message code or a template with an already known template
+   * name and a different message definition. This means that if the same message or template is encountered twice,
+   * it is not considered a duplicate.
    *
    * @return  duplicate message strategy property, never {@code null}
    *
@@ -184,15 +183,14 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Property containing a boolean stating whether to validate referenced templates. The
-   * default value resolves to {@code true}.
+   * Property containing a boolean stating whether to validate referenced templates. The default value resolves to
+   * {@code true}.
    * <p>
-   * If the property resolves to {@code true} the task will check whether all referenced
-   * templates (including nested templates) are available and included in the packed message file.
+   * If the property resolves to {@code true} the task will check whether all reference templates (including nested
+   * templates) are available and included in the packed message file.
    * <p>
-   * If the property resolves to {@code false} no checks are performed. This may lead to a
-   * situation where a message cannot be formatted if the referenced template is missing from
-   * the message support.
+   * If the property resolves to {@code false} no checks are performed. This may lead to a situation where a message
+   * cannot be formatted if the referenced template is missing from the message support.
    *
    * @return  validate referenced templates property, never {@code null}
    */
@@ -224,6 +222,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * Include messages matching the {@code regex}.
    *
    * @param regex  regex matching message codes
+   *
+   * @see #getIncludeRegexFilters()
    */
   public void include(String... regex) {
     includeRegexFilters.addAll(List.of(regex));
@@ -234,6 +234,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * Exclude messages matching the {@code regex}.
    *
    * @param regex  regex matching message codes
+   *
+   * @see #getExcludeRegexFilters()
    */
   public void exclude(String... regex) {
     excludeRegexFilters.addAll(List.of(regex));
@@ -253,13 +255,13 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Provide the task with an action that allows for querying the scanned messages and templates.
-   * This action is invoked just before the messages and templates are written to the packed message file.
+   * Provide the task with an action that allows for querying the scanned messages and templates. This action is
+   * invoked just before the messages and templates are written to the packed message file.
    * <p>
    * Here's an example of how to use this action.<br>
    * Let's say all message codes start with a prefix
-   * {@code MSG-} followed by a 4-digit number (e.g. {@code MSG-0318}). The action could then be
-   * used to output the next 10 available message codes:
+   * {@code MSG-} followed by a 4-digit number (e.g. {@code MSG-0318}). The action could then be used to output the
+   * next 10 available message codes:
    * <pre>
    *   action {
    *       def codes = getMessageCodes()
@@ -280,6 +282,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * If multiple actions are provided, they are executed in the order of definition.
    *
    * @param action  custom action, not {@code null}
+   *
+   * @since 0.8.0
    */
   public void action(Action<@NotNull MessageAccessor> action)
   {
@@ -291,7 +295,10 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Task action.
+   * Scans the configured source files for message and template annotations, validates referenced templates, executes
+   * registered actions and writes the packed message file.
+   *
+   * @throws GradleException  if scanning, validation or writing fails
    */
   @TaskAction
   public void pack()
