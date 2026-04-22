@@ -96,6 +96,13 @@ tasks.named('zipMavenCentralPortalPublication') {
 }
 
 
+tasks.named('publishPlugins') {
+  mustRunAfter 'zipMavenCentralPortalPublication'
+  mustRunAfter 'validateMavenCentralPortalPublication'
+  mustRunAfter 'releaseMavenCentralPortalPublication'
+}
+
+
 ext.releaseTask.configure {
   if (snapshot)
     dependsOn ':message-gradle-plugin:publishMessageFormatPluginMarkerMavenPublicationToMavenCentralSnapshotRepository'
