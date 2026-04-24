@@ -1,3 +1,8 @@
+---
+title: 0.10.0 -> 0.11.0
+toc_depth: 2
+---
+
 # Version [0.11.0](https://github.com/jgremmen/message-format/tree/0.11.0) (2024-10-01)
 
 ## Breaking Changes

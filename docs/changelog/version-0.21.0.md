@@ -1,3 +1,8 @@
+---
+title: 0.20.1 -> 0.21.0
+toc_depth: 2
+---
+
 # Version [0.21.0](https://github.com/jgremmen/message-format/tree/0.21.0) (2026-04-21)
 
 ## Breaking Changes
@@ -170,7 +175,7 @@ Both template parameter delegation and template parameter defaults have changed 
 
 Parameter delegation has changed from `=` to `->`:
 
-```
+```msgfmt
 // 0.20.1
 %[my-template, localParam=delegatedParam]
 
@@ -180,7 +185,7 @@ Parameter delegation has changed from `=` to `->`:
 
 Parameter defaults previously used the named config syntax (`name:value`) and are now specified with `=`:
 
-```
+```msgfmt
 // 0.20.1
 %[my-template, paramName:'default value']
 %[my-template, count:42]
@@ -199,13 +204,13 @@ config keyword `format` and can appear in any order among the parameter's comma-
 
 Previously:
 
-```
+```msgfmt
 %{myParam, string, clip:20}
 ```
 
 Now:
 
-```
+```msgfmt
 %{myParam, format:string, clip:20}
 ```
 
@@ -277,7 +282,7 @@ interfaces in `de.sayayi.lib.message.part`.
 A new message part type, post formatter, has been introduced. Post formatters transform the formatted text of a
 contained message using a named post formatter. The syntax uses parentheses:
 
-```
+```msgfmt
 %(case, 'hello world', case:'upper')
 ```
 
