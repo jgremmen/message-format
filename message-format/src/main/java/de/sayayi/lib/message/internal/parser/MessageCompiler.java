@@ -612,7 +612,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           if (map.put(context.name, context.value) != null)
           {
             syntaxError("duplicate config name " + context.name + " for post formatter '" +
-                ((PostFormatPartContext) context.parent).postFormatName().name + '\'')
+                ((PostFormatPartContext)context.parent).postFormatName().name + '\'')
                 .with(context)
                 .report();
           }
@@ -777,7 +777,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       if (equalOperator != null)
         ctx.cmp = equalOperator.cmp;
       else
-        switch(((TerminalNode)ctx.getChild(0)).getSymbol().getType())
+        switch(getTerminalToken(ctx, 0).getType())
         {
           case LTE -> ctx.cmp = CompareType.LTE;
           case LT -> ctx.cmp = CompareType.LT;
