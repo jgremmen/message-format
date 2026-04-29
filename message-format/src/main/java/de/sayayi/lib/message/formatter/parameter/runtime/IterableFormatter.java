@@ -102,7 +102,7 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> 
 
 
 
-  private static final class TextIterator implements Iterator<Text>
+  private static final class TextIterator extends AbstractTextIterator
   {
     private final MessageAccessor messageAccessor;
     private final Message.WithSpaces valueMessage;
@@ -110,7 +110,6 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> 
     private final Supplier<Text> thisText;
     private final Iterable<?> iterable;
     private final Iterator<?> iterator;
-    private Text nextText;
 
 
     private TextIterator(@NotNull ParameterFormatterContext context, @NotNull Iterable<?> iterable)
@@ -129,39 +128,25 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> 
           noSpaceText(context.getConfigValueString(CONFIG_THIS)
               .orElse("(this collection)")));
 
-      prepareNextText();
+      initIterator();
     }
 
 
-    private void prepareNextText()
+    @Override
+    protected Text prepareNextText()
     {
-      for(nextText = null; nextText == null && iterator.hasNext();)
+      while (iterator.hasNext())
       {
-        var value = iterator.next();
-        var text = value == iterable
+        final var value = iterator.next();
+        final var text = value == iterable
             ? thisText.get()
             : noSpaceText(valueMessage.format(messageAccessor, parameters.setValue(value)));
 
         if (!text.isEmpty())
-          nextText = text;
+          return text;
       }
-    }
 
-
-    @Override
-    public boolean hasNext() {
-      return nextText != null;
-    }
-
-
-    @Override
-    public Text next()
-    {
-      var text = nextText;
-
-      prepareNextText();
-
-      return text;
+      return null;
     }
   }
 }

@@ -137,7 +137,7 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
 
 
 
-  private static final class TextIterator implements Iterator<Text>
+  private static final class TextIterator extends AbstractTextIterator
   {
     private final MessageAccessor messageAccessor;
     private final KeyValueParameters parameters;
@@ -145,7 +145,6 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
     private final Map<?,?> map;
     private final Iterator<Entry<?,?>> iterator;
     private final Message.WithSpaces keyValueMessage;
-    private Text nextText;
 
 
     @SuppressWarnings("unchecked")
@@ -165,41 +164,26 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
       thisText = SupplierDelegate.of(() ->
           noSpaceText(context.getConfigValueString("map-this").orElse("(this map)")));
 
-      prepareNextText();
+      initIterator();
     }
 
 
-    private void prepareNextText()
+    @Override
+    protected Text prepareNextText()
     {
-      Text text;
-
-      for(nextText = null; nextText == null && iterator.hasNext();)
+      while(iterator.hasNext())
       {
         final var entry = iterator.next();
 
         parameters.key = fixValue(entry.getKey());
         parameters.value = fixValue(entry.getValue());
 
-        if (!(text = noSpaceText(keyValueMessage.format(messageAccessor, parameters))).isEmpty())
-          nextText = text;
+        final var formattedEntry = keyValueMessage.format(messageAccessor, parameters);
+        if (!formattedEntry.isEmpty())
+          return noSpaceText(formattedEntry);
       }
-    }
 
-
-    @Override
-    public boolean hasNext() {
-      return nextText != null;
-    }
-
-
-    @Override
-    public Text next()
-    {
-      final var text = nextText;
-
-      prepareNextText();
-
-      return text;
+      return null;
     }
 
 

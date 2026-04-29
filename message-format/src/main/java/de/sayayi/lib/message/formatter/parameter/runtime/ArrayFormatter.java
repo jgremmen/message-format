@@ -73,7 +73,6 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 public final class ArrayFormatter extends AbstractListFormatter<Object> implements SizeQueryable
 {
   @Override
-  @SuppressWarnings("ResultOfMethodCallIgnored")
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {
     context.addClassifier("array");
@@ -160,7 +159,7 @@ public final class ArrayFormatter extends AbstractListFormatter<Object> implemen
 
 
 
-  private static final class TextIterator implements Iterator<Text>
+  private static final class TextIterator extends AbstractTextIterator
   {
     private final MessageAccessor messageAccessor;
     private final IntFunction<Object> getter;
@@ -169,7 +168,6 @@ public final class ArrayFormatter extends AbstractListFormatter<Object> implemen
     private final Supplier<Text> thisText;
     private final Object array;
     private final int length;
-    private Text nextText = null;
     private int idx = 0;
 
 
@@ -189,13 +187,14 @@ public final class ArrayFormatter extends AbstractListFormatter<Object> implemen
           context.getConfigValueString(CONFIG_THIS).orElse("(this array)")));
       length = getLength(array);
 
-      prepareNextText();
+      initIterator();
     }
 
 
-    private void prepareNextText()
+    @Override
+    protected Text prepareNextText()
     {
-      for(nextText = null; nextText == null && idx < length;)
+      while(idx < length)
       {
         var value = getter.apply(idx++);
         var text = value == array
@@ -203,25 +202,10 @@ public final class ArrayFormatter extends AbstractListFormatter<Object> implemen
             : noSpaceText(valueMessage.format(messageAccessor, parameters.setValue(value)));
 
         if (!text.isEmpty())
-          nextText = text;
+          return text;
       }
-    }
 
-
-    @Override
-    public boolean hasNext() {
-      return nextText != null;
-    }
-
-
-    @Override
-    public Text next()
-    {
-      var text = nextText;
-
-      prepareNextText();
-
-      return text;
+      return null;
     }
   }
 }
