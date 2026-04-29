@@ -517,9 +517,9 @@ public final class MessageUtil
    * Tells whether the file at the given {@code path} is a message format pack file.
    * <p>
    * This method is useful in environments where the {@link PackFileTypeDetector} service implementation is not
-   * installed or active. For example, due to classloader separation in plugin frameworks such as IntelliJ IDEA. It
-   * bypasses the {@link java.nio.file.Files#probeContentType(Path) Files.probeContentType()} SPI mechanism and
-   * directly probes the file content instead.
+   * installed or active. For example, due to classloader separation in plugin frameworks such as IntelliJ IDEA or
+   * Gradle. It bypasses the {@link java.nio.file.Files#probeContentType(Path) Files.probeContentType()} SPI mechanism
+   * and directly probes the file content instead.
    *
    * @param path  the path to the file to check, not {@code null}
    *
