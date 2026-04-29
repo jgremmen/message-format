@@ -46,9 +46,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-import static de.sayayi.lib.message.internal.pack.PackSupport.MIME_TYPE;
+import static de.sayayi.lib.message.util.MessageUtil.isMessageFormatPack;
 import static de.sayayi.plugin.gradle.message.DuplicateMsgStrategy.IGNORE_AND_WARN;
-import static java.nio.file.Files.*;
+import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Files.newOutputStream;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Locale.ROOT;
 import static org.gradle.api.logging.LogLevel.ERROR;
@@ -394,9 +395,9 @@ public abstract class MessageFormatPackTask extends DefaultTask
         messageSupport.exportMessages(packOutputStream, getCompress().get(), this::messageCodeFilter);
       }
 
-      if (!probeContentType(packFile).startsWith(MIME_TYPE))
-        throw new IOException("Message pack header corrupt");
-    } catch(IOException ex) {
+      if (!isMessageFormatPack(packFile))
+        throw new IOException("Message pack file missing or corrupt");
+    } catch(Exception ex) {
       throw new GradleException("Failed to write message pack", ex);
     }
   }
