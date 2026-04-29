@@ -84,12 +84,20 @@ import static java.lang.Integer.MAX_VALUE;
  */
 public abstract class AbstractListFormatter<T> extends AbstractParameterFormatter<T> implements MapKeyComparator<T>
 {
-  /** Default message used for formatting each list element: {@code %{value}}. */
-  // default list-value: %{value}
+  /**
+   * Default message used for formatting each list element: {@code %{value}}.
+   *
+   * @see #CONFIG_VALUE
+   */
   protected static final Message.WithSpaces DEFAULT_VALUE_MESSAGE =
       MessageBuilder.create().parameter("value").build();
 
-  /** Default separator inserted between list elements ({@code ", "}). */
+  /**
+   * Default separator inserted between list elements ({@code ", "}).
+   *
+   * @see #CONFIG_SEPARATOR
+   * @see #CONFIG_SEPARATOR_LAST
+   */
   protected static final String DEFAULT_SEPARATOR = ", ";
 
   /** Configuration key for the maximum number of elements to include in the output. */
@@ -104,10 +112,18 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
   /** Configuration key for a message that represents a self-reference to the list value itself. */
   protected static final String CONFIG_THIS = "list-this";
 
-  /** Configuration key that controls whether duplicate element texts are suppressed. */
+  /**
+   * Configuration key that controls whether duplicate element texts are suppressed.
+   *
+   * @since 0.21.1
+   */
   protected static final String CONFIG_UNIQUE = "list-unique";
 
-  /** Configuration key for the message format used to format each individual element. */
+  /**
+   * Configuration key for the message format used to format each individual element.
+   *
+   * @see #DEFAULT_VALUE_MESSAGE
+   */
   protected static final String CONFIG_VALUE = "list-value";
 
   /** Configuration key for the text appended when the list is truncated due to {@code list-max-size}. */
@@ -193,8 +209,11 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
    * @return  a set containing the list configuration key names, never {@code null}
    */
   @Override
-  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
-    return Set.of(CONFIG_MAX_SIZE, CONFIG_SEPARATOR, CONFIG_SEPARATOR_LAST, CONFIG_VALUE, CONFIG_VALUE_MORE, CONFIG_THIS);
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames()
+  {
+    return Set.of(
+        CONFIG_MAX_SIZE, CONFIG_SEPARATOR, CONFIG_SEPARATOR_LAST, CONFIG_THIS, CONFIG_UNIQUE,
+        CONFIG_VALUE, CONFIG_VALUE_MORE);
   }
 
 
@@ -205,6 +224,8 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
    * <p>
    * Subclasses implement {@link #prepareNextText()} to supply the next text element. The iterator reports
    * {@code hasNext() == true} as long as {@code prepareNextText()} returns a non-{@code null} value.
+   *
+   * @since 0.21.1
    */
   protected static abstract class AbstractTextIterator implements Iterator<Text>
   {
