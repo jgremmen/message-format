@@ -26,7 +26,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_LIST;
@@ -52,6 +54,7 @@ import static java.lang.Integer.MAX_VALUE;
  *   </li>
  *   <li>{@code list-max-size} (*) &ndash; maximum number of elements to include</li>
  *   <li>{@code list-value-more} (*) &ndash; text to append when the list is truncated (e.g. {@code "..."})</li>
+ *   <li>{@code list-unique} (*) &ndash; if {@code true}, duplicate element texts are suppressed</li>
  *   <li>
  *     {@code list-value} &ndash; message format used to format each individual element (default: {@code %{value}})
  *   </li>
@@ -81,20 +84,41 @@ import static java.lang.Integer.MAX_VALUE;
  */
 public abstract class AbstractListFormatter<T> extends AbstractParameterFormatter<T> implements MapKeyComparator<T>
 {
+  /** Default message used for formatting each list element: {@code %{value}}. */
   // default list-value: %{value}
   protected static final Message.WithSpaces DEFAULT_VALUE_MESSAGE =
       MessageBuilder.create().parameter("value").build();
 
+  /** Default separator inserted between list elements ({@code ", "}). */
   protected static final String DEFAULT_SEPARATOR = ", ";
 
+  /** Configuration key for the maximum number of elements to include in the output. */
   protected static final String CONFIG_MAX_SIZE = "list-max-size";
+
+  /** Configuration key for the separator between elements. */
   protected static final String CONFIG_SEPARATOR = "list-sep";
+
+  /** Configuration key for the separator before the last element. */
   protected static final String CONFIG_SEPARATOR_LAST = "list-sep-last";
-  protected static final String CONFIG_VALUE = "list-value";
-  protected static final String CONFIG_VALUE_MORE = "list-value-more";
+
+  /** Configuration key for a message that represents a self-reference to the list value itself. */
   protected static final String CONFIG_THIS = "list-this";
 
+  /** Configuration key that controls whether duplicate element texts are suppressed. */
+  protected static final String CONFIG_UNIQUE = "list-unique";
 
+  /** Configuration key for the message format used to format each individual element. */
+  protected static final String CONFIG_VALUE = "list-value";
+
+  /** Configuration key for the text appended when the list is truncated due to {@code list-max-size}. */
+  protected static final String CONFIG_VALUE_MORE = "list-value-more";
+
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@link ClassifierContext#CLASSIFIER_LIST LIST} classifier.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {
@@ -116,7 +140,9 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
     final var moreValue = context.getConfigValueString(CONFIG_VALUE_MORE).orElse(null);
     final var hasMoreValue = moreValue != null && !isTrimmedEmpty(moreValue);
     final var joiner = new TextJoiner();
-    final var iterator = createIterator(context, list);
+    final var iterator = context.getConfigValueBool(CONFIG_UNIQUE).orElse(false)
+        ? new UniqueTextIterator(createIterator(context, list))
+        : createIterator(context, list);
 
     var n = (int)context.getConfigValueNumber(CONFIG_MAX_SIZE).orElse(MAX_VALUE);
 
@@ -169,5 +195,100 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return Set.of(CONFIG_MAX_SIZE, CONFIG_SEPARATOR, CONFIG_SEPARATOR_LAST, CONFIG_VALUE, CONFIG_VALUE_MORE, CONFIG_THIS);
+  }
+
+
+
+
+  /**
+   * Abstract base class for iterators that lazily prepare the next {@link Text} element.
+   * <p>
+   * Subclasses implement {@link #prepareNextText()} to supply the next text element. The iterator reports
+   * {@code hasNext() == true} as long as {@code prepareNextText()} returns a non-{@code null} value.
+   */
+  protected static abstract class AbstractTextIterator implements Iterator<Text>
+  {
+    private Text nextText = null;
+
+
+    /**
+     * Initializes the iterator by preparing the first text element. Must be called by subclass constructors after
+     * all fields have been assigned.
+     */
+    protected void initIterator() {
+      nextText = prepareNextText();
+    }
+
+
+    /**
+     * Prepares and returns the next text element, or {@code null} if no more elements are available.
+     * The returned text must not be {@linkplain Text#isEmpty() empty}.
+     *
+     * @return  the next non-empty text element, or {@code null} when exhausted
+     */
+    protected abstract Text prepareNextText();
+
+
+    /** {@inheritDoc} */
+    @Override
+    public final boolean hasNext() {
+      return nextText != null;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public final Text next()
+    {
+      var text = nextText;
+      if (text == null)
+        throw new NoSuchElementException("next");
+
+      nextText = prepareNextText();
+
+      return text;
+    }
+  }
+
+
+
+
+  /**
+   * An iterator wrapper that filters out duplicate {@link Text} elements, ensuring each unique text is returned only
+   * once.
+   */
+  private static final class UniqueTextIterator extends AbstractTextIterator
+  {
+    private final Set<Text> uniqueTexts = new HashSet<>();
+    private final Iterator<Text> iterator;
+
+
+    /**
+     * Creates a new unique-filtering iterator wrapping the given delegate.
+     *
+     * @param iterator  the delegate iterator to filter, not {@code null}
+     */
+    private UniqueTextIterator(@NotNull Iterator<Text> iterator)
+    {
+      this.iterator = iterator;
+
+      initIterator();
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    protected Text prepareNextText()
+    {
+      while(iterator.hasNext())
+      {
+        final var text = iterator.next();
+
+        if (uniqueTexts.add(text))
+          return text;
+      }
+
+      return null;
+    }
   }
 }
