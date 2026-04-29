@@ -4,6 +4,7 @@ de.sayayi.lib.message.formatter.parameter.named.SizeFormatter
 de.sayayi.lib.message.formatter.parameter.named.StringFormatter
 de.sayayi.lib.message.formatter.parameter.runtime.ArrayFormatter
 de.sayayi.lib.message.formatter.parameter.runtime.AtomicBooleanFormatter
+de.sayayi.lib.message.formatter.parameter.runtime.BitSetFormatter
 de.sayayi.lib.message.formatter.parameter.runtime.BooleanSupplierFormatter
 de.sayayi.lib.message.formatter.parameter.runtime.ByteArrayFormatter
 de.sayayi.lib.message.formatter.parameter.runtime.CharsetFormatter
