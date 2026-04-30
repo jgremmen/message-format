@@ -61,7 +61,12 @@ generateGrammarSource {
   packageName = 'de.sayayi.lib.message.internal.parser'
 }
 
-compileJava.dependsOn generateGrammarSource
+
+compileJava {
+  dependsOn generateGrammarSource
+
+  options.compilerArgs << '-implicit:class'
+}
 
 
 sourcesJar {
@@ -84,7 +89,8 @@ javadoc {
     group('Core', [
         'de.sayayi.lib.message',
         'de.sayayi.lib.message.exception',
-        'de.sayayi.lib.message.part*'
+        'de.sayayi.lib.message.part*',
+        'de.sayayi.lib.message.util'
     ])
     group('Adopters', [
         'de.sayayi.lib.message.adopter',
@@ -92,9 +98,6 @@ javadoc {
     ])
     group('Formatters', [
         'de.sayayi.lib.message.formatter*'
-    ])
-    group('Util', [
-        'de.sayayi.lib.message.util'
     ])
 
     linksOffline(
