@@ -16,7 +16,7 @@
 
 /**
  * Additional named parameter formatter implementations for specialized formatting purposes such as
- * geographic coordinates and file sizes.
+ * geographic coordinates, file sizes and bitmasks.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

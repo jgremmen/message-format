@@ -16,7 +16,7 @@
 
 /**
  * Named parameter formatter implementations that can be explicitly referenced by name in a message format, such as
- * {@code bool}, {@code choice}, {@code size} and {@code string}.
+ * {@code bool}, {@code choice}, {@code classifier}, {@code size} and {@code string}.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

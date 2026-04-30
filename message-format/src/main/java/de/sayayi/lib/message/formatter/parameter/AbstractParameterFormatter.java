@@ -35,8 +35,8 @@ import static de.sayayi.lib.message.part.TextPartFactory.nullText;
  * {@code %{val,null:'no text',empty:'empty text'} }) the associated message is returned.
  * If no match was found for {@code null} then {@link TextPartFactory#nullText() nullText()} is returned.
  * <p>
- * Non-{@code null} values are delegated to {@link #formatValue(ParameterFormatterContext, Object)}. The returned text will
- * be matched against {@code null} and empty parameter configuration entries and is replaced by the best matching
+ * Non-{@code null} values are delegated to {@link #formatValue(ParameterFormatterContext, Object)}. The returned text
+ * will be matched against {@code null} and empty parameter configuration entries and is replaced by the best matching
  * message found.
  *
  * @param <T>  parameter type
@@ -75,11 +75,10 @@ public abstract class AbstractParameterFormatter<T> implements ParameterFormatte
   /**
    * Format {@code value} using {@code context}.
    * <p>
-   * This method differs from {@link #format(ParameterFormatterContext, Object)} in that it has already
-   * handled {@code empty} and {@code null} cases matched in the parameter configuration.
+   * This method differs from {@link #format(ParameterFormatterContext, Object)} in that it has already handled
+   * {@code empty} and {@code null} cases matched in the parameter configuration.
    * <p>
-   * In the same way it will handle {@code empty} and {@code null} cases for the text returned
-   * by this method.
+   * In the same way it will handle {@code empty} and {@code null} cases for the text returned by this method.
    *
    * @param context  formatter context, not {@code null}
    * @param value    value to be formatted, not {@code null}
