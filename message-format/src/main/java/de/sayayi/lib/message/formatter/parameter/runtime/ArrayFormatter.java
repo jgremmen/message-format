@@ -72,6 +72,12 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  */
 public final class ArrayFormatter extends AbstractListFormatter<Object> implements SizeQueryable
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code array} classifier in addition to the
+   * {@link ClassifierContext#CLASSIFIER_LIST LIST} classifier.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {
@@ -131,6 +137,13 @@ public final class ArrayFormatter extends AbstractListFormatter<Object> implemen
   }
 
 
+  /**
+   * Returns the length of the given array or atomic array.
+   *
+   * @param array  array instance, not {@code null}
+   *
+   * @return  the array length
+   */
   @Contract(pure = true)
   private static int getLength(@NotNull Object array)
   {
@@ -144,6 +157,13 @@ public final class ArrayFormatter extends AbstractListFormatter<Object> implemen
   }
 
 
+  /**
+   * Creates an element accessor function for the given array or atomic array type.
+   *
+   * @param array  array instance, not {@code null}
+   *
+   * @return  an {@link IntFunction} that retrieves the element at a given index, never {@code null}
+   */
   @Contract(pure = true)
   private static @NotNull IntFunction<Object> createGetter(@NotNull Object array)
   {
@@ -159,6 +179,10 @@ public final class ArrayFormatter extends AbstractListFormatter<Object> implemen
 
 
 
+  /**
+   * Iterator that formats each array element using the configured list value message and yields the resulting
+   * non-empty text elements.
+   */
   private static final class TextIterator extends AbstractTextIterator
   {
     private final MessageAccessor messageAccessor;
@@ -171,6 +195,12 @@ public final class ArrayFormatter extends AbstractListFormatter<Object> implemen
     private int idx = 0;
 
 
+    /**
+     * Creates a new text iterator for the given array.
+     *
+     * @param context  formatter context, not {@code null}
+     * @param array    the array to iterate over, not {@code null}
+     */
     private TextIterator(@NotNull ParameterFormatterContext context, @NotNull Object array)
     {
       this.array = array;
@@ -191,6 +221,7 @@ public final class ArrayFormatter extends AbstractListFormatter<Object> implemen
     }
 
 
+    /** {@inheritDoc} */
     @Override
     protected Text prepareNextText()
     {

@@ -63,7 +63,21 @@ import static java.util.Collections.emptyIterator;
  */
 public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implements SizeQueryable
 {
-  // default map-kv: %{key,null:'(null)'}=%{value,null:'(null)'}
+  /**
+   * Configuration key for the message format used to render each map entry.
+   *
+   * @see #DEFAULT_KEY_VALUE_MESSAGE
+   */
+  private static final String CONFIG_MAP_KEY_VALUE = "map-kv";
+
+  /** Configuration key for the text used when the map references itself as a key or value. */
+  private static final String CONFIG_MAP_THIS = "map-this";
+
+  /**
+   * Default message used for formatting each map entry: {@code %{key,null:'(null)'}=%{value,null:'(null)'}}.
+   *
+   * @see #CONFIG_MAP_KEY_VALUE
+   */
   private static final Message.WithSpaces DEFAULT_KEY_VALUE_MESSAGE = MessageBuilder
       .create()
       .parameter("key").mapNull().message("(null)")
@@ -72,6 +86,9 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
       .build();
 
 
+  /**
+   * Adds the {@code map} classifier.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {
@@ -130,13 +147,20 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
    *          {@code map-this}), never {@code null}
    */
   @Override
-  public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
-    return Set.of(CONFIG_MAX_SIZE, CONFIG_SEPARATOR, CONFIG_SEPARATOR_LAST, CONFIG_VALUE_MORE, "map-kv", "map-this");
+  public @Unmodifiable @NotNull Set<String> getParameterConfigNames()
+  {
+    return Set.of(
+        CONFIG_MAX_SIZE, CONFIG_SEPARATOR, CONFIG_SEPARATOR_LAST, CONFIG_THIS, CONFIG_UNIQUE,
+        CONFIG_VALUE, CONFIG_VALUE_MORE, CONFIG_MAP_KEY_VALUE, CONFIG_MAP_THIS);
   }
 
 
 
 
+  /**
+   * Iterator that formats each map entry using the configured key-value message and yields the resulting
+   * non-empty text elements.
+   */
   private static final class TextIterator extends AbstractTextIterator
   {
     private final MessageAccessor messageAccessor;
@@ -147,6 +171,12 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
     private final Message.WithSpaces keyValueMessage;
 
 
+    /**
+     * Creates a new text iterator for the entries of the given map.
+     *
+     * @param context  formatter context, not {@code null}
+     * @param map      the map whose entries to iterate over, not {@code null}
+     */
     @SuppressWarnings("unchecked")
     private TextIterator(@NotNull ParameterFormatterContext context, @NotNull Map<?,?> map)
     {
@@ -157,17 +187,18 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
       messageAccessor = context.getMessageAccessor();
 
       keyValueMessage = context
-          .getConfigValueMessage("map-kv")
+          .getConfigValueMessage(CONFIG_MAP_KEY_VALUE)
           .orElse(DEFAULT_KEY_VALUE_MESSAGE);
       parameters = new KeyValueParameters(context.getLocale());
 
       thisText = SupplierDelegate.of(() ->
-          noSpaceText(context.getConfigValueString("map-this").orElse("(this map)")));
+          noSpaceText(context.getConfigValueString(CONFIG_MAP_THIS).orElse("(this map)")));
 
       initIterator();
     }
 
 
+    /** {@inheritDoc} */
     @Override
     protected Text prepareNextText()
     {
@@ -187,6 +218,13 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
     }
 
 
+    /**
+     * Returns the given value, or the {@code thisText} placeholder if the value is a self-reference to the map.
+     *
+     * @param value  the value to check
+     *
+     * @return  the original value or a placeholder text for self-references
+     */
     private Object fixValue(Object value) {
       return value == map ? thisText.get() : value;
     }
@@ -195,6 +233,10 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
 
 
 
+  /**
+   * A {@link Parameters} implementation that provides {@code key} and {@code value} parameters for formatting
+   * individual map entries.
+   */
   private static final class KeyValueParameters implements Parameters
   {
     private final Locale locale;
@@ -202,29 +244,38 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
     private Object value;
 
 
+    /**
+     * Creates a new parameters instance with the given locale.
+     *
+     * @param locale  the locale to use for formatting, not {@code null}
+     */
     private KeyValueParameters(@NotNull Locale locale) {
       this.locale = locale;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull Locale getLocale() {
       return locale;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public Object getParameterValue(@NotNull String parameter) {
       return "key".equals(parameter) ? key : "value".equals(parameter) ? value : null;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull Set<String> getParameterNames() {
       return Set.of("key", "value");
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
       return "Parameters(locale='" + locale + "',{key=" + key + ",value=" + value + "})";

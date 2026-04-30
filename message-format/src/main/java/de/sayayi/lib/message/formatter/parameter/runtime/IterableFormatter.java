@@ -102,6 +102,10 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> 
 
 
 
+  /**
+   * Iterator that formats each iterable element using the configured list value message and yields the resulting
+   * non-empty text elements.
+   */
   private static final class TextIterator extends AbstractTextIterator
   {
     private final MessageAccessor messageAccessor;
@@ -112,6 +116,12 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> 
     private final Iterator<?> iterator;
 
 
+    /**
+     * Creates a new text iterator for the given iterable.
+     *
+     * @param context   formatter context, not {@code null}
+     * @param iterable  the iterable to iterate over, not {@code null}
+     */
     private TextIterator(@NotNull ParameterFormatterContext context, @NotNull Iterable<?> iterable)
     {
       this.iterable = iterable;
@@ -132,6 +142,7 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> 
     }
 
 
+    /** {@inheritDoc} */
     @Override
     protected Text prepareNextText()
     {
