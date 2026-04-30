@@ -17,7 +17,7 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.exception.MessageFormatException;
-import de.sayayi.lib.message.internal.EmptyMessage;
+import de.sayayi.lib.message.internal.*;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.intellij.lang.annotations.Language;
@@ -59,7 +59,7 @@ import static java.util.Collections.unmodifiableSet;
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
-public interface Message extends FormatStringSerializer
+public sealed interface Message extends FormatStringSerializer
 {
   /**
    * Empty message.
@@ -234,7 +234,7 @@ public interface Message extends FormatStringSerializer
   /**
    * A message class implementing this interface provides information about leading/trailing spaces.
    */
-  interface WithSpaces extends Message, SpacesAware
+  sealed interface WithSpaces extends Message, SpacesAware permits CompoundMessage, EmptyMessage, TextMessage
   {
     /**
      * Tells if the message has a leading space.
@@ -266,7 +266,7 @@ public interface Message extends FormatStringSerializer
   /**
    * A message class implementing this interface provides an additional code uniquely identifying the message.
    */
-  interface WithCode extends Message
+  sealed interface WithCode extends Message permits AbstractMessageWithCode
   {
     /**
      * Returns a unique message code.
@@ -283,7 +283,7 @@ public interface Message extends FormatStringSerializer
   /**
    * Message classes implementing this interface are capable of formatting messages for one or more locales.
    */
-  interface LocaleAware extends Message
+  sealed interface LocaleAware extends Message permits LocalizedMessageBundleWithCode
   {
     /**
      * {@inheritDoc}

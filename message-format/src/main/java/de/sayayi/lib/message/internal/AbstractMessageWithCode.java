@@ -25,7 +25,8 @@ import static de.sayayi.lib.message.util.MessageUtil.validateName;
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
-abstract class AbstractMessageWithCode implements Message.WithCode
+public sealed abstract class AbstractMessageWithCode implements Message.WithCode
+    permits EmptyMessageWithCode, LocalizedMessageBundleWithCode, MessageDelegateWithCode
 {
   /**
    * Unique message code, never {@code null} nor empty.

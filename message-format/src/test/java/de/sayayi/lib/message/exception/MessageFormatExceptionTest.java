@@ -25,6 +25,7 @@ import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.internal.MessageDelegateWithCode;
+import de.sayayi.lib.message.internal.TextMessage;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
@@ -74,7 +75,7 @@ final class MessageFormatExceptionTest
     formatterService.addFormatter(formatter);
 
     MESSAGE_SUPPORT = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE);
-    THROWING_MESSAGE = mock(Message.class, CALLS_REAL_METHODS);
+    THROWING_MESSAGE = mock(TextMessage.class, CALLS_REAL_METHODS);
     when(THROWING_MESSAGE.formatAsText(any(MessageAccessor.class), any(Parameters.class)))
         .thenAnswer(invocation -> { throw new MessageFormatException(null); });
 
