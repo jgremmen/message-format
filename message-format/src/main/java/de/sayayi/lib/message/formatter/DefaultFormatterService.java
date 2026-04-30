@@ -61,7 +61,7 @@ public class DefaultFormatterService extends GenericFormatterService
     $LOCK.lock();
     try {
       if (INSTANCE == null)
-        INSTANCE = new DefaultFormatterService();
+        INSTANCE = new DefaultFormatterService().seal();
     } finally {
       $LOCK.unlock();
     }

@@ -43,7 +43,8 @@ import java.util.Set;
  * @see GenericFormatterService
  * @see DefaultFormatterService
  */
-public interface FormatterService
+public sealed interface FormatterService
+    permits FormatterService.WithRegistry, GenericFormatterService.SealedFormatterService
 {
   /**
    * Returns a list of parameter formatters for the given {@code format}, {@code type} and {@code config}.
@@ -90,7 +91,7 @@ public interface FormatterService
   /**
    * Extension of {@link FormatterService} that adds methods for registering parameter formatters and post formatters.
    */
-  interface WithRegistry extends FormatterService
+  sealed interface WithRegistry extends FormatterService permits GenericFormatterService
   {
     /**
      * Register a parameter formatter for the given formattable type. The formattable types returned by
@@ -130,5 +131,15 @@ public interface FormatterService
      * @since 0.21.0
      */
     void addPostFormatter(@NotNull PostFormatter postFormatter);
+
+
+    /**
+     * Creates a sealed, immutable snapshot of this formatter service. The returned instance can no longer be modified.
+     *
+     * @return  an immutable formatter service, never {@code null}
+     *
+     * @since 0.22.0
+     */
+    @NotNull FormatterService seal();
   }
 }

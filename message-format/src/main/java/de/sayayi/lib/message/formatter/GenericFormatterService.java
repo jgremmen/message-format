@@ -57,11 +57,12 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.1.0 (renamed in 0.4.1)
  */
-public class GenericFormatterService implements FormatterService.WithRegistry
+public non-sealed class GenericFormatterService implements FormatterService.WithRegistry
 {
-  /** default cache size for type to parameter formatters cache */
+  /** Default cache size for the type-to-formatter lookup cache. */
   public static final int DEFAULT_FORMATTER_CACHE_SIZE = 256;
 
+  /** Maps primitive types and primitive array types to their corresponding wrapper types. */
   private static final @NotNull Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
 
   private final Lock $lock = new ReentrantLock();
@@ -206,6 +207,14 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
+  /**
+   * Registers a named formatter for automatic application when its configuration keys are present in the parameter
+   * configuration.
+   *
+   * @param namedParameterFormatter  the named formatter to register for auto-apply, not {@code null}
+   *
+   * @throws FormatterServiceException  if a configuration key conflicts with an already registered auto-apply formatter
+   */
   private void addAutoApplyNamedFormatter(@NotNull NamedParameterFormatter namedParameterFormatter)
   {
     for(var parameterConfigName: namedParameterFormatter.getParameterConfigNames())
@@ -303,6 +312,14 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
+  /**
+   * Returns a stream of all types in the class hierarchy of the given {@code type}, including superclasses,
+   * interfaces and wrapper types for primitives.
+   *
+   * @param type  the type to resolve, not {@code null}
+   *
+   * @return  a stream of all candidate types to match against registered formatters, never {@code null}
+   */
   @Contract(pure = true)
   private @NotNull Stream<Class<?>> streamTypes(@NotNull Class<?> type)
   {
@@ -333,6 +350,12 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
+  /**
+   * Recursively collects all interface types implemented by the given {@code type} into {@code collectedTypes}.
+   *
+   * @param type            the type whose interfaces to collect, not {@code null}
+   * @param collectedTypes  the set to add discovered interface types to, not {@code null}
+   */
   @Contract(mutates = "param2")
   private static void addInterfaceTypes(@NotNull Class<?> type, @NotNull Set<Class<?>> collectedTypes)
   {
@@ -359,20 +382,79 @@ public class GenericFormatterService implements FormatterService.WithRegistry
   }
 
 
+  /** {@inheritDoc} */
+  @Override
+  public @NotNull FormatterService seal() {
+    return new SealedFormatterService();
+  }
 
 
+
+
+  /**
+   * A prioritized wrapper around a {@link ParameterFormatter} that is used for ordering formatters by their
+   * registration priority.
+   *
+   * @param order      the priority order (lower values have higher priority)
+   * @param formatter  the wrapped parameter formatter, not {@code null}
+   */
   private record PrioritizedFormatter(int order, @NotNull ParameterFormatter formatter)
       implements Comparable<PrioritizedFormatter>
   {
+    /** {@inheritDoc} */
     @Override
     public int compareTo(@NotNull PrioritizedFormatter o) {
       return Integer.compare(order, o.order);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull String toString() {
       return "PrioritizedFormatter(order=" + order + ",formatter=" + formatter + ')';
+    }
+  }
+
+
+
+
+  /**
+   * Immutable, sealed view of the enclosing {@link GenericFormatterService}. All queries are delegated to the
+   * enclosing service instance. This class does not permit further formatter registrations.
+   *
+   * @since 0.22.0
+   */
+  final class SealedFormatterService implements FormatterService
+  {
+    private SealedFormatterService() {
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, Config config) {
+      return GenericFormatterService.this.getFormatters(format, type, config);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @UnmodifiableView @NotNull Map<String,PostFormatter> getPostFormatters() {
+      return GenericFormatterService.this.getPostFormatters();
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @UnmodifiableView @NotNull Set<String> getParameterConfigNames() {
+      return GenericFormatterService.this.getParameterConfigNames();
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+      return GenericFormatterService.this.toString();
     }
   }
 }

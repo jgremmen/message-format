@@ -33,7 +33,7 @@ import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
  * <p>
  * Two creation strategies are available:
  * <ul>
- *   <li>{@link #shared()} – returns a lazily initialised, sealed singleton backed by the
+ *   <li>{@link #shared()} – returns a lazily initialized, sealed singleton backed by the
  *       {@linkplain DefaultFormatterService#getSharedInstance() shared default formatter service}
  *       and a non-caching {@link MessageFactory}. This is convenient for simple use cases where
  *       no custom configuration is required.</li>
@@ -70,7 +70,7 @@ public final class MessageSupportFactory
     $LOCK.lock();
     try {
       if (SHARED == null)
-        SHARED = create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE).seal();
+        SHARED = create(DefaultFormatterService.getSharedInstance()).seal();
     } finally {
       $LOCK.unlock();
     }
@@ -94,5 +94,24 @@ public final class MessageSupportFactory
   public static @NotNull ConfigurableMessageSupport create(@NotNull FormatterService formatterService,
                                                            @NotNull MessageFactory messageFactory) {
     return new MessageSupportImpl(formatterService, messageFactory);
+  }
+
+
+  /**
+   * Create a new {@link MessageSupport} instance with the given {@code formatterService} and a non-caching
+   * {@link MessageFactory}.
+   * <p>
+   * This is a convenience method equivalent to calling
+   * {@link #create(FormatterService, MessageFactory) create(formatterService, MessageFactory.NO_CACHE_INSTANCE)}.
+   *
+   * @param formatterService  formatter service, not {@code null}
+   *
+   * @return  new configurable message support instance, never {@code null}
+   *
+   * @since 0.22.0
+   */
+  @Contract(value = "_ -> new")
+  public static @NotNull ConfigurableMessageSupport create(@NotNull FormatterService formatterService) {
+    return create(formatterService, NO_CACHE_INSTANCE);
   }
 }
