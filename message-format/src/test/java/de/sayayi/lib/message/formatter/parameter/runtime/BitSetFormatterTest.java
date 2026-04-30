@@ -45,7 +45,7 @@ final class BitSetFormatterTest extends AbstractFormatterTest
   void init()
   {
     messageSupport = MessageSupportFactory
-        .create(createFormatterService(new BitSetFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new BitSetFormatter()).seal(), NO_CACHE_INSTANCE)
         .setLocale(ROOT);
   }
 
@@ -111,15 +111,15 @@ final class BitSetFormatterTest extends AbstractFormatterTest
 
     // bits 1, 3, 5 all map to 'same'; with list-unique:true duplicates are suppressed
     assertEquals("same, two, eight", messageSupport
-        .message("%{bs,list-unique:true,1:same,2:two,(3,5):same,8:eight}")
+        .message("%{bs,list-unique:true,(1,3,5):same,2:two,8:eight}")
         .with("bs", bitSet)
         .format());
   }
 
 
   @Test
-  @DisplayName("Most significant bit first ordering (msb1st)")
-  void testMsb1stOrdering()
+  @DisplayName("Most significant set bit first ordering (msb-set)")
+  void testMsbSetOrdering()
   {
     val bitSet = new BitSet();
 
@@ -130,15 +130,15 @@ final class BitSetFormatterTest extends AbstractFormatterTest
     bitSet.set(8);
 
     assertEquals("eight, six, four, two, zero", messageSupport
-        .message("%{bs,bitset:msb1st,0:zero,2:two,4:four,6:six,8:eight}")
+        .message("%{bs,bitset:msb-set,0:zero,2:two,4:four,6:six,8:eight}")
         .with("bs", bitSet)
         .format());
   }
 
 
   @Test
-  @DisplayName("Least significant bit first ordering (lsb1st)")
-  void testLsb1stOrdering()
+  @DisplayName("Least significant set bit first ordering (lsb-set)")
+  void testLsbSetOrdering()
   {
     val bitSet = new BitSet();
 
@@ -149,7 +149,79 @@ final class BitSetFormatterTest extends AbstractFormatterTest
     bitSet.set(8);
 
     assertEquals("zero, two, four, six, eight", messageSupport
-        .message("%{bs,bitset:lsb1st,0:zero,2:two,4:four,6:six,8:eight}")
+        .message("%{bs,bitset:lsb-set,0:zero,2:two,4:four,6:six,8:eight}")
+        .with("bs", bitSet)
+        .format());
+  }
+
+
+  @Test
+  @DisplayName("LSB bits with default true/false messages")
+  void testLsbBitsDefault()
+  {
+    val bitSet = new BitSet();
+
+    bitSet.set(0);
+    bitSet.set(3);
+    bitSet.set(5);
+
+    // bits: 0=1, 1=0, 2=0, 3=1, 4=0, 5=1 → "100101"
+    assertEquals("100101", messageSupport
+        .message("%{bs,bitset:lsb-bits}")
+        .with("bs", bitSet)
+        .format());
+  }
+
+
+  @Test
+  @DisplayName("MSB bits with default true/false messages")
+  void testMsbBitsDefault()
+  {
+    val bitSet = new BitSet();
+
+    bitSet.set(0);
+    bitSet.set(3);
+    bitSet.set(5);
+
+    // bits: 5=1, 4=0, 3=1, 2=0, 1=0, 0=1 → "101001"
+    assertEquals("101001", messageSupport
+        .message("%{bs,bitset:msb-bits}")
+        .with("bs", bitSet)
+        .format());
+  }
+
+
+  @Test
+  @DisplayName("LSB bits with custom true/false messages")
+  void testLsbBitsCustom()
+  {
+    val bitSet = new BitSet();
+
+    bitSet.set(1);
+    bitSet.set(2);
+    bitSet.set(4);
+
+    // bits: 0=X, 1=O, 2=O, 3=X, 4=O → "XOOXO"
+    assertEquals("XOOXO", messageSupport
+        .message("%{bs,bitset:lsb-bits,bit0:X,bit1:O}")
+        .with("bs", bitSet)
+        .format());
+  }
+
+
+  @Test
+  @DisplayName("MSB bits with custom true/false messages")
+  void testMsbBitsCustom()
+  {
+    val bitSet = new BitSet();
+
+    bitSet.set(1);
+    bitSet.set(2);
+    bitSet.set(4);
+
+    // bits: 4=O, 3=X, 2=O, 1=O, 0=X → "OXOOX"
+    assertEquals("OXOOX", messageSupport
+        .message("%{bs,bitset:msb-bits,bit0:X,bit1:O}")
         .with("bs", bitSet)
         .format());
   }

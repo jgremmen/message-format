@@ -37,8 +37,8 @@ import java.util.BitSet;
  * support. A formatter for type {@code BitSet} (such as {@code BitSetFormatter}) <b>must</b> be registered for this
  * named formatter to work properly.
  * <p>
- * The formatter is selected by specifying the name {@code "bitmask"} in a message parameter, for example:
- * {@code %{flags,bitmask}}.
+ * The formatter is selected by specifying the name {@code "bitmask"} in a message parameter, for example:<br>
+ * {@code %{flags,format:bitmask,0:'bit 0',1:'bit 1',2:'bit 2'}}.
  *
  * @author Jeroen Gremmen
  * @since 0.21.1
@@ -48,7 +48,11 @@ import java.util.BitSet;
 public final class BitmaskFormatter extends AbstractParameterFormatter<Object>
     implements NamedParameterFormatter
 {
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   *
+   * @return  {@code "bitmask"}
+   */
   @Override
   public @NotNull String getName() {
     return "bitmask";

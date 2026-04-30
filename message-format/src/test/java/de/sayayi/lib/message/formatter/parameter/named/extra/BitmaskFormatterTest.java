@@ -48,7 +48,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   {
     messageSupport = MessageSupportFactory
         .create(
-            createFormatterService(new BitmaskFormatter(), new BitSetFormatter(), new NumberFormatter()),
+            createFormatterService(new BitmaskFormatter(), new BitSetFormatter(), new NumberFormatter()).seal(),
             NO_CACHE_INSTANCE)
         .setLocale(ROOT);
   }
@@ -60,7 +60,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   {
     // 0x8000_0000_0000_00A5L = bits 0, 2, 5, 7, 63 are set
     assertEquals("b0, b2, b5, b7 and b63", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb1st,list-sep-last:' and ',0:b0,2:b2,5:b5,7:b7,63:b63}")
+        .message("%{v,format:bitmask,bitset:lsb-set,list-sep-last:' and ',0:b0,2:b2,5:b5,7:b7,63:b63}")
         .with("v", 0x8000_0000_0000_00A5L)
         .format());
   }
@@ -72,7 +72,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   {
     // 0x8000_0000_0000_00A5L = bits 0, 2, 5, 7, 63 are set
     assertEquals("b63, b7, b5, b2, b0", messageSupport
-        .message("%{v,format:bitmask,bitset:msb1st,0:b0,2:b2,5:b5,7:b7,63:b63}")
+        .message("%{v,format:bitmask,bitset:msb-set,0:b0,2:b2,5:b5,7:b7,63:b63}")
         .with("v", 0x8000_0000_0000_00A5L)
         .format());
   }
@@ -84,7 +84,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   {
     // 0x8000_00C3 = bits 0, 1, 6, 7, 31 are set
     assertEquals("b0, b1, b6, b7, b31", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb1st,0:b0,1:b1,6:b6,7:b7,31:b31}")
+        .message("%{v,format:bitmask,bitset:lsb-set,0:b0,1:b1,6:b6,7:b7,31:b31}")
         .with("v", (int)0x8000_00C3L)
         .format());
   }
@@ -96,7 +96,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   {
     // 0x8000_00C3 = bits 0, 1, 6, 7, 31 are set
     assertEquals("b31, b7, b6, b1, b0", messageSupport
-        .message("%{v,format:bitmask,bitset:msb1st,0:b0,1:b1,6:b6,7:b7,31:b31}")
+        .message("%{v,format:bitmask,bitset:msb-set,0:b0,1:b1,6:b6,7:b7,31:b31}")
         .with("v", (int)0x8000_00C3L)
         .format());
   }
@@ -108,7 +108,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   {
     // 0x800A = bits 1, 3, 15 are set
     assertEquals("b1, b3, b15", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb1st,0:b0,1:b1,2:b2,3:b3,15:b15}")
+        .message("%{v,format:bitmask,bitset:lsb-set,0:b0,1:b1,2:b2,3:b3,15:b15}")
         .with("v", (short)0x800A)
         .format());
   }
@@ -120,7 +120,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   {
     // 0x800A = bits 1, 3, 15 are set
     assertEquals("b15, b3, b1", messageSupport
-        .message("%{v,format:bitmask,bitset:msb1st,0:b0,1:b1,2:b2,3:b3,15:b15}")
+        .message("%{v,format:bitmask,bitset:msb-set,0:b0,1:b1,2:b2,3:b3,15:b15}")
         .with("v", (short)0x800A)
         .format());
   }
@@ -132,7 +132,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   {
     // 0x95 = 0b1001_0101 = bits 0, 2, 4, 7 are set
     assertEquals("b0, b2, b4, b7", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb1st,0:b0,2:b2,4:b4,7:b7}")
+        .message("%{v,format:bitmask,bitset:lsb-set,0:b0,2:b2,4:b4,7:b7}")
         .with("v", (byte)0x95)
         .format());
   }
@@ -144,7 +144,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   {
     // 0x95 = 0b1001_0101 = bits 0, 2, 4, 7 are set
     assertEquals("b7, b4, b2, b0", messageSupport
-        .message("%{v,format:bitmask,bitset:msb1st,0:b0,2:b2,4:b4,7:b7}")
+        .message("%{v,format:bitmask,bitset:msb-set,0:b0,2:b2,4:b4,7:b7}")
         .with("v", (byte)0x95)
         .format());
   }
@@ -157,7 +157,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   {
     // '\u8041' = bits 0, 6, 15 are set
     assertEquals("b0, b6, b15", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb1st,0:b0,1:b1,6:b6,7:b7,15:b15,16:b16}")
+        .message("%{v,format:bitmask,bitset:lsb-set,0:b0,1:b1,6:b6,7:b7,15:b15,16:b16}")
         .with("v", '\u8041')
         .format());
   }
@@ -170,7 +170,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   {
     // '\u8041' = bits 0, 6, 15 are set
     assertEquals("b15, b6, b0", messageSupport
-        .message("%{v,format:bitmask,bitset:msb1st,0:b0,1:b1,6:b6,7:b7,15:b15,16:b16}")
+        .message("%{v,format:bitmask,bitset:msb-set,0:b0,1:b1,6:b6,7:b7,15:b15,16:b16}")
         .with("v", '\u8041')
         .format());
   }
@@ -184,7 +184,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
     final var bigValue = ONE.shiftLeft(64).or(BigInteger.valueOf(3));
 
     assertEquals("b0, b1, b64", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb1st,0:b0,1:b1,2:b2,64:b64}")
+        .message("%{v,format:bitmask,bitset:lsb-set,0:b0,1:b1,2:b2,64:b64}")
         .with("v", bigValue)
         .format());
   }
@@ -198,7 +198,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
     final var bigValue = ONE.shiftLeft(64).or(BigInteger.valueOf(3));
 
     assertEquals("b64, b1, b0", messageSupport
-        .message("%{v,format:bitmask,bitset:msb1st,0:b0,1:b1,2:b2,64:b64}")
+        .message("%{v,format:bitmask,bitset:msb-set,0:b0,1:b1,2:b2,64:b64}")
         .with("v", bigValue)
         .format());
   }
@@ -210,7 +210,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   {
     // -1 as int = 0xFFFFFFFF = all 32 bits set
     assertEquals("b0, b7, b15, b31", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb1st,0:b0,7:b7,15:b15,31:b31}")
+        .message("%{v,format:bitmask,bitset:lsb-set,0:b0,7:b7,15:b15,31:b31}")
         .with("v", -1)
         .format());
   }
@@ -222,7 +222,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   {
     // -1 as byte = 0xFF = all 8 bits set
     assertEquals("b0, b1, b2, b3, b4, b5, b6, b7", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb1st,0:b0,1:b1,2:b2,3:b3,4:b4,5:b5,6:b6,7:b7}")
+        .message("%{v,format:bitmask,bitset:lsb-set,0:b0,1:b1,2:b2,3:b3,4:b4,5:b5,6:b6,7:b7}")
         .with("v", (byte)-1)
         .format());
   }
@@ -234,7 +234,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   {
     // -1 as short = 0xFFFF = all 16 bits set
     assertEquals("b0, b7, b15", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb1st,0:b0,7:b7,15:b15}")
+        .message("%{v,format:bitmask,bitset:lsb-set,0:b0,7:b7,15:b15}")
         .with("v", (short)-1)
         .format());
   }
@@ -248,7 +248,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
     final var bigValue = ONE.shiftLeft(100).or(ONE);
 
     assertEquals("b100, b0", messageSupport
-        .message("%{v,format:bitmask,bitset:msb1st,0:b0,100:b100}")
+        .message("%{v,format:bitmask,bitset:msb-set,0:b0,100:b100}")
         .with("v", bigValue)
         .format());
   }
