@@ -1,0 +1,14 @@
+title: Core Library
+nav:
+  - index.md
+  - syntax.md
+  - formatting.md
+  - messages-and-templates.md
+  - formatter-service.md
+  - parameter-formatters.md
+  - post-formatters.md
+  - adopters.md
+  - pack-files.md
+  - default-configuration.md
+  - exceptions.md
+  - utilities.md

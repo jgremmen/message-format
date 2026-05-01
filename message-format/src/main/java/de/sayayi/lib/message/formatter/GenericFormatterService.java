@@ -67,7 +67,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
 
   private final Lock $lock = new ReentrantLock();
 
-  private final @NotNull Map<String, NamedParameterFormatter> namedFormatters = new TreeMap<>();
+  private final @NotNull Map<String,NamedParameterFormatter> namedFormatters = new TreeMap<>();
   private final @NotNull Map<String,NamedParameterFormatter> configNameToNamedFormatterMap = new TreeMap<>();
   private final @NotNull Map<Class<?>,List<PrioritizedFormatter>> typeFormatters = new HashMap<>();
   private final @NotNull Set<String> parameterConfigNames = new TreeSet<>();

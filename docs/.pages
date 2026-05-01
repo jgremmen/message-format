@@ -1,3 +1,10 @@
 nav:
+  - index.md
+  - core
+  - annotations
+  - asm
+  - log4j
+  - spring
+  - gradle-plugin
   - formatter
   - changelog
