@@ -38,14 +38,20 @@ import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 
 /**
  * This parameter formatter converts legacy date/time objects, like {@link Calendar} and {@link Date}, into a
- * {@link Temporal} representation and delegates formatting. In order to actually format those objects a
- * {@link Temporal} or more specific formatter is required.
+ * {@link Temporal} representation and delegates formatting. In order to actually format those objects, a formatter
+ * for {@link Instant}, {@link LocalDate} and {@link LocalTime} must be registered.
+ * {@link TemporalFormatter}, which is part of this library, covers all three types out of the box.
  *
  * @author Jeroen Gremmen
  * @since 0.12.0  (renamed in 0.20.0)
  */
 public final class ToTemporalDelegate implements ParameterFormatter
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@link ClassifierContext#CLASSIFIER_TEMPORAL temporal} classifier.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {

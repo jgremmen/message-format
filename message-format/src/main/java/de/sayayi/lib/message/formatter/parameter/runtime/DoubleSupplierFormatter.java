@@ -44,6 +44,11 @@ public final class DoubleSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<DoubleSupplier>
     implements MapKeyComparator<DoubleSupplier>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code supplier} and {@link ClassifierContext#CLASSIFIER_NUMBER number} classifiers.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {

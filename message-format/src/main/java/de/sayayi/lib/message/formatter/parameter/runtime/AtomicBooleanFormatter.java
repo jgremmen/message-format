@@ -42,6 +42,11 @@ public final class AtomicBooleanFormatter
     extends AbstractSingleTypeParameterFormatter<AtomicBoolean>
     implements MapKeyComparator<AtomicBoolean>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@link ClassifierContext#CLASSIFIER_BOOL bool} classifier.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {

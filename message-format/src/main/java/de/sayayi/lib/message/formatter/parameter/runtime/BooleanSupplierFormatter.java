@@ -43,6 +43,11 @@ public final class BooleanSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<BooleanSupplier>
     implements MapKeyComparator<BooleanSupplier>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code supplier} and {@link ClassifierContext#CLASSIFIER_BOOL bool} classifiers.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {

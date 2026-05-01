@@ -50,6 +50,11 @@ import static java.util.stream.Collectors.joining;
  */
 public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Type>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code type} classifier.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {

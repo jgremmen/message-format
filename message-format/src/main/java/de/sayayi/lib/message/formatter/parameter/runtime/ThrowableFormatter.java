@@ -34,6 +34,11 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.Class
  */
 public final class ThrowableFormatter extends AbstractSingleTypeParameterFormatter<Throwable>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code throwable} and {@link ClassifierContext#CLASSIFIER_STRING string} classifiers.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {

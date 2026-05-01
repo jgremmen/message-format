@@ -44,6 +44,11 @@ public final class IntSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<IntSupplier>
     implements MapKeyComparator<IntSupplier>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code supplier} and {@link ClassifierContext#CLASSIFIER_NUMBER number} classifiers.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {

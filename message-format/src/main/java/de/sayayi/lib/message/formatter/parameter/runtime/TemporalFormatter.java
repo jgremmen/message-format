@@ -91,6 +91,11 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
       entry("-F", ofLocalizedTime(FULL)));
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@link ClassifierContext#CLASSIFIER_TEMPORAL temporal} classifier.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {

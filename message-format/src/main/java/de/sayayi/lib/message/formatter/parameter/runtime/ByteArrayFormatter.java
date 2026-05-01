@@ -65,6 +65,12 @@ public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatt
   private static final byte[] LINE_SEPARATOR = new byte[] { '\n' };
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code array} classifier. If the {@code bytes} configuration key is present, the
+   * {@link ClassifierContext#CLASSIFIER_STRING string} classifier is added as well.
+   */
   @Override
   protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, byte @NotNull [] value)
   {

@@ -47,6 +47,12 @@ public final class OptionalLongFormatter
     extends AbstractSingleTypeParameterFormatter<OptionalLong>
     implements MapKeyComparator<OptionalLong>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code optional} classifier. If the optional contains a value, the
+   * {@link ClassifierContext#CLASSIFIER_NUMBER number} classifier is added as well.
+   */
   @Override
   protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, @NotNull OptionalLong value)
   {

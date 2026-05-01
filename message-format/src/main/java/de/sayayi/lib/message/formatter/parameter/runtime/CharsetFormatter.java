@@ -54,6 +54,12 @@ public final class CharsetFormatter extends AbstractMultiSelectFormatter<Charset
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code charset} classifier. If the {@code charset} configuration key refers to a known display option,
+   * the {@link ClassifierContext#CLASSIFIER_STRING string} classifier is added as well.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {

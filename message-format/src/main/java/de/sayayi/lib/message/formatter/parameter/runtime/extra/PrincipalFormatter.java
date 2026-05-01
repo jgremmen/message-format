@@ -45,6 +45,11 @@ public final class PrincipalFormatter
     extends AbstractSingleTypeParameterFormatter<Principal>
     implements MapKeyComparator<Principal>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@link ClassifierContext#CLASSIFIER_STRING string} classifier.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {

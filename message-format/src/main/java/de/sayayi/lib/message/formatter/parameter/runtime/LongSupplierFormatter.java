@@ -43,6 +43,11 @@ public final class LongSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<LongSupplier>
     implements MapKeyComparator<LongSupplier>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code supplier} and {@link ClassifierContext#CLASSIFIER_NUMBER number} classifiers.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {

@@ -58,6 +58,11 @@ public final class FieldFormatter
     extends AbstractSingleTypeParameterFormatter<Field>
     implements MapKeyComparator<Field>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code field} and {@link ClassifierContext#CLASSIFIER_STRING string} classifiers.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {

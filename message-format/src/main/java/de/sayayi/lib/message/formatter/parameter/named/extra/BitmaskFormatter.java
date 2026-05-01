@@ -121,11 +121,11 @@ public final class BitmaskFormatter extends AbstractParameterFormatter<Object>
     final var bytes = bigInteger.toByteArray(); // big-endian, two's complement
 
     // reverse to little-endian (BitSet.valueOf expects little-endian)
-    for(int i = 0, j = bytes.length - 1; i < j; i++, j--)
+    for(int i = 0, n = bytes.length - 1; i < n; i++, n--)
     {
       final var tmp = bytes[i];
-      bytes[i] = bytes[j];
-      bytes[j] = tmp;
+      bytes[i] = bytes[n];
+      bytes[n] = tmp;
     }
 
     return BitSet.valueOf(bytes);

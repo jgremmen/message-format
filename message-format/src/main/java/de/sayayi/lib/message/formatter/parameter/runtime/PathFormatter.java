@@ -85,6 +85,11 @@ public final class PathFormatter extends AbstractMultiSelectFormatter<Object> im
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code path} classifier.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {

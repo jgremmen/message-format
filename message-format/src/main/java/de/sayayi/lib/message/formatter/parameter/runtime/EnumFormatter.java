@@ -55,6 +55,11 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  */
 public final class EnumFormatter extends AbstractMultiSelectFormatter<Enum<?>> implements MapKeyComparator<Enum<?>>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@link ClassifierContext#CLASSIFIER_ENUM enum} classifier.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {

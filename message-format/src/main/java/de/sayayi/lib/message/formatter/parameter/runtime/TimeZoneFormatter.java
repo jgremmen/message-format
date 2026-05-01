@@ -37,6 +37,11 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.Class
  */
 public final class TimeZoneFormatter extends AbstractSingleTypeParameterFormatter<TimeZone>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code timezone} and {@link ClassifierContext#CLASSIFIER_STRING string} classifiers.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {

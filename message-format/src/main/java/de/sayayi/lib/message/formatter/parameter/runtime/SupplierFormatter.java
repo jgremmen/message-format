@@ -44,6 +44,11 @@ public final class SupplierFormatter
     extends AbstractSingleTypeParameterFormatter<Supplier<?>>
     implements SizeQueryable, MapKeyComparator<Supplier<?>>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code supplier} classifier and delegates classifier resolution to the supplied value.
+   */
   @Override
   protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, @NotNull Supplier<?> value)
   {

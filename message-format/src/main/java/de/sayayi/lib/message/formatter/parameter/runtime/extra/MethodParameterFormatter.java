@@ -56,6 +56,12 @@ public final class MethodParameterFormatter
     extends AbstractSingleTypeParameterFormatter<Parameter>
     implements MapKeyComparator<Parameter>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code method-parameter} classifier. If the {@code parameter} configuration key refers to a known
+   * option, the {@link ClassifierContext#CLASSIFIER_STRING string} classifier is added as well.
+   */
   @Override
   protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, @NotNull Parameter value)
   {

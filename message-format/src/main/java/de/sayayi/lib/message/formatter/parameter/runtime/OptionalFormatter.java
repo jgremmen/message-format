@@ -50,6 +50,12 @@ import static de.sayayi.lib.message.part.MapKey.MatchResult.forNullKey;
 public final class OptionalFormatter extends AbstractSingleTypeParameterFormatter<Optional<?>>
     implements SizeQueryable, MapKeyComparator<Optional<?>>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code optional} classifier. If the optional contains a value, classifier resolution is delegated
+   * to the contained value.
+   */
   @Override
   protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, @NotNull Optional<?> value)
   {

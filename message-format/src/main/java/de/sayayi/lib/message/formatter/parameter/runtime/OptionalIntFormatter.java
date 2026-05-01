@@ -47,6 +47,12 @@ public final class OptionalIntFormatter
     extends AbstractSingleTypeParameterFormatter<OptionalInt>
     implements MapKeyComparator<OptionalInt>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code optional} classifier. If the optional contains a value, the
+   * {@link ClassifierContext#CLASSIFIER_NUMBER number} classifier is added as well.
+   */
   @Override
   protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, @NotNull OptionalInt value)
   {

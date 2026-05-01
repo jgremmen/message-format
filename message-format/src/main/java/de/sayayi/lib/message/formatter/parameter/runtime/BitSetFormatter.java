@@ -100,6 +100,25 @@ public final class BitSetFormatter extends AbstractListFormatter<BitSet>
   /**
    * {@inheritDoc}
    * <p>
+   * Adds the {@code bit-set} classifier. In set-bit mode ({@code lsb-set}/{@code msb-set}), the
+   * {@link ClassifierContext#CLASSIFIER_LIST list} classifier is added as well.
+   */
+  @Override
+  public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
+  {
+    context.addClassifier("bit-set");
+
+    final var bitSetConfig = context.getConfigValueString("bitset").orElse(null);
+    if (!CONFIG_LSB_BITS.equals(bitSetConfig) && !CONFIG_MSB_BITS.equals(bitSetConfig))
+      super.updateClassifiers(context, value);
+
+    return true;
+  }
+
+
+  /**
+   * {@inheritDoc}
+   * <p>
    * Delegates to either the binary string formatting mode or the inherited list-based formatting, depending on the
    * {@code bitset} configuration value.
    */

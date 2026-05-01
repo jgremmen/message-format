@@ -53,6 +53,12 @@ public final class MapEntryFormatter extends AbstractMultiSelectFormatter<Entry<
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code map-entry} classifier. If the {@code entry} configuration key is set to {@code key} or
+   * {@code value}, classifier resolution is delegated to the entry's key or value respectively.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object entry)
   {

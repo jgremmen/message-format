@@ -20,7 +20,7 @@ import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.part.ConfigAccessor;
 import de.sayayi.lib.message.part.MapKey;
-import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.MessagePart.Config;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextPartFactory;
 import org.jetbrains.annotations.Contract;
@@ -65,6 +65,15 @@ public interface ParameterFormatter
 
 
   /**
+   * Updates the classifiers for the given {@code value}. Classifiers are type-based labels that describe the
+   * nature of a parameter value (e.g. {@code "bool"}, {@code "number"}, {@code "string"}).
+   *
+   * @param context  classifier context, not {@code null}
+   * @param value    the non-{@code null} parameter value to classify
+   *
+   * @return  {@code true} if classification is complete and no further formatters should be consulted,
+   *          {@code false} to continue with the next formatter
+   *
    * @since 0.21.0
    */
   @Contract(mutates = "param1")
@@ -264,6 +273,8 @@ public interface ParameterFormatter
   interface MapKeyComparator<T> extends ParameterFormatter
   {
     /**
+     * Compares a value against the {@code null} map key.
+     *
      * @param value    value to compare against the null configuration key
      * @param context  comparator context instance, not {@code null}
      *
@@ -278,6 +289,8 @@ public interface ParameterFormatter
 
 
     /**
+     * Compares a value against the {@code empty} map key.
+     *
      * @param value    value to compare against the empty configuration key
      * @param context  comparator context instance, not {@code null}
      *
@@ -292,6 +305,8 @@ public interface ParameterFormatter
 
 
     /**
+     * Compares a value against a {@code bool} map key.
+     *
      * @param value    value to compare against the bool configuration key, not {@code null}
      * @param context  comparator context instance, not {@code null}
      *
@@ -306,6 +321,8 @@ public interface ParameterFormatter
 
 
     /**
+     * Compares a value against a {@code number} map key.
+     *
      * @param value    value to compare against the number configuration key, not {@code null}
      * @param context  comparator context instance, not {@code null}
      *
@@ -320,6 +337,8 @@ public interface ParameterFormatter
 
 
     /**
+     * Compares a value against a {@code string} map key.
+     *
      * @param value    value to compare against the string configuration key, not {@code null}
      * @param context  comparator context instance, not {@code null}
      *
@@ -337,6 +356,8 @@ public interface ParameterFormatter
 
 
   /**
+   * Context providing access to map key metadata and value matching during parameter map key comparison.
+   *
    * @since 0.8.4
    */
   interface ComparatorContext extends ConfigAccessor
@@ -392,14 +413,35 @@ public interface ParameterFormatter
     @NotNull String getStringKeyValue();
 
 
+    /**
+     * Returns the locale in effect during message formatting.
+     *
+     * @return  locale, never {@code null}
+     */
     @Contract(pure = true)
     @NotNull Locale getLocale();
 
 
+    /**
+     * Matches the given {@code value} against the current map key using the value's runtime type.
+     *
+     * @param value  value to match, or {@code null}
+     *
+     * @return  match result, never {@code null}
+     */
     @Contract(pure = true)
     @NotNull MatchResult matchForObject(Object value);
 
 
+    /**
+     * Matches the given {@code value} against the current map key using the specified {@code valueType}.
+     *
+     * @param value      value to match, or {@code null}
+     * @param valueType  the type to use for formatter lookup, not {@code null}
+     * @param <T>        value type
+     *
+     * @return  match result, never {@code null}
+     */
     @Contract(pure = true)
     @NotNull <T> MatchResult matchForObject(T value, @NotNull Class<T> valueType);
   }
@@ -408,33 +450,70 @@ public interface ParameterFormatter
 
 
   /**
+   * Context used during classifier resolution. Classifiers are type-based labels that describe the nature of a
+   * parameter value. Formatters can add classifiers to this context to indicate the value's characteristics.
+   *
    * @since 0.21.0
    */
   interface ClassifierContext extends ConfigAccessor
   {
+    /** Classifier for boolean values. */
     String CLASSIFIER_BOOL = "bool";
+
+    /** Classifier for enum values. */
     String CLASSIFIER_ENUM = "enum";
+
+    /** Classifier for list-like values. */
     String CLASSIFIER_LIST = "list";
+
+    /** Classifier for {@code null} values. */
     String CLASSIFIER_NULL = "null";
+
+    /** Classifier for numeric values. */
     String CLASSIFIER_NUMBER = "number";
+
+    /** Classifier for string values. */
     String CLASSIFIER_STRING = "string";
+
+    /** Classifier for temporal values. */
     String CLASSIFIER_TEMPORAL = "temporal";
 
 
+    /**
+     * Adds a classifier label to this context.
+     *
+     * @param classifier  classifier name, not {@code null}
+     */
     void addClassifier(@NotNull String classifier);
 
 
+    /**
+     * Returns all classifiers that have been added to this context.
+     *
+     * @return  set of classifier names, never {@code null}
+     */
     @Contract(pure = true)
     @NotNull Set<String> getClassifiers();
 
 
     /**
+     * Resolves classifiers for the given {@code value} by consulting the registered formatters.
      *
-     * @return  true = done, false = continue with next formatter
+     * @param value   value to classify, or {@code null}
+     * @param config  parameter configuration to use, not {@code null}
+     *
+     * @return  {@code true} if classification is complete, {@code false} to continue with the next formatter
      */
-    boolean updateClassifiers(Object value, @NotNull MessagePart.Config config);
+    boolean updateClassifiers(Object value, @NotNull Config config);
 
 
+    /**
+     * Resolves classifiers for the given {@code value} using the current parameter configuration.
+     *
+     * @param value  value to classify, or {@code null}
+     *
+     * @return  {@code true} if classification is complete, {@code false} to continue with the next formatter
+     */
     default boolean updateClassifiers(Object value) {
       return updateClassifiers(value, getConfig());
     }

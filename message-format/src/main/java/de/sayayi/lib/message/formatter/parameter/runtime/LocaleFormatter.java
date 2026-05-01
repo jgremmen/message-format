@@ -67,6 +67,12 @@ public final class LocaleFormatter extends AbstractMultiSelectFormatter<Locale>
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code locale} classifier. If the {@code locale} configuration key refers to a known locale aspect,
+   * the {@link ClassifierContext#CLASSIFIER_STRING string} classifier is added as well.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {

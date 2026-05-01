@@ -57,6 +57,13 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  */
 public final class URLFormatter extends AbstractSingleTypeParameterFormatter<URL>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code url} classifier. Depending on the {@code url} configuration key, the
+   * {@link ClassifierContext#CLASSIFIER_STRING string} or {@link ClassifierContext#CLASSIFIER_NUMBER number}
+   * classifier is added as well.
+   */
   @Override
   protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, @NotNull URL value)
   {

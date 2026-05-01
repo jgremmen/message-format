@@ -133,7 +133,7 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
   /**
    * {@inheritDoc}
    * <p>
-   * Adds the {@link ClassifierContext#CLASSIFIER_LIST LIST} classifier.
+   * Adds the {@link ClassifierContext#CLASSIFIER_LIST list} classifier.
    */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)

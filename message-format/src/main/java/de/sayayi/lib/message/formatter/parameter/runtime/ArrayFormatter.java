@@ -75,8 +75,7 @@ public final class ArrayFormatter extends AbstractListFormatter<Object> implemen
   /**
    * {@inheritDoc}
    * <p>
-   * Adds the {@code array} classifier in addition to the
-   * {@link ClassifierContext#CLASSIFIER_LIST LIST} classifier.
+   * Adds the {@code array} classifier in addition to the {@link ClassifierContext#CLASSIFIER_LIST list} classifier.
    */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
