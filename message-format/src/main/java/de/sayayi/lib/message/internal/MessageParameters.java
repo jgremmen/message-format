@@ -31,6 +31,11 @@ import static java.util.Spliterators.emptySpliterator;
 
 
 /**
+ * Immutable snapshot of the locale and parameter values from a {@link Configurer}, used to pass formatting context to
+ * {@link de.sayayi.lib.message.Message#format Message.format(...)}.
+ * <p>
+ * Parameter names are kept in sorted order to allow efficient binary-search based lookup by name.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
@@ -40,6 +45,11 @@ final class MessageParameters implements Parameters
   private final Object[] parameters;
 
 
+  /**
+   * Creates a new parameters snapshot from the given configurer's current state.
+   *
+   * @param configurer  configurer to copy locale and parameters from, not {@code null}
+   */
   MessageParameters(@NotNull Configurer<?> configurer)
   {
     locale = configurer.locale;
@@ -47,12 +57,14 @@ final class MessageParameters implements Parameters
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Locale getLocale() {
     return locale;
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public Object getParameterValue(@NotNull String parameter)
   {
@@ -73,6 +85,7 @@ final class MessageParameters implements Parameters
   }
 
 
+  /** {@inheritDoc} */
   @Contract(pure = true)
   public @NotNull Set<String> getParameterNames() {
     return new NameSet();
@@ -138,26 +151,37 @@ final class MessageParameters implements Parameters
 
 
 
+  /**
+   * Unmodifiable set of parameter names backed by the sorted parameter array.
+   */
   private final class NameSet extends AbstractSet<String>
   {
+    /** {@inheritDoc} */
     @Override
     public boolean isEmpty() {
       return parameters.length == 0;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public int size() {
       return parameters.length >> 1;
     }
 
 
+    /**
+     * Not supported.
+     *
+     * @throws UnsupportedOperationException  always
+     */
     @Override
     public void clear() {
       throw new UnsupportedOperationException("clear");
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public boolean contains(Object o)
     {
@@ -179,30 +203,51 @@ final class MessageParameters implements Parameters
     }
 
 
+    /**
+     * Not supported.
+     *
+     * @throws UnsupportedOperationException  always
+     */
     @Override
     public boolean add(String s) {
       throw new UnsupportedOperationException("add");
     }
 
 
+    /**
+     * Not supported.
+     *
+     * @throws UnsupportedOperationException  always
+     */
     @Override
     public boolean remove(Object o) {
       throw new UnsupportedOperationException("remove");
     }
 
 
+    /**
+     * Not supported.
+     *
+     * @throws UnsupportedOperationException  always
+     */
     @Override
     public boolean removeAll(Collection<?> c) {
       throw new UnsupportedOperationException("removeAll");
     }
 
 
+    /**
+     * Not supported.
+     *
+     * @throws UnsupportedOperationException  always
+     */
     @Override
     public boolean removeIf(@NotNull Predicate<? super String> filter) {
       throw new UnsupportedOperationException("removeIf");
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public void forEach(Consumer<? super String> action)
     {
@@ -213,6 +258,7 @@ final class MessageParameters implements Parameters
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull Iterator<String> iterator()
     {
@@ -222,6 +268,7 @@ final class MessageParameters implements Parameters
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull Spliterator<String> spliterator()
     {
@@ -254,6 +301,9 @@ final class MessageParameters implements Parameters
 
 
 
+  /**
+   * Iterator over the parameter names in the sorted parameter array.
+   */
   private static final class NameIterator implements Iterator<String>
   {
     private final Object[] parameters;
@@ -287,6 +337,9 @@ final class MessageParameters implements Parameters
 
 
 
+  /**
+   * Spliterator over the parameter names in the sorted parameter array.
+   */
   private static final class NameSpliterator implements Spliterator<String>
   {
     private final Object[] parameters;

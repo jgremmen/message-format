@@ -40,6 +40,7 @@ public final class EmptyMessage implements Message.WithSpaces
   private EmptyMessage() {}
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
       throws MessageFormatException {
@@ -47,6 +48,7 @@ public final class EmptyMessage implements Message.WithSpaces
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
       throws MessageFormatException {
@@ -76,18 +78,21 @@ public final class EmptyMessage implements Message.WithSpaces
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MessagePart[] getMessageParts() {
     return new MessagePart[] { Text.EMPTY };
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull String asFormatString(@NotNull Charset charset) {
     return "";
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public void serialize(@NotNull Context context) {
   }

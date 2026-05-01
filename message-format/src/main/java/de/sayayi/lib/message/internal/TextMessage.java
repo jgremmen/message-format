@@ -52,18 +52,21 @@ public final class TextMessage implements Message.WithSpaces
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean isSpaceBefore() {
     return textPart.isSpaceBefore();
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean isSpaceAfter() {
     return textPart.isSpaceAfter();
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
       throws MessageFormatException {
@@ -71,6 +74,7 @@ public final class TextMessage implements Message.WithSpaces
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MessagePart[] getMessageParts() {
     return new MessagePart[] { textPart };
@@ -107,7 +111,9 @@ public final class TextMessage implements Message.WithSpaces
 
 
   /**
-   * @param packStream  data output pack target
+   * Writes this text message to the given pack output stream.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -122,6 +128,8 @@ public final class TextMessage implements Message.WithSpaces
 
 
   /**
+   * Reads a text message from the given pack input stream.
+   *
    * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked text message, never {@code null}

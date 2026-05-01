@@ -42,6 +42,11 @@ final class FormatterCache
   private Node tail;
 
 
+  /**
+   * Creates a new formatter cache with the given capacity. The effective capacity is at least 8.
+   *
+   * @param n  desired cache capacity
+   */
   FormatterCache(int n)
   {
     capacity = Math.max(n, 8);
@@ -51,6 +56,9 @@ final class FormatterCache
   }
 
 
+  /**
+   * Removes all entries from this cache.
+   */
   synchronized void clear()
   {
     head = null;
@@ -59,6 +67,15 @@ final class FormatterCache
   }
 
 
+  /**
+   * Looks up the parameter formatters for the given {@code type}. If the type is not yet cached, the
+   * {@code buildFormatters} function is invoked to create the formatter list and the result is added to the cache.
+   *
+   * @param type             value type to look up formatters for, not {@code null}
+   * @param buildFormatters  function to build the formatter list if not cached, not {@code null}
+   *
+   * @return  cached or newly built parameter formatters for the given type, never {@code null}
+   */
   synchronized @NotNull ParameterFormatter[] lookup(@NotNull Class<?> type,
                                                     @NotNull Function<Class<?>,ParameterFormatter[]> buildFormatters)
   {
@@ -201,6 +218,9 @@ final class FormatterCache
 
 
 
+  /**
+   * Doubly-linked list node holding the cached formatter list for a single value type.
+   */
   private static final class Node
   {
     private final Class<?> type;

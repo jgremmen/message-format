@@ -22,6 +22,9 @@ import static de.sayayi.lib.message.util.MessageUtil.validateName;
 
 
 /**
+ * Abstract base class for {@link Message.WithCode} implementations, providing the message code
+ * along with {@code equals} and {@code hashCode} based on the code.
+ *
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
@@ -34,11 +37,19 @@ public sealed abstract class AbstractMessageWithCode implements Message.WithCode
   protected final @NotNull String code;
 
 
+  /**
+   * Constructs a message with the given {@code code}.
+   *
+   * @param code  message code, not {@code null} and not empty
+   *
+   * @throws IllegalArgumentException  if the message code is empty or does not follow the naming convention
+   */
   AbstractMessageWithCode(@NotNull String code) {
     this.code = validateName(code, "message code");
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull String getCode() {
     return code;

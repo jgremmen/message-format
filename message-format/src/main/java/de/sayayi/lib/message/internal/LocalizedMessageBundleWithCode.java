@@ -41,6 +41,9 @@ import static java.util.stream.Collectors.toUnmodifiableSet;
 
 
 /**
+ * {@link Message.WithCode} implementation that holds multiple locale-specific messages and selects the best
+ * matching message at format time based on the requested locale.
+ *
  * @author Jeroen Gremmen
  * @since 0.1.0 (renamed in 0.5.0)
  */
@@ -68,6 +71,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
       throws MessageFormatException
@@ -121,6 +125,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   }
 
 
+  /** {@inheritDoc} */
   @Override
   @Contract(value = "-> new", pure = true)
   public @NotNull Set<Locale> getLocales() {
@@ -128,12 +133,14 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Map<Locale,Message> getLocalizedMessages() {
     return unmodifiableMap(localizedMessages);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   @Unmodifiable
   public @NotNull Set<String> getTemplateNames()
@@ -168,7 +175,9 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
 
   /**
-   * @param packStream  data output pack target
+   * Writes this localized message bundle with code to the given pack output stream.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -188,6 +197,8 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
 
   /**
+   * Reads a localized message bundle with code from the given pack input stream.
+   *
    * @param unpack      unpacker instance, not {@code null}
    * @param packStream  source data input, not {@code null}
    *

@@ -22,6 +22,10 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
+ * Abstract base class for {@link MapKeyComparator} implementations that only provide map key comparison
+ * and do not perform any formatting themselves. The {@code format} method always delegates to the next
+ * formatter in the chain.
+ *
  * @param <T>  parameter type
  *
  * @author Jeroen Gremmen
@@ -29,6 +33,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class AbstractMapKeyComparator<T> implements MapKeyComparator<T>
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This implementation always delegates to the next formatter.
+   */
   @Override
   public final @NotNull Text format(@NotNull ParameterFormatterContext context, Object value) {
     return context.delegateToNextFormatter();

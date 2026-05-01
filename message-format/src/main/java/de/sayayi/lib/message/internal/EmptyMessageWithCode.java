@@ -32,6 +32,8 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
+ * Message implementation representing an empty text associated with a message code.
+ *
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
@@ -49,6 +51,7 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
   }
 
 
+  /** {@inheritDoc} */
   @Override
   @Contract(pure = true)
   public @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters) {
@@ -56,6 +59,7 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
       throws MessageFormatException {
@@ -63,18 +67,21 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MessagePart[] getMessageParts() {
     return new MessagePart[] { Text.EMPTY };
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull String asFormatString(@NotNull Charset charset) {
     return "";
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public void serialize(@NotNull Context context) {
   }
@@ -93,7 +100,9 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
 
   /**
-   * @param packStream  data output pack target
+   * Writes this empty message with code to the given pack output stream.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -105,6 +114,8 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
 
 
   /**
+   * Reads an empty message with code from the given pack input stream.
+   *
    * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked empty message with code, never {@code null}

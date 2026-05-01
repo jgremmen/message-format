@@ -34,6 +34,9 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
+ * {@link Message.WithCode} implementation that associates a message code with an existing {@link Message} and
+ * delegates all formatting and serialization requests to it.
+ *
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
@@ -43,6 +46,14 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
   private final @NotNull Message message;
 
 
+  /**
+   * Constructs a message delegate associating the given {@code code} with the given {@code message}.
+   *
+   * @param code     message code, not {@code null} and not empty
+   * @param message  message to delegate to, not {@code null}
+   *
+   * @throws IllegalArgumentException  if the message code is empty or does not follow the naming convention
+   */
   public MessageDelegateWithCode(@NotNull String code, @NotNull Message message)
   {
     super(code);
@@ -62,6 +73,7 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
       throws MessageFormatException
@@ -74,12 +86,14 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MessagePart[] getMessageParts() {
     return message.getMessageParts();
   }
 
 
+  /** {@inheritDoc} */
   @Override
   @Unmodifiable
   public @NotNull Set<String> getTemplateNames() {
@@ -106,7 +120,9 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
 
 
   /**
-   * @param packStream  data output pack target
+   * Writes this message delegate with code to the given pack output stream.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -120,7 +136,9 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
 
 
   /**
-   * @param unpack     unpacker instance, not {@code null}
+   * Reads a message delegate with code from the given pack input stream.
+   *
+   * @param unpack      unpacker instance, not {@code null}
    * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked message delegate with code, never {@code null}

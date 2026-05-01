@@ -88,6 +88,7 @@ public final class CompoundMessage implements Message.WithSpaces
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
       throws MessageFormatException
@@ -139,24 +140,28 @@ public final class CompoundMessage implements Message.WithSpaces
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean isSpaceBefore() {
     return messageParts[0].isSpaceBefore();
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean isSpaceAfter() {
     return messageParts[messageParts.length - 1].isSpaceAfter();
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MessagePart[] getMessageParts() {
     return copyOf(messageParts, messageParts.length);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   @Unmodifiable
   public @NotNull Set<String> getTemplateNames()
@@ -199,7 +204,9 @@ public final class CompoundMessage implements Message.WithSpaces
 
 
   /**
-   * @param packStream  data output pack target
+   * Writes this compound message to the given pack output stream.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -215,10 +222,12 @@ public final class CompoundMessage implements Message.WithSpaces
 
 
   /**
+   * Reads a compound message from the given pack input stream.
+   *
    * @param unpack      unpacker instance, not {@code null}
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked parameterized message, never {@code null}
+   * @return  unpacked compound message, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *

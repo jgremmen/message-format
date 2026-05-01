@@ -60,6 +60,15 @@ import static java.util.stream.Collectors.toCollection;
 
 
 /**
+ * Default implementation of {@link ConfigurableMessageSupport}.
+ * <p>
+ * This class manages a set of messages (identified by code), templates (identified by name) and default configuration
+ * values. It provides the fluent {@link MessageConfigurer} API for preparing and formatting messages.
+ * <p>
+ * Duplicate messages and templates are handled by configurable filters. By default, adding a message or template with
+ * a code or name that already exists will throw a {@link DuplicateMessageException} or
+ * {@link DuplicateTemplateException} respectively.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
@@ -77,6 +86,12 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   private @NotNull TemplateFilter templateFilter;
 
 
+  /**
+   * Creates a new message support instance with the given formatter service and message factory.
+   *
+   * @param formatterService  formatter service providing parameter and post formatters, not {@code null}
+   * @param messageFactory    factory for parsing and creating messages, not {@code null}
+   */
   public MessageSupportImpl(@NotNull FormatterService formatterService, @NotNull MessageFactory messageFactory)
   {
     this.formatterService = requireNonNull(formatterService, "formatterService must not be null");
@@ -89,12 +104,14 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MessageAccessor getMessageAccessor() {
     return messageAccessor;
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull ConfigurableMessageSupport setLocale(@NotNull Locale locale)
   {
@@ -103,6 +120,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, boolean value)
   {
@@ -113,6 +131,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, long value)
   {
@@ -121,6 +140,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, @NotNull String value)
   {
@@ -129,6 +149,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, @NotNull Message.WithSpaces value)
   {
@@ -137,6 +158,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull ConfigurableMessageSupport setMessageFilter(@NotNull MessageFilter messageFilter)
   {
@@ -145,6 +167,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull ConfigurableMessageSupport setTemplateFilter(@NotNull TemplateFilter templateFilter)
   {
@@ -153,6 +176,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull ConfigurableMessageSupport addMessage(@NotNull Message.WithCode message)
   {
@@ -163,6 +187,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name, @NotNull Message template)
   {
@@ -173,6 +198,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public void exportMessages(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
       throws IOException
@@ -207,6 +233,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MessageConfigurer<Message.WithCode> code(@NotNull String code)
   {
@@ -218,12 +245,14 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MessageConfigurer<Message> message(@NotNull String message) {
     return new Configurer<>(SupplierDelegate.of(() -> messageFactory.parseMessage(message)));
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public <M extends Message> @NotNull MessageConfigurer<M> message(@NotNull M message)
   {
@@ -233,6 +262,18 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   }
 
 
+  /**
+   * Default message filter that rejects duplicate messages with different content.
+   * <p>
+   * If a message with the same code already exists and has the same content, the new message is silently ignored.
+   * If the content differs, a {@link DuplicateMessageException} is thrown.
+   *
+   * @param message  message to check, not {@code null}
+   *
+   * @return  {@code true} if the message should be added, {@code false} if it already exists with the same content
+   *
+   * @throws DuplicateMessageException  if a different message with the same code already exists
+   */
   protected boolean failOnDuplicateMessage(@NotNull Message.WithCode message)
   {
     final var code = message.getCode();
@@ -253,6 +294,19 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
   }
 
 
+  /**
+   * Default template filter that rejects duplicate templates with different content.
+   * <p>
+   * If a template with the same name already exists and has the same content, the new template is silently ignored.
+   * If the content differs, a {@link DuplicateTemplateException} is thrown.
+   *
+   * @param name      template name, not {@code null}
+   * @param template  template to check, not {@code null}
+   *
+   * @return  {@code true} if the template should be added, {@code false} if it already exists with the same content
+   *
+   * @throws DuplicateTemplateException  if a different template with the same name already exists
+   */
   protected boolean failOnDuplicateTemplate(@NotNull String name, @NotNull Message template)
   {
     var ttm = templates.get(name);
@@ -273,6 +327,12 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
 
+  /**
+   * Internal {@link MessageConfigurer} implementation that holds the message, locale and parameter values for
+   * a single formatting operation.
+   *
+   * @param <M>  the message type this configurer operates on
+   */
   final class Configurer<M extends Message> implements MessageConfigurer<M>
   {
     private final @NotNull Supplier<M> message;
@@ -290,12 +350,14 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull M getMessage() {
       return requireNonNull(message.get(), "message must not be null");
     }
 
 
+    /** {@inheritDoc} */
     @Override
     @Unmodifiable
     public @NotNull Map<String,Object> getParameters() {
@@ -303,6 +365,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull MessageConfigurer<M> clear()
     {
@@ -311,6 +374,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull MessageConfigurer<M> remove(@NotNull String parameter)
     {
@@ -336,6 +400,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull MessageConfigurer<M> with(@NotNull String parameter, Object value)
     {
@@ -378,6 +443,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull MessageConfigurer<M> locale(Locale locale)
     {
@@ -386,12 +452,14 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull String format() {
       return getMessage().format(messageAccessor, new MessageParameters(this));
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull Supplier<String> formatSupplier()
     {
@@ -402,6 +470,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull <X extends Exception> X formattedException(
         @NotNull ExceptionConstructorWithCause<X> constructor, Throwable cause) {
@@ -409,12 +478,14 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull <X extends Exception> X formattedException(@NotNull ExceptionConstructor<X> constructor) {
       return constructor.construct(format());
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull <X extends Exception> Supplier<X> formattedExceptionSupplier(
         @NotNull ExceptionConstructorWithCause<X> constructor, Throwable cause)
@@ -426,6 +497,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull <X extends Exception> Supplier<X> formattedExceptionSupplier(
         @NotNull ExceptionConstructor<X> constructor)
@@ -440,62 +512,76 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
 
+  /**
+   * Internal {@link MessageAccessor} implementation providing read-only access to the messages, templates,
+   * formatters and default configuration managed by the enclosing {@link MessageSupportImpl}.
+   */
   private final class Accessor implements MessageAccessor
   {
+    /** {@inheritDoc} */
     @Override
     public @NotNull MessageFactory getMessageFactory() {
       return messageFactory;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull Locale getLocale() {
       return locale;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull @UnmodifiableView Set<String> getMessageCodes() {
       return unmodifiableSet(messages.keySet());
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull @UnmodifiableView Set<String> getTemplateNames() {
       return unmodifiableSet(templates.keySet());
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public Message getTemplateByName(@NotNull String name) {
       return templates.get(name);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public boolean hasMessageWithCode(String code) {
       return code != null && messages.containsKey(code);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public Message.WithCode getMessageByCode(@NotNull String code) {
       return messages.get(code);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public boolean hasTemplateWithName(String name) {
       return name != null && templates.containsKey(name);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public TypedValue<?> getDefaultConfig(@NotNull String name) {
       return defaultConfig.get(name);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type,
                                                        MessagePart.Config config) {
@@ -503,12 +589,14 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public PostFormatter getPostFormatter(@NotNull String postFormatterName) {
       return formatterService.getPostFormatters().get(postFormatterName);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull Set<String> findMissingTemplates(Predicate<String> messageCodeFilter)
     {
@@ -526,6 +614,10 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
 
+  /**
+   * Unmodifiable, sorted {@link Map} implementation backed by the parameter name/value pairs from a
+   * {@link Configurer}. The parameters are stored in a flat array with alternating keys and values.
+   */
   private static final class ParameterMap extends AbstractMap<String,Object> implements Serializable, Cloneable
   {
     private final @NotNull Object[] parameters;
@@ -536,18 +628,21 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public int size() {
       return parameters.length / 2;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public boolean isEmpty() {
       return parameters.length == 0;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public boolean containsKey(Object key)
     {
@@ -560,6 +655,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public boolean containsValue(Object value)
     {
@@ -571,12 +667,14 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public Object get(Object key) {
       return getOrDefault(key, null);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public Object getOrDefault(Object key, Object defaultValue)
     {
@@ -598,24 +696,36 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /**
+     * Not supported.
+     *
+     * @throws UnsupportedOperationException  always
+     */
     @Override
     public Object remove(Object key) {
       throw new UnsupportedOperationException("remove");
     }
 
 
+    /**
+     * Not supported.
+     *
+     * @throws UnsupportedOperationException  always
+     */
     @Override
     public void clear() {
       throw new UnsupportedOperationException("clear");
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull Set<Entry<String,Object>> entrySet() {
       return new ParameterEntrySet(parameters);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public void forEach(BiConsumer<? super String,? super Object> action)
     {
@@ -702,6 +812,9 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
 
 
 
+  /**
+   * Unmodifiable entry set for {@link ParameterMap}, providing iteration over the parameter name/value pairs.
+   */
   private static final class ParameterEntrySet extends AbstractSet<Entry<String,Object>>
       implements Serializable, Cloneable
   {
@@ -713,18 +826,21 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public int size() {
       return parameters.length / 2;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public boolean isEmpty() {
       return parameters.length == 0;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull Iterator<Entry<String,Object>> iterator()
     {
@@ -751,6 +867,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull Spliterator<Entry<String,Object>> spliterator()
     {
@@ -792,24 +909,40 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
     }
 
 
+    /**
+     * Not supported.
+     *
+     * @throws UnsupportedOperationException  always
+     */
     @Override
     public void clear() {
       throw new UnsupportedOperationException("clear");
     }
 
 
+    /**
+     * Not supported.
+     *
+     * @throws UnsupportedOperationException  always
+     */
     @Override
     public boolean remove(Object o) {
       throw new UnsupportedOperationException("remove");
     }
 
 
+    /**
+     * Not supported.
+     *
+     * @throws UnsupportedOperationException  always
+     */
     @Override
     public boolean removeIf(@NotNull Predicate<? super Entry<String,Object>> filter) {
       throw new UnsupportedOperationException("removeIf");
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public void forEach(@NotNull Consumer<? super Entry<String,Object>> action)
     {
