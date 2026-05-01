@@ -7,8 +7,8 @@ nav:
   - formatter-service.md
   - parameter-formatters.md
   - post-formatters.md
+  - default-configuration.md
   - adopters.md
   - pack-files.md
-  - default-configuration.md
   - exceptions.md
   - utilities.md
