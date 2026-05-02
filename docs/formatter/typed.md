@@ -26,7 +26,6 @@ TODO
 | `Calendar`             | `ToTemporalDelegate`               | 80    | [Temporal](parameter/typed/temporal.md)     |
 | `char[]`               | `StringFormatter`[^1]              | 100   | [String](parameter/typed/string.md)         |
 | `CharSequence`         | `StringFormatter`[^1]              | 80    | [String](parameter/typed/string.md)         |
-| `Charset`              | `CharsetFormatter`                 | 80    | [Charset](parameter/typed/charset.md)       |
 | `Date`                 | `ToTemporalDelegate`               | 80    | [Temporal](parameter/typed/temporal.md)     |
 | `Dictionary`           | `DictionaryFormatter`              | 70    | [Dictionary](parameter/typed/dictionary.md) |
 | `double[]`             | `ArrayFormatter`                   | 100   | [List](parameter/typed/iterable.md)         |
