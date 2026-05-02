@@ -57,8 +57,8 @@ logger.error("Failed to load %{p1}: %{p2}", "config.xml",
 
 ### Parameterized Message Fallback
 
-When enabled (the default), messages containing Log4j-style `{}` placeholders—and no
-message-format placeholders (`%{`, `%[` or `%(`)—are delegated to Log4j's
+When enabled (the default), messages containing Log4j-style `{}` placeholders, and no
+message-format placeholders (`%{`, `%[` or `%(`), are delegated to Log4j's
 `ParameterizedMessage` for backward compatibility. This makes it safe to introduce
 `Log4jMessageFactory` in an existing codebase without rewriting all log statements at once:
 
