@@ -1,3 +1,7 @@
+---
+icon: material/connection
+---
+
 # Gradle Plugin
 
 The `message-gradle-plugin` provides a Gradle plugin for scanning compiled classes for

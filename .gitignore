@@ -13,6 +13,9 @@ out/
 *.tokens
 *-SNAPSHOT.mfp
 
+# message-gradle-plugin
+/message-gradle-plugin/src/main/generated/
+
 *.iml
 .DS_Store
-/message-gradle-plugin/src/main/generated/
+preview-libdoc-site.sh

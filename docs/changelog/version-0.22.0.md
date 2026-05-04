@@ -55,7 +55,8 @@ If you relied on the `charset:display` or `charset:display-name` configuration t
 name, format the display name explicitly before passing it as a parameter:
 
 ```java
-messageSupport.message("my-msg")
+messageSupport
+    .message("my-msg")
     .with("charset", myCharset.displayName(locale))
     .format();
 ```
@@ -162,4 +163,3 @@ if (MessageUtil.isMessageFormatPack(path))
 - Fixed `PackFileTypeDetector` not being discovered in Gradle's isolated classloader environment, causing
   `Files.probeContentType()` to return `null` for message format pack files.
 - Fixed compiler warning for ANTLR4-generated source files by adding the `-implicit:class` compiler argument.
-

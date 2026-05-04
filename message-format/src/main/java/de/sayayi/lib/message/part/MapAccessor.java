@@ -9,6 +9,13 @@ import java.util.Set;
 
 
 /**
+ * Provides read access to a parameter configuration map, allowing lookup of messages by key and key type.
+ * Implementations of this interface are used during message formatting to resolve the appropriate message from a map
+ * based on a given parameter value.
+ *
+ * @see MessagePart.Map
+ * @see MapKey.Type
+ *
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
@@ -36,8 +43,9 @@ public interface MapAccessor
 
 
   /**
-   * Gets a message for {@code key} from the parameter configuration map. The map will be
-   * probed for keys with the given {@code keyTypes} only.
+   * Gets a message for {@code key} from the parameter configuration map. The map will be probed for keys with the
+   * given {@code keyTypes} only. The default map entry is never considered, even if the map contains mappings for
+   * the given key types.
    *
    * @param key       the key to get the message for
    * @param keyTypes  key types to be considered when matching the {@code key}, not {@code null}
@@ -52,21 +60,22 @@ public interface MapAccessor
 
 
   /**
-   * Gets a message for {@code key} from the parameter configuration map. The map will be
-   * probed for keys with the given {@code keyTypes} only. If no entry for {@code key} is
-   * found the default message, if present, will be returned.
+   * Gets a message for {@code key} from the parameter configuration map. The map will be probed for keys with the
+   * given {@code keyTypes} only.
    * <p>
-   * The default message is considered only if the parameter configuration map contains at
-   * least 1 key with a type contained in {@code keyTypes}.
+   * If {@code includeDefault} is {@code true} and no matching key is found, the default message is returned
+   * instead — but only if the map contains at least 1 key with a type contained in {@code keyTypes}. If the map
+   * has no keys matching any of the given key types, the default message is not considered and
+   * {@link Optional#empty()} is returned.
    *
    * @param key             the key to get the message for
-   * @param keyTypes        key types to be considered when matching the {@code key},
-   *                        not {@code null}
-   * @param includeDefault  {@code true} will return the default message (if any) in case no
-   *                        matching key is found, {@code false} will not return the default message
+   * @param keyTypes        key types to be considered when matching the {@code key}, not {@code null}
+   * @param includeDefault  {@code true} will return the default message (if any) in case no matching key is found
+   *                        and the map contains at least 1 key with a type in {@code keyTypes}, {@code false} will
+   *                        never return the default message
    *
-   * @return  optional instance containing the mapped message, never {@code null}. If no matching
-   *          message is found, {@link Optional#empty()} is returned
+   * @return  optional instance containing the mapped message, never {@code null}. If no matching message is found,
+   *          {@link Optional#empty()} is returned
    */
   @Contract(pure = true)
   @NotNull Optional<Message.WithSpaces> getMapMessage(Object key, @NotNull Set<MapKey.Type> keyTypes,

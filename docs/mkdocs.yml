@@ -1,0 +1,66 @@
+nav:
+  - Home: index.md
+  - Core:
+    - core/index.md
+    - Syntax: core/syntax.md
+    - Formatting: core/formatting.md
+    - Messages and Templates: core/messages-and-templates.md
+    - Formatter Service: core/formatter-service.md
+    - Parameter Formatters: core/parameter-formatters.md
+    - Post Formatters: core/post-formatters.md
+    - Default Configuration: core/default-configuration.md
+    - Adopters: core/adopters.md
+    - Pack Files: core/pack-files.md
+    - Exceptions: core/exceptions.md
+    - Utilities: core/utilities.md
+  - Formatters:
+    - formatter/index.md
+    - Parameter Formatters:
+      - formatter/parameter/index.md
+      - Type Formatters:
+        - formatter/parameter/typed/index.md
+        - BitSet: formatter/parameter/typed/bit-set.md
+        - Boolean: formatter/parameter/typed/boolean.md
+        - Byte-Array: formatter/parameter/typed/byte-array.md
+        - Charset: formatter/parameter/typed/charset.md
+        - Dictionary: formatter/parameter/typed/dictionary.md
+        - Enum: formatter/parameter/typed/enum.md
+        - Iterable: formatter/parameter/typed/iterable.md
+        - Locale: formatter/parameter/typed/locale.md
+        - Map: formatter/parameter/typed/map.md
+        - Number: formatter/parameter/typed/number.md
+        - Optional: formatter/parameter/typed/optional.md
+        - Path: formatter/parameter/typed/path.md
+        - Reference: formatter/parameter/typed/reference.md
+        - String: formatter/parameter/typed/string.md
+        - Supplier: formatter/parameter/typed/supplier.md
+        - Temporal: formatter/parameter/typed/temporal.md
+        - Throwable: formatter/parameter/typed/throwable.md
+        - TimeZone: formatter/parameter/typed/time-zone.md
+        - Type: formatter/parameter/typed/type.md
+        - URI: formatter/parameter/typed/uri.md
+        - URL: formatter/parameter/typed/url.md
+      - Named Formatters:
+        - formatter/parameter/named/index.md
+        - Bitmask: formatter/parameter/named/bitmask.md
+        - Bool: formatter/parameter/named/bool.md
+        - Choice: formatter/parameter/named/choice.md
+        - Classifier: formatter/parameter/named/classifier.md
+        - Geo: formatter/parameter/named/geo.md
+        - Size: formatter/parameter/named/size.md
+        - SpEL [spring]: formatter/parameter/named/spel.md
+        - String: formatter/parameter/named/string.md
+    - Post Formatters:
+      - formatter/post/index.md
+      - Case: formatter/post/case.md
+      - Clip: formatter/post/clip.md
+  - Gradle Plugin:
+    - gradle-plugin/index.md
+    - Pack Task: gradle-plugin/pack-task.md
+  - Changelogs:
+    - changelog/version-0.22.0.md
+    - changelog/version-0.21.0.md
+    - changelog/version-0.20.1.md
+    - changelog/version-0.20.0.md
+    - changelog/version-0.12.0.md
+    - changelog/version-0.11.0.md
