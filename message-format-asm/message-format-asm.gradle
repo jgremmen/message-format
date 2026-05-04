@@ -27,8 +27,7 @@ dependencies {
 
   compileOnly project(':message-format')
 
-  //noinspection DependencyNotationArgument
-  testImplementation project(':message-format').sourceSets.test.output
+  testImplementation project(path: ':message-format', configuration: 'testOutput')
 }
 
 

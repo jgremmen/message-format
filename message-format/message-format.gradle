@@ -33,7 +33,19 @@ configurations {
     canBeResolved = true
   }
 
+  testOutput {
+    canBeConsumed = true
+    canBeResolved = false
+  }
+
   api.setExtendsFrom([])
+}
+
+
+artifacts {
+  testOutput(sourceSets.test.java.classesDirectory) {
+    builtBy tasks.compileTestJava
+  }
 }
 
 
