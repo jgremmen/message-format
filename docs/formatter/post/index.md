@@ -87,57 +87,6 @@ var messageSupport = MessageSupportFactory.create(formatterService);
 ```
 
 
-## Implementing a Custom Post Formatter
-
-To create your own post formatter, implement the `PostFormatter` interface. The interface
-requires two methods: `getName()` returns the kebab-case name that identifies the post
-formatter in message format strings, and `format(String, PostFormatterContext)` performs the
-actual text transformation.
-
-The `PostFormatterContext` provides access to the configuration keys declared in the message
-format string (and any matching global defaults). It also exposes the locale for which the
-message is being formatted. The context offers typed accessor methods for retrieving
-configuration values as strings, numbers, booleans or messages.
-
-The following example implements a post formatter that repeats its input text a configurable
-number of times:
-
-```java
-public final class RepeatPostFormatter implements PostFormatter
-{
-  @Override
-  public @NotNull String getName() {
-    return "repeat";
-  }
-
-  @Override
-  public @NotNull String format(@NotNull String string,
-                                @NotNull PostFormatterContext context)
-  {
-    var count = (int)context.getConfigValueNumber("repeat").orElse(1);
-    if (count <= 1)
-      return string;
-
-    return string.repeat(count);
-  }
-}
-```
-
-To make it available through `ServiceLoader` auto-discovery, add the fully qualified class
-name to `META-INF/services/de.sayayi.lib.message.formatter.post.PostFormatter`. Otherwise,
-register it manually via `addPostFormatter`.
-
-Once registered, the post formatter can be used in any message:
-
-```java
-messageSupport
-    .message("%(repeat,'%{syllable}',repeat:3)")
-    .with("syllable", "na")
-    .format();
-// "nanana"
-```
-
-
 ## Nesting
 
 Post formatter invocations can be nested. The output of one post formatter can serve as the

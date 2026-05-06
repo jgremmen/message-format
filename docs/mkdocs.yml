@@ -14,7 +14,7 @@ nav:
     - formatter/index.md
     - Parameter Formatters:
       - formatter/parameter/index.md
-      - Type Formatters:
+      - Type-Specific:
         - formatter/parameter/typed/index.md
         - BitSet: formatter/parameter/typed/bit-set.md
         - Boolean: formatter/parameter/typed/boolean.md
@@ -37,7 +37,7 @@ nav:
         - Type: formatter/parameter/typed/type.md
         - URI: formatter/parameter/typed/uri.md
         - URL: formatter/parameter/typed/url.md
-      - Named Formatters:
+      - Named:
         - formatter/parameter/named/index.md
         - Bitmask: formatter/parameter/named/bitmask.md
         - Bool: formatter/parameter/named/bool.md
@@ -51,6 +51,14 @@ nav:
       - formatter/post/index.md
       - Case: formatter/post/case.md
       - Clip: formatter/post/clip.md
+    - Development:
+      - formatter/development/index.md
+      - Parameter:
+        - Type-Specific Formatter: formatter/development/typed-parameter-formatter.md
+        - Named Formatter: formatter/development/named-parameter-formatter.md
+        - Size Queryable: formatter/development/size-queryable.md
+        - Map Key Comparator: formatter/development/map-key-comparator.md
+      - Post Formatter: formatter/development/post-formatter.md
   - Adopters:
     - adopter/index.md
     - Annotation:

@@ -190,5 +190,8 @@ messageSupport
 | `classifier` | `ClassifierFormatter` | [Classifier](classifier.md) |
 | `geo`        | `GeoFormatter`        | [Geo](geo.md)               |
 | `size`       | `SizeFormatter`       | [Size](size.md)             |
-| `spel`       | `SpELFormatter`       | [SpEL](spel.md)             |
+| `spel` [^1]  | `SpELFormatter`       | [SpEL](spel.md)             |
 | `string`     | `StringFormatter`     | [String](string.md)         |
+
+[^1]: Provided by the `message-format-spring` module, not the core `message-format` module.
+
