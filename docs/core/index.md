@@ -86,7 +86,7 @@ content differs. Identical duplicates are silently ignored. This behavior can be
 registering a custom `MessageFilter`.
 
 Messages can also be loaded in bulk from external sources through
-[adopters](adopters.md), from [annotation-scanned classes](../annotations/index.md), or
+[adopters](../adopter/index.md), from [annotation-scanned classes](../adopter/annotation/index.md), or
 from [pack files](pack-files.md).
 
 

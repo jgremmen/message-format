@@ -6,10 +6,7 @@ nav:
     - Formatting: core/formatting.md
     - Messages and Templates: core/messages-and-templates.md
     - Formatter Service: core/formatter-service.md
-    - Parameter Formatters: core/parameter-formatters.md
-    - Post Formatters: core/post-formatters.md
     - Default Configuration: core/default-configuration.md
-    - Adopters: core/adopters.md
     - Pack Files: core/pack-files.md
     - Exceptions: core/exceptions.md
     - Utilities: core/utilities.md
@@ -54,6 +51,14 @@ nav:
       - formatter/post/index.md
       - Case: formatter/post/case.md
       - Clip: formatter/post/clip.md
+  - Adopters:
+    - adopter/index.md
+    - Annotation:
+      - adopter/annotation/index.md
+      - ASM: adopter/annotation/asm.md
+      - Spring: adopter/annotation/spring.md
+    - Properties: adopter/properties.md
+    - Resource Bundle: adopter/resource-bundle.md
   - Gradle Plugin:
     - gradle-plugin/index.md
     - Pack Task: gradle-plugin/pack-task.md
@@ -64,3 +69,4 @@ nav:
     - changelog/version-0.20.0.md
     - changelog/version-0.12.0.md
     - changelog/version-0.11.0.md
+    - changelog/version-0.10.0.md
