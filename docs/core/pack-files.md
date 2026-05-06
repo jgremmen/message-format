@@ -79,3 +79,12 @@ The pack format is designed to be backward-compatible, so pack files created wit
 version of the library can generally be read by newer versions. However, pack files created
 with a newer version cannot be read by older versions. When in doubt, re-export your pack
 files after upgrading.
+
+
+## Generating Pack Files at Build Time
+
+If your project uses `@MessageDef` and `@TemplateDef` annotations to declare messages and
+templates in source code, the [Gradle Plugin](../gradle-plugin/index.md) can scan the compiled
+classes and produce a `.mfp` pack file automatically as part of the build. This removes the
+need to export pack files manually and ensures that the pack file is always in sync with the
+annotated message definitions in your codebase.

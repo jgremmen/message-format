@@ -123,24 +123,25 @@ de.sayayi.lib:message-format-spring:<version>
 
 This module depends on `message-format-annotations` (which transitively includes the
 `message-format` core) and on `org.springframework:spring-context` (version 5.x or 6.x). Spring
-Context transitively provides `spring-core`, which contains the bundled ASM classes. When using
-Gradle:
+Context transitively provides `spring-core`, which contains the bundled ASM classes.
 
-```groovy
-dependencies {
-    implementation 'de.sayayi.lib:message-format-spring:<version>'
-}
-```
+=== "Gradle"
 
-For Maven:
+    ```groovy
+    dependencies {
+      implementation 'de.sayayi.lib:message-format-spring:<version>'
+    }
+    ```
 
-```xml
-<dependency>
-    <groupId>de.sayayi.lib</groupId>
-    <artifactId>message-format-spring</artifactId>
-    <version><!-- version --></version>
-</dependency>
-```
+=== "Maven"
+
+    ```xml
+    <dependency>
+      <groupId>de.sayayi.lib</groupId>
+      <artifactId>message-format-spring</artifactId>
+      <version><!-- version --></version>
+    </dependency>
+    ```
 
 The `message-format-spring` module also provides other Spring integration components such as
 `MessageSupportMessageSource` and a SpEL parameter formatter. See the

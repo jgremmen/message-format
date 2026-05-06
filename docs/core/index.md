@@ -192,20 +192,20 @@ manner.
 de.sayayi.lib:message-format:<version>
 ```
 
-When using Gradle:
+=== "Gradle"
 
-```groovy
-dependencies {
-    implementation 'de.sayayi.lib:message-format:<version>'
-}
-```
+    ```groovy
+    dependencies {
+      implementation 'de.sayayi.lib:message-format:<version>'
+    }
+    ```
 
-For Maven:
+=== "Maven"
 
-```xml
-<dependency>
-    <groupId>de.sayayi.lib</groupId>
-    <artifactId>message-format</artifactId>
-    <version><!-- version --></version>
-</dependency>
-```
+    ```xml
+    <dependency>
+      <groupId>de.sayayi.lib</groupId>
+      <artifactId>message-format</artifactId>
+      <version><!-- version --></version>
+    </dependency>
+    ```

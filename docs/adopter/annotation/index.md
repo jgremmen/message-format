@@ -128,8 +128,8 @@ For localized messages, leave the text parameter empty and provide the translati
 ```java
 adopter.adopt(new AbstractAnnotationAdopter.MessageDefImpl(
     "goodbye", "", new Text[] {
-        new AbstractAnnotationAdopter.TextImpl("en", "Goodbye, %{name}!", ""),
-        new AbstractAnnotationAdopter.TextImpl("de", "Auf Wiedersehen, %{name}!", "")
+      new AbstractAnnotationAdopter.TextImpl("en", "Goodbye, %{name}!", ""),
+      new AbstractAnnotationAdopter.TextImpl("de", "Auf Wiedersehen, %{name}!", "")
     }));
 
 messageSupport

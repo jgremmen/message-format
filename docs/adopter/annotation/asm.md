@@ -102,24 +102,25 @@ de.sayayi.lib:message-format-asm:<version>
 ```
 
 This module depends on `message-format-annotations` (which transitively includes the
-`message-format` core) and on the ASM library `org.ow2.asm:asm` (version 9.x). When using
-Gradle:
+`message-format` core) and on the ASM library `org.ow2.asm:asm` (version 9.x).
 
-```groovy
-dependencies {
-    implementation 'de.sayayi.lib:message-format-asm:<version>'
-}
-```
+=== "Gradle"
 
-For Maven:
+    ```groovy
+    dependencies {
+      implementation 'de.sayayi.lib:message-format-asm:<version>'
+    }
+    ```
 
-```xml
-<dependency>
-    <groupId>de.sayayi.lib</groupId>
-    <artifactId>message-format-asm</artifactId>
-    <version><!-- version --></version>
-</dependency>
-```
+=== "Maven"
+
+    ```xml
+    <dependency>
+      <groupId>de.sayayi.lib</groupId>
+      <artifactId>message-format-asm</artifactId>
+      <version><!-- version --></version>
+    </dependency>
+    ```
 
 If your project already uses Spring Framework, consider using the
 [Spring Annotation Adopter](spring.md) instead. Spring bundles its own copy of ASM, and the

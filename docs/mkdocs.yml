@@ -61,6 +61,7 @@ nav:
     - Resource Bundle: adopter/resource-bundle.md
   - Gradle Plugin:
     - gradle-plugin/index.md
+    - Extension Configuration: gradle-plugin/extension.md
     - Pack Task: gradle-plugin/pack-task.md
   - Changelogs:
     - changelog/version-0.22.0.md
