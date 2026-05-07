@@ -103,3 +103,15 @@ contributes nothing but comparison behavior. The
 [Custom Map Key Comparator](map-key-comparator.md) page explains the interface, the scoring
 system, the comparator context, and provides complete examples for both integrated and
 standalone comparators.
+
+
+## Utilities
+
+The core module ships with several helper classes that solve problems you will encounter
+repeatedly when building formatters. They cover space-aware string handling, text assembly,
+lightweight parameter containers and lazy value caching. These are the same building blocks
+that the library's own formatters use internally, so relying on them keeps your code
+consistent with the rest of the framework.
+
+The [Formatter Utilities](utilities.md) page documents every utility with complete code
+examples.

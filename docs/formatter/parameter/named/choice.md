@@ -57,7 +57,7 @@ messageSupport
 ```
 
 Because map values are messages themselves, they can contain nested parameters. This allows a mapped message to
-reference the same or other parameters. This technique is shown in the [pluralization](#pluralization) example
+reference the same or other parameters. This technique is shown in the [plural suffix](#plural-suffix) example
 below.
 
 

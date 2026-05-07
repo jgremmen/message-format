@@ -482,7 +482,7 @@ A post formatter applies a text transformation to the result of a sub-message. U
 parameter formatters which operate on individual values, post formatters operate on already
 formatted text. The syntax is:
 
-```
+```message-format
 %(formatter-name, 'sub-message', config:value)
 ```
 

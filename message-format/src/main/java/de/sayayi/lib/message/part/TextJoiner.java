@@ -38,11 +38,12 @@ public final class TextJoiner
 
 
   /**
-   * Returns the joined text parts as a {@link Text} that preserves a trailing space. If non-space content was
-   * followed by a space (or a space-only text), the resulting text will have its
-   * {@linkplain Text#isSpaceAfter() trailing space} flag set.
+   * Returns the joined text parts as a {@link Text} that preserves leading and trailing spaces. If the first content
+   * added was preceded by a {@linkplain Text#isSpaceBefore() leading space}, the resulting text will have its
+   * leading space flag set. If non-space content was followed by a space (or a space-only text), the resulting text
+   * will have its {@linkplain Text#isSpaceAfter() trailing space} flag set.
    *
-   * @return  joined text optionally with a trailing space, never {@code null}
+   * @return  joined text optionally with leading/trailing spaces, never {@code null}
    *
    * @see #asNoSpaceText()
    */

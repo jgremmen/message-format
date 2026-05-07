@@ -1,15 +1,17 @@
 nav:
-  - Home: index.md
+  - Home:
+    - index.md
+    - Philosophy: philosophy.md
+    - Getting started:
+      - Syntax: core/syntax.md
   - Core:
     - core/index.md
-    - Syntax: core/syntax.md
     - Formatting: core/formatting.md
     - Messages and Templates: core/messages-and-templates.md
     - Formatter Service: core/formatter-service.md
     - Default Configuration: core/default-configuration.md
     - Pack Files: core/pack-files.md
     - Exceptions: core/exceptions.md
-    - Utilities: core/utilities.md
   - Formatters:
     - formatter/index.md
     - Parameter Formatters:
@@ -59,6 +61,7 @@ nav:
         - Size Queryable: formatter/development/size-queryable.md
         - Map Key Comparator: formatter/development/map-key-comparator.md
       - Post Formatter: formatter/development/post-formatter.md
+      - Utilities: formatter/development/utilities.md
   - Adopters:
     - adopter/index.md
     - Annotation:
@@ -70,6 +73,8 @@ nav:
   - Add-Ons:
     - add-on/index.md
     - Log4j: add-on/log4j.md
+    - Spring:
+      - Message Source: add-on/spring/message-source.md
   - Gradle Plugin:
     - gradle-plugin/index.md
     - Extension Configuration: gradle-plugin/extension.md

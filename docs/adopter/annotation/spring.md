@@ -145,4 +145,4 @@ Context transitively provides `spring-core`, which contains the bundled ASM clas
 
 The `message-format-spring` module also provides other Spring integration components such as
 `MessageSupportMessageSource` and a SpEL parameter formatter. See the
-[Spring module overview](../../add-on/spring/index.md) for details.
+[Spring module overview](../../add-on/spring/message-source.md) for details.
