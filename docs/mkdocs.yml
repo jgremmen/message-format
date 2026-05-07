@@ -67,6 +67,9 @@ nav:
       - Spring: adopter/annotation/spring.md
     - Properties: adopter/properties.md
     - Resource Bundle: adopter/resource-bundle.md
+  - Add-Ons:
+    - add-on/index.md
+    - Log4j: add-on/log4j.md
   - Gradle Plugin:
     - gradle-plugin/index.md
     - Extension Configuration: gradle-plugin/extension.md
