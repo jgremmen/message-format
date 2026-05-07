@@ -18,12 +18,30 @@ package de.sayayi.lib.message.util;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 
 /**
  * This supplier implementation delegates to another supplier and caches the supplied value, thus
  * invoking the delegated supplier only once.
+ * <p>
+ * This class is thread-safe.
+ *
+ * <h2>Example</h2>
+ * <pre>
+ *   Supplier&lt;ExpensiveObject&gt; lazyObject =
+ *       SupplierDelegate.of(() -&gt; new ExpensiveObject());
+ *
+ *   // the delegate supplier is invoked only on the first call
+ *   ExpensiveObject obj1 = lazyObject.get();
+ *
+ *   // subsequent calls return the cached value
+ *   ExpensiveObject obj2 = lazyObject.get();
+ *
+ *   assert obj1 == obj2;
+ * </pre>
  *
  * @param <T>  supplier value type
  *
@@ -32,7 +50,8 @@ import java.util.function.Supplier;
  */
 public final class SupplierDelegate<T> implements Supplier<T>
 {
-  private Supplier<T> supplier;
+  private volatile Lock lock = new ReentrantLock();
+  private volatile Supplier<T> supplier;
   private T value;
 
 
@@ -41,13 +60,32 @@ public final class SupplierDelegate<T> implements Supplier<T>
   }
 
 
+  /**
+   * Returns the cached value, invoking the delegate supplier on the first call.
+   * Subsequent calls will return the cached value without invoking the delegate again.
+   *
+   * @return  the supplied value, which may be {@code null} depending on the delegate
+   */
   @Override
   public T get()
   {
     if (supplier != null)
     {
-      value = supplier.get();
-      supplier = null;  // drop supplier; we don't need it anymore
+      var _lock = lock;
+      if (_lock != null)
+      {
+        _lock.lock();
+        try {
+          if (supplier != null)
+          {
+            value = supplier.get();
+            supplier = null;
+            lock = null;
+          }
+        } finally {
+          _lock.unlock();
+        }
+      }
     }
 
     return value;
