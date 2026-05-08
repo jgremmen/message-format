@@ -45,6 +45,11 @@ Add the `message-format-log4j` module to your project alongside the Log4j API de
       <artifactId>message-format-log4j</artifactId>
       <version>0.22.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>2.24.3</version>
+    </dependency>
     ```
 
 For JPMS-based projects, the module name is `de.sayayi.lib.message.log4j`. It requires
@@ -80,6 +85,40 @@ The factory created with the no-argument constructor uses the shared `DefaultFor
 and enables the parameterized message fallback (explained below). Every logger that should use
 the message format syntax needs its own factory reference at construction time. Loggers created
 without a factory continue to use Log4j's default formatting.
+
+
+## Global Configuration
+
+Instead of passing a `Log4jMessageFactory` to each individual logger, you can configure it as
+the default message factory for the entire application. Log4j2 reads the system property
+`log4j2.messageFactory` at startup and uses the specified class for every logger that is
+created without an explicit factory argument. Set it on the JVM command line:
+
+```
+-Dlog4j2.messageFactory=de.sayayi.lib.message.log4j.Log4jMessageFactory
+```
+
+With this property in place, all calls to `LogManager.getLogger()` throughout the application
+will automatically use the message format syntax.
+
+```java
+// No factory argument needed — the global default applies
+private static final Logger logger = LogManager.getLogger(OrderService.class);
+```
+
+Log4j instantiates the factory through its public no-argument constructor. This means the
+global factory always uses the shared `DefaultFormatterService` and has the parameterized
+message fallback enabled. If you need a custom `MessageSupport` instance or want to disable
+the fallback, you must pass the factory explicitly to each logger as shown in the previous
+section.
+
+Because the property affects all loggers, third-party libraries that use Log4j in the same
+JVM will also receive a `Log4jMessageFactory`. This is usually harmless when the parameterized
+message fallback is active, since their existing `{}` log statements are automatically
+delegated to Log4j's `ParameterizedMessage`. However, if a library produces log messages that
+contain character sequences resembling message format markers (`%{`, `%[` or `%(`), those
+messages will be parsed by the message format engine instead. Review your dependencies before
+enabling this setting globally.
 
 
 ## Parameter Mapping

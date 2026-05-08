@@ -4,14 +4,19 @@ nav:
     - Philosophy: philosophy.md
     - Getting started:
       - Syntax: core/syntax.md
+    - License: license.md
   - Core:
     - core/index.md
     - Formatting: core/formatting.md
     - Messages and Templates: core/messages-and-templates.md
-    - Formatter Service: core/formatter-service.md
-    - Default Configuration: core/default-configuration.md
-    - Pack Files: core/pack-files.md
     - Exceptions: core/exceptions.md
+  - Config:
+    - core/configuration/index.md
+    - Message Support: core/configuration/message-support.md
+    - Message Factory: core/configuration/message-factory.md
+    - Formatter Service: core/configuration/formatter-service.md
+    - Default Configuration: core/configuration/default-configuration.md
+    - Pack Files: core/configuration/pack-files.md
   - Formatters:
     - formatter/index.md
     - Parameter Formatters:
@@ -79,11 +84,11 @@ nav:
     - gradle-plugin/index.md
     - Extension Configuration: gradle-plugin/extension.md
     - Pack Task: gradle-plugin/pack-task.md
-  - Changelogs:
+  - Upgrade:
+    - changelog/index.md
     - changelog/version-0.22.0.md
     - changelog/version-0.21.0.md
     - changelog/version-0.20.1.md
     - changelog/version-0.20.0.md
     - changelog/version-0.12.0.md
     - changelog/version-0.11.0.md
-    - changelog/version-0.10.0.md

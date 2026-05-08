@@ -4,7 +4,7 @@ Every developer knows the pain of producing messages that give users feedback ab
 what went wrong, or what to do next. Because it is painful, it usually does not receive the care
 it deserves. The result is technical, barely readable output that leans heavily on whatever
 `toString()` happens to produce for a Java object. Grammar consistency falls by the wayside
-because getting it right would take more effort and more code than most teams are willing to
+because getting it right would take more effort and more code than most developers are willing to
 invest. "Found 1 search results" is a familiar sight. And when those messages must be available in
 multiple languages, the problem becomes too complex to handle at the call site where the message
 is produced.
@@ -44,5 +44,5 @@ ones.
 **Full locale support.** When an application needs to produce messages in multiple languages, the
 library handles this without making the code at the call site more complex.
 
-**Open source.** The library is open source and licensed under the Apache License. It can be used
+**Open source.** The library is open source and licensed under the [Apache License](license.md). It can be used
 freely in both open source and commercial projects without restrictions.

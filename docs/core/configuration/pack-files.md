@@ -12,8 +12,8 @@ The `exportMessages` method on `MessageSupport` writes all published messages an
 templates they reference to an `OutputStream`.
 
 ```java
-try (var out = new FileOutputStream("messages.mfp")) {
-    messageSupport.exportMessages(out);
+try(var out = new FileOutputStream("messages.mfp")) {
+  messageSupport.exportMessages(out);
 }
 ```
 
@@ -43,8 +43,8 @@ The `importMessages` method on `ConfigurableMessageSupport` reads a pack file fr
 `InputStream` and adds all messages and templates it contains to the message support instance.
 
 ```java
-try (var in = new FileInputStream("messages.mfp")) {
-    messageSupport.importMessages(in);
+try(var in = new FileInputStream("messages.mfp")) {
+  messageSupport.importMessages(in);
 }
 ```
 

@@ -1,4 +1,4 @@
-# The Formatter Service
+# Formatter Service
 
 The formatter service is responsible for resolving the right formatter for a given parameter
 value. When a message is formatted, each parameter's value needs to be converted to text. The
@@ -10,7 +10,7 @@ In addition to parameter formatters, the formatter service also manages post for
 transform already formatted text.
 
 
-## The Interface Hierarchy
+## Interface Hierarchy
 
 The formatter service is defined by two interfaces. `FormatterService` is the read-only
 interface used during message formatting. It provides methods to look up parameter formatters
