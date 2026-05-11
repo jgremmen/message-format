@@ -26,7 +26,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.Optional;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -43,8 +42,7 @@ final class OptionalFormatterTest extends AbstractFormatterTest
   void testEmptyNull()
   {
     val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new OptionalFormatter(), new StringFormatter()),
-            NO_CACHE_INSTANCE)
+        .create(createFormatterService(new OptionalFormatter(), new StringFormatter()))
         .setLocale(ROOT);
 
     assertEquals("null", messageSupport

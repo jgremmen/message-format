@@ -12,7 +12,6 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,8 +31,8 @@ final class AnnotationFormatterTest extends AbstractFormatterTest
   @MyAnnotation(value = 56, name = "Annotation", chars = { 'A', 'b', 'C' })
   void testAnnotation() throws ReflectiveOperationException
   {
-    val context = MessageSupportFactory.create(
-        createFormatterService(new AnnotationFormatter()), NO_CACHE_INSTANCE);
+    val context = MessageSupportFactory
+        .create(createFormatterService(new AnnotationFormatter()));
 
     val annotation = AnnotationFormatterTest.class
         .getDeclaredMethod("testAnnotation").getAnnotation(MyAnnotation.class);

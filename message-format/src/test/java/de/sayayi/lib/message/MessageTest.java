@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.Locale;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.UK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -51,7 +50,7 @@ public class MessageTest
     texts.put(Locale.GERMAN, "%{n} %{n,format:choice,1: 'Farbe', :'Farben'}.");
     texts.put(Locale.US, "%{n} %{n,format:choice,1:'color', :'colors'}.");
 
-    val msg = NO_CACHE_INSTANCE.parseMessage(texts);
+    val msg = MessageFactory.getSharedInstance().parseMessage(texts);
     val messageSupport = MessageSupportFactory.shared();
 
     assertEquals("1 kleur.",

@@ -25,7 +25,6 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 
 import java.util.Optional;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.ENGLISH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -46,7 +45,7 @@ final class MessageSupportMessageSourceTest
   void init()
   {
     val messageSupport = MessageSupportFactory
-        .create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+        .create(DefaultFormatterService.getSharedInstance());
 
     messageSupport.addMessage("spring.message.1",
         "you have %{p1,format:choice,1:'a single result',:'%{p1} results'}");

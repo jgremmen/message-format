@@ -25,7 +25,6 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -41,7 +40,7 @@ final class FieldFormatterTest extends AbstractFormatterTest
 
   @BeforeEach
   void init() {
-    context = MessageSupportFactory.create(createFormatterService(new FieldFormatter()), NO_CACHE_INSTANCE);
+    context = MessageSupportFactory.create(createFormatterService(new FieldFormatter()));
   }
 
 

@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.part.template;
 
+import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
@@ -24,7 +25,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.GERMANY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -41,7 +41,7 @@ public class TemplateTest
   @BeforeEach
   void init()
   {
-    val messageFactory = NO_CACHE_INSTANCE;
+    val messageFactory = MessageFactory.getSharedInstance();
     val configurableMessageSupport = MessageSupportFactory
         .create(DefaultFormatterService.getSharedInstance(), messageFactory)
         .setLocale(GERMANY);

@@ -29,7 +29,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.HashMap;
 import java.util.Map;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -109,7 +108,7 @@ final class GeoFormatterTest extends AbstractFormatterTest
   void testFormatLongitude()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new GeoFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new GeoFormatter()))
         .setLocale(ROOT)
         .getMessageAccessor();
 
@@ -141,7 +140,7 @@ final class GeoFormatterTest extends AbstractFormatterTest
   void testFormatter()
   {
     val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new GeoFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new GeoFormatter()))
         .setLocale(ENGLISH);
     val parameters = new HashMap<String,Object>();
 

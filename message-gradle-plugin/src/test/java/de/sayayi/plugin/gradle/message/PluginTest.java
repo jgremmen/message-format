@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.nio.file.Files.*;
 import static java.util.Objects.requireNonNull;
 import static org.gradle.testkit.runner.TaskOutcome.FAILED;
@@ -233,8 +232,7 @@ final class PluginTest
   @Contract(pure = true)
   private @NotNull MessageAccessor readMessagePack(@NotNull File pack) throws IOException
   {
-    val messageSupport = MessageSupportFactory
-        .create(new GenericFormatterService(), NO_CACHE_INSTANCE);
+    val messageSupport = MessageSupportFactory.create(new GenericFormatterService());
 
     return messageSupport
         .importMessages(newInputStream(pack.toPath()))

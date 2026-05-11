@@ -22,8 +22,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-
 
 /**
  * Fluent builder interface for constructing {@link Message} instances programmatically.
@@ -137,13 +135,13 @@ public sealed interface MessageBuilder
 
   /**
    * Creates a new message builder using the
-   * {@linkplain MessageFactory#NO_CACHE_INSTANCE shared no-cache message factory}.
+   * {@linkplain MessageFactory#getSharedInstance() shared message factory}.
    *
    * @return  new message builder, never {@code null}
    */
   @Contract("-> new")
   static @NotNull MessageBuilder create() {
-    return new InternalMessageBuilder(NO_CACHE_INSTANCE);
+    return create(MessageFactory.getSharedInstance());
   }
 
 

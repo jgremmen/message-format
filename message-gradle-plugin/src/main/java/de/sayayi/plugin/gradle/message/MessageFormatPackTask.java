@@ -45,7 +45,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.util.MessageUtil.isMessageFormatPack;
 import static de.sayayi.plugin.gradle.message.DuplicateMsgStrategy.IGNORE_AND_WARN;
 import static java.nio.file.Files.newInputStream;
@@ -304,8 +303,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   @TaskAction
   public void pack()
   {
-    final var messageSupport = MessageSupportFactory
-        .create(new GenericFormatterService(), NO_CACHE_INSTANCE);
+    final var messageSupport = MessageSupportFactory.create(new GenericFormatterService());
 
     configureDuplicatesStrategy(messageSupport);
 

@@ -28,7 +28,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.ArrayList;
 import java.util.concurrent.CyclicBarrier;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.normalizer.MessagePartNormalizer.PASS_THROUGH;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,7 +43,7 @@ final class MessageFactoryTest
   @Test
   @DisplayName("Parse message format string into CompoundMessage")
   void testParseString() {
-    assertInstanceOf(CompoundMessage.class, NO_CACHE_INSTANCE.parseMessage("this is %{test}"));
+    assertInstanceOf(CompoundMessage.class, MessageFactory.getSharedInstance().parseMessage("this is %{test}"));
   }
 
 
@@ -52,11 +51,12 @@ final class MessageFactoryTest
   @DisplayName("Wrap message with a different code using withCode()")
   void testWithCode()
   {
-    final var msgWithCode1 = NO_CACHE_INSTANCE.withCode("ABC", EmptyMessage.INSTANCE);
+    final var msgWithCode1 = MessageFactory.getSharedInstance().withCode("ABC", EmptyMessage.INSTANCE);
     assertEquals("ABC", msgWithCode1.getCode());
     assertInstanceOf(EmptyMessageWithCode.class, msgWithCode1);
 
-    final var msgWithCode2 = NO_CACHE_INSTANCE.withCode("ABC", new EmptyMessageWithCode("DEF"));
+    final var msgWithCode2 = MessageFactory.getSharedInstance()
+        .withCode("ABC", new EmptyMessageWithCode("DEF"));
     assertEquals("ABC", msgWithCode2.getCode());
     assertInstanceOf(EmptyMessageWithCode.class, msgWithCode2);
   }
@@ -68,11 +68,11 @@ final class MessageFactoryTest
   {
     // lexer error
     assertThrows(MessageParserException.class,
-        () -> NO_CACHE_INSTANCE.parseMessage("%{x,{true false:1}"));
+        () -> MessageFactory.getSharedInstance().parseMessage("%{x,{true false:1}"));
 
     // parser error
     assertThrows(MessageParserException.class,
-        () -> NO_CACHE_INSTANCE.parseMessage("%{x,true false:1}"));
+        () -> MessageFactory.getSharedInstance().parseMessage("%{x,true false:1}"));
   }
 
 
@@ -93,8 +93,9 @@ final class MessageFactoryTest
   @DisplayName("No-cache factory returns different instances for identical format string")
   void testParseMessageNoCacheReturnsDifferentInstances()
   {
-    final var msg1 = NO_CACHE_INSTANCE.parseMessage("hello %{name}");
-    final var msg2 = NO_CACHE_INSTANCE.parseMessage("hello %{name}");
+    final var messageFactory = new MessageFactory(PASS_THROUGH, 0);
+    final var msg1 = messageFactory.parseMessage("hello %{name}");
+    final var msg2 = messageFactory.parseMessage("hello %{name}");
 
     assertNotSame(msg1, msg2);
   }

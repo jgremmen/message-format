@@ -397,7 +397,7 @@ var messageSupport = MessageSupportFactory.create(
     DefaultFormatterService.getSharedInstance());
 
 messageSupport.addTemplate("greeting",
-    MessageFactory.NO_CACHE_INSTANCE.parseTemplate("Hello %{who}!"));
+    MessageFactory.getSharedInstance().parseTemplate("Hello %{who}!"));
 
 messageSupport
     .message("Result: %[greeting]")
@@ -421,7 +421,7 @@ provides the value under the name `userName`. The delegation `who->userName` bri
 
 ```java
 messageSupport.addTemplate("greeting",
-    MessageFactory.NO_CACHE_INSTANCE.parseTemplate("Hello %{who}!"));
+    MessageFactory.getSharedInstance().parseTemplate("Hello %{who}!"));
 
 messageSupport
     .message("%[greeting,who->userName]")
@@ -438,7 +438,7 @@ enclosing message does not provide a value for the parameter, the default is use
 
 ```java
 messageSupport.addTemplate("greeting",
-    MessageFactory.NO_CACHE_INSTANCE.parseTemplate("Hello %{who}!"));
+    MessageFactory.getSharedInstance().parseTemplate("Hello %{who}!"));
 
 messageSupport
     .message("%[greeting,who='stranger']")
@@ -457,7 +457,7 @@ In and of itself this is a simple concept, but it becomes very powerful for temp
 are used across multiple messages with different parameter naming conventions.
 
 ```java
-var factory = MessageFactory.NO_CACHE_INSTANCE;
+var factory = MessageFactory.getSharedInstance();
 
 messageSupport.addTemplate("order-line",
     factory.parseTemplate("%{qty}x %{product}"));
@@ -559,7 +559,7 @@ case, a template reference with parameter delegation for the item count, and pla
 tie everything together.
 
 ```java
-var factory = MessageFactory.NO_CACHE_INSTANCE;
+var factory = MessageFactory.getSharedInstance();
 var messageSupport = MessageSupportFactory.create(
     DefaultFormatterService.getSharedInstance());
 

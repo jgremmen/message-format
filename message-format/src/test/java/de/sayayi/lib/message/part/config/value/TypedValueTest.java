@@ -70,7 +70,7 @@ class TypedValueTest
     assertEquals("Hello %{s}", string.stringValue());
     assertEquals("Hello %{s}", string.asObject());
 
-    val messageFactory = MessageFactory.NO_CACHE_INSTANCE;
+    val messageFactory = MessageFactory.getSharedInstance();
 
     assertEquals(messageFactory.parseMessage("Hello  %{ s }"),
         string.asMessage(messageFactory));
@@ -83,7 +83,7 @@ class TypedValueTest
     //noinspection DataFlowIssue
     assertThrows(Exception.class, () -> new TypedValueMessage(null));
 
-    val messageFactory = MessageFactory.NO_CACHE_INSTANCE;
+    val messageFactory = MessageFactory.getSharedInstance();
     val msg = messageFactory.parseMessage("%{a,format:bool} %{s}.");
 
     val message = new TypedValueMessage(msg);

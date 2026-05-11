@@ -26,7 +26,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.lang.reflect.Method;
 import java.util.Set;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.UK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -48,7 +47,7 @@ final class MethodFormatterTest extends AbstractFormatterTest
   void testFormat() throws Exception
   {
     val message = MessageSupportFactory
-        .create(createFormatterService(new MethodFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new MethodFormatter()))
         .setLocale(UK)
         .message("%{m} %{m,method:'name'} %{m,method:'return-type'} %{m,method:'class'}");
 

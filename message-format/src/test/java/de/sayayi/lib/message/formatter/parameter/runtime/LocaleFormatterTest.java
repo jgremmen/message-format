@@ -28,7 +28,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.Locale;
 import java.util.Map;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,7 +51,7 @@ final class LocaleFormatterTest extends AbstractFormatterTest
   void testFormatCountry()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new LocaleFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new LocaleFormatter()))
         .setLocale(FRANCE)
         .getMessageAccessor();
 
@@ -69,7 +68,7 @@ final class LocaleFormatterTest extends AbstractFormatterTest
   void testFormatLanguage()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new LocaleFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new LocaleFormatter()))
         .setLocale(Locale.forLanguageTag("es-ES"))
         .getMessageAccessor();
 
@@ -86,7 +85,7 @@ final class LocaleFormatterTest extends AbstractFormatterTest
   void testFormatName()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new LocaleFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new LocaleFormatter()))
         .setLocale(Locale.forLanguageTag("nl-BE"))
         .getMessageAccessor();
 

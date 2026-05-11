@@ -28,7 +28,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -52,7 +51,7 @@ final class StringFormatterTest extends AbstractFormatterTest
   public void testFormat()
   {
     val messageAccessor = MessageSupportFactory
-        .create(new GenericFormatterService(), NO_CACHE_INSTANCE)
+        .create(new GenericFormatterService())
         .getMessageAccessor();
 
     assertEquals(noSpaceText("text"), format(messageAccessor, " text "));
@@ -69,7 +68,8 @@ final class StringFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatter()
   {
-    val messageSupport = MessageSupportFactory.create(new GenericFormatterService(), NO_CACHE_INSTANCE);
+    val messageSupport = MessageSupportFactory
+        .create(new GenericFormatterService());
 
     assertEquals("This is a test 1234", messageSupport
         .message("This is %{a} %{b} %{c}")
@@ -83,8 +83,7 @@ final class StringFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatterWithMap()
   {
-    val messageSupport = MessageSupportFactory.create(
-        new GenericFormatterService(), NO_CACHE_INSTANCE);
+    val messageSupport = MessageSupportFactory.create(new GenericFormatterService());
     val parameters = new HashMap<String,Object>();
 
     parameters.put("empty", "");
@@ -114,8 +113,7 @@ final class StringFormatterTest extends AbstractFormatterTest
   @Test
   void testMapKey()
   {
-    val messageSupport = MessageSupportFactory.create(
-        new DefaultFormatterService(), NO_CACHE_INSTANCE);
+    val messageSupport = MessageSupportFactory.create(new DefaultFormatterService());
 
     assertEquals("exact", messageSupport
         .message("%{text,format:choice,'Süd':'exact'}")
@@ -132,8 +130,7 @@ final class StringFormatterTest extends AbstractFormatterTest
   @Test
   void testDefaultToString()
   {
-    val messageSupport = MessageSupportFactory.create(
-        new DefaultFormatterService(), NO_CACHE_INSTANCE);
+    val messageSupport = MessageSupportFactory.create(new DefaultFormatterService());
     messageSupport.addMessage("OBJ", "%{object}");
 
     val object = new Object();

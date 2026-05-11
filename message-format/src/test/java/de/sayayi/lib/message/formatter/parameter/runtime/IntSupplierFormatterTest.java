@@ -25,7 +25,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.function.IntSupplier;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.lang.Integer.MAX_VALUE;
@@ -51,7 +50,7 @@ final class IntSupplierFormatterTest extends AbstractFormatterTest
   void testFormat()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new IntSupplierFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new IntSupplierFormatter()))
         .setLocale(ROOT)
         .getMessageAccessor();
 

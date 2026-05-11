@@ -29,7 +29,6 @@ import java.time.LocalTime;
 import java.util.Map;
 import java.util.TimeZone;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Locale.*;
@@ -62,7 +61,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   void testLocalDate()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new TemporalFormatter()))
         .setLocale(GERMANY)
         .getMessageAccessor();
     val date = LocalDate.of(1972, 8, 17);
@@ -87,7 +86,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   void testLocalTime()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new TemporalFormatter()))
         .setLocale(GERMANY)
         .getMessageAccessor();
     val time = LocalTime.of(16, 34, 11, 672000000);
@@ -112,7 +111,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   void testDateTime()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new TemporalFormatter()))
         .setLocale(UK)
         .getMessageAccessor();
     val datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
@@ -137,7 +136,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   void testCustomPattern()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new TemporalFormatter()))
         .setLocale(FRANCE)
         .getMessageAccessor();
     val datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
@@ -155,7 +154,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   void testFormatter()
   {
     val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter()), NO_CACHE_INSTANCE);
+        .create(createFormatterService(new TemporalFormatter()));
 
     assertEquals("17 aug 1972 16:45 14:23:01 2019-02-19 feb", messageSupport
         .message("%{a} %{b,date:'short'} %{c,date:'time'} %{c,date:'yyyy-MM-dd MMM'}")

@@ -148,7 +148,7 @@ a configuration key is not explicitly provided in the message itself.
 
 ```java
 var messageSupport = MessageSupportFactory
-    .create(new DefaultFormatterService(), NO_CACHE_INSTANCE);
+    .create(new DefaultFormatterService(), MessageFactory.getSharedInstance());
 
 // Globally disable the ellipsis suffix
 messageSupport.setDefaultConfig("clip-suffix", false);

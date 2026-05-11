@@ -25,7 +25,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.function.BooleanSupplier;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.util.Locale.ROOT;
@@ -49,7 +48,7 @@ final class BooleanSupplierFormatterTest extends AbstractFormatterTest
   public void testFormat()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new BooleanSupplierFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new BooleanSupplierFormatter()))
         .setLocale(ROOT)
         .getMessageAccessor();
 

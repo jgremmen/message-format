@@ -24,7 +24,6 @@ import org.junit.jupiter.api.*;
 
 import java.math.BigInteger;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.math.BigInteger.ONE;
 import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,9 +46,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   void init()
   {
     messageSupport = MessageSupportFactory
-        .create(
-            createFormatterService(new BitmaskFormatter(), new BitSetFormatter(), new NumberFormatter()).seal(),
-            NO_CACHE_INSTANCE)
+        .create(createFormatterService(new BitmaskFormatter(), new BitSetFormatter(), new NumberFormatter()).seal())
         .setLocale(ROOT);
   }
 

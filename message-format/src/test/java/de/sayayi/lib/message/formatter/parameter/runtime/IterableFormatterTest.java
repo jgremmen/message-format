@@ -26,7 +26,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.List;
 import java.util.Set;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,7 +48,7 @@ final class IterableFormatterTest extends AbstractFormatterTest
   void testObjectArray()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new IterableFormatter()))
         .setLocale("de-DE")
         .getMessageAccessor();
 
@@ -62,7 +61,7 @@ final class IterableFormatterTest extends AbstractFormatterTest
   void testEmptyOrNullCollection()
   {
     val message = MessageSupportFactory
-        .create(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new IterableFormatter()))
         .message("%{c,null:null,empty:empty}");
 
     assertEquals("null", message.with("c", null).format());
@@ -74,7 +73,7 @@ final class IterableFormatterTest extends AbstractFormatterTest
   void testSeparator()
   {
     val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new IterableFormatter()), NO_CACHE_INSTANCE);
+        .create(createFormatterService(new IterableFormatter()));
 
     assertEquals("1, 2, 3, 4 and 5", messageSupport
         .message("%{c,list-sep:', ',list-sep-last:' and '}").with("c", List.of(1, 2, 3, 4, 5)).format());

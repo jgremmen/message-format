@@ -29,7 +29,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.List;
 import java.util.Map;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.UK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -46,7 +45,7 @@ final class SizeFormatterTest extends AbstractFormatterTest
   {
     val messageSupport = MessageSupportFactory
         .create(createFormatterService(new SizeFormatter(), new IterableFormatter(),
-            new ArrayFormatter(), new MapFormatter()), NO_CACHE_INSTANCE)
+            new ArrayFormatter(), new MapFormatter()))
         .setLocale(UK);
     val message = messageSupport
         .message("%{c,format:size} %{c,format:size,0:'empty',1:'singleton',:'multiple'}").getMessage();
@@ -66,7 +65,7 @@ final class SizeFormatterTest extends AbstractFormatterTest
   void testFormatNoSizeQueryable()
   {
     val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new SizeFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new SizeFormatter()))
         .setLocale(UK);
 
     assertEquals("", messageSupport.message("%{c,format:size}").with("c", true).format());

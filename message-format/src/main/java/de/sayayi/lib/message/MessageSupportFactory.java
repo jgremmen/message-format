@@ -25,8 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
-
 
 /**
  * Factory class for creating {@link MessageSupport} instances.
@@ -49,7 +47,7 @@ import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 public final class MessageSupportFactory
 {
   private static final Lock $LOCK = new ReentrantLock();
-  private static MessageSupport SHARED = null;
+  private static volatile MessageSupport SHARED = null;
 
 
   private MessageSupportFactory() {
@@ -67,15 +65,19 @@ public final class MessageSupportFactory
    */
   public static @NotNull MessageSupport shared()
   {
-    $LOCK.lock();
-    try {
-      if (SHARED == null)
-        SHARED = create(DefaultFormatterService.getSharedInstance()).seal();
-    } finally {
-      $LOCK.unlock();
+    var shared = SHARED;
+    if (shared == null)
+    {
+      $LOCK.lock();
+      try {
+        if ((shared = SHARED) == null)
+          SHARED = shared = create(DefaultFormatterService.getSharedInstance()).seal();
+      } finally {
+        $LOCK.unlock();
+      }
     }
 
-    return SHARED;
+    return shared;
   }
 
 
@@ -102,7 +104,7 @@ public final class MessageSupportFactory
    * {@link MessageFactory}.
    * <p>
    * This is a convenience method equivalent to calling
-   * {@link #create(FormatterService, MessageFactory) create(formatterService, MessageFactory.NO_CACHE_INSTANCE)}.
+   * {@link #create(FormatterService, MessageFactory) create(formatterService, MessageFactory.getSharedInstance())}.
    *
    * @param formatterService  formatter service, not {@code null}
    *
@@ -112,6 +114,6 @@ public final class MessageSupportFactory
    */
   @Contract(value = "_ -> new")
   public static @NotNull ConfigurableMessageSupport create(@NotNull FormatterService formatterService) {
-    return create(formatterService, NO_CACHE_INSTANCE);
+    return create(formatterService, MessageFactory.getSharedInstance());
   }
 }

@@ -25,7 +25,6 @@ import org.springframework.core.convert.support.DefaultConversionService;
 
 import java.util.TreeMap;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -48,7 +47,7 @@ final class SpELFormatterTest extends AbstractFormatterTest
     formatterService.addFormatter(new SpELFormatter(
         new DefaultConversionService(), SpELFormatterTest.class.getClassLoader()));
 
-    messageSupport = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE);
+    messageSupport = MessageSupportFactory.create(formatterService);
   }
 
 

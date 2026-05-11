@@ -7,17 +7,17 @@ to create and configure a `MessageFactory`. For the full API of parsing methods 
 `MessageBuilder`, see [Messages and Templates](../messages-and-templates.md).
 
 
-## The Shared No-Cache Instance
+## The Shared Instance
 
-For most applications the shared `MessageFactory.NO_CACHE_INSTANCE` is sufficient. It uses the
-`PASS_THROUGH` normalizer, which means message parts are not deduplicated, and it does not cache
-parsed messages. When you call `MessageSupportFactory.create(FormatterService)` without
+For most applications the shared `MessageFactory.getSharedInstance()` singleton is sufficient. It
+uses the `PASS_THROUGH` normalizer, which means message parts are not deduplicated, and it caches
+up to 128 parsed messages. When you call `MessageSupportFactory.create(FormatterService)` without
 specifying a factory, this is the instance that is used:
 
 ```java
 // these two calls are equivalent
 var ms1 = MessageSupportFactory.create(formatterService);
-var ms2 = MessageSupportFactory.create(formatterService, MessageFactory.NO_CACHE_INSTANCE);
+var ms2 = MessageSupportFactory.create(formatterService, MessageFactory.getSharedInstance());
 ```
 
 

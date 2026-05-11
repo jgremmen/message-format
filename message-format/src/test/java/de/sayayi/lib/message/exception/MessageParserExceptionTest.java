@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.exception;
 
+import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.exception.MessageParserException.Type;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +32,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAGE;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.TEMPLATE;
 import static java.util.Locale.*;
@@ -156,7 +156,6 @@ final class MessageParserExceptionTest
   @DisplayName("Detailed exception messages (thrown by parser)")
   @ParameterizedTest(name = "parse: {4}")
   @MethodSource("testParseFailure_parameters")
-  @SuppressWarnings("UnknownLanguage")
   @Order(2)
   void testParseFailure(String code, Locale locale, @NotNull Type type,
                         @Language("MessageFormat") @NotNull String parseString, @NotNull String msg)
@@ -170,27 +169,27 @@ final class MessageParserExceptionTest
       switch(n)
       {
         case 0b000:
-          NO_CACHE_INSTANCE.parseMessage(parseString);
+          MessageFactory.getSharedInstance().parseMessage(parseString);
           break;
 
         case 0b001:
-          NO_CACHE_INSTANCE.parseMessage(Map.of(locale, parseString));
+          MessageFactory.getSharedInstance().parseMessage(Map.of(locale, parseString));
           break;
 
         case 0b100:
-          NO_CACHE_INSTANCE.parseMessage(code, parseString);
+          MessageFactory.getSharedInstance().parseMessage(code, parseString);
           break;
 
         case 0b101:
-          NO_CACHE_INSTANCE.parseMessage(code, Map.of(locale, parseString));
+          MessageFactory.getSharedInstance().parseMessage(code, Map.of(locale, parseString));
           break;
 
         case 0b010:
-          NO_CACHE_INSTANCE.parseTemplate(parseString);
+          MessageFactory.getSharedInstance().parseTemplate(parseString);
           break;
 
         case 0b011:
-          NO_CACHE_INSTANCE.parseTemplate(Map.of(locale, parseString));
+          MessageFactory.getSharedInstance().parseTemplate(Map.of(locale, parseString));
           break;
       }
     }).getMessage().startsWith(msg + ": "));

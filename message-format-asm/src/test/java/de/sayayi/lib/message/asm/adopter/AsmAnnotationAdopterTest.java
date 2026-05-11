@@ -30,7 +30,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.Set;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -57,7 +56,7 @@ final class AsmAnnotationAdopterTest
     val messageFactory = new MessageFactory(LRUMessagePartNormalizer.create(10));
     val messageSupport = MessageSupportFactory.create(new DefaultFormatterService(), messageFactory);
 
-    new AsmAnnotationAdopter(NO_CACHE_INSTANCE, messageSupport).adopt(
+    new AsmAnnotationAdopter(MessageFactory.getSharedInstance(), messageSupport).adopt(
         AsmAnnotationAdopterTest.class.getClassLoader(),
         Set.of(AsmAnnotationAdopterTest.class.getPackage().getName()));
 

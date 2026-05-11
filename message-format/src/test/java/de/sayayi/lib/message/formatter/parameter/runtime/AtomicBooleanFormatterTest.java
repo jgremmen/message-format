@@ -25,7 +25,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,7 +47,7 @@ final class AtomicBooleanFormatterTest extends AbstractFormatterTest
   void testFormat()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new AtomicBooleanFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new AtomicBooleanFormatter()))
         .setLocale("de-DE")
         .getMessageAccessor();
 

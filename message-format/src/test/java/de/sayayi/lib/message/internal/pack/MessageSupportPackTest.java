@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -30,8 +29,7 @@ final class MessageSupportPackTest
   @BeforeAll
   static void initMessageSupport()
   {
-    var cms =
-        MessageSupportFactory.create(new GenericFormatterService(), NO_CACHE_INSTANCE);
+    var cms = MessageSupportFactory.create(new GenericFormatterService());
     var messageFactory = cms.getMessageAccessor().getMessageFactory();
 
     cms.addMessage("MSG-001", "");
@@ -58,8 +56,7 @@ final class MessageSupportPackTest
 
     messageSupport.exportMessages(pack);
 
-    val messageSupportCloned =
-        MessageSupportFactory.create(new GenericFormatterService(), NO_CACHE_INSTANCE);
+    val messageSupportCloned = MessageSupportFactory.create(new GenericFormatterService());
 
     try(val inStream = new ByteArrayInputStream(pack.toByteArray())) {
       messageSupportCloned.importMessages(inStream);

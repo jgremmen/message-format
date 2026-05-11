@@ -31,7 +31,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Locale;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.forLanguageTag;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -49,8 +48,7 @@ final class MessageDefAnnotationTest
   @BeforeAll
   static void initialize()
   {
-    val cms = MessageSupportFactory
-        .create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+    val cms = MessageSupportFactory.create(DefaultFormatterService.getSharedInstance());
 
     new AsmAnnotationAdopter(cms).adopt(MessageDefAnnotationTest.class);
 
@@ -171,7 +169,7 @@ final class MessageDefAnnotationTest
     messageSupport.exportMessages(packStream, true, code -> code.startsWith("T"));
 
     val newMessageSupport = MessageSupportFactory
-        .create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+        .create(DefaultFormatterService.getSharedInstance());
     newMessageSupport.importMessages(new ByteArrayInputStream(packStream.toByteArray()));
 
     val codes = newMessageSupport.getMessageAccessor().getMessageCodes();

@@ -24,7 +24,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.lang.Math.PI;
 import static java.util.Locale.GERMANY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,7 +45,7 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
   void testClipNoEllipsis()
   {
     val messageSupport = MessageSupportFactory
-        .create(new DefaultFormatterService(), NO_CACHE_INSTANCE)
+        .create(new DefaultFormatterService())
         .setDefaultConfig("clip-suffix", false)
         .setLocale(GERMANY);
 
@@ -106,7 +105,7 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
   void testClipSize()
   {
     val messageSupport = MessageSupportFactory
-        .create(new DefaultFormatterService(), NO_CACHE_INSTANCE);
+        .create(new DefaultFormatterService());
 
     assertEquals(
         TEXT.substring(0, 63) + "\u2026",
@@ -150,7 +149,7 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
   void testClipEllipsis()
   {
     val messageSupport = MessageSupportFactory
-        .create(new DefaultFormatterService(), NO_CACHE_INSTANCE)
+        .create(new DefaultFormatterService())
         .setLocale(GERMANY);
 
     assertEquals(
@@ -174,7 +173,7 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
   void testClipCustomSuffix()
   {
     val messageSupport = MessageSupportFactory
-        .create(new DefaultFormatterService(), NO_CACHE_INSTANCE)
+        .create(new DefaultFormatterService())
         .setLocale(GERMANY);
 
     assertEquals(

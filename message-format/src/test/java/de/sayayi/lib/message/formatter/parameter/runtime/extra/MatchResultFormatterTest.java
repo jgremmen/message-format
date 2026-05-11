@@ -23,7 +23,6 @@ import org.junit.jupiter.api.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -38,10 +37,8 @@ final class MatchResultFormatterTest extends AbstractFormatterTest
 
 
   @BeforeEach
-  void init()
-  {
-    context = MessageSupportFactory.create(
-        createFormatterService(new MatchResultFormatter()), NO_CACHE_INSTANCE);
+  void init() {
+    context = MessageSupportFactory.create(createFormatterService(new MatchResultFormatter()));
   }
 
 

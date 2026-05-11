@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import lombok.val;
 import org.junit.jupiter.api.*;
@@ -24,7 +25,6 @@ import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.GERMAN;
 import static java.util.Locale.ITALIAN;
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,7 +47,8 @@ final class MessageParametersTest
   @BeforeEach
   void init()
   {
-    val messageSupport = new MessageSupportImpl(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+    val messageSupport = new MessageSupportImpl(DefaultFormatterService.getSharedInstance(),
+        MessageFactory.getSharedInstance());
     val configurer = messageSupport.new Configurer<>(() -> null);
 
     configurer

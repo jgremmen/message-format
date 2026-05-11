@@ -31,7 +31,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.lang.Boolean.FALSE;
@@ -60,7 +59,7 @@ final class BoolFormatterTest extends AbstractFormatterTest
   void testFormat()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new BoolFormatter()))
         .setLocale("de-DE")
         .getMessageAccessor();
 
@@ -80,7 +79,7 @@ final class BoolFormatterTest extends AbstractFormatterTest
   void testFormatter()
   {
     val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new BoolFormatter()))
         .setLocale(ENGLISH);
 
     assertEquals("false true 1234 true no 3.14", messageSupport
@@ -98,7 +97,7 @@ final class BoolFormatterTest extends AbstractFormatterTest
   void testNamedFormatter()
   {
     val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new BoolFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new BoolFormatter()))
         .setLocale(GERMAN);
 
     val msg = messageSupport.message("%{b,format:bool,null:'<unknown>',true:'yes',false:'no'}").getMessage();
@@ -113,7 +112,7 @@ final class BoolFormatterTest extends AbstractFormatterTest
   void testConfigKeyNull()
   {
     val messageSupport = MessageSupportFactory
-        .create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+        .create(DefaultFormatterService.getSharedInstance());
 
     val message = messageSupport
         .message("%{b,empty:empty,!empty:'not empty',null:null,!null:'not null'}");
@@ -138,7 +137,7 @@ final class BoolFormatterTest extends AbstractFormatterTest
   void testConfigKeyEmpty()
   {
     val messageSupport = MessageSupportFactory
-        .create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+        .create(DefaultFormatterService.getSharedInstance());
 
     assertEquals("not empty", messageSupport
         .message("%{b,empty:empty,!empty:'not empty',null:null}")
@@ -161,7 +160,7 @@ final class BoolFormatterTest extends AbstractFormatterTest
   void testConfigKeyBool()
   {
     val messageSupport = MessageSupportFactory
-        .create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+        .create(DefaultFormatterService.getSharedInstance());
 
     var message = messageSupport.message("%{b,true:true,false:false}");
 
@@ -246,7 +245,7 @@ final class BoolFormatterTest extends AbstractFormatterTest
   void testConfigKeyString()
   {
     val messageSupport = MessageSupportFactory
-        .create(DefaultFormatterService.getSharedInstance(), NO_CACHE_INSTANCE);
+        .create(DefaultFormatterService.getSharedInstance());
 
     val message = messageSupport.message("%{b,format:bool,'false':false,'True':'True'}");
 

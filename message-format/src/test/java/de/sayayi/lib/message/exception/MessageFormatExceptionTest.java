@@ -41,7 +41,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
@@ -74,7 +73,7 @@ final class MessageFormatExceptionTest
 
     formatterService.addFormatter(formatter);
 
-    MESSAGE_SUPPORT = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE);
+    MESSAGE_SUPPORT = MessageSupportFactory.create(formatterService);
     THROWING_MESSAGE = mock(TextMessage.class, CALLS_REAL_METHODS);
     when(THROWING_MESSAGE.formatAsText(any(MessageAccessor.class), any(Parameters.class)))
         .thenAnswer(invocation -> { throw new MessageFormatException(null); });

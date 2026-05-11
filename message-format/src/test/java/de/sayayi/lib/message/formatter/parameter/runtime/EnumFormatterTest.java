@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
+import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
@@ -26,7 +27,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.Map;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,7 +49,7 @@ final class EnumFormatterTest extends AbstractFormatterTest
   void testFormat()
   {
     val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new EnumFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new EnumFormatter()))
         .setLocale(ROOT);
     val messageAccessor = messageSupport.getMessageAccessor();
 
@@ -65,13 +65,13 @@ final class EnumFormatterTest extends AbstractFormatterTest
   void testMapWithoutDefault()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new EnumFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new EnumFormatter()))
         .getMessageAccessor();
 
-    assertEquals("upper", NO_CACHE_INSTANCE.parseMessage("%{e,>'C':upper,<'C':lower}")
+    assertEquals("upper", MessageFactory.getSharedInstance().parseMessage("%{e,>'C':upper,<'C':lower}")
         .format(messageAccessor, Map.of("e", MyEnum.CC)));
 
-    assertEquals("", NO_CACHE_INSTANCE.parseMessage("%{e,>'C':upper}")
+    assertEquals("", MessageFactory.getSharedInstance().parseMessage("%{e,>'C':upper}")
         .format(messageAccessor, Map.of("e", MyEnum.AA)));
   }
 
@@ -80,10 +80,10 @@ final class EnumFormatterTest extends AbstractFormatterTest
   void testMapWithDefault()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new EnumFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new EnumFormatter()))
         .getMessageAccessor();
 
-    assertEquals("C or D", NO_CACHE_INSTANCE
+    assertEquals("C or D", MessageFactory.getSharedInstance()
         .parseMessage("%{e,'AA':A,'BB':B,:'C or D'}")
         .format(messageAccessor, Map.of("e", MyEnum.CC)));
   }

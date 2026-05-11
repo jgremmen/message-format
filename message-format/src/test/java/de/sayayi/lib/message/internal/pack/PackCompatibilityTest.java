@@ -1,5 +1,6 @@
 package de.sayayi.lib.message.internal.pack;
 
+import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
@@ -20,7 +21,7 @@ import java.nio.file.Path;
 import java.util.Properties;
 import java.util.stream.Stream;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
+import static de.sayayi.lib.message.part.normalizer.MessagePartNormalizer.PASS_THROUGH;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
@@ -48,7 +49,7 @@ final class PackCompatibilityTest
   @BeforeAll
   static void init() throws IOException
   {
-    MESSAGE_SUPPORT = MessageSupportFactory.create(new DefaultFormatterService(), NO_CACHE_INSTANCE);
+    MESSAGE_SUPPORT = MessageSupportFactory.create(new DefaultFormatterService(), new MessageFactory(PASS_THROUGH));
 
     var properties = new Properties();
     var adopter = new PropertiesAdopter((ConfigurableMessageSupport)MESSAGE_SUPPORT);
@@ -81,7 +82,7 @@ final class PackCompatibilityTest
       throws IOException
   {
     var messagePackPath = Path.of("src/test/resources/messages-" + libraryVersion + ".mfp");
-    var cms = MessageSupportFactory.create(new DefaultFormatterService(), NO_CACHE_INSTANCE);
+    var cms = MessageSupportFactory.create(new DefaultFormatterService());
 
     // mime type
     var mimeType = parseMimeType(probeContentType(messagePackPath));

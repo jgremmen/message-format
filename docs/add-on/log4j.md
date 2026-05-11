@@ -281,7 +281,7 @@ var messageSupport = MessageSupportFactory.create(
 
 // Add a reusable template
 messageSupport.addTemplate("user-info",
-    MessageFactory.NO_CACHE_INSTANCE
+    MessageFactory.getSharedInstance()
         .parseTemplate("%{name} (%{role})"));
 
 var factory = new Log4jMessageFactory(messageSupport, true);

@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.LongSupplier;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -45,8 +44,7 @@ final class SupplierFormatterTest extends AbstractFormatterTest
   void testBooleanSupplier()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new BoolFormatter(), new BooleanSupplierFormatter()),
-            NO_CACHE_INSTANCE)
+        .create(createFormatterService(new BoolFormatter(), new BooleanSupplierFormatter()))
         .getMessageAccessor();
 
     assertEquals(noSpaceText("true"), format(messageAccessor, (BooleanSupplier)() -> true));
@@ -57,8 +55,7 @@ final class SupplierFormatterTest extends AbstractFormatterTest
   void testLongSupplier()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new NumberFormatter(), new LongSupplierFormatter()),
-            NO_CACHE_INSTANCE)
+        .create(createFormatterService(new NumberFormatter(), new LongSupplierFormatter()))
         .setLocale("en")
         .getMessageAccessor();
 

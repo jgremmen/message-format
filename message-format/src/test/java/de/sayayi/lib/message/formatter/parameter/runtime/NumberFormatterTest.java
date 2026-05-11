@@ -23,7 +23,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.lang.Math.PI;
 import static java.util.Locale.GERMANY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -56,7 +55,7 @@ final class NumberFormatterTest extends AbstractFormatterTest
   void testDoubleFormat()
   {
     val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new NumberFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new NumberFormatter()))
         .setLocale(GERMANY);
 
     assertEquals("3,14", messageSupport

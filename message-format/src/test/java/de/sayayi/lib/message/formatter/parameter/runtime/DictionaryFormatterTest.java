@@ -30,7 +30,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -45,8 +44,7 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
 {
   private final MessageSupport messageSupport = MessageSupportFactory
       .create(createFormatterService(
-          new DictionaryFormatter(), new MapFormatter(), new IterableFormatter(), new StringFormatter()),
-          NO_CACHE_INSTANCE);
+          new DictionaryFormatter(), new MapFormatter(), new IterableFormatter(), new StringFormatter()));
 
 
   @Test

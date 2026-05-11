@@ -60,8 +60,8 @@ ConfigurableMessageSupport messageSupport = MessageSupportFactory.create(
     new MessageFactory(myNormalizer, 256));
 ```
 
-When no factory is specified, `MessageFactory.NO_CACHE_INSTANCE` is used by default. This
-shared, non-caching factory is sufficient for most use cases.
+When no factory is specified, `MessageFactory.getSharedInstance()` is used by default. This
+shared singleton, which caches up to 128 parsed messages, is sufficient for most use cases.
 
 
 ## Adding Messages

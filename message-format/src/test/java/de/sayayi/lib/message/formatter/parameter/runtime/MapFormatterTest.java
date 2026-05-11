@@ -27,7 +27,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Collections.singletonMap;
 import static java.util.Locale.UK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,8 +51,7 @@ final class MapFormatterTest extends AbstractFormatterTest
   void testSeparator()
   {
     val message = MessageSupportFactory
-        .create(createFormatterService(new MapFormatter(), new ArrayFormatter()),
-            NO_CACHE_INSTANCE)
+        .create(createFormatterService(new MapFormatter(), new ArrayFormatter()))
         .setLocale(UK)
         .message("%{map1} %{map2,map-kv:'%{key}   -> %{value}'} %{map3,map-kv:' %{key}:  %{value} '}");
 
@@ -71,8 +69,7 @@ final class MapFormatterTest extends AbstractFormatterTest
   void testNullKeyValue()
   {
     val message = MessageSupportFactory
-        .create(createFormatterService(new MapFormatter(), new ArrayFormatter()),
-            NO_CACHE_INSTANCE)
+        .create(createFormatterService(new MapFormatter(), new ArrayFormatter()))
         .setLocale(UK)
         .message("%{map1} %{map2,map-kv:'%{key,null:key}=%{value,null:value}'}");
 
@@ -88,7 +85,7 @@ final class MapFormatterTest extends AbstractFormatterTest
   void testEmpty()
   {
     val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new MapFormatter(), new ArrayFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new MapFormatter(), new ArrayFormatter()))
         .setLocale(UK);
     val parameters = Map.<String,Object>of("map", Map.of());
 
@@ -101,9 +98,7 @@ final class MapFormatterTest extends AbstractFormatterTest
   void testMultiEntry()
   {
     val message = MessageSupportFactory
-        .create(createFormatterService(
-            new MapFormatter(), new ArrayFormatter(), new NumberFormatter()),
-            NO_CACHE_INSTANCE)
+        .create(createFormatterService(new MapFormatter(), new ArrayFormatter(), new NumberFormatter()))
         .setLocale(UK)
         .message("%{map,map-kv:'%{key} -> %{value,number:\"0000\"}',list-sep:', ',list-sep-last:' and '}");
 
@@ -122,9 +117,7 @@ final class MapFormatterTest extends AbstractFormatterTest
   void testKeyFormat()
   {
     val message = MessageSupportFactory
-        .create(createFormatterService(
-            new MapFormatter(), new ArrayFormatter(), new BoolFormatter()),
-            NO_CACHE_INSTANCE)
+        .create(createFormatterService(new MapFormatter(), new ArrayFormatter(), new BoolFormatter()))
         .message("%{map,map-kv:'%{key,format:bool}:%{value}',list-sep:' / '}");
 
     val map = new LinkedHashMap<Integer,Integer>();

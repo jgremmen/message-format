@@ -29,7 +29,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.nio.charset.IllegalCharsetNameException;
 import java.util.Map;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -57,7 +56,8 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
   void testEncodedByteArray()
   {
     val formatterService = createFormatterService(new ByteArrayFormatter(), new ArrayFormatter());
-    val messageAccessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
+    val messageAccessor = MessageSupportFactory
+        .create(formatterService)
         .setLocale("de-DE")
         .getMessageAccessor();
 
@@ -77,7 +77,8 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
   void testEmptyArray()
   {
     val formatterService = createFormatterService(new ByteArrayFormatter());
-    val messageAccessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
+    val messageAccessor = MessageSupportFactory
+        .create(formatterService)
         .setLocale(ROOT)
         .getMessageAccessor();
 
@@ -90,7 +91,8 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
   void testIllegalCharset()
   {
     val formatterService = createFormatterService(new ByteArrayFormatter(), new ArrayFormatter());
-    val messageAccessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
+    val messageAccessor = MessageSupportFactory
+        .create(formatterService)
         .setLocale("de-DE")
         .getMessageAccessor();
 
@@ -103,7 +105,8 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
   void testBase64()
   {
     val formatterService = createFormatterService(new ByteArrayFormatter(), new ArrayFormatter());
-    val messageAccessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
+    val messageAccessor = MessageSupportFactory
+        .create(formatterService)
         .getMessageAccessor();
 
     assertEquals(new TextPart("R3LDtsOfZQ=="), format(messageAccessor, "Größe".getBytes(),
@@ -115,7 +118,8 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
   void testBase64lf()
   {
     val formatterService = createFormatterService(new ByteArrayFormatter(), new ArrayFormatter());
-    val messageAccessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
+    val messageAccessor = MessageSupportFactory
+        .create(formatterService)
         .getMessageAccessor();
 
     assertEquals(new TextPart(
@@ -132,7 +136,8 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
     val formatterService = createFormatterService(
         new ByteArrayFormatter(),
         new ArrayFormatter());
-    val messageAccessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
+    val messageAccessor = MessageSupportFactory
+        .create(formatterService)
         .setLocale("de-DE")
         .getMessageAccessor();
 
@@ -148,8 +153,7 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
         createFormatterService(
             new SizeFormatter(),
             new ArrayFormatter(),
-            new ByteArrayFormatter()),
-        NO_CACHE_INSTANCE);
+            new ByteArrayFormatter()));
 
     assertEquals("2", messageSupport.message("%{c,format:size}")
         .with("c", new byte[] { 'a', 'b' }).format());

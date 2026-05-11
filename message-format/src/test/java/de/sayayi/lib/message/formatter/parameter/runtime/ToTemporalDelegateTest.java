@@ -11,7 +11,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Locale.GERMANY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,7 +31,7 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
   void init()
   {
     messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter(), new ToTemporalDelegate()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new TemporalFormatter(), new ToTemporalDelegate()))
         .setLocale(GERMANY)
         .getMessageAccessor();
   }

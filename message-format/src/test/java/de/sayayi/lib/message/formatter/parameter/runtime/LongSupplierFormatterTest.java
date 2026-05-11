@@ -25,7 +25,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.function.LongSupplier;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.lang.Long.MAX_VALUE;
@@ -51,7 +50,7 @@ final class LongSupplierFormatterTest extends AbstractFormatterTest
   void testFormat()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new LongSupplierFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new LongSupplierFormatter()))
         .setLocale(ROOT)
         .getMessageAccessor();
 

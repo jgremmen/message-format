@@ -30,7 +30,6 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.Map;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.util.Locale.ROOT;
@@ -50,7 +49,7 @@ final class PathFormatterTest extends AbstractFormatterTest
   void formatFile()
   {
     val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new PathFormatter(), new IterableFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new PathFormatter(), new IterableFormatter()))
         .setLocale(ROOT)
         .getMessageAccessor();
     val f = new File("/path1/path2/filename.ext");
@@ -71,7 +70,7 @@ final class PathFormatterTest extends AbstractFormatterTest
   void formatPathFileExtension()
   {
     val context = MessageSupportFactory
-        .create(createFormatterService(new IterableFormatter(), new PathFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new IterableFormatter(), new PathFormatter()))
         .setLocale(ROOT);
 
     assertEquals("file.jpg = image/jpeg", context

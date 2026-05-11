@@ -41,8 +41,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class DefaultFormatterService extends GenericFormatterService
 {
   private static final Lock $LOCK = new ReentrantLock();
-
-  private static FormatterService INSTANCE = null;
+  private static volatile FormatterService INSTANCE = null;
 
   /**
    * Classloader to be used to load parameter formatter service classes or {@code null} for the system class loader.
@@ -58,15 +57,19 @@ public class DefaultFormatterService extends GenericFormatterService
    */
   public static FormatterService getSharedInstance()
   {
-    $LOCK.lock();
-    try {
-      if (INSTANCE == null)
-        INSTANCE = new DefaultFormatterService().seal();
-    } finally {
-      $LOCK.unlock();
+    var instance = INSTANCE;
+    if (instance == null)
+    {
+      $LOCK.lock();
+      try {
+        if ((instance = INSTANCE) == null)
+          INSTANCE = instance = new DefaultFormatterService().seal();
+      } finally {
+        $LOCK.unlock();
+      }
     }
 
-    return INSTANCE;
+    return instance;
   }
 
 

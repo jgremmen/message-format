@@ -23,7 +23,6 @@ import org.junit.jupiter.api.*;
 
 import java.util.BitSet;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
@@ -45,7 +44,7 @@ final class BitSetFormatterTest extends AbstractFormatterTest
   void init()
   {
     messageSupport = MessageSupportFactory
-        .create(createFormatterService(new BitSetFormatter()).seal(), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new BitSetFormatter()).seal())
         .setLocale(ROOT);
   }
 

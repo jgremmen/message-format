@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static de.sayayi.lib.message.MessageFactory.NO_CACHE_INSTANCE;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -64,7 +63,8 @@ final class ArrayFormatterTest extends AbstractFormatterTest
   void testBooleanArray()
   {
     val formatterService = createFormatterService(new ArrayFormatter(), new BoolFormatter());
-    val messageAccessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
+    val messageAccessor = MessageSupportFactory
+        .create(formatterService)
         .setLocale("de-DE")
         .getMessageAccessor();
 
@@ -116,7 +116,8 @@ final class ArrayFormatterTest extends AbstractFormatterTest
   void testIntegerArray()
   {
     val formatterService = createFormatterService(new ArrayFormatter());
-    val messageAccessor = MessageSupportFactory.create(formatterService, NO_CACHE_INSTANCE)
+    val messageAccessor = MessageSupportFactory
+        .create(formatterService)
         .setLocale("de-DE")
         .getMessageAccessor();
 
@@ -166,7 +167,8 @@ final class ArrayFormatterTest extends AbstractFormatterTest
         new ArrayFormatter(),
         new BoolFormatter(),
         new NumberFormatter());
-    val messageAccessor = MessageSupportFactory.create(registry, NO_CACHE_INSTANCE)
+    val messageAccessor = MessageSupportFactory
+        .create(registry)
         .setLocale("de-DE")
         .getMessageAccessor();
 
@@ -185,7 +187,7 @@ final class ArrayFormatterTest extends AbstractFormatterTest
   void testEmptyOrNullArray()
   {
     val messageSupport = MessageSupportFactory.create(
-        createFormatterService(new ArrayFormatter()), NO_CACHE_INSTANCE);
+        createFormatterService(new ArrayFormatter()));
     val message = messageSupport.message("%{array,null:null,empty:empty}").getMessage();
 
     assertEquals("null",
@@ -199,8 +201,8 @@ final class ArrayFormatterTest extends AbstractFormatterTest
   @DisplayName("Separator spaces")
   void testSeparator()
   {
-    val messageSupport = MessageSupportFactory.create(
-        createFormatterService(new ArrayFormatter()), NO_CACHE_INSTANCE);
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new ArrayFormatter()));
 
     assertEquals("1, 2, 3, 4 and 5", messageSupport
         .message("%{c,list-sep:', ',list-sep-last:' and '}")
@@ -249,7 +251,7 @@ final class ArrayFormatterTest extends AbstractFormatterTest
     messageFormat.append("}");
 
     val message = MessageSupportFactory
-        .create(createFormatterService(new ArrayFormatter()), NO_CACHE_INSTANCE)
+        .create(createFormatterService(new ArrayFormatter()))
         .message(messageFormat.toString())
         .with("array", array);
 

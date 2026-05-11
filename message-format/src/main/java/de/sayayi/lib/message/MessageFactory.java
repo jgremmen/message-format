@@ -54,7 +54,7 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * Each factory instance is configured with a {@link MessagePartNormalizer} that is applied to parsed message parts,
  * enabling deduplication or caching strategies for large message sets. For simple use cases the
- * {@link #NO_CACHE_INSTANCE shared no-cache instance} is sufficient.
+ * {@linkplain #getSharedInstance() shared instance} is sufficient.
  * <p>
  * Optionally, a message cache can be enabled via {@link #MessageFactory(MessagePartNormalizer, int)} to avoid
  * repeated parsing of the same message format string. When the cache reaches its configured maximum size, the least
@@ -67,13 +67,8 @@ import static java.util.Objects.requireNonNull;
  */
 public class MessageFactory
 {
-  /**
-   * Shared message factory without any caching capabilities.
-   * <p>
-   * This message factory will suffice in most cases. However, if you have a large number of messages, it is better
-   * to construct a message factory with an appropriate {@link MessagePartNormalizer}.
-   */
-  public static final MessageFactory NO_CACHE_INSTANCE = new MessageFactory(PASS_THROUGH);
+  private static final Lock $LOCK = new ReentrantLock();
+  private static volatile MessageFactory INSTANCE = null;
 
   private static final SecureRandom RANDOM = new SecureRandom();
   private static final AtomicInteger CODE_ID = new AtomicInteger();
@@ -83,6 +78,34 @@ public class MessageFactory
 
   private final @Nullable Map<String,Message.WithSpaces> messageCache;
   private final @Nullable Lock cacheLock;
+
+
+  /**
+   * Returns the shared {@code MessageFactory} singleton instance, creating it on first access.
+   * <p>
+   * The shared instance uses a {@linkplain MessagePartNormalizer#PASS_THROUGH pass-through} normalizer and a message
+   * cache with a maximum size of 128 entries.
+   *
+   * @return  shared message factory instance, never {@code null}
+   *
+   * @since 0.23.0
+   */
+  public static @NotNull MessageFactory getSharedInstance()
+  {
+    var instance = INSTANCE;
+    if (instance == null)
+    {
+      $LOCK.lock();
+      try {
+        if ((instance = INSTANCE) == null)
+          INSTANCE = instance = new MessageFactory(PASS_THROUGH, 128);
+      } finally {
+        $LOCK.unlock();
+      }
+    }
+
+    return instance;
+  }
 
 
   /**
@@ -205,7 +228,7 @@ public class MessageFactory
 
 
   /**
-   * Parse the message {@code text} into a {@link Message} instance.
+   * Parse the message {@code text} into a {@link Message} instance and associate it with the given {@code code}.
    *
    * @param code  message code, not {@code null}
    * @param text  message format, not {@code null}
@@ -327,7 +350,8 @@ public class MessageFactory
 
 
   /**
-   * Modifies {@code message} so that it has the given {@code code}.
+   * Returns a {@link Message.WithCode} that wraps the given {@code message} with the specified {@code code}.
+   * If the message already has the same code, it is returned as-is.
    *
    * @param code     (new) message code, not {@code null} and not empty
    * @param message  message, not {@code null}
@@ -359,10 +383,8 @@ public class MessageFactory
 
 
   /**
-   * Generates a unique message or template code by combining the given {@code prefix} with a
-   * random base-36 hash and a monotonically increasing counter. The resulting code is
-   * upper-cased and has the form <code>PREFIX[HASH-COUNTER]</code> (e.g.
-   * {@code MSG[1A2B3C4D5E-XXXXX]}).
+   * Generates a unique message or template code with the given {@code prefix}. The resulting code has the form
+   * <code>PREFIX[...]</code> (e.g. {@code MSG[1A2B3C4D5E-XXXXX]}) and can be recognized by {@link #isGeneratedCode(String)}.
    *
    * @param prefix  code prefix (e.g. {@code "MSG"} or {@code "TPL"}), not {@code null}
    *
