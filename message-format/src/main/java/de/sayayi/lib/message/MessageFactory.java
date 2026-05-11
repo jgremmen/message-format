@@ -77,7 +77,7 @@ public class MessageFactory
   final MessageCompiler messageCompiler;
 
   private final @Nullable Map<String,Message.WithSpaces> messageCache;
-  private final @Nullable Lock cacheLock;
+  private final @Nullable Lock messageCacheLock;
 
 
   /**
@@ -143,12 +143,12 @@ public class MessageFactory
           return size() > messageCacheSize;
         }
       };
-      cacheLock = new ReentrantLock();
+      messageCacheLock = new ReentrantLock();
     }
     else
     {
       messageCache = null;
-      cacheLock = null;
+      messageCacheLock = null;
     }
   }
 
@@ -196,16 +196,16 @@ public class MessageFactory
   @Contract(pure = true)
   public @NotNull Message.WithSpaces parseMessage(@NotNull @Language("MessageFormat") String text)
   {
-    if (cacheLock == null)
+    if (messageCacheLock == null)
       return messageCompiler.compileMessage(text);
 
-    cacheLock.lock();
+    messageCacheLock.lock();
     try {
       //noinspection DataFlowIssue
       return messageCache.computeIfAbsent(text, messageCompiler::compileMessage);
     }
     finally {
-      cacheLock.unlock();
+      messageCacheLock.unlock();
     }
   }
 
