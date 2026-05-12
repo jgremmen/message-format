@@ -137,16 +137,12 @@ public final class CharsetFormatter
         }
     }
 
-    if (compareType == EQ && matchResult != MISMATCH)
+    if (compareType == EQ)
       return matchResult;
-    else if (compareType == NE)
-    {
-      if (matchResult == MISMATCH)
-        return EXACT;
-      else if (matchResult == EQUIVALENT)
-        return LENIENT;
-    }
 
-    return MISMATCH;
+    // NE
+    return matchResult == MISMATCH
+        ? EXACT
+        : matchResult == EQUIVALENT ? LENIENT : MISMATCH;
   }
 }
