@@ -16,22 +16,19 @@
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.internal.part.map.key.MapKeyString;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
+import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import java.nio.charset.Charset;
-import java.util.Map;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.charset.StandardCharsets.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -88,27 +85,11 @@ final class CharsetFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  @DisplayName("Format charset with canonical name mapped")
-  void formatWithCanonicalNameMapping()
-  {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new CharsetFormatter()))
-        .getMessageAccessor();
-
-    assertEquals(noSpaceText("Unicode UTF-8"), format(messageAccessor, UTF_8,
-        Map.of(), Map.of(new MapKeyString("UTF-8"), new TypedValueString("Unicode UTF-8"))));
-  }
-
-
-  @Test
   @DisplayName("Format charset matched by alias only")
   void formatWithAliasMapping()
   {
-    // UTF-8 has aliases like "unicode-1-1-utf-8", "UTF8", etc.
-    // Use an alias that is NOT the canonical name to verify alias matching
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new CharsetFormatter()))
-        .getMessageAccessor();
+    val context = MessageSupportFactory
+        .create(createFormatterService(new CharsetFormatter()));
 
     // Find an alias for UTF-8 that differs from the canonical name
     val alias = UTF_8.aliases().stream()
@@ -116,45 +97,11 @@ final class CharsetFormatterTest extends AbstractFormatterTest
         .findFirst()
         .orElseThrow();
 
-    assertEquals(noSpaceText("Matched by alias"), format(messageAccessor, UTF_8,
-        Map.of(), Map.of(new MapKeyString(alias), new TypedValueString("Matched by alias"))));
+    assertEquals("Matched by alias", context
+        .message("%{cs,'" + alias + "':'Matched by alias'}")
+        .with("cs", UTF_8)
+        .format());
   }
-
-
-  @Test
-  @DisplayName("Format ISO-8859-1 matched by alias 'latin1'")
-  void formatIso88591WithLatin1Alias()
-  {
-    // ISO-8859-1 has alias "latin1" (among others)
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new CharsetFormatter()))
-        .getMessageAccessor();
-
-    assertEquals(noSpaceText("Latin 1"), format(messageAccessor, ISO_8859_1,
-        Map.of(), Map.of(new MapKeyString("latin1"), new TypedValueString("Latin 1"))));
-  }
-
-
-  @Test
-  @DisplayName("Canonical name mapping takes precedence over alias mapping")
-  void formatCanonicalNameTakesPrecedenceOverAlias()
-  {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new CharsetFormatter()))
-        .getMessageAccessor();
-
-    // When both canonical name and alias are mapped, canonical name should win
-    val alias = ISO_8859_1.aliases().stream()
-        .filter(a -> !a.equals(ISO_8859_1.name()))
-        .findFirst()
-        .orElseThrow();
-
-    assertEquals(noSpaceText("Canonical"), format(messageAccessor, ISO_8859_1,
-        Map.of(),
-        Map.of(new MapKeyString(ISO_8859_1.name()), new TypedValueString("Canonical"),
-               new MapKeyString(alias), new TypedValueString("Alias"))));
-  }
-
 
 
   @Test
@@ -172,57 +119,71 @@ final class CharsetFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  @DisplayName("Format charset via message template with map")
-  void formatCharsetViaMessageTemplateWithMap()
+  @DisplayName("EQ with canonical key, alias key and default selects correct match")
+  void eqWithCanonicalAliasAndDefault()
   {
     val context = MessageSupportFactory
         .create(createFormatterService(new CharsetFormatter()));
 
-    assertEquals("8-bit Unicode", context
-        .message("%{cs,'UTF-8':'8-bit Unicode'}")
-        .with("cs", UTF_8)
-        .format());
+    // canonical 'UTF-8' matches UTF-8, alias 'latin1' matches ISO-8859-1, default for others
+    @Language("MessageFormat")
+    val msg = "%{cs,'UTF-8':'by-canonical','latin1':'by-alias',:'default'}";
+
+    assertEquals("by-canonical", context.message(msg).with("cs", UTF_8).format());
+    assertEquals("by-alias", context.message(msg).with("cs", ISO_8859_1).format());
+    assertEquals("default", context.message(msg).with("cs", US_ASCII).format());
   }
 
 
   @Test
-  @DisplayName("Format charset with default map entry")
-  void formatCharsetWithDefaultMapEntry()
+  @DisplayName("EQ with canonical key and alias key for the same charset")
+  void eqCanonicalAndAliasForSameCharset()
   {
     val context = MessageSupportFactory
         .create(createFormatterService(new CharsetFormatter()));
 
-    assertEquals("unknown encoding", context
-        .message("%{cs,'UTF-16':'wide','UTF-32':'very wide',:'unknown encoding'}")
-        .with("cs", UTF_8)
-        .format());
+    // 'US-ASCII' is canonical, 'ASCII' is alias → canonical match (EXACT) wins over alias (EQUIVALENT)
+    @Language("MessageFormat")
+    val msg = "%{cs,'ASCII':'by-alias','US-ASCII':'by-canonical',:'default'}";
+
+    assertEquals("by-canonical", context.message(msg).with("cs", US_ASCII).format());
   }
 
 
   @Test
-  @DisplayName("Default map entry is not used when canonical name matches")
-  void formatCharsetDefaultNotUsedWhenNameMatches()
+  @DisplayName("NE with canonical key and alias key selects correct match")
+  @SuppressWarnings("UnreachableMapEntry")
+  void neWithCanonicalAndAliasKey()
   {
     val context = MessageSupportFactory
         .create(createFormatterService(new CharsetFormatter()));
 
-    assertEquals("matched", context
-        .message("%{cs,'UTF-8':'matched',:'fallback'}")
-        .with("cs", UTF_8)
-        .format());
+    // !'UTF-8' mismatches for UTF-8, matches for others;
+    // !'latin1' leniently matches for ISO-8859-1 (alias), matches for others
+    @Language("MessageFormat")
+    val msg = "%{cs,!'UTF-8':'not-utf8',!'latin1':'not-latin1',:'default'}";
+
+    // UTF-8: !'UTF-8' fails (canonical match), !'latin1' succeeds → "not-latin1"
+    assertEquals("not-latin1", context.message(msg).with("cs", UTF_8).format());
+
+    // ISO-8859-1: !'UTF-8' succeeds exactly, !'latin1' succeeds leniently → "not-utf8" wins
+    assertEquals("not-utf8", context.message(msg).with("cs", ISO_8859_1).format());
+
+    // US-ASCII: both NE keys succeed exactly, first in order wins → "not-utf8"
+    assertEquals("not-utf8", context.message(msg).with("cs", US_ASCII).format());
   }
 
 
   @Test
-  @DisplayName("Default map entry is not used when alias matches")
-  void formatCharsetDefaultNotUsedWhenAliasMatches()
+  @DisplayName("No string key match and no default uses display name")
+  void noMatchNoDefaultUsesDisplayName()
   {
     val context = MessageSupportFactory
         .create(createFormatterService(new CharsetFormatter()));
 
-    assertEquals("matched alias", context
-        .message("%{cs,'latin1':'matched alias',:'fallback'}")
-        .with("cs", ISO_8859_1)
+    assertEquals(UTF_8.displayName(), context
+        .message("%{cs,'ISO-8859-1':latin1}")
+        .with("cs", UTF_8)
         .format());
   }
 }

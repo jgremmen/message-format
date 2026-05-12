@@ -15,33 +15,54 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.Charset;
-import java.util.Optional;
 
 import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_STRING;
+import static de.sayayi.lib.message.part.MapKey.CompareType.EQ;
+import static de.sayayi.lib.message.part.MapKey.CompareType.NE;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.*;
 import static de.sayayi.lib.message.part.MapKey.STRING_TYPE;
-import static de.sayayi.lib.message.part.MapKey.Type.STRING;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
  * Parameter formatter for {@link Charset} values.
  * <p>
- * The charset's canonical name and aliases are matched against string map keys in the parameter
- * configuration. If no match is found, the default map entry is used. If no default is provided,
+ * When no string map key matches, the default map entry is used. If no default is provided,
  * the charset's locale-sensitive display name is used as the formatted result.
+ * <p>
+ * Map key comparison supports {@code string} keys matched against the charset's canonical name
+ * and aliases. Only the {@code EQ} and {@code NE} comparison types are supported:
+ * <ul>
+ *   <li>
+ *     {@code EQ} a canonical name match returns
+ *     {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#EXACT EXACT}, an alias match
+ *     returns {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#EQUIVALENT EQUIVALENT}
+ *   </li>
+ *   <li>
+ *     {@code NE} if neither the canonical name nor any alias matches the key,
+ *     {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#EXACT EXACT} is returned;
+ *     if only an alias matches,
+ *     {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#LENIENT LENIENT} is returned;
+ *     a canonical name match results in
+ *     {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#MISMATCH MISMATCH}
+ *   </li>
+ * </ul>
  *
  * @author Jeroen Gremmen
  * @since 0.22.1
  */
-public final class CharsetFormatter extends AbstractSingleTypeParameterFormatter<Charset>
+public final class CharsetFormatter
+    extends AbstractSingleTypeParameterFormatter<Charset>
+    implements MapKeyComparator<Charset>
 {
   /**
    * {@inheritDoc}
@@ -68,22 +89,8 @@ public final class CharsetFormatter extends AbstractSingleTypeParameterFormatter
   @Override
   protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Charset charset)
   {
-    Optional<Message.WithSpaces> mappedMessage;
-
-    findMapped: {
-      final var name = charset.name();
-
-      if ((mappedMessage = context.getMapMessage(name, STRING_TYPE)).isPresent())
-        break findMapped;
-
-      for(var alias: charset.aliases())
-        if (!name.equals(alias) && (mappedMessage = context.getMapMessage(alias, STRING_TYPE)).isPresent())
-          break findMapped;
-
-      mappedMessage = context.getMap().getDefaultMessage(context.getMessageAccessor(), STRING);
-    }
-
-    return mappedMessage
+    return context
+        .getMapMessage(charset, STRING_TYPE, true)
         .map(context::format)
         .orElseGet(() -> noSpaceText(charset.displayName(context.getLocale())));
   }
@@ -97,5 +104,49 @@ public final class CharsetFormatter extends AbstractSingleTypeParameterFormatter
   @Override
   protected @NotNull FormattableType getFormattableType() {
     return new FormattableType(Charset.class);
+  }
+
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Compares the charset's canonical name and aliases against the string map key. Only the
+   * {@link de.sayayi.lib.message.part.MapKey.CompareType#EQ EQ} and
+   * {@link de.sayayi.lib.message.part.MapKey.CompareType#NE NE} comparison types are supported;
+   * all other types return {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#MISMATCH MISMATCH}.
+   */
+  @Override
+  public @NotNull MatchResult compareToStringKey(@NotNull Charset charset, @NotNull ComparatorContext context)
+  {
+    final var compareType = context.getCompareType();
+    if (compareType != EQ && compareType != NE)
+      return MISMATCH;
+
+    final var stringKey = context.getStringKeyValue();
+    var matchResult = MISMATCH;
+
+    if (charset.name().equals(stringKey))
+      matchResult = EXACT;
+    else
+    {
+      for(var alias: charset.aliases())
+        if (alias.equals(stringKey))
+        {
+          matchResult = EQUIVALENT;
+          break;
+        }
+    }
+
+    if (compareType == EQ && matchResult != MISMATCH)
+      return matchResult;
+    else if (compareType == NE)
+    {
+      if (matchResult == MISMATCH)
+        return EXACT;
+      else if (matchResult == EQUIVALENT)
+        return LENIENT;
+    }
+
+    return MISMATCH;
   }
 }
