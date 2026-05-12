@@ -59,7 +59,7 @@ Configuration keys specified in the message format string always take precedence
 defaults registered via `setDefaultConfig` on the `ConfigurableMessageSupport`. If neither an
 inline value nor a default is present, the post formatter falls back to its own built-in
 default. This resolution order is the same as for parameter formatter configuration keys and
-is described in detail on the [Default Configuration](../../core/default-configuration.md)
+is described in detail on the [Default Configuration](../../configuration/default-configuration.md)
 page.
 
 

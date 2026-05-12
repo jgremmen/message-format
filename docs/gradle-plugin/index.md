@@ -1,5 +1,5 @@
 ---
-icon: material/connection
+icon: simple/gradle
 ---
 
 # Gradle Plugin

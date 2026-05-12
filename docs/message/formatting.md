@@ -4,8 +4,8 @@ toc_depth: 2
 
 # Formatting Messages
 
-Once you have a `MessageSupport` instance, you use its fluent API to format messages. The
-entry point is either `code(...)` for messages that have been published with a message code,
+Once you have a [`MessageSupport`](../configuration/message-support.md) instance, you use its fluent API to format
+messages. The entry point is either `code(...)` for messages that have been published with a message code,
 or `message(...)` for inline format strings and pre-parsed `Message` objects. Both methods
 return a `MessageConfigurer` that lets you set parameter values, choose a locale, and produce
 the final formatted text.
@@ -108,9 +108,9 @@ String text = messageSupport
 
 ### Bulk Parameters from a Map
 
-If your parameter values are already collected in a `Map<String, Object>`, you can pass the
-entire map in a single call. This is convenient when parameters come from an external source
-such as a database row or a REST request.
+If your parameter values are already collected in a `Map<String,Object>`, you can pass the
+entire map in a single call. Since `Properties` extends `Map`, this works with `Properties`
+objects as well.
 
 ```java
 var params = Map.of(
@@ -123,24 +123,6 @@ String text = messageSupport
     .with(params)
     .format();
 // "It is 18°C in Amsterdam."
-```
-
-### Bulk Parameters from Properties
-
-For integration with Java `Properties` (for example loaded from a file), you can pass a
-`Properties` object directly. Each property key becomes a parameter name and each property
-value becomes the parameter value.
-
-```java
-var props = new Properties();
-props.setProperty("host", "db.example.com");
-props.setProperty("port", "5432");
-
-String text = messageSupport
-    .message("Connecting to %{host}:%{port}")
-    .with(props)
-    .format();
-// "Connecting to db.example.com:5432"
 ```
 
 ### Removing and Clearing Parameters

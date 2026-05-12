@@ -2,21 +2,27 @@ nav:
   - Home:
     - index.md
     - Philosophy: philosophy.md
-    - Getting started:
-      - Syntax: core/syntax.md
+    - Version Update:
+      - changelog/version-0.22.0.md
+      - changelog/version-0.21.0.md
+      - changelog/version-0.20.1.md
+      - changelog/version-0.20.0.md
+      - changelog/version-0.12.0.md
+      - changelog/version-0.11.0.md
     - License: license.md
-  - Core:
-    - core/index.md
-    - Formatting: core/formatting.md
-    - Messages and Templates: core/messages-and-templates.md
-    - Exceptions: core/exceptions.md
+  - Message:
+    - message/index.md
+    - Syntax: message/syntax.md
+    - Formatting: message/formatting.md
   - Config:
-    - core/configuration/index.md
-    - Message Support: core/configuration/message-support.md
-    - Message Factory: core/configuration/message-factory.md
-    - Formatter Service: core/configuration/formatter-service.md
-    - Default Configuration: core/configuration/default-configuration.md
-    - Pack Files: core/configuration/pack-files.md
+    - configuration/index.md
+    - Message Support: configuration/message-support.md
+    - Message Factory: configuration/message-factory.md
+    - Formatter Service: configuration/formatter-service.md
+    - Default Configuration: configuration/default-configuration.md
+    - Messages and Templates: configuration/messages-and-templates.md
+    - Pack Files: configuration/pack-files.md
+    - Exceptions: configuration/exceptions.md
   - Formatters:
     - formatter/index.md
     - Parameter Formatters:
@@ -84,11 +90,3 @@ nav:
     - gradle-plugin/index.md
     - Extension Configuration: gradle-plugin/extension.md
     - Pack Task: gradle-plugin/pack-task.md
-  - Upgrade:
-    - changelog/index.md
-    - changelog/version-0.22.0.md
-    - changelog/version-0.21.0.md
-    - changelog/version-0.20.1.md
-    - changelog/version-0.20.0.md
-    - changelog/version-0.12.0.md
-    - changelog/version-0.11.0.md

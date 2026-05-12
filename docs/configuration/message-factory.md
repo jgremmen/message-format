@@ -4,7 +4,7 @@ The `MessageFactory` is responsible for parsing message format strings into `Mes
 Every `MessageSupport` instance uses a `MessageFactory` internally, and the factory you choose
 determines how parsed messages are normalized and whether they are cached. This page covers how
 to create and configure a `MessageFactory`. For the full API of parsing methods and the
-`MessageBuilder`, see [Messages and Templates](../messages-and-templates.md).
+`MessageBuilder`, see [Messages and Templates](messages-and-templates.md).
 
 
 ## The Shared Instance

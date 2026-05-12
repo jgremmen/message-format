@@ -1,7 +1,7 @@
 # Log4j
 
 The `message-format-log4j` module integrates the message format library with
-[Apache Log4j 2](https://logging.apache.org/log4j/2.x/). It provides a Log4j `MessageFactory`
+[Apache Log4j2](https://logging.apache.org/log4j/2.x/). It provides a Log4j `MessageFactory`
 implementation that replaces Log4j's default message formatting with the full power of the
 message format syntax. Instead of writing log statements with Log4j's `{}` placeholders, you
 can use parameter references, map keys, templates and post formatters directly in your log
@@ -23,7 +23,7 @@ Add the `message-format-log4j` module to your project alongside the Log4j API de
 
     ```groovy
     dependencies {
-      implementation 'de.sayayi.lib:message-format-log4j:0.22.0'
+      implementation 'de.sayayi.lib:message-format-log4j:0.23.0'
       implementation 'org.apache.logging.log4j:log4j-api:2.24.3'
     }
     ```
@@ -32,7 +32,7 @@ Add the `message-format-log4j` module to your project alongside the Log4j API de
 
     ```kotlin
     dependencies {
-      implementation("de.sayayi.lib:message-format-log4j:0.22.0")
+      implementation("de.sayayi.lib:message-format-log4j:0.23.0")
       implementation("org.apache.logging.log4j:log4j-api:2.24.3")
     }
     ```
@@ -69,15 +69,15 @@ import de.sayayi.lib.message.log4j.Log4jMessageFactory;
 
 public class OrderService
 {
-    private static final Logger logger =
-        LogManager.getLogger(OrderService.class, new Log4jMessageFactory());
+  private static final Logger logger =
+      LogManager.getLogger(OrderService.class, new Log4jMessageFactory());
 
-    public void placeOrder(String customerId, int itemCount)
-    {
-        logger.info("Customer %{p1} placed an order with %{p2} items.",
-            customerId, itemCount);
-        // Output: "Customer C-42 placed an order with 3 items."
-    }
+  public void placeOrder(String customerId, int itemCount)
+  {
+    logger.info("Customer %{p1} placed an order with %{p2} items.",
+        customerId, itemCount);
+    // Output: "Customer C-42 placed an order with 3 items."
+  }
 }
 ```
 
@@ -90,16 +90,27 @@ without a factory continue to use Log4j's default formatting.
 ## Global Configuration
 
 Instead of passing a `Log4jMessageFactory` to each individual logger, you can configure it as
-the default message factory for the entire application. Log4j2 reads the system property
+the default message factory for the entire application. Log4j2 reads the property
 `log4j2.messageFactory` at startup and uses the specified class for every logger that is
-created without an explicit factory argument. Set it on the JVM command line:
+created without an explicit factory argument.
+
+The most straightforward way to set this property is on the JVM command line:
 
 ```
 -Dlog4j2.messageFactory=de.sayayi.lib.message.log4j.Log4jMessageFactory
 ```
 
-With this property in place, all calls to `LogManager.getLogger()` throughout the application
-will automatically use the message format syntax.
+Alternatively, you can place a file named `log4j2.component.properties` on the classpath
+(typically in `src/main/resources`). Log4j2 reads this file automatically during
+initialization, so no JVM arguments are required.
+
+```properties
+# src/main/resources/log4j2.component.properties
+log4j2.messageFactory=de.sayayi.lib.message.log4j.Log4jMessageFactory
+```
+
+With either approach in place, all calls to `LogManager.getLogger()` throughout the
+application will automatically use the message format syntax.
 
 ```java
 // No factory argument needed — the global default applies
@@ -163,11 +174,11 @@ can reference it in the message text if needed.
 
 ```java
 try {
-    connectToDatabase();
-} catch (SQLException ex) {
-    logger.error("Connection to %{p1}:%{p2} failed.", host, port, ex);
-    // Output: "Connection to db.local:5432 failed."
-    // The stack trace of 'ex' is rendered by Log4j's layout.
+  connectToDatabase();
+} catch(SQLException ex) {
+  logger.error("Connection to %{p1}:%{p2} failed.", host, port, ex);
+  // Output: "Connection to db.local:5432 failed."
+  // The stack trace of 'ex' is rendered by Log4j's layout.
 }
 ```
 
@@ -281,7 +292,8 @@ var messageSupport = MessageSupportFactory.create(
 
 // Add a reusable template
 messageSupport.addTemplate("user-info",
-    MessageFactory.getSharedInstance()
+    MessageFactory
+        .getSharedInstance()
         .parseTemplate("%{name} (%{role})"));
 
 var factory = new Log4jMessageFactory(messageSupport, true);
