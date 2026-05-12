@@ -31,6 +31,7 @@ import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MapKey.CompareType;
 import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextJoiner;
 import de.sayayi.lib.message.part.TypedValue;
 import org.jetbrains.annotations.Contract;
@@ -43,7 +44,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static de.sayayi.lib.message.part.MapKey.CompareType.EQ;
+import static de.sayayi.lib.message.part.MapKey.CompareType.*;
+import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
+import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
 import static de.sayayi.lib.message.util.MessageUtil.isKebabCaseName;
 import static de.sayayi.lib.message.util.MessageUtil.isKebabOrLowerCamelCaseName;
 import static java.util.Objects.requireNonNull;
@@ -62,7 +65,7 @@ public final class InternalMessageBuilder implements MessageBuilder
 {
   private final @NotNull MessageFactory messageFactory;
   private final @NotNull List<MessagePart> parts;
-  private @NotNull TextJoiner pendingText;
+  private Runnable activePartFlusher;
 
 
   /**
@@ -74,28 +77,33 @@ public final class InternalMessageBuilder implements MessageBuilder
   {
     this.messageFactory = requireNonNull(messageFactory, "messageFactory must not be null");
     this.parts = new ArrayList<>();
-    this.pendingText = new TextJoiner();
   }
 
 
   /**
-   * Flushes any accumulated pending text as a text part into the parts list, resetting the text joiner.
+   * Flushes any active non-text sub-builder into the parts list.
    */
-  private void flushText()
+  private void flushActivePart()
   {
-    var text = pendingText.asSpacedText();
-    if (!text.isEmpty() || text.isSpaceBefore() || text.isSpaceAfter())
+    if (activePartFlusher != null)
     {
-      parts.add(text);
-      pendingText = new TextJoiner();
+      activePartFlusher.run();
+      activePartFlusher = null;
     }
   }
 
 
   /** {@inheritDoc} */
   @Override
-  public @NotNull TextBuilder text(@NotNull String text) {
-    return new TextBuilderImpl(requireNonNull(text, "text must not be null"));
+  public @NotNull TextBuilder text(@NotNull String text)
+  {
+    flushActivePart();
+
+    final var builder = new TextBuilderImpl(requireNonNull(text, "text must not be null"));
+
+    activePartFlusher = builder::flush;
+
+    return builder;
   }
 
 
@@ -103,8 +111,13 @@ public final class InternalMessageBuilder implements MessageBuilder
   @Override
   public @NotNull ParameterBuilder parameter(@NotNull String name)
   {
-    flushText();
-    return new ParameterBuilderImpl(name);
+    flushActivePart();
+
+    final var builder = new ParameterBuilderImpl(name);
+
+    activePartFlusher = builder::flush;
+
+    return builder;
   }
 
 
@@ -112,8 +125,13 @@ public final class InternalMessageBuilder implements MessageBuilder
   @Override
   public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
   {
-    flushText();
-    return new PostFormatterBuilderImpl(name);
+    flushActivePart();
+
+    final var builder = new PostFormatterBuilderImpl(name);
+
+    activePartFlusher = builder::flush;
+
+    return builder;
   }
 
 
@@ -121,8 +139,36 @@ public final class InternalMessageBuilder implements MessageBuilder
   @Override
   public @NotNull TemplateBuilder template(@NotNull String name)
   {
-    flushText();
-    return new TemplateBuilderImpl(name);
+    flushActivePart();
+
+    final var builder = new TemplateBuilderImpl(name);
+
+    activePartFlusher = builder::flush;
+
+    return builder;
+  }
+
+
+  /**
+   * Merges consecutive {@link Text} entries in the parts list into single text parts using
+   * a {@link TextJoiner}.
+   */
+  private void mergeConsecutiveTextParts()
+  {
+    for(var i = 0; i < parts.size() - 1; i++)
+      if (parts.get(i) instanceof Text first && parts.get(i + 1) instanceof Text)
+      {
+        final var joiner = new TextJoiner();
+
+        joiner.add(first);
+
+        var j = i + 1;
+        for(var l = parts.size(); j < l && parts.get(j) instanceof Text next; j++)
+          joiner.add(next);
+
+        parts.subList(i, j).clear();
+        parts.add(i, joiner.asSpacedText());
+      }
   }
 
 
@@ -130,15 +176,16 @@ public final class InternalMessageBuilder implements MessageBuilder
   @Override
   public @NotNull Message.WithSpaces build()
   {
-    flushText();
+    flushActivePart();
 
     if (parts.isEmpty())
       return EmptyMessage.INSTANCE;
 
-    if (parts.size() == 1 && parts.getFirst() instanceof MessagePart.Text textPart)
-      return new TextMessage(textPart);
+    mergeConsecutiveTextParts();
 
-    return new CompoundMessage(parts);
+    return parts.size() == 1 && parts.getFirst() instanceof Text textPart
+        ? new TextMessage(textPart)
+        : new CompoundMessage(parts);
   }
 
 
@@ -194,16 +241,14 @@ public final class InternalMessageBuilder implements MessageBuilder
   /**
    * Default implementation of {@link TextBuilder}.
    * <p>
-   * Accumulates literal text and flushes it into the enclosing builder's pending text joiner when another part is
-   * started or when the message is built.
+   * Adds a text part directly to the enclosing builder's parts list.
    *
    * @since 0.21.0
    */
-  public final class TextBuilderImpl
-      extends AbstractSpacedBuilder<TextBuilder>
-      implements TextBuilder
+  public final class TextBuilderImpl extends AbstractSpacedBuilder<TextBuilder> implements TextBuilder
   {
     private final @NotNull String text;
+    private boolean flushed;
 
 
     /**
@@ -217,18 +262,15 @@ public final class InternalMessageBuilder implements MessageBuilder
 
 
     /**
-     * Flushes the accumulated text (including any space-before/space-after settings) into the enclosing builder's
-     * pending text joiner.
+     * Adds this text part (including any space-before/space-after settings) to the enclosing builder's parts list.
      */
     private void flush()
     {
-      if (spaceBefore)
-        pendingText.add(' ');
-
-      pendingText.addWithSpace(text);
-
-      if (spaceAfter)
-        pendingText.add(' ');
+      if (!flushed)
+      {
+        flushed = true;
+        parts.add(addSpaces(spacedText(text), spaceBefore, spaceAfter));
+      }
     }
 
 
@@ -237,7 +279,8 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull TextBuilder text(@NotNull String text)
     {
       flush();
-      return new TextBuilderImpl(requireNonNull(text, "text must not be null"));
+
+      return InternalMessageBuilder.this.text(requireNonNull(text, "text must not be null"));
     }
 
 
@@ -246,8 +289,8 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull ParameterBuilder parameter(@NotNull String name)
     {
       flush();
-      flushText();
-      return new ParameterBuilderImpl(name);
+
+      return InternalMessageBuilder.this.parameter(name);
     }
 
 
@@ -256,8 +299,8 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
     {
       flush();
-      flushText();
-      return new PostFormatterBuilderImpl(name);
+
+      return InternalMessageBuilder.this.postFormatter(name);
     }
 
 
@@ -266,8 +309,8 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull TemplateBuilder template(@NotNull String name)
     {
       flush();
-      flushText();
-      return new TemplateBuilderImpl(name);
+
+      return InternalMessageBuilder.this.template(name);
     }
 
 
@@ -276,6 +319,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull Message.WithSpaces build()
     {
       flush();
+
       return InternalMessageBuilder.this.build();
     }
 
@@ -285,6 +329,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull Message.WithCode buildWithCode(@NotNull String code)
     {
       flush();
+
       return InternalMessageBuilder.this.buildWithCode(code);
     }
   }
@@ -415,6 +460,8 @@ public final class InternalMessageBuilder implements MessageBuilder
      */
     private void flush()
     {
+      activePartFlusher = null;
+
       parts.add(new ParameterPart(name, format, spaceBefore, spaceAfter,
           new MessagePartConfig(config), new MessagePartMap(map)));
     }
@@ -501,11 +548,27 @@ public final class InternalMessageBuilder implements MessageBuilder
      *
      * @return  this parameter builder, never {@code null}
      */
-    private @NotNull ParameterBuilder addMapEntry(@NotNull MapKey key, @NotNull String message)
+    private @NotNull ParameterBuilder addMapEntry(@NotNull MapKey key, @NotNull String message) {
+      return addMapEntry(key, messageFactory.parseMessage(requireNonNull(message, "message must not be null")));
+    }
+
+
+    /**
+     * Adds a map entry with the given key and a message built using a nested builder callback.
+     *
+     * @param key                map key, not {@code null}
+     * @param messageConfigurer  callback that receives a nested {@link MessageBuilder}, not {@code null}
+     *
+     * @return  this parameter builder, never {@code null}
+     */
+    private @NotNull ParameterBuilder addMapEntry(@NotNull MapKey key,
+                                                  @NotNull Consumer<MessageBuilder> messageConfigurer)
     {
-      map.put(key, new TypedValueMessage(
-          messageFactory.parseMessage(requireNonNull(message, "message must not be null"))));
-      return this;
+      final var nestedBuilder = new InternalMessageBuilder(messageFactory);
+
+      messageConfigurer.accept(nestedBuilder);
+
+      return addMapEntry(key, nestedBuilder.build());
     }
 
 
@@ -521,6 +584,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull TextBuilder text(@NotNull String text)
     {
       flush();
+
       return InternalMessageBuilder.this.text(text);
     }
 
@@ -530,6 +594,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull ParameterBuilder parameter(@NotNull String name)
     {
       flush();
+
       return InternalMessageBuilder.this.parameter(name);
     }
 
@@ -539,6 +604,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
     {
       flush();
+
       return InternalMessageBuilder.this.postFormatter(name);
     }
 
@@ -548,6 +614,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull TemplateBuilder template(@NotNull String name)
     {
       flush();
+
       return InternalMessageBuilder.this.template(name);
     }
 
@@ -557,6 +624,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull Message.WithSpaces build()
     {
       flush();
+
       return InternalMessageBuilder.this.build();
     }
 
@@ -566,6 +634,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull Message.WithCode buildWithCode(@NotNull String code)
     {
       flush();
+
       return InternalMessageBuilder.this.buildWithCode(code);
     }
   }
@@ -612,7 +681,10 @@ public final class InternalMessageBuilder implements MessageBuilder
     /**
      * Flushes the post-formatter configuration as a {@link PostFormatterPart} into the enclosing builder's parts list.
      */
-    private void flush() {
+    private void flush()
+    {
+      activePartFlusher = null;
+
       parts.add(new PostFormatterPart(name, innerMessage, spaceBefore, spaceAfter, new MessagePartConfig(config)));
     }
 
@@ -625,7 +697,9 @@ public final class InternalMessageBuilder implements MessageBuilder
       requireNonNull(messageConfigurer, "messageConfigurer must not be null");
 
       final var nestedBuilder = new InternalMessageBuilder(messageFactory);
+
       messageConfigurer.accept(nestedBuilder);
+
       innerMessage = nestedBuilder.build();
 
       return this;
@@ -637,6 +711,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull TextBuilder text(@NotNull String text)
     {
       flush();
+
       return InternalMessageBuilder.this.text(text);
     }
 
@@ -646,6 +721,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull ParameterBuilder parameter(@NotNull String name)
     {
       flush();
+
       return InternalMessageBuilder.this.parameter(name);
     }
 
@@ -655,6 +731,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
     {
       flush();
+
       return InternalMessageBuilder.this.postFormatter(name);
     }
 
@@ -664,6 +741,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull TemplateBuilder template(@NotNull String name)
     {
       flush();
+
       return InternalMessageBuilder.this.template(name);
     }
 
@@ -673,6 +751,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull Message.WithSpaces build()
     {
       flush();
+
       return InternalMessageBuilder.this.build();
     }
 
@@ -682,6 +761,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull Message.WithCode buildWithCode(@NotNull String code)
     {
       flush();
+
       return InternalMessageBuilder.this.buildWithCode(code);
     }
   }
@@ -727,7 +807,10 @@ public final class InternalMessageBuilder implements MessageBuilder
     /**
      * Flushes the template configuration as a {@link TemplatePart} into the enclosing builder's parts list.
      */
-    private void flush() {
+    private void flush()
+    {
+      activePartFlusher = null;
+
       parts.add(new TemplatePart(name, spaceBefore, spaceAfter, defaultParameters, parameterDelegates));
     }
 
@@ -752,6 +835,7 @@ public final class InternalMessageBuilder implements MessageBuilder
       }
 
       defaultParameters.put(name, requireNonNull(value, "value must not be null"));
+
       return this;
     }
 
@@ -793,9 +877,20 @@ public final class InternalMessageBuilder implements MessageBuilder
     @Contract("_, _ -> this")
     public @NotNull TemplateBuilder withParameterDelegate(@NotNull String templateParam, @NotNull String messageParam)
     {
-      parameterDelegates.put(
-          requireNonNull(templateParam, "templateParam must not be null"),
-          requireNonNull(messageParam, "messageParam must not be null"));
+      if (!isKebabOrLowerCamelCaseName(requireNonNull(templateParam, "templateParam must not be null")))
+      {
+        throw new IllegalArgumentException("template parameter name '" + templateParam +
+            "' must match the kebab-case or lower camel-case naming convention");
+      }
+
+      if (!isKebabOrLowerCamelCaseName(requireNonNull(messageParam, "messageParam must not be null")))
+      {
+        throw new IllegalArgumentException("message parameter name '" + messageParam +
+            "' must match the kebab-case or lower camel-case naming convention");
+      }
+
+      parameterDelegates.put(templateParam, messageParam);
+
       return this;
     }
 
@@ -805,6 +900,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull TextBuilder text(@NotNull String text)
     {
       flush();
+
       return InternalMessageBuilder.this.text(text);
     }
 
@@ -814,6 +910,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull ParameterBuilder parameter(@NotNull String name)
     {
       flush();
+
       return InternalMessageBuilder.this.parameter(name);
     }
 
@@ -823,6 +920,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
     {
       flush();
+
       return InternalMessageBuilder.this.postFormatter(name);
     }
 
@@ -832,6 +930,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull TemplateBuilder template(@NotNull String name)
     {
       flush();
+
       return InternalMessageBuilder.this.template(name);
     }
 
@@ -841,6 +940,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull Message.WithSpaces build()
     {
       flush();
+
       return InternalMessageBuilder.this.build();
     }
 
@@ -850,6 +950,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull Message.WithCode buildWithCode(@NotNull String code)
     {
       flush();
+
       return InternalMessageBuilder.this.buildWithCode(code);
     }
   }
@@ -896,6 +997,13 @@ public final class InternalMessageBuilder implements MessageBuilder
     public @NotNull ParameterBuilder message(@NotNull String message) {
       return parameterBuilder.addMapEntry(key, message);
     }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull ParameterBuilder message(@NotNull Consumer<MessageBuilder> messageConfigurer) {
+      return parameterBuilder.addMapEntry(key, messageConfigurer);
+    }
   }
 
 
@@ -934,9 +1042,10 @@ public final class InternalMessageBuilder implements MessageBuilder
     /** {@inheritDoc} */
     @Override
     @Contract("-> this")
-    public @NotNull MapEqualityBuilder eq()
+    public @NotNull MapValueBuilder eq()
     {
       compareType = EQ;
+
       return this;
     }
 
@@ -944,9 +1053,10 @@ public final class InternalMessageBuilder implements MessageBuilder
     /** {@inheritDoc} */
     @Override
     @Contract("-> this")
-    public @NotNull MapEqualityBuilder ne()
+    public @NotNull MapValueBuilder ne()
     {
-      compareType = CompareType.NE;
+      compareType = NE;
+
       return this;
     }
 
@@ -962,6 +1072,13 @@ public final class InternalMessageBuilder implements MessageBuilder
     @Override
     public @NotNull ParameterBuilder message(@NotNull String message) {
       return parameterBuilder.addMapEntry(keyFactory.apply(compareType), message);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull ParameterBuilder message(@NotNull Consumer<MessageBuilder> messageConfigurer) {
+      return parameterBuilder.addMapEntry(keyFactory.apply(compareType), messageConfigurer);
     }
   }
 
@@ -993,9 +1110,10 @@ public final class InternalMessageBuilder implements MessageBuilder
     /** {@inheritDoc} */
     @Override
     @Contract("-> this")
-    public @NotNull MapRelationalBuilder lt()
+    public @NotNull MapValueBuilder lt()
     {
-      compareType = CompareType.LT;
+      compareType = LT;
+
       return this;
     }
 
@@ -1003,9 +1121,10 @@ public final class InternalMessageBuilder implements MessageBuilder
     /** {@inheritDoc} */
     @Override
     @Contract("-> this")
-    public @NotNull MapRelationalBuilder lte()
+    public @NotNull MapValueBuilder lte()
     {
-      compareType = CompareType.LTE;
+      compareType = LTE;
+
       return this;
     }
 
@@ -1013,9 +1132,10 @@ public final class InternalMessageBuilder implements MessageBuilder
     /** {@inheritDoc} */
     @Override
     @Contract("-> this")
-    public @NotNull MapRelationalBuilder gt()
+    public @NotNull MapValueBuilder gt()
     {
-      compareType = CompareType.GT;
+      compareType = GT;
+
       return this;
     }
 
@@ -1023,9 +1143,10 @@ public final class InternalMessageBuilder implements MessageBuilder
     /** {@inheritDoc} */
     @Override
     @Contract("-> this")
-    public @NotNull MapRelationalBuilder gte()
+    public @NotNull MapValueBuilder gte()
     {
-      compareType = CompareType.GTE;
+      compareType = GTE;
+
       return this;
     }
   }

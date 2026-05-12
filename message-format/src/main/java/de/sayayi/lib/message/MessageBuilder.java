@@ -397,6 +397,22 @@ public sealed interface MessageBuilder
      * @return  the enclosing parameter builder, never {@code null}
      */
     @NotNull ParameterBuilder message(@NotNull @Language("MessageFormat") String message);
+
+
+    /**
+     * Sets the map value message using a nested builder callback and returns to the enclosing parameter builder.
+     * <p>
+     * The consumer must not invoke {@link #build()} or {@link #buildWithCode(String)} on the provided builder;
+     * the message is built automatically after the consumer returns.
+     *
+     * @param messageConfigurer  callback that receives a nested {@link MessageBuilder} for constructing the map
+     *                           value message, not {@code null}
+     *
+     * @return  the enclosing parameter builder, never {@code null}
+     *
+     * @since 0.23.0
+     */
+    @NotNull ParameterBuilder message(@NotNull Consumer<MessageBuilder> messageConfigurer);
   }
 
 
@@ -419,8 +435,7 @@ public sealed interface MessageBuilder
      *
      * @return  this builder, never {@code null}
      */
-    @Contract("-> this")
-    @NotNull MapEqualityBuilder eq();
+    @NotNull MapValueBuilder eq();
 
 
     /**
@@ -428,8 +443,7 @@ public sealed interface MessageBuilder
      *
      * @return  this builder, never {@code null}
      */
-    @Contract("-> this")
-    @NotNull MapEqualityBuilder ne();
+    @NotNull MapValueBuilder ne();
   }
 
 
@@ -452,8 +466,7 @@ public sealed interface MessageBuilder
      *
      * @return  this builder, never {@code null}
      */
-    @Contract("-> this")
-    @NotNull MapRelationalBuilder lt();
+    @NotNull MapValueBuilder lt();
 
 
     /**
@@ -461,8 +474,7 @@ public sealed interface MessageBuilder
      *
      * @return  this builder, never {@code null}
      */
-    @Contract("-> this")
-    @NotNull MapRelationalBuilder lte();
+    @NotNull MapValueBuilder lte();
 
 
     /**
@@ -470,8 +482,7 @@ public sealed interface MessageBuilder
      *
      * @return  this builder, never {@code null}
      */
-    @Contract("-> this")
-    @NotNull MapRelationalBuilder gt();
+    @NotNull MapValueBuilder gt();
 
 
     /**
@@ -479,8 +490,7 @@ public sealed interface MessageBuilder
      *
      * @return  this builder, never {@code null}
      */
-    @Contract("-> this")
-    @NotNull MapRelationalBuilder gte();
+    @NotNull MapValueBuilder gte();
   }
 
 
@@ -501,6 +511,9 @@ public sealed interface MessageBuilder
   {
     /**
      * Configures the inner message to be post-formatted using a nested builder callback.
+     * <p>
+     * The consumer must not invoke {@link #build()} or {@link #buildWithCode(String)} on the provided builder;
+     * the message is built automatically after the consumer returns.
      *
      * @param messageConfigurer  callback that receives a nested {@link MessageBuilder} for constructing the inner
      *                           message, not {@code null}
