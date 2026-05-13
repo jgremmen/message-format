@@ -3,6 +3,7 @@ nav:
     - index.md
     - Philosophy: philosophy.md
     - Version Update:
+      - changelog/version-0.23.0.md
       - changelog/version-0.22.0.md
       - changelog/version-0.21.0.md
       - changelog/version-0.20.1.md
