@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static de.sayayi.lib.message.MessageSupportFactory.shared;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -45,6 +46,8 @@ class MessageBuilderTest
               .mapBool(false).message(b -> b.text("no"))
           .build();
 
+      assertEquals("%{flag,true:yes,false:no}", message.asFormatString(UTF_8));
+
       final var messageSupport = shared();
 
       assertEquals("yes", messageSupport.message(message).with("flag", true).format());
@@ -62,6 +65,8 @@ class MessageBuilderTest
               .mapNull().message(b -> b.text("stranger"))
               .mapDefault().message(b -> b.text("Hello").parameter("name").spaceBefore())
           .build();
+
+      assertEquals("%{name,format:choice,null:stranger,:'Hello %{name}'}", message.asFormatString(UTF_8));
 
       final var messageSupport = shared();
 
@@ -81,6 +86,8 @@ class MessageBuilderTest
               .mapDefault().message(b -> b.parameter("count").text(" items").spaceBefore())
           .build();
 
+      assertEquals("%{count,format:choice,1:'one item',:'%{count} items'}", message.asFormatString(UTF_8));
+
       final var messageSupport = shared();
 
       assertEquals("one item", messageSupport.message(message).with("count", 1).format());
@@ -99,6 +106,8 @@ class MessageBuilderTest
               .mapDefault().message(b -> b.text("Unknown color"))
           .build();
 
+      assertEquals("%{color,format:choice,'red':'Red color',:'Unknown color'}", message.asFormatString(UTF_8));
+
       final var messageSupport = shared();
 
       assertEquals("Red color", messageSupport.message(message).with("color", "red").format());
@@ -116,6 +125,8 @@ class MessageBuilderTest
               .mapDefault().message(b -> b.parameter("value"))
           .build();
 
+      assertEquals("%{value,null:nothing,:'%{value}'}", message.asFormatString(UTF_8));
+
       final var messageSupport = shared();
 
       assertEquals("nothing", messageSupport.message(message).with("value", null).format());
@@ -132,6 +143,8 @@ class MessageBuilderTest
               .mapEmpty().message(b -> b.text("(empty)"))
               .mapDefault().message(b -> b.parameter("text"))
           .build();
+
+      assertEquals("%{text,empty:'(empty)',:'%{text}'}", message.asFormatString(UTF_8));
 
       final var messageSupport = shared();
 
@@ -151,6 +164,8 @@ class MessageBuilderTest
               .mapNumber(0).gt().message(b -> b.text("positive"))
               .mapDefault().message(b -> b.text("zero"))
           .build();
+
+      assertEquals("%{n,format:choice,<0:negative,>0:positive,:zero}", message.asFormatString(UTF_8));
 
       final var messageSupport = shared();
 
@@ -191,6 +206,7 @@ class MessageBuilderTest
       assertEquals(1, message.getMessageParts().length);
       assertInstanceOf(MessagePart.Text.class, message.getMessageParts()[0]);
 
+      assertEquals("Hello World", message.asFormatString(UTF_8));
       assertEquals("Hello World", shared().message(message).format());
     }
 
@@ -207,6 +223,7 @@ class MessageBuilderTest
 
       assertEquals(1, message.getMessageParts().length);
 
+      assertEquals("one two three", message.asFormatString(UTF_8));
       assertEquals("one two three", shared().message(message).format());
     }
 
@@ -224,6 +241,7 @@ class MessageBuilderTest
       // text + parameter + text = 3 parts
       assertEquals(3, message.getMessageParts().length);
 
+      assertEquals("Hello %{name}!", message.asFormatString(UTF_8));
       assertEquals("Hello Alice!", shared().message(message).with("name", "Alice").format());
     }
 
@@ -244,6 +262,7 @@ class MessageBuilderTest
       // "Dear customer" (merged) + parameter + ", welcome back!" (merged) = 3 parts
       assertEquals(3, message.getMessageParts().length);
 
+      assertEquals("Dear customer %{name}, welcome back!", message.asFormatString(UTF_8));
       assertEquals("Dear customer Alice, welcome back!",
           shared().message(message).with("name", "Alice").format());
     }
@@ -259,6 +278,7 @@ class MessageBuilderTest
 
       assertEquals(1, message.getMessageParts().length);
 
+      assertEquals("solo", message.asFormatString(UTF_8));
       assertEquals("solo", shared().message(message).format());
     }
 
@@ -274,6 +294,7 @@ class MessageBuilderTest
 
       assertEquals(1, message.getMessageParts().length);
 
+      assertEquals("left right", message.asFormatString(UTF_8));
       assertEquals("left right", shared().message(message).format());
     }
 
@@ -292,10 +313,9 @@ class MessageBuilderTest
       // parameter + ", and " (merged) + parameter = 3 parts
       assertEquals(3, message.getMessageParts().length);
 
+      assertEquals("%{a}, and %{b}", message.asFormatString(UTF_8));
       assertEquals("1, and 2",
           shared().message(message).with("a", 1).with("b", 2).format());
     }
   }
 }
-
-
