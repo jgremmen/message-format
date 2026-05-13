@@ -31,6 +31,7 @@ import java.io.IOException;
 import static de.sayayi.lib.message.part.MessagePart.Text.SPACE;
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.util.MessageUtil.serializeMessage;
 import static de.sayayi.lib.message.util.MessageUtil.validateName;
 import static java.util.Objects.requireNonNull;
 
@@ -128,9 +129,8 @@ public final class PostFormatterPart implements MessagePart.PostFormat
     if (spaceBefore)
       textJoiner.add(SPACE);
 
-    textJoiner.addNoSpace("%(").addNoSpace(name).addNoSpace(",\"");
-    message.serialize(context.withStringQuote('"'));
-    textJoiner.add('"');
+    textJoiner.addNoSpace("%(").addNoSpace(name).add(',');
+    serializeMessage(context, message, true);
 
     final var contextWithoutQuotes = context.withoutStringQuote();
 

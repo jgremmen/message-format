@@ -17,8 +17,10 @@ package de.sayayi.lib.message.util;
 
 import de.sayayi.lib.message.FormatStringSerializer.Context;
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.internal.TextMessage;
 import de.sayayi.lib.message.internal.pack.PackFileTypeDetector;
 import de.sayayi.lib.message.internal.pack.PackSupport;
+import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.pack.PackInputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -520,6 +522,53 @@ public final class MessageUtil
 
     context.textJoiner().add(quote);
     serializeString(context.withStringQuote(quote), string);
+    context.textJoiner().add(quote);
+  }
+
+
+  /**
+   * Serializes a message into the format string representation. If the message is a simple
+   * {@link TextMessage} whose text is a valid {@linkplain #isName(String) name} and
+   * {@code forceQuoted} is {@code false}, the text is serialized without quotes. Otherwise,
+   * the message is wrapped in quotes and serialized using the message's own serialization logic.
+   * <p>
+   * The quote character is automatically chosen: if any text part contains a single quote
+   * ({@code '}), a double quote ({@code "}) is used; otherwise a single quote is used.
+   *
+   * @param context      the serialization context providing charset encoding, text joiner and
+   *                     string quoting information, not {@code null}
+   * @param message      the message to serialize, not {@code null}
+   * @param forceQuoted  if {@code true}, the message is always serialized as a quoted string;
+   *                     if {@code false}, simple name-like text messages may be unquoted
+   *
+   * @see #serializeString(Context, String)
+   * @see #serializeQuotedString(Context, String)
+   *
+   * @since 0.23.0
+   */
+  public static void serializeMessage(@NotNull Context context, @NotNull Message message, boolean forceQuoted)
+  {
+    if (!forceQuoted && message instanceof TextMessage textMessage)
+    {
+      final var string = ((Text)textMessage.getMessageParts()[0]).getTextWithSpaces();
+      if (isName(string))
+      {
+        serializeString(context, string);
+        return;
+      }
+    }
+
+    var quote = '\'';
+
+    for(var messagePart: message.getMessageParts())
+      if (messagePart instanceof Text text && text.getTextNotNull().indexOf('\'') >= 0)
+      {
+        quote = '"';
+        break;
+      }
+
+    context.textJoiner().add(quote);
+    message.serialize(context.withStringQuote(quote));
     context.textJoiner().add(quote);
   }
 

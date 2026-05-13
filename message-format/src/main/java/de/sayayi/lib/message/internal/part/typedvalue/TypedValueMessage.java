@@ -16,18 +16,16 @@
 package de.sayayi.lib.message.internal.part.typedvalue;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.internal.TextMessage;
 import de.sayayi.lib.message.internal.pack.PackSupport;
-import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TypedValue.MessageValue;
+import de.sayayi.lib.message.util.MessageUtil;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static de.sayayi.lib.message.util.MessageUtil.isName;
-import static de.sayayi.lib.message.util.MessageUtil.serializeString;
+import static de.sayayi.lib.message.util.MessageUtil.serializeMessage;
 import static java.util.Objects.requireNonNull;
 
 
@@ -71,21 +69,8 @@ public record TypedValueMessage(@NotNull Message.WithSpaces messageValue) implem
    * @param context  the serialization context, not {@code null}
    */
   @Override
-  public void serialize(@NotNull Context context)
-  {
-    if (messageValue instanceof TextMessage textMessage)
-    {
-      final var string = ((Text)textMessage.getMessageParts()[0]).getTextWithSpaces();
-      if (isName(string))
-      {
-        serializeString(context, string);
-        return;
-      }
-    }
-
-    context.textJoiner().add('\'');
-    messageValue.serialize(context.withStringQuote('\''));
-    context.textJoiner().add('\'');
+  public void serialize(@NotNull Context context) {
+    serializeMessage(context, messageValue, false);
   }
 
 
