@@ -431,8 +431,8 @@ public final class InternalMessageBuilder implements MessageBuilder
       implements ParameterBuilder
   {
     private final @NotNull String name;
-    private String format;
     private final @NotNull Map<MapKey,TypedValue<?>> map;
+    private String format;
 
 
     /**
