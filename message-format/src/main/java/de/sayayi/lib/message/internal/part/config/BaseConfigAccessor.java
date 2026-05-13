@@ -33,14 +33,27 @@ import static java.util.Optional.ofNullable;
 
 
 /**
- * @since 0.8.4  (extracted from ParameterFormatterContext)
+ * Base implementation of {@link ConfigAccessor} that resolves configuration values from a {@link Config} instance,
+ * falling back to default configuration values provided by the {@link MessageAccessor}.
+ *
+ * @author Jeroen Gremmen
+ * @since 0.8.4 (extracted from ParameterFormatterContext)
  */
 public class BaseConfigAccessor implements ConfigAccessor
 {
+  /** The message accessor used to resolve default configuration values. */
   protected final @NotNull MessageAccessor messageAccessor;
+
+  /** The configuration to look up values from. */
   protected final @NotNull Config config;
 
 
+  /**
+   * Creates a new base config accessor with the given message accessor and configuration.
+   *
+   * @param messageAccessor  the message accessor for resolving defaults, not {@code null}
+   * @param config           the configuration to look up values from, not {@code null}
+   */
   public BaseConfigAccessor(@NotNull MessageAccessor messageAccessor, @NotNull Config config)
   {
     this.messageAccessor = messageAccessor;
@@ -48,12 +61,18 @@ public class BaseConfigAccessor implements ConfigAccessor
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public @NotNull Config getConfig() {
     return config;
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public @NotNull Optional<TypedValue<?>> getConfigValue(@NotNull String name)
   {
@@ -65,6 +84,9 @@ public class BaseConfigAccessor implements ConfigAccessor
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public @NotNull Optional<String> getConfigValueString(@NotNull String name)
   {
@@ -76,6 +98,9 @@ public class BaseConfigAccessor implements ConfigAccessor
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public @NotNull OptionalLong getConfigValueNumber(@NotNull String name)
   {
@@ -87,6 +112,9 @@ public class BaseConfigAccessor implements ConfigAccessor
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public @NotNull Optional<Boolean> getConfigValueBool(@NotNull String name)
   {
@@ -98,6 +126,9 @@ public class BaseConfigAccessor implements ConfigAccessor
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public @NotNull Optional<Message.WithSpaces> getConfigValueMessage(@NotNull String name)
   {

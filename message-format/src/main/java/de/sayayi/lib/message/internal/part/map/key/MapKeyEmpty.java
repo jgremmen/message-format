@@ -24,21 +24,27 @@ import java.io.IOException;
 
 
 /**
- * The empty configuration key represents values which are considered empty by their associated
- * parameter formatter.
+ * Internal implementation of {@link MapKey} representing an empty map key. This enum provides
+ * two singleton constants for the two supported compare types: {@link #EQ} (matches empty values)
+ * and {@link #NE} (matches non-empty values).
+ * <p>
+ * What constitutes an "empty" value is determined by the associated parameter formatter.
  *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
 public enum MapKeyEmpty implements MapKey
 {
-  /** Empty config key with compare type {@link MapKey.CompareType#EQ EQ}. */
+  /** Empty map key with compare type {@link MapKey.CompareType#EQ EQ}. */
   EQ,
 
-  /** Empty config key with compare type {@link MapKey.CompareType#NE NE}. */
+  /** Empty map key with compare type {@link MapKey.CompareType#NE NE}. */
   NE;
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public @NotNull CompareType getCompareType() {
     return this == EQ ? CompareType.EQ : CompareType.NE;
@@ -56,12 +62,22 @@ public enum MapKeyEmpty implements MapKey
   }
 
 
+  /**
+   * Serializes this empty map key into its format string representation (e.g. {@code "empty"} or {@code "<>empty"}).
+   *
+   * @param context  the serialization context, not {@code null}
+   */
   @Override
   public void serialize(@NotNull Context context) {
     context.textJoiner().addNoSpace(getCompareType().asPrefix() + "empty");
   }
 
 
+  /**
+   * Returns the string representation of this empty map key.
+   *
+   * @return  string representation, never {@code null}
+   */
   @Override
   public String toString() {
     return getCompareType().asPrefix() + "empty";
@@ -69,7 +85,9 @@ public enum MapKeyEmpty implements MapKey
 
 
   /**
-   * @param packStream  data output pack target
+   * Writes this empty map key to the given pack output stream for binary serialization.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -81,6 +99,8 @@ public enum MapKeyEmpty implements MapKey
 
 
   /**
+   * Reads a {@code MapKeyEmpty} from the given pack input stream.
+   *
    * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked empty map key, never {@code null}

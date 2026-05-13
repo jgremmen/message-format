@@ -30,30 +30,35 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * This class represents a string configuration value.
+ * Internal implementation of {@link StringValue} representing a string typed configuration value.
+ * The string can optionally be parsed into a {@link Message.WithSpaces} via
+ * {@link #asMessage(MessageFactory)}.
  *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
 public final class TypedValueString implements StringValue
 {
-  /** Configuration value string. */
+  /** The string value. */
   private final @NotNull String string;
 
   private transient volatile Message.WithSpaces message;
 
 
+  /**
+   * Creates a new typed value string wrapping the given string.
+   *
+   * @param string  the string value, not {@code null}
+   *
+   * @throws NullPointerException  if {@code string} is {@code null}
+   */
   public TypedValueString(@NotNull String string) {
     this.string = requireNonNull(string, "string must not be null");
   }
 
 
   /**
-   * Return the string value.
-   *
-   * @return  string, never {@code null}
-   *
-   * @since 0.8.0
+   * {@inheritDoc}
    */
   @Override
   public @NotNull String stringValue() {
@@ -62,9 +67,7 @@ public final class TypedValueString implements StringValue
 
 
   /**
-   * Returns the string value.
-   *
-   * @return  string, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   @Contract(pure = true)
@@ -74,11 +77,7 @@ public final class TypedValueString implements StringValue
 
 
   /**
-   * Returns the parsed string value as a message.
-   *
-   * @param messageFactory  message factory instance, not {@code null}
-   *
-   * @return  string value parsed as a message, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull Message.WithSpaces asMessage(@NotNull MessageFactory messageFactory)
@@ -93,6 +92,13 @@ public final class TypedValueString implements StringValue
   }
 
 
+  /**
+   * Serializes this string value into its format string representation. If the string is a valid
+   * {@linkplain de.sayayi.lib.message.util.MessageUtil#isName(String) name}, it is serialized
+   * unquoted; otherwise it is serialized as a quoted string.
+   *
+   * @param context  the serialization context, not {@code null}
+   */
   @Override
   public void serialize(@NotNull Context context)
   {
@@ -103,18 +109,36 @@ public final class TypedValueString implements StringValue
   }
 
 
+  /**
+   * Compares this typed value string with another object for equality based on the wrapped
+   * string value.
+   *
+   * @param o  the object to compare with
+   *
+   * @return  {@code true} if {@code o} is a {@code TypedValueString} with the same string value
+   */
   @Override
   public boolean equals(Object o) {
     return o instanceof TypedValueString && string.equals(((TypedValueString)o).string);
   }
 
 
+  /**
+   * Returns the hash code based on the wrapped string value.
+   *
+   * @return  hash code
+   */
   @Override
   public int hashCode() {
     return 59 + string.hashCode();
   }
 
 
+  /**
+   * Returns the string value enclosed in single quotes, with internal single quotes escaped.
+   *
+   * @return  quoted string representation, never {@code null}
+   */
   @Override
   @Contract(pure = true)
   public @NotNull String toString() {
@@ -123,7 +147,9 @@ public final class TypedValueString implements StringValue
 
 
   /**
-   * @param packStream  data output pack target
+   * Writes this string value to the given pack output stream for binary serialization.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -135,9 +161,11 @@ public final class TypedValueString implements StringValue
 
 
   /**
+   * Reads a {@code TypedValueString} from the given pack input stream.
+   *
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked string map value, never {@code null}
+   * @return  unpacked string value, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *

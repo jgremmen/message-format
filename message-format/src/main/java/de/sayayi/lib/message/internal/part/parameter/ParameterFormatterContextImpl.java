@@ -40,7 +40,9 @@ import static java.util.Optional.ofNullable;
 
 
 /**
- * Parameter formatter context implementation.
+ * Internal implementation of {@link ParameterFormatterContext} that provides parameter formatters with all context
+ * information required for formatting a parameter value. This includes access to parameter values, configuration,
+ * map messages and formatter delegation.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -55,6 +57,17 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
   private int parameterFormatterIndex = 0;
 
 
+  /**
+   * Creates a new parameter formatter context.
+   *
+   * @param messageAccessor  message accessor, not {@code null}
+   * @param parameters       formatting parameters, not {@code null}
+   * @param value            parameter value to format, or {@code null}
+   * @param type             value type, or {@code null} to determine automatically
+   * @param format           formatter name, or {@code null}
+   * @param config           parameter configuration, not {@code null}
+   * @param map              parameter map, not {@code null}
+   */
   ParameterFormatterContextImpl(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters,
                                 Object value, Class<?> type, String format, @NotNull Config config,
                                 @NotNull MessagePart.Map map)
@@ -73,42 +86,49 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MessagePart.Map getMap() {
     return map;
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull MessageAccessor getMessageAccessor() {
     return messageAccessor;
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Locale getLocale() {
     return parameters.getLocale();
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public Object getParameterValue(@NotNull String parameter) {
     return parameters.getParameterValue(parameter);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Set<String> getParameterNames() {
     return parameters.getParameterNames();
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean hasMapMessage(@NotNull MapKey.Type keyType) {
     return map.hasMessageWithKeyType(keyType);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Optional<Message.WithSpaces> getMapMessage(
       Object key, @NotNull Set<MapKey.Type> keyTypes, boolean includeDefault) {
@@ -116,6 +136,7 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Text delegateToNextFormatter()
   {
@@ -126,6 +147,7 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Text format(Object value)
   {
@@ -135,6 +157,7 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Text format(Object value, @NotNull Class<?> type)
   {
@@ -144,6 +167,7 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Text format(Object value, Class<?> type, String format, Config config)
   {
@@ -152,6 +176,7 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Text format(Message.WithSpaces message)
   {
@@ -164,6 +189,7 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull OptionalLong size(Object value)
   {
@@ -181,6 +207,7 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Set<String> getClassifiers(Object value, Config config)
   {
@@ -195,28 +222,40 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
 
 
 
+  /**
+   * Internal implementation of {@link ClassifierContext} that collects classifier labels for a parameter value by
+   * consulting registered formatters.
+   */
   private final class InternalClassifierContext extends BaseConfigAccessor implements ClassifierContext
   {
     private final Set<String> classifiers = new LinkedHashSet<>();
 
 
+    /**
+     * Creates a new classifier context with the given configuration.
+     *
+     * @param config  the parameter configuration, not {@code null}
+     */
     private InternalClassifierContext(@NotNull Config config) {
       super(ParameterFormatterContextImpl.this.messageAccessor, config);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public void addClassifier(@NotNull String classifier) {
       classifiers.add(requireNonNull(classifier, "classifier must not be null"));
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull Set<String> getClassifiers() {
       return classifiers;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public boolean updateClassifiers(Object value, @NotNull Config config)
     {

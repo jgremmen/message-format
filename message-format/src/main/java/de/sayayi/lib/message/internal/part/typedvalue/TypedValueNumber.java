@@ -30,9 +30,10 @@ import static java.lang.Integer.MIN_VALUE;
 
 
 /**
- * This class represents a numeric configuration value.
+ * Internal implementation of {@link NumberValue} representing a numeric typed configuration value
+ * backed by a {@code long}.
  *
- * @param longValue  configuration value number.
+ * @param longValue  the numeric value
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -40,13 +41,7 @@ import static java.lang.Integer.MIN_VALUE;
 public record TypedValueNumber(long longValue) implements NumberValue
 {
   /**
-   * Return the number as int.
-   * <p>
-   * If the number is larger than the integer range, the returned value is either
-   * {@code 4294967295} for positive values or {@code −4294967296} for negative values.
-   *
-   * @return number as int
-   * @since 0.8.0
+   * {@inheritDoc}
    */
   @Override
   public int intValue() {
@@ -55,9 +50,7 @@ public record TypedValueNumber(long longValue) implements NumberValue
 
 
   /**
-   * Returns the number value.
-   *
-   * @return number, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   @Contract(pure = true)
@@ -66,12 +59,22 @@ public record TypedValueNumber(long longValue) implements NumberValue
   }
 
 
+  /**
+   * Serializes this numeric value into its format string representation.
+   *
+   * @param context  the serialization context, not {@code null}
+   */
   @Override
   public void serialize(@NotNull Context context) {
     context.textJoiner().addNoSpace(Long.toString(longValue));
   }
 
 
+  /**
+   * Returns the string representation of this numeric value.
+   *
+   * @return  string representation, never {@code null}
+   */
   @Override
   @Contract(pure = true)
   public @NotNull String toString() {
@@ -80,7 +83,9 @@ public record TypedValueNumber(long longValue) implements NumberValue
 
 
   /**
-   * @param packStream  data output pack target
+   * Writes this numeric value to the given pack output stream for binary serialization.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -92,9 +97,11 @@ public record TypedValueNumber(long longValue) implements NumberValue
 
 
   /**
+   * Reads a {@code TypedValueNumber} from the given pack input stream.
+   *
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked number map value, never {@code null}
+   * @return  unpacked numeric value, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *

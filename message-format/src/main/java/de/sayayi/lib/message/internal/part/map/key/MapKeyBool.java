@@ -25,22 +25,27 @@ import java.io.IOException;
 
 
 /**
+ * Internal implementation of {@link MapKey} representing a boolean map key. This enum provides two singleton constants,
+ * {@link #TRUE} and {@link #FALSE}, corresponding to the two boolean key values.
+ * <p>
+ * Boolean map keys always use the {@link CompareType#EQ EQ} compare type.
+ *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
 public enum MapKeyBool implements MapKey
 {
-  /** Boolean config key representing {@code false}. */
+  /** Boolean map key representing {@code false}. */
   FALSE,
 
-  /** Boolean config key representing {@code true}. */
+  /** Boolean map key representing {@code true}. */
   TRUE;
 
 
   /**
-   * Returns the config key boolean value.
+   * Returns the boolean value of this map key.
    *
-   * @return  config key boolean value
+   * @return  {@code true} for {@link #TRUE}, {@code false} for {@link #FALSE}
    */
   @Contract(pure = true)
   public boolean isBool() {
@@ -59,12 +64,22 @@ public enum MapKeyBool implements MapKey
   }
 
 
+  /**
+   * Serializes this boolean map key into its format string representation ({@code "true"} or {@code "false"}).
+   *
+   * @param context  the serialization context, not {@code null}
+   */
   @Override
   public void serialize(@NotNull Context context) {
     context.textJoiner().addNoSpace(Boolean.toString(isBool()));
   }
 
 
+  /**
+   * Returns the string representation of this boolean map key ({@code "true"} or {@code "false"}).
+   *
+   * @return  string representation, never {@code null}
+   */
   @Override
   public String toString() {
     return Boolean.toString(isBool());
@@ -72,7 +87,9 @@ public enum MapKeyBool implements MapKey
 
 
   /**
-   * @param packStream  data output pack target
+   * Writes this boolean map key to the given pack output stream for binary serialization.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -84,6 +101,8 @@ public enum MapKeyBool implements MapKey
 
 
   /**
+   * Reads a {@code MapKeyBool} from the given pack input stream.
+   *
    * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked boolean map key, never {@code null}

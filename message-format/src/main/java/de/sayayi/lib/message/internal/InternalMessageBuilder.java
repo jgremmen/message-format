@@ -60,6 +60,9 @@ import static java.util.Objects.requireNonNull;
  *
  * @author Jeroen Gremmen
  * @since 0.21.0
+ *
+ * @see MessageBuilder
+ * @see MessageFactory#messageBuilder()
  */
 public final class InternalMessageBuilder implements MessageBuilder
 {

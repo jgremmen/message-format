@@ -29,23 +29,28 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
+ * Internal implementation of {@link MapKey} representing a string map key. A string key consists of a string value
+ * and a {@link CompareType} that determines how the provided value is compared to this key.
+ *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
 @SuppressWarnings("ClassCanBeRecord")
 public final class MapKeyString implements MapKey
 {
-  /** Configuration string key comparison type. */
+  /** The comparison type for this map key. */
   private final @NotNull CompareType compareType;
 
-  /** Configuration key string. */
+  /** The string key value. */
   private final @NotNull String string;
 
 
   /**
-   * Constructs a configuration key string.
+   * Creates a string map key with compare type {@link CompareType#EQ EQ}.
    *
-   * @param string  configuration key string, not {@code null}
+   * @param string  the string key value, not {@code null}
+   *
+   * @throws NullPointerException  if {@code string} is {@code null}
    *
    * @since 0.10.0
    */
@@ -55,10 +60,12 @@ public final class MapKeyString implements MapKey
 
 
   /**
-   * Constructs a configuration key string with comparison type.
+   * Creates a string map key with the given comparison type and string value.
    *
-   * @param compareType  configuration key comparison type, not {@code null}
-   * @param string  configuration key string, not {@code null}
+   * @param compareType  comparison type, not {@code null}
+   * @param string       the string key value, not {@code null}
+   *
+   * @throws NullPointerException  if {@code compareType} or {@code string} is {@code null}
    */
   public MapKeyString(@NotNull CompareType compareType, @NotNull String string)
   {
@@ -67,6 +74,9 @@ public final class MapKeyString implements MapKey
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public @NotNull CompareType getCompareType() {
     return compareType;
@@ -74,9 +84,9 @@ public final class MapKeyString implements MapKey
 
 
   /**
-   * Returns the config key string value.
+   * Returns the string key value.
    *
-   * @return  config key string value, never {@code null}
+   * @return  string key value, never {@code null}
    */
   @Contract(pure = true)
   public @NotNull String getString() {
@@ -95,6 +105,12 @@ public final class MapKeyString implements MapKey
   }
 
 
+  /**
+   * Serializes this string map key into its format string representation, including the comparison type prefix
+   * if applicable.
+   *
+   * @param context  the serialization context, not {@code null}
+   */
   @Override
   public void serialize(@NotNull Context context)
   {
@@ -103,18 +119,36 @@ public final class MapKeyString implements MapKey
   }
 
 
+  /**
+   * Compares this string map key with another object for equality based on the string value and comparison type.
+   *
+   * @param o  the object to compare with
+   *
+   * @return  {@code true} if {@code o} is a {@code MapKeyString} with the same string value and comparison type
+   */
   @Override
   public boolean equals(Object o) {
     return o instanceof MapKeyString that && compareType == that.compareType && string.equals(that.string);
   }
 
 
+  /**
+   * Returns the hash code based on the string value and comparison type.
+   *
+   * @return  hash code
+   */
   @Override
   public int hashCode() {
     return (59 + compareType.hashCode()) * 59 + string.hashCode();
   }
 
 
+  /**
+   * Returns the string representation of this string map key, including the comparison type prefix and the quoted
+   * string value.
+   *
+   * @return  string representation, never {@code null}
+   */
   @Override
   public String toString() {
     return compareType.asPrefix() + '\'' + string.replace("'", "\\'") + '\'';
@@ -122,7 +156,9 @@ public final class MapKeyString implements MapKey
 
 
   /**
-   * @param packStream  data output pack target
+   * Writes this string map key to the given pack output stream for binary serialization.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -136,6 +172,8 @@ public final class MapKeyString implements MapKey
 
 
   /**
+   * Reads a {@code MapKeyString} from the given pack input stream.
+   *
    * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked string map key, never {@code null}

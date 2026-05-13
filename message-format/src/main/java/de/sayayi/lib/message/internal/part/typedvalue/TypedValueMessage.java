@@ -32,24 +32,31 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * This class represents a message configuration value.
+ * Internal implementation of {@link MessageValue} that wraps a {@link Message.WithSpaces} as a
+ * typed configuration value. This record is used in parameter configurations and map entries
+ * where the value is a message.
  *
- * @param messageValue  configuration value message.
+ * @param messageValue  the wrapped message, not {@code null}
  *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
 public record TypedValueMessage(@NotNull Message.WithSpaces messageValue) implements MessageValue
 {
+  /**
+   * Creates a new typed value message wrapping the given message.
+   *
+   * @param messageValue  the message to wrap, not {@code null}
+   *
+   * @throws NullPointerException  if {@code messageValue} is {@code null}
+   */
   public TypedValueMessage(@NotNull Message.WithSpaces messageValue) {
     this.messageValue = requireNonNull(messageValue, "message must not be null");
   }
 
 
   /**
-   * Returns the message with spaces.
-   *
-   * @return  message with spaces, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull Message.WithSpaces asObject() {
@@ -57,6 +64,12 @@ public record TypedValueMessage(@NotNull Message.WithSpaces messageValue) implem
   }
 
 
+  /**
+   * Serializes this message value into its format string representation using
+   * {@link MessageUtil#serializeMessage(Context, Message, boolean)}.
+   *
+   * @param context  the serialization context, not {@code null}
+   */
   @Override
   public void serialize(@NotNull Context context)
   {
@@ -76,6 +89,11 @@ public record TypedValueMessage(@NotNull Message.WithSpaces messageValue) implem
   }
 
 
+  /**
+   * Returns the string representation of the wrapped message.
+   *
+   * @return  string representation, never {@code null}
+   */
   @Override
   public @NotNull String toString() {
     return messageValue.toString();
@@ -83,7 +101,9 @@ public record TypedValueMessage(@NotNull Message.WithSpaces messageValue) implem
 
 
   /**
-   * @param packStream  data output pack target
+   * Writes this message value to the given pack output stream for binary serialization.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -95,10 +115,12 @@ public record TypedValueMessage(@NotNull Message.WithSpaces messageValue) implem
 
 
   /**
+   * Reads a {@code TypedValueMessage} from the given pack input stream.
+   *
    * @param unpack      unpacker instance, not {@code null}
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked message map value, never {@code null}
+   * @return  unpacked message value, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *

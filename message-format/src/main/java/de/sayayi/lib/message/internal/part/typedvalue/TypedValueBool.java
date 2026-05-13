@@ -25,26 +25,24 @@ import java.io.IOException;
 
 
 /**
- * This class represents a boolean configuration value.
+ * Internal implementation of {@link BoolValue} representing a boolean typed configuration value.
+ * This enum provides two singleton constants, {@link #TRUE} and {@link #FALSE}, corresponding
+ * to the two boolean values.
  *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
 public enum TypedValueBool implements BoolValue
 {
-  /** Boolean config value representing {@code false}. */
+  /** Boolean typed value representing {@code false}. */
   FALSE,
 
-  /** Boolean config value representing {@code true}. */
+  /** Boolean typed value representing {@code true}. */
   TRUE;
 
 
   /**
-   * Return the number as boolean.
-   *
-   * @return  number as boolean
-   *
-   * @since 0.8.0
+   * {@inheritDoc}
    */
   @Override
   @Contract(pure = true)
@@ -54,9 +52,7 @@ public enum TypedValueBool implements BoolValue
 
 
   /**
-   * Returns the boolean value.
-   *
-   * @return  boolean, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull Boolean asObject() {
@@ -64,12 +60,22 @@ public enum TypedValueBool implements BoolValue
   }
 
 
+  /**
+   * Serializes this boolean value into its format string representation ({@code "true"} or {@code "false"}).
+   *
+   * @param context  the serialization context, not {@code null}
+   */
   @Override
   public void serialize(@NotNull Context context) {
     context.textJoiner().addNoSpace(Boolean.toString(booleanValue()));
   }
 
 
+  /**
+   * Returns the string representation of this boolean value ({@code "true"} or {@code "false"}).
+   *
+   * @return  string representation, never {@code null}
+   */
   @Override
   public String toString() {
     return Boolean.toString(booleanValue());
@@ -77,7 +83,9 @@ public enum TypedValueBool implements BoolValue
 
 
   /**
-   * @param packStream  data output pack target
+   * Writes this boolean value to the given pack output stream for binary serialization.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -89,9 +97,11 @@ public enum TypedValueBool implements BoolValue
 
 
   /**
+   * Reads a {@code TypedValueBool} from the given pack input stream.
+   *
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked boolean map value, never {@code null}
+   * @return  unpacked boolean value, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *

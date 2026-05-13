@@ -32,23 +32,34 @@ import static java.util.Collections.unmodifiableSet;
 
 
 /**
- * This class represents the message parameter or post-formatter configuration map.
+ * Internal implementation of {@link MessagePart.Config} backed by a name-to-value map. This class holds the
+ * configuration entries for message parameters and post-formatters.
  *
  * @author Jeroen Gremmen
  * @since 0.4.0
  */
 public final class MessagePartConfig implements MessagePart.Config
 {
+  /** Shared empty configuration instance. */
   public static final MessagePartConfig EMPTY_CONFIG = new MessagePartConfig(Map.of());
 
+  /** The configuration map, keyed by config name. */
   private final @NotNull Map<String,TypedValue<?>> config;
 
 
+  /**
+   * Creates a new configuration backed by the given map.
+   *
+   * @param config  the configuration map, not {@code null}
+   */
   public MessagePartConfig(@NotNull Map<String,TypedValue<?>> config) {
     this.config = config;
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public @NotNull MessagePart.Config excludeConfigByName(@NotNull Set<String> configNames)
   {
@@ -89,6 +100,9 @@ public final class MessagePartConfig implements MessagePart.Config
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @Contract(pure = true)
   public TypedValue<?> getConfigValue(@NotNull String name) {
@@ -117,18 +131,37 @@ public final class MessagePartConfig implements MessagePart.Config
   }
 
 
+  /**
+   * Compares this configuration with another object for equality based on the underlying configuration map.
+   *
+   * @param o  the object to compare with
+   *
+   * @return  {@code true} if {@code o} is a {@code MessagePartConfig} with an equal
+   *          configuration map
+   */
   @Override
   public boolean equals(Object o) {
     return o instanceof MessagePartConfig that && config.equals(that.config);
   }
 
 
+  /**
+   * Returns the hash code based on the underlying configuration map.
+   *
+   * @return  hash code
+   */
   @Override
   public int hashCode() {
     return config.hashCode();
   }
 
 
+  /**
+   * Returns a string representation of this configuration in the form
+   * <code>{key1=value1,key2=value2,...}</code>.
+   *
+   * @return  string representation, never {@code null}
+   */
   @Override
   @Contract(pure = true)
   public String toString()
@@ -143,6 +176,13 @@ public final class MessagePartConfig implements MessagePart.Config
   }
 
 
+  /**
+   * Writes this configuration to the given pack output stream for binary serialization.
+   *
+   * @param packStream  data output pack target, not {@code null}
+   *
+   * @throws IOException  if an I/O error occurs
+   */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeSmallVar(config.size());
@@ -155,6 +195,16 @@ public final class MessagePartConfig implements MessagePart.Config
   }
 
 
+  /**
+   * Reads a {@code MessagePartConfig} from the given pack input stream.
+   *
+   * @param unpack      unpacker instance, not {@code null}
+   * @param packStream  source data input, not {@code null}
+   *
+   * @return  unpacked configuration, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs
+   */
   @SuppressWarnings("unchecked")
   public static @NotNull MessagePartConfig unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
       throws IOException

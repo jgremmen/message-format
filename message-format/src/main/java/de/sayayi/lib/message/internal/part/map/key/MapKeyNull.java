@@ -24,18 +24,25 @@ import java.io.IOException;
 
 
 /**
+ * Internal implementation of {@link MapKey} representing a null map key. This enum provides two singleton constants
+ * for the two supported compare types: {@link #EQ} (matches {@code null} values) and {@link #NE} (matches
+ * non-{@code null} values).
+ *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
 public enum MapKeyNull implements MapKey
 {
-  /** Null config key with compare type {@link MapKey.CompareType#EQ EQ}. */
+  /** Null map key with compare type {@link MapKey.CompareType#EQ EQ}. */
   EQ,
 
-  /** Null config key with compare type {@link MapKey.CompareType#NE NE}. */
+  /** Null map key with compare type {@link MapKey.CompareType#NE NE}. */
   NE;
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public @NotNull CompareType getCompareType() {
     return this == EQ ? CompareType.EQ : CompareType.NE;
@@ -53,12 +60,22 @@ public enum MapKeyNull implements MapKey
   }
 
 
+  /**
+   * Serializes this null map key into its format string representation (e.g. {@code "null"} or {@code "<>null"}).
+   *
+   * @param context  the serialization context, not {@code null}
+   */
   @Override
   public void serialize(@NotNull Context context) {
     context.textJoiner().addNoSpace(getCompareType().asPrefix() + "null");
   }
 
 
+  /**
+   * Returns the string representation of this null map key.
+   *
+   * @return  string representation, never {@code null}
+   */
   @Override
   public String toString() {
     return getCompareType().asPrefix() + "null";
@@ -66,7 +83,9 @@ public enum MapKeyNull implements MapKey
 
 
   /**
-   * @param packStream  data output pack target
+   * Writes this null map key to the given pack output stream for binary serialization.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -78,6 +97,8 @@ public enum MapKeyNull implements MapKey
 
 
   /**
+   * Reads a {@code MapKeyNull} from the given pack input stream.
+   *
    * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked null map key, never {@code null}

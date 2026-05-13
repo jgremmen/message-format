@@ -29,24 +29,29 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
+ * Internal implementation of {@link MapKey} representing a numeric map key. A number key consists of a {@code long}
+ * value and a {@link CompareType} that determines how the provided value is compared to this key.
+ *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
 @SuppressWarnings("ClassCanBeRecord")
 public final class MapKeyNumber implements MapKey
 {
-  /** Configuration number key comparison type. */
+  /** The comparison type for this map key. */
   private final @NotNull CompareType compareType;
 
-  /** Configuration key number. */
+  /** The numeric key value. */
   private final long number;
 
 
   /**
-   * Constructs a configuration key number with a comparison type.
+   * Creates a numeric map key with the given comparison type and number.
    *
-   * @param compareType  configuration key comparison type, not {@code null}
-   * @param number       configuration key number
+   * @param compareType  comparison type, not {@code null}
+   * @param number       numeric key value
+   *
+   * @throws NullPointerException  if {@code compareType} is {@code null}
    *
    * @since 0.4.0 (made public in 0.10.0)
    */
@@ -57,6 +62,9 @@ public final class MapKeyNumber implements MapKey
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public @NotNull CompareType getCompareType() {
     return compareType;
@@ -64,9 +72,9 @@ public final class MapKeyNumber implements MapKey
 
 
   /**
-   * Returns the config key number value.
+   * Returns the numeric key value.
    *
-   * @return  config key number value
+   * @return  numeric key value
    */
   @Contract(pure = true)
   public long getNumber() {
@@ -85,24 +93,47 @@ public final class MapKeyNumber implements MapKey
   }
 
 
+  /**
+   * Serializes this numeric map key into its format string representation, including the comparison type prefix
+   * if applicable.
+   *
+   * @param context  the serialization context, not {@code null}
+   */
   @Override
   public void serialize(@NotNull Context context) {
     context.textJoiner().addNoSpace(compareType.asPrefix() + number);
   }
 
 
+  /**
+   * Compares this numeric map key with another object for equality based on the number and comparison type.
+   *
+   * @param o  the object to compare with
+   *
+   * @return  {@code true} if {@code o} is a {@code MapKeyNumber} with the same number and comparison type
+   */
   @Override
   public boolean equals(Object o) {
     return o instanceof MapKeyNumber that && number == that.number && compareType == that.compareType;
   }
 
 
+  /**
+   * Returns the hash code based on the number and comparison type.
+   *
+   * @return  hash code
+   */
   @Override
   public int hashCode() {
     return (59 + Long.hashCode(number)) * 59 + compareType.hashCode();
   }
 
 
+  /**
+   * Returns the string representation of this numeric map key, including the comparison type prefix.
+   *
+   * @return  string representation, never {@code null}
+   */
   @Override
   public String toString() {
     return compareType.asPrefix() + number;
@@ -110,7 +141,9 @@ public final class MapKeyNumber implements MapKey
 
 
   /**
-   * @param packStream  data output pack target
+   * Writes this numeric map key to the given pack output stream for binary serialization.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -124,9 +157,11 @@ public final class MapKeyNumber implements MapKey
 
 
   /**
+   * Reads a {@code MapKeyNumber} from the given pack input stream.
+   *
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked number map key, never {@code null}
+   * @return  unpacked numeric map key, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *

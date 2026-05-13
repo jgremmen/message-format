@@ -36,7 +36,15 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * This class contains various methods related to messages.
+ * Utility class providing static helper methods for message processing, including:
+ * <ul>
+ *   <li>Name validation (kebab-case, lower camel-case, general name format)</li>
+ *   <li>Space-aware string trimming and normalization</li>
+ *   <li>Message and string serialization into the format string representation</li>
+ *   <li>Pack file detection and message/template import</li>
+ * </ul>
+ *
+ * <p>This class cannot be instantiated.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0
@@ -53,6 +61,9 @@ public final class MessageUtil
    * @param nameDescription  the name description to use in exception messages
    *
    * @return  the validated name, never {@code null} or empty
+   *
+   * @throws NullPointerException      if {@code name} is {@code null}
+   * @throws IllegalArgumentException  if {@code name} is blank
    */
   @Contract(value = "null, _ -> fail; _, _ -> param1", pure = true)
   public static @NotNull String validateName(String name, @NotNull String nameDescription)
