@@ -512,7 +512,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
     final ContextToMapCollector<TemplateParameterDelegateContext,String,String> TEMPLATE_PARAMETER_DELEGATE_COLLECTOR =
         new ContextToMapCollector<>(HashMap::new, (map, context) -> {
-          if (map.put(context.parameter, context.delegatedParameter) != null)
+          if (!context.parameter.equals(context.delegatedParameter) &&
+              map.put(context.parameter, context.delegatedParameter) != null)
           {
             syntaxError("duplicate template parameter delegate '" + context.parameter + "'")
                 .with(context)
