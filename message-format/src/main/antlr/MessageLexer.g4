@@ -287,6 +287,7 @@ fragment Character
 
 fragment EscapeSequence
         : '\\u' HexDigit HexDigit HexDigit HexDigit
+        | '\\x' HexDigit HexDigit
         | '\\' ["'%{\\\u005b]
         ;
 
