@@ -9,7 +9,6 @@ nav:
       - changelog/version-0.20.1.md
       - changelog/version-0.20.0.md
       - changelog/version-0.12.0.md
-      - changelog/version-0.11.0.md
     - License: license.md
   - Message:
     - message/index.md
