@@ -35,14 +35,15 @@ include these characters literally in your text you need to escape the percent s
 
 The following escape sequences are recognized:
 
-| Escape | Character |
-|---|---|
-| `\\` | backslash |
-| `\'` | single quote |
-| `\"` | double quote |
-| `\%` | percent sign |
-| `\{` | left curly brace |
-| `\[` | left square bracket |
+| Escape   | Character                        |
+|----------|----------------------------------|
+| `\\`     | backslash                        |
+| `\'`     | single quote                     |
+| `\"`     | double quote                     |
+| `\%`     | percent sign                     |
+| `\{`     | left curly brace                 |
+| `\[`     | left square bracket              |
+| `\xNN`   | Latin-1 character (2 hex digits) |
 | `\uXXXX` | Unicode character (4 hex digits) |
 
 In the following example the literal text `%{` must be escaped because the parser would
