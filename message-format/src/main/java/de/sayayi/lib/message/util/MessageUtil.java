@@ -532,8 +532,9 @@ public final class MessageUtil
    * {@code forceQuoted} is {@code false}, the text is serialized without quotes. Otherwise,
    * the message is wrapped in quotes and serialized using the message's own serialization logic.
    * <p>
-   * The quote character is automatically chosen: if any text part contains a single quote
-   * ({@code '}), a double quote ({@code "}) is used; otherwise a single quote is used.
+   * The quote character is automatically chosen to prevent or reduce unnecessary escape sequences in the
+   * resulting format string: if any text part contains a single quote ({@code '}), a double quote
+   * ({@code "}) is used; otherwise a single quote is used.
    *
    * @param context      the serialization context providing charset encoding, text joiner and
    *                     string quoting information, not {@code null}
