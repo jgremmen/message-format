@@ -15,12 +15,15 @@
  */
 package de.sayayi.lib.message.util;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import de.sayayi.lib.message.FormatStringSerializer;
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageBuilder;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.*;
 
 import static de.sayayi.lib.message.util.MessageUtil.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -70,7 +73,6 @@ final class MessageUtilTest
 
   @Test
   @DisplayName("invalid kebab-case names")
-  @SuppressWarnings("SpellCheckingInspection")
   void testIsKebabCaseNameInvalid()
   {
     // Empty string
@@ -299,7 +301,6 @@ final class MessageUtilTest
 
   @Test
   @DisplayName("invalid kebab- or lower camel-case names")
-  @SuppressWarnings("SpellCheckingInspection")
   void testIsKebabOrLowerCamelCaseNameInvalid()
   {
     // Empty string
@@ -393,6 +394,7 @@ final class MessageUtilTest
   void testTrimAndNormalizeSpacesNullAndEmpty()
   {
     // null returns null
+    //noinspection ConstantValue
     assertNull(trimAndNormalizeSpaces(null));
 
     // empty string returns empty
@@ -492,5 +494,113 @@ final class MessageUtilTest
     assertEquals("a", trimAndNormalizeSpaces("a"));
     assertEquals("a", trimAndNormalizeSpaces(" a "));
     assertEquals("a", trimAndNormalizeSpaces("   a   "));
+  }
+
+
+
+
+  @Nested
+  @DisplayName("serializeMessage")
+  class SerializeMessageTest
+  {
+
+
+    @Test
+    @DisplayName("force quoted regular text message with letters only")
+    void testRegularTextLettersOnlyForceQuoted()
+    {
+      final var message = MessageBuilder
+          .create()
+          .text("hello")
+          .build();
+      assertEquals("'hello'", serialize(message, true));
+    }
+
+
+    @Test
+    @DisplayName("regular text message with letters only serializes unquoted")
+    void testRegularTextLettersOnly()
+    {
+      final var message = MessageBuilder
+          .create()
+          .text("hello")
+          .build();
+      assertEquals("hello", serialize(message, false));
+    }
+
+
+    @Test
+    @DisplayName("text message with single quotes uses double-quote wrapper")
+    void testTextWithSingleQuotes()
+    {
+      final var message = MessageBuilder
+          .create()
+          .text("it's good")
+          .build();
+      assertEquals("\"it's good\"", serialize(message, false));
+    }
+
+
+    @Test
+    @DisplayName("text message with double quotes uses single-quote wrapper")
+    void testTextWithDoubleQuotes()
+    {
+      final var message = MessageBuilder
+          .create()
+          .text("say \"hi\"")
+          .build();
+      assertEquals("'say \"hi\"'", serialize(message, false));
+    }
+
+
+    @Test
+    @DisplayName("text message with more single quotes than double quotes uses double-quote wrapper")
+    void testTextWithMoreSingleQuotesThanDoubleQuotes()
+    {
+      final var message = MessageBuilder
+          .create()
+          .text("it's 'nice' \"ok\"")
+          .build();
+      assertEquals("\"it's 'nice' \\\"ok\\\"\"", serialize(message, false));
+    }
+
+
+    @Test
+    @DisplayName("text message with more double quotes than single quotes uses single-quote wrapper")
+    void testTextWithMoreDoubleQuotesThanSingleQuotes()
+    {
+      final var message = MessageBuilder
+          .create()
+          .text("\"a\" \"b\" 'c'")
+          .build();
+      assertEquals("'\"a\" \"b\" \\'c\\''", serialize(message, false));
+    }
+
+
+    @Test
+    @DisplayName("compound message with text part containing single quote after parameter uses double-quote wrapper")
+    void testCompoundMessageWithSingleQuoteAfterParameter()
+    {
+      final var message = MessageBuilder
+          .create()
+          .parameter("x")
+          .text("it's").spaceBefore()
+          .build();
+      assertEquals("\"%{x} it's\"", serialize(message, false));
+    }
+
+
+    @Contract(pure = true)
+    private @NotNull String serialize(@NotNull Message message, boolean forceQuoted)
+    {
+      final var context = new FormatStringSerializer.Context(UTF_8);
+
+      serializeMessage(context, message, forceQuoted);
+
+      return context
+          .textJoiner()
+          .asSpacedText()
+          .getTextNotNull();
+    }
   }
 }

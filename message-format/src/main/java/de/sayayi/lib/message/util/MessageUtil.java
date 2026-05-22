@@ -502,8 +502,9 @@ public final class MessageUtil
 
   /**
    * Serializes a string as a quoted string into the format string representation. The quote
-   * character is chosen automatically: if the string contains a single quote ({@code '}), a
-   * double quote ({@code "}) is used; otherwise a single quote is used.
+   * character is automatically chosen to prevent or reduce unnecessary escape sequences in the
+   * resulting format string: if the string contains more single quotes ({@code '}) than double
+   * quotes ({@code "}), a double quote is used as the wrapper; otherwise a single quote is used.
    * <p>
    * The opening and closing quote characters are appended to the context's
    * {@linkplain Context#textJoiner() text joiner}, and the string content between the quotes is
@@ -518,7 +519,17 @@ public final class MessageUtil
    */
   public static void serializeQuotedString(@NotNull Context context, @NotNull String string)
   {
-    final var quote = string.contains("'") ? '"' : '\'';
+    int quoteBalance = 0;
+
+    for(var ch: string.toCharArray())
+    {
+      if (ch == '\'')
+        quoteBalance++;
+      else if (ch == '"')
+        quoteBalance--;
+    }
+
+    final var quote = quoteBalance > 0 ? '"' : '\'';
 
     context.textJoiner().add(quote);
     serializeString(context.withStringQuote(quote), string);
@@ -559,14 +570,19 @@ public final class MessageUtil
       }
     }
 
-    var quote = '\'';
+    int quoteBalance = 0;
 
     for(var messagePart: message.getMessageParts())
-      if (messagePart instanceof Text text && text.getTextNotNull().indexOf('\'') >= 0)
-      {
-        quote = '"';
-        break;
-      }
+      if (messagePart instanceof Text text)
+        for(var ch: text.getTextNotNull().toCharArray())
+        {
+          if (ch == '\'')
+            quoteBalance++;
+          else if (ch == '"')
+            quoteBalance--;
+        }
+
+    final var quote = quoteBalance > 0 ? '"' : '\'';
 
     context.textJoiner().add(quote);
     message.serialize(context.withStringQuote(quote));
