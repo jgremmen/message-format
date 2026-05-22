@@ -3,6 +3,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Java](https://img.shields.io/badge/Java-21%2B-red.svg)](https://openjdk.org/)
 [![Maven Central](https://img.shields.io/maven-central/v/de.sayayi.lib/message-format.svg)](https://central.sonatype.com/artifact/de.sayayi.lib/message-format)
+[![Documentation](https://img.shields.io/badge/Documentation-8A2BE2)](https://lib.sayayi.de/message-format/latest)
 
 Message Format is a Java library for producing human-readable messages. Instead of constructing
 text by concatenating strings, format conversions, and conditional logic in Java code, messages
