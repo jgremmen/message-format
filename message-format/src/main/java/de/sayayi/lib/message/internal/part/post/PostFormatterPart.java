@@ -37,10 +37,19 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * Post formatter message part implementation.
+ * Internal implementation of {@link MessagePart.PostFormat} that applies a named
+ * {@link de.sayayi.lib.message.formatter.post.PostFormatter PostFormatter} to the formatted text of a contained
+ * message.
+ * <p>
+ * This part first formats the embedded message, then passes the resulting text through the registered post formatter
+ * identified by {@linkplain #getName() name}. Configuration values and space handling are preserved throughout this
+ * process.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0
+ *
+ * @see MessagePart.PostFormat
+ * @see de.sayayi.lib.message.formatter.post.PostFormatter PostFormatter
  */
 public final class PostFormatterPart implements MessagePart.PostFormat
 {
@@ -60,6 +69,15 @@ public final class PostFormatterPart implements MessagePart.PostFormat
   private final boolean spaceAfter;
 
 
+  /**
+   * Creates a new post formatter part.
+   *
+   * @param name         the post formatter name, not empty or {@code null}
+   * @param message      the message whose formatted text will be post-processed, not {@code null}
+   * @param spaceBefore  whether this part is preceded by a space
+   * @param spaceAfter   whether this part is followed by a space
+   * @param config       the configuration for the post formatter, not {@code null}
+   */
   public PostFormatterPart(@NotNull String name, @NotNull Message.WithSpaces message,
                            boolean spaceBefore, boolean spaceAfter, @NotNull MessagePartConfig config)
   {
@@ -102,6 +120,17 @@ public final class PostFormatterPart implements MessagePart.PostFormat
   }
 
 
+  /**
+   * Formats the embedded message and applies the named post formatter to the result.
+   * <p>
+   * If the embedded message formats to empty text, the empty text is returned as-is without invoking the post
+   * formatter. Leading and trailing spaces from both this part and the formatted text are merged.
+   *
+   * @param messageAccessor  accessor for retrieving formatters and locale, not {@code null}
+   * @param parameters       formatting parameters, not {@code null}
+   *
+   * @return  the post-formatted text, never {@code null}
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
@@ -186,7 +215,9 @@ public final class PostFormatterPart implements MessagePart.PostFormat
 
 
   /**
-   * @param packStream  data output pack target
+   * Writes this post formatter part to the given pack output stream.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    */
@@ -201,10 +232,12 @@ public final class PostFormatterPart implements MessagePart.PostFormat
 
 
   /**
-   * @param unpack      unpacker instance, not {@code null}
+   * Reads a post formatter part from the given pack input stream.
+   *
+   * @param unpack      unpacker instance providing deserialization support, not {@code null}
    * @param packStream  source data input, not {@code null}
    *
-   * @return  unpacked parameter part, never {@code null}
+   * @return  unpacked post formatter part, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
    */
