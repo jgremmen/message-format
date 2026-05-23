@@ -19,6 +19,7 @@ import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.post.PostFormatter;
+import de.sayayi.lib.message.internal.MessageSupportImpl;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.message.util.MessageUtil;
@@ -187,7 +188,7 @@ public interface MessageSupport
    *
    * @param <M>  the message type this configurer operates on
    */
-  interface MessageConfigurer<M extends Message>
+  sealed interface MessageConfigurer<M extends Message> permits MessageSupportImpl.Configurer
   {
     /**
      * Returns the message associated with this message configurer.
@@ -557,7 +558,7 @@ public interface MessageSupport
    * Configurable extend of message support providing methods to add/import messages, set default
    * parameter configuration values and change the default locale.
    */
-  interface ConfigurableMessageSupport extends MessageSupport, MessagePublisher
+  sealed interface ConfigurableMessageSupport extends MessageSupport, MessagePublisher permits MessageSupportImpl
   {
     /**
      * {@inheritDoc}
@@ -793,7 +794,7 @@ public interface MessageSupport
   /**
    * This interface allows access to all messages and templates published to the message support.
    */
-  interface MessageAccessor extends TemplateAccessor
+  sealed interface MessageAccessor extends TemplateAccessor permits MessageSupportImpl.Accessor
   {
     /**
      * Returns the locale configured for this message support instance.
@@ -921,7 +922,7 @@ public interface MessageSupport
   /**
    * This interface allows access to all templates published to the message support.
    */
-  interface TemplateAccessor
+  sealed interface TemplateAccessor permits MessageAccessor
   {
     /**
      * Returns all templates contained in this message builder.
@@ -982,7 +983,7 @@ public interface MessageSupport
    * @author Jeroen Gremmen
    * @since 0.8.0
    */
-  interface MessagePublisher
+  sealed interface MessagePublisher permits ConfigurableMessageSupport
   {
     /**
      * Adds a message with code to this publisher.

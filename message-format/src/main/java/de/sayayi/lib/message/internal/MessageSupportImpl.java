@@ -72,7 +72,7 @@ import static java.util.stream.Collectors.toCollection;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSupport
+public final class MessageSupportImpl implements MessageSupport.ConfigurableMessageSupport
 {
   private final @NotNull FormatterService formatterService;
   private final @NotNull MessageFactory messageFactory;
@@ -274,7 +274,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
    *
    * @throws DuplicateMessageException  if a different message with the same code already exists
    */
-  protected boolean failOnDuplicateMessage(@NotNull Message.WithCode message)
+  private boolean failOnDuplicateMessage(@NotNull Message.WithCode message)
   {
     final var code = message.getCode();
     final var tm = messages.get(code);
@@ -307,7 +307,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
    *
    * @throws DuplicateTemplateException  if a different template with the same name already exists
    */
-  protected boolean failOnDuplicateTemplate(@NotNull String name, @NotNull Message template)
+  private boolean failOnDuplicateTemplate(@NotNull String name, @NotNull Message template)
   {
     var ttm = templates.get(name);
     if (ttm != null)
@@ -333,7 +333,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
    *
    * @param <M>  the message type this configurer operates on
    */
-  final class Configurer<M extends Message> implements MessageConfigurer<M>
+  public final class Configurer<M extends Message> implements MessageConfigurer<M>
   {
     private final @NotNull Supplier<M> message;
     @NotNull Locale locale;
@@ -516,7 +516,7 @@ public class MessageSupportImpl implements MessageSupport.ConfigurableMessageSup
    * Internal {@link MessageAccessor} implementation providing read-only access to the messages, templates,
    * formatters and default configuration managed by the enclosing {@link MessageSupportImpl}.
    */
-  private final class Accessor implements MessageAccessor
+  public final class Accessor implements MessageAccessor
   {
     /** {@inheritDoc} */
     @Override
