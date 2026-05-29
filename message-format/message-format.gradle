@@ -63,14 +63,15 @@ dependencies {
 }
 
 
-def grammarOutputDirectory = layout.buildDirectory
-    .dir('generated-src/antlr/main/de/sayayi/lib/message/internal/parser').get().asFile
-
 generateGrammarSource {
   //noinspection GroovyAccessibility
   antlrClasspath = configurations.antlr4
-  outputDirectory = grammarOutputDirectory
-  packageName = 'de.sayayi.lib.message.internal.parser'
+
+  def parserPackage = 'de.sayayi.lib.message.internal.parser'
+
+  outputDirectory = layout.buildDirectory
+      .dir('generated/sources/antlr/main/' + parserPackage.replace('.', '/')).get().asFile
+  packageName = parserPackage
 }
 
 
