@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -52,11 +53,26 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class PluginTest
 {
-  @TempDir File testProjectDir;
-  File buildDir;
-  File javaDir;
-  File testPackageDir;
-  File packFile;
+  private static String MESSAGE_FORMAT_ANNOTATIONS_JAR;
+
+  @TempDir
+  private File testProjectDir;
+
+  private File testPackageDir;
+  private File packFile;
+
+
+  @BeforeAll
+  static void prepareExternalJar() throws IOException
+  {
+    try(var is = PluginTest.class.getClassLoader().getResourceAsStream("external-jars.properties")) {
+      var props = new Properties();
+
+      props.load(is);
+
+      MESSAGE_FORMAT_ANNOTATIONS_JAR = props.getProperty("message-format-annotations");
+    }
+  }
 
 
   @BeforeEach
@@ -69,10 +85,8 @@ final class PluginTest
 
     writeBuildGradle(List.of());
 
-    buildDir = new File(testProjectDir, "build");
-    javaDir = new File(testProjectDir, "src/main/java");
-    testPackageDir = new File(javaDir, "test");
-    packFile = new File(buildDir, "messageFormatPack/messages.mfp");
+    testPackageDir = new File(testProjectDir, "src/main/java/test");
+    packFile = new File(testProjectDir, "build/messageFormatPack/messages.mfp");
 
     createDirectories(testPackageDir.toPath());
   }
@@ -178,6 +192,7 @@ final class PluginTest
     copy(getResource("test-source-2.java"),
         new File(testPackageDir, "Source2.java").toPath());
 
+    //noinspection TestFailedLine
     val runner = GradleRunner.create()
         .withProjectDir(testProjectDir)
         .withArguments("messageFormatPack")
@@ -248,7 +263,7 @@ final class PluginTest
         "  id 'de.sayayi.plugin.gradle.message'",
         "}",
         "dependencies {",
-        "  implementation files('" + System.getProperty("MFA_JAR") + "')",
+        "  implementation files('" + MESSAGE_FORMAT_ANNOTATIONS_JAR + "')",
         "}"
     ));
 

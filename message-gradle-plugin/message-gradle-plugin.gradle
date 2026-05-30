@@ -39,15 +39,24 @@ dependencies {
 }
 
 
-tasks.named('test', Test) {
+sourceSets.test.resources.srcDir tasks.register('generateTestResources') {
+  description = 'Generates test resources for the Message Format Gradle Plugin.'
+
   dependsOn ':message-format-annotations:jar'
 
-  // is there a better way to do this?
-  systemProperty 'MFA_JAR', project(':message-format-annotations').jar.archiveFile.asFile.get().absolutePath
+  def testResourcesDir = layout.buildDirectory.dir('generated/resources/test')
+  def annotationsJarFile = project(':message-format-annotations').jar.archiveFile as RegularFileProperty
 
-  // GradleRunner requires java 21
-  javaLauncher = javaToolchains.launcherFor {
-    languageVersion = JavaLanguageVersion.of(21)
+  inputs.file annotationsJarFile
+  outputs.dir testResourcesDir
+
+  doLast {
+    def testResourcesDirAsFile = testResourcesDir.get().asFile
+    testResourcesDirAsFile.mkdirs()
+
+    new File(testResourcesDirAsFile, 'external-jars.properties').setText(
+        "message-format-annotations=${annotationsJarFile.get().asFile.toURI().path}\n",
+        'ISO-8859-1')
   }
 }
 
