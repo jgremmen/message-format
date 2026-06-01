@@ -28,9 +28,9 @@ registering custom formatters.
 
 [Adopters](adopter/index.md) covers the different ways to populate a `MessageSupport` instance
 with messages and templates. Messages can be declared through
-[annotations](adopter/annotation/index.md) and discovered at runtime via
-[ASM bytecode scanning](adopter/annotation/asm.md) or through
-[Spring's component scanning](adopter/annotation/spring.md). Alternatively, messages can be
+[annotations](adopter/annotation.md) and discovered at runtime via bytecode scanning using
+one of the three built-in implementations (ASM, Byte Buddy, or Spring). Alternatively, messages
+can be
 loaded from [properties files](adopter/properties.md) or standard Java
 [resource bundles](adopter/resource-bundle.md).
 

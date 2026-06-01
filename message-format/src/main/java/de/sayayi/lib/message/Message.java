@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.util.Collections.unmodifiableSet;
+import static java.util.Locale.ROOT;
 
 
 /**
@@ -413,5 +414,33 @@ public sealed interface Message extends FormatStringSerializer
      * @return  the hash code value for this parameters instance
      */
     int hashCode();
+
+
+    /**
+     * Returns an empty parameters instance with the {@linkplain Locale#ROOT root locale} and no parameter values.
+     *
+     * @return  empty parameters instance, never {@code null}
+     *
+     * @since 0.24.0
+     */
+    @Contract(value = "-> new", pure = true)
+    static @NotNull Parameters empty() {
+      return new NoParameters(ROOT);
+    }
+
+
+    /**
+     * Returns an empty parameters instance with the given {@code locale} and no parameter values.
+     *
+     * @param locale  locale for the parameters, not {@code null}
+     *
+     * @return  empty parameters instance, never {@code null}
+     *
+     * @since 0.24.0
+     */
+    @Contract(value = "_ -> new", pure = true)
+    static @NotNull Parameters empty(Locale locale) {
+      return new NoParameters(locale);
+    }
   }
 }

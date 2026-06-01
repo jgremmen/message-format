@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.annotation;
 
+import de.sayayi.lib.message.annotation.adopter.AnnotationAdopter;
 import org.intellij.lang.annotations.Language;
 
 import java.lang.annotation.Repeatable;
@@ -33,7 +34,7 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * &#x40;TemplateDef(name = "ex-msg", text = "%{ex,!empty:': %{ex}'}")
  * </pre></blockquote>
  *
- * @see AbstractAnnotationAdopter
+ * @see AnnotationAdopter
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

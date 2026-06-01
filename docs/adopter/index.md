@@ -12,10 +12,10 @@ without manually re-registering every message in code.
 
 The core library ships with two concrete adopters:
 [`ResourceBundleAdopter`](resource-bundle.md) for Java `ResourceBundle` instances and
-[`PropertiesAdopter`](properties.md) for `Properties` objects. Additional adopters for
-annotation-based message definitions are provided by the
-[Annotations](annotation/index.md), [ASM](annotation/asm.md) and
-[Spring](annotation/spring.md) modules.
+[`PropertiesAdopter`](properties.md) for `Properties` objects. The
+[annotation adopter](annotation.md) provides additional support for discovering messages
+and templates declared through `@MessageDef` and `@TemplateDef` annotations in compiled class
+files.
 
 
 ## AbstractMessageAdopter

@@ -75,10 +75,7 @@ nav:
       - Utilities: formatter/development/utilities.md
   - Adopters:
     - adopter/index.md
-    - Annotation:
-      - adopter/annotation/index.md
-      - ASM: adopter/annotation/asm.md
-      - Spring: adopter/annotation/spring.md
+    - Annotation: adopter/annotation.md
     - Properties: adopter/properties.md
     - Resource Bundle: adopter/resource-bundle.md
   - Add-Ons:

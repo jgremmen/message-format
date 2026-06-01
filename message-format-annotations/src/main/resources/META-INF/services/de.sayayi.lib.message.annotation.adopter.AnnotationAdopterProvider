@@ -1,0 +1,3 @@
+de.sayayi.lib.message.annotation.adopter.provider.AsmAnnotationAdopterProvider
+de.sayayi.lib.message.annotation.adopter.provider.ByteBuddyAnnotationAdopterProvider
+de.sayayi.lib.message.annotation.adopter.provider.SpringAnnotationAdopterProvider
