@@ -196,6 +196,9 @@ publishing {
 }
 
 
+publishToProjectLocalRepository.dependsOn test
+
+
 ext.releaseTask.configure {
   mustRunAfter 'test'
   dependsOn 'test'
