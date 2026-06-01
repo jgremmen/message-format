@@ -58,9 +58,10 @@ product names, legal phrases, or recurring sentence patterns.
 
 Messages and templates can be declared directly in Java source code using `@MessageDef` and
 `@TemplateDef` annotations. Each annotation carries a message code (or template name) and one or
-more locale-tagged format strings. Annotated classes are picked up by an adopter that extracts
-the definitions and publishes them to a `MessageSupport` instance. This keeps message definitions
-close to the code that uses them while still allowing them to be managed centrally.
+more locale-tagged format strings. The `AnnotationAdopter` scans compiled `.class` files for
+these annotations without loading the classes into the JVM and publishes the discovered
+definitions to a `MessageSupport` instance. This keeps message definitions close to the code
+that uses them while still allowing them to be managed centrally.
 
 ### Import and export
 
@@ -74,12 +75,8 @@ files can be read by newer versions of the library.
 ### Adopters
 
 Adopters are pluggable readers that import messages from external sources into a `MessageSupport`
-instance. The core module includes adopters for `ResourceBundle` and `Properties` files. The
-annotations module adds an adopter for `@MessageDef` / `@TemplateDef` annotations, and the ASM
-module provides a variant that works at the bytecode level. It can extract definitions from
-classes that are already loaded as well as from classes that are not present in the JVM. The
-Spring module contributes a Spring-aware ASM adopter that uses Spring's `ResourceLoader` for
-classpath scanning. Custom adopters can be implemented by extending `AbstractMessageAdopter`.
+instance. The core module includes adopters for `ResourceBundle` and `Properties` files.
+Custom adopters can be implemented by extending `AbstractMessageAdopter`.
 
 ### Log4j integration
 
@@ -97,8 +94,7 @@ The `message-format-spring` module bridges Message Format into the Spring ecosys
 message resolution and formatting to a `MessageSupport` instance. Positional `Object[]` arguments
 from the Spring `MessageSource` API are mapped to named parameters (`p1`, `p2`, …) with a
 configurable prefix. The module also registers a `SpELFormatter` that evaluates Spring Expression
-Language expressions inside message format strings, and includes `SpringAsmAnnotationAdopter` for
-classpath scanning of annotated message definitions using Spring's resource infrastructure.
+Language expressions inside message format strings.
 
 ### Gradle plugin
 
@@ -113,10 +109,10 @@ resources so it is included in the final artifact automatically.
 
 | Module                                                                                                             | Description                                                                     |
 |--------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
-| message-format&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format/0.23.0)                         | Core library: parsing, formatting, adopters, pack format, and the formatter SPI |
-| message-format-annotations&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-annotations/0.23.0) | `@MessageDef`, `@TemplateDef` and related annotations                           |
-| message-format-log4j&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-log4j/0.23.0)             | Log4j integration: `MessageFactory` using message-format syntax                 |
-| message-format-spring&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-spring/0.23.0)           | Spring `MessageSource` bridge, SpEL formatter, classpath scanning               |
+| message-format&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format/0.24.0)                         | Core library: parsing, formatting, adopters, pack format, and the formatter SPI |
+| message-format-annotations&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-annotations/0.24.0) | `@MessageDef`, `@TemplateDef`, annotation adopter and synthetic annotations     |
+| message-format-log4j&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-log4j/0.24.0)             | Log4j integration: `MessageFactory` using message-format syntax                 |
+| message-format-spring&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-spring/0.24.0)           | Spring `MessageSource` bridge and SpEL formatter                                |
 | message-gradle-plugin                                                                                              | Gradle plugin for build-time annotation scanning and message packing            |
 
 ## Quick Example
