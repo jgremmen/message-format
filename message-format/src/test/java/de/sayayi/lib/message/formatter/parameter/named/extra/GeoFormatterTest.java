@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter.parameter.named.extra;
 
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.NoParameters;
 import de.sayayi.lib.message.formatter.parameter.named.extra.GeoFormatter.Format;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
@@ -29,6 +28,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.HashMap;
 import java.util.Map;
 
+import static de.sayayi.lib.message.Message.Parameters;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -124,13 +124,13 @@ final class GeoFormatterTest extends AbstractFormatterTest
 
     // medium-longitude
     assertEquals(noSpaceText("18\u00b059'59,9\"E"),
-        format(messageAccessor, new NoParameters(GERMANY),
+        format(messageAccessor, Parameters.empty(GERMANY),
             dms(18, 59, 59, 891),
             Map.of("geo", new TypedValueString("medium-longitude")), Map.of(), "geo"));
 
     // long-longitude
     assertEquals(noSpaceText("18\u00b059'59.891\"W"),
-        format(messageAccessor, new NoParameters(UK),
+        format(messageAccessor, Parameters.empty(UK),
             -dms(18, 59, 59, 891),
             Map.of("geo", new TypedValueString("long-longitude")), Map.of(), "geo"));
   }

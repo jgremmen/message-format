@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.annotation;
 
+import de.sayayi.lib.message.annotation.adopter.AnnotationAdopter;
 import org.intellij.lang.annotations.Language;
 
 import java.lang.annotation.Repeatable;
@@ -36,7 +37,7 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * })
  * </pre></blockquote>
  *
- * @see AbstractAnnotationAdopter
+ * @see AnnotationAdopter
  *
  * @author Jeroen Gremmen
  * @since 0.1.0 (renamed in 0.3.0)

@@ -17,7 +17,6 @@ package de.sayayi.lib.message.internal.part.parameter;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.NoParameters;
 import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
@@ -52,14 +51,14 @@ public abstract class AbstractFormatterTest
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value) {
-    return format(messageContext, new NoParameters(messageContext.getLocale()), value, Map.of(), Map.of(), null);
+    return format(messageContext, Parameters.empty(messageContext.getLocale()), value, Map.of(), Map.of(), null);
   }
 
 
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
                                         @NotNull String format) {
-    return format(messageContext, new NoParameters(messageContext.getLocale()), value, Map.of(), Map.of(), format);
+    return format(messageContext, Parameters.empty(messageContext.getLocale()), value, Map.of(), Map.of(), format);
   }
 
 
@@ -75,7 +74,7 @@ public abstract class AbstractFormatterTest
                                         @NotNull Map<String,TypedValue<?>> config,
                                         @NotNull Map<MapKey,TypedValue<?>> map)
   {
-    return format(messageContext, new NoParameters(messageContext.getLocale()), value, config, map, null);
+    return format(messageContext, Parameters.empty(messageContext.getLocale()), value, config, map, null);
   }
 
 
@@ -84,7 +83,7 @@ public abstract class AbstractFormatterTest
                                         @NotNull Map<String,TypedValue<?>> config,
                                         @NotNull Map<MapKey,TypedValue<?>> map,
                                         @NotNull String format) {
-    return format(messageContext, new NoParameters(messageContext.getLocale()), value, config, map, format);
+    return format(messageContext, Parameters.empty(messageContext.getLocale()), value, config, map, format);
   }
 
 
