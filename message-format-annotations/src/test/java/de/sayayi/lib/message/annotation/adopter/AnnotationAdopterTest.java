@@ -22,9 +22,6 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.TemplateDef;
 import de.sayayi.lib.message.annotation.adopter.fixture.AnnotationsFixture;
-import de.sayayi.lib.message.annotation.adopter.lib.AsmAnnotationAdopter;
-import de.sayayi.lib.message.annotation.adopter.lib.ByteBuddyAnnotationAdopter;
-import de.sayayi.lib.message.annotation.adopter.lib.SpringAnnotationAdopter;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticMessageDef;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticTemplateDef;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticText;
@@ -34,11 +31,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Named;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -48,20 +42,17 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createTempFile;
 import static java.util.Locale.*;
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.objectweb.asm.Opcodes.*;
 
 
 /**
- * Parameterized tests for all non-default {@link AnnotationAdopter} methods, executed for each of the
- * three adopter implementations: ASM, ByteBuddy and Spring.
+ * Tests for all {@link AnnotationAdopter} methods.
  *
  * @author Jeroen Gremmen
  * @since 0.24.0
@@ -70,39 +61,35 @@ import static org.objectweb.asm.Opcodes.*;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 class AnnotationAdopterTest
 {
-  @ParameterizedTest(name = "{0}")
-  @MethodSource("adopters")
+  @Test
   @DisplayName("adopt(Class<?> type)")
-  void testAdoptType(@NotNull Class<? extends AbstractAnnotationAdopter> adopterClass) throws Exception
+  void testAdoptType()
   {
     val cms = newMessageSupport();
 
-    createAdopter(adopterClass, cms).adopt(AnnotationsFixture.class);
+    new AnnotationAdopter(cms).adopt(AnnotationsFixture.class);
     verifyFixture(cms.getMessageAccessor());
   }
 
 
-  @ParameterizedTest(name = "{0}")
-  @MethodSource("adopters")
+  @Test
   @DisplayName("adopt(Path classFile)")
-  void testAdoptPath(@NotNull Class<? extends AbstractAnnotationAdopter> adopterClass) throws Exception
+  void testAdoptPath() throws Exception
   {
     val cms = newMessageSupport();
 
-    createAdopter(adopterClass, cms).adopt(classFilePath(AnnotationsFixture.class));
+    new AnnotationAdopter(cms).adopt(classFilePath(AnnotationsFixture.class));
     verifyFixture(cms.getMessageAccessor());
   }
 
 
-  @ParameterizedTest(name = "{0}")
-  @MethodSource("adopters")
+  @Test
   @DisplayName("ignore synthetic method annotations")
-  void testIgnoreSyntheticMethodAnnotations(@NotNull Class<? extends AbstractAnnotationAdopter> adopterClass)
-      throws Exception
+  void testIgnoreSyntheticMethodAnnotations() throws Exception
   {
     val cms = newMessageSupport();
 
-    createAdopter(adopterClass, cms).adopt(syntheticMethodFixtureClassFile());
+    new AnnotationAdopter(cms).adopt(syntheticMethodFixtureClassFile());
 
     val accessor = cms.getMessageAccessor();
     assertTrue(accessor.hasMessageWithCode("control-msg"));
@@ -115,28 +102,49 @@ class AnnotationAdopterTest
   }
 
 
-  @ParameterizedTest(name = "{0}")
-  @MethodSource("adopters")
-  @DisplayName("adopt(ClassLoader, Set<String>)")
-  void testAdoptClassLoader(@NotNull Class<? extends AbstractAnnotationAdopter> adopterClass) throws Exception
+  @Test
+  @DisplayName("adopt(Class<?> innerType)")
+  void testAdoptInnerType()
   {
     val cms = newMessageSupport();
 
-    createAdopter(adopterClass, cms).adopt(
-        AnnotationsFixture.class.getClassLoader(),
-        Set.of(AnnotationsFixture.class.getPackageName()));
-    verifyFixture(cms.getMessageAccessor());
+    new AnnotationAdopter(cms).adopt(AnnotationsFixture.InnerRecord.class);
+    verifyInnerRecordFixture(cms.getMessageAccessor());
   }
 
 
-  @ParameterizedTest(name = "{0}")
-  @MethodSource("adopters")
-  @DisplayName("adopt(MessageDef)")
-  @SuppressWarnings("ExtractMethodRecommender")
-  void testAdoptMessageDef(@NotNull Class<? extends AbstractAnnotationAdopter> adopterClass) throws Exception
+  @Test
+  @DisplayName("adopt(Path innerClassFile)")
+  void testAdoptInnerPath() throws Exception
   {
     val cms = newMessageSupport();
-    val adopter = createAdopter(adopterClass, cms);
+
+    new AnnotationAdopter(cms).adopt(classFilePath(AnnotationsFixture.InnerRecord.class));
+    verifyInnerRecordFixture(cms.getMessageAccessor());
+  }
+
+
+  @Test
+  @DisplayName("adopt(ClassLoader, Set<String>)")
+  void testAdoptClassLoader()
+  {
+    val cms = newMessageSupport();
+
+    new AnnotationAdopter(cms).adopt(
+        AnnotationsFixture.class.getClassLoader(),
+        Set.of(AnnotationsFixture.class.getPackageName()));
+    verifyFixture(cms.getMessageAccessor());
+    verifyInnerRecordFixture(cms.getMessageAccessor());
+  }
+
+
+  @Test
+  @DisplayName("adopt(MessageDef)")
+  @SuppressWarnings("ExtractMethodRecommender")
+  void testAdoptMessageDef()
+  {
+    val cms = newMessageSupport();
+    val adopter = new AnnotationAdopter(cms);
 
     // Form 1: plain text= attribute (no @Text), uses single-text path
     adopter.adopt(new SyntheticMessageDef("MSG-D1", "Direct message 1"));
@@ -173,14 +181,13 @@ class AnnotationAdopterTest
   }
 
 
-  @ParameterizedTest(name = "{0}")
-  @MethodSource("adopters")
+  @Test
   @DisplayName("adopt(TemplateDef)")
   @SuppressWarnings("ExtractMethodRecommender")
-  void testAdoptTemplateDef(@NotNull Class<? extends AbstractAnnotationAdopter> adopterClass) throws Exception
+  void testAdoptTemplateDef()
   {
     val cms = newMessageSupport();
-    val adopter = createAdopter(adopterClass, cms);
+    val adopter = new AnnotationAdopter(cms);
 
     // Form 1: plain text= attribute (no @Text), uses single-text path
     adopter.adopt(new SyntheticTemplateDef("tmpl-d1", "Direct template 1"));
@@ -218,31 +225,12 @@ class AnnotationAdopterTest
 
 
   @Contract(pure = true)
-  static @NotNull Stream<Arguments> adopters()
-  {
-    return Stream.of(
-        arguments(Named.of("ASM", AsmAnnotationAdopter.class)),
-        arguments(Named.of("Byte-Buddy", ByteBuddyAnnotationAdopter.class)),
-        arguments(Named.of("Spring", SpringAnnotationAdopter.class)));
-  }
-
-
-  @Contract(pure = true)
   private static @NotNull ConfigurableMessageSupport newMessageSupport() {
     return MessageSupportFactory.create(DefaultFormatterService.getSharedInstance());
   }
 
 
   @Contract(pure = true)
-  private static AbstractAnnotationAdopter createAdopter(
-      @NotNull Class<? extends AbstractAnnotationAdopter> adopterClass,
-      @NotNull ConfigurableMessageSupport cms) throws Exception {
-    return adopterClass.getDeclaredConstructor(ConfigurableMessageSupport.class).newInstance(cms);
-  }
-
-
-  @Contract(pure = true)
-  @SuppressWarnings("SameParameterValue")
   private static @NotNull Path classFilePath(Class<?> type) throws URISyntaxException
   {
     val resourceName = type.getName().replace('.', '/') + ".class";
@@ -378,5 +366,25 @@ class AnnotationAdopterTest
     val methodTmpl3Locales = ((LocaleAware)methodTmpl3).getLocalizedMessages();
     assertEquals("EN method tmpl 3", methodTmpl3Locales.get(ENGLISH).asFormatString(UTF_8));
     assertEquals("FR method tmpl 3", methodTmpl3Locales.get(FRENCH).asFormatString(UTF_8));
+  }
+
+
+  private static void verifyInnerRecordFixture(@NotNull MessageAccessor accessor)
+  {
+    // inner-msg-1: plain text= form
+    assertTrue(accessor.hasMessageWithCode("inner-msg-1"));
+    assertEquals("Inner message 1", accessor.getMessageByCode("inner-msg-1").asFormatString(UTF_8));
+
+    // inner-msg-2: multi-locale (EN, DE)
+    assertTrue(accessor.hasMessageWithCode("inner-msg-2"));
+    val innerMsg2 = accessor.getMessageByCode("inner-msg-2");
+    assertInstanceOf(LocaleAware.class, innerMsg2);
+    val innerMsg2Locales = ((LocaleAware)innerMsg2).getLocalizedMessages();
+    assertEquals("EN inner msg 2", innerMsg2Locales.get(ENGLISH).asFormatString(UTF_8));
+    assertEquals("DE inner msg 2", innerMsg2Locales.get(GERMAN).asFormatString(UTF_8));
+
+    // inner-tmpl-1: texts=@Text("value") form
+    assertTrue(accessor.hasTemplateWithName("inner-tmpl-1"));
+    assertEquals("Inner template 1", accessor.getTemplateByName("inner-tmpl-1").asFormatString(UTF_8));
   }
 }

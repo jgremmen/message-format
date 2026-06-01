@@ -32,12 +32,7 @@ dependencies {
 
   testAnnotationProcessor libs.lombok
 
-  testImplementation(libs.bundles.mockito.test) {
-    exclude module: 'byte-buddy'
-    exclude module: 'byte-buddy-agent'
-  }
-  testImplementation libs.byte.buddy
-  testImplementation libs.byte.buddy.agent
+  testImplementation libs.bundles.mockito.test
 
   def junitVersion = libs.versions.junit.get()
 

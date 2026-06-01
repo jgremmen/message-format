@@ -19,7 +19,7 @@ import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.annotation.adopter.lib.AsmAnnotationAdopter;
+import de.sayayi.lib.message.annotation.adopter.AnnotationAdopter;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
@@ -321,7 +321,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
     logger.info("Scanning classes for messages and templates");
 
     try {
-      var adopter = new AsmAnnotationAdopter(messageSupport);
+      var adopter = new AnnotationAdopter(messageSupport);
       var trace = logger.isTraceEnabled();
 
       getSources()

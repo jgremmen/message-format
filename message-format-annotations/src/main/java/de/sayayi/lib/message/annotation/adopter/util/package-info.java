@@ -21,8 +21,10 @@
  * {@link de.sayayi.lib.message.annotation.Text Text} instances.
  * <p>
  * These records allow messages and templates to be registered via
- * {@link de.sayayi.lib.message.annotation.adopter.AnnotationAdopter AnnotationAdopter} without requiring annotated
- * class files, which is useful in programmatic and testing scenarios.
+ * {@link de.sayayi.lib.message.annotation.adopter.AbstractAnnotationAdopter#adopt(de.sayayi.lib.message.annotation.MessageDef)
+ * adopt(MessageDef)} and
+ * {@link de.sayayi.lib.message.annotation.adopter.AbstractAnnotationAdopter#adopt(de.sayayi.lib.message.annotation.TemplateDef)
+ * adopt(TemplateDef)} without requiring annotated class files, which is useful in programmatic and testing scenarios.
  *
  * @author Jeroen Gremmen
  * @since 0.24.0

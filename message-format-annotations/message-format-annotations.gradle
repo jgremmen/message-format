@@ -16,16 +16,156 @@
 
 //file:noinspection GroovyAssignabilityCheck
 
+import org.objectweb.asm.ClassReader
+import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.ModuleVisitor
+import org.objectweb.asm.commons.ClassRemapper
+import org.objectweb.asm.commons.Remapper
+
+import java.util.zip.ZipFile
+
+import static org.objectweb.asm.Opcodes.ASM9
+
+
+buildscript {
+  def asmVersion = '9.10.+'
+
+  repositories {
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath "org.ow2.asm:asm:${asmVersion}"
+    classpath "org.ow2.asm:asm-commons:${asmVersion}"
+  }
+}
+
 
 description = 'Message Format Library (annotations)'
+
+
+configurations {
+  asmToBundle
+
+  api.extendsFrom asmToBundle
+}
 
 
 dependencies {
   implementation project(':message-format')
 
-  api libs.asm
-  api libs.byte.buddy
-  api libs.spring.context
+  asmToBundle libs.asm
+}
+
+
+def asmRelocatedDir = layout.buildDirectory.dir('classes/asm-relocated')
+def asmPackagePrefix = 'org/objectweb/asm'
+
+//noinspection deprecation
+def asmRemapper = new Remapper(ASM9) {
+  @Override
+  String map(String internalName) {
+    return internalName.startsWith(asmPackagePrefix)
+        ? 'de/sayayi/lib/message/annotation/adopter/asm' + internalName.substring(asmPackagePrefix.length())
+        : internalName
+  }
+}
+
+
+def relocateAsmLibraryClasses = { File outputDir ->
+  configurations.asmToBundle.each { jar ->
+    new ZipFile(jar).withCloseable { zip -> zip
+        .entries()
+        .findAll { !it.directory && it.name.endsWith('.class') && it.name != 'module-info.class' }
+        .each { entry ->
+          def writer = new ClassWriter(0)
+
+          new ClassReader(zip.getInputStream(entry)).accept(new ClassRemapper(writer, asmRemapper), 0)
+
+          def outFile = new File(outputDir, asmRemapper.map(entry.name.replace('.class', '')) + '.class')
+
+          outFile.parentFile.mkdirs()
+          outFile.bytes = writer.toByteArray()
+        }
+    }
+  }
+}
+
+
+def rewriteAsmClassReferences = {
+  sourceSets.main.java.classesDirectory.get().asFile.eachFileRecurse(groovy.io.FileType.FILES) { classFile ->
+    if (classFile.name == 'module-info.class')
+    {
+      def writer = new ClassWriter(0)
+
+      new ClassReader(classFile.bytes).accept(new ClassVisitor(ASM9, writer) {
+        @Override
+        ModuleVisitor visitModule(String name, int access, String version)
+        {
+          return new ModuleVisitor(ASM9, super.visitModule(name, access, version)) {
+            @Override
+            void visitRequire(String module, int reqAccess, String reqVersion)
+            {
+              if (module != 'org.objectweb.asm')
+                super.visitRequire(module, reqAccess, reqVersion)
+            }
+          }
+        }
+      }, 0)
+
+      classFile.bytes = writer.toByteArray()
+    }
+    else if (classFile.name.endsWith('.class'))
+    {
+      def writer = new ClassWriter(0)
+
+      new ClassReader(classFile.bytes).accept(new ClassRemapper(writer, asmRemapper), 0)
+
+      classFile.bytes = writer.toByteArray()
+    }
+  }
+}
+
+
+tasks.register('relocateAsm') {
+  description = 'Relocates ASM classes and rewrites project class references.'
+
+  inputs.files(configurations.asmToBundle)
+  inputs.dir(sourceSets.main.java.classesDirectory)
+
+  outputs.dir(asmRelocatedDir)
+
+  dependsOn 'compileJava'
+
+  doLast {
+    def outputDir = asmRelocatedDir.get().asFile
+
+    outputDir.deleteDir()
+    outputDir.mkdirs()
+
+    logger.info("Relocating ASM library classes to ${outputDir.absolutePath}...")
+    relocateAsmLibraryClasses(outputDir)
+
+    logger.info('Rewriting project class references to relocated ASM classes...')
+    rewriteAsmClassReferences()
+  }
+}
+
+
+sourceSets.main.output.dir(asmRelocatedDir, builtBy: 'relocateAsm')
+
+
+// run tests against the final jar (with relocated ASM) instead of raw compiled classes
+// override jar.dependsOn(test) from java-library.gradle — test must run after jar, not before
+jar.setDependsOn(jar.dependsOn.findAll { it != test && it.toString() != 'test' })
+jar.dependsOn 'relocateAsm'
+
+
+test {
+  dependsOn jar
+
+  classpath = files(jar.archiveFile) + classpath - sourceSets.main.output
 }
 
 
@@ -57,6 +197,9 @@ publishing {
 
 
 ext.releaseTask.configure {
+  mustRunAfter 'test'
+  dependsOn 'test'
+
   if (snapshot) {
     dependsOn ':message-format-annotations:publishOSSRHPublicationToMavenCentralSnapshotRepository'
   }

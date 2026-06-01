@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Jeroen Gremmen
+ * Copyright 2023 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,196 +18,349 @@ package de.sayayi.lib.message.annotation.adopter;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
-import de.sayayi.lib.message.annotation.MessageDef;
-import de.sayayi.lib.message.annotation.TemplateDef;
-import de.sayayi.lib.message.annotation.Text;
-import de.sayayi.lib.message.annotation.adopter.provider.AnnotationAdopterFactory;
-import de.sayayi.lib.message.exception.DuplicateMessageException;
-import de.sayayi.lib.message.exception.DuplicateTemplateException;
-import de.sayayi.lib.message.exception.MessageAdopterException;
-import de.sayayi.lib.message.exception.MessageParserException;
-import org.jetbrains.annotations.Contract;
+import de.sayayi.lib.message.annotation.*;
+import de.sayayi.lib.message.annotation.adopter.util.SyntheticMessageDef;
+import de.sayayi.lib.message.annotation.adopter.util.SyntheticTemplateDef;
+import de.sayayi.lib.message.annotation.adopter.util.SyntheticText;
 import org.jetbrains.annotations.NotNull;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.MethodVisitor;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.Set;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.objectweb.asm.ClassReader.*;
+import static org.objectweb.asm.Opcodes.ACC_SYNTHETIC;
+import static org.objectweb.asm.Opcodes.ASM9;
+import static org.objectweb.asm.Type.getDescriptor;
 
 
 /**
- * Adopter interface for discovering and publishing messages and templates defined by {@link MessageDef} and
- * {@link TemplateDef} annotations in compiled class files.
+ * ASM-based annotation adopter that scans compiled class files for message and template annotations without
+ * loading the classes into the JVM.
  * <p>
- * This interface provides several strategies for locating annotated classes:
+ * This adopter recognizes the following annotations (including their repeatable container forms):
  * <ul>
- *   <li>
- *     <b>Classpath scanning</b> – {@link #adopt(ClassLoader, Set)} scans one or more packages for class files,
- *     including jar, war and zip archives.
- *   </li>
- *   <li>
- *     <b>Single class file</b> – {@link #adopt(Path)} and {@link #adopt(File)} accept individual class files.
- *   </li>
- *   <li>
- *     <b>Loaded type</b> – {@link #adopt(Class)} locates the class file of a loaded type via its class loader.
- *   </li>
- *   <li>
- *     <b>Annotation instances</b> – {@link #adopt(MessageDef)} and {@link #adopt(TemplateDef)} accept annotation
- *     instances directly.
- *   </li>
+ *   <li>{@link MessageDef} / {@link MessageDefs} – message definitions</li>
+ *   <li>{@link TemplateDef} / {@link TemplateDefs} – template definitions</li>
  * </ul>
+ * Annotations are detected on class-level as well as on non-synthetic methods.
  * <p>
- * All {@code adopt} methods return the adopter instance itself, allowing calls to be chained fluently.
+ * Class files are analyzed with the ASM bytecode library, which means the scanned classes do not need to be on
+ * the runtime classpath.
  * <p>
- * Use one of the {@link #getAutoDetected(ConfigurableMessageSupport) getAutoDetected} factory methods to obtain an
- * implementation that is automatically selected based on the available bytecode analysis library on the classpath.
+ * If there is a requirement to select a part of the messages provided by a class, the message support must be
+ * configured with an appropriate {@link de.sayayi.lib.message.MessageSupport.MessageFilter MessageFilter} or
+ * {@link de.sayayi.lib.message.MessageSupport.TemplateFilter TemplateFilter}.
+ * <p>
+ * In addition to class-file scanning, the {@link #adopt(MessageDef)} and {@link #adopt(TemplateDef)} methods
+ * inherited from {@link AbstractAnnotationAdopter} can be used to adopt synthesized or mocked annotations directly.
+ * <p>
+ * Using this class requires a dependency on the ASM library ({@code org.ow2.asm:asm:9.+}).
  *
  * @author Jeroen Gremmen
- * @since 0.24.0
- *
- * @see MessageDef
- * @see TemplateDef
+ * @since 0.8.0
  */
-public interface AnnotationAdopter
+public final class AnnotationAdopter extends AbstractAnnotationAdopter
 {
-  /**
-   * Scan the classpath for class files in the given packages and adopt all message and template annotations found.
-   * The scan includes directories as well as jar, war and zip archives on the classpath. Each package is resolved
-   * using the given {@code classLoader}. Classes that have already been visited are silently skipped.
-   *
-   * @param classLoader   classloader for locating package resources on the classpath, not {@code null}
-   * @param packageNames  package names to scan (e.g. {@code "com.example.messages"}), not {@code null}
-   *
-   * @return  this annotation adopter instance, never {@code null}
-   *
-   * @throws MessageAdopterException  if the classpath scan fails
-   * @throws MessageParserException   if a message or template text cannot be parsed
-   */
-  @Contract(value = "_, _ -> this")
-  @NotNull AnnotationAdopter adopt(@NotNull ClassLoader classLoader, @NotNull Set<String> packageNames);
+  private static final String MESSAGE_DEFS_DESCRIPTOR = getDescriptor(MessageDefs.class);
+  private static final String MESSAGE_DEF_DESCRIPTOR = getDescriptor(MessageDef.class);
+  private static final String TEMPLATE_DEFS_DESCRIPTOR = getDescriptor(TemplateDefs.class);
+  private static final String TEMPLATE_DEF_DESCRIPTOR = getDescriptor(TemplateDef.class);
+  private static final String TEXT_DESCRIPTOR = getDescriptor(Text.class);
 
 
   /**
-   * Adopt messages and templates from the given class file identified by {@code classFile}. If the class file has
-   * already been visited, this method returns immediately without re-parsing.
+   * Create an ASM annotation adopter for the given {@code configurableMessageSupport}. The message factory and
+   * message publisher are both obtained from the configurable message support instance.
    *
-   * @param classFile  path to the class file to analyze for message annotations, not {@code null}
-   *
-   * @return  this annotation adopter instance, never {@code null}
-   *
-   * @throws MessageAdopterException  if the class file cannot be read
-   * @throws MessageParserException   if a message or template text cannot be parsed
+   * @param configurableMessageSupport  configurable message support, not {@code null}
    */
-  @Contract(value = "_ -> this")
-  @NotNull AnnotationAdopter adopt(@NotNull Path classFile);
-
-
-  /**
-   * Adopt messages and templates from the given class file identified by {@code classFile}. This method delegates to
-   * {@link #adopt(Path)} after converting the {@link File} to a {@link Path}.
-   *
-   * @param classFile  location of the class file to analyze for message annotations, not {@code null}
-   *
-   * @return  this annotation adopter instance, never {@code null}
-   *
-   * @throws MessageAdopterException  if the class file cannot be read
-   * @throws MessageParserException   if a message or template text cannot be parsed
-   */
-  @Contract(value = "_ -> this")
-  default @NotNull AnnotationAdopter adopt(@NotNull File classFile)
-  {
-    adopt(classFile.toPath());
-    return this;
+  public AnnotationAdopter(@NotNull ConfigurableMessageSupport configurableMessageSupport) {
+    super(configurableMessageSupport);
   }
 
 
   /**
-   * Adopt messages and templates from the class file of the given {@code type}. The class file is located via the
-   * type's class loader. If the type has already been visited or has no class loader (e.g. bootstrap classes), this
-   * method returns immediately.
-   *
-   * @param type  type to analyze for message annotations, not {@code null}
-   *
-   * @return  this annotation adopter instance, never {@code null}
-   *
-   * @throws MessageAdopterException  if the class file cannot be read
-   * @throws MessageParserException   if a message or template text cannot be parsed
-   */
-  @Contract(value = "_ -> this")
-  @NotNull AnnotationAdopter adopt(@NotNull Class<?> type);
-
-
-  /**
-   * Publish the message defined in the given {@link MessageDef} annotation. If the annotation contains multiple
-   * {@link Text} entries, they are treated as localized variants of the same message. If only a single
-   * {@linkplain MessageDef#text() text} is provided, it is used as the sole message text.
-   *
-   * @param messageDef  {@code MessageDef} annotation, not {@code null}
-   *
-   * @return  this annotation adopter instance, never {@code null}
-   *
-   * @throws DuplicateMessageException  if different messages are provided for the same locale
-   * @throws MessageParserException     if a message or template text cannot be parsed
-   */
-  @Contract(value = "_ -> this")
-  @NotNull AnnotationAdopter adopt(@NotNull MessageDef messageDef);
-
-
-  /**
-   * Publish the template defined in the given {@link TemplateDef} annotation. If the annotation contains multiple
-   * {@link Text} entries, they are treated as localized variants of the same template. If only a single
-   * {@linkplain TemplateDef#text() text} is provided, it is used as the sole template text.
-   *
-   * @param templateDef  {@code TemplateDef} annotation, not {@code null}
-   *
-   * @return  this annotation adopter instance, never {@code null}
-   *
-   * @throws DuplicateTemplateException  if different template messages are provided for the same locale
-   * @throws MessageParserException      if the template text cannot be parsed
-   */
-  @Contract(value = "_ -> this")
-  @NotNull AnnotationAdopter adopt(@NotNull TemplateDef templateDef);
-
-
-
-
-  /**
-   * Create a new {@code AnnotationAdopter} by auto-detecting the best available bytecode analysis library on the
-   * classpath. The message factory and message publisher are both obtained from the given
-   * {@code configurableMessageSupport}.
-   *
-   * @param configurableMessageSupport  configurable message support to use for message parsing and publishing,
-   *                                    not {@code null}
-   *
-   * @return  a new annotation adopter instance, never {@code null}
-   *
-   * @throws de.sayayi.lib.message.exception.MessageAdopterException
-   *         if no suitable annotation adopter provider is available
-   */
-  @Contract(value = "_ -> new", pure = true)
-  static @NotNull AnnotationAdopter getAutoDetected(@NotNull ConfigurableMessageSupport configurableMessageSupport)
-  {
-    return getAutoDetected(
-        configurableMessageSupport.getMessageAccessor().getMessageFactory(), configurableMessageSupport);
-  }
-
-
-
-
-  /**
-   * Create a new {@code AnnotationAdopter} by auto-detecting the best available bytecode analysis library on the
-   * classpath. This method allows the message factory and message publisher to be provided independently.
+   * Create an ASM annotation adopter for the given {@code messageFactory} and {@code publisher}. This constructor
+   * allows the message factory and message publisher to be provided independently.
    *
    * @param messageFactory  message factory used for parsing message format strings, not {@code null}
    * @param publisher       message publisher used for publishing parsed messages and templates, not {@code null}
-   *
-   * @return  a new annotation adopter instance, never {@code null}
-   *
-   * @throws de.sayayi.lib.message.exception.MessageAdopterException
-   *         if no suitable annotation adopter provider is available
    */
-  @Contract(value = "_, _ -> new", pure = true)
-  static @NotNull AnnotationAdopter getAutoDetected(@NotNull MessageFactory messageFactory,
-                                                    @NotNull MessagePublisher publisher) {
-    return AnnotationAdopterFactory.getAutoDetected(messageFactory, publisher);
+  public AnnotationAdopter(@NotNull MessageFactory messageFactory, @NotNull MessagePublisher publisher) {
+    super(messageFactory, publisher);
+  }
+
+
+  /**
+   * Parses the given class file input stream using the ASM {@link ClassReader}, visiting class-level and method-level
+   * annotations to detect message and template definitions. Only non-synthetic methods are visited.
+   *
+   * @param classInputStream  input stream of a class file to scan, not {@code null}
+   *
+   * @throws IOException  if an I/O error occurs while reading the class file
+   */
+  @Override
+  protected void parseClass(@NotNull InputStream classInputStream) throws IOException {
+    new ClassReader(classInputStream).accept(new MainClassVisitor(), SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
+  }
+
+
+
+
+  /**
+   * ASM class visitor that delegates class-level and method-level annotation visits to the enclosing adopter.
+   * Synthetic methods are skipped.
+   */
+  private final class MainClassVisitor extends ClassVisitor
+  {
+    private MainClassVisitor() {
+      super(ASM9);
+    }
+
+
+    @Override
+    public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
+                                     String[] exceptions) {
+      return (access & ACC_SYNTHETIC) == ACC_SYNTHETIC ? null : new MessageMethodVisitor();
+    }
+
+
+    @Override
+    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+      return AnnotationAdopter.this.visitAnnotation(descriptor);
+    }
+  }
+
+
+
+
+  /**
+   * Returns an appropriate annotation visitor for the given annotation descriptor, or {@code null} if the
+   * descriptor does not match a recognized message or template annotation.
+   */
+  @SuppressWarnings("DuplicatedCode")
+  private AnnotationVisitor visitAnnotation(String descriptor)
+  {
+    if (MESSAGE_DEF_DESCRIPTOR.equals(descriptor))
+      return new MessageDefAnnotationVisitor();
+    if (MESSAGE_DEFS_DESCRIPTOR.equals(descriptor))
+      return new MessageDefsAnnotationVisitor();
+    if (TEMPLATE_DEF_DESCRIPTOR.equals(descriptor))
+      return new TemplateDefAnnotationVisitor();
+    if (TEMPLATE_DEFS_DESCRIPTOR.equals(descriptor))
+      return new TemplateDefsAnnotationVisitor();
+
+    return null;
+  }
+
+
+
+
+  /**
+   * ASM method visitor that delegates method-level annotation visits to the enclosing adopter.
+   */
+  private final class MessageMethodVisitor extends MethodVisitor
+  {
+    private MessageMethodVisitor() {
+      super(ASM9);
+    }
+
+
+    @Override
+    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+      return AnnotationAdopter.this.visitAnnotation(descriptor);
+    }
+  }
+
+
+
+
+  /**
+   * Visitor for the {@link MessageDefs} repeatable container annotation. Delegates each contained
+   * {@link MessageDef} to a {@link MessageDefAnnotationVisitor}.
+   */
+  private final class MessageDefsAnnotationVisitor extends AnnotationVisitor
+  {
+    private MessageDefsAnnotationVisitor() {
+      super(ASM9);
+    }
+
+
+    @Override
+    public AnnotationVisitor visitArray(String name)
+    {
+      return new AnnotationVisitor(ASM9) {
+        @Override
+        public AnnotationVisitor visitAnnotation(String name, String descriptor) {
+          return MESSAGE_DEF_DESCRIPTOR.equals(descriptor) ? new MessageDefAnnotationVisitor() : null;
+        }
+      };
+    }
+  }
+
+
+
+
+  /**
+   * Visitor for a single {@link MessageDef} annotation. Collects the message code, text and localized
+   * {@link Text} entries, then adopts the resulting message definition.
+   */
+  private final class MessageDefAnnotationVisitor extends AnnotationVisitor
+  {
+    private String code;
+    private String text;
+    private final List<Text> texts = new ArrayList<>();
+
+
+    private MessageDefAnnotationVisitor() {
+      super(ASM9);
+    }
+
+
+    @Override
+    public void visit(String name, Object value)
+    {
+      if ("code".equals(name))
+        code = (String)value;
+      else if ("text".equals(name))
+        text = (String)value;
+    }
+
+
+    @Override
+    public AnnotationVisitor visitArray(String name)
+    {
+      return new AnnotationVisitor(ASM9) {
+        @Override
+        public AnnotationVisitor visitAnnotation(String name, String descriptor) {
+          return TEXT_DESCRIPTOR.equals(descriptor) ? new TextAnnotationVisitor(texts) : null;
+        }
+      };
+    }
+
+
+    @Override
+    public void visitEnd() {
+      adopt(new SyntheticMessageDef(code, text, texts.toArray(Text[]::new)));
+    }
+  }
+
+
+
+
+  /**
+   * Visitor for the {@link TemplateDefs} repeatable container annotation. Delegates each contained
+   * {@link TemplateDef} to a {@link TemplateDefAnnotationVisitor}.
+   */
+  private final class TemplateDefsAnnotationVisitor extends AnnotationVisitor
+  {
+    private TemplateDefsAnnotationVisitor() {
+      super(ASM9);
+    }
+
+
+    @Override
+    public AnnotationVisitor visitArray(String name)
+    {
+      return new AnnotationVisitor(ASM9) {
+        @Override
+        public AnnotationVisitor visitAnnotation(String name, String descriptor) {
+          return TEMPLATE_DEF_DESCRIPTOR.equals(descriptor) ? new TemplateDefAnnotationVisitor() : null;
+        }
+      };
+    }
+  }
+
+
+
+
+  /**
+   * Visitor for a single {@link TemplateDef} annotation. Collects the template name, text and localized
+   * {@link Text} entries, then adopts the resulting template definition.
+   */
+  private final class TemplateDefAnnotationVisitor extends AnnotationVisitor
+  {
+    private String name;
+    private String text;
+    private final List<Text> texts = new ArrayList<>();
+
+
+    private TemplateDefAnnotationVisitor() {
+      super(ASM9);
+    }
+
+
+    @Override
+    public void visit(String name, Object value)
+    {
+      if ("name".equals(name))
+        this.name = (String)value;
+      else if ("text".equals(name))
+        text = (String)value;
+    }
+
+
+    @Override
+    public AnnotationVisitor visitArray(String name)
+    {
+      return new AnnotationVisitor(ASM9) {
+        @Override
+        public AnnotationVisitor visitAnnotation(String name, String descriptor) {
+          return TEXT_DESCRIPTOR.equals(descriptor) ? new TextAnnotationVisitor(texts) : null;
+        }
+      };
+    }
+
+
+    @Override
+    public void visitEnd() {
+      adopt(new SyntheticTemplateDef(name, text, texts.toArray(Text[]::new)));
+    }
+  }
+
+
+
+
+  /**
+   * Visitor for a single {@link Text} annotation. Collects the locale, text and value attributes
+   * and adds the resulting synthetic text to a shared list.
+   */
+  private static final class TextAnnotationVisitor extends AnnotationVisitor
+  {
+    private final List<Text> inheritedTexts;
+    private String locale;
+    private String text;
+    private String value;
+
+
+    private TextAnnotationVisitor(List<Text> inheritedTexts)
+    {
+      super(ASM9);
+      this.inheritedTexts = inheritedTexts;
+    }
+
+
+    @Override
+    public void visit(String name, Object value)
+    {
+      if ("locale".equals(name))
+        locale = (String)value;
+      else if ("text".equals(name))
+        text = (String)value;
+      else if ("value".equals(name))
+        this.value = (String)value;
+    }
+
+
+    @Override
+    public void visitEnd() {
+      inheritedTexts.add(new SyntheticText(locale, text, value));
+    }
   }
 }

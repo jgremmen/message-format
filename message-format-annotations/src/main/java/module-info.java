@@ -29,19 +29,19 @@
  * <p>
  * <b>Adopter</b> ({@code de.sayayi.lib.message.annotation.adopter}):
  * <br>
- * The {@link de.sayayi.lib.message.annotation.adopter.AnnotationAdopter AnnotationAdopter} interface scans compiled
- * class files for message and template annotations and publishes them to a
- * {@link de.sayayi.lib.message.MessageSupport.MessagePublisher MessagePublisher}. Use
- * {@link de.sayayi.lib.message.annotation.adopter.AnnotationAdopter#getAutoDetected(
- * de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport) AnnotationAdopter.getAutoDetected(...)} to obtain
- * an implementation that is automatically selected based on the bytecode analysis library available on the classpath.
+ * The {@link de.sayayi.lib.message.annotation.adopter.AbstractAnnotationAdopter AbstractAnnotationAdopter} provides
+ * multiple strategies for locating annotated classes, including classpath scanning, single class file analysis, and
+ * direct annotation instance processing. The
+ * {@link de.sayayi.lib.message.annotation.adopter.AnnotationAdopter AnnotationAdopter} is the concrete
+ * implementation that scans compiled class files for message and template annotations without loading the classes
+ * into the JVM, and publishes them to a
+ * {@link de.sayayi.lib.message.MessageSupport.MessagePublisher MessagePublisher}.
  * <p>
- * <b>Library-specific implementations</b> ({@code de.sayayi.lib.message.annotation.adopter.lib}):
+ * <b>Synthetic annotations</b> ({@code de.sayayi.lib.message.annotation.adopter.util}):
  * <br>
- * Concrete adopter implementations are provided for standalone
- * <a href="https://asm.ow2.io/">ASM</a>, <a href="https://bytebuddy.net/">Byte Buddy</a>'s bundled ASM,
- * and <a href="https://spring.io/projects/spring-framework">Spring Framework</a>'s bundled ASM. Only one of these
- * libraries needs to be present on the classpath.
+ * Synthetic implementations of the annotation interfaces allow messages and templates to be constructed and
+ * registered programmatically without requiring annotated class files, which is useful in programmatic and testing
+ * scenarios.
  */
 module de.sayayi.lib.message.annotations
 {
@@ -50,13 +50,8 @@ module de.sayayi.lib.message.annotations
   requires static org.jetbrains.annotations;
 
   requires static org.objectweb.asm;
-  requires static net.bytebuddy;
-  requires static spring.core;
 
   exports de.sayayi.lib.message.annotation;
   exports de.sayayi.lib.message.annotation.adopter;
-  exports de.sayayi.lib.message.annotation.adopter.lib;
   exports de.sayayi.lib.message.annotation.adopter.util;
-
-  uses de.sayayi.lib.message.annotation.adopter.AnnotationAdopterProvider;
 }

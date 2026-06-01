@@ -24,7 +24,10 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 
 
 /**
- * Repeatable {@code MessageDef} annotation.
+ * Container annotation for repeatable {@link MessageDef} annotations. This annotation is automatically applied
+ * by the compiler when multiple {@code @MessageDef} annotations are placed on the same element.
+ *
+ * @see MessageDef
  *
  * @author Jeroen Gremmen
  * @since 0.1.0 (renamed in 0.3.0)

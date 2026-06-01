@@ -76,4 +76,17 @@ public final class AnnotationsFixture
       @Text(locale = "fr", text = "FR method tmpl 3")
   })
   public void methodC() {}
+
+
+
+
+  // Inner record class with type-level annotations
+  @MessageDef(code = "inner-msg-1", text = "Inner message 1")
+  @MessageDef(code = "inner-msg-2", texts = {
+      @Text(locale = "en", text = "EN inner msg 2"),
+      @Text(locale = "de", text = "DE inner msg 2")
+  })
+  @TemplateDef(name = "inner-tmpl-1", texts = @Text("Inner template 1"))
+  public record InnerRecord(String value) {
+  }
 }

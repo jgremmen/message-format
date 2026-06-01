@@ -31,7 +31,6 @@ dependencies {
   api gradleApi()
 
   implementation project(':message-format-annotations')
-  implementation libs.asm
 
   compileOnly project(':message-format')
   compileOnly project(':message-format-annotations')

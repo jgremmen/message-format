@@ -1,94 +1,35 @@
 # Annotation Adopter
 
 The annotation adopter reads `@MessageDef` and `@TemplateDef` annotations from compiled `.class`
-files and publishes the discovered messages and templates to a `MessageSupport` instance. Unlike
-traditional Java reflection, the adopter works at the bytecode level: the annotated classes never
-need to be loaded into the JVM. This is possible because both annotations use
-`RetentionPolicy.CLASS`, which means the Java compiler writes them into the `.class` file but
-they are not retained for runtime reflection. A bytecode analysis library such as ASM can still
-read them directly from the binary class data. This approach makes annotation adopters safe to use
-in build-time processing, plugin environments, and any other situation where loading classes into
-the running JVM would be undesirable or impossible.
+files and publishes the discovered messages and templates to a `MessageSupport` instance. The
+annotated classes do not need to be loaded into the JVM. Both annotations use
+`RetentionPolicy.CLASS`, so the adopter can read them directly from the binary class data
+without requiring runtime reflection.
 
-The `AnnotationAdopter` interface defines the contract for all annotation-based adopters. It
-declares the discovery methods for locating annotated classes and provides two static
-`getAutoDetected` factory methods that select the best available implementation at runtime.
-Behind the interface, the abstract base class `AbstractAnnotationAdopter` contains all the logic
-for locating class files, deduplicating scans, and converting annotation data into messages and
-templates. It extends `AbstractMessageAdopter`, which holds the two collaborators every adopter
-needs: a `MessageFactory` for parsing message format strings and a `MessagePublisher` for
-storing the results. Concrete subclasses only need to implement a single method,
-`parseClass(InputStream)`, which performs the actual bytecode analysis.
-
-The `message-format-annotations` module ships with three implementations, all located in the
-`de.sayayi.lib.message.annotation.adopter.lib` package. All three are based on the
-[ASM bytecode library](https://asm.ow2.io/) but differ in where the ASM classes come from.
-`AsmAnnotationAdopter` uses the standalone ASM artifact (`org.ow2.asm:asm`).
-`ByteBuddyAnnotationAdopter` uses the ASM copy repackaged under `net.bytebuddy.jar.asm` by
-Byte Buddy. `SpringAnnotationAdopter` uses the ASM copy repackaged under `org.springframework.asm`
-by Spring Framework. Because many projects already pull in Byte Buddy or Spring as a transitive
-dependency, the corresponding adopter avoids adding yet another ASM artifact to the classpath.
-All three implementations share the same discovery strategies, deduplication behavior, and error
-handling described on this page.
+The `AnnotationAdopter` class provides multiple strategies for locating annotated classes,
+tracks which classes have already been processed, and converts the annotation data into messages
+and templates.
 
 
-## Auto-Detection
+## Creating an Adopter
 
-In most cases you do not need to pick a specific implementation yourself. The `AnnotationAdopter`
-interface provides a static `getAutoDetected` method that inspects the classpath and returns an
-instance backed by the best available bytecode library. The selection is based on a priority
-order managed through the Java `ServiceLoader` mechanism: each implementation registers an
-`AnnotationAdopterProvider` that declares which classes it requires and a numeric priority. At
-runtime, `getAutoDetected` loads all providers, filters out those whose required classes are
-missing, and selects the one with the lowest order value. The built-in priorities are Spring at
-100, ASM at 200, and Byte Buddy at 300. This means Spring is preferred when available, followed
-by standalone ASM, then Byte Buddy.
-
-The simplest way to obtain an adopter is to pass a `ConfigurableMessageSupport`:
+The most common way to create an `AnnotationAdopter` is by passing a
+`ConfigurableMessageSupport`, which provides both a `MessageFactory` and a `MessagePublisher`
+through a single argument:
 
 ```java
 var messageSupport = MessageSupportFactory.create(
     DefaultFormatterService.getSharedInstance());
 
-var adopter = AnnotationAdopter.getAutoDetected(messageSupport);
+var adopter = new AnnotationAdopter(messageSupport);
 ```
 
-When the factory and publisher need to be provided independently, use the two-argument overload:
+When the factory and publisher need to be provided independently, for example to collect messages
+from multiple sources before publishing them to different targets, use the two-argument
+constructor:
 
 ```java
-var adopter = AnnotationAdopter.getAutoDetected(messageFactory, publisher);
-```
-
-If no suitable bytecode library is found on the classpath, both methods throw a
-`MessageAdopterException`.
-
-
-## Creating an Adopter Directly
-
-When you know which bytecode library you want to use, you can instantiate the corresponding
-implementation directly. Pass a `ConfigurableMessageSupport` instance, which provides both a
-`MessageFactory` and a `MessagePublisher` through a single argument:
-
-```java
-var messageSupport = MessageSupportFactory.create(
-    DefaultFormatterService.getSharedInstance());
-
-// Standalone ASM
-var adopter = new AsmAnnotationAdopter(messageSupport);
-
-// Byte Buddy's bundled ASM
-var adopter = new ByteBuddyAnnotationAdopter(messageSupport);
-
-// Spring Framework's bundled ASM
-var adopter = new SpringAnnotationAdopter(messageSupport);
-```
-
-When you need to separate the factory from the publisher, for example to collect messages from
-multiple sources before publishing them to different targets, every implementation also offers a
-two-argument constructor:
-
-```java
-var adopter = new AsmAnnotationAdopter(messageFactory, publisher);
+var adopter = new AnnotationAdopter(messageFactory, publisher);
 ```
 
 
@@ -123,14 +64,6 @@ adopter.adopt(
     Set.of("com.example"));
 ```
 
-The `SpringAnnotationAdopter` additionally accepts a Spring `ResourceLoader` in place of the
-`ClassLoader`. It extracts the class loader from the resource loader and delegates to the regular
-classpath scan, which saves you from calling `getClassLoader()` yourself:
-
-```java
-adopter.adopt(resourceLoader, Set.of("com.example.messages"));
-```
-
 ### Single Class File
 
 When you know the exact location of a class file on disk, you can provide its path directly.
@@ -148,7 +81,8 @@ The `File` variant delegates to the `Path` variant internally, so both behave id
 
 If the annotated class is already loaded in the JVM, you can pass its `Class` object. The
 adopter uses the class loader associated with the type to locate the corresponding `.class`
-resource and parses it for annotations:
+resource and parses it for annotations. If the type has no class loader (e.g. bootstrap classes),
+the call returns immediately without doing anything.
 
 ```java
 adopter.adopt(MyMessages.class);
@@ -158,13 +92,13 @@ adopter.adopt(MyMessages.class);
 ### Annotation Instances
 
 The `adopt(MessageDef)` and `adopt(TemplateDef)` methods accept annotation instances directly,
-bypassing bytecode scanning entirely. This is primarily useful in programmatic or testing
-scenarios where you want to register messages without creating an annotated class. The
-`adopter.util` package provides the record implementations `SyntheticMessageDef`,
-`SyntheticTemplateDef`, and `SyntheticText` that you can use to construct these instances.
+bypassing bytecode scanning entirely. This is useful in programmatic or testing scenarios where
+you want to register messages without creating an annotated class. The `adopter.util` package
+provides the record implementations `SyntheticMessageDef`, `SyntheticTemplateDef`, and
+`SyntheticText` for constructing these instances.
 
-For a simple, non-localized message, pass an empty `Text` array as the third argument and provide
-the message text as the second argument:
+For a simple, non-localized message you only need to provide the code and the text. The
+convenience constructor creates the record without any localized `Text` variants:
 
 ```java
 adopter.adopt(new SyntheticMessageDef("welcome", "Hello, %{name}!"));
@@ -177,14 +111,14 @@ messageSupport
 // "Hello, Alice!"
 ```
 
-For localized messages, leave the text parameter empty and provide the translations through the
-`texts` array:
+For localized messages, provide the translations through the `texts` array and leave the `text`
+parameter `null` or empty:
 
 ```java
 adopter.adopt(new SyntheticMessageDef(
-    "goodbye", "", new Text[] {
-      new SyntheticText("en", "Goodbye, %{name}!", ""),
-      new SyntheticText("de", "Auf Wiedersehen, %{name}!", "")
+    "goodbye", null, new Text[] {
+      new SyntheticText("en", "Goodbye, %{name}!", null),
+      new SyntheticText("de", "Auf Wiedersehen, %{name}!", null)
     }));
 
 messageSupport
@@ -209,16 +143,17 @@ messageSupport
 // "Done successfully"
 ```
 
-The `SyntheticText` record accepts three string parameters: `locale`, `text`, and `value`. The `value`
-parameter is only evaluated when both `locale` and `text` are empty, which mirrors the behavior
-of the `@Text` annotation's shorthand form. All three parameters are trimmed during construction,
-and `null` values are treated as empty strings.
+The `SyntheticText` record accepts three string parameters: `locale`, `text`, and `value`. When
+both `locale` and `text` are empty, the `value` parameter is used instead, which mirrors the
+behavior of the `@Text` annotation's shorthand form `@Text("...")`. All three parameters are
+trimmed during construction, and `null` values are treated as empty strings. Similarly,
+`SyntheticMessageDef` trims the `code` and defaults a `null` text to an empty string, while
+`SyntheticTemplateDef` validates the `name` and trims the text.
 
 
 ## Method Chaining
 
-All `adopt` methods return the adopter instance itself, so calls can be chained fluently. This is
-convenient when adopting multiple individual classes in sequence:
+All `adopt` methods return the adopter instance itself, so calls can be chained fluently:
 
 ```java
 adopter
@@ -267,8 +202,8 @@ and contain identical text, the duplicate is silently accepted.
 
 ## Complete Example
 
-The following example brings together all the pieces. It declares annotated messages, uses
-auto-detection to obtain an adopter, scans a package, and formats one of the discovered messages:
+The following example brings together all the pieces. It declares annotated messages, creates an
+adopter, scans a package, and formats one of the discovered messages:
 
 ```java
 @MessageDef(code = "order-confirm", texts = {
@@ -279,10 +214,10 @@ public class OrderMessages {}
 ```
 
 ```java
-// Set up message support and auto-detect the adopter
+// Set up message support and create the adopter
 var messageSupport = MessageSupportFactory.create(
     DefaultFormatterService.getSharedInstance());
-var adopter = AnnotationAdopter.getAutoDetected(messageSupport);
+var adopter = new AnnotationAdopter(messageSupport);
 
 // Scan for annotated classes
 adopter.adopt(
@@ -302,24 +237,14 @@ String result = messageSupport
 
 ## Module Coordinates
 
-All three implementations are part of the `message-format-annotations` module. You only need a
-runtime dependency on the bytecode library that backs the implementation you want to use. If you
-rely on auto-detection, simply make sure at least one of these libraries is on the classpath.
-
-```
-de.sayayi.lib:message-format-annotations:<version>
-```
+The annotation adopter is part of the `message-format-annotations` module. The ASM bytecode
+library is bundled with this module, so only a single dependency is needed.
 
 === "Gradle"
 
     ```groovy
     dependencies {
       implementation 'de.sayayi.lib:message-format-annotations:<version>'
-
-      // Pick one (or rely on a transitive dependency from your framework):
-      runtimeOnly 'org.ow2.asm:asm:9.+'                  // for AsmAnnotationAdopter
-      runtimeOnly 'net.bytebuddy:byte-buddy:1.+'         // for ByteBuddyAnnotationAdopter
-      runtimeOnly 'org.springframework:spring-core:6.+'  // for SpringAnnotationAdopter
     }
     ```
 
@@ -330,31 +255,5 @@ de.sayayi.lib:message-format-annotations:<version>
       <groupId>de.sayayi.lib</groupId>
       <artifactId>message-format-annotations</artifactId>
       <version><!-- version --></version>
-    </dependency>
-
-    <!-- Pick one (or rely on a transitive dependency from your framework): -->
-
-    <!-- for AsmAnnotationAdopter -->
-    <dependency>
-      <groupId>org.ow2.asm</groupId>
-      <artifactId>asm</artifactId>
-      <version><!-- 9.x --></version>
-      <scope>runtime</scope>
-    </dependency>
-
-    <!-- for ByteBuddyAnnotationAdopter -->
-    <dependency>
-      <groupId>net.bytebuddy</groupId>
-      <artifactId>byte-buddy</artifactId>
-      <version><!-- 1.x --></version>
-      <scope>runtime</scope>
-    </dependency>
-
-    <!-- for SpringAnnotationAdopter -->
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-      <version><!-- 6.x --></version>
-      <scope>runtime</scope>
     </dependency>
     ```

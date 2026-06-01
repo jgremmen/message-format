@@ -24,7 +24,10 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 
 
 /**
- * Repeatable {@code TemplateDef} annotation.
+ * Container annotation for repeatable {@link TemplateDef} annotations. This annotation is automatically applied
+ * by the compiler when multiple {@code @TemplateDef} annotations are placed on the same element.
+ *
+ * @see TemplateDef
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

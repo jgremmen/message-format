@@ -34,9 +34,6 @@ dependencies {
 
 javadoc {
   (options as StandardJavadocDocletOptions).with {
-    group('Adopters', [
-        'de.sayayi.lib.message.spring.adopter',
-    ])
     group('Formatters', [
         'de.sayayi.lib.message.spring.formatter'
     ])

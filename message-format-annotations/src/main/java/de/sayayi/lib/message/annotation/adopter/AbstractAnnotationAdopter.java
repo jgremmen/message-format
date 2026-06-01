@@ -89,7 +89,7 @@ import static java.util.Objects.requireNonNull;
  * @see TemplateDef
  */
 @SuppressWarnings("UnusedReturnValue")
-public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter implements AnnotationAdopter
+public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 {
   private static final Set<String> ZIP_PROTOCOLS = Set.of("zip", "jar", "war");
 
@@ -132,7 +132,6 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter i
    * @throws MessageAdopterException  if the classpath scan fails
    * @throws MessageParserException   if a message or template text cannot be parsed
    */
-  @Override
   @Contract(value = "_, _ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull ClassLoader classLoader, @NotNull Set<String> packageNames)
   {
@@ -147,6 +146,10 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter i
   }
 
 
+  /**
+   * Scan all classpath resources matching the given package name and adopt class files found in
+   * directories and zip-based archives (jar, war, zip).
+   */
   private void adopt_scan(@NotNull ClassLoader classLoader, @NotNull String packageName) throws Exception
   {
     var classPathPrefix = packageName.replace('.', '/');
@@ -172,6 +175,9 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter i
   }
 
 
+  /**
+   * Recursively scan a filesystem directory for class files and parse each one that has not been visited yet.
+   */
   private void adopt_scan_directory(@NotNull File baseDirectory, @NotNull File directory) throws IOException
   {
     var files = directory.listFiles();
@@ -198,6 +204,10 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter i
   }
 
 
+  /**
+   * Scan the entries of a zip-based archive (jar, war, zip) for class files matching the given classpath prefix
+   * and parse each one that has not been visited yet.
+   */
   private void adopt_scan_zipEntries(@NotNull URL zipUrl, @NotNull String classPathPrefix) throws IOException
   {
     final var con = zipUrl.openConnection();
@@ -241,6 +251,9 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter i
   }
 
 
+  /**
+   * Open a {@link ZipFile} from the given URL string, handling {@code file:} scheme URLs.
+   */
   private @NotNull ZipFile adopt_scan_createZipFileFromUrl(@NotNull String zipFileUrl) throws IOException
   {
     if (zipFileUrl.startsWith("file:"))
@@ -256,6 +269,9 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter i
   }
 
 
+  /**
+   * Record a classpath name as visited, returning {@code true} if it was not already known.
+   */
   private boolean scan_checkVisited(@NotNull String classPathName) {
     return indexedClasses.add(classPathName);
   }
@@ -274,7 +290,6 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter i
    *
    * @since 0.12.0
    */
-  @Override
   @Contract(value = "_ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull Path classFile)
   {
@@ -295,6 +310,25 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter i
 
 
   /**
+   * Adopt messages and templates from the given class file identified by {@code classFile}. This method delegates to
+   * {@link #adopt(Path)} after converting the {@link File} to a {@link Path}.
+   *
+   * @param classFile  location of the class file to analyze for message annotations, not {@code null}
+   *
+   * @return  this annotation adopter instance, never {@code null}
+   *
+   * @throws MessageAdopterException  if the class file cannot be read
+   * @throws MessageParserException   if a message or template text cannot be parsed
+   */
+  @Contract(value = "_ -> this")
+  public @NotNull AbstractAnnotationAdopter adopt(@NotNull File classFile)
+  {
+    adopt(classFile.toPath());
+    return this;
+  }
+
+
+  /**
    * Adopt messages and templates from the class file of the given {@code type}. The class file is located via the
    * type's class loader. If the type has already been visited or has no class loader (e.g. bootstrap classes), this
    * method returns immediately.
@@ -306,7 +340,6 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter i
    * @throws MessageAdopterException  if the class file cannot be read
    * @throws MessageParserException   if a message or template text cannot be parsed
    */
-  @Override
   @Contract(value = "_ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull Class<?> type)
   {
@@ -344,7 +377,6 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter i
    * @throws DuplicateMessageException  if different messages are provided for the same locale
    * @throws MessageParserException     if a message or template text cannot be parsed
    */
-  @Override
   @Contract(value = "_ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull MessageDef messageDef)
   {
@@ -389,7 +421,6 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter i
    * @throws DuplicateTemplateException  if different template messages are provided for the same locale
    * @throws MessageParserException      if the template text cannot be parsed
    */
-  @Override
   @Contract(value = "_ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull TemplateDef templateDef)
   {

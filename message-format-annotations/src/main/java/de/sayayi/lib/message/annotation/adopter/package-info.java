@@ -19,13 +19,13 @@
  * {@link de.sayayi.lib.message.annotation.MessageDef MessageDef} and
  * {@link de.sayayi.lib.message.annotation.TemplateDef TemplateDef} annotations in compiled class files.
  * <p>
- * The main entry point is the {@link de.sayayi.lib.message.annotation.adopter.AnnotationAdopter AnnotationAdopter}
- * interface which provides multiple strategies for locating annotated classes, including classpath scanning, single
- * class file analysis, and direct annotation instance processing.
+ * The {@link de.sayayi.lib.message.annotation.adopter.AbstractAnnotationAdopter AbstractAnnotationAdopter}
+ * provides multiple strategies for locating annotated classes, including classpath scanning, single class file
+ * analysis, and direct annotation instance processing.
  * <p>
- * The {@link de.sayayi.lib.message.annotation.adopter.AnnotationAdopterProvider AnnotationAdopterProvider} SPI
- * allows different bytecode analysis libraries to be plugged in. The best available provider is automatically
- * selected at runtime.
+ * The {@link de.sayayi.lib.message.annotation.adopter.AnnotationAdopter AnnotationAdopter} is the concrete
+ * ASM-based implementation that scans compiled class files for message and template annotations without loading
+ * the classes into the JVM.
  *
  * @author Jeroen Gremmen
  * @since 0.24.0

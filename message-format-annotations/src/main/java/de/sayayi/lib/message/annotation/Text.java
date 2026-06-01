@@ -27,7 +27,10 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 
 
 /**
- * Message text annotation.
+ * Provides a localized text variant for use within {@link MessageDef} and {@link TemplateDef} annotations.
+ * <p>
+ * When used with a {@link #locale()}, the {@link #text()} element supplies the localized message text. When used
+ * without a locale (as a shorthand), the {@link #value()} element can be used instead, e.g. {@code @Text("...")}.
  *
  * @see MessageDef
  * @see TemplateDef
@@ -53,7 +56,7 @@ public @interface Text
 
 
   /**
-   * Localized message text.
+   * Localized message text. Used together with {@link #locale()} to provide a text for a specific locale.
    *
    * @return  message text
    */
@@ -62,7 +65,8 @@ public @interface Text
 
 
   /**
-   * Not localized message text.
+   * Message text without locale. This is a shorthand for when no {@link #locale()} is needed, allowing the
+   * compact form {@code @Text("...")}.
    * <p>
    * This value is used only if {@code locale} and {@code text} are not set, otherwise its value is ignored.
    *

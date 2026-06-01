@@ -15,8 +15,11 @@
  */
 
 /**
- * Annotations for defining messages and templates directly in Java source code, along with the adopter for
- * processing them.
+ * Annotations for defining messages and templates directly in Java source code.
+ * <p>
+ * Annotated classes can be scanned and published using the
+ * {@link de.sayayi.lib.message.annotation.adopter.AnnotationAdopter AnnotationAdopter} from the
+ * {@code de.sayayi.lib.message.annotation.adopter} package.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0
