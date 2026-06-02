@@ -89,6 +89,11 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code string} classifier to the context, indicating that the value can be represented as a string.
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {
@@ -193,7 +198,13 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Compares the string representation of the value against the empty key. A value is considered empty if it is
+   * {@code null}, an empty {@code char[]}, or an empty string. Whitespace-only strings are treated as a near-match
+   * for equality comparisons.
+   */
   @Override
   public @NotNull MatchResult compareToEmptyKey(Object value, @NotNull ComparatorContext context)
   {
@@ -216,7 +227,13 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Matches the string representation of the value against the boolean key by comparing it to the literal strings
+   * {@code "true"} and {@code "false"}. An exact case match yields an {@code EQUIVALENT} result, while a
+   * case-insensitive match yields {@code LENIENT}.
+   */
   @Override
   public @NotNull MatchResult compareToBoolKey(@NotNull Object value, @NotNull ComparatorContext context)
   {
@@ -238,7 +255,12 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Parses the string representation of the value as a {@link BigDecimal} and compares it to the number key value.
+   * Returns {@code MISMATCH} if the string cannot be parsed as a number.
+   */
   @Override
   public @NotNull MatchResult compareToNumberKey(@NotNull Object value, @NotNull ComparatorContext context)
   {
@@ -254,7 +276,13 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Compares the string representation of the value against the string key value using a locale-sensitive
+   * {@link Collator}. An identical match (including case and accents) yields an {@code EXACT} result, while a
+   * case-insensitive match yields {@code LENIENT}.
+   */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull Object value, @NotNull ComparatorContext context)
   {

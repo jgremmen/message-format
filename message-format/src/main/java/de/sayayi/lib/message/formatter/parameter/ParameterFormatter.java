@@ -44,12 +44,27 @@ import static java.util.Optional.empty;
 
 
 /**
- * A parameter formatter takes care of formatting a parameter value.
+ * A parameter formatter is responsible for converting a parameter value into formatted text during message formatting.
  * <p>
- * If {@link #getFormattableTypes()} returns a non-empty collection, parameter values that match
- * one of the types in the collection will be formatted using this parameter formatter. If the
- * returned collection is empty, the formatter is selected only if it implements
- * {@link NamedParameterFormatter} and is referenced by name.
+ * If {@link #getFormattableTypes()} returns a non-empty collection, parameter values that match one of the types in
+ * the collection will be formatted using this parameter formatter. If the returned collection is empty, the formatter
+ * is selected only if it implements {@link NamedParameterFormatter} and is referenced by name.
+ * <p>
+ * This interface also defines several sub-interfaces that extend the formatter's capabilities:
+ * <ul>
+ *   <li>
+ *     {@link SizeQueryable} – allows a formatter to report the size (e.g. length or count) of a value, used by the
+ *     {@code size} named formatter.
+ *   </li>
+ *   <li>
+ *     {@link MapKeyComparator} – enables a formatter to match parameter values against map keys
+ *     (null, empty, bool, number, string) in the parameter configuration.
+ *   </li>
+ *   <li>
+ *     {@link DefaultFormatter} – marks a formatter as the fallback for {@code Object}-typed values when no more
+ *     specific formatter is available.
+ *   </li>
+ * </ul>
  *
  * @author Jeroen Gremmen
  * @since 0.1.0
@@ -242,8 +257,11 @@ public interface ParameterFormatter
 
 
   /**
-   * This interface marks a parameter formatter as being capable of calculating the size of the
-   * formattable type.
+   * A parameter formatter that can report the size of a value, such as the length of a string, the number of elements
+   * in a collection, or the size of an array. This is used by the {@code size} named formatter to evaluate size-based
+   * map keys.
+   *
+   * @since 0.8.0
    */
   interface SizeQueryable extends ParameterFormatter
   {
@@ -253,8 +271,8 @@ public interface ParameterFormatter
      * @param context  formatter context, not {@code null}
      * @param value    object to calculate the size of, not {@code null}
      *
-     * @return  value size (&gt;= 0) or {@link OptionalLong#empty()} if this formatter is not
-     *          capable of determining the size, never {@code null}
+     * @return  value size (&gt;= 0) or {@link OptionalLong#empty()} if this formatter is not capable of determining
+     *          the size, never {@code null}
      */
     @Contract(pure = true)
     @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object value);
@@ -523,7 +541,9 @@ public interface ParameterFormatter
 
 
   /**
-   * Qualifies a parameter formatter for being assigned to type {@code Object}.
+   * Marker interface that qualifies a parameter formatter as the fallback formatter for {@code Object}-typed values.
+   * A default formatter is consulted when no more specific formatter is registered for the parameter value's type and
+   * also provides map key comparison for arbitrary objects.
    *
    * @see GenericFormatterService#addFormatterForType(FormattableType, ParameterFormatter)
    *
