@@ -61,14 +61,6 @@ import static java.util.Locale.ROOT;
 public sealed interface Message extends FormatStringSerializer
 {
   /**
-   * Empty message.
-   *
-   * @since 0.12.0
-   */
-  Message.WithSpaces EMPTY = EmptyMessage.INSTANCE;
-
-
-  /**
    * Formats the message based on the message parameters provided.
    *
    * @param messageAccessor  message accessor providing formatting information, not {@code null}
@@ -224,6 +216,19 @@ public sealed interface Message extends FormatStringSerializer
   {
     for(var messagePart: getMessageParts())
       messagePart.serialize(context);
+  }
+
+
+  /**
+   * Returns a shared empty message instance that produces an empty string when formatted.
+   *
+   * @return  empty message, never {@code null}
+   *
+   * @since 0.24.0
+   */
+  @Contract(pure = true)
+  static @NotNull Message.WithSpaces empty() {
+    return EmptyMessage.INSTANCE;
   }
 
 

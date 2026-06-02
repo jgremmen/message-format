@@ -76,6 +76,6 @@ public final class ChoiceFormatter implements NamedParameterFormatter
   {
     return context.format(context
         .getMapMessage(value, KEY_TYPES, true)
-        .orElse(Message.WithSpaces.EMPTY));
+        .orElse(Message.empty()));
   }
 }
