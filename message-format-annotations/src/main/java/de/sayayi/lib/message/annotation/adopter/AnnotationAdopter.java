@@ -339,9 +339,10 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
     private String value;
 
 
-    private TextAnnotationVisitor(List<Text> inheritedTexts)
+    private TextAnnotationVisitor(@NotNull List<Text> inheritedTexts)
     {
       super(ASM9);
+
       this.inheritedTexts = inheritedTexts;
     }
 
