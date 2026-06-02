@@ -69,10 +69,21 @@ import static org.antlr.v4.runtime.Token.EOF;
 
 
 /**
- * This class provides methods for compiling messages and templates.
+ * Compiler for parsing message format strings and templates into their structural {@link Message} representation
+ * using an ANTLR-based parser. This is the main entry point for turning message format text into an object model that
+ * can be formatted at runtime.
+ * <p>
+ * The compiler supports the full message format syntax including parameters ({@code %{...}}), templates
+ * ({@code %[...]}), post-formatters ({@code %(...)}), map entries with typed keys and values, and quoted strings.
+ * <p>
+ * Use {@link #compileMessage(String)} to compile a message format string and {@link #compileTemplate(String)} to
+ * compile a template format string. Both methods validate the input syntax and throw a {@link MessageParserException}
+ * with a descriptive error message if parsing fails.
  *
  * @author Jeroen Gremmen
  * @since 0.5.0
+ *
+ * @see MessageFactory
  */
 public final class MessageCompiler extends AbstractAntlr4Parser
 {
@@ -82,6 +93,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   private final @NotNull MessageFactory messageFactory;
 
 
+  /**
+   * Creates a new message compiler using the given message factory.
+   *
+   * @param messageFactory  factory used for normalizing and creating message parts, not {@code null}
+   */
   public MessageCompiler(@NotNull MessageFactory messageFactory)
   {
     super(SYNTAX_ERROR_FORMATTER);
@@ -134,6 +150,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   }
 
 
+  /**
+   * Creates a {@link MessageParserException} from parser error information. This method is called by the ANTLR error
+   * handling framework when a syntax error is detected during parsing.
+   */
   @Override
   protected @NotNull RuntimeException createException(@NotNull Token startToken, @NotNull Token stopToken,
                                                       @NotNull String formattedMessage, @NotNull String errorMsg,
@@ -142,6 +162,9 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   }
 
 
+  /**
+   * Creates a human-readable error message for unrecognized tokens encountered during lexing.
+   */
   @Override
   protected @NotNull String createTokenRecognitionMessage(@NotNull org.antlr.v4.runtime.Lexer lexer,
                                                           @NotNull String text, boolean hasEOF) {
@@ -149,6 +172,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   }
 
 
+  /**
+   * Creates a context-aware error message when the parser encounters an ambiguity or dead end. Produces specific
+   * messages for common situations such as incomplete message formats, missing default messages in parameters, and
+   * syntax errors in map elements.
+   */
   @Override
   protected @NotNull String createNoViableAlternativeMessage(@NotNull org.antlr.v4.runtime.Parser parser,
                                                              @NotNull Token startToken, @NotNull Token offendingToken)
@@ -169,6 +197,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   }
 
 
+  /**
+   * Creates a context-aware error message when the parser encounters a token that does not match what is expected.
+   * Produces specific messages for missing parameter names, template names, default messages, and unclosed parameter
+   * expressions.
+   */
   @Override
   protected @NotNull String createInputMismatchMessage(@NotNull org.antlr.v4.runtime.Parser parser,
                                                        @NotNull IntervalSet expectedTokens,
@@ -208,6 +241,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   }
 
 
+  /**
+   * Creates a context-aware error message when an unwanted token is found, such as a premature end of input inside
+   * an unclosed parameter expression.
+   */
   @Override
   protected @NotNull String createUnwantedTokenMessage(@NotNull org.antlr.v4.runtime.Parser parser,
                                                        @NotNull Token unwantedToken,
@@ -224,6 +261,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
 
+  /**
+   * Custom vocabulary providing human-readable token display names for error messages. Maps token types
+   * (e.g. {@code P_START}, {@code COMMA}) to descriptive labels (e.g. {@code '%\{'}, {@code ','}) so that syntax
+   * errors are easier to understand.
+   */
   private static final Vocabulary VOCABULARY = new AbstractVocabulary() {
     @Override
     protected void addTokens()
@@ -261,6 +303,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
 
+  /**
+   * ANTLR lexer that tokenizes message format strings. Extends the generated {@link MessageLexer} to use the
+   * compiler's custom {@link #VOCABULARY} for producing human-readable error messages.
+   */
   private static final class Lexer extends MessageLexer
   {
     private Lexer(@NotNull String message) {
@@ -277,6 +323,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
 
+  /**
+   * ANTLR parser that processes message format token streams. Extends the generated {@link MessageParser} to use the
+   * compiler's custom {@link #VOCABULARY} for producing human-readable error messages.
+   */
   private static final class Parser extends MessageParser
   {
     private Parser(@NotNull TokenStream tokenStream) {
@@ -293,6 +343,27 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
 
+  /**
+   * Parse tree listener that builds the {@link Message} object model from the ANTLR parse tree.
+   * This listener is invoked as the parser walks the tree and is responsible for:
+   * <ul>
+   *   <li>
+   *     Constructing message parts (text, parameters, templates, post-formatters)
+   *   </li>
+   *   <li>
+   *     Parsing and validating map keys and typed values
+   *   </li>
+   *   <li>
+   *     Enforcing naming conventions (kebab-case, lower camelCase) for parameters, templates and configuration keys
+   *   </li>
+   *   <li>
+   *     Detecting duplicate map entries, config definitions and template parameter defaults
+   *   </li>
+   *   <li>
+   *     Assembling the final {@link Message.WithSpaces} from its constituent parts
+   *   </li>
+   * </ul>
+   */
   private final class Listener extends MessageParserBaseListener implements WalkerSupplier
   {
     private static final String KEBAB_CASE_MATCH = "must match the kebab case naming convention";

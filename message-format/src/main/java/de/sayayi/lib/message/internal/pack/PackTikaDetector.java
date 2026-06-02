@@ -22,13 +22,16 @@ import static de.sayayi.lib.message.internal.pack.PackSupport.PACK_CONFIG;
 
 
 /**
- * Tika detector for message format packs.
+ * Apache Tika detector for message format pack files. This detector uses the
+ * {@linkplain PackSupport#PACK_CONFIG pack configuration} to identify files by their magic bytes
+ * and reports the {@linkplain PackSupport#MIME_TYPE message format pack MIME type}.
  *
  * @author Jeroen Gremmen
  * @since 0.20.0
  */
 public final class PackTikaDetector extends AbstractTikaDetector
 {
+  /** Creates a new Tika detector for message format pack files. */
   public PackTikaDetector() {
     super(PACK_CONFIG, MIME_TYPE);
   }

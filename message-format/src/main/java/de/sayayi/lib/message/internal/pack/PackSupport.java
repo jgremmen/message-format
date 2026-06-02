@@ -45,19 +45,29 @@ import static java.util.function.Function.identity;
 
 
 /**
- * This class provides methods for packing and unpacking message (and related) objects.
+ * Provides serialization and deserialization support for packing messages, message parts, map keys
+ * and typed values into a compact binary format.
+ * <p>
+ * Static {@code pack} methods serialize objects to a {@link PackOutputStream}. Instance
+ * {@code unpack} methods deserialize objects from a {@link PackInputStream} while deduplicating
+ * equivalent instances to reduce memory usage.
+ * <p>
+ * This class also provides variable-length encoding for {@code long} values via
+ * {@link #packLongVar(long, PackOutputStream)} and {@link #unpackLongVar(PackInputStream)},
+ * optimized for smaller numbers that are closer to zero.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
 public final class PackSupport
 {
-  /** Pack version */
+  /** Current pack format version. */
   public static final int VERSION = 3;
 
-  /** Pack mime type */
+  /** MIME type used to identify message format pack data. */
   public static final String MIME_TYPE = "application/x-message-format-pack";
 
+  /** Default pack configuration with magic bytes, version range and compression support. */
   public static final PackConfig PACK_CONFIG = new PackConfig
       .Builder()
       .withMagic("%{msg}")
@@ -65,12 +75,19 @@ public final class PackSupport
       .withCompressionSupport(true)
       .build();
 
+  /** Type identifier for boolean map keys. */
   public static final int MAP_KEY_BOOL_ID = 0;
+  /** Type identifier for empty map keys. */
   public static final int MAP_KEY_EMPTY_ID = 1;
+  /** Type identifier for name map keys (used in versions prior to 3). */
   public static final int MAP_KEY_NAME_ID = 2;  // < version 3
+  /** Type identifier for null map keys. */
   public static final int MAP_KEY_NULL_ID = 3;
+  /** Type identifier for number map keys. */
   public static final int MAP_KEY_NUMBER_ID = 4;
+  /** Type identifier for string map keys. */
   public static final int MAP_KEY_STRING_ID = 5;
+  /** Type identifier for default/catch-all map keys. */
   public static final int MAP_KEY_DEFAULT_ID = 6;
 
   private static final int MAP_VALUE_BOOL_ID = 0;
@@ -98,6 +115,14 @@ public final class PackSupport
   private final Map<Message.WithSpaces,Message.WithSpaces> messagesWithSpaces = new HashMap<>();
 
 
+  /**
+   * Packs a {@link Message} into the given output stream.
+   *
+   * @param message      message to pack, not {@code null}
+   * @param packStream   output stream to write to, not {@code null}
+   *
+   * @throws IOException  if an I/O error occurs during packing
+   */
   @Contract(mutates = "param2,io")
   public static void pack(@NotNull Message message, @NotNull PackOutputStream packStream) throws IOException
   {
@@ -130,6 +155,16 @@ public final class PackSupport
   }
 
 
+  /**
+   * Unpacks a {@link Message.WithSpaces} from the given input stream. Equivalent instances are
+   * deduplicated.
+   *
+   * @param packStream   input stream to read from, not {@code null}
+   *
+   * @return  unpacked message with spaces, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs during unpacking
+   */
   @Contract(mutates = "param1,io")
   public @NotNull Message.WithSpaces unpackMessageWithSpaces(@NotNull PackInputStream packStream) throws IOException
   {
@@ -156,6 +191,15 @@ public final class PackSupport
   }
 
 
+  /**
+   * Unpacks a {@link Message.WithCode} from the given input stream.
+   *
+   * @param packStream   input stream to read from, not {@code null}
+   *
+   * @return  unpacked message with code, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs during unpacking
+   */
   @Contract(mutates = "param1,io")
   public @NotNull Message.WithCode unpackMessageWithCode(@NotNull PackInputStream packStream) throws IOException
   {
@@ -169,6 +213,16 @@ public final class PackSupport
   }
 
 
+  /**
+   * Unpacks a {@link Message} of any type from the given input stream. Messages that implement
+   * {@link Message.WithSpaces} are deduplicated.
+   *
+   * @param packStream   input stream to read from, not {@code null}
+   *
+   * @return  unpacked message, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs during unpacking
+   */
   @Contract(mutates = "param1,io")
   public @NotNull Message unpackMessage(@NotNull PackInputStream packStream) throws IOException
   {
@@ -204,6 +258,14 @@ public final class PackSupport
   }
 
 
+  /**
+   * Packs a {@link MessagePart} into the given output stream.
+   *
+   * @param messagePart  message part to pack, not {@code null}
+   * @param packStream   output stream to write to, not {@code null}
+   *
+   * @throws IOException  if an I/O error occurs during packing
+   */
   @Contract(mutates = "param2,io")
   public static void pack(@NotNull MessagePart messagePart, @NotNull PackOutputStream packStream) throws IOException
   {
@@ -232,6 +294,16 @@ public final class PackSupport
   }
 
 
+  /**
+   * Unpacks a {@link MessagePart} from the given input stream. Equivalent instances are
+   * deduplicated. Supports backward-compatible reading of older pack format versions.
+   *
+   * @param packStream   input stream to read from, not {@code null}
+   *
+   * @return  unpacked message part, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs during unpacking
+   */
   @Contract(mutates = "param1,io")
   @SuppressWarnings("OptionalGetWithoutIsPresent")
   public @NotNull MessagePart unpackMessagePart(@NotNull PackInputStream packStream) throws IOException
@@ -257,6 +329,15 @@ public final class PackSupport
   }
 
 
+  /**
+   * Packs a {@link MapKey} into the given output stream. A {@code null} map key is packed as
+   * the default/catch-all key.
+   *
+   * @param mapKey       map key to pack, or {@code null} for the default key
+   * @param packStream   output stream to write to, not {@code null}
+   *
+   * @throws IOException  if an I/O error occurs during packing
+   */
   @Contract(mutates = "param2,io")
   public static void pack(MapKey mapKey, @NotNull PackOutputStream packStream) throws IOException
   {
@@ -289,6 +370,16 @@ public final class PackSupport
   }
 
 
+  /**
+   * Unpacks a {@link MapKey} from the given input stream. Equivalent instances are deduplicated.
+   * Returns {@code null} for the default/catch-all key.
+   *
+   * @param packStream   input stream to read from, not {@code null}
+   *
+   * @return  unpacked map key, or {@code null} for the default key
+   *
+   * @throws IOException  if an I/O error occurs during unpacking
+   */
   @Contract(mutates = "param1,io")
   @SuppressWarnings("DuplicatedCode")
   public MapKey unpackMapKey(@NotNull PackInputStream packStream) throws IOException
@@ -308,6 +399,14 @@ public final class PackSupport
   }
 
 
+  /**
+   * Packs a {@link TypedValue} into the given output stream.
+   *
+   * @param typedValue   typed value to pack, not {@code null}
+   * @param packStream   output stream to write to, not {@code null}
+   *
+   * @throws IOException  if an I/O error occurs during packing
+   */
   @Contract(mutates = "param2,io")
   public static void pack(@NotNull TypedValue<?> typedValue, @NotNull PackOutputStream packStream) throws IOException
   {
@@ -335,6 +434,16 @@ public final class PackSupport
   }
 
 
+  /**
+   * Unpacks a {@link TypedValue} from the given input stream. Equivalent instances are
+   * deduplicated.
+   *
+   * @param packStream   input stream to read from, not {@code null}
+   *
+   * @return  unpacked typed value, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs during unpacking
+   */
   @Contract(mutates = "param1,io")
   public @NotNull TypedValue<?> unpackTypedValue(@NotNull PackInputStream packStream) throws IOException
   {
@@ -351,6 +460,19 @@ public final class PackSupport
   }
 
 
+  /**
+   * Packs a {@code long} value using variable-length encoding optimized for smaller numbers.
+   * Values close to zero require fewer bits (as little as 5 bits for values in the range
+   * {@code -8..7}), while the full {@code long} range is still supported at the cost of more
+   * bits.
+   *
+   * @param value        the value to pack
+   * @param packStream   output stream to write to, not {@code null}
+   *
+   * @throws IOException  if an I/O error occurs during packing
+   *
+   * @see #unpackLongVar(PackInputStream)
+   */
   @Contract(mutates = "param2,io")
   public static void packLongVar(long value, @NotNull PackOutputStream packStream) throws IOException
   {
@@ -417,6 +539,18 @@ public final class PackSupport
   }
 
 
+  /**
+   * Unpacks a {@code long} value that was encoded using variable-length encoding optimized for
+   * smaller numbers.
+   *
+   * @param packStream   input stream to read from, not {@code null}
+   *
+   * @return  the unpacked long value
+   *
+   * @throws IOException  if an I/O error occurs during unpacking
+   *
+   * @see #packLongVar(long, PackOutputStream)
+   */
   @Contract(mutates = "param1,io")
   public static long unpackLongVar(@NotNull PackInputStream packStream) throws IOException
   {
