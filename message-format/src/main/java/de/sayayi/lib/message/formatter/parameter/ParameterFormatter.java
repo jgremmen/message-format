@@ -282,7 +282,12 @@ public interface ParameterFormatter
 
 
   /**
-   * This interface allows formatters to match a value against parameter map keys.
+   * A parameter formatter that can match parameter values against map keys in the parameter configuration. Map keys
+   * can be of type {@code null}, {@code empty}, {@code bool}, {@code number}, or {@code string}, and this interface
+   * provides a comparison method for each.
+   * <p>
+   * The default {@link #format(ParameterFormatterContext, Object)} implementation delegates to the next formatter in
+   * the chain, since a map key comparator typically only contributes comparison logic rather than direct formatting.
    *
    * @param <T>  type of the value this comparator is capable of comparing
    *
@@ -290,6 +295,20 @@ public interface ParameterFormatter
    */
   interface MapKeyComparator<T> extends ParameterFormatter
   {
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This default implementation delegates to the next formatter in the chain, since a map key
+     * comparator typically only contributes comparison logic rather than direct formatting.
+     *
+     * @since 0.24.0
+     */
+    @Override
+    default @NotNull Text format(@NotNull ParameterFormatterContext context, Object value) {
+      return context.delegateToNextFormatter();
+    }
+
+
     /**
      * Compares a value against the {@code null} map key.
      *

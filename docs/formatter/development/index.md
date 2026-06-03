@@ -96,13 +96,9 @@ methods that make sense for your type. Each method returns a `MatchResult` that 
 how well the value matches the key. When multiple keys match, the engine picks the one with
 the highest score.
 
-The library also provides `AbstractMapKeyComparator<T>` for cases where you only want to
-add map key comparison logic to a type that already has a satisfactory formatter. The base
-class delegates all formatting to the next formatter in the chain, so your subclass
-contributes nothing but comparison behavior. The
-[Custom Map Key Comparator](map-key-comparator.md) page explains the interface, the scoring
-system, the comparator context, and provides complete examples for both integrated and
-standalone comparators.
+The [Custom Map Key Comparator](map-key-comparator.md) page explains the interface, the
+scoring system, the comparator context, and provides complete examples for both integrated
+and standalone comparators.
 
 
 ## Utilities

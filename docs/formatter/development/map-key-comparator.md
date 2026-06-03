@@ -10,9 +10,9 @@ Every built-in formatter that supports map key matching already implements `MapK
 `NumberFormatter`, for example, knows how to compare a `Number` value against number keys, string
 keys that contain numeric text, and bool keys where zero maps to `false`. When you create a custom
 formatter for your own type and want map entries to work with that type, you implement
-`MapKeyComparator` yourself. The library also provides `AbstractMapKeyComparator<T>`, a convenience
-base class for formatters that only contribute map key comparison logic and delegate all formatting
-to the next formatter in the chain.
+`MapKeyComparator` yourself. The interface provides a default `format` method that delegates to the
+next formatter in the chain, so a formatter that only contributes map key comparison logic does not
+need to implement formatting at all.
 
 
 ## The Interface
@@ -288,10 +288,11 @@ public @NotNull MatchResult compareToNumberKey(
 ## Standalone Map Key Comparator
 
 Sometimes you want to add map key matching behavior for a type that already has a satisfactory
-formatter but no `MapKeyComparator` support. The `AbstractMapKeyComparator<T>` base class exists for
-exactly this purpose. It implements `MapKeyComparator<T>` and provides a `format` method that always
-delegates to the next formatter in the chain. Your subclass only contributes comparison logic without
-affecting how the value is rendered.
+formatter but no `MapKeyComparator` support. Because the `MapKeyComparator` interface provides a
+default `format` method that delegates to the next formatter in the chain, you can implement
+`MapKeyComparator<T>` directly without having to provide any formatting logic. Your implementation
+only contributes comparison behavior while the existing formatter continues to produce the output
+text.
 
 This approach is useful when you cannot modify the existing formatter, or when the comparison logic
 is orthogonal to the formatting logic and you want to keep them in separate classes.
@@ -302,7 +303,7 @@ ability to match against ISO country codes in map entries:
 
 ```java
 public final class CountryMapKeyComparator
-    extends AbstractMapKeyComparator<Country>
+    implements MapKeyComparator<Country>
 {
   @Override
   public @NotNull MatchResult compareToStringKey(
@@ -339,9 +340,9 @@ public final class CountryMapKeyComparator
 }
 ```
 
-Because `AbstractMapKeyComparator` delegates formatting to the next formatter in the chain, the
-existing `Country` formatter continues to produce the output text. The standalone comparator only
-participates in map key resolution.
+Because the default `format` method delegates to the next formatter in the chain, the existing
+`Country` formatter continues to produce the output text. The standalone comparator only participates
+in map key resolution.
 
 With both the formatter and the comparator registered, the message author can use map entries to map
 country codes:
