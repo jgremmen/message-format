@@ -20,6 +20,7 @@ import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.annotation.adopter.AnnotationAdopter;
+import de.sayayi.lib.message.annotation.adopter.asm.ClassReader;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
@@ -37,7 +38,6 @@ import org.gradle.api.tasks.*;
 import org.gradle.api.tasks.util.PatternFilterable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.objectweb.asm.ClassReader;
 
 import java.io.File;
 import java.io.IOException;
