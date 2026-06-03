@@ -16,7 +16,6 @@
 
 
 apply plugin: 'java-library'
-apply plugin: 'jacoco'
 apply plugin: 'com.adarshr.test-logger'
 
 
