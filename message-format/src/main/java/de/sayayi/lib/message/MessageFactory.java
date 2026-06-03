@@ -202,9 +202,14 @@ public class MessageFactory
     messageCacheLock.lock();
     try {
       //noinspection DataFlowIssue
-      return messageCache.computeIfAbsent(text, messageCompiler::compileMessage);
-    }
-    finally {
+      var message = messageCache.get(text);
+
+      //noinspection Java8MapApi
+      if (message == null)
+        messageCache.put(text, message = messageCompiler.compileMessage(text));
+
+      return message;
+    } finally {
       messageCacheLock.unlock();
     }
   }

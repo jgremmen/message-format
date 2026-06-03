@@ -21,13 +21,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.Math.clamp;
 import static java.lang.Math.min;
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.copyOf;
 import static java.util.Objects.requireNonNull;
-import static java.util.function.Function.identity;
 
 
 /**
@@ -153,10 +154,10 @@ public final class LRUMessagePartNormalizer
    * {@link LinkedHashMap}-based LRU normalizer suitable for larger cache sizes. Provides constant-time lookup and
    * automatic eviction of the least recently used entry.
    */
-  @SuppressWarnings("ClassCanBeRecord")
   private static final class Large implements MessagePartNormalizer
   {
     private final LinkedHashMap<MessagePart,MessagePart> cache;
+    private final Lock cacheLock;
 
 
     private Large(int maxSize)
@@ -167,14 +168,27 @@ public final class LRUMessagePartNormalizer
           return size() > maxSize;
         }
       };
+
+      cacheLock = new ReentrantLock();
     }
 
 
     @Override
     @Contract(mutates = "this")
     @SuppressWarnings("unchecked")
-    public <T extends MessagePart> @NotNull T normalize(@NotNull T part) {
-      return (T)cache.computeIfAbsent(requireNonNull(part, "part must not be null"), identity());
+    public <T extends MessagePart> @NotNull T normalize(@NotNull T part)
+    {
+      cacheLock.lock();
+      try {
+        T result = (T)cache.get(requireNonNull(part, "part must not be null"));
+
+        if (result == null)
+          cache.put(part, result = part);
+
+        return result;
+      } finally {
+        cacheLock.unlock();
+      }
     }
   }
 }
