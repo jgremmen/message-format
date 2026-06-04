@@ -15,6 +15,7 @@
  */
 
 //file:noinspection GroovyAssignabilityCheck
+//file:noinspection SpellCheckingInspection
 
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
@@ -182,10 +183,6 @@ publishing {
 
 
 ext.releaseTask.configure {
-  mustRunAfter 'test'
-  dependsOn 'test'
-
-  if (snapshot) {
+  if (snapshot)
     dependsOn ':message-format-annotations:publishOSSRHPublicationToMavenCentralSnapshotRepository'
-  }
 }
