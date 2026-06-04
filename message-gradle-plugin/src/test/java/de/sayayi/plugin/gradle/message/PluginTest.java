@@ -86,7 +86,7 @@ final class PluginTest
     writeBuildGradle(List.of());
 
     testPackageDir = new File(testProjectDir, "src/main/java/test");
-    packFile = new File(testProjectDir, "build/messageFormatPack/messages.mfp");
+    packFile = new File(testProjectDir, "build/messageFormatPack/test-message-pack.mfp");
 
     createDirectories(testPackageDir.toPath());
   }
