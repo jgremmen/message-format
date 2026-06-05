@@ -30,7 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import static java.util.Collections.unmodifiableSet;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Locale.ROOT;
 
 
@@ -120,8 +120,13 @@ public sealed interface Message extends FormatStringSerializer
       }
 
       @Override
-      public @NotNull Set<String> getParameterNames() {
-        return unmodifiableSet(parameterValues.keySet());
+      public @Unmodifiable @NotNull Map<String,Object> asParameterMap() {
+        return unmodifiableMap(parameterValues);
+      }
+
+      @Override
+      public String toString() {
+        return "Parameters(locale=" + messageAccessor.getLocale() + ',' + parameterValues + ')';
       }
     });
   }
@@ -416,8 +421,20 @@ public sealed interface Message extends FormatStringSerializer
      * @return  set with all data names, never {@code null}
      */
     @Contract(pure = true)
-    @Unmodifiable
-    @NotNull Set<String> getParameterNames();
+    default @Unmodifiable @NotNull Set<String> getParameterNames() {
+      return asParameterMap().keySet();
+    }
+
+
+    /**
+     * Returns an unmodifiable map containing all parameter names and their associated values.
+     *
+     * @return  unmodifiable parameter map, never {@code null}
+     *
+     * @since 0.24.0
+     */
+    @Contract(pure = true)
+    @Unmodifiable @NotNull Map<String,Object> asParameterMap();
 
 
     /**

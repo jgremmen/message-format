@@ -28,6 +28,7 @@ import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Config;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
 
@@ -114,10 +115,14 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   *
+   * @return  unmodifiable map view of the parameter names and values
+   */
   @Override
-  public @NotNull Set<String> getParameterNames() {
-    return parameters.getParameterNames();
+  public @Unmodifiable @NotNull Map<String,Object> asParameterMap() {
+    return parameters.asParameterMap();
   }
 
 

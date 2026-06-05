@@ -18,8 +18,10 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message.Parameters;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -48,6 +50,7 @@ public final class NoParameters implements Parameters
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Locale getLocale() {
     return locale;
@@ -77,8 +80,20 @@ public final class NoParameters implements Parameters
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always an empty map
+   */
+  @Override
+  public @Unmodifiable @NotNull Map<String,Object> asParameterMap() {
+    return Map.of();
+  }
+
+
+  /** {@inheritDoc} */
   @Override
   public String toString() {
-    return "Parameters(locale='" + locale + "')";
+    return "Parameters(locale=" + locale + ",{})";
   }
 }

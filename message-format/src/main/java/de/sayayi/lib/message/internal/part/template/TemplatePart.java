@@ -20,30 +20,32 @@ import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
+import de.sayayi.lib.message.util.SortedStringMap;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
 
 import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
 import static de.sayayi.lib.message.part.MessagePart.Text.SPACE;
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.util.MessageUtil.validateName;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 
 
 /**
- * Template message part with optional leading and/or trailing spaces.
+ * Template message part with optional leading and/or trailing spaces. A template part references a named template
+ * message registered in the {@link MessageAccessor}. During formatting, the referenced template is resolved and
+ * formatted using the current parameters. Parameter names can be delegated to other parameter names and missing
+ * parameter values can fall back to configured defaults.
  *
  * @author Jeroen Gremmen
  *
@@ -66,7 +68,7 @@ public final class TemplatePart implements MessagePart.Template
    * <p>
    * The map is optimized to require the least amount of space.
    */
-  private final SortedArrayMap<String,TypedValue<?>> defaultParameterMap;
+  private final SortedStringMap<TypedValue<?>> defaultParameterMap;
 
   /**
    * Parameter delegate map. If a parameter is referenced in the template message the parameter
@@ -74,7 +76,7 @@ public final class TemplatePart implements MessagePart.Template
    * <p>
    * The map is optimized to require the least amount of space.
    */
-  private final SortedArrayMap<String,String> parameterDelegateMap;
+  private final SortedStringMap<String> parameterDelegateMap;
 
 
   /**
@@ -96,29 +98,33 @@ public final class TemplatePart implements MessagePart.Template
     this.spaceBefore = spaceBefore;
     this.spaceAfter = spaceAfter;
 
-    defaultParameterMap = new SortedArrayMap<>(defaultParameters);
-    parameterDelegateMap = new SortedArrayMap<>(parameterDelegates);
+    defaultParameterMap = new SortedStringMap<>(defaultParameters, true);
+    parameterDelegateMap = new SortedStringMap<>(parameterDelegates, true);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull String getName() {
     return name;
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean isSpaceBefore() {
     return spaceBefore;
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean isSpaceAfter() {
     return spaceAfter;
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
   {
@@ -131,6 +137,7 @@ public final class TemplatePart implements MessagePart.Template
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public void serialize(@NotNull Context context)
   {
@@ -144,13 +151,12 @@ public final class TemplatePart implements MessagePart.Template
 
     final var contextWithoutQuotes = context.withoutStringQuote();
 
-    parameterDelegateMap.iterator().forEachRemaining(parameterDelegate -> textJoiner
-        .add(',').addNoSpace(parameterDelegate.getKey()).addNoSpace("->")
-        .addNoSpace(parameterDelegate.getValue()));
+    parameterDelegateMap.forEach((key, value) ->
+        textJoiner.add(',').addNoSpace(key).addNoSpace("->").addNoSpace(value));
 
-    defaultParameterMap.iterator().forEachRemaining(defaultParameter -> {
-      textJoiner.add(',').addNoSpace(defaultParameter.getKey()).add('=');
-      defaultParameter.getValue().serialize(contextWithoutQuotes);
+    defaultParameterMap.forEach((key, value) -> {
+      textJoiner.add(',').addNoSpace(key).add('=');
+      value.serialize(contextWithoutQuotes);
     });
 
     textJoiner.add(']');
@@ -160,6 +166,7 @@ public final class TemplatePart implements MessagePart.Template
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean equals(Object o)
   {
@@ -170,12 +177,14 @@ public final class TemplatePart implements MessagePart.Template
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public int hashCode() {
     return name.hashCode() * 11 + (spaceBefore ? 8 : 0) + (spaceAfter ? 2 : 0);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   @Contract(pure = true)
   public String toString()
@@ -202,7 +211,9 @@ public final class TemplatePart implements MessagePart.Template
 
 
   /**
-   * @param packStream  data output pack target
+   * Serializes this template part to the given pack output stream.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    */
@@ -214,13 +225,13 @@ public final class TemplatePart implements MessagePart.Template
     packStream.writeSmallVar(defaultParameterMap.size());
     packStream.writeSmallVar(parameterDelegateMap.size());
 
-    for(var defaultParameter: defaultParameterMap)
+    for(var defaultParameter: defaultParameterMap.entrySet())
     {
       packStream.writeString(defaultParameter.getKey());
       PackSupport.pack(defaultParameter.getValue(), packStream);
     }
 
-    for(var parameterDelegate: parameterDelegateMap)
+    for(var parameterDelegate: parameterDelegateMap.entrySet())
     {
       packStream.writeString(parameterDelegate.getKey());
       packStream.writeString(parameterDelegate.getValue());
@@ -231,6 +242,8 @@ public final class TemplatePart implements MessagePart.Template
 
 
   /**
+   * Deserializes a template part from the given pack input stream.
+   *
    * @param unpack      pack helper instance, not {@code null}
    * @param packStream  source data input, not {@code null}
    *
@@ -270,44 +283,63 @@ public final class TemplatePart implements MessagePart.Template
 
 
 
+  /**
+   * A {@link Parameters} adapter that resolves parameter name delegation and provides default values for missing
+   * parameters as configured in the enclosing {@link TemplatePart}.
+   */
   private final class ParameterAdapter implements Parameters
   {
     private final Parameters parameters;
 
 
+    /**
+     * Creates a new parameter adapter wrapping the given parameters.
+     *
+     * @param parameters  the original parameters to adapt, not {@code null}
+     */
     private ParameterAdapter(@NotNull Parameters parameters) {
       this.parameters = parameters;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull Locale getLocale() {
       return parameters.getLocale();
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull Set<String> getParameterNames()
     {
       final var names = new TreeSet<String>();
+      final var parameterMap = parameters.asParameterMap();
 
-      defaultParameterMap.forEach(defaultParameter -> names.add(defaultParameter.getKey()));
+      names.addAll(defaultParameterMap.keySet());
+      names.addAll(parameterMap.keySet());
+
+      parameterDelegateMap.forEach((key, value) -> {
+        if (parameterMap.containsKey(value))
+          names.add(key);
+      });
 
       return unmodifiableSet(names);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public Object getParameterValue(@NotNull String parameter)
     {
-      var delegatedParameter = parameterDelegateMap.findValue(parameter);
+      var delegatedParameter = parameterDelegateMap.get(parameter);
       if (delegatedParameter != null)
         parameter = delegatedParameter;
 
       var value = parameters.getParameterValue(parameter);
       if (value == null)
       {
-        var templateConfigValue = defaultParameterMap.findValue(parameter);
+        var templateConfigValue = defaultParameterMap.get(parameter);
         if (templateConfigValue != null)
           value = templateConfigValue.asObject();
       }
@@ -316,13 +348,27 @@ public final class TemplatePart implements MessagePart.Template
     }
 
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return  unmodifiable map view of the adapted parameter names and values
+     */
     @Override
-    public String toString()
+    public @NotNull java.util.Map<String,Object> asParameterMap()
     {
-      return "Parameters(locale='" + parameters.getLocale() + "'," + getParameterNames()
-          .stream()
-          .map(name -> name + '=' + getParameterValue(name))
-          .collect(joining(",", "{", "})"));
+      final var map = new TreeMap<String,Object>();
+
+      for(var parameterName: getParameterNames())
+        map.put(parameterName, getParameterValue(parameterName));
+
+      return unmodifiableMap(map);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+      return "Parameters(locale=" + parameters.getLocale() + ',' + asParameterMap() + ')';
     }
   }
 }

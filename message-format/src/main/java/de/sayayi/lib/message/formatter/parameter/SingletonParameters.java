@@ -18,9 +18,13 @@ package de.sayayi.lib.message.formatter.parameter;
 import de.sayayi.lib.message.Message.Parameters;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+
+import static java.util.Collections.singletonMap;
 
 
 /**
@@ -108,6 +112,18 @@ public final class SingletonParameters implements Parameters
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  a singleton map containing the parameter name and its current value
+   */
+  @Override
+  public @Unmodifiable @NotNull Map<String,Object> asParameterMap() {
+    return singletonMap(parameterName, value);
+  }
+
+
+  /** {@inheritDoc} */
   @Override
   public String toString() {
     return "Parameters(locale=" + locale + ",{" + parameterName + '=' + value + "})";

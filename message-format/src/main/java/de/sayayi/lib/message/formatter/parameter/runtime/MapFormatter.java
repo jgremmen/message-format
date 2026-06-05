@@ -36,6 +36,7 @@ import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_ORDER;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.forEmptyKey;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Collections.emptyIterator;
+import static java.util.Collections.unmodifiableMap;
 
 
 /**
@@ -87,6 +88,8 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
 
 
   /**
+   * {@inheritDoc}
+   * <p>
    * Adds the {@code map} classifier.
    */
   @Override
@@ -268,17 +271,27 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     *
+     * @return  an unmodifiable map with keys {@code key} and {@code value}
+     */
     @Override
-    public @NotNull Set<String> getParameterNames() {
-      return Set.of("key", "value");
+    public @Unmodifiable @NotNull Map<String,Object> asParameterMap()
+    {
+      final var map = new HashMap<String,Object>(4, 1.0f);
+
+      map.put("key", key);
+      map.put("value", value);
+
+      return unmodifiableMap(map);
     }
 
 
     /** {@inheritDoc} */
     @Override
     public String toString() {
-      return "Parameters(locale='" + locale + "',{key=" + key + ",value=" + value + "})";
+      return "Parameters(locale=" + locale + ",{key=" + key + ",value=" + value + "})";
     }
   }
 }

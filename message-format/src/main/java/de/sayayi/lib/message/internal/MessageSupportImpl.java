@@ -30,21 +30,16 @@ import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
+import de.sayayi.lib.message.util.SortedStringMap;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import de.sayayi.lib.pack.PackOutputStream;
-import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.util.*;
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.Map.Entry;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -52,8 +47,6 @@ import static de.sayayi.lib.message.internal.pack.PackSupport.PACK_CONFIG;
 import static de.sayayi.lib.message.internal.pack.PackSupport.VERSION;
 import static de.sayayi.lib.message.util.MessageUtil.isKebabOrLowerCamelCaseName;
 import static de.sayayi.lib.message.util.MessageUtil.validateName;
-import static java.lang.System.arraycopy;
-import static java.util.Arrays.copyOf;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
@@ -337,8 +330,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   {
     private final @NotNull Supplier<M> message;
     @NotNull Locale locale;
-    @NotNull Object[] parameters;
-    int parameterCount;
+    @NotNull Map<String,Object> parameters;
 
 
     Configurer(@NotNull Supplier<M> message)
@@ -346,7 +338,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
       this.message = message;
 
       locale = MessageSupportImpl.this.locale;
-      parameters = new Object[16];
+      parameters = new SortedStringMap<>();
     }
 
 
@@ -359,9 +351,8 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
 
     /** {@inheritDoc} */
     @Override
-    @Unmodifiable
-    public @NotNull Map<String,Object> getParameters() {
-      return new ParameterMap(this);
+    public @Unmodifiable @NotNull Map<String,Object> getParameters() {
+      return parameters;
     }
 
 
@@ -369,7 +360,8 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     @Override
     public @NotNull MessageConfigurer<M> clear()
     {
-      parameterCount = 0;
+      parameters.clear();
+
       return this;
     }
 
@@ -379,22 +371,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     public @NotNull MessageConfigurer<M> remove(@NotNull String parameter)
     {
       if (!requireNonNull(parameter, "parameter must not be null").isEmpty())
-        for(int low = 0, high = parameterCount - 1; low <= high;)
-        {
-          final var mid = (low + high) >>> 1;
-          final var cmp = parameter.compareTo((String)parameters[mid * 2]);
-
-          if (cmp < 0)
-            high = mid - 1;
-          else if (cmp > 0)
-            low = mid + 1;
-          else
-          {
-            final var offset = mid * 2;
-            arraycopy(parameters, offset + 2, parameters, offset, --parameterCount * 2 - offset);
-            break;
-          }
-        }
+        parameters.remove(parameter);
 
       return this;
     }
@@ -410,34 +387,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
             "' must match the camel- or kebab-case naming convention");
       }
 
-      setValue: {
-        var low = 0;
-
-        for(var high = parameterCount - 1; low <= high;)
-        {
-          final var mid = (low + high) >>> 1;
-          final var cmp = parameter.compareTo((String)parameters[mid * 2]);
-
-          if (cmp < 0)
-            high = mid - 1;
-          else if (cmp > 0)
-            low = mid + 1;
-          else
-          {
-            parameters[mid * 2 + 1] = value;  // overwrite current value
-            break setValue;
-          }
-        }
-
-        if (parameterCount * 2 == parameters.length)
-          parameters = copyOf(parameters, parameterCount * 2 + 16);
-
-        final var offset = low * 2;
-        arraycopy(parameters, offset, parameters, offset + 2, parameterCount++ * 2 - offset);
-
-        parameters[offset] = parameter;
-        parameters[offset + 1] = value;
-      }
+      parameters.put(parameter, value);
 
       return this;
     }
@@ -608,374 +558,6 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
           .distinct()
           .filter(templateName -> !templates.containsKey(templateName))
           .collect(toCollection(TreeSet::new));
-    }
-  }
-
-
-
-
-  /**
-   * Unmodifiable, sorted {@link Map} implementation backed by the parameter name/value pairs from a
-   * {@link Configurer}. The parameters are stored in a flat array with alternating keys and values.
-   */
-  private static final class ParameterMap extends AbstractMap<String,Object> implements Serializable, Cloneable
-  {
-    private final @NotNull Object[] parameters;
-
-
-    private ParameterMap(@NotNull Configurer<?> configurer) {
-      parameters = copyOf(configurer.parameters, configurer.parameterCount * 2);
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public int size() {
-      return parameters.length / 2;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isEmpty() {
-      return parameters.length == 0;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean containsKey(Object key)
-    {
-      if (key instanceof String)
-        for(int offset = 0, length = parameters.length; offset < length; offset += 2)
-          if (parameters[offset].equals(key))
-            return true;
-
-      return false;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean containsValue(Object value)
-    {
-      for(int offset = 1, length = parameters.length; offset < length; offset += 2)
-        if (Objects.equals(parameters[offset], value))
-          return true;
-
-      return false;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public Object get(Object key) {
-      return getOrDefault(key, null);
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public Object getOrDefault(Object key, Object defaultValue)
-    {
-      if (key instanceof String)
-        for(int low = 0, high = parameters.length - 2; low <= high;)
-        {
-          final var mid = ((low + high) >>> 1) & 0xfffe;
-          final var cmp = ((String)key).compareTo((String)parameters[mid]);
-
-          if (cmp < 0)
-            high = mid - 2;
-          else if (cmp > 0)
-            low = mid + 2;
-          else
-            return parameters[mid + 1];
-        }
-
-      return defaultValue;
-    }
-
-
-    /**
-     * Not supported.
-     *
-     * @throws UnsupportedOperationException  always
-     */
-    @Override
-    public Object remove(Object key) {
-      throw new UnsupportedOperationException("remove");
-    }
-
-
-    /**
-     * Not supported.
-     *
-     * @throws UnsupportedOperationException  always
-     */
-    @Override
-    public void clear() {
-      throw new UnsupportedOperationException("clear");
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public @NotNull Set<Entry<String,Object>> entrySet() {
-      return new ParameterEntrySet(parameters);
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public void forEach(BiConsumer<? super String,? super Object> action)
-    {
-      for(int offset = 0, length = parameters.length; offset < length; offset += 2)
-        action.accept((String)parameters[offset], parameters[offset + 1]);
-    }
-
-
-    @Override
-    @SneakyThrows(CloneNotSupportedException.class)
-    public @NotNull Map<String,Object> clone() {
-      return (ParameterMap)super.clone();
-    }
-
-
-    @Override
-    public boolean equals(Object o)
-    {
-      if (this != o)
-      {
-        if (!(o instanceof Map<?,?> that))
-          return false;
-
-        if (size() != that.size())
-          return false;
-
-        for(int offset = 0, length = parameters.length; offset < length; offset += 2)
-        {
-          final var key = parameters[offset];
-          final var value = parameters[offset + 1];
-          final var thatValue = that.get(key);
-
-          //noinspection ConstantValue
-          if (value == null)
-          {
-            if (thatValue != null || !that.containsKey(key))
-              return false;
-          }
-          else if (!value.equals(thatValue))
-            return false;
-        }
-      }
-
-      return true;
-    }
-
-
-    @Override
-    @SuppressWarnings("ConstantValue")
-    public int hashCode()
-    {
-      var hash = 0;
-      Object value;
-
-      // respect map hashcode contract!
-      for(int offset = 0, length = parameters.length; offset < length; offset += 2)
-        hash += parameters[offset].hashCode() ^ ((value = parameters[offset + 1]) == null ? 0 : value.hashCode());
-
-      return hash;
-    }
-
-
-    @Override
-    public String toString()
-    {
-      var length = parameters.length;
-      if (length == 0)
-        return "{}";
-
-      final var sb = new StringBuilder("{");
-
-      for(var offset = 0; offset < length; offset += 2)
-      {
-        if (offset > 0)
-          sb.append(", ");
-
-        sb.append(parameters[offset]).append('=').append(parameters[offset + 1]);
-      }
-
-      return sb.append("}").toString();
-    }
-  }
-
-
-
-
-  /**
-   * Unmodifiable entry set for {@link ParameterMap}, providing iteration over the parameter name/value pairs.
-   */
-  private static final class ParameterEntrySet extends AbstractSet<Entry<String,Object>>
-      implements Serializable, Cloneable
-  {
-    private final @NotNull Object[] parameters;
-
-
-    private ParameterEntrySet(@NotNull Object[] parameters) {
-      this.parameters = parameters;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public int size() {
-      return parameters.length / 2;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isEmpty() {
-      return parameters.length == 0;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public @NotNull Iterator<Entry<String,Object>> iterator()
-    {
-      return new Iterator<>() {
-        int offset = 0;
-
-        @Override
-        public boolean hasNext() {
-          return offset < parameters.length;
-        }
-
-        @Override
-        public Entry<String,Object> next()
-        {
-          if (!hasNext())
-            throw new NoSuchElementException();
-
-          final var entry = new SimpleImmutableEntry<>((String)parameters[offset], parameters[offset + 1]);
-          offset += 2;
-
-          return entry;
-        }
-      };
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public @NotNull Spliterator<Entry<String,Object>> spliterator()
-    {
-      return new Spliterator<>() {
-        int offset = 0;
-
-        @Override
-        public boolean tryAdvance(Consumer<? super Entry<String,Object>> action)
-        {
-          if (offset == parameters.length)
-            return false;
-
-          action.accept(new SimpleImmutableEntry<>((String)parameters[offset], parameters[offset + 1]));
-          offset += 2;
-
-          return true;
-        }
-
-        @Override
-        public Spliterator<Entry<String,Object>> trySplit() {
-          return null;
-        }
-
-        @Override
-        public long estimateSize() {
-          return parameters.length / 2;
-        }
-
-        @Override
-        public Comparator<? super Entry<String,Object>> getComparator() {
-          return null;
-        }
-
-        @Override
-        public int characteristics() {
-          return ORDERED | DISTINCT | NONNULL | SIZED | IMMUTABLE;
-        }
-      };
-    }
-
-
-    /**
-     * Not supported.
-     *
-     * @throws UnsupportedOperationException  always
-     */
-    @Override
-    public void clear() {
-      throw new UnsupportedOperationException("clear");
-    }
-
-
-    /**
-     * Not supported.
-     *
-     * @throws UnsupportedOperationException  always
-     */
-    @Override
-    public boolean remove(Object o) {
-      throw new UnsupportedOperationException("remove");
-    }
-
-
-    /**
-     * Not supported.
-     *
-     * @throws UnsupportedOperationException  always
-     */
-    @Override
-    public boolean removeIf(@NotNull Predicate<? super Entry<String,Object>> filter) {
-      throw new UnsupportedOperationException("removeIf");
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public void forEach(@NotNull Consumer<? super Entry<String,Object>> action)
-    {
-      for(int offset = 0, length = parameters.length; offset < length; offset += 2)
-        action.accept(new SimpleImmutableEntry<>((String)parameters[offset], parameters[offset + 1]));
-    }
-
-
-    @Override
-    @SneakyThrows(CloneNotSupportedException.class)
-    public @NotNull Set<Entry<String,Object>> clone() {
-      return (ParameterEntrySet)super.clone();
-    }
-
-
-    @Override
-    public String toString()
-    {
-      var length = parameters.length;
-      if (length == 0)
-        return "[]";
-
-      final var sb = new StringBuilder("[");
-
-      for(var offset = 0; offset < length; offset += 2)
-      {
-        if (offset > 0)
-          sb.append(", ");
-
-        sb.append((String)parameters[offset]).append('=').append(parameters[offset + 1]);
-      }
-
-      return sb.append("]").toString();
     }
   }
 }

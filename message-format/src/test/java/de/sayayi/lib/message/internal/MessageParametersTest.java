@@ -96,6 +96,7 @@ final class MessageParametersTest
     when(otherParameters.getParameterNames()).thenReturn(otherMap.keySet());
     when(otherParameters.getParameterValue(anyString()))
         .thenAnswer(invocation -> otherMap.get(invocation.getArgument(0, String.class)));
+    when(otherParameters.asParameterMap()).thenReturn(otherMap);
 
     assertEquals(parameters, otherParameters);
 
@@ -116,6 +117,6 @@ final class MessageParametersTest
         "a", "Hello");
 
     assertEquals(parameters.hashCode(), otherMap.entrySet().stream()
-        .mapToInt(e -> e.getKey().hashCode() + e.getValue().hashCode()).sum() + ITALIAN.hashCode());
+        .mapToInt(e -> e.getKey().hashCode() ^ e.getValue().hashCode()).sum() + ITALIAN.hashCode());
   }
 }

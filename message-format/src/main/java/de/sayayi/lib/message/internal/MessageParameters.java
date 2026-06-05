@@ -17,17 +17,12 @@ package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.internal.MessageSupportImpl.Configurer;
-import org.jetbrains.annotations.Contract;
+import de.sayayi.lib.message.util.SortedStringMap;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-
-import static java.util.Arrays.copyOf;
-import static java.util.Collections.emptyIterator;
-import static java.util.Objects.requireNonNull;
-import static java.util.Spliterators.emptySpliterator;
+import java.util.Locale;
+import java.util.Map;
 
 
 /**
@@ -42,7 +37,7 @@ import static java.util.Spliterators.emptySpliterator;
 final class MessageParameters implements Parameters
 {
   private final Locale locale;
-  private final Object[] parameters;
+  private final Map<String,Object> parameters;
 
 
   /**
@@ -53,7 +48,7 @@ final class MessageParameters implements Parameters
   MessageParameters(@NotNull Configurer<?> configurer)
   {
     locale = configurer.locale;
-    parameters = copyOf(configurer.parameters, configurer.parameterCount * 2);
+    parameters = new SortedStringMap<>(configurer.parameters, true);
   }
 
 
@@ -66,32 +61,23 @@ final class MessageParameters implements Parameters
 
   /** {@inheritDoc} */
   @Override
-  public Object getParameterValue(@NotNull String parameter)
-  {
-    for(int low = 0, high = parameters.length - 2; low <= high;)
-    {
-      final var mid = ((low + high) >>> 1) & 0xfffe;
-      final var cmp = parameter.compareTo((String)parameters[mid]);
+  public Object getParameterValue(@NotNull String parameter) {
+    return parameters.get(parameter);
+  }
 
-      if (cmp < 0)
-        high = mid - 2;
-      else if (cmp > 0)
-        low = mid + 2;
-      else
-        return parameters[mid + 1];
-    }
 
-    return null;
+  /**
+   * {@inheritDoc}
+   *
+   * @return  unmodifiable map view of the parameter names and values
+   */
+  @Override
+  public @Unmodifiable @NotNull Map<String,Object> asParameterMap() {
+    return parameters;
   }
 
 
   /** {@inheritDoc} */
-  @Contract(pure = true)
-  public @NotNull Set<String> getParameterNames() {
-    return new NameSet();
-  }
-
-
   @Override
   public boolean equals(Object o)
   {
@@ -102,291 +88,22 @@ final class MessageParameters implements Parameters
 
     var that = (Parameters)o;
 
-    if (!locale.equals(that.getLocale()))
-      return false;
-
-    final var thatParameterNames = that.getParameterNames();
-
-    for(var n = 0; n < parameters.length; n += 2)
-    {
-      final var parameterName = (String)parameters[n];
-
-      if (!thatParameterNames.contains(parameterName) ||
-          !Objects.equals(parameters[n + 1], that.getParameterValue(parameterName)))
-        return false;
-    }
-
-    return true;
+    return
+        locale.equals(that.getLocale()) &&
+        parameters.equals(that.asParameterMap());
   }
 
 
+  /** {@inheritDoc} */
   @Override
-  public int hashCode()
-  {
-    var hash = locale.hashCode();
-
-    for(var parameter: parameters)
-      hash += parameter.hashCode();
-
-    return hash;
+  public int hashCode() {
+    return locale.hashCode() + parameters.hashCode();
   }
 
 
+  /** {@inheritDoc} */
   @Override
-  public String toString()
-  {
-    final var s = new StringBuilder("Parameters(locale='").append(locale).append("',{");
-
-    for(int n = 0, l = parameters.length; n < l; n += 2)
-    {
-      if (n > 0)
-        s.append(',');
-
-      s.append(parameters[n]).append("=").append(parameters[n + 1]);
-    }
-
-    return s.append("})").toString();
-  }
-
-
-
-
-  /**
-   * Unmodifiable set of parameter names backed by the sorted parameter array.
-   */
-  private final class NameSet extends AbstractSet<String>
-  {
-    /** {@inheritDoc} */
-    @Override
-    public boolean isEmpty() {
-      return parameters.length == 0;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public int size() {
-      return parameters.length >> 1;
-    }
-
-
-    /**
-     * Not supported.
-     *
-     * @throws UnsupportedOperationException  always
-     */
-    @Override
-    public void clear() {
-      throw new UnsupportedOperationException("clear");
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean contains(Object o)
-    {
-      if (o instanceof String)
-        for(int low = 0, high = parameters.length - 2; low <= high;)
-        {
-          final var mid = ((low + high) >>> 1) & 0xfffe;
-          final var cmp = ((String)o).compareTo((String)parameters[mid]);
-
-          if (cmp < 0)
-            high = mid - 2;
-          else if (cmp > 0)
-            low = mid + 2;
-          else
-            return true;
-        }
-
-      return false;
-    }
-
-
-    /**
-     * Not supported.
-     *
-     * @throws UnsupportedOperationException  always
-     */
-    @Override
-    public boolean add(String s) {
-      throw new UnsupportedOperationException("add");
-    }
-
-
-    /**
-     * Not supported.
-     *
-     * @throws UnsupportedOperationException  always
-     */
-    @Override
-    public boolean remove(Object o) {
-      throw new UnsupportedOperationException("remove");
-    }
-
-
-    /**
-     * Not supported.
-     *
-     * @throws UnsupportedOperationException  always
-     */
-    @Override
-    public boolean removeAll(Collection<?> c) {
-      throw new UnsupportedOperationException("removeAll");
-    }
-
-
-    /**
-     * Not supported.
-     *
-     * @throws UnsupportedOperationException  always
-     */
-    @Override
-    public boolean removeIf(@NotNull Predicate<? super String> filter) {
-      throw new UnsupportedOperationException("removeIf");
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public void forEach(Consumer<? super String> action)
-    {
-      requireNonNull(action);
-
-      for(int n = 0, l = parameters.length; n < l; n += 2)
-        action.accept((String)parameters[n]);
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public @NotNull Iterator<String> iterator()
-    {
-      return parameters.length == 0
-          ? emptyIterator()
-          : new NameIterator(MessageParameters.this);
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public @NotNull Spliterator<String> spliterator()
-    {
-      return parameters.length == 0
-          ? emptySpliterator()
-          : new NameSpliterator(MessageParameters.this);
-    }
-
-
-    @Override
-    public String toString()
-    {
-      if (isEmpty())
-        return "[]";
-
-      final var s = new StringBuilder("[");
-
-      for(int n = 0, l = parameters.length; n < l; n += 2)
-      {
-        if (n > 0)
-          s.append(", ");
-
-        s.append((String)parameters[n]);
-      }
-
-      return s.append(']').toString();
-    }
-  }
-
-
-
-
-  /**
-   * Iterator over the parameter names in the sorted parameter array.
-   */
-  private static final class NameIterator implements Iterator<String>
-  {
-    private final Object[] parameters;
-    private int n = 0;
-
-
-    private NameIterator(@NotNull MessageParameters messageParameters) {
-      parameters = messageParameters.parameters;
-    }
-
-
-    @Override
-    public boolean hasNext() {
-      return n < parameters.length;
-    }
-
-
-    @Override
-    public String next()
-    {
-      if (!hasNext())
-        throw new NoSuchElementException("parameter name iterator out of bounds");
-
-      final var name = (String)parameters[n];
-      n += 2;
-
-      return name;
-    }
-  }
-
-
-
-
-  /**
-   * Spliterator over the parameter names in the sorted parameter array.
-   */
-  private static final class NameSpliterator implements Spliterator<String>
-  {
-    private final Object[] parameters;
-    private int n = 0;
-
-
-    private NameSpliterator(@NotNull MessageParameters messageParameters) {
-      parameters = messageParameters.parameters;
-    }
-
-
-    @Override
-    public boolean tryAdvance(Consumer<? super String> action)
-    {
-      if (n < parameters.length)
-      {
-        action.accept((String)parameters[n]);
-        n += 2;
-
-        return true;
-      }
-
-      return false;
-    }
-
-
-    @Override
-    public Spliterator<String> trySplit() {
-      return null;
-    }
-
-
-    @Override
-    public long estimateSize() {
-      return parameters.length >> 1;
-    }
-
-
-    @Override
-    public Comparator<? super String> getComparator() {
-      return null;
-    }
-
-
-    @Override
-    public int characteristics() {
-      return DISTINCT | IMMUTABLE | NONNULL | ORDERED | SORTED | SIZED;
-    }
+  public String toString() {
+    return "Parameters(locale=" + locale + ',' + parameters + ')';
   }
 }
