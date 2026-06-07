@@ -13,15 +13,15 @@ The task tracks its inputs and outputs through Gradle's incremental build system
 the inputs change between builds, Gradle skips the task entirely and reuses the cached output.
 
 The input properties are the source file collection, the pack filename, the compression flag,
-the duplicate message strategy, the template validation flag, and the include and exclude regex
-filter lists. The single output is the generated pack file, which is located at
-`build/messageFormatPack/<packFilename>` by default.
+the duplicate message strategy, the template validation flag, the template ignore patterns, and
+the include and exclude regex filter lists. The single output is the generated pack file, which
+is located at `<buildDir>/messageFormatPack/<packFilename>` by default.
 
 
 ## Scanning
 
 The task iterates over all `.class` files in its configured source collection and passes each
-one to an `AsmAnnotationAdopter`. The adopter reads `@MessageDef` and `@TemplateDef` annotations
+one to an `AnnotationAdopter`. The adopter reads `@MessageDef` and `@TemplateDef` annotations
 directly from the bytecode without loading the class into the JVM. Annotations are recognized on
 the class declaration itself and on every non-synthetic method in the class, in both their
 singular form and their repeatable container form (`@MessageDefs`, `@TemplateDefs`).
@@ -35,12 +35,18 @@ You can observe the scanning progress by running Gradle with increased log verbo
 class name as it is scanned. At the `trace` level, the full file path is logged alongside the
 class name.
 
+```shell
+# Show class-level scanning output
+./gradlew messageFormatPack --debug 2>&1 | grep "Scanning class"
+```
+
 
 ## Include and Exclude Filters
 
-The include and exclude regex filters configured through the [extension](extension.md) are
-forwarded to the task as conventions. They can also be set directly on the task if needed. The
-filters control which message codes are written to the pack file and which are skipped.
+The include and exclude regex filters configured through the [extension](extension.md) `messages`
+block are forwarded to the task as conventions. They can also be set directly on the task if
+needed. The filters control which message codes are written to the pack file and which are
+skipped.
 
 The filtering logic works as follows. If no include filters are defined, every scanned message is
 eligible. If at least one include filter is defined, a message is eligible only when its code
@@ -48,27 +54,77 @@ matches at least one of the include patterns. After that, if the message code ma
 pattern, it is removed from the output. Filters are standard Java regular expressions matched
 against the full message code string.
 
-The filters also apply during template validation. When `validateReferencedTemplates` is enabled,
+The filters also apply during template validation. When `validateReferences` is enabled,
 the task checks for missing templates only among messages that pass the filters. Messages that
 are excluded by the filters are not considered.
+
+To configure the filters directly on the task rather than through the extension:
+
+=== "Groovy DSL"
+
+    ```groovy
+    tasks.named('messageFormatPack') {
+      messages {
+        include 'ORDER-.*'
+        exclude '.*-DRAFT'
+      }
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    tasks.named<de.sayayi.plugin.gradle.message.MessageFormatPackTask>("messageFormatPack") {
+      messages {
+        include("ORDER-.*")
+        exclude(".*-DRAFT")
+      }
+    }
+    ```
 
 
 ## Template Validation
 
-When the `validateReferencedTemplates` property is `true` (the default), the task collects all
-template names referenced by the filtered messages and checks that each one has a corresponding
-`@TemplateDef` in the scanned classes. The check follows nested references as well: if template
-A references template B, then template B must also be present.
+When the `validateReferences` property in the `templates` block is `true` (the default), the
+task collects all template names referenced by the filtered messages and checks that each one has
+a corresponding `@TemplateDef` in the scanned classes. The check follows nested references as
+well: if template A references template B, then template B must also be present.
 
-If one or more templates are missing, the task fails with an error that lists the missing
-template names. For a single missing template the error reads
-`Missing message template: <name>`, and for multiple missing templates
-the error reads `Missing message templates: <name1>, <name2> and <name3>`.
+If one or more templates are missing (after applying the `ignore` patterns), the task fails with
+an error that lists the missing template names. For a single missing template the error reads
+`Missing message template: <name>`, and for multiple missing templates the error reads
+`Missing message templates: <name1>, <name2> and <name3>`.
 
 Disabling this check (by setting the property to `false`) can be useful when templates are
-loaded from a different source at runtime, for example from a separate pack file
-or through programmatic registration. Be aware that a missing template at runtime causes a
-formatting error when the message that references it is formatted.
+loaded from a different source at runtime, for example from a separate pack file or through
+programmatic registration. Be aware that a missing template at runtime causes a formatting error
+when the message that references it is formatted.
+
+The `ignore` method on the `templates` block allows selectively suppressing the validation for
+specific template names without disabling validation entirely. This is covered in detail on the
+[Extension](extension.md) page.
+
+=== "Groovy DSL"
+
+    ```groovy
+    tasks.named('messageFormatPack') {
+      templates {
+        validateReferences = true
+        ignore 'lib-.*'
+      }
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    tasks.named<de.sayayi.plugin.gradle.message.MessageFormatPackTask>("messageFormatPack") {
+      templates {
+        validateReferences.set(true)
+        ignore("lib-.*")
+      }
+    }
+    ```
 
 
 ## Duplicate Handling
@@ -87,7 +143,9 @@ warning at the `WARN` level with the same information. This lets you identify du
 failing the build.
 
 Note that two annotations with the same code or name and identical content are never considered
-duplicates. They are silently accepted regardless of the strategy.
+duplicates. They are silently accepted regardless of the strategy. This behavior is intentional
+and allows the same message definition to appear in multiple classes (for example, in shared
+interfaces) without triggering duplicate handling logic.
 
 
 ## Custom Actions
@@ -97,18 +155,31 @@ validation, but before the pack file is written. Each action receives a `Message
 provides read-only access to all scanned messages and templates. This is useful for build-time
 analysis, reporting, or validation that goes beyond what the built-in checks offer.
 
-Actions are registered using the `action` method on the task. If you configure the task through
-the `messageFormatPack` task directly, the action block looks like this:
+Actions are registered using the `action` method on the task:
 
-```groovy
-tasks.named('messageFormatPack') {
-  action {
-    // 'it' is a MessageAccessor
-    println "Total messages: ${it.messageCodes.size()}"
-    println "Total templates: ${it.templateNames.size()}"
-  }
-}
-```
+=== "Groovy DSL"
+
+    ```groovy
+    tasks.named('messageFormatPack') {
+      action {
+        // 'it' is a MessageAccessor
+        println "Total messages: ${it.messageCodes.size()}"
+        println "Total templates: ${it.templateNames.size()}"
+      }
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    tasks.named<de.sayayi.plugin.gradle.message.MessageFormatPackTask>("messageFormatPack") {
+      action {
+        // 'it' is a MessageAccessor
+        println("Total messages: ${it.messageCodes.size}")
+        println("Total templates: ${it.templateNames.size}")
+      }
+    }
+    ```
 
 The `MessageAccessor` exposes methods such as `getMessageCodes()` to retrieve all collected
 message codes, `getTemplateNames()` to retrieve all template names, `hasMessageWithCode(String)`
@@ -118,24 +189,82 @@ A more elaborate example uses the action to find unused message codes in a prede
 Suppose all your messages follow a naming convention where each code starts with `ERR-` followed
 by a four-digit number. The following action prints the next ten available codes:
 
-```groovy
-tasks.named('messageFormatPack') {
-  action {
-    def codes = it.getMessageCodes()
-    def available = []
+=== "Groovy DSL"
 
-    for(int n = 1; available.size() < 10; n++) {
-      def code = String.format("ERR-%04d", n)
+    ```groovy
+    tasks.named('messageFormatPack') {
+      action {
+        def codes = it.getMessageCodes()
+        def available = []
 
-      if (!codes.contains(code))
-        available.add(code)
+        for(int n = 1; available.size() < 10; n++) {
+          def code = String.format("ERR-%04d", n)
+
+          if (!codes.contains(code))
+            available.add(code)
+        }
+
+        println "Available error codes:"
+        println String.join(" ", available)
+      }
     }
+    ```
 
-    println "Available error codes:"
-    println String.join(" ", available)
-  }
-}
-```
+=== "Kotlin DSL"
+
+    ```kotlin
+    tasks.named<de.sayayi.plugin.gradle.message.MessageFormatPackTask>("messageFormatPack") {
+      action {
+        val codes = it.messageCodes
+        val available = mutableListOf<String>()
+
+        var n = 1
+        while (available.size < 10) {
+          val code = String.format("ERR-%04d", n++)
+
+          if (!codes.contains(code))
+            available.add(code)
+        }
+
+        println("Available error codes:")
+        println(available.joinToString(" "))
+      }
+    }
+    ```
+
+Another practical use case is verifying that every message code matches a project-wide naming
+convention. The following action fails the build if any message code does not match the expected
+pattern:
+
+=== "Groovy DSL"
+
+    ```groovy
+    tasks.named('messageFormatPack') {
+      action {
+        def pattern = ~/^[A-Z]+-\d{4}$/
+
+        it.getMessageCodes().each { code ->
+          if (!(code ==~ pattern))
+            throw new GradleException("Message code '${code}' violates naming convention")
+        }
+      }
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    tasks.named<de.sayayi.plugin.gradle.message.MessageFormatPackTask>("messageFormatPack") {
+      action {
+        val pattern = Regex("^[A-Z]+-\\d{4}$")
+
+        it.messageCodes.forEach { code ->
+          if (!pattern.matches(code))
+            throw GradleException("Message code '$code' violates naming convention")
+        }
+      }
+    }
+    ```
 
 If multiple actions are registered, they are executed in the order they were defined. Each action
 receives the same `MessageAccessor` instance.
@@ -152,8 +281,8 @@ the task verifies that the produced file is a valid message format pack by check
 bytes. If the check fails, the task throws a `GradleException` with the message
 `Message pack file missing or corrupt`.
 
-The destination directory defaults to `build/messageFormatPack/`. The filename defaults to
-`messages.mfp` but can be changed through the `packFilename` property.
+The destination directory defaults to `<buildDir>/messageFormatPack/`. The filename defaults to the
+project name with a `.mfp` extension but can be changed through the `packFilename` property.
 
 
 ## Running the Task
@@ -170,4 +299,10 @@ on the [plugin overview page](index.md)), it also runs automatically as part of 
 
 ```shell
 ./gradlew jar
+```
+
+To inspect the task's up-to-date checks and see why it ran or was skipped, use the `--info` flag:
+
+```shell
+./gradlew messageFormatPack --info
 ```

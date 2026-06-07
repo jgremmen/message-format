@@ -21,14 +21,17 @@
  * The {@link de.sayayi.plugin.gradle.message.MessageFormatPlugin MessageFormatPlugin} provides the
  * {@code messageFormat} extension and registers the {@code messageFormatPack} task. The extension is represented by
  * {@link de.sayayi.plugin.gradle.message.MessageFormatExtension MessageFormatExtension} and allows configuring source
- * sets, pack filename, compression, duplicate handling strategy, template validation and include/exclude filters.
+ * sets, pack filename and compression. Message inclusion/exclusion filters and duplicate handling are configured via
+ * the nested {@link de.sayayi.plugin.gradle.message.MessageFormatMessagesExtension messages} block. Template
+ * validation and filtering are configured via the nested
+ * {@link de.sayayi.plugin.gradle.message.MessageFormatTemplatesExtension templates} block.
  * <p>
  * The {@link de.sayayi.plugin.gradle.message.MessageFormatPackTask MessageFormatPackTask} performs the actual scanning
  * and packing. It scans class files for message and template annotations, applies include/exclude filters based on
  * message codes and writes the result to a packed message file.
  * <p>
  * Duplicate message codes and template names are handled according to the configured
- * {@link de.sayayi.plugin.gradle.message.DuplicateMsgStrategy DuplicateMsgStrategy}.
+ * {@link de.sayayi.plugin.gradle.message.DuplicateStrategy DuplicateStrategy}.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

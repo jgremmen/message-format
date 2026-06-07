@@ -44,29 +44,42 @@ the [Pack Task](pack-task.md) page.
 
 ## Including the Pack File in Your Jar
 
-The `messageFormatPack` task produces its output in the `build/messageFormatPack/` directory. To
+The `messageFormatPack` task produces its output in the `<buildDir>/messageFormatPack/` directory. To
 include the generated pack file in your application jar, add a `from` directive to the `jar`
 task:
 
-```groovy
-jar {
-  from messageFormatPack {
-    into 'META-INF'
-  }
-}
-```
+=== "Groovy DSL"
+
+    ```groovy
+    jar {
+      from messageFormatPack {
+        into 'META-INF'
+      }
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    tasks.jar {
+      from(tasks.named("messageFormatPack")) {
+        into("META-INF")
+      }
+    }
+    ```
 
 This tells Gradle to copy the output of `messageFormatPack` into the `META-INF` directory inside
 the jar. Gradle automatically establishes a task dependency, so `messageFormatPack` runs before
 `jar` whenever you build the project.
 
-At runtime, you can then load the pack file from the classpath:
+At runtime, you can then load the pack file from the classpath. The default filename is derived
+from the project name (e.g. a project named `my-app` produces `my-app.mfp`):
 
 ```java
 var messageSupport = MessageSupportFactory.create(
     DefaultFormatterService.getSharedInstance());
 
-try(var in = getClass().getResourceAsStream("/META-INF/messages.mfp")) {
+try(var in = getClass().getResourceAsStream("/META-INF/my-app.mfp")) {
   messageSupport.importMessages(in);
 }
 // All messages and templates from the pack file are now available.
@@ -85,20 +98,37 @@ application. Suppose you have a class with a few message definitions:
 public class ShopMessages {}
 ```
 
-Your `build.gradle` applies the plugin and includes the pack file in the jar:
+Your build script applies the plugin and includes the pack file in the jar:
 
-```groovy
-plugins {
-  id 'java'
-  id 'de.sayayi.plugin.gradle.message'
-}
+=== "Groovy DSL"
 
-jar {
-  from messageFormatPack {
-    into 'META-INF'
-  }
-}
-```
+    ```groovy
+    plugins {
+      id 'java'
+      id 'de.sayayi.plugin.gradle.message'
+    }
+
+    jar {
+      from messageFormatPack {
+        into 'META-INF'
+      }
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    plugins {
+      java
+      id("de.sayayi.plugin.gradle.message")
+    }
+
+    tasks.jar {
+      from(tasks.named("messageFormatPack")) {
+        into("META-INF")
+      }
+    }
+    ```
 
 Running `./gradlew jar` compiles the source, scans the compiled classes for annotations, writes
 the pack file, and bundles it into the jar. At runtime:
@@ -107,7 +137,7 @@ the pack file, and bundles it into the jar. At runtime:
 var messageSupport = MessageSupportFactory.create(
     DefaultFormatterService.getSharedInstance());
 
-try(var in = getClass().getResourceAsStream("/META-INF/messages.mfp")) {
+try(var in = getClass().getResourceAsStream("/META-INF/shop.mfp")) {
   messageSupport.importMessages(in);
 }
 
@@ -117,3 +147,7 @@ messageSupport.code("greeting").with("name", "World").format();
 messageSupport.code("item-count").with("count", 5).format();
 // "5 items in stock."
 ```
+
+In this example the pack file is named `shop.mfp` because the Gradle project is named `shop`.
+If you need a different filename, configure the `packFilename` property in the `messageFormat`
+extension block as described on the [Extension](extension.md) page.

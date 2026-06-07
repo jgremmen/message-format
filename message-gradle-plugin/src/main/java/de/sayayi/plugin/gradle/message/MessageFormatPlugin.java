@@ -22,7 +22,7 @@ import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
 import org.jetbrains.annotations.NotNull;
 
-import static de.sayayi.plugin.gradle.message.DuplicateMsgStrategy.IGNORE_AND_WARN;
+import static de.sayayi.plugin.gradle.message.DuplicateStrategy.IGNORE_AND_WARN;
 import static org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME;
 
 
@@ -68,8 +68,8 @@ public class MessageFormatPlugin implements Plugin<@NotNull Project>
 
     messageFormatExtension.getPackFilename().convention(project.provider(() -> project.getName() + ".mfp"));
     messageFormatExtension.getCompress().convention(false);
-    messageFormatExtension.getDuplicateMsgStrategy().convention(IGNORE_AND_WARN);
-    messageFormatExtension.getValidateReferencedTemplates().convention(true);
+    messageFormatExtension.getMessages().getDuplicateStrategy().convention(IGNORE_AND_WARN);
+    messageFormatExtension.getTemplates().getValidateReferences().convention(true);
 
     final var mainJavaSourceSet = extensions
         .getByType(JavaPluginExtension.class)
@@ -108,14 +108,20 @@ public class MessageFormatPlugin implements Plugin<@NotNull Project>
       // pack file
       packTask.getDestinationDir().convention(layout.getBuildDirectory().dir(packTask.getName()));
       packTask.getPackFilename().convention(extension.getPackFilename());
-
-      // settings
       packTask.getCompress().convention(extension.getCompress());
-      packTask.getDuplicateMsgStrategy().convention(extension.getDuplicateMsgStrategy());
-      packTask.getValidateReferencedTemplates().convention(extension.getValidateReferencedTemplates());
 
-      packTask.include(extension.getIncludeRegexFilters().toArray(String[]::new));
-      packTask.exclude(extension.getExcludeRegexFilters().toArray(String[]::new));
+      // messages { ... }
+      final var messagesExtension = extension.getMessages();
+      final var packTaskMessages = packTask.getMessages();
+
+      packTaskMessages.getDuplicateStrategy().convention(messagesExtension.getDuplicateStrategy());
+
+      packTaskMessages.include(messagesExtension.getIncludeRegexFilters().toArray(String[]::new));
+      packTaskMessages.exclude(messagesExtension.getExcludeRegexFilters().toArray(String[]::new));
+
+      // templates {... }
+      final var templatesExtension = extension.getTemplates();
+      packTask.getTemplates().getValidateReferences().convention(templatesExtension.getValidateReferences());
 
       packTask.dependsOn(mainSourceSet.getOutput());
     });

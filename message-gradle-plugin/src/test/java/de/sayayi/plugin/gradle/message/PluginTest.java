@@ -143,7 +143,9 @@ final class PluginTest
   {
     writeBuildGradle(List.of(
         "messageFormat {",
-        "  include '.*INNER.*'",
+        "  messages {",
+        "    include '.*INNER.*'",
+        "  }",
         "}"
     ));
 
@@ -185,14 +187,13 @@ final class PluginTest
   void testDuplicateMessage(@NotNull String duplicateMsgStrategy, boolean success)
       throws IOException
   {
-    writeBuildGradle(List.of("messageFormat.duplicateMsgStrategy = '" + duplicateMsgStrategy + "'"));
+    writeBuildGradle(List.of("messageFormat.messages.duplicateStrategy = '" + duplicateMsgStrategy + "'"));
 
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
     copy(getResource("test-source-2.java"),
         new File(testPackageDir, "Source2.java").toPath());
 
-    //noinspection TestFailedLine
     val runner = GradleRunner.create()
         .withProjectDir(testProjectDir)
         .withArguments("messageFormatPack")
@@ -247,9 +248,8 @@ final class PluginTest
   @Contract(pure = true)
   private @NotNull MessageAccessor readMessagePack(@NotNull File pack) throws IOException
   {
-    val messageSupport = MessageSupportFactory.create(new GenericFormatterService());
-
-    return messageSupport
+    return MessageSupportFactory
+        .create(new GenericFormatterService())
         .importMessages(newInputStream(pack.toPath()))
         .getMessageAccessor();
   }

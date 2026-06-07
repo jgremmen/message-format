@@ -33,12 +33,14 @@ import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.logging.LogLevel;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
 import org.gradle.api.tasks.util.PatternFilterable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -46,10 +48,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static de.sayayi.lib.message.util.MessageUtil.isMessageFormatPack;
-import static de.sayayi.plugin.gradle.message.DuplicateMsgStrategy.IGNORE_AND_WARN;
+import static de.sayayi.plugin.gradle.message.DuplicateStrategy.IGNORE_AND_WARN;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
-import static java.util.Collections.unmodifiableList;
 import static java.util.Locale.ROOT;
 import static org.gradle.api.logging.LogLevel.ERROR;
 import static org.gradle.api.logging.LogLevel.WARN;
@@ -72,8 +73,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
   private static final Action<@NotNull PatternFilterable> CLASS_FILES =
       patternFilterable -> patternFilterable.include("**/*.class");
 
-  private final List<String> includeRegexFilters = new ArrayList<>();
-  private final List<String> excludeRegexFilters = new ArrayList<>();
+  private final MessageFormatMessagesExtension messages;
+  private final MessageFormatTemplatesExtension templates;
   private final List<Action<@NotNull MessageAccessor>> actionList = new ArrayList<>();
 
   private final ThreadLocal<String> currentClassName = new ThreadLocal<>();
@@ -81,12 +82,91 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   /**
    * Gradle task constructor.
+   *
+   * @param objectFactory  Gradle object factory for creating managed instances
    */
-  public MessageFormatPackTask()
+  @Inject
+  public MessageFormatPackTask(@NotNull ObjectFactory objectFactory)
   {
+    messages = objectFactory.newInstance(MessageFormatMessagesExtension.class);
+    messages.getDuplicateStrategy().convention(IGNORE_AND_WARN);
+
+    templates = objectFactory.newInstance(MessageFormatTemplatesExtension.class);
+    templates.getValidateReferences().convention(true);
+
     getCompress().convention(false);
-    getDuplicateMsgStrategy().convention(IGNORE_AND_WARN);
-    getValidateReferencedTemplates().convention(true);
+  }
+
+
+  /**
+   * Returns the nested messages extension for configuring message inclusion/exclusion filters and
+   * duplicate message handling strategy.
+   *
+   * @return  nested messages extension, never {@code null}
+   *
+   * @since 0.24.0
+   */
+  @Nested
+  public MessageFormatMessagesExtension getMessages() {
+    return messages;
+  }
+
+
+  /**
+   * Configures the nested {@code messages} block.
+   * <p>
+   * Example usage:
+   * <pre>
+   *   messageFormatPack {
+   *     messages {
+   *       include 'xy'
+   *       exclude 'r.*'
+   *       duplicateStrategy = 'fail'
+   *     }
+   *   }
+   * </pre>
+   *
+   * @param action  configuration action for the messages extension, not {@code null}
+   *
+   * @since 0.24.0
+   */
+  public void messages(@NotNull Action<? super MessageFormatMessagesExtension> action) {
+    action.execute(messages);
+  }
+
+
+  /**
+   * Returns the nested templates extension for configuring template validation and filtering.
+   *
+   * @return  nested templates extension, never {@code null}
+   *
+   * @since 0.24.0
+   */
+  @Nested
+  public MessageFormatTemplatesExtension getTemplates() {
+    return templates;
+  }
+
+
+  /**
+   * Configures the nested {@code templates} block.
+   * <p>
+   * Example usage:
+   * <pre>
+   *   messageFormatPack {
+   *     templates {
+   *       validateReferences = true
+   *       ignore 'tpl-.*'
+   *     }
+   *   }
+   * </pre>
+   *
+   * @param action  configuration action for the templates extension, not {@code null}
+   *
+   * @since 0.24.0
+   */
+  public void templates(@NotNull Action<? super MessageFormatTemplatesExtension> action) {
+    action.execute(templates);
   }
 
 
@@ -109,36 +189,6 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Return a list of regular expressions which will be matched against each message code. If it matches, the message
-   * will be included in the packed message file. If it doesn't match the message is skipped.
-   * <p>
-   * If the list is empty, all messages are included, unless they're explicitly excluded.
-   *
-   * @return  list of regular expressions for message inclusion, never {@code null}
-   *
-   * @see #getExcludeRegexFilters()
-   */
-  @Input
-  public List<String> getIncludeRegexFilters() {
-    return unmodifiableList(includeRegexFilters);
-  }
-
-
-  /**
-   * Return a list of regular expressions which will be matched against each message code. If it matches, the message
-   * will be excluded from the packed message file. If it doesn't match the message is included.
-   *
-   * @return  list of regular expressions for message exclusion, never {@code null}
-   *
-   * @see #getIncludeRegexFilters()
-   */
-  @Input
-  public List<String> getExcludeRegexFilters() {
-    return unmodifiableList(excludeRegexFilters);
-  }
-
-
-  /**
    * Returns a collection of source files to scan for message and template annotations.
    * <p>
    * There's no restriction on what kind of files are in the collection. This task will only use and scan class
@@ -155,47 +205,15 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Property containing the strategy to use in case a duplicate message code or template name (with different message
-   * definition) is found. The default strategy is {@link DuplicateMsgStrategy#IGNORE_AND_WARN IGNORE_AND_WARN}.
-   * <p>
-   * This property accepts various formats:
-   * <ul>
-   *   <li>
-   *     {@link DuplicateMsgStrategy} enum value (e.g. {@link DuplicateMsgStrategy#FAIL FAIL})
-   *   </li>
-   *   <li>
-   *     Strategy string. The string is converted to uppercase, dashes are translated to underscores and the resulting
-   *     strategy name is matched against {@link DuplicateMsgStrategy} (e.g. {@code 'override-and-warn'} matches
-   *     {@link DuplicateMsgStrategy#OVERRIDE_AND_WARN OVERRIDE_AND_WARN})
-   *   </li>
-   * </ul>
-   * <p>
-   * A duplicate is either a message with an already known message code or a template with an already known template
-   * name and a different message definition. This means that if the same message or template is encountered twice,
-   * it is not considered a duplicate.
+   * Add all outputs for the given {@code sourceSet} to the collection of sources.
    *
-   * @return  duplicate message strategy property, never {@code null}
+   * @param sourceSet  source set to include in message/template scanning
    *
-   * @see DuplicateMsgStrategy
+   * @see #getSources()
    */
-  @Input
-  public abstract Property<@NotNull Object> getDuplicateMsgStrategy();
-
-
-  /**
-   * Property containing a boolean stating whether to validate referenced templates. The default value resolves to
-   * {@code true}.
-   * <p>
-   * If the property resolves to {@code true} the task will check whether all reference templates (including nested
-   * templates) are available and included in the packed message file.
-   * <p>
-   * If the property resolves to {@code false} no checks are performed. This may lead to a situation where a message
-   * cannot be formatted if the referenced template is missing from the message support.
-   *
-   * @return  validate referenced templates property, never {@code null}
-   */
-  @Input
-  public abstract Property<@NotNull Boolean> getValidateReferencedTemplates();
+  public void sourceSet(SourceSet sourceSet) {
+    getSources().from(sourceSet.getOutput());
+  }
 
 
   /**
@@ -215,42 +233,6 @@ public abstract class MessageFormatPackTask extends DefaultTask
   @OutputFile
   public RegularFile getPackFile() {
     return getDestinationDir().file(getPackFilename()).get();
-  }
-
-
-  /**
-   * Include messages matching the {@code regex}.
-   *
-   * @param regex  regex matching message codes
-   *
-   * @see #getIncludeRegexFilters()
-   */
-  public void include(String... regex) {
-    includeRegexFilters.addAll(List.of(regex));
-  }
-
-
-  /**
-   * Exclude messages matching the {@code regex}.
-   *
-   * @param regex  regex matching message codes
-   *
-   * @see #getExcludeRegexFilters()
-   */
-  public void exclude(String... regex) {
-    excludeRegexFilters.addAll(List.of(regex));
-  }
-
-
-  /**
-   * Add all outputs for the given {@code sourceSet} to the collection of sources.
-   *
-   * @param sourceSet  source set to include in message/template scanning
-   *
-   * @see #getSources()
-   */
-  public void sourceSet(SourceSet sourceSet) {
-    getSources().from(sourceSet.getOutput());
   }
 
 
@@ -349,14 +331,33 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void pack_validateTemplates(@NotNull MessageSupport messageSupport)
   {
-    if (getValidateReferencedTemplates().get())
-    {
-      getLogger().debug("Validating referenced templates");
+    final var templates = getTemplates();
 
-      var missingTemplateNames = new ArrayList<>(messageSupport
+    if (templates.getValidateReferences().get())
+    {
+      final var logger = getLogger();
+
+      logger.debug("Validating referenced templates");
+
+      final var missingTemplateNames = new ArrayList<>(messageSupport
           .getMessageAccessor()
           .findMissingTemplates(this::messageCodeFilter));
-      var count = missingTemplateNames.size();
+      final var ignoreRegexFilters = templates.getIgnoreRegexFilters();
+
+      for(var iterator = missingTemplateNames.iterator(); iterator.hasNext();)
+      {
+        final var templateName = iterator.next();
+
+        for(var ignoreRegex: ignoreRegexFilters)
+          if (ignoreRegex.matches(templateName))
+          {
+            logger.debug("Ignore missing template '{}'", templateName);
+            iterator.remove();
+            break;
+          }
+      }
+
+      final var count = missingTemplateNames.size();
 
       switch(count)
       {
@@ -403,6 +404,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private boolean messageCodeFilter(@NotNull String code)
   {
+    var includeRegexFilters = messages.getIncludeRegexFilters();
+    var excludeRegexFilters = messages.getExcludeRegexFilters();
     var match = includeRegexFilters.isEmpty();
 
     if (!match)
@@ -453,12 +456,12 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   @Contract(pure = true)
-  private @NotNull DuplicateMsgStrategy configureDuplicatesStrategy_toEnum()
+  private @NotNull DuplicateStrategy configureDuplicatesStrategy_toEnum()
   {
-    var value = getDuplicateMsgStrategy().get();
+    var value = messages.getDuplicateStrategy().get();
 
-    if (value instanceof DuplicateMsgStrategy)
-      return (DuplicateMsgStrategy)value;
+    if (value instanceof DuplicateStrategy)
+      return (DuplicateStrategy)value;
 
     if (value instanceof GString)
       value = ((GString)value).toString();
@@ -468,7 +471,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
       var valueAsIs = ((String)value).toUpperCase(ROOT);
       var valueUnderscore = valueAsIs.replace('-', '_');
 
-      for(var ds: DuplicateMsgStrategy.values())
+      for(var ds: DuplicateStrategy.values())
         if (ds.name().equals(valueAsIs) ||
             ds.name().equals(valueUnderscore))
           return ds;

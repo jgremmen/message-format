@@ -2,25 +2,40 @@
 
 The `messageFormat` extension is the central configuration point for the Gradle plugin. All
 properties set on the extension are forwarded as conventions to the `messageFormatPack` task, so
-in most cases you only need to configure the extension and the task will pick up the values
+in most cases you only need to configure the extension and the task picks up the values
 automatically.
 
+The extension is organized into top-level properties that control the output file and source
+scanning, and two nested blocks (`messages` and `templates`) that control filtering, duplicate
+handling, and template validation respectively.
 
-## Properties
+
+## Top-Level Properties
 
 ### `packFilename`
 
-The name of the output pack file. The default value is `messages.mfp`. If your project produces
-multiple pack files (for example, one per subproject in a multi-project build), you can give each
-one a distinct name to avoid collisions:
+The name of the output pack file. The default value is the Gradle project name with a `.mfp`
+extension appended. For a project named `billing`, the default pack filename is `billing.mfp`.
+If your project produces multiple pack files (for example, one per subproject in a multi-project
+build), you can assign each one a distinct name to avoid collisions:
 
-```groovy
-messageFormat {
-  packFilename = 'orders-messages.mfp'
-}
-```
+=== "Groovy DSL"
 
-The file is written to the task's destination directory (`build/messageFormatPack/` by default).
+    ```groovy
+    messageFormat {
+      packFilename = 'orders-messages.mfp'
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    messageFormat {
+      packFilename.set("orders-messages.mfp")
+    }
+    ```
+
+The file is written to the task's destination directory (`<buildDir>/messageFormatPack/` by default).
 Only the filename is configured here, not the full path.
 
 
@@ -31,22 +46,109 @@ binary pack format already uses extensive bit-packing, so compression may not re
 noticeably for small message sets. For larger sets with hundreds or thousands of messages,
 enabling compression can reduce the file size significantly:
 
-```groovy
-messageFormat {
-  compress = true
-}
-```
+=== "Groovy DSL"
+
+    ```groovy
+    messageFormat {
+      compress = true
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    messageFormat {
+      compress.set(true)
+    }
+    ```
 
 Compressed and uncompressed pack files are both imported the same way at runtime. The
 `importMessages` method detects the format automatically.
 
 
-### `duplicateMsgStrategy`
+## Source Sets
+
+By default, the plugin scans the output of the `main` source set, which means all compiled
+`.class` files under `<buildDir>/classes/java/main/`. If your messages and templates are defined in
+additional source sets, you can add them to the scan with the `sourceSet` method:
+
+=== "Groovy DSL"
+
+    ```groovy
+    messageFormat {
+      sourceSet sourceSets.main
+      sourceSet sourceSets.test
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    messageFormat {
+      sourceSet(sourceSets.main.get())
+      sourceSet(sourceSets.test.get())
+    }
+    ```
+
+You can also point the plugin at arbitrary file collections through the `sources` property. Only
+`.class` files in the collection are actually scanned; all other file types are ignored:
+
+=== "Groovy DSL"
+
+    ```groovy
+    messageFormat {
+      sources.from(files('libs/external-messages.jar'))
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    messageFormat {
+      sources.from(files("libs/external-messages.jar"))
+    }
+    ```
+
+This flexibility is useful when message definitions come from precompiled libraries or generated
+code that does not belong to a standard Gradle source set.
+
+
+## The `messages` Block
+
+The `messages` block configures how message codes are filtered and how duplicate definitions are
+handled. It is accessed as a nested closure inside the `messageFormat` extension:
+
+=== "Groovy DSL"
+
+    ```groovy
+    messageFormat {
+      messages {
+        duplicateStrategy = 'fail'
+        include 'ORDER-.*', 'INVOICE-.*'
+        exclude '.*-DRAFT'
+      }
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    messageFormat {
+      messages {
+        duplicateStrategy.set("fail")
+        include("ORDER-.*", "INVOICE-.*")
+        exclude(".*-DRAFT")
+      }
+    }
+    ```
+
+
+### `duplicateStrategy`
 
 Determines how the plugin handles duplicate message codes and template names. A duplicate occurs
-when two messages share the same code but have different message text, or when two templates share
-the same name but have different content. If two entries with the same code or name have identical
-content, they are silently accepted regardless of the strategy.
+when two messages share the same code but have different message text, or when two templates
+share the same name but have different content. If two entries with the same code or name have
+identical content, they are silently accepted regardless of the strategy.
 
 The default strategy is `IGNORE_AND_WARN`. The following strategies are available:
 
@@ -61,77 +163,64 @@ duplicate code and the class in which it was found.
 
 `FAIL` immediately stops the build with an error when a duplicate is encountered.
 
-The property accepts both the enum constant and a case-insensitive string. Dashes in the string
-are converted to underscores automatically, so all of the following are equivalent:
+The property accepts both a `DuplicateStrategy` enum constant and a case-insensitive string.
+Dashes in the string are converted to underscores automatically, so all of the following are
+equivalent:
 
-```groovy
-messageFormat {
-  duplicateMsgStrategy = 'FAIL'
-}
-```
+=== "Groovy DSL"
 
-```groovy
-messageFormat {
-  duplicateMsgStrategy = 'override-and-warn'
-}
-```
+    ```groovy
+    messageFormat {
+      messages {
+        duplicateStrategy = 'FAIL'
+      }
+    }
+    ```
 
-```groovy
-messageFormat {
-  duplicateMsgStrategy = 'IGNORE_AND_WARN'
-}
-```
+    ```groovy
+    messageFormat {
+      messages {
+        duplicateStrategy = 'override-and-warn'
+      }
+    }
+    ```
 
+    ```groovy
+    messageFormat {
+      messages {
+        duplicateStrategy = 'IGNORE_AND_WARN'
+      }
+    }
+    ```
 
-### `validateReferencedTemplates`
+=== "Kotlin DSL"
 
-Controls whether the plugin checks that all templates referenced by messages (including nested
-template references) are present in the scanned classes. The default value is `true`.
+    ```kotlin
+    messageFormat {
+      messages {
+        duplicateStrategy.set("FAIL")
+      }
+    }
+    ```
 
-When enabled, the task collects all template names that appear in `%[template-name]` references
-across all scanned messages and verifies that a corresponding `@TemplateDef` exists. If one or
-more templates are missing, the build fails with an error listing the missing template names.
-This catches broken template references early, at build time, rather than at runtime when a
-message is formatted.
+    ```kotlin
+    messageFormat {
+      messages {
+        duplicateStrategy.set("override-and-warn")
+      }
+    }
+    ```
 
-When disabled, no such validation is performed. This can be useful if templates are loaded from
-a different source at runtime, for example from a separate pack file or through programmatic
-registration:
-
-```groovy
-messageFormat {
-  validateReferencedTemplates = false
-}
-```
-
-
-## Source Sets
-
-By default, the plugin scans the output of the `main` source set, which means all compiled
-`.class` files under `build/classes/java/main/`. If your messages and templates are defined in
-additional source sets, you can add them to the scan with the `sourceSet` method:
-
-```groovy
-messageFormat {
-  sourceSet sourceSets.main
-  sourceSet sourceSets.test
-}
-```
-
-You can also point the plugin at arbitrary file collections through the `sources` property. Only
-`.class` files in the collection are actually scanned; all other file types are ignored:
-
-```groovy
-messageFormat {
-  sources.from(files('libs/external-messages.jar'))
-}
-```
-
-This flexibility is useful when message definitions come from precompiled libraries or generated
-code that does not belong to a standard Gradle source set.
+    ```kotlin
+    messageFormat {
+      messages {
+        duplicateStrategy.set("IGNORE_AND_WARN")
+      }
+    }
+    ```
 
 
-## Include and Exclude Filters
+### Include and Exclude Filters
 
 The `include` and `exclude` methods control which message codes end up in the pack file. Both
 accept one or more regular expressions that are matched against each message code found during
@@ -146,24 +235,159 @@ also matches an include pattern.
 The following example includes only message codes that start with `ORDER-` but excludes any
 codes ending in `-DRAFT`:
 
-```groovy
-messageFormat {
-  include 'ORDER-.*'
-  exclude '.*-DRAFT'
-}
-```
+=== "Groovy DSL"
+
+    ```groovy
+    messageFormat {
+      messages {
+        include 'ORDER-.*'
+        exclude '.*-DRAFT'
+      }
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    messageFormat {
+      messages {
+        include("ORDER-.*")
+        exclude(".*-DRAFT")
+      }
+    }
+    ```
 
 Multiple patterns can be passed in a single call or across multiple calls, and they accumulate:
 
-```groovy
-messageFormat {
-  include 'ORDER-.*', 'INVOICE-.*'
-  exclude '.*-INTERNAL'
-}
-```
+=== "Groovy DSL"
+
+    ```groovy
+    messageFormat {
+      messages {
+        include 'ORDER-.*', 'INVOICE-.*'
+        exclude '.*-INTERNAL'
+      }
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    messageFormat {
+      messages {
+        include("ORDER-.*", "INVOICE-.*")
+        exclude(".*-INTERNAL")
+      }
+    }
+    ```
 
 Filters apply only to messages, not to templates. Templates are included automatically if they
 are referenced by any message that passes the filters.
+
+
+## The `templates` Block
+
+The `templates` block configures template reference validation and allows ignoring specific
+template names during that validation. It is accessed as a nested closure inside the
+`messageFormat` extension:
+
+=== "Groovy DSL"
+
+    ```groovy
+    messageFormat {
+      templates {
+        validateReferences = true
+        ignore 'shared-.*'
+      }
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    messageFormat {
+      templates {
+        validateReferences.set(true)
+        ignore("shared-.*")
+      }
+    }
+    ```
+
+
+### `validateReferences`
+
+Controls whether the plugin checks that all templates referenced by messages (including nested
+template references) are present in the scanned classes. The default value is `true`.
+
+When enabled, the task collects all template names that appear in `%[template-name]` references
+across all scanned messages and verifies that a corresponding `@TemplateDef` exists. If one or
+more templates are missing, the build fails with an error listing the missing template names.
+This catches broken template references early, at build time, rather than at runtime when a
+message is formatted.
+
+When disabled, no such validation is performed. This can be useful if templates are loaded from
+a different source at runtime, for example from a separate pack file or through programmatic
+registration:
+
+=== "Groovy DSL"
+
+    ```groovy
+    messageFormat {
+      templates {
+        validateReferences = false
+      }
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    messageFormat {
+      templates {
+        validateReferences.set(false)
+      }
+    }
+    ```
+
+
+### `ignore`
+
+The `ignore` method accepts one or more regular expressions that are matched against template
+names during validation. If a missing template's name matches any of the ignore patterns, the
+validation does not report it as an error. This is particularly useful when certain templates are
+expected to be provided by a different module or registered programmatically at runtime, while
+you still want validation to catch genuinely missing templates.
+
+Consider a project that references templates from a shared library that is loaded separately at
+runtime. Without the `ignore` method, you would have to disable validation entirely and lose the
+safety net for your own templates. With `ignore`, you can selectively suppress the check for
+known external templates:
+
+=== "Groovy DSL"
+
+    ```groovy
+    messageFormat {
+      templates {
+        validateReferences = true
+        ignore 'shared-.*', 'external-footer'
+      }
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    messageFormat {
+      templates {
+        validateReferences.set(true)
+        ignore("shared-.*", "external-footer")
+      }
+    }
+    ```
+
+In this example, templates whose name starts with `shared-` or equals `external-footer` will not
+cause validation failures even if they are absent from the scanned classes. All other template
+references are still validated normally.
 
 
 ## Single-Project Configuration
@@ -171,32 +395,64 @@ are referenced by any message that passes the filters.
 A typical single-project setup requires very little configuration. Apply the plugin, optionally
 adjust the extension properties, and wire the pack file into the jar:
 
-```groovy
-plugins {
-  id 'java'
-  id 'de.sayayi.plugin.gradle.message'
-}
+=== "Groovy DSL"
 
-dependencies {
-  implementation 'de.sayayi.lib:message-format-annotations:<version>'
-}
+    ```groovy
+    plugins {
+      id 'java'
+      id 'de.sayayi.plugin.gradle.message'
+    }
 
-messageFormat {
-  compress = true
-  duplicateMsgStrategy = 'fail'
-}
+    dependencies {
+      implementation 'de.sayayi.lib:message-format-annotations:<version>'
+    }
 
-jar {
-  from messageFormatPack {
-    into 'META-INF'
-  }
-}
-```
+    messageFormat {
+      compress = true
+
+      messages {
+        duplicateStrategy = 'fail'
+      }
+    }
+
+    jar {
+      from messageFormatPack {
+        into 'META-INF'
+      }
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    plugins {
+      java
+      id("de.sayayi.plugin.gradle.message")
+    }
+
+    dependencies {
+      implementation("de.sayayi.lib:message-format-annotations:<version>")
+    }
+
+    messageFormat {
+      compress.set(true)
+
+      messages {
+        duplicateStrategy.set("fail")
+      }
+    }
+
+    tasks.jar {
+      from(tasks.named("messageFormatPack")) {
+        into("META-INF")
+      }
+    }
+    ```
 
 With this configuration in place, running `./gradlew jar` compiles your Java sources, scans the
-compiled classes for `@MessageDef` and `@TemplateDef` annotations, produces a compressed
-`messages.mfp` file, and bundles it into `META-INF/` inside the jar. The build fails immediately
-if two classes define the same message code with different text.
+compiled classes for `@MessageDef` and `@TemplateDef` annotations, produces a compressed pack
+file, and bundles it into `META-INF/` inside the jar. The build fails immediately if two classes
+define the same message code with different text.
 
 
 ## Multi-Project Configuration
@@ -210,57 +466,89 @@ The simplest approach is to apply the plugin independently to each subproject th
 message definitions. Every subproject produces its own `.mfp` file, and at runtime the
 application imports all of them:
 
-```groovy
-// settings.gradle
-rootProject.name = 'my-application'
-include 'core', 'orders', 'billing'
-```
+=== "Groovy DSL"
 
-```groovy
-// core/build.gradle
-plugins {
-  id 'java-library'
-  id 'de.sayayi.plugin.gradle.message'
-}
+    ```groovy
+    // settings.gradle
+    rootProject.name = 'my-application'
+    include 'core', 'orders', 'billing'
+    ```
 
-messageFormat {
-  packFilename = 'core-messages.mfp'
-}
+    ```groovy
+    // core/build.gradle
+    plugins {
+      id 'java-library'
+      id 'de.sayayi.plugin.gradle.message'
+    }
 
-jar {
-  from messageFormatPack {
-    into 'META-INF'
-  }
-}
-```
+    jar {
+      from messageFormatPack {
+        into 'META-INF'
+      }
+    }
+    ```
 
-```groovy
-// orders/build.gradle
-plugins {
-  id 'java-library'
-  id 'de.sayayi.plugin.gradle.message'
-}
+    ```groovy
+    // orders/build.gradle
+    plugins {
+      id 'java-library'
+      id 'de.sayayi.plugin.gradle.message'
+    }
 
-messageFormat {
-  packFilename = 'orders-messages.mfp'
-}
+    jar {
+      from messageFormatPack {
+        into 'META-INF'
+      }
+    }
+    ```
 
-jar {
-  from messageFormatPack {
-    into 'META-INF'
-  }
-}
-```
+=== "Kotlin DSL"
 
-At runtime, import each pack file separately:
+    ```kotlin
+    // settings.gradle.kts
+    rootProject.name = "my-application"
+    include("core", "orders", "billing")
+    ```
+
+    ```kotlin
+    // core/build.gradle.kts
+    plugins {
+      `java-library`
+      id("de.sayayi.plugin.gradle.message")
+    }
+
+    tasks.jar {
+      from(tasks.named("messageFormatPack")) {
+        into("META-INF")
+      }
+    }
+    ```
+
+    ```kotlin
+    // orders/build.gradle.kts
+    plugins {
+      `java-library`
+      id("de.sayayi.plugin.gradle.message")
+    }
+
+    tasks.jar {
+      from(tasks.named("messageFormatPack")) {
+        into("META-INF")
+      }
+    }
+    ```
+
+Because the default pack filename is derived from the project name, the `core` subproject
+produces `core.mfp` and the `orders` subproject produces `orders.mfp` without any additional
+configuration. At runtime, import each pack file separately:
 
 ```java
 var messageSupport = MessageSupportFactory.create(
     DefaultFormatterService.getSharedInstance());
 
 for(var resource: List.of(
-    "/META-INF/core-messages.mfp",
-    "/META-INF/orders-messages.mfp")) {
+    "/META-INF/core.mfp",
+    "/META-INF/orders.mfp")) {
   try(var in = getClass().getResourceAsStream(resource)) {
     messageSupport.importMessages(in);
   }
@@ -275,23 +563,51 @@ This approach keeps each subproject self-contained and allows independent builds
 If many subprojects share the same plugin configuration, you can define it once in a convention
 plugin or a `subprojects` block in the root build script to avoid repetition:
 
-```groovy
-// build.gradle (root)
-subprojects {
-  plugins.withId('de.sayayi.plugin.gradle.message') {
-    messageFormat {
-      compress = true
-      duplicateMsgStrategy = 'ignore-and-warn'
-    }
+=== "Groovy DSL"
 
-    jar {
-      from messageFormatPack {
-        into 'META-INF'
+    ```groovy
+    // build.gradle (root)
+    subprojects {
+      plugins.withId('de.sayayi.plugin.gradle.message') {
+        messageFormat {
+          compress = true
+
+          messages {
+            duplicateStrategy = 'ignore-and-warn'
+          }
+        }
+
+        jar {
+          from messageFormatPack {
+            into 'META-INF'
+          }
+        }
       }
     }
-  }
-}
-```
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    // build.gradle.kts (root)
+    subprojects {
+      plugins.withId("de.sayayi.plugin.gradle.message") {
+        configure<de.sayayi.plugin.gradle.message.MessageFormatExtension> {
+          compress.set(true)
+
+          messages {
+            duplicateStrategy.set("ignore-and-warn")
+          }
+        }
+
+        tasks.named<Jar>("jar") {
+          from(tasks.named("messageFormatPack")) {
+            into("META-INF")
+          }
+        }
+      }
+    }
+    ```
 
 Each subproject still applies the plugin itself, but the configuration block in the root project
 ensures that all subprojects share the same compression and duplicate handling settings. The
@@ -304,38 +620,75 @@ If you prefer a single pack file that contains all messages from all subprojects
 configure one subproject (or the root project) to scan the compiled classes of multiple
 subprojects:
 
-```groovy
-// app/build.gradle
-plugins {
-  id 'java'
-  id 'de.sayayi.plugin.gradle.message'
-}
+=== "Groovy DSL"
 
-dependencies {
-  implementation project(':core')
-  implementation project(':orders')
-  implementation project(':billing')
-}
+    ```groovy
+    // app/build.gradle
+    plugins {
+      id 'java'
+      id 'de.sayayi.plugin.gradle.message'
+    }
 
-messageFormat {
-  sourceSet project(':core').sourceSets.main
-  sourceSet project(':orders').sourceSets.main
-  sourceSet project(':billing').sourceSets.main
-  duplicateMsgStrategy = 'fail'
-}
+    dependencies {
+      implementation project(':core')
+      implementation project(':orders')
+      implementation project(':billing')
+    }
 
-jar {
-  from messageFormatPack {
-    into 'META-INF'
-  }
-}
-```
+    messageFormat {
+      sourceSet project(':core').sourceSets.main
+      sourceSet project(':orders').sourceSets.main
+      sourceSet project(':billing').sourceSets.main
 
-This configuration produces a single `messages.mfp` containing all messages and templates from
-the `core`, `orders`, and `billing` subprojects, plus any messages defined in `app` itself
-(because the plugin always includes the `main` source set by default). Because the sources from
-other subprojects are added explicitly, the task also depends on their compilation output, so
-Gradle compiles all three subprojects before scanning.
+      messages {
+        duplicateStrategy = 'fail'
+      }
+    }
+
+    jar {
+      from messageFormatPack {
+        into 'META-INF'
+      }
+    }
+    ```
+
+=== "Kotlin DSL"
+
+    ```kotlin
+    // app/build.gradle.kts
+    plugins {
+      java
+      id("de.sayayi.plugin.gradle.message")
+    }
+
+    dependencies {
+      implementation(project(":core"))
+      implementation(project(":orders"))
+      implementation(project(":billing"))
+    }
+
+    messageFormat {
+      sourceSet(project(":core").sourceSets.main.get())
+      sourceSet(project(":orders").sourceSets.main.get())
+      sourceSet(project(":billing").sourceSets.main.get())
+
+      messages {
+        duplicateStrategy.set("fail")
+      }
+    }
+
+    tasks.jar {
+      from(tasks.named("messageFormatPack")) {
+        into("META-INF")
+      }
+    }
+    ```
+
+This configuration produces a single pack file containing all messages and templates from the
+`core`, `orders`, and `billing` subprojects, plus any messages defined in `app` itself (because
+the plugin always includes the `main` source set by default). Because the sources from other
+subprojects are added explicitly, the task also depends on their compilation output, so Gradle
+compiles all three subprojects before scanning.
 
 Using the `FAIL` strategy in an aggregated setup is recommended because it catches accidental
 code collisions between subprojects at build time.

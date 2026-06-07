@@ -15,20 +15,22 @@
  */
 package de.sayayi.plugin.gradle.message;
 
+import org.gradle.api.Action;
 import org.gradle.api.file.ConfigurableFileCollection;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Nested;
 import org.gradle.api.tasks.SourceSet;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.inject.Inject;
 
 
 /**
  * Gradle extension {@code messageFormat} for configuring the {@link MessageFormatPackTask messageFormatPack} task.
  * <p>
- * This extension allows configuring the pack filename, compression, duplicate message handling strategy, template
- * validation, source sets to scan and include/exclude filters for message codes.
+ * This extension allows configuring the pack filename, compression, template validation, source sets to scan and
+ * message inclusion/exclusion filters via the nested {@code messages} block.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -38,39 +40,91 @@ import java.util.List;
  */
 public abstract class MessageFormatExtension
 {
-  private final List<String> includeRegexFilter = new ArrayList<>();
-  private final List<String> excludeRegexFilter = new ArrayList<>();
+  private final MessageFormatMessagesExtension messages;
+  private final MessageFormatTemplatesExtension templates;
 
 
   /**
-   * Return a list of regular expressions which will be matched against each message code. If it matches, the message
-   * will be included in the packed message file. If it doesn't match the message is skipped.
-   * <p>
-   * If the list is empty, all messages are included, unless they're explicitly excluded.
+   * Creates the extension and instantiates the nested {@code messages} extension.
    *
-   * @return  list of regular expressions for message inclusion, never {@code null}
-   *
-   * @see #getExcludeRegexFilters()
-   *
-   * @since 0.8.0 (renamed in 0.9.1)
+   * @param objectFactory  Gradle object factory for creating managed instances
    */
-  public List<String> getIncludeRegexFilters() {
-    return includeRegexFilter;
+  @Inject
+  public MessageFormatExtension(@NotNull ObjectFactory objectFactory)
+  {
+    messages = objectFactory.newInstance(MessageFormatMessagesExtension.class);
+    templates = objectFactory.newInstance(MessageFormatTemplatesExtension.class);
   }
 
 
   /**
-   * Return a list of regular expressions which will be matched against each message code. If it matches, the message
-   * will be excluded from the packed message file. If it doesn't match the message is included.
+   * Returns the nested messages extension for configuring message inclusion/exclusion filters and
+   * duplicate message handling strategy.
    *
-   * @return  list of regular expressions for message exclusion, never {@code null}
+   * @return  nested messages extension, never {@code null}
    *
-   * @see #getIncludeRegexFilters()
-   *
-   * @since 0.8.0 (renamed in 0.9.1)
+   * @since 0.24.0
    */
-  public List<String> getExcludeRegexFilters() {
-    return excludeRegexFilter;
+  public MessageFormatMessagesExtension getMessages() {
+    return messages;
+  }
+
+
+  /**
+   * Configures the nested {@code messages} block.
+   * <p>
+   * Example usage:
+   * <pre>
+   *   messageFormat {
+   *     messages {
+   *       include 'xy'
+   *       exclude 'r.*'
+   *       duplicateStrategy = 'fail'
+   *     }
+   *   }
+   * </pre>
+   *
+   * @param action  configuration action for the messages extension, not {@code null}
+   *
+   * @since 0.24.0
+   */
+  public void messages(@NotNull Action<? super MessageFormatMessagesExtension> action) {
+    action.execute(messages);
+  }
+
+
+  /**
+   * Returns the nested templates extension for configuring template validation and filtering.
+   *
+   * @return  nested templates extension, never {@code null}
+   *
+   * @since 0.24.0
+   */
+  @Nested
+  public MessageFormatTemplatesExtension getTemplates() {
+    return templates;
+  }
+
+
+  /**
+   * Configures the nested {@code templates} block.
+   * <p>
+   * Example usage:
+   * <pre>
+   *   messageFormat {
+   *     templates {
+   *       validateReferences = true
+   *       ignore 'tpl-.*'
+   *     }
+   *   }
+   * </pre>
+   *
+   * @param action  configuration action for the templates extension, not {@code null}
+   *
+   * @since 0.24.0
+   */
+  public void templates(@NotNull Action<? super MessageFormatTemplatesExtension> action) {
+    action.execute(templates);
   }
 
 
@@ -105,76 +159,6 @@ public abstract class MessageFormatExtension
    * @see #sourceSet(SourceSet)
    */
   public abstract ConfigurableFileCollection getSources();
-
-
-  /**
-   * Property containing the strategy to use in case a duplicate message code or template name (with different message
-   * definition) is found. The default strategy is {@link DuplicateMsgStrategy#IGNORE_AND_WARN IGNORE_AND_WARN}.
-   * <p>
-   * This property accepts various formats:
-   * <ul>
-   *   <li>
-   *     {@link DuplicateMsgStrategy} enum value (e.g. {@link DuplicateMsgStrategy#FAIL FAIL})
-   *   </li>
-   *   <li>
-   *     Duplicate strategy string. The string is converted to uppercase, dashes are translated to underscores and the
-   *     resulting strategy name is matched against {@link DuplicateMsgStrategy} (e.g. {@code 'override-and-warn'}
-   *     matches {@link DuplicateMsgStrategy#OVERRIDE_AND_WARN OVERRIDE_AND_WARN})
-   *   </li>
-   * </ul>
-   * <p>
-   * A duplicate is either a message with an already known message code or a template with an already known template
-   * name and a different message definition. This means that if the same message or template is encountered twice, it
-   * is not considered a duplicate.
-   *
-   * @return  duplicate message strategy property, never {@code null}
-   *
-   * @see DuplicateMsgStrategy
-   */
-  public abstract Property<@NotNull Object> getDuplicateMsgStrategy();
-
-
-  /**
-   * Property containing a boolean stating whether to validate referenced templates. The default value resolves to
-   * {@code true}.
-   * <p>
-   * If the property resolves to {@code true} the task will check whether all referenced templates (including nested
-   * templates) are available and included in the packed message file.
-   * <p>
-   * If the property resolves to {@code false} no checks are performed. This may lead to a situation where a message
-   * cannot be formatted if the referenced template is missing from the message support.
-   *
-   * @return  validate referenced templates property, never {@code null}
-   */
-  public abstract Property<@NotNull Boolean> getValidateReferencedTemplates();
-
-
-  /**
-   * Include messages that match the given regular expressions.
-   *
-   * @param regex  array of regular expressions, not {@code null}
-   *
-   * @see #getIncludeRegexFilters()
-   *
-   * @since 0.8.0
-   */
-  public void include(String... regex) {
-    includeRegexFilter.addAll(List.of(regex));
-  }
-
-
-  /**
-   * Exclude messages that match the given regular expressions.
-   *
-   * @param regex  array of regular expressions, not {@code null}
-   *
-   * @see #getExcludeRegexFilters()
-   *
-   * @since 0.8.0
-   */
-  public void exclude(String... regex) {
-    excludeRegexFilter.addAll(List.of(regex));
-  }
 
 
   /**
