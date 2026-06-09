@@ -17,6 +17,7 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.internal.InternalMessageBuilder;
 import de.sayayi.lib.message.internal.InternalMessageBuilder.*;
+import de.sayayi.lib.message.template.Template;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -132,6 +133,18 @@ public sealed interface MessageBuilder
    * @return  the constructed message with code, never {@code null}
    */
   @NotNull Message.WithCode buildWithCode(@NotNull String code);
+
+
+  /**
+   * Builds and returns the message as a {@link Template}.
+   * <p>
+   * When called on a sub-builder, the current part is finalized first.
+   *
+   * @return  the constructed template, never {@code null}
+   *
+   * @since 0.24.0
+   */
+  @NotNull Template buildAsTemplate();
 
 
   /**

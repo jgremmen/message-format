@@ -25,6 +25,7 @@ import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.internal.MessageDelegateWithCode;
+import de.sayayi.lib.message.internal.MessageTemplate;
 import de.sayayi.lib.message.internal.TextMessage;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
@@ -78,7 +79,7 @@ final class MessageFormatExceptionTest
     when(THROWING_MESSAGE.formatAsText(any(MessageAccessor.class), any(Parameters.class)))
         .thenAnswer(invocation -> { throw new MessageFormatException(null); });
 
-    MESSAGE_SUPPORT.addTemplate("tpl", THROWING_MESSAGE);
+    MESSAGE_SUPPORT.addTemplate("tpl", new MessageTemplate(THROWING_MESSAGE));
   }
 
 
@@ -233,7 +234,7 @@ final class MessageFormatExceptionTest
   void testFormat0101()
   {
     MESSAGE_SUPPORT.addTemplate("msg-with-default", MESSAGE_SUPPORT.getMessageAccessor()
-        .getMessageFactory().parseMessage("%{m,format:throw}"));
+        .getMessageFactory().parseTemplate("%{m,format:throw}"));
 
     assertEquals("failed to format parameter 'm' in template 'msg-with-default'",
         assertThrowsExactly(MessageFormatException.class, () -> MESSAGE_SUPPORT
@@ -266,7 +267,7 @@ final class MessageFormatExceptionTest
   void testFormat0111()
   {
     MESSAGE_SUPPORT.addTemplate("name", MESSAGE_SUPPORT.getMessageAccessor()
-        .getMessageFactory().parseMessage("%{p,format:throw}"));
+        .getMessageFactory().parseTemplate("%{p,format:throw}"));
 
     val lmMap = new HashMap<Locale,String>();
 
@@ -360,7 +361,7 @@ final class MessageFormatExceptionTest
   void testFormat1101()
   {
     MESSAGE_SUPPORT.addTemplate("age-range", MESSAGE_SUPPORT.getMessageAccessor()
-        .getMessageFactory().parseMessage("%{abc,format:throw}"));
+        .getMessageFactory().parseTemplate("%{abc,format:throw}"));
 
     assertEquals("failed to format parameter 'abc' in template 'age-range' for message with code 'MFP2'",
         assertThrowsExactly(MessageFormatException.class, () -> MESSAGE_SUPPORT
@@ -395,7 +396,7 @@ final class MessageFormatExceptionTest
   void testFormat1111()
   {
     MESSAGE_SUPPORT.addTemplate("bool", MESSAGE_SUPPORT.getMessageAccessor()
-        .getMessageFactory().parseMessage("%{j,format:throw}"));
+        .getMessageFactory().parseTemplate("%{j,format:throw}"));
 
     val lmMap = new HashMap<Locale,String>();
 

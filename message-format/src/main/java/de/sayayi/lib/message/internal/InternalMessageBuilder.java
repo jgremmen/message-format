@@ -34,6 +34,7 @@ import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextJoiner;
 import de.sayayi.lib.message.part.TypedValue;
+import de.sayayi.lib.message.template.Template;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -199,6 +200,13 @@ public final class InternalMessageBuilder implements MessageBuilder
   }
 
 
+  /** {@inheritDoc} */
+  @Override
+  public @NotNull Template buildAsTemplate() {
+    return new MessageTemplate(build());
+  }
+
+
 
 
   /**
@@ -334,6 +342,16 @@ public final class InternalMessageBuilder implements MessageBuilder
       flush();
 
       return InternalMessageBuilder.this.buildWithCode(code);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull Template buildAsTemplate()
+    {
+      flush();
+
+      return InternalMessageBuilder.this.buildAsTemplate();
     }
   }
 
@@ -640,6 +658,16 @@ public final class InternalMessageBuilder implements MessageBuilder
 
       return InternalMessageBuilder.this.buildWithCode(code);
     }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull Template buildAsTemplate()
+    {
+      flush();
+
+      return InternalMessageBuilder.this.buildAsTemplate();
+    }
   }
 
 
@@ -766,6 +794,16 @@ public final class InternalMessageBuilder implements MessageBuilder
       flush();
 
       return InternalMessageBuilder.this.buildWithCode(code);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull Template buildAsTemplate()
+    {
+      flush();
+
+      return InternalMessageBuilder.this.buildAsTemplate();
     }
   }
 
@@ -955,6 +993,16 @@ public final class InternalMessageBuilder implements MessageBuilder
       flush();
 
       return InternalMessageBuilder.this.buildWithCode(code);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull Template buildAsTemplate()
+    {
+      flush();
+
+      return InternalMessageBuilder.this.buildAsTemplate();
     }
   }
 

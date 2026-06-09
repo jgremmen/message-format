@@ -20,7 +20,8 @@ nav:
     - Message Factory: configuration/message-factory.md
     - Formatter Service: configuration/formatter-service.md
     - Default Configuration: configuration/default-configuration.md
-    - Messages and Templates: configuration/messages-and-templates.md
+    - Messages: configuration/messages.md
+    - Templates: configuration/templates.md
     - Pack Files: configuration/pack-files.md
     - Exceptions: configuration/exceptions.md
   - Formatters:

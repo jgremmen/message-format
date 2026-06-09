@@ -60,6 +60,10 @@ public final class MessageSupportFactory
    * The shared message support is backed by the shared instance of the default formatter service
    * ({@link DefaultFormatterService#getSharedInstance()}). This means that changes (e.g. adding new formatters) to
    * the formatting service will reflect in formatting operations of the shared message support.
+   * <p>
+   * The shared instance automatically discovers and registers all
+   * {@link de.sayayi.lib.message.template.NamedTemplate NamedTemplate} service providers on the classpath,
+   * and is then {@linkplain ConfigurableMessageSupport#seal() sealed} so it cannot be modified further.
    *
    * @return  shared message support instance, never {@code null}
    */
@@ -71,7 +75,11 @@ public final class MessageSupportFactory
       $LOCK.lock();
       try {
         if ((shared = SHARED) == null)
-          SHARED = shared = create(DefaultFormatterService.getSharedInstance()).seal();
+        {
+          SHARED = shared = create(DefaultFormatterService.getSharedInstance())
+              .registerTemplatesFromService(MessageSupportFactory.class.getClassLoader())
+              .seal();
+        }
       } finally {
         $LOCK.unlock();
       }

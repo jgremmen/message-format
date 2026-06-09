@@ -391,7 +391,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
     try {
       try(var packOutputStream = newOutputStream(packFile)) {
-        messageSupport.exportMessages(packOutputStream, getCompress().get(), this::messageCodeFilter);
+        messageSupport.exportMessages(packOutputStream, getCompress().get(), this::messageCodeFilter, null);
       }
 
       if (!isMessageFormatPack(packFile))

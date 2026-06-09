@@ -22,6 +22,9 @@ import de.sayayi.lib.message.formatter.post.PostFormatter;
 import de.sayayi.lib.message.internal.MessageSupportImpl;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
+import de.sayayi.lib.message.template.AbstractNamedTemplate;
+import de.sayayi.lib.message.template.NamedTemplate;
+import de.sayayi.lib.message.template.Template;
 import de.sayayi.lib.message.util.MessageUtil;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
@@ -141,7 +144,7 @@ public interface MessageSupport
    * @see ConfigurableMessageSupport#importMessages(InputStream)
    */
   default void exportMessages(@NotNull OutputStream stream) throws IOException {
-    exportMessages(stream, true, null);
+    exportMessages(stream, true, null, null);
   }
 
 
@@ -158,12 +161,16 @@ public interface MessageSupport
    * @param compress           {@code true} compress pack, {@code false} do not compress pack
    * @param messageCodeFilter  optional predicate for selecting message codes. If {@code null}
    *                           all messages from this message support will be selected
+   * @param templateNameFilter optional predicate for selecting template names. If {@code null}
+   *                           all templates referenced by the selected messages will be included
    *
    * @throws IOException  if an I/O error occurs
    *
    * @see ConfigurableMessageSupport#importMessages(InputStream)
    */
-  void exportMessages(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
+  void exportMessages(@NotNull OutputStream stream, boolean compress,
+                      Predicate<String> messageCodeFilter,
+                      Predicate<String> templateNameFilter)
       throws IOException;
 
 
@@ -474,7 +481,7 @@ public interface MessageSupport
 
 
     /**
-     * Throw an exception with the formatted message.
+     * Create an exception with the formatted message.
      * <p>
      * Exceptions thrown by the constructor function are relayed to the caller.
      *
@@ -579,7 +586,7 @@ public interface MessageSupport
      */
     @Override
     @Contract(value = "_, _ -> this", mutates = "this")
-    @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name, @NotNull Message template);
+    @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name, @NotNull Template template);
 
 
     /**
@@ -708,10 +715,10 @@ public interface MessageSupport
 
 
     /**
-     * Set a {@code messageHandler} for this message support.
+     * Set a {@code messageFilter} for this message support.
      * <p>
-     * On adding a message the message handler is invoked with the message code. If the handler
-     * returns {@code true} the message is added to the message support. If the handler returns
+     * On adding a message the message filter is invoked with the message. If the filter
+     * returns {@code true} the message is added to the message support. If the filter returns
      * {@code false} the message is not added to the message support.
      * <p>
      * Exceptions thrown by the message filter are relayed to the caller.
@@ -741,11 +748,35 @@ public interface MessageSupport
      *
      * @return  configurable message support instance, never {@code null}
      *
-     * @see ConfigurableMessageSupport#addTemplate(String, Message)
+     * @see ConfigurableMessageSupport#addTemplate(String, Template)
      * @see DuplicateTemplateException
      */
     @Contract(value = "_ -> this", mutates = "this")
     @NotNull ConfigurableMessageSupport setTemplateFilter(@NotNull TemplateFilter templateFilter);
+
+
+    /**
+     * Discovers and registers all {@link NamedTemplate} service providers available from the given class loader.
+     * <p>
+     * Each discovered {@code NamedTemplate} is registered under the name returned by
+     * {@link NamedTemplate#getName()}. The configured {@link TemplateFilter} is applied to each
+     * discovered template before registration.
+     * <p>
+     * Service providers are declared either in a
+     * {@code META-INF/services/de.sayayi.lib.message.template.NamedTemplate} file or in
+     * a {@code module-info.java} using
+     * {@code provides de.sayayi.lib.message.template.NamedTemplate with ...}.
+     *
+     * @param classLoader  class loader used for service discovery, not {@code null}
+     *
+     * @return  configurable message support instance, never {@code null}
+     *
+     * @since 0.24.0
+     *
+     * @see AbstractNamedTemplate
+     */
+    @Contract(value = "_ -> this", mutates = "this")
+    @NotNull ConfigurableMessageSupport registerTemplatesFromService(ClassLoader classLoader);
 
 
     /**
@@ -782,9 +813,10 @@ public interface MessageSupport
         }
 
         @Override
-        public void exportMessages(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
+        public void exportMessages(@NotNull OutputStream stream, boolean compress,
+                                   Predicate<String> messageCodeFilter, Predicate<String> templateNameFilter)
             throws IOException {
-          ConfigurableMessageSupport.this.exportMessages(stream, compress, messageCodeFilter);
+          ConfigurableMessageSupport.this.exportMessages(stream, compress, messageCodeFilter, templateNameFilter);
         }
       };
     }
@@ -794,7 +826,10 @@ public interface MessageSupport
 
 
   /**
-   * This interface allows access to all messages and templates published to the message support.
+   * Read-only accessor providing access to messages, templates, formatters and default configuration
+   * values published to a {@link MessageSupport} instance.
+   *
+   * @see MessageSupport#getMessageAccessor()
    */
   sealed interface MessageAccessor extends TemplateAccessor permits MessageSupportImpl.Accessor
   {
@@ -820,11 +855,11 @@ public interface MessageSupport
 
 
     /**
-     * Tells if this builder contains a message with {@code code}.
+     * Tells if this message support contains a message with {@code code}.
      *
      * @param code  message code to check, or {@code null}
      *
-     * @return  {@code true} if {@code code} is not {@code null} and the bundle contains a
+     * @return  {@code true} if {@code code} is not {@code null} and this message support contains a
      *          message with this code, {@code false} otherwise
      */
     @Contract(value = "null -> false", pure = true)
@@ -946,7 +981,7 @@ public interface MessageSupport
      * @return  template or {@code null} if no template with this name exists
      */
     @Contract(pure = true)
-    Message getTemplateByName(@NotNull String name);
+    Template getTemplateByName(@NotNull String name);
 
 
     /**
@@ -1014,7 +1049,26 @@ public interface MessageSupport
      * @throws DuplicateTemplateException  in case a template with the same name already exists
      */
     @Contract(value = "_, _ -> this", mutates = "this")
-    @NotNull MessagePublisher addTemplate(@NotNull String name, @NotNull Message template);
+    @NotNull MessagePublisher addTemplate(@NotNull String name, @NotNull Template template);
+
+
+    /**
+     * Adds a named template to this publisher. The template is registered under the name returned by
+     * {@link NamedTemplate#getName()}.
+     *
+     * @param template  named template, not {@code null}
+     *
+     * @return  this message publisher instance, never {@code null}
+     *
+     * @throws IllegalArgumentException   if the template name does not follow the kebab-case naming convention
+     * @throws DuplicateTemplateException  in case a template with the same name already exists
+     *
+     * @since 0.24.0
+     */
+    @Contract(value = "_ -> this", mutates = "this")
+    default @NotNull MessagePublisher addTemplate(@NotNull NamedTemplate template) {
+      return addTemplate(template.getName(), template);
+    }
   }
 
 
@@ -1032,7 +1086,7 @@ public interface MessageSupport
     /**
      * Decides if {@code message} is filtered or not.
      *
-     * @param message  message to analyse, not {@code null}
+     * @param message  message to analyze, not {@code null}
      *
      * @return  {@code true} if the message will be included,
      *          {@code false} if the message will be excluded
@@ -1061,7 +1115,7 @@ public interface MessageSupport
      * @return  {@code true} if the template will be included,
      *          {@code false} if the template will be excluded
      */
-    boolean filter(@NotNull String name, @NotNull Message template);
+    boolean filter(@NotNull String name, @NotNull Template template);
   }
 
 

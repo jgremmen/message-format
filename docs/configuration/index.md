@@ -12,7 +12,7 @@ flows. It combines a [`MessageFactory`](message-factory.md) for parsing format s
 Java values into text.
 
 A `MessageSupport` can hold a registry of named
-[messages and templates](messages-and-templates.md). Messages are registered with a code and
+[messages](messages.md) and [templates](templates.md). Messages are registered with a code and
 can then be looked up at format time, while templates provide reusable message fragments that
 other messages can reference. Both can be added programmatically, discovered from annotations,
 or loaded from [pack files](pack-files.md). Pack files are a compact binary format that lets

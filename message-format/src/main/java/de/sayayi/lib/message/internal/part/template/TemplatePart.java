@@ -32,8 +32,7 @@ import java.util.Map.Entry;
 
 import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
 import static de.sayayi.lib.message.part.MessagePart.Text.SPACE;
-import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
-import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.part.TextPartFactory.setSpaces;
 import static de.sayayi.lib.message.util.MessageUtil.validateName;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
@@ -128,10 +127,10 @@ public final class TemplatePart implements MessagePart.Template
   @Override
   public @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
   {
-    var message = messageAccessor.getTemplateByName(name);
+    final var template = messageAccessor.getTemplateByName(name);
 
-    return addSpaces(message != null
-        ? noSpaceText(message.format(messageAccessor, new ParameterAdapter(parameters)))
+    return setSpaces(template != null
+        ? template.formatAsText(messageAccessor, new ParameterAdapter(parameters))
         : EMPTY,
         spaceBefore, spaceAfter);
   }

@@ -15,7 +15,9 @@
  */
 package de.sayayi.lib.message;
 
+import de.sayayi.lib.message.internal.MessageTemplate;
 import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.template.Template;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -318,4 +320,148 @@ class MessageBuilderTest
           shared().message(message).with("a", 1).with("b", 2).format());
     }
   }
+
+
+
+
+  @Nested
+  @DisplayName("buildAsTemplate")
+  class BuildAsTemplateTest
+  {
+    @Test
+    @DisplayName("Simple text message produces a MessageTemplate")
+    void testSimpleTextTemplate()
+    {
+      final Template template = MessageBuilder.create()
+          .text("hello")
+          .buildAsTemplate();
+
+      assertNotNull(template);
+      assertInstanceOf(MessageTemplate.class, template);
+      assertEquals("Template(\"hello\")", template.toString());
+    }
+
+
+    @Test
+    @DisplayName("Template with parameter part")
+    void testTemplateWithParameter()
+    {
+      final Template template = MessageBuilder.create()
+          .text("Hello")
+          .parameter("name").spaceBefore()
+          .text("!")
+          .buildAsTemplate();
+
+      assertInstanceOf(MessageTemplate.class, template);
+
+      final var messageTemplate = (MessageTemplate) template;
+      final var message = messageTemplate.getMessage();
+
+      assertEquals("Hello %{name}!", message.asFormatString(java.nio.charset.StandardCharsets.UTF_8));
+    }
+
+
+    @Test
+    @DisplayName("Template wraps a message that formats correctly")
+    void testTemplateFormatsCorrectly()
+    {
+      final Template template = MessageBuilder.create()
+          .text("Welcome")
+          .parameter("user").spaceBefore()
+          .buildAsTemplate();
+
+      assertInstanceOf(MessageTemplate.class, template);
+
+      final var messageTemplate = (MessageTemplate) template;
+      final var message = messageTemplate.getMessage();
+
+      assertEquals("Welcome Alice",
+          shared().message(message).with("user", "Alice").format());
+    }
+
+
+    @Test
+    @DisplayName("Template from builder with map entries")
+    void testTemplateWithMapEntries()
+    {
+      final Template template = MessageBuilder.create()
+          .parameter("count")
+              .withFormat("choice")
+              .mapNumber(1).message("one item")
+              .mapDefault().message(b -> b.parameter("count").text(" items").spaceBefore())
+          .buildAsTemplate();
+
+      assertInstanceOf(MessageTemplate.class, template);
+
+      final var messageTemplate = (MessageTemplate) template;
+      final var message = messageTemplate.getMessage();
+
+      assertEquals("%{count,format:choice,1:'one item',:'%{count} items'}",
+          message.asFormatString(java.nio.charset.StandardCharsets.UTF_8));
+    }
+
+
+    @Test
+    @DisplayName("Empty message produces a template")
+    void testEmptyMessageTemplate()
+    {
+      final Template template = MessageBuilder.create()
+          .buildAsTemplate();
+
+      assertNotNull(template);
+      assertInstanceOf(MessageTemplate.class, template);
+    }
+
+
+    @Test
+    @DisplayName("buildAsTemplate from sub-builder finalizes current part")
+    void testBuildAsTemplateFromSubBuilder()
+    {
+      final Template template = MessageBuilder.create()
+          .text("test")
+          .parameter("x").spaceBefore()
+              .withFormat("string")
+              .buildAsTemplate();
+
+      assertInstanceOf(MessageTemplate.class, template);
+
+      final var messageTemplate = (MessageTemplate) template;
+      final var message = messageTemplate.getMessage();
+
+      assertEquals("test %{x,format:string}", message.asFormatString(java.nio.charset.StandardCharsets.UTF_8));
+    }
+
+
+    @Test
+    @DisplayName("isSame returns true for identical templates built separately")
+    void testIsSameForIdenticalTemplates()
+    {
+      final Template template1 = MessageBuilder.create()
+          .text("hello")
+          .buildAsTemplate();
+
+      final Template template2 = MessageBuilder.create()
+          .text("hello")
+          .buildAsTemplate();
+
+      assertTrue(template1.isSame(template2));
+    }
+
+
+    @Test
+    @DisplayName("isSame returns false for different templates")
+    void testIsSameForDifferentTemplates()
+    {
+      final Template template1 = MessageBuilder.create()
+          .text("hello")
+          .buildAsTemplate();
+
+      final Template template2 = MessageBuilder.create()
+          .text("world")
+          .buildAsTemplate();
+
+      assertFalse(template1.isSame(template2));
+    }
+  }
 }
+

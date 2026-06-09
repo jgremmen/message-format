@@ -2,7 +2,7 @@
 toc_depth: 2
 ---
 
-# Messages and Templates
+# Messages
 
 Every piece of text that the library can format is represented by a `Message` object. A message
 is the parsed, immutable form of a message format string and is composed of one or more message
@@ -10,9 +10,9 @@ parts such as literal text, parameter references, template references and post-f
 invocations. Once parsed, a message can be formatted repeatedly with different parameter values
 and locales without paying the parsing cost again.
 
-This page explains the `Message` interface hierarchy, how to create messages and templates
-through `MessageFactory` parsing methods and the programmatic `MessageBuilder`, and how to
-register them on a `ConfigurableMessageSupport`. For the format string syntax itself, see
+This page explains the `Message` interface hierarchy, how to create messages through
+`MessageFactory` parsing methods and the programmatic `MessageBuilder`, and how to register
+them on a `ConfigurableMessageSupport`. For the format string syntax itself, see
 [Syntax](../message/syntax.md). For how to configure and obtain a `MessageFactory`, see
 [MessageFactory](message-factory.md).
 
@@ -37,9 +37,8 @@ formatting, this space information determines whether a separator space is inser
 adjacent parts. The `isSpaceBefore()` and `isSpaceAfter()` methods derive their values from
 the first and last message part respectively.
 
-Every message produced by `MessageFactory.parseMessage(String)` and
-`MessageFactory.parseTemplate(String)` returns a `Message.WithSpaces`, because after parsing, the
-space information is always known.
+Every message produced by `MessageFactory.parseMessage(String)` returns a `Message.WithSpaces`,
+because after parsing, the space information is always known.
 
 ### Message.WithCode
 
@@ -66,8 +65,8 @@ Calling `getMessageParts()` or `asFormatString(Charset)` on it throws
 
 ## Creating Messages with MessageFactory
 
-`MessageFactory` provides parsing methods for both messages and templates, in two flavors each:
-a single format string and a locale-keyed map of format strings.
+`MessageFactory` provides parsing methods for messages in two flavors: a single format string
+and a locale-keyed map of format strings.
 
 ### Parsing a Single Message
 
@@ -120,29 +119,6 @@ MessageFactory.isGeneratedCode(msg.getCode());
 When the map contains only a single entry, the result is a plain `Message.WithCode` rather than
 a `Message.LocaleAware`, because there is no locale selection to perform.
 
-### Parsing Templates
-
-Templates are parsed with `parseTemplate(String)`, which returns a `Message.WithSpaces`.
-Templates differ from messages in that they cannot contain nested template references. The
-parsed result is otherwise identical to a regular message.
-
-```java
-Message.WithSpaces template = factory.parseTemplate(
-    "%{error,!empty:': %{error}'}");
-```
-
-Localized templates work the same way as localized messages. Pass a `Map<Locale, String>` to
-`parseTemplate(Map)`:
-
-```java
-Message template = factory.parseTemplate(Map.of(
-    Locale.ENGLISH, "%{count} item(s)",
-    Locale.GERMAN,  "%{count} Eintrag/Einträge"));
-```
-
-When the map contains more than one entry, the factory generates a template code with the prefix
-`TPL[...]` internally.
-
 ### Wrapping a Message with a Code
 
 If you already have a parsed `Message` and need to associate it with a particular code, use
@@ -178,8 +154,8 @@ MessageBuilder builder = factory.messageBuilder();
 MessageBuilder builder = MessageBuilder.create();
 ```
 
-The builder is not thread-safe and must not be reused after calling `build()` or
-`buildWithCode(String)`.
+The builder is not thread-safe and must not be reused after calling `build()`,
+`buildWithCode(String)` or `buildAsTemplate()`.
 
 ### Text Parts
 
@@ -350,10 +326,10 @@ Message.WithCode msg = MessageBuilder
 
 ## Adding Messages to ConfigurableMessageSupport
 
-Once you have created or parsed messages and templates, they need to be registered on a
+Once you have created or parsed messages, they need to be registered on a
 `ConfigurableMessageSupport` before they can be formatted by code. The
 [MessageSupport](message-support.md) page covers the `ConfigurableMessageSupport` API in
-detail; this section focuses on the different ways to add messages and templates.
+detail; this section focuses on the different ways to add messages.
 
 ### Adding Messages by Code and Format String
 
@@ -412,57 +388,11 @@ messageSupport
 // "3 Artikel in Ihrem Warenkorb"
 ```
 
-### Adding Templates
-
-Templates are registered with a name and a `Message`. The template is typically obtained from
-`parseTemplate(String)` or `parseTemplate(Map)`:
-
-```java
-MessageFactory factory = messageSupport.getMessageAccessor().getMessageFactory();
-
-messageSupport.addTemplate("opt-error",
-    factory.parseTemplate("%{error,!empty:': %{error}'}"));
-
-messageSupport
-    .message("Operation failed%[opt-error]")
-    .with("error", "disk full")
-    .format();
-// "Operation failed: disk full"
-
-messageSupport
-    .message("Operation failed%[opt-error]")
-    .with("error", "")
-    .format();
-// "Operation failed"
-```
-
-Templates can also be built programmatically and then registered:
-
-```java
-Message.WithSpaces template = MessageBuilder
-    .create()
-    .parameter("unit")
-        .mapEmpty().ne().message(inner ->
-            inner.parameter("unit").spaceBefore())
-        .mapDefault().message(Message.EMPTY)
-    .build();
-
-messageSupport.addTemplate("opt-unit", template);
-
-messageSupport
-    .message("Distance: %{value}%[opt-unit]")
-    .with("value", 42)
-    .with("unit", "km")
-    .format();
-// "Distance: 42 km"
-```
-
 ### Duplicate Handling
 
 Attempting to add a message whose code already exists throws a `DuplicateMessageException` if
 the content differs. If the new message is identical to the existing one, the duplicate is
-silently ignored. The same applies to templates with `DuplicateTemplateException`. This
-behavior can be customized by installing a `MessageFilter` or `TemplateFilter` as described on
+silently ignored. This behavior can be customized by installing a `MessageFilter` as described on
 the [MessageSupport](message-support.md#filters) page.
 
 ### Bulk Loading
@@ -471,3 +401,4 @@ For loading messages from external sources such as properties files, resource bu
 classes, or compiled pack files, the library provides adopters that handle parsing and
 registration in bulk. See [Adopters](../adopter/index.md) and
 [Pack Files](pack-files.md) for details.
+

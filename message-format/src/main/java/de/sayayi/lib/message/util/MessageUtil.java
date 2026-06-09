@@ -17,10 +17,12 @@ package de.sayayi.lib.message.util;
 
 import de.sayayi.lib.message.FormatStringSerializer.Context;
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.internal.MessageTemplate;
 import de.sayayi.lib.message.internal.TextMessage;
 import de.sayayi.lib.message.internal.pack.PackFileTypeDetector;
 import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.template.Template;
 import de.sayayi.lib.pack.PackInputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -633,7 +635,7 @@ public final class MessageUtil
   @Contract(mutates = "param1,io")
   public static void importMessages(@NotNull InputStream packStream,
                                     Consumer<Message.WithCode> messageConsumer,
-                                    BiConsumer<String,Message> templateConsumer)
+                                    BiConsumer<String,Template> templateConsumer)
       throws IOException
   {
     requireNonNull(packStream, "packStream must not be null");
@@ -657,7 +659,7 @@ public final class MessageUtil
       for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
       {
         final var name = requireNonNull(dataStream.readString());
-        final var template = packHelper.unpackMessage(dataStream);
+        final var template = new MessageTemplate(packHelper.unpackMessage(dataStream));
 
         if (templateConsumer != null)
           templateConsumer.accept(name, template);

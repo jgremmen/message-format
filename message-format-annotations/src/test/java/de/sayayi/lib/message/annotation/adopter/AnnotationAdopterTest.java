@@ -26,6 +26,7 @@ import de.sayayi.lib.message.annotation.adopter.util.SyntheticMessageDef;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticTemplateDef;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticText;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import de.sayayi.lib.message.internal.MessageTemplate;
 import lombok.val;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -95,7 +96,8 @@ class AnnotationAdopterTest
     assertTrue(accessor.hasMessageWithCode("control-msg"));
     assertEquals("Control message", accessor.getMessageByCode("control-msg").asFormatString(UTF_8));
     assertTrue(accessor.hasTemplateWithName("control-tmpl"));
-    assertEquals("Control template", accessor.getTemplateByName("control-tmpl").asFormatString(UTF_8));
+    assertEquals("Control template",
+        ((MessageTemplate)accessor.getTemplateByName("control-tmpl")).getMessage().asFormatString(UTF_8));
 
     assertFalse(accessor.hasMessageWithCode("synthetic-msg"));
     assertFalse(accessor.hasTemplateWithName("synthetic-tmpl"));
@@ -209,13 +211,15 @@ class AnnotationAdopterTest
     val accessor = cms.getMessageAccessor();
 
     assertTrue(accessor.hasTemplateWithName("tmpl-d1"));
-    assertEquals("Direct template 1", accessor.getTemplateByName("tmpl-d1").asFormatString(UTF_8));
+    assertEquals("Direct template 1",
+        ((MessageTemplate)accessor.getTemplateByName("tmpl-d1")).getMessage().asFormatString(UTF_8));
 
     assertTrue(accessor.hasTemplateWithName("tmpl-d2"));
-    assertEquals("Direct template 2", accessor.getTemplateByName("tmpl-d2").asFormatString(UTF_8));
+    assertEquals("Direct template 2",
+        ((MessageTemplate)accessor.getTemplateByName("tmpl-d2")).getMessage().asFormatString(UTF_8));
 
     assertTrue(accessor.hasTemplateWithName("tmpl-d3"));
-    val tmpl3 = accessor.getTemplateByName("tmpl-d3");
+    val tmpl3 = ((MessageTemplate)accessor.getTemplateByName("tmpl-d3")).getMessage();
     assertInstanceOf(LocaleAware.class, tmpl3);
     val locTemplates3 = ((LocaleAware) tmpl3).getLocalizedMessages();
     assertEquals("EN direct tmpl 3", locTemplates3.get(ENGLISH).asFormatString(UTF_8));
@@ -335,15 +339,17 @@ class AnnotationAdopterTest
 
     // type-tmpl-1: plain text= form
     assertTrue(accessor.hasTemplateWithName("type-tmpl-1"));
-    assertEquals("Type template 1", accessor.getTemplateByName("type-tmpl-1").asFormatString(UTF_8));
+    assertEquals("Type template 1",
+        ((MessageTemplate)accessor.getTemplateByName("type-tmpl-1")).getMessage().asFormatString(UTF_8));
 
     // type-tmpl-2: texts=@Text("value") form
     assertTrue(accessor.hasTemplateWithName("type-tmpl-2"));
-    assertEquals("Type template 2", accessor.getTemplateByName("type-tmpl-2").asFormatString(UTF_8));
+    assertEquals("Type template 2",
+        ((MessageTemplate)accessor.getTemplateByName("type-tmpl-2")).getMessage().asFormatString(UTF_8));
 
     // type-tmpl-3: multi-locale (EN, DE)
     assertTrue(accessor.hasTemplateWithName("type-tmpl-3"));
-    val typeTmpl3 = accessor.getTemplateByName("type-tmpl-3");
+    val typeTmpl3 = ((MessageTemplate)accessor.getTemplateByName("type-tmpl-3")).getMessage();
     assertInstanceOf(LocaleAware.class, typeTmpl3);
     val typeTmpl3Locales = ((LocaleAware)typeTmpl3).getLocalizedMessages();
     assertEquals("EN type tmpl 3", typeTmpl3Locales.get(ENGLISH).asFormatString(UTF_8));
@@ -353,15 +359,17 @@ class AnnotationAdopterTest
 
     // method-tmpl-1: plain text= form — standalone @TemplateDef on method
     assertTrue(accessor.hasTemplateWithName("method-tmpl-1"));
-    assertEquals("Method template 1", accessor.getTemplateByName("method-tmpl-1").asFormatString(UTF_8));
+    assertEquals("Method template 1",
+        ((MessageTemplate)accessor.getTemplateByName("method-tmpl-1")).getMessage().asFormatString(UTF_8));
 
     // method-tmpl-2: texts=@Text("value") form (@TemplateDefs container on method)
     assertTrue(accessor.hasTemplateWithName("method-tmpl-2"));
-    assertEquals("Method template 2", accessor.getTemplateByName("method-tmpl-2").asFormatString(UTF_8));
+    assertEquals("Method template 2",
+        ((MessageTemplate)accessor.getTemplateByName("method-tmpl-2")).getMessage().asFormatString(UTF_8));
 
     // method-tmpl-3: multi-locale (EN, FR) — @TemplateDefs container on method
     assertTrue(accessor.hasTemplateWithName("method-tmpl-3"));
-    val methodTmpl3 = accessor.getTemplateByName("method-tmpl-3");
+    val methodTmpl3 = ((MessageTemplate)accessor.getTemplateByName("method-tmpl-3")).getMessage();
     assertInstanceOf(LocaleAware.class, methodTmpl3);
     val methodTmpl3Locales = ((LocaleAware)methodTmpl3).getLocalizedMessages();
     assertEquals("EN method tmpl 3", methodTmpl3Locales.get(ENGLISH).asFormatString(UTF_8));
@@ -385,6 +393,7 @@ class AnnotationAdopterTest
 
     // inner-tmpl-1: texts=@Text("value") form
     assertTrue(accessor.hasTemplateWithName("inner-tmpl-1"));
-    assertEquals("Inner template 1", accessor.getTemplateByName("inner-tmpl-1").asFormatString(UTF_8));
+    assertEquals("Inner template 1",
+        ((MessageTemplate)accessor.getTemplateByName("inner-tmpl-1")).getMessage().asFormatString(UTF_8));
   }
 }

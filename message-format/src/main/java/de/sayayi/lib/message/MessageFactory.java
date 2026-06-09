@@ -16,12 +16,10 @@
 package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.exception.MessageParserException;
-import de.sayayi.lib.message.internal.EmptyMessage;
-import de.sayayi.lib.message.internal.EmptyMessageWithCode;
-import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
-import de.sayayi.lib.message.internal.MessageDelegateWithCode;
+import de.sayayi.lib.message.internal.*;
 import de.sayayi.lib.message.internal.parser.MessageCompiler;
 import de.sayayi.lib.message.part.normalizer.MessagePartNormalizer;
+import de.sayayi.lib.message.template.Template;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -297,35 +295,35 @@ public class MessageFactory
 
 
   /**
-   * Parse a template format text into a message instance.
+   * Parse a template format text into a template instance.
    *
    * @param text  template format text, not {@code null}
    *
-   * @return  message instance, never {@code null}
+   * @return  template instance, never {@code null}
    *
    * @throws MessageParserException  in case the template could not be parsed
    */
   @Contract(value = "_ -> new", pure = true)
-  public @NotNull Message.WithSpaces parseTemplate(@NotNull @Language("MessageFormat") String text) {
-    return messageCompiler.compileTemplate(text);
+  public @NotNull Template parseTemplate(@NotNull @Language("MessageFormat") String text) {
+    return new MessageTemplate(messageCompiler.compileTemplate(text));
   }
 
 
   /**
-   * Parse the localized template messages {@code localizedTexts} into a {@link Message} instance.
+   * Parse the localized template messages {@code localizedTexts} into a {@link Template} instance.
    *
    * @param localizedTexts  a map containing template message formats, keyed by locale, not {@code null}
    *
-   * @return  template message instance, never {@code null}
+   * @return  template instance, never {@code null}
    *
    * @throws MessageParserException  in case one of the template messages could not be parsed
    */
   @Contract(pure = true)
-  public @NotNull Message parseTemplate(@NotNull Map<Locale,String> localizedTexts)
+  public @NotNull Template parseTemplate(@NotNull Map<Locale,String> localizedTexts)
   {
     return switch(requireNonNull(localizedTexts, "localizedTexts must not be null").size())
     {
-      case 0 -> EmptyMessage.INSTANCE;
+      case 0 -> new MessageTemplate(EmptyMessage.INSTANCE);
 
       case 1 -> {
         final var entry = localizedTexts.entrySet().iterator().next();
@@ -342,13 +340,13 @@ public class MessageFactory
 
         localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) -> {
           try {
-            localizedMessages.put(locale, parseTemplate(text));
+            localizedMessages.put(locale, messageCompiler.compileTemplate(text));
           } catch(MessageParserException ex) {
             throw ex.withLocale(locale);
           }
         });
 
-        yield new LocalizedMessageBundleWithCode(generateCode("TPL"), localizedMessages);
+        yield new MessageTemplate(new LocalizedMessageBundleWithCode(generateCode("TPL"), localizedMessages));
       }
     };
   }

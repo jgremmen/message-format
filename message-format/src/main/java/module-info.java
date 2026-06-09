@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import de.sayayi.lib.message.template.AbstractNamedTemplate;
+
 /**
  * Message Format – a Java library for parsing, formatting and managing parameterized, locale-aware messages.
  *
@@ -34,6 +36,12 @@
  *   <li>
  *     {@link de.sayayi.lib.message.MessageBuilder MessageBuilder} – fluent builder for constructing messages
  *     programmatically.
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.template.Template Template} – reusable template that can be registered by name
+ *     and referenced from messages. Custom templates extend
+ *     {@link AbstractNamedTemplate AbstractNamedTemplate} and can be discovered automatically
+ *     via the {@link java.util.ServiceLoader} mechanism.
  *   </li>
  * </ul>
  *
@@ -81,10 +89,12 @@ module de.sayayi.lib.message
   exports de.sayayi.lib.message.formatter.post.runtime;
   exports de.sayayi.lib.message.part;
   exports de.sayayi.lib.message.part.normalizer;
+  exports de.sayayi.lib.message.template;
   exports de.sayayi.lib.message.util;
 
   uses de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
   uses de.sayayi.lib.message.formatter.post.PostFormatter;
+  uses de.sayayi.lib.message.template.NamedTemplate;
 
   // internal service implementations
   provides java.nio.file.spi.FileTypeDetector with de.sayayi.lib.message.internal.pack.PackFileTypeDetector;

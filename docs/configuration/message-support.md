@@ -17,7 +17,8 @@ on.
 Instances are created through `MessageSupportFactory`, which offers two strategies.
 
 The `shared()` method returns a lazily initialized, sealed singleton that is backed by the shared
-`DefaultFormatterService`. It is convenient for simple scenarios where you only need inline
+`DefaultFormatterService`. It also discovers and registers any `NamedTemplate` service
+providers on the classpath. It is convenient for simple scenarios where you only need inline
 message formatting and do not need to register messages or customize configuration:
 
 ```java
@@ -110,6 +111,11 @@ messageSupport
 Just like messages, adding a template whose name already exists throws a
 `DuplicateTemplateException` when the content differs. Identical duplicates are silently ignored.
 
+Templates can also be implemented entirely in Java by extending `AbstractNamedTemplate`, and can be
+discovered automatically at startup through the `ServiceLoader` mechanism by calling
+`registerTemplatesFromService(ClassLoader)`. Both topics are covered in detail on the
+[Templates](templates.md#custom-templates) page.
+
 ### Default Configuration and Locale
 
 `ConfigurableMessageSupport` provides methods for setting application-wide default configuration
@@ -150,8 +156,7 @@ messageSupport.setMessageFilter(message ->
         .hasMessageWithCode(message.getCode()));
 ```
 
-Template filters work the same way. The `TemplateFilter` receives the template name and the
-template message:
+Template filters work the same way. The `TemplateFilter` receives the template name and the template:
 
 ```java
 messageSupport.setTemplateFilter((name, template) ->
@@ -229,7 +234,7 @@ Set<String> templateNames = accessor.getTemplateNames();
 
 boolean exists = accessor.hasTemplateWithName("opt-detail");
 
-Message template = accessor.getTemplateByName("opt-detail");
+Template template = accessor.getTemplateByName("opt-detail");
 
 // find templates referenced by messages but not yet registered
 Set<String> missing = accessor.findMissingTemplates(null);

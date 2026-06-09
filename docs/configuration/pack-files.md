@@ -22,7 +22,8 @@ signature gives you more control:
 
 ```java
 void exportMessages(OutputStream stream, boolean compress,
-                    Predicate<String> messageCodeFilter) throws IOException
+                    Predicate<String> messageCodeFilter,
+                    Predicate<String> templateNameFilter) throws IOException
 ```
 
 - **compress** – when `true`, the output is wrapped in GZip compression. The binary format
@@ -31,6 +32,11 @@ void exportMessages(OutputStream stream, boolean compress,
   size noticeably.
 - **messageCodeFilter** – an optional predicate that selects which message codes to include.
   Pass `null` to export all messages.
+- **templateNameFilter** – an optional predicate that selects which template names to include.
+  Pass `null` to include all templates referenced by the selected messages. Only templates
+  that were created from parsed message format strings (i.e. `MessageTemplate` instances) can
+  be serialized; custom `AbstractNamedTemplate` implementations are excluded automatically since
+  they have no serializable message representation.
 
 Only the templates that are actually referenced by the exported messages are included in the
 pack file. Templates that exist in the message support but are not used by any selected
@@ -55,7 +61,7 @@ filters apply as usual.
 
 If you need lower-level control over the imported entries, you can use the static utility
 method `MessageUtil.importMessages` instead. It accepts a `Consumer<Message.WithCode>` for
-messages and a `BiConsumer<String, Message.WithSpaces>` for templates, letting you inspect or
+messages and a `BiConsumer<String,Template>` for templates, letting you inspect or
 transform each entry before adding it.
 
 ```java

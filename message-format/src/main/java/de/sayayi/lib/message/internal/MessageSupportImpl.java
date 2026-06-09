@@ -30,6 +30,8 @@ import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
+import de.sayayi.lib.message.template.NamedTemplate;
+import de.sayayi.lib.message.template.Template;
 import de.sayayi.lib.message.util.SortedStringMap;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import de.sayayi.lib.pack.PackOutputStream;
@@ -70,7 +72,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   private final @NotNull MessageFactory messageFactory;
   private final @NotNull Map<String,TypedValue<?>> defaultConfig = new TreeMap<>();
   private final @NotNull Map<String,Message.WithCode> messages = new TreeMap<>();
-  private final @NotNull Map<String,Message> templates = new TreeMap<>();
+  private final @NotNull Map<String,Template> templates = new TreeMap<>();
   private final @NotNull MessageAccessor messageAccessor;
 
   private @NotNull Locale locale;
@@ -181,7 +183,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
 
   /** {@inheritDoc} */
   @Override
-  public @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name, @NotNull Message template)
+  public @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name, @NotNull Template template)
   {
     if (!isKebabCaseName(validateName(name, "template name")))
       throw new IllegalArgumentException("template name '" + name + "' must match the kebab-case naming convention");
@@ -195,7 +197,23 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
 
   /** {@inheritDoc} */
   @Override
-  public void exportMessages(@NotNull OutputStream stream, boolean compress, Predicate<String> messageCodeFilter)
+  public @NotNull ConfigurableMessageSupport registerTemplatesFromService(ClassLoader classLoader)
+  {
+    ServiceLoader
+        .load(NamedTemplate.class, classLoader)
+        .forEach(template -> {
+          if (templateFilter.filter(template.getName(), template))
+            addTemplate(template);
+        });
+
+    return this;
+  }
+
+
+  /** {@inheritDoc} */
+  @Override
+  public void exportMessages(@NotNull OutputStream stream, boolean compress,
+                             Predicate<String> messageCodeFilter, Predicate<String> templateNameFilter)
       throws IOException
   {
     try(var dataStream = new PackOutputStream(PACK_CONFIG, VERSION, compress, stream)) {
@@ -217,12 +235,15 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
       }
 
       // pack all required templates
-      templateNames.removeIf(templateName -> !templates.containsKey(templateName));
+      templateNames.removeIf(templateName -> !(templates.get(templateName) instanceof MessageTemplate));
+      if (templateNameFilter != null)
+        templateNames.removeIf(templateNameFilter.negate());
+
       dataStream.writeUnsignedShort(templateNames.size());
       for(var templateName: templateNames)
       {
         dataStream.writeString(templateName);
-        PackSupport.pack(templates.get(templateName), dataStream);
+        PackSupport.pack(((MessageTemplate)templates.get(templateName)).getMessage(), dataStream);
       }
     }
   }
@@ -302,7 +323,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
    *
    * @throws DuplicateTemplateException  if a different template with the same name already exists
    */
-  private boolean failOnDuplicateTemplate(@NotNull String name, @NotNull Message template)
+  private boolean failOnDuplicateTemplate(@NotNull String name, @NotNull Template template)
   {
     var ttm = templates.get(name);
     if (ttm != null)
@@ -500,7 +521,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
 
     /** {@inheritDoc} */
     @Override
-    public Message getTemplateByName(@NotNull String name) {
+    public Template getTemplateByName(@NotNull String name) {
       return templates.get(name);
     }
 
