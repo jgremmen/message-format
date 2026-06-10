@@ -633,7 +633,7 @@ public final class MessageUtil
   @Contract(mutates = "param1,io")
   public static void importMessages(@NotNull InputStream packStream,
                                     Consumer<Message.WithCode> messageConsumer,
-                                    BiConsumer<String,Message.WithSpaces> templateConsumer)
+                                    BiConsumer<String,Message> templateConsumer)
       throws IOException
   {
     requireNonNull(packStream, "packStream must not be null");
@@ -657,7 +657,7 @@ public final class MessageUtil
       for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
       {
         final var name = requireNonNull(dataStream.readString());
-        final var template = packHelper.unpackMessageWithSpaces(dataStream);
+        final var template = packHelper.unpackMessage(dataStream);
 
         if (templateConsumer != null)
           templateConsumer.accept(name, template);
