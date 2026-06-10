@@ -183,6 +183,13 @@ public final class TextPart implements MessagePart.Text
   }
 
 
+  /** {@inheritDoc} */
+  @Override
+  public @NotNull Text trim() {
+    return !spaceBefore && !spaceAfter ? this : text == null ? NULL : text.isEmpty() ? EMPTY : new TextPart(text);
+  }
+
+
   /**
    * {@inheritDoc}
    * <p>
@@ -227,6 +234,11 @@ public final class TextPart implements MessagePart.Text
   }
 
 
+  /**
+   * Returns a string representation of this text part, useful for debugging.
+   *
+   * @return  string representation, never {@code null}
+   */
   @Override
   @Contract(pure = true)
   public String toString()

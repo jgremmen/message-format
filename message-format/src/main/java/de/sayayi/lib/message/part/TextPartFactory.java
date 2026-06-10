@@ -27,7 +27,11 @@ import static de.sayayi.lib.message.util.MessageUtil.trimSpaces;
 
 
 /**
- * Text part factory.
+ * Factory for creating {@link Text} message parts from string values.
+ * <p>
+ * This class provides static methods for constructing text parts with various space-handling
+ * strategies (no space, preserved spaces, added spaces) as well as constants for {@code null}
+ * and empty text.
  *
  * @author Jeroen Gremmen
  * @since 0.5.0 (renamed in 0.8.0)
@@ -123,5 +127,25 @@ public final class TextPartFactory
     }
 
     return text;
+  }
+
+
+  /**
+   * Returns a text part with the specified space settings, replacing any existing space decoration.
+   *
+   * @param text         text part to modify, not {@code null}
+   * @param spaceBefore  {@code true} to set a leading space
+   * @param spaceAfter   {@code true} to set a trailing space
+   *
+   * @return  text part with the specified space settings, never {@code null}
+   *
+   * @since 0.24.0
+   */
+  @Contract(pure = true)
+  public static @NotNull Text setSpaces(@NotNull Text text, boolean spaceBefore, boolean spaceAfter)
+  {
+    return spaceBefore || spaceAfter
+        ? new TextPart(text.getText(), spaceBefore, spaceAfter)
+        : text.trim();
   }
 }

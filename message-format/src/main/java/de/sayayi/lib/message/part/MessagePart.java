@@ -125,6 +125,15 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
 
 
     /**
+     * Returns a trimmed version of this text part with leading and trailing spaces removed.
+     *
+     * @return  trimmed text part, never {@code null}
+     */
+    @Contract(pure = true)
+    @NotNull Text trim();
+
+
+    /**
      * Tells if this text message part is empty.
      *
      * @return  {@code true} if this message part is empty, {@code false} otherwise
