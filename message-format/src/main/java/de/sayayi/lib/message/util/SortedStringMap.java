@@ -28,14 +28,15 @@ import java.util.stream.StreamSupport;
 
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.copyOf;
+import static java.util.Objects.requireNonNull;
 
 
 /**
  * A compact, array-backed {@link Map} implementation with {@link String} keys kept in sorted order. This map supports
  * an optional {@linkplain #seal() seal} operation that makes it immutable and trims internal storage.
  * <p>
- * Keys are maintained in natural string order (with {@code null} always first), enabling binary search for efficient
- * lookups.
+ * Keys are maintained in natural string order, enabling binary search for efficient lookups. {@code null} keys are
+ * not supported.
  * <p>
  * This map is not thread-safe.
  *
@@ -48,7 +49,6 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
 {
   private Object[] kv;
   private int size;
-  private boolean hasNullKey;
   private boolean sealed;
 
 
@@ -82,7 +82,6 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
     {
       size = map.size();
       kv = copyOf(sortedStringMap.kv, size * 2);
-      hasNullKey = sortedStringMap.hasNullKey;
     }
     else if (map == null)
       kv = seal ? null : new Object[16];
@@ -136,11 +135,8 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
 
   /** {@inheritDoc} */
   @Override
-  public boolean containsKey(Object key)
-  {
-    return key == null
-        ? hasNullKey
-        : key instanceof String string && findKeyIndex(string) >= 0;
+  public boolean containsKey(Object key) {
+    return key instanceof String string && findKeyIndex(string) >= 0;
   }
 
 
@@ -168,14 +164,14 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
   @SuppressWarnings("unchecked")
   public V getOrDefault(Object key, V defaultValue)
   {
-    if (key == null)
-      return hasNullKey ? (V)kv[1] : defaultValue;
+    if (key instanceof String string)
+    {
+      var idx = findKeyIndex(string);
+      if (idx >= 0)
+        return (V)kv[idx * 2 + 1];
+    }
 
-    final int idx;
-
-    return key instanceof String string && (idx = findKeyIndex(string)) >= 0
-        ? (V)kv[idx * 2 + 1]
-        : defaultValue;
+    return defaultValue;
   }
 
 
@@ -183,6 +179,7 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
    * {@inheritDoc}
    *
    * @throws UnsupportedOperationException  if this map is sealed
+   * @throws NullPointerException           if the key is {@code null}
    */
   @Override
   @Contract(mutates = "this")
@@ -192,31 +189,35 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
     if (sealed)
       throw new UnsupportedOperationException("put");
 
-    final var idx = findKeyIndex(key);
-    int offset;
-
+    final var idx = findKeyIndex(requireNonNull(key, "key must not be null"));
     if (idx >= 0)
     {
-      V previous = (V)kv[offset = idx * 2 + 1];
-      kv[offset] = value;
+      final var valueOffset = idx * 2 + 1;
+
+      V previous = (V)kv[valueOffset];
+      kv[valueOffset] = value;
 
       return previous;
     }
     else
     {
       final var length = size * 2;
+      final var insertOffset = -(idx + 1) * 2;
 
       if (length == kv.length)
-        kv = copyOf(kv, length + 8);
+      {
+        final var kvNew = new Object[length + 8];
 
-      offset = -(idx + 1) * 2;
-      arraycopy(kv, offset, kv, offset + 2, length - offset);
+        arraycopy(kv, 0, kvNew, 0, insertOffset);
+        arraycopy(kv, insertOffset, kvNew, insertOffset + 2, length - insertOffset);
 
-      kv[offset] = key;
-      kv[offset + 1] = value;
+        kv = kvNew;
+      }
+      else
+        arraycopy(kv, insertOffset, kv, insertOffset + 2, length - insertOffset);
 
-      if (key == null)
-        hasNullKey = true;
+      kv[insertOffset] = key;
+      kv[insertOffset + 1] = value;
 
       size++;
 
@@ -237,16 +238,7 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
   {
     V result = null;
 
-    if (key == null && hasNullKey)
-    {
-      if (sealed)
-        throw new UnsupportedOperationException("remove");
-
-      result = (V)kv[1];
-      arraycopy(kv, 2, kv, 0, --size * 2);
-      hasNullKey = false;
-    }
-    else if (key instanceof String string)
+    if (key instanceof String string)
     {
       final var idx = findKeyIndex(string);
       if (idx >= 0)
@@ -280,7 +272,6 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
         throw new UnsupportedOperationException("clear");
 
       size = 0;
-      hasNullKey = false;
     }
   }
 
@@ -382,7 +373,7 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
 
     // respect map hashcode contract!
     for(int offset = 0, length = size * 2; offset < length; offset += 2)
-      hash += Objects.hashCode(kv[offset]) ^ Objects.hashCode(kv[offset + 1]);
+      hash += kv[offset].hashCode() ^ Objects.hashCode(kv[offset + 1]);
 
     return hash;
   }
@@ -412,17 +403,14 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
   /**
    * Performs a binary search for the given key in the internal sorted array.
    *
-   * @param key  the key to search for, may be {@code null}
+   * @param key  the key to search for, not {@code null}
    *
    * @return  the index of the key if found, or {@code -(insertion point) - 1} if not found
    */
   @Contract(pure = true)
-  private int findKeyIndex(String key)
+  private int findKeyIndex(@NotNull String key)
   {
-    if (key == null)
-      return hasNullKey ? 0 : -1;
-
-    var low = hasNullKey ? 1 : 0;
+    var low = 0;
 
     for(var high = size - 1; low <= high;)
     {
@@ -637,7 +625,7 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
     {
       return
           o instanceof Entry<?,?> entry &&
-          Objects.equals(kv[offset], entry.getKey()) &&
+          kv[offset].equals(entry.getKey()) &&
           Objects.equals(kv[offset + 1], entry.getValue());
     }
 
@@ -645,14 +633,14 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
     /** {@inheritDoc} */
     @Override
     public int hashCode() {
-      return Objects.hashCode(kv[offset]) ^ Objects.hashCode(kv[offset + 1]);
+      return kv[offset].hashCode() ^ Objects.hashCode(kv[offset + 1]);
     }
 
 
     /** {@inheritDoc} */
     @Override
     public String toString() {
-      return String.valueOf(kv[offset]) + '=' + kv[offset + 1];
+      return kv[offset] + "=" + kv[offset + 1];
     }
   }
 
