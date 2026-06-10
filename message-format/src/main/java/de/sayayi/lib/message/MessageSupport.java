@@ -555,8 +555,10 @@ public interface MessageSupport
 
 
   /**
-   * Configurable extend of message support providing methods to add/import messages, set default
-   * parameter configuration values and change the default locale.
+   * Configurable extension of {@link MessageSupport} providing methods to add/import messages,
+   * register templates, set default configuration values and change the default locale.
+   *
+   * @see MessageSupportFactory#create(de.sayayi.lib.message.formatter.FormatterService, MessageFactory)
    */
   sealed interface ConfigurableMessageSupport extends MessageSupport, MessagePublisher permits MessageSupportImpl
   {
@@ -920,12 +922,14 @@ public interface MessageSupport
 
 
   /**
-   * This interface allows access to all templates published to the message support.
+   * Read-only accessor providing access to all templates published to a {@link MessageSupport} instance.
+   *
+   * @see MessageAccessor
    */
   sealed interface TemplateAccessor permits MessageAccessor
   {
     /**
-     * Returns all templates contained in this message builder.
+     * Returns all template names contained in this message support.
      *
      * @return  unmodifiable set with all template names, never {@code null}
      */
@@ -935,22 +939,22 @@ public interface MessageSupport
 
 
     /**
-     * Returns the template message associated with {@code name}.
+     * Returns the template associated with {@code name}.
      *
      * @param name  template name
      *
-     * @return  template message or {@code null} if no template with this name exists
+     * @return  template or {@code null} if no template with this name exists
      */
     @Contract(pure = true)
     Message getTemplateByName(@NotNull String name);
 
 
     /**
-     * Tells if this builder contains a template with {@code name}.
+     * Tells if this message support contains a template with {@code name}.
      *
      * @param name  template name to check, or {@code null}
      *
-     * @return  {@code true} if {@code name} is not {@code null} and this builder contains a
+     * @return  {@code true} if {@code name} is not {@code null} and this message support contains a
      *          template with this name, {@code false} otherwise
      */
     @Contract(value = "null -> false", pure = true)
@@ -1001,11 +1005,12 @@ public interface MessageSupport
     /**
      * Adds a template identified by {@code name} to this publisher.
      *
-     * @param name      template name, not {@code null}
+     * @param name      template name in kebab-case, not {@code null}
      * @param template  template message, not {@code null}
      *
      * @return  this message publisher instance, never {@code null}
      *
+     * @throws IllegalArgumentException   if {@code name} does not follow the kebab-case naming convention
      * @throws DuplicateTemplateException  in case a template with the same name already exists
      */
     @Contract(value = "_, _ -> this", mutates = "this")
@@ -1051,7 +1056,7 @@ public interface MessageSupport
      * Decides if {@code template} with {@code name} is filtered or not.
      *
      * @param name      template name, not {@code null}
-     * @param template  template message to analyse, not {@code null}
+     * @param template  template message to analyze, not {@code null}
      *
      * @return  {@code true} if the template will be included,
      *          {@code false} if the template will be excluded

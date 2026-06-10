@@ -45,8 +45,7 @@ import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.internal.pack.PackSupport.PACK_CONFIG;
 import static de.sayayi.lib.message.internal.pack.PackSupport.VERSION;
-import static de.sayayi.lib.message.util.MessageUtil.isKebabOrLowerCamelCaseName;
-import static de.sayayi.lib.message.util.MessageUtil.validateName;
+import static de.sayayi.lib.message.util.MessageUtil.*;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
@@ -184,7 +183,10 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   @Override
   public @NotNull ConfigurableMessageSupport addTemplate(@NotNull String name, @NotNull Message template)
   {
-    if (templateFilter.filter(validateName(name, "template name"), template))
+    if (!isKebabCaseName(validateName(name, "template name")))
+      throw new IllegalArgumentException("template name '" + name + "' must match the kebab-case naming convention");
+
+    if (templateFilter.filter(name, template))
       templates.put(name, requireNonNull(template));
 
     return this;

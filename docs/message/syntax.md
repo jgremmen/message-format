@@ -390,8 +390,12 @@ A template is a reusable message fragment identified by a name. Templates allow 
 a piece of formatting logic once and reference it from multiple messages. This is particularly
 useful for complex formatting patterns that would otherwise be duplicated.
 
-A template reference uses the syntax `%[template-name]`. The template itself is a regular
-message that is registered separately on the `ConfigurableMessageSupport`.
+Template names must follow the kebab-case naming convention: lowercase letters and digits
+separated by single hyphens (e.g. `opt-error`, `item-count`).
+
+A template reference uses the syntax `%[template-name]`. The template is registered separately
+on the `ConfigurableMessageSupport` and is typically created through
+`MessageFactory.parseTemplate(String)`.
 
 ```java
 var messageSupport = MessageSupportFactory.create(

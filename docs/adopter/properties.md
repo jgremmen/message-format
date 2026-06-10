@@ -67,6 +67,7 @@ messageSupport
 Templates are reusable message fragments that can be referenced from other messages using the
 `%[template-name]` syntax. The `adoptTemplates(Properties)` method works like `adopt`, but
 registers each entry as a template rather than a message. Property keys become template names
+(which must follow the kebab-case naming convention)
 and their values are parsed as template format strings.
 
 ```java

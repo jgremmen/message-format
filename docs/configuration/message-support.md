@@ -82,8 +82,8 @@ silently ignored. This default behavior can be changed by installing a custom `M
 
 ### Adding Templates
 
-Templates are reusable message fragments registered under a name. They are referenced from
-messages using the `%[template-name]` syntax. Because they share the parameter context of the
+Templates are reusable message fragments registered under a kebab-case name. They are referenced
+from messages using the `%[template-name]` syntax. Because they share the parameter context of the
 enclosing message, they can access the same parameter values without any extra wiring:
 
 ```java
@@ -180,8 +180,9 @@ a truly immutable snapshot, stop modifying the configurable instance after seali
 
 ## MessageAccessor
 
-The `MessageAccessor` interface provides read-only access to the messages, templates, formatters
-and default configuration managed by a `MessageSupport`. You obtain it through
+The `MessageAccessor` interface provides read-only access to the messages, formatters and default
+configuration managed by a `MessageSupport`. It also extends `TemplateAccessor`, so all
+template-related queries are available through the same object. You obtain it through
 `getMessageAccessor()`:
 
 ```java
@@ -190,8 +191,8 @@ MessageSupport.MessageAccessor accessor = messageSupport.getMessageAccessor();
 
 Through the accessor you can inspect the current state of the message support without risk of
 modification. It provides methods to query messages by code, list all registered message codes,
-check whether a message or template exists, look up formatters, retrieve default configuration
-values, and access the `MessageFactory`.
+check whether a message exists, look up formatters, retrieve default configuration values, and
+access the `MessageFactory`.
 
 ```java
 // check if a message exists before formatting
@@ -213,11 +214,15 @@ Locale locale = accessor.getLocale();
 MessageFactory factory = accessor.getMessageFactory();
 ```
 
-### TemplateAccessor
 
-`MessageAccessor` extends `TemplateAccessor`, which provides template-specific queries. You can
-list template names, retrieve a template by name, check for existence, and find templates that
-are referenced by messages but have not been registered:
+## TemplateAccessor
+
+`TemplateAccessor` provides read-only access to the templates managed by a `MessageSupport`.
+Because `MessageAccessor` extends `TemplateAccessor`, all template queries are available
+directly on the accessor obtained through `getMessageAccessor()`.
+
+You can list template names, retrieve a template by name, check for existence, and find
+templates that are referenced by messages but have not been registered:
 
 ```java
 Set<String> templateNames = accessor.getTemplateNames();
