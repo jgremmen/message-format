@@ -20,9 +20,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Objects.requireNonNull;
 
@@ -66,6 +64,61 @@ public final class NoParameters implements Parameters
   @Contract("_ -> null")
   public Object getParameterValue(@NotNull String parameter) {
     return null;
+  }
+
+
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always an empty optional
+   */
+  @Override
+  public @NotNull Optional<Boolean> getParameterValueAsBoolean(@NotNull String parameter) {
+    return Optional.empty();
+  }
+
+
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always an empty optional
+   */
+  @Override
+  public @NotNull OptionalInt getParameterValueAsInt(@NotNull String parameter) {
+    return OptionalInt.empty();
+  }
+
+
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always an empty optional
+   */
+  @Override
+  public @NotNull OptionalLong getParameterValueAsLong(@NotNull String parameter) {
+    return OptionalLong.empty();
+  }
+
+
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always an empty optional
+   */
+  @Override
+  public @NotNull <T extends Enum<T>> Optional<T> getParameterValueAsEnum(@NotNull String parameter, @NotNull Class<T> enumType) {
+    return Optional.empty();
+  }
+
+
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always an empty optional
+   */
+  @Override
+  public @NotNull Optional<String> getParameterValueAsString(@NotNull String parameter) {
+    return Optional.empty();
   }
 
 

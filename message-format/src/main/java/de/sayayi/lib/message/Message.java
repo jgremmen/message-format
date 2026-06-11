@@ -20,15 +20,14 @@ import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.internal.*;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.util.ParameterValueHelper;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.nio.charset.Charset;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Locale.ROOT;
@@ -413,6 +412,99 @@ public sealed interface Message extends FormatStringSerializer
      */
     @Contract(pure = true)
     Object getParameterValue(@NotNull String parameter);
+
+
+    /**
+     * Returns the named parameter value converted to a {@code Boolean}.
+     *
+     * @param parameter  parameter name, not {@code null}
+     *
+     * @return  an {@link Optional} containing the boolean value, or an empty optional if the value is {@code null}
+     *          or not convertible to a boolean
+     *
+     * @see ParameterValueHelper#getBoolean(Parameters, String)
+     *
+     * @since 0.24.0
+     */
+    @Contract(pure = true)
+    default @NotNull Optional<Boolean> getParameterValueAsBoolean(@NotNull String parameter) {
+      return ParameterValueHelper.getBoolean(this, parameter);
+    }
+
+
+    /**
+     * Returns the named parameter value converted to an {@code int}.
+     *
+     * @param parameter  parameter name, not {@code null}
+     *
+     * @return  an {@link OptionalInt} containing the int value, or an empty optional if the value is {@code null}
+     *          or not convertible to an int
+     *
+     * @see ParameterValueHelper#getInt(Parameters, String)
+     *
+     * @since 0.24.0
+     */
+    @Contract(pure = true)
+    default @NotNull OptionalInt getParameterValueAsInt(@NotNull String parameter) {
+      return ParameterValueHelper.getInt(this, parameter);
+    }
+
+
+    /**
+     * Returns the named parameter value converted to a {@code long}.
+     *
+     * @param parameter  parameter name, not {@code null}
+     *
+     * @return  an {@link OptionalLong} containing the long value, or an empty optional if the value is {@code null}
+     *          or not convertible to a long
+     *
+     * @see ParameterValueHelper#getLong(Parameters, String)
+     *
+     * @since 0.24.0
+     */
+    @Contract(pure = true)
+    default @NotNull OptionalLong getParameterValueAsLong(@NotNull String parameter) {
+      return ParameterValueHelper.getLong(this, parameter);
+    }
+
+
+    /**
+     * Returns the named parameter value converted to an enum constant of the specified type.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param enumType   the enum class to convert to, not {@code null}
+     * @param <T>        the enum type
+     *
+     * @return  an {@link Optional} containing the matching enum constant, or an empty optional if the value is
+     *          {@code null} or does not match any constant
+     *
+     * @see ParameterValueHelper#getEnum(Parameters, String, Class)
+     *
+     * @since 0.24.0
+     */
+    @Contract(pure = true)
+    default <T extends Enum<T>> @NotNull Optional<T> getParameterValueAsEnum(@NotNull String parameter,
+                                                                             @NotNull Class<T> enumType) {
+      return ParameterValueHelper.getEnum(this, parameter, enumType);
+    }
+
+
+    /**
+     * Returns the named parameter value converted to a {@code String}.
+     *
+     * @param parameter  parameter name, not {@code null}
+     *
+     * @return  an {@link Optional} containing the string value, or an empty optional if the value is {@code null}
+     *          or not a {@link CharSequence}
+     *
+     * @see ParameterValueHelper#getString(Parameters, String)
+     *
+     * @since 0.24.0
+     */
+    @Contract(pure = true)
+    default @NotNull Optional<String> getParameterValueAsString(@NotNull String parameter) {
+      return ParameterValueHelper.getString(this, parameter);
+    }
 
 
     /**
