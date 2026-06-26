@@ -22,7 +22,7 @@ def gradleDirectory = layout.projectDirectory.dir('gradle')
 
 allprojects {
   group = 'de.sayayi.lib'
-  version = libs.versions.message.format.get()
+  version = rootProject.libs.versions.message.format.get()
 
   layout.buildDirectory = '.build'
 

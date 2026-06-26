@@ -27,13 +27,13 @@ configurations {
 
 
 dependencies {
-  compileOnly libs.jetbrains.annotations
+  compileOnly rootProject.libs.jetbrains.annotations
 
-  testAnnotationProcessor libs.lombok
+  testAnnotationProcessor rootProject.libs.lombok
 
-  testImplementation libs.bundles.mockito.test
+  testImplementation rootProject.libs.bundles.mockito.test
 
-  def junitVersion = libs.versions.junit.get()
+  def junitVersion = rootProject.libs.versions.junit.get()
 
   testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
   testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
