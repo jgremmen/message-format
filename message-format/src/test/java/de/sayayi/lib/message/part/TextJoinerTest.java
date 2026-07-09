@@ -25,6 +25,9 @@ import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 
+/**
+ * @author Jeroen Gremmen
+ */
 @DisplayName("Text joiner")
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class TextJoinerTest
