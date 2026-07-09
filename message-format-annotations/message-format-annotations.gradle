@@ -176,6 +176,8 @@ publishing {
     withType(MavenPublication).configureEach {
       pom {
         inceptionYear = '2025'
+
+        url = "https://lib.sayayi.de/message-format/${releaseVersion}/adopter/annotation/"
       }
     }
   }

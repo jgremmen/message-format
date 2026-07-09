@@ -67,7 +67,8 @@ tasks.withType(Jar).configureEach {
         'Implementation-Vendor': 'Jeroen Gremmen',
         'Implementation-Vendor-Id': project.group,
         'Implementation-Title': project.name,
-        'Implementation-Version': project.version,
+        'Implementation-Version': releaseVersion,
+        'Implementation-URL': "https://lib.sayayi.de/message-format/${releaseVersion}/",
         'Created-By': System.getProperty('java.version'),
         'Built-Date': new Date().format('yyyy-MM-dd HH:mm:ss')
     )

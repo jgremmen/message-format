@@ -54,6 +54,8 @@ publishing {
     withType(MavenPublication).configureEach {
       pom {
         inceptionYear = '2026'
+
+        url = "https://lib.sayayi.de/message-format/${releaseVersion}/add-on/log4j/"
       }
     }
   }

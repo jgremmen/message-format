@@ -62,6 +62,8 @@ publishing {
     withType(MavenPublication).configureEach {
       pom {
         inceptionYear = '2023'
+
+        url = "https://lib.sayayi.de/message-format/${releaseVersion}/add-on/"
       }
     }
   }

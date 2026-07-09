@@ -90,6 +90,8 @@ publishing {
       pom {
         description = 'Gradle Plugin to scan the class path, pre-compile and pack message and template formats into a single file.'
         inceptionYear = '2023'
+
+        url = "https://lib.sayayi.de/message-format/${releaseVersion}/gradle-plugin/"
       }
     }
   }

@@ -24,6 +24,8 @@ allprojects {
   group = 'de.sayayi.lib'
   version = rootProject.libs.versions.message.format.get()
 
+  ext.releaseVersion = (version as String).endsWith('-SNAPSHOT') ? (version as String)[0..-10] : version
+
   layout.buildDirectory = '.build'
 
   apply plugin: 'base'
