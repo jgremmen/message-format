@@ -20,8 +20,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.part.TextPartFactory.*;
-import static de.sayayi.lib.message.util.MessageUtil.isSpaceChar;
-import static de.sayayi.lib.message.util.MessageUtil.trimSpaces;
+import static de.sayayi.lib.message.util.MessageUtil.*;
 
 
 /**
@@ -161,8 +160,14 @@ public final class TextJoiner
    * @return  this text joiner, never {@code null}
    */
   @Contract(value = "_ -> this", mutates = "this")
-  public @NotNull TextJoiner addNoSpace(@NotNull Text text) {
-    return addNoSpace(text.getText());
+  public @NotNull TextJoiner addNoSpace(@NotNull Text text)
+  {
+    final var trimmedText = text.getText();
+
+    if (!isEmpty(trimmedText))
+      add(trimmedText.toCharArray());
+
+    return this;
   }
 
 
@@ -176,7 +181,7 @@ public final class TextJoiner
   @Contract(value = "_ -> this", mutates = "this")
   public @NotNull TextJoiner addNoSpace(String text)
   {
-    if (text != null)
+    if (!isEmpty(text))
       add(trimSpaces(text).toCharArray());
 
     return this;
@@ -193,7 +198,7 @@ public final class TextJoiner
   @Contract(value = "_ -> this", mutates = "this")
   public @NotNull TextJoiner addWithSpace(String text)
   {
-    if (text != null)
+    if (!isEmpty(text))
       add(text.toCharArray());
 
     return this;
