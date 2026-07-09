@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static de.sayayi.lib.message.util.MessageUtil.isSpaceChar;
+import static de.sayayi.lib.message.util.MessageUtil.trimSpaces;
 
 
 /**
@@ -99,6 +100,29 @@ public final class TextJoiner
 
 
   /**
+   * Adds all characters of the given array to this joiner in order, applying the same space handling as
+   * {@link #add(char)} to each character. This means that runs of space characters are collapsed into a single
+   * pending separator space.
+   *
+   * @param chars  characters to add, not {@code null}
+   *
+   * @return  this text joiner, never {@code null}
+   *
+   * @see #add(char)
+   *
+   * @since 0.24.0
+   */
+  @Contract(value = "_ -> this", mutates = "this")
+  public @NotNull TextJoiner add(char @NotNull [] chars)
+  {
+    for(var ch: chars)
+      add(ch);
+
+    return this;
+  }
+
+
+  /**
    * Adds a single character to this joiner. If the character is a
    * {@linkplain de.sayayi.lib.message.util.MessageUtil#isSpaceChar(char) space character}, it is not appended
    * directly but instead recorded as a pending space that will be emitted as a single separator space before the next
@@ -138,7 +162,7 @@ public final class TextJoiner
    */
   @Contract(value = "_ -> this", mutates = "this")
   public @NotNull TextJoiner addNoSpace(@NotNull Text text) {
-    return add(noSpaceText(text.getText()));
+    return addNoSpace(text.getText());
   }
 
 
@@ -150,8 +174,12 @@ public final class TextJoiner
    * @return  this text joiner, never {@code null}
    */
   @Contract(value = "_ -> this", mutates = "this")
-  public @NotNull TextJoiner addNoSpace(String text) {
-    return add(noSpaceText(text));
+  public @NotNull TextJoiner addNoSpace(String text)
+  {
+    if (text != null)
+      add(trimSpaces(text).toCharArray());
+
+    return this;
   }
 
 
@@ -163,8 +191,12 @@ public final class TextJoiner
    * @return  this text joiner, never {@code null}
    */
   @Contract(value = "_ -> this", mutates = "this")
-  public @NotNull TextJoiner addWithSpace(String text) {
-    return add(spacedText(text));
+  public @NotNull TextJoiner addWithSpace(String text)
+  {
+    if (text != null)
+      add(text.toCharArray());
+
+    return this;
   }
 
 
