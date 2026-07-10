@@ -229,7 +229,7 @@ public final class ArrayFormatter extends AbstractListFormatter<Object> implemen
         var value = getter.apply(idx++);
         var text = value == array
             ? thisText.get()
-            : noSpaceText(valueMessage.format(messageAccessor, parameters.setValue(value)));
+            : valueMessage.formatAsText(messageAccessor, parameters.setValue(value));
 
         if (!text.isEmpty())
           return text;

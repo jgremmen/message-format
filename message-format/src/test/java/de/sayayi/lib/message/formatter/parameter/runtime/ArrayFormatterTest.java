@@ -220,7 +220,7 @@ final class ArrayFormatterTest extends AbstractFormatterTest
   {
     return Stream.of(
         Arguments.of("Empty array with max size 0", new String[0], null, 0, null, ""),
-        Arguments.of("Array with last separator", new String[] { "A", "B", "C" }, " and ", null, null, "A, B and C"),
+        Arguments.of("Array with last separator", new String[] { " A ", "B", "C" }, " and ", null, null, "A, B and C"),
         Arguments.of("Array with max size 2 and more value", new String[] { "A", "B", "C" }, null, 2, "...", "A, B, ..."),
         Arguments.of("Array with max size 2 and last separator", new String[] { "A", "B", "C" }, " and ", 2, null, "A and B"),
         Arguments.of("Array with max size 1 and last separator", new String[] { "A", "B", "C" }, " and ", 1, null, "A"),

@@ -146,12 +146,12 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> 
     @Override
     protected Text prepareNextText()
     {
-      while (iterator.hasNext())
+      while(iterator.hasNext())
       {
         final var value = iterator.next();
         final var text = value == iterable
             ? thisText.get()
-            : noSpaceText(valueMessage.format(messageAccessor, parameters.setValue(value)));
+            : valueMessage.formatAsText(messageAccessor, parameters.setValue(value));
 
         if (!text.isEmpty())
           return text;

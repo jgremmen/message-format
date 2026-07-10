@@ -177,10 +177,7 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
         else
           joiner.add(separator);
 
-        if (n-- == 0)
-          joiner.add(moreValue);
-        else
-          joiner.add(text);
+        joiner.add(n-- == 0 ? moreValue : text.getText());
       }
     }
 
@@ -277,7 +274,7 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
    */
   private static final class UniqueTextIterator extends AbstractTextIterator
   {
-    private final Set<Text> uniqueTexts = new HashSet<>();
+    private final Set<String> uniqueTexts = new HashSet<>();
     private final Iterator<Text> iterator;
 
 
@@ -302,7 +299,7 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
       {
         final var text = iterator.next();
 
-        if (uniqueTexts.add(text))
+        if (uniqueTexts.add(text.getText()))
           return text;
       }
 
