@@ -91,7 +91,7 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
 
 
     /**
-     * Returns the trimmed text for this message part.
+     * Returns the trimmed and normalized text for this message part.
      *
      * @return  trimmed text or {@code null}
      *
@@ -102,7 +102,7 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
 
 
     /**
-     * Returns the trimmed text for this message part.
+     * Returns the trimmed and normalized text for this message part.
      *
      * @return  trimmed text, never {@code null}
      *

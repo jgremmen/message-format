@@ -32,8 +32,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_LIST;
-import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
 import static de.sayayi.lib.message.util.MessageUtil.isTrimmedEmpty;
 import static java.lang.Integer.MAX_VALUE;
 
@@ -163,10 +161,10 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
     var n = (int)context.getConfigValueNumber(CONFIG_MAX_SIZE).orElse(MAX_VALUE);
 
     if (n == 0 && iterator.hasNext() && hasMoreValue)
-      joiner.add(noSpaceText(moreValue));
+      joiner.addNoSpace(moreValue);
     else
     {
-      final var separator = spacedText(context.getConfigValueString(CONFIG_SEPARATOR).orElse(DEFAULT_SEPARATOR));
+      final var separator = context.getConfigValueString(CONFIG_SEPARATOR).orElse(DEFAULT_SEPARATOR);
 
       for(var first = true; iterator.hasNext() && !(n == 0 && !hasMoreValue);)
       {
@@ -175,15 +173,14 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
         if (first)
           first = false;
         else if (!hasMoreValue && (!iterator.hasNext() || n == 1))
-        {
-          joiner.add(spacedText(context
-              .getConfigValueString(CONFIG_SEPARATOR_LAST)
-              .orElseGet(separator::getTextWithSpaces)));
-        }
+          joiner.add(context.getConfigValueString(CONFIG_SEPARATOR_LAST).orElse(separator));
         else
           joiner.add(separator);
 
-        joiner.add(n-- == 0 ? spacedText(moreValue) : text);
+        if (n-- == 0)
+          joiner.add(moreValue);
+        else
+          joiner.add(text);
       }
     }
 

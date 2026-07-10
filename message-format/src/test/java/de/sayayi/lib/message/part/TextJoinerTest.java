@@ -51,10 +51,10 @@ final class TextJoinerTest
     val joiner = new TextJoiner();
 
     joiner
-        .addWithSpace(" Test ")
-        .addWithSpace(null)
-        .addWithSpace(" ")
-        .addWithSpace("1 ");
+        .add(" Test ")
+        .add((String)null)
+        .add(" ")
+        .add("1 ");
 
     assertEquals(noSpaceText("Test 1"), joiner.asNoSpaceText());
     assertEquals(spacedText(" Test 1 "), joiner.asSpacedText());
@@ -77,12 +77,12 @@ final class TextJoinerTest
 
 
   @Test
-  @DisplayName("addWithSpace collapses consecutive spaces into a single separator")
+  @DisplayName("add(String) collapses consecutive spaces into a single separator")
   void testCollapseSpaces()
   {
     val joiner = new TextJoiner();
 
-    joiner.addWithSpace("a     b   c");
+    joiner.add("a     b   c");
 
     assertEquals(noSpaceText("a b c"), joiner.asNoSpaceText());
     assertEquals(spacedText("a b c"), joiner.asSpacedText());
@@ -90,12 +90,12 @@ final class TextJoinerTest
 
 
   @Test
-  @DisplayName("addWithSpace preserves leading and trailing spaces")
-  void testAddWithSpacePreservesSurroundingSpaces()
+  @DisplayName("add(String) preserves leading and trailing spaces")
+  void testAddPreservesSurroundingSpaces()
   {
     val joiner = new TextJoiner();
 
-    joiner.addWithSpace("  hello  ");
+    joiner.add("  hello  ");
 
     assertEquals(spacedText(" hello "), joiner.asSpacedText());
     assertEquals(noSpaceText("hello"), joiner.asNoSpaceText());
@@ -103,12 +103,12 @@ final class TextJoinerTest
 
 
   @Test
-  @DisplayName("addWithSpace ignores null argument")
-  void testAddWithSpaceNull()
+  @DisplayName("add(String) ignores null argument")
+  void testAddNull()
   {
     val joiner = new TextJoiner();
 
-    joiner.addWithSpace(null);
+    joiner.add((String)null);
 
     assertEquals(emptyText(), joiner.asSpacedText());
     assertEquals(emptyText(), joiner.asNoSpaceText());
@@ -116,12 +116,12 @@ final class TextJoinerTest
 
 
   @Test
-  @DisplayName("addWithSpace with blank string only records a pending space")
-  void testAddWithSpaceBlank()
+  @DisplayName("add(String) with blank string only records a pending space")
+  void testAddBlank()
   {
     val joiner = new TextJoiner();
 
-    joiner.addWithSpace("   ");
+    joiner.add("   ");
 
     // pending trailing space is emitted by asSpacedText, discarded by asNoSpaceText
     assertEquals(setSpaces(emptyText(), false, true), joiner.asSpacedText());
@@ -400,7 +400,7 @@ final class TextJoinerTest
   {
     val joiner = new TextJoiner();
 
-    joiner.addWithSpace(" a b ");
+    joiner.add(" a b ");
 
     // toString delegates to asSpacedText().toString() (the debug representation)
     assertEquals(joiner.asSpacedText().toString(), joiner.toString());
@@ -418,7 +418,7 @@ final class TextJoinerTest
     assertSame(joiner, joiner.add(noSpaceText("b")));
     assertSame(joiner, joiner.addNoSpace("c"));
     assertSame(joiner, joiner.addNoSpace(noSpaceText("d")));
-    assertSame(joiner, joiner.addWithSpace("e"));
+    assertSame(joiner, joiner.add("e"));
   }
 
 
@@ -429,7 +429,7 @@ final class TextJoinerTest
     val joiner = new TextJoiner();
 
     joiner
-        .addWithSpace("   one ")
+        .add("   one ")
         .add(noSpaceText("two"))
         .add(',')
         .add(' ')

@@ -80,21 +80,33 @@ public final class TextJoiner
   @Contract(value = "_ -> this", mutates = "this")
   public @NotNull TextJoiner add(@NotNull Text text)
   {
-    insertSpaceBefore |= text.isSpaceBefore();
-
-    var s = text.getText();
-    if (s != null && !s.isEmpty())
+    if (text.isEmpty())
+      insertSpaceBefore |= text.isSpaceBefore() | text.isSpaceAfter();
+    else
     {
-      if (insertSpaceBefore)
+      if (insertSpaceBefore || text.isSpaceBefore())
         joined.append(' ');
-      joined.append(s);
+      joined.append(text.getText());
 
       insertSpaceBefore = text.isSpaceAfter();
     }
-    else
-      insertSpaceBefore |= text.isSpaceAfter();
 
     return this;
+  }
+
+
+  /**
+   * Adds a string to this joiner, preserving its leading and trailing spaces.
+   *
+   * @param text  string to add, or {@code null}
+   *
+   * @return  this text joiner, never {@code null}
+   *
+   * @since 0.24.0
+   */
+  @Contract(value = "_ -> this", mutates = "this")
+  public @NotNull TextJoiner add(String text) {
+    return isEmpty(text) ? this : add(text.toCharArray());
   }
 
 
@@ -160,14 +172,8 @@ public final class TextJoiner
    * @return  this text joiner, never {@code null}
    */
   @Contract(value = "_ -> this", mutates = "this")
-  public @NotNull TextJoiner addNoSpace(@NotNull Text text)
-  {
-    final var trimmedText = text.getText();
-
-    if (!isEmpty(trimmedText))
-      add(trimmedText.toCharArray());
-
-    return this;
+  public @NotNull TextJoiner addNoSpace(@NotNull Text text) {
+    return text.isEmpty() ? this : add(text.getText().toCharArray());
   }
 
 
@@ -179,29 +185,8 @@ public final class TextJoiner
    * @return  this text joiner, never {@code null}
    */
   @Contract(value = "_ -> this", mutates = "this")
-  public @NotNull TextJoiner addNoSpace(String text)
-  {
-    if (!isEmpty(text))
-      add(trimSpaces(text).toCharArray());
-
-    return this;
-  }
-
-
-  /**
-   * Adds a string to this joiner, preserving its leading and trailing spaces.
-   *
-   * @param text  string to add, or {@code null}
-   *
-   * @return  this text joiner, never {@code null}
-   */
-  @Contract(value = "_ -> this", mutates = "this")
-  public @NotNull TextJoiner addWithSpace(String text)
-  {
-    if (!isEmpty(text))
-      add(text.toCharArray());
-
-    return this;
+  public @NotNull TextJoiner addNoSpace(String text) {
+    return isEmpty(text) ? this : add(trimSpaces(text).toCharArray());
   }
 
 
