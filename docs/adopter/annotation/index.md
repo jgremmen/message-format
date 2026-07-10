@@ -1,12 +1,171 @@
+---
+icon: material/at
+toc_depth: 2
+---
+
 # Annotation Adopter
 
 The annotation adopter reads `@MessageDef` and `@TemplateDef` annotations from compiled `.class` files and publishes 
-the discovered messages and templates to a `MessageSupport` instance. The annotated classes do not need to be loaded 
-into the JVM. Both annotations use `RetentionPolicy.CLASS`, so the adopter can read them directly from the binary class
-data without requiring runtime reflection.
+the discovered messages and templates to a `MessageSupport` instance.
 
 The `AnnotationAdopter` class provides multiple strategies for locating annotated classes. It tracks which classes have
 already been processed to avoid duplicate registrations.
+
+
+## Declaring Messages and Templates
+
+Before the adopter can discover anything, the messages and templates have to be declared through annotations in the 
+source code. `@MessageDef` defines a message that is later retrieved by its code and `@TemplateDef` defines a reusable 
+message fragment that is referenced by name from other messages.
+
+### Where the Annotations Go
+
+Both `@MessageDef` and `@TemplateDef` may be placed on a type or on a method. The annotated element is only a carrier 
+for the declaration. The message or template has no relationship to what the class or method actually does. Declarations
+may therefore be grouped wherever they read best, for example on a dedicated holder class that contains nothing but
+annotations, or directly on the method whose behavior a message describes.
+
+The following holder class keeps all authentication messages in one place. Because both annotations are repeatable, 
+any number of them may be stacked on a single element.
+
+```java
+@MessageDef(code = "auth.login-failed", text = "Login failed for %{user}.")
+@MessageDef(code = "auth.locked", text = "Account %{user} is locked.")
+public final class AuthMessages {}
+// Declares two messages, retrieved later by code "auth.login-failed" and "auth.locked"
+```
+
+Placing a declaration on a method is useful when a message belongs conceptually to a specific operation. The method 
+body remains untouched.
+
+```java
+public class OrderService
+{
+  @MessageDef(code = "order.shipped", text = "Order %{id} has shipped.")
+  public void ship(String id) {
+    // business logic
+  }
+}
+// Declares the message "order.shipped" while leaving ship() fully functional
+```
+
+### Messages Without a Locale
+
+When a message has only one text and no localization is required, use the `text` element of `@MessageDef`. It is a
+shorthand for a single `@Text` without a locale. A message declared this way matches every locale used for formatting.
+
+```java
+@MessageDef(code = "app.name", text = "Message Format Library")
+public final class BrandingMessages {}
+
+messageSupport
+    .code("app.name")
+    .format();
+// "Message Format Library"
+```
+
+The equivalent long form assigns a single `@Text` to the `texts` element and relies on its value shorthand. Both 
+declarations produce the same locale independent message, so prefer the compact `text` form for this case.
+
+```java
+@MessageDef(code = "app.name", texts = @Text("Message Format Library"))
+public final class BrandingMessages {}
+// Identical in effect to the text = "..." form above
+```
+
+The same shorthand exists for templates. A locale independent template uses the `text` element of `@TemplateDef`. 
+The template below appends an error detail only when one is present.
+
+```java
+@TemplateDef(name = "opt-error", text = "%{err,!empty:': %{err}'}")
+public final class CommonTemplates {}
+
+messageSupport
+    .message("Operation failed%[opt-error]")
+    .with("err", "disk full")
+    .format();
+// "Operation failed: disk full"
+```
+
+### Locale Dependent Messages
+
+To provide translations, list several `@Text` entries in the `texts` element and give each one a `locale`. The locale 
+is either a plain language code such as `en` or `de`, or a language and country combination such as `de_DE` or `fr_CA`.
+Leave the `text` element unset when `texts` is used.
+
+```java
+@MessageDef(code = "greeting", texts = {
+    @Text(locale = "en", text = "Hello %{name}!"),
+    @Text(locale = "de", text = "Hallo %{name}!"),
+    @Text(locale = "fr", text = "Bonjour %{name} !")
+})
+public final class GreetingMessages {}
+
+messageSupport
+    .code("greeting")
+    .with("name", "Alice")
+    .locale(Locale.GERMAN)
+    .format();
+// "Hallo Alice!"
+```
+
+A `@Text` whose `locale` is omitted corresponds to `Locale.ROOT`. It acts as the fallback that matches any locale for 
+which no dedicated translation exists. Combining a root text with specific translations provides a default plus targeted
+overrides in a single declaration.
+
+```java
+@MessageDef(code = "farewell", texts = {
+    @Text("Goodbye %{name}."),
+    @Text(locale = "de", text = "Auf Wiedersehen %{name}.")
+})
+public final class FarewellMessages {}
+
+messageSupport
+    .code("farewell")
+    .with("name", "Bob")
+    .locale(Locale.FRENCH)
+    .format();
+// "Goodbye Bob." because no French text exists, so the root text applies
+```
+
+Localization becomes especially valuable together with the map key features of the message format, because plural rules 
+differ between languages. The next example selects the correct wording for zero, one and many items independently per 
+locale.
+
+```java
+@MessageDef(code = "cart.count", texts = {
+    @Text(locale = "en",
+        text = "%{n,format:choice,0:'your cart is empty',1:'1 item',:'%{n} items'}"),
+    @Text(locale = "de",
+        text = "%{n,format:choice,0:'Ihr Warenkorb ist leer',1:'1 Artikel',:'%{n} Artikel'}")
+})
+public final class CartMessages {}
+
+messageSupport
+    .code("cart.count")
+    .with("n", 3)
+    .locale(Locale.GERMAN)
+    .format();
+// "3 Artikel"
+```
+
+Templates are localized in exactly the same way. Supply multiple `@Text` entries in the `texts` element of 
+`@TemplateDef` to translate a shared fragment.
+
+```java
+@TemplateDef(name = "unit-days", texts = {
+    @Text(locale = "en", text = "%{d,format:choice,1:'1 day',:'%{d} days'}"),
+    @Text(locale = "de", text = "%{d,format:choice,1:'1 Tag',:'%{d} Tage'}")
+})
+public final class DurationTemplates {}
+
+messageSupport
+    .message("Delivery in %[unit-days].")
+    .with("d", 1)
+    .locale(Locale.ENGLISH)
+    .format();
+// "Delivery in 1 day."
+```
 
 
 ## Creating an Adopter
@@ -47,8 +206,8 @@ adopter.adopt(
 ```
 
 The first argument is the `ClassLoader` used to resolve package resources. The second argument is a set of package 
-names. This strategy is the most convenient when your message definitions are spread across many classes within a known 
-set of packages, because a single call processes everything:
+names. This strategy is the most convenient when message definitions are spread across many classes within a known set 
+of packages, because a single call processes everything:
 
 ```java
 // Scan the entire com.example hierarchy
@@ -59,21 +218,17 @@ adopter.adopt(
 
 ### Single Class File
 
-When you know the exact location of a class file on disk, you can provide its path directly. This is useful in build
+When the exact location of a class file on disk is known, its path can be provided directly. This is useful in build
 tool integrations, Gradle tasks, or test setups where the output directory is known:
 
 ```java
 adopter.adopt(Path.of("build/classes/java/main/com/example/MyMessages.class"));
-adopter.adopt(new File("build/classes/java/main/com/example/MyConstants.class"));
 ```
-
-The `File` variant delegates to the `Path` variant internally, so both behave identically.
 
 ### Loaded Type
 
-If the annotated class is already loaded in the JVM, you can pass its `Class` object. The adopter uses the class loader
-associated with the type to locate the corresponding `.class` resource and parses it for annotations. If the type has 
-no class loader (e.g. bootstrap classes), the call returns immediately without doing anything.
+If the annotated class is already loaded in the JVM, its `Class` object can be passed. If the type has no class loader
+(e.g. bootstrap classes), the call returns immediately without doing anything.
 
 ```java
 adopter.adopt(MyMessages.class);
@@ -82,12 +237,12 @@ adopter.adopt(MyMessages.class);
 
 ### Annotation Instances
 
-The `adopt(MessageDef)` and `adopt(TemplateDef)` methods accept annotation instances directly, bypassing bytecode
-scanning entirely. This is useful in programmatic or testing scenarios where you want to register messages without
-creating an annotated class. The `adopter.util` package provides the record implementations `SyntheticMessageDef`, 
-`SyntheticTemplateDef` and `SyntheticText` for constructing these instances.
+The `adopt(MessageDef)` and `adopt(TemplateDef)` methods accept annotation instances directly. This is useful in
+programmatic or testing scenarios where messages need to be registered without creating an annotated class. The 
+`adopter.util` package provides the record implementations `SyntheticMessageDef`, `SyntheticTemplateDef` and 
+`SyntheticText` for constructing these instances.
 
-For a simple, non-localized message you only need to provide the code and the text. The convenience constructor creates
+For a simple, non-localized message only the code and the text need to be provided. The convenience constructor creates
 the record without any localized `Text` variants:
 
 ```java
@@ -140,18 +295,6 @@ Similarly, `SyntheticMessageDef` trims the `code` and defaults a `null` text to 
 `SyntheticTemplateDef` validates the `name` and trims the text.
 
 
-## Method Chaining
-
-All `adopt` methods return the adopter instance itself, so calls can be chained fluently:
-
-```java
-adopter
-    .adopt(AuthMessages.class)
-    .adopt(OrderMessages.class)
-    .adopt(CommonTemplates.class);
-```
-
-
 ## Deduplication
 
 The adopter tracks every class it has visited, identified by its classpath entry or fully qualified type name. When the
@@ -165,7 +308,7 @@ adopter.adopt(classLoader, Set.of("com.example"));
 adopter.adopt(classLoader, Set.of("com.example.messages"));
 ```
 
-Deduplication applies at the class level, not at the individual message or template level. If you need fine-grained 
+Deduplication applies at the class level, not at the individual message or template level. For fine-grained 
 control over which messages or templates are accepted, configure a `MessageFilter` or `TemplateFilter` on the 
 `ConfigurableMessageSupport` before adopting. The filter is consulted each time a message or template is about to be 
 published, regardless of whether the class itself has been visited before.

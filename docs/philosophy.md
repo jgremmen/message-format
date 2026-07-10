@@ -11,7 +11,7 @@ is produced.
 
 The common workaround is to write messages that sidestep grammar altogether. Something like
 "Results found: 3" works for any number, translates easily into most languages with a simple
-placeholder replacement, and never has to agree with a noun or verb. But nobody actually speaks
+placeholder replacement and never has to agree with a noun or verb. But nobody actually speaks
 like that. The message is functional, yet it reads like output from a machine rather than
 communication from one human to another.
 

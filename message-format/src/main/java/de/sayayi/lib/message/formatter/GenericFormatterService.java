@@ -47,7 +47,7 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * This service resolves formatters for a given value type by walking the type hierarchy (superclasses and interfaces)
  * and returning all matching formatters in priority order. Named formatters can be selected explicitly by name in
- * message parameters, and some named formatters are automatically applied when their configuration key is present.
+ * message parameters and some named formatters are automatically applied when their configuration key is present.
  * <p>
  * A {@link de.sayayi.lib.message.formatter.parameter.named.StringFormatter StringFormatter} is registered as the
  * default fallback formatter for {@link Object}.

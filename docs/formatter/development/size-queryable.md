@@ -30,7 +30,7 @@ framework should continue searching through additional formatters registered for
 When a message contains `%{param,format:size}`, the `SizeFormatter` calls `context.size(value)`. The context
 implementation iterates over all formatters registered for the value's runtime type. For each formatter that
 implements `SizeQueryable`, it calls the `size` method. The first formatter that returns a present
-`OptionalLong` wins, and its value becomes the computed size. If no formatter can determine the size, the
+`OptionalLong` wins and its value becomes the computed size. If no formatter can determine the size, the
 `size` formatter treats the result as indeterminate and uses the `empty` map key.
 
 This means that `SizeQueryable` is not limited to the `size` named formatter. Any formatter that holds a

@@ -18,7 +18,7 @@ formatter to work.
 
 ## Set-Bit Mode
 
-The most common use of `bitmask` is labeling individual bits. Each number map key represents a bit index, and the
+The most common use of `bitmask` is labeling individual bits. Each number map key represents a bit index and the
 associated message is the label for that bit. The `bitset` configuration key controls the bit ordering: `lsb-set`
 (least significant bit first, the default) or `msb-set` (most significant bit first). Only bits that are set in
 the value **and** have a matching number map key produce output; all other bits are silently skipped.

@@ -6,7 +6,7 @@
 [![Documentation](https://img.shields.io/badge/Documentation-8A2BE2)](https://lib.sayayi.de/message-format/latest)
 
 Message Format is a Java library for producing human-readable messages. Instead of constructing
-text by concatenating strings, format conversions, and conditional logic in Java code, messages
+text by concatenating strings, format conversions and conditional logic in Java code, messages
 are written as format strings where the focus is on the text itself. Variable parts are
 represented by named parameters that the library resolves and formats automatically.
 
@@ -45,7 +45,7 @@ patterns.
 A message can carry multiple locale-specific variants. When the message is formatted, the library
 selects the best matching variant for the requested `Locale`, falling back through the locale
 hierarchy. This makes it straightforward to maintain multilingual applications: all translations
-for a given message code live together, and the selection logic is handled by the library.
+for a given message code live together and the selection logic is handled by the library.
 
 ### Templates
 
@@ -68,7 +68,7 @@ that uses them while still allowing them to be managed centrally.
 Messages and templates can be serialized into a compact binary pack format (`.mfp`). A pack file
 contains pre-compiled message definitions that can be loaded into a `MessageSupport` instance at
 application startup. This is the recommended way to distribute message definitions: the Gradle
-plugin produces a single `.mfp` file during the build, and the application imports it at runtime
+plugin produces a single `.mfp` file during the build and the application imports it at runtime
 with a single method call. The pack format also provides as a compatibility mechanism, so older pack
 files can be read by newer versions of the library.
 
@@ -100,20 +100,20 @@ Language expressions inside message format strings.
 
 The `de.sayayi.plugin.gradle.message` Gradle plugin automates message packing as part of the
 build. It scans the project's compiled classes for `@MessageDef` and `@TemplateDef` annotations,
-pre-compiles the format strings, and writes all definitions into a single `.mfp` pack file. The
+pre-compiles the format strings and writes all definitions into a single `.mfp` pack file. The
 plugin provides a `messageFormat` extension for configuring the source sets to scan and the
 strategy for handling duplicate message codes. The resulting pack file is added to the project's
 resources so it is included in the final artifact automatically.
 
 ## Modules
 
-| Module                                                                                                             | Description                                                                     |
-|--------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
-| message-format&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format/0.24.0)                         | Core library: parsing, formatting, adopters, pack format, and the formatter SPI |
-| message-format-annotations&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-annotations/0.24.0) | `@MessageDef`, `@TemplateDef`, annotation adopter and synthetic annotations     |
-| message-format-log4j&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-log4j/0.24.0)             | Log4j integration: `MessageFactory` using message-format syntax                 |
-| message-format-spring&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-spring/0.24.0)           | Spring `MessageSource` bridge and SpEL formatter                                |
-| message-gradle-plugin                                                                                              | Gradle plugin for build-time annotation scanning and message packing            |
+| Module                                                                                                             | Description                                                                    |
+|--------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| message-format&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format/0.24.0)                         | Core library: parsing, formatting, adopters, pack format and the formatter SPI |
+| message-format-annotations&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-annotations/0.24.0) | `@MessageDef`, `@TemplateDef`, annotation adopter and synthetic annotations    |
+| message-format-log4j&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-log4j/0.24.0)             | Log4j integration: `MessageFactory` using message-format syntax                |
+| message-format-spring&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-spring/0.24.0)           | Spring `MessageSource` bridge and SpEL formatter                               |
+| message-gradle-plugin                                                                                              | Gradle plugin for build-time annotation scanning and message packing           |
 
 ## Quick Example
 

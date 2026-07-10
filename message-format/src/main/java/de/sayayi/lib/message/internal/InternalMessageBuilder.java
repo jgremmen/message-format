@@ -442,7 +442,7 @@ public final class InternalMessageBuilder implements MessageBuilder
   /**
    * Default implementation of {@link ParameterBuilder}.
    * <p>
-   * Collects the parameter name, optional format, configuration values and map entries, and flushes them as a
+   * Collects the parameter name, optional format, configuration values and map entries and flushes them as a
    * {@link ParameterPart} when the next part is started or the message is built.
    *
    * @since 0.21.0
@@ -676,7 +676,7 @@ public final class InternalMessageBuilder implements MessageBuilder
   /**
    * Default implementation of {@link PostFormatterBuilder}.
    * <p>
-   * Collects the post-formatter name, inner message and configuration values, and flushes them as a
+   * Collects the post-formatter name, inner message and configuration values and flushes them as a
    * {@link PostFormatterPart} when the next part is started or the message is built.
    *
    * @since 0.21.0
@@ -813,7 +813,7 @@ public final class InternalMessageBuilder implements MessageBuilder
   /**
    * Default implementation of {@link TemplateBuilder}.
    * <p>
-   * Collects the template name, default parameter values and parameter delegate mappings, and flushes them as a
+   * Collects the template name, default parameter values and parameter delegate mappings and flushes them as a
    * {@link TemplatePart} when the next part is started or the message is built.
    *
    * @since 0.21.0

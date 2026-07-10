@@ -40,7 +40,7 @@ import static org.w3c.dom.Node.ELEMENT_NODE;
  * Parameter formatter for DOM {@link Node} values, specifically {@link Element} and {@link Attr} nodes.
  * <p>
  * This formatter renders a DOM node as its XPath expression. Elements are represented with their positional index
- * predicate when siblings with the same name exist, and attributes are prefixed with {@code @}.
+ * predicate when siblings with the same name exist and attributes are prefixed with {@code @}.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

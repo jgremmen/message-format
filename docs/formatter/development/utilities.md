@@ -56,7 +56,7 @@ MessageUtil.trimSpaces("\t\nhello\n\t");       // "\nhello\n"
 ### `trimAndNormalizeSpaces(String)`
 
 This method goes a step further than `trimSpaces`. It trims leading and trailing spaces, collapses
-consecutive internal space characters into a single ASCII space (U+0020), and replaces any remaining
+consecutive internal space characters into a single ASCII space (U+0020) and replaces any remaining
 Unicode space character with a regular ASCII space. Newlines are left untouched throughout this
 process. The method returns `null` when the input is `null` and an empty string when the input
 contains only space characters.
@@ -188,7 +188,7 @@ t2.isSpaceAfter();   // false
 ### `addSpaces(Text, boolean, boolean)`
 
 This method adds space flags to an existing `Text`. The first boolean controls whether a leading
-space should be added, and the second controls the trailing space. If the `Text` already has the
+space should be added and the second controls the trailing space. If the `Text` already has the
 requested space flag set, no change is made for that side. When neither flag would change, the
 original `Text` instance is returned as-is. This is useful when a formatter needs to inject spacing
 around an intermediate result that was produced by another method or formatter.
@@ -219,7 +219,7 @@ and avoid emitting a leading or trailing separator space.
 `TextJoiner` solves all of this. It accumulates `Text` parts, strings and individual characters
 into a single buffer. Whenever it encounters a space character, it does not append it immediately.
 Instead, it records the space as pending. The space is emitted only when actual non-space content
-follows, and adjacent pending spaces are collapsed into one separator space.
+follows and adjacent pending spaces are collapsed into one separator space.
 
 ### Creating and Adding Content
 
@@ -228,7 +228,7 @@ several methods, each accepting a different input type. All `add` methods return
 so calls can be chained.
 
 `add(Text)` appends a `Text` instance. The leading and trailing space flags of the `Text` are
-honored: a leading space flag causes a separator space before the content, and a trailing space
+honored: a leading space flag causes a separator space before the content and a trailing space
 flag is recorded as pending for the next addition.
 
 `add(char)` appends a single character. If the character is a space character (as defined by
@@ -289,7 +289,7 @@ Text spaced = joiner.asSpacedText();
 ### Practical Example: Joining Collection Elements
 
 The following example shows how a formatter might use `TextJoiner` to render the elements of a
-collection as a comma-separated list. Each element is formatted individually, and the joiner
+collection as a comma-separated list. Each element is formatted individually and the joiner
 takes care of the spacing between elements.
 
 ```java

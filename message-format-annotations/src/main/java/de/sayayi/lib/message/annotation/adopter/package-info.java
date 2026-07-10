@@ -21,7 +21,7 @@
  * <p>
  * The {@link de.sayayi.lib.message.annotation.adopter.AbstractAnnotationAdopter AbstractAnnotationAdopter}
  * provides multiple strategies for locating annotated classes, including classpath scanning, single class file
- * analysis, and direct annotation instance processing.
+ * analysis and direct annotation instance processing.
  * <p>
  * The {@link de.sayayi.lib.message.annotation.adopter.AnnotationAdopter AnnotationAdopter} is the concrete
  * ASM-based implementation that scans compiled class files for message and template annotations without loading

@@ -23,7 +23,7 @@ messageSupport
 ```
 
 By default each entry is rendered as `key=(null)` when the value is `null`, `(null)=value` when the key is
-`null`, and `key=value` otherwise. Multiple entries are separated by `", "`.
+`null` and `key=value` otherwise. Multiple entries are separated by `", "`.
 
 ```java
 Map<String,Integer> scores = new LinkedHashMap<>();

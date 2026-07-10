@@ -6,7 +6,7 @@ icon: material/alphabet-latin
 
 When a parameter appears in a message, the library selects a formatter based on the Java type
 of the parameter value. An `int` is handled by the number formatter, a `LocalDate` by the
-temporal formatter, a `List` by the iterable formatter, and so on. This automatic type-based
+temporal formatter, a `List` by the iterable formatter and so on. This automatic type-based
 selection covers the majority of cases, but sometimes the way a value should be presented has
 nothing to do with its Java type. You might want to treat a number as a boolean, determine
 the size of a collection, or select one of several messages based on a value without
@@ -26,7 +26,7 @@ no special syntax in the message.
 
 Named formatters implement `NamedParameterFormatter`, which extends `ParameterFormatter` and
 adds two key characteristics. The `getName()` method returns the formatter's name used to
-reference it in a message, and `getFormattableTypes()` returns an empty set by default, so
+reference it in a message and `getFormattableTypes()` returns an empty set by default, so
 the formatter is never selected automatically. It is only activated when the message
 explicitly requests it through `format:<name>`.
 
@@ -48,7 +48,7 @@ be selected.
 
 To select a named formatter, add `format:<name>` to the parameter configuration. The
 following example forces the `bool` formatter on an integer value. Without the explicit
-`format:bool`, the library would use the number formatter instead, and the `true` and `false`
+`format:bool`, the library would use the number formatter instead and the `true` and `false`
 map keys would never match because the number formatter does not interpret integers as
 booleans.
 
@@ -77,7 +77,7 @@ using the named formatter.
 The `bool` formatter, for example, accepts `Boolean`, all numeric primitives, `String`,
 `Optional`, `OptionalInt`, `OptionalLong` and `null`. If you were to pass a `List` with
 `format:bool`, the `bool` formatter would decline because `canFormat(List.class)` returns
-`false`, and the library would fall back to the default formatter for lists.
+`false` and the library would fall back to the default formatter for lists.
 
 
 ## Showcase
@@ -90,7 +90,7 @@ details and configuration options.
 
 The `bool` formatter converts a wide range of input types to a boolean value and maps it to
 custom text. Numbers are interpreted as `false` when zero and `true` otherwise. Strings
-`"true"` and `"false"` are recognized literally, and numeric strings are parsed and treated
+`"true"` and `"false"` are recognized literally and numeric strings are parsed and treated
 as numbers.
 
 ```java
@@ -145,7 +145,7 @@ messageSupport
 
 The `size` formatter determines the size of a value by delegating to `SizeQueryable`
 formatters registered for the value's type. It can compute the length of a string, the number
-of elements in a collection or array, the number of entries in a map, and similar
+of elements in a collection or array, the number of entries in a map and similar
 measurements. The resulting size can be mapped to custom text using number map keys.
 
 ```java

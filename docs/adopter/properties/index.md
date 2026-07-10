@@ -1,25 +1,28 @@
+---
+icon: material/comment-text-outline
+---
+
 # Properties Adopter
 
-`PropertiesAdopter` reads messages and templates from Java `Properties` objects. Property keys
-serve as message codes or template names, and their values are parsed as message format strings.
-Unlike `ResourceBundleAdopter`, which ties directly into the Java resource bundle mechanism,
-this adopter works with any `Properties` instance regardless of where it came from. This makes
-it a good fit when you load localized text from custom sources such as configuration files,
+`PropertiesAdopter` reads messages and templates from Java `Properties` objects. Property keys serve as message codes 
+or template names and their values are parsed as message format strings. Unlike `ResourceBundleAdopter`, which ties 
+directly into the Java resource bundle mechanism, this adopter works with any `Properties` instance regardless of where
+it came from. This makes it a good fit for loading localized text from custom sources such as configuration files,
 databases, REST endpoints or in-memory maps.
 
-The adopter offers three operations: adopting non-localized messages, adopting templates, and
-adopting locale-aware messages from a map of properties.
+The adopter offers three operations: adopting non-localized messages, adopting templates and adopting locale-aware
+messages from a map of properties.
 
 
 ## Adopting Messages
 
-The `adopt(Properties)` method registers every entry in the given `Properties` object as a
-message. Each property key becomes the message code that you later use to look up the message,
-and the corresponding value is parsed as a message format string.
+The `adopt(Properties)` method registers every entry in the given `Properties` object as a message. Each property key 
+becomes the message code used later to look up the message, and the corresponding value is parsed as a message
+format string.
 
-Because no locale is associated with the properties, the resulting messages are locale-neutral.
-They will be returned regardless of which locale is requested at format time. This is
-convenient for technical messages, log output or any situation where localization is not needed.
+Because no locale is associated with the properties, the resulting messages are locale-neutral. They will be returned 
+regardless of which locale is requested at format time. This is convenient for technical messages, log output or any 
+situation where localization is not needed.
 
 ```java
 var messageSupport = MessageSupportFactory.create(
@@ -38,9 +41,9 @@ messageSupport
 // "Welcome, Charlie!"
 ```
 
-You can call `adopt` multiple times with different `Properties` objects. Each call adds the
-entries to the same `MessagePublisher`, so all messages accumulate in one place. This is useful
-if your application assembles messages from several property files or modules.
+The `adopt` method can be called multiple times with different `Properties` objects. Each call adds the entries to the
+same `MessagePublisher`, so all messages accumulate in one place. This is useful when an application assembles messages 
+from several property files or modules.
 
 ```java
 var coreProps = new Properties();
@@ -64,11 +67,10 @@ messageSupport
 
 ## Adopting Templates
 
-Templates are reusable message fragments that can be referenced from other messages using the
-`%[template-name]` syntax. The `adoptTemplates(Properties)` method works like `adopt`, but
-registers each entry as a template rather than a message. Property keys become template names
-(which must follow the kebab-case naming convention)
-and their values are parsed as template format strings.
+Templates are reusable message fragments that can be referenced from other messages using the `%[template-name]` 
+syntax. The `adoptTemplates(Properties)` method works like `adopt`, but registers each entry as a template rather than 
+a message. Property keys become template names (which must follow the kebab-case naming convention) and their values 
+are parsed as template format strings.
 
 ```java
 var templateProps = new Properties();
@@ -89,10 +91,9 @@ messageSupport
 // "Task completed"
 ```
 
-Because templates are shared across all messages, they are a natural way to enforce consistent
-formatting patterns throughout your application. For example, you could define a template that
-renders an optional suffix only when its parameter is present, and then reference it from
-dozens of different messages without repeating the conditional logic.
+Because templates are shared across all messages, they are a natural way to enforce consistent formatting patterns 
+throughout an application. For example, a template can be defined that renders an optional suffix only when its
+parameter is present and then reference it from dozens of different messages without repeating the conditional logic.
 
 ```java
 var templates = new Properties();
@@ -120,15 +121,14 @@ messageSupport
 
 ## Adopting Localized Messages
 
-The `adopt(Map<Locale, Properties>)` method accepts a map where each key is a `Locale` and each
-value is a `Properties` object containing messages for that locale. When the same property key
-appears in multiple locale entries, all locale-specific values are combined into a single
-locale-aware message. At format time the library selects the value that best matches the
-requested locale.
+The `adopt(Map<Locale, Properties>)` method accepts a map where each key is a `Locale` and each value is a `Properties` 
+object containing messages for that locale. When the same property key appears in multiple locale entries, all 
+locale-specific values are combined into a single locale-aware message. At format time the library selects the value 
+that best matches the requested locale.
 
-This approach is useful when localized property files are loaded individually, for example from
-a naming convention like `messages_en.properties` and `messages_de.properties`, or when
-translations are fetched from a database where each locale corresponds to a separate result set.
+This approach is useful when localized property files are loaded individually, for example from a naming convention
+like `messages_en.properties` and `messages_de.properties`, or when translations are fetched from a database where each
+locale corresponds to a separate result set.
 
 ```java
 var english = new Properties();
@@ -158,9 +158,9 @@ messageSupport
 // "Hallo, Alice!"
 ```
 
-The map can contain as many locales as needed. If only some property keys appear in a given
-locale, the adopter still registers whatever is available. Messages that exist for only one
-locale will simply not produce a result for the other locales.
+The map can contain as many locales as needed. If only some property keys appear in a given locale, the adopter still
+registers whatever is available. Messages that exist for only one locale will simply not produce a result for the other 
+locales.
 
 ```java
 var english = new Properties();
@@ -193,9 +193,9 @@ messageSupport
 // "メートル"
 ```
 
-Localized entries can contain the full message format syntax, including parameters, map keys
-and template references. This lets you handle locale-specific differences that go beyond simple
-word substitution, such as different pluralization rules or different word order.
+Localized entries can contain the full message format syntax, including parameters, map keys and template references. 
+This allows locale-specific differences that go beyond simple word substitution to be handled, such as different 
+pluralization rules or different word order.
 
 ```java
 var english = new Properties();

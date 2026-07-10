@@ -4,7 +4,7 @@ This formatter is included in the `DefaultFormatterService`.
 
 The library offers three formatters that deal with boolean values. It is important to understand that these
 formatters fall into two fundamentally different categories: type-based formatters that are selected automatically
-when a parameter holds a boolean-related Java type, and a named formatter that you select explicitly to force
+when a parameter holds a boolean-related Java type and a named formatter that you select explicitly to force
 boolean interpretation on values that are not inherently boolean.
 
 

@@ -2,13 +2,13 @@
 
 This formatter is included in the `DefaultFormatterService`.
 
-The `ThrowableFormatter` handles `java.lang.Throwable` and all of its subclasses, including `Exception`,
-`RuntimeException`, `Error` and any custom exception types. The formatter is automatically selected whenever a
+The `ThrowableFormatter` handles `java.lang.Throwable` and all of its subclasses, including `Exception`, 
+`RuntimeException`, `Error` and any custom exception types. The formatter is automatically selected whenever a 
 parameter value is an instance of `Throwable`.
 
 The formatter extracts the throwable's localized message by calling `getLocalizedMessage()` and delegates the
-formatting of that string to the string formatter. This means the output is the exception's message text, and
-all map keys and behavior that apply to string values work transparently.
+formatting of that string to the string formatter. This means the output is the exception's message text and all map
+keys and behavior that apply to string values work transparently.
 
 ```java
 messageSupport
@@ -29,8 +29,8 @@ messageSupport
 
 ## Map Keys
 
-Because the throwable's message is delegated to the string formatter, all string map keys work against the
-message text. This allows you to match specific error messages or patterns.
+Because the throwable's message is delegated to the string formatter, all string map keys work against the message text.
+This allows specific error messages or patterns to be matched.
 
 ```java
 messageSupport
@@ -40,8 +40,8 @@ messageSupport
 // "missing file"
 ```
 
-The `empty` key matches when the throwable's localized message is `null` or empty (some exceptions do not carry
-a message).
+The `empty` key matches when the throwable's localized message is `null` or empty (some exceptions do not carry a 
+message).
 
 ```java
 messageSupport
@@ -54,8 +54,8 @@ messageSupport
 
 ## Null Handling
 
-A `null` parameter value produces an empty string by default. You can provide a `null` map key to handle this
-case explicitly.
+A `null` parameter value produces an empty string by default. A `null` map key can be provided to handle this case
+explicitly.
 
 ```java
 messageSupport

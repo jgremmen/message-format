@@ -13,7 +13,7 @@ Template names must follow the kebab-case naming convention: lowercase letters a
 (e.g. `opt-error`, `item-count`).
 
 This page explains how to create templates through `MessageFactory` parsing methods and the programmatic
-`MessageBuilder`, how to register them on a `ConfigurableMessageSupport`, and how to implement custom templates in 
+`MessageBuilder`, how to register them on a `ConfigurableMessageSupport` and how to implement custom templates in 
 Java. For the format string syntax itself, see [Syntax](../message/syntax.md). For how to configure and obtain a 
 `MessageFactory`, see [MessageFactory](message-factory.md).
 
@@ -129,7 +129,7 @@ Beyond message-based templates, the library supports custom `Template` implement
 returns formatted text directly from Java code, without a parsed message format string.
 
 The `Template` interface is sealed and permits two implementation paths: `MessageTemplate` for templates backed by a
-parsed message format string, and `NamedTemplate` for templates implemented entirely in Java. `AbstractNamedTemplate`
+parsed message format string and `NamedTemplate` for templates implemented entirely in Java. `AbstractNamedTemplate`
 is the non-sealed base class that implements `NamedTemplate`, so extending it lets you produce formatted output through
 arbitrary logic rather than through the message format parser.
 

@@ -4,7 +4,7 @@ This formatter is included in the `DefaultFormatterService`.
 
 The `BitSetFormatter` handles `java.util.BitSet` values. It is automatically selected whenever a parameter value
 is a `BitSet`. The formatter supports two fundamentally different output modes: a set-bit mode that renders named
-labels for each set bit, and a binary string mode that renders the entire bit set as a sequence of characters.
+labels for each set bit and a binary string mode that renders the entire bit set as a sequence of characters.
 
 The `bitset` configuration key controls which mode is used.
 

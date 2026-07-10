@@ -1,15 +1,15 @@
 # Clip
 
-The `clip` post formatter truncates formatted text to a maximum number of characters. This is
-useful when displaying user-generated or dynamically formatted content in space-constrained
-contexts such as log messages, table columns, notification previews or UI labels.
+The `clip` post formatter truncates formatted text to a maximum number of characters. This is useful when displaying 
+user-generated or dynamically formatted content in space-constrained contexts such as log messages, table columns, 
+notification previews or UI labels.
 
 
 ## Basic Usage
 
-The maximum length is specified by the `clip` configuration key as a numeric value. When the
-formatted sub-message exceeds this length, it is truncated and an ellipsis character (`…`) is
-appended by default to signal that the text was cut short.
+The maximum length is specified by the `clip` configuration key as a numeric value. When the formatted sub-message
+exceeds this length, it is truncated and an ellipsis character (`…`) is appended by default to signal that the text was
+cut short.
 
 ```java
 messageSupport
@@ -19,9 +19,8 @@ messageSupport
 // "A very elaborate an…"
 ```
 
-The total length of the result, including the ellipsis, does not exceed the configured maximum.
-In the example above the output is exactly 20 characters: 19 visible characters plus the
-ellipsis.
+The total length of the result, including the ellipsis, does not exceed the configured maximum. In the example above 
+the output is exactly 20 characters: 19 visible characters plus the ellipsis.
 
 If the text is shorter than or equal to the maximum length, it is returned unchanged.
 
@@ -36,8 +35,8 @@ messageSupport
 
 ## Clipping Disabled
 
-Setting the `clip` configuration key to zero or a negative number disables clipping entirely.
-The text passes through unmodified regardless of its length.
+Setting the `clip` configuration key to zero or a negative number disables clipping entirely. The text passes through
+unmodified regardless of its length.
 
 ```java
 messageSupport
@@ -50,11 +49,10 @@ messageSupport
 
 ## Minimum Effective Length
 
-When the suffix is enabled, the clip post formatter enforces a minimum effective length to
-ensure that at least a few characters of actual content are visible alongside the suffix. With
-the default ellipsis suffix (one character), the minimum effective output length is 5
-characters: 4 content characters plus the ellipsis. This means that even if you set `clip` to
-a very small value like 2, the result will still contain enough characters to be meaningful.
+When the suffix is enabled, the clip post formatter enforces a minimum effective length to ensure that at least a few 
+characters of actual content are visible alongside the suffix. With the default ellipsis suffix (one character), the 
+minimum effective output length is 5 characters: 4 content characters plus the ellipsis. This means that even when 
+`clip` is set to a very small value like 2, the result will still contain enough characters to be meaningful.
 
 ```java
 messageSupport
@@ -64,15 +62,14 @@ messageSupport
 // "This…"
 ```
 
-The minimum scales with the suffix length. For a custom suffix of 3 characters, the minimum
-effective length is 7: at least 4 content characters plus the 3-character suffix.
+The minimum scales with the suffix length. For a custom suffix of 3 characters, the minimum effective length is 7: at
+least 4 content characters plus the 3-character suffix.
 
 
 ## Trailing Whitespace
 
-When the text is clipped and a suffix is appended, any trailing whitespace at the truncation
-point is trimmed before the suffix is added. This prevents awkward results where a space
-appears right before the ellipsis.
+When the text is clipped and a suffix is appended, any trailing whitespace at the truncation point is trimmed before
+the suffix is added. This prevents awkward results where a space appears right before the ellipsis.
 
 ```java
 messageSupport
@@ -82,17 +79,15 @@ messageSupport
 // "This is…"
 ```
 
-In this example the first 8 characters of the text would be `"This is "`, with a trailing
-space. That space is trimmed before appending the ellipsis, producing `"This is…"` (8
-characters total) rather than `"This is …"`.
+In this example the first 8 characters of the text would be `"This is "`, with a trailing space. That space is trimmed
+before appending the ellipsis, producing `"This is…"` (8 characters total) rather than `"This is …"`.
 
 
 ## Disabling the Suffix
 
-By default, clipped text receives an ellipsis suffix to indicate truncation. You can disable
-this behavior by setting the `clip-suffix` configuration key to `false`. When disabled, the
-text is hard-truncated at the exact maximum length with no suffix appended and no trailing
-whitespace trimming.
+By default, clipped text receives an ellipsis suffix to indicate truncation. This behavior can be disabled by setting
+the `clip-suffix` configuration key to `false`. When disabled, the text is hard-truncated at the exact maximum length
+with no suffix appended and no trailing whitespace trimming.
 
 ```java
 messageSupport
@@ -105,10 +100,9 @@ messageSupport
 
 ## Custom Suffix Text
 
-Instead of the default ellipsis character, you can provide your own suffix string using the
-`clip-suffix-text` configuration key. This replaces the ellipsis entirely. When a custom
-suffix is set, the `clip-suffix` key does not need to be specified because providing a custom
-suffix text implicitly enables the suffix behavior.
+Instead of the default ellipsis character, a custom suffix string can be provided using the `clip-suffix-text` 
+configuration key. This replaces the ellipsis entirely. When a custom suffix is set, the `clip-suffix` key does not 
+need to be specified because providing a custom suffix text implicitly enables the suffix behavior.
 
 ```java
 messageSupport
@@ -126,8 +120,8 @@ messageSupport
 // "Documentation [more]"
 ```
 
-Custom suffix text is particularly handy for localization. In German, for instance, you might
-want to append `" usw."` (abbreviation for "und so weiter") instead of an ellipsis.
+Custom suffix text is particularly handy for localization. In German, for instance, appending `" usw."` (abbreviation 
+for "und so weiter") instead of an ellipsis may be preferable.
 
 ```java
 messageSupport
@@ -141,10 +135,9 @@ messageSupport
 
 ## Global Default Configuration
 
-If you want to control the suffix behavior consistently across all messages without repeating
-configuration keys in every post formatter invocation, you can set global defaults on the
-`ConfigurableMessageSupport` instance using `setDefaultConfig`. These defaults apply whenever
-a configuration key is not explicitly provided in the message itself.
+To control the suffix behavior consistently across all messages without repeating configuration keys in every post
+formatter invocation, global defaults can be set on the `ConfigurableMessageSupport` instance using `setDefaultConfig`. 
+These defaults apply whenever a configuration key is not explicitly provided in the message itself.
 
 ```java
 var messageSupport = MessageSupportFactory
@@ -160,8 +153,8 @@ messageSupport
 // "Hello Worl"
 ```
 
-Per-message configuration keys always take precedence over global defaults. This allows you to
-set a project-wide policy and override it selectively where needed.
+Per-message configuration keys always take precedence over global defaults. This allows a project-wide policy to be set
+and overridden selectively where needed.
 
 ```java
 // Global default: suffix disabled
@@ -178,10 +171,9 @@ messageSupport
 
 ## Combining with Other Formatters
 
-The sub-message inside a clip post formatter is a full message. It can contain parameter
-references with their own formatting configuration, template references and even nested post
-formatter invocations. This makes `clip` a natural fit for capping the output of any complex
-formatting pipeline.
+The sub-message inside a clip post formatter is a full message. It can contain parameter references with their own 
+formatting configuration, template references and even nested post formatter invocations. This makes `clip` a natural 
+fit for capping the output of any complex formatting pipeline.
 
 ```java
 messageSupport
@@ -193,8 +185,7 @@ messageSupport
 // "1,234,567.89 U…"
 ```
 
-You can also nest `clip` inside a `case` post formatter, or apply `case` first and then clip
-the result.
+`clip` can also be nested inside a `case` post formatter, or `case` can be applied first and then clip the result.
 
 ```java
 messageSupport

@@ -57,7 +57,7 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * Alternatively, a custom {@link DateTimeFormatter} pattern can be provided (e.g. {@code "yyyy-MM-dd"}).
  * <p>
- * The formatter automatically detects whether the temporal value supports date fields, time fields, or both, and
+ * The formatter automatically detects whether the temporal value supports date fields, time fields, or both and
  * adjusts the output accordingly. All formatting is locale-aware using the formatting context's locale.
  *
  * @author Jeroen Gremmen

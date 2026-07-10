@@ -37,7 +37,7 @@ The following table lists the most common classifiers and the types that produce
 
 Some formatters also add more specific classifiers before the general ones. For example, a `Locale` value
 produces the classifier `locale` first, followed by `string` when a string-producing configuration is active.
-A `Path` value produces `path`, a `BitSet` produces `bit-set` (and `list` in set-bit mode), and wrapper types
+A `Path` value produces `path`, a `BitSet` produces `bit-set` (and `list` in set-bit mode) and wrapper types
 like `Supplier` and `Reference` produce their own classifier before delegating to the contained value.
 
 ```java

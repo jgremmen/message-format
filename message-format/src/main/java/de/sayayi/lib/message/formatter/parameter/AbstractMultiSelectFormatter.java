@@ -141,7 +141,7 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
 
   /**
    * Looks up the config value for the configured key from the parameter configuration, resolves the corresponding
-   * registered {@link MultiSelectFunction}, and applies it to the given value.
+   * registered {@link MultiSelectFunction} and applies it to the given value.
    * <p>
    * If the config key is absent from the parameter configuration, the {@code defaultConfigValueForAbsentKey} is used
    * instead.  If no registered function matches the resolved config value, behavior depends on the

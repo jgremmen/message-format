@@ -8,7 +8,7 @@ value of type `T` compares against each kind of map key.
 
 Every built-in formatter that supports map key matching already implements `MapKeyComparator`. The
 `NumberFormatter`, for example, knows how to compare a `Number` value against number keys, string
-keys that contain numeric text, and bool keys where zero maps to `false`. When you create a custom
+keys that contain numeric text and bool keys where zero maps to `false`. When you create a custom
 formatter for your own type and want map entries to work with that type, you implement
 `MapKeyComparator` yourself. The interface provides a default `format` method that delegates to the
 next formatter in the chain, so a formatter that only contributes map key comparison logic does not
@@ -19,7 +19,7 @@ need to implement formatting at all.
 
 The `MapKeyComparator<T>` interface extends `ParameterFormatter` and declares five comparison methods,
 one for each map key type. Each method receives the parameter value and a `ComparatorContext` that
-provides access to the key's value, its comparison operator, and the current locale. The method
+provides access to the key's value, its comparison operator and the current locale. The method
 returns a `MatchResult` that tells the engine how well the value matches the key.
 
 ```java
@@ -43,7 +43,7 @@ are meaningful for its type.
 ## Match Results
 
 The `MatchResult` interface represents the outcome of comparing a value to a map key. Its `value()`
-method returns a numeric score. Higher scores indicate better matches, and a score of zero or less
+method returns a numeric score. Higher scores indicate better matches and a score of zero or less
 indicates a mismatch. When multiple map keys match the same value, the engine selects the entry with
 the highest score.
 
@@ -62,7 +62,7 @@ The `MatchResult.Defined` enum provides predefined results ordered from worst to
 
 When your comparator can match a value against a key, return the result that best describes the
 quality of the match. Use `EXACT` when value and key share the same type and the comparison succeeds,
-`EQUIVALENT` when the key is a different representation of the same value, and `LENIENT` when the
+`EQUIVALENT` when the key is a different representation of the same value and `LENIENT` when the
 match requires interpreting the value in a non-obvious way.
 
 The scoring matters when a message contains keys of different types that could both match. For
@@ -83,7 +83,7 @@ key has a `GT` compare type with a number key value of `5`.
 
 The `CompareType.match(int signum)` method is the standard way to evaluate a comparison. You compute a
 signum value (negative, zero, or positive) using a method like `Long.compare` or
-`String.compareTo`, and then call `match` on the compare type with that signum. If the comparison
+`String.compareTo` and then call `match` on the compare type with that signum. If the comparison
 operator matches the signum, the method returns `true`.
 
 For retrieving the actual key value, the context provides `getBoolKeyValue()`,
@@ -166,7 +166,7 @@ messageSupport
 ```
 
 Status codes above or equal to 500 are matched by the `>=500` key, which uses the `GTE` compare type.
-The `compareToNumberKey` method computes `Long.compare(503, 500)` which returns a positive signum, and
+The `compareToNumberKey` method computes `Long.compare(503, 500)` which returns a positive signum and
 `GTE.match(positive)` returns `true`:
 
 ```java
@@ -225,7 +225,7 @@ public @NotNull MatchResult compareToEmptyKey(
 
 The static helper method `MatchResult.forEmptyKey(compareType, isEmpty)` handles the standard logic:
 it returns `EMPTY` when the compare type is `EQ` and the value is empty, `NOT_EMPTY` when the compare
-type is `NE` and the value is not empty, and `MISMATCH` in all other cases.
+type is `NE` and the value is not empty and `MISMATCH` in all other cases.
 
 With this override in place, the message author can use the `empty` key to detect status objects
 without a reason phrase:
@@ -270,7 +270,7 @@ public @NotNull MatchResult compareToStringKey(
 
 This pattern is especially useful for `Optional`-like types. The `OptionalIntFormatter` delegates
 comparisons for number, bool and string keys to the contained `int` value when the optional is
-present, and returns `MISMATCH` when the optional is empty:
+present and returns `MISMATCH` when the optional is empty:
 
 ```java
 @Override

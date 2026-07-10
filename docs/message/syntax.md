@@ -4,34 +4,33 @@ toc_depth: 2
 
 # Message Format Syntax
 
-A message format string is the textual representation of a message. When parsed, it produces
-an immutable `Message` object that can be formatted with parameter values and a locale. The
-format string is composed of four types of parts that are concatenated during formatting:
-literal text, parameter references, template references and post formatter invocations.
+A message format string is the textual representation of a message. When parsed, it produces an immutable `Message` 
+object that can be formatted with parameter values and a locale. The format string is composed of four types of parts
+that are concatenated during formatting: literal text, parameter references, template references and post formatter
+invocations.
 
-This page walks through the syntax from simple to complex, with examples and Java code
-showing how each feature works in practice.
+This page walks through the syntax from simple to complex, with examples and Java code showing how each feature works 
+in practice.
 
 
 ## Text
 
-The simplest possible message is plain text. It contains no special syntax, just characters
-that appear in the output exactly as written.
+The simplest possible message is plain text. It contains no special syntax, just characters that appear in the output 
+exactly as written.
 
 ```java
 messageSupport.message("Hello World!").format();
 // "Hello World!"
 ```
 
-Text may contain Unicode letters, numbers, punctuation and symbols. Multiple consecutive
-whitespace characters are collapsed into a single space. Control characters (U+0000 through
-U+001F) are silently ignored by the parser.
+Text may contain Unicode letters, numbers, punctuation and symbols. Multiple consecutive whitespace characters are 
+collapsed into a single space. Control characters (U+0000 through U+001F) are silently ignored by the parser.
 
 ### Escape Sequences
 
-Some characters have special meaning in the message format syntax. The percent sign followed
-by `{`, `[` or `(` starts a parameter, template or post formatter part respectively. To
-include these characters literally in your text you need to escape the percent sign.
+Some characters have special meaning in the message format syntax. The percent sign followed by `{`, `[` or `(` starts
+a parameter, template or post formatter part respectively. To include these characters literally in message text, the 
+percent sign must be escaped.
 
 The following escape sequences are recognized:
 
@@ -46,9 +45,8 @@ The following escape sequences are recognized:
 | `\xNN`   | Latin-1 character (2 hex digits) |
 | `\uXXXX` | Unicode character (4 hex digits) |
 
-In the following example the literal text `%{` must be escaped because the parser would
-otherwise interpret it as the start of a parameter reference. Note that in Java string
-literals the backslash itself must be doubled.
+In the following example the literal text `%{` must be escaped because the parser would otherwise interpret it as the 
+start of a parameter reference. Note that in Java string literals the backslash itself must be doubled.
 
 ```java
 messageSupport
@@ -57,8 +55,7 @@ messageSupport
 // "Use %{name} to insert a parameter."
 ```
 
-The Unicode escape is useful for inserting characters that may not be available in your source
-file encoding.
+The Unicode escape is useful for inserting characters that may not be available in the source file encoding.
 
 ```java
 messageSupport
@@ -70,13 +67,12 @@ messageSupport
 
 ## Parameters
 
-A parameter inserts a formatted value into the message. The simplest form references a named
-value using `%{parameterName}`. When the message is formatted, the parameter is replaced with
-the string representation of the value that was provided for that name.
+A parameter inserts a formatted value into the message. The simplest form references a named value using 
+`%{parameterName}`. When the message is formatted, the parameter is replaced with the string representation of the
+value that was provided for that name.
 
-Parameter names follow kebab-case or camelCase conventions. A name must start with a letter
-and may contain letters, digits, and `_` or `-` separators. Each separator must be followed
-by at least one letter or digit.
+Parameter names follow kebab-case or camelCase conventions. A name must start with a letter and may contain letters, 
+digits and `_` or `-` separators. Each separator must be followed by at least one letter or digit.
 
 /// note
 The keywords `null`, `empty`, `true`, `false` and `format` are also valid parameter names.
@@ -84,8 +80,8 @@ The keywords `null`, `empty`, `true`, `false` and `format` are also valid parame
 
 ### Simple Parameter
 
-The most basic use of a parameter is direct value substitution. You provide the value using
-the `.with(name, value)` method on the message configurer.
+The most basic use of a parameter is direct value substitution. The value is provided using the `.with(name, value)` 
+method on the message configurer.
 
 ```java
 messageSupport
@@ -109,17 +105,16 @@ messageSupport
 
 ### Named Format
 
-By default, the library selects a formatter based on the type of the value. You can override
-this by specifying a named formatter explicitly with the `format` keyword. The syntax is
-`format:<name>` where the name identifies a registered `NamedParameterFormatter`.
+By default, the library selects a formatter based on the type of the value. This can be overridden by specifying a 
+named formatter explicitly with the `format` keyword. The syntax is `format:<name>` where the name identifies a 
+registered `NamedParameterFormatter`.
 
 Built-in named formatters include `string`, `bool`, `choice`, `size` and `classifier`.
 
-Explicitly selecting a named formatter is particularly useful when the automatic type-based
-selection would pick a different formatter than the one you need. In the following example the
-parameter value is the integer `4`. Without `format:bool` the library would select the number
-formatter. By forcing the `bool` formatter, the numeric value is interpreted as a boolean
-instead: any number that is not equal to zero is considered `true`, so the value `4` matches
+Explicitly selecting a named formatter is particularly useful when the automatic type-based selection would pick a 
+different formatter than the one required. In the following example the parameter value is the integer `4`. Without 
+`format:bool` the library would select the number formatter. By forcing the `bool` formatter, the numeric value is
+interpreted as a boolean instead: any number that is not equal to zero is considered `true`, so the value `4` matches
 the `true` map entry.
 
 ```java
@@ -132,14 +127,12 @@ messageSupport
 
 ### Configuration Keys
 
-In addition to `format`, a parameter can carry any number of configuration key-value pairs.
-These provide additional settings to the formatter that handles the parameter. The syntax is
-`key:value` where the value can be a boolean (`true`/`false`), a number, a plain string or a
-quoted message.
+In addition to `format`, a parameter can carry any number of configuration key-value pairs. These provide additional 
+settings to the formatter that handles the parameter. The syntax is `key:value` where the value can be a boolean 
+(`true`/`false`), a number, a plain string or a quoted message.
 
-Different formatters recognize different configuration keys. For example, the temporal
-formatter recognizes the `date` key, and the iterable/array formatter recognizes `list-sep`
-and `list-sep-last`.
+Different formatters recognize different configuration keys. For example, the temporal formatter recognizes the `date`
+key and the iterable/array formatter recognizes `list-sep` and `list-sep-last`.
 
 ```java
 messageSupport
@@ -150,8 +143,7 @@ messageSupport
 // "5/1/26"
 ```
 
-The next example configures the separator and the last-item separator for formatting a list
-of values.
+The next example configures the separator and the last-item separator for formatting a list of values.
 
 ```java
 messageSupport
@@ -164,10 +156,9 @@ messageSupport
 
 ## Map Keys
 
-Map keys are one of the most powerful features of the message format syntax. They allow a
-parameter to select different output based on the parameter value. Each map entry consists of
-a key that specifies a condition and a value that provides the text to use when the condition
-matches.
+Map keys are one of the most powerful features of the message format syntax. They allow a parameter to select different
+output based on the parameter value. Each map entry consists of a key that specifies a condition and a value that 
+provides the text to use when the condition matches.
 
 The general structure looks like this:
 
@@ -175,18 +166,17 @@ The general structure looks like this:
 %{param, key1:'message1', key2:'message2', :'default'}
 ```
 
-The value side of a map entry can be either a quoted message (using single or double quotes)
-or a simple string. Quoted messages are full sub-messages that can contain nested parameter
-references, template references and post formatter invocations. Simple strings are plain text
-without any nesting.
+The value side of a map entry can be either a quoted message (using single or double quotes) or a simple string. Quoted 
+messages are full sub-messages that can contain nested parameter references, template references and post formatter 
+invocations. Simple strings are plain text without any nesting.
 
-There are five types of map keys: `null`, `empty`, `bool`, `number` and `string`. Each type
-is described below with examples.
+There are five types of map keys: `null`, `empty`, `bool`, `number` and `string`. Each type is described below with 
+examples.
 
 ### Null Key
 
-The `null` key matches when the parameter value is `null`. The negated form `!null` matches
-any non-null value. This is useful for providing a fallback when a value might not be present.
+The `null` key matches when the parameter value is `null`. The negated form `!null` matches any non-null value. This is
+useful for providing a fallback when a value might not be present.
 
 ```java
 messageSupport
@@ -204,9 +194,9 @@ messageSupport
 
 ### Empty Key
 
-The `empty` key matches when the parameter value is considered empty. What counts as "empty"
-depends on the type: null values, empty strings, empty collections and empty arrays are all
-considered empty. The negated form `!empty` matches non-empty values.
+The `empty` key matches when the parameter value is considered empty. What counts as "empty" depends on the type: 
+null values, empty strings, empty collections and empty arrays are all considered empty. The negated form `!empty` 
+matches non-empty values.
 
 ```java
 messageSupport
@@ -224,9 +214,8 @@ messageSupport
 
 ### Bool Key
 
-The `true` and `false` keys match when the parameter value is (or can be interpreted as) a
-boolean. This is a straightforward way to produce different text for on/off or yes/no
-scenarios.
+The `true` and `false` keys match when the parameter value is (or can be interpreted as) a boolean. This is a 
+straightforward way to produce different text for on/off or yes/no scenarios.
 
 ```java
 messageSupport
@@ -238,13 +227,12 @@ messageSupport
 
 ### Number Key
 
-Number keys match integer values. They can be combined with relational operators to express
-ranges. The supported operators are `=` (equal, also the default when no operator is given),
-`!` or `<>` (not equal), `<` (less than), `<=` (less than or equal), `>` (greater than) and
-`>=` (greater than or equal). Numbers must be integers and may be negative.
+Number keys match integer values. They can be combined with relational operators to express ranges. The supported
+operators are `=` (equal, also the default when no operator is given), `!` or `<>` (not equal), `<` (less than), `<=` 
+(less than or equal), `>` (greater than) and `>=` (greater than or equal). Numbers must be integers and may be 
+negative.
 
-A common use case is pluralization, where you provide specific text for zero, one and many
-items.
+A common use case is pluralization, where specific text is provided for zero, one and many items.
 
 ```java
 messageSupport
@@ -266,8 +254,8 @@ messageSupport
 // "42 items"
 ```
 
-Relational operators allow you to match ranges of values. In the following example, any
-negative number matches `<0`, zero matches `0`, and any positive number matches `>0`.
+Relational operators allow ranges of values to be matched. In the following example, any negative number matches `<0`,
+zero matches `0` and any positive number matches `>0`.
 
 ```java
 messageSupport
@@ -279,9 +267,8 @@ messageSupport
 
 ### String Key
 
-String keys match against string values. They use the same relational operators as number
-keys, but the comparison is locale-aware. The string itself must be quoted with single or
-double quotes.
+String keys match against string values. They use the same relational operators as number keys, but the comparison is
+locale-aware. The string itself must be quoted with single or double quotes.
 
 ```java
 messageSupport
@@ -293,9 +280,9 @@ messageSupport
 
 ### Grouped Keys
 
-Sometimes multiple keys should map to the same value. Rather than repeating the value for
-each key, you can group the keys in parentheses. The grouped keys are separated by commas and
-the group is followed by a colon and the shared value.
+Sometimes multiple keys should map to the same value. Rather than repeating the value for each key, the keys can be 
+grouped in parentheses. The grouped keys are separated by commas and the group is followed by a colon and the shared 
+value.
 
 ```java
 messageSupport
@@ -307,9 +294,8 @@ messageSupport
 
 ### Default Entry
 
-A trailing entry with no key serves as a fallback when no other key matches. It consists of
-just a colon followed by the value. The default entry must always be the last entry in the
-parameter.
+A trailing entry with no key serves as a fallback when no other key matches. It consists of just a colon followed by 
+the value. The default entry must always be the last entry in the parameter.
 
 ```java
 messageSupport
@@ -321,13 +307,12 @@ messageSupport
 
 ### The Choice Formatter
 
-The `choice` formatter is a named formatter specifically designed for value-based selection.
-It supports all map key types and picks the best matching entry. Unlike the default type-based
-formatters, the choice formatter does not convert or format the value itself. Instead it
-purely acts as a selector that picks one of several mapped messages based on the value.
+The `choice` formatter is a named formatter specifically designed for value-based selection. It supports all map key 
+types and picks the best matching entry. Unlike the default type-based formatters, the choice formatter does not
+convert or format the value itself. Instead, it purely acts as a selector that picks one of several mapped messages 
+based on the value.
 
-A typical use case is pluralization where the same parameter appears both as a number and as
-part of the choice logic.
+A typical use case is pluralization where the same parameter appears both as a number and as part of the choice logic.
 
 ```java
 messageSupport
@@ -345,13 +330,12 @@ messageSupport
 
 ### The Size Formatter
 
-The `size` formatter determines the size of a value and makes that size available for mapping.
-It can determine the length of a string, the size of a collection, the length of an array and
-similar measurements. The size calculation is delegated to `SizeQueryable` formatters
-registered for the value's type.
+The `size` formatter determines the size of a value and makes that size available for mapping. It can determine the 
+length of a string, the size of a collection, the length of an array and similar measurements. The size calculation is 
+delegated to `SizeQueryable` formatters registered for the value's type.
 
-The resulting size can then be mapped to custom text using number map keys. If no mapping is
-provided, the numeric size is formatted as text.
+The resulting size can then be mapped to custom text using number map keys. If no mapping is provided, the numeric size
+is formatted as text.
 
 ```java
 messageSupport
@@ -364,14 +348,12 @@ messageSupport
 
 ## Quoted Messages
 
-Inside parameter, template and post formatter parts, single-quoted (`'...'`) and
-double-quoted (`"..."`) strings define sub-messages. These quoted messages are not just plain
-text. They are full messages that can themselves contain nested `%{...}`, `%[...]` and
-`%(...)` references.
+Inside parameter, template and post formatter parts, single-quoted (`'...'`) and double-quoted (`"..."`) strings define 
+sub-messages. These quoted messages are not just plain text. They are full messages that can themselves contain nested 
+`%{...}`, `%[...]` and `%(...)` references.
 
-This is what makes map entries so powerful. The value side of a map entry can be a quoted
-message that references other parameters, templates or post formatters, allowing for
-arbitrarily complex formatting logic.
+This is what makes map entries so powerful. The value side of a map entry can be a quoted message that references other
+parameters, templates or post formatters, allowing for arbitrarily complex formatting logic.
 
 ```java
 messageSupport
@@ -386,16 +368,15 @@ An empty quoted string (`''` or `""`) represents an empty message and produces n
 
 ## Templates
 
-A template is a reusable message fragment identified by a name. Templates allow you to define
-a piece of formatting logic once and reference it from multiple messages. This is particularly
-useful for complex formatting patterns that would otherwise be duplicated.
+A template is a reusable message fragment identified by a name. Templates allow a piece of formatting logic to be 
+defined once and referenced from multiple messages. This is particularly useful for complex formatting patterns that 
+would otherwise be duplicated.
 
-Template names must follow the kebab-case naming convention: lowercase letters and digits
-separated by single hyphens (e.g. `opt-error`, `item-count`).
+Template names must follow the kebab-case naming convention: lowercase letters and digits separated by single hyphens
+(e.g. `opt-error`, `item-count`).
 
-A template reference uses the syntax `%[template-name]`. The template is registered separately
-on the `ConfigurableMessageSupport` and is typically created through
-`MessageFactory.parseTemplate(String)`.
+A template reference uses the syntax `%[template-name]`. The template is registered separately on the 
+`ConfigurableMessageSupport` and is typically created through `MessageFactory.parseTemplate(String)`.
 
 ```java
 var messageSupport = MessageSupportFactory.create(
@@ -411,18 +392,17 @@ messageSupport
 // "Result: Hello World!"
 ```
 
-By default, a template accesses the same parameters as the enclosing message. The template
-in the example above reads the `who` parameter directly from the values provided to the
-message configurer.
+By default, a template accesses the same parameters as the enclosing message. The template in the example above reads
+the `who` parameter directly from the values provided to the message configurer.
 
 ### Parameter Delegation
 
-Parameter delegation allows you to rename a parameter so the template sees it under a
-different name. The syntax is `templateParam->messageParam`. This is useful when the template
-uses a generic parameter name but the enclosing message has a more specific one.
+Parameter delegation allows a parameter to be renamed so the template sees it under a different name. The syntax is 
+`templateParam->messageParam`. This is useful when the template uses a generic parameter name but the enclosing message
+has a more specific one.
 
-In the following example, the template expects a parameter called `who`, but the message
-provides the value under the name `userName`. The delegation `who->userName` bridges this gap.
+In the following example, the template expects a parameter called `who`, but the message provides the value under the
+name `userName`. The delegation `who->userName` bridges this gap.
 
 ```java
 messageSupport.addTemplate("greeting",
@@ -437,9 +417,9 @@ messageSupport
 
 ### Parameter Defaults
 
-A template reference can provide default values for parameters that may not be available in
-the enclosing context. Default values can be strings (quoted), numbers or booleans. If the
-enclosing message does not provide a value for the parameter, the default is used instead.
+A template reference can provide default values for parameters that may not be available in the enclosing context. 
+Default values can be strings (quoted), numbers or booleans. If the enclosing message does not provide a value for the 
+parameter, the default is used instead.
 
 ```java
 messageSupport.addTemplate("greeting",
@@ -455,11 +435,11 @@ The syntax for numeric and boolean defaults is straightforward: `count=0` or `ve
 
 ### Combining Delegation and Defaults
 
-Delegation and defaults can be mixed freely in a single template reference. This gives you
-full control over how the template's parameters are wired to the enclosing message.
+Delegation and defaults can be mixed freely in a single template reference. This gives full control over how the
+template's parameters are wired to the enclosing message.
 
-In and of itself this is a simple concept, but it becomes very powerful for templates that
-are used across multiple messages with different parameter naming conventions.
+In and of itself this is a simple concept, but it becomes very powerful for templates that are used across multiple
+messages with different parameter naming conventions.
 
 ```java
 var factory = MessageFactory.getSharedInstance();
@@ -483,24 +463,21 @@ messageSupport.message("Order: %[order-line,product->item]")
 
 ## Post Formatters
 
-A post formatter applies a text transformation to the result of a sub-message. Unlike
-parameter formatters which operate on individual values, post formatters operate on already
-formatted text. The syntax is:
+A post formatter applies a text transformation to the result of a sub-message. Unlike parameter formatters which 
+operate on individual values, post formatters operate on already formatted text. The syntax is:
 
 ```message-format
 %(formatter-name, 'sub-message', config:value)
 ```
 
-The first argument is the name of the post formatter. The second argument is a quoted message
-whose formatted result will be transformed. Any additional arguments are configuration
-key-value pairs that control the transformation.
+The first argument is the name of the post formatter. The second argument is a quoted message whose formatted result 
+will be transformed. Any additional arguments are configuration key-value pairs that control the transformation.
 
 ### Case Conversion
 
-The `case` post formatter converts text to uppercase or lowercase. The target case is
-specified by the `case` configuration key, which accepts `upper` (or `uppercase`) and `lower`
-(or `lowercase`). The conversion is locale-aware, meaning it respects locale-specific casing
-rules.
+The `case` post formatter converts text to uppercase or lowercase. The target case is specified by the `case`
+configuration key, which accepts `upper` (or `uppercase`) and `lower` (or `lowercase`). The conversion is locale-aware,
+meaning it respects locale-specific casing rules.
 
 ```java
 messageSupport
@@ -522,10 +499,9 @@ messageSupport
 
 ### Clipping
 
-The `clip` post formatter truncates text to a maximum length. The maximum length is specified
-by the `clip` configuration key as a numeric value. When the text exceeds this length, it is
-truncated and by default an ellipsis character is appended to indicate that the text has been
-clipped.
+The `clip` post formatter truncates text to a maximum length. The maximum length is specified by the `clip` 
+configuration key as a numeric value. When the text exceeds this length, it is truncated and by default an ellipsis
+character is appended to indicate that the text has been clipped.
 
 ```java
 messageSupport
@@ -535,9 +511,9 @@ messageSupport
 // "This is a very long…"
 ```
 
-The suffix behavior can be customized. Setting `clip-suffix` to `false` disables the suffix
-entirely and performs a hard truncation at the exact maximum length. Alternatively, you can
-provide a custom suffix string using `clip-suffix-text`.
+The suffix behavior can be customized. Setting `clip-suffix` to `false` disables the suffix entirely and performs a 
+hard truncation at the exact maximum length. Alternatively, a custom suffix string can be provided using
+`clip-suffix-text`.
 
 ```java
 messageSupport
@@ -558,10 +534,9 @@ messageSupport
 
 ## Putting It All Together
 
-The following example combines all four part types in a single message. It uses a post
-formatter to uppercase the user name, a parameter with map keys to handle the empty-user
-case, a template reference with parameter delegation for the item count, and plain text to
-tie everything together.
+The following example combines all four part types in a single message. It uses a post formatter to uppercase the 
+user name, a parameter with map keys to handle the empty-user case, a template reference with parameter delegation for 
+the item count and plain text to tie everything together.
 
 ```java
 var factory = MessageFactory.getSharedInstance();

@@ -71,7 +71,7 @@ All import statements for these classes must be updated accordingly.
 
 The `message-format-jodatime` module has been removed entirely. The `JodaDateTimeFormatter` is no longer
 available. Use the `java.time` API instead. The new `TemporalFormatter` handles all `java.time.temporal.Temporal`
-types, and legacy `java.util.Date` / `java.util.Calendar` objects are automatically converted via
+types and legacy `java.util.Date` / `java.util.Calendar` objects are automatically converted via
 `LegacyToTemporalDelegate`.
 
 ### Date/time formatter redesign
@@ -82,7 +82,7 @@ been removed and replaced by:
 - `TemporalFormatter` - formats any `Temporal` value using localized or custom `DateTimeFormatter` patterns.
   The `date` config key controls the output style: `short`, `medium`, `long`, `full`, `date`, `time` or a
   custom `DateTimeFormatter` pattern string. The formatter automatically detects whether the temporal value
-  supports date fields, time fields, or both, and selects the appropriate format.
+  supports date fields, time fields, or both and selects the appropriate format.
 
 - `LegacyToTemporalDelegate` - converts `Calendar`, `Date`, `java.sql.Date`, `java.sql.Time` and
   `java.nio.file.attribute.FileTime` into their `Temporal` equivalents and delegates formatting to the

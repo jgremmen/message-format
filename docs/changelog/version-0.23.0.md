@@ -13,7 +13,7 @@ The public static field `MessageFactory.NO_CACHE_INSTANCE` has been removed. It 
 `MessageFactory.getSharedInstance()`, which returns a lazily initialized, thread-safe singleton. Unlike
 `NO_CACHE_INSTANCE`, the shared instance includes a message cache with a maximum size of 128 entries.
 
-If you referenced `NO_CACHE_INSTANCE` directly:
+Code that referenced `NO_CACHE_INSTANCE` directly:
 
 ```java
 // before
@@ -23,7 +23,7 @@ MessageFactory factory = MessageFactory.NO_CACHE_INSTANCE;
 MessageFactory factory = MessageFactory.getSharedInstance();
 ```
 
-If you passed `NO_CACHE_INSTANCE` to `MessageSupportFactory.create`:
+Code that passed `NO_CACHE_INSTANCE` to `MessageSupportFactory.create`:
 
 ```java
 // before
@@ -42,8 +42,8 @@ The methods `eq()`, `ne()`, `lt()`, `lte()`, `gt()` and `gte()` on `MapEqualityB
 now return `MapValueBuilder` instead of their previous, more specific return types (`MapEqualityBuilder` and
 `MapRelationalBuilder` respectively). The `@Contract("-> this")` annotation has been removed from these methods.
 
-If your code relied on chaining an operator method followed by another operator method on the same builder, this is
-no longer possible after the operator has been set. Assign the operator before adding the map value:
+Code that relied on chaining an operator method followed by another operator method on the same builder is no longer 
+possible after the operator has been set. Assign the operator before adding the map value:
 
 ```java
 // before (compiled because eq() returned MapEqualityBuilder)
@@ -54,8 +54,8 @@ builder.forString("x").eq().message("...");
 ```
 
 The common usage pattern of calling an operator followed by `.message(...)` or `.text(...)` is unaffected, since
-`MapValueBuilder` declares both of these methods. Code that called a second operator after the first (e.g.
-`.eq().ne()`) will no longer compile; this was not a meaningful pattern.
+`MapValueBuilder` declares both of these methods. Code that called a second operator after the first (e.g. `.eq().ne()`)
+will no longer compile; this was not a meaningful pattern.
 
 
 ## New Features
@@ -69,8 +69,8 @@ Map key comparison supports `string` keys matched against the charset's canonica
 (`EQ`) and inequality (`NE`) comparison types are supported:
 
 - `EQ`: a canonical name match returns `EXACT`; an alias match returns `EQUIVALENT`.
-- `NE`: if neither the canonical name nor any alias matches the key, `EXACT` is returned; if only an alias
-  matches, `LENIENT` is returned; a canonical name match results in `MISMATCH`.
+- `NE`: if neither the canonical name nor any alias matches the key, `EXACT` is returned; if only an alias matches,
+  `LENIENT` is returned; a canonical name match results in `MISMATCH`.
 
 ```msgfmt
 %{encoding, 'UTF-8':'Unicode (8-bit)', 'ISO-8859-1':'Latin-1', :'unknown'}
@@ -120,4 +120,3 @@ simple name-like text messages are serialized without quotes.
 ## Bug Fixes
 
 *There are no bug fixes in this version.*
-

@@ -283,7 +283,7 @@ public interface ParameterFormatter
 
   /**
    * A parameter formatter that can match parameter values against map keys in the parameter configuration. Map keys
-   * can be of type {@code null}, {@code empty}, {@code bool}, {@code number}, or {@code string}, and this interface
+   * can be of type {@code null}, {@code empty}, {@code bool}, {@code number}, or {@code string} and this interface
    * provides a comparison method for each.
    * <p>
    * The default {@link #format(ParameterFormatterContext, Object)} implementation delegates to the next formatter in

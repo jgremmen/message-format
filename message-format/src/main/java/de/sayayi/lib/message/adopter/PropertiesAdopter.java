@@ -29,7 +29,7 @@ import java.util.Properties;
 
 /**
  * Message adopter that reads messages and templates from {@link Properties} objects. Property keys are used as
- * message codes or template names, and property values are parsed as message format strings.
+ * message codes or template names and property values are parsed as message format strings.
  * <p>
  * For locale-aware messages, the {@link #adopt(Map)} method accepts a map of {@link Properties} keyed by
  * {@link Locale}. Properties that share the same key across multiple locales are combined into a single localized

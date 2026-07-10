@@ -4,29 +4,26 @@ icon: material/invoice-import-outline
 
 # Message Adopters
 
-Adopters are the bridge between external message sources and the message format library. They
-read messages and templates from formats you may already have in your project, such as Java
-resource bundles or properties files, parse the values as message format strings, and publish the
-results to a `MessageSupport` instance. This lets you reuse existing localization infrastructure
-without manually re-registering every message in code.
+Adopters are the bridge between external message sources and the message format library. They read messages and 
+templates from formats already present in a project, such as Java resource bundles or properties files, parse
+the values as message format strings and publish the results to a `MessageSupport` instance. This allows existing
+localization infrastructure to be reused without manually re-registering every message in code.
 
-The core library ships with two concrete adopters:
-[`ResourceBundleAdopter`](resource-bundle.md) for Java `ResourceBundle` instances and
-[`PropertiesAdopter`](properties.md) for `Properties` objects. The
-[annotation adopter](annotation.md) provides additional support for discovering messages
-and templates declared through `@MessageDef` and `@TemplateDef` annotations in compiled class
-files.
+The core library ships with two concrete adopters: [`ResourceBundleAdopter`](resource-bundle/index.md) for Java 
+`ResourceBundle` instances and [`PropertiesAdopter`](properties/index.md) for `Properties` objects. The
+[annotation adopter](annotation/index.md) provides additional support for discovering messages and templates declared
+through `@MessageDef` and `@TemplateDef` annotations in compiled class files.
 
 
 ## AbstractMessageAdopter
 
-All adopters extend `AbstractMessageAdopter`, which holds the two collaborators every adopter
-needs: a `MessageFactory` for parsing message format strings into `Message` objects, and a
-`MessagePublisher` for storing the parsed messages and templates.
+All adopters extend `AbstractMessageAdopter`, which holds the two collaborators every adopter needs: a 
+`MessageFactory` for parsing message format strings into `Message` objects and a `MessagePublisher` for storing the
+parsed messages and templates.
 
 The most common way to construct an adopter is by passing a `ConfigurableMessageSupport`. Because
-`ConfigurableMessageSupport` implements `MessagePublisher` and provides access to a
-`MessageFactory` through its message accessor, a single argument is sufficient:
+`ConfigurableMessageSupport` implements `MessagePublisher` and provides access to a `MessageFactory` through its
+message accessor, a single argument is sufficient:
 
 ```java
 var messageSupport = MessageSupportFactory.create(
@@ -35,8 +32,8 @@ var messageSupport = MessageSupportFactory.create(
 var adopter = new ResourceBundleAdopter(messageSupport);
 ```
 
-When you need to decouple factory and publisher, for example to collect messages before
-publishing them to multiple targets, every adopter also offers a two-argument constructor:
+To decouple factory and publisher, for example to collect messages before publishing them to multiple targets, every 
+adopter also offers a two-argument constructor:
 
 ```java
 var adopter = new ResourceBundleAdopter(messageFactory, publisher);

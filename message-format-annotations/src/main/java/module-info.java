@@ -15,7 +15,7 @@
  */
 
 /**
- * Provides annotations for defining messages and templates directly in Java source code, and an adopter framework
+ * Provides annotations for defining messages and templates directly in Java source code and an adopter framework
  * for discovering and publishing them from compiled class files.
  * <p>
  * <b>Annotations</b> ({@code de.sayayi.lib.message.annotation}):
@@ -30,11 +30,11 @@
  * <b>Adopter</b> ({@code de.sayayi.lib.message.annotation.adopter}):
  * <br>
  * The {@link de.sayayi.lib.message.annotation.adopter.AbstractAnnotationAdopter AbstractAnnotationAdopter} provides
- * multiple strategies for locating annotated classes, including classpath scanning, single class file analysis, and
+ * multiple strategies for locating annotated classes, including classpath scanning, single class file analysis and
  * direct annotation instance processing. The
  * {@link de.sayayi.lib.message.annotation.adopter.AnnotationAdopter AnnotationAdopter} is the concrete
  * implementation that scans compiled class files for message and template annotations without loading the classes
- * into the JVM, and publishes them to a
+ * into the JVM and publishes them to a
  * {@link de.sayayi.lib.message.MessageSupport.MessagePublisher MessagePublisher}.
  * <p>
  * <b>Synthetic annotations</b> ({@code de.sayayi.lib.message.annotation.adopter.util}):

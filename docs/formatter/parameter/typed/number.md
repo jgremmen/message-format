@@ -5,7 +5,7 @@ This formatter is included in the `DefaultFormatterService`.
 When a parameter value is a numeric type, the library automatically selects the `NumberFormatter`. This formatter
 is registered for `Number` and all primitive numeric types (`byte`, `short`, `int`, `long`, `float`, `double`),
 so it handles `Integer`, `Long`, `BigInteger`, `BigDecimal`, `AtomicInteger`, `AtomicLong`, `LongAdder`,
-`LongAccumulator`, and all other `Number` subclasses.
+`LongAccumulator` and all other `Number` subclasses.
 
 By default, integer types (`BigInteger`, `Long`, `Integer`, `Short`, `Byte`, `AtomicInteger`, `AtomicLong`,
 `LongAdder`, `LongAccumulator`) are rendered using their plain `toString()` representation. All other numeric
@@ -120,7 +120,7 @@ messageSupport
 ### Custom `DecimalFormat` Pattern
 
 Any value that does not match one of the predefined options is interpreted as a `DecimalFormat` pattern. This
-gives you full control over the number format, including digit counts, grouping separators, and decimal places.
+gives you full control over the number format, including digit counts, grouping separators and decimal places.
 
 ```java
 messageSupport

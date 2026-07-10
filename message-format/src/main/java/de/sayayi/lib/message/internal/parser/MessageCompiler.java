@@ -74,7 +74,7 @@ import static org.antlr.v4.runtime.Token.EOF;
  * can be formatted at runtime.
  * <p>
  * The compiler supports the full message format syntax including parameters ({@code %{...}}), templates
- * ({@code %[...]}), post-formatters ({@code %(...)}), map entries with typed keys and values, and quoted strings.
+ * ({@code %[...]}), post-formatters ({@code %(...)}), map entries with typed keys and values and quoted strings.
  * <p>
  * Use {@link #compileMessage(String)} to compile a message format string and {@link #compileTemplate(String)} to
  * compile a template format string. Both methods validate the input syntax and throw a {@link MessageParserException}
@@ -174,7 +174,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
   /**
    * Creates a context-aware error message when the parser encounters an ambiguity or dead end. Produces specific
-   * messages for common situations such as incomplete message formats, missing default messages in parameters, and
+   * messages for common situations such as incomplete message formats, missing default messages in parameters and
    * syntax errors in map elements.
    */
   @Override
@@ -199,7 +199,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
   /**
    * Creates a context-aware error message when the parser encounters a token that does not match what is expected.
-   * Produces specific messages for missing parameter names, template names, default messages, and unclosed parameter
+   * Produces specific messages for missing parameter names, template names, default messages and unclosed parameter
    * expressions.
    */
   @Override

@@ -54,7 +54,7 @@ public class MessageFormatException extends MessageException
    * incorporated in this runtime exception's detail message.
    *
    * @param cause    the cause (which is saved for later retrieval by the {@link #getCause()}
-   *                 method). (A {@code null} value is permitted, and indicates that the cause is
+   *                 method). (A {@code null} value is permitted and indicates that the cause is
    *                 nonexistent or unknown.)
    */
   protected MessageFormatException(Throwable cause) {

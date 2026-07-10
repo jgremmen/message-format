@@ -76,9 +76,12 @@ nav:
       - Utilities: formatter/development/utilities.md
   - Adopters:
     - adopter/index.md
-    - Annotation: adopter/annotation.md
-    - Properties: adopter/properties.md
-    - Resource Bundle: adopter/resource-bundle.md
+    - Annotation:
+      - adopter/annotation/index.md
+    - Properties:
+      - adopter/properties/index.md
+    - Resource Bundle:
+      - adopter/resource-bundle/index.md
   - Add-Ons:
     - add-on/index.md
     - Log4j: add-on/log4j.md

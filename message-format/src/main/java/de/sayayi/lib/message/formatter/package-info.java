@@ -21,7 +21,7 @@
  * The main types in this package are:
  * <ul>
  *   <li>{@link de.sayayi.lib.message.formatter.FormatterService FormatterService} – service interface for looking
- *       up parameter formatters by value type and name, and for managing post formatters</li>
+ *       up parameter formatters by value type and name and for managing post formatters</li>
  *   <li>{@link de.sayayi.lib.message.formatter.GenericFormatterService GenericFormatterService} – base implementation
  *       with a mutable formatter registry</li>
  *   <li>{@link de.sayayi.lib.message.formatter.DefaultFormatterService DefaultFormatterService} – pre-configured

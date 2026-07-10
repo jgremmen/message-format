@@ -3,18 +3,18 @@
 This formatter is included in the `DefaultFormatterService`.
 
 The library provides two formatters for date and time values: `TemporalFormatter` for the modern `java.time`
-temporal types, and `ToTemporalDelegate` which bridges legacy date/time types (`Date`, `Calendar`, etc.) to the
+temporal types and `ToTemporalDelegate` which bridges legacy date/time types (`Date`, `Calendar`, etc.) to the
 temporal formatter.
 
 
 ## TemporalFormatter
 
 The `TemporalFormatter` handles any `java.time.temporal.Temporal` value, which includes `LocalDate`, `LocalTime`,
-`LocalDateTime`, `ZonedDateTime`, `OffsetDateTime`, `Instant`, `Year`, `YearMonth` and all other temporal types.
-It is automatically selected whenever a parameter value implements `Temporal`.
+`LocalDateTime`, `ZonedDateTime`, `OffsetDateTime`, `Instant`, `Year`, `YearMonth` and all other temporal types. It is
+automatically selected whenever a parameter value implements `Temporal`.
 
-The formatter automatically detects whether the temporal value supports date fields, time fields, or both, and
-adjusts the output accordingly. All formatting is locale-aware.
+The formatter automatically detects whether the temporal value supports date fields, time fields, or both and adjusts
+the output accordingly. All formatting is locale-aware.
 
 ```java
 messageSupport
@@ -59,9 +59,9 @@ The `date` configuration key controls the output format. It accepts predefined s
 | `date`     | Date only (medium style)             |
 | `time`     | Time only (medium style)             |
 
-The formatter automatically omits the date or time portion if the temporal value does not support the necessary
-fields. For example, formatting a `LocalDate` with `date:short` produces a short date (no time), while formatting
-a `LocalTime` with `date:short` produces a short time (no date).
+The formatter automatically omits the date or time portion if the temporal value does not support the necessary fields.
+For example, formatting a `LocalDate` with `date:short` produces a short date (no time), while formatting a `LocalTime`
+with `date:short` produces a short time (no date).
 
 ```java
 LocalDate date = LocalDate.of(1972, 8, 17);
@@ -144,13 +144,13 @@ messageSupport
 // "14:23:01"
 ```
 
-When a temporal does not support the requested portion, the formatter produces an empty string. For example,
-requesting `date:time` on a `LocalDate` or `date:date` on a `LocalTime` returns nothing.
+When a temporal does not support the requested portion, the formatter produces an empty string. For example, requesting
+`date:time` on a `LocalDate` or `date:date` on a `LocalTime` returns nothing.
 
 #### Custom Patterns
 
-Any string that is not a predefined style name is treated as a `DateTimeFormatter` pattern. This gives you full
-control over the output format.
+Any string that is not a predefined style name is treated as a `DateTimeFormatter` pattern. This gives full control
+over the output format.
 
 ```java
 messageSupport
@@ -180,8 +180,8 @@ messageSupport
 
 ### Null Handling
 
-A `null` parameter value produces an empty string by default. You can provide a `null` map key to handle this
-case explicitly.
+A `null` parameter value produces an empty string by default. A `null` map key can be provided to handle this case
+explicitly.
 
 ```java
 messageSupport
@@ -240,8 +240,8 @@ messageSupport
 
 ### Null Handling
 
-A `null` parameter value produces an empty string by default. You can provide a `null` map key to handle this
-case explicitly.
+A `null` parameter value produces an empty string by default. A `null` map key can be provided to handle this case
+explicitly.
 
 ```java
 messageSupport

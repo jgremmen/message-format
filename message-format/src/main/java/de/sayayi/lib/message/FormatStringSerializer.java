@@ -47,7 +47,7 @@ public interface FormatStringSerializer
    * {@link Context#textJoiner() text joiner} provided by the given {@code context}.
    * <p>
    * The context provides a {@link java.nio.charset.CharsetEncoder CharsetEncoder} for checking character encodability, 
-   * a {@link TextJoiner} for accumulating serialized text fragments, and optional string quoting information for 
+   * a {@link TextJoiner} for accumulating serialized text fragments and optional string quoting information for
    * proper escaping of nested strings.
    *
    * @param context  the serialization context providing the text joiner, charset encoder and
@@ -63,7 +63,7 @@ public interface FormatStringSerializer
 
   /**
    * Immutable serialization context used during format string serialization. It provides a {@link CharsetEncoder} 
-   * for checking character encodability, a {@link TextJoiner} for accumulating serialized text fragments, and an
+   * for checking character encodability, a {@link TextJoiner} for accumulating serialized text fragments and an
    * optional string quote character that indicates the current quoting context for proper escaping of nested strings.
    *
    * @param encoder            charset encoder used to determine whether a character can be

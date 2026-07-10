@@ -649,7 +649,7 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
 
   /**
    * A {@link Spliterator} over the entries of the enclosing {@link SortedStringMap}, providing
-   * ordered, sized, and non-splitting traversal.
+   * ordered, sized and non-splitting traversal.
    */
   private final class EntrySpliterator implements Spliterator<Entry<String,V>>
   {

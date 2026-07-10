@@ -51,7 +51,7 @@ as a second argument. See [MessageFactory](message-factory.md) for details.
 ## ConfigurableMessageSupport
 
 `ConfigurableMessageSupport` extends `MessageSupport` with mutating methods for adding messages
-and templates, setting default configuration values, changing the default locale, and installing
+and templates, setting default configuration values, changing the default locale and installing
 filters. It also implements `MessagePublisher`, which means it can be passed directly to adopters
 and other components that register messages.
 
@@ -111,7 +111,7 @@ messageSupport
 Just like messages, adding a template whose name already exists throws a
 `DuplicateTemplateException` when the content differs. Identical duplicates are silently ignored.
 
-Templates can also be implemented entirely in Java by extending `AbstractNamedTemplate`, and can be
+Templates can also be implemented entirely in Java by extending `AbstractNamedTemplate` and can be
 discovered automatically at startup through the `ServiceLoader` mechanism by calling
 `registerTemplatesFromService(ClassLoader)`. Both topics are covered in detail on the
 [Templates](templates.md#custom-templates) page.
@@ -174,7 +174,7 @@ MessageSupport sealed = messageSupport.seal();
 ```
 
 The sealed instance is a lightweight wrapper that delegates formatting calls to the underlying
-configurable instance but hides mutating methods such as `addMessage`, `addTemplate`, and
+configurable instance but hides mutating methods such as `addMessage`, `addTemplate` and
 `setDefaultConfig`. This is useful when you want to expose the message support to other
 components without allowing them to modify it.
 
@@ -196,7 +196,7 @@ MessageSupport.MessageAccessor accessor = messageSupport.getMessageAccessor();
 
 Through the accessor you can inspect the current state of the message support without risk of
 modification. It provides methods to query messages by code, list all registered message codes,
-check whether a message exists, look up formatters, retrieve default configuration values, and
+check whether a message exists, look up formatters, retrieve default configuration values and
 access the `MessageFactory`.
 
 ```java
@@ -226,7 +226,7 @@ MessageFactory factory = accessor.getMessageFactory();
 Because `MessageAccessor` extends `TemplateAccessor`, all template queries are available
 directly on the accessor obtained through `getMessageAccessor()`.
 
-You can list template names, retrieve a template by name, check for existence, and find
+You can list template names, retrieve a template by name, check for existence and find
 templates that are referenced by messages but have not been registered:
 
 ```java

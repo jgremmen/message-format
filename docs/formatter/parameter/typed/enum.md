@@ -2,9 +2,8 @@
 
 This formatter is included in the `DefaultFormatterService`.
 
-When a parameter value is a Java enum constant, the library automatically selects the `EnumFormatter`. This
-formatter is registered for the `Enum` type and therefore handles all enum types without any additional
-configuration.
+When a parameter value is a Java enum constant, the library automatically selects the `EnumFormatter`. This formatter
+is registered for the `Enum` type and therefore handles all enum types without any additional configuration.
 
 By default, the formatter outputs the enum constant's name as returned by the `name()` method.
 
@@ -27,14 +26,14 @@ messageSupport
 
 ## The `enum` Configuration Key
 
-The formatter uses the `enum` configuration key to select what aspect of the enum constant to output. Two modes
-are available: `name` and `ordinal`. If the configuration key contains a value that does not match any of these
-options, formatting is delegated to the next formatter in the chain.
+The formatter uses the `enum` configuration key to select what aspect of the enum constant to output. Two modes are
+available: `name` and `ordinal`. If the configuration key contains a value that does not match any of these options,
+formatting is delegated to the next formatter in the chain.
 
 ### Name Mode (Default)
 
-When the `enum` configuration key is absent or set to `name`, the formatter outputs the constant's name. This is
-the default behavior.
+When the `enum` configuration key is absent or set to `name`, the formatter outputs the constant's name. This is the 
+default behavior.
 
 ```java
 messageSupport
@@ -48,8 +47,8 @@ Since `name` is the default, writing `enum:name` explicitly is equivalent to omi
 
 ### Ordinal Mode
 
-When the `enum` configuration key is set to `ordinal` (or its short form `ord`), the formatter outputs the
-constant's ordinal value as a number.
+When the `enum` configuration key is set to `ordinal` (or its short form `ord`), the formatter outputs the constant's
+ordinal value as a number.
 
 ```java
 messageSupport
@@ -84,8 +83,8 @@ messageSupport
 
 ### String Keys (Name Mode)
 
-In name mode, string map keys are compared against the constant's name. This allows you to map specific enum
-constant names to custom text.
+In name mode, string map keys are compared against the constant's name. This allows mapping specific enum constant 
+names to custom text.
 
 ```java
 messageSupport
@@ -117,8 +116,8 @@ messageSupport
 
 ### Number Keys (Ordinal Mode)
 
-In ordinal mode, number map keys are compared against the constant's ordinal value. This allows you to map
-specific ordinal positions to custom text.
+In ordinal mode, number map keys are compared against the constant's ordinal value. This allows mapping specific
+ordinal positions to custom text.
 
 ```java
 messageSupport
@@ -130,8 +129,8 @@ messageSupport
 
 ### Null Handling
 
-When the parameter value is `null`, the formatter outputs an empty string by default. You can provide a `null`
-map key to produce specific text.
+When the parameter value is `null`, the formatter outputs an empty string by default. A `null` map key can be provided
+to produce specific text.
 
 ```java
 messageSupport
@@ -144,8 +143,8 @@ messageSupport
 
 ## Unmatched Values
 
-When a string or number map key is present but the enum constant's name or ordinal does not match any of them,
-the formatter outputs an empty string. If a default map key (`:`) is provided, it is used instead.
+When a string or number map key is present but the enum constant's name or ordinal does not match any of them, the
+formatter outputs an empty string. If a default map key (`:`) is provided, it is used instead.
 
 ```java
 messageSupport

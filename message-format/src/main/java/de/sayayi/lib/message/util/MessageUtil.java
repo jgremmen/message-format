@@ -264,7 +264,7 @@ public final class MessageUtil
    *   <li> It must start with a lowercase letter.
    *   <li> It must not end with a hyphen ('-').
    *   <li> It must not contain consecutive hyphens ('--').
-   *   <li> It must only contain lowercase letters, digits, and hyphens ('-').
+   *   <li> It must only contain lowercase letters, digits and hyphens ('-').
    * </ul>
    *
    * @param name  the name to check, not {@code null}
@@ -339,7 +339,7 @@ public final class MessageUtil
    *   <li> It must start with a lowercase letter.
    *   <li> It must not end with a hyphen ('-').
    *   <li> It must not contain consecutive hyphens ('--').
-   *   <li> It must only contain lowercase letters, digits, and hyphens ('-').
+   *   <li> It must only contain lowercase letters, digits and hyphens ('-').
    * </ul>
    * <p>
    * A valid lower camel case name must satisfy the following conditions:
@@ -509,7 +509,7 @@ public final class MessageUtil
    * quotes ({@code "}), a double quote is used as the wrapper; otherwise a single quote is used.
    * <p>
    * The opening and closing quote characters are appended to the context's
-   * {@linkplain Context#textJoiner() text joiner}, and the string content between the quotes is
+   * {@linkplain Context#textJoiner() text joiner} and the string content between the quotes is
    * serialized using {@link #serializeString(Context, String)} with the chosen quote set as the
    * active {@linkplain Context#withStringQuote(char) string quote}.
    *

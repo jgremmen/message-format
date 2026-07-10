@@ -2,8 +2,8 @@
 
 This formatter is included in the `DefaultFormatterService`.
 
-The `URIFormatter` is a type-based formatter registered for `java.net.URI`. It is automatically selected whenever
-a parameter value is a `URI`. By default, it outputs the full URI string representation.
+The `URIFormatter` is a type-based formatter registered for `java.net.URI`. It is automatically selected whenever a 
+parameter value is a `URI`. By default, it outputs the full URI string representation.
 
 The `uri` configuration key controls which component of the URI to display:
 
@@ -102,8 +102,8 @@ messageSupport
 // "secure"
 ```
 
-The `port` component supports number map keys to override the output for specific port numbers. When no port
-is specified in the URI, the port value is `-1` and the output is an empty string.
+The `port` component supports number map keys to override the output for specific port numbers. When no port is 
+specified in the URI, the port value is `-1` and the output is an empty string.
 
 ```java
 messageSupport
@@ -116,8 +116,7 @@ messageSupport
 
 ## Null Handling
 
-A `null` parameter value produces an empty string by default. You can provide a `null` map key to produce
-specific text.
+A `null` parameter value produces an empty string by default. A `null` map key can be provided to produce specific text.
 
 ```java
 messageSupport

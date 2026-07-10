@@ -46,14 +46,14 @@ messageSupport
 
 The library does not require a formatter to be registered for the exact runtime class of a
 value. Instead, it walks the value's type hierarchy, collecting the class itself, all its
-superclasses and all implemented interfaces, and then looks up registered formatters for each
+superclasses and all implemented interfaces and then looks up registered formatters for each
 of those types. This means a formatter registered for `Number.class` will be found when the
 value is an `Integer`, a `BigDecimal` or any other `Number` subclass.
 
 The walk proceeds upward from the runtime type through `getSuperclass()` and recursively
 through `getInterfaces()`, stopping at `Object`. The result is a set of candidate types.
 For each candidate that has at least one registered formatter, those formatters are collected
-into a single list, sorted by order, and used in sequence.
+into a single list, sorted by order and used in sequence.
 
 For primitive types and primitive array types the library automatically maps them to their
 wrapper equivalents if no formatter is registered for the primitive directly. A `boolean`
@@ -70,13 +70,13 @@ a dedicated registration for every possible array element type.
 ## Formatter Order
 
 Because the type hierarchy walk can collect formatters from multiple levels of the class
-hierarchy, and because multiple formatters can be registered for the same type, the library
+hierarchy and because multiple formatters can be registered for the same type, the library
 needs a way to decide which formatter takes precedence. This is where the order attribute of
 `FormattableType` comes in.
 
 Each `FormattableType` carries an order value in the range 0 through 127. A lower number
 means higher priority. When the library resolves the formatter list for a given value type,
-all candidate formatters are sorted by their order, and the formatter with the lowest order
+all candidate formatters are sorted by their order and the formatter with the lowest order
 is tried first. If two formatters have the same order, the library falls back to sorting by
 the formatter's fully qualified class name to keep the behavior deterministic.
 

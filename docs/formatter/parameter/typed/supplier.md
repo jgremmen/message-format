@@ -2,20 +2,20 @@
 
 This formatter is included in the `DefaultFormatterService`.
 
-The library provides five formatters that handle Java's supplier functional interfaces: `Supplier`,
-`BooleanSupplier`, `IntSupplier`, `LongSupplier` and `DoubleSupplier`. Each formatter is automatically selected
-based on the parameter's type. The core principle is the same for all five: the supplier is evaluated once at
-format time and the resulting value is delegated to the formatter appropriate for its type.
+The library provides five formatters that handle Java's supplier functional interfaces: `Supplier`, `BooleanSupplier`,
+`IntSupplier`, `LongSupplier` and `DoubleSupplier`. Each formatter is automatically selected based on the parameter's
+type. The core principle is the same for all five: the supplier is evaluated once at format time and the resulting 
+value is delegated to the formatter appropriate for its type.
 
-Suppliers are useful when you want to defer value computation until the message is actually formatted. The
-supplier is called exactly once during formatting, so any side effects occur at that point.
+Suppliers are useful for deferring value computation until the message is actually formatted. The supplier is called
+exactly once during formatting, so any side effects occur at that point.
 
 
 ## SupplierFormatter
 
-The `SupplierFormatter` handles `java.util.function.Supplier` values. It calls `get()` on the supplier and
-delegates formatting of the returned object to the formatter appropriate for that object's type. Because the
-supplied value can be of any type, the output depends entirely on what the supplier returns.
+The `SupplierFormatter` handles `java.util.function.Supplier` values. It calls `get()` on the supplier and delegates
+formatting of the returned object to the formatter appropriate for that object's type. Because the supplied value can 
+be of any type, the output depends entirely on what the supplier returns.
 
 ```java
 Supplier<String> greeting = () -> "hello";
@@ -37,8 +37,8 @@ messageSupport
 // "positive"
 ```
 
-All map keys and configuration options that apply to the supplied value's type work transparently through the
-supplier wrapper.
+All map keys and configuration options that apply to the supplied value's type work transparently through the supplier
+wrapper.
 
 ```java
 Supplier<Boolean> check = () -> true;
@@ -64,15 +64,15 @@ messageSupport
 
 ### Size Delegation
 
-The `SupplierFormatter` supports size queries. The size is determined by evaluating the supplier and querying
-the size of the returned value.
+The `SupplierFormatter` supports size queries. The size is determined by evaluating the supplier and querying the size
+of the returned value.
 
 
 ## BooleanSupplierFormatter
 
-The `BooleanSupplierFormatter` handles `java.util.function.BooleanSupplier` values. It calls `getAsBoolean()`
-on the supplier and delegates formatting to the boolean formatter. The result is identical to passing a plain
-`boolean` value directly.
+The `BooleanSupplierFormatter` handles `java.util.function.BooleanSupplier` values. It calls `getAsBoolean()` on the
+supplier and delegates formatting to the boolean formatter. The result is identical to passing a plain `boolean` value
+directly.
 
 This formatter is also documented on the [Boolean](boolean.md) page.
 
@@ -100,8 +100,7 @@ messageSupport
 ## IntSupplierFormatter
 
 The `IntSupplierFormatter` handles `java.util.function.IntSupplier` values. It calls `getAsInt()` on the supplier
-and delegates formatting to the integer formatter. The result is identical to passing a plain `int` value
-directly.
+and delegates formatting to the integer formatter. The result is identical to passing a plain `int` value directly.
 
 ```java
 IntSupplier itemCount = () -> 7;
@@ -128,9 +127,8 @@ messageSupport
 
 ## LongSupplierFormatter
 
-The `LongSupplierFormatter` handles `java.util.function.LongSupplier` values. It calls `getAsLong()` on the
-supplier and delegates formatting to the long formatter. The result is identical to passing a plain `long` value
-directly.
+The `LongSupplierFormatter` handles `java.util.function.LongSupplier` values. It calls `getAsLong()` on the supplier 
+and delegates formatting to the long formatter. The result is identical to passing a plain `long` value directly.
 
 ```java
 LongSupplier timestamp = () -> System.currentTimeMillis();
@@ -157,9 +155,9 @@ messageSupport
 
 ## DoubleSupplierFormatter
 
-The `DoubleSupplierFormatter` handles `java.util.function.DoubleSupplier` values. It calls `getAsDouble()` on
-the supplier and delegates formatting to the double formatter. The result is identical to passing a plain
-`double` value directly.
+The `DoubleSupplierFormatter` handles `java.util.function.DoubleSupplier` values. It calls `getAsDouble()` on the 
+supplier and delegates formatting to the double formatter. The result is identical to passing a plain `double` value
+directly.
 
 ```java
 DoubleSupplier pi = () -> Math.PI;
@@ -186,8 +184,8 @@ messageSupport
 
 ## Null Handling
 
-For all five supplier formatters, a `null` parameter value (the supplier itself is `null`) produces an empty
-string by default. You can provide a `null` map key to handle this case explicitly.
+For all five supplier formatters, a `null` parameter value (the supplier itself is `null`) produces an empty string by
+default. A `null` map key can be provided to handle this case explicitly.
 
 ```java
 messageSupport

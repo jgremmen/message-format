@@ -17,7 +17,7 @@ itself. When a formatter needs to handle multiple unrelated types, you implement
 
 The vast majority of custom formatters handle a single type. Extending
 `AbstractSingleTypeParameterFormatter<T>` requires you to implement two methods:
-`formatValue(context, value)`, which produces the formatted text, and `getFormattableType()`, which
+`formatValue(context, value)`, which produces the formatted text and `getFormattableType()`, which
 tells the framework which Java class this formatter handles. The base class automatically handles
 `null` and empty values through parameter map key matching before your `formatValue` method is called,
 so `value` is guaranteed to be non-null.
@@ -76,7 +76,7 @@ deterministic.
 
 When you construct a `FormattableType` without specifying an order, it receives a sensible default.
 Regular classes get order 80 (`DEFAULT_ORDER`), primitive types and array types get order 100
-(`DEFAULT_PRIMITIVE_OR_ARRAY_ORDER`), and `Object` is fixed at order 127. To override the default
+(`DEFAULT_PRIMITIVE_OR_ARRAY_ORDER`) and `Object` is fixed at order 127. To override the default
 order and give your formatter higher or lower precedence than an existing one, pass an explicit
 order value to the constructor:
 
@@ -211,7 +211,7 @@ look up a mapped message. The convenience methods `formatUsingMappedString` and
 against string and number map keys.
 
 The following example formats an `InetAddress` by rendering its host address. It first checks
-whether the message author has provided a string map entry that matches the address, and falls
+whether the message author has provided a string map entry that matches the address and falls
 back to the plain host address string if no mapping was found:
 
 ```java
@@ -376,7 +376,7 @@ formatterService.addFormatter(new ColorFormatter());
 
 The `addFormatter` method reads the `FormattableType` entries returned by `getFormattableTypes()` and
 registers the formatter for each type. Multiple formatters can coexist for the same type. They are
-ordered by their `FormattableType` order value, and the formatter with the lowest order is used first.
+ordered by their `FormattableType` order value and the formatter with the lowest order is used first.
 
 If you need to bind a formatter to a specific type regardless of what `getFormattableTypes()` returns,
 use `addFormatterForType`:

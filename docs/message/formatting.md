@@ -4,15 +4,13 @@ toc_depth: 2
 
 # Formatting Messages
 
-Once you have a [`MessageSupport`](../configuration/message-support.md) instance, you use its fluent API to format
-messages. The entry point is either `code(...)` for messages that have been published with a message code,
-or `message(...)` for inline format strings and pre-parsed `Message` objects. Both methods
-return a `MessageConfigurer` that lets you set parameter values, choose a locale, and produce
-the final formatted text.
+A [`MessageSupport`](../configuration/message-support.md) instance provides a fluent API to format messages. The entry 
+point is either `code(...)` for messages that have been published with a message code, or `message(...)` for inline 
+format strings and pre-parsed `Message` objects. Both methods return a `MessageConfigurer` that allows parameter values
+to be set, a locale to be chosen and produce the final formatted text.
 
-This page covers the full lifecycle of formatting a message: starting with the configurer,
-setting parameters, choosing a locale, producing the formatted result, and creating
-exceptions with formatted messages.
+This page covers the full lifecycle of formatting a message: starting with the configurer, setting parameters, choosing 
+a locale, producing the formatted result and creating exceptions with formatted messages.
 
 
 ## Starting a Message Configurer
@@ -21,9 +19,8 @@ There are three ways to obtain a `MessageConfigurer` from a `MessageSupport` ins
 
 ### By Message Code
 
-If a message has been published to the message support (for example through annotations or
-by calling `addMessage`), you can reference it by its code. The `code` method looks up the
-message and returns a configurer for it.
+If a message has been published to the message support (for example through annotations or by calling `addMessage`), it
+can be referenced by its code. The `code` method looks up the message and returns a configurer for it.
 
 ```java
 var messageSupport = MessageSupportFactory.create(
@@ -40,16 +37,15 @@ String text = messageSupport
 // "Order A-1234 confirmed for Alice."
 ```
 
-If the code does not exist, an `IllegalArgumentException` is thrown. This makes it easy to
-catch configuration errors early.
+If the code does not exist, an `IllegalArgumentException` is thrown. This makes it easy to catch configuration errors
+early.
 
 ### By Inline Format String
 
-When you do not need a pre-registered message, you can pass a format string directly to the
-`message` method. The format string is not parsed immediately when you call `message`. Instead,
-parsing is deferred until the message is actually needed for formatting. This means that for
-an immediate `format()` call, parsing happens right away as part of that call. But when you
-use `formatSupplier()` or `formattedExceptionSupplier()`, parsing does not happen until the
+When a pre-registered message is not needed, a format string can be passed directly to the `message` method. The format
+string is not parsed immediately when `message` is called. Instead, parsing is deferred until the message is actually 
+needed for formatting. This means that for an immediate `format()` call, parsing happens right away as part of that 
+call. But when `formatSupplier()` or `formattedExceptionSupplier()` is used, parsing does not happen until the
 supplier's `get()` method is invoked.
 
 ```java
@@ -60,14 +56,12 @@ String text = messageSupport
 // "Welcome back, Bob!"
 ```
 
-This approach is convenient for one-off messages or for situations where messages are
-constructed dynamically.
+This approach is convenient for one-off messages or for situations where messages are constructed dynamically.
 
 ### By Pre-Parsed Message Object
 
-If you have already parsed a `Message` object, you can pass it directly to the `message`
-method. This avoids parsing the format string again and is useful when the same message is
-formatted repeatedly with different parameters.
+An already parsed `Message` object can be passed directly to the `message` method. This avoids parsing the format
+string again and is useful when the same message is formatted repeatedly with different parameters.
 
 ```java
 MessageFactory factory = messageSupport
@@ -86,15 +80,14 @@ String text = messageSupport
 
 ## Setting Parameters
 
-The `MessageConfigurer` provides several `with` methods for binding parameter values. All of
-them return the configurer itself, so calls can be chained fluently.
+The `MessageConfigurer` provides several `with` methods for binding parameter values. All of them return the configurer
+itself, so calls can be chained fluently.
 
 ### Individual Parameters
 
-The most common pattern is setting parameters one at a time with `.with(name, value)`. The
-library provides overloaded methods for all Java primitive types (`boolean`, `byte`, `char`,
-`short`, `int`, `long`, `float`, `double`) as well as `Object`, so you never need to box
-values manually.
+The most common pattern is setting parameters one at a time with `.with(name, value)`. The library provides overloaded
+methods for all Java primitive types (`boolean`, `byte`, `char`, `short`, `int`, `long`, `float`, `double`) as well as 
+`Object`, so values never need to be boxed manually.
 
 ```java
 String text = messageSupport
@@ -108,9 +101,8 @@ String text = messageSupport
 
 ### Bulk Parameters from a Map
 
-If your parameter values are already collected in a `Map<String,Object>`, you can pass the
-entire map in a single call. Since `Properties` extends `Map`, this works with `Properties`
-objects as well.
+When parameter values are already collected in a `Map<String,Object>`, the entire map can be passed in a single call. 
+Since `Properties` extends `Map`, this works with `Properties` objects as well.
 
 ```java
 var params = Map.of(
@@ -127,9 +119,8 @@ String text = messageSupport
 
 ### Removing and Clearing Parameters
 
-The configurer is mutable. You can remove a single parameter by name or clear all parameters
-at once. This is useful when you reuse a configurer for multiple formatting calls with
-slightly different parameter sets.
+The configurer is mutable. A single parameter can be removed by name or all parameters cleared at once. This is useful 
+when a configurer is reused for multiple formatting calls with slightly different parameter sets.
 
 ```java
 var configurer = messageSupport
@@ -157,9 +148,8 @@ configurer
 
 ## Choosing a Locale
 
-The locale controls locale-sensitive formatting such as number grouping, date patterns and
-string comparisons in map keys. You can set the locale using the `locale` method, which
-accepts either a `Locale` object or a language tag string.
+The locale controls locale-sensitive formatting such as number grouping, date patterns and string comparisons in map 
+keys. The locale is set using the `locale` method, which accepts either a `Locale` object or a language tag string.
 
 ```java
 String text = messageSupport
@@ -179,16 +169,16 @@ String text = messageSupport
 // "1 mai 2026"
 ```
 
-If you do not set a locale, the default locale configured on the `MessageSupport` instance
-is used. You can also pass `null` to explicitly reset to the default locale.
+If no locale is set, the default locale configured on the `MessageSupport` instance is used. Passing `null` explicitly
+resets to the default locale.
 
 
 ## Producing the Formatted Result
 
 ### Immediate Formatting
 
-The simplest way to get the formatted text is to call `format()`. It evaluates all parameters
-and returns the result as a `String` immediately.
+The simplest way to get the formatted text is to call `format()`. It evaluates all parameters and returns the result as
+a `String` immediately.
 
 ```java
 String text = messageSupport
@@ -200,18 +190,16 @@ String text = messageSupport
 
 ### Deferred Formatting with a Supplier
 
-Sometimes you want to delay the actual formatting until the result is needed. The
-`formatSupplier()` method returns a `Supplier<String>` that captures the current parameter
-values and locale at the time of the call. The formatting itself does not happen until
-`Supplier.get()` is invoked.
+Sometimes the actual formatting should be delayed until the result is needed. The `formatSupplier()` method returns a 
+`Supplier<String>` that captures the current parameter values and locale at the time of the call. The formatting itself 
+does not happen until `Supplier.get()` is invoked.
 
-When the message was created from an inline format string via `message(String)`, deferred
-formatting also means deferred parsing. The format string is only parsed the first time the
-supplier is evaluated. This matters for performance-sensitive code paths where the formatted
-result may never be needed at all.
+When the message was created from an inline format string via `message(String)`, deferred formatting also means 
+deferred parsing. The format string is only parsed the first time the supplier is evaluated. This matters for 
+performance-sensitive code paths where the formatted result may never be needed at all.
 
-This is particularly useful for logging frameworks where the message should only be formatted
-if the log level is active, or for lazy evaluation scenarios.
+This is particularly useful for logging frameworks where the message should only be formatted if the log level is 
+active, or for lazy evaluation scenarios.
 
 ```java
 var configurer = messageSupport
@@ -226,9 +214,8 @@ String text = supplier.get();
 // "15.06.2023"
 ```
 
-An important detail is that the supplier captures a snapshot of the parameters and locale.
-If you change the configurer after obtaining the supplier, the supplier still uses the values
-that were set when it was created.
+An important detail is that the supplier captures a snapshot of the parameters and locale. If the configurer is changed
+after obtaining the supplier, the supplier still uses the values that were set when it was created.
 
 ```java
 var configurer = messageSupport
@@ -250,16 +237,14 @@ second.get();
 
 ## Creating Exceptions with Formatted Messages
 
-A common pattern in Java applications is to throw exceptions with descriptive messages. The
-message configurer provides dedicated methods that format the message and pass the result
-directly to an exception constructor. This avoids the need to format the message into a
-temporary variable before constructing the exception.
+A common pattern in Java applications is to throw exceptions with descriptive messages. The message configurer provides 
+dedicated methods that format the message and pass the result directly to an exception constructor. This avoids the 
+need to format the message into a temporary variable before constructing the exception.
 
 ### Immediate Exception
 
-The `formattedException` method formats the message and passes the result to the constructor
-function you provide. You can use a method reference or a lambda expression for any exception
-type.
+The `formattedException` method formats the message and passes the result to the constructor function provided. A 
+method reference or a lambda expression can be used for any exception type.
 
 ```java
 throw messageSupport
@@ -287,9 +272,9 @@ try {
 
 ### Deferred Exception with a Supplier
 
-The `formattedExceptionSupplier` method returns a `Supplier` that creates the exception
-lazily. This is useful in combination with `Optional.orElseThrow` and similar methods where
-you only want to construct the exception if the value is actually absent.
+The `formattedExceptionSupplier` method returns a `Supplier` that creates the exception lazily. This is useful in 
+combination with `Optional.orElseThrow` and similar methods where the exception should only be constructed if the value 
+is actually absent.
 
 ```java
 User user = findUserById(userId)
@@ -300,9 +285,8 @@ User user = findUserById(userId)
 // throws IllegalStateException("No user with id 42") only if the Optional is empty
 ```
 
-Just like `formatSupplier`, the exception supplier captures a snapshot of the current
-parameters and locale. The message is only formatted (and, for inline format strings, only
-parsed) when `Supplier.get()` is invoked.
+Just like `formatSupplier`, the exception supplier captures a snapshot of the current parameters and locale. The
+message is only formatted (and, for inline format strings, only parsed) when `Supplier.get()` is invoked.
 
 ```java
 Supplier<IOException> supplier = messageSupport
@@ -319,12 +303,11 @@ OptionalInt.empty().orElseThrow(supplier);
 
 ## Accessing the Message and Parameters
 
-The configurer also provides read access to the message it is working with and to the
-parameters that have been set so far. The `getMessage()` method returns the `Message` object,
-and `getParameters()` returns an unmodifiable snapshot of the current parameter map.
+The configurer also provides read access to the message it is working with and to the parameters that have been set so 
+far. The `getMessage()` method returns the `Message` object and `getParameters()` returns an unmodifiable snapshot of
+the current parameter map.
 
-This can be useful for debugging or when you need to inspect the configurer's state
-programmatically.
+This can be useful for debugging or when the configurer's state needs to be inspected programmatically.
 
 ```java
 var configurer = messageSupport
@@ -339,5 +322,5 @@ Map<String, Object> params = configurer.getParameters();
 // {name=Alice, role=admin}
 ```
 
-The map returned by `getParameters()` is a snapshot. Subsequent changes to the configurer
-are not reflected in a previously obtained map.
+The map returned by `getParameters()` is a snapshot. Subsequent changes to the configurer are not reflected in a
+previously obtained map.

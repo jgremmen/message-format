@@ -1,7 +1,7 @@
 # Custom Named Parameter Formatter
 
 This page explains how to implement the `NamedParameterFormatter` interface, how to control
-which value types your formatter accepts, and how to make a formatter activate automatically
+which value types your formatter accepts and how to make a formatter activate automatically
 when its configuration key is present.
 
 
@@ -123,12 +123,12 @@ messageSupport
 When your named formatter needs automatic `null` and empty value handling before the actual
 formatting logic runs, extend `AbstractParameterFormatter<T>` and implement
 `NamedParameterFormatter`. The base class intercepts `null` and empty values, checks whether
-the parameter configuration contains a matching map key for them, and only calls your
+the parameter configuration contains a matching map key for them and only calls your
 `formatValue` method when the value is non-null and no map key matched. This eliminates the
 boilerplate of checking for `null` in every named formatter.
 
 The following example formats a numeric value as a percentage string. It extends
-`AbstractParameterFormatter<Number>` so that `null` handling is automatic, and it restricts
+`AbstractParameterFormatter<Number>` so that `null` handling is automatic and it restricts
 itself to numeric types through `canFormat`:
 
 ```java
@@ -514,7 +514,7 @@ messageSupport
 Named formatters are registered with the formatter service in the same way as typed
 formatters. The `addFormatter` method handles both. When it detects that the formatter
 implements `NamedParameterFormatter`, it validates the name against the kebab-case convention,
-registers the formatter under its name, and, if the formatter returns types from
+registers the formatter under its name and, if the formatter returns types from
 `getFormattableTypes()`, also registers it for those types. If auto-apply is enabled, it
 additionally maps the formatter's configuration key names for automatic activation.
 

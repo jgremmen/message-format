@@ -7,7 +7,7 @@ cases like changing letter case and truncating text. When your application needs
 goes beyond what the built-in formatters offer, you can write your own.
 
 Post formatters are invoked in messages using the `%(name, 'sub-message', ...)` syntax. The
-sub-message is first formatted as a regular message, and the resulting string is then passed to the
+sub-message is first formatted as a regular message and the resulting string is then passed to the
 post formatter's `format` method. The post formatter returns the transformed string, which takes the
 place of the entire `%(...)` expression in the final output.
 
@@ -48,7 +48,7 @@ declared in the message syntax. It also exposes the locale for which the message
 The typed accessor methods are the same ones used by parameter formatters:
 
 `getConfigValueString(name)` returns a string configuration value,
-`getConfigValueNumber(name)` returns a numeric value as `OptionalLong`, and
+`getConfigValueNumber(name)` returns a numeric value as `OptionalLong` and
 `getConfigValueBool(name)` returns a boolean value. Each returns an empty `Optional` when the key
 is absent or when the stored value type does not match the requested type.
 
@@ -66,7 +66,7 @@ a post formatter.
 
 The following implementation masks a portion of the input text by replacing characters with a
 configurable mask character. It reads the number of visible characters to keep at the end from a
-`mask-show` configuration key, and optionally a custom mask character from `mask-char`:
+`mask-show` configuration key and optionally a custom mask character from `mask-char`:
 
 ```java
 public final class MaskPostFormatter implements PostFormatter

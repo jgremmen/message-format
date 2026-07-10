@@ -73,7 +73,7 @@ and reads its `value` property. The result is the integer `34`, which is then fo
 ## Combining Expression and Format
 
 The real power of this formatter emerges when you combine `spel-expr` with `spel-format`. The expression
-extracts a value, and the format interprets that value through a different named formatter.
+extracts a value and the format interprets that value through a different named formatter.
 
 ```java
 var map = new TreeMap<String, Integer>();
@@ -207,7 +207,7 @@ clear that SpEL evaluation is intended.
 
 /// warning
 SpEL is a powerful expression language that can invoke arbitrary methods on objects. Constructors are
-**not** available in the evaluation context (the constructor resolver list is empty), and bean resolution
+**not** available in the evaluation context (the constructor resolver list is empty) and bean resolution
 is disabled, which limits some attack vectors. However, the expression can still call any public method
 on the root object and on objects reachable from it.
 

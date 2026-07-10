@@ -1,23 +1,20 @@
 # Extension Configuration
 
-The `messageFormat` extension is the central configuration point for the Gradle plugin. All
-properties set on the extension are forwarded as conventions to the `messageFormatPack` task, so
-in most cases you only need to configure the extension and the task picks up the values
-automatically.
+The `messageFormat` extension is the central configuration point for the Gradle plugin. All properties set on the 
+extension are forwarded as conventions to the `messageFormatPack` task, so in most cases only the extension needs to be 
+configured and the task picks up the values automatically.
 
-The extension is organized into top-level properties that control the output file and source
-scanning, and two nested blocks (`messages` and `templates`) that control filtering, duplicate
-handling, and template validation respectively.
+The extension is organized into top-level properties that control the output file and source scanning and two nested 
+blocks (`messages` and `templates`) that control filtering, duplicate handling and template validation respectively.
 
 
 ## Top-Level Properties
 
 ### `packFilename`
 
-The name of the output pack file. The default value is the Gradle project name with a `.mfp`
-extension appended. For a project named `billing`, the default pack filename is `billing.mfp`.
-If your project produces multiple pack files (for example, one per subproject in a multi-project
-build), you can assign each one a distinct name to avoid collisions:
+The name of the output pack file. The default value is the Gradle project name with a `.mfp` extension appended. For a
+project named `billing`, the default pack filename is `billing.mfp`. When a project produces multiple pack files (for
+example, one per subproject in a multi-project build), each one can be assigned a distinct name to avoid collisions:
 
 === "Groovy DSL"
 
@@ -35,16 +32,15 @@ build), you can assign each one a distinct name to avoid collisions:
     }
     ```
 
-The file is written to the task's destination directory (`<buildDir>/messageFormatPack/` by default).
-Only the filename is configured here, not the full path.
+The file is written to the task's destination directory (`<buildDir>/messageFormatPack/` by default). Only the filename 
+is configured here, not the full path.
 
 
 ### `compress`
 
-Controls whether the output pack file is GZip-compressed. The default value is `false`. The
-binary pack format already uses extensive bit-packing, so compression may not reduce the size
-noticeably for small message sets. For larger sets with hundreds or thousands of messages,
-enabling compression can reduce the file size significantly:
+Controls whether the output pack file is GZip-compressed. The default value is `false`. The binary pack format already 
+uses extensive bit-packing, so compression may not reduce the size noticeably for small message sets. For larger sets
+with hundreds or thousands of messages, enabling compression can reduce the file size significantly:
 
 === "Groovy DSL"
 
@@ -62,15 +58,15 @@ enabling compression can reduce the file size significantly:
     }
     ```
 
-Compressed and uncompressed pack files are both imported the same way at runtime. The
-`importMessages` method detects the format automatically.
+Compressed and uncompressed pack files are both imported the same way at runtime. The `importMessages` method detects 
+the format automatically.
 
 
 ## Source Sets
 
-By default, the plugin scans the output of the `main` source set, which means all compiled
-`.class` files under `<buildDir>/classes/java/main/`. If your messages and templates are defined in
-additional source sets, you can add them to the scan with the `sourceSet` method:
+By default, the plugin scans the output of the `main` source set, which means all compiled `.class` files under
+`<buildDir>/classes/java/main/`. When messages and templates are defined in additional source sets, they can be added 
+to the scan with the `sourceSet` method:
 
 === "Groovy DSL"
 
@@ -90,8 +86,8 @@ additional source sets, you can add them to the scan with the `sourceSet` method
     }
     ```
 
-You can also point the plugin at arbitrary file collections through the `sources` property. Only
-`.class` files in the collection are actually scanned; all other file types are ignored:
+The plugin can also be pointed at arbitrary file collections through the `sources` property. Only `.class` files in the 
+collection are actually scanned; all other file types are ignored:
 
 === "Groovy DSL"
 
@@ -109,14 +105,14 @@ You can also point the plugin at arbitrary file collections through the `sources
     }
     ```
 
-This flexibility is useful when message definitions come from precompiled libraries or generated
-code that does not belong to a standard Gradle source set.
+This flexibility is useful when message definitions come from precompiled libraries or generated code that does not
+belong to a standard Gradle source set.
 
 
 ## The `messages` Block
 
-The `messages` block configures how message codes are filtered and how duplicate definitions are
-handled. It is accessed as a nested closure inside the `messageFormat` extension:
+The `messages` block configures how message codes are filtered and how duplicate definitions are handled. It is
+accessed as a nested closure inside the `messageFormat` extension:
 
 === "Groovy DSL"
 
@@ -145,17 +141,17 @@ handled. It is accessed as a nested closure inside the `messageFormat` extension
 
 ### `duplicateStrategy`
 
-Determines how the plugin handles duplicate message codes and template names. A duplicate occurs
-when two messages share the same code but have different message text, or when two templates
-share the same name but have different content. If two entries with the same code or name have
-identical content, they are silently accepted regardless of the strategy.
+Determines how the plugin handles duplicate message codes and template names. A duplicate occurs when two messages
+share the same code but have different message text, or when two templates share the same name but have different
+content. If two entries with the same code or name have identical content, they are silently accepted regardless of the
+strategy.
 
 The default strategy is `IGNORE_AND_WARN`. The following strategies are available:
 
 `IGNORE` silently discards the second definition and keeps the first.
 
-`IGNORE_AND_WARN` discards the second definition but logs a warning that identifies the
-duplicate code and the class in which it was found.
+`IGNORE_AND_WARN` discards the second definition but logs a warning that identifies the duplicate code and the class in 
+which it was found.
 
 `OVERRIDE` silently replaces the first definition with the second.
 
@@ -163,9 +159,8 @@ duplicate code and the class in which it was found.
 
 `FAIL` immediately stops the build with an error when a duplicate is encountered.
 
-The property accepts both a `DuplicateStrategy` enum constant and a case-insensitive string.
-Dashes in the string are converted to underscores automatically, so all of the following are
-equivalent:
+The property accepts both a `DuplicateStrategy` enum constant and a case-insensitive string. Dashes in the string are 
+converted to underscores automatically, so all the following are equivalent:
 
 === "Groovy DSL"
 
@@ -222,18 +217,15 @@ equivalent:
 
 ### Include and Exclude Filters
 
-The `include` and `exclude` methods control which message codes end up in the pack file. Both
-accept one or more regular expressions that are matched against each message code found during
-scanning.
+The `include` and `exclude` methods control which message codes end up in the pack file. Both accept one or more 
+regular expressions that are matched against each message code found during scanning.
 
-When no include filters are configured (the default), all scanned messages are eligible for
-inclusion. As soon as at least one include filter is specified, only messages whose code matches
-at least one of the include patterns are considered. Exclude filters are evaluated after include
-filters: if a message code matches an exclude pattern, it is removed from the output even if it
-also matches an include pattern.
+When no include filters are configured (the default), all scanned messages are eligible for inclusion. As soon as at 
+least one include filter is specified, only messages whose code matches at least one of the include patterns are 
+considered. Exclude filters are evaluated after include filters: if a message code matches an exclude pattern, it is
+removed from the output even if it also matches an include pattern.
 
-The following example includes only message codes that start with `ORDER-` but excludes any
-codes ending in `-DRAFT`:
+The following example includes only message codes that start with `ORDER-` but excludes any codes ending in `-DRAFT`:
 
 === "Groovy DSL"
 
@@ -257,7 +249,7 @@ codes ending in `-DRAFT`:
     }
     ```
 
-Multiple patterns can be passed in a single call or across multiple calls, and they accumulate:
+Multiple patterns can be passed in a single call or across multiple calls and they accumulate:
 
 === "Groovy DSL"
 
@@ -281,15 +273,14 @@ Multiple patterns can be passed in a single call or across multiple calls, and t
     }
     ```
 
-Filters apply only to messages, not to templates. Templates are included automatically if they
-are referenced by any message that passes the filters.
+Filters apply only to messages, not to templates. Templates are included automatically if they are referenced by any
+message that passes the filters.
 
 
 ## The `templates` Block
 
-The `templates` block configures template reference validation and allows ignoring specific
-template names during that validation. It is accessed as a nested closure inside the
-`messageFormat` extension:
+The `templates` block configures template reference validation and allows ignoring specific template names during that 
+validation. It is accessed as a nested closure inside the `messageFormat` extension:
 
 === "Groovy DSL"
 
@@ -316,18 +307,16 @@ template names during that validation. It is accessed as a nested closure inside
 
 ### `validateReferences`
 
-Controls whether the plugin checks that all templates referenced by messages (including nested
-template references) are present in the scanned classes. The default value is `true`.
+Controls whether the plugin checks that all templates referenced by messages (including nested template references) are
+present in the scanned classes. The default value is `true`.
 
-When enabled, the task collects all template names that appear in `%[template-name]` references
-across all scanned messages and verifies that a corresponding `@TemplateDef` exists. If one or
-more templates are missing, the build fails with an error listing the missing template names.
-This catches broken template references early, at build time, rather than at runtime when a
-message is formatted.
+When enabled, the task collects all template names that appear in `%[template-name]` references across all scanned 
+messages and verifies that a corresponding `@TemplateDef` exists. If one or more templates are missing, the build fails 
+with an error listing the missing template names. This catches broken template references early, at build time, rather 
+than at runtime when a message is formatted.
 
-When disabled, no such validation is performed. This can be useful if templates are loaded from
-a different source at runtime, for example from a separate pack file or through programmatic
-registration:
+When disabled, no such validation is performed. This can be useful if templates are loaded from a different source at 
+runtime, for example from a separate pack file or through programmatic registration:
 
 === "Groovy DSL"
 
@@ -352,16 +341,14 @@ registration:
 
 ### `ignore`
 
-The `ignore` method accepts one or more regular expressions that are matched against template
-names during validation. If a missing template's name matches any of the ignore patterns, the
-validation does not report it as an error. This is particularly useful when certain templates are
-expected to be provided by a different module or registered programmatically at runtime, while
-you still want validation to catch genuinely missing templates.
+The `ignore` method accepts one or more regular expressions that are matched against template names during validation.
+If a missing template's name matches any of the ignore patterns, the validation does not report it as an error. This is
+particularly useful when certain templates are expected to be provided by a different module or registered
+programmatically at runtime, while validation should still catch genuinely missing templates.
 
-Consider a project that references templates from a shared library that is loaded separately at
-runtime. Without the `ignore` method, you would have to disable validation entirely and lose the
-safety net for your own templates. With `ignore`, you can selectively suppress the check for
-known external templates:
+Consider a project that references templates from a shared library that is loaded separately at runtime. Without the
+`ignore` method, validation would have to be disabled entirely, losing the safety net for the project's own templates. 
+With `ignore`, the check can be selectively suppressed for known external templates:
 
 === "Groovy DSL"
 
@@ -385,15 +372,14 @@ known external templates:
     }
     ```
 
-In this example, templates whose name starts with `shared-` or equals `external-footer` will not
-cause validation failures even if they are absent from the scanned classes. All other template
-references are still validated normally.
+In this example, templates whose name starts with `shared-` or equals `external-footer` will not cause validation 
+failures even if they are absent from the scanned classes. All other template references are still validated normally.
 
 
 ## Single-Project Configuration
 
-A typical single-project setup requires very little configuration. Apply the plugin, optionally
-adjust the extension properties, and wire the pack file into the jar:
+A typical single-project setup requires very little configuration. Apply the plugin, optionally adjust the extension 
+properties and wire the pack file into the jar:
 
 === "Groovy DSL"
 
@@ -449,22 +435,20 @@ adjust the extension properties, and wire the pack file into the jar:
     }
     ```
 
-With this configuration in place, running `./gradlew jar` compiles your Java sources, scans the
-compiled classes for `@MessageDef` and `@TemplateDef` annotations, produces a compressed pack
-file, and bundles it into `META-INF/` inside the jar. The build fails immediately if two classes
-define the same message code with different text.
+With this configuration in place, running `./gradlew jar` compiles the Java sources, scans the compiled classes for 
+`@MessageDef` and `@TemplateDef` annotations, produces a compressed pack file and bundles it into `META-INF/` inside 
+the jar. The build fails immediately if two classes define the same message code with different text.
 
 
 ## Multi-Project Configuration
 
-In a Gradle multi-project build, each subproject typically defines its own messages and templates.
-There are two common approaches for handling this.
+In a Gradle multi-project build, each subproject typically defines its own messages and templates. There are two common
+approaches for handling this.
 
 ### Per-Subproject Pack Files
 
-The simplest approach is to apply the plugin independently to each subproject that contains
-message definitions. Every subproject produces its own `.mfp` file, and at runtime the
-application imports all of them:
+The simplest approach is to apply the plugin independently to each subproject that contains message definitions. Every
+subproject produces its own `.mfp` file and at runtime the application imports all of them:
 
 === "Groovy DSL"
 
@@ -538,9 +522,9 @@ application imports all of them:
     }
     ```
 
-Because the default pack filename is derived from the project name, the `core` subproject
-produces `core.mfp` and the `orders` subproject produces `orders.mfp` without any additional
-configuration. At runtime, import each pack file separately:
+Because the default pack filename is derived from the project name, the `core` subproject produces `core.mfp` and the 
+`orders` subproject produces `orders.mfp` without any additional configuration. At runtime, import each pack file 
+separately:
 
 ```java
 var messageSupport = MessageSupportFactory.create(
@@ -560,8 +544,8 @@ This approach keeps each subproject self-contained and allows independent builds
 
 ### Shared Plugin Configuration
 
-If many subprojects share the same plugin configuration, you can define it once in a convention
-plugin or a `subprojects` block in the root build script to avoid repetition:
+If many subprojects share the same plugin configuration, it can be defined once in a convention plugin or a
+`subprojects` block in the root build script to avoid repetition:
 
 === "Groovy DSL"
 
@@ -609,16 +593,15 @@ plugin or a `subprojects` block in the root build script to avoid repetition:
     }
     ```
 
-Each subproject still applies the plugin itself, but the configuration block in the root project
-ensures that all subprojects share the same compression and duplicate handling settings. The
-`plugins.withId` guard makes the block apply only to subprojects that actually use the message
-format plugin, so subprojects without message definitions are not affected.
+Each subproject still applies the plugin itself, but the configuration block in the root project ensures that all 
+subprojects share the same compression and duplicate handling settings. The `plugins.withId` guard makes the block
+apply only to subprojects that actually use the message format plugin, so subprojects without message definitions are 
+not affected.
 
 ### Aggregated Pack File
 
-If you prefer a single pack file that contains all messages from all subprojects, you can
-configure one subproject (or the root project) to scan the compiled classes of multiple
-subprojects:
+For a single pack file that contains all messages from all subprojects, one subproject (or the root project) can be 
+configured to scan the compiled classes of multiple subprojects:
 
 === "Groovy DSL"
 
@@ -684,11 +667,10 @@ subprojects:
     }
     ```
 
-This configuration produces a single pack file containing all messages and templates from the
-`core`, `orders`, and `billing` subprojects, plus any messages defined in `app` itself (because
-the plugin always includes the `main` source set by default). Because the sources from other
-subprojects are added explicitly, the task also depends on their compilation output, so Gradle
-compiles all three subprojects before scanning.
+This configuration produces a single pack file containing all messages and templates from the `core`, `orders` and 
+`billing` subprojects, plus any messages defined in `app` itself (because the plugin always includes the `main` source 
+set by default). Because the sources from other subprojects are added explicitly, the task also depends on their
+compilation output, so Gradle compiles all three subprojects before scanning.
 
-Using the `FAIL` strategy in an aggregated setup is recommended because it catches accidental
-code collisions between subprojects at build time.
+Using the `FAIL` strategy in an aggregated setup is recommended because it catches accidental code collisions between 
+subprojects at build time.

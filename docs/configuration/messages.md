@@ -11,7 +11,7 @@ invocations. Once parsed, a message can be formatted repeatedly with different p
 and locales without paying the parsing cost again.
 
 This page explains the `Message` interface hierarchy, how to create messages through
-`MessageFactory` parsing methods and the programmatic `MessageBuilder`, and how to register
+`MessageFactory` parsing methods and the programmatic `MessageBuilder` and how to register
 them on a `ConfigurableMessageSupport`. For the format string syntax itself, see
 [Syntax](../message/syntax.md). For how to configure and obtain a `MessageFactory`, see
 [MessageFactory](message-factory.md).
@@ -26,7 +26,7 @@ a message can do. All message objects are immutable and thread-safe.
 
 The root `Message` interface represents a message in its most generic form. It provides methods
 for formatting the message, retrieving its constituent message parts, listing the template names
-it references, and serializing it back into a format string. The static field `Message.EMPTY`
+it references and serializing it back into a format string. The static field `Message.EMPTY`
 holds a shared singleton instance that always formats to an empty string.
 
 ### Message.WithSpaces
@@ -54,7 +54,7 @@ factory wraps it with the code you supply.
 `Message.LocaleAware` extends `Message` and holds multiple locale-specific messages. When the
 message is formatted, the locale provided through the `Parameters` is used to select the best
 matching variant. The matching algorithm first looks for an exact locale match (language and
-country), then falls back to the same language with a different country, and finally selects the
+country), then falls back to the same language with a different country and finally selects the
 first available variant as a last resort.
 
 A `Message.LocaleAware` does not have a single array of message parts or a single format string.
@@ -186,7 +186,7 @@ Message.WithSpaces msg = MessageBuilder
 ### Parameter Parts
 
 A parameter part inserts a formatted value. After calling `parameter(name)`, the returned
-`ParameterBuilder` lets you configure the formatter, map entries, configuration values, and
+`ParameterBuilder` lets you configure the formatter, map entries, configuration values and
 spaces:
 
 ```java
@@ -202,7 +202,7 @@ Message.WithSpaces msg = MessageBuilder
 ```
 
 The parameter builder supports map entries that mirror the map syntax of the format string. Each
-map entry has a key, an optional comparison operator, and a value message:
+map entry has a key, an optional comparison operator and a value message:
 
 ```java
 Message.WithSpaces msg = MessageBuilder

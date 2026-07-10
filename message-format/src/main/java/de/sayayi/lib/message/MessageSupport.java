@@ -48,7 +48,7 @@ import static java.util.Locale.forLanguageTag;
  * Central entry point for formatting messages.
  * <p>
  * A {@code MessageSupport} instance provides access to a set of published messages (identified by
- * code) and templates, and allows preparing them for formatting using a fluent
+ * code) and templates and allows preparing them for formatting using a fluent
  * {@link MessageConfigurer} API:
  * <pre>
  *   String text = messageSupport

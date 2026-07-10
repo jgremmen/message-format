@@ -246,7 +246,7 @@ public sealed interface MapKey extends FormatStringSerializer
 
   /**
    * Interface representing the match result when comparing a provided value to a map key. The match result is
-   * represented by a numeric value, where higher values indicate better matches, and zero or negative values
+   * represented by a numeric value, where higher values indicate better matches and zero or negative values
    * indicate mismatches.
    *
    * @see Defined

@@ -2,13 +2,12 @@
 
 This formatter is included in the `DefaultFormatterService`.
 
-The `TypeFormatter` is a type-based formatter registered for `java.lang.reflect.Type` (which includes `Class`).
-It is automatically selected whenever a parameter value is a `Type` or `Class` instance. The formatter renders
-the type as a human-readable string, handling classes, generic types, parameterized types, type variables,
-wildcard types and arrays.
+The `TypeFormatter` is a type-based formatter registered for `java.lang.reflect.Type` (which includes `Class`). It is
+automatically selected whenever a parameter value is a `Type` or `Class` instance. The formatter renders the type as a
+human-readable string, handling classes, generic types, parameterized types, type variables, wildcard types and arrays.
 
-The `type` configuration key controls which simplifications are applied to the output. It accepts a string of
-format flags:
+The `type` configuration key controls which simplifications are applied to the output. It accepts a string of format 
+flags:
 
 | Flag | Effect                                          |
 |------|-------------------------------------------------|
@@ -17,14 +16,14 @@ format flags:
 | `u`  | Strip the `java.util.` package prefix           |
 | `v`  | Expand type variable bounds                     |
 
-The default format is `ju`, which strips both the `java.lang.` and `java.util.` package prefixes while keeping
-all other packages fully qualified.
+The default format is `ju`, which strips both the `java.lang.` and `java.util.` package prefixes while keeping all 
+other packages fully qualified.
 
 
 ## Basic Output
 
-Without any configuration, the formatter uses the default `ju` format. Primitive types always use their simple
-name regardless of the format flags.
+Without any configuration, the formatter uses the default `ju` format. Primitive types always use their simple name 
+regardless of the format flags.
 
 ```java
 messageSupport
@@ -72,8 +71,7 @@ messageSupport
 
 ### Strip `java.lang.` (`j`)
 
-The `j` flag removes the `java.lang.` prefix. Classes in sub-packages of `java.lang` keep the sub-package
-portion.
+The `j` flag removes the `java.lang.` prefix. Classes in sub-packages of `java.lang` keep the sub-package portion.
 
 ```java
 messageSupport
@@ -147,8 +145,8 @@ messageSupport
 
 ## Parameterized Types
 
-Parameterized types (generics) are displayed with their type arguments. The format flags apply to both the raw
-type and the type arguments.
+Parameterized types (generics) are displayed with their type arguments. The format flags apply to both the raw type and
+the type arguments.
 
 ```java
 // Given: Map<K, V> unmodifiableMap(Map<? extends K, ? extends V>)
@@ -193,8 +191,8 @@ messageSupport
 
 ## Type Variable Bounds (`v`)
 
-By default, type variables are shown as their name only (e.g. `T`). The `v` flag expands the bounds of type
-variables, showing the full constraint.
+By default, type variables are shown as their name only (e.g. `T`). The `v` flag expands the bounds of type variables,
+showing the full constraint.
 
 ```java
 // Given: <T extends Iterable<String> & Enumeration<String>> void method(T)
@@ -236,8 +234,7 @@ messageSupport
 
 ## Null Handling
 
-A `null` parameter value produces an empty string by default. You can provide a `null` map key to produce
-specific text.
+A `null` parameter value produces an empty string by default. A `null` map key can be provided to produce specific text.
 
 ```java
 messageSupport

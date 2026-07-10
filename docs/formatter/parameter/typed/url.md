@@ -2,8 +2,8 @@
 
 This formatter is included in the `DefaultFormatterService`.
 
-The `URLFormatter` is a type-based formatter registered for `java.net.URL`. It is automatically selected whenever
-a parameter value is a `URL`. By default, it outputs the full external form of the URL.
+The `URLFormatter` is a type-based formatter registered for `java.net.URL`. It is automatically selected whenever a
+parameter value is a `URL`. By default, it outputs the full external form of the URL.
 
 The `url` configuration key controls which component of the URL to display:
 
@@ -23,8 +23,8 @@ The `url` configuration key controls which component of the URL to display:
 
 ## Full URL
 
-When the `url` configuration key is absent or set to `external`, the formatter outputs the complete URL
-in its external form.
+When the `url` configuration key is absent or set to `external`, the formatter outputs the complete URL in its external
+form.
 
 ```java
 messageSupport
@@ -100,8 +100,8 @@ messageSupport
 
 ## Port Default Fallback
 
-Unlike the [URI formatter](uri.md), the URL formatter falls back to the protocol's default port when no explicit
-port is specified. For example, an `https` URL without a port returns `443`.
+Unlike the [URI formatter](uri.md), the URL formatter falls back to the protocol's default port when no explicit port 
+is specified. For example, an `https` URL without a port returns `443`.
 
 ```java
 messageSupport
@@ -143,7 +143,7 @@ messageSupport
 
 ## Null Handling
 
-A `null` parameter value produces an empty string by default. You can provide a `null` map key to produce
+A `null` parameter value produces an empty string by default. A `null` map key can be provided to produce
 specific text.
 
 ```java

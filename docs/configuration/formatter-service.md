@@ -3,7 +3,7 @@
 The formatter service is responsible for resolving the right formatter for a given parameter
 value. When a message is formatted, each parameter's value needs to be converted to text. The
 formatter service determines which parameter formatter handles this conversion based on the
-value's type, the optional named format specified in the message, and any configuration keys
+value's type, the optional named format specified in the message and any configuration keys
 present on the parameter.
 
 In addition to parameter formatters, the formatter service also manages post formatters that
@@ -18,7 +18,7 @@ and post formatters but does not allow registration of new ones.
 
 The `FormatterService.WithRegistry` sub-interface extends `FormatterService` with methods for
 registering parameter formatters and post formatters. You use this interface when setting up
-your formatter service, and then optionally seal it to prevent further modifications.
+your formatter service and then optionally seal it to prevent further modifications.
 
 
 ## GenericFormatterService
@@ -76,7 +76,7 @@ var messageSupport = MessageSupportFactory.create(formatterService);
 ```
 
 You can also provide a custom `ClassLoader` if the formatters need to be discovered from a
-specific location, and configure the internal formatter cache size. The formatter cache stores
+specific location and configure the internal formatter cache size. The formatter cache stores
 the resolved list of parameter formatters for each value type so that the class hierarchy does
 not need to be walked on every format call. The cache size determines how many type-to-formatter
 mappings are kept; the least frequently used entries are evicted when the cache is full. The

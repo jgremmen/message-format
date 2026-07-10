@@ -1,7 +1,7 @@
 # MessageFactory
 
 The `MessageFactory` is responsible for parsing message format strings into `Message` objects.
-Every `MessageSupport` instance uses a `MessageFactory` internally, and the factory you choose
+Every `MessageSupport` instance uses a `MessageFactory` internally and the factory you choose
 determines how parsed messages are normalized and whether they are cached. This page covers how
 to create and configure a `MessageFactory`. For the full API of parsing methods and the
 `MessageBuilder`, see [Messages](messages.md) and [Templates](templates.md).
@@ -10,7 +10,7 @@ to create and configure a `MessageFactory`. For the full API of parsing methods 
 ## The Shared Instance
 
 For most applications the shared `MessageFactory.getSharedInstance()` singleton is sufficient. It
-uses the `PASS_THROUGH` normalizer, which means message parts are not deduplicated, and it caches
+uses the `PASS_THROUGH` normalizer, which means message parts are not deduplicated and it caches
 up to 128 parsed messages. When you call `MessageSupportFactory.create(FormatterService)` without
 specifying a factory, this is the instance that is used:
 

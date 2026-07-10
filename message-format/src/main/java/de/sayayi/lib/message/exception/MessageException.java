@@ -24,7 +24,7 @@ public class MessageException extends RuntimeException
 {
   /**
    * Constructs a new message exception with the specified detail message.
-   * The cause is not initialized, and may subsequently be initialized by a
+   * The cause is not initialized and may subsequently be initialized by a
    * call to {@link #initCause}.
    *
    * @param message  the detail message. The detail message is saved for later retrieval by the
@@ -44,7 +44,7 @@ public class MessageException extends RuntimeException
    * @param message  the detail message (which is saved for later retrieval by the
    *                 {@link #getMessage()} method).
    * @param cause    the cause (which is saved for later retrieval by the {@link #getCause()}
-   *                 method). (A {@code null} value is permitted, and indicates that the cause is
+   *                 method). (A {@code null} value is permitted and indicates that the cause is
    *                 nonexistent or unknown.)
    */
   public MessageException(String message, Throwable cause) {
@@ -59,7 +59,7 @@ public class MessageException extends RuntimeException
    * incorporated in this runtime exception's detail message.
    *
    * @param cause    the cause (which is saved for later retrieval by the {@link #getCause()}
-   *                 method). (A {@code null} value is permitted, and indicates that the cause is
+   *                 method). (A {@code null} value is permitted and indicates that the cause is
    *                 nonexistent or unknown.)
    */
   public MessageException(Throwable cause) {

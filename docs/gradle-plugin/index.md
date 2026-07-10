@@ -4,18 +4,16 @@ icon: simple/gradle
 
 # Gradle Plugin
 
-When your project uses `@MessageDef` and `@TemplateDef` annotations to declare messages and
-templates in source code, the Gradle plugin can scan the compiled classes and produce a `.mfp`
-pack file automatically as part of the build. This removes the need to export pack files
-manually and ensures that the pack file is always in sync with the annotated message definitions
-in your codebase.
+When a project uses `@MessageDef` and `@TemplateDef` annotations to declare messages and templates in source code, the 
+Gradle plugin can scan the compiled classes and produce a `.mfp` pack file automatically as part of the build. This
+removes the need to export pack files manually and ensures that the pack file is always in sync with the annotated 
+message definitions in the codebase.
 
 
 ## Applying the Plugin
 
-Apply the plugin in your `build.gradle` file. Because the plugin requires compiled class files to
-scan, your project must also apply the `java` plugin (or a plugin that extends it, such as
-`java-library`):
+Apply the plugin in the `build.gradle` file. Because the plugin requires compiled class files to scan, the project must
+also apply the `java` plugin (or a plugin that extends it, such as `java-library`):
 
 === "Groovy DSL"
 
@@ -35,18 +33,16 @@ scan, your project must also apply the `java` plugin (or a plugin that extends i
     }
     ```
 
-Applying the plugin has two effects. It registers a `messageFormat` extension block that you can
-use to configure how messages are packed, and it registers a `messageFormatPack` task in the
-`build` group that performs the actual scanning and packing. The extension and its properties are
-described in detail on the [Extension](extension.md) page, and the task specifics are covered on
-the [Pack Task](pack-task.md) page.
+Applying the plugin has two effects. It registers a `messageFormat` extension block that can be used to configure how
+messages are packed and it registers a `messageFormatPack` task in the `build` group that performs the actual scanning 
+and packing. The extension and its properties are described in detail on the [Extension](extension.md) page and the 
+task specifics are covered on the [Pack Task](pack-task.md) page.
 
 
-## Including the Pack File in Your Jar
+## Including the Pack File in the Jar
 
-The `messageFormatPack` task produces its output in the `<buildDir>/messageFormatPack/` directory. To
-include the generated pack file in your application jar, add a `from` directive to the `jar`
-task:
+The `messageFormatPack` task produces its output in the `<buildDir>/messageFormatPack/` directory. To include the 
+generated pack file in the application jar, add a `from` directive to the `jar` task:
 
 === "Groovy DSL"
 
@@ -68,12 +64,11 @@ task:
     }
     ```
 
-This tells Gradle to copy the output of `messageFormatPack` into the `META-INF` directory inside
-the jar. Gradle automatically establishes a task dependency, so `messageFormatPack` runs before
-`jar` whenever you build the project.
+This tells Gradle to copy the output of `messageFormatPack` into the `META-INF` directory inside the jar. Gradle
+automatically establishes a task dependency, so `messageFormatPack` runs before `jar` whenever the project is built.
 
-At runtime, you can then load the pack file from the classpath. The default filename is derived
-from the project name (e.g. a project named `my-app` produces `my-app.mfp`):
+At runtime, the pack file can then be loaded from the classpath. The default filename is derived from the project name
+(e.g. a project named `my-app` produces `my-app.mfp`):
 
 ```java
 var messageSupport = MessageSupportFactory.create(
@@ -88,8 +83,8 @@ try(var in = getClass().getResourceAsStream("/META-INF/my-app.mfp")) {
 
 ## Minimal Example
 
-The following example shows the complete workflow from annotated source code to a runnable
-application. Suppose you have a class with a few message definitions:
+The following example shows the complete workflow from annotated source code to a runnable application. Consider a
+class with a few message definitions:
 
 ```java
 @MessageDef(code = "greeting", text = "Hello %{name}!")
@@ -98,7 +93,7 @@ application. Suppose you have a class with a few message definitions:
 public class ShopMessages {}
 ```
 
-Your build script applies the plugin and includes the pack file in the jar:
+The build script applies the plugin and includes the pack file in the jar:
 
 === "Groovy DSL"
 
@@ -130,8 +125,8 @@ Your build script applies the plugin and includes the pack file in the jar:
     }
     ```
 
-Running `./gradlew jar` compiles the source, scans the compiled classes for annotations, writes
-the pack file, and bundles it into the jar. At runtime:
+Running `./gradlew jar` compiles the source, scans the compiled classes for annotations, writes the pack file and
+bundles it into the jar. At runtime:
 
 ```java
 var messageSupport = MessageSupportFactory.create(
@@ -148,6 +143,6 @@ messageSupport.code("item-count").with("count", 5).format();
 // "5 items in stock."
 ```
 
-In this example the pack file is named `shop.mfp` because the Gradle project is named `shop`.
-If you need a different filename, configure the `packFilename` property in the `messageFormat`
-extension block as described on the [Extension](extension.md) page.
+In this example the pack file is named `shop.mfp` because the Gradle project is named `shop`. If a different filename 
+is needed, configure the `packFilename` property in the `messageFormat` extension block as described on the
+[Extension](extension.md) page.
