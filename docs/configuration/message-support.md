@@ -1,25 +1,23 @@
 # MessageSupport
 
-`MessageSupport` is the central entry point for formatting messages. Every formatting operation
-in the library goes through this interface, whether the message was registered beforehand with a
-code or constructed inline from a format string. It provides a fluent API for supplying parameter
-values, selecting a locale and producing the final text.
+`MessageSupport` is the central entry point for formatting messages. Every formatting operation in the library goes 
+through this interface, whether the message was registered beforehand with a code or constructed inline from a format
+string. It provides a fluent API for supplying parameter values, selecting a locale and producing the final text.
 
-A `MessageSupport` instance is backed by two collaborating components. The `FormatterService`
-knows how to convert Java values into text fragments (see
-[Formatter Service](formatter-service.md)), while the [`MessageFactory`](message-factory.md) parses format strings
-into `Message` objects. Together they form the foundation that every formatting operation relies
-on.
+A `MessageSupport` instance is backed by two collaborating components. The `FormatterService` knows how to convert Java
+values into text fragments (see [Formatter Service](formatter-service.md)), while the
+[`MessageFactory`](message-factory.md) parses format strings into `Message` objects. Together they form the foundation 
+that every formatting operation relies on.
 
 
 ## Creating a MessageSupport
 
 Instances are created through `MessageSupportFactory`, which offers two strategies.
 
-The `shared()` method returns a lazily initialized, sealed singleton that is backed by the shared
-`DefaultFormatterService`. It also discovers and registers any `NamedTemplate` service
-providers on the classpath. It is convenient for simple scenarios where you only need inline
-message formatting and do not need to register messages or customize configuration:
+The `shared()` method returns a lazily initialized, sealed singleton that is backed by the shared 
+`DefaultFormatterService`. It also discovers and registers any `NamedTemplate` service providers on the classpath. It 
+is convenient for simple scenarios that only require inline message formatting and do not need to register messages or 
+customize configuration:
 
 ```java
 MessageSupport shared = MessageSupportFactory.shared();
@@ -32,33 +30,30 @@ String text = shared
 ```
 
 Because the shared instance is sealed, it does not expose any of the mutating methods found on
-`ConfigurableMessageSupport`. You cannot add messages, templates or default configuration through
-it.
+`ConfigurableMessageSupport`. Messages, templates or default configuration cannot be added through it.
 
-For most applications you will use the `create` method, which returns a
-`ConfigurableMessageSupport` that you can populate with messages, templates and default
-configuration:
+Most applications use the `create` method, which returns a `ConfigurableMessageSupport` that can be populated with 
+messages, templates and default configuration:
 
 ```java
 var messageSupport = MessageSupportFactory.create(
     DefaultFormatterService.getSharedInstance());
 ```
 
-If you need a custom `MessageFactory`, for example to enable message caching, you can supply it
-as a second argument. See [MessageFactory](message-factory.md) for details.
+For a custom `MessageFactory`, for example to enable message caching, it can be supplied as a second argument. See 
+[MessageFactory](message-factory.md) for details.
 
 
 ## ConfigurableMessageSupport
 
-`ConfigurableMessageSupport` extends `MessageSupport` with mutating methods for adding messages
-and templates, setting default configuration values, changing the default locale and installing
-filters. It also implements `MessagePublisher`, which means it can be passed directly to adopters
-and other components that register messages.
+`ConfigurableMessageSupport` extends `MessageSupport` with mutating methods for adding messages and templates, setting 
+default configuration values, changing the default locale and installing filters. It also implements `MessagePublisher`,
+which means it can be passed directly to adopters and other components that register messages.
 
 ### Adding Messages
 
-Messages are registered by code. Once a message has been added, it can be formatted anywhere in
-the application by referring to that code:
+Messages are registered by code. Once a message has been added, it can be formatted anywhere in the application by 
+referring to that code:
 
 ```java
 messageSupport.addMessage("order.placed",
@@ -72,20 +67,18 @@ messageSupport
 // "Order A-1042 placed for Alice."
 ```
 
-A convenience overload accepts the code and a format string directly. If you already have a
-parsed `Message.WithCode` object (for example from a `MessageFactory`), you can pass it to
-`addMessage(Message.WithCode)` instead.
+A convenience overload accepts the code and a format string directly. An existing parsed `Message.WithCode` object (for
+example from a `MessageFactory`) can be passed to `addMessage(Message.WithCode)` instead.
 
-Attempting to add a message with a code that already exists throws a `DuplicateMessageException`
-when the content differs. If the new message is identical to the existing one, the duplicate is
-silently ignored. This default behavior can be changed by installing a custom `MessageFilter`
-(see [Filters](#filters)).
+Attempting to add a message with a code that already exists throws a `DuplicateMessageException` when the content 
+differs. If the new message is identical to the existing one, the duplicate is silently ignored. This default behavior 
+can be changed by installing a custom `MessageFilter` (see [Filters](#filters)).
 
 ### Adding Templates
 
-Templates are reusable message fragments registered under a kebab-case name. They are referenced
-from messages using the `%[template-name]` syntax. Because they share the parameter context of the
-enclosing message, they can access the same parameter values without any extra wiring:
+Templates are reusable message fragments registered under a kebab-case name. They are referenced from messages using 
+the `%[template-name]` syntax. Because they share the parameter context of the enclosing message, they can access the 
+same parameter values without any extra wiring:
 
 ```java
 var factory = messageSupport.getMessageAccessor().getMessageFactory();
@@ -108,28 +101,26 @@ messageSupport
 // "Distance: 42"
 ```
 
-Just like messages, adding a template whose name already exists throws a
-`DuplicateTemplateException` when the content differs. Identical duplicates are silently ignored.
+Just like messages, adding a template whose name already exists throws a `DuplicateTemplateException` when the content
+differs. Identical duplicates are silently ignored.
 
-Templates can also be implemented entirely in Java by extending `AbstractNamedTemplate` and can be
-discovered automatically at startup through the `ServiceLoader` mechanism by calling
-`registerTemplatesFromService(ClassLoader)`. Both topics are covered in detail on the
-[Templates](templates.md#custom-templates) page.
+Templates can also be implemented entirely in Java by extending `AbstractNamedTemplate` and can be discovered 
+automatically at startup through the `ServiceLoader` mechanism by calling `registerTemplatesFromService(ClassLoader)`. 
+Both topics are covered in detail on the [Templates](templates.md#custom-templates) page.
 
 ### Default Configuration and Locale
 
-`ConfigurableMessageSupport` provides methods for setting application-wide default configuration
-values and a default locale. These topics are covered in detail on the
-[Default Configuration](default-configuration.md) page.
+`ConfigurableMessageSupport` provides methods for setting application-wide default configuration values and a default
+locale. These topics are covered in detail on the [Default Configuration](default-configuration.md) page.
 
 ### Filters
 
-The default duplicate handling described above can be customized by installing a `MessageFilter`
-or `TemplateFilter`. Both are functional interfaces whose single method receives the incoming
-entry and returns `true` to accept it or `false` to skip it.
+The default duplicate handling described above can be customized by installing a `MessageFilter` or `TemplateFilter`. 
+Both are functional interfaces whose single method receives the incoming entry and returns `true` to accept it or 
+`false` to skip it.
 
-A typical use case is logging every message that gets registered, for example during development
-when you want to track what is being loaded from annotation scanning or pack files:
+A typical use case is logging every message that gets registered, for example during development when tracking what is
+being loaded from annotation scanning or pack files is desired:
 
 ```java
 messageSupport.setMessageFilter(message -> {
@@ -146,9 +137,9 @@ messageSupport.setMessageFilter(message -> {
 });
 ```
 
-Another scenario is selectively ignoring certain codes. When loading messages from multiple
-sources, you may want to keep the first registration and silently discard any later attempt
-to register the same code, regardless of whether the content differs:
+Another scenario is selectively ignoring certain codes. When loading messages from multiple sources, it may be 
+preferable to keep the first registration and silently discard any later attempt to register the same code, regardless 
+of whether the content differs:
 
 ```java
 messageSupport.setMessageFilter(message ->
@@ -166,38 +157,35 @@ messageSupport.setTemplateFilter((name, template) ->
 
 ### Sealing
 
-Once all messages, templates and configuration have been registered, you can seal the
-`ConfigurableMessageSupport` to produce a read-only `MessageSupport`:
+Once all messages, templates and configuration have been registered, the `ConfigurableMessageSupport` can be sealed to
+produce a read-only `MessageSupport`:
 
 ```java
 MessageSupport sealed = messageSupport.seal();
 ```
 
-The sealed instance is a lightweight wrapper that delegates formatting calls to the underlying
-configurable instance but hides mutating methods such as `addMessage`, `addTemplate` and
-`setDefaultConfig`. This is useful when you want to expose the message support to other
-components without allowing them to modify it.
+The sealed instance is a lightweight wrapper that delegates formatting calls to the underlying configurable instance 
+but hides mutating methods such as `addMessage`, `addTemplate` and `setDefaultConfig`. This is useful for exposing the
+message support to other components without allowing them to modify it.
 
-The sealed wrapper does not copy any data. Changes made to the underlying
-`ConfigurableMessageSupport` after sealing are visible through the sealed instance. If you need
-a truly immutable snapshot, stop modifying the configurable instance after sealing.
+The sealed wrapper does not copy any data. Changes made to the underlying `ConfigurableMessageSupport` after sealing
+are visible through the sealed instance. For a truly immutable snapshot, stop modifying the configurable instance after 
+sealing.
 
 
 ## MessageAccessor
 
-The `MessageAccessor` interface provides read-only access to the messages, formatters and default
-configuration managed by a `MessageSupport`. It also extends `TemplateAccessor`, so all
-template-related queries are available through the same object. You obtain it through
-`getMessageAccessor()`:
+The `MessageAccessor` interface provides read-only access to the messages, formatters and default configuration managed
+by a `MessageSupport`. It also extends `TemplateAccessor`, so all template-related queries are available through the 
+same object. It is obtained through `getMessageAccessor()`:
 
 ```java
 MessageSupport.MessageAccessor accessor = messageSupport.getMessageAccessor();
 ```
 
-Through the accessor you can inspect the current state of the message support without risk of
-modification. It provides methods to query messages by code, list all registered message codes,
-check whether a message exists, look up formatters, retrieve default configuration values and
-access the `MessageFactory`.
+Through the accessor the current state of the message support can be inspected without risk of modification. It provides 
+methods to query messages by code, list all registered message codes, check whether a message exists, look up
+formatters, retrieve default configuration values and access the `MessageFactory`.
 
 ```java
 // check if a message exists before formatting
@@ -222,12 +210,12 @@ MessageFactory factory = accessor.getMessageFactory();
 
 ## TemplateAccessor
 
-`TemplateAccessor` provides read-only access to the templates managed by a `MessageSupport`.
-Because `MessageAccessor` extends `TemplateAccessor`, all template queries are available
-directly on the accessor obtained through `getMessageAccessor()`.
+`TemplateAccessor` provides read-only access to the templates managed by a `MessageSupport`. Because `MessageAccessor` 
+extends `TemplateAccessor`, all template queries are available directly on the accessor obtained through 
+`getMessageAccessor()`.
 
-You can list template names, retrieve a template by name, check for existence and find
-templates that are referenced by messages but have not been registered:
+Template names can be listed, a template retrieved by name, existence checked, and templates that are referenced by 
+messages but have not been registered found:
 
 ```java
 Set<String> templateNames = accessor.getTemplateNames();
@@ -240,21 +228,21 @@ Template template = accessor.getTemplateByName("opt-detail");
 Set<String> missing = accessor.findMissingTemplates(null);
 ```
 
-The `findMissingTemplates` method accepts an optional `Predicate<String>` that filters which
-message codes to analyze. Passing `null` analyzes all registered messages. This is useful during
-application startup to verify that all required templates have been added.
+The `findMissingTemplates` method accepts an optional `Predicate<String>` that filters which message codes to analyze.
+Passing `null` analyzes all registered messages. This is useful during application startup to verify that all required 
+templates have been added.
 
 
 ## Export and Import
 
-`MessageSupport` provides an `exportMessages` method that serializes all registered messages and
-the templates they reference to a compact binary pack file. The
-`ConfigurableMessageSupport.importMessages` method reads such a file and adds all messages and
-templates to the instance. This topic is covered in detail on the [Pack Files](pack-files.md) page.
+`MessageSupport` provides an `exportMessages` method that serializes all registered messages and the templates they
+reference to a compact binary pack file. The `ConfigurableMessageSupport.importMessages` method reads such a file and
+adds all messages and templates to the instance. This topic is covered in detail on the [Pack Files](pack-files.md) 
+page.
 
 
 ## Thread Safety
 
 `MessageFactory`, `ConfigurableMessageSupport` and the singletons returned by
-`DefaultFormatterService.getSharedInstance()` and `MessageSupportFactory.shared()` are all
-thread-safe. Adding messages, changing configuration and formatting can happen concurrently.
+`DefaultFormatterService.getSharedInstance()` and `MessageSupportFactory.shared()` are all thread-safe. Adding messages,
+changing configuration and formatting can happen concurrently.

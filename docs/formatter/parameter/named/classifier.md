@@ -1,27 +1,27 @@
 # Classifier
 
 /// note
-This formatter is **not** included in the `DefaultFormatterService`. You must register it explicitly
-by adding a `ClassifierFormatter` instance to your formatter service.
+This formatter is **not** included in the `DefaultFormatterService`. It must be registered explicitly by adding a 
+`ClassifierFormatter` instance to the formatter service.
 ///
 
 The named formatter `classifier` is selected explicitly by writing `format:classifier` in the message parameter
-configuration. It inspects the parameter value and determines one or more classifiers that describe the nature
-of the value. These classifiers are type-based labels such as `null`, `bool`, `number`, `string`, `enum`, `list`
-or `temporal`. The formatter then iterates over the classifiers and matches each one against the string map keys
-in the parameter configuration. The message associated with the first matching key is output. If no classifier
-matches any key, the default map entry is used. If no default is present either, the `null` representation
-(typically an empty string) is returned.
+configuration. It inspects the parameter value and determines one or more classifiers that describe the nature of the
+value. These classifiers are type-based labels such as `null`, `bool`, `number`, `string`, `enum`, `list` or `temporal`.
+The formatter then iterates over the classifiers and matches each one against the string map keys in the parameter 
+configuration. The message associated with the first matching key is output. If no classifier matches any key, the
+default map entry is used. If no default is present either, the `null` representation (typically an empty string) is
+returned.
 
-This formatter is useful for branching message output based on the runtime type of a parameter value, without
-having to know the exact Java class.
+This formatter is useful for branching message output based on the runtime type of a parameter value, without having to 
+know the exact Java class.
 
 
 ## Classifiers
 
-Each value type produces one or more classifiers. The type-based formatter registered for the value's Java type
-is responsible for declaring which classifiers apply. When multiple classifiers are present, they are checked
-against the map keys in order. The first match wins.
+Each value type produces one or more classifiers. The type-based formatter registered for the value's Java type is 
+responsible for declaring which classifiers apply. When multiple classifiers are present, they are checked against the
+map keys in order. The first match wins.
 
 The following table lists the most common classifiers and the types that produce them.
 
@@ -35,10 +35,10 @@ The following table lists the most common classifiers and the types that produce
 | `list`       | `Iterable`, `Collection`, arrays, `Map`, `BitSet` (in set-bit mode)               |
 | `temporal`   | All temporal types (`LocalDate`, `Instant`, `ZonedDateTime`, etc.)                 |
 
-Some formatters also add more specific classifiers before the general ones. For example, a `Locale` value
-produces the classifier `locale` first, followed by `string` when a string-producing configuration is active.
-A `Path` value produces `path`, a `BitSet` produces `bit-set` (and `list` in set-bit mode) and wrapper types
-like `Supplier` and `Reference` produce their own classifier before delegating to the contained value.
+Some formatters also add more specific classifiers before the general ones. For example, a `Locale` value produces the
+classifier `locale` first, followed by `string` when a string-producing configuration is active. A `Path` value 
+produces `path`, a `BitSet` produces `bit-set` (and `list` in set-bit mode) and wrapper types like `Supplier` and 
+`Reference` produce their own classifier before delegating to the contained value.
 
 ```java
 messageSupport
@@ -63,7 +63,7 @@ messageSupport
 
 ## Null Values
 
-When the parameter value is `null`, the only classifier is `null`. You can match it with a `'null'` string key.
+When the parameter value is `null`, the only classifier is `null`. It can be matched with a `'null'` string key.
 
 ```java
 messageSupport
@@ -76,9 +76,9 @@ messageSupport
 
 ## Classifier Priority
 
-When a value produces multiple classifiers, they are checked in order and the first matching string key wins.
-For example, a `Locale` value produces `locale` first and then `string` (when a string-producing configuration
-is active). If you provide keys for both, the more specific one matches.
+When a value produces multiple classifiers, they are checked in order and the first matching string key wins. For 
+example, a `Locale` value produces `locale` first and then `string` (when a string-producing configuration is active).
+When keys are provided for both, the more specific one matches.
 
 ```java
 messageSupport
@@ -88,8 +88,8 @@ messageSupport
 // "enumeration"
 ```
 
-Since `enum` is checked before any general classifier, the `'enum'` key matches even though enum values can
-also be represented as strings.
+Since `enum` is checked before any general classifier, the `'enum'` key matches even though enum values can also be 
+represented as strings.
 
 
 ## Unmatched Values
@@ -117,9 +117,9 @@ messageSupport
 
 ## Practical Example
 
-The `classifier` formatter is well suited for building messages that adapt to the type of a parameter. In the
-following example, a diagnostic message describes what kind of value was received. The nested parameter `%{v}`
-inside the mapped messages outputs the value itself using its type-based formatter.
+The `classifier` formatter is well suited for building messages that adapt to the type of a parameter. In the following 
+example, a diagnostic message describes what kind of value was received. The nested parameter `%{v}` inside the mapped
+messages outputs the value itself using its type-based formatter.
 
 ```java
 messageSupport

@@ -1,14 +1,14 @@
 # Geo
 
 /// note
-This formatter is **not** included in the `DefaultFormatterService`. You must register it explicitly
-by adding a `GeoFormatter` instance to your formatter service.
+This formatter is **not** included in the `DefaultFormatterService`. It must be registered explicitly by adding a 
+`GeoFormatter` instance to the formatter service.
 ///
 
-The named formatter `geo` is selected explicitly by writing `format:geo` in the message parameter configuration.
-It can also be activated automatically by providing the `geo` configuration key directly (e.g. `geo:latitude`).
-The formatter converts numeric values representing decimal degrees into geographic coordinates in degrees, minutes
-and seconds (DMS) notation.
+The named formatter `geo` is selected explicitly by writing `format:geo` in the message parameter configuration. It can
+also be activated automatically by providing the `geo` configuration key directly (e.g. `geo:latitude`). The formatter
+converts numeric values representing decimal degrees into geographic coordinates in degrees, minutes and seconds (DMS)
+notation.
 
 It accepts all `Number` types (including primitive `double` and `float`) and formats them using either a predefined
 format name or a custom format pattern. Negative values represent west (longitude) or south (latitude) coordinates.
@@ -66,8 +66,8 @@ messageSupport
 
 ## Custom Format Patterns
 
-When none of the predefined formats fit, you can provide a custom format pattern as the `geo` configuration
-value. The pattern syntax is:
+When none of the predefined formats fit, a custom format pattern can be provided as the `geo` configuration value. The
+pattern syntax is:
 
 ```
 d[ ][0](m|M|MM|MMM)[ ][0](s|S|SS|SSS)[ ](LO|LA)
@@ -91,8 +91,8 @@ Each element of the pattern controls a specific aspect of the output:
 | `LO`              | Append compass direction for longitude (E/W)                         |
 | `LA`              | Append compass direction for latitude (N/S)                          |
 
-When `LO` or `LA` is omitted, negative values are shown with a minus sign. When a compass direction is appended,
-the sign is expressed as the direction letter instead.
+When `LO` or `LA` is omitted, negative values are shown with a minus sign. When a compass direction is appended, the 
+sign is expressed as the direction letter instead.
 
 ```java
 messageSupport
@@ -112,8 +112,8 @@ messageSupport
 // "4°48.0' E"
 ```
 
-Here, `M` produces minutes with one decimal place and the space after `M` inserts a space after the minute symbol.
-The space before `LO` inserts a space before the compass direction.
+Here, `M` produces minutes with one decimal place and the space after `M` inserts a space after the minute symbol. The
+space before `LO` inserts a space before the compass direction.
 
 A pattern with only degrees and a compass direction:
 
@@ -138,8 +138,8 @@ messageSupport
 
 ## Compass Direction Labels
 
-The compass direction letters default to `N`, `S`, `E` and `W`. These can be customized using the configuration
-keys `geo-n`, `geo-s`, `geo-e` and `geo-w`.
+The compass direction letters default to `N`, `S`, `E` and `W`. These can be customized using the configuration keys 
+`geo-n`, `geo-s`, `geo-e` and `geo-w`.
 
 ```java
 messageSupport
@@ -152,8 +152,7 @@ messageSupport
 
 ## Null Handling
 
-A `null` parameter value produces an empty string by default. You can provide a `null` map key to produce
-specific text.
+A `null` parameter value produces an empty string by default. A `null` map key can be provided to produce specific text.
 
 ```java
 messageSupport

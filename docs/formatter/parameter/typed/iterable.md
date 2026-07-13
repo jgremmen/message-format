@@ -2,21 +2,20 @@
 
 This formatter is included in the `DefaultFormatterService`.
 
-The library provides two formatters for rendering collections of elements as joined text: `ArrayFormatter` for
-arrays and `IterableFormatter` for any `Iterable` (including all `Collection` types such as `List` and `Set`).
-Both formatters share the same underlying logic: each element is formatted individually and the results are
-joined into a single text string. Separator, truncation and overflow behavior are controlled by a set of
-configuration keys.
+The library provides two formatters for rendering collections of elements as joined text: `ArrayFormatter` for arrays
+and `IterableFormatter` for any `Iterable` (including all `Collection` types such as `List` and `Set`). Both formatters
+share the same underlying logic: each element is formatted individually and the results are joined into a single text
+string. Separator, truncation and overflow behavior are controlled by a set of configuration keys.
 
 Elements that format to an empty string are silently omitted from the output.
 
 
 ## ArrayFormatter
 
-The `ArrayFormatter` handles all Java array types: primitive arrays (`int[]`, `long[]`, `boolean[]`, `byte[]`,
+The `ArrayFormatter` handles all Java array types: primitive arrays (`int[]`, `long[]`, `boolean[]`, `byte[]`, 
 `short[]`, `float[]`, `double[]`), object arrays (`Object[]`, `String[]`, etc.) and the atomic array types
-`AtomicIntegerArray`, `AtomicLongArray` and `AtomicReferenceArray`. It is automatically selected whenever a
-parameter value is an array.
+`AtomicIntegerArray`, `AtomicLongArray` and `AtomicReferenceArray`. It is automatically selected whenever a parameter
+value is an array.
 
 ```java
 messageSupport
@@ -34,7 +33,7 @@ messageSupport
 // "1, 2, 3"
 ```
 
-Each element is formatted using the formatter appropriate for its type. For primitive arrays, the corresponding
+Each element is formatted using the formatter appropriate for its type. For primitive arrays, the corresponding 
 primitive type formatter is used. For object arrays, each element is formatted according to its own runtime type.
 
 ```java
@@ -48,9 +47,8 @@ messageSupport
 
 ## IterableFormatter
 
-The `IterableFormatter` handles any `java.lang.Iterable` value, which includes all `Collection` types such as
-`List`, `Set`, `Queue` and any custom iterable. It is automatically selected whenever a parameter value implements
-`Iterable`.
+The `IterableFormatter` handles any `java.lang.Iterable` value, which includes all `Collection` types such as `List`,
+`Set`, `Queue` and any custom iterable. It is automatically selected whenever a parameter value implements `Iterable`.
 
 ```java
 messageSupport
@@ -116,8 +114,8 @@ messageSupport
 
 ### `list-max-size`
 
-The maximum number of elements to include in the output. Elements beyond this limit are omitted. When truncation
-occurs, the `list-sep-last` separator is used before the last included element (if `list-value-more` is not set).
+The maximum number of elements to include in the output. Elements beyond this limit are omitted. When truncation occurs,
+the `list-sep-last` separator is used before the last included element (if `list-value-more` is not set).
 
 ```java
 messageSupport
@@ -135,8 +133,8 @@ messageSupport
 // "A and B"
 ```
 
-Setting `list-max-size` to `0` suppresses all elements entirely (unless `list-value-more` is set, in which case
-only the overflow text is shown).
+Setting `list-max-size` to `0` suppresses all elements entirely (unless `list-value-more` is set, in which case only 
+the overflow text is shown).
 
 ```java
 messageSupport
@@ -154,8 +152,8 @@ messageSupport
 
 ### `list-value-more`
 
-The text appended when the list is truncated due to `list-max-size`. This text is treated as an additional
-element and separated from the preceding elements by the regular separator.
+The text appended when the list is truncated due to `list-max-size`. This text is treated as an additional element and
+separated from the preceding elements by the regular separator.
 
 ```java
 messageSupport
@@ -165,13 +163,13 @@ messageSupport
 // "A, B, ..."
 ```
 
-When `list-value-more` is set, the `list-sep-last` separator is not used. The regular separator is used before
-the overflow text.
+When `list-value-more` is set, the `list-sep-last` separator is not used. The regular separator is used before the 
+overflow text.
 
 ### `list-value`
 
-A message format used to format each individual element. The element is available as the parameter `value` inside
-this message. Defaults to `%{value}` which simply formats the element using its own type's formatter.
+A message format used to format each individual element. The element is available as the parameter `value` inside this
+message. Defaults to `%{value}` which simply formats the element using its own type's formatter.
 
 ```java
 messageSupport
@@ -189,7 +187,7 @@ messageSupport
 // "0001, -0007, 0248"
 ```
 
-This is a powerful mechanism that allows you to apply any formatting, map keys or configuration to each element
+This is a powerful mechanism that allows any formatting, map keys or configuration to be applied to each element
 independently.
 
 ### `list-unique`
@@ -207,8 +205,8 @@ messageSupport
 
 ### `list-this`
 
-The text to output when an element refers to the collection itself (self-reference). Defaults to
-`(this array)` for arrays and `(this collection)` for iterables.
+The text to output when an element refers to the collection itself (self-reference). Defaults to `(this array)` for
+arrays and `(this collection)` for iterables.
 
 ```java
 Object[] arr = new Object[2];
@@ -227,8 +225,8 @@ messageSupport
 
 ### Empty Key
 
-The `empty` key matches when the array or iterable contains no elements (length zero or no elements in the
-iterator). Its negated form `!empty` matches when there is at least one element.
+The `empty` key matches when the array or iterable contains no elements (length zero or no elements in the iterator).
+Its negated form `!empty` matches when there is at least one element.
 
 ```java
 messageSupport
@@ -267,23 +265,23 @@ messageSupport
 
 ## Size Queries
 
-Both formatters report the number of elements as their size. For arrays this is the array length. For collections
-this uses `Collection.size()`. For other iterables the elements are counted by iteration.
+Both formatters report the number of elements as their size. For arrays this is the array length. For collections this
+uses `Collection.size()`. For other iterables the elements are counted by iteration.
 
 
 ## Interaction Table
 
 The following table illustrates how the configuration keys interact with each other:
 
-| Array       | `list-sep-last` | `list-max-size` | `list-value-more` | Result         |
-|-------------|-----------------|-----------------|--------------------| ---------------|
-| []          | n/a             | 0               | n/a                | (empty)        |
-| [A, B, C]   | `" and "`       | (not set)       | n/a                | `A, B and C`   |
-| [A, B, C]   | (not set)       | 2               | `"..."`            | `A, B, ...`    |
-| [A, B, C]   | `" and "`       | 2               | (not set)          | `A and B`      |
-| [A, B, C]   | `" and "`       | 1               | (not set)          | `A`            |
-| [A, B, C]   | (not set)       | 0               | (not set)          | (empty)        |
-| [A, B, C]   | (not set)       | 0               | `"..."`            | `...`          |
-| [A, B, C]   | (not set)       | (not set)       | n/a                | `A, B, C`      |
-| [A, B, C]   | (not set)       | 2               | (not set)          | `A, B`         |
-| [A, B, C]   | (not set)       | 1               | (not set)          | `A`            |
+| Array      | `list-sep-last` | `list-max-size` | `list-value-more` | Result       |
+|------------|-----------------|-----------------|-------------------|--------------|
+| []         | n/a             | 0               | n/a               | (empty)      |
+| [A, B, C]  | `" and "`       | (not set)       | n/a               | `A, B and C` |
+| [A, B, C]  | (not set)       | 2               | `"..."`           | `A, B, ...`  |
+| [A, B, C]  | `" and "`       | 2               | (not set)         | `A and B`    |
+| [A, B, C]  | `" and "`       | 1               | (not set)         | `A`          |
+| [A, B, C]  | (not set)       | 0               | (not set)         | (empty)      |
+| [A, B, C]  | (not set)       | 0               | `"..."`           | `...`        |
+| [A, B, C]  | (not set)       | (not set)       | n/a               | `A, B, C`    |
+| [A, B, C]  | (not set)       | 2               | (not set)         | `A, B`       |
+| [A, B, C]  | (not set)       | 1               | (not set)         | `A`          |

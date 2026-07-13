@@ -3,16 +3,15 @@
 This formatter is included in the `DefaultFormatterService`.
 
 The library provides two formatters for map-related types: `MapFormatter` for `java.util.Map` values and
-`MapEntryFormatter` for individual `Map.Entry` values. Both are automatically selected based on the parameter's
-type.
+`MapEntryFormatter` for individual `Map.Entry` values. Both are automatically selected based on the parameter's type.
 
 
 ## MapFormatter
 
-The `MapFormatter` handles any `java.util.Map` value, including `HashMap`, `LinkedHashMap`, `TreeMap` and all
-other map implementations. It formats each entry as a key-value pair and joins the results into a single text
-string. Separator, truncation and overflow behavior are controlled by the same list configuration keys used by
-the array and iterable formatters, plus two map-specific configuration keys.
+The `MapFormatter` handles any `java.util.Map` value, including `HashMap`, `LinkedHashMap`, `TreeMap` and all other map
+implementations. It formats each entry as a key-value pair and joins the results into a single text string. Separator,
+truncation and overflow behavior are controlled by the same list configuration keys used by the array and iterable 
+formatters, plus two map-specific configuration keys.
 
 ```java
 messageSupport
@@ -22,8 +21,8 @@ messageSupport
 // "host=localhost"
 ```
 
-By default each entry is rendered as `key=(null)` when the value is `null`, `(null)=value` when the key is
-`null` and `key=value` otherwise. Multiple entries are separated by `", "`.
+By default each entry is rendered as `key=(null)` when the value is `null`, `(null)=value` when the key is `null` and
+`key=value` otherwise. Multiple entries are separated by `", "`.
 
 ```java
 Map<String,Integer> scores = new LinkedHashMap<>();
@@ -40,9 +39,9 @@ messageSupport
 
 ### `map-kv`
 
-The `map-kv` configuration key specifies a message format used to render each entry. Inside this message the
-parameters `key` and `value` are available and refer to the entry's key and value respectively. This is how you
-customize the appearance of each entry.
+The `map-kv` configuration key specifies a message format used to render each entry. Inside this message the parameters
+`key` and `value` are available and refer to the entry's key and value respectively. This is how the appearance of each
+entry is customized.
 
 The default format is `%{key,null:'(null)'}=%{value,null:'(null)'}`.
 
@@ -62,8 +61,8 @@ messageSupport
 // "host: localhost, port: 8080"
 ```
 
-Because the `map-kv` message is a full message format, you can apply any formatting or map keys to the key and
-value parameters individually.
+Because the `map-kv` message is a full message format, any formatting or map keys can be applied to the key and value 
+parameters individually.
 
 ```java
 Map<Integer,Integer> data = new LinkedHashMap<>();
@@ -91,7 +90,7 @@ messageSupport
 // "map1 -> 0001, map2 -> -1234 and map3 -> 0008"
 ```
 
-You can also customize how `null` keys and values appear inside the entry format:
+The appearance of `null` keys and values inside the entry format can also be customized:
 
 ```java
 messageSupport
@@ -108,8 +107,8 @@ The text to output when the map references itself as a key or value within one o
 
 ### List Configuration Keys
 
-The `MapFormatter` inherits all list configuration keys from the array and iterable formatters. These control
-how entries are separated and truncated:
+The `MapFormatter` inherits all list configuration keys from the array and iterable formatters. These control how 
+entries are separated and truncated:
 
 - `list-sep` is the separator between entries (default: `", "`)
 - `list-sep-last` is the separator before the last entry
@@ -132,8 +131,8 @@ messageSupport
 
 ### Map Keys
 
-The `empty` key matches when the map contains no entries. Its negated form `!empty` matches when the map has at
-least one entry.
+The `empty` key matches when the map contains no entries. Its negated form `!empty` matches when the map has at least
+one entry.
 
 ```java
 messageSupport
@@ -160,9 +159,9 @@ The `MapFormatter` reports the number of entries in the map as its size.
 
 ## MapEntryFormatter
 
-The `MapEntryFormatter` handles `java.util.Map.Entry` values. It is automatically selected whenever a parameter
-value is a `Map.Entry` instance. This formatter uses the `entry` configuration key to select which part of the
-entry to format.
+The `MapEntryFormatter` handles `java.util.Map.Entry` values. It is automatically selected whenever a parameter value 
+is a `Map.Entry` instance. This formatter uses the `entry` configuration key to select which part of the entry to
+format.
 
 ### The `entry` Configuration Key
 
@@ -194,8 +193,8 @@ messageSupport
 // "Value: 42"
 ```
 
-Because the key or value is delegated to the formatter appropriate for its type, all map keys and configuration
-that apply to that type work transparently.
+Because the key or value is delegated to the formatter appropriate for its type, all map keys and configuration that 
+apply to that type work transparently.
 
 ```java
 Map.Entry<String,Boolean> entry = Map.entry("active", true);
@@ -209,8 +208,8 @@ messageSupport
 
 ### Null Handling
 
-A `null` parameter value produces an empty string by default. You can provide a `null` map key to handle this
-case explicitly.
+A `null` parameter value produces an empty string by default. A `null` map key can be provided to handle this case
+explicitly.
 
 ```java
 messageSupport

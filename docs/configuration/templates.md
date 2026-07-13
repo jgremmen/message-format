@@ -13,8 +13,8 @@ Template names must follow the kebab-case naming convention: lowercase letters a
 (e.g. `opt-error`, `item-count`).
 
 This page explains how to create templates through `MessageFactory` parsing methods and the programmatic
-`MessageBuilder`, how to register them on a `ConfigurableMessageSupport` and how to implement custom templates in 
-Java. For the format string syntax itself, see [Syntax](../message/syntax.md). For how to configure and obtain a 
+`MessageBuilder`, how to register them on a `ConfigurableMessageSupport` and how to implement custom templates in Java.
+For the format string syntax itself, see [Syntax](../message/syntax.md). For how to configure and obtain a
 `MessageFactory`, see [MessageFactory](message-factory.md).
 
 
@@ -51,8 +51,8 @@ When the map contains more than one entry, the factory generates a template code
 ## Building Templates Programmatically
 
 The `MessageBuilder` fluent API can produce a `Template` directly by calling `buildAsTemplate()` as the terminal 
-operation instead of `build()`. This is useful when the template structure is determined at runtime or when you want to
-avoid embedding format strings in Java source.
+operation instead of `build()`. This is useful when the template structure is determined at runtime or to avoid 
+embedding format strings in Java source.
 
 ```java
 Template template = MessageBuilder
@@ -72,9 +72,9 @@ For the full `MessageBuilder` API including all part types, space control and co
 
 ## Adding Templates to ConfigurableMessageSupport
 
-Once you have created or parsed templates, they need to be registered on a `ConfigurableMessageSupport` before messages
-can reference them. The [MessageSupport](message-support.md) page covers the `ConfigurableMessageSupport` API in 
-detail; this section focuses on the different ways to add templates.
+Once templates have been created or parsed, they need to be registered on a `ConfigurableMessageSupport` before messages
+can reference them. The [MessageSupport](message-support.md) page covers the `ConfigurableMessageSupport` API in detail;
+this section focuses on the different ways to add templates.
 
 ### Adding Parsed Templates
 
@@ -124,14 +124,14 @@ messageSupport
 
 ### Custom Templates
 
-Beyond message-based templates, the library supports custom `Template` implementations through the 
+Beyond message-based templates, the library supports custom `Template` implementations through the
 `AbstractNamedTemplate` base class. A custom template receives the message accessor and parameters at format time and 
 returns formatted text directly from Java code, without a parsed message format string.
 
 The `Template` interface is sealed and permits two implementation paths: `MessageTemplate` for templates backed by a
 parsed message format string and `NamedTemplate` for templates implemented entirely in Java. `AbstractNamedTemplate`
-is the non-sealed base class that implements `NamedTemplate`, so extending it lets you produce formatted output through
-arbitrary logic rather than through the message format parser.
+is the non-sealed base class that implements `NamedTemplate`, so extending it allows formatted output to be produced 
+through arbitrary logic rather than through the message format parser.
 
 A custom template must implement the `getName()` method (returning the kebab-case template name) and the `formatAsText`
 method, which receives a `MessageAccessor` and a `Parameters` object and returns a `MessagePart.Text`. The 
@@ -208,7 +208,7 @@ public class CurrentDateTemplate extends AbstractNamedTemplate
 }
 ```
 
-Declare the provider in your `module-info.java` or in a
+Declare the provider in the `module-info.java` or in a
 `META-INF/services/de.sayayi.lib.message.template.NamedTemplate` file:
 
 ```java
@@ -227,7 +227,7 @@ messageSupport.registerTemplatesFromService(
     CurrentDateTemplate.class.getClassLoader());
 ```
 
-The shared `MessageSupport` singleton returned by `MessageSupportFactory.shared()` performs this  discovery 
+The shared `MessageSupport` singleton returned by `MessageSupportFactory.shared()` performs this discovery 
 automatically, so any `NamedTemplate` providers on the classpath are registered without explicit code.
 
 

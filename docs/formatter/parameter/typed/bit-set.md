@@ -12,11 +12,11 @@ The `bitset` configuration key controls which mode is used.
 ## Set-Bit Mode (`lsb-set` / `msb-set`)
 
 In set-bit mode, the formatter iterates over the set bits in the `BitSet` and looks up each bit's index among the
-number map keys defined in the parameter configuration. Only bits that have a matching number map key produce
-output; unmatched bits are silently skipped. The matched messages are formatted individually and joined into a
-single text string using the standard list configuration keys.
+number map keys defined in the parameter configuration. Only bits that have a matching number map key produce output; 
+unmatched bits are silently skipped. The matched messages are formatted individually and joined into a single text
+string using the standard list configuration keys.
 
-The default mode is `lsb-set` (least significant bit first). You can also use `msb-set` to output set bits from
+The default mode is `lsb-set` (least significant bit first). The `msb-set` mode can also be used to output set bits from
 highest to lowest.
 
 ```java
@@ -50,8 +50,7 @@ messageSupport
 
 ### Bit Ordering
 
-With `lsb-set` (the default), bits are output from lowest index to highest. With `msb-set`, the order is
-reversed.
+With `lsb-set` (the default), bits are output from lowest index to highest. With `msb-set`, the order is reversed.
 
 ```java
 BitSet bits = new BitSet();
@@ -76,8 +75,8 @@ messageSupport
 
 ### Unmatched Bits
 
-Set bits that do not have a corresponding number map key are skipped entirely. This means the output only
-includes bits you explicitly define labels for.
+Set bits that do not have a corresponding number map key are skipped entirely. This means the output only includes bits
+that have explicitly defined labels.
 
 ```java
 BitSet bits = new BitSet();
@@ -121,12 +120,12 @@ messageSupport
 
 ## Binary String Mode (`lsb-bits` / `msb-bits`)
 
-In binary string mode, the formatter renders the entire bit set as a sequence of characters, one per bit position
-from index 0 up to the highest set bit. Each position outputs either the `bit0` character (for unset bits) or the
-`bit1` character (for set bits).
+In binary string mode, the formatter renders the entire bit set as a sequence of characters, one per bit position from
+index 0 up to the highest set bit. Each position outputs either the `bit0` character (for unset bits) or the `bit1`
+character (for set bits).
 
-Use `lsb-bits` for least-significant-bit-first order (index 0 on the left) or `msb-bits` for
-most-significant-bit-first order (highest bit on the left).
+Use `lsb-bits` for least-significant-bit-first order (index 0 on the left) or `msb-bits` for most-significant-bit-first
+order (highest bit on the left).
 
 ```java
 BitSet bits = new BitSet();
@@ -149,8 +148,8 @@ messageSupport
 
 ### Custom Bit Characters
 
-The `bit0` and `bit1` configuration keys control the text used for unset and set bits respectively. They default
-to `0` and `1`.
+The `bit0` and `bit1` configuration keys control the text used for unset and set bits respectively. They default to `0` 
+and `1`.
 
 ```java
 BitSet bits = new BitSet();
@@ -173,8 +172,7 @@ messageSupport
 
 ### Empty BitSet
 
-When the bit set has no bits set, the binary string mode produces an empty string (since the logical length is
-zero).
+When the bit set has no bits set, the binary string mode produces an empty string (since the logical length is zero).
 
 ```java
 messageSupport
@@ -187,8 +185,8 @@ messageSupport
 
 ## Null Handling
 
-A `null` parameter value produces an empty string by default. You can provide a `null` map key to handle this
-case explicitly.
+A `null` parameter value produces an empty string by default. A `null` map key can be provided to handle this case 
+explicitly.
 
 ```java
 messageSupport

@@ -2,12 +2,12 @@
 
 This formatter is included in the `DefaultFormatterService`.
 
-The `StringFormatter` is a type-based formatter registered for `CharSequence` (which includes `String`) and
-`char[]`. It is automatically selected by the library when a parameter holds one of these types. It also serves
-as the library's default formatter, the fallback used for any value type that has no specific formatter registered.
+The `StringFormatter` is a type-based formatter registered for `CharSequence` (which includes `String`) and `char[]`.
+It is automatically selected by the library when a parameter holds one of these types. It also serves as the library's
+default formatter, the fallback used for any value type that has no specific formatter registered.
 
-By default, the formatter outputs the string representation of the parameter value. For `CharSequence` and
-`char[]` values this is their text content; for all other types it is the result of `String.valueOf(value)`.
+By default, the formatter outputs the string representation of the parameter value. For `CharSequence` and`char[]` 
+values this is their text content; for all other types it is the result of `String.valueOf(value)`.
 
 ```java
 messageSupport
@@ -25,8 +25,8 @@ messageSupport
 // "abc"
 ```
 
-Because `StringFormatter` is the default formatter, it also handles values of types that have no dedicated
-formatter. In that case, `toString()` is called on the value.
+Because `StringFormatter` is the default formatter, it also handles values of types that have no dedicated formatter.
+In that case, `toString()` is called on the value.
 
 ```java
 messageSupport
@@ -41,9 +41,9 @@ messageSupport
 
 ### String Keys
 
-String map keys are compared against the parameter value using a locale-aware `Collator`. The comparison first
-attempts an exact match (identical strength). If that fails, a lenient match ignoring case and accents (primary
-strength) is attempted.
+String map keys are compared against the parameter value using a locale-aware `Collator`. The comparison first attempts 
+an exact match (identical strength). If that fails, a lenient match ignoring case and accents (primary strength) is 
+attempted.
 
 ```java
 messageSupport
@@ -71,9 +71,9 @@ messageSupport
 
 ### Empty and Null Keys
 
-The `empty` key matches when the string value is empty or (with an equality comparison) consists only of
-whitespace. The `null` key matches when the parameter value is `null`. A `null` value also matches `empty`
-since it has no string content. The negated forms `!empty` and `!null` are available as well.
+The `empty` key matches when the string value is empty or (with an equality comparison) consists only of whitespace. 
+The `null` key matches when the parameter value is `null`. A `null` value also matches `empty` since it has no string 
+content. The negated forms `!empty` and `!null` are available as well.
 
 ```java
 messageSupport
@@ -103,8 +103,8 @@ messageSupport
 
 ### Bool Keys
 
-Bool keys match when the string value equals the literal text `"true"` or `"false"`. The match is
-case-insensitive at lenient strength.
+Bool keys match when the string value equals the literal text `"true"` or `"false"`. The match is case-insensitive at 
+lenient strength.
 
 ```java
 messageSupport
@@ -116,8 +116,8 @@ messageSupport
 
 ### Number Keys
 
-Number keys parse the string value as a number and compare it against the key value. If the string is not a
-valid number, the key does not match.
+Number keys parse the string value as a number and compare it against the key value. If the string is not a valid 
+number, the key does not match.
 
 ```java
 messageSupport
@@ -142,8 +142,8 @@ messageSupport
 
 ## Null Handling
 
-When the parameter value is `null`, the formatter outputs an empty string by default. You can provide a `null`
-map key to produce specific text.
+When the parameter value is `null`, the formatter outputs an empty string by default. A `null` map key can be provided 
+to produce specific text.
 
 ```java
 messageSupport
@@ -164,8 +164,8 @@ messageSupport
 
 When the `StringFormatter` is used as the default fallback for arbitrary objects, some objects produce unhelpful
 `toString()` output. In particular the default `Object.toString()` identity string (e.g. `java.lang.Object@1a2b3c`)
-and lambda class names are rarely useful. The `ignore-default-tostring` configuration option tells the formatter
-to treat such values as empty strings instead.
+and lambda class names are rarely useful. The `ignore-default-tostring` configuration option tells the formatter to 
+treat such values as empty strings instead.
 
 This is a system-wide default configuration set via `setDefaultConfig`:
 
@@ -190,5 +190,5 @@ When this option is not set or set to `false`, the identity string is output as-
 
 ## Named Formatter `string` (Explicit Selection)
 
-The named formatter `string` is documented on its own page: [String](../named/string.md). You select it
-explicitly by writing `format:string` to force string conversion on any value, regardless of its Java type.
+The named formatter `string` is documented on its own page: [String](../named/string.md). It is selected explicitly by
+writing `format:string` to force string conversion on any value, regardless of its Java type.

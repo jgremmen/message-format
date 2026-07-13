@@ -2,16 +2,16 @@
 
 This formatter is included in the `DefaultFormatterService`.
 
-The `PathFormatter` handles `java.nio.file.Path` and `java.io.File` values. It is automatically selected whenever
-a parameter value is a `Path` or `File` instance. The formatter uses the `path` configuration key to select which
-aspect of the path to render.
+The `PathFormatter` handles `java.nio.file.Path` and `java.io.File` values. It is automatically selected whenever a 
+parameter value is a `Path` or `File` instance. The formatter uses the `path` configuration key to select which aspect 
+of the path to render.
 
 
 ## The `path` Configuration Key
 
-The `path` configuration key determines what part or representation of the path is output. If the key is absent,
-the path is rendered as-is (equivalent to `path:path`). If the value does not match any known option, formatting
-is delegated to the next available formatter.
+The `path` configuration key determines what part or representation of the path is output. If the key is absent, the 
+path is rendered as-is (equivalent to `path:path`). If the value does not match any known option, formatting is 
+delegated to the next available formatter.
 
 ### `path` (default)
 
@@ -75,8 +75,8 @@ messageSupport
 
 ### `real-path`
 
-Outputs the real (resolved) path with symbolic links and relative segments resolved. If the path cannot be
-resolved (e.g. the file does not exist), it falls back to the absolute path.
+Outputs the real (resolved) path with symbolic links and relative segments resolved. If the path cannot be resolved 
+(e.g. the file does not exist), it falls back to the absolute path.
 
 ```java
 messageSupport
@@ -100,8 +100,8 @@ messageSupport
 
 ### `ext` / `extension`
 
-Outputs the file extension (the part after the last dot in the file name). If the file has no extension, the
-output is an empty string. If the path has no file name component, the output is empty.
+Outputs the file extension (the part after the last dot in the file name). If the file has no extension, the output is 
+an empty string. If the path has no file name component, the output is empty.
 
 String map keys can be used to map specific extensions to custom text.
 
@@ -131,8 +131,8 @@ messageSupport
 
 ### `mimetype`
 
-Outputs the MIME type of the file as detected by the operating system. This only works for regular files that
-exist on disk. If the file does not exist or is not a regular file, the output is empty.
+Outputs the MIME type of the file as detected by the operating system. This only works for regular files that exist on 
+disk. If the file does not exist or is not a regular file, the output is empty.
 
 ```java
 messageSupport
@@ -145,8 +145,8 @@ messageSupport
 
 ## File Support
 
-The formatter also handles `java.io.File` values. A `File` is internally converted to a `Path` before
-formatting, so all configuration options work identically.
+The formatter also handles `java.io.File` values. A `File` is internally converted to a `Path` before formatting, so 
+all configuration options work identically.
 
 ```java
 messageSupport
@@ -159,8 +159,8 @@ messageSupport
 
 ## Size Queries
 
-The `PathFormatter` reports the file size in bytes for regular files that exist on disk. If the path does not
-refer to a regular file or the file cannot be accessed, no size is available.
+The `PathFormatter` reports the file size in bytes for regular files that exist on disk. If the path does not refer to
+a regular file or the file cannot be accessed, no size is available.
 
 ```java
 messageSupport
@@ -173,8 +173,8 @@ messageSupport
 
 ## Null Handling
 
-A `null` parameter value produces an empty string by default. You can provide a `null` map key to handle this
-case explicitly.
+A `null` parameter value produces an empty string by default. A `null` map key can be provided to handle this case 
+explicitly.
 
 ```java
 messageSupport

@@ -2,19 +2,19 @@
 
 This formatter is included in the `DefaultFormatterService`.
 
-The `ByteArrayFormatter` handles `byte[]` values and provides specialized encoding and decoding options that go
-beyond what the general array formatter offers. It is registered with a higher priority than the general
-`ArrayFormatter` for `byte[]`, so it is selected first whenever a byte array is used as a parameter value.
+The `ByteArrayFormatter` handles `byte[]` values and provides specialized encoding and decoding options that go beyond
+what the general array formatter offers. It is registered with a higher priority than the general`ArrayFormatter` for
+`byte[]`, so it is selected first whenever a byte array is used as a parameter value.
 
-The formatter's behavior is controlled by the `bytes` configuration key. When this key is present, the byte
-array is converted to a string using the specified encoding. When the key is absent, formatting is delegated to
-the next available formatter in the chain (typically the general `ArrayFormatter`, which renders each byte as a
-comma-separated number).
+The formatter's behavior is controlled by the `bytes` configuration key. When this key is present, the byte array is 
+converted to a string using the specified encoding. When the key is absent, formatting is delegated to the next 
+available formatter in the chain (typically the general `ArrayFormatter`, which renders each byte as a comma-separated
+number).
 
 
 ## The `bytes` Configuration Key
 
-The `bytes` configuration key determines how the byte array is converted to a string. The following values are
+The `bytes` configuration key determines how the byte array is converted to a string. The following values are 
 recognized:
 
 ### `base64`
@@ -43,8 +43,8 @@ messageSupport
 
 ### Charset Name
 
-Any valid Java charset name (such as `UTF-8`, `iso-8859-1`, `US-ASCII`) decodes the byte array into a string
-using that charset.
+Any valid Java charset name (such as `UTF-8`, `iso-8859-1`, `US-ASCII`) decodes the byte array into a string using that 
+charset.
 
 ```java
 messageSupport
@@ -64,8 +64,8 @@ messageSupport
 
 ### Empty or Unsupported Charset
 
-When the `bytes` value is an empty string or a charset name that is not supported by the platform, the byte
-array is decoded using the platform's default charset.
+When the `bytes` value is an empty string or a charset name that is not supported by the platform, the byte array is
+decoded using the platform's default charset.
 
 ```java
 messageSupport
@@ -78,8 +78,8 @@ messageSupport
 
 ## Delegation
 
-When the `bytes` configuration key is absent, the formatter delegates to the next formatter in the chain. This
-is typically the general `ArrayFormatter`, which renders each byte as a comma-separated decimal number.
+When the `bytes` configuration key is absent, the formatter delegates to the next formatter in the chain. This is 
+typically the general `ArrayFormatter`, which renders each byte as a comma-separated decimal number.
 
 ```java
 messageSupport
@@ -89,14 +89,14 @@ messageSupport
 // "71, 114, -61, -74"
 ```
 
-This means you can still use all list configuration keys (`list-sep`, `list-max-size`, etc.) when no `bytes`
-key is specified.
+This means all list configuration keys (`list-sep`, `list-max-size`, etc.) remain usable when no `bytes` key is
+specified.
 
 
 ## Empty Array
 
-When the byte array is empty (length zero) and the `bytes` configuration key is present, the formatter produces
-an empty string.
+When the byte array is empty (length zero) and the `bytes` configuration key is present, the formatter produces an 
+empty string.
 
 ```java
 messageSupport
@@ -109,8 +109,8 @@ messageSupport
 
 ## Map Keys
 
-The `empty` key matches when the byte array has zero length. Its negated form `!empty` matches when the array
-contains at least one byte.
+The `empty` key matches when the byte array has zero length. Its negated form `!empty` matches when the array contains
+at least one byte.
 
 ```java
 messageSupport
@@ -133,8 +133,8 @@ messageSupport
 
 ## Size Queries
 
-The `ByteArrayFormatter` reports the length of the byte array as its size. This can be used with the `size`
-named formatter.
+The `ByteArrayFormatter` reports the length of the byte array as its size. This can be used with the `size` named 
+formatter.
 
 ```java
 messageSupport

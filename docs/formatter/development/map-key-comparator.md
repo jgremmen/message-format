@@ -1,26 +1,24 @@
 # Custom Map Key Comparator
 
-When a message contains a parameter with map entries such as `%{status,0:'off',1:'on'}`, the
-formatting engine needs to determine which map entry matches the current parameter value. Each map
-entry has a key with a type (string, number, bool, null, or empty) and a comparison operator. The
-`MapKeyComparator<T>` interface is the contract that formatters implement to tell the engine how a
-value of type `T` compares against each kind of map key.
+When a message contains a parameter with map entries such as `%{status,0:'off',1:'on'}`, the formatting engine needs to
+determine which map entry matches the current parameter value. Each map entry has a key with a type (string, number, 
+bool, null, or empty) and a comparison operator. The `MapKeyComparator<T>` interface is the contract that formatters 
+implement to tell the engine how a value of type `T` compares against each kind of map key.
 
-Every built-in formatter that supports map key matching already implements `MapKeyComparator`. The
-`NumberFormatter`, for example, knows how to compare a `Number` value against number keys, string
-keys that contain numeric text and bool keys where zero maps to `false`. When you create a custom
-formatter for your own type and want map entries to work with that type, you implement
-`MapKeyComparator` yourself. The interface provides a default `format` method that delegates to the
-next formatter in the chain, so a formatter that only contributes map key comparison logic does not
-need to implement formatting at all.
+Every built-in formatter that supports map key matching already implements `MapKeyComparator`. The `NumberFormatter`,
+for example, knows how to compare a `Number` value against number keys, string keys that contain numeric text and bool
+keys where zero maps to `false`. To create a custom formatter for another type and have map entries work with that type,
+implement `MapKeyComparator` in that formatter. The interface provides a default `format` method that delegates to the
+next formatter in the chain, so a formatter that only contributes map key comparison logic does not need to implement 
+formatting at all.
 
 
 ## The Interface
 
-The `MapKeyComparator<T>` interface extends `ParameterFormatter` and declares five comparison methods,
-one for each map key type. Each method receives the parameter value and a `ComparatorContext` that
-provides access to the key's value, its comparison operator and the current locale. The method
-returns a `MatchResult` that tells the engine how well the value matches the key.
+The `MapKeyComparator<T>` interface extends `ParameterFormatter` and declares five comparison methods, one for each map 
+key type. Each method receives the parameter value and a `ComparatorContext` that provides access to the key's value, 
+its comparison operator and the current locale. The method returns a `MatchResult` that tells the engine how well the 
+value matches the key.
 
 ```java
 public interface MapKeyComparator<T> extends ParameterFormatter
@@ -33,19 +31,17 @@ public interface MapKeyComparator<T> extends ParameterFormatter
 }
 ```
 
-All five methods have default implementations. `compareToNullKey` checks whether the value is
-`null` and returns a match or mismatch accordingly. `compareToEmptyKey` does the same for `null`
-values, treating them as empty. `compareToBoolKey`, `compareToNumberKey` and `compareToStringKey`
-all return `MISMATCH` by default. This means a formatter only needs to override the methods that
-are meaningful for its type.
+All five methods have default implementations. `compareToNullKey` checks whether the value is `null` and returns a 
+match or mismatch accordingly. `compareToEmptyKey` does the same for `null` values, treating them as empty. 
+`compareToBoolKey`, `compareToNumberKey` and `compareToStringKey` all return `MISMATCH` by default. This means a 
+formatter only needs to override the methods that are meaningful for its type.
 
 
 ## Match Results
 
-The `MatchResult` interface represents the outcome of comparing a value to a map key. Its `value()`
-method returns a numeric score. Higher scores indicate better matches and a score of zero or less
-indicates a mismatch. When multiple map keys match the same value, the engine selects the entry with
-the highest score.
+The `MatchResult` interface represents the outcome of comparing a value to a map key. Its `value()` method returns a 
+numeric score. Higher scores indicate better matches and a score of zero or less indicates a mismatch. When multiple map
+keys match the same value, the engine selects the entry with the highest score.
 
 The `MatchResult.Defined` enum provides predefined results ordered from worst to best:
 
@@ -60,55 +56,50 @@ The `MatchResult.Defined` enum provides predefined results ordered from worst to
 | `EQUIVALENT` | 12    | Same value but different type (e.g. `4` matches `'4'`)               |
 | `EXACT`      | 14    | Exact type and value match                                           |
 
-When your comparator can match a value against a key, return the result that best describes the
-quality of the match. Use `EXACT` when value and key share the same type and the comparison succeeds,
-`EQUIVALENT` when the key is a different representation of the same value and `LENIENT` when the
-match requires interpreting the value in a non-obvious way.
+When the comparator can match a value against a key, return the result that best describes the quality of the match. 
+Use `EXACT` when value and key share the same type and the comparison succeeds, `EQUIVALENT` when the key is a different
+representation of the same value and `LENIENT` when the match requires interpreting the value in a non-obvious way.
 
-The scoring matters when a message contains keys of different types that could both match. For
-example, if a message contains both `1:'one'` and `'1':'one as string'`, a numeric value of `1`
-would match the number key with `EXACT` and the string key with `EQUIVALENT`. The engine picks the
-number key because `EXACT` scores higher.
+The scoring matters when a message contains keys of different types that could both match. For example, if a message 
+contains both `1:'one'` and `'1':'one as string'`, a numeric value of `1` would match the number key with `EXACT` and 
+the string key with `EQUIVALENT`. The engine picks the number key because `EXACT` scores higher.
 
 
 ## The ComparatorContext
 
-The `ComparatorContext` passed to each comparison method provides everything you need to perform the
-comparison. It extends `ConfigAccessor`, so you can read parameter configuration values if needed.
+The `ComparatorContext` passed to each comparison method provides everything needed to perform the comparison. It 
+extends `ConfigAccessor`, so parameter configuration values can be read if needed.
 
-`getCompareType()` returns the comparison operator for the current key. The `CompareType` enum
-defines six operators: `EQ` (equal), `NE` (not equal), `LT` (less than), `LTE` (less than or equal),
-`GT` (greater than) and `GTE` (greater than or equal). When the message author writes `>5:'big'`, the
-key has a `GT` compare type with a number key value of `5`.
+`getCompareType()` returns the comparison operator for the current key. The `CompareType` enum defines six operators: 
+`EQ` (equal), `NE` (not equal), `LT` (less than), `LTE` (less than or equal), `GT` (greater than) and `GTE` (greater 
+than or equal). When the message author writes `>5:'big'`, the key has a `GT` compare type with a number key value of 
+`5`.
 
-The `CompareType.match(int signum)` method is the standard way to evaluate a comparison. You compute a
-signum value (negative, zero, or positive) using a method like `Long.compare` or
-`String.compareTo` and then call `match` on the compare type with that signum. If the comparison
-operator matches the signum, the method returns `true`.
+The `CompareType.match(int signum)` method is the standard way to evaluate a comparison. Compute a signum value
+(negative, zero, or positive) using a method like `Long.compare` or `String.compareTo` and then call `match` on the 
+compare type with that signum. If the comparison operator matches the signum, the method returns `true`.
 
-For retrieving the actual key value, the context provides `getBoolKeyValue()`,
-`getNumberKeyValue()` and `getStringKeyValue()`. Each method returns the key's value in the
-appropriate Java type. Calling the wrong getter for the current key type throws a
-`ClassCastException`, but this is not a concern in practice because each comparison method is only
-called when the key type matches.
+For retrieving the actual key value, the context provides `getBoolKeyValue()`, `getNumberKeyValue()` and 
+`getStringKeyValue()`. Each method returns the key's value in the appropriate Java type. Calling the wrong getter for 
+the current key type throws a `ClassCastException`, but this is not a concern in practice because each comparison 
+method is only called when the key type matches.
 
-The context also provides two `matchForObject` methods. These are useful when your type wraps another
-value and you want to delegate the comparison to the wrapped value's formatter. For example, the
-`OptionalIntFormatter` delegates comparisons for number, bool and string keys to the contained `int`
-value's formatter by calling `context.matchForObject(optionalInt.getAsInt(), int.class)`.
+The context also provides two `matchForObject` methods. These are useful when a type wraps another value and the 
+comparison should be delegated to the wrapped value's formatter. For example, the `OptionalIntFormatter` delegates 
+comparisons for number, bool and string keys to the contained `int` value's formatter by calling 
+`context.matchForObject(optionalInt.getAsInt(), int.class)`.
 
 
 ## Adding Map Key Comparison to a Typed Formatter
 
-The most common scenario is adding `MapKeyComparator` support to a formatter that already handles
-formatting for a specific type. Your formatter extends `AbstractSingleTypeParameterFormatter` (or
-`AbstractParameterFormatter`) and additionally implements `MapKeyComparator<T>`. You override only the
-comparison methods that make sense for your type.
+The most common scenario is adding `MapKeyComparator` support to a formatter that already handles formatting for a 
+specific type. Such a formatter extends `AbstractSingleTypeParameterFormatter` (or `AbstractParameterFormatter`) and 
+additionally implements `MapKeyComparator<T>`. It overrides only the comparison methods that make sense for the type.
 
-The following example creates a formatter for an `HttpStatus` class that wraps an HTTP status code.
-The formatter renders the status as its code number by default, but map entries allow the message
-author to provide custom labels for specific codes. The comparator supports number keys (matched
-against the numeric code) and string keys (matched against the reason phrase):
+The following example creates a formatter for an `HttpStatus` class that wraps an HTTP status code. The formatter 
+renders the status as its code number by default, but map entries allow the message author to provide custom labels for 
+specific codes. The comparator supports number keys (matched against the numeric code) and string keys (matched against
+the reason phrase):
 
 ```java
 public final class HttpStatusFormatter
@@ -165,9 +156,9 @@ messageSupport
 // "Not Found"
 ```
 
-Status codes above or equal to 500 are matched by the `>=500` key, which uses the `GTE` compare type.
-The `compareToNumberKey` method computes `Long.compare(503, 500)` which returns a positive signum and
-`GTE.match(positive)` returns `true`:
+Status codes above or equal to 500 are matched by the `>=500` key, which uses the `GTE` compare type. The 
+`compareToNumberKey` method computes `Long.compare(503, 500)` which returns a positive signum and `GTE.match(positive)`
+returns `true`:
 
 ```java
 messageSupport
@@ -187,8 +178,8 @@ messageSupport
 // "Unknown"
 ```
 
-Because the formatter also supports string key comparison, the message author can match against reason
-phrases if preferred:
+Because the formatter also supports string key comparison, the message author can match against reason phrases if 
+preferred:
 
 ```java
 messageSupport
@@ -201,13 +192,12 @@ messageSupport
 
 ## Implementing the Empty Key
 
-The default `compareToEmptyKey` treats only `null` values as empty. Many custom types have their own
-notion of emptiness. An empty collection, a blank string, or a container with no elements are all
-conceptually "empty" but not `null`. When your type has such a concept, override `compareToEmptyKey`
-so that the `empty` map key works naturally.
+The default `compareToEmptyKey` treats only `null` values as empty. Many custom types have their own notion of 
+emptiness. An empty collection, a blank string, or a container with no elements are all conceptually "empty" but not 
+`null`. When a type has such a concept, override `compareToEmptyKey` so that the `empty` map key works naturally.
 
-The following example adds empty key support to the `HttpStatus` formatter. An `HttpStatus` is
-considered empty when it has no reason phrase:
+The following example adds empty key support to the `HttpStatus` formatter. An `HttpStatus` is considered empty when it
+has no reason phrase:
 
 ```java
 @Override
@@ -223,12 +213,12 @@ public @NotNull MatchResult compareToEmptyKey(
 }
 ```
 
-The static helper method `MatchResult.forEmptyKey(compareType, isEmpty)` handles the standard logic:
-it returns `EMPTY` when the compare type is `EQ` and the value is empty, `NOT_EMPTY` when the compare
-type is `NE` and the value is not empty and `MISMATCH` in all other cases.
+The static helper method `MatchResult.forEmptyKey(compareType, isEmpty)` handles the standard logic: it returns `EMPTY`
+when the compare type is `EQ` and the value is empty, `NOT_EMPTY` when the compare type is `NE` and the value is not 
+empty and `MISMATCH` in all other cases.
 
-With this override in place, the message author can use the `empty` key to detect status objects
-without a reason phrase:
+With this override in place, the message author can use the `empty` key to detect status objects without a reason
+phrase:
 
 ```java
 messageSupport
@@ -241,13 +231,13 @@ messageSupport
 
 ## Delegating Comparison to Another Type
 
-Some types are wrappers or adapters around a simpler value. Rather than duplicating comparison logic,
-you can delegate the map key comparison to the wrapped value's formatter by calling
-`context.matchForObject(wrappedValue, valueType)` on the `ComparatorContext`. This looks up the
-`MapKeyComparator` registered for the wrapped value's type and uses it to perform the comparison.
+Some types are wrappers or adapters around a simpler value. Rather than duplicating comparison logic, the map key 
+comparison can be delegated to the wrapped value's formatter by calling
+`context.matchForObject(wrappedValue, valueType)` on the `ComparatorContext`. This looks up the `MapKeyComparator`
+registered for the wrapped value's type and uses it to perform the comparison.
 
-The built-in `BooleanSupplierFormatter` demonstrates this approach. It wraps a `BooleanSupplier` and
-delegates all comparisons to the `boolean` type's comparator:
+The built-in `BooleanSupplierFormatter` demonstrates this approach. It wraps a `BooleanSupplier` and delegates all 
+comparisons to the `boolean` type's comparator:
 
 ```java
 @Override
@@ -268,9 +258,9 @@ public @NotNull MatchResult compareToStringKey(
 }
 ```
 
-This pattern is especially useful for `Optional`-like types. The `OptionalIntFormatter` delegates
-comparisons for number, bool and string keys to the contained `int` value when the optional is
-present and returns `MISMATCH` when the optional is empty:
+This pattern is especially useful for `Optional`-like types. The `OptionalIntFormatter` delegates comparisons for
+number, bool and string keys to the contained `int` value when the optional is present and returns `MISMATCH` when the
+optional is empty:
 
 ```java
 @Override
@@ -287,19 +277,18 @@ public @NotNull MatchResult compareToNumberKey(
 
 ## Standalone Map Key Comparator
 
-Sometimes you want to add map key matching behavior for a type that already has a satisfactory
-formatter but no `MapKeyComparator` support. Because the `MapKeyComparator` interface provides a
-default `format` method that delegates to the next formatter in the chain, you can implement
-`MapKeyComparator<T>` directly without having to provide any formatting logic. Your implementation
-only contributes comparison behavior while the existing formatter continues to produce the output
-text.
+Sometimes map key matching behavior is needed for a type that already has a satisfactory formatter but no 
+`MapKeyComparator` support. Because the `MapKeyComparator` interface provides a default `format` method that delegates
+to the next formatter in the chain, `MapKeyComparator<T>` can be implemented directly without having to provide any
+formatting logic. Such an implementation only contributes comparison behavior while the existing formatter continues to 
+produce the output text.
 
-This approach is useful when you cannot modify the existing formatter, or when the comparison logic
-is orthogonal to the formatting logic and you want to keep them in separate classes.
+This approach is useful when the existing formatter cannot be modified, or when the comparison logic is orthogonal to
+the formatting logic and the two are best kept in separate classes.
 
-The following example adds string key comparison to a hypothetical `Country` type. The existing
-formatter already renders `Country` objects as their display name. The standalone comparator adds the
-ability to match against ISO country codes in map entries:
+The following example adds string key comparison to a hypothetical `Country` type. The existing formatter already 
+renders `Country` objects as their display name. The standalone comparator adds the ability to match against ISO 
+country codes in map entries:
 
 ```java
 public final class CountryMapKeyComparator
@@ -340,12 +329,10 @@ public final class CountryMapKeyComparator
 }
 ```
 
-Because the default `format` method delegates to the next formatter in the chain, the existing
-`Country` formatter continues to produce the output text. The standalone comparator only participates
-in map key resolution.
+Because the default `format` method delegates to the next formatter in the chain, the existing `Country` formatter 
+continues to produce the output text. The standalone comparator only participates in map key resolution.
 
-With both the formatter and the comparator registered, the message author can use map entries to map
-country codes:
+With both the formatter and the comparator registered, the message author can use map entries to map country codes:
 
 ```java
 messageSupport
@@ -355,18 +342,17 @@ messageSupport
 // "Germany"
 ```
 
-To ensure the standalone comparator is consulted during map key matching, register it with a
-`FormattableType` order value that places it before or alongside the existing formatter. Because the
-framework iterates all formatters registered for the value's type (not just the first one) when
-resolving map keys, both the formatter and the comparator will participate in the matching process.
-If multiple `MapKeyComparator` implementations produce a match for the same key, the engine takes the
-one with the highest `MatchResult` score.
+To ensure the standalone comparator is consulted during map key matching, register it with a `FormattableType` order 
+value that places it before or alongside the existing formatter. Because the framework iterates all formatters 
+registered for the value's type (not just the first one) when resolving map keys, both the formatter and the comparator 
+will participate in the matching process. If multiple `MapKeyComparator` implementations produce a match for the same
+key, the engine takes the one with the highest `MatchResult` score.
 
 
 ## Registration
 
-Map key comparators are registered like any other parameter formatter. Use `addFormatter` on a
-`DefaultFormatterService` instance:
+Map key comparators are registered like any other parameter formatter. Use `addFormatter` on a `DefaultFormatterService`
+instance:
 
 ```java
 var formatterService = new DefaultFormatterService();
@@ -374,20 +360,19 @@ formatterService.addFormatter(new HttpStatusFormatter());
 formatterService.addFormatter(new CountryMapKeyComparator());
 ```
 
-The shared instance returned by `DefaultFormatterService.getSharedInstance()` is sealed and cannot be
-modified. Custom comparators require a new `DefaultFormatterService` instance.
+The shared instance returned by `DefaultFormatterService.getSharedInstance()` is sealed and cannot be modified. Custom 
+comparators require a new `DefaultFormatterService` instance.
 
 ### ServiceLoader Auto-Discovery
 
-For library authors distributing comparators as a JAR, the Java `ServiceLoader` mechanism provides
-automatic registration. Create a file named
-`META-INF/services/de.sayayi.lib.message.formatter.parameter.ParameterFormatter` in your resources
-directory and list the fully qualified class names:
+For library authors distributing comparators as a JAR, the Java `ServiceLoader` mechanism provides automatic 
+registration. Create a file named `META-INF/services/de.sayayi.lib.message.formatter.parameter.ParameterFormatter` in 
+the resources directory and list the fully qualified class names:
 
 ```
 com.example.formatter.HttpStatusFormatter
 com.example.formatter.CountryMapKeyComparator
 ```
 
-When the application creates a `DefaultFormatterService`, it calls `ServiceLoader.load` for the
-`ParameterFormatter` interface and registers every discovered implementation automatically.
+When the application creates a `DefaultFormatterService`, it calls `ServiceLoader.load` for the `ParameterFormatter`
+interface and registers every discovered implementation automatically.

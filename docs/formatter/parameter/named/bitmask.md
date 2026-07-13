@@ -1,27 +1,26 @@
 # Bitmask
 
 /// note
-This formatter is **not** included in the `DefaultFormatterService`. You must register it explicitly
-by adding a `BitmaskFormatter` instance to your formatter service.
+This formatter is **not** included in the `DefaultFormatterService`. It must be registered explicitly by adding a 
+`BitmaskFormatter` instance to the formatter service.
 ///
 
 The named formatter `bitmask` is selected explicitly by writing `format:bitmask` in the message parameter
-configuration. It converts integral numeric values into a `BitSet` and then delegates the actual formatting to
-the [BitSet type-based formatter](../typed/bit-set.md). This allows you to use all `BitSet` formatting features
-(set-bit mode, binary string mode, list separators) on plain integer values that represent bit flags.
+configuration. It converts integral numeric values into a `BitSet` and then delegates the actual formatting to the
+[BitSet type-based formatter](../typed/bit-set.md). This allows all `BitSet` formatting features to be used (set-bit 
+mode, binary string mode, list separators) on plain integer values that represent bit flags.
 
 The formatter accepts all Java integral types: `byte`, `short`, `int`, `long` (and their boxed equivalents),
-`char`/`Character` and `BigInteger`. Negative values are treated as unsigned bit patterns, so all bits are
-preserved as-is going through the conversion. A `BitSet` formatter **must** be registered for the `bitmask`
-formatter to work.
+`char`/`Character` and `BigInteger`. Negative values are treated as unsigned bit patterns, so all bits are preserved 
+as-is going through the conversion. A `BitSet` formatter **must** be registered for the `bitmask` formatter to work.
 
 
 ## Set-Bit Mode
 
 The most common use of `bitmask` is labeling individual bits. Each number map key represents a bit index and the
 associated message is the label for that bit. The `bitset` configuration key controls the bit ordering: `lsb-set`
-(least significant bit first, the default) or `msb-set` (most significant bit first). Only bits that are set in
-the value **and** have a matching number map key produce output; all other bits are silently skipped.
+(least significant bit first, the default) or `msb-set` (most significant bit first). Only bits that are set in the 
+value **and** have a matching number map key produce output; all other bits are silently skipped.
 
 ```java
 // 0x15 = 0b10101 → bits 0, 2, 4 are set
@@ -43,8 +42,8 @@ messageSupport
 // "admin, execute, read"
 ```
 
-Bits that are set in the value but do not have a corresponding number map key are skipped. In the following
-example, bits 1 and 3 are set but have no label, so none of them appear in the output.
+Bits that are set in the value but do not have a corresponding number map key are skipped. In the following example, 
+bits 1 and 3 are set but have no label, so none of them appear in the output.
 
 ```java
 // 0x0E = 0b1110 → bits 1, 2, 3 are set
@@ -76,9 +75,9 @@ messageSupport
 
 ## Binary String Mode
 
-The `bitmask` formatter also supports binary string mode by setting `bitset` to `lsb-bits` or `msb-bits`. In
-this mode the entire bit pattern of the numeric value is rendered as a sequence of characters. The `bit0` and
-`bit1` configuration keys control the characters used for unset and set bits (default: `0` and `1`).
+The `bitmask` formatter also supports binary string mode by setting `bitset` to `lsb-bits` or `msb-bits`. In this mode
+the entire bit pattern of the numeric value is rendered as a sequence of characters. The `bit0` and `bit1` 
+configuration keys control the characters used for unset and set bits (default: `0` and `1`).
 
 ```java
 // 0x95 = 0b10010101 → bits 0, 2, 4, 7 are set
@@ -98,7 +97,7 @@ messageSupport
 
 ## Supported Types
 
-All examples above use `int` or `long` values, but the formatter handles all integral types. Negative values are
+All examples above use `int` or `long` values, but the formatter handles all integral types. Negative values are 
 treated as unsigned bit patterns, preserving all bits.
 
 ```java
@@ -124,8 +123,7 @@ messageSupport
 
 ## Null Handling
 
-A `null` parameter value produces an empty string by default. You can provide a `null` map key to produce
-specific text.
+A `null` parameter value produces an empty string by default. A `null` map key can be provided to produce specific text.
 
 ```java
 messageSupport

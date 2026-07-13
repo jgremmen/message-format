@@ -2,24 +2,24 @@
 
 This formatter is included in the `DefaultFormatterService`.
 
-The `DictionaryFormatter` is a type-based formatter registered for `java.util.Dictionary`. It is automatically
-selected whenever a parameter value is a `Dictionary` subclass, which includes `Hashtable` and `Properties`.
+The `DictionaryFormatter` is a type-based formatter registered for `java.util.Dictionary`. It is automatically selected
+whenever a parameter value is a `Dictionary` subclass, which includes `Hashtable` and `Properties`.
 
-The formatter's primary feature is looking up a value inside the dictionary using the `key` configuration entry.
-The looked-up value is then formatted using the appropriate type-based formatter for its type. When no `key`
-configuration is present, the formatter delegates to the next available formatter, which for `Hashtable` is
-typically the [Map formatter](map.md) (since `Hashtable` implements `Map`).
+The formatter's primary feature is looking up a value inside the dictionary using the `key` configuration entry. The 
+looked-up value is then formatted using the appropriate type-based formatter for its type. When no `key` configuration 
+is present, the formatter delegates to the next available formatter, which for `Hashtable` is typically the 
+[Map formatter](map.md) (since `Hashtable` implements `Map`).
 
 
 ## Key Lookup
 
-The `key` configuration entry specifies which entry to retrieve from the dictionary. The key can be a string,
-a number or a boolean value.
+The `key` configuration entry specifies which entry to retrieve from the dictionary. The key can be a string, a number
+or a boolean value.
 
 ### String Keys
 
-A string key performs a direct lookup in the dictionary. If the string is a single character and no entry is
-found, a second lookup with the `char` value is attempted.
+A string key performs a direct lookup in the dictionary. If the string is a single character and no entry is found, a
+second lookup with the `char` value is attempted.
 
 ```java
 Hashtable<String, String> config = new Hashtable<>();
@@ -41,8 +41,8 @@ messageSupport
 
 ### Number Keys
 
-A number key attempts the lookup using several numeric types in sequence: `long`, `BigInteger`, `BigDecimal`,
-`int`, `short` and `byte`. This covers dictionaries keyed by any of these types.
+A number key attempts the lookup using several numeric types in sequence: `long`, `BigInteger`, `BigDecimal`,`int`,
+`short` and `byte`. This covers dictionaries keyed by any of these types.
 
 ```java
 Hashtable<Integer, String> codes = new Hashtable<>();
@@ -75,8 +75,8 @@ messageSupport
 
 ## Missing Keys
 
-When the key is not found in the dictionary, the result is treated as `null`. If a `null` or `empty` map key is
-present in the parameter configuration, its message is used. Otherwise, the output is an empty string.
+When the key is not found in the dictionary, the result is treated as `null`. If a `null` or `empty` map key is present
+in the parameter configuration, its message is used. Otherwise, the output is an empty string.
 
 ```java
 Hashtable<String, String> config = new Hashtable<>();
@@ -98,10 +98,10 @@ messageSupport
 
 ## Without Key Configuration
 
-When no `key` configuration entry is present, the formatter delegates to the next available formatter. For
-`Hashtable` (which implements `Map`), this is the [Map formatter](map.md), so the entire dictionary is formatted
-as a list of key-value pairs. For `Dictionary` subclasses that do not implement `Map`, the default string
-formatter is used, which calls `toString()` on the dictionary.
+When no `key` configuration entry is present, the formatter delegates to the next available formatter. For `Hashtable`
+(which implements `Map`), this is the [Map formatter](map.md), so the entire dictionary is formatted as a list of 
+key-value pairs. For `Dictionary` subclasses that do not implement `Map`, the default string formatter is used, which 
+calls `toString()` on the dictionary.
 
 ```java
 Hashtable<String, String> ht = new Hashtable<>();
@@ -118,8 +118,8 @@ messageSupport
 
 ## Properties
 
-`Properties` extends `Hashtable<Object, Object>` and is therefore handled by this formatter. Key lookup
-works the same way.
+`Properties` extends `Hashtable<Object, Object>` and is therefore handled by this formatter. Key lookup works the same
+way.
 
 ```java
 Properties props = new Properties();
@@ -136,8 +136,7 @@ messageSupport
 
 ## Null Handling
 
-A `null` parameter value produces an empty string by default. You can provide a `null` map key to produce
-specific text.
+A `null` parameter value produces an empty string by default. A `null` map key can be provided to produce specific text.
 
 ```java
 messageSupport

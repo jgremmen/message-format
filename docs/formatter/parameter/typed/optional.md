@@ -2,21 +2,20 @@
 
 This formatter is included in the `DefaultFormatterService`.
 
-The library provides four formatters that handle Java's optional types: `Optional`, `OptionalInt`, `OptionalLong`
-and `OptionalDouble`. Each formatter is automatically selected based on the parameter's type. The core principle
-is the same for all four: if the optional contains a value, it is unwrapped and formatting is delegated to the
-formatter appropriate for the contained value's type. If the optional is empty, it is treated as an empty value.
+The library provides four formatters that handle Java's optional types: `Optional`, `OptionalInt`, `OptionalLong` and 
+`OptionalDouble`. Each formatter is automatically selected based on the parameter's type. The core principle is the 
+same for all four: if the optional contains a value, it is unwrapped and formatting is delegated to the formatter 
+appropriate for the contained value's type. If the optional is empty, it is treated as an empty value.
 
-Because the contained value is delegated to another formatter, the output and map key behavior depends entirely
-on what is inside the optional. An `OptionalInt` containing `42` behaves the same as passing `42` directly. An
-`Optional` containing a `String` behaves the same as passing that string directly.
+Because the contained value is delegated to another formatter, the output and map key behavior depends entirely on what 
+is inside the optional. An `OptionalInt` containing `42` behaves the same as passing `42` directly. An `Optional`
+containing a `String` behaves the same as passing that string directly.
 
 
 ## OptionalFormatter
 
-The `OptionalFormatter` handles `java.util.Optional` values. When the optional is present, the contained object
-is unwrapped and formatted according to its own type. When the optional is empty, the formatter produces an empty
-string.
+The `OptionalFormatter` handles `java.util.Optional` values. When the optional is present, the contained object is 
+unwrapped and formatted according to its own type. When the optional is empty, the formatter produces an empty string.
 
 ```java
 messageSupport
@@ -34,8 +33,8 @@ messageSupport
 // ""
 ```
 
-Because formatting is delegated to the contained value's formatter, any map keys or configuration that apply to
-the contained type work transparently through the optional wrapper.
+Because formatting is delegated to the contained value's formatter, any map keys or configuration that apply to the 
+contained type work transparently through the optional wrapper.
 
 ```java
 messageSupport
@@ -55,12 +54,11 @@ messageSupport
 
 ### Map Key Behavior
 
-Map key comparisons for `bool`, `number` and `string` keys are delegated to the contained value. When the
-optional is empty, these key types never match.
+Map key comparisons for `bool`, `number` and `string` keys are delegated to the contained value. When the optional is 
+empty, these key types never match.
 
-The `null` key matches when the parameter value is `null` or when the optional is empty. The `empty` key also
-matches when the optional is empty. When both are present, the `null` key takes precedence because it is
-evaluated first.
+The `null` key matches when the parameter value is `null` or when the optional is empty. The `empty` key also matches 
+when the optional is empty. When both are present, the `null` key takes precedence because it is evaluated first.
 
 ```java
 messageSupport
@@ -96,15 +94,15 @@ messageSupport
 
 ### Size Delegation
 
-The `OptionalFormatter` supports size queries. When the optional is present, the size query is delegated to the
+The `OptionalFormatter` supports size queries. When the optional is present, the size query is delegated to the 
 contained value. When the optional is empty, no size is available.
 
 
 ## OptionalIntFormatter
 
-The `OptionalIntFormatter` handles `java.util.OptionalInt` values. When the optional is present, the contained
-`int` value is unwrapped and formatting is delegated to the integer formatter. When the optional is empty, the
-formatter produces an empty string.
+The `OptionalIntFormatter` handles `java.util.OptionalInt` values. When the optional is present, the contained `int` 
+value is unwrapped and formatting is delegated to the integer formatter. When the optional is empty, the formatter 
+produces an empty string.
 
 ```java
 messageSupport
@@ -145,9 +143,9 @@ messageSupport
 
 ## OptionalLongFormatter
 
-The `OptionalLongFormatter` handles `java.util.OptionalLong` values. When the optional is present, the contained
-`long` value is unwrapped and formatting is delegated to the long formatter. When the optional is empty, the
-formatter produces an empty string.
+The `OptionalLongFormatter` handles `java.util.OptionalLong` values. When the optional is present, the contained `long`
+value is unwrapped and formatting is delegated to the long formatter. When the optional is empty, the formatter 
+produces an empty string.
 
 ```java
 messageSupport
@@ -188,9 +186,9 @@ messageSupport
 
 ## OptionalDoubleFormatter
 
-The `OptionalDoubleFormatter` handles `java.util.OptionalDouble` values. When the optional is present, the
-contained `double` value is unwrapped and formatting is delegated to the double formatter. When the optional is
-empty, the formatter produces an empty string.
+The `OptionalDoubleFormatter` handles `java.util.OptionalDouble` values. When the optional is present, the contained 
+`double` value is unwrapped and formatting is delegated to the double formatter. When the optional is empty, the 
+formatter produces an empty string.
 
 ```java
 messageSupport
@@ -231,9 +229,8 @@ messageSupport
 
 ## Null Handling
 
-For all four formatters, a `null` parameter value (as opposed to an empty optional) produces an empty string by
-default. You can provide a `null` map key to handle this case explicitly. An empty optional also matches the
-`null` key.
+For all four formatters, a `null` parameter value (as opposed to an empty optional) produces an empty string by default.
+A `null` map key can be provided to handle this case explicitly. An empty optional also matches the `null` key.
 
 ```java
 messageSupport

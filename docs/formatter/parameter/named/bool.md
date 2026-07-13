@@ -2,19 +2,19 @@
 
 This formatter is included in the `DefaultFormatterService`.
 
-The named formatter `bool` is selected explicitly by writing `format:bool` in the message parameter configuration.
-Its purpose is to coerce values that are not inherently boolean, such as numbers, strings or optionals, into a
-boolean result. If your parameter is already a `Boolean`, `BooleanSupplier` or `AtomicBoolean`, you do not need
-this formatter; the [type-based formatter](../typed/boolean.md) handles that automatically.
+The named formatter `bool` is selected explicitly by writing `format:bool` in the message parameter configuration. Its 
+purpose is to coerce values that are not inherently boolean, such as numbers, strings or optionals, into a boolean
+result. If the parameter is already a `Boolean`, `BooleanSupplier` or `AtomicBoolean`, this formatter is not needed; 
+the [type-based formatter](../typed/boolean.md) handles that automatically.
 
 
 ## Conversion Rules
 
 The named `bool` formatter accepts the following types and applies these conversion rules.
 
-**Numbers** (all primitive numeric types, their boxed equivalents, `BigInteger` and `BigDecimal`) are interpreted
-as `false` when the value is zero and `true` when the value is non-zero. The sign of the number does not matter,
-only whether it equals zero.
+**Numbers** (all primitive numeric types, their boxed equivalents, `BigInteger` and `BigDecimal`) are interpreted as 
+`false` when the value is zero and `true` when the value is non-zero. The sign of the number does not matter, only 
+whether it equals zero.
 
 ```java
 messageSupport
@@ -30,10 +30,9 @@ messageSupport
 // "has items"
 ```
 
-**Strings** are recognized when they match the literal text `"true"` or `"false"` (case-sensitive). If the string
-does not match either literal, the formatter attempts to parse it as a number and applies the same zero-check
-rule. A string that is neither a boolean literal nor a valid number cannot be converted to a boolean and is
-treated as an empty value.
+**Strings** are recognized when they match the literal text `"true"` or `"false"` (case-sensitive). If the string does
+not match either literal, the formatter attempts to parse it as a number and applies the same zero-check rule. A string
+that is neither a boolean literal nor a valid number cannot be converted to a boolean and is treated as an empty value.
 
 ```java
 messageSupport
@@ -55,9 +54,9 @@ messageSupport
 // "unknown"
 ```
 
-**Optional**, **OptionalInt** and **OptionalLong** are unwrapped before conversion. If the optional contains a
-value, that value is converted according to the rules described above. An empty optional cannot produce a boolean
-and is treated as an empty value.
+**Optional**, **OptionalInt** and **OptionalLong** are unwrapped before conversion. If the optional contains a value,
+that value is converted according to the rules described above. An empty optional cannot produce a boolean and is
+treated as an empty value.
 
 ```java
 messageSupport
@@ -94,8 +93,8 @@ messageSupport
 
 The named `bool` formatter supports four map key types: `bool`, `string`, `null` and `empty`.
 
-The **bool** keys `true` and `false` are the most common way to customize the output. They map the converted
-boolean value to custom text.
+The **bool** keys `true` and `false` are the most common way to customize the output. They map the converted boolean
+value to custom text.
 
 ```java
 messageSupport
@@ -105,7 +104,7 @@ messageSupport
 // "on"
 ```
 
-**String** keys match against the string representation of the converted boolean value, although this is not
+**String** keys match against the string representation of the converted boolean value, although this is not 
 recommended. Use `true` and `false` bool keys instead.
 
 ```java
@@ -121,12 +120,12 @@ The **null** key matches when the parameter value is `null`.
 
 ## The `empty` Map Key
 
-Because the named `bool` formatter coerces non-boolean types, the conversion can fail. When it does, the value
-is considered empty. This is the key distinction from the type-based formatters, where the value is always a
-valid boolean and the `empty` key never matches.
+Because the named `bool` formatter coerces non-boolean types, the conversion can fail. When it does, the value is 
+considered empty. This is the key distinction from the type-based formatters, where the value is always a valid boolean 
+and the `empty` key never matches.
 
-For example, a string that is neither a boolean literal nor a valid number cannot be converted to a boolean.
-The `empty` key catches these cases. Its negated form `!empty` matches any value that was successfully converted.
+For example, a string that is neither a boolean literal nor a valid number cannot be converted to a boolean. The `empty` 
+key catches these cases. Its negated form `!empty` matches any value that was successfully converted.
 
 ```java
 messageSupport
@@ -145,8 +144,8 @@ messageSupport
 
 ## Default Output
 
-When no map keys are provided, the named `bool` formatter outputs the text `true` or `false` after conversion.
-For `null` values and for values that cannot be converted to a boolean, the output is an empty string.
+When no map keys are provided, the named `bool` formatter outputs the text `true` or `false` after conversion. For
+`null` values and for values that cannot be converted to a boolean, the output is an empty string.
 
 ```java
 messageSupport
@@ -165,8 +164,8 @@ messageSupport
 
 ## Practical Example
 
-A common use case is presenting a user-facing label derived from a numeric or string value. The following example
-shows how to build a status message that covers all possible states including null and unconvertible values.
+A common use case is presenting a user-facing label derived from a numeric or string value. The following example shows
+how to build a status message that covers all possible states including null and unconvertible values.
 
 ```java
 messageSupport
