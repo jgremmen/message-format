@@ -22,9 +22,8 @@ import java.util.function.Supplier;
 
 
 /**
- * Log4j {@link Message} implementation that delegates message formatting to a supplier.
- * This allows for lazy evaluation of the formatted message string, deferring the formatting work until the message
- * is actually needed.
+ * Log4j {@link Message} implementation that delegates message formatting to a supplier. This allows for lazy
+ * evaluation of the formatted message string, deferring the formatting work until the message is actually needed.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0

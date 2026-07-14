@@ -15,7 +15,7 @@
  */
 
 /**
- * Spring-specific parameter formatters, providing integration with the Spring Expression Language (SpEL).
+ * Spring-specific parameter formatter, providing integration with the Spring Expression Language (SpEL).
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

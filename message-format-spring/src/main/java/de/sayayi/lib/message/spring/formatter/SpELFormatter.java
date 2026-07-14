@@ -39,6 +39,24 @@ import static org.springframework.expression.spel.support.DataBindingPropertyAcc
 
 
 /**
+ * A named parameter formatter that evaluates Spring Expression Language (SpEL) expressions on parameter values during
+ * message formatting.
+ * <p>
+ * This formatter is registered under the name {@code spel} and supports the following parameter configuration options:
+ * <ul>
+ *   <li>
+ *     {@code spel-expr} a SpEL expression to evaluate against the parameter value. The parameter value serves as
+ *     the root object of the expression.
+ *   </li>
+ *   <li>
+ *     {@code spel-format} an optional format name used to format the result of the SpEL expression.
+ *   </li>
+ * </ul>
+ * <p>
+ * Message parameters referencing other parameter values are made available as SpEL variables
+ * (e.g. {@code #otherParam}). Variable assignment is not supported and will result in a
+ * {@link org.springframework.expression.spel.SpelEvaluationException SpelEvaluationException}.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.3  (refactored in 0.12.0)
  */
@@ -93,6 +111,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
   }
 
 
+  /** {@inheritDoc} */
   @Override
   @Contract(pure = true)
   public @NotNull String getName() {
@@ -100,6 +119,10 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
   }
 
 
+  /**
+   * Formats the given value by optionally evaluating a SpEL expression ({@code spel-expr}) against it and then
+   * delegating to the next formatter in the chain.
+   */
   @Override
   protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Object value)
   {
@@ -116,12 +139,14 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return PARAMETER_CONFIG_NAMES;
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean autoApplyOnNamedConfigParameter() {
     return true;
@@ -130,6 +155,10 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
 
 
 
+  /**
+   * A read-only SpEL {@link EvaluationContext} that uses the parameter value as its root object and exposes other
+   * message parameters as SpEL variables.
+   */
   private final class ParameterEvaluationContext implements EvaluationContext
   {
     private final ParameterFormatterContext context;
