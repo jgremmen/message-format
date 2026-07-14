@@ -1117,6 +1117,7 @@ class SortedStringMapTest
 
     @Test
     @DisplayName("entrySet toArray returns all entries")
+    @SuppressWarnings("unchecked")
     void entrySetToArray()
     {
       var map = new SortedStringMap<String>();
@@ -1130,7 +1131,6 @@ class SortedStringMapTest
       var array = map.entrySet().toArray();
 
       assertEquals(5, array.length);
-      //noinspection unchecked
       assertEquals("alpha", ((Entry<String,String>)array[0]).getKey());
     }
 

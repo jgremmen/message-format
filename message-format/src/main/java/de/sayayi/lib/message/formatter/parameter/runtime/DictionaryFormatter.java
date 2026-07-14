@@ -33,6 +33,7 @@ import java.util.Set;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT_ORDER;
 import static de.sayayi.lib.message.part.MapKey.EMPTY_NULL_TYPE;
+import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 
 
 /**
@@ -85,7 +86,7 @@ public final class DictionaryFormatter implements ParameterFormatter
       return context
           .getMapMessage(null, EMPTY_NULL_TYPE)
           .map(context::format)
-          .orElse(Text.NULL);
+          .orElse(nullText());
     }
 
     return context.format(value);

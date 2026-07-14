@@ -57,7 +57,11 @@ class Log4jMessageFactoryTest
     appender = WriterAppender.newBuilder()
         .setName("TestStringWriter")
         .setTarget(stringWriter)
-        .setLayout(PatternLayout.newBuilder().withPattern("%m%n").withConfiguration(config).build())
+        .setLayout(PatternLayout
+            .newBuilder()
+            .setPattern("%m%n")
+            .setConfiguration(config)
+            .build())
         .setFollow(true)
         .build();
     appender.start();
@@ -146,7 +150,7 @@ class Log4jMessageFactoryTest
   @DisplayName("Log object message")
   void testNewMessageWithObject()
   {
-    logger.info(LOG4J_MESSAGE_FACTORY.newMessage((Object)42));
+    logger.info(LOG4J_MESSAGE_FACTORY.newMessage(42));
     assertEquals("42\n", stringWriter.toString());
   }
 
