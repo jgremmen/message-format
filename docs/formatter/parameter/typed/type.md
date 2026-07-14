@@ -9,12 +9,12 @@ human-readable string, handling classes, generic types, parameterized types, typ
 The `type` configuration key controls which simplifications are applied to the output. It accepts a string of format 
 flags:
 
-| Flag | Effect                                          |
-|------|-------------------------------------------------|
-| `c`  | Use the simple class name only (no package)     |
-| `j`  | Strip the `java.lang.` package prefix           |
-| `u`  | Strip the `java.util.` package prefix           |
-| `v`  | Expand type variable bounds                     |
+| Flag | Effect                                      |
+|------|---------------------------------------------|
+| `c`  | Use the simple class name only (no package) |
+| `j`  | Strip the `java.lang.` package prefix       |
+| `u`  | Strip the `java.util.` package prefix       |
+| `v`  | Expand type variable bounds                 |
 
 The default format is `ju`, which strips both the `java.lang.` and `java.util.` package prefixes while keeping all 
 other packages fully qualified.

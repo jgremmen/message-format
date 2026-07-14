@@ -21,8 +21,8 @@ read by 0.20.0. Re-export all pack files after upgrading.
 
 ### Dependency changes
 
-| Dependency | Type | 0.20.0 | 0.20.1 |
-|---|---|---|---|
+| Dependency         | Type    | 0.20.0    | 0.20.1      |
+|--------------------|---------|-----------|-------------|
 | de.sayayi.lib:pack | compile | [0.1,0.2) | [0.1.3,0.2) |
 
 

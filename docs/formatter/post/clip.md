@@ -202,5 +202,5 @@ messageSupport
 | Key                | Type    | Default | Description                                       |
 |--------------------|---------|---------|---------------------------------------------------|
 | `clip`             | number  |         | Maximum length of the output text                 |
-| `clip-suffix`      | boolean | `true`  | Whether to append a suffix when text is clipped    |
+| `clip-suffix`      | boolean | `true`  | Whether to append a suffix when text is clipped   |
 | `clip-suffix-text` | string  | `…`     | Custom suffix text to use instead of the ellipsis |

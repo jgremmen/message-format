@@ -20,21 +20,21 @@ The `geo` configuration key accepts the following predefined format names.
 
 ### Longitude Formats
 
-| Format name          | Example output     | Description                                      |
-|----------------------|--------------------|--------------------------------------------------|
-| `short-longitude`    | `12°45'E`          | Degrees and whole minutes, compass direction      |
-| `longitude`          | `12°45'3"E`        | Degrees, minutes and whole seconds                |
-| `medium-longitude`   | `12°45'2.9"E`      | Degrees, minutes and seconds with 1 decimal place |
-| `long-longitude`     | `12°45'2.581"E`    | Degrees, minutes and seconds with 3 decimal places|
+| Format name        | Example output  | Description                                        |
+|--------------------|-----------------|----------------------------------------------------|
+| `short-longitude`  | `12°45'E`       | Degrees and whole minutes, compass direction       |
+| `longitude`        | `12°45'3"E`     | Degrees, minutes and whole seconds                 |
+| `medium-longitude` | `12°45'2.9"E`   | Degrees, minutes and seconds with 1 decimal place  |
+| `long-longitude`   | `12°45'2.581"E` | Degrees, minutes and seconds with 3 decimal places |
 
 ### Latitude Formats
 
-| Format name          | Example output     | Description                                      |
-|----------------------|--------------------|--------------------------------------------------|
-| `short-latitude`     | `51°34'N`          | Degrees and whole minutes, compass direction      |
-| `latitude`           | `51°34'9"N`        | Degrees, minutes and whole seconds                |
-| `medium-latitude`    | `51°34'9.0"N`      | Degrees, minutes and seconds with 1 decimal place |
-| `long-latitude`      | `51°34'9.000"N`    | Degrees, minutes and seconds with 3 decimal places|
+| Format name       | Example output  | Description                                        |
+|-------------------|-----------------|----------------------------------------------------|
+| `short-latitude`  | `51°34'N`       | Degrees and whole minutes, compass direction       |
+| `latitude`        | `51°34'9"N`     | Degrees, minutes and whole seconds                 |
+| `medium-latitude` | `51°34'9.0"N`   | Degrees, minutes and seconds with 1 decimal place  |
+| `long-latitude`   | `51°34'9.000"N` | Degrees, minutes and seconds with 3 decimal places |
 
 ```java
 messageSupport
@@ -75,21 +75,21 @@ d[ ][0](m|M|MM|MMM)[ ][0](s|S|SS|SSS)[ ](LO|LA)
 
 Each element of the pattern controls a specific aspect of the output:
 
-| Element           | Meaning                                                              |
-|-------------------|----------------------------------------------------------------------|
-| `d`               | Degrees (always present)                                             |
-| ` ` (space)       | Insert a space after the preceding element                           |
-| `0`               | Zero-pad the following minutes or seconds (e.g. `05` instead of `5`) |
-| `m`               | Minutes with no decimal places                                       |
-| `M`               | Minutes with 1 decimal place                                         |
-| `MM`              | Minutes with 2 decimal places                                        |
-| `MMM`             | Minutes with 3 decimal places                                        |
-| `s`               | Seconds with no decimal places                                       |
-| `S`               | Seconds with 1 decimal place                                         |
-| `SS`              | Seconds with 2 decimal places                                        |
-| `SSS`             | Seconds with 3 decimal places                                        |
-| `LO`              | Append compass direction for longitude (E/W)                         |
-| `LA`              | Append compass direction for latitude (N/S)                          |
+| Element     | Meaning                                                              |
+|-------------|----------------------------------------------------------------------|
+| `d`         | Degrees (always present)                                             |
+| ` ` (space) | Insert a space after the preceding element                           |
+| `0`         | Zero-pad the following minutes or seconds (e.g. `05` instead of `5`) |
+| `m`         | Minutes with no decimal places                                       |
+| `M`         | Minutes with 1 decimal place                                         |
+| `MM`        | Minutes with 2 decimal places                                        |
+| `MMM`       | Minutes with 3 decimal places                                        |
+| `s`         | Seconds with no decimal places                                       |
+| `S`         | Seconds with 1 decimal place                                         |
+| `SS`        | Seconds with 2 decimal places                                        |
+| `SSS`       | Seconds with 3 decimal places                                        |
+| `LO`        | Append compass direction for longitude (E/W)                         |
+| `LA`        | Append compass direction for latitude (N/S)                          |
 
 When `LO` or `LA` is omitted, negative values are shown with a minus sign. When a compass direction is appended, the 
 sign is expressed as the direction letter instead.

@@ -143,10 +143,10 @@ associating a non-`DefaultFormatter` with `Object.class` or registering a format
 
 ### Dependency changes
 
-| Dependency | Type | 0.12.0 | 0.20.0 |
-|---|---|---|---|
+| Dependency                       | Type    | 0.12.0    | 0.20.0    |
+|----------------------------------|---------|-----------|-----------|
 | de.sayayi.lib:antlr4-runtime-ext | compile | [0.5,0.6) | [0.6,0.7) |
-| de.sayayi.lib:pack | compile | - | [0.1,0.2) |
+| de.sayayi.lib:pack               | compile | -         | [0.1,0.2) |
 
 
 ## New Features

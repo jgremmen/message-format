@@ -93,6 +93,6 @@ messageSupport
 
 ## Configuration Reference
 
-| Key    | Type   | Default | Description                                                              |
-|--------|--------|---------|--------------------------------------------------------------------------|
+| Key    | Type   | Default | Description                                               |
+|--------|--------|---------|-----------------------------------------------------------|
 | `case` | string |         | Target case: `upper`, `uppercase`, `lower` or `lowercase` |

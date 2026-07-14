@@ -18,19 +18,19 @@ and the `empty` map key is used.
 When the `size` formatter processes a parameter value, it delegates the size calculation to the type-based formatter
 registered for the value's type. Each type defines what "size" means:
 
-| Type                                  | Size meaning                                                                 |
-|---------------------------------------|------------------------------------------------------------------------------|
-| `CharSequence` (including `String`)   | Number of characters                                                         |
-| `char[]`                              | Length of the array                                                          |
-| `Collection` (including `List`, `Set`)| Number of elements                                                           |
-| `Iterable`                            | Number of elements (counted by iterating)                                    |
-| `Map`                                 | Number of entries                                                            |
-| Arrays (all types)                    | Length of the array                                                          |
-| `byte[]`                              | Length of the array                                                          |
-| `Path`                                | File size in bytes (for regular files)                                       |
-| `Optional`                            | Delegates to the contained value                                             |
-| `Reference`                           | Delegates to the referenced value                                            |
-| `Supplier`                            | Delegates to the supplied value                                              |
+| Type                                   | Size meaning                              |
+|----------------------------------------|-------------------------------------------|
+| `CharSequence` (including `String`)    | Number of characters                      |
+| `char[]`                               | Length of the array                       |
+| `Collection` (including `List`, `Set`) | Number of elements                        |
+| `Iterable`                             | Number of elements (counted by iterating) |
+| `Map`                                  | Number of entries                         |
+| Arrays (all types)                     | Length of the array                       |
+| `byte[]`                               | Length of the array                       |
+| `Path`                                 | File size in bytes (for regular files)    |
+| `Optional`                             | Delegates to the contained value          |
+| `Reference`                            | Delegates to the referenced value         |
+| `Supplier`                             | Delegates to the supplied value           |
 
 ```java
 messageSupport

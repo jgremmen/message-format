@@ -17,8 +17,8 @@ now sealed. This means that custom implementations of these interfaces are no lo
 `LocalizedMessageBundleWithCode` and `MessageDelegateWithCode`).
 `Message.LocaleAware` permits `LocalizedMessageBundleWithCode`.
 
-If you have custom classes implementing any of these interfaces, you must refactor your code to use one of the
-permitted implementations or compose behavior by delegating to them.
+Custom classes implementing any of these interfaces must be refactored to use one of the permitted implementations or 
+to compose behavior by delegating to them.
 
 ### Sealed `FormatterService` interface hierarchy
 
@@ -29,8 +29,8 @@ permits only `GenericFormatterService`.
 `GenericFormatterService` is declared as `non-sealed`, so existing subclasses of `GenericFormatterService` (such as
 `DefaultFormatterService`) continue to work without changes.
 
-If you have custom classes that directly implement `FormatterService` or `FormatterService.WithRegistry`, you must
-change them to extend `GenericFormatterService` instead.
+Custom classes that directly implement `FormatterService` or `FormatterService.WithRegistry` must be changed to extend
+`GenericFormatterService` instead.
 
 ### `DefaultFormatterService.getSharedInstance()` now returns a sealed instance
 
@@ -39,7 +39,7 @@ service. The return type remains `FormatterService`, but the instance no longer 
 `FormatterService.WithRegistry`. Any code that cast the shared instance to `FormatterService.WithRegistry` or
 `GenericFormatterService` to register additional formatters will fail at runtime.
 
-To register custom formatters, create your own `DefaultFormatterService` instance:
+To register custom formatters, create a dedicated `DefaultFormatterService` instance:
 
 ```java
 var formatterService = new DefaultFormatterService();
@@ -51,8 +51,8 @@ formatterService.addParameterFormatter(new MyCustomFormatter());
 The `CharsetFormatter` for `java.nio.charset.Charset` values has been removed. `Charset.toString()` already produces
 the charset name, so the dedicated formatter did not add value beyond what the default `String` formatting provides.
 
-If you relied on the `charset:display` or `charset:display-name` configuration to obtain the locale-specific display
-name, format the display name explicitly before passing it as a parameter:
+Code that relied on the `charset:display` or `charset:display-name` configuration to obtain the locale-specific display
+name should format the display name explicitly before passing it as a parameter:
 
 ```java
 messageSupport
@@ -63,15 +63,14 @@ messageSupport
 
 ### `BitsFormatter` removed
 
-The deprecated named formatter `bits` has been removed. Use the new `bitmask` named formatter
-(`BitmaskFormatter`) together with the `BitSetFormatter` as a replacement. See the "New Features" section for details.
+The deprecated named formatter `bits` has been removed. Use the new `bitmask` named formatter (`BitmaskFormatter`) 
+together with the `BitSetFormatter` as a replacement. See the "New Features" section for details.
 
 ### `AbstractMessageWithCode` visibility changed
 
 The class `AbstractMessageWithCode` has been changed from package-private to `public sealed abstract`. While this
-broadens its visibility, the `sealed` modifier restricts subclassing to the permitted classes
-(`EmptyMessageWithCode`, `LocalizedMessageBundleWithCode`, `MessageDelegateWithCode`). External subclasses are not
-allowed.
+broadens its visibility, the `sealed` modifier restricts subclassing to the permitted classes (`EmptyMessageWithCode`, 
+`LocalizedMessageBundleWithCode`, `MessageDelegateWithCode`). External subclasses are not allowed.
 
 
 ## New Features
@@ -93,8 +92,8 @@ In set-bit mode (`lsb-set`/`msb-set`), each set bit is mapped to a message via a
 
 For a `BitSet` with bits 0 and 2 set, this produces `Read, Execute`.
 
-In binary string mode (`lsb-bits`/`msb-bits`), the `bit0` and `bit1` configuration keys control the character
-used for unset and set bits (defaulting to `0` and `1`):
+In binary string mode (`lsb-bits`/`msb-bits`), the `bit0` and `bit1` configuration keys control the character used for
+unset and set bits (defaulting to `0` and `1`):
 
 ```msgfmt
 %{flags, bitset:'msb-bits', bit0:'.', bit1:'#'}
@@ -105,8 +104,8 @@ The formatter inherits all list formatting configuration keys from `AbstractList
 
 ### `BitmaskFormatter` named formatter
 
-A new named parameter formatter `bitmask` converts integral numeric values (`byte`, `short`, `int`, `long`,
-`char`, `BigInteger`) into a `BitSet` and delegates formatting to the registered `BitSetFormatter`.
+A new named parameter formatter `bitmask` converts integral numeric values (`byte`, `short`, `int`, `long`, `char`,
+`BigInteger`) into a `BitSet` and delegates formatting to the registered `BitSetFormatter`.
 
 ```msgfmt
 %{permissions, format:bitmask, 0:'Read', 1:'Write', 2:'Execute'}
@@ -118,8 +117,7 @@ This replaces the removed `BitsFormatter`. Where `bits` produced a raw binary st
 ### Duplicate suppression in list formatting
 
 The `AbstractListFormatter` (used by `ArrayFormatter`, `IterableFormatter`, `MapFormatter` and `BitSetFormatter`)
-now supports a `list-unique` configuration key. When set to `true`, duplicate formatted element texts are
-suppressed:
+now supports a `list-unique` configuration key. When set to `true`, duplicate formatted element texts are suppressed:
 
 ```msgfmt
 %{items, list-unique:true, list-sep:', '}
@@ -149,7 +147,7 @@ var messageSupport = MessageSupportFactory.create(formatterService);
 ### `MessageUtil.isMessageFormatPack(Path)` utility method
 
 A new static method `MessageUtil.isMessageFormatPack(Path)` probes whether a file is a message format pack file. This
-is useful in environments where the `PackFileTypeDetector` service provider is not available due to classloader
+is useful in environments where the `PackFileTypeDetector` service provider is not available due to classloader 
 isolation (e.g. Gradle plugins or IntelliJ IDEA plugins):
 
 ```java

@@ -18,12 +18,12 @@ interfaces, records, pattern matching, etc.).
 The formatter-related packages have been reorganized under a new hierarchy. All parameter formatters have moved from
 `de.sayayi.lib.message.formatter` into sub-packages under `de.sayayi.lib.message.formatter.parameter`:
 
-| Old package | New package |
-|---|---|
-| `de.sayayi.lib.message.formatter` | `de.sayayi.lib.message.formatter.parameter` |
-| `de.sayayi.lib.message.formatter.named` | `de.sayayi.lib.message.formatter.parameter.named` |
-| `de.sayayi.lib.message.formatter.named.extra` | `de.sayayi.lib.message.formatter.parameter.named.extra` |
-| `de.sayayi.lib.message.formatter.runtime` | `de.sayayi.lib.message.formatter.parameter.runtime` |
+| Old package                                     | New package                                               |
+|-------------------------------------------------|-----------------------------------------------------------|
+| `de.sayayi.lib.message.formatter`               | `de.sayayi.lib.message.formatter.parameter`               |
+| `de.sayayi.lib.message.formatter.named`         | `de.sayayi.lib.message.formatter.parameter.named`         |
+| `de.sayayi.lib.message.formatter.named.extra`   | `de.sayayi.lib.message.formatter.parameter.named.extra`   |
+| `de.sayayi.lib.message.formatter.runtime`       | `de.sayayi.lib.message.formatter.parameter.runtime`       |
 | `de.sayayi.lib.message.formatter.runtime.extra` | `de.sayayi.lib.message.formatter.parameter.runtime.extra` |
 
 The following interfaces have been moved accordingly:
@@ -34,7 +34,7 @@ The following interfaces have been moved accordingly:
 - `AbstractSingleTypeParameterFormatter` is now at `de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter`
 - `AbstractMultiSelectFormatter` is now at `de.sayayi.lib.message.formatter.parameter.AbstractMultiSelectFormatter`
 
-Update all import statements in your code to reflect the new package paths.
+Update all import statements in the codebase to reflect the new package paths.
 
 ### `ParameterPostFormatter` replaced by `PostFormatter`
 
@@ -42,9 +42,8 @@ The `ParameterPostFormatter` interface in the `de.sayayi.lib.message.formatter` 
 by a new `PostFormatter` interface at `de.sayayi.lib.message.formatter.post.PostFormatter`. The `ClipPostFormatter`
 has been moved to `de.sayayi.lib.message.formatter.post.runtime.ClipPostFormatter`.
 
-The service loader declaration has changed accordingly. If you have custom post formatter implementations registered
-via `META-INF/services`, update the service file name from
-`de.sayayi.lib.message.formatter.ParameterPostFormatter` to
+The service loader declaration has changed accordingly. For custom post formatter implementations registered via 
+`META-INF/services`, update the service file name from `de.sayayi.lib.message.formatter.ParameterPostFormatter` to
 `de.sayayi.lib.message.formatter.post.PostFormatter`.
 
 ### `ParameterConfig` removed and replaced by `MessagePart.Config` and `MessagePart.Map`
@@ -63,19 +62,19 @@ Code that previously called `getParamConfig()` on a `MessagePart.Parameter` must
 The `ConfigKey` and `ConfigValue` types from `de.sayayi.lib.message.part.parameter.key` and
 `de.sayayi.lib.message.part.parameter.value` have been removed. Map keys are now represented by `MapKey`
 (in `de.sayayi.lib.message.part`) and configuration values by `TypedValue<?>` (in `de.sayayi.lib.message.part`).
-The concrete key implementations (`ConfigKeyBool`, `ConfigKeyNull`, etc.) have been moved to internal packages and
-are no longer part of the public API.
+The concrete key implementations (`ConfigKeyBool`, `ConfigKeyNull`, etc.) have been moved to internal packages and are
+no longer part of the public API.
 
 ### `MessagePart` interfaces are now sealed
 
 The `MessagePart` interface hierarchy is now sealed. `MessagePart` permits only `MessagePart.Text` and
-`MessagePart.NamedMessagePart`. `NamedMessagePart` permits `MessagePart.Parameter`, `MessagePart.Template` and the
-new `MessagePart.PostFormat`. Custom implementations of these interfaces are no longer allowed.
+`MessagePart.NamedMessagePart`. `NamedMessagePart` permits `MessagePart.Parameter`, `MessagePart.Template` and the new 
+`MessagePart.PostFormat`. Custom implementations of these interfaces are no longer allowed.
 
 ### `SortedArrayMap` moved to internal package
 
-`SortedArrayMap` has been moved from `de.sayayi.lib.message.util` to an internal package and is no longer accessible
-as public API.
+`SortedArrayMap` has been moved from `de.sayayi.lib.message.util` to an internal package and is no longer accessible as
+public API.
 
 ### `MatcherFormatter` renamed to `MatchResultFormatter`
 
@@ -105,8 +104,8 @@ messageSupport.setDefaultConfig("clip", 20);
 ### `getParameterPostFormatters` replaced by `getPostFormatter`
 
 The `getParameterPostFormatters()` method on `MessageAccessor` (which returned a `Map<String,ParameterPostFormatter>`)
-has been replaced by `getPostFormatter(String)` which returns a single `PostFormatter` for the given name, or `null`
-if not found.
+has been replaced by `getPostFormatter(String)` which returns a single `PostFormatter` for the given name, or `null` if
+not found.
 
 ### `getFormatters` signature changed
 
@@ -142,7 +141,7 @@ The `importMessages` method on `ConfigurableMessageSupport` no longer accepts va
 `MessageUtil.importMessages(InputStream, Consumer<Message.WithCode>, BiConsumer<String,Message.WithSpaces>)` is
 available for lower-level control over imported messages and templates.
 
-If you previously used:
+Code that previously used:
 
 ```java
 messageSupport.importMessages(stream1, stream2);
@@ -214,13 +213,13 @@ Now:
 %{myParam, format:string, clip:20}
 ```
 
-Additionally, configuration entries and map entries within a parameter can now appear in any order. In the old
-syntax, the format had to come first, followed by configuration/map entries, followed by the default message.
+Additionally, configuration entries and map entries within a parameter can now appear in any order. In the old syntax, 
+the format had to come first, followed by configuration/map entries, followed by the default message.
 
 ### `clip-ellipsis` renamed to `clip-suffix`
 
-The `clip-ellipsis` configuration parameter for the clip post formatter has been renamed to `clip-suffix`.
-A new configuration parameter `clip-suffix-text` allows customizing the suffix text appended when clipping.
+The `clip-ellipsis` configuration parameter for the clip post formatter has been renamed to `clip-suffix`. A new 
+configuration parameter `clip-suffix-text` allows customizing the suffix text appended when clipping.
 
 ### Naming conventions enforced
 
@@ -230,16 +229,16 @@ produce a syntax error:
 - **Parameter names** and **template parameter delegate names**: lower camelCase or kebab-case
 - **Template names**, **parameter format names**, **post formatter names** and **config names**: kebab-case
 
-Messages that previously used names not matching these conventions (e.g. underscores in parameter names or
-uppercase letters in template names) will fail to parse.
+Messages that previously used names not matching these conventions (e.g. underscores in parameter names or uppercase
+letters in template names) will fail to parse.
 
 ### Tika detector no longer declared in `module-info.java`
 
 The `requires static org.apache.tika.core` directive and the `provides org.apache.tika.detect.Detector` declaration
-have been removed from `module-info.java`. The `PackTikaDetector` class still exists and is still registered via
-the `META-INF/services/org.apache.tika.detect.Detector` service provider file, so it remains available on the
-classpath. However, in a modular (JPMS) environment Tika will no longer automatically discover the detector through
-the module system.
+have been removed from `module-info.java`. The `PackTikaDetector` class still exists and is still registered via the 
+`META-INF/services/org.apache.tika.detect.Detector` service provider file, so it remains available on the classpath. 
+However, in a modular (JPMS) environment Tika will no longer automatically discover the detector through the module 
+system.
 
 ### `FormatterContext` removed
 
@@ -249,9 +248,9 @@ under a new type.
 
 ### `StreamFormatter` removed
 
-The `StreamFormatter` has been removed. Formatting a `Stream` requires consuming it, which mutates the stream's
-state and makes it unusable afterwards. This side effect is unacceptable in a formatting context. Collect the stream
-into a list or array before passing it to the formatter.
+The `StreamFormatter` has been removed. Formatting a `Stream` requires consuming it, which mutates the stream's state
+and makes it unusable afterwards. This side effect is unacceptable in a formatting context. Collect the stream into a 
+list or array before passing it to the formatter.
 
 ### `SpacesUtil` removed
 
@@ -267,12 +266,12 @@ interfaces in `de.sayayi.lib.message.part`.
 
 ### Dependency changes
 
-| Dependency | Type | 0.20.1 | 0.21.0 |
-|---|---|---|---|
-| de.sayayi.lib:antlr4-runtime-ext | compile | [0.6,0.7) | [0.6,0.8) |
-| de.sayayi.lib:pack | compile | [0.1.3,0.2) | [0.1.3,0.3) |
-| org.springframework:spring-core | compile | [5.0,6.0) | [5.0,7.0) |
-| org.springframework:spring-context | compile | [5.0,6.0) | [5.0,7.0) |
+| Dependency                         | Type    | 0.20.1      | 0.21.0      |
+|------------------------------------|---------|-------------|-------------|
+| de.sayayi.lib:antlr4-runtime-ext   | compile | [0.6,0.7)   | [0.6,0.8)   |
+| de.sayayi.lib:pack                 | compile | [0.1.3,0.2) | [0.1.3,0.3) |
+| org.springframework:spring-core    | compile | [5.0,6.0)   | [5.0,7.0)   |
+| org.springframework:spring-context | compile | [5.0,6.0)   | [5.0,7.0)   |
 
 
 ## New Features
@@ -287,8 +286,8 @@ contained message using a named post formatter. The syntax uses parentheses:
 ```
 
 This applies the `case` post formatter to the message `hello world` with the configuration `case:'upper'`.
-Post formatters implement the `PostFormatter` interface in `de.sayayi.lib.message.formatter.post` and are
-discovered via `ServiceLoader`.
+Post formatters implement the `PostFormatter` interface in `de.sayayi.lib.message.formatter.post` and are discovered 
+via `ServiceLoader`.
 
 Two built-in post formatters are provided:
 
@@ -299,13 +298,13 @@ The `case` post formatter converts text to uppercase or lowercase based on the `
 
 ### Compound message validation
 
-The parser now validates the list of message parts for compound messages, rejecting invalid combinations at parse
-time rather than at format time.
+The parser now validates the list of message parts for compound messages, rejecting invalid combinations at parse time
+rather than at format time.
 
 ### `MessageBuilder` fluent API
 
-A new fluent builder API allows constructing `Message` instances programmatically without parsing a format string.
-Use `MessageBuilder.create()` or `MessageFactory.messageBuilder()` to obtain a builder:
+A new fluent builder API allows constructing `Message` instances programmatically without parsing a format string. Use
+`MessageBuilder.create()` or `MessageFactory.messageBuilder()` to obtain a builder:
 
 ```java
 // builds: Hello %{name,format:string}!
@@ -322,8 +321,8 @@ The builder supports all four message part types: text, parameter, post formatte
 
 ### `Message#asFormatString(Charset)`
 
-Messages can now be serialized back into their message format string representation. This is useful for debugging
-or exporting messages in a human-readable form:
+Messages can now be serialized back into their message format string representation. This is useful for debugging or 
+exporting messages in a human-readable form:
 
 ```java
 String formatString = message.asFormatString(StandardCharsets.UTF_8);
@@ -333,8 +332,8 @@ Characters that cannot be encoded by the specified charset are serialized as Uni
 
 ### `Text.getTextNotNull()`
 
-A new method `getTextNotNull()` on `MessagePart.Text` returns the trimmed text as a non-null `String`, returning
-an empty string instead of `null` for empty text parts.
+A new method `getTextNotNull()` on `MessagePart.Text` returns the trimmed text as a non-null `String`, returning an 
+empty string instead of `null` for empty text parts.
 
 ### Message caching in `MessageFactory`
 
@@ -354,21 +353,21 @@ parameter value. This is useful for grouping values into categories and selectin
 
 ### `DictionaryFormatter`
 
-A new `DictionaryFormatter` handles `java.util.Dictionary` values by looking up entries using a key specified via
-the `key` configuration parameter. This formatter takes priority over `MapFormatter` for `Dictionary` subtypes
-(e.g. `Hashtable`) to ensure correct handling.
+A new `DictionaryFormatter` handles `java.util.Dictionary` values by looking up entries using a key specified via the 
+`key` configuration parameter. This formatter takes priority over `MapFormatter` for `Dictionary` subtypes (e.g. 
+`Hashtable`) to ensure correct handling.
 
 ### `InstantSource` support in temporal delegation
 
-The `TemporalFormatter` now handles the more generic `java.time.InstantSource` in addition to `java.time.Clock`
-for temporal parameter delegation.
+The `TemporalFormatter` now handles the more generic `java.time.InstantSource` in addition to `java.time.Clock` for
+temporal parameter delegation.
 
 ### Auto-application of named formatters
 
 Named formatters can now declare that they should be automatically applied when a parameter's configuration contains
 one of their config names, even without an explicit `format:` specification. This is controlled by the new
-`autoApplyOnNamedConfigParameter()` method on `NamedParameterFormatter`. The `getFormatters` method on
-`MessageAccessor` takes the parameter configuration into account when resolving formatters.
+`autoApplyOnNamedConfigParameter()` method on `NamedParameterFormatter`. The `getFormatters` method on `MessageAccessor` 
+takes the parameter configuration into account when resolving formatters.
 
 ### Log4j integration module (`message-format-log4j`)
 
@@ -388,7 +387,6 @@ propagated as the message's throwable for Log4j stack trace rendering.
 A new utility class `MessageUtil` in `de.sayayi.lib.message.util` consolidates various message-related helper
 methods, including `importMessages` (moved from `MessageSupport`), name validation, space character detection and
 string trimming.
-
 
 
 ## Bug Fixes

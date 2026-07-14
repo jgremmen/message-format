@@ -25,15 +25,15 @@ map keys in order. The first match wins.
 
 The following table lists the most common classifiers and the types that produce them.
 
-| Classifier   | Produced by                                                                       |
-|--------------|-----------------------------------------------------------------------------------|
-| `null`       | Any `null` value                                                                  |
-| `bool`       | `Boolean`, `AtomicBoolean`, `BooleanSupplier`                                     |
-| `number`     | All `Number` types, `IntSupplier`, `DoubleSupplier`, `OptionalInt`, `OptionalLong` |
-| `string`     | `CharSequence` (including `String`), `char[]`                                     |
-| `enum`       | All `Enum` types                                                                  |
-| `list`       | `Iterable`, `Collection`, arrays, `Map`, `BitSet` (in set-bit mode)               |
-| `temporal`   | All temporal types (`LocalDate`, `Instant`, `ZonedDateTime`, etc.)                 |
+| Classifier | Produced by                                                                        |
+|------------|------------------------------------------------------------------------------------|
+| `null`     | Any `null` value                                                                   |
+| `bool`     | `Boolean`, `AtomicBoolean`, `BooleanSupplier`                                      |
+| `number`   | All `Number` types, `IntSupplier`, `DoubleSupplier`, `OptionalInt`, `OptionalLong` |
+| `string`   | `CharSequence` (including `String`), `char[]`                                      |
+| `enum`     | All `Enum` types                                                                   |
+| `list`     | `Iterable`, `Collection`, arrays, `Map`, `BitSet` (in set-bit mode)                |
+| `temporal` | All temporal types (`LocalDate`, `Instant`, `ZonedDateTime`, etc.)                 |
 
 Some formatters also add more specific classifiers before the general ones. For example, a `Locale` value produces the
 classifier `locale` first, followed by `string` when a string-producing configuration is active. A `Path` value 

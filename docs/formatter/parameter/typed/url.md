@@ -7,18 +7,18 @@ parameter value is a `URL`. By default, it outputs the full external form of the
 
 The `url` configuration key controls which component of the URL to display:
 
-| Value         | Output                                                                    |
-|---------------|---------------------------------------------------------------------------|
-| `external`    | Full external form of the URL (default when no config is set)            |
-| `authority`   | Authority component (e.g. `host:8080`)                                   |
-| `file`        | File component (path + query)                                            |
-| `host`        | Host name                                                                |
-| `path`        | Path component                                                           |
-| `port`        | Port number (falls back to the protocol's default port if not specified)  |
-| `protocol`    | Protocol (e.g. `https`, `ftp`)                                           |
-| `query`       | Query string (after `?`)                                                 |
-| `user-info`   | User info component (before `@`)                                         |
-| `ref`         | Reference/fragment component (after `#`)                                 |
+| Value       | Output                                                                   |
+|-------------|--------------------------------------------------------------------------|
+| `external`  | Full external form of the URL (default when no config is set)            |
+| `authority` | Authority component (e.g. `host:8080`)                                   |
+| `file`      | File component (path + query)                                            |
+| `host`      | Host name                                                                |
+| `path`      | Path component                                                           |
+| `port`      | Port number (falls back to the protocol's default port if not specified) |
+| `protocol`  | Protocol (e.g. `https`, `ftp`)                                           |
+| `query`     | Query string (after `?`)                                                 |
+| `user-info` | User info component (before `@`)                                         |
+| `ref`       | Reference/fragment component (after `#`)                                 |
 
 
 ## Full URL

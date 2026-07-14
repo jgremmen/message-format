@@ -50,14 +50,14 @@ The `date` configuration key controls the output format. It accepts predefined s
 
 #### Predefined Styles
 
-| Style      | Description                          |
-|------------|--------------------------------------|
-| `short`    | Short date and/or time               |
-| `medium`   | Medium date and/or time (default)    |
-| `long`     | Long date and/or time                |
-| `full`     | Full date and/or time                |
-| `date`     | Date only (medium style)             |
-| `time`     | Time only (medium style)             |
+| Style    | Description                       |
+|----------|-----------------------------------|
+| `short`  | Short date and/or time            |
+| `medium` | Medium date and/or time (default) |
+| `long`   | Long date and/or time             |
+| `full`   | Full date and/or time             |
+| `date`   | Date only (medium style)          |
+| `time`   | Time only (medium style)          |
 
 The formatter automatically omits the date or time portion if the temporal value does not support the necessary fields.
 For example, formatting a `LocalDate` with `date:short` produces a short date (no time), while formatting a `LocalTime`

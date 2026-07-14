@@ -7,17 +7,17 @@ parameter value is a `URI`. By default, it outputs the full URI string represent
 
 The `uri` configuration key controls which component of the URI to display:
 
-| Value         | Output                                             |
-|---------------|----------------------------------------------------|
-| `default`     | Full URI string (default when no config is set)    |
-| `authority`   | Authority component (e.g. `user@host:8080`)        |
-| `fragment`    | Fragment component (after `#`)                     |
-| `host`        | Host name                                          |
-| `path`        | Path component                                     |
-| `port`        | Port number (empty when not specified)             |
-| `query`       | Query string (after `?`)                           |
-| `scheme`      | Scheme (e.g. `https`, `ftp`)                       |
-| `user-info`   | User info component (before `@`)                   |
+| Value       | Output                                          |
+|-------------|-------------------------------------------------|
+| `default`   | Full URI string (default when no config is set) |
+| `authority` | Authority component (e.g. `user@host:8080`)     |
+| `fragment`  | Fragment component (after `#`)                  |
+| `host`      | Host name                                       |
+| `path`      | Path component                                  |
+| `port`      | Port number (empty when not specified)          |
+| `query`     | Query string (after `?`)                        |
+| `scheme`    | Scheme (e.g. `https`, `ftp`)                    |
+| `user-info` | User info component (before `@`)                |
 
 
 ## Full URI

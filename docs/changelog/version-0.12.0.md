@@ -58,11 +58,11 @@ implementation "de.sayayi.lib:message-format-asm:0.12.0"
 
 All classes in the `message-format-spring` module have moved to new packages:
 
-| Class | 0.11.0 | 0.12.0 |
-|---|---|---|
-| `MessageSupportMessageSource` | `de.sayayi.lib.message` | `de.sayayi.lib.message.spring` |
-| `SpringAsmAnnotationAdopter` | `de.sayayi.lib.message.adopter` | `de.sayayi.lib.message.spring.adopter` |
-| `SpELFormatter` | `de.sayayi.lib.message.formatter.spring` | `de.sayayi.lib.message.spring.formatter` |
+| Class                         | 0.11.0                                   | 0.12.0                                   |
+|-------------------------------|------------------------------------------|------------------------------------------|
+| `MessageSupportMessageSource` | `de.sayayi.lib.message`                  | `de.sayayi.lib.message.spring`           |
+| `SpringAsmAnnotationAdopter`  | `de.sayayi.lib.message.adopter`          | `de.sayayi.lib.message.spring.adopter`   |
+| `SpELFormatter`               | `de.sayayi.lib.message.formatter.spring` | `de.sayayi.lib.message.spring.formatter` |
 
 All import statements for these classes must be updated accordingly.
 

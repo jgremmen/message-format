@@ -8,13 +8,13 @@ context's locale.
 
 The `locale` configuration key controls which aspect of the locale to display:
 
-| Value                  | Output                                              |
-|------------------------|-----------------------------------------------------|
-| `name` (default)       | Full display name (e.g. "English (United Kingdom)") |
-| `country`              | Country display name (e.g. "United Kingdom")        |
-| `lang` or `language`   | Language display name (e.g. "English")              |
-| `script`               | Script display name (e.g. "Latin")                  |
-| `variant`              | Variant display name                                |
+| Value                | Output                                              |
+|----------------------|-----------------------------------------------------|
+| `name` (default)     | Full display name (e.g. "English (United Kingdom)") |
+| `country`            | Country display name (e.g. "United Kingdom")        |
+| `lang` or `language` | Language display name (e.g. "English")              |
+| `script`             | Script display name (e.g. "Latin")                  |
+| `variant`            | Variant display name                                |
 
 All display names are resolved using the formatting context's locale, so the output language depends on the locale set
 on the `MessageSupport` instance, not on the parameter value itself.
