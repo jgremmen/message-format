@@ -69,7 +69,7 @@ public final class ClipPostFormatter implements PostFormatter
   @SuppressWarnings("UnnecessaryUnicodeEscape")
   public @NotNull String format(@NotNull String string, @NotNull PostFormatterContext context)
   {
-    var maxSize = (int)context.getConfigValueNumber("clip").orElse(0);
+    var maxSize = context.getConfigValueInt("clip").orElse(0);
     if (maxSize > 0)
     {
       if (context.getConfigValueBool("clip-suffix").orElse(true))

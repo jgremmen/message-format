@@ -20,13 +20,21 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.OptionalLong;
 
 
 /**
- * This interface provides access to the message part configuration.
+ * Provides typed access to message part configuration values.
+ * <p>
+ * A configuration consists of named key-value pairs that control how a message parameter is formatted. This interface
+ * offers convenience methods for retrieving configuration values as specific types (string, number, boolean, message).
+ * If a key is not present in the local configuration, the message support is consulted for a default value.
  *
  * @since 0.8.4
+ *
+ * @see MessagePart.Config
+ * @see TypedValue
  */
 public interface ConfigAccessor
 {
@@ -44,8 +52,8 @@ public interface ConfigAccessor
   /**
    * Gets a configuration value for named key {@code name}.
    * <p>
-   * The value is taken from the configuration map. If no such key is found the
-   * message support is queried for a default configuration value.
+   * The value is taken from the configuration map. If no such key is found the message support is queried for a
+   * default configuration value.
    *
    * @param name  configuration key, not {@code null}
    *
@@ -58,11 +66,11 @@ public interface ConfigAccessor
   /**
    * Gets a string configuration value for named key {@code name}.
    * <p>
-   * The value is taken from the configuration map. If no such key is found the
-   * message support is queried for a default configuration value.
+   * The value is taken from the configuration map. If no such key is found the message support is queried for a
+   * default configuration value.
    * <p>
-   * If a value is found for the given {@code name} but the type is not a string, the method
-   * returns {@link Optional#empty()}.
+   * If a value is found for the given {@code name} but the type is not a string, the method returns
+   * {@link Optional#empty()}.
    *
    * @param name  configuration key, not {@code null}
    *
@@ -73,30 +81,52 @@ public interface ConfigAccessor
 
 
   /**
-   * Gets a number configuration value for named key {@code name}.
+   * Gets a long configuration value for named key {@code name}.
    * <p>
-   * The value is taken from the configuration map. If no such key is found the
-   * message support is queried for a default configuration value.
+   * The value is taken from the configuration map. If no such key is found the message support is queried for a
+   * default configuration value.
    * <p>
-   * If a value is found for the given {@code name} but the type is not a number, the method
-   * returns {@link Optional#empty()}.
+   * If a value is found for the given {@code name} but the type is not a number, the method returns
+   * {@link OptionalLong#empty()}.
    *
    * @param name  configuration key, not {@code null}
    *
-   * @return  optional number instance representing the found value, never {@code null}
+   * @return  optional long instance representing the found value, never {@code null}
+   *
+   * @since 0.24.0
    */
   @Contract(pure = true)
-  @NotNull OptionalLong getConfigValueNumber(@NotNull String name);
+  @NotNull OptionalLong getConfigValueLong(@NotNull String name);
+
+
+  /**
+   * Gets an integer configuration value for named key {@code name}.
+   * <p>
+   * The value is taken from the configuration map. If no such key is found the message support is queried for a
+   * default configuration value.
+   * <p>
+   * If a value is found for the given {@code name} but the type is not a number, or the number value is outside the
+   * integer range ({@link Integer#MIN_VALUE} to {@link Integer#MAX_VALUE}), the method returns
+   * {@link OptionalInt#empty()}.
+   *
+   * @param name  configuration key, not {@code null}
+   *
+   * @return  optional integer instance representing the found value, never {@code null}
+   *
+   * @since 0.24.0
+   */
+  @Contract(pure = true)
+  @NotNull OptionalInt getConfigValueInt(@NotNull String name);
 
 
   /**
    * Gets a boolean configuration value for named key {@code name}.
    * <p>
-   * The value is taken from the configuration map. If no such key is found the
-   * message support is queried for a default configuration value.
+   * The value is taken from the configuration map. If no such key is found the message support is queried for a
+   * default configuration value.
    * <p>
-   * If a value is found for the given {@code name} but the type is not boolean, the method
-   * returns {@link Optional#empty()}.
+   * If a value is found for the given {@code name} but the type is not boolean, the method returns
+   * {@link Optional#empty()}.
    *
    * @param name  configuration key, not {@code null}
    *
@@ -109,11 +139,11 @@ public interface ConfigAccessor
   /**
    * Gets a message configuration value for named key {@code name}.
    * <p>
-   * The value is taken from the configuration map. If no such key is found the
-   * message support is queried for a default configuration value.
+   * The value is taken from the configuration map. If no such key is found the message support is queried for a
+   * default configuration value.
    * <p>
-   * If a value is found for the given {@code name} but the type is not a string nor a message,
-   * the method returns {@link Optional#empty()}.
+   * If a value is found for the given {@code name} but the type is not a string nor a message, the method returns
+   * {@link Optional#empty()}.
    *
    * @param name  configuration key, not {@code null}
    *

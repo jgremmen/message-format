@@ -158,7 +158,7 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
         ? new UniqueTextIterator(createIterator(context, list))
         : createIterator(context, list);
 
-    var n = (int)context.getConfigValueNumber(CONFIG_MAX_SIZE).orElse(MAX_VALUE);
+    var n = context.getConfigValueInt(CONFIG_MAX_SIZE).orElse(MAX_VALUE);
 
     if (n == 0 && iterator.hasNext() && hasMoreValue)
       joiner.addNoSpace(moreValue);

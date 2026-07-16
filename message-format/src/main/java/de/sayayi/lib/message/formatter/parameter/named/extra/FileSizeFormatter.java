@@ -105,7 +105,7 @@ public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
     final var size = value.longValue();
     final var s = new StringBuilder();
     final int unitIndex;
-    var scale = normalizeScale(context.getConfigValueNumber("scale").orElse(1));
+    var scale = normalizeScale(context.getConfigValueInt("scale").orElse(1));
 
     if (size <= 0)
     {
@@ -135,7 +135,7 @@ public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
   }
 
 
-  private static int normalizeScale(long scale) {
+  private static int normalizeScale(int scale) {
     return scale < 0 ? 0 : (int)Math.min(scale, 3);
   }
 

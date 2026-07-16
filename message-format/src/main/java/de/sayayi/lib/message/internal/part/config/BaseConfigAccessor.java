@@ -24,9 +24,11 @@ import de.sayayi.lib.message.part.TypedValue.BoolValue;
 import de.sayayi.lib.message.part.TypedValue.MessageValue;
 import de.sayayi.lib.message.part.TypedValue.NumberValue;
 import de.sayayi.lib.message.part.TypedValue.StringValue;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.OptionalLong;
 
 import static java.util.Optional.ofNullable;
@@ -102,13 +104,43 @@ public class BaseConfigAccessor implements ConfigAccessor
    * {@inheritDoc}
    */
   @Override
-  public @NotNull OptionalLong getConfigValueNumber(@NotNull String name)
+  public @NotNull OptionalLong getConfigValueLong(@NotNull String name)
   {
     return config.getConfigValue(name) instanceof NumberValue cvn
         ? OptionalLong.of(cvn.longValue())
         : messageAccessor.getDefaultConfig(name) instanceof NumberValue cvn
             ? OptionalLong.of(cvn.longValue())
             : OptionalLong.empty();
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public @NotNull OptionalInt getConfigValueInt(@NotNull String name)
+  {
+    return config.getConfigValue(name) instanceof NumberValue cvn && isIntegerRange(cvn)
+        ? OptionalInt.of(cvn.intValue())
+        : messageAccessor.getDefaultConfig(name) instanceof NumberValue cvn && isIntegerRange(cvn)
+            ? OptionalInt.of(cvn.intValue())
+            : OptionalInt.empty();
+  }
+
+
+  /**
+   * Checks whether the given number value fits within the range of an integer.
+   *
+   * @param numberValue  the number value to check, not {@code null}
+   *
+   * @return  {@code true} if the value fits in an integer, {@code false} otherwise
+   */
+  @Contract(pure = true)
+  private boolean isIntegerRange(@NotNull NumberValue numberValue)
+  {
+    final var n = numberValue.longValue();
+
+    return n >= Integer.MIN_VALUE && n <= Integer.MAX_VALUE;
   }
 
 
