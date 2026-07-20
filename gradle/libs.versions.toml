@@ -4,6 +4,7 @@ message-format = '0.24.0-SNAPSHOT'
 
 antlr4 = '[4.13.0,4.14)'
 antlr4-ext = '[0.6,0.8)'
+icu4j = '[78.0,79.0)'
 jetbrains-annotations = '[24.0,26.2)'
 junit = '6.1.+'
 log4j = '[2.0,3.0)'
@@ -16,6 +17,7 @@ spring = '[5.0,7.1)'
 antlr4 = { module = 'org.antlr:antlr4', version.ref = "antlr4" }
 antlr4-runtime = { module = 'org.antlr:antlr4-runtime', version.ref = 'antlr4' }
 antlr4-ext-runtime = { module = 'de.sayayi.lib:antlr4-runtime-ext', version.ref = 'antlr4-ext' }
+icu4j = { module = 'com.ibm.icu:icu4j', version.ref = 'icu4j' }
 jetbrains-annotations = { module = 'org.jetbrains:annotations', version.ref = 'jetbrains-annotations' }
 log4j-api = { module = 'org.apache.logging.log4j:log4j-api', version.ref = 'log4j' }
 log4j-core = { module = 'org.apache.logging.log4j:log4j-core', version.ref = 'log4j' }

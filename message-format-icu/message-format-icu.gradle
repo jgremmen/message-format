@@ -23,7 +23,7 @@ description = 'Message Format Library (ICU formatter)'
 dependencies {
   implementation project(':message-format')
 
-  implementation("com.ibm.icu:icu4j:78.3")
+  implementation libs.icu4j
 
   testImplementation project(path: ':message-format', configuration: 'testOutput')
 }
@@ -31,8 +31,8 @@ dependencies {
 
 javadoc {
   (options as StandardJavadocDocletOptions).with {
-    group('Log4j', [
-        'de.sayayi.lib.message.log4j',
+    group('ICU', [
+        'de.sayayi.lib.message.icu',
     ])
 
     linksOffline(
@@ -58,6 +58,6 @@ publishing {
 
 ext.releaseTask.configure {
   if (snapshot) {
-    dependsOn ':message-format-log4j:publishOSSRHPublicationToMavenCentralSnapshotRepository'
+    dependsOn ':message-format-icu:publishOSSRHPublicationToMavenCentralSnapshotRepository'
   }
 }
