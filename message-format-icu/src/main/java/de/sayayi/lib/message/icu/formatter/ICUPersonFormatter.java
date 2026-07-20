@@ -70,6 +70,11 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
       "order", "usage", "formality", "length");
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  {@code "icu-person"}, never {@code null}
+   */
   @Override
   @Contract(pure = true)
   public @NotNull String getName() {
@@ -77,6 +82,21 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
   }
 
 
+  /**
+   * Formats a person name by assembling the name parts obtained from the parameter context.
+   * <p>
+   * The name parts ({@code given-name}, {@code family-name}, {@code middle-name}, {@code prefix} and {@code suffix})
+   * are read from the context parameters. If both {@code given-name} and {@code family-name} are absent, the
+   * {@linkplain #formatNull(ParameterFormatterContext) null format} is used.
+   * <p>
+   * For {@link Usage#MONOGRAM monogram} usage, the ICU {@link PersonNameFormatter} is used to produce locale-specific
+   * initials. For all other usages, the name is assembled manually based on the per-part format configuration.
+   *
+   * @param context  the formatter context providing parameter values and configuration, not {@code null}
+   * @param value    the parameter value (unused, name parts are read from named parameters)
+   *
+   * @return  the formatted person name as text, never {@code null}
+   */
   @Override
   public @NotNull Text format(@NotNull ParameterFormatterContext context, Object value)
   {
@@ -135,6 +155,10 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
   }
 
 
+  /**
+   * Formats a person name using the ICU {@link PersonNameFormatter}, which provides locale-sensitive
+   * name formatting. This method is used for {@link Usage#MONOGRAM monogram} usage.
+   */
   private static @NotNull Text formatWithICU(Locale locale, String givenName, String familyName, String middleName,
                                              String prefix, String suffix, Order order, Usage usage,
                                              Formality formality, Length length)
@@ -172,6 +196,10 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
   }
 
 
+  /**
+   * Assembles a person name manually based on per-part format settings. Each name part is individually
+   * formatted according to its configured format before assembly.
+   */
   private static @NotNull Text formatManually(String givenName, String familyName, String middleName, String prefix,
                                               String suffix, PartFormat givenFormat, PartFormat familyFormat,
                                               PartFormat middleFormat, PresenceFormat prefixFormat,
@@ -197,6 +225,7 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
   }
 
 
+  /** Assembles name parts in given-first order: prefix, given, middle, family, suffix. */
   private static void assembleGivenFirst(@NotNull StringBuilder sb, String given, String middle, String family,
                                          String prefix, String suffix)
   {
@@ -213,6 +242,10 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
   }
 
 
+  /**
+   * Assembles name parts in surname-first order: family, prefix, given, middle, suffix.
+   * In sorting mode, a comma separates the family name from the remaining parts.
+   */
   private static void assembleSurnameFirst(@NotNull StringBuilder sb, String family, String given, String middle,
                                            String prefix, String suffix, boolean sorting)
   {
@@ -233,6 +266,11 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  unmodifiable set of supported configuration key names, never {@code null}
+   */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return CONFIG_NAMES;
@@ -243,12 +281,28 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
 
   /**
    * Format for name parts that support full, initial and none.
+   *
+   * @see #apply(String)
    */
   public enum PartFormat
   {
-    FULL, INITIAL, NONE;
+    /** Show the full name part. */
+    FULL,
+
+    /** Show only the first character followed by a period. */
+    INITIAL,
+
+    /** Omit the name part entirely. */
+    NONE;
 
 
+    /**
+     * Applies this format to the given name part value.
+     *
+     * @param value  the name part value, or {@code null}
+     *
+     * @return  the formatted value, or {@code null} if the part should be omitted
+     */
     @Contract(pure = true)
     String apply(String value)
     {
@@ -265,12 +319,25 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
 
   /**
    * Format for prefix/suffix parts that only support full and none.
+   *
+   * @see #apply(String)
    */
   public enum PresenceFormat
   {
-    FULL, NONE;
+    /** Include the part as-is. */
+    FULL,
+
+    /** Omit the part entirely. */
+    NONE;
 
 
+    /**
+     * Applies this format to the given prefix or suffix value.
+     *
+     * @param value  the prefix or suffix value, or {@code null}
+     *
+     * @return  the value unchanged for {@link #FULL}, or {@code null} for {@link #NONE}
+     */
     @Contract(pure = true)
     String apply(String value) {
       return this == NONE ? null : value;
@@ -281,12 +348,17 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
 
 
   /**
-   * Name display order.
+   * Name display order, mapping to the corresponding ICU {@link DisplayOrder} values.
    */
   public enum Order
   {
+    /** Given name appears before the family name. */
     GIVEN_FIRST(DisplayOrder.FORCE_GIVEN_FIRST),
+
+    /** Family name appears before the given name. */
     SURNAME_FIRST(DisplayOrder.FORCE_SURNAME_FIRST),
+
+    /** Family name first, separated by a comma for sorting purposes. */
     SORTING(DisplayOrder.SORTING);
 
     final DisplayOrder displayOrder;

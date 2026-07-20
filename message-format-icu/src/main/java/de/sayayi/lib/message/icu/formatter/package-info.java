@@ -15,33 +15,24 @@
  */
 
 /**
- * Provides ICU4J-based parameter formatters for the message-format library.
+ * Named parameter formatter implementations that integrate ICU4J formatting capabilities into the message-format
+ * library.
  * <p>
- * This module extends the core {@code de.sayayi.lib.message} library with formatters that leverage the
- * <a href="https://unicode-org.github.io/icu/userguide/icu4j/">ICU4J</a> library for advanced locale-sensitive
- * formatting:
+ * This package provides the following formatters:
  * <ul>
  *   <li>
  *     {@link de.sayayi.lib.message.icu.formatter.ICUFormatter ICUFormatter} ({@code icu}) – formats parameter values
- *     using ICU {@link com.ibm.icu.text.MessageFormat MessageFormat} patterns, supporting plurals, select expressions
- *     and locale-aware number/date formatting.
+ *     using ICU {@link com.ibm.icu.text.MessageFormat MessageFormat} patterns, providing access to ICU's rich
+ *     locale-sensitive formatting features such as plurals, select and number/date formatting.
  *   </li>
  *   <li>
  *     {@link de.sayayi.lib.message.icu.formatter.ICUPersonFormatter ICUPersonFormatter} ({@code icu-person}) – formats
- *     person names with configurable control over name part visibility, ordering, formality and length.
+ *     person names using the ICU {@link com.ibm.icu.text.PersonNameFormatter PersonNameFormatter}, with configurable
+ *     control over name part visibility, ordering, formality and length.
  *   </li>
  * </ul>
  *
  * @author Jeroen Gremmen
  * @since 0.24.0
  */
-module de.sayayi.lib.message.icu
-{
-  requires transitive de.sayayi.lib.message;
-
-  requires com.ibm.icu;
-
-  requires static org.jetbrains.annotations;
-
-  exports de.sayayi.lib.message.icu.formatter;
-}
+package de.sayayi.lib.message.icu.formatter;

@@ -32,11 +32,30 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
 
 /**
+ * Named parameter formatter that formats values using ICU {@link MessageFormat} patterns.
+ * <p>
+ * This formatter is selected by using the name {@code icu} in a message parameter, or automatically when the parameter
+ * configuration contains the {@code icu} config key:
+ * <pre>{@code %{p,icu:''{0,number,currency}''}}</pre>
+ * <p>
+ * The ICU pattern is read from the {@code icu} configuration value. All parameters available in the formatting context
+ * are passed to the ICU message format as a named argument map. The formatter uses the context locale for
+ * locale-sensitive formatting.
+ * <p>
+ * If the ICU pattern is missing or formatting fails, empty text is returned.
+ *
  * @author Jeroen Gremmen
  * @since 0.24.0
+ *
+ * @see MessageFormat
  */
 public final class ICUFormatter implements NamedParameterFormatter
 {
+  /**
+   * {@inheritDoc}
+   *
+   * @return  {@code "icu"}, never {@code null}
+   */
   @Override
   @Contract(pure = true)
   public @NotNull String getName() {
@@ -44,6 +63,17 @@ public final class ICUFormatter implements NamedParameterFormatter
   }
 
 
+  /**
+   * Formats the parameter value using the ICU message format pattern specified in the {@code icu} configuration key.
+   * <p>
+   * If the formatted result is empty, mapped messages for {@code empty} key types are consulted.
+   * If no ICU pattern is configured or an error occurs during formatting, empty text is returned.
+   *
+   * @param context  message context providing formatting information, not {@code null}
+   * @param value    parameter value (can be {@code null})
+   *
+   * @return  formatted text, never {@code null}
+   */
   @Override
   public @NotNull Text format(@NotNull ParameterFormatterContext context, Object value)
   {
@@ -74,12 +104,22 @@ public final class ICUFormatter implements NamedParameterFormatter
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  unmodifiable set containing {@code "icu"}, never {@code null}
+   */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
     return Set.of("icu");
   }
 
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return  always {@code true}
+   */
   @Override
   public boolean autoApplyOnNamedConfigParameter() {
     return true;
