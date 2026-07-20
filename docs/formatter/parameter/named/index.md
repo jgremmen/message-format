@@ -166,15 +166,18 @@ messageSupport
 
 ## Reference
 
-| Format Name  | Formatter Class       | Documentation               |
-|--------------|-----------------------|-----------------------------|
-| `bitmask`    | `BitmaskFormatter`    | [Bitmask](bitmask.md)       |
-| `bool`       | `BoolFormatter`       | [Bool](bool.md)             |
-| `choice`     | `ChoiceFormatter`     | [Choice](choice.md)         |
-| `classifier` | `ClassifierFormatter` | [Classifier](classifier.md) |
-| `geo`        | `GeoFormatter`        | [Geo](geo.md)               |
-| `size`       | `SizeFormatter`       | [Size](size.md)             |
-| `spel` [^1]  | `SpELFormatter`       | [SpEL](spel.md)             |
-| `string`     | `StringFormatter`     | [String](string.md)         |
+| Format Name       | Formatter Class       | Documentation                    |
+|-------------------|-----------------------|----------------------------------|
+| `bitmask`         | `BitmaskFormatter`    | [Bitmask](bitmask.md)            |
+| `bool`            | `BoolFormatter`       | [Bool](bool.md)                  |
+| `choice`          | `ChoiceFormatter`     | [Choice](choice.md)              |
+| `classifier`      | `ClassifierFormatter` | [Classifier](classifier.md)      |
+| `geo`             | `GeoFormatter`        | [Geo](geo.md)                    |
+| `icu` [^1]        | `ICUFormatter`        | [ICU](icu.md)                    |
+| `icu-person` [^1] | `ICUPersonFormatter`  | [ICU Person Name](icu-person.md) |
+| `size`            | `SizeFormatter`       | [Size](size.md)                  |
+| `spel` [^2]       | `SpELFormatter`       | [SpEL](spel.md)                  |
+| `string`          | `StringFormatter`     | [String](string.md)              |
 
-[^1]: Provided by the `message-format-spring` module, not the core `message-format` module.
+[^1]: Provided by the `message-format-icu` module, not the core `message-format` module.
+[^2]: Provided by the `message-format-spring` module, not the core `message-format` module.

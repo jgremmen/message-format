@@ -59,6 +59,8 @@ nav:
         - Classifier: formatter/parameter/named/classifier.md
         - Geo: formatter/parameter/named/geo.md
         - Size: formatter/parameter/named/size.md
+        - ICU [icu]: formatter/parameter/named/icu.md
+        - ICU Person Name [icu]: formatter/parameter/named/icu-person.md
         - SpEL [spring]: formatter/parameter/named/spel.md
         - String: formatter/parameter/named/string.md
     - Post Formatters:
