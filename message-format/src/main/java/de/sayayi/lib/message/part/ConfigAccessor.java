@@ -28,9 +28,10 @@ import java.util.OptionalLong;
  * Provides typed access to message part configuration values.
  * <p>
  * A configuration consists of named key-value pairs that control how a message parameter is formatted. This interface
- * offers convenience methods for retrieving configuration values as specific types (string, number, boolean, message).
- * If a key is not present in the local configuration, the message support is consulted for a default value.
+ * offers convenience methods for retrieving configuration values as specific types (string, number, boolean, message,
+ * enum). If a key is not present in the local configuration, the message support is consulted for a default value.
  *
+ * @author Jeroen Gremmen
  * @since 0.8.4
  *
  * @see MessagePart.Config
@@ -151,4 +152,26 @@ public interface ConfigAccessor
    */
   @Contract(pure = true)
   @NotNull Optional<Message.WithSpaces> getConfigValueMessage(@NotNull String name);
+
+
+  /**
+   * Gets an enum configuration value for named key {@code name}.
+   * <p>
+   * The value is taken from the configuration map. If no such key is found the message support is queried for a
+   * default configuration value.
+   * <p>
+   * The string value associated with the key is matched against the enum constants of the given {@code enumType}.
+   * If no value is found, the value is not a string, or it does not match any enum constant, the method returns
+   * {@link Optional#empty()}.
+   *
+   * @param name      configuration key, not {@code null}
+   * @param enumType  the enum class to match the string value against, not {@code null}
+   * @param <T>       the enum type
+   *
+   * @return  optional enum instance representing the found value, never {@code null}
+   *
+   * @since 0.24.0
+   */
+  @Contract(pure = true)
+  @NotNull <T extends Enum<T>> Optional<T> getConfigValueEnum(@NotNull String name, @NotNull Class<T> enumType);
 }

@@ -131,8 +131,9 @@ All three types are now formatted by the same formatter instance. When the frame
 A formatter can accept configuration keys that influence its behavior. Configuration keys are named values embedded in
 the message syntax using the `name:value` notation. The `ParameterFormatterContext` (which extends `ConfigAccessor`) 
 provides typed accessors to read them: `getConfigValueString(name)`, `getConfigValueNumber(name)`,
-`getConfigValueBool(name)` and `getConfigValueMessage(name)`. Each returns an `Optional` that is empty when the key is
-absent or when the value type does not match.
+`getConfigValueBool(name)`, `getConfigValueMessage(name)` and `getConfigValueEnum(name, enumType)`. Each returns an
+`Optional` that is empty when the key is absent or when the value type does not match. The enum accessor performs a
+case-insensitive match and also supports hyphenated names (e.g. `"my-value"` matches the enum constant `MY_VALUE`).
 
 The following example extends the `ColorFormatter` to support a `color` configuration key that controls the output 
 format:
