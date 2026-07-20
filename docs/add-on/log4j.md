@@ -21,7 +21,7 @@ Add the `message-format-log4j` module to the project alongside the Log4j API dep
 
     ```groovy
     dependencies {
-      implementation 'de.sayayi.lib:message-format-log4j:0.23.0'
+      implementation 'de.sayayi.lib:message-format-log4j:0.24.0'
       implementation 'org.apache.logging.log4j:log4j-api:2.24.3'
     }
     ```
@@ -30,7 +30,7 @@ Add the `message-format-log4j` module to the project alongside the Log4j API dep
 
     ```kotlin
     dependencies {
-      implementation("de.sayayi.lib:message-format-log4j:0.23.0")
+      implementation("de.sayayi.lib:message-format-log4j:0.24.0")
       implementation("org.apache.logging.log4j:log4j-api:2.24.3")
     }
     ```
@@ -41,7 +41,7 @@ Add the `message-format-log4j` module to the project alongside the Log4j API dep
     <dependency>
       <groupId>de.sayayi.lib</groupId>
       <artifactId>message-format-log4j</artifactId>
-      <version>0.22.0</version>
+      <version>0.24.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
