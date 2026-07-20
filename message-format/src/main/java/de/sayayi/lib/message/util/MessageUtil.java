@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -665,5 +666,33 @@ public final class MessageUtil
           templateConsumer.accept(name, template);
       }
     }
+  }
+
+
+  /**
+   * Finds an enum constant matching the given string value. The match is case-insensitive and also supports
+   * hyphenated names (e.g. "my-value" matches {@code MY_VALUE}).
+   *
+   * @param value     the string value to match against enum constant names, not {@code null}
+   * @param enumType  the enum class to search, not {@code null}
+   * @param <T>       the enum type
+   *
+   * @return  an optional containing the matching enum constant, or empty if no match is found
+   *
+   * @since 0.24.0
+   */
+  @Contract(pure = true)
+  public static <T extends Enum<T>> Optional<T> findEnumValue(@NotNull String value, @NotNull Class<T> enumType)
+  {
+    for(T enumValue: enumType.getEnumConstants())
+    {
+      final var enumName = enumValue.name();
+
+      if (enumName.equalsIgnoreCase(value) ||
+          enumName.replace('_', '-').equalsIgnoreCase(value))
+        return Optional.of(enumValue);
+    }
+
+    return Optional.empty();
   }
 }

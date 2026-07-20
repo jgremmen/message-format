@@ -26,6 +26,8 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
+import static de.sayayi.lib.message.util.MessageUtil.findEnumValue;
+
 
 /**
  * Utility class that provides type-safe conversions for
@@ -202,14 +204,7 @@ public final class ParameterValueHelper
         value = optional.orElse(null);
 
       if (value instanceof String string)
-        for(T enumValue: enumType.getEnumConstants())
-        {
-          final var enumName = enumValue.name();
-
-          if (enumName.equalsIgnoreCase(string) ||
-              enumName.replace('_', '-').equalsIgnoreCase(string))
-            return Optional.of(enumValue);
-        }
+        return findEnumValue(string, enumType);
     }
 
     return Optional.empty();

@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
+import static de.sayayi.lib.message.util.MessageUtil.findEnumValue;
 import static java.util.Optional.ofNullable;
 
 
@@ -201,31 +202,5 @@ public class BaseConfigAccessor implements ConfigAccessor
     }
 
     return enumValue;
-  }
-
-
-  /**
-   * Finds an enum constant matching the given string value. The match is case-insensitive and also supports
-   * hyphenated names (e.g. "my-value" matches {@code MY_VALUE}).
-   *
-   * @param value     the string value to match against enum constant names, not {@code null}
-   * @param enumType  the enum class to search, not {@code null}
-   * @param <T>       the enum type
-   *
-   * @return  an optional containing the matching enum constant, or empty if no match is found
-   */
-  @Contract(pure = true)
-  private <T extends Enum<T>> Optional<T> findEnumValue(@NotNull String value, @NotNull Class<T> enumType)
-  {
-    for(T enumValue: enumType.getEnumConstants())
-    {
-      final var enumName = enumValue.name();
-
-      if (enumName.equalsIgnoreCase(value) ||
-          enumName.replace('_', '-').equalsIgnoreCase(value))
-        return Optional.of(enumValue);
-    }
-
-    return Optional.empty();
   }
 }
