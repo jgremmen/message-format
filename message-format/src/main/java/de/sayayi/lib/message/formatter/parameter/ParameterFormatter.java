@@ -99,6 +99,10 @@ public interface ParameterFormatter
 
   /**
    * Formats the parameter value to a string representation.
+   * <p>
+   * Implementations must not throw exceptions due to unexpected values. The only acceptable reason for throwing an
+   * exception is invalid formatter-specific configuration, which indicates a developer error. If the configuration is
+   * valid, any runtime value, no matter how unexpected, must be handled gracefully without throwing.
    *
    * @param context  message context providing formatting information, never {@code null}
    * @param value    parameter value (can be {@code null})

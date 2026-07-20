@@ -40,10 +40,14 @@ public interface PostFormatter
 
 
   /**
-   * Formats the given {@code string} using the post formatter. The {@code context} can be used to access
-   * the post format configuration.
+   * Formats the given {@code string} using the post formatter. The {@code context} can be used to access the post
+   * format configuration.
    * <p>
    * The {@code string} is the trimmed result of formatting the message associated with the post format message part.
+   * <p>
+   * Implementations must not throw exceptions during formatting. The only acceptable case for throwing an exception
+   * is when the post formatter configuration is invalid, as this indicates a programming error. Given a valid
+   * configuration, this method must always complete normally.
    *
    * @param string   the string to format, not {@code null}
    * @param context  the post formatter context, not {@code null}
