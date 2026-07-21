@@ -110,6 +110,308 @@ MessageUtil.isEmpty("a");    // false
 ```
 
 
+## `MessageUtil` Name Validation Methods
+
+The library enforces naming conventions for various identifiers such as formatter names, parameter names and template
+names. `MessageUtil` provides a set of static validation methods that check whether a string conforms to a particular
+naming style. These methods operate on Unicode code points, so they correctly handle characters outside the Basic
+Multilingual Plane.
+
+### `validateName(String, String)`
+
+This is a guard method that throws an exception if the given name is `null` or blank. The second argument is a
+descriptive label used in the exception message to indicate which name failed validation. When the check passes, the
+original name is returned, making it convenient for inline validation in constructors or setters.
+
+```java
+// valid name passes through
+String name = MessageUtil.validateName("myFormatter", "formatter name");
+// name → "myFormatter"
+
+// null throws NullPointerException with message "formatter name must not be null"
+MessageUtil.validateName(null, "formatter name");
+
+// blank throws IllegalArgumentException with message "template name must not be empty"
+MessageUtil.validateName("   ", "template name");
+```
+
+### `isKebabCaseName(String)`
+
+This method checks whether a string follows kebab-case conventions. A valid kebab-case name starts with a lowercase
+letter, contains only lowercase letters, digits and hyphens, does not end with a hyphen and does not contain
+consecutive hyphens.
+
+```java
+MessageUtil.isKebabCaseName("date-format");      // true
+MessageUtil.isKebabCaseName("my-formatter-2");   // true
+MessageUtil.isKebabCaseName("x");                // true
+
+// must start with a lowercase letter
+MessageUtil.isKebabCaseName("2things");          // false
+MessageUtil.isKebabCaseName("MyName");           // false
+
+// no trailing hyphen
+MessageUtil.isKebabCaseName("trailing-");        // false
+
+// no consecutive hyphens
+MessageUtil.isKebabCaseName("double--dash");     // false
+
+// uppercase letters are not allowed
+MessageUtil.isKebabCaseName("camelCase");        // false
+```
+
+### `isLowerCamelCaseName(String)`
+
+This method checks whether a string follows lower camelCase conventions. A valid lower camelCase name starts with a
+lowercase letter and contains only letters and digits. Unlike kebab-case, hyphens and underscores are not permitted.
+Uppercase letters are allowed after the first character to form the camelCase humps.
+
+```java
+MessageUtil.isLowerCamelCaseName("dateFormat");     // true
+MessageUtil.isLowerCamelCaseName("myFormatter2");   // true
+MessageUtil.isLowerCamelCaseName("x");              // true
+
+// must start with a lowercase letter
+MessageUtil.isLowerCamelCaseName("DateFormat");     // false
+MessageUtil.isLowerCamelCaseName("3items");         // false
+
+// hyphens and underscores are not allowed
+MessageUtil.isLowerCamelCaseName("date-format");    // false
+MessageUtil.isLowerCamelCaseName("date_format");    // false
+```
+
+### `isKebabOrLowerCamelCaseName(String)`
+
+This method combines the two checks above into a single-pass validation. It accepts a name that is either valid
+kebab-case or valid lower camelCase, but it rejects names that mix the two styles. A name containing both uppercase
+letters and hyphens fails the check because such a name belongs to neither convention.
+
+```java
+MessageUtil.isKebabOrLowerCamelCaseName("date-format");   // true (kebab)
+MessageUtil.isKebabOrLowerCamelCaseName("dateFormat");    // true (camelCase)
+
+// mixing styles is rejected
+MessageUtil.isKebabOrLowerCamelCaseName("date-Format");  // false
+MessageUtil.isKebabOrLowerCamelCaseName("dateFormat-x");  // false
+```
+
+This method is useful when an API accepts identifiers in either convention and needs to validate the input without
+caring which style was chosen, as long as the styles are not mixed.
+
+### `isName(String)`
+
+This method validates a name against the rules defined by the message format lexer grammar. A valid name starts with
+a Unicode letter (`\p{L}`), followed by zero or more Unicode letters or numbers (`\p{L}` or `\p{N}`). After this
+initial segment, zero or more groups may follow, where each group consists of a single underscore or hyphen followed
+by one or more Unicode letters or numbers. The name must not end with a separator character and consecutive separators
+are not allowed.
+
+```java
+MessageUtil.isName("hello");            // true
+MessageUtil.isName("myParam");          // true
+MessageUtil.isName("date-format");      // true
+MessageUtil.isName("item_count");       // true
+MessageUtil.isName("größe");            // true (Unicode letters allowed)
+MessageUtil.isName("abc123");           // true
+MessageUtil.isName("a-b_c");           // true
+
+// must start with a letter
+MessageUtil.isName("123abc");           // false
+MessageUtil.isName("_hidden");          // false
+MessageUtil.isName("-start");           // false
+
+// must not end with a separator
+MessageUtil.isName("trailing-");        // false
+MessageUtil.isName("trailing_");        // false
+
+// consecutive separators are not allowed
+MessageUtil.isName("double--sep");      // false
+MessageUtil.isName("double__sep");      // false
+
+// empty string is not a valid name
+MessageUtil.isName("");                 // false
+```
+
+
+## `MessageUtil` Serialization Methods
+
+The message format engine can convert its internal message representation back into a format string. This process is
+called serialization and is driven by a `FormatStringSerializer.Context`. The context carries a `CharsetEncoder` to
+determine which characters can be represented directly, a `TextJoiner` that accumulates the serialized output and an
+optional quote character that indicates whether serialization is currently inside a quoted string.
+
+`MessageUtil` provides three static methods that handle the most common serialization tasks: writing a raw string with
+proper escaping, wrapping a string in quotes and serializing a full `Message` object.
+
+### `serializeString(Context, String)`
+
+This method appends a string character by character to the context's text joiner, applying the following escaping
+rules. If the context has an active quote character (because serialization is happening inside a quoted string), every
+occurrence of that quote character is backslash-escaped. A `%` character followed by `{`, `[` or `(` is
+backslash-escaped to prevent the parser from interpreting it as a parameter reference. ISO control characters and
+characters that cannot be encoded in the context's charset are written as Unicode escape sequences in the form
+`\u0000`.
+
+```java
+var context = new FormatStringSerializer.Context(StandardCharsets.UTF_8);
+
+// serializing a plain string without a quote context
+MessageUtil.serializeString(context, "hello world");
+// text joiner contains: hello world
+
+// with an active single-quote context, single quotes are escaped
+var quoted = context.withStringQuote('\'');
+MessageUtil.serializeString(quoted, "it's a test");
+// text joiner contains: it\'s a test
+
+// percent followed by { is escaped to avoid parameter interpretation
+MessageUtil.serializeString(context, "100%{done}");
+// text joiner contains: 100\%{done}
+
+// control characters are written as unicode escapes
+MessageUtil.serializeString(context, "line\u0000end");
+// text joiner contains: line\u0000end
+```
+
+### `serializeQuotedString(Context, String)`
+
+This method serializes a string wrapped in quotes. It automatically selects the quote character that minimizes the
+number of escape sequences in the output. If the string contains more single quotes than double quotes, a double
+quote is used as the wrapper; otherwise a single quote is chosen. The opening quote, the escaped content and the
+closing quote are all appended to the context's text joiner.
+
+```java
+var context = new FormatStringSerializer.Context(StandardCharsets.UTF_8);
+
+// string with no quotes uses single quotes by default
+MessageUtil.serializeQuotedString(context, "hello");
+// text joiner contains: 'hello'
+
+// string with more single quotes switches to double quotes
+MessageUtil.serializeQuotedString(context, "it's five o'clock");
+// text joiner contains: "it's five o'clock"
+
+// string with more double quotes uses single quotes
+MessageUtil.serializeQuotedString(context, "say \"hi\" now");
+// text joiner contains: 'say "hi" now'
+```
+
+### `serializeMessage(Context, Message, boolean)`
+
+This method serializes an entire `Message` object. The `forceQuoted` parameter controls whether the message is always
+wrapped in quotes. When `forceQuoted` is `false` and the message is a simple `TextMessage` whose text is a valid name
+(as defined by `isName`), the text is serialized directly without quotes. In all other cases, the message is wrapped
+in quotes. The quote character is chosen by examining all text parts in the message for single quotes; if any text
+part contains a single quote, double quotes are used as the wrapper.
+
+```java
+var context = new FormatStringSerializer.Context(StandardCharsets.UTF_8);
+
+// a simple text message that is a valid name can be serialized unquoted
+Message simpleMsg = ...;  // TextMessage containing "hello"
+MessageUtil.serializeMessage(context, simpleMsg, false);
+// text joiner contains: hello
+
+// forcing quotes on a simple name
+MessageUtil.serializeMessage(context, simpleMsg, true);
+// text joiner contains: 'hello'
+
+// a message containing spaces is always quoted regardless of forceQuoted
+Message spacedMsg = ...;  // TextMessage containing "hello world"
+MessageUtil.serializeMessage(context, spacedMsg, false);
+// text joiner contains: 'hello world'
+```
+
+
+## `MessageUtil` Pack File Methods
+
+The library supports a binary pack format for storing pre-compiled messages and templates. The pack format allows
+applications to ship pre-parsed message bundles that can be loaded without re-parsing the format strings at runtime.
+`MessageUtil` offers two static methods to detect and import pack files.
+
+### `isMessageFormatPack(Path)`
+
+This method probes a file to determine whether it is a message format pack file. It bypasses the standard
+`Files.probeContentType()` SPI mechanism and directly inspects the file content. This is particularly useful in
+environments where the `PackFileTypeDetector` service provider is not active due to classloader isolation, such as
+IntelliJ IDEA plugins or Gradle build scripts.
+
+```java
+Path packFile = Path.of("messages.pack");
+Path textFile = Path.of("messages.properties");
+
+MessageUtil.isMessageFormatPack(packFile);   // true (if it is a valid pack file)
+MessageUtil.isMessageFormatPack(textFile);   // false
+```
+
+The method returns `false` for any file that does not exist, cannot be read or does not contain a valid pack file
+header. It never throws an exception.
+
+### `importMessages(InputStream, Consumer, BiConsumer)`
+
+This method reads a pack input stream and delivers each message and template it contains to the provided consumers.
+The first consumer receives `Message.WithCode` instances (messages with their associated code). The second consumer
+receives templates as name-template pairs. Either consumer may be `null` if only one type of entry is needed.
+
+The input stream is always closed when this method returns, regardless of success or failure.
+
+```java
+try(var stream = Files.newInputStream(Path.of("messages.pack")))
+{
+  MessageUtil.importMessages(
+      stream,
+      message -> messageSupport.addMessage(message),
+      (name, template) -> messageSupport.addTemplate(name, template));
+}
+
+// importing only messages, ignoring templates
+try(var stream = getClass().getResourceAsStream("/bundle.pack"))
+{
+  MessageUtil.importMessages(stream, message -> registry.put(message.getCode(), message), null);
+}
+```
+
+An `IOException` is thrown if the stream is unreadable or the content does not conform to the pack format. An
+`IllegalArgumentException` is thrown if the pack stream lacks version information.
+
+
+## `MessageUtil` Enum Utility
+
+### `findEnumValue(String, Class)`
+
+This method performs a case-insensitive lookup of an enum constant by name. It also supports the common convention of
+using hyphens in configuration values where Java enum constants use underscores. A value like `"my-value"` matches an
+enum constant named `MY_VALUE` because the method replaces underscores in the enum constant name with hyphens before
+comparing.
+
+The method returns an `Optional` containing the matching constant, or an empty `Optional` if no match is found.
+
+```java
+enum Alignment { LEFT, CENTER, RIGHT, JUSTIFY_ALL }
+
+MessageUtil.findEnumValue("left", Alignment.class);
+// Optional[LEFT]
+
+// case-insensitive matching
+MessageUtil.findEnumValue("Center", Alignment.class);
+// Optional[CENTER]
+
+MessageUtil.findEnumValue("RIGHT", Alignment.class);
+// Optional[RIGHT]
+
+// hyphenated value matches underscored enum constant
+MessageUtil.findEnumValue("justify-all", Alignment.class);
+// Optional[JUSTIFY_ALL]
+
+// no match returns empty
+MessageUtil.findEnumValue("unknown", Alignment.class);
+// Optional.empty()
+```
+
+This method is especially useful in formatters that accept configuration parameters as strings and need to resolve
+them to internal enum values without forcing callers to know the exact casing or separator convention.
+
+
 ## `TextPartFactory`
 
 When a formatter produces its output, it returns a `Text` object. The `Text` interface represents a piece of text 
