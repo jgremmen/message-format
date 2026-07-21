@@ -47,11 +47,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static de.sayayi.lib.message.util.MessageUtil.findEnumValue;
 import static de.sayayi.lib.message.util.MessageUtil.isMessageFormatPack;
 import static de.sayayi.plugin.gradle.message.DuplicateStrategy.IGNORE_AND_WARN;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
-import static java.util.Locale.ROOT;
 import static org.gradle.api.logging.LogLevel.ERROR;
 import static org.gradle.api.logging.LogLevel.WARN;
 import static org.gradle.api.tasks.PathSensitivity.RELATIVE;
@@ -466,15 +466,11 @@ public abstract class MessageFormatPackTask extends DefaultTask
     if (value instanceof GString)
       value = ((GString)value).toString();
 
-    if (value instanceof String)
+    if (value instanceof String string)
     {
-      var valueAsIs = ((String)value).toUpperCase(ROOT);
-      var valueUnderscore = valueAsIs.replace('-', '_');
-
-      for(var ds: DuplicateStrategy.values())
-        if (ds.name().equals(valueAsIs) ||
-            ds.name().equals(valueUnderscore))
-          return ds;
+      var ds = findEnumValue(string, DuplicateStrategy.class);
+      if (ds.isPresent())
+        return ds.get();
     }
 
     throw new InvalidUserDataException("Unknown duplicates strategy: " + value);
