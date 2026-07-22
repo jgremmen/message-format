@@ -24,7 +24,6 @@ options {
 
 @header {
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.part.MessagePart.*;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.TypedValue;

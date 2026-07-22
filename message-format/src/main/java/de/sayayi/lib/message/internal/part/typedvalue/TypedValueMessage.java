@@ -17,6 +17,7 @@ package de.sayayi.lib.message.internal.part.typedvalue;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.internal.pack.PackSupport;
+import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.message.part.TypedValue.MessageValue;
 import de.sayayi.lib.message.util.MessageUtil;
 import de.sayayi.lib.pack.PackInputStream;
@@ -100,7 +101,7 @@ public record TypedValueMessage(@NotNull Message.WithSpaces messageValue) implem
 
 
   /**
-   * Reads a {@code TypedValueMessage} from the given pack input stream.
+   * Reads a {@link MessageValue} from the given pack input stream.
    *
    * @param unpack      unpacker instance, not {@code null}
    * @param packStream  source data input, not {@code null}
@@ -111,8 +112,8 @@ public record TypedValueMessage(@NotNull Message.WithSpaces messageValue) implem
    *
    * @since 0.8.0
    */
-  public static @NotNull TypedValueMessage unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
-      throws IOException {
+  public static @NotNull TypedValue.MessageValue unpack(@NotNull PackSupport unpack,
+                                                        @NotNull PackInputStream packStream) throws IOException {
     return new TypedValueMessage(unpack.unpackMessageWithSpaces(packStream));
   }
 }

@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.internal.part.config;
 
 import de.sayayi.lib.message.internal.pack.PackSupport;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.pack.PackInputStream;
@@ -124,8 +123,8 @@ public final class MessagePartConfig implements MessagePart.Config
     final var templateNames = new TreeSet<String>();
 
     for(var configValue: config.values())
-      if (configValue instanceof TypedValueMessage)
-        templateNames.addAll(((TypedValueMessage)configValue).asObject().getTemplateNames());
+      if (configValue instanceof TypedValue.MessageValue messageValue)
+        templateNames.addAll(messageValue.messageValue().getTemplateNames());
 
     return unmodifiableSet(templateNames);
   }

@@ -91,10 +91,10 @@ public final class PackSupport
   /** Type identifier for default/catch-all map keys. */
   public static final int MAP_KEY_DEFAULT_ID = 6;
 
-  private static final int MAP_VALUE_BOOL_ID = 0;
-  private static final int MAP_VALUE_MESSAGE_ID = 1;
-  private static final int MAP_VALUE_NUMBER_ID = 2;
-  private static final int MAP_VALUE_STRING_ID = 3;
+  private static final int VALUE_BOOL_ID = 0;
+  private static final int VALUE_MESSAGE_ID = 1;
+  private static final int VALUE_NUMBER_ID = 2;
+  private static final int VALUE_STRING_ID = 3;
 
   private static final int PART_NO_SPACE_TEXT_ID = 0;  // obsolete since version 3
   private static final int PART_PARAMETER_ID = 1;
@@ -420,19 +420,19 @@ public final class PackSupport
     switch(typedValue)
     {
       case TypedValueBool configValueBool -> {
-        packStream.writeSmall(MAP_VALUE_BOOL_ID, 2);
+        packStream.writeSmall(VALUE_BOOL_ID, 2);
         configValueBool.pack(packStream);
       }
       case TypedValueMessage configValueMessage -> {
-        packStream.writeSmall(MAP_VALUE_MESSAGE_ID, 2);
+        packStream.writeSmall(VALUE_MESSAGE_ID, 2);
         configValueMessage.pack(packStream);
       }
       case TypedValueNumber configValueNumber -> {
-        packStream.writeSmall(MAP_VALUE_NUMBER_ID, 2);
+        packStream.writeSmall(VALUE_NUMBER_ID, 2);
         configValueNumber.pack(packStream);
       }
       case TypedValueString configValueString -> {
-        packStream.writeSmall(MAP_VALUE_STRING_ID, 2);
+        packStream.writeSmall(VALUE_STRING_ID, 2);
         configValueString.pack(packStream);
       }
 
@@ -455,10 +455,10 @@ public final class PackSupport
   public @NotNull TypedValue<?> unpackTypedValue(@NotNull PackInputStream packStream) throws IOException
   {
     final var configValue = switch(packStream.readSmall(2)) {
-      case MAP_VALUE_BOOL_ID -> TypedValueBool.unpack(packStream);
-      case MAP_VALUE_MESSAGE_ID -> TypedValueMessage.unpack(this, packStream);
-      case MAP_VALUE_NUMBER_ID -> TypedValueNumber.unpack(packStream);
-      case MAP_VALUE_STRING_ID -> TypedValueString.unpack(packStream);
+      case VALUE_BOOL_ID -> TypedValueBool.unpack(packStream);
+      case VALUE_MESSAGE_ID -> TypedValueMessage.unpack(this, packStream);
+      case VALUE_NUMBER_ID -> TypedValueNumber.unpack(packStream);
+      case VALUE_STRING_ID -> TypedValueString.unpack(packStream);
 
       default -> throw new IllegalStateException("typed value expected");
     };
