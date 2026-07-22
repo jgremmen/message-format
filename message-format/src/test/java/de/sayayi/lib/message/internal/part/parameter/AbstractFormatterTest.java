@@ -72,7 +72,7 @@ public abstract class AbstractFormatterTest
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
                                         @NotNull Map<String,TypedValue<?>> config,
-                                        @NotNull Map<MapKey,TypedValue<?>> map)
+                                        @NotNull Map<MapKey,TypedValue.MessageValue> map)
   {
     return format(messageContext, Parameters.empty(messageContext.getLocale()), value, config, map, null);
   }
@@ -81,7 +81,7 @@ public abstract class AbstractFormatterTest
   @Contract(pure = true)
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext, Object value,
                                         @NotNull Map<String,TypedValue<?>> config,
-                                        @NotNull Map<MapKey,TypedValue<?>> map,
+                                        @NotNull Map<MapKey,TypedValue.MessageValue> map,
                                         @NotNull String format) {
     return format(messageContext, Parameters.empty(messageContext.getLocale()), value, config, map, format);
   }
@@ -91,7 +91,7 @@ public abstract class AbstractFormatterTest
   protected @NotNull MessagePart format(@NotNull MessageAccessor messageContext,
                                         @NotNull Parameters parameters, Object value,
                                         @NotNull Map<String,TypedValue<?>> config,
-                                        @NotNull Map<MapKey,TypedValue<?>> map,
+                                        @NotNull Map<MapKey,TypedValue.MessageValue> map,
                                         String format)
   {
     return new ParameterFormatterContextImpl(messageContext, parameters, value, null, format,

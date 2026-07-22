@@ -317,7 +317,7 @@ public final class ParameterPart implements MessagePart.Parameter
     final var name = requireNonNull(packStream.readString());
 
     final var config = new HashMap<String,TypedValue<?>>();
-    final var map = new LinkedHashMap<MapKey,TypedValue<?>>();
+    final var map = new LinkedHashMap<MapKey,TypedValue.MessageValue>();
 
     for(int n = 0, size = packStream.readSmallVar(); n < size; n++)
     {
@@ -338,7 +338,7 @@ public final class ParameterPart implements MessagePart.Parameter
           default -> throw new IllegalStateException("map key expected");
         };
 
-        map.put(mapKey, unpack.unpackTypedValue(packStream));
+        map.put(mapKey, unpack.fixMessageValue(unpack.unpackTypedValue(packStream)));
       }
     }
 

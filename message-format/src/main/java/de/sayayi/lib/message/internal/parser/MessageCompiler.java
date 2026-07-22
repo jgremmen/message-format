@@ -49,10 +49,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.TreeMap;
+import java.util.*;
 
 import static de.sayayi.lib.antlr4.walker.Walker.WALK_EXIT_RULES_HEAP;
 import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAGE;
@@ -238,6 +235,18 @@ public final class MessageCompiler extends AbstractAntlr4Parser
       return "end of message parameter expected at " + getTokenDisplayText(parser, mismatchLocationNearToken);
 
     return super.createInputMismatchMessage(parser, expectedTokens, mismatchLocationNearToken);
+  }
+
+
+  @Override
+  protected @NotNull String createMissingTokenMessage(@NotNull org.antlr.v4.runtime.Parser parser,
+                                                      @NotNull IntervalSet expectedTokens,
+                                                      Token missingLocationNearToken)
+  {
+    if (isEOFToken(missingLocationNearToken))
+      return "pre-mature end of message parameter reached; missing " + expectedTokens.toString(parser.getVocabulary());
+
+    return super.createMissingTokenMessage(parser, expectedTokens, missingLocationNearToken);
   }
 
 
@@ -499,58 +508,32 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final ContextToMapCollector<ConfigDefinitionContext,String,TypedValue<?>> PARAMETER_CONFIG_DEFINITION_COLLECTOR =
-        new ContextToMapCollector<>(TreeMap::new, (map, context) -> {
-          if (map.put(context.name, context.value) != null)
-          {
-            syntaxError("duplicate config name " + context.name + " for parameter '" +
-                ((ParameterPartContext)context.parent).parameterName().name + '\'')
-                .with(context)
-                .report();
-          }
-        });
-
-
-    final ContextToMapCollector<MapEntryContext,MapKey,TypedValue<?>> PARAMETER_MAP_ENTRY_COLLECTOR =
-        new ContextToMapCollector<>(LinkedHashMap::new, (map, context) -> {
-          for(var key: context.keys)
-            if (map.put(key, context.value) != null)
-            {
-              syntaxError("duplicate config element " + key + " for parameter '" +
-                  ((ParameterPartContext)context.parent).parameterName().name + '\'')
-                  .with(context)
-                  .report();
-            }
-        });
-
-
     @Override
     public void exitParameterPart(ParameterPartContext ctx)
     {
-      final var mapElements = ctx.mapEntry().stream().collect(PARAMETER_MAP_ENTRY_COLLECTOR);
-      final var mapEntryDefault = ctx.mapEntryDefault();
+      final Map<String,TypedValue<?>> config;
+      final Map<MapKey,TypedValue.MessageValue> map;
+      String format = null;
 
-      if (mapEntryDefault != null)
-        mapElements.put(null, new TypedValueMessage(mapEntryDefault.messageWithSpaces));
-
-      final var parameterFormat = ctx.parameterFormat();
-      final var format = switch(parameterFormat.size()) {
-        case 0 -> null;
-        case 1 -> parameterFormat.getFirst().format;
-        default -> {
-          syntaxError("parameter format can occur only once")
-              .with(parameterFormat.get(1))
-              .report();
-          yield null;  // never reached
-        }
-      };
+      var parameterEntries = ctx.parameterEntries();
+      if (parameterEntries != null)
+      {
+        format = parameterEntries.format;
+        config = parameterEntries.config;
+        map = parameterEntries.map;
+      }
+      else
+      {
+        config = Map.of();
+        map = Map.of();
+      }
 
       ctx.part = messageFactory.getMessagePartNormalizer().normalize(new ParameterPart(
           ctx.parameterName().name, format,
           isSpaceAtTokenIndex(ctx.getStart().getTokenIndex() - 1),
           isSpaceAtTokenIndex(ctx.getStop().getTokenIndex() + 1),
-          new MessagePartConfig(ctx.configDefinition().stream().collect(PARAMETER_CONFIG_DEFINITION_COLLECTOR)),
-          new MessagePartMap(mapElements)));
+          new MessagePartConfig(config),
+          new MessagePartMap(map)));
     }
 
 
@@ -559,6 +542,69 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     {
       if (!isKebabOrLowerCamelCaseName(ctx.name = ctx.nameOrKeyword().name))
         syntaxError("parameter name " + KEBAB_LOWER_CAMEL_CASE_MATCH).with(ctx).report();
+    }
+
+
+    @Override
+    public void exitParameterEntries(ParameterEntriesContext ctx)
+    {
+      MapEntryDefaultContext _mapEntryDefaultContext = null;
+
+      ctx.config = new TreeMap<>();
+      ctx.map = new LinkedHashMap<>();
+
+      for(var entryContext: ctx.parameterEntry())
+        switch(entryContext.getChild(0))
+        {
+          case ParameterFormatContext formatContext -> {
+            if (ctx.format != null)
+            {
+              syntaxError("config parameter 'format' can occur only once")
+                  .with(formatContext)
+                  .report();
+            }
+
+            ctx.format = formatContext.format;
+          }
+          case ConfigDefinitionContext configDefinitionContext -> {
+            if (ctx.config.put(configDefinitionContext.name, configDefinitionContext.value) != null)
+            {
+              syntaxError("duplicate config name '" + configDefinitionContext.name + "' for parameter '" +
+                  ((ParameterPartContext)ctx.parent).parameterName().name + '\'')
+                  .with(configDefinitionContext)
+                  .report();
+            }
+          }
+          case MapEntryContext mapEntryContext -> {
+            for(var key: mapEntryContext.keys)
+              if (ctx.map.put(key, mapEntryContext.value) != null)
+              {
+                syntaxError("duplicate map entry key " + key + " for parameter '" +
+                    ((ParameterPartContext)ctx.parent).parameterName().name + '\'')
+                    .with(mapEntryContext)
+                    .report();
+              }
+          }
+          case MapEntryDefaultContext mapEntryDefaultContext -> {
+            if (_mapEntryDefaultContext != null)
+            {
+              syntaxError("default map entry can occur only once")
+                  .with(mapEntryDefaultContext)
+                  .report();
+            }
+
+            ctx.map.put(null, new TypedValueMessage(mapEntryDefaultContext.messageWithSpaces));
+            _mapEntryDefaultContext = mapEntryDefaultContext;
+          }
+          default -> {}
+        }
+
+      if (_mapEntryDefaultContext != null && ctx.map.size() == 1)
+      {
+        syntaxError("default map entry can only be used in combination with other map entries")
+            .with(_mapEntryDefaultContext)
+            .report();
+      }
     }
 
 
@@ -720,10 +766,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
     @Override
+    @SuppressWarnings("LanguageMismatch")
     public void exitMapEntryString(MapEntryStringContext ctx)
     {
       ctx.keys = ctx.mapKeys().keys;
-      ctx.value = new TypedValueString(ctx.simpleString().string);
+      ctx.value = new TypedValueMessage(messageFactory.parseMessage(ctx.simpleString().string));
     }
 
 

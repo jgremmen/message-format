@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.internal.pack;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.internal.*;
 import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.internal.part.map.key.*;
@@ -109,10 +110,16 @@ public final class PackSupport
   private static final int MESSAGE_TEXT = 5;
 
 
+  private final MessageFactory messageFactory;
   private final Map<MapKey,MapKey> mapKeys = new HashMap<>();
   private final Map<TypedValue<?>,TypedValue<?>> mapValues = new HashMap<>();
   private final Map<MessagePart,MessagePart> messageParts = new HashMap<>();
   private final Map<Message.WithSpaces,Message.WithSpaces> messagesWithSpaces = new HashMap<>();
+
+
+  public PackSupport(@NotNull MessageFactory messageFactory) {
+    this.messageFactory = messageFactory;
+  }
 
 
   /**
@@ -590,5 +597,28 @@ public final class PackSupport
 
     // 111111 -> -132105..-9223372036854775808  (63 bit)
     return -packStream.readLarge(63) - 132105L;
+  }
+
+
+  /**
+   * Converts the given typed value into a {@link TypedValue.MessageValue}, either by returning it directly if it
+   * already is a message value, or by converting a string value into a message value using the message factory.
+   *
+   * @param typedValue  typed value to convert, not {@code null}
+   *
+   * @return  message value representation of the given typed value, never {@code null}
+   *
+   * @throws IllegalStateException  if the typed value is neither a message value nor a string value
+   *
+   * @since 0.24.0
+   */
+  @Contract(pure = true)
+  public @NotNull TypedValue.MessageValue fixMessageValue(@NotNull TypedValue<?> typedValue)
+  {
+    return switch(typedValue) {
+      case TypedValue.MessageValue messageValue -> messageValue;
+      case TypedValue.StringValue stringValue -> new TypedValueMessage(stringValue.asMessage(messageFactory));
+      default -> throw new IllegalStateException();
+    };
   }
 }

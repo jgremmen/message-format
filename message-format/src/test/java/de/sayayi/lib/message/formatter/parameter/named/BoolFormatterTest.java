@@ -19,7 +19,7 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.part.map.key.MapKeyBool;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.TypedValue;
 import lombok.val;
@@ -63,9 +63,9 @@ final class BoolFormatterTest extends AbstractFormatterTest
         .setLocale("de-DE")
         .getMessageAccessor();
 
-    val map = new HashMap<MapKey,TypedValue<?>>();
-    map.put(MapKeyBool.TRUE, new TypedValueString("wahr"));
-    map.put(MapKeyBool.FALSE, new TypedValueString("falsch"));
+    val map = new HashMap<MapKey,TypedValue.MessageValue>();
+    map.put(MapKeyBool.TRUE, new TypedValueMessage(messageAccessor.getMessageFactory().parseMessage("wahr")));
+    map.put(MapKeyBool.FALSE, new TypedValueMessage(messageAccessor.getMessageFactory().parseMessage("falsch")));
 
     assertEquals(noSpaceText("wahr"), format(messageAccessor, TRUE, Map.of(), map));
     assertEquals(noSpaceText("falsch"), format(messageAccessor, 0.0d, Map.of(), map, "bool"));

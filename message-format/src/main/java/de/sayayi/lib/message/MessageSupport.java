@@ -620,12 +620,13 @@ public interface MessageSupport
      *
      * @throws IOException  if an I/O error occurs or the pack stream is invalid
      *
-     * @see MessageUtil#importMessages(InputStream, Consumer, BiConsumer)
+     * @see MessageUtil#importMessages(MessageFactory, InputStream, Consumer, BiConsumer) 
      */
     @Contract(value = "_ -> this", mutates = "this,param1,io")
     default @NotNull ConfigurableMessageSupport importMessages(@NotNull InputStream packStream) throws IOException
     {
-      MessageUtil.importMessages(packStream, this::addMessage, this::addTemplate);
+      MessageUtil.importMessages(getMessageAccessor().getMessageFactory(), packStream, 
+          this::addMessage, this::addTemplate);
       return this;
     }
 

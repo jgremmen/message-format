@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.map.key.MapKeyString;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
@@ -60,7 +61,8 @@ final class LocaleFormatterTest extends AbstractFormatterTest
 
     assertEquals(noSpaceText("The Great Kingdom"), format(messageAccessor, UK,
         Map.of("locale", new TypedValueString("country")),
-        Map.of(new MapKeyString("GB"), new TypedValueString("The Great Kingdom"))));
+        Map.of(new MapKeyString("GB"),
+            new TypedValueMessage(messageAccessor.getMessageFactory().parseMessage("The Great Kingdom")))));
   }
 
 
@@ -77,7 +79,8 @@ final class LocaleFormatterTest extends AbstractFormatterTest
 
     assertEquals(noSpaceText("francesa"), format(messageAccessor, FRANCE,
         Map.of("locale", new TypedValueString("language")),
-        Map.of(new MapKeyString("fr"), new TypedValueString("francesa"))));
+        Map.of(new MapKeyString("fr"),
+            new TypedValueMessage(messageAccessor.getMessageFactory().parseMessage("francesa")))));
   }
 
 

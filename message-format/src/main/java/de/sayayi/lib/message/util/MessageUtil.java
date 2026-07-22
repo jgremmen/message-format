@@ -17,6 +17,7 @@ package de.sayayi.lib.message.util;
 
 import de.sayayi.lib.message.FormatStringSerializer.Context;
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.internal.MessageTemplate;
 import de.sayayi.lib.message.internal.TextMessage;
 import de.sayayi.lib.message.internal.pack.PackFileTypeDetector;
@@ -633,15 +634,16 @@ public final class MessageUtil
    *
    * @throws IOException  if an I/O error occurs or the pack stream is invalid
    */
-  @Contract(mutates = "param1,io")
-  public static void importMessages(@NotNull InputStream packStream,
+  @Contract(mutates = "param2,io")
+  public static void importMessages(@NotNull MessageFactory messageFactory,
+                                    @NotNull InputStream packStream,
                                     Consumer<Message.WithCode> messageConsumer,
                                     BiConsumer<String,Template> templateConsumer)
       throws IOException
   {
     requireNonNull(packStream, "packStream must not be null");
 
-    final var packHelper = new PackSupport();
+    final var packHelper = new PackSupport(messageFactory);
 
     try(var dataStream = new PackInputStream(PACK_CONFIG, packStream)) {
       if (dataStream.getVersion().isEmpty())
