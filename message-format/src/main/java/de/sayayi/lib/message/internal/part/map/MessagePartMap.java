@@ -37,7 +37,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.IOException;
-import java.util.AbstractMap.SimpleEntry;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -48,13 +48,22 @@ import static java.util.Collections.unmodifiableSet;
 
 
 /**
- * This class represents the message part map.
+ * Implementation of the {@link MessagePart.Map} interface that maps {@link MapKey} entries to message values. It
+ * resolves the best matching message for a given parameter value by comparing map keys using
+ * {@link ParameterFormatter} instances.
+ * <p>
+ * Map keys are stored in a sorted order and matched against a parameter value at format time. An optional default
+ * value is returned when no explicit key matches.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0
+ *
+ * @see MapKey
+ * @see MessagePart.Map
  */
 public final class MessagePartMap implements MessagePart.Map
 {
+  /** Shared empty map instance containing no keys and no default value. */
   public static final MessagePartMap EMPTY_MAP = new MessagePartMap(Map.of());
 
 
@@ -72,9 +81,9 @@ public final class MessagePartMap implements MessagePart.Map
 
 
   /**
-   * Create a message parameter config instance with the given {@code map}.
+   * Create a message parameter map instance with the given {@code map}.
    *
-   * @param map  message parameter config map, not {@code null}
+   * @param map  message parameter map, not {@code null}
    */
   public MessagePartMap(@NotNull Map<MapKey,TypedValue.MessageValue> map)
   {
@@ -140,6 +149,9 @@ public final class MessagePartMap implements MessagePart.Map
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Optional<Message.WithSpaces> getDefaultMessage(@NotNull MessageAccessor messageAccessor,
@@ -151,11 +163,14 @@ public final class MessagePartMap implements MessagePart.Map
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @Contract(pure = true)
-  public Message.WithSpaces getMessage(@NotNull MessageAccessor messageAccessor, Object key, @NotNull Locale locale,
-                                       @NotNull Set<MapKey.Type> keyTypes, boolean includeDefault,
-                                       MessagePart.Config config)
+  public @NotNull Optional<Message.WithSpaces> getMessage(@NotNull MessageAccessor messageAccessor, Object key,
+                                                          @NotNull Locale locale, @NotNull Set<MapKey.Type> keyTypes,
+                                                          boolean includeDefault, MessagePart.Config config)
   {
     var configValue = findMappedValue(messageAccessor, locale, key, keyTypes, config);
     if (configValue == null)
@@ -163,20 +178,19 @@ public final class MessagePartMap implements MessagePart.Map
       if (includeDefault && defaultValue != null && keyTypes.stream().anyMatch(this::hasMessageWithKeyType))
         configValue = defaultValue;
       else
-        return null;
+        return Optional.empty();
     }
 
-    return configValue instanceof TypedValue.StringValue stringValue
-        ? stringValue.asMessage(messageAccessor.getMessageFactory())
-        : (Message.WithSpaces)configValue.asObject();
+    return Optional.of(configValue.messageValue());
   }
 
 
   @Contract(pure = true)
-  private TypedValue<?> findMappedValue(@NotNull MessageAccessor messageAccessor, @NotNull Locale locale,
-                                        Object value, @NotNull Set<MapKey.Type> keyTypes, MessagePart.Config config)
+  private TypedValue.MessageValue findMappedValue(@NotNull MessageAccessor messageAccessor, @NotNull Locale locale,
+                                                  Object value, @NotNull Set<MapKey.Type> keyTypes,
+                                                  MessagePart.Config config)
   {
-    TypedValue<?> bestMatch = null;
+    TypedValue.MessageValue bestMatch = null;
 
     final var comparatorContext = new ConfigKeyComparatorContext(messageAccessor, locale, config);
     final var formatters = messageAccessor
@@ -251,6 +265,9 @@ public final class MessagePartMap implements MessagePart.Map
   @Unmodifiable
   public @NotNull Set<String> getTemplateNames()
   {
+    if (mapValues.length == 0 && defaultValue == null)
+      return Set.of();
+
     var templateNames = new TreeSet<String>();
 
     for(var configValue: mapValues)
@@ -263,6 +280,9 @@ public final class MessagePartMap implements MessagePart.Map
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean equals(Object o)
   {
@@ -274,12 +294,18 @@ public final class MessagePartMap implements MessagePart.Map
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public int hashCode() {
     return (Objects.hashCode(defaultValue) * 59 + Arrays.hashCode(mapKeys)) * 59 + Arrays.hashCode(mapValues);
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @Contract(pure = true)
   public String toString()
@@ -297,6 +323,13 @@ public final class MessagePartMap implements MessagePart.Map
   }
 
 
+  /**
+   * Serializes this message part map to the given pack output stream.
+   *
+   * @param packStream  output stream to write to, not {@code null}
+   *
+   * @throws IOException  if an I/O error occurs during writing
+   */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeSmallVar(mapKeys.length);
@@ -315,6 +348,16 @@ public final class MessagePartMap implements MessagePart.Map
   }
 
 
+  /**
+   * Deserializes a message part map from the given pack input stream.
+   *
+   * @param unpack      pack support instance providing deserialization helpers, not {@code null}
+   * @param packStream  input stream to read from, not {@code null}
+   *
+   * @return  deserialized message part map, never {@code null}
+   *
+   * @throws IOException  if an I/O error occurs during reading
+   */
   public static @NotNull MessagePartMap unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
@@ -332,6 +375,10 @@ public final class MessagePartMap implements MessagePart.Map
 
 
 
+  /**
+   * Iterator over all key-value entries in the enclosing {@link MessagePartMap}. Yields sorted map key entries first,
+   * followed by the default entry (if present).
+   */
   private final class MapEntryIterator implements Iterator<Entry<MapKey,TypedValue<?>>>
   {
     private Entry<MapKey,TypedValue<?>> nextEntry;
@@ -347,12 +394,12 @@ public final class MessagePartMap implements MessagePart.Map
     {
       if (idx == mapKeys.length && defaultValue != null)
       {
-        nextEntry = new SimpleEntry<>(null, defaultValue);
+        nextEntry = new SimpleImmutableEntry<>(null, defaultValue);
         idx++;
       }
       else if (idx < mapKeys.length)
       {
-        nextEntry = new SimpleEntry<>(mapKeys[idx], mapValues[idx]);
+        nextEntry = new SimpleImmutableEntry<>(mapKeys[idx], mapValues[idx]);
         idx++;
       }
       else
@@ -383,6 +430,10 @@ public final class MessagePartMap implements MessagePart.Map
 
 
 
+  /**
+   * {@link ComparatorContext} implementation that provides access to the current map key and locale during
+   * value-to-key matching within this message part map.
+   */
   private static final class ConfigKeyComparatorContext extends BaseConfigAccessor implements ComparatorContext
   {
     private final Locale locale;

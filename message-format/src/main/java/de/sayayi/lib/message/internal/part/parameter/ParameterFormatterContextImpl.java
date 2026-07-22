@@ -37,7 +37,6 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.NULL_
 import static de.sayayi.lib.message.part.MessagePart.Text.NULL;
 import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
 import static java.util.Objects.requireNonNull;
-import static java.util.Optional.ofNullable;
 
 
 /**
@@ -135,9 +134,9 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
 
   /** {@inheritDoc} */
   @Override
-  public @NotNull Optional<Message.WithSpaces> getMapMessage(
-      Object key, @NotNull Set<MapKey.Type> keyTypes, boolean includeDefault) {
-    return ofNullable(map.getMessage(messageAccessor, key, getLocale(), keyTypes, includeDefault, config));
+  public @NotNull Optional<Message.WithSpaces> getMapMessage(Object key, @NotNull Set<MapKey.Type> keyTypes,
+                                                             boolean includeDefault) {
+    return map.getMessage(messageAccessor, key, getLocale(), keyTypes, includeDefault, config);
   }
 
 

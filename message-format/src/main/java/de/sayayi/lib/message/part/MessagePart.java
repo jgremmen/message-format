@@ -349,8 +349,8 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
 
 
     /**
-     * Returns the best matching message for the given {@code key} value by comparing it against
-     * the map entries using the specified key types and locale.
+     * Returns the best matching message for the given {@code key} value by comparing it against the map entries using
+     * the specified key types and locale.
      *
      * @param messageAccessor  message accessor instance, not {@code null}
      * @param key              the value to match against map keys, may be {@code null}
@@ -359,12 +359,12 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
      * @param includeDefault   whether to fall back to a default message if no match is found
      * @param config           optional configuration for the comparison, may be {@code null}
      *
-     * @return  the best matching message, or {@code null} if no match is found
+     * @return  an optional containing the best matching message, or empty if no match is found
      */
     @Contract(pure = true)
-    Message.WithSpaces getMessage(@NotNull MessageAccessor messageAccessor, Object key, @NotNull Locale locale,
-                                  @NotNull Set<MapKey.Type> keyTypes, boolean includeDefault,
-                                  MessagePart.Config config);
+    @NotNull Optional<Message.WithSpaces> getMessage(@NotNull MessageAccessor messageAccessor, Object key,
+                                                     @NotNull Locale locale, @NotNull Set<MapKey.Type> keyTypes,
+                                                     boolean includeDefault, MessagePart.Config config);
 
 
     /**
