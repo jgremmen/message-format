@@ -53,7 +53,7 @@ CTRL_CHAR
 
 
 // ------------------ In single quoted text mode ------------------
-mode TEXT1;
+mode SINGLE_QUOTED_TEXT;
 
 P_START1
         : ParamStart -> pushMode(PARAMETER), type(P_START)
@@ -77,7 +77,7 @@ CTRL_CHAR1
 
 
 // ------------------ In double quoted text mode ------------------
-mode TEXT2;
+mode DOUBLE_QUOTED_TEXT;
 
 P_START2
         : ParamStart -> pushMode(PARAMETER), type(P_START)
@@ -131,13 +131,13 @@ P_NUMBER
         : Number -> type(NUMBER)
         ;
 P_SQ_START
-        : '\'' -> pushMode(TEXT1), type(SQ_START)
+        : '\'' -> pushMode(SINGLE_QUOTED_TEXT), type(SQ_START)
         ;
 P_DQ_START
-        : '"' -> pushMode(TEXT2), type(DQ_START)
+        : '"' -> pushMode(DOUBLE_QUOTED_TEXT), type(DQ_START)
         ;
 P_WS
-        : (CtrlChar | ' ')+ -> skip
+        : (CtrlChar | [\p{Zs}])+ -> skip
         ;
 P_EQ
         : '=' -> type(EQ)
@@ -191,13 +191,13 @@ T_NAME
         : Name -> type(NAME)
         ;
 T_SQ_START
-        : '\'' -> pushMode(TEXT1), type(SQ_START)
+        : '\'' -> pushMode(SINGLE_QUOTED_TEXT), type(SQ_START)
         ;
 T_DQ_START
-        : '"' -> pushMode(TEXT2), type(DQ_START)
+        : '"' -> pushMode(DOUBLE_QUOTED_TEXT), type(DQ_START)
         ;
 T_WS
-        : (CtrlChar | ' ')+ -> skip
+        : (CtrlChar | [\p{Zs}])+ -> skip
         ;
 
 
@@ -230,13 +230,13 @@ PF_NAME
         : Name -> type(NAME)
         ;
 PF_SQ_START
-        : '\'' -> pushMode(TEXT1), type(SQ_START)
+        : '\'' -> pushMode(SINGLE_QUOTED_TEXT), type(SQ_START)
         ;
 PF_DQ_START
-        : '"' -> pushMode(TEXT2), type(DQ_START)
+        : '"' -> pushMode(DOUBLE_QUOTED_TEXT), type(DQ_START)
         ;
 PF_WS
-        : (CtrlChar | ' ')+ -> skip
+        : (CtrlChar | [\p{Zs}])+ -> skip
         ;
 
 
