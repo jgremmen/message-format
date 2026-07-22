@@ -75,7 +75,7 @@ public final class ClassifierFormatter implements NamedParameterFormatter
 
     return context
         .getMap()
-        .getDefaultMessage(context.getMessageAccessor(), STRING)
+        .getDefaultMessage(STRING)
         .map(context::format)
         .orElseGet(() -> formatNull(context));
   }

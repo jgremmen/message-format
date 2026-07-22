@@ -154,8 +154,7 @@ public final class MessagePartMap implements MessagePart.Map
    */
   @Override
   @Contract(pure = true)
-  public @NotNull Optional<Message.WithSpaces> getDefaultMessage(@NotNull MessageAccessor messageAccessor,
-                                                                 @NotNull MapKey.Type keyType)
+  public @NotNull Optional<Message.WithSpaces> getDefaultMessage(@NotNull MapKey.Type keyType)
   {
     return defaultValue == null || !hasMessageWithKeyType(keyType)
         ? Optional.empty()

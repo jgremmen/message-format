@@ -335,8 +335,7 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
      * with the given {@code keyType}. If no entries for the given key type exist, the default
      * message is not applicable and an empty optional is returned.
      *
-     * @param messageAccessor  message accessor instance, not {@code null}
-     * @param keyType          key type to look for, not {@code null}
+     * @param keyType  key type to look for, not {@code null}
      *
      * @return  an optional containing the default message, or empty if there is no default or if
      *          the map has no entries for the given key type
@@ -344,8 +343,7 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
      * @since 0.21.0
      */
     @Contract(pure = true)
-    @NotNull Optional<Message.WithSpaces> getDefaultMessage(@NotNull MessageAccessor messageAccessor,
-                                                            @NotNull MapKey.Type keyType);
+    @NotNull Optional<Message.WithSpaces> getDefaultMessage(@NotNull MapKey.Type keyType);
 
 
     /**
