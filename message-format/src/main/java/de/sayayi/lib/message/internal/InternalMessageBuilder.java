@@ -452,7 +452,7 @@ public final class InternalMessageBuilder implements MessageBuilder
       implements ParameterBuilder
   {
     private final @NotNull String name;
-    private final @NotNull Map<MapKey,TypedValue<?>> map;
+    private final @NotNull Map<MapKey,TypedValue.MessageValue> map;
     private String format;
 
 

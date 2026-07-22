@@ -24,9 +24,13 @@ options {
 
 @header {
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.part.MessagePart.*;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.TypedValue;
+
+import java.util.Map;
+import java.util.SequencedMap;
 }
 
 
@@ -35,7 +39,11 @@ message returns [Message.WithSpaces messageWithSpaces]
         ;
 
 message0 returns [Message.WithSpaces messageWithSpaces]
-        : (textPart | parameterPart | templatePart | postFormatPart)*
+        : (  textPart
+           | parameterPart
+           | templatePart
+           | postFormatPart
+          )*
         ;
 
 textPart returns [Text part]
@@ -64,13 +72,25 @@ simpleString returns [String string]
 parameterPart returns [Parameter part]
         : P_START
           parameterName
-          (COMMA (configDefinition | mapEntry | parameterFormat))*
-          (COMMA mapEntryDefault)?
+          (COMMA parameterEntries)?
           P_END
         ;
 
 parameterName returns [String name]
         : nameOrKeyword  // kebab- or lower camel-case format
+        ;
+
+parameterEntries returns [String format,
+                          Map<String,TypedValue<?>> config,
+                          SequencedMap<MapKey,TypedValue.MessageValue> map]
+        : parameterEntry (COMMA parameterEntry)*
+        ;
+
+parameterEntry
+        : parameterFormat
+        | configDefinition
+        | mapEntry
+        | mapEntryDefault
         ;
 
 parameterFormat returns [String format]
@@ -88,11 +108,13 @@ templateName returns [String name]
         : nameOrKeyword  // kebab-case format
         ;
 
-templateParameterDelegate returns [String parameter, String delegatedParameter]
+templateParameterDelegate returns [String parameter,
+                                   String delegatedParameter]
         : nameOrKeyword ARROW nameOrKeyword  // both in kebab- or lower camel-case format
         ;
 
-templateParameterDefault returns [String parameter, TypedValue<?> value]
+templateParameterDefault returns [String parameter,
+                                  TypedValue<?> value]
         : nameOrKeyword EQ BOOL          #templateParameterDefaultBool
         | nameOrKeyword EQ NUMBER        #templateParameterDefaultNumber
         | nameOrKeyword EQ quotedString  #templateParameterDefaultString
@@ -110,14 +132,16 @@ postFormatName returns [String name]
         : nameOrKeyword  // kebab-case format
         ;
 
-configDefinition returns [String name, TypedValue<?> value]
+configDefinition returns [String name,
+                          TypedValue<?> value]
         : NAME COLON BOOL           #configDefinitionBool
         | NAME COLON NUMBER         #configDefinitionNumber
         | NAME COLON simpleString   #configDefinitionString
         | NAME COLON quotedMessage  #configDefinitionMessage
         ;
 
-mapEntry returns [List<MapKey> keys, TypedValue<?> value]
+mapEntry returns [List<MapKey> keys,
+                  TypedValue.MessageValue value]
         : mapKeys COLON quotedMessage  #mapEntryMessage
         | mapKeys COLON simpleString   #mapEntryString
         ;

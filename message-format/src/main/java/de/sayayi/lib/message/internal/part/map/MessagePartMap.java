@@ -26,8 +26,6 @@ import de.sayayi.lib.message.internal.part.config.BaseConfigAccessor;
 import de.sayayi.lib.message.internal.part.map.key.MapKeyBool;
 import de.sayayi.lib.message.internal.part.map.key.MapKeyNumber;
 import de.sayayi.lib.message.internal.part.map.key.MapKeyString;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart;
@@ -64,10 +62,10 @@ public final class MessagePartMap implements MessagePart.Map
   private final @NotNull MapKey[] mapKeys;
 
   /** Array containing the mapped message corresponding to the map key at the same index. */
-  private final @NotNull TypedValue<?>[] mapValues;
+  private final @NotNull TypedValue.MessageValue[] mapValues;
 
   /** Default message. */
-  private final TypedValue<?> defaultValue;
+  private final TypedValue.MessageValue defaultValue;
 
   /** Bitmask for {@link MapKey.Type} stating which keys map to a message. */
   private final byte hasKeyType;
@@ -78,10 +76,10 @@ public final class MessagePartMap implements MessagePart.Map
    *
    * @param map  message parameter config map, not {@code null}
    */
-  public MessagePartMap(@NotNull Map<MapKey,TypedValue<?>> map)
+  public MessagePartMap(@NotNull Map<MapKey,TypedValue.MessageValue> map)
   {
     final var mapKeyList = new ArrayList<OrderedConfigKey>();
-    TypedValue<?> mapNullValue = null;
+    TypedValue.MessageValue mapNullValue = null;
     MapKey key;
     var keyTypeMask = 0;
 
@@ -100,7 +98,7 @@ public final class MessagePartMap implements MessagePart.Map
 
     final var mapLength = mapKeyList.size();
     mapKeys = new MapKey[mapLength];
-    mapValues = new TypedValue[mapLength];
+    mapValues = new TypedValue.MessageValue[mapLength];
 
     for(var n = 0; n < mapLength; n++)
     {
@@ -147,12 +145,9 @@ public final class MessagePartMap implements MessagePart.Map
   public @NotNull Optional<Message.WithSpaces> getDefaultMessage(@NotNull MessageAccessor messageAccessor,
                                                                  @NotNull MapKey.Type keyType)
   {
-    if (defaultValue == null || !hasMessageWithKeyType(keyType))
-      return Optional.empty();
-
-    return Optional.of(defaultValue instanceof TypedValueString stringValue
-        ? stringValue.asMessage(messageAccessor.getMessageFactory())
-        : (Message.WithSpaces)defaultValue.asObject());
+    return defaultValue == null || !hasMessageWithKeyType(keyType)
+        ? Optional.empty()
+        : Optional.of(defaultValue.messageValue());
   }
 
 
@@ -260,8 +255,7 @@ public final class MessagePartMap implements MessagePart.Map
     var templateNames = new TreeSet<String>();
 
     for(var configValue: mapValues)
-      if (configValue instanceof TypedValueMessage)
-        templateNames.addAll(((TypedValueMessage)configValue).asObject().getTemplateNames());
+      templateNames.addAll(configValue.messageValue().getTemplateNames());
 
     return unmodifiableSet(templateNames);
   }
@@ -322,13 +316,13 @@ public final class MessagePartMap implements MessagePart.Map
   public static @NotNull MessagePartMap unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
       throws IOException
   {
-    final var map = new LinkedHashMap<MapKey,TypedValue<?>>();
+    final var map = new LinkedHashMap<MapKey,TypedValue.MessageValue>();
 
     for(int n = 0, size = packStream.readSmallVar(); n < size; n++)
-      map.put(unpack.unpackMapKey(packStream), unpack.unpackTypedValue(packStream));
+      map.put(unpack.unpackMapKey(packStream), unpack.fixMessageValue(unpack.unpackTypedValue(packStream)));
 
     if (packStream.readBoolean())
-      map.put(null, unpack.unpackTypedValue(packStream));
+      map.put(null, unpack.fixMessageValue(unpack.unpackTypedValue(packStream)));
 
     return new MessagePartMap(map);
   }
