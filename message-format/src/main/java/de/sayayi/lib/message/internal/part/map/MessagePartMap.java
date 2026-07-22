@@ -160,8 +160,7 @@ public final class MessagePartMap implements MessagePart.Map
     var configValue = findMappedValue(messageAccessor, locale, key, keyTypes, config);
     if (configValue == null)
     {
-      if (includeDefault && defaultValue != null &&
-          Arrays.stream(mapKeys).anyMatch(mk -> keyTypes.contains(mk.getType())))
+      if (includeDefault && defaultValue != null && keyTypes.stream().anyMatch(this::hasMessageWithKeyType))
         configValue = defaultValue;
       else
         return null;
@@ -256,6 +255,9 @@ public final class MessagePartMap implements MessagePart.Map
 
     for(var configValue: mapValues)
       templateNames.addAll(configValue.messageValue().getTemplateNames());
+
+    if (defaultValue != null)
+      templateNames.addAll(defaultValue.messageValue().getTemplateNames());
 
     return unmodifiableSet(templateNames);
   }
