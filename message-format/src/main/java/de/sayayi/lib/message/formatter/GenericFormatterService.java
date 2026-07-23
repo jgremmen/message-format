@@ -36,8 +36,6 @@ import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT;
 import static de.sayayi.lib.message.util.MessageUtil.isEmpty;
 import static de.sayayi.lib.message.util.MessageUtil.isKebabCaseName;
 import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 
 
@@ -53,6 +51,11 @@ import static java.util.Objects.requireNonNull;
  * default fallback formatter for {@link Object}.
  * <p>
  * Formatter lookup results are cached for performance. The cache size can be configured via the constructor.
+ * <p>
+ * This class is thread-safe. All mutating operations ({@link #addFormatter(ParameterFormatter)},
+ * {@link #addFormatterForType(FormattableType, ParameterFormatter)}, {@link #addPostFormatter(PostFormatter)}) and
+ * read operations ({@link #getFormatters(String, Class, Config)}, {@link #getPostFormatters()},
+ * {@link #getParameterConfigNames()}) are protected by a reentrant lock to ensure safe concurrent access.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0 (renamed in 0.4.1)
@@ -143,24 +146,29 @@ public non-sealed class GenericFormatterService implements FormatterService.With
     if (type == Object.class && !(formatter instanceof DefaultFormatter))
       throw new FormatterServiceException("formatter associated with Object must implement DefaultFormatter interface");
 
-    typeFormatters
-        .computeIfAbsent(type, t -> new ArrayList<>(4))
-        .add(new PrioritizedFormatter(formattableType.getOrder(), formatter));
+    lock.lock();
+    try {
+      typeFormatters
+          .computeIfAbsent(type, t -> new ArrayList<>(4))
+          .add(new PrioritizedFormatter(formattableType.getOrder(), formatter));
 
-    for(var parameterConfigName: formatter.getParameterConfigNames())
-      if (!isKebabCaseName(parameterConfigName))
-      {
-        final var formatterName = formatter instanceof NamedParameterFormatter namedParameterFormatter
-            ? '\'' + namedParameterFormatter.getName() + '\''
-            : formatter.getClass().getSimpleName();
+      for(var parameterConfigName: formatter.getParameterConfigNames())
+        if (!isKebabCaseName(parameterConfigName))
+        {
+          final var formatterName = formatter instanceof NamedParameterFormatter namedParameterFormatter
+              ? '\'' + namedParameterFormatter.getName() + '\''
+              : formatter.getClass().getSimpleName();
 
-        throw new FormatterServiceException("parameter configuration name '" + parameterConfigName +
-            "' for formatter " + formatterName + " does not match the kebab case naming convention");
-      }
-      else
-        parameterConfigNames.add(parameterConfigName);
-  
-    formatterCache.clear();
+          throw new FormatterServiceException("parameter configuration name '" + parameterConfigName +
+              "' for formatter " + formatterName + " does not match the kebab case naming convention");
+        }
+        else
+          parameterConfigNames.add(parameterConfigName);
+
+      formatterCache.clear();
+    } finally {
+      lock.unlock();
+    }
   }
 
 
@@ -249,8 +257,13 @@ public non-sealed class GenericFormatterService implements FormatterService.With
           postFormatter.getClass().getSimpleName() + " does not match the kebab case naming convention");
     }
 
-    if (postFormatters.put(postFormatterName, postFormatter) != null)
-      throw new FormatterServiceException("post formatter '" + postFormatterName + "' has already been registered");
+    lock.lock();
+    try {
+      if (postFormatters.put(postFormatterName, postFormatter) != null)
+        throw new FormatterServiceException("post formatter '" + postFormatterName + "' has already been registered");
+    } finally {
+      lock.unlock();
+    }
   }
 
 
@@ -370,15 +383,27 @@ public non-sealed class GenericFormatterService implements FormatterService.With
 
   /** {@inheritDoc} */
   @Override
-  public @UnmodifiableView @NotNull Map<String,PostFormatter> getPostFormatters() {
-    return unmodifiableMap(postFormatters);
+  public @UnmodifiableView @NotNull Map<String,PostFormatter> getPostFormatters()
+  {
+    lock.lock();
+    try {
+      return Map.copyOf(postFormatters);
+    } finally {
+      lock.unlock();
+    }
   }
 
 
   /** {@inheritDoc} */
   @Override
-  public @UnmodifiableView @NotNull Set<String> getParameterConfigNames() {
-    return unmodifiableSet(parameterConfigNames);
+  public @UnmodifiableView @NotNull Set<String> getParameterConfigNames()
+  {
+    lock.lock();
+    try {
+      return Set.copyOf(parameterConfigNames);
+    } finally {
+      lock.unlock();
+    }
   }
 
 
