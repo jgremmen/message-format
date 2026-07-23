@@ -63,7 +63,7 @@ import static java.util.function.Function.identity;
 public final class PackSupport
 {
   /** Current pack format version. */
-  public static final int VERSION = 3;
+  public static final int VERSION = 4;
 
   /** MIME type used to identify message format pack data. */
   public static final String MIME_TYPE = "application/x-message-format-pack";

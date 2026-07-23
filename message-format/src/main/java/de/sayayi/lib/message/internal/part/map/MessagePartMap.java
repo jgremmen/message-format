@@ -26,6 +26,7 @@ import de.sayayi.lib.message.internal.part.config.BaseConfigAccessor;
 import de.sayayi.lib.message.internal.part.map.key.MapKeyBool;
 import de.sayayi.lib.message.internal.part.map.key.MapKeyNumber;
 import de.sayayi.lib.message.internal.part.map.key.MapKeyString;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart;
@@ -71,7 +72,7 @@ public final class MessagePartMap implements MessagePart.Map
   private final @NotNull MapKey[] mapKeys;
 
   /** Array containing the mapped message corresponding to the map key at the same index. */
-  private final @NotNull TypedValue.MessageValue[] mapValues;
+  private final @NotNull TypedValue.MessageValue[] mapMessages;
 
   /** Default message. */
   private final TypedValue.MessageValue defaultValue;
@@ -107,12 +108,12 @@ public final class MessagePartMap implements MessagePart.Map
 
     final var mapLength = mapKeyList.size();
     mapKeys = new MapKey[mapLength];
-    mapValues = new TypedValue.MessageValue[mapLength];
+    mapMessages = new TypedValue.MessageValue[mapLength];
 
     for(var n = 0; n < mapLength; n++)
     {
       mapKeys[n] = mapKeyList.get(n).mapKey();
-      mapValues[n] = map.get(mapKeys[n]);
+      mapMessages[n] = map.get(mapKeys[n]);
     }
 
     this.defaultValue = mapNullValue;
@@ -129,7 +130,7 @@ public final class MessagePartMap implements MessagePart.Map
   @Override
   @Contract(pure = true)
   public boolean isEmpty() {
-    return mapValues.length == 0 && defaultValue == null;
+    return mapMessages.length == 0 && defaultValue == null;
   }
 
 
@@ -205,7 +206,7 @@ public final class MessagePartMap implements MessagePart.Map
         if (MatchResult.compare(matchResult, bestMatchResult) > 0)
         {
           bestMatchResult = matchResult;
-          bestMatch = mapValues[n];
+          bestMatch = mapMessages[n];
         }
       }
 
@@ -264,12 +265,12 @@ public final class MessagePartMap implements MessagePart.Map
   @Unmodifiable
   public @NotNull Set<String> getTemplateNames()
   {
-    if (mapValues.length == 0 && defaultValue == null)
+    if (mapMessages.length == 0 && defaultValue == null)
       return Set.of();
 
     var templateNames = new TreeSet<String>();
 
-    for(var configValue: mapValues)
+    for(var configValue: mapMessages)
       templateNames.addAll(configValue.messageValue().getTemplateNames());
 
     if (defaultValue != null)
@@ -288,7 +289,7 @@ public final class MessagePartMap implements MessagePart.Map
     return o instanceof MessagePartMap that &&
         hasKeyType == that.hasKeyType &&
         Arrays.equals(mapKeys, that.mapKeys) &&
-        Arrays.equals(mapValues, that.mapValues) &&
+        Arrays.equals(mapMessages, that.mapMessages) &&
         Objects.equals(defaultValue, that.defaultValue);
   }
 
@@ -298,7 +299,7 @@ public final class MessagePartMap implements MessagePart.Map
    */
   @Override
   public int hashCode() {
-    return (Objects.hashCode(defaultValue) * 59 + Arrays.hashCode(mapKeys)) * 59 + Arrays.hashCode(mapValues);
+    return (Objects.hashCode(defaultValue) * 59 + Arrays.hashCode(mapKeys)) * 59 + Arrays.hashCode(mapMessages);
   }
 
 
@@ -313,7 +314,7 @@ public final class MessagePartMap implements MessagePart.Map
 
     // map
     for(var n = 0; n < mapKeys.length; n++)
-      s.add(mapKeys[n].toString() + ':' + mapValues[n]);
+      s.add(mapKeys[n].toString() + ':' + mapMessages[n]);
 
     if (defaultValue != null)
       s.add(":" + defaultValue);
@@ -332,18 +333,16 @@ public final class MessagePartMap implements MessagePart.Map
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeSmallVar(mapKeys.length);
+    packStream.writeBoolean(defaultValue != null);
 
     for(int n = 0, l = mapKeys.length; n < l; n++)
     {
       PackSupport.pack(mapKeys[n], packStream);
-      PackSupport.pack(mapValues[n], packStream);
+      ((TypedValueMessage)mapMessages[n]).pack(packStream);
     }
 
-    final var hasDefaultValue = defaultValue != null;
-    packStream.writeBoolean(hasDefaultValue);
-
-    if (hasDefaultValue)
-      PackSupport.pack(defaultValue, packStream);
+    if (defaultValue != null)
+      ((TypedValueMessage)defaultValue).pack(packStream);
   }
 
 
@@ -361,12 +360,26 @@ public final class MessagePartMap implements MessagePart.Map
       throws IOException
   {
     final var map = new LinkedHashMap<MapKey,TypedValue.MessageValue>();
+    final var size = packStream.readSmallVar();
 
-    for(int n = 0, size = packStream.readSmallVar(); n < size; n++)
-      map.put(unpack.unpackMapKey(packStream), unpack.fixMessageValue(unpack.unpackTypedValue(packStream)));
+    if (packStream.getVersion().orElseThrow() >= 4)
+    {
+      final var hasDefault = packStream.readBoolean();
 
-    if (packStream.readBoolean())
-      map.put(null, unpack.fixMessageValue(unpack.unpackTypedValue(packStream)));
+      for(int n = 0; n < size; n++)
+        map.put(unpack.unpackMapKey(packStream), TypedValueMessage.unpack(unpack, packStream));
+
+      if (hasDefault)
+        map.put(null, TypedValueMessage.unpack(unpack, packStream));
+    }
+    else
+    {
+      for(int n = 0; n < size; n++)
+        map.put(unpack.unpackMapKey(packStream), unpack.fixMessageValue(unpack.unpackTypedValue(packStream)));
+
+      if (packStream.readBoolean())
+        map.put(null, unpack.fixMessageValue(unpack.unpackTypedValue(packStream)));
+    }
 
     return new MessagePartMap(map);
   }
@@ -398,7 +411,7 @@ public final class MessagePartMap implements MessagePart.Map
       }
       else if (idx < mapKeys.length)
       {
-        nextEntry = new SimpleImmutableEntry<>(mapKeys[idx], mapValues[idx]);
+        nextEntry = new SimpleImmutableEntry<>(mapKeys[idx], mapMessages[idx]);
         idx++;
       }
       else
