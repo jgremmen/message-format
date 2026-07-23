@@ -30,8 +30,8 @@ import static java.util.Arrays.fill;
 /**
  * The formatter cache is a fixed size cache for storing a sorted list of parameter formatters for each value type.
  * <p>
- * The cache prioritizes frequently used value types and drops the least used ones as soon as the cache size
- * is exhausted.
+ * The cache prioritizes frequently used value types and drops the least used ones as soon as the cache size is
+ * exhausted.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -86,8 +86,8 @@ final class FormatterCache
    * {@code buildFormatters} function is invoked to create the formatter list and the result is added to the cache.
    * <p>
    * The {@code buildFormatters} function is invoked outside the lock to avoid blocking other threads during
-   * potentially expensive formatter construction. A double-check pattern is used to handle concurrent builds
-   * for the same type.
+   * potentially expensive formatter construction. A double-check pattern is used to handle concurrent builds for the
+   * same type.
    *
    * @param type             value type to look up formatters for, not {@code null}
    * @param buildFormatters  function to build the formatter list if not cached, not {@code null}
@@ -136,6 +136,11 @@ final class FormatterCache
   }
 
 
+  /**
+   * Moves the given node to the head of the linked list, promoting it as the most recently accessed entry.
+   *
+   * @param node  the node to promote, not {@code null}
+   */
   private void moveNodeToHead(@NotNull Node node)
   {
     final var prevNode = node.prev;
@@ -160,6 +165,13 @@ final class FormatterCache
   }
 
 
+  /**
+   * Adds a new type-to-formatters mapping to the cache. If the cache is at full capacity, the least recently used
+   * entry (tail) is evicted first.
+   *
+   * @param type        the value type to cache, not {@code null}
+   * @param formatters  the formatter list for the type, not {@code null}
+   */
   private void addNew(@NotNull Class<?> type, @NotNull ParameterFormatter[] formatters)
   {
     // if capacity has been reached -> remove tail
@@ -209,6 +221,13 @@ final class FormatterCache
   }
 
 
+  /**
+   * Performs a binary search for the given type in the sorted type array.
+   *
+   * @param type  the type to search for, not {@code null}
+   *
+   * @return  the index if found, or {@code -(insertion point) - 1} if not found
+   */
   private int findTypeIndex(@NotNull Class<?> type)
   {
     final var typeName = type.getName();
@@ -235,6 +254,9 @@ final class FormatterCache
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String toString()
   {
@@ -274,6 +296,9 @@ final class FormatterCache
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString()
     {

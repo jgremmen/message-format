@@ -88,7 +88,7 @@ public final class MessagePartMap implements MessagePart.Map
    */
   public MessagePartMap(@NotNull Map<MapKey,TypedValue.MessageValue> map)
   {
-    final var mapKeyList = new ArrayList<OrderedConfigKey>();
+    final var mapKeyList = new ArrayList<OrderedMapKey>();
     TypedValue.MessageValue mapNullValue = null;
     MapKey key;
     var keyTypeMask = 0;
@@ -99,12 +99,12 @@ public final class MessagePartMap implements MessagePart.Map
         mapNullValue = entry.getValue();
       else
       {
-        mapKeyList.add(new OrderedConfigKey(mapKeyList.size(), key));
+        mapKeyList.add(new OrderedMapKey(mapKeyList.size(), key));
         keyTypeMask |= 1 << key.getType().ordinal();
       }
     }
 
-    mapKeyList.sort(OrderedConfigKey.SORTER);
+    mapKeyList.sort(OrderedMapKey.SORTER);
 
     final var mapLength = mapKeyList.size();
     mapKeys = new MapKey[mapLength];
@@ -185,6 +185,18 @@ public final class MessagePartMap implements MessagePart.Map
   }
 
 
+  /**
+   * Finds the best matching mapped value for the given parameter value by iterating over all map keys that match
+   * the specified key types and comparing them using the registered formatters.
+   *
+   * @param messageAccessor  accessor for formatter lookup, not {@code null}
+   * @param locale           locale for comparison, not {@code null}
+   * @param value            the parameter value to match against map keys
+   * @param keyTypes         set of key types to consider during matching, not {@code null}
+   * @param config           optional configuration for formatter resolution
+   *
+   * @return  the best matching message value, or {@code null} if no key matches
+   */
   @Contract(pure = true)
   private TypedValue.MessageValue findMappedValue(@NotNull MessageAccessor messageAccessor, @NotNull Locale locale,
                                                   Object value, @NotNull Set<MapKey.Type> keyTypes,
@@ -214,6 +226,16 @@ public final class MessagePartMap implements MessagePart.Map
   }
 
 
+  /**
+   * Determines the best match result for a given value against the current map key by iterating over all provided
+   * formatters that implement {@link MapKeyComparator}.
+   *
+   * @param context     comparator context providing the current map key and locale, not {@code null}
+   * @param formatters  parameter formatters to use for comparison, not {@code null}
+   * @param value       the value to compare against the current map key
+   *
+   * @return  the best match result across all formatters, never {@code null}
+   */
   @SuppressWarnings({"rawtypes", "unchecked"})
   private static @NotNull MatchResult findBestMatch(@NotNull ComparatorContext context,
                                                     @NotNull ParameterFormatter[] formatters, Object value)
@@ -241,9 +263,8 @@ public final class MessagePartMap implements MessagePart.Map
 
 
   /**
-   * Returns an iterator over all map entries in this message part map. The iterator yields the
-   * sorted key-value entries first, followed by the default value entry (with a {@code null} key)
-   * if one is defined.
+   * Returns an iterator over all map entries in this message part map. The iterator yields the sorted key-value
+   * entries first, followed by the default value entry (with a {@code null} key) if one is defined.
    *
    * @return  iterator over all map entries, never {@code null}
    *
@@ -255,8 +276,8 @@ public final class MessagePartMap implements MessagePart.Map
 
 
   /**
-   * Returns a set of template names referenced in all message values which are available in
-   * the message parameter configuration.
+   * Returns a set of template names referenced in all message values which are available in the message parameter
+   * configuration.
    *
    * @return  unmodifiable set of all referenced template names, never {@code null}
    */
@@ -419,12 +440,18 @@ public final class MessagePartMap implements MessagePart.Map
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean hasNext() {
       return nextEntry != null;
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Entry<MapKey,TypedValue<?>> next()
     {
@@ -461,42 +488,63 @@ public final class MessagePartMap implements MessagePart.Map
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public @NotNull MapKey.CompareType getCompareType() {
       return mapKey.getCompareType();
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public @NotNull MapKey.Type getKeyType() {
       return mapKey.getType();
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean getBoolKeyValue() {
       return ((MapKeyBool)mapKey).isBool();
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long getNumberKeyValue() {
       return ((MapKeyNumber)mapKey).getNumber();
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public @NotNull String getStringKeyValue() {
       return ((MapKeyString)mapKey).getString();
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public @NotNull Locale getLocale() {
       return locale;
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public @NotNull MatchResult matchForObject(Object value)
     {
@@ -505,6 +553,9 @@ public final class MessagePartMap implements MessagePart.Map
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public @NotNull <T> MatchResult matchForObject(@NotNull T value, @NotNull Class<T> valueType) {
       return findBestMatch(this, messageAccessor.getFormatters(valueType, config), value);

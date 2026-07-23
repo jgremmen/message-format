@@ -89,18 +89,27 @@ public final class PostFormatterPart implements MessagePart.PostFormat
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public @NotNull String getName() {
     return name;
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public @NotNull Message.WithSpaces getMessage() {
     return message;
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @Contract(pure = true)
   public @NotNull MessagePart.Config getConfig() {
@@ -108,12 +117,18 @@ public final class PostFormatterPart implements MessagePart.PostFormat
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean isSpaceBefore() {
     return spaceBefore;
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean isSpaceAfter() {
     return spaceAfter;
@@ -150,6 +165,9 @@ public final class PostFormatterPart implements MessagePart.PostFormat
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void serialize(@NotNull Context context)
   {
@@ -176,6 +194,9 @@ public final class PostFormatterPart implements MessagePart.PostFormat
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean equals(Object o)
   {
@@ -188,12 +209,18 @@ public final class PostFormatterPart implements MessagePart.PostFormat
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public int hashCode() {
     return name.hashCode() * 11 + (spaceBefore ? 8 : 0) + (spaceAfter ? 2 : 0);
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @Contract(pure = true)
   public String toString()

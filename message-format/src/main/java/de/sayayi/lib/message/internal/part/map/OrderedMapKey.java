@@ -27,18 +27,37 @@ import static de.sayayi.lib.message.part.MapKey.Type.*;
 
 
 /**
- * This record represents a configuration key with an order for sorting.
+ * This record represents a map key with an insertion order for stable sorting. Map keys are sorted first by their
+ * logical sort order and then by insertion order to preserve definition sequence within the same sort order.
+ * <p>
+ * The logical sort order is determined by both the key type and the compare type:
+ * <table>
+ *   <caption>Map key sort order</caption>
+ *   <tr><th>Order</th><th>Type</th><th>CompareType</th><th>Description</th></tr>
+ *   <tr><td>0</td><td>NULL</td><td>EQ</td><td>=null</td></tr>
+ *   <tr><td>1</td><td>EMPTY</td><td>EQ</td><td>=empty</td></tr>
+ *   <tr><td>2</td><td>BOOL</td><td>(any)</td><td>bool</td></tr>
+ *   <tr><td>3</td><td>NUMBER</td><td>(any)</td><td>number</td></tr>
+ *   <tr><td>4</td><td>STRING</td><td>(any)</td><td>string</td></tr>
+ *   <tr><td>5</td><td>EMPTY</td><td>NE</td><td>!empty</td></tr>
+ *   <tr><td>6</td><td>NULL</td><td>NE</td><td>!null</td></tr>
+ *   <tr><td>7</td><td>(other)</td><td>(other)</td><td>default</td></tr>
+ * </table>
  *
- * @param order      the order of the configuration key, used for sorting
- * @param mapKey  the configuration key, not {@code null}
+ * @param order   the insertion order of the map key, used as tie-breaker during sorting
+ * @param mapKey  the map key, not {@code null}
  *
+ * @author Jeroen Gremmen
  * @since 0.21.0
  */
-record OrderedConfigKey(int order, @NotNull MapKey mapKey)
+record OrderedMapKey(int order, @NotNull MapKey mapKey)
 {
-  static final Comparator<OrderedConfigKey> SORTER = new Comparator<>() {
+  /**
+   * Comparator that sorts map keys by their logical type priority first, and by insertion order second.
+   */
+  static final Comparator<OrderedMapKey> SORTER = new Comparator<>() {
     @Override
-    public int compare(OrderedConfigKey k1, OrderedConfigKey k2)
+    public int compare(OrderedMapKey k1, OrderedMapKey k2)
     {
       var cmp = Integer.compare(configKeyToOrder(k1.mapKey()), configKeyToOrder(k2.mapKey()));
       if (cmp == 0)

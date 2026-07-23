@@ -44,10 +44,19 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * Parameter message part with optional leading and/or trailing spaces.
+ * Internal implementation of {@link MessagePart.Parameter} representing a named parameter reference within a message
+ * format. A parameter part resolves its value at format time by looking up the parameter name in the provided
+ * parameters and delegating to the appropriate {@link de.sayayi.lib.message.formatter.parameter.ParameterFormatter
+ * ParameterFormatter}.
+ * <p>
+ * Each parameter part may optionally specify a formatter name, a configuration map, and a key-value map for
+ * conditional message selection. Leading and trailing spaces are preserved as part of the formatted output.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0
+ *
+ * @see MessagePart.Parameter
+ * @see de.sayayi.lib.message.formatter.parameter.ParameterFormatter ParameterFormatter
  */
 public final class ParameterPart implements MessagePart.Parameter
 {
@@ -104,6 +113,16 @@ public final class ParameterPart implements MessagePart.Parameter
   }
 
 
+  /**
+   * Construct a parameter part with all options specified.
+   *
+   * @param name         parameter name, not {@code null} or empty
+   * @param format       optional formatter name, or {@code null} for automatic formatter selection
+   * @param spaceBefore  adds a leading space to this parameter
+   * @param spaceAfter   adds a trailing space to this parameter
+   * @param config       parameter configuration, not {@code null}
+   * @param map          parameter map for conditional value selection, not {@code null}
+   */
   public ParameterPart(@NotNull String name, String format, boolean spaceBefore, boolean spaceAfter,
                        @NotNull MessagePartConfig config, @NotNull MessagePartMap map)
   {
@@ -116,6 +135,9 @@ public final class ParameterPart implements MessagePart.Parameter
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @Contract(pure = true)
   public @NotNull String getName() {
@@ -123,6 +145,9 @@ public final class ParameterPart implements MessagePart.Parameter
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @Contract(pure = true)
   public String getFormat() {
@@ -130,6 +155,9 @@ public final class ParameterPart implements MessagePart.Parameter
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @Contract(pure = true)
   public @NotNull MessagePart.Config getConfig() {
@@ -137,24 +165,36 @@ public final class ParameterPart implements MessagePart.Parameter
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public @NotNull MessagePart.Map getMap() {
     return map;
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean isSpaceBefore() {
     return spaceBefore;
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean isSpaceAfter() {
     return spaceAfter;
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @Contract(pure = true)
   public @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
@@ -166,6 +206,9 @@ public final class ParameterPart implements MessagePart.Parameter
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void serialize(@NotNull Context context)
   {
@@ -209,6 +252,9 @@ public final class ParameterPart implements MessagePart.Parameter
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean equals(Object o)
   {
@@ -222,12 +268,18 @@ public final class ParameterPart implements MessagePart.Parameter
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public int hashCode() {
     return name.hashCode() * 11 + (spaceBefore ? 8 : 0) + (spaceAfter ? 2 : 0);
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @Contract(pure = true)
   public String toString()
@@ -253,7 +305,9 @@ public final class ParameterPart implements MessagePart.Parameter
 
 
   /**
-   * @param packStream  data output pack target
+   * Writes this parameter part to the given pack output stream.
+   *
+   * @param packStream  data output pack target, not {@code null}
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -272,7 +326,9 @@ public final class ParameterPart implements MessagePart.Parameter
 
 
   /**
-   * @param unpack      unpacker instance, not {@code null}
+   * Reads a parameter part from the given pack input stream.
+   *
+   * @param unpack      unpacker instance providing deserialization support, not {@code null}
    * @param packStream  source data input, not {@code null}
    *
    * @return  unpacked parameter part, never {@code null}
