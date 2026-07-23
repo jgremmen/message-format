@@ -138,13 +138,13 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   @MustBeInvokedByOverriders
   public void addFormatterForType(@NotNull FormattableType formattableType, @NotNull ParameterFormatter formatter)
   {
-    if (formattableType.getType() == Object.class && !(formatter instanceof DefaultFormatter))
+    final var type = requireNonNull(formattableType, "formattableType must not be null").getType();
+
+    if (type == Object.class && !(formatter instanceof DefaultFormatter))
       throw new FormatterServiceException("formatter associated with Object must implement DefaultFormatter interface");
 
     typeFormatters
-        .computeIfAbsent(
-            requireNonNull(formattableType, "formattableType must not be null").getType(),
-            type -> new ArrayList<>(4))
+        .computeIfAbsent(type, t -> new ArrayList<>(4))
         .add(new PrioritizedFormatter(formattableType.getOrder(), formatter));
 
     for(var parameterConfigName: formatter.getParameterConfigNames())
@@ -250,7 +250,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
     }
 
     if (postFormatters.put(postFormatterName, postFormatter) != null)
-      throw new FormatterServiceException("post formatter '" + postFormatter + "' has already been registered");
+      throw new FormatterServiceException("post formatter '" + postFormatterName + "' has already been registered");
   }
 
 
@@ -333,7 +333,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
       if (type.isPrimitive() || (isArray && type.getComponentType().isPrimitive()))
         type = WRAPPER_CLASS_MAP.get(type);
 
-      // object arrays != Object[] (eg. String[]) will imply Object[] as well
+      // object arrays != Object[] (e.g. String[]) will imply Object[] as well
       if (isArray && type.getComponentType() != Object.class)
         collectedTypes.add(Object[].class);  // default array formatter
     }
