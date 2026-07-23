@@ -18,6 +18,9 @@ package de.sayayi.lib.message.formatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.StringJoiner;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
 import static java.lang.System.arraycopy;
@@ -35,6 +38,8 @@ import static java.util.Arrays.fill;
  */
 final class FormatterCache
 {
+  private final Lock lock = new ReentrantLock();
+
   private final int capacity;
   private final Object[] typeFormatters;  // 2 * n = type, 2 * n + 1 = node
 
@@ -60,49 +65,74 @@ final class FormatterCache
   /**
    * Removes all entries from this cache.
    */
-  synchronized void clear()
+  void clear()
   {
-    fill(typeFormatters, null);
+    lock.lock();
+    try {
+      fill(typeFormatters, null);
 
-    head = null;
-    tail = null;
+      head = null;
+      tail = null;
 
-    typeCount = 0;
+      typeCount = 0;
+    } finally {
+      lock.unlock();
+    }
   }
 
 
   /**
    * Looks up the parameter formatters for the given {@code type}. If the type is not yet cached, the
    * {@code buildFormatters} function is invoked to create the formatter list and the result is added to the cache.
+   * <p>
+   * The {@code buildFormatters} function is invoked outside the lock to avoid blocking other threads during
+   * potentially expensive formatter construction. A double-check pattern is used to handle concurrent builds
+   * for the same type.
    *
    * @param type             value type to look up formatters for, not {@code null}
    * @param buildFormatters  function to build the formatter list if not cached, not {@code null}
    *
    * @return  cached or newly built parameter formatters for the given type, never {@code null}
    */
-  synchronized @NotNull ParameterFormatter[] lookup(@NotNull Class<?> type,
-                                                    @NotNull Function<Class<?>,ParameterFormatter[]> buildFormatters)
+  @NotNull ParameterFormatter[] lookup(@NotNull Class<?> type,
+                                       @NotNull Function<Class<?>,ParameterFormatter[]> buildFormatters)
   {
-    //TODO fix concurrency issue?
+    lock.lock();
+    try {
+      final var idx = findTypeIndex(type);
 
-    final var idx = findTypeIndex(type);
-    final ParameterFormatter[] formatters;
+      if (idx >= 0)
+      {
+        var node = (Node)typeFormatters[idx * 2 + 1];
 
-    if (idx >= 0)
-    {
-      var node = (Node)typeFormatters[idx * 2 + 1];
+        // move to head?
+        // start moving if we've reached 75% of the total capacity and the node is located in the lower 25%
+        if (node != head && typeCount >= capacity * 3 / 4 && node.countNext < typeCount / 4)
+          moveNodeToHead(node);
 
-      // move to head?
-      // start moving if we've reached 75% of the total capacity and the node is located in the lower 25%
-      if (node != head && typeCount >= capacity * 3 / 4 && node.countNext < typeCount / 4)
-        moveNodeToHead(node);
-
-      formatters = node.formatters;
+        return node.formatters;
+      }
+    } finally {
+      lock.unlock();
     }
-    else
-      addNew(type, formatters = buildFormatters.apply(type));
 
-    return formatters;
+    // build formatters outside the lock to avoid blocking other threads
+    final var formatters = buildFormatters.apply(type);
+
+    lock.lock();
+    try {
+      // double-check: another thread may have added the same type while we were building
+      final var idx = findTypeIndex(type);
+
+      if (idx >= 0)
+        return ((Node)typeFormatters[idx * 2 + 1]).formatters;
+
+      addNew(type, formatters);
+
+      return formatters;
+    } finally {
+      lock.unlock();
+    }
   }
 
 
@@ -208,17 +238,17 @@ final class FormatterCache
   @Override
   public String toString()
   {
-    final var s = new StringBuilder("[");
+    lock.lock();
+    try {
+      final var s = new StringJoiner(", ", "[", "]");
 
-    for(var n = head; n != null; n = n.next)
-    {
-      if (n != head)
-        s.append(", ");
+      for(var n = head; n != null; n = n.next)
+        s.add(n.toString());
 
-      s.append(n);
+      return s.toString();
+    } finally {
+      lock.unlock();
     }
-
-    return s.append(']').toString();
   }
 
 
