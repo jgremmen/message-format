@@ -65,7 +65,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   /** Maps primitive types and primitive array types to their corresponding wrapper types. */
   private static final @NotNull Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
 
-  private final Lock $lock = new ReentrantLock();
+  private final Lock lock = new ReentrantLock();
 
   private final @NotNull Map<String,NamedParameterFormatter> namedFormatters = new TreeMap<>();
   private final @NotNull Map<String,NamedParameterFormatter> configNameToNamedFormatterMap = new TreeMap<>();
@@ -179,7 +179,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   {
     requireNonNull(formatter, "formatter must not be null");
 
-    $lock.lock();
+    lock.lock();
     try {
       if (formatter instanceof NamedParameterFormatter namedParameterFormatter)
       {
@@ -202,7 +202,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
       for(var formattableType: formatter.getFormattableTypes())
         addFormatterForType(formattableType, formatter);
     } finally {
-      $lock.unlock();
+      lock.unlock();
     }
   }
 
@@ -274,7 +274,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   {
     requireNonNull(type, "type must not be null");
 
-    $lock.lock();
+    lock.lock();
     try {
       if (format != null)
       {
@@ -307,7 +307,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
 
       return formatters.toArray(new ParameterFormatter[0]);
     } finally {
-      $lock.unlock();
+      lock.unlock();
     }
   }
 
@@ -403,8 +403,13 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   {
     /** {@inheritDoc} */
     @Override
-    public int compareTo(@NotNull PrioritizedFormatter o) {
-      return Integer.compare(order, o.order);
+    public int compareTo(@NotNull PrioritizedFormatter o)
+    {
+      var cmp = Integer.compare(order, o.order);
+      if (cmp == 0)
+        cmp = formatter.getClass().getName().compareTo(o.formatter.getClass().getName());
+
+      return cmp;
     }
 
 
