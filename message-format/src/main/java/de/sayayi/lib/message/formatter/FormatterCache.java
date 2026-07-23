@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Function;
 
 import static java.lang.System.arraycopy;
+import static java.util.Arrays.fill;
 
 
 /**
@@ -50,7 +51,7 @@ final class FormatterCache
   FormatterCache(int n)
   {
     capacity = Math.max(n, 8);
-    typeFormatters = new Object[n * 2];
+    typeFormatters = new Object[capacity * 2];
 
     clear();
   }
@@ -61,8 +62,11 @@ final class FormatterCache
    */
   synchronized void clear()
   {
+    fill(typeFormatters, null);
+
     head = null;
     tail = null;
+
     typeCount = 0;
   }
 
@@ -79,6 +83,8 @@ final class FormatterCache
   synchronized @NotNull ParameterFormatter[] lookup(@NotNull Class<?> type,
                                                     @NotNull Function<Class<?>,ParameterFormatter[]> buildFormatters)
   {
+    //TODO fix concurrency issue?
+
     final var idx = findTypeIndex(type);
     final ParameterFormatter[] formatters;
 
