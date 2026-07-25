@@ -28,6 +28,7 @@ import java.util.stream.StreamSupport;
 
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.copyOf;
+import static java.util.Arrays.fill;
 import static java.util.Objects.requireNonNull;
 
 
@@ -37,6 +38,14 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * Keys are maintained in natural string order, enabling binary search for efficient lookups. {@code null} keys are
  * not supported.
+ * <p>
+ * <b>Concurrent modification while iterating:</b> While the map is unsealed, the iterators, spliterators and streams
+ * returned by this map (and its collection views) are <em>not</em> fail-fast. If the map is structurally modified
+ * after an iterator or spliterator is created, the iteration result is undefined: entries may be skipped, duplicated
+ * or otherwise inconsistent, and no {@link java.util.ConcurrentModificationException} will be thrown. The same
+ * applies to {@link #forEach(java.util.function.BiConsumer)} and the entry set's
+ * {@link java.util.Set#forEach(java.util.function.Consumer) forEach}. Once the map is {@linkplain #seal() sealed},
+ * structural modification is impossible and iteration is inherently safe.
  * <p>
  * This map is not thread-safe.
  *
@@ -249,7 +258,12 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
         final var offset = idx * 2;
 
         result = (V)kv[offset + 1];
-        arraycopy(kv, offset + 2, kv, offset, --size * 2 - offset);
+
+        final var newSize = --size * 2;
+        arraycopy(kv, offset + 2, kv, offset, newSize - offset);
+
+        kv[newSize] = null;
+        kv[newSize + 1] = null;
       }
     }
 
@@ -272,6 +286,8 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
         throw new UnsupportedOperationException("clear");
 
       size = 0;
+
+      fill(kv, null);
     }
   }
 
