@@ -44,6 +44,8 @@ final class FormatterCache
   private final Object[] typeFormatters;  // 2 * n = type, 2 * n + 1 = node
 
   private int typeCount;
+  private int modCount;
+
   private Node head;
   private Node tail;
 
@@ -75,6 +77,7 @@ final class FormatterCache
       tail = null;
 
       typeCount = 0;
+      modCount++;
     } finally {
       lock.unlock();
     }
@@ -86,8 +89,8 @@ final class FormatterCache
    * {@code buildFormatters} function is invoked to create the formatter list and the result is added to the cache.
    * <p>
    * The {@code buildFormatters} function is invoked outside the lock to avoid blocking other threads during
-   * potentially expensive formatter construction. A double-check pattern is used to handle concurrent builds for the
-   * same type.
+   * potentially expensive formatter construction. A modification counter is used to skip the redundant type lookup
+   * on re-entry when no concurrent modification occurred.
    *
    * @param type             value type to look up formatters for, not {@code null}
    * @param buildFormatters  function to build the formatter list if not cached, not {@code null}
@@ -97,13 +100,14 @@ final class FormatterCache
   @NotNull ParameterFormatter[] lookup(@NotNull Class<?> type,
                                        @NotNull Function<Class<?>,ParameterFormatter[]> buildFormatters)
   {
+    final int _modCount;
+    int idx;
+
     lock.lock();
     try {
-      final var idx = findTypeIndex(type);
-
-      if (idx >= 0)
+      if ((idx = findTypeIndex(type)) >= 0)
       {
-        var node = (Node)typeFormatters[idx * 2 + 1];
+        final var node = (Node)typeFormatters[idx * 2 + 1];
 
         // move to head?
         // start moving if we've reached 75% of the total capacity and the node is located in the lower 25%
@@ -112,6 +116,8 @@ final class FormatterCache
 
         return node.formatters;
       }
+
+      _modCount = modCount;
     } finally {
       lock.unlock();
     }
@@ -121,10 +127,7 @@ final class FormatterCache
 
     lock.lock();
     try {
-      // double-check: another thread may have added the same type while we were building
-      final var idx = findTypeIndex(type);
-
-      if (idx >= 0)
+      if (modCount != _modCount && (idx = findTypeIndex(type)) >= 0)
         return ((Node)typeFormatters[idx * 2 + 1]).formatters;
 
       addNew(type, formatters);
@@ -216,6 +219,7 @@ final class FormatterCache
     typeFormatters[insertOffset] = type;
     typeFormatters[insertOffset + 1] = node;
     typeCount++;
+    modCount++;
 
     head = node;
   }

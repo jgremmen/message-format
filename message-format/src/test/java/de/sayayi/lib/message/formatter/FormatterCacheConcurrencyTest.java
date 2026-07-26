@@ -132,7 +132,7 @@ final class FormatterCacheConcurrencyTest
     for(var result: results)
       assertNotNull(result);
 
-    // buildFormatters may be called more than once due to the double-check pattern,
+    // buildFormatters may be called more than once due to the concurrent lookup pattern,
     // but the cache should not be corrupted
     val finalResult = cache.lookup(String.class, t -> fail("should be cached"));
     assertNotNull(finalResult);
