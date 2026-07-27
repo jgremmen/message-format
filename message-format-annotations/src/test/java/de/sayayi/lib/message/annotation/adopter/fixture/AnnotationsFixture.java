@@ -78,6 +78,13 @@ public final class AnnotationsFixture
   public void methodC() {}
 
 
+  // 2 @MessageDef on constructor → stored as @MessageDefs container in bytecode
+  @MessageDef(code = "ctor-msg-1", text = "Constructor message 1")
+  @MessageDef(code = "ctor-msg-2", texts = {
+      @Text(locale = "en", text = "EN ctor msg 2"),
+      @Text(locale = "de", text = "DE ctor msg 2")
+  })
+  public AnnotationsFixture() {}
 
 
   // Inner record class with type-level annotations

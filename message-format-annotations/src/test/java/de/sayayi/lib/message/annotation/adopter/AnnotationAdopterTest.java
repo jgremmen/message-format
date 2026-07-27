@@ -374,6 +374,20 @@ class AnnotationAdopterTest
     val methodTmpl3Locales = ((LocaleAware)methodTmpl3).getLocalizedMessages();
     assertEquals("EN method tmpl 3", methodTmpl3Locales.get(ENGLISH).asFormatString(UTF_8));
     assertEquals("FR method tmpl 3", methodTmpl3Locales.get(FRENCH).asFormatString(UTF_8));
+
+    // --- Messages: constructor-level ---
+
+    // ctor-msg-1: plain text= form (@MessageDefs container on constructor)
+    assertTrue(accessor.hasMessageWithCode("ctor-msg-1"));
+    assertEquals("Constructor message 1", accessor.getMessageByCode("ctor-msg-1").asFormatString(UTF_8));
+
+    // ctor-msg-2: multi-locale (EN, DE) (@MessageDefs container on constructor)
+    assertTrue(accessor.hasMessageWithCode("ctor-msg-2"));
+    val ctorMsg2 = accessor.getMessageByCode("ctor-msg-2");
+    assertInstanceOf(LocaleAware.class, ctorMsg2);
+    val ctorMsg2Locales = ((LocaleAware)ctorMsg2).getLocalizedMessages();
+    assertEquals("EN ctor msg 2", ctorMsg2Locales.get(ENGLISH).asFormatString(UTF_8));
+    assertEquals("DE ctor msg 2", ctorMsg2Locales.get(GERMAN).asFormatString(UTF_8));
   }
 
 

@@ -18,8 +18,7 @@ package de.sayayi.lib.message.annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.CLASS;
 
 
@@ -32,7 +31,7 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-@Target({ METHOD, TYPE })
+@Target({ METHOD, CONSTRUCTOR, TYPE })
 @Retention(CLASS)
 public @interface TemplateDefs
 {

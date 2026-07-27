@@ -39,7 +39,7 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-@Target({ ANNOTATION_TYPE, METHOD, TYPE })
+@Target({ ANNOTATION_TYPE, METHOD, CONSTRUCTOR, TYPE })
 @Retention(CLASS)
 @Repeatable(TemplateDefs.class)
 @SuppressWarnings("GrazieInspection")

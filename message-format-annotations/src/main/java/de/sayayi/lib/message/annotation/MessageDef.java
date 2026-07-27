@@ -42,10 +42,9 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * @author Jeroen Gremmen
  * @since 0.1.0 (renamed in 0.3.0)
  */
-@Target({ ANNOTATION_TYPE, METHOD, TYPE })
+@Target({ ANNOTATION_TYPE, METHOD, CONSTRUCTOR, TYPE })
 @Retention(CLASS)
 @Repeatable(MessageDefs.class)
-@SuppressWarnings("GrazieInspection")
 public @interface MessageDef
 {
   /**
@@ -60,15 +59,20 @@ public @interface MessageDef
 
 
   /**
-   * 1..n localized texts.
+   * Localized message texts. Use this attribute to provide message texts for one or more locales.
+   * <p>
+   * Either this attribute or {@link #text()} must be specified, but not both.
    *
-   * @return  localized texts
+   * @return  localized texts, not empty if specified
    */
   Text[] texts() default {};
 
 
   /**
-   * Message text. Short for {@code texts = @Text("...")}
+   * Convenience attribute for specifying a single locale-independent message text.
+   * Short for {@code texts = @Text("...")}.
+   * <p>
+   * Either this attribute or {@link #texts()} must be specified, but not both.
    *
    * @return  message text
    */
