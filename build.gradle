@@ -24,7 +24,8 @@ allprojects {
   group = 'de.sayayi.lib'
   version = rootProject.libs.versions.message.format.get()
 
-  ext.releaseVersion = (version as String).endsWith('-SNAPSHOT') ? (version as String)[0..-10] : version
+  ext.snapshot = (version as String).endsWith('-SNAPSHOT')
+  ext.releaseVersion = ext.snapshot ? (version as String)[0..-10] : version
 
   layout.buildDirectory = '.build'
 
@@ -38,9 +39,6 @@ configure(subprojects.findAll {name.startsWith('message-') }) {
   apply from: gradleDirectory.file('javadoc.gradle')
   apply from: gradleDirectory.file('publish.gradle')
 }
-
-
-def snapshot = version.toString().endsWith('-SNAPSHOT')
 
 
 tasks.register('releaseAllDryRun', Sync) {
@@ -57,13 +55,13 @@ tasks.register('releaseAllDryRun', Sync) {
 }
 
 
-tasks.register(snapshot ? 'releaseAllSnapshots' : 'releaseAll') {
+tasks.register(ext.snapshot ? 'releaseAllSnapshots' : 'releaseAll') {
   group = 'release'
-  description = snapshot
+  description = ext.snapshot
       ? 'Release all snapshot artifacts to Maven Central Repository.'
       : 'Release final artifacts to Maven Central repository.'
 
-  inputs.property('snapshot', snapshot)
+  inputs.property('snapshot', ext.snapshot)
 
   dependsOn ':message-format:releaseMessageFormatArtifacts'
   dependsOn ':message-format-annotations:releaseMessageFormatAnnotationsArtifacts'

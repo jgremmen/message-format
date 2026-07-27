@@ -20,9 +20,6 @@ import org.gradle.util.internal.TextUtil
 apply plugin: 'org.danilopianini.publish-on-central'
 
 
-ext.snapshot = version.toString().endsWith('-SNAPSHOT')
-
-
 publishOnCentral {
   repoOwner = 'jgremmen'
 
