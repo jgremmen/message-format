@@ -151,8 +151,7 @@ Template filters work the same way. The `TemplateFilter` receives the template n
 
 ```java
 messageSupport.setTemplateFilter((name, template) ->
-    !messageSupport.getMessageAccessor()
-        .hasTemplateWithName(name));
+    !messageSupport.getMessageAccessor().hasTemplateWithName(name));
 ```
 
 ### Sealing
@@ -180,7 +179,8 @@ by a `MessageSupport`. It also extends `TemplateAccessor`, so all template-relat
 same object. It is obtained through `getMessageAccessor()`:
 
 ```java
-MessageSupport.MessageAccessor accessor = messageSupport.getMessageAccessor();
+MessageSupport.MessageAccessor accessor = 
+    messageSupport.getMessageAccessor();
 ```
 
 Through the accessor the current state of the message support can be inspected without risk of modification. It provides 

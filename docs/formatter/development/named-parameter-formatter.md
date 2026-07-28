@@ -133,7 +133,8 @@ public final class PercentNamedFormatter
   }
 
   @Override
-  public boolean canFormat(@NotNull Class<?> type) {
+  public boolean canFormat(@NotNull Class<?> type) 
+  {
     return Number.class.isAssignableFrom(type) ||
            type == int.class || type == long.class ||
            type == double.class || type == float.class ||
@@ -145,9 +146,9 @@ public final class PercentNamedFormatter
       @NotNull ParameterFormatterContext context,
       @NotNull Number number)
   {
-    // read the number of decimal places from the 'percent-scale' config key
-    var scale = (int)context
-        .getConfigValueNumber("percent-scale").orElse(1);
+    // read the number of decimal places from the 'percent-scale' 
+    // config key
+    var scale = (int)context.getConfigValueInt("percent-scale").orElse(1);
 
     var formatted = String.format(
         context.getLocale(), "%." + scale + "f%%",
@@ -263,7 +264,8 @@ public final class CurrencyNamedFormatter
   }
 
   @Override
-  public boolean canFormat(@NotNull Class<?> type) {
+  public boolean canFormat(@NotNull Class<?> type) 
+  {
     return Number.class.isAssignableFrom(type) ||
            type == int.class || type == long.class ||
            type == double.class || type == float.class ||
@@ -271,7 +273,8 @@ public final class CurrencyNamedFormatter
   }
 
   @Override
-  public boolean autoApplyOnNamedConfigParameter() {
+  public boolean autoApplyOnNamedConfigParameter() 
+  {
     // activate this formatter whenever 'currency' config key is present
     return true;
   }
@@ -357,8 +360,7 @@ public final class HexNamedFormatter
       @NotNull ParameterFormatterContext context,
       @NotNull Number number)
   {
-    var prefix = context
-        .getConfigValueBool("hex-prefix").orElse(true);
+    var prefix = context.getConfigValueBool("hex-prefix").orElse(true);
 
     // renders e.g. "0xff" or "ff" depending on the prefix config
     var hex = Long.toHexString(number.longValue());
@@ -380,7 +382,8 @@ it is never used automatically. To make `Byte` values always be formatted as hex
 public @NotNull Set<FormattableType> getFormattableTypes() 
 {
   // Byte values will be formatted as hex automatically;
-  // order 60 gives this formatter higher precedence than the default NumberFormatter
+  // order 60 gives this formatter higher precedence than the default 
+  // NumberFormatter
   return Set.of(new FormattableType(Byte.class, 60));
 }
 ```
@@ -427,7 +430,8 @@ the enum's numeric level to a string and uses `formatUsingMappedNumber` so that 
 levels to custom labels:
 
 ```java
-public final class PriorityNamedFormatter implements NamedParameterFormatter
+public final class PriorityNamedFormatter 
+    implements NamedParameterFormatter
 {
   @Override
   public @NotNull String getName() {
@@ -459,7 +463,9 @@ The message author can now map priority levels to descriptive labels:
 
 ```java
 messageSupport
-    .message("%{p,format:priority,1:'low',2:'medium',3:'high',:'unclassified'}")
+    .message("""
+        %{p,format:priority,1:'low',2:'medium',3:'high',:'unclassified'}\
+        """)
     .with("p", Priority.HIGH)  // getLevel() returns 3
     .format();
 // "high"
@@ -469,7 +475,9 @@ When a priority level has no explicit mapping, the default map entry acts as a f
 
 ```java
 messageSupport
-    .message("%{p,format:priority,1:'low',2:'medium',3:'high',:'unclassified'}")
+    .message("""
+        %{p,format:priority,1:'low',2:'medium',3:'high',:'unclassified'}\
+        """)
     .with("p", Priority.CRITICAL)  // getLevel() returns 5
     .format();
 // "unclassified"

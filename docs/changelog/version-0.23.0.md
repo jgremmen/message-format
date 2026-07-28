@@ -27,7 +27,8 @@ Code that passed `NO_CACHE_INSTANCE` to `MessageSupportFactory.create`:
 
 ```java
 // before
-var messageSupport = MessageSupportFactory.create(formatterService, MessageFactory.NO_CACHE_INSTANCE);
+var messageSupport = MessageSupportFactory
+    .create(formatterService, MessageFactory.NO_CACHE_INSTANCE);
 
 // after
 var messageSupport = MessageSupportFactory.create(formatterService);

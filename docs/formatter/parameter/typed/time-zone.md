@@ -45,7 +45,11 @@ Because the formatter delegates to the string formatter, string map keys match a
 
 ```java
 messageSupport
-    .message("%{tz,'Central European Standard Time':'CET','Eastern Standard Time':'EST'}")
+    .message("""
+        %{tz,\
+            'Central European Standard Time':'CET',\
+            'Eastern Standard Time':'EST'}\
+        """)
     .with("tz", TimeZone.getTimeZone("Europe/Berlin"))
     .locale("en-US")
     .format();

@@ -27,7 +27,8 @@ When the `uri` configuration key is absent or set to `default`, the formatter ou
 ```java
 messageSupport
     .message("%{u}")
-    .with("u", URI.create("https://user@example.com:8443/api/v1?q=test#section"))
+    .with("u", URI
+        .create("https://user@example.com:8443/api/v1?q=test#section"))
     .format();
 // "https://user@example.com:8443/api/v1?q=test#section"
 ```
@@ -38,7 +39,8 @@ messageSupport
 Each component can be extracted using the `uri` configuration key.
 
 ```java
-URI uri = URI.create("https://user@example.com:8443/api/v1?q=test#section");
+URI uri = URI
+    .create("https://user@example.com:8443/api/v1?q=test#section");
 
 messageSupport
     .message("%{u,uri:scheme}")

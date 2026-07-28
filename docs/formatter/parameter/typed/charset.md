@@ -51,7 +51,13 @@ parameter value.
 
 ```java
 messageSupport
-    .message("%{cs,'UTF-8':'Unicode','ISO-8859-1':'Latin','US-ASCII':'ASCII',:'unknown'}")
+    .message("""
+        %{cs,\
+            'UTF-8':'Unicode',\
+            'ISO-8859-1':'Latin',\
+            'US-ASCII':'ASCII',\
+            :'unknown'}\
+        """)
     .with("cs", StandardCharsets.ISO_8859_1)
     .format();
 // "Latin"
@@ -112,7 +118,8 @@ parameter with two not-equal keys targeting different charsets.
 
 ```java
 messageSupport
-    .message("%{cs,!'UTF-8':'not UTF-8',!'latin1':'not latin1',:'default'}")
+    .message(
+        "%{cs,!'UTF-8':'not UTF-8',!'latin1':'not latin1',:'default'}")
     .with("cs", StandardCharsets.UTF_8)
     .format();
 // "not latin1"
@@ -128,7 +135,9 @@ If a default is provided, its message is used.
 
 ```java
 messageSupport
-    .message("%{cs,'UTF-16':'wide','UTF-32':'very wide',:'unknown encoding'}")
+    .message("""
+        %{cs,'UTF-16':'wide','UTF-32':'very wide',:'unknown encoding'}\
+        """)
     .with("cs", StandardCharsets.UTF_8)
     .format();
 // "unknown encoding"

@@ -24,7 +24,7 @@ message objects are immutable and thread-safe.
 
 The root `Message` interface represents a message in its most generic form. It provides methods for formatting the 
 message, retrieving its constituent message parts, listing the template names it references and serializing it back 
-into a format string. The static field `Message.EMPTY` holds a shared singleton instance that always formats to an 
+into a format string. The static method `Message.empty()` returns a shared singleton instance that always formats to an 
 empty string.
 
 ### Message.WithSpaces
@@ -84,7 +84,7 @@ Message.WithCode msg = factory.parseMessage("order.placed",
 
 ### Parsing Localized Messages
 
-For the same message in multiple languages, pass a `Map<Locale, String>` keyed by locale. With an explicit code:
+For the same message in multiple languages, pass a `Map<Locale,String>` keyed by locale. With an explicit code:
 
 ```java
 Message.WithCode msg = factory.parseMessage("item.count", Map.of(
@@ -290,7 +290,7 @@ Message.WithSpaces msg = MessageBuilder
     .create()
     .text("Result:")
     .template("summary")
-        .withDefaultParameterString("label", "N/A")
+        .withDefaultParameter("label", "N/A")
         .withParameterDelegate("item", "product")
         .spaceBefore()
     .build();
@@ -328,8 +328,7 @@ the `MessageFactory` associated with the message support:
 var messageSupport = MessageSupportFactory.create(
     DefaultFormatterService.getSharedInstance());
 
-messageSupport.addMessage("user.greeting",
-    "Welcome back, %{username}!");
+messageSupport.addMessage("user.greeting", "Welcome back, %{username}!");
 
 messageSupport
     .code("user.greeting")
@@ -343,9 +342,12 @@ messageSupport
 For an existing `Message.WithCode` from the factory or the builder, pass it to `addMessage(Message.WithCode)`:
 
 ```java
-MessageFactory factory = messageSupport.getMessageAccessor().getMessageFactory();
+MessageFactory factory = messageSupport
+    .getMessageAccessor()
+    .getMessageFactory();
 
-Message.WithCode msg = factory.parseMessage("order.shipped",
+Message.WithCode msg = factory.parseMessage(
+    "order.shipped", 
     "Your order %{orderId} has shipped.");
 
 messageSupport.addMessage(msg);
@@ -356,14 +358,20 @@ the underlying `MessagePublisher`.
 
 ### Adding Localized Messages
 
-Localized messages are created by parsing a `Map<Locale, String>` and then adding the result:
+Localized messages are created by parsing a `Map<Locale,String>` and then adding the result:
 
 ```java
-MessageFactory factory = messageSupport.getMessageAccessor().getMessageFactory();
+MessageFactory factory = messageSupport
+    .getMessageAccessor()
+    .getMessageFactory();
 
-Message.WithCode msg = factory.parseMessage("cart.summary", Map.of(
-    Locale.ENGLISH, "%{count,1:'1 item',:'%{count} items'} in your cart",
-    Locale.GERMAN,  "%{count,1:'1 Artikel',:'%{count} Artikel'} in Ihrem Warenkorb"));
+Message.WithCode msg = factory.parseMessage(
+    "cart.summary", 
+    Map.of(
+        Locale.ENGLISH, 
+        "%{count,1:'1 item',:'%{count} items'} in your cart", 
+        Locale.GERMAN,  
+        "%{count,1:'1 Artikel',:'%{count} Artikel'} in Ihrem Warenkorb"));
 
 messageSupport.addMessage(msg);
 

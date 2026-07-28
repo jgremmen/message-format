@@ -42,7 +42,14 @@ toppings.set(2);
 toppings.set(3);
 
 messageSupport
-    .message("Pizza with %{t,list-sep-last:' and ',0:cheese,1:ham,2:mushrooms,3:olives}")
+    .message("""
+        Pizza with %{t,\
+            list-sep-last:' and ',\
+            0:cheese,\
+            1:ham,\
+            2:mushrooms,\
+            3:olives}\
+        """)
     .with("t", toppings)
     .format();
 // "Pizza with cheese, mushrooms and olives"

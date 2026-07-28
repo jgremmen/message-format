@@ -45,7 +45,8 @@ of a collection computed, or one of several messages selected based on a value w
 
 ```java
 messageSupport
-    .message("%{errorCount,format:bool,true:'has errors',false:'no errors'}")
+    .message(
+        "%{errorCount,format:bool,true:'has errors',false:'no errors'}")
     .with("errorCount", 3)
     .format();
 // "has errors"

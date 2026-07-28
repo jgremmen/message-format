@@ -91,7 +91,11 @@ methods for all Java primitive types (`boolean`, `byte`, `char`, `short`, `int`,
 
 ```java
 String text = messageSupport
-    .message("%{product} costs %{price} and has %{inStock,true:'in stock',false:'sold out'}.")
+    .message("""
+        %{product} costs %{price} and has %{inStock,\
+            true:'in stock',\
+            false:'sold out'}.\
+        """)
     .with("product", "Widget")
     .with("price", 29.95)
     .with("inStock", true)
@@ -282,7 +286,8 @@ User user = findUserById(userId)
         .message("No user with id %{id}")
         .with("id", userId)
         .formattedExceptionSupplier(IllegalStateException::new));
-// throws IllegalStateException("No user with id 42") only if the Optional is empty
+// throws IllegalStateException("No user with id 42") only if the 
+// Optional is empty
 ```
 
 Just like `formatSupplier`, the exception supplier captures a snapshot of the current parameters and locale. The
@@ -318,7 +323,7 @@ var configurer = messageSupport
 Message.WithCode msg = configurer.getMessage();
 // the Message object registered under code "welcome"
 
-Map<String, Object> params = configurer.getParameters();
+Map<String,Object> params = configurer.getParameters();
 // {name=Alice, role=admin}
 ```
 

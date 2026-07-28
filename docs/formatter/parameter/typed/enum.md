@@ -88,7 +88,12 @@ names to custom text.
 
 ```java
 messageSupport
-    .message("%{status,'PENDING':'Awaiting review','APPROVED':'Ready','REJECTED':'Denied'}")
+    .message("""
+        %{status,\
+            'PENDING':'Awaiting review',\
+            'APPROVED':'Ready',\
+            'REJECTED':'Denied'}\
+        """)
     .with("status", OrderStatus.APPROVED)
     .format();
 // "Ready"

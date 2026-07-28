@@ -33,7 +33,8 @@ the outer message and single quotes inside, or vice versa.
 
 ```java
 messageSupport
-    .message("%(case,\"%{flag,true:'enabled',false:'disabled'}\",case:upper)")
+    .message(
+        "%(case,\"%{flag,true:'enabled',false:'disabled'}\",case:upper)")
     .with("flag", true)
     .locale(Locale.US)
     .format();

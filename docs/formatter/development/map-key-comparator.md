@@ -123,7 +123,8 @@ public final class HttpStatusFormatter
       @NotNull ComparatorContext context)
   {
     // compare status code against the number key
-    return context.getCompareType()
+    return context
+        .getCompareType()
         .match(Long.compare(status.getCode(), context.getNumberKeyValue()))
             ? EXACT : MISMATCH;
   }
@@ -134,8 +135,10 @@ public final class HttpStatusFormatter
       @NotNull ComparatorContext context)
   {
     // compare reason phrase against the string key (case-sensitive)
-    return context.getCompareType()
-        .match(status.getReasonPhrase().compareTo(context.getStringKeyValue()))
+    return context
+        .getCompareType()
+        .match(status.getReasonPhrase()
+            .compareTo(context.getStringKeyValue()))
             ? EQUIVALENT : MISMATCH;
   }
 
@@ -150,7 +153,9 @@ With this formatter registered, the message author can map individual status cod
 
 ```java
 messageSupport
-    .message("%{status,200:'OK',404:'Not Found',>=500:'Server Error',:'Unknown'}")
+    .message("""
+        %{status,200:'OK',404:'Not Found',>=500:'Server Error',:'Unknown'}\
+        """)
     .with("status", HttpStatus.of(404))
     .format();
 // "Not Found"
@@ -162,7 +167,9 @@ returns `true`:
 
 ```java
 messageSupport
-    .message("%{status,200:'OK',404:'Not Found',>=500:'Server Error',:'Unknown'}")
+    .message("""
+        %{status,200:'OK',404:'Not Found',>=500:'Server Error',:'Unknown'}\
+        """)
     .with("status", HttpStatus.of(503))
     .format();
 // "Server Error"
@@ -172,7 +179,9 @@ When no key matches, the default entry `:'Unknown'` acts as a fallback:
 
 ```java
 messageSupport
-    .message("%{status,200:'OK',404:'Not Found',>=500:'Server Error',:'Unknown'}")
+    .message("""
+        %{status,200:'OK',404:'Not Found',>=500:'Server Error',:'Unknown'}\
+        """)
     .with("status", HttpStatus.of(301))
     .format();
 // "Unknown"
@@ -246,7 +255,8 @@ public @NotNull MatchResult compareToBoolKey(
     @NotNull ComparatorContext context)
 {
   // delegates to the boolean formatter's comparator
-  return context.matchForObject(booleanSupplier.getAsBoolean(), boolean.class);
+  return context
+      .matchForObject(booleanSupplier.getAsBoolean(), boolean.class);
 }
 
 @Override
@@ -254,7 +264,8 @@ public @NotNull MatchResult compareToStringKey(
     @NotNull BooleanSupplier booleanSupplier,
     @NotNull ComparatorContext context)
 {
-  return context.matchForObject(booleanSupplier.getAsBoolean(), boolean.class);
+  return context
+      .matchForObject(booleanSupplier.getAsBoolean(), boolean.class);
 }
 ```
 
@@ -336,7 +347,9 @@ With both the formatter and the comparator registered, the message author can us
 
 ```java
 messageSupport
-    .message("%{country,'US':'United States','DE':'Germany','FR':'France',:'Other'}")
+    .message("""
+        %{country,'US':'United States','DE':'Germany','FR':'France',:'Other'}\
+        """)
     .with("country", Country.of("DE"))
     .format();
 // "Germany"

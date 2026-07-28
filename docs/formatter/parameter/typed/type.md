@@ -149,19 +149,19 @@ Parameterized types (generics) are displayed with their type arguments. The form
 the type arguments.
 
 ```java
-// Given: Map<K, V> unmodifiableMap(Map<? extends K, ? extends V>)
+// Given: Map<K,V> unmodifiableMap(Map<? extends K,? extends V>)
 
 messageSupport
     .message("%{t,type:''}")
-    .with("t", method.getGenericReturnType())  // Map<K, V>
+    .with("t", method.getGenericReturnType())  // Map<K,V>
     .format();
-// "java.util.Map<K, V>"
+// "java.util.Map<K,V>"
 
 messageSupport
     .message("%{t}")
     .with("t", method.getGenericReturnType())
     .format();
-// "Map<K, V>"
+// "Map<K,V>"
 ```
 
 

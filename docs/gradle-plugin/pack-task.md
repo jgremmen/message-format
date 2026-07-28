@@ -232,7 +232,8 @@ action fails the build if any message code does not match the expected pattern:
 
         it.getMessageCodes().each { code ->
           if (!(code ==~ pattern))
-            throw new GradleException("Message code '${code}' violates naming convention")
+            throw new GradleException(
+                "Message code '${code}' violates naming convention")
         }
       }
     }
@@ -247,7 +248,8 @@ action fails the build if any message code does not match the expected pattern:
 
         it.messageCodes.forEach { code ->
           if (!pattern.matches(code))
-            throw GradleException("Message code '$code' violates naming convention")
+            throw GradleException(
+                "Message code '$code' violates naming convention")
         }
       }
     }

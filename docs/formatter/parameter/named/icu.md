@@ -9,7 +9,7 @@ This formatter is **not** included in the core library. It is part of the `messa
 added as a dependency to use.
 
 ```
-de.sayayi.lib:message-format-icu:<version>
+de.sayayi.lib:message-format-icu:0.24.0
 ```
 ///
 
@@ -44,7 +44,10 @@ the parameter in the message output.
 
 ```java
 messageSupport
-    .message("%{unused,icu:'{name} bought {count, plural, one {# book} other {# books}}'}")
+    .message("""
+        %{unused,icu:\
+            '{name} bought {count, plural, one {# book} other {# books}}'}\
+        """)
     .with("name", "Alice")
     .with("count", 3)
     .format();
@@ -56,7 +59,10 @@ plural expression.
 
 ```java
 messageSupport
-    .message("%{unused,icu:'{name} has {count, plural, one {# cat} other {# cats}}'}")
+    .message("""
+        %{unused,icu:\
+            '{name} has {count, plural, one {# cat} other {# cats}}'}\
+        """)
     .with("name", "Bob")
     .with("count", 1)
     .format();
@@ -67,7 +73,11 @@ The `select` construct chooses text based on an exact string match.
 
 ```java
 messageSupport
-    .message("%{unused,icu:'{gender, select, male {He} female {She} other {They}} liked the post.'}")
+    .message("""
+        %{unused,icu:\
+            '{gender, select, male {He} female {She} other {They}} liked\
+              the post.'}\
+        """)
     .with("gender", "female")
     .format();
 // "She liked the post."
@@ -77,7 +87,11 @@ English ordinal suffixes can be expressed with `selectordinal`.
 
 ```java
 messageSupport
-    .message("%{unused,icu:'{rank, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}'}")
+    .message("""
+        %{unused,icu:\
+            '{rank, selectordinal, one {#st} two {#nd} few {#rd} other\
+             {#th}}'}\
+        """)
     .with("rank", 22)
     .format();
 // "22nd"
@@ -111,7 +125,11 @@ string. Using double quotes avoids this issue because single quotes pass through
 
 ```java
 messageSupport
-    .message("%{unused,icu:\"{name} doesn''t have {count, plural, one {# item} other {# items}}\"}")
+    .message("""
+        %{unused,icu:\
+            "{name} doesn''t have\
+             {count, plural, one {# item} other {# items}}"}\
+        """)
     .with("name", "Alice")
     .with("count", 0)
     .format();
@@ -126,7 +144,11 @@ such as Polish with its four forms, are handled automatically by ICU's CLDR-base
 
 ```java
 messageSupport
-    .message("%{unused,icu:'{count, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}'}")
+    .message("""
+        %{unused,icu:\
+            '{count, plural, one {# plik} few {# pliki} many {# plików}\
+             other {# pliku}}'}\
+        """)
     .with("count", 22)
     .locale(Locale.forLanguageTag("pl"))
     .format();
@@ -137,7 +159,11 @@ Welsh ordinals illustrate a language with six ordinal categories (zero, one, two
 
 ```java
 messageSupport
-    .message("%{unused,icu:'{rank, selectordinal, zero {#ain} one {#af} two {#ail} few {#ydd} many {#ed} other {#fed}}'}")
+    .message("""
+        %{unused,icu:\
+            '{rank, selectordinal, zero {#ain} one {#af} two {#ail} few\
+             {#ydd} many {#ed} other {#fed}}'}\
+        """)
     .with("rank", 5)
     .locale(Locale.forLanguageTag("cy"))
     .format();
@@ -152,7 +178,12 @@ branch.
 
 ```java
 messageSupport
-    .message("%{unused,icu:'{gender, select, male {He has {count, plural, one {# new message} other {# new messages}}} other {She has {count, plural, one {# new message} other {# new messages}}}}'}")
+    .message("""
+        %{unused,icu:\
+            '{gender, select,\
+             male {He has {count, plural, one {# new message} other {# new messages}}}\ 
+             other {She has {count, plural, one {# new message} other {# new messages}}}}'}\
+        """)
     .with("gender", "male")
     .with("count", 5)
     .format();
@@ -164,7 +195,14 @@ people".
 
 ```java
 messageSupport
-    .message("%{unused,icu:'{guests, plural, offset:1 =0 {Nobody is attending} =1 {Only {name} is attending} one {{name} and # other person are attending} other {{name} and # other people are attending}}'}")
+    .message("""
+        %{unused,icu:\
+            '{guests, plural, offset:1\ 
+             =0 {Nobody is attending}\
+             =1 {Only {name} is attending}\ 
+             one {{name} and # other person are attending}\ 
+             other {{name} and # other people are attending}}'}\
+        """)
     .with("guests", 5)
     .with("name", "Alice")
     .format();
@@ -183,14 +221,19 @@ The following two message format strings are equivalent:
 ```java
 // with explicit format selection
 messageSupport
-    .message("%{unused,format:icu,icu:'{count, plural, one {# item} other {# items}}'}")
+    .message("""
+        %{unused,format:icu,icu:
+            '{count, plural, one {# item} other {# items}}'}\
+        """)
     .with("count", 1)
     .format();
 // "1 item"
 
 // with auto application (icu key triggers the icu formatter automatically)
 messageSupport
-    .message("%{unused,icu:'{count, plural, one {# item} other {# items}}'}")
+    .message("""
+        %{unused,icu:'{count, plural, one {# item} other {# items}}'}\
+        """)
     .with("count", 1)
     .format();
 // "1 item"

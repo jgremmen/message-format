@@ -115,7 +115,8 @@ messageSupport
 
 ```java
 messageSupport
-    .message("%{file,path:extension,'pdf':'PDF document','txt':'text file'}")
+    .message(
+        "%{file,path:extension,'pdf':'PDF document','txt':'text file'}")
     .with("file", Path.of("report.pdf"))
     .format();
 // "PDF document"

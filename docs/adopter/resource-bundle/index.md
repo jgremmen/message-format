@@ -104,7 +104,8 @@ var messageSupport = MessageSupportFactory.create(
     DefaultFormatterService.getSharedInstance());
 var adopter = new ResourceBundleAdopter(messageSupport);
 
-var bundle = ResourceBundle.getBundle("com.example.messages", Locale.FRENCH);
+var bundle = ResourceBundle.getBundle("com.example.messages", 
+    Locale.FRENCH);
 adopter.adopt(bundle);
 
 // Assumes messages_fr.properties contains:

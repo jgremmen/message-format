@@ -149,7 +149,9 @@ is present.
 
 ```java
 messageSupport
-    .message("%{check,null:'no checker provided',true:'ok',false:'failed'}")
+    .message("""
+        %{check,null:'no checker provided',true:'ok',false:'failed'}\
+        """)
     .with("check", (BooleanSupplier) null)
     .format();
 // "no checker provided"

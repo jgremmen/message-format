@@ -36,7 +36,9 @@ Encodes the byte array as a MIME Base64 string with line breaks inserted every 7
 ```java
 messageSupport
     .message("%{data,bytes:'base64-lf'}")
-    .with("data", "This appears to be a very long text with a single linefeed!".getBytes())
+    .with("data", 
+        "This appears to be a very long text with a single linefeed!"
+            .getBytes())
     .format();
 // "VGhpcyBhcHBlYXJzIHRvIGJlIGEgdmVyeSBsb25nIHRleHQgd2l0aCBhIHNpbmdsZSBsaW5lZmVl\nZCE="
 ```

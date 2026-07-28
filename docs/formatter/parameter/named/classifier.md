@@ -42,19 +42,34 @@ produces `path`, a `BitSet` produces `bit-set` (and `list` in set-bit mode) and 
 
 ```java
 messageSupport
-    .message("%{v,format:classifier,'number':'a number','string':'text','list':'a list'}")
+    .message("""
+        %{v,format:classifier,\
+            'number':'a number',\
+            'string':'text',\
+            'list':'a list'}\
+        """)
     .with("v", 42)
     .format();
 // "a number"
 
 messageSupport
-    .message("%{v,format:classifier,'number':'a number','string':'text','list':'a list'}")
+    .message("""
+        %{v,format:classifier,\
+            'number':'a number',\
+            'string':'text',\
+            'list':'a list'}\
+        """)
     .with("v", "hello")
     .format();
 // "text"
 
 messageSupport
-    .message("%{v,format:classifier,'number':'a number','string':'text','list':'a list'}")
+    .message("""
+        %{v,format:classifier,\
+            'number':'a number',\
+            'string':'text',\
+            'list':'a list'}\
+        """)
     .with("v", List.of(1, 2, 3))
     .format();
 // "a list"
@@ -67,7 +82,12 @@ When the parameter value is `null`, the only classifier is `null`. It can be mat
 
 ```java
 messageSupport
-    .message("%{v,format:classifier,'null':'nothing','number':'a number','string':'text'}")
+    .message("""
+        %{v,format:classifier,\
+            'null':'nothing',\
+            'number':'a number',\
+            'string':'text'}\
+        """)
     .with("v", null)
     .format();
 // "nothing"
@@ -82,7 +102,12 @@ When keys are provided for both, the more specific one matches.
 
 ```java
 messageSupport
-    .message("%{v,format:classifier,'bool':'boolean','enum':'enumeration','string':'text'}")
+    .message("""
+        %{v,format:classifier,\
+            'bool':'boolean',\
+            'enum':'enumeration',\
+            'string':'text'}\
+        """)
     .with("v", RetentionPolicy.RUNTIME)
     .format();
 // "enumeration"
@@ -123,19 +148,40 @@ messages outputs the value itself using its type-based formatter.
 
 ```java
 messageSupport
-    .message("Received %{v,format:classifier,'null':'a null value','bool':'boolean %{v}','number':'number %{v}','string':'text \"%{v}\"','list':'a list of elements'}")
+    .message("""
+        Received %{v,format:classifier,\
+            'null':'a null value',\
+            'bool':'boolean %{v}',\
+            'number':'number %{v}',\
+            'string':'text \"%{v}\"',\
+            'list':'a list of elements'}\
+        """)
     .with("v", true)
     .format();
 // "Received boolean true"
 
 messageSupport
-    .message("Received %{v,format:classifier,'null':'a null value','bool':'boolean %{v}','number':'number %{v}','string':'text \"%{v}\"','list':'a list of elements'}")
+    .message("""
+        Received %{v,format:classifier,\
+            'null':'a null value',\
+            'bool':'boolean %{v}',\
+            'number':'number %{v}',\
+            'string':'text \"%{v}\"',\
+            'list':'a list of elements'}\
+        """)
     .with("v", 3.14)
     .format();
 // "Received number 3.14"
 
 messageSupport
-    .message("Received %{v,format:classifier,'null':'a null value','bool':'boolean %{v}','number':'number %{v}','string':'text \"%{v}\"','list':'a list of elements'}")
+    .message("""
+        Received %{v,format:classifier,\
+            'null':'a null value',\
+            'bool':'boolean %{v}',\
+            'number':'number %{v}',\
+            'string':'text \"%{v}\"',\
+            'list':'a list of elements'}\
+        """)
     .with("v", null)
     .format();
 // "Received a null value"

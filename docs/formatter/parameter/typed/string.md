@@ -133,7 +133,8 @@ A default map key (`:`) catches any value that does not match a specific key.
 
 ```java
 messageSupport
-    .message("%{status,'active':'Active','inactive':'Inactive',:'Unknown'}")
+    .message(
+        "%{status,'active':'Active','inactive':'Inactive',:'Unknown'}")
     .with("status", "other")
     .format();
 // "Unknown"

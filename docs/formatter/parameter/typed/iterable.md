@@ -198,7 +198,8 @@ included in the output.
 ```java
 messageSupport
     .message("%{tags,list-unique:true}")
-    .with("tags", new String[] { "java", "kotlin", "java", "scala", "kotlin" })
+    .with("tags", 
+        new String[] { "java", "kotlin", "java", "scala", "kotlin" })
     .format();
 // "java, kotlin, scala"
 ```

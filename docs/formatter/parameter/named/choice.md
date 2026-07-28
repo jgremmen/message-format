@@ -70,19 +70,31 @@ exact strength first, then a lenient match ignoring case and accents.
 
 ```java
 messageSupport
-    .message("%{status,format:choice,'active':'System is running','inactive':'System is stopped'}")
+    .message("""
+        %{status,format:choice,\
+            'active':'System is running',\
+            'inactive':'System is stopped'}\
+        """)
     .with("status", "active")
     .format();
 // "System is running"
 
 messageSupport
-    .message("%{status,format:choice,'active':'System is running','inactive':'System is stopped'}")
+    .message("""
+        %{status,format:choice,\
+            'active':'System is running',\
+            'inactive':'System is stopped'}\
+        """)
     .with("status", "ACTIVE")
     .format();
 // "System is running"
 
 messageSupport
-    .message("%{status,format:choice,'active':'System is running','inactive':'System is stopped'}")
+    .message("""
+        %{status,format:choice,\
+            'active':'System is running',\
+            'inactive':'System is stopped'}\
+        """)
     .with("status", "other")
     .format();
 // ""
@@ -137,19 +149,34 @@ empty (e.g. an empty string or an empty collection). The negated forms `!null` a
 
 ```java
 messageSupport
-    .message("%{name,format:choice,null:'no name',empty:'blank name',!empty:'%{name}'}")
+    .message("""
+        %{name,format:choice,\
+            null:'no name',\
+            empty:'blank name',\
+            !empty:'%{name}'}\
+        """)
     .with("name", null)
     .format();
 // "no name"
 
 messageSupport
-    .message("%{name,format:choice,null:'no name',empty:'blank name',!empty:'%{name}'}")
+    .message("""
+        %{name,format:choice,\
+            null:'no name',\
+            empty:'blank name',\
+            !empty:'%{name}'}\
+        """)
     .with("name", "")
     .format();
 // "blank name"
 
 messageSupport
-    .message("%{name,format:choice,null:'no name',empty:'blank name',!empty:'%{name}'}")
+    .message("""
+        %{name,format:choice,\
+            null:'no name',\
+            empty:'blank name',\
+            !empty:'%{name}'}\
+        """)
     .with("name", "Alice")
     .format();
 // "Alice"
@@ -203,19 +230,31 @@ output like "Login complete. 0".
 
 ```java
 messageSupport
-    .message("Login complete. %{warn,format:choice,403:'Access denied.',429:'Too many attempts.'}")
+    .message("""
+        Login complete. %{warn,format:choice,\
+            403:'Access denied.',\
+            429:'Too many attempts.'}\
+        """)
     .with("warn", 0)
     .format();
 // "Login complete."
 
 messageSupport
-    .message("Login complete. %{warn,format:choice,403:'Access denied.',429:'Too many attempts.'}")
+    .message("""
+        Login complete. %{warn,format:choice,\
+            403:'Access denied.',\
+            429:'Too many attempts.'}\
+        """)
     .with("warn", 403)
     .format();
 // "Login complete. Access denied."
 
 messageSupport
-    .message("Login complete. %{warn,format:choice,403:'Access denied.',429:'Too many attempts.'}")
+    .message("""
+        Login complete. %{warn,format:choice,\
+            403:'Access denied.',\
+            429:'Too many attempts.'}\
+        """)
     .with("warn", 429)
     .format();
 // "Login complete. Too many attempts."
@@ -230,19 +269,40 @@ which is intentional because only recognized codes should be labeled.
 
 ```java
 messageSupport
-    .message("%{code,format:choice,0:'SUCCESS',1:'GENERAL_ERROR',2:'MISUSE',126:'NOT_EXECUTABLE',127:'NOT_FOUND'}")
+    .message("""
+        %{code,format:choice,\
+            0:'SUCCESS',\
+            1:'GENERAL_ERROR',\
+            2:'MISUSE',\
+            126:'NOT_EXECUTABLE',\
+            127:'NOT_FOUND'}
+        """)
     .with("code", 0)
     .format();
 // "SUCCESS"
 
 messageSupport
-    .message("%{code,format:choice,0:'SUCCESS',1:'GENERAL_ERROR',2:'MISUSE',126:'NOT_EXECUTABLE',127:'NOT_FOUND'}")
+    .message("""
+        %{code,format:choice,\
+            0:'SUCCESS',\
+            1:'GENERAL_ERROR',\
+            2:'MISUSE',\
+            126:'NOT_EXECUTABLE',\
+            127:'NOT_FOUND'}\
+        """)
     .with("code", 126)
     .format();
 // "NOT_EXECUTABLE"
 
 messageSupport
-    .message("%{code,format:choice,0:'SUCCESS',1:'GENERAL_ERROR',2:'MISUSE',126:'NOT_EXECUTABLE',127:'NOT_FOUND'}")
+    .message("""
+        %{code,format:choice,\
+            0:'SUCCESS',\
+            1:'GENERAL_ERROR',\
+            2:'MISUSE',\
+            126:'NOT_EXECUTABLE',\
+            127:'NOT_FOUND'}\
+        """)
     .with("code", 42)
     .format();
 // ""

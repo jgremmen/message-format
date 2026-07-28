@@ -76,7 +76,8 @@ Attempting to create a message source with a prefix that is blank or does not st
 `IllegalArgumentException` immediately.
 
 ```java
-// throws IllegalArgumentException: parameterPrefix must start with a letter
+// throws IllegalArgumentException: parameterPrefix must start with 
+// a letter
 new MessageSupportMessageSource("1x", messageSupport);
 ```
 
@@ -92,7 +93,8 @@ traditional `.properties` files or another `MessageSource` implementation.
 
 ```java
 // A standard Spring ResourceBundleMessageSource for legacy messages
-ResourceBundleMessageSource legacySource = new ResourceBundleMessageSource();
+ResourceBundleMessageSource legacySource = 
+    new ResourceBundleMessageSource();
 legacySource.setBasename("messages");
 
 // The message-format-backed source with the legacy source as parent
@@ -133,10 +135,11 @@ default message. The `MessageSupportMessageSource` processes a resolvable by try
 The first code that exists in the backing `MessageSupport` is used for formatting.
 
 ```java
-DefaultMessageSourceResolvable resolvable = new DefaultMessageSourceResolvable(
-    new String[] { "error.specific", "error.generic" },
-    new Object[] { "file.txt" },
-    "An error occurred");
+DefaultMessageSourceResolvable resolvable = 
+    new DefaultMessageSourceResolvable(
+        new String[] { "error.specific", "error.generic" }, 
+        new Object[] { "file.txt" }, 
+        "An error occurred");
 
 messageSupport.addMessage("error.generic", "Error processing %{p1}");
 
