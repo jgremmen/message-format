@@ -259,6 +259,7 @@ public final class InternalMessageBuilder implements MessageBuilder
   public final class TextBuilderImpl extends AbstractSpacedBuilder<TextBuilder> implements TextBuilder
   {
     private final @NotNull String text;
+
     private boolean flushed;
 
 
@@ -453,7 +454,9 @@ public final class InternalMessageBuilder implements MessageBuilder
   {
     private final @NotNull String name;
     private final @NotNull Map<MapKey,TypedValue.MessageValue> map;
+
     private String format;
+    private boolean flushed;
 
 
     /**
@@ -481,10 +484,14 @@ public final class InternalMessageBuilder implements MessageBuilder
      */
     private void flush()
     {
-      activePartFlusher = null;
+      if (!flushed)
+      {
+        flushed = true;
+        activePartFlusher = null;
 
-      parts.add(new ParameterPart(name, format, spaceBefore, spaceAfter,
-          new MessagePartConfig(config), new MessagePartMap(map)));
+        parts.add(new ParameterPart(name, format, spaceBefore, spaceAfter,
+            new MessagePartConfig(config), new MessagePartMap(map)));
+      }
     }
 
 
@@ -686,7 +693,9 @@ public final class InternalMessageBuilder implements MessageBuilder
       implements PostFormatterBuilder
   {
     private final @NotNull String name;
+
     private @NotNull Message.WithSpaces innerMessage;
+    private boolean flushed;
 
 
     /**
@@ -714,9 +723,13 @@ public final class InternalMessageBuilder implements MessageBuilder
      */
     private void flush()
     {
-      activePartFlusher = null;
+      if (!flushed)
+      {
+        flushed = true;
+        activePartFlusher = null;
 
-      parts.add(new PostFormatterPart(name, innerMessage, spaceBefore, spaceAfter, new MessagePartConfig(config)));
+        parts.add(new PostFormatterPart(name, innerMessage, spaceBefore, spaceAfter, new MessagePartConfig(config)));
+      }
     }
 
 
@@ -826,6 +839,8 @@ public final class InternalMessageBuilder implements MessageBuilder
     private final @NotNull Map<String,TypedValue<?>> defaultParameters;
     private final @NotNull Map<String,String> parameterDelegates;
 
+    private boolean flushed;
+
 
     /**
      * Construct a new template builder for the given template name.
@@ -850,9 +865,13 @@ public final class InternalMessageBuilder implements MessageBuilder
      */
     private void flush()
     {
-      activePartFlusher = null;
+      if (!flushed)
+      {
+        flushed = true;
+        activePartFlusher = null;
 
-      parts.add(new TemplatePart(name, spaceBefore, spaceAfter, defaultParameters, parameterDelegates));
+        parts.add(new TemplatePart(name, spaceBefore, spaceAfter, defaultParameters, parameterDelegates));
+      }
     }
 
 
