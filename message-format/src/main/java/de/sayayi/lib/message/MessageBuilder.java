@@ -586,7 +586,7 @@ public sealed interface MessageBuilder
      * @return  this template builder, never {@code null}
      */
     @Contract("_, _ -> this")
-    @NotNull TemplateBuilder withDefaultParameterString(@NotNull String name, @NotNull String value);
+    @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, @NotNull String value);
 
 
     /**
@@ -598,7 +598,7 @@ public sealed interface MessageBuilder
      * @return  this template builder, never {@code null}
      */
     @Contract("_, _ -> this")
-    @NotNull TemplateBuilder withDefaultParameterBool(@NotNull String name, boolean value);
+    @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, boolean value);
 
 
     /**
@@ -610,7 +610,7 @@ public sealed interface MessageBuilder
      * @return  this template builder, never {@code null}
      */
     @Contract("_, _ -> this")
-    @NotNull TemplateBuilder withDefaultParameterNumber(@NotNull String name, long value);
+    @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, long value);
 
 
     /**
@@ -622,7 +622,26 @@ public sealed interface MessageBuilder
      * @return  this template builder, never {@code null}
      */
     @Contract("_, _ -> this")
-    @NotNull TemplateBuilder withDefaultParameterMessage(@NotNull String name, @NotNull Message.WithSpaces message);
+    @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, @NotNull Message.WithSpaces message);
+
+
+    /**
+     * Adds a default message parameter value for the template using a nested builder callback.
+     * <p>
+     * The consumer must not invoke {@link #build()} or {@link #buildWithCode(String)} on the provided builder;
+     * the message is built automatically after the consumer returns.
+     *
+     * @param name                parameter name, not {@code null}
+     * @param messageConfigurer   callback that receives a nested {@link MessageBuilder} for constructing the
+     *                            default message value, not {@code null}
+     *
+     * @return  this template builder, never {@code null}
+     *
+     * @since 0.24.0
+     */
+    @Contract("_, _ -> this")
+    @NotNull TemplateBuilder withDefaultParameter(@NotNull String name,
+                                                  @NotNull Consumer<MessageBuilder> messageConfigurer);
 
 
     /**

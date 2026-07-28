@@ -15,9 +15,13 @@
  */
 package de.sayayi.lib.message;
 
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.MessageTemplate;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.template.Template;
+import org.intellij.lang.annotations.Language;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -44,7 +48,8 @@ class MessageBuilderTest
     @DisplayName("mapBool with nested builder message")
     void testMapBoolWithConsumerMessage()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .parameter("flag")
               .mapBool(true).message(b -> b.text("yes"))
               .mapBool(false).message(b -> b.text("no"))
@@ -63,7 +68,8 @@ class MessageBuilderTest
     @DisplayName("mapDefault with nested builder message")
     void testMapDefaultWithConsumerMessage()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .parameter("name")
               .withFormat("choice")
               .mapNull().message(b -> b.text("stranger"))
@@ -83,7 +89,8 @@ class MessageBuilderTest
     @DisplayName("mapNumber with nested builder message")
     void testMapNumberWithConsumerMessage()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .parameter("count")
               .withFormat("choice")
               .mapNumber(1).message(b -> b.text("one item"))
@@ -103,7 +110,8 @@ class MessageBuilderTest
     @DisplayName("mapString with nested builder message")
     void testMapStringWithConsumerMessage()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .parameter("color")
               .withFormat("choice")
               .mapString("red").message(b -> b.text("Red color"))
@@ -123,7 +131,8 @@ class MessageBuilderTest
     @DisplayName("mapNull with nested builder message")
     void testMapNullWithConsumerMessage()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .parameter("value")
               .mapNull().message(b -> b.text("nothing"))
               .mapDefault().message(b -> b.parameter("value"))
@@ -142,7 +151,8 @@ class MessageBuilderTest
     @DisplayName("mapEmpty with nested builder message")
     void testMapEmptyWithConsumerMessage()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .parameter("text")
               .mapEmpty().message(b -> b.text("(empty)"))
               .mapDefault().message(b -> b.parameter("text"))
@@ -161,7 +171,8 @@ class MessageBuilderTest
     @DisplayName("mapNumber with relational operator and nested builder message")
     void testMapNumberRelationalWithConsumerMessage()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .parameter("n")
               .withFormat("choice")
               .mapNumber(0).lt().message(b -> b.text("negative"))
@@ -184,10 +195,10 @@ class MessageBuilderTest
     @SuppressWarnings("DataFlowIssue")
     void testNullConsumerThrowsException()
     {
-      assertThrows(NullPointerException.class, () ->
-          MessageBuilder.create()
-              .parameter("x")
-                  .mapDefault().message((java.util.function.Consumer<MessageBuilder>)null));
+      assertThrows(NullPointerException.class, () -> MessageBuilder
+          .create()
+          .parameter("x")
+              .mapDefault().message((java.util.function.Consumer<MessageBuilder>)null));
     }
   }
 
@@ -202,7 +213,8 @@ class MessageBuilderTest
     @DisplayName("Two consecutive text parts are merged into one")
     void testTwoConsecutiveTexts()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .text("Hello")
           .text("World").spaceBefore()
           .build();
@@ -219,7 +231,8 @@ class MessageBuilderTest
     @DisplayName("Three consecutive text parts are merged into one")
     void testThreeConsecutiveTexts()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .text("one")
           .text("two").spaceBefore()
           .text("three").spaceBefore()
@@ -236,7 +249,8 @@ class MessageBuilderTest
     @DisplayName("Text parts around a parameter remain separate")
     void testTextAroundParameter()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .text("Hello")
           .parameter("name").spaceBefore()
           .text("!")
@@ -254,7 +268,8 @@ class MessageBuilderTest
     @DisplayName("Multiple text parts before and after a parameter are each merged")
     void testMultipleTextGroupsAroundParameter()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .text("Dear")
           .text("customer").spaceBefore()
           .parameter("name").spaceBefore()
@@ -276,7 +291,8 @@ class MessageBuilderTest
     @DisplayName("Single text part produces a single-part message")
     void testSingleText()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .text("solo")
           .build();
 
@@ -291,7 +307,8 @@ class MessageBuilderTest
     @DisplayName("Text with spaceAfter merges correctly with following text")
     void testSpaceAfterMerge()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .text("left").spaceAfter()
           .text("right")
           .build();
@@ -307,7 +324,8 @@ class MessageBuilderTest
     @DisplayName("Consecutive texts between two parameters are merged")
     void testConsecutiveTextsBetweenParameters()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .parameter("a")
           .text(",")
           .text("and").spaceBefore().spaceAfter()
@@ -334,7 +352,8 @@ class MessageBuilderTest
     @DisplayName("Simple text message produces a MessageTemplate")
     void testSimpleTextTemplate()
     {
-      final Template template = MessageBuilder.create()
+      final Template template = MessageBuilder
+          .create()
           .text("hello")
           .buildAsTemplate();
 
@@ -348,16 +367,14 @@ class MessageBuilderTest
     @DisplayName("Template with parameter part")
     void testTemplateWithParameter()
     {
-      final Template template = MessageBuilder.create()
+      final Template template = MessageBuilder
+          .create()
           .text("Hello")
           .parameter("name").spaceBefore()
           .text("!")
           .buildAsTemplate();
 
-      assertInstanceOf(MessageTemplate.class, template);
-
-      final var messageTemplate = (MessageTemplate) template;
-      final var message = messageTemplate.getMessage();
+      final var message = assertInstanceOf(MessageTemplate.class, template).getMessage();
 
       assertEquals("Hello %{name}!", message.asFormatString(java.nio.charset.StandardCharsets.UTF_8));
     }
@@ -367,15 +384,13 @@ class MessageBuilderTest
     @DisplayName("Template wraps a message that formats correctly")
     void testTemplateFormatsCorrectly()
     {
-      final Template template = MessageBuilder.create()
+      final Template template = MessageBuilder
+          .create()
           .text("Welcome")
           .parameter("user").spaceBefore()
           .buildAsTemplate();
 
-      assertInstanceOf(MessageTemplate.class, template);
-
-      final var messageTemplate = (MessageTemplate) template;
-      final var message = messageTemplate.getMessage();
+      final var message = assertInstanceOf(MessageTemplate.class, template).getMessage();
 
       assertEquals("Welcome Alice",
           shared().message(message).with("user", "Alice").format());
@@ -386,17 +401,15 @@ class MessageBuilderTest
     @DisplayName("Template from builder with map entries")
     void testTemplateWithMapEntries()
     {
-      final Template template = MessageBuilder.create()
+      final Template template = MessageBuilder
+          .create()
           .parameter("count")
               .withFormat("choice")
               .mapNumber(1).message("one item")
               .mapDefault().message(b -> b.parameter("count").text(" items").spaceBefore())
           .buildAsTemplate();
 
-      assertInstanceOf(MessageTemplate.class, template);
-
-      final var messageTemplate = (MessageTemplate) template;
-      final var message = messageTemplate.getMessage();
+      final var message = assertInstanceOf(MessageTemplate.class, template).getMessage();
 
       assertEquals("%{count,format:choice,1:'one item',:'%{count} items'}",
           message.asFormatString(java.nio.charset.StandardCharsets.UTF_8));
@@ -407,7 +420,8 @@ class MessageBuilderTest
     @DisplayName("Empty message produces a template")
     void testEmptyMessageTemplate()
     {
-      final Template template = MessageBuilder.create()
+      final Template template = MessageBuilder
+          .create()
           .buildAsTemplate();
 
       assertNotNull(template);
@@ -419,16 +433,14 @@ class MessageBuilderTest
     @DisplayName("buildAsTemplate from sub-builder finalizes current part")
     void testBuildAsTemplateFromSubBuilder()
     {
-      final Template template = MessageBuilder.create()
+      final Template template = MessageBuilder
+          .create()
           .text("test")
           .parameter("x").spaceBefore()
               .withFormat("string")
               .buildAsTemplate();
 
-      assertInstanceOf(MessageTemplate.class, template);
-
-      final var messageTemplate = (MessageTemplate) template;
-      final var message = messageTemplate.getMessage();
+      final var message = assertInstanceOf(MessageTemplate.class, template).getMessage();
 
       assertEquals("test %{x,format:string}", message.asFormatString(java.nio.charset.StandardCharsets.UTF_8));
     }
@@ -438,11 +450,13 @@ class MessageBuilderTest
     @DisplayName("isSame returns true for identical templates built separately")
     void testIsSameForIdenticalTemplates()
     {
-      final Template template1 = MessageBuilder.create()
+      final Template template1 = MessageBuilder
+          .create()
           .text("hello")
           .buildAsTemplate();
 
-      final Template template2 = MessageBuilder.create()
+      final Template template2 = MessageBuilder
+          .create()
           .text("hello")
           .buildAsTemplate();
 
@@ -454,11 +468,13 @@ class MessageBuilderTest
     @DisplayName("isSame returns false for different templates")
     void testIsSameForDifferentTemplates()
     {
-      final Template template1 = MessageBuilder.create()
+      final Template template1 = MessageBuilder
+          .create()
           .text("hello")
           .buildAsTemplate();
 
-      final Template template2 = MessageBuilder.create()
+      final Template template2 = MessageBuilder
+          .create()
           .text("world")
           .buildAsTemplate();
 
@@ -477,11 +493,13 @@ class MessageBuilderTest
     @DisplayName("withMessage(Message.WithSpaces) sets inner message")
     void testWithMessageObject()
     {
-      final var innerMessage = MessageBuilder.create()
+      final var innerMessage = MessageBuilder
+          .create()
           .text("hello world")
           .build();
 
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .postFormatter("case")
               .withMessage(innerMessage)
               .configString("case", "upper")
@@ -496,7 +514,8 @@ class MessageBuilderTest
     @DisplayName("withMessage(String) parses format string as inner message")
     void testWithMessageString()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .postFormatter("case")
               .withMessage("hello world")
               .configString("case", "upper")
@@ -511,7 +530,8 @@ class MessageBuilderTest
     @DisplayName("withMessage(String) with parameter reference")
     void testWithMessageStringContainingParameter()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .postFormatter("case")
               .withMessage("Hello %{name}")
               .configString("case", "upper")
@@ -526,7 +546,8 @@ class MessageBuilderTest
     @DisplayName("withMessage(Consumer) builds inner message via nested builder")
     void testWithMessageConsumer()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .postFormatter("case")
               .withMessage(b -> b.text("hello world"))
               .configString("case", "upper")
@@ -541,7 +562,8 @@ class MessageBuilderTest
     @DisplayName("withMessage(Consumer) with parameter in nested builder")
     void testWithMessageConsumerWithParameter()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .postFormatter("case")
               .withMessage(b -> b.text("Hello").parameter("name").spaceBefore())
               .configString("case", "upper")
@@ -556,7 +578,8 @@ class MessageBuilderTest
     @DisplayName("withMessage defaults to empty message when not set")
     void testDefaultEmptyMessage()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .postFormatter("case")
               .configString("case", "upper")
           .build();
@@ -570,10 +593,10 @@ class MessageBuilderTest
     @SuppressWarnings("DataFlowIssue")
     void testWithMessageConsumerNullThrows()
     {
-      assertThrows(NullPointerException.class, () ->
-          MessageBuilder.create()
-              .postFormatter("case")
-                  .withMessage((Consumer<MessageBuilder>)null));
+      assertThrows(NullPointerException.class, () -> MessageBuilder
+          .create()
+          .postFormatter("case")
+              .withMessage((Consumer<MessageBuilder>)null));
     }
 
 
@@ -582,10 +605,10 @@ class MessageBuilderTest
     @SuppressWarnings("DataFlowIssue")
     void testWithMessageObjectNullThrows()
     {
-      assertThrows(NullPointerException.class, () ->
-          MessageBuilder.create()
-              .postFormatter("case")
-                  .withMessage((Message.WithSpaces)null));
+      assertThrows(NullPointerException.class, () -> MessageBuilder
+          .create()
+          .postFormatter("case")
+              .withMessage((Message.WithSpaces)null));
     }
 
 
@@ -594,10 +617,10 @@ class MessageBuilderTest
     @SuppressWarnings("DataFlowIssue")
     void testWithMessageStringNullThrows()
     {
-      assertThrows(NullPointerException.class, () ->
-          MessageBuilder.create()
-              .postFormatter("case")
-                  .withMessage((String)null));
+      assertThrows(NullPointerException.class, () -> MessageBuilder
+          .create()
+          .postFormatter("case")
+              .withMessage((String)null));
     }
 
 
@@ -605,7 +628,8 @@ class MessageBuilderTest
     @DisplayName("Post-formatter with spaceBefore and spaceAfter")
     void testWithSpacing()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .text("Result:")
           .postFormatter("case")
               .withMessage("hello")
@@ -623,7 +647,8 @@ class MessageBuilderTest
     @DisplayName("Last withMessage call wins")
     void testLastWithMessageWins()
     {
-      final var message = MessageBuilder.create()
+      final var message = MessageBuilder
+          .create()
           .postFormatter("case")
               .withMessage("first")
               .withMessage("second")
@@ -633,5 +658,298 @@ class MessageBuilderTest
       assertEquals("SECOND", shared().message(message).format());
     }
   }
-}
 
+
+
+
+  @Nested
+  @DisplayName("TemplateBuilder.withDefaultParameter")
+  class TemplateBuilderWithDefaultParameterTest
+  {
+    @Test
+    @DisplayName("withDefaultParameter(String, String) provides string default")
+    void testWithDefaultParameterString()
+    {
+      final var cms = createMessageSupportWithTemplate("greeting", "Hello %{name}");
+      final var message = MessageBuilder
+          .create()
+          .template("greeting")
+              .withDefaultParameter("name", "World")
+          .build();
+
+      assertEquals("Hello World", cms.message(message).format());
+    }
+
+
+    @Test
+    @DisplayName("withDefaultParameter(String, String) is overridden by explicit parameter")
+    void testWithDefaultParameterStringOverridden()
+    {
+      final var cms = createMessageSupportWithTemplate("greeting", "Hello %{name}");
+      final var message = MessageBuilder
+          .create()
+          .template("greeting")
+              .withDefaultParameter("name", "World")
+          .build();
+
+      assertEquals("Hello Alice", cms.message(message).with("name", "Alice").format());
+    }
+
+
+    @Test
+    @DisplayName("withDefaultParameter(String, boolean) provides boolean default")
+    void testWithDefaultParameterBoolean()
+    {
+      final var cms = createMessageSupportWithTemplate("status",
+          "%{active,true:enabled,false:disabled}");
+      final var message = MessageBuilder
+          .create()
+          .template("status")
+              .withDefaultParameter("active", true)
+          .build();
+
+      assertEquals("enabled", cms.message(message).format());
+    }
+
+
+    @Test
+    @DisplayName("withDefaultParameter(String, boolean) false value")
+    void testWithDefaultParameterBooleanFalse()
+    {
+      final var cms = createMessageSupportWithTemplate("status",
+          "%{active,true:enabled,false:disabled}");
+      final var message = MessageBuilder
+          .create()
+          .template("status")
+              .withDefaultParameter("active", false)
+          .build();
+
+      assertEquals("disabled", cms.message(message).format());
+    }
+
+
+    @Test
+    @DisplayName("withDefaultParameter(String, long) provides numeric default")
+    void testWithDefaultParameterLong()
+    {
+      final var cms = createMessageSupportWithTemplate("count-msg",
+          "%{count,format:choice,1:'one item',:'%{count} items'}");
+      final var message = MessageBuilder
+          .create()
+          .template("count-msg")
+              .withDefaultParameter("count", 42)
+          .build();
+
+      assertEquals("42 items", cms.message(message).format());
+    }
+
+
+    @Test
+    @DisplayName("withDefaultParameter(String, long) is overridden by explicit parameter")
+    void testWithDefaultParameterLongOverridden()
+    {
+      final var cms = createMessageSupportWithTemplate("count-msg",
+          "%{count,format:choice,1:'one item',:'%{count} items'}");
+      final var message = MessageBuilder
+          .create()
+          .template("count-msg")
+              .withDefaultParameter("count", 42)
+          .build();
+
+      assertEquals("one item", cms.message(message).with("count", 1).format());
+    }
+
+
+    @Test
+    @DisplayName("withDefaultParameter(String, Message.WithSpaces) provides message default")
+    void testWithDefaultParameterMessage()
+    {
+      final var cms = createMessageSupportWithTemplate("wrapper",
+          "%{content,!null:'has content',null:'no content'}");
+      final var innerMessage = MessageBuilder
+          .create()
+          .text("hello world")
+          .build();
+
+      final var message = MessageBuilder
+          .create()
+          .template("wrapper")
+              .withDefaultParameter("content", innerMessage)
+          .build();
+
+      assertEquals("has content", cms.message(message).format());
+    }
+
+
+    @Test
+    @DisplayName("withDefaultParameter(String, Consumer) builds message via nested builder")
+    void testWithDefaultParameterConsumer()
+    {
+      final var cms = createMessageSupportWithTemplate("wrapper",
+          "%{content,!null:'has content',null:'no content'}");
+      final var message = MessageBuilder
+          .create()
+          .template("wrapper")
+              .withDefaultParameter("content", b -> b.text("built via consumer"))
+          .build();
+
+      assertEquals("has content", cms.message(message).format());
+    }
+
+
+    @Test
+    @DisplayName("withDefaultParameter(String, Consumer) with parameter in nested message")
+    void testWithDefaultParameterConsumerWithParameter()
+    {
+      final var cms = createMessageSupportWithTemplate("wrapper",
+          "%{content,!null:'has content',null:'no content'}");
+      final var message = MessageBuilder
+          .create()
+          .template("wrapper")
+              .withDefaultParameter("content", b -> b.text("Hello").parameter("user").spaceBefore())
+          .build();
+
+      assertEquals("has content", cms.message(message).with("user", "Admin").format());
+    }
+
+
+    @Test
+    @DisplayName("Multiple default parameters on same template")
+    void testMultipleDefaultParameters()
+    {
+      final var cms = createMessageSupportWithTemplate("multi",
+          "%{greeting} %{name}");
+      final var message = MessageBuilder
+          .create()
+          .template("multi")
+              .withDefaultParameter("greeting", "Hi")
+              .withDefaultParameter("name", "there")
+          .build();
+
+      assertEquals("Hi there", cms.message(message).format());
+    }
+
+
+    @Test
+    @DisplayName("withDefaultParameter with null name throws NullPointerException")
+    @SuppressWarnings("DataFlowIssue")
+    void testWithDefaultParameterNullNameThrows()
+    {
+      assertThrows(NullPointerException.class, () -> MessageBuilder
+          .create()
+          .template("t")
+              .withDefaultParameter(null, "value"));
+    }
+
+
+    @Test
+    @DisplayName("withDefaultParameter(String) with null value throws NullPointerException")
+    @SuppressWarnings("DataFlowIssue")
+    void testWithDefaultParameterNullStringValueThrows()
+    {
+      assertThrows(NullPointerException.class, () -> MessageBuilder
+          .create()
+          .template("t")
+              .withDefaultParameter("name", (String)null));
+    }
+
+
+    @Test
+    @DisplayName("withDefaultParameter(Message.WithSpaces) with null value throws NullPointerException")
+    @SuppressWarnings("DataFlowIssue")
+    void testWithDefaultParameterNullMessageValueThrows()
+    {
+      assertThrows(NullPointerException.class, () -> MessageBuilder
+          .create()
+          .template("t")
+              .withDefaultParameter("name", (Message.WithSpaces)null));
+    }
+
+
+    @Test
+    @DisplayName("withDefaultParameter(Consumer) with null consumer throws NullPointerException")
+    @SuppressWarnings("DataFlowIssue")
+    void testWithDefaultParameterNullConsumerThrows()
+    {
+      assertThrows(NullPointerException.class, () -> MessageBuilder
+          .create()
+          .template("t")
+              .withDefaultParameter("name", (Consumer<MessageBuilder>)null));
+    }
+
+
+    @Test
+    @DisplayName("withDefaultParameter with invalid name throws IllegalArgumentException")
+    void testWithDefaultParameterInvalidNameThrows()
+    {
+      assertThrows(IllegalArgumentException.class, () -> MessageBuilder
+          .create()
+          .template("t")
+              .withDefaultParameter("INVALID NAME!", "value"));
+    }
+
+
+    @Test
+    @DisplayName("Template with default parameter serializes correctly")
+    void testDefaultParameterSerialization()
+    {
+      final var message = MessageBuilder
+          .create()
+          .template("tpl")
+              .withDefaultParameter("name", "World")
+          .build();
+
+      final var formatString = message.asFormatString(UTF_8);
+
+      assertTrue(formatString.contains("%[tpl"), "Expected template reference in: " + formatString);
+      assertTrue(formatString.contains("name="), "Expected default parameter in: " + formatString);
+    }
+
+
+    @Test
+    @DisplayName("Template with spaceBefore and default parameter")
+    void testTemplateWithSpacingAndDefault()
+    {
+      final var cms = createMessageSupportWithTemplate("suffix",
+          "%{value}");
+      final var message = MessageBuilder
+          .create()
+          .text("Result:")
+          .template("suffix")
+              .withDefaultParameter("value", "ok")
+              .spaceBefore()
+          .build();
+
+      assertEquals("Result: ok", cms.message(message).format());
+    }
+
+
+    @Test
+    @DisplayName("withParameterDelegate maps template param to message param")
+    void testWithParameterDelegate()
+    {
+      final var cms = createMessageSupportWithTemplate("greeting",
+          "Hello %{name}");
+      final var message = MessageBuilder
+          .create()
+          .template("greeting")
+              .withParameterDelegate("name", "user")
+          .build();
+
+      assertEquals("Hello Alice", cms.message(message).with("user", "Alice").format());
+    }
+
+
+    @Contract(pure = true)
+    private @NotNull MessageSupport createMessageSupportWithTemplate(
+        @NotNull String templateName, @NotNull @Language("MessageFormat") String templateFormat)
+    {
+      final var messageFactory = MessageFactory.getSharedInstance();
+
+      return MessageSupportFactory
+          .create(DefaultFormatterService.getSharedInstance(), messageFactory)
+          .addTemplate(templateName, messageFactory.parseTemplate(templateFormat))
+          .seal();
+    }
+  }
+}

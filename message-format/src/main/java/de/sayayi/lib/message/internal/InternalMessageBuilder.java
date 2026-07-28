@@ -894,6 +894,49 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, @NotNull String value) {
+      return withDefaultParameter(name, new TypedValueString(value));
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, boolean value) {
+      return withDefaultParameter(name, value ? TypedValueBool.TRUE : TypedValueBool.FALSE);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, long value) {
+      return withDefaultParameter(name, new TypedValueNumber(value));
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, @NotNull Message.WithSpaces message) {
+      return withDefaultParameter(name, new TypedValueMessage(message));
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name,
+                                                         @NotNull Consumer<MessageBuilder> messageConfigurer)
+    {
+      requireNonNull(messageConfigurer, "messageConfigurer must not be null");
+
+      final var nestedBuilder = new InternalMessageBuilder(messageFactory);
+
+      messageConfigurer.accept(nestedBuilder);
+
+      return withDefaultParameter(name, nestedBuilder.build());
+    }
+
+
     /**
      * Adds a typed default parameter value with the given name.
      *
@@ -913,41 +956,9 @@ public final class InternalMessageBuilder implements MessageBuilder
             "' must match the kebab-case or lower camel-case naming convention");
       }
 
-      defaultParameters.put(name, requireNonNull(value, "value must not be null"));
+      defaultParameters.put(name, value);
 
       return this;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    @Contract("_, _ -> this")
-    public @NotNull TemplateBuilder withDefaultParameterString(@NotNull String name, @NotNull String value) {
-      return withDefaultParameter(name, new TypedValueString(value));
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    @Contract("_, _ -> this")
-    public @NotNull TemplateBuilder withDefaultParameterBool(@NotNull String name, boolean value) {
-      return withDefaultParameter(name, value ? TypedValueBool.TRUE : TypedValueBool.FALSE);
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    @Contract("_, _ -> this")
-    public @NotNull TemplateBuilder withDefaultParameterNumber(@NotNull String name, long value) {
-      return withDefaultParameter(name, new TypedValueNumber(value));
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    @Contract("_, _ -> this")
-    public @NotNull TemplateBuilder withDefaultParameterMessage(@NotNull String name, @NotNull Message.WithSpaces message) {
-      return withDefaultParameter(name, new TypedValueMessage(message));
     }
 
 
