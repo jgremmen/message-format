@@ -99,6 +99,8 @@ public class MessageFormatPlugin implements Plugin<@NotNull Project>
     final var layout = project.getLayout();
 
     tasks.register("messageFormatPack", MessageFormatPackTask.class, packTask -> {
+      packTask.dependsOn(mainSourceSet.getOutput());
+
       packTask.setGroup("build");
       packTask.setDescription("Scans and packs message format definitions.");
 
@@ -121,9 +123,11 @@ public class MessageFormatPlugin implements Plugin<@NotNull Project>
 
       // templates {... }
       final var templatesExtension = extension.getTemplates();
-      packTask.getTemplates().getValidateReferences().convention(templatesExtension.getValidateReferences());
+      final var packTaskTemplates = packTask.getTemplates();
 
-      packTask.dependsOn(mainSourceSet.getOutput());
+      packTaskTemplates.getValidateReferences().convention(templatesExtension.getValidateReferences());
+
+      packTaskTemplates.ignore(templatesExtension.getIgnoreRegexFilters().toArray(String[]::new));
     });
   }
 }
