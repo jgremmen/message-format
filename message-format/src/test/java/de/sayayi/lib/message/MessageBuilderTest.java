@@ -22,6 +22,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.function.Consumer;
+
 import static de.sayayi.lib.message.MessageSupportFactory.shared;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
@@ -461,6 +463,174 @@ class MessageBuilderTest
           .buildAsTemplate();
 
       assertFalse(template1.isSame(template2));
+    }
+  }
+
+
+
+
+  @Nested
+  @DisplayName("PostFormatterBuilder.withMessage")
+  class PostFormatterBuilderWithMessageTest
+  {
+    @Test
+    @DisplayName("withMessage(Message.WithSpaces) sets inner message")
+    void testWithMessageObject()
+    {
+      final var innerMessage = MessageBuilder.create()
+          .text("hello world")
+          .build();
+
+      final var message = MessageBuilder.create()
+          .postFormatter("case")
+              .withMessage(innerMessage)
+              .configString("case", "upper")
+          .build();
+
+      assertEquals("%(case,'hello world',case:upper)", message.asFormatString(UTF_8));
+      assertEquals("HELLO WORLD", shared().message(message).format());
+    }
+
+
+    @Test
+    @DisplayName("withMessage(String) parses format string as inner message")
+    void testWithMessageString()
+    {
+      final var message = MessageBuilder.create()
+          .postFormatter("case")
+              .withMessage("hello world")
+              .configString("case", "upper")
+          .build();
+
+      assertEquals("%(case,'hello world',case:upper)", message.asFormatString(UTF_8));
+      assertEquals("HELLO WORLD", shared().message(message).format());
+    }
+
+
+    @Test
+    @DisplayName("withMessage(String) with parameter reference")
+    void testWithMessageStringContainingParameter()
+    {
+      final var message = MessageBuilder.create()
+          .postFormatter("case")
+              .withMessage("Hello %{name}")
+              .configString("case", "upper")
+          .build();
+
+      assertEquals("%(case,'Hello %{name}',case:upper)", message.asFormatString(UTF_8));
+      assertEquals("HELLO ALICE", shared().message(message).with("name", "Alice").format());
+    }
+
+
+    @Test
+    @DisplayName("withMessage(Consumer) builds inner message via nested builder")
+    void testWithMessageConsumer()
+    {
+      final var message = MessageBuilder.create()
+          .postFormatter("case")
+              .withMessage(b -> b.text("hello world"))
+              .configString("case", "upper")
+          .build();
+
+      assertEquals("%(case,'hello world',case:upper)", message.asFormatString(UTF_8));
+      assertEquals("HELLO WORLD", shared().message(message).format());
+    }
+
+
+    @Test
+    @DisplayName("withMessage(Consumer) with parameter in nested builder")
+    void testWithMessageConsumerWithParameter()
+    {
+      final var message = MessageBuilder.create()
+          .postFormatter("case")
+              .withMessage(b -> b.text("Hello").parameter("name").spaceBefore())
+              .configString("case", "upper")
+          .build();
+
+      assertEquals("%(case,'Hello %{name}',case:upper)", message.asFormatString(UTF_8));
+      assertEquals("HELLO ALICE", shared().message(message).with("name", "Alice").format());
+    }
+
+
+    @Test
+    @DisplayName("withMessage defaults to empty message when not set")
+    void testDefaultEmptyMessage()
+    {
+      final var message = MessageBuilder.create()
+          .postFormatter("case")
+              .configString("case", "upper")
+          .build();
+
+      assertEquals("", shared().message(message).format());
+    }
+
+
+    @Test
+    @DisplayName("withMessage(Consumer) with null throws NullPointerException")
+    @SuppressWarnings("DataFlowIssue")
+    void testWithMessageConsumerNullThrows()
+    {
+      assertThrows(NullPointerException.class, () ->
+          MessageBuilder.create()
+              .postFormatter("case")
+                  .withMessage((Consumer<MessageBuilder>)null));
+    }
+
+
+    @Test
+    @DisplayName("withMessage(Message.WithSpaces) with null throws NullPointerException")
+    @SuppressWarnings("DataFlowIssue")
+    void testWithMessageObjectNullThrows()
+    {
+      assertThrows(NullPointerException.class, () ->
+          MessageBuilder.create()
+              .postFormatter("case")
+                  .withMessage((Message.WithSpaces)null));
+    }
+
+
+    @Test
+    @DisplayName("withMessage(String) with null throws NullPointerException")
+    @SuppressWarnings("DataFlowIssue")
+    void testWithMessageStringNullThrows()
+    {
+      assertThrows(NullPointerException.class, () ->
+          MessageBuilder.create()
+              .postFormatter("case")
+                  .withMessage((String)null));
+    }
+
+
+    @Test
+    @DisplayName("Post-formatter with spaceBefore and spaceAfter")
+    void testWithSpacing()
+    {
+      final var message = MessageBuilder.create()
+          .text("Result:")
+          .postFormatter("case")
+              .withMessage("hello")
+              .configString("case", "upper")
+              .spaceBefore()
+          .text("!")
+          .build();
+
+      assertEquals("Result: %(case,'hello',case:upper)!", message.asFormatString(UTF_8));
+      assertEquals("Result: HELLO!", shared().message(message).format());
+    }
+
+
+    @Test
+    @DisplayName("Last withMessage call wins")
+    void testLastWithMessageWins()
+    {
+      final var message = MessageBuilder.create()
+          .postFormatter("case")
+              .withMessage("first")
+              .withMessage("second")
+              .configString("case", "upper")
+          .build();
+
+      assertEquals("SECOND", shared().message(message).format());
     }
   }
 }

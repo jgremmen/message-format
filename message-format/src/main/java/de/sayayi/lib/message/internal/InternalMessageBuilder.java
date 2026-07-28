@@ -736,6 +736,25 @@ public final class InternalMessageBuilder implements MessageBuilder
     /** {@inheritDoc} */
     @Override
     @Contract("_ -> this")
+    public @NotNull PostFormatterBuilder withMessage(@NotNull Message.WithSpaces message)
+    {
+      innerMessage = requireNonNull(message, "message must not be null");
+
+      return this;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    @Contract("_ -> this")
+    public @NotNull PostFormatterBuilder withMessage(@NotNull String message) {
+      return withMessage(messageFactory.parseMessage(requireNonNull(message, "message must not be null")));
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    @Contract("_ -> this")
     public @NotNull PostFormatterBuilder withMessage(@NotNull Consumer<MessageBuilder> messageConfigurer)
     {
       requireNonNull(messageConfigurer, "messageConfigurer must not be null");
