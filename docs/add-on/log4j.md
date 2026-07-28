@@ -22,7 +22,7 @@ Add the `message-format-log4j` module to the project alongside the Log4j API dep
     ```groovy
     dependencies {
       implementation 'de.sayayi.lib:message-format-log4j:0.24.0'
-      implementation 'org.apache.logging.log4j:log4j-api:2.24.3'
+      implementation 'org.apache.logging.log4j:log4j-api:2.26.1'
     }
     ```
 
@@ -31,7 +31,7 @@ Add the `message-format-log4j` module to the project alongside the Log4j API dep
     ```kotlin
     dependencies {
       implementation("de.sayayi.lib:message-format-log4j:0.24.0")
-      implementation("org.apache.logging.log4j:log4j-api:2.24.3")
+      implementation("org.apache.logging.log4j:log4j-api:2.26.1")
     }
     ```
 
@@ -46,7 +46,7 @@ Add the `message-format-log4j` module to the project alongside the Log4j API dep
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-      <version>2.24.3</version>
+      <version>2.26.1</version>
     </dependency>
     ```
 
@@ -108,7 +108,8 @@ the message format syntax.
 
 ```java
 // No factory argument needed — the global default applies
-private static final Logger logger = LogManager.getLogger(OrderService.class);
+private static final Logger logger = 
+    LogManager.getLogger(OrderService.class);
 ```
 
 Log4j instantiates the factory through its public no-argument constructor. This means the global factory always uses 
@@ -139,8 +140,7 @@ The full message format syntax can be used on these parameters, including map ke
 formatters.
 
 ```java
-logger.info(
-    "%{p1,0:'no items',1:'one item',:'%{p1} items'} in the cart.",
+logger.info("%{p1,0:'no items',1:'one item',:'%{p1} items'} in the cart.",
     itemCount);
 // itemCount = 0  -> "no items in the cart."
 // itemCount = 1  -> "one item in the cart."
@@ -148,8 +148,10 @@ logger.info(
 ```
 
 ```java
-logger.debug(
-    "User %{p1} has role %{p2,'admin':'Administrator','user':'Standard User',:'%{p2}'}.",
+logger.debug("""
+    User %{p1} has role \
+    %{p2,'admin':'Administrator','user':'Standard User',:'%{p2}'}."\
+    """,
     userName, role);
 // userName = "bob", role = "admin"
 // Output: "User bob has role Administrator."
@@ -184,7 +186,8 @@ rendering.
 logger.warn("Step %{p1} failed: %{p2}. Retrying with %{p3}.",
     3, new IOException("disk full"), "fallback-path");
 // Output: "Step 3 failed: disk full. Retrying with fallback-path."
-// No stack trace is rendered because the last argument is a String, not a Throwable.
+// No stack trace is rendered because the last argument is a String, 
+// not a Throwable.
 ```
 
 

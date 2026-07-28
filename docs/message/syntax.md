@@ -200,13 +200,15 @@ matches non-empty values.
 
 ```java
 messageSupport
-    .message("%{query,empty:'no search term',!empty:'searching for: %{query}'}")
+    .message(
+        "%{query,empty:'no search term',!empty:'searching for: %{query}'}")
     .with("query", "")
     .format();
 // "no search term"
 
 messageSupport
-    .message("%{query,empty:'no search term',!empty:'searching for: %{query}'}")
+    .message(
+        "%{query,empty:'no search term',!empty:'searching for: %{query}'}")
     .with("query", "hello")
     .format();
 // "searching for: hello"
@@ -272,7 +274,8 @@ locale-aware. The string itself must be quoted with single or double quotes.
 
 ```java
 messageSupport
-    .message("%{status,'active':'running','stopped':'halted',:'unknown state'}")
+    .message(
+        "%{status,'active':'running','stopped':'halted',:'unknown state'}")
     .with("status", "active")
     .format();
 // "running"
@@ -339,7 +342,13 @@ is formatted as text.
 
 ```java
 messageSupport
-    .message("%{list,format:size,0:'empty',1:'single',:'%{list,format:size} elements'}")
+    .message("""
+        %{list,\
+            format:size,\
+            0:'empty',\
+            1:'single',\
+            :'%{list,format:size} elements'}\
+        """)
     .with("list", List.of("a", "b", "c"))
     .format();
 // "3 elements"
@@ -506,7 +515,8 @@ character is appended to indicate that the text has been clipped.
 ```java
 messageSupport
     .message("%(clip,'%{description}',clip:20)")
-    .with("description", "This is a very long description that should be truncated")
+    .with("description", 
+        "This is a very long description that should be truncated")
     .format();
 // "This is a very long…"
 ```

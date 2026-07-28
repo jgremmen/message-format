@@ -31,8 +31,7 @@ message internally and can be registered on a `ConfigurableMessageSupport` under
 ```java
 MessageFactory factory = MessageFactory.getSharedInstance();
 
-Template template = factory.parseTemplate(
-    "%{error,!empty:': %{error}'}");
+Template template = factory.parseTemplate("%{error,!empty:': %{error}'}");
 ```
 
 ### Parsing Localized Templates
@@ -60,7 +59,7 @@ Template template = MessageBuilder
     .parameter("error")
         .mapEmpty().ne().message(inner ->
             inner.text(":").parameter("error").spaceBefore())
-        .mapDefault().message(Message.EMPTY)
+        .mapDefault().message(Message.empty())
     .buildAsTemplate();
 
 messageSupport.addTemplate("opt-error", template);
@@ -82,7 +81,9 @@ Templates are registered with a name and a `Template`. The template is typically
 or `parseTemplate(Map)`:
 
 ```java
-MessageFactory factory = messageSupport.getMessageAccessor().getMessageFactory();
+MessageFactory factory = messageSupport
+    .getMessageAccessor()
+    .getMessageFactory();
 
 messageSupport.addTemplate("opt-error",
     factory.parseTemplate("%{error,!empty:': %{error}'}"));
@@ -109,7 +110,7 @@ Template template = MessageBuilder
     .parameter("unit")
         .mapEmpty().ne().message(inner ->
             inner.parameter("unit").spaceBefore())
-        .mapDefault().message(Message.EMPTY)
+        .mapDefault().message(Message.empty())
     .buildAsTemplate();
 
 messageSupport.addTemplate("opt-unit", template);
@@ -155,7 +156,8 @@ public class CurrentDateTemplate extends AbstractNamedTemplate
   {
     var locale = parameters.getLocale();
     var formatted = LocalDate.now()
-        .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+        .format(DateTimeFormatter
+            .ofLocalizedDate(FormatStyle.MEDIUM)
             .withLocale(locale));
 
     return TextPartFactory.noSpaceText(formatted);
@@ -200,7 +202,8 @@ public class CurrentDateTemplate extends AbstractNamedTemplate
   {
     var locale = parameters.getLocale();
     var formatted = LocalDate.now()
-        .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+        .format(DateTimeFormatter
+            .ofLocalizedDate(FormatStyle.MEDIUM)
             .withLocale(locale));
 
     return TextPartFactory.noSpaceText(formatted);
@@ -208,8 +211,8 @@ public class CurrentDateTemplate extends AbstractNamedTemplate
 }
 ```
 
-Declare the provider in the `module-info.java` or in a
-`META-INF/services/de.sayayi.lib.message.template.NamedTemplate` file:
+Declare the provider in the `module-info.java` or in a `META-INF/services/de.sayayi.lib.message.template.NamedTemplate`
+file:
 
 ```java
 // module-info.java

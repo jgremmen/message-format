@@ -5,6 +5,7 @@ toc_depth: 2
 
 # Version [0.22.0](https://github.com/jgremmen/message-format/tree/0.22.0) (2026-05-04)
 
+
 ## Breaking Changes
 
 ### Sealed `Message` interface hierarchy

@@ -5,6 +5,7 @@ toc_depth: 2
 
 # Version [0.21.0](https://github.com/jgremmen/message-format/tree/0.21.0) (2026-04-21)
 
+
 ## Breaking Changes
 
 ### Java 21 required

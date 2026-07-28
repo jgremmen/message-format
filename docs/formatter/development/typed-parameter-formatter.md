@@ -31,7 +31,8 @@ public final class ColorFormatter
       @NotNull Color color)
   {
     // renders the color as a hex string, e.g. "#ff8800"
-    return noSpaceText(String.format("#%06x", color.getRGB() & 0xFFFFFF));
+    return noSpaceText(
+        String.format("#%06x", color.getRGB() & 0xFFFFFF));
   }
 
   @Override
@@ -108,7 +109,8 @@ public final class MeasurementFormatter
       @NotNull Measurement measurement)
   {
     // renders the measurement as "value unit", e.g. "3.5 kg"
-    return noSpaceText(measurement.getValue() + " " + measurement.getUnit());
+    return noSpaceText(
+        measurement.getValue() + " " + measurement.getUnit());
   }
 
   @Override
@@ -130,8 +132,8 @@ All three types are now formatted by the same formatter instance. When the frame
 
 A formatter can accept configuration keys that influence its behavior. Configuration keys are named values embedded in
 the message syntax using the `name:value` notation. The `ParameterFormatterContext` (which extends `ConfigAccessor`) 
-provides typed accessors to read them: `getConfigValueString(name)`, `getConfigValueNumber(name)`,
-`getConfigValueBool(name)`, `getConfigValueMessage(name)` and `getConfigValueEnum(name, enumType)`. Each returns an
+provides typed accessors to read them: `getConfigValueString(name)`, `getConfigValueLong(name)`,
+`getConfigValueInt(name)`, `getConfigValueBool(name)`, `getConfigValueMessage(name)` and `getConfigValueEnum(name, enumType)`. Each returns an
 `Optional` that is empty when the key is absent or when the value type does not match. The enum accessor performs a
 case-insensitive match and also supports hyphenated names (e.g. `"my-value"` matches the enum constant `MY_VALUE`).
 
@@ -230,7 +232,12 @@ The message author can now map well-known addresses to descriptive labels:
 
 ```java
 messageSupport
-    .message("Connected to %{addr,'127.0.0.1':'localhost','0.0.0.0':'any interface',:'unknown host'}")
+    .message("""
+        Connected to %{addr,\
+            '127.0.0.1':'localhost',\
+            '0.0.0.0':'any interface',\
+            :'unknown host'}\
+        """)
     .with("addr", InetAddress.getByName("127.0.0.1"))
     .format();
 // "Connected to localhost"
@@ -243,7 +250,11 @@ explicitly mapped:
 
 ```java
 messageSupport
-    .message("Connected to %{addr,'127.0.0.1':'localhost','0.0.0.0':'any interface',:'unknown host'}")
+    .message("""
+        Connected to %{addr,
+            '127.0.0.1':'localhost',
+            '0.0.0.0':'any interface',
+            :'unknown host'}""")
     .with("addr", InetAddress.getByName("192.168.1.42"))
     .format();
 // "Connected to unknown host"
@@ -307,8 +318,10 @@ The built-in `ToTemporalDelegate` uses this approach to convert legacy date obje
 
 ```java
 if (value instanceof java.sql.Time)
-  return context.format(((java.sql.Time)value).toLocalTime(), LocalTime.class);
-
+{
+  return context.format(((java.sql.Time)value).toLocalTime(), 
+     LocalTime.class);
+}
 if (value instanceof java.sql.Date)
   return context.format(((java.sql.Date)value).toLocalDate(), LocalDate.class);
 ```
@@ -329,7 +342,8 @@ public final class MoneyFormatter
     var amountText = context.format(money.getAmount(), Number.class);
 
     // append the currency symbol
-    return noSpaceText(amountText.getText() + " " + money.getCurrency().getSymbol());
+    return noSpaceText(
+        amountText.getText() + " " + money.getCurrency().getSymbol());
   }
 
   @Override

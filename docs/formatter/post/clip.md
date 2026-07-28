@@ -125,7 +125,11 @@ for "und so weiter") instead of an ellipsis may be preferable.
 
 ```java
 messageSupport
-    .message("%(clip,\"%{v,number:'#.##################'}\",clip:12,clip-suffix-text:' usw.')")
+    .message("""
+        %(clip,"%{v,number:'#.##################'}",\
+            clip:12,\
+            clip-suffix-text:' usw.')\
+        """)
     .with("v", Math.PI)
     .locale(Locale.GERMANY)
     .format();

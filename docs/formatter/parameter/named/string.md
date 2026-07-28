@@ -69,7 +69,9 @@ Comparison operators are supported and use the same collator-based comparison.
 
 ```java
 messageSupport
-    .message("%{grade,format:string,<'C':'good',>='C':'needs improvement'}")
+    .message("""
+        %{grade,format:string,<'C':'good',>='C':'needs improvement'}\
+        """)
     .with("grade", "A")
     .format();
 // "good"
@@ -121,7 +123,12 @@ messageSupport
 // "nothing"
 
 messageSupport
-    .message("%{text,format:string,null:'no value',empty:'blank',!empty:'%{text}!'}")
+    .message("""
+        %{text,format:string,\
+            null:'no value',\
+            empty:'blank',\
+            !empty:'%{text}!'}\
+        """)
     .with("text", null)
     .format();
 // "no value"
@@ -139,7 +146,12 @@ A default map key (`:`) catches any value that does not match a specific key.
 
 ```java
 messageSupport
-    .message("%{status,format:string,'active':'Active','inactive':'Inactive',:'Unknown'}")
+    .message("""
+        %{status,format:string,\
+            'active':'Active',\
+            'inactive':'Inactive',\
+            :'Unknown'}\
+        """)
     .with("status", "other")
     .format();
 // "Unknown"
@@ -201,19 +213,36 @@ user-facing label. The following example shows how to match specific values and 
 
 ```java
 messageSupport
-    .message("Status: %{code,format:string,'200':'OK','404':'Not Found','500':'Server Error',:'Unexpected'}")
+    .message("""
+        Status: %{code,format:string,\
+            '200':'OK',\
+            '404':'Not Found',\
+            '500':'Server Error',\
+            :'Unexpected'}\
+        """)
     .with("code", 200)
     .format();
 // "Status: OK"
 
 messageSupport
-    .message("Status: %{code,format:string,'200':'OK','404':'Not Found','500':'Server Error',:'Unexpected'}")
+    .message("""
+        Status: %{code,format:string,\
+            '200':'OK',\
+            '404':'Not Found',\
+            '500':'Server Error',\
+            :'Unexpected'}\
+        """)
     .with("code", 418)
     .format();
 // "Status: Unexpected"
 
 messageSupport
-    .message("Status: %{code,format:string,null:'No status received','200':'OK',:'Other'}")
+    .message("""
+        Status: %{code,format:string,\
+            null:'No status received',\
+            '200':'OK',\
+            :'Other'}\
+        """)
     .with("code", null)
     .format();
 // "Status: No status received"

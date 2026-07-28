@@ -26,6 +26,7 @@ is often all that is needed.
 Messages can be stored centrally in a `MessageSupport` instance, each identified by a unique code.
 Reusable fragments can be extracted into templates and embedded in other messages.
 
+
 ## Features
 
 ### Parameterized messages
@@ -105,6 +106,7 @@ plugin provides a `messageFormat` extension for configuring the source sets to s
 strategy for handling duplicate message codes. The resulting pack file is added to the project's
 resources so it is included in the final artifact automatically.
 
+
 ## Modules
 
 | Module                                                                                                             | Description                                                                    |
@@ -114,6 +116,7 @@ resources so it is included in the final artifact automatically.
 | message-format-log4j&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-log4j/0.24.0)             | Log4j integration: `MessageFactory` using message-format syntax                |
 | message-format-spring&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-spring/0.24.0)           | Spring `MessageSource` bridge and SpEL formatter                               |
 | message-gradle-plugin                                                                                              | Gradle plugin for build-time annotation scanning and message packing           |
+
 
 ## Quick Example
 
@@ -129,9 +132,11 @@ String text = messageSupport
 // "42 results found"   (n = 42)
 ```
 
+
 ## Documentation
 
 The full documentation is available at [lib.sayayi.de/message-format](https://lib.sayayi.de/message-format).
+
 
 ## License
 

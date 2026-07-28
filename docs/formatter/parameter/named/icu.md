@@ -9,14 +9,13 @@ This formatter is **not** included in the core library. It is part of the `messa
 added as a dependency to use.
 
 ```
-de.sayayi.lib:message-format-icu:<version>
+de.sayayi.lib:message-format-icu:0.24.0
 ```
 ///
 
 The named formatter `icu` delegates formatting to the
-[ICU4J](https://unicode-org.github.io/icu/userguide/format_parse/messages/) `MessageFormat` engine. This makes ICU's
-locale-sensitive formatting capabilities available directly within message format strings, including plural rules,
-gender-based selection, ordinal formatting and number and date styles.
+[ICU4J](https://unicode-org.github.io/icu/userguide/format_parse/messages/) `MessageFormat` engine. Any valid ICU
+`MessageFormat` pattern can be embedded in a message format string and evaluated at runtime against the current locale.
 
 The formatter operates on the full parameter map of the current message. All parameters passed to the message are
 available inside the ICU pattern by their original names. The parameter referenced in the `%{...}` anchor does not need
@@ -25,7 +24,7 @@ meaningful parameter name can be used instead if that reads better in context, b
 formatter itself.
 
 
-## Configuration Keys
+## Configuration Key
 
 The `icu` formatter recognizes a single configuration key.
 
@@ -33,6 +32,10 @@ The `icu` formatter recognizes a single configuration key.
 
 A quoted string containing an ICU `MessageFormat` pattern. The formatter passes all message parameters as a named map
 to the ICU engine, which evaluates the pattern against the locale set on the message.
+
+Before the pattern is compiled, leading and trailing whitespace is stripped and internal runs of whitespace are 
+collapsed into single spaces. This normalization allows multiline patterns in Java text blocks without affecting the 
+ICU output.
 
 When `icu` is omitted, the formatter produces empty text.
 
@@ -44,131 +47,102 @@ the parameter in the message output.
 
 ```java
 messageSupport
-    .message("%{unused,icu:'{name} bought {count, plural, one {# book} other {# books}}'}")
-    .with("name", "Alice")
-    .with("count", 3)
+    .message("""
+        %{unused,icu:\
+            '{count, plural, one {# item} other {# items}}'}\
+        """)
+    .with("count", 5)
     .format();
-// "Alice bought 3 books"
+// "5 items"
 ```
 
-Multiple parameters can be referenced inside a single ICU pattern. This example combines a simple substitution with a
-plural expression.
+All parameters available in the message context can be referenced inside the pattern by name, regardless of which
+parameter the `%{...}` anchor refers to.
 
 ```java
 messageSupport
-    .message("%{unused,icu:'{name} has {count, plural, one {# cat} other {# cats}}'}")
+    .message("""
+        %{unused,icu:\
+            '{name} has {count, plural,one {# cat} other {# cats}}'}\
+        """)
     .with("name", "Bob")
     .with("count", 1)
     .format();
 // "Bob has 1 cat"
 ```
 
-The `select` construct chooses text based on an exact string match.
+The anchor parameter name is arbitrary. It does not need to exist as a parameter and its value is never read by the
+formatter. The following example uses `p` as a short throwaway name.
 
 ```java
 messageSupport
-    .message("%{unused,icu:'{gender, select, male {He} female {She} other {They}} liked the post.'}")
-    .with("gender", "female")
+    .message("%{p,icu:'{greeting}, {name}!'}")
+    .with("greeting", "Hello")
+    .with("name", "World")
     .format();
-// "She liked the post."
-```
-
-English ordinal suffixes can be expressed with `selectordinal`.
-
-```java
-messageSupport
-    .message("%{unused,icu:'{rank, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}'}")
-    .with("rank", 22)
-    .format();
-// "22nd"
-```
-
-ICU number and date styles are also available.
-
-```java
-messageSupport
-    .message("%{unused,icu:'{amount, number, currency}'}")
-    .with("amount", 1234.56)
-    .locale(Locale.US)
-    .format();
-// "$1,234.56"
-
-messageSupport
-    .message("%{unused,icu:'{ratio, number, percent}'}")
-    .with("ratio", 0.75)
-    .locale(Locale.US)
-    .format();
-// "75%"
+// "Hello, World!"
 ```
 
 
 ## Pattern Quoting
 
-The ICU pattern must be enclosed in quotes within the message format syntax (`'...'` or `"..."`). ICU patterns that
-contain literal single quotes must escape them as `''` (two consecutive single quotes) per ICU conventions. When the
-pattern is wrapped in single quotes, each ICU `''` must be written as `\'\'` to avoid prematurely ending the quoted
-string. Using double quotes avoids this issue because single quotes pass through unchanged.
+The ICU pattern must be enclosed in quotes within the message format syntax. Both single quotes (`'...'`) and double
+quotes (`"..."`) are supported. Which one to choose depends on whether the ICU pattern itself contains literal single
+quotes.
+
+ICU uses `''` (two consecutive single quotes) to represent a literal single quote inside a pattern. When the
+message format string wraps the pattern in single quotes, each ICU `''` must be escaped as `\'\'` to prevent the
+message format parser from interpreting the quote as the end of the string. Using double quotes as the outer wrapper
+avoids this issue entirely because single quotes pass through to ICU unchanged.
 
 ```java
+// Double-quoted wrapper: ICU '' passes through directly
 messageSupport
-    .message("%{unused,icu:\"{name} doesn''t have {count, plural, one {# item} other {# items}}\"}")
+    .message("""
+        %{p,icu:\
+            "{name} doesn''t have\
+             {count, plural, one {# item} other {# items}}"}\
+        """)
+    .with("name", "Alice")
+    .with("count", 0)
+    .format();
+// "Alice doesn't have 0 items"
+
+// Single-quoted wrapper: ICU '' must be written as \'\'
+messageSupport
+    .message("""
+        %{p,icu:\
+            '{name} doesn\\'\\'\\'t have\
+             {count, plural,one {# item} other {# items}}'}\
+        """)
     .with("name", "Alice")
     .with("count", 0)
     .format();
 // "Alice doesn't have 0 items"
 ```
 
+For patterns that contain literal single quotes, the double-quote wrapper is the more readable option.
 
-## Locale-Sensitive Formatting
 
-The locale set on the message determines which ICU locale rules are applied. Languages with complex plural categories,
-such as Polish with its four forms, are handled automatically by ICU's CLDR-based rules.
+## Locale
+
+The locale set on the message determines which ICU locale rules are applied during formatting. The formatter calls
+`setLocale` on the ICU `MessageFormat` instance before evaluating the pattern, so all locale-sensitive behavior inside
+the pattern (plural categories, number formatting, date formatting) follows the active locale.
 
 ```java
 messageSupport
-    .message("%{unused,icu:'{count, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}'}")
+    .message("""
+        %{p,icu:\
+            '{count, plural,\
+              one {# plik}\
+              few {# pliki} many {# plików}\
+              other {# pliku}}'}\
+        """)
     .with("count", 22)
     .locale(Locale.forLanguageTag("pl"))
     .format();
 // "22 pliki"
-```
-
-Welsh ordinals illustrate a language with six ordinal categories (zero, one, two, few, many, other).
-
-```java
-messageSupport
-    .message("%{unused,icu:'{rank, selectordinal, zero {#ain} one {#af} two {#ail} few {#ydd} many {#ed} other {#fed}}'}")
-    .with("rank", 5)
-    .locale(Locale.forLanguageTag("cy"))
-    .format();
-// "5ed"
-```
-
-
-## Nested Constructs
-
-ICU constructs can be nested. A common pattern is a `select` that branches on gender, with a `plural` inside each
-branch.
-
-```java
-messageSupport
-    .message("%{unused,icu:'{gender, select, male {He has {count, plural, one {# new message} other {# new messages}}} other {She has {count, plural, one {# new message} other {# new messages}}}}'}")
-    .with("gender", "male")
-    .with("count", 5)
-    .format();
-// "He has 5 new messages"
-```
-
-The `plural` construct supports an `offset` that reduces the displayed count, allowing patterns like "Alice and 4 other
-people".
-
-```java
-messageSupport
-    .message("%{unused,icu:'{guests, plural, offset:1 =0 {Nobody is attending} =1 {Only {name} is attending} one {{name} and # other person are attending} other {{name} and # other people are attending}}'}")
-    .with("guests", 5)
-    .with("name", "Alice")
-    .format();
-// "Alice and 4 other people are attending"
 ```
 
 
@@ -176,21 +150,25 @@ messageSupport
 
 The `icu` formatter supports automatic application. When the formatter service encounters a parameter configuration
 that contains the `icu` configuration key but no explicit `format:icu`, it automatically selects the `icu` formatter.
-This means `format:icu` does not need to be written every time `icu:` is used.
-
-The following two message format strings are equivalent:
+Writing `format:icu` is therefore optional whenever the `icu` key is present.
 
 ```java
-// with explicit format selection
+// explicit format selection
 messageSupport
-    .message("%{unused,format:icu,icu:'{count, plural, one {# item} other {# items}}'}")
+    .message("""
+        %{unused,format:icu,icu:\
+            '{count, plural, one {# item} other {# items}}'}\
+        """)
     .with("count", 1)
     .format();
 // "1 item"
 
-// with auto application (icu key triggers the icu formatter automatically)
+// auto application (equivalent)
 messageSupport
-    .message("%{unused,icu:'{count, plural, one {# item} other {# items}}'}")
+    .message("""
+        %{unused,icu:\
+            '{count, plural, one {# item} other {# items}}'}\
+        """)
     .with("count", 1)
     .format();
 // "1 item"
@@ -199,9 +177,9 @@ messageSupport
 
 ## Map Keys on the Result
 
-The ICU formatter supports `empty` and `!empty` map keys on its result. After the ICU pattern is evaluated, the
-resulting text is checked against map keys defined in the parameter. This allows providing fallback text when the ICU
-formatting produces an empty result.
+After the ICU pattern is evaluated, the resulting text is checked against map keys defined in the parameter. The
+formatter supports the `empty` and `!empty` map key types. This allows providing fallback text when the ICU formatting
+produces an empty result.
 
 ```java
 messageSupport

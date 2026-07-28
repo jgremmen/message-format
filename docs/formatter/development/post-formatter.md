@@ -46,9 +46,10 @@ The `PostFormatterContext` extends `ConfigAccessor` and provides access to the c
 message syntax. It also exposes the locale for which the message is being formatted. The typed accessor methods are the
 same ones used by parameter formatters:
 
-`getConfigValueString(name)` returns a string configuration value, `getConfigValueNumber(name)` returns a numeric value
-as `OptionalLong` and `getConfigValueBool(name)` returns a boolean value. Each returns an empty `Optional` when the key
-is absent or when the stored value type does not match the requested type.
+`getConfigValueString(name)` returns a string configuration value, `getConfigValueLong(name)` returns a numeric value
+as `OptionalLong`, `getConfigValueInt(name)` returns a numeric value as `OptionalInt` and `getConfigValueBool(name)` 
+returns a boolean value. Each returns an empty `Optional` when the key is absent or when the stored value type does not 
+match the requested type.
 
 Configuration keys specified inline in the message always take precedence over global defaults registered via 
 `setDefaultConfig` on `ConfigurableMessageSupport`.
@@ -77,7 +78,7 @@ public final class MaskPostFormatter implements PostFormatter
   public @NotNull String format(@NotNull String string,
                                 @NotNull PostFormatterContext context)
   {
-    var show = (int)context.getConfigValueNumber("mask-show").orElse(4);
+    var show = (int)context.getConfigValueLong("mask-show").orElse(4);
     var maskChar = context.getConfigValueString("mask-char").orElse("*");
 
     if (show >= string.length())

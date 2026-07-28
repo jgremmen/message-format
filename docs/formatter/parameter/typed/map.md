@@ -84,7 +84,12 @@ items.put("map2", -1234);
 items.put("map3", 8);
 
 messageSupport
-    .message("%{map,map-kv:'%{key} -> %{value,number:\"0000\"}',list-sep:', ',list-sep-last:' and '}")
+    .message("""
+        %{map,\
+            map-kv:'%{key} -> %{value,number:\"0000\"}',\
+            list-sep:', ',\
+            list-sep-last:' and '}\
+        """)
     .with("map", items)
     .format();
 // "map1 -> 0001, map2 -> -1234 and map3 -> 0008"
@@ -117,7 +122,7 @@ entries are separated and truncated:
 - `list-unique` suppresses duplicate entry texts
 
 ```java
-Map<String, String> env = new LinkedHashMap<>();
+Map<String,String> env = new LinkedHashMap<>();
 env.put("HOME", "/home/user");
 env.put("PATH", "/usr/bin");
 env.put("LANG", "en_US");

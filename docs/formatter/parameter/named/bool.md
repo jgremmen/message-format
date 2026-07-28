@@ -60,19 +60,25 @@ treated as an empty value.
 
 ```java
 messageSupport
-    .message("%{flag,format:bool,true:'present',false:'absent',empty:'missing'}")
+    .message("""
+        %{flag,format:bool,true:'present',false:'absent',empty:'missing'}\
+        """)
     .with("flag", Optional.of(false))
     .format();
 // "absent"
 
 messageSupport
-    .message("%{flag,format:bool,true:'present',false:'absent',empty:'missing'}")
+    .message("""
+        %{flag,format:bool,true:'present',false:'absent',empty:'missing'}\
+        """)
     .with("flag", OptionalInt.empty())
     .format();
 // "missing"
 
 messageSupport
-    .message("%{flag,format:bool,true:'present',false:'absent',empty:'missing'}")
+    .message("""
+        %{flag,format:bool,true:'present',false:'absent',empty:'missing'}\
+        """)
     .with("flag", OptionalLong.of(100))
     .format();
 // "present"
@@ -82,7 +88,12 @@ A **null** value is handled separately. If no `null` map key is provided, the fo
 
 ```java
 messageSupport
-    .message("%{status,format:bool,null:'<unknown>',true:'active',false:'inactive'}")
+    .message("""
+        %{status,format:bool,\
+            null:'<unknown>',\
+            true:'active',\
+            false:'inactive'}\
+        """)
     .with("status", null)
     .format();
 // "<unknown>"
@@ -169,19 +180,37 @@ how to build a status message that covers all possible states including null and
 
 ```java
 messageSupport
-    .message("Access: %{granted,format:bool,null:'pending',true:'granted',false:'denied',empty:'error'}")
+    .message("""
+        Access: %{granted,format:bool,\
+           null:'pending',\
+           true:'granted',\
+           false:'denied',\
+           empty:'error'}\
+        """)
     .with("granted", 1)
     .format();
 // "Access: granted"
 
 messageSupport
-    .message("Access: %{granted,format:bool,null:'pending',true:'granted',false:'denied',empty:'error'}")
+    .message("""
+        Access: %{granted,format:bool,\
+            null:'pending',\
+            true:'granted',\
+            false:'denied',\
+            empty:'error'}\
+        """)
     .with("granted", null)
     .format();
 // "Access: pending"
 
 messageSupport
-    .message("Access: %{granted,format:bool,null:'pending',true:'granted',false:'denied',empty:'error'}")
+    .message("""
+        Access: %{granted,format:bool,\
+            null:'pending',\
+            true:'granted',\
+            false:'denied',\
+            empty:'error'}\
+        """)
     .with("granted", "invalid")
     .format();
 // "Access: error"

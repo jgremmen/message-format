@@ -5,6 +5,7 @@ toc_depth: 2
 
 # Version [0.20.0](https://github.com/jgremmen/message-format/tree/0.20.0) (2025-06-08)
 
+
 ## Breaking Changes
 
 ### Pack serialization replaced by `de.sayayi.lib:pack` library

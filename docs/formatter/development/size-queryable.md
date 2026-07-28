@@ -59,7 +59,7 @@ public final class RingFormatter
   {
     // format as comma-separated list of elements
     var sb = new StringBuilder();
-    for(var element : ring)
+    for(var element: ring)
     {
       if (!sb.isEmpty())
         sb.append(", ");
@@ -96,7 +96,12 @@ messageSupport
 // "3"
 
 messageSupport
-    .message("%{buffer,format:size,0:'empty ring',1:'one element',:'%{buffer,format:size} elements'}")
+    .message("""
+        %{buffer,format:size,\
+            0:'empty ring',\
+            1:'one element',\
+             :'%{buffer,format:size} elements'}\
+        """)
     .with("buffer", ringWithElements("a", "b", "c"))
     .format();
 // "3 elements"
@@ -134,7 +139,9 @@ public final class LazyFormatter
     var inner = ((Lazy<?>)value).get();
 
     // delegates size calculation to the contained value's formatter
-    return inner == null ? OptionalLong.empty() : context.size(inner);
+    return inner == null
+        ? OptionalLong.empty()
+        : context.size(inner);
   }
   
   @Override
@@ -206,7 +213,8 @@ keys), assign a higher precedence through the `FormattableType` order:
 protected @NotNull FormattableType getFormattableType() 
 {
   // lower order value = higher precedence
-  return new FormattableType(Multimap.class, FormattableType.DEFAULT_ORDER - 10);
+  return new FormattableType(Multimap.class, 
+      FormattableType.DEFAULT_ORDER - 10);
 }
 ```
 
@@ -233,7 +241,7 @@ public @NotNull OptionalLong size(
   
   try {
     return OptionalLong.of(resource.contentLength());
-  } catch (IOException ex) {
+  } catch(IOException ex) {
     // size cannot be determined due to I/O failure
     return OptionalLong.empty();
   }

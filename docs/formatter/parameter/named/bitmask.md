@@ -12,7 +12,11 @@ mode, binary string mode, list separators) on plain integer values that represen
 
 The formatter accepts all Java integral types: `byte`, `short`, `int`, `long` (and their boxed equivalents),
 `char`/`Character` and `BigInteger`. Negative values are treated as unsigned bit patterns, so all bits are preserved 
-as-is going through the conversion. A `BitSet` formatter **must** be registered for the `bitmask` formatter to work.
+as-is going through the conversion.
+
+/// warning
+A [`BitSet` formatter](../typed/bit-set.md) **must** be registered for the `bitmask` formatter to work.
+///
 
 
 ## Set-Bit Mode
@@ -36,7 +40,9 @@ The default ordering is `lsb-set`. To reverse the order, set `bitset` to `msb-se
 ```java
 // 0x15 = bits 0, 2, 4 are set
 messageSupport
-    .message("%{flags,format:bitmask,bitset:'msb-set',0:read,2:execute,4:admin}")
+    .message("""
+        %{flags,format:bitmask,bitset:'msb-set',0:read,2:execute,4:admin}\
+        """)
     .with("flags", 0x15)
     .format();
 // "admin, execute, read"
@@ -66,7 +72,16 @@ Because set-bit mode produces a list of labels, all list configuration keys from
 ```java
 // 0x8000_0000_0000_00A5 → bits 0, 2, 5, 7, 63 are set
 messageSupport
-    .message("%{v,format:bitmask,bitset:'lsb-set',list-sep-last:' and ',0:b0,2:b2,5:b5,7:b7,63:b63}")
+    .message("""
+        %{v,format:bitmask,\
+            bitset:'lsb-set',\
+            list-sep-last:' and ',\
+            0:b0,\
+            2:b2,\
+            5:b5,\
+            7:b7,\
+            63:b63}
+        """)
     .with("v", 0x8000_0000_0000_00A5L)
     .format();
 // "b0, b2, b5, b7 and b63"

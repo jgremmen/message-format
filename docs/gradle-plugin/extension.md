@@ -390,7 +390,7 @@ properties and wire the pack file into the jar:
     }
 
     dependencies {
-      implementation 'de.sayayi.lib:message-format-annotations:<version>'
+      implementation 'de.sayayi.lib:message-format-annotations:0.24.0'
     }
 
     messageFormat {
@@ -417,7 +417,7 @@ properties and wire the pack file into the jar:
     }
 
     dependencies {
-      implementation("de.sayayi.lib:message-format-annotations:<version>")
+      implementation("de.sayayi.lib:message-format-annotations:0.24.0")
     }
 
     messageFormat {
@@ -532,7 +532,8 @@ var messageSupport = MessageSupportFactory.create(
 
 for(var resource: List.of(
     "/META-INF/core.mfp",
-    "/META-INF/orders.mfp")) {
+    "/META-INF/orders.mfp")) 
+{
   try(var in = getClass().getResourceAsStream(resource)) {
     messageSupport.importMessages(in);
   }

@@ -5,6 +5,7 @@ toc_depth: 2
 
 # Version [0.23.0](https://github.com/jgremmen/message-format/tree/0.23.0) (2026-05-13)
 
+
 ## Breaking Changes
 
 ### `MessageFactory.NO_CACHE_INSTANCE` replaced by `MessageFactory.getSharedInstance()`
@@ -27,7 +28,8 @@ Code that passed `NO_CACHE_INSTANCE` to `MessageSupportFactory.create`:
 
 ```java
 // before
-var messageSupport = MessageSupportFactory.create(formatterService, MessageFactory.NO_CACHE_INSTANCE);
+var messageSupport = MessageSupportFactory
+    .create(formatterService, MessageFactory.NO_CACHE_INSTANCE);
 
 // after
 var messageSupport = MessageSupportFactory.create(formatterService);

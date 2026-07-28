@@ -20,10 +20,10 @@ message fragment that is referenced by name from other messages.
 
 ### Where the Annotations Go
 
-Both `@MessageDef` and `@TemplateDef` may be placed on a type or on a method. The annotated element is only a carrier 
-for the declaration. The message or template has no relationship to what the class or method actually does. Declarations
-may therefore be grouped wherever they read best, for example on a dedicated holder class that contains nothing but
-annotations, or directly on the method whose behavior a message describes.
+Both `@MessageDef` and `@TemplateDef` may be placed on a type, a method or a constructor. The annotated element is only 
+a carrier for the declaration. The message or template has no relationship to what the class, method or constructor 
+actually does. Declarations may therefore be grouped wherever they read best, for example on a dedicated holder class 
+that contains nothing but annotations, or directly on the method or constructor whose behavior a message describes.
 
 The following holder class keeps all authentication messages in one place. Because both annotations are repeatable, 
 any number of them may be stacked on a single element.
@@ -32,11 +32,12 @@ any number of them may be stacked on a single element.
 @MessageDef(code = "auth.login-failed", text = "Login failed for %{user}.")
 @MessageDef(code = "auth.locked", text = "Account %{user} is locked.")
 public final class AuthMessages {}
-// Declares two messages, retrieved later by code "auth.login-failed" and "auth.locked"
+// Declares two messages, retrieved later by code "auth.login-failed" 
+// and "auth.locked"
 ```
 
-Placing a declaration on a method is useful when a message belongs conceptually to a specific operation. The method 
-body remains untouched.
+Placing a declaration on a method or constructor is useful when a message belongs conceptually to a specific operation. 
+The method body remains untouched.
 
 ```java
 public class OrderService
@@ -45,8 +46,15 @@ public class OrderService
   public void ship(String id) {
     // business logic
   }
+
+  @MessageDef(code = "order.invalid-state", 
+              text = "Order %{id} is in an invalid state.")
+  public OrderService(String id) {
+    // initialization logic
+  }
 }
-// Declares the message "order.shipped" while leaving ship() fully functional
+// Declares "order.shipped" on a method and "order.invalid-state" on 
+// a constructor
 ```
 
 ### Messages Without a Locale
@@ -134,10 +142,18 @@ locale.
 
 ```java
 @MessageDef(code = "cart.count", texts = {
-    @Text(locale = "en",
-        text = "%{n,format:choice,0:'your cart is empty',1:'1 item',:'%{n} items'}"),
-    @Text(locale = "de",
-        text = "%{n,format:choice,0:'Ihr Warenkorb ist leer',1:'1 Artikel',:'%{n} Artikel'}")
+    @Text(locale = "en", text = """
+        %{n,format:choice,\
+            0:'your cart is empty',\
+            1:'1 item',\
+             :'%{n} items'}\
+        """),
+    @Text(locale = "de", text = """
+        %{n,format:choice,\
+            0:'Ihr Warenkorb ist leer',\
+            1:'1 Artikel',\
+             :'%{n} Artikel'}\
+        """)
 })
 public final class CartMessages {}
 
@@ -154,8 +170,10 @@ Templates are localized in exactly the same way. Supply multiple `@Text` entries
 
 ```java
 @TemplateDef(name = "unit-days", texts = {
-    @Text(locale = "en", text = "%{d,format:choice,1:'1 day',:'%{d} days'}"),
-    @Text(locale = "de", text = "%{d,format:choice,1:'1 Tag',:'%{d} Tage'}")
+    @Text(locale = "en", 
+          text = "%{d,format:choice,1:'1 day',:'%{d} days'}"),
+    @Text(locale = "de", 
+          text = "%{d,format:choice,1:'1 Tag',:'%{d} Tage'}")
 })
 public final class DurationTemplates {}
 
@@ -222,7 +240,8 @@ When the exact location of a class file on disk is known, its path can be provid
 tool integrations, Gradle tasks, or test setups where the output directory is known:
 
 ```java
-adopter.adopt(Path.of("build/classes/java/main/com/example/MyMessages.class"));
+adopter.adopt(Path.of(
+    "build/classes/java/main/com/example/MyMessages.class"));
 ```
 
 ### Loaded Type
@@ -303,7 +322,8 @@ combination of different discovery strategies, it is silently skipped. This make
 hierarchies without worrying about duplicate processing:
 
 ```java
-// These two calls overlap on com.example, but each class is processed only once.
+// These two calls overlap on com.example, but each class is processed 
+// only once.
 adopter.adopt(classLoader, Set.of("com.example"));
 adopter.adopt(classLoader, Set.of("com.example.messages"));
 ```
@@ -336,8 +356,10 @@ package and formats one of the discovered messages:
 
 ```java
 @MessageDef(code = "order-confirm", texts = {
-    @Text(locale = "en", text = "Order %{id} confirmed for %{customer}."),
-    @Text(locale = "de", text = "Bestellung %{id} bestätigt für %{customer}.")
+    @Text(locale = "en", 
+          text = "Order %{id} confirmed for %{customer}."),
+    @Text(locale = "de", 
+          text = "Bestellung %{id} bestätigt für %{customer}.")
 })
 public class OrderMessages {}
 ```
@@ -372,7 +394,7 @@ The annotation adopter is part of the `message-format-annotations` module. No ad
 
     ```groovy
     dependencies {
-      implementation 'de.sayayi.lib:message-format-annotations:<version>'
+      implementation 'de.sayayi.lib:message-format-annotations:0.24.0'
     }
     ```
 
@@ -382,6 +404,6 @@ The annotation adopter is part of the `message-format-annotations` module. No ad
     <dependency>
       <groupId>de.sayayi.lib</groupId>
       <artifactId>message-format-annotations</artifactId>
-      <version><!-- version --></version>
+      <version>0.24.0</version>
     </dependency>
     ```

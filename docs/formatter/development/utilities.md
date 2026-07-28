@@ -22,14 +22,14 @@ can contain intentional line breaks that must survive trimming and normalization
 
 ```java
 // regular space and tab are recognized as space characters
-MessageUtil.isSpaceChar(' ');     // true
-MessageUtil.isSpaceChar('\t');    // true
+MessageUtil.isSpaceChar(' ');       // true
+MessageUtil.isSpaceChar('\t');      // true
 
 // non-breaking space (U+00A0) is a SPACE_SEPARATOR
-MessageUtil.isSpaceChar('\u00A0'); // true
+MessageUtil.isSpaceChar('\u00A0');  // true
 
 // newline is NOT a space character
-MessageUtil.isSpaceChar('\n');    // false
+MessageUtil.isSpaceChar('\n');      // false
 ```
 
 ### `trimSpaces(String)`
@@ -40,15 +40,15 @@ of `isSpaceChar`. Unlike `String.trim()`, it does not remove newlines. If the in
 leading or trailing spaces, the original `String` instance is returned, avoiding a needless allocation.
 
 ```java
-MessageUtil.trimSpaces("  hello  ");          // "hello"
-MessageUtil.trimSpaces("\t  hello\t ");        // "hello"
-MessageUtil.trimSpaces(null);                  // null
+MessageUtil.trimSpaces("  hello  ");      // "hello"
+MessageUtil.trimSpaces("\t  hello\t ");   // "hello"
+MessageUtil.trimSpaces(null);             // null
 
 // newlines at the edges are preserved
-MessageUtil.trimSpaces("\nhello\n");           // "\nhello\n"
+MessageUtil.trimSpaces("\nhello\n");      // "\nhello\n"
 
 // mixed: tabs are trimmed, newlines stay
-MessageUtil.trimSpaces("\t\nhello\n\t");       // "\nhello\n"
+MessageUtil.trimSpaces("\t\nhello\n\t");  // "\nhello\n"
 ```
 
 ### `trimAndNormalizeSpaces(String)`
@@ -85,15 +85,15 @@ This method returns `true` if the given string has zero length or consists entir
 meaningful content.
 
 ```java
-MessageUtil.isTrimmedEmpty("");          // true
-MessageUtil.isTrimmedEmpty("   ");       // true
-MessageUtil.isTrimmedEmpty("\t \t");     // true
-MessageUtil.isTrimmedEmpty("\u00A0");    // true
+MessageUtil.isTrimmedEmpty("");        // true
+MessageUtil.isTrimmedEmpty("   ");     // true
+MessageUtil.isTrimmedEmpty("\t \t");   // true
+MessageUtil.isTrimmedEmpty("\u00A0");  // true
 
 // a string containing only a newline is NOT trimmed empty
-MessageUtil.isTrimmedEmpty("\n");        // false
+MessageUtil.isTrimmedEmpty("\n");      // false
 
-MessageUtil.isTrimmedEmpty("hello");    // false
+MessageUtil.isTrimmedEmpty("hello");   // false
 ```
 
 ### `isEmpty(String)`
@@ -125,13 +125,16 @@ original name is returned, making it convenient for inline validation in constru
 
 ```java
 // valid name passes through
-String name = MessageUtil.validateName("myFormatter", "formatter name");
+String name = MessageUtil
+        .validateName("myFormatter", "formatter name");
 // name → "myFormatter"
 
-// null throws NullPointerException with message "formatter name must not be null"
+// null throws NullPointerException with message 
+// "formatter name must not be null"
 MessageUtil.validateName(null, "formatter name");
 
-// blank throws IllegalArgumentException with message "template name must not be empty"
+// blank throws IllegalArgumentException with message 
+// "template name must not be empty"
 MessageUtil.validateName("   ", "template name");
 ```
 
@@ -142,22 +145,22 @@ letter, contains only lowercase letters, digits and hyphens, does not end with a
 consecutive hyphens.
 
 ```java
-MessageUtil.isKebabCaseName("date-format");      // true
-MessageUtil.isKebabCaseName("my-formatter-2");   // true
-MessageUtil.isKebabCaseName("x");                // true
+MessageUtil.isKebabCaseName("date-format");     // true
+MessageUtil.isKebabCaseName("my-formatter-2");  // true
+MessageUtil.isKebabCaseName("x");               // true
 
 // must start with a lowercase letter
-MessageUtil.isKebabCaseName("2things");          // false
-MessageUtil.isKebabCaseName("MyName");           // false
+MessageUtil.isKebabCaseName("2things");         // false
+MessageUtil.isKebabCaseName("MyName");          // false
 
 // no trailing hyphen
-MessageUtil.isKebabCaseName("trailing-");        // false
+MessageUtil.isKebabCaseName("trailing-");       // false
 
 // no consecutive hyphens
-MessageUtil.isKebabCaseName("double--dash");     // false
+MessageUtil.isKebabCaseName("double--dash");    // false
 
 // uppercase letters are not allowed
-MessageUtil.isKebabCaseName("camelCase");        // false
+MessageUtil.isKebabCaseName("camelCase");       // false
 ```
 
 ### `isLowerCamelCaseName(String)`
@@ -167,17 +170,17 @@ lowercase letter and contains only letters and digits. Unlike kebab-case, hyphen
 Uppercase letters are allowed after the first character to form the camelCase humps.
 
 ```java
-MessageUtil.isLowerCamelCaseName("dateFormat");     // true
-MessageUtil.isLowerCamelCaseName("myFormatter2");   // true
-MessageUtil.isLowerCamelCaseName("x");              // true
+MessageUtil.isLowerCamelCaseName("dateFormat");    // true
+MessageUtil.isLowerCamelCaseName("myFormatter2");  // true
+MessageUtil.isLowerCamelCaseName("x");             // true
 
 // must start with a lowercase letter
-MessageUtil.isLowerCamelCaseName("DateFormat");     // false
-MessageUtil.isLowerCamelCaseName("3items");         // false
+MessageUtil.isLowerCamelCaseName("DateFormat");    // false
+MessageUtil.isLowerCamelCaseName("3items");        // false
 
 // hyphens and underscores are not allowed
-MessageUtil.isLowerCamelCaseName("date-format");    // false
-MessageUtil.isLowerCamelCaseName("date_format");    // false
+MessageUtil.isLowerCamelCaseName("date-format");   // false
+MessageUtil.isLowerCamelCaseName("date_format");   // false
 ```
 
 ### `isKebabOrLowerCamelCaseName(String)`
@@ -191,7 +194,7 @@ MessageUtil.isKebabOrLowerCamelCaseName("date-format");   // true (kebab)
 MessageUtil.isKebabOrLowerCamelCaseName("dateFormat");    // true (camelCase)
 
 // mixing styles is rejected
-MessageUtil.isKebabOrLowerCamelCaseName("date-Format");  // false
+MessageUtil.isKebabOrLowerCamelCaseName("date-Format");   // false
 MessageUtil.isKebabOrLowerCamelCaseName("dateFormat-x");  // false
 ```
 
@@ -207,29 +210,29 @@ by one or more Unicode letters or numbers. The name must not end with a separato
 are not allowed.
 
 ```java
-MessageUtil.isName("hello");            // true
-MessageUtil.isName("myParam");          // true
-MessageUtil.isName("date-format");      // true
-MessageUtil.isName("item_count");       // true
-MessageUtil.isName("größe");            // true (Unicode letters allowed)
-MessageUtil.isName("abc123");           // true
-MessageUtil.isName("a-b_c");           // true
+MessageUtil.isName("hello");        // true
+MessageUtil.isName("myParam");      // true
+MessageUtil.isName("date-format");  // true
+MessageUtil.isName("item_count");   // true
+MessageUtil.isName("größe");        // true (Unicode letters allowed)
+MessageUtil.isName("abc123");       // true
+MessageUtil.isName("a-b_c");        // true
 
 // must start with a letter
-MessageUtil.isName("123abc");           // false
-MessageUtil.isName("_hidden");          // false
-MessageUtil.isName("-start");           // false
+MessageUtil.isName("123abc");       // false
+MessageUtil.isName("_hidden");      // false
+MessageUtil.isName("-start");       // false
 
 // must not end with a separator
-MessageUtil.isName("trailing-");        // false
-MessageUtil.isName("trailing_");        // false
+MessageUtil.isName("trailing-");    // false
+MessageUtil.isName("trailing_");    // false
 
 // consecutive separators are not allowed
-MessageUtil.isName("double--sep");      // false
-MessageUtil.isName("double__sep");      // false
+MessageUtil.isName("double--sep");  // false
+MessageUtil.isName("double__sep");  // false
 
 // empty string is not a valid name
-MessageUtil.isName("");                 // false
+MessageUtil.isName("");             // false
 ```
 
 
@@ -253,7 +256,8 @@ characters that cannot be encoded in the context's charset are written as Unicod
 `\u0000`.
 
 ```java
-var context = new FormatStringSerializer.Context(StandardCharsets.UTF_8);
+var context = 
+    new FormatStringSerializer.Context(StandardCharsets.UTF_8);
 
 // serializing a plain string without a quote context
 MessageUtil.serializeString(context, "hello world");
@@ -281,7 +285,8 @@ quote is used as the wrapper; otherwise a single quote is chosen. The opening qu
 closing quote are all appended to the context's text joiner.
 
 ```java
-var context = new FormatStringSerializer.Context(StandardCharsets.UTF_8);
+var context = 
+    new FormatStringSerializer.Context(StandardCharsets.UTF_8);
 
 // string with no quotes uses single quotes by default
 MessageUtil.serializeQuotedString(context, "hello");
@@ -305,7 +310,8 @@ in quotes. The quote character is chosen by examining all text parts in the mess
 part contains a single quote, double quotes are used as the wrapper.
 
 ```java
-var context = new FormatStringSerializer.Context(StandardCharsets.UTF_8);
+var context = 
+    new FormatStringSerializer.Context(StandardCharsets.UTF_8);
 
 // a simple text message that is a valid name can be serialized unquoted
 Message simpleMsg = ...;  // TextMessage containing "hello"
@@ -340,8 +346,8 @@ IntelliJ IDEA plugins or Gradle build scripts.
 Path packFile = Path.of("messages.pack");
 Path textFile = Path.of("messages.properties");
 
-MessageUtil.isMessageFormatPack(packFile);   // true (if it is a valid pack file)
-MessageUtil.isMessageFormatPack(textFile);   // false
+MessageUtil.isMessageFormatPack(packFile);  // true (if it is a valid pack file)
+MessageUtil.isMessageFormatPack(textFile);  // false
 ```
 
 The method returns `false` for any file that does not exist, cannot be read or does not contain a valid pack file
@@ -356,8 +362,7 @@ receives templates as name-template pairs. Either consumer may be `null` if only
 The input stream is always closed when this method returns, regardless of success or failure.
 
 ```java
-try(var stream = Files.newInputStream(Path.of("messages.pack")))
-{
+try(var stream = Files.newInputStream(Path.of("messages.pack"))) {
   MessageUtil.importMessages(
       stream,
       message -> messageSupport.addMessage(message),
@@ -365,9 +370,9 @@ try(var stream = Files.newInputStream(Path.of("messages.pack")))
 }
 
 // importing only messages, ignoring templates
-try(var stream = getClass().getResourceAsStream("/bundle.pack"))
-{
-  MessageUtil.importMessages(stream, message -> registry.put(message.getCode(), message), null);
+try(var stream = getClass().getResourceAsStream("/bundle.pack")) {
+  MessageUtil.importMessages(stream, 
+      message -> registry.put(message.getCode(), message), null);
 }
 ```
 
@@ -448,17 +453,17 @@ without adding any surrounding whitespace.
 
 ```java
 Text t = noSpaceText("hello");
-t.getText();         // "hello"
-t.isSpaceBefore();   // false
-t.isSpaceAfter();    // false
+t.getText();        // "hello"
+t.isSpaceBefore();  // false
+t.isSpaceAfter();   // false
 
 // leading and trailing spaces are trimmed
 Text t2 = noSpaceText("  hello  ");
-t2.getText();        // "hello"
+t2.getText();       // "hello"
 
 // null input yields the null-text singleton
 Text t3 = noSpaceText(null);
-t3.getText();        // null
+t3.getText();       // null
 ```
 
 ### `spacedText(String)`
@@ -470,9 +475,9 @@ input string is meaningful and must be carried through to the assembled message.
 
 ```java
 Text t = spacedText(" hello ");
-t.getText();         // "hello"
-t.isSpaceBefore();   // true
-t.isSpaceAfter();    // true
+t.getText();        // "hello"
+t.isSpaceBefore();  // true
+t.isSpaceAfter();   // true
 
 // no surrounding spaces means no space flags
 Text t2 = spacedText("hello");
@@ -491,9 +496,9 @@ formatter needs to inject spacing around an intermediate result that was produce
 Text original = noSpaceText("hello");
 Text spaced = addSpaces(original, true, false);
 
-spaced.getText();         // "hello"
-spaced.isSpaceBefore();   // true
-spaced.isSpaceAfter();    // false
+spaced.getText();        // "hello"
+spaced.isSpaceBefore();  // true
+spaced.isSpaceAfter();   // false
 
 // adding a trailing space to text that already has one is a no-op
 Text alreadySpaced = spacedText(" hello ");
@@ -526,8 +531,12 @@ flag causes a separator space before the content and a trailing space flag is re
 it is recorded as pending rather than appended immediately. A non-space character is appended to the buffer, preceded 
 by a separator space if one was pending.
 
-`addWithSpace(String)` appends a string, preserving any leading and trailing spaces in the string. Internally, it 
-delegates to `spacedText` from `TextPartFactory`.
+`add(char[])` processes each character in the array sequentially, applying the same space-handling logic as `add(char)`.
+Runs of space characters are collapsed into a single pending separator space.
+
+`add(String)` appends a string, preserving any leading and trailing spaces in the string. Internally, it converts the 
+string to a character array and processes it character by character, meaning consecutive spaces within the string are 
+also collapsed. A `null` or empty string is ignored.
 
 `addNoSpace(String)` and `addNoSpace(Text)` append content with leading and trailing spaces stripped.
 
@@ -556,10 +565,10 @@ addition), the resulting `Text` will have its `isSpaceAfter()` flag set.
 ```java
 TextJoiner joiner = new TextJoiner();
 
-joiner.addWithSpace(" red ")
-      .addWithSpace(null)       // null is ignored
-      .addWithSpace(" ")        // only records a pending space
-      .addWithSpace("green ");
+joiner.add(" red ")
+      .add((String)null)  // null is ignored
+      .add(" ")           // only records a pending space
+      .add("green ");
 
 // asNoSpaceText() strips the surrounding spaces
 Text noSpace = joiner.asNoSpaceText();
@@ -582,7 +591,7 @@ comma-separated list. Each element is formatted individually and the joiner take
 ```java
 TextJoiner joiner = new TextJoiner();
 
-for(String element : List.of("apple", "banana", "cherry"))
+for(String element: List.of("apple", "banana", "cherry"))
 {
   if (!joiner.asNoSpaceText().isEmpty())
     joiner.add(spacedText(", "));
@@ -608,12 +617,14 @@ The constructor takes a `Locale` and the parameter name. The initial value is `n
 `format` call.
 
 ```java
-SingletonParameters params = new SingletonParameters(Locale.US, "item");
+SingletonParameters params = 
+    new SingletonParameters(Locale.US, "item");
 
 // format individual elements by updating the value in place
-for(Object element : collection) 
+for(Object element: collection) 
 {
-  Text formatted = message.format(accessor, params.setValue(element));
+  Text formatted = message.format(accessor, 
+      params.setValue(element));
   joiner.add(formatted);
 }
 ```
@@ -622,7 +633,8 @@ Requesting the value of any parameter name other than the one provided at constr
 `getParameterNames()` method returns an immutable singleton set containing only the configured name.
 
 ```java
-SingletonParameters params = new SingletonParameters(Locale.GERMAN, "name");
+SingletonParameters params = 
+    new SingletonParameters(Locale.GERMAN, "name");
 params.setValue("Berlin");
 
 params.getParameterValue("name");   // "Berlin"
@@ -665,19 +677,43 @@ BigDecimal val2 = expensiveValue.get();
 
 `SupplierDelegate` is thread-safe. After the first invocation, the delegate supplier is released for garbage collection.
 
-A typical use case inside a formatter is to defer a type conversion until a map comparison method actually needs it:
+A typical use case inside a formatter is to defer an expensive computation until it is actually needed. The 
+`IterableFormatter` in this library illustrates this pattern well. When formatting a collection, a self-reference 
+placeholder (e.g. `"(this collection)"`) is only required if one of the elements in the collection turns out to be the 
+collection itself. Rather than computing that text eagerly for every formatting call, the formatter wraps it in a 
+`SupplierDelegate`:
 
 ```java
 @Override
 public @NotNull Text format(
-    @NotNull ParameterFormatter.Context context,
-    @NotNull Object value)
+    @NotNull ParameterFormatterContext context, Object value)
 {
-  Supplier<String> normalizedName = SupplierDelegate.of(
-      () -> normalizePersonName((Person) value));
+  List<?> list = (List<?>)value;
 
-  // The supplier is only invoked if the map contains a string key
-  // that triggers a comparison against the normalized name.
-  context.delegateToNextFormatter();
+  // deferred: only computed if the list contains a self-reference
+  Supplier<Text> thisText = SupplierDelegate.of(() -> noSpaceText(
+      context.getConfigValueString("this").orElse("(this list)")));
+
+  SingletonParameters params = 
+      new SingletonParameters(context.getLocale(), "item");
+  TextJoiner joiner = new TextJoiner();
+
+  for(Object element: list)
+  {
+    Text formatted = (element == list)
+        ? thisText.get()  // triggers computation only on first self-reference
+        : itemMessage.formatAsText(context.getMessageAccessor(), 
+              params.setValue(element));
+
+    joiner.add(formatted);
+  }
+
+  return joiner.asNoSpaceText();
+  // For input ["hello", <self-ref>, "world"]:
+  // result → "hello, (this list), world"
 }
 ```
+
+In this example, if no element in the list is a self-reference, the config value lookup and `Text` construction never 
+execute. When a self-reference does occur, the first call to `thisText.get()` computes and caches the result. Any 
+subsequent self-references in the same list reuse the cached value without repeating the lookup.

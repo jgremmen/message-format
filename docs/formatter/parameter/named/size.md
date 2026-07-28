@@ -93,13 +93,17 @@ Comparison operators allow expressing ranges.
 
 ```java
 messageSupport
-    .message("%{items,format:size,0:'none',<5:'a few',<20:'several',:'many'}")
+    .message("""
+        %{items,format:size,0:'none',<5:'a few',<20:'several',:'many'}\
+        """)
     .with("items", List.of(1, 2, 3))
     .format();
 // "a few"
 
 messageSupport
-    .message("%{items,format:size,0:'none',<5:'a few',<20:'several',:'many'}")
+    .message("""
+        %{items,format:size,0:'none',<5:'a few',<20:'several',:'many'}\
+        """)
     .with("items", List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12))
     .format();
 // "several"
@@ -111,7 +115,12 @@ The `null` key matches when the parameter value is `null`.
 
 ```java
 messageSupport
-    .message("%{items,format:size,null:'no list provided',0:'empty list',:'%{items,format:size} items'}")
+    .message("""
+        %{items,format:size,\
+            null:'no list provided',\
+            0:'empty list',\
+            :'%{items,format:size} items'}\
+        """)
     .with("items", null)
     .format();
 // "no list provided"
@@ -148,7 +157,11 @@ it acts as a fallback for unmatched sizes.
 
 ```java
 messageSupport
-    .message("%{text,format:size,0:'empty',:'not empty (%{text,format:size} chars)'}")
+    .message("""
+        %{text,format:size,\
+            0:'empty',\
+            :'not empty (%{text,format:size} chars)'}\
+        """)
     .with("text", "hello world")
     .format();
 // "not empty (11 chars)"
@@ -183,25 +196,49 @@ collection sizes.
 
 ```java
 messageSupport
-    .message("Cart: %{cart,format:size,null:'not loaded',0:'empty',1:'1 item',:'%{cart,format:size} items'}")
+    .message("""
+        Cart: %{cart,format:size,\
+            null:'not loaded',\
+            0:'empty',\
+            1:'1 item',\
+            :'%{cart,format:size} items'}\
+        """)
     .with("cart", null)
     .format();
 // "Cart: not loaded"
 
 messageSupport
-    .message("Cart: %{cart,format:size,null:'not loaded',0:'empty',1:'1 item',:'%{cart,format:size} items'}")
+    .message("""
+        Cart: %{cart,format:size,\
+            null:'not loaded',\
+            0:'empty',\
+            1:'1 item',\
+            :'%{cart,format:size} items'}\
+        """)
     .with("cart", List.of())
     .format();
 // "Cart: empty"
 
 messageSupport
-    .message("Cart: %{cart,format:size,null:'not loaded',0:'empty',1:'1 item',:'%{cart,format:size} items'}")
+    .message("""
+        Cart: %{cart,format:size,\
+            null:'not loaded',\
+            0:'empty',\
+            1:'1 item',\
+            :'%{cart,format:size} items'}\
+        """)
     .with("cart", List.of("Laptop"))
     .format();
 // "Cart: 1 item"
 
 messageSupport
-    .message("Cart: %{cart,format:size,null:'not loaded',0:'empty',1:'1 item',:'%{cart,format:size} items'}")
+    .message("""
+        Cart: %{cart,format:size,\
+            null:'not loaded',\
+            0:'empty',\
+            1:'1 item',\
+            :'%{cart,format:size} items'}\
+        """)
     .with("cart", List.of("Laptop", "Mouse", "Keyboard"))
     .format();
 // "Cart: 3 items"

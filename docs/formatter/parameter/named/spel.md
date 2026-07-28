@@ -9,7 +9,7 @@ This formatter is **not** included in the core library. It is part of the `messa
 added as a dependency to use.
 
 ```
-de.sayayi.lib:message-format-spring:<version>
+de.sayayi.lib:message-format-spring:0.24.0
 ```
 ///
 
@@ -53,7 +53,7 @@ Consider a `Map<String,Integer>` passed as a parameter. To extract a specific en
 that navigates the map's entry set can be written.
 
 ```java
-var map = new TreeMap<String, Integer>();
+var map = new TreeMap<String,Integer>();
 map.put("A", 0);
 map.put("D", -8);
 map.put("C", 34);
@@ -76,15 +76,19 @@ The real power of this formatter emerges when `spel-expr` is combined with `spel
 value and the format interprets that value through a different named formatter.
 
 ```java
-var map = new TreeMap<String, Integer>();
+var map = new TreeMap<String,Integer>();
 map.put("A", 0);
 map.put("C", 34);
 map.put("D", -8);
 
 messageSupport
-    .message(
-        "%{map,format:spel,spel-expr:'entrySet().toArray()[0].value'," +
-        "                  spel-format:bool,false:no,true:yes}")
+    .message("""
+        %{map,format:spel,\
+            spel-expr:'entrySet().toArray()[0].value',
+            spel-format:bool,\
+            false:no,\
+            true:yes}\
+        """)
     .with("map", map)
     .format();
 // "no"
@@ -98,9 +102,14 @@ The same technique works with the `choice` formatter for numeric range matching.
 
 ```java
 messageSupport
-    .message(
-        "%{map,spel-expr:'entrySet().toArray()[2].value'," +
-        "      spel-format:choice,<0:negative,0:zero,>0:positive}")
+    .message("""
+        %{map,\
+            spel-expr:'entrySet().toArray()[2].value',\
+            spel-format:choice,\
+            <0:negative,\
+            0:zero,\
+            >0:positive}\
+        """)
     .with("map", map)
     .format();
 // "negative"
@@ -191,7 +200,8 @@ messageSupport
     .format();
 // "2"
 
-// with auto application (spel-expr triggers the spel formatter automatically)
+// with auto application (spel-expr triggers the spel formatter 
+// automatically)
 messageSupport
     .message("%{map,spel-expr:'size()'}")
     .with("map", Map.of("a", 1, "b", 2))
@@ -241,7 +251,7 @@ conversion infrastructure.
 @Bean
 public SpELFormatter spelFormatter(ConversionService conversionService,
                                    ResourceLoader resourceLoader) {
-    return new SpELFormatter(conversionService, resourceLoader);
+  return new SpELFormatter(conversionService, resourceLoader);
 }
 ```
 
@@ -251,9 +261,9 @@ When a specific class loader is needed but no `ResourceLoader` is available, the
 
 ```java
 var formatterService = new DefaultFormatterService();
-formatterService.addFormatter(
-    new SpELFormatter(new DefaultConversionService(),
-                      MyApp.class.getClassLoader()));
+formatterService.addFormatter(new SpELFormatter(
+    new DefaultConversionService(),
+    MyApp.class.getClassLoader()));
 ```
 
 The `ConversionService` is used by the SpEL `TypeConverter` to convert values during expression evaluation. The 

@@ -16,7 +16,8 @@ used:
 ```java
 // these two calls are equivalent
 var ms1 = MessageSupportFactory.create(formatterService);
-var ms2 = MessageSupportFactory.create(formatterService, MessageFactory.getSharedInstance());
+var ms2 = MessageSupportFactory.create(formatterService,
+    MessageFactory.getSharedInstance());
 ```
 
 
@@ -119,7 +120,7 @@ receives a `MessagePart` and must return an equal instance (which may or may not
 
 ```java
 MessagePartNormalizer myNormalizer = new MessagePartNormalizer() {
-  private final Map<MessagePart, MessagePart> cache =
+  private final Map<MessagePart,MessagePart> cache = 
       new ConcurrentHashMap<>();
 
   @Override

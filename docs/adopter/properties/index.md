@@ -52,8 +52,10 @@ coreProps.setProperty("app.stop", "Application stopped.");
 adopter.adopt(coreProps);
 
 var errorProps = new Properties();
-errorProps.setProperty("err.timeout", "Connection to %{host} timed out after %{seconds} seconds.");
-errorProps.setProperty("err.auth", "Authentication failed for user %{user}.");
+errorProps.setProperty("err.timeout", 
+    "Connection to %{host} timed out after %{seconds} seconds.");
+errorProps.setProperty("err.auth", 
+    "Authentication failed for user %{user}.");
 adopter.adopt(errorProps);
 
 messageSupport
@@ -74,8 +76,7 @@ are parsed as template format strings.
 
 ```java
 var templateProps = new Properties();
-templateProps.setProperty("opt-detail",
-    "%{detail,!empty:' (%{detail})'}");
+templateProps.setProperty("opt-detail", "%{detail,!empty:' (%{detail})'}");
 adopter.adoptTemplates(templateProps);
 
 messageSupport
@@ -121,7 +122,7 @@ messageSupport
 
 ## Adopting Localized Messages
 
-The `adopt(Map<Locale, Properties>)` method accepts a map where each key is a `Locale` and each value is a `Properties` 
+The `adopt(Map<Locale,Properties>)` method accepts a map where each key is a `Locale` and each value is a `Properties` 
 object containing messages for that locale. When the same property key appears in multiple locale entries, all 
 locale-specific values are combined into a single locale-aware message. At format time the library selects the value 
 that best matches the requested locale.

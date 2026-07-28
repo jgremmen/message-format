@@ -22,7 +22,8 @@ control:
 ```java
 void exportMessages(OutputStream stream, boolean compress,
                     Predicate<String> messageCodeFilter,
-                    Predicate<String> templateNameFilter) throws IOException
+                    Predicate<String> templateNameFilter) 
+    throws IOException
 ```
 
 - **compress** – when `true`, the output is wrapped in GZip compression. The binary format already uses extensive 

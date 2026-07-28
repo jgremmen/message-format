@@ -46,7 +46,9 @@ as booleans.
 
 ```java
 messageSupport
-    .message("%{errorCount,format:bool,true:'has errors',false:'no errors'}")
+    .message("""
+        %{errorCount,format:bool,true:'has errors',false:'no errors'}\
+        """)
     .with("errorCount", 3)
     .format();
 // "has errors"
@@ -82,7 +84,9 @@ numeric strings are parsed and treated as numbers.
 
 ```java
 messageSupport
-    .message("Feature flag: %{flag,format:bool,true:'enabled',false:'disabled'}")
+    .message("""
+        Feature flag: %{flag,format:bool,true:'enabled',false:'disabled'}\
+        """)
     .with("flag", "true")
     .format();
 // "Feature flag: enabled"
@@ -104,7 +108,12 @@ does not format the value itself. It is purely a selector.
 
 ```java
 messageSupport
-    .message("%{status,format:choice,'active':'running','paused':'on hold',:'unknown'}")
+    .message("""
+        %{status,format:choice,\
+            'active':'running',\
+            'paused':'on hold',\
+            :'unknown'}\
+        """)
     .with("status", "paused")
     .format();
 // "on hold"
@@ -135,7 +144,12 @@ entries in a map and similar measurements. The resulting size can be mapped to c
 
 ```java
 messageSupport
-    .message("%{names,format:size,0:'nobody',1:'one person',:'%{names,format:size} people'}")
+    .message("""
+        %{names,format:size,\
+            0:'nobody',\
+            1:'one person',\
+            :'%{names,format:size} people'}\
+        """)
     .with("names", List.of("Alice", "Bob", "Charlie"))
     .format();
 // "3 people"
@@ -143,7 +157,12 @@ messageSupport
 
 ```java
 messageSupport
-    .message("Password strength: %{pw,format:size,<8:'too short',<12:'acceptable',:'strong'}")
+    .message("""
+        Password strength: %{pw,format:size,\
+            <8:'too short',\
+            <12:'acceptable',\
+            :'strong'}\
+        """)
     .with("pw", "s3cret!")
     .format();
 // "Password strength: too short"
