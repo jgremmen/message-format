@@ -444,6 +444,7 @@ public sealed interface MessageBuilder
      *
      * @return  this builder, never {@code null}
      */
+    @Contract("-> this")
     @NotNull MapValueBuilder eq();
 
 
@@ -452,6 +453,7 @@ public sealed interface MessageBuilder
      *
      * @return  this builder, never {@code null}
      */
+    @Contract("-> this")
     @NotNull MapValueBuilder ne();
   }
 
@@ -474,6 +476,7 @@ public sealed interface MessageBuilder
      *
      * @return  this builder, never {@code null}
      */
+    @Contract("-> this")
     @NotNull MapValueBuilder lt();
 
 
@@ -482,6 +485,7 @@ public sealed interface MessageBuilder
      *
      * @return  this builder, never {@code null}
      */
+    @Contract("-> this")
     @NotNull MapValueBuilder lte();
 
 
@@ -490,6 +494,7 @@ public sealed interface MessageBuilder
      *
      * @return  this builder, never {@code null}
      */
+    @Contract("-> this")
     @NotNull MapValueBuilder gt();
 
 
@@ -498,6 +503,7 @@ public sealed interface MessageBuilder
      *
      * @return  this builder, never {@code null}
      */
+    @Contract("-> this")
     @NotNull MapValueBuilder gte();
   }
 
@@ -518,22 +524,6 @@ public sealed interface MessageBuilder
       permits PostFormatterBuilderImpl
   {
     /**
-     * Sets the inner message to be post-formatted.
-     * <p>
-     * The grammar requires an inner message for post-formatter parts. If not set, the builder defaults to an
-     * empty message.
-     *
-     * @param message  inner message, not {@code null}
-     *
-     * @return  this post-formatter builder, never {@code null}
-     *
-     * @since 0.24.0
-     */
-    @Contract("_ -> this")
-    @NotNull PostFormatterBuilder withMessage(@NotNull Message.WithSpaces message);
-
-
-    /**
      * Sets the inner message to be post-formatted by parsing the given message format string.
      * <p>
      * The grammar requires an inner message for post-formatter parts. If not set, the builder defaults to an
@@ -547,6 +537,22 @@ public sealed interface MessageBuilder
      */
     @Contract("_ -> this")
     @NotNull PostFormatterBuilder withMessage(@NotNull @Language("MessageFormat") String message);
+
+
+    /**
+     * Sets the inner message to be post-formatted.
+     * <p>
+     * The grammar requires an inner message for post-formatter parts. If not set, the builder defaults to an
+     * empty message.
+     *
+     * @param message  inner message, not {@code null}
+     *
+     * @return  this post-formatter builder, never {@code null}
+     *
+     * @since 0.24.0
+     */
+    @Contract("_ -> this")
+    @NotNull PostFormatterBuilder withMessage(@NotNull Message.WithSpaces message);
 
 
     /**

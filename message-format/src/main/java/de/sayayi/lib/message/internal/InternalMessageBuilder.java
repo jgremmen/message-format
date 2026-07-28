@@ -80,20 +80,8 @@ public final class InternalMessageBuilder implements MessageBuilder
   public InternalMessageBuilder(@NotNull MessageFactory messageFactory)
   {
     this.messageFactory = requireNonNull(messageFactory, "messageFactory must not be null");
-    this.parts = new ArrayList<>();
-  }
 
-
-  /**
-   * Flushes any active non-text sub-builder into the parts list.
-   */
-  private void flushActivePart()
-  {
-    if (activePartFlusher != null)
-    {
-      activePartFlusher.run();
-      activePartFlusher = null;
-    }
+    parts = new ArrayList<>();
   }
 
 
@@ -153,12 +141,15 @@ public final class InternalMessageBuilder implements MessageBuilder
   }
 
 
-  /**
-   * Merges consecutive {@link Text} entries in the parts list into single text parts using
-   * a {@link TextJoiner}.
-   */
-  private void mergeConsecutiveTextParts()
+  /** {@inheritDoc} */
+  @Override
+  public @NotNull Message.WithSpaces build()
   {
+    flushActivePart();
+
+    if (parts.isEmpty())
+      return EmptyMessage.INSTANCE;
+
     for(var i = 0; i < parts.size() - 1; i++)
       if (parts.get(i) instanceof Text first && parts.get(i + 1) instanceof Text)
       {
@@ -173,19 +164,6 @@ public final class InternalMessageBuilder implements MessageBuilder
         parts.subList(i, j).clear();
         parts.add(i, joiner.asSpacedText());
       }
-  }
-
-
-  /** {@inheritDoc} */
-  @Override
-  public @NotNull Message.WithSpaces build()
-  {
-    flushActivePart();
-
-    if (parts.isEmpty())
-      return EmptyMessage.INSTANCE;
-
-    mergeConsecutiveTextParts();
 
     return parts.size() == 1 && parts.getFirst() instanceof Text textPart
         ? new TextMessage(textPart)
@@ -204,6 +182,19 @@ public final class InternalMessageBuilder implements MessageBuilder
   @Override
   public @NotNull Template buildAsTemplate() {
     return new MessageTemplate(build());
+  }
+
+
+  /**
+   * Flushes any active non-text sub-builder into the parts list.
+   */
+  private void flushActivePart()
+  {
+    if (activePartFlusher != null)
+    {
+      activePartFlusher.run();
+      activePartFlusher = null;
+    }
   }
 
 
@@ -226,22 +217,22 @@ public final class InternalMessageBuilder implements MessageBuilder
 
     /** {@inheritDoc} */
     @Override
-    @Contract("-> this")
     @SuppressWarnings("unchecked")
     public @NotNull S spaceBefore()
     {
       spaceBefore = true;
+
       return (S)this;
     }
 
 
     /** {@inheritDoc} */
     @Override
-    @Contract("-> this")
     @SuppressWarnings("unchecked")
     public @NotNull S spaceAfter()
     {
       spaceAfter = true;
+
       return (S)this;
     }
   }
@@ -382,6 +373,34 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull S configString(@NotNull String name, @NotNull String value) {
+      return withConfig(name, new TypedValueString(value));
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull S configBool(@NotNull String name, boolean value) {
+      return withConfig(name, value ? TypedValueBool.TRUE : TypedValueBool.FALSE);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull S configNumber(@NotNull String name, long value) {
+      return withConfig(name, new TypedValueNumber(value));
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull S configMessage(@NotNull String name, @NotNull Message.WithSpaces message) {
+      return withConfig(name, new TypedValueMessage(message));
+    }
+
+
     /**
      * Adds a typed configuration value with the given name.
      *
@@ -402,38 +421,6 @@ public final class InternalMessageBuilder implements MessageBuilder
       config.put(name, requireNonNull(value, "value must not be null"));
 
       return (S)this;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    @Contract("_, _ -> this")
-    public @NotNull S configString(@NotNull String name, @NotNull String value) {
-      return withConfig(name, new TypedValueString(value));
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    @Contract("_, _ -> this")
-    public @NotNull S configBool(@NotNull String name, boolean value) {
-      return withConfig(name, value ? TypedValueBool.TRUE : TypedValueBool.FALSE);
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    @Contract("_, _ -> this")
-    public @NotNull S configNumber(@NotNull String name, long value) {
-      return withConfig(name, new TypedValueNumber(value));
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    @Contract("_, _ -> this")
-    public @NotNull S configMessage(@NotNull String name, @NotNull Message.WithSpaces message) {
-      return withConfig(name, new TypedValueMessage(message));
     }
   }
 
@@ -479,31 +466,15 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /**
-     * Flushes the parameter configuration as a {@link ParameterPart} into the enclosing builder's parts list.
-     */
-    private void flush()
-    {
-      if (!flushed)
-      {
-        flushed = true;
-        activePartFlusher = null;
-
-        parts.add(new ParameterPart(name, format, spaceBefore, spaceAfter,
-            new MessagePartConfig(config), new MessagePartMap(map)));
-      }
-    }
-
-
     /** {@inheritDoc} */
     @Override
-    @Contract("_ -> this")
     public @NotNull ParameterBuilder withFormat(@NotNull String format)
     {
       if (!isKebabCaseName(requireNonNull(format, "format must not be null")))
         throw new IllegalArgumentException("format name '" + format + "' must match the kebab-case naming convention");
 
       this.format = format;
+
       return this;
     }
 
@@ -564,6 +535,7 @@ public final class InternalMessageBuilder implements MessageBuilder
     private @NotNull ParameterBuilder addMapEntry(@NotNull MapKey key, @NotNull Message.WithSpaces message)
     {
       map.put(key, new TypedValueMessage(requireNonNull(message, "message must not be null")));
+
       return this;
     }
 
@@ -675,6 +647,22 @@ public final class InternalMessageBuilder implements MessageBuilder
 
       return InternalMessageBuilder.this.buildAsTemplate();
     }
+
+
+    /**
+     * Flushes the parameter configuration as a {@link ParameterPart} into the enclosing builder's parts list.
+     */
+    private void flush()
+    {
+      if (!flushed)
+      {
+        flushed = true;
+        activePartFlusher = null;
+
+        parts.add(new ParameterPart(name, format, spaceBefore, spaceAfter,
+            new MessagePartConfig(config), new MessagePartMap(map)));
+      }
+    }
   }
 
 
@@ -735,7 +723,13 @@ public final class InternalMessageBuilder implements MessageBuilder
 
     /** {@inheritDoc} */
     @Override
-    @Contract("_ -> this")
+    public @NotNull PostFormatterBuilder withMessage(@NotNull String message) {
+      return withMessage(messageFactory.parseMessage(requireNonNull(message, "message must not be null")));
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
     public @NotNull PostFormatterBuilder withMessage(@NotNull Message.WithSpaces message)
     {
       innerMessage = requireNonNull(message, "message must not be null");
@@ -746,15 +740,6 @@ public final class InternalMessageBuilder implements MessageBuilder
 
     /** {@inheritDoc} */
     @Override
-    @Contract("_ -> this")
-    public @NotNull PostFormatterBuilder withMessage(@NotNull String message) {
-      return withMessage(messageFactory.parseMessage(requireNonNull(message, "message must not be null")));
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    @Contract("_ -> this")
     public @NotNull PostFormatterBuilder withMessage(@NotNull Consumer<MessageBuilder> messageConfigurer)
     {
       requireNonNull(messageConfigurer, "messageConfigurer must not be null");
@@ -964,7 +949,6 @@ public final class InternalMessageBuilder implements MessageBuilder
 
     /** {@inheritDoc} */
     @Override
-    @Contract("_, _ -> this")
     public @NotNull TemplateBuilder withParameterDelegate(@NotNull String templateParam, @NotNull String messageParam)
     {
       if (!isKebabOrLowerCamelCaseName(requireNonNull(templateParam, "templateParam must not be null")))
@@ -1087,14 +1071,14 @@ public final class InternalMessageBuilder implements MessageBuilder
 
     /** {@inheritDoc} */
     @Override
-    public @NotNull ParameterBuilder message(@NotNull Message.WithSpaces message) {
+    public @NotNull ParameterBuilder message(@NotNull String message) {
       return parameterBuilder.addMapEntry(key, message);
     }
 
 
     /** {@inheritDoc} */
     @Override
-    public @NotNull ParameterBuilder message(@NotNull String message) {
+    public @NotNull ParameterBuilder message(@NotNull Message.WithSpaces message) {
       return parameterBuilder.addMapEntry(key, message);
     }
 
@@ -1141,7 +1125,6 @@ public final class InternalMessageBuilder implements MessageBuilder
 
     /** {@inheritDoc} */
     @Override
-    @Contract("-> this")
     public @NotNull MapValueBuilder eq()
     {
       compareType = EQ;
@@ -1152,7 +1135,6 @@ public final class InternalMessageBuilder implements MessageBuilder
 
     /** {@inheritDoc} */
     @Override
-    @Contract("-> this")
     public @NotNull MapValueBuilder ne()
     {
       compareType = NE;
@@ -1209,7 +1191,6 @@ public final class InternalMessageBuilder implements MessageBuilder
 
     /** {@inheritDoc} */
     @Override
-    @Contract("-> this")
     public @NotNull MapValueBuilder lt()
     {
       compareType = LT;
@@ -1220,7 +1201,6 @@ public final class InternalMessageBuilder implements MessageBuilder
 
     /** {@inheritDoc} */
     @Override
-    @Contract("-> this")
     public @NotNull MapValueBuilder lte()
     {
       compareType = LTE;
@@ -1231,7 +1211,6 @@ public final class InternalMessageBuilder implements MessageBuilder
 
     /** {@inheritDoc} */
     @Override
-    @Contract("-> this")
     public @NotNull MapValueBuilder gt()
     {
       compareType = GT;
@@ -1242,7 +1221,6 @@ public final class InternalMessageBuilder implements MessageBuilder
 
     /** {@inheritDoc} */
     @Override
-    @Contract("-> this")
     public @NotNull MapValueBuilder gte()
     {
       compareType = GTE;
