@@ -29,6 +29,7 @@ import java.util.Set;
 import static de.sayayi.lib.message.part.MapKey.EMPTY_TYPE;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.util.MessageUtil.trimAndNormalizeSpaces;
 
 
 /**
@@ -64,10 +65,15 @@ public final class ICUFormatter implements NamedParameterFormatter
 
 
   /**
-   * Formats the parameter value using the ICU message format pattern specified in the {@code icu} configuration key.
+   * {@inheritDoc}
    * <p>
-   * If the formatted result is empty, mapped messages for {@code empty} key types are consulted.
-   * If no ICU pattern is configured or an error occurs during formatting, empty text is returned.
+   * Formats the parameter value using the ICU {@link MessageFormat} pattern specified in the {@code icu} configuration
+   * key. The pattern is trimmed and normalized before being passed to ICU. All parameters available in the formatting
+   * context are passed to the ICU message format as a named argument map, and the context locale is applied for
+   * locale-sensitive formatting.
+   * <p>
+   * If the formatted result is empty, mapped messages for {@code empty} key types are consulted. If no ICU pattern is
+   * configured or an error occurs during formatting, empty text is returned.
    *
    * @param context  message context providing formatting information, not {@code null}
    * @param value    parameter value (can be {@code null})
@@ -82,7 +88,7 @@ public final class ICUFormatter implements NamedParameterFormatter
     if (icuPattern.isPresent())
     {
       try {
-        final var icuFormat = new MessageFormat(icuPattern.get());
+        final var icuFormat = new MessageFormat(trimAndNormalizeSpaces(icuPattern.get()));
 
         icuFormat.setLocale(context.getLocale());
 
