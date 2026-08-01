@@ -75,10 +75,24 @@ generateGrammarSource {
 }
 
 
+generateTestGrammarSource {
+  //noinspection GroovyAccessibility
+  antlrClasspath = configurations.antlr4
+
+  outputDirectory = layout.buildDirectory.dir('generated/sources/antlr/test').get().asFile
+  packageName = 'de.sayayi.lib.message.util'
+}
+
+
 compileJava {
   dependsOn generateGrammarSource
 
   options.compilerArgs << '-implicit:class'
+}
+
+
+compileTestJava {
+  dependsOn generateTestGrammarSource
 }
 
 
