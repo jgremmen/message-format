@@ -172,6 +172,21 @@ public sealed interface MessageBuilder
   }
 
 
+  /**
+   * Creates a new message builder using the given {@code messageSupport}.
+   *
+   * @param messageSupport  message support to use, not {@code null}
+   *
+   * @return  new message builder, never {@code null}
+   *
+   * @since 0.24.0
+   */
+  @Contract("_ -> new")
+  static @NotNull MessageBuilder create(@NotNull MessageSupport messageSupport) {
+    return new InternalMessageBuilder(messageSupport.getMessageAccessor().getMessageFactory());
+  }
+
+
 
 
   /**
