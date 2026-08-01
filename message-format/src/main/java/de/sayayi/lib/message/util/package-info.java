@@ -16,6 +16,19 @@
 
 /**
  * Utility classes for the message format library.
+ * <p>
+ * This package provides supporting utilities used throughout the message format framework:
+ * <ul>
+ *   <li>{@link de.sayayi.lib.message.util.MessageUtil MessageUtil}: static helper methods for message processing
+ *       and analysis</li>
+ *   <li>{@link de.sayayi.lib.message.util.ParameterValueHelper ParameterValueHelper}: type-safe conversions for
+ *       message parameter values</li>
+ *   <li>{@link de.sayayi.lib.message.util.SortedStringMap SortedStringMap}: a compact, array-backed map with
+ *       sorted string keys</li>
+ *   <li>{@link de.sayayi.lib.message.util.SupplierDelegate SupplierDelegate}: a caching supplier decorator</li>
+ *   <li>{@link de.sayayi.lib.message.util.AbstractAntlr4Parser AbstractAntlr4Parser}: base parser integrating
+ *       ANTLR4 syntax error reporting with the message support framework</li>
+ * </ul>
  *
  * @author Jeroen Gremmen
  * @since 0.21.0
