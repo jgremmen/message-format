@@ -124,123 +124,249 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
    * A builder that combines the message format parameterization capabilities of {@link MessageConfigurer} with the
    * syntax error location tracking of {@link SyntaxErrorBuilder}.
    * <p>
-   * Parameters and locale are configured first, then the token position is specified which transitions the builder
-   * into a {@link SyntaxErrorBuilder} that can report the error.
+   * Parameters and locale are configured first, then the token position is specified which transitions the builder into
+   * a {@link SyntaxErrorBuilder} that can report the error.
    *
    * @since 0.24.0
    */
   protected sealed interface SyntaxErrorMessageBuilder
-      extends SyntaxErrorBuilder
       permits SyntaxErrorMessageBuilderImpl
   {
     /**
+     * Sets a boolean parameter value for the error message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return this builder instance, never {@code null}
+     *
      * @see MessageConfigurer#with(String, boolean)
      */
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, boolean value);
 
 
     /**
+     * Sets a byte parameter value for the error message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return this builder instance, never {@code null}
+     *
      * @see MessageConfigurer#with(String, byte)
      */
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, byte value);
 
 
     /**
+     * Sets a char parameter value for the error message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return this builder instance, never {@code null}
+     *
      * @see MessageConfigurer#with(String, char)
      */
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, char value);
 
 
     /**
+     * Sets a short parameter value for the error message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return this builder instance, never {@code null}
+     *
      * @see MessageConfigurer#with(String, short)
      */
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, short value);
 
 
     /**
+     * Sets an int parameter value for the error message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return this builder instance, never {@code null}
+     *
      * @see MessageConfigurer#with(String, int)
      */
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, int value);
 
 
     /**
+     * Sets a long parameter value for the error message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return this builder instance, never {@code null}
+     *
      * @see MessageConfigurer#with(String, long)
      */
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, long value);
 
 
     /**
+     * Sets a float parameter value for the error message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return this builder instance, never {@code null}
+     *
      * @see MessageConfigurer#with(String, float)
      */
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, float value);
 
 
     /**
+     * Sets a double parameter value for the error message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return this builder instance, never {@code null}
+     *
      * @see MessageConfigurer#with(String, double)
      */
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, double value);
 
 
     /**
+     * Sets an object parameter value for the error message.
+     *
+     * @param parameter  parameter name, not {@code null}
+     * @param value      parameter value
+     *
+     * @return this builder instance, never {@code null}
+     *
      * @see MessageConfigurer#with(String, Object)
      */
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, Object value);
 
 
     /**
+     * Sets multiple parameter values for the error message from a map.
+     *
+     * @param parameterValues  map of parameter names to values, not {@code null}
+     *
+     * @return this builder instance, never {@code null}
+     *
      * @see MessageConfigurer#with(Map)
      */
     @NotNull SyntaxErrorMessageBuilder with(@NotNull Map<String,Object> parameterValues);
 
 
     /**
+     * Sets multiple parameter values for the error message from properties.
+     *
+     * @param properties  properties containing parameter names and values, not {@code null}
+     *
+     * @return this builder instance, never {@code null}
+     *
      * @see MessageConfigurer#with(Properties)
      */
     @NotNull SyntaxErrorMessageBuilder with(@NotNull Properties properties);
 
 
     /**
+     * Sets the locale for formatting the error message.
+     *
+     * @param locale  locale to use, or {@code null} for the default locale
+     *
+     * @return this builder instance, never {@code null}
+     *
      * @see MessageConfigurer#locale(Locale)
      */
     @NotNull SyntaxErrorMessageBuilder locale(Locale locale);
 
 
     /**
+     * Sets the locale for formatting the error message using a language tag.
+     *
+     * @param locale  locale language tag, or {@code null} for the default locale
+     *
+     * @return this builder instance, never {@code null}
+     *
      * @see MessageConfigurer#locale(String)
      */
     @NotNull SyntaxErrorMessageBuilder locale(String locale);
 
 
-    @Override
+    /**
+     * Formats the error message and creates a syntax error builder with start position at the given token.
+     *
+     * @param token  token marking the start of the error location, not {@code null}
+     *
+     * @return a syntax error builder for further position and reporting configuration, never {@code null}
+     *
+     * @see SyntaxErrorBuilder#withStart(Token)
+     */
     @NotNull SyntaxErrorBuilder withStart(@NotNull Token token);
 
 
-    @Override
+    /**
+     * Formats the error message and creates a syntax error builder with start position at the given syntax tree node.
+     *
+     * @param syntaxTree  syntax tree node marking the start of the error location, not {@code null}
+     *
+     * @return a syntax error builder for further position and reporting configuration, never {@code null}
+     *
+     * @see SyntaxErrorBuilder#withStart(SyntaxTree)
+     */
     @NotNull SyntaxErrorBuilder withStart(@NotNull SyntaxTree syntaxTree);
 
 
-    @Override
+    /**
+     * Formats the error message and creates a syntax error builder with stop position at the given token.
+     *
+     * @param token  token marking the end of the error location, not {@code null}
+     *
+     * @return a syntax error builder for further position and reporting configuration, never {@code null}
+     *
+     * @see SyntaxErrorBuilder#withStop(Token)
+     */
     @NotNull SyntaxErrorBuilder withStop(@NotNull Token token);
 
 
-    @Override
+    /**
+     * Formats the error message and creates a syntax error builder with stop position at the given syntax tree node.
+     *
+     * @param syntaxTree  syntax tree node marking the end of the error location, not {@code null}
+     *
+     * @return a syntax error builder for further position and reporting configuration, never {@code null}
+     *
+     * @see SyntaxErrorBuilder#withStop(SyntaxTree)
+     */
     @NotNull SyntaxErrorBuilder withStop(@NotNull SyntaxTree syntaxTree);
 
 
-    @Override
+    /**
+     * Formats the error message and creates a syntax error builder spanning the entire given syntax tree node.
+     *
+     * @param syntaxTree  syntax tree node defining the full error location, not {@code null}
+     *
+     * @return a syntax error builder for further position and reporting configuration, never {@code null}
+     *
+     * @see SyntaxErrorBuilder#with(SyntaxTree)
+     */
     @NotNull SyntaxErrorBuilder with(@NotNull SyntaxTree syntaxTree);
 
 
-    @Override
-    @NotNull SyntaxErrorBuilder withCause(Exception cause);
-
-
     /**
-     * This method can only be invoked without start/end token information and hence will fail.
+     * Formats the error message and creates a syntax error builder with the given cause exception.
+     *
+     * @param cause  exception that caused the syntax error, or {@code null}
+     *
+     * @return a syntax error builder for further position and reporting configuration, never {@code null}
+     *
+     * @see SyntaxErrorBuilder#withCause(Exception)
      */
-    @Override
-    @Contract("-> fail")
-    void report();
+    @NotNull SyntaxErrorBuilder withCause(Exception cause);
   }
 
 
@@ -255,14 +381,13 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     private final MessageConfigurer<? extends Message> messageConfigurer;
 
 
+    /**
+     * Creates a new builder backed by the given message configurer.
+     *
+     * @param messageConfigurer  message configurer providing parameter and locale support, not {@code null}
+     */
     private SyntaxErrorMessageBuilderImpl(@NotNull MessageConfigurer<? extends Message> messageConfigurer) {
       this.messageConfigurer = messageConfigurer;
-    }
-
-
-    @Contract(value = "-> new", pure = true)
-    private @NotNull SyntaxErrorBuilder createSyntaxErrorBuilder() {
-      return AbstractAntlr4Parser.this.syntaxError(messageConfigurer.format());
     }
 
 
@@ -406,9 +531,14 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     }
 
 
-    @Override
-    public void report() {
-      createSyntaxErrorBuilder().report();
+    /**
+     * Formats the configured message and creates a new syntax error builder for position specification.
+     *
+     * @return a new syntax error builder, never {@code null}
+     */
+    @Contract(value = "-> new", pure = true)
+    private @NotNull SyntaxErrorBuilder createSyntaxErrorBuilder() {
+      return AbstractAntlr4Parser.this.syntaxError(messageConfigurer.format());
     }
   }
 }
