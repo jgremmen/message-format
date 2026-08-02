@@ -57,6 +57,7 @@ import static java.util.Locale.ROOT;
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
+@SuppressWarnings("DuplicatedCode")
 public sealed interface Message extends FormatStringSerializer
 {
   /**
@@ -79,6 +80,44 @@ public sealed interface Message extends FormatStringSerializer
   /**
    * Formats the message based on the message parameters provided.
    *
+   * @param messageAccessor   message accessor providing formatting information, not {@code null}
+   * @param parameterValues   message parameter values, not {@code null}
+   *
+   * @return  formatted message, never {@code null}
+   *
+   * @throws MessageFormatException  in case a formatting error occurred
+   */
+  @Contract(pure = true)
+  default @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Map<String,Object> parameterValues)
+      throws MessageFormatException
+  {
+    return format(messageAccessor, new Parameters() {
+      @Override
+      public @NotNull Locale getLocale() {
+        return messageAccessor.getLocale();
+      }
+
+      @Override
+      public Object getParameterValue(@NotNull String parameter) {
+        return parameterValues.get(parameter);
+      }
+
+      @Override
+      public @Unmodifiable @NotNull Map<String,Object> asParameterMap() {
+        return unmodifiableMap(parameterValues);
+      }
+
+      @Override
+      public String toString() {
+        return "Parameters(locale=" + messageAccessor.getLocale() + ',' + parameterValues + ')';
+      }
+    });
+  }
+
+
+  /**
+   * Formats the message based on the message parameters provided.
+   *
    * @param messageAccessor  message accessor providing formatting information, not {@code null}
    * @param parameters       message parameters, not {@code null}
    *
@@ -94,20 +133,25 @@ public sealed interface Message extends FormatStringSerializer
 
 
   /**
-   * Formats the message based on the message parameters provided.
+   * Formats the message based on the given parameter values map. The locale is obtained from the
+   * {@code messageAccessor}. This is a convenience method that wraps the parameter values in a {@link Parameters}
+   * instance and delegates to {@link #formatAsText(MessageAccessor, Parameters)}.
    *
    * @param messageAccessor   message accessor providing formatting information, not {@code null}
    * @param parameterValues   message parameter values, not {@code null}
    *
-   * @return  formatted message, never {@code null}
+   * @return  formatted message as text optionally with leading/trailing spaces, never {@code null}
    *
    * @throws MessageFormatException  in case a formatting error occurred
+   *
+   * @since 0.24.0
    */
   @Contract(pure = true)
-  default @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Map<String,Object> parameterValues)
+  default @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
+                                     @NotNull Map<String,Object> parameterValues)
       throws MessageFormatException
   {
-    return format(messageAccessor, new Parameters() {
+    return formatAsText(messageAccessor, new Parameters() {
       @Override
       public @NotNull Locale getLocale() {
         return messageAccessor.getLocale();

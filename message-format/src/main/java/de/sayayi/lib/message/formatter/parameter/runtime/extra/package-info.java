@@ -16,7 +16,7 @@
 
 /**
  * Additional parameter formatter implementations for specialized Java runtime types such as reflection types,
- * network addresses, XML nodes, security principals and more.
+ * network addresses, XML nodes, security principals, ANTLR tokens and more.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

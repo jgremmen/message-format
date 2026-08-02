@@ -15,6 +15,8 @@
  */
 package de.sayayi.lib.message;
 
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.internal.InternalMessageBuilder;
 import de.sayayi.lib.message.internal.InternalMessageBuilder.*;
 import de.sayayi.lib.message.template.Template;
@@ -173,6 +175,21 @@ public sealed interface MessageBuilder
 
 
   /**
+   * Creates a new message builder using the message factory obtained from the given {@code messageAccessor}.
+   *
+   * @param messageAccessor  message accessor to obtain the message factory from, not {@code null}
+   *
+   * @return  new message builder, never {@code null}
+   *
+   * @since 0.24.0
+   */
+  @Contract("_ -> new")
+  static @NotNull MessageBuilder create(@NotNull MessageAccessor messageAccessor) {
+    return create(messageAccessor.getMessageFactory());
+  }
+
+
+  /**
    * Creates a new message builder using the given {@code messageSupport}.
    *
    * @param messageSupport  message support to use, not {@code null}
@@ -183,7 +200,23 @@ public sealed interface MessageBuilder
    */
   @Contract("_ -> new")
   static @NotNull MessageBuilder create(@NotNull MessageSupport messageSupport) {
-    return new InternalMessageBuilder(messageSupport.getMessageAccessor().getMessageFactory());
+    return create(messageSupport.getMessageAccessor());
+  }
+
+
+  /**
+   * Creates a new message builder using the message factory obtained from the given parameter formatter
+   * {@code context}.
+   *
+   * @param context  parameter formatter context to obtain the message factory from, not {@code null}
+   *
+   * @return  new message builder, never {@code null}
+   *
+   * @since 0.24.0
+   */
+  @Contract("_ -> new")
+  static @NotNull MessageBuilder create(@NotNull ParameterFormatterContext context) {
+    return create(context.getMessageAccessor());
   }
 
 

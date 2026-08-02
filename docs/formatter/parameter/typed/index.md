@@ -315,6 +315,7 @@ messageSupport
 | `Temporal`             | `TemporalFormatter`                | 80    | [Temporal](temporal.md)     |
 | `Throwable`            | `ThrowableFormatter`               | 80    | [Throwable](throwable.md)   |
 | `TimeZone`             | `TimeZoneFormatter`                | 80    | [TimeZone](time-zone.md)    |
+| `Token`                | `TokenFormatter`                   | 80    | [Token](token.md)           |
 | `Type`                 | `TypeFormatter`                    | 80    | [Type](type.md)             |
 | `URI`                  | `URIFormatter`                     | 80    | [URI](uri.md)               |
 | `URL`                  | `URLFormatter`                     | 80    | [URL](url.md)               |

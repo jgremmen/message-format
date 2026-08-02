@@ -34,7 +34,7 @@ import static de.sayayi.lib.message.util.CalculatorParser.*;
  * @author Jeroen Gremmen
  * @since 0.24.0
  */
-final class Calculator extends AbstractAntlr4Parser
+public final class Calculator extends AbstractAntlr4Parser
 {
   private static final SyntaxErrorFormatter SYNTAX_ERROR_FORMATTER =
       new GenericSyntaxErrorFormatter(1, 0, 0, 2);
@@ -54,14 +54,14 @@ final class Calculator extends AbstractAntlr4Parser
   };
 
 
-  Calculator(@NotNull MessageSupport messageSupport) {
+  public Calculator(@NotNull MessageSupport messageSupport) {
     super(SYNTAX_ERROR_FORMATTER, messageSupport);
   }
 
 
   @Contract(pure = true)
   @SuppressWarnings("UnusedReturnValue")
-  int calculate(@NotNull String expression) {
+  public int calculate(@NotNull String expression) {
     return parse(new Lexer(expression), Parser::new, Parser::calc, new Listener(), ctx -> ctx.result);
   }
 

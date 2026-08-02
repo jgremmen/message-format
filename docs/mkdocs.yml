@@ -49,6 +49,7 @@ nav:
         - Temporal: formatter/parameter/typed/temporal.md
         - Throwable: formatter/parameter/typed/throwable.md
         - TimeZone: formatter/parameter/typed/time-zone.md
+        - Token: formatter/parameter/typed/token.md
         - Type: formatter/parameter/typed/type.md
         - URI: formatter/parameter/typed/uri.md
         - URL: formatter/parameter/typed/url.md
