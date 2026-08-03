@@ -3,191 +3,193 @@ title: 0.23.0 -> 0.24.0
 toc_depth: 2
 ---
 
-# Version [0.24.0](https://github.com/jgremmen/message-format/tree/0.24.0) (2026-07-28)
+# [Version 0.24.0](https://github.com/jgremmen/message-format/tree/0.24.0) (2026-08-03)
 
 
 ## Breaking Changes
 
+### Templates are now a dedicated type
 
-### Template type replaces `Message` for template registration
+The method `MessageSupport.TemplateAccessor.getTemplateByName(String)` now returns `Template` instead of `Message`.
+Similarly, `MessageSupport.MessagePublisher.addTemplate(String, Message)` has been changed to
+`addTemplate(String, Template)`. The `MessageFactory.parseTemplate(...)` methods now return `Template` instead of
+`Message.WithSpaces`.
 
-Templates are no longer represented as plain `Message` instances. A new `Template` interface (in the
-`de.sayayi.lib.message.template` package) replaces `Message` wherever templates are registered or
-accessed.
+The new `Template` interface (in the new `de.sayayi.lib.message.template` package) represents a reusable template
+that can be registered by name and referenced from messages. It provides a `formatAsText(MessageAccessor, Parameters)`
+method and an `isSame(Template)` method for semantic equality.
 
-The following method signatures have changed:
+To create a `Template` from a message format string:
 
 ```java
-// Before (0.23.0)
-ConfigurableMessageSupport addTemplate(String name, Message template);
-Message getTemplateByName(String name);
-
-// After (0.24.0)
-ConfigurableMessageSupport addTemplate(String name, Template template);
-Template getTemplateByName(String name);
+MessageFactory factory = MessageFactory.getSharedInstance();
+Template template = factory.parseTemplate("Hello %{name}");
 ```
 
-To convert existing `Message.WithSpaces` instances for use as templates, call `MessageBuilder.buildAsTemplate()`
-or wrap your message in a `Template` implementation. A `MessageBuilder` now provides the `buildAsTemplate()` method
-to produce a `Template` directly.
+The `MessageBuilder` now also provides `buildAsTemplate()`:
 
+```java
+Template template = MessageBuilder
+    .create()
+    .text("Hello ")
+    .parameter("name")
+    .buildAsTemplate();
+```
+
+Custom templates can be implemented by extending `AbstractNamedTemplate` and discovered via the `ServiceLoader`
+mechanism. Register them in `module-info.java`:
+
+```java
+provides de.sayayi.lib.message.template.NamedTemplate
+    with com.example.MyCustomTemplate;
+```
+
+or via `META-INF/services/de.sayayi.lib.message.template.NamedTemplate`.
+
+A new method `ConfigurableMessageSupport.registerTemplatesFromService(ClassLoader)` loads and registers all
+`NamedTemplate` service providers.
+
+### Template names must follow kebab-case naming convention
+
+Calling `addTemplate(String, Template)` with a template name that does not conform to kebab-case (e.g.
+`myTemplate` or `My_Template`) now throws an `IllegalArgumentException`. Existing code using camelCase or other
+naming styles for template names must be updated to use kebab-case (e.g. `my-template`).
 
 ### Sealed `MessageSupport` interfaces
 
-The following interfaces are now `sealed`:
+The following interfaces inside `MessageSupport` are now `sealed`:
 
-- `MessageSupport.MessageConfigurer`
-- `MessageSupport.ConfigurableMessageSupport`
-- `MessageSupport.MessageAccessor`
-- `MessageSupport.TemplateAccessor`
-- `MessageSupport.MessagePublisher`
+- `ConfigurableMessageSupport` (permits `MessageSupportImpl`)
+- `MessageConfigurer` (permits `MessageSupportImpl.Configurer`)
+- `MessageAccessor` (permits `MessageSupportImpl.Accessor`)
+- `TemplateAccessor` (permits `MessageAccessor`)
+- `MessagePublisher` (permits `ConfigurableMessageSupport`)
 
-Code that directly implements any of these interfaces will no longer compile. Use the provided factory
-methods (`MessageSupportFactory.create(...)`) and the built-in implementations instead.
-
+`MessageSupportImpl` is now `final`. Code that previously subclassed `MessageSupportImpl` or implemented these
+interfaces directly will no longer compile. Use the factory method `MessageSupportFactory.create(...)` to obtain
+an instance of `ConfigurableMessageSupport`.
 
 ### `Message.EMPTY` constant removed
 
-The public constant `Message.EMPTY` has been removed. Use the new static factory method instead:
+The public constant `Message.WithSpaces.EMPTY` has been removed. Use the new static method `Message.empty()`
+instead:
 
 ```java
-// Before
-Message.WithSpaces empty = Message.EMPTY;
+// Before:
+Message.WithSpaces msg = Message.WithSpaces.EMPTY;
 
-// After
-Message.WithSpaces empty = Message.empty();
+// After:
+Message.WithSpaces msg = Message.empty();
 ```
-
 
 ### `AbstractMapKeyComparator` removed
 
-The abstract class `AbstractMapKeyComparator<T>` has been removed. The `MapKeyComparator` interface now provides
-a default `format(...)` method that delegates to the next formatter in the chain. Implementations that extended
-`AbstractMapKeyComparator` should implement `MapKeyComparator` directly; no additional method override is needed
-since the default `format(...)` method already provides the delegation behavior.
+The abstract class `AbstractMapKeyComparator` has been removed. Its sole purpose was to provide a `format()` method
+that delegates to the next formatter. This behavior is now the default implementation in the
+`MapKeyComparator.format(ParameterFormatterContext, Object)` interface method. Custom `MapKeyComparator`
+implementations that previously extended `AbstractMapKeyComparator` should now implement `MapKeyComparator` directly;
+no `format()` override is needed unless custom formatting behavior is desired.
 
-
-### `ConfigAccessor.getConfigValueNumber(...)` split into two methods
+### `ConfigAccessor.getConfigValueNumber` split into `getConfigValueInt` and `getConfigValueLong`
 
 The method `getConfigValueNumber(String)` returning `OptionalLong` has been removed and replaced by two methods:
 
-```java
-// Before
-OptionalLong getConfigValueNumber(String name);
-
-// After
-OptionalLong getConfigValueLong(String name);
-OptionalInt getConfigValueInt(String name);
-```
-
-The `getConfigValueInt(...)` variant returns `OptionalInt.empty()` if the stored number exceeds the integer range.
-
-
-### `MessagePart.Map.getMessage(...)` now returns `Optional`
-
-The method `getMessage(...)` on `MessagePart.Map` now returns `Optional<Message.WithSpaces>` instead of a
-nullable `Message.WithSpaces`:
+- `getConfigValueInt(String)` returning `OptionalInt` (returns empty if the value is outside integer range)
+- `getConfigValueLong(String)` returning `OptionalLong`
 
 ```java
-// Before
-Message.WithSpaces getMessage(MessageAccessor messageAccessor, 
-    Object key, Locale locale, Set<MapKey.Type> keyTypes, 
-    boolean includeDefault, MessagePart.Config config);
+// Before:
+var n = (int)context.getConfigValueNumber("size").orElse(10);
 
-// After
-Optional<Message.WithSpaces> getMessage(MessageAccessor messageAccessor,
-    Object key, Locale locale, Set<MapKey.Type> keyTypes, 
-    boolean includeDefault, MessagePart.Config config);
+// After:
+var n = context.getConfigValueInt("size").orElse(10);
 ```
 
+### Map values in parameter configurations are now strictly messages
 
-### `MessagePart.Map.getDefaultMessage(...)` signature changed
+Map entry values in parameter configurations (`%{param, key:'value'}`) are now always stored as
+`TypedValue.MessageValue`. Previously, simple string values in map entries were stored as `TypedValue.StringValue`
+and converted lazily. This change affects the pack format (version incremented to 4) and makes the internal type
+system more consistent. This library version can still read older pack files, but pack files generated with this
+version cannot be read by older library versions.
 
-The `MessageAccessor` parameter has been removed:
+The `MessagePart.Map.getMessage(...)` method now returns `Optional<Message.WithSpaces>` instead of a nullable
+`Message.WithSpaces`.
+
+### `MessagePart.Map.getDefaultMessage` signature change
+
+The `MessageAccessor` parameter has been removed from `getDefaultMessage`:
 
 ```java
-// Before
-Optional<Message.WithSpaces> getDefaultMessage(
-    MessageAccessor messageAccessor, MapKey.Type keyType);
+// Before:
+map.getDefaultMessage(messageAccessor, keyType);
 
-// After
-Optional<Message.WithSpaces> getDefaultMessage(MapKey.Type keyType);
+// After:
+map.getDefaultMessage(keyType);
 ```
 
+### `MessageUtil.importMessages` signature change
 
-### `Parameters.getParameterNames()` replaced by `asParameterMap()`
-
-The abstract method `getParameterNames()` on `Message.Parameters` is no longer abstract. It is now a default
-method that delegates to the new abstract method `asParameterMap()`:
+The static method `MessageUtil.importMessages(...)` now requires a `MessageFactory` as its first parameter, and
+the template consumer accepts `Template` instead of `Message.WithSpaces`:
 
 ```java
-// New abstract method that implementations must provide
-@Unmodifiable Map<String,Object> asParameterMap();
+// Before:
+MessageUtil.importMessages(inputStream, msgConsumer, templateConsumer);
+
+// After:
+MessageUtil.importMessages(messageFactory, inputStream, 
+                           msgConsumer, templateConsumer);
 ```
 
-Existing `Parameters` implementations must add `asParameterMap()`. The `getParameterNames()` method remains
-available but is derived from the map's key set.
+### `TextJoiner.addWithSpace(String)` renamed to `add(String)`
 
+The method `TextJoiner.addWithSpace(String)` has been renamed to `add(String)`. The method retains the same
+behavior of preserving leading and trailing spaces from the input string.
 
-### `TextJoiner.addWithSpace(String)` removed
+### `TemplateBuilder.withDefaultParameterXYZ` methods renamed
 
-The method `addWithSpace(String)` has been removed from `TextJoiner`. Use `add(String)` instead, which preserves
-leading and trailing spaces from the input string.
+The following `TemplateBuilder` methods have been renamed to overloaded `withDefaultParameter(...)`:
 
+| Old method                                                | New method                                         |
+|-----------------------------------------------------------|----------------------------------------------------|
+| `withDefaultParameterString(String, String)`              | `withDefaultParameter(String, String)`             |
+| `withDefaultParameterBool(String, boolean)`               | `withDefaultParameter(String, boolean)`            |
+| `withDefaultParameterNumber(String, long)`                | `withDefaultParameter(String, long)`               |
+| `withDefaultParameterMessage(String, Message.WithSpaces)` | `withDefaultParameter(String, Message.WithSpaces)` |
 
-### Map entry parsing restructured
+### Gradle plugin DSL restructured
 
-The internal grammar for parameter map entries has been restructured. Map entries (key-value pairs), config
-definitions, format specifications and the default entry can now appear in any order within the parameter
-definition. Previously, map entries had to follow config/format definitions and the default entry had to be last.
-
-This change affects custom code that programmatically constructs `MessagePartMap` instances: map values are now
-always stored as `TypedValue.MessageValue` instead of `TypedValue<?>`. Plain string values are automatically
-wrapped as messages during parsing.
-
-
-### Pack format version upgraded to 4
-
-The binary pack format has been upgraded from version 3 to version 4. Map values are now packed as messages
-rather than as typed values. Pack files created with version 0.24.0 cannot be read by older library versions.
-The library still reads pack files of version 3.
-
-
-### `message-format-asm` module removed
-
-The `message-format-asm` module (containing `AsmAnnotationAdopter`) has been removed. Its functionality has been
-merged into the `message-format-annotations` module. The ASM dependency is now bundled (shaded) so there is no
-additional runtime dependency required.
-
-If you previously depended on `message-format-asm`, replace it with `message-format-annotations`:
+The `messageFormat` extension DSL has been restructured. The `duplicateMsgStrategy`, `validateReferencedTemplates`,
+`includeRegexFilters` and `excludeRegexFilters` properties have been moved into nested `messages` and `templates`
+blocks. The enum `DuplicateMsgStrategy` has been renamed to `DuplicateStrategy`.
 
 ```groovy
-// Before
-implementation 'de.sayayi.lib:message-format-asm:0.23.0'
+// Before:
+messageFormat {
+  duplicateMsgStrategy = 'fail'
+  validateReferencedTemplates = true
+  includeRegexFilter.add('xy')
+  excludeRegexFilter.add('r.*')
+}
 
-// After
-implementation 'de.sayayi.lib:message-format-annotations:0.24.0'
+// After:
+messageFormat {
+  messages {
+    duplicateStrategy = 'fail'
+    include 'xy'
+    exclude 'r.*'
+  }
+  templates {
+    validateReferences = true
+  }
+}
 ```
 
-The `AnnotationAdopter` class is now located at `de.sayayi.lib.message.annotation.adopter.AnnotationAdopter`.
+### Default pack filename changed
 
-
-### `SpringAsmAnnotationAdopter` removed
-
-The `de.sayayi.lib.message.spring.adopter` package and its `SpringAsmAnnotationAdopter` class have been removed.
-Use `AnnotationAdopter` from the `message-format-annotations` module instead.
-
-
-### Template names must follow kebab-case
-
-Registering a template with a name that does not follow the kebab-case naming convention now throws
-`IllegalArgumentException`. Previously, any string was accepted as a template name.
-
-
-### Default `packFilename` changed
-
-The Gradle plugin default for `packFilename` has changed from `messages.mfp` to `${project.name}.mfp`.
-If your build relies on the old default filename, set it explicitly:
+The default value of `messageFormat.packFilename` in the Gradle plugin is now `<project-name>.mfp` instead of the
+fixed `messages.mfp`. Builds that rely on the previous filename must set it explicitly:
 
 ```groovy
 messageFormat {
@@ -195,282 +197,269 @@ messageFormat {
 }
 ```
 
+### Module `message-format-asm` removed
 
-### Gradle plugin DSL restructured
+The `message-format-asm` module has been removed entirely. Its functionality has been merged into
+`message-format-annotations`. The class `de.sayayi.lib.message.asm.adopter.AsmAnnotationAdopter` no longer exists.
 
-The `messageFormat` extension has been restructured. Message filtering and duplicate strategy configuration
-have moved into a nested `messages` block, and template validation has moved into a nested `templates` block:
+The dependency must be replaced:
 
 ```groovy
-// Before (0.23.0)
-messageFormat {
-  include 'MSG-.*'
-  exclude 'INTERNAL-.*'
-  duplicateMsgStrategy = 'fail'
-  validateReferencedTemplates = true
-}
+// Before:
+implementation 'de.sayayi.lib:message-format-asm:0.23.0'
 
-// After (0.24.0)
-messageFormat {
-  messages {
-    include 'MSG-.*'
-    exclude 'INTERNAL-.*'
-    duplicateStrategy = 'fail'
-  }
-  templates {
-    validateReferences = true
-    ignore 'tpl-.*'
-  }
-}
+// After (no additional dependency needed):
+implementation 'de.sayayi.lib:message-format-annotations:0.24.0'
 ```
 
-The `getIncludeRegexFilters()`, `getExcludeRegexFilters()`, `getDuplicateMsgStrategy()` and
-`getValidateReferencedTemplates()` properties on the extension and the task have been removed.
-
-
-### `TemplateBuilder.withDefaultParameterXYZ(...)` methods renamed
-
-The following methods on `TemplateBuilder` have been renamed to overloaded `withDefaultParameter(...)`:
-
-| Before                                                    | After                                              |
-|-----------------------------------------------------------|----------------------------------------------------|
-| `withDefaultParameterString(String, String)`              | `withDefaultParameter(String, String)`             |
-| `withDefaultParameterBool(String, boolean)`               | `withDefaultParameter(String, boolean)`            |
-| `withDefaultParameterNumber(String, long)`                | `withDefaultParameter(String, long)`               |
-| `withDefaultParameterMessage(String, Message.WithSpaces)` | `withDefaultParameter(String, Message.WithSpaces)` |
-
-
-### `exportMessages(...)` requires additional parameter
-
-The method `exportMessages(OutputStream, boolean, Predicate<String>)` now requires a fourth parameter for
-template name filtering:
+The replacement class is `de.sayayi.lib.message.annotation.adopter.AnnotationAdopter`, with identical constructor
+signatures and scanning behavior:
 
 ```java
-// Before
-void exportMessages(OutputStream stream, boolean compress,
-   Predicate<String> messageCodeFilter);
+// Before:
+import de.sayayi.lib.message.asm.adopter.AsmAnnotationAdopter;
 
-// After
-void exportMessages(OutputStream stream, boolean compress,
-    Predicate<String> messageCodeFilter, 
-    Predicate<String> templateNameFilter);
+var adopter = new AsmAnnotationAdopter(cms);
+adopter.adopt(classLoader, Set.of("com.example"));
+
+// After:
+import de.sayayi.lib.message.annotation.adopter.AnnotationAdopter;
+
+var adopter = new AnnotationAdopter(cms);
+adopter.adopt(classLoader, Set.of("com.example"));
 ```
 
-Pass `null` for `templateNameFilter` to include all templates referenced by the selected messages.
+The ASM library (`org.ow2.asm:asm`) is now relocated and bundled inside `message-format-annotations` at build time.
+It is no longer exposed as a transitive dependency. Code that previously obtained ASM classes transitively through
+this library must now declare an explicit `org.ow2.asm:asm` dependency.
 
+### Module `message-format-spring`: package `spring.adopter` removed
+
+The `de.sayayi.lib.message.spring.adopter` package and its class `SpringAsmAnnotationAdopter` have been removed.
+This class used Spring's bundled ASM to scan the classpath via a `ResourceLoader`. The replacement is the unified
+`AnnotationAdopter` from `message-format-annotations`, which accepts a standard `ClassLoader`:
+
+```java
+// Before:
+import de.sayayi.lib.message.spring.adopter.SpringAsmAnnotationAdopter;
+
+var adopter = new SpringAsmAnnotationAdopter(cms);
+adopter.adopt(resourceLoader, Set.of("com.example"));
+
+// After:
+import de.sayayi.lib.message.annotation.adopter.AnnotationAdopter;
+
+var adopter = new AnnotationAdopter(cms);
+adopter.adopt(
+    resourceLoader.getClassLoader(),
+    Set.of("com.example"));
+```
+
+The `byte-buddy` and `spring-context` transitive API dependencies have also been removed from
+`message-format-annotations`. The `AnnotationAdopter` now works without any additional external dependencies beyond
+the `message-format` core library.
+
+### `Map<String,Object>` parameter methods widened to `Map<String,?>`
+
+The following methods now accept `Map<String,?>` instead of `Map<String,Object>`:
+
+- `Message.format(MessageAccessor, Map)`
+- `Message.formatAsText(MessageAccessor, Map)`
+- `MessageConfigurer.with(Map)`
+
+Existing code compiles without changes since `Map<String,Object>` is assignable to `Map<String,?>`.
+
+### Map entry parsing corrected
+
+The internal grammar for parameter map entries has been corrected. Map entries are now parsed more strictly, and
+their values are always typed as messages. Format strings that relied on undocumented parsing behavior may need
+adjustment.
 
 ### Dependency changes
 
-| Dependency                          | Type    | 0.23.0      | 0.24.0            |
-|-------------------------------------|---------|-------------|-------------------|
-| `com.ibm.icu:icu4j` [^1]            | compile | -           | [74.1,79.0)       |
-| `org.ow2.asm:asm`                   | compile | [9.0,10.0)  | removed (bundled) |
-| `de.sayayi.lib:antlr4-runtime-ext`  | runtime | [0.6,0.8)   | [0.6,0.8)         |
-| `org.springframework:spring-*` [^2] | compile | [5.0,7.0)   | [6.0.8,7.1)       |
-| `de.sayayi.lib:message-format-pack` | compile | [0.1.3,0.3) | [0.1.2,0.4)       |
+| Dependency                          | Type                 | Old version | New version              |
+|-------------------------------------|----------------------|-------------|--------------------------|
+| `de.sayayi.lib:message-format-asm`  | compile              | 0.23.0      | removed (merged [^3])    |
+| `org.ow2.asm:asm`                   | compile              | [9.0,10.0)  | removed (bundled [^3])   |
+| `de.sayayi.lib:pack`                | runtime              | [0.1.3,0.3) | [0.1.2,0.4)             |
+| `org.springframework:spring-*` [^2] | compile              | [5.0,7.0)   | [6.0.8,7.1)             |
+| `com.ibm.icu:icu4j` [^1]            | compile (ICU module) | -           | [74.1,79.0)             |
 
 [^1]: The ICU4J dependency applies only to the new `message-format-icu` module.
 [^2]: The Spring dependency applies only to the `message-format-spring` module.
+[^3]: Functionality merged into `message-format-annotations`; ASM is relocated and no longer a public dependency.
 
 
 ## New Features
-
 
 ### New `message-format-icu` module
 
 A new module `message-format-icu` provides ICU4J-based parameter formatters:
 
-#### `ICUFormatter` (name: `icu`)
+#### ICU Formatter (`icu`)
 
-Formats parameter values using ICU `MessageFormat` patterns. The ICU pattern is specified via the `icu`
-configuration key:
-
-```
-%{amount,format:icu,icu:'{amount, number, currency}'}
-```
-
-All parameters available in the formatting context are passed to the ICU message format as named arguments.
-The formatter uses the context locale for locale-sensitive formatting.
-
-#### `ICUPersonFormatter` (name: `icu-person`)
-
-Formats person names using the ICU `PersonNameFormatter`. Name parts are read from parameters named
-`given-name`, `family-name`, `middle-name`, `prefix` and `suffix`. Configuration keys control formatting:
+Formats parameter values using ICU `MessageFormat` patterns, supporting plurals, select expressions and
+locale-aware number/date formatting. The formatter is triggered by the `icu` configuration key:
 
 ```
-%{unused,format:icu-person,given-format:initial,
-         family-format:full,formality:formal}
+%{count, icu:'{count, plural, one {# item} other {# items}}'}
 ```
 
+#### ICU Person Formatter (`icu-person`)
+
+Formats person names with configurable control over name part visibility, ordering, formality and length using the
+ICU4J `PersonNameFormatter` API.
 
 ### `Template` type and service discovery
 
-Templates can now be implemented as Java classes that extend `AbstractNamedTemplate`. They are discovered
-automatically via the `ServiceLoader` mechanism:
+Templates are now first-class types (see Breaking Changes above). The new `de.sayayi.lib.message.template` package
+exports `Template`, `NamedTemplate` and `AbstractNamedTemplate`. Custom templates can be loaded automatically:
 
 ```java
-public class MyTemplate extends AbstractNamedTemplate
-{
-  @Override
-  public @NotNull String getName() {
-    return "my-template";
-  }
-
-  @Override
-  public @NotNull Text formatAsText(
-      @NotNull MessageAccessor messageAccessor, 
-      @NotNull Parameters parameters)
-  {
-    // custom formatting logic
-    return noSpaceText("formatted result");
-  }
-}
+cms.registerTemplatesFromService(getClass().getClassLoader());
 ```
 
-Register discovered templates with:
+### `AbstractAntlr4Parser` for message-format syntax errors
+
+A new abstract class `de.sayayi.lib.message.util.AbstractAntlr4Parser` extends the ANTLR4 base parser with
+message-format integration for syntax error reporting. It provides `syntaxErrorCode(String)` and
+`syntaxErrorMessage(String)` builder methods that combine parameterized message formatting with syntax error
+location tracking.
+
+### ANTLR `Token` formatter
+
+A new named formatter `token` formats ANTLR `Token` objects. It supports the following `token` config values:
+`text`, `type`, `channel`, `line`, `column`, and `position`. The `position` mode formats line and column together
+using a configurable `token-position-format` message.
+
+### `@MessageDef` and `@TemplateDef` annotations on constructors
+
+The `@MessageDef`, `@MessageDefs`, `@TemplateDef` and `@TemplateDefs` annotations can now be placed on constructors
+in addition to types and methods.
+
+### `Parameters.getParameterValueAsXXX(...)` convenience methods
+
+The `Message.Parameters` interface now provides typed accessor methods:
 
 ```java
-configurableMessageSupport.registerTemplatesFromService(
-    MyTemplate.class.getClassLoader());
+Optional<Boolean> getParameterValueAsBoolean(String)
+OptionalInt getParameterValueAsInt(String)
+OptionalLong getParameterValueAsLong(String)
+Optional<String> getParameterValueAsString(String)
+<T extends Enum<T>> Optional<T> getParameterValueAsEnum(String, Class<T>)
 ```
 
-Declare the provider in `module-info.java`:
+### `Message.asParameterMap()`
 
-```java
-provides de.sayayi.lib.message.template.NamedTemplate 
-    with com.example.MyTemplate;
-```
-
-Or, for non-modular projects, create a file `META-INF/services/de.sayayi.lib.message.template.NamedTemplate`
-containing the fully qualified class name:
-
-```
-com.example.MyTemplate
-```
-
-
-### `Parameters.getParameterValueAsXYZ(...)` convenience methods
-
-The `Message.Parameters` interface provides new default methods for typed parameter access:
-
-- `getParameterValueAsBoolean(String)` returns `Optional<Boolean>`
-- `getParameterValueAsInt(String)` returns `OptionalInt`
-- `getParameterValueAsLong(String)` returns `OptionalLong`
-- `getParameterValueAsEnum(String, Class<T>)` returns `Optional<T>`
-- `getParameterValueAsString(String)` returns `Optional<String>`
-
+The `Parameters` interface now includes `asParameterMap()` returning an unmodifiable `Map<String,Object>` of all
+parameter names and values. The existing `getParameterNames()` method is now a default method delegating to
+`asParameterMap().keySet()`.
 
 ### `ConfigAccessor.getConfigValueEnum(...)`
 
-A new method retrieves configuration values as enum constants:
+A new method on `ConfigAccessor` retrieves a configuration value as an enum constant. The match is
+case-insensitive and supports hyphenated names (e.g. `my-value` matches `MY_VALUE`):
 
 ```java
-Optional<MyEnum> value = configAccessor
-    .getConfigValueEnum("key", MyEnum.class);
+Optional<MyEnum> val = context.getConfigValueEnum("mode", MyEnum.class);
 ```
-
-
-### `@MessageDef` and `@TemplateDef` on constructors
-
-The `@MessageDef` and `@TemplateDef` annotations can now be placed on constructors in addition to types and
-methods. The `AnnotationAdopter` scans constructor annotations as well.
-
 
 ### Hexadecimal escape sequences in message format strings
 
 The lexer now supports `\xHH` escape sequences (two hex digits) in addition to the existing `\uHHHH` (four hex
-digits):
+digits). For example, `\x20` represents a space character.
+
+### Default map entry allowed anywhere in parameter definition
+
+In previous versions, the default map entry (`:message`) had to be the last entry in a parameter definition. The
+grammar now treats all parameter entries — format, config, map entries and the default map entry — uniformly, so
+the default map entry can appear at any position.
 
 ```
-'Hello \x41 World'  // produces "Hello A World"
+// Before: default map entry was only allowed at the end
+%{type, null:'n/a', :'unknown'}
+
+// Now: default map entry can appear anywhere
+%{type, :'unknown', null:'n/a'}
 ```
-
-
-### `MessagePart.Text.trim()`
-
-A new `trim()` method on `MessagePart.Text` returns a trimmed copy with leading/trailing space flags removed.
-
-
-### `TextJoiner.add(String)` and `TextJoiner.add(char[])`
-
-`TextJoiner` gains an `add(String)` method that preserves leading/trailing spaces from the input string,
-and an `add(char[])` method that processes each character individually with space collapsing.
-
-
-### `PostFormatterBuilder.withMessage(...)` methods
-
-The `PostFormatterBuilder` now provides `withMessage(String)` and `withMessage(Message.WithSpaces)` to set
-the inner message directly instead of requiring a consumer callback.
-
-
-### `TemplateBuilder.withDefaultParameter(String, Consumer<MessageBuilder>)`
-
-A new overload accepts a `Consumer<MessageBuilder>` to construct the default message parameter value using
-the builder API.
-
-
-### `MessageBuilder.buildAsTemplate()`
-
-Builds the message directly as a `Template` instance for registration.
-
-
-### `Message.Parameters.asParameterMap()`
-
-Returns all parameters as an unmodifiable `Map<String,Object>`, giving direct access to all parameter
-names and values in a single call.
-
 
 ### Reduced quote escaping in format string serialization
 
-The `asFormatString(...)` serialization now chooses the wrapping quote character (single or double) based on
-which character appears less frequently in the text content, reducing the number of escape sequences in the
-serialized output.
+The serializer now picks the quote character (single or double) that minimizes escape sequences in the output,
+based on the relative frequency of quote characters in the string content.
+
+### `MessageBuilder.create(MessageSupport)`
+
+A new factory method creates a `MessageBuilder` using the `MessageFactory` obtained from the given
+`MessageSupport` instance.
+
+### `PostFormatterBuilder.withMessage(...)` methods
+
+The post-formatter builder now provides `withMessage(Message.WithSpaces)` and `withMessage(String)` to set
+the inner message directly without using a nested builder callback.
+
+### `TemplateBuilder.withDefaultParameter(String, Consumer<MessageBuilder>)`
+
+A new overload accepts a consumer callback for constructing the default parameter message value using a nested
+builder.
+
+### `MessagePart.Text.trim()` and `TextPartFactory.setSpaces(...)`
+
+`Text.trim()` returns a copy of the text part with leading and trailing spaces removed.
+`TextPartFactory.setSpaces(Text, boolean, boolean)` returns a text part with explicit space settings.
+
+### `TextJoiner.add(String)` method
+
+A new `add(String)` method on `TextJoiner` adds a string while preserving its leading and trailing spaces. This
+replaces the former `addWithSpace(String)` method.
 
 
 ## Bug Fixes
 
-- `FormatterCache` used `synchronized` methods, which meant the `buildFormatters` function (potentially expensive)
-  was invoked while holding the lock, blocking all other threads from cache lookups. The cache now uses a
-  `ReentrantLock` with a lock-release-build-reacquire pattern: the lock is released before calling
-  `buildFormatters` and reacquired afterwards, with a modification counter to detect concurrent insertions and
-  avoid redundant type lookups on re-entry.
+- The `MessageFactory` message cache and the `LRUMessagePartNormalizer` (large variant) used a `LinkedHashMap`
+  configured with access-order and called `computeIfAbsent` on it. In Java, `computeIfAbsent` on an access-ordered
+  `LinkedHashMap` is considered a structural modification, which throws `ConcurrentModificationException` even under
+  a lock if the map's internal state is mutated during the call. The fix replaces `computeIfAbsent` with an explicit
+  `get`/`put` sequence and adds a `ReentrantLock` to the `LRUMessagePartNormalizer.Large` class.
 
-- `FormatterCache` allocated its internal array based on the constructor argument `n` directly
-  (`new Object[n * 2]`), but the minimum capacity is clamped to 8. When `n < 8`, the array was undersized
-  relative to the actual capacity, causing `ArrayIndexOutOfBoundsException` when the cache filled up. The
-  array is now allocated using the clamped capacity.
+- The `FormatterCache` used `synchronized` methods that held the monitor while invoking the potentially expensive
+  `buildFormatters` function. This blocked all other threads attempting cache lookups for unrelated types. The fix
+  replaces `synchronized` with a `ReentrantLock` and moves the `buildFormatters` invocation outside the lock,
+  using a double-check pattern with a modification counter to handle concurrent inserts for the same type.
 
-- `GenericFormatterService` methods `addFormatter(...)`, `addFormatterForType(...)`, `addPostFormatter(...)`,
-  `getPostFormatters()` and `getParameterConfigNames()` were not thread-safe. Concurrent calls to register
-  formatters while other threads were resolving formatters could corrupt internal data structures. All mutating
-  and read operations are now protected by a shared `ReentrantLock`.
+- The `GenericFormatterService` had no synchronization around mutations of `typeFormatters`, `postFormatters` and
+  `parameterConfigNames`. Concurrent calls to `addFormatter` or `addFormatterForType` from multiple threads could
+  corrupt these collections. All mutating and reading operations are now protected by a shared `ReentrantLock`.
 
-- `GenericFormatterService.addFormatterForType(...)` called `requireNonNull` on `formattableType` inside the
-  `computeIfAbsent` lambda, after already dereferencing `formattableType.getType()` on the line above. If
-  `formattableType` was `null`, a `NullPointerException` was thrown on the `getType()` call with no descriptive
-  message. The `requireNonNull` check is now performed before the first use.
+- When constructing a `FormatterCache` with a capacity below 8, the internal array was allocated with size `n * 2`
+  (where `n` is the requested capacity) but the effective capacity was clamped to a minimum of 8. This caused
+  `ArrayIndexOutOfBoundsException` when the cache attempted to store entries beyond the undersized array. The array
+  is now allocated using the clamped capacity.
 
-- `MessageFactory` and `LRUMessagePartNormalizer` used `LinkedHashMap` configured with access-order and called
-  `computeIfAbsent(...)` on it. In access-order mode, `computeIfAbsent` structurally modifies the map (to move the
-  accessed entry to the end), which triggers a `ConcurrentModificationException` from within the same call. Both
-  caches now use explicit `get`/`put` sequences instead of `computeIfAbsent`, and `LRUMessagePartNormalizer`
-  additionally protects access with a `ReentrantLock`.
+- Unpacking localized templates from `.mfp` pack files failed because the unpack logic called
+  `unpackMessageWithSpaces`, which expects a `Message.WithSpaces` wire format. Localized templates are stored as
+  full `Message` instances (which may be `LocaleAware`). The fix switches to `unpackMessage` and widens the template
+  consumer type to accept `Message` instead of `Message.WithSpaces`.
 
-- The list formatters (`ArrayFormatter`, `IterableFormatter`) called `noSpaceText(...)` on the formatted text of
-  each element, stripping any leading/trailing space information from the resulting `Text` parts. When the unique
-  text deduplication iterator compared `Text` objects, two entries with the same text content but different space
-  flags were treated as distinct. The formatters now use `formatAsText(...)` to preserve space information, and
-  the deduplication set compares on the raw text string rather than the `Text` object.
+- In the `GenericFormatterService.addFormatterForType` method, the `formattableType.getType()` call was performed
+  inside the `computeIfAbsent` key expression after the null-check on `formattableType`. If the type was `Object`
+  and the formatter did not implement `DefaultFormatter`, the exception message referenced `formattableType` before
+  it was dereferenced, causing a `NullPointerException` when `formattableType` was `null`. The fix extracts the type
+  into a local variable early.
 
-- In a template part definition like `%[tmpl,p->p]`, where a parameter is delegated to itself (`p->p`), the
-  compiler silently accepted the delegation, which at format time caused infinite recursion. Self-delegations
-  are now detected during compilation and silently ignored.
+- When a template parameter delegate mapped a parameter to itself (e.g. `name->name`), the parser stored this as
+  an explicit delegation entry. At format time, the template resolver followed the delegation and re-resolved the
+  same parameter, resulting in infinite recursion. The fix skips storing delegations where the source and target
+  parameter names are identical, treating them as no-ops.
 
-- Unpacking templates from a pack file always called `unpackMessageWithSpaces(...)`, which failed for locale-aware
-  templates (which implement `Message.LocaleAware`, not `Message.WithSpaces`). The unpacker now calls the more
-  general `unpackMessage(...)` method, which handles both message types.
+- The `MessageBuilder`'s parameter, template and post-formatter sub-builders could flush their accumulated state
+  multiple times if accessed after the builder had already moved on to a subsequent part. Each `flush()` call
+  appended a duplicate `MessagePart` to the parts list. The fix introduces a `flushed` flag in each sub-builder
+  that prevents repeated flushes.
 
-- The `MessageBuilder` sub-builders for parameter, template and post-formatter parts did not guard against
-  double-flushing. When a builder method like `withMessage(Consumer)` triggered an early flush (by building the
-  inner message), and then the parent builder flushed again during `build()`, the same part was added to the
-  message parts list twice. Each sub-builder now tracks a `flushed` flag to ensure the part is added exactly once.
+- The list and array formatters (`IterableFormatter`, `ArrayFormatter`) formatted element values via
+  `Message.format(...)` which returns a plain `String`, then wrapped the result with `noSpaceText(...)`. This
+  discarded any leading or trailing spaces that were part of the element's formatted output. Additionally, the
+  `UniqueTextIterator` used `Text` object equality for deduplication, causing elements with identical text content
+  but different space flags to be treated as distinct. The fix uses `formatAsText(...)` to preserve space
+  information and compares the raw text content for uniqueness.
