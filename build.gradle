@@ -55,13 +55,16 @@ tasks.register('releaseAllDryRun', Sync) {
 }
 
 
-tasks.register(ext.snapshot ? 'releaseAllSnapshots' : 'releaseAll') {
+def snapshot = ext.snapshot
+
+
+tasks.register(snapshot ? 'releaseAllSnapshots' : 'releaseAll') {
   group = 'release'
-  description = ext.snapshot
+  description = snapshot
       ? 'Release all snapshot artifacts to Maven Central Repository.'
       : 'Release final artifacts to Maven Central repository.'
 
-  inputs.property('snapshot', ext.snapshot)
+  inputs.property('snapshot', snapshot)
 
   dependsOn ':message-format:releaseMessageFormatArtifacts'
   dependsOn ':message-format-annotations:releaseMessageFormatAnnotationsArtifacts'
