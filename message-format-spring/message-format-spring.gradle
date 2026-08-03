@@ -23,7 +23,7 @@ description = 'Message Format Library (Spring adopter and formatter)'
 
 dependencies {
   implementation project(':message-format')
-  implementation project(':message-format-annotations')
+  //implementation project(':message-format-annotations')
 
   implementation libs.spring.context
 
