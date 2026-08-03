@@ -371,7 +371,7 @@ public interface MessageSupport
      * @return  message configurer instance for this message, never {@code null}
      */
     @Contract(value = "_ -> this", mutates = "this")
-    default @NotNull MessageConfigurer<M> with(@NotNull Map<String,Object> parameterValues)
+    default @NotNull MessageConfigurer<M> with(@NotNull Map<String,?> parameterValues)
     {
       parameterValues.forEach(this::with);
       return this;

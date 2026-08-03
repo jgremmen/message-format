@@ -258,7 +258,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see MessageConfigurer#with(Map)
      */
-    @NotNull SyntaxErrorMessageBuilder with(@NotNull Map<String,Object> parameterValues);
+    @NotNull SyntaxErrorMessageBuilder with(@NotNull Map<String,?> parameterValues);
 
 
     /**
@@ -464,7 +464,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
 
 
     @Override
-    public @NotNull SyntaxErrorMessageBuilder with(@NotNull Map<String, Object> parameterValues)
+    public @NotNull SyntaxErrorMessageBuilder with(@NotNull Map<String,?> parameterValues)
     {
       messageConfigurer.with(parameterValues);
       return this;

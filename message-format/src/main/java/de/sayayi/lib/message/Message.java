@@ -88,30 +88,9 @@ public sealed interface Message extends FormatStringSerializer
    * @throws MessageFormatException  in case a formatting error occurred
    */
   @Contract(pure = true)
-  default @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Map<String,Object> parameterValues)
-      throws MessageFormatException
-  {
-    return format(messageAccessor, new Parameters() {
-      @Override
-      public @NotNull Locale getLocale() {
-        return messageAccessor.getLocale();
-      }
-
-      @Override
-      public Object getParameterValue(@NotNull String parameter) {
-        return parameterValues.get(parameter);
-      }
-
-      @Override
-      public @Unmodifiable @NotNull Map<String,Object> asParameterMap() {
-        return unmodifiableMap(parameterValues);
-      }
-
-      @Override
-      public String toString() {
-        return "Parameters(locale=" + messageAccessor.getLocale() + ',' + parameterValues + ')';
-      }
-    });
+  default @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Map<String,?> parameterValues)
+      throws MessageFormatException {
+    return formatAsText(messageAccessor, parameterValues).getTextNotNull();
   }
 
 
@@ -148,8 +127,7 @@ public sealed interface Message extends FormatStringSerializer
    */
   @Contract(pure = true)
   default @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor,
-                                     @NotNull Map<String,Object> parameterValues)
-      throws MessageFormatException
+                                     @NotNull Map<String,?> parameterValues) throws MessageFormatException
   {
     return formatAsText(messageAccessor, new Parameters() {
       @Override
