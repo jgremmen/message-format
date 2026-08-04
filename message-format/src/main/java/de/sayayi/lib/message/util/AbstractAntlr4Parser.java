@@ -129,8 +129,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
    *
    * @since 0.24.0
    */
-  protected sealed interface SyntaxErrorMessageBuilder
-      permits SyntaxErrorMessageBuilderImpl
+  protected sealed interface SyntaxErrorMessageBuilder permits SyntaxErrorMessageBuilderImpl
   {
     /**
      * Sets a boolean parameter value for the error message.
@@ -142,6 +141,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see MessageConfigurer#with(String, boolean)
      */
+    @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, boolean value);
 
 
@@ -155,6 +155,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see MessageConfigurer#with(String, byte)
      */
+    @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, byte value);
 
 
@@ -168,6 +169,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see MessageConfigurer#with(String, char)
      */
+    @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, char value);
 
 
@@ -181,6 +183,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see MessageConfigurer#with(String, short)
      */
+    @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, short value);
 
 
@@ -194,6 +197,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see MessageConfigurer#with(String, int)
      */
+    @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, int value);
 
 
@@ -207,6 +211,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see MessageConfigurer#with(String, long)
      */
+    @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, long value);
 
 
@@ -220,6 +225,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see MessageConfigurer#with(String, float)
      */
+    @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, float value);
 
 
@@ -233,6 +239,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see MessageConfigurer#with(String, double)
      */
+    @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, double value);
 
 
@@ -246,6 +253,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see MessageConfigurer#with(String, Object)
      */
+    @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, Object value);
 
 
@@ -258,6 +266,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see MessageConfigurer#with(Map)
      */
+    @Contract(value = "_ -> this", mutates = "this")
     @NotNull SyntaxErrorMessageBuilder with(@NotNull Map<String,?> parameterValues);
 
 
@@ -270,6 +279,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see MessageConfigurer#with(Properties)
      */
+    @Contract(value = "_ -> this", mutates = "this")
     @NotNull SyntaxErrorMessageBuilder with(@NotNull Properties properties);
 
 
@@ -282,6 +292,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see MessageConfigurer#locale(Locale)
      */
+    @Contract(value = "_ -> this", mutates = "this")
     @NotNull SyntaxErrorMessageBuilder locale(Locale locale);
 
 
@@ -294,6 +305,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see MessageConfigurer#locale(String)
      */
+    @Contract(value = "_ -> this", mutates = "this")
     @NotNull SyntaxErrorMessageBuilder locale(String locale);
 
 
@@ -306,6 +318,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see SyntaxErrorBuilder#withStart(Token)
      */
+    @Contract(value = "_ -> new", pure = true)
     @NotNull SyntaxErrorBuilder withStart(@NotNull Token token);
 
 
@@ -318,6 +331,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see SyntaxErrorBuilder#withStart(SyntaxTree)
      */
+    @Contract(value = "_ -> new", pure = true)
     @NotNull SyntaxErrorBuilder withStart(@NotNull SyntaxTree syntaxTree);
 
 
@@ -330,6 +344,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see SyntaxErrorBuilder#withStop(Token)
      */
+    @Contract(value = "_ -> new", pure = true)
     @NotNull SyntaxErrorBuilder withStop(@NotNull Token token);
 
 
@@ -342,7 +357,23 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see SyntaxErrorBuilder#withStop(SyntaxTree)
      */
+    @Contract(value = "_ -> new", pure = true)
     @NotNull SyntaxErrorBuilder withStop(@NotNull SyntaxTree syntaxTree);
+
+
+    /**
+     * Formats the error message and creates a syntax error builder spanning the entire given token.
+     *
+     * @param token  token where the syntax error occurred, not {@code null}
+     *
+     * @return a syntax error builder for further position and reporting configuration, never {@code null}
+     *
+     * @see SyntaxErrorBuilder#with(Token)
+     *
+     * @since 0.24.1
+     */
+    @Contract(value = "_ -> new", pure = true)
+    @NotNull SyntaxErrorBuilder with(@NotNull Token token);
 
 
     /**
@@ -354,6 +385,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see SyntaxErrorBuilder#with(SyntaxTree)
      */
+    @Contract(value = "_ -> new", pure = true)
     @NotNull SyntaxErrorBuilder with(@NotNull SyntaxTree syntaxTree);
 
 
@@ -366,6 +398,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see SyntaxErrorBuilder#withCause(Exception)
      */
+    @Contract(value = "_ -> new", pure = true)
     @NotNull SyntaxErrorBuilder withCause(Exception cause);
   }
 
@@ -516,6 +549,12 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     @Override
     public @NotNull SyntaxErrorBuilder withStop(@NotNull SyntaxTree syntaxTree) {
       return createSyntaxErrorBuilder().withStop(syntaxTree);
+    }
+
+
+    @Override
+    public @NotNull SyntaxErrorBuilder with(@NotNull Token token) {
+      return createSyntaxErrorBuilder().with(token);
     }
 
 
