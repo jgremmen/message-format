@@ -15,12 +15,19 @@
  */
 
 //file:noinspection DependencyNotationArgument
-//file:noinspection GroovyAssignabilityCheck
+
+
+import de.sayayi.gradle.BuildSupport
 
 
 plugins {
   id 'antlr'
   id 'idea'
+
+  id 'de.sayayi.message.base'
+  id 'de.sayayi.message.java-library'
+  id 'de.sayayi.message.javadoc'
+  id 'de.sayayi.message.publish'
 }
 
 
@@ -84,19 +91,19 @@ generateTestGrammarSource {
 }
 
 
-compileJava {
+tasks.named('compileJava') {
   dependsOn generateGrammarSource
 
   options.compilerArgs << '-implicit:class'
 }
 
 
-compileTestJava {
+tasks.named('compileTestJava') {
   dependsOn generateTestGrammarSource
 }
 
 
-sourcesJar {
+tasks.named('sourcesJar') {
   dependsOn generateGrammarSource
 
   exclude 'gen/*'
@@ -104,7 +111,7 @@ sourcesJar {
 }
 
 
-jar {
+tasks.named('jar') {
   manifest {
     attributes['Implementation-Title'] = project.description
   }
@@ -117,6 +124,7 @@ javadoc {
         'de.sayayi.lib.message',
         'de.sayayi.lib.message.exception',
         'de.sayayi.lib.message.part*',
+        'de.sayayi.lib.message.template',
         'de.sayayi.lib.message.util'
     ])
     group('Adopters', [
@@ -158,14 +166,12 @@ publishing {
 }
 
 
-ext.releaseTask.configure {
-  if (snapshot) {
-    dependsOn ':message-format:publishOSSRHPublicationToMavenCentralSnapshotRepository'
-  }
+BuildSupport.configureSnapshotRelease(project) {
+  dependsOn ':message-format:publishOSSRHPublicationToMavenCentralSnapshotRepository'
 }
 
 
-clean {
+tasks.named('clean') {
   delete layout.projectDirectory.dir('src/main/antlr/gen')
   delete layout.projectDirectory.dir('src/main/gen')
   delete layout.projectDirectory.dir('out')

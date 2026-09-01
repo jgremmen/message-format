@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
+//file:noinspection DependencyNotationArgument
 //file:noinspection GroovyAssignabilityCheck
-//file:noinspection SpellCheckingInspection
 
+
+import de.sayayi.gradle.BuildSupport
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassWriter
@@ -24,8 +26,10 @@ import org.objectweb.asm.ModuleVisitor
 import org.objectweb.asm.commons.ClassRemapper
 import org.objectweb.asm.commons.Remapper
 
+import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
+import static groovy.io.FileType.FILES
 import static org.objectweb.asm.Opcodes.ASM9
 
 
@@ -45,6 +49,12 @@ buildscript {
 }
 
 
+pluginManager.apply('de.sayayi.message.base')
+pluginManager.apply('de.sayayi.message.java-library')
+pluginManager.apply('de.sayayi.message.javadoc')
+pluginManager.apply('de.sayayi.message.publish')
+
+
 description = 'Message Format Library (annotations)'
 
 
@@ -59,7 +69,7 @@ configurations {
 dependencies {
   implementation project(':message-format')
 
-  asmToBundle "org.ow2.asm:asm:${asmVersion}"
+  asmToBundle libs.asm
 }
 
 
@@ -76,11 +86,11 @@ def asmRemapper = new Remapper(ASM9) {
 }
 
 
-compileJava {
+tasks.named('compileJava') {
   doLast {
     logger.info('Rewriting project class references to relocated ASM classes...')
 
-    sourceSets.main.java.classesDirectory.get().asFile.eachFileRecurse(groovy.io.FileType.FILES) { classFile ->
+    sourceSets.main.java.classesDirectory.get().asFile.eachFileRecurse(FILES) { classFile ->
       if (classFile.name == 'module-info.class')
       {
         def writer = new ClassWriter(0)
@@ -136,7 +146,7 @@ tasks.register('prepareRelocatedAsmClasses') {
       new ZipFile(jar).withCloseable { zip -> zip
           .entries()
           .findAll { !it.directory && it.name.endsWith('.class') && it.name != 'module-info.class' }
-          .each { entry ->
+          .each { ZipEntry entry ->
             def writer = new ClassWriter(0)
 
             new ClassReader(zip.getInputStream(entry)).accept(new ClassRemapper(writer, asmRemapper), 0)
@@ -153,6 +163,15 @@ tasks.register('prepareRelocatedAsmClasses') {
 
 
 sourceSets.main.output.dir(asmMainDir, builtBy: 'prepareRelocatedAsmClasses')
+
+
+tasks.named('sourcesJar') {
+  eachFile { fileCopyDetails ->
+    if (!fileCopyDetails.directory && fileCopyDetails.name.endsWith('.java')) {
+      filter { line -> line.replace('org.objectweb.asm', 'de.sayayi.lib.message.annotation.adopter.asm') }
+    }
+  }
+}
 
 
 javadoc {
@@ -184,7 +203,6 @@ publishing {
 }
 
 
-ext.releaseTask.configure {
-  if (snapshot)
-    dependsOn ':message-format-annotations:publishOSSRHPublicationToMavenCentralSnapshotRepository'
+BuildSupport.configureSnapshotRelease(project) {
+  dependsOn ':message-format-annotations:publishOSSRHPublicationToMavenCentralSnapshotRepository'
 }

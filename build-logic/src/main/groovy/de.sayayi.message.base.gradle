@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Jeroen Gremmen
+ * Copyright 2026 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,27 @@
  * limitations under the License.
  */
 
+import de.sayayi.gradle.BuildSupport
+
+
+plugins {
+  id 'base'
+}
+
+
+layout.buildDirectory = '.build'
+
+
+ext.snapshot = BuildSupport.isSnapshot(project)
+ext.releaseVersion = BuildSupport.releaseVersion(project)
+
 
 repositories {
-  // for releases don't use the snapshot repository to resolve dependencies
   if (snapshot) {
     maven {
       name = 'MavenSnapshots'
       url = 'https://central.sonatype.com/repository/maven-snapshots/'
+
       mavenContent {
         includeGroup 'de.sayayi.lib'
         snapshotsOnly()
@@ -28,7 +42,7 @@ repositories {
     }
   }
 
-  mavenCentral() {
+  mavenCentral {
     mavenContent {
       releasesOnly()
     }

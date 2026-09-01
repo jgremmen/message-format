@@ -15,7 +15,17 @@
  */
 
 //file:noinspection DependencyNotationArgument
-//file:noinspection GroovyAssignabilityCheck
+
+
+import de.sayayi.gradle.BuildSupport
+
+
+plugins {
+  id 'de.sayayi.message.base'
+  id 'de.sayayi.message.java-library'
+  id 'de.sayayi.message.javadoc'
+  id 'de.sayayi.message.publish'
+}
 
 
 description = 'Message Format Library (Spring adopter and formatter)'
@@ -23,11 +33,8 @@ description = 'Message Format Library (Spring adopter and formatter)'
 
 dependencies {
   implementation project(':message-format')
-  //implementation project(':message-format-annotations')
-
   implementation libs.spring.context
 
-  //noinspection DependencyNotationArgument
   testImplementation project(path: ':message-format', configuration: 'testOutput')
 }
 
@@ -70,8 +77,6 @@ publishing {
 }
 
 
-ext.releaseTask.configure {
-  if (snapshot) {
-    dependsOn ':message-format-spring:publishOSSRHPublicationToMavenCentralSnapshotRepository'
-  }
+BuildSupport.configureSnapshotRelease(project) {
+  dependsOn ':message-format-spring:publishOSSRHPublicationToMavenCentralSnapshotRepository'
 }

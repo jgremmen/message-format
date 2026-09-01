@@ -17,12 +17,22 @@
 //file:noinspection DependencyNotationArgument
 
 
+import de.sayayi.gradle.BuildSupport
+
+
+plugins {
+  id 'de.sayayi.message.base'
+  id 'de.sayayi.message.java-library'
+  id 'de.sayayi.message.javadoc'
+  id 'de.sayayi.message.publish'
+}
+
+
 description = 'Message Format Library (ICU formatter)'
 
 
 dependencies {
   implementation project(':message-format')
-
   implementation libs.icu4j
 
   testImplementation project(path: ':message-format', configuration: 'testOutput')
@@ -56,8 +66,6 @@ publishing {
 }
 
 
-ext.releaseTask.configure {
-  if (snapshot) {
-    dependsOn ':message-format-icu:publishOSSRHPublicationToMavenCentralSnapshotRepository'
-  }
+BuildSupport.configureSnapshotRelease(project) {
+  dependsOn ':message-format-icu:publishOSSRHPublicationToMavenCentralSnapshotRepository'
 }

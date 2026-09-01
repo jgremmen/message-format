@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Jeroen Gremmen
+ * Copyright 2026 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,24 @@
  * limitations under the License.
  */
 
+plugins {
+  id 'java-library'
+  id 'com.adarshr.test-logger'
+}
 
-apply plugin: 'java-library'
-apply plugin: 'com.adarshr.test-logger'
+
+configurations.named('compileOnly') {
+  extendsFrom configurations.annotationProcessor
+}
 
 
-configurations {
-  compileOnly.extendsFrom annotationProcessor
-  testAnnotationProcessor.extendsFrom annotationProcessor
-  testCompileOnly.extendsFrom compileOnly, testAnnotationProcessor
+configurations.named('testAnnotationProcessor') {
+  extendsFrom configurations.annotationProcessor
+}
+
+
+configurations.named('testCompileOnly') {
+  extendsFrom configurations.compileOnly, configurations.testAnnotationProcessor
 }
 
 
@@ -32,14 +41,11 @@ dependencies {
   testAnnotationProcessor rootProject.libs.lombok
 
   testImplementation rootProject.libs.bundles.mockito.test
+  testImplementation rootProject.libs.junit.jupiter.api
+  testImplementation rootProject.libs.junit.jupiter.params
 
-  def junitVersion = rootProject.libs.versions.junit.get()
-
-  testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
-  testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
-
-  testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-  testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+  testRuntimeOnly rootProject.libs.junit.jupiter.engine
+  testRuntimeOnly rootProject.libs.junit.platform.launcher
 }
 
 
@@ -112,13 +118,13 @@ tasks.withType(Test).configureEach {
 }
 
 
-compileJava {
+tasks.named('compileJava') {
   sourceCompatibility = 21
   targetCompatibility = 21
 }
 
 
-compileTestJava {
+tasks.named('compileTestJava') {
   sourceCompatibility = 21
   targetCompatibility = 21
 }

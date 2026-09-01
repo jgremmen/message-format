@@ -13,32 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+plugins {
+  id 'de.sayayi.message.base' apply false
+  id 'de.sayayi.message.java-library' apply false
+  id 'de.sayayi.message.javadoc' apply false
+  id 'de.sayayi.message.publish' apply false
+}
+
 
 description = 'Message Format Library Projects'
-
-
-def gradleDirectory = layout.projectDirectory.dir('gradle')
 
 
 allprojects {
   group = 'de.sayayi.lib'
   version = rootProject.libs.versions.message.format.get()
-
-  ext.snapshot = (version as String).endsWith('-SNAPSHOT')
-  ext.releaseVersion = ext.snapshot ? (version as String)[0..-10] : version
-
-  layout.buildDirectory = '.build'
-
-  apply plugin: 'base'
-  apply from: gradleDirectory.file('repositories.gradle')
 }
 
 
-configure(subprojects.findAll {name.startsWith('message-') }) {
-  apply from: gradleDirectory.file('java-library.gradle')
-  apply from: gradleDirectory.file('javadoc.gradle')
-  apply from: gradleDirectory.file('publish.gradle')
-}
+pluginManager.apply('de.sayayi.message.base')
 
 
 tasks.register('releaseAllDryRun', Sync) {
@@ -48,14 +40,10 @@ tasks.register('releaseAllDryRun', Sync) {
   into layout.buildDirectory.dir('repository')
 
   configure(subprojects) { subproject ->
-    def publishTask = subproject.tasks.named('publishToProjectLocalRepository')
-    if (publishTask != null)
-      from publishTask
+    if (subproject.tasks.names.contains('publishToProjectLocalRepository'))
+      from subproject.tasks.named('publishToProjectLocalRepository')
   }
 }
-
-
-def snapshot = ext.snapshot
 
 
 tasks.register(snapshot ? 'releaseAllSnapshots' : 'releaseAll') {
@@ -74,11 +62,11 @@ tasks.register(snapshot ? 'releaseAllSnapshots' : 'releaseAll') {
 }
 
 
-clean {
+tasks.named('clean') {
   delete layout.projectDirectory.dir('build')
 }
 
 
-wrapper {
+tasks.named('wrapper', Wrapper) {
   distributionType = Wrapper.DistributionType.ALL
 }

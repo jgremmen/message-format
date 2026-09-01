@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jeroen Gremmen
+ * Copyright 2026 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 
-pluginManagement {
-  repositories {
-    gradlePluginPortal()
-    mavenCentral()
+javadoc {
+  title = "${project.description} ${version}"
+
+  (options as StandardJavadocDocletOptions).with {
+    encoding 'UTF-8'
+
+    noQualifiers 'java.util', 'java.lang'
+
+    addStringOption('Xdoclint:none', '-quiet')
+    addStringOption('-show-module-contents', 'api')
   }
+
+  failOnError = false
 }
 
 
-include 'message-format'
-include 'message-format-annotations'
-include 'message-format-icu'
-include 'message-format-log4j'
-include 'message-format-spring'
-include 'message-gradle-plugin'
-
-
-includeBuild 'build-logic'
-
-
-rootProject.name = 'message-format-projects'
-rootProject.children.each { project ->
-  project.buildFileName = "${project.name}.gradle"
+ext.resolveVersion = { artifactName ->
+  configurations
+      .compileClasspath
+      .resolvedConfiguration
+      .resolvedArtifacts
+      .find { it.name == artifactName }
+      .moduleVersion.id.version
 }

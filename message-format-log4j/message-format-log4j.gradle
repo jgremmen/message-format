@@ -17,6 +17,17 @@
 //file:noinspection DependencyNotationArgument
 
 
+import de.sayayi.gradle.BuildSupport
+
+
+plugins {
+  id 'de.sayayi.message.base'
+  id 'de.sayayi.message.java-library'
+  id 'de.sayayi.message.javadoc'
+  id 'de.sayayi.message.publish'
+}
+
+
 description = 'Message Format Library (log4j formatter)'
 
 
@@ -24,7 +35,6 @@ dependencies {
   implementation project(':message-format')
   implementation libs.log4j.api
 
-  //noinspection DependencyNotationArgument
   testImplementation project(path: ':message-format', configuration: 'testOutput')
   testImplementation libs.log4j.core
 }
@@ -62,8 +72,6 @@ publishing {
 }
 
 
-ext.releaseTask.configure {
-  if (snapshot) {
-    dependsOn ':message-format-log4j:publishOSSRHPublicationToMavenCentralSnapshotRepository'
-  }
+BuildSupport.configureSnapshotRelease(project) {
+  dependsOn ':message-format-log4j:publishOSSRHPublicationToMavenCentralSnapshotRepository'
 }

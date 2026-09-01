@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Jeroen Gremmen
+ * Copyright 2026 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,10 @@
  * limitations under the License.
  */
 
-
-ext.resolveVersion = { artifactName ->
-  configurations
-      .compileClasspath
-      .resolvedConfiguration
-      .resolvedArtifacts
-      .find { it.name == artifactName }
-      .moduleVersion.id.version
-}
-
-
-javadoc {
-  title = "${project.description} ${version}"
-
-  (options as StandardJavadocDocletOptions).with {
-    encoding 'UTF-8'
-
-    noQualifiers 'java.util', 'java.lang'
-
-    addStringOption('Xdoclint:none', '-quiet')
-    addStringOption('-show-module-contents', 'api')
+dependencyResolutionManagement {
+  versionCatalogs {
+    libs {
+      from(files('../gradle/libs.versions.toml'))
+    }
   }
-
-  failOnError = false
 }

@@ -18,8 +18,17 @@
 //file:noinspection GroovyAssignabilityCheck
 
 
+import de.sayayi.gradle.BuildSupport
+
+
 plugins {
   id 'java-gradle-plugin'
+
+  id 'de.sayayi.message.base'
+  id 'de.sayayi.message.java-library'
+  id 'de.sayayi.message.javadoc'
+  id 'de.sayayi.message.publish'
+
   alias(libs.plugins.publish.gradle.plugin)
 }
 
@@ -27,13 +36,13 @@ plugins {
 description = 'Message Format Gradle Plugin'
 
 
-evaluationDependsOn ':message-format-annotations'
+def messageFormatAnnotationsProject = rootProject.project(':message-format-annotations')
 
 
 dependencies {
   api gradleApi()
 
-  implementation files(rootProject.project(':message-format-annotations').jar)
+  implementation files(messageFormatAnnotationsProject.tasks.named('jar', Jar).flatMap { it.archiveFile })
 
   compileOnly project(':message-format')
   runtimeOnly project(':message-format-annotations')
@@ -46,7 +55,7 @@ sourceSets.test.resources.srcDir tasks.register('generateTestResources') {
   dependsOn ':message-format-annotations:jar'
 
   def testResourcesDir = layout.buildDirectory.dir('generated/resources/test')
-  def annotationsJarFile = project(':message-format-annotations').jar.archiveFile as RegularFileProperty
+  def annotationsJarFile = messageFormatAnnotationsProject.tasks.named('jar', Jar).flatMap { it.archiveFile }
 
   inputs.file annotationsJarFile
   outputs.dir testResourcesDir
@@ -115,8 +124,8 @@ tasks.named('publishPlugins') {
 }
 
 
-ext.releaseTask.configure {
-  if (snapshot)
+releaseTask.configure {
+  if (BuildSupport.isSnapshot(project))
     dependsOn ':message-gradle-plugin:publishMessageFormatPluginMarkerMavenPublicationToMavenCentralSnapshotRepository'
   else
     dependsOn ':message-gradle-plugin:publishPlugins'

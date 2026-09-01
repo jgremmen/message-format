@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Jeroen Gremmen
+ * Copyright 2026 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-import org.gradle.util.internal.TextUtil
+import de.sayayi.gradle.BuildSupport
 
 
-apply plugin: 'org.danilopianini.publish-on-central'
+plugins {
+  id 'org.danilopianini.publish-on-central'
+}
 
 
 publishOnCentral {
@@ -51,8 +53,7 @@ publishing {
     }
   }
 
-  if (snapshot)
-  {
+  if (snapshot) {
     repositories {
       maven {
         name = 'mavenCentralSnapshot'
@@ -87,18 +88,11 @@ tasks.named('zipMavenCentralPortalPublication') {
 }
 
 
-ext.releaseTask = tasks.register(TextUtil.toLowerCamelCase("release-${project.name}-artifacts")) {
-  group = 'release'
-  description = "Release ${project.name} ${snapshot ? 'snapshot ' : ''}artifacts to Maven Central Repository."
-
-  inputs.property('snapshot', snapshot)
-
-  dependsOn 'publishToProjectLocalRepository'
-
+ext.releaseTask = BuildSupport.registerReleaseTask(project)
+ext.releaseTask.configure {
   if (snapshot)
     dependsOn 'publishOSSRHPublicationToMavenCentralSnapshotRepository'
-  else
-  {
+  else {
     dependsOn 'zipMavenCentralPortalPublication'
     dependsOn 'validateMavenCentralPortalPublication'
     dependsOn 'releaseMavenCentralPortalPublication'

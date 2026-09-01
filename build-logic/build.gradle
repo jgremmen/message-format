@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jeroen Gremmen
+ * Copyright 2026 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-pluginManagement {
-  repositories {
-    gradlePluginPortal()
-    mavenCentral()
-  }
+plugins {
+  id 'groovy-gradle-plugin'
 }
 
 
-include 'message-format'
-include 'message-format-annotations'
-include 'message-format-icu'
-include 'message-format-log4j'
-include 'message-format-spring'
-include 'message-gradle-plugin'
+layout.buildDirectory = '.build'
 
 
-includeBuild 'build-logic'
+group = 'de.sayayi.buildlogic'
 
 
-rootProject.name = 'message-format-projects'
-rootProject.children.each { project ->
-  project.buildFileName = "${project.name}.gradle"
+repositories {
+  gradlePluginPortal()
+  mavenCentral()
+}
+
+
+dependencies {
+  implementation "org.danilopianini.publish-on-central:org.danilopianini.publish-on-central.gradle.plugin:${libs.versions.publish.on.central.get()}"
+  implementation "com.adarshr:gradle-test-logger-plugin:${libs.versions.test.logger.get()}"
 }
