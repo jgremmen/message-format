@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+//file:noinspection DependencyNotationArgument
+
+
 plugins {
   id 'java-library'
   id 'com.adarshr.test-logger'
