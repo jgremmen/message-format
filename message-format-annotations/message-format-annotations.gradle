@@ -34,17 +34,13 @@ import static org.objectweb.asm.Opcodes.ASM9
 
 
 buildscript {
-  ext {
-    asmVersion = '[9.10,10)'
-  }
-
   repositories {
     mavenCentral()
   }
 
   dependencies {
-    classpath "org.ow2.asm:asm:${asmVersion}"
-    classpath "org.ow2.asm:asm-commons:${asmVersion}"
+    classpath libs.asm
+    classpath libs.asm.commons
   }
 }
 
