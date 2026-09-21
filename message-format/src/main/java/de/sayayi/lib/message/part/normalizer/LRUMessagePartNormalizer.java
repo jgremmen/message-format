@@ -81,6 +81,7 @@ public final class LRUMessagePartNormalizer
   private static final class Small implements MessagePartNormalizer
   {
     private final int maxSize;
+    private final Lock cacheLock;
     private MessagePart[] parts;
     private int size;
 
@@ -89,6 +90,7 @@ public final class LRUMessagePartNormalizer
     {
       this.maxSize = maxSize;
 
+      cacheLock = new ReentrantLock();
       parts = null;
       size = 0;
     }
@@ -101,38 +103,43 @@ public final class LRUMessagePartNormalizer
     {
       requireNonNull(part, "part must not be null");
 
-      var n = -1;
-      MessagePart cachedPart = null;
+      cacheLock.lock();
+      try {
+        var n = -1;
+        MessagePart cachedPart = null;
 
-      if (parts != null)
-        for(var i = 0; i < size; i++)
-          if (parts[i] == part || (cachedPart = parts[i]).equals(part))
-          {
-            if (cachedPart == null)
-              cachedPart = parts[i];
-            n = i;
-            break;
-          }
+        if (parts != null)
+          for(var i = 0; i < size; i++)
+            if (parts[i] == part || (cachedPart = parts[i]).equals(part))
+            {
+              if (cachedPart == null)
+                cachedPart = parts[i];
+              n = i;
+              break;
+            }
 
-      if (n != 0)
-      {
-        if (n == -1)
+        if (n != 0)
         {
-          ensureSize();
+          if (n == -1)
+          {
+            ensureSize();
 
-          arraycopy(parts, 0, parts, 1, min(maxSize - 1, size));
-          cachedPart = part;
+            arraycopy(parts, 0, parts, 1, min(maxSize - 1, size));
+            cachedPart = part;
 
-          if (size < maxSize)
-            size++;
+            if (size < maxSize)
+              size++;
+          }
+          else
+            arraycopy(parts, 0, parts, 1, n);
+
+          parts[0] = cachedPart;
         }
-        else
-          arraycopy(parts, 0, parts, 1, n);
 
-        parts[0] = cachedPart;
+        return (T)cachedPart;
+      } finally {
+        cacheLock.unlock();
       }
-
-      return (T)cachedPart;
     }
 
 
