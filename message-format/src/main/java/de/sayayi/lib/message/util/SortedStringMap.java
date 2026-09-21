@@ -90,7 +90,9 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
     if (map instanceof SortedStringMap<V> sortedStringMap)
     {
       size = map.size();
-      kv = copyOf(sortedStringMap.kv, size * 2);
+      kv = sortedStringMap.kv == null
+          ? (seal ? null : new Object[16])
+          : copyOf(sortedStringMap.kv, size * 2);
     }
     else if (map == null)
       kv = seal ? null : new Object[16];
