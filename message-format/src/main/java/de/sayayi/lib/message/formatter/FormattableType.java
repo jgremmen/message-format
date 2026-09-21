@@ -139,13 +139,13 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
 
   @Override
   public boolean equals(Object o) {
-    return o instanceof FormattableType && type == ((FormattableType)o).type;
+    return this == o || (o instanceof FormattableType that && type == that.type && order == that.order);
   }
 
 
   @Override
   public int hashCode() {
-    return type.hashCode();
+    return type.hashCode() * 31 + order;
   }
 
 
