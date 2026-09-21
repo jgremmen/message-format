@@ -17,7 +17,6 @@ package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
-import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
@@ -42,16 +41,14 @@ public final class EmptyMessage implements Message.WithSpaces
 
   /** {@inheritDoc} */
   @Override
-  public @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
-      throws MessageFormatException {
+  public @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters) {
     return "";
   }
 
 
   /** {@inheritDoc} */
   @Override
-  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
-      throws MessageFormatException {
+  public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters) {
     return Text.EMPTY;
   }
 

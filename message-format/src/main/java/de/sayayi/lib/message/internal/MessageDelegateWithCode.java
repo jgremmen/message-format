@@ -76,7 +76,6 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
   /** {@inheritDoc} */
   @Override
   public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
-      throws MessageFormatException
   {
     try {
       return message.formatAsText(messageAccessor, parameters);

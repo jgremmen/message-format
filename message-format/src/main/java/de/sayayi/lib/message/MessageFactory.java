@@ -395,7 +395,6 @@ public class MessageFactory
    *
    * @see #isGeneratedCode(String)
    */
-  @Contract(pure = true)
   protected @NotNull String generateCode(@NotNull String prefix)
   {
     final var hashBytes = new byte[6];

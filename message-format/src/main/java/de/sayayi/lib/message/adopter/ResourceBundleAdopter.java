@@ -19,7 +19,6 @@ import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
 import de.sayayi.lib.message.exception.MessageAdopterException;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -81,7 +80,6 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    * @see #adopt(Collection)
    * @see #adopt(String)
    */
-  @Contract(pure = true)
   public void adopt(@NotNull ResourceBundle resourceBundle)
   {
     final var locale = resourceBundle.getLocale();
@@ -101,7 +99,6 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    *
    * @see #adopt(ResourceBundle)
    */
-  @Contract(pure = true)
   public void adopt(@NotNull Collection<ResourceBundle> resourceBundles)
   {
     final var localizedMessagesByCode = new HashMap<String,Map<Locale,String>>();
@@ -133,7 +130,6 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    * @see #adopt(String, ClassLoader)
    * @see #adopt(String, Set)
    */
-  @Contract(pure = true)
   public void adopt(@NotNull String bundleBaseName) {
     adopt(bundleBaseName, null, null, false);
   }
@@ -149,7 +145,6 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    * @see #adopt(String)
    * @see #adopt(String, Set, ClassLoader)
    */
-  @Contract(pure = true)
   public void adopt(@NotNull String bundleBaseName, @NotNull ClassLoader classLoader) {
     adopt(bundleBaseName, null, classLoader, false);
   }
@@ -168,7 +163,6 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    * @see #adopt(String)
    * @see #adopt(String, Set, ClassLoader)
    */
-  @Contract(pure = true)
   public void adopt(@NotNull String bundleBaseName, @NotNull Set<Locale> locales) {
     adopt(bundleBaseName, locales.toArray(Locale[]::new), null, true);
   }
@@ -188,7 +182,6 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    * @see #adopt(String, ClassLoader)
    * @see #adopt(String, Set)
    */
-  @Contract(pure = true)
   public void adopt(@NotNull String bundleBaseName, @NotNull Set<Locale> locales, @NotNull ClassLoader classLoader) {
     adopt(bundleBaseName, locales.toArray(Locale[]::new), classLoader, true);
   }
@@ -211,7 +204,6 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    * @throws MessageAdopterException  if {@code throwOnMissingResourceBundle} is {@code true} and a resource bundle
    *                                  is missing
    */
-  @Contract(pure = true)
   protected void adopt(@NotNull String bundleBaseName, Locale[] locales, ClassLoader classLoader,
                        boolean throwOnMissingResourceBundle)
   {

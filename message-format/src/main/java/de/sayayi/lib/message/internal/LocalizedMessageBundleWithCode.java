@@ -74,7 +74,6 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   /** {@inheritDoc} */
   @Override
   public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
-      throws MessageFormatException
   {
     var locale = parameters.getLocale();
 

@@ -18,7 +18,6 @@ package de.sayayi.lib.message.adopter;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -72,7 +71,6 @@ public class PropertiesAdopter extends AbstractMessageAdopter
    *
    * @see #adopt(Map)
    */
-  @Contract(pure = true)
   public void adopt(@NotNull Properties properties)
   {
     properties.forEach((code,message) ->
@@ -89,7 +87,6 @@ public class PropertiesAdopter extends AbstractMessageAdopter
    *
    * @since 0.20.0
    */
-  @Contract(pure = true)
   public void adoptTemplates(@NotNull Properties properties)
   {
     properties.forEach((code,message) ->
@@ -108,7 +105,6 @@ public class PropertiesAdopter extends AbstractMessageAdopter
    *
    * @see #adopt(Properties)
    */
-  @Contract(pure = true)
   public void adopt(@NotNull Map<Locale,Properties> properties)
   {
     final var localizedMessagesByCode = new HashMap<String,Map<Locale,String>>();

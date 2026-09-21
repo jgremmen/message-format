@@ -22,6 +22,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
+import static java.util.Objects.requireNonNull;
+
 
 /**
  * This supplier implementation delegates to another supplier and caches the supplied value, thus
@@ -56,7 +58,7 @@ public final class SupplierDelegate<T> implements Supplier<T>
 
 
   private SupplierDelegate(@NotNull Supplier<T> supplier) {
-    this.supplier = supplier;
+    this.supplier = requireNonNull(supplier);
   }
 
 
