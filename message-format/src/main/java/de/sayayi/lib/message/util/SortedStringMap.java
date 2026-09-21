@@ -703,7 +703,7 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
     /** {@inheritDoc} */
     @Override
     public long estimateSize() {
-      return size;
+      return size - index;
     }
 
 
@@ -717,7 +717,7 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
     /** {@inheritDoc} */
     @Override
     public int characteristics() {
-      return ORDERED | DISTINCT | NONNULL | SIZED | IMMUTABLE;
+      return ORDERED | DISTINCT | NONNULL | SIZED;
     }
   }
 

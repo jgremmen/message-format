@@ -1197,7 +1197,6 @@ class SortedStringMapTest
       assertTrue(spliterator.hasCharacteristics(Spliterator.DISTINCT));
       assertTrue(spliterator.hasCharacteristics(Spliterator.NONNULL));
       assertTrue(spliterator.hasCharacteristics(Spliterator.SIZED));
-      assertTrue(spliterator.hasCharacteristics(Spliterator.IMMUTABLE));
       assertNull(spliterator.getComparator());
     }
 
