@@ -29,8 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 import static de.sayayi.lib.message.part.MessagePart.Text.SPACE;
-import static de.sayayi.lib.message.part.TextPartFactory.addSpaces;
-import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.part.TextPartFactory.*;
 import static de.sayayi.lib.message.util.MessageUtil.serializeMessage;
 import static de.sayayi.lib.message.util.MessageUtil.validateName;
 import static java.util.Objects.requireNonNull;
@@ -152,7 +151,7 @@ public final class PostFormatterPart implements MessagePart.PostFormat
   {
     final var text = message.formatAsText(messageAccessor, parameters);
     if (text.isEmpty())
-      return text;
+      return spaceBefore || spaceAfter ? spacedText(" ") : text;
 
     final var postFormatter = requireNonNull(
         messageAccessor.getPostFormatter(name),
