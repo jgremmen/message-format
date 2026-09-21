@@ -17,6 +17,9 @@ package de.sayayi.lib.message.pack;
 
 import de.sayayi.lib.pack.PackConfig;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 
 /**
  * Shared constants used for reading and writing the packed (binary) representation of messages and templates.
@@ -26,6 +29,9 @@ import de.sayayi.lib.pack.PackConfig;
  *
  * @author Jeroen Gremmen
  * @since 0.25.0
+ * 
+ * @see de.sayayi.lib.message.MessageSupport#exportMessages(OutputStream)
+ * @see de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport#importMessages(InputStream) 
  */
 public interface PackConstants
 {

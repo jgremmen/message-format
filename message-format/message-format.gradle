@@ -154,6 +154,7 @@ javadoc {
     group('Core', [
         'de.sayayi.lib.message',
         'de.sayayi.lib.message.exception',
+        'de.sayayi.lib.message.pack',
         'de.sayayi.lib.message.part*',
         'de.sayayi.lib.message.template',
         'de.sayayi.lib.message.util'

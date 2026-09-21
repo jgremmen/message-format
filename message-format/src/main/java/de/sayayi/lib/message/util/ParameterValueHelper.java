@@ -176,9 +176,11 @@ public final class ParameterValueHelper
   /**
    * Retrieves the named parameter value and converts it to an enum constant of the specified type.
    * <p>
-   * If the value is already an instance of the given enum type it is returned directly. String values are matched
-   * against enum constant names in a case-insensitive manner; additionally, underscores in enum names are treated as
-   * interchangeable with hyphens. Values wrapped in an {@link Optional} are unwrapped before conversion.
+   * If the value is already an instance of the given enum type it is returned directly. Otherwise, if the value is
+   * wrapped in an {@link Optional}, it is unwrapped first; the unwrapped value is converted only if it is a
+   * {@code String}, which is matched against enum constant names in a case-insensitive manner (underscores in enum
+   * constant names are treated as interchangeable with hyphens). Note that an enum constant wrapped in an
+   * {@link Optional} is not recognized, as the enum-instance check is performed before unwrapping.
    *
    * @param parameters  parameters instance to retrieve the value from, not {@code null}
    * @param name        parameter name, not {@code null}
@@ -186,7 +188,8 @@ public final class ParameterValueHelper
    * @param <T>         the enum type
    *
    * @return  an {@link Optional} containing the matching enum constant, or an empty optional if the value is
-   *          {@code null} or does not match any constant
+   *          {@code null}, an enum constant wrapped in an {@code Optional}, or a value that does not match any
+   *          constant
    */
   @Contract(pure = true)
   @SuppressWarnings("unchecked")

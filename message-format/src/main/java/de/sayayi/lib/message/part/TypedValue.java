@@ -109,8 +109,9 @@ public sealed interface TypedValue<T> extends FormatStringSerializer
     /**
      * Return the number as int.
      * <p>
-     * If the number is larger than the integer range, the returned value is either
-     * {@code 4294967295} for positive values or {@code −4294967296} for negative values.
+     * If the number is outside the integer range, the returned value is saturated to
+     * {@link Integer#MAX_VALUE} for positive values or {@link Integer#MIN_VALUE} for
+     * negative values.
      *
      * @return  number as int
      */

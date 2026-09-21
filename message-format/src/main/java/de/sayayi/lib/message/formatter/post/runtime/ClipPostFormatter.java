@@ -32,16 +32,17 @@ import static java.lang.Math.max;
  * text has been clipped. The suffix behavior can be controlled with the following configuration keys:
  * <ul>
  *   <li>
- *     {@code clip-suffix} &ndash; set to {@code false} to disable the suffix and perform a hard truncation at the
- *     maximum length
+ *     {@code clip-suffix}: set to {@code false} to disable the suffix and perform a hard truncation at the maximum
+ *     length
  *   </li>
  *   <li>
- *     {@code clip-suffix-text} &ndash; a custom suffix string to use instead of the default ellipsis character
+ *     {@code clip-suffix-text}: a custom suffix string to use instead of the default ellipsis character
  *   </li>
  * </ul>
  * <p>
- * When a suffix is used, the string is truncated so that the total length including the suffix
- * does not exceed the configured maximum.
+ * When a suffix is used, the configured maximum is treated as a lower bound rather than a hard limit: it may be
+ * increased internally so that the truncated text combined with the suffix remains meaningful. Only when the suffix is
+ * disabled is the configured maximum enforced as a strict, hard limit.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0
@@ -62,8 +63,14 @@ public final class ClipPostFormatter implements PostFormatter
   /**
    * {@inheritDoc}
    * <p>
-   * Clips the given {@code string} to the maximum length specified by the {@code clip} configuration key,
-   * optionally appending a suffix to indicate truncation.
+   * Clips the given {@code string} to the length specified by the {@code clip} configuration key, optionally appending
+   * a suffix to indicate truncation. When a suffix is used, the configured length is treated as a lower bound and may
+   * be increased internally so that the truncated text combined with the suffix remains meaningful.
+   *
+   * @param string   the string to clip, not {@code null}
+   * @param context  the post formatter context, not {@code null}
+   *
+   * @return  the clipped string, never {@code null}
    */
   @Override
   @SuppressWarnings("UnnecessaryUnicodeEscape")

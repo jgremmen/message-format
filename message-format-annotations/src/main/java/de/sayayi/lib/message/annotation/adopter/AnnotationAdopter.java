@@ -50,7 +50,8 @@ import static org.objectweb.asm.Type.getDescriptor;
  * </ul>
  * Annotations are detected on class-level as well as on non-synthetic methods.
  * <p>
- * Class files are analyzed with the ASM bytecode library, which means the scanned classes do not need to be on
+ * Class files are analyzed with the ASM bytecode library, which is relocated and bundled into this module's
+ * artifact (rather than being an external dependency), which means the scanned classes do not need to be on
  * the runtime classpath.
  * <p>
  * If there is a requirement to select a part of the messages provided by a class, the message support must be
@@ -59,8 +60,6 @@ import static org.objectweb.asm.Type.getDescriptor;
  * <p>
  * In addition to class-file scanning, the {@link #adopt(MessageDef)} and {@link #adopt(TemplateDef)} methods
  * inherited from {@link AbstractAnnotationAdopter} can be used to adopt synthesized or mocked annotations directly.
- * <p>
- * Using this class requires a dependency on the ASM library ({@code org.ow2.asm:asm:9.+}).
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

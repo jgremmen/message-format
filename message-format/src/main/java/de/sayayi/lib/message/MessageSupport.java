@@ -29,7 +29,6 @@ import de.sayayi.lib.message.util.MessageUtil;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.IOException;
@@ -47,9 +46,8 @@ import static java.util.Locale.forLanguageTag;
 /**
  * Central entry point for formatting messages.
  * <p>
- * A {@code MessageSupport} instance provides access to a set of published messages (identified by
- * code) and templates and allows preparing them for formatting using a fluent
- * {@link MessageConfigurer} API:
+ * A {@code MessageSupport} instance provides access to a set of published messages (identified by code) and templates
+ * and allows preparing them for formatting using a fluent {@link MessageConfigurer} API:
  * <pre>
  *   String text = messageSupport
  *       .code("welcome")
@@ -57,25 +55,30 @@ import static java.util.Locale.forLanguageTag;
  *       .locale(userLocale)
  *       .format();
  * </pre>
- * Messages can also be formatted from an inline format string using
- * {@link #message(String) message(...)}.
+ * Messages can also be formatted from an inline format string using {@link #message(String) message(...)}.
  * <p>
  * Instances are created through {@link MessageSupportFactory#create(
- * de.sayayi.lib.message.formatter.FormatterService, MessageFactory) MessageSupportFactory.create(...)}
- * or obtained via {@link MessageSupportFactory#shared() MessageSupportFactory.shared()}. The
- * factory returns a {@link ConfigurableMessageSupport} which can be
- * {@linkplain ConfigurableMessageSupport#seal() sealed} to produce an immutable
- * {@code MessageSupport}.
+ * de.sayayi.lib.message.formatter.FormatterService, MessageFactory) MessageSupportFactory.create(...)} or obtained via
+ * {@link MessageSupportFactory#shared() MessageSupportFactory.shared()}. The factory returns a
+ * {@link ConfigurableMessageSupport} which can be {@linkplain ConfigurableMessageSupport#seal() sealed} to produce a
+ * read-only {@code MessageSupport} view. The view is backed by the original configurable instance, so any later
+ * changes made through that instance remain visible via the sealed view.
  * <p>
  * This interface also defines several nested types:
  * <ul>
- *   <li>{@link MessageConfigurer} &ndash; fluent builder for configuring and formatting a
- *       message</li>
- *   <li>{@link ConfigurableMessageSupport} &ndash; mutable extension for adding messages,
- *       templates and default configuration</li>
- *   <li>{@link MessageAccessor} &ndash; read-only access to messages, templates, formatters and
- *       configuration</li>
- *   <li>{@link MessagePublisher} &ndash; interface for registering messages and templates</li>
+ *   <li>
+ *     {@link MessageConfigurer} &ndash; fluent builder for configuring and formatting a message
+ *   </li>
+ *   <li>
+ *     {@link ConfigurableMessageSupport} &ndash; mutable extension for adding messages, templates and default
+ *     configuration
+ *   </li>
+ *   <li>
+ *     {@link MessageAccessor} &ndash; read-only access to messages, templates, formatters and configuration
+ *   </li>
+ *   <li>
+ *     {@link MessagePublisher} &ndash; interface for registering messages and templates
+ *   </li>
  * </ul>
  *
  * @see MessageSupportFactory
@@ -207,14 +210,13 @@ public interface MessageSupport
 
 
     /**
-     * Returns a map with all parameters configured for this message.
+     * Returns the current parameter map configured for this message.
      * <p>
-     * The returned map is not backed by this configurer, so changes to the configurer will not reflect in the map.
+     * The returned map is backed by this configurer, so changes to the configurer will reflect in the map.
      *
-     * @return  unmodifiable parameter map, never {@code null}
+     * @return  parameter map, never {@code null}
      */
     @Contract(pure = true)
-    @Unmodifiable
     @NotNull Map<String,Object> getParameters();
 
 
