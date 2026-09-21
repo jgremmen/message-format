@@ -282,7 +282,7 @@ public final class MessageUtil
     if (length == 0 || !isLowerCase(name.codePointAt(0)) || name.charAt(length - 1) == '-')
       return false;
 
-    for(int idx = 0, cp; idx < length; idx++)
+    for(int idx = 0, cp; idx < length; idx += charCount(cp))
       if ((cp = name.codePointAt(idx)) == '-')
       {
         // we already checked that '-' cannot be the last character of the name
@@ -318,12 +318,14 @@ public final class MessageUtil
     if (length == 0 || !isLowerCase(name.codePointAt(0)))
       return false;
 
-    for(var idx = 1; idx < length; idx++)
+    for(var idx = charCount(name.codePointAt(0)); idx < length;)
     {
       final var cp = name.codePointAt(idx);
 
       if (!isLetter(cp) && !isDigit(cp))
         return false;
+
+      idx += charCount(cp);
     }
 
     return true;
@@ -367,7 +369,7 @@ public final class MessageUtil
     var hasHyphen = false;
     var hasUppercase = false;
 
-    for(int idx = 1, cp; idx < length; idx++)
+    for(int idx = charCount(name.codePointAt(0)), cp; idx < length; idx += charCount(cp))
     {
       if ((cp = name.codePointAt(idx)) == '-')
       {
