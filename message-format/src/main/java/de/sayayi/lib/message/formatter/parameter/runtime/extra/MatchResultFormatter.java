@@ -43,8 +43,9 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  *   <li>Absent &ndash; returns the entire match (group 0)</li>
  * </ul>
  * <p>
- * If the match result is a {@link Matcher} that does not match, or the specified group does not exist, empty text
- * is returned.
+ * If the match result is a {@link Matcher} without an existing match, the whole input is matched against the
+ * pattern as a fallback (without disturbing an already established match, e.g. from a prior {@code find()} call).
+ * If no match can be established this way, or the specified group does not exist, empty text is returned.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -55,13 +56,21 @@ public final class MatchResultFormatter extends AbstractSingleTypeParameterForma
    * {@inheritDoc}
    * <p>
    * Extracts a capture group from the matcher based on the {@code matcher} configuration key.
-   * Returns empty text if the matcher does not match or the group does not exist.
+   * Returns empty text if no match can be established, or the group does not exist.
    */
   @Override
   protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull MatchResult matchResult)
   {
-    if (matchResult instanceof Matcher matcher && !matcher.matches())
-      return emptyText();
+    if (matchResult instanceof Matcher matcher)
+    {
+      try {
+        //noinspection ResultOfMethodCallIgnored
+        matcher.start();
+      } catch(IllegalStateException ex) {
+        if (!matcher.matches())
+          return emptyText();
+      }
+    }
 
     return context
         .getConfigValue("matcher")
