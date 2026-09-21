@@ -952,4 +952,95 @@ class MessageBuilderTest
           .seal();
     }
   }
+
+
+
+
+  @Nested
+  @DisplayName("Builder reuse after build()")
+  class BuilderReuseTest
+  {
+    @Test
+    @DisplayName("Calling build() twice throws IllegalStateException")
+    void testBuildTwiceThrows()
+    {
+      final var builder = MessageBuilder.create().text("hello");
+
+      builder.build();
+
+      assertThrows(IllegalStateException.class, builder::build);
+    }
+
+
+    @Test
+    @DisplayName("Calling buildWithCode() after build() throws IllegalStateException")
+    void testBuildWithCodeAfterBuildThrows()
+    {
+      final var builder = MessageBuilder.create().text("hello");
+
+      builder.build();
+
+      assertThrows(IllegalStateException.class, () -> builder.buildWithCode("MSG-001"));
+    }
+
+
+    @Test
+    @DisplayName("Calling buildAsTemplate() after buildWithCode() throws IllegalStateException")
+    void testBuildAsTemplateAfterBuildWithCodeThrows()
+    {
+      final var builder = MessageBuilder.create().text("hello");
+
+      builder.buildWithCode("MSG-001");
+
+      assertThrows(IllegalStateException.class, builder::buildAsTemplate);
+    }
+
+
+    @Test
+    @DisplayName("Calling text() after build() throws IllegalStateException")
+    void testTextAfterBuildThrows()
+    {
+      final var builder = MessageBuilder.create().text("hello");
+
+      builder.build();
+
+      assertThrows(IllegalStateException.class, () -> builder.text("world"));
+    }
+
+
+    @Test
+    @DisplayName("Calling parameter() after build() throws IllegalStateException")
+    void testParameterAfterBuildThrows()
+    {
+      final var builder = MessageBuilder.create().text("hello");
+
+      builder.build();
+
+      assertThrows(IllegalStateException.class, () -> builder.parameter("name"));
+    }
+
+
+    @Test
+    @DisplayName("Calling postFormatter() after build() throws IllegalStateException")
+    void testPostFormatterAfterBuildThrows()
+    {
+      final var builder = MessageBuilder.create().text("hello");
+
+      builder.build();
+
+      assertThrows(IllegalStateException.class, () -> builder.postFormatter("upper-case"));
+    }
+
+
+    @Test
+    @DisplayName("Calling template() after build() throws IllegalStateException")
+    void testTemplateAfterBuildThrows()
+    {
+      final var builder = MessageBuilder.create().text("hello");
+
+      builder.build();
+
+      assertThrows(IllegalStateException.class, () -> builder.template("greeting"));
+    }
+  }
 }

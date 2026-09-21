@@ -70,6 +70,7 @@ public final class InternalMessageBuilder implements MessageBuilder
   private final @NotNull MessageFactory messageFactory;
   private final @NotNull List<MessagePart> parts;
   private Runnable activePartFlusher;
+  private boolean built;
 
 
   /**
@@ -89,6 +90,7 @@ public final class InternalMessageBuilder implements MessageBuilder
   @Override
   public @NotNull TextBuilder text(@NotNull String text)
   {
+    checkNotBuilt();
     flushActivePart();
 
     final var builder = new TextBuilderImpl(requireNonNull(text, "text must not be null"));
@@ -103,6 +105,7 @@ public final class InternalMessageBuilder implements MessageBuilder
   @Override
   public @NotNull ParameterBuilder parameter(@NotNull String name)
   {
+    checkNotBuilt();
     flushActivePart();
 
     final var builder = new ParameterBuilderImpl(name);
@@ -117,6 +120,7 @@ public final class InternalMessageBuilder implements MessageBuilder
   @Override
   public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
   {
+    checkNotBuilt();
     flushActivePart();
 
     final var builder = new PostFormatterBuilderImpl(name);
@@ -131,6 +135,7 @@ public final class InternalMessageBuilder implements MessageBuilder
   @Override
   public @NotNull TemplateBuilder template(@NotNull String name)
   {
+    checkNotBuilt();
     flushActivePart();
 
     final var builder = new TemplateBuilderImpl(name);
@@ -145,6 +150,9 @@ public final class InternalMessageBuilder implements MessageBuilder
   @Override
   public @NotNull Message.WithSpaces build()
   {
+    checkNotBuilt();
+    built = true;
+
     flushActivePart();
 
     if (parts.isEmpty())
@@ -195,6 +203,19 @@ public final class InternalMessageBuilder implements MessageBuilder
       activePartFlusher.run();
       activePartFlusher = null;
     }
+  }
+
+
+  /**
+   * Ensures this builder has not already been finalized by a call to {@link #build()} or
+   * {@link #buildWithCode(String)}.
+   *
+   * @throws IllegalStateException  if this builder has already been used to build a message
+   */
+  private void checkNotBuilt()
+  {
+    if (built)
+      throw new IllegalStateException("builder must not be reused after calling build() or buildWithCode()");
   }
 
 
