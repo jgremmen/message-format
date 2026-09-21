@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.internal.part.post;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.post.PostFormatterContext;
 import de.sayayi.lib.message.internal.part.config.BaseConfigAccessor;
@@ -39,25 +40,33 @@ import java.util.Optional;
  */
 final class PostFormatterContextImpl extends BaseConfigAccessor implements PostFormatterContext
 {
+  private final @NotNull Parameters parameters;
+
+
   /**
    * Creates a new post formatter context.
    *
    * @param messageAccessor  message accessor providing locale and default configuration, not {@code null}
+   * @param parameters       formatting parameters providing the current locale, not {@code null}
    * @param config           post format configuration from the message part, not {@code null}
    */
-  PostFormatterContextImpl(@NotNull MessageAccessor messageAccessor, @NotNull Config config) {
+  PostFormatterContextImpl(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters,
+                           @NotNull Config config)
+  {
     super(messageAccessor, config);
+
+    this.parameters = parameters;
   }
 
 
   /**
    * {@inheritDoc}
    *
-   * @return  the locale from the message accessor, never {@code null}
+   * @return  the locale from the current formatting parameters, never {@code null}
    */
   @Override
   public @NotNull Locale getLocale() {
-    return messageAccessor.getLocale();
+    return parameters.getLocale();
   }
 
 

@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message;
 
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
@@ -112,5 +114,26 @@ final class MessageSupportTest
     });
 
     assertEquals("answer = yes", exception.getMessage());
+  }
+
+
+  @Test
+  @DisplayName("Post formatter uses per-call locale")
+  @SuppressWarnings("UnnecessaryUnicodeEscape")
+  void testPostFormatterLocaleOverride()
+  {
+    assertEquals("I", MessageSupportFactory
+        .create(new DefaultFormatterService())
+        .setLocale(Locale.forLanguageTag("tr"))
+        .message("%(case,'i',case:upper)")
+        .locale(US)
+        .format());
+
+    assertEquals("\u0130", MessageSupportFactory
+        .create(new DefaultFormatterService())
+        .setLocale(US)
+        .message("%(case,'i',case:upper)")
+        .locale(Locale.forLanguageTag("tr"))
+        .format());
   }
 }

@@ -159,7 +159,8 @@ public final class PostFormatterPart implements MessagePart.PostFormat
         "post formatter with name '" + name + "' has not been registered");
 
     return addSpaces(
-        noSpaceText(postFormatter.format(text.getTextNotNull(), new PostFormatterContextImpl(messageAccessor, config))),
+        noSpaceText(postFormatter.format(text.getTextNotNull(),
+            new PostFormatterContextImpl(messageAccessor, parameters, config))),
         spaceBefore || text.isSpaceBefore(),
         spaceAfter || text.isSpaceAfter());
   }
