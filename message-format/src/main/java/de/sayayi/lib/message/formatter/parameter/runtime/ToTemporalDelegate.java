@@ -55,7 +55,7 @@ public final class ToTemporalDelegate implements ParameterFormatter
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {
-    context.updateClassifiers(CLASSIFIER_TEMPORAL);
+    context.addClassifier(CLASSIFIER_TEMPORAL);
 
     return true;
   }
