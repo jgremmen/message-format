@@ -169,17 +169,25 @@ public final class TemplatePart implements MessagePart.Template
   @Override
   public boolean equals(Object o)
   {
-    return o instanceof Template that &&
-        spaceBefore == that.isSpaceBefore() &&
-        spaceAfter == that.isSpaceAfter() &&
-        name.equals(that.getName());
+    return o instanceof TemplatePart that &&
+        spaceBefore == that.spaceBefore &&
+        spaceAfter == that.spaceAfter &&
+        name.equals(that.name) &&
+        defaultParameterMap.equals(that.defaultParameterMap) &&
+        parameterDelegateMap.equals(that.parameterDelegateMap);
   }
 
 
   /** {@inheritDoc} */
   @Override
-  public int hashCode() {
-    return name.hashCode() * 11 + (spaceBefore ? 8 : 0) + (spaceAfter ? 2 : 0);
+  public int hashCode()
+  {
+    var hash = (spaceBefore ? 2 : 0) + (spaceAfter ? 1 : 0);
+
+    hash = hash * 31 + defaultParameterMap.hashCode();
+    hash = hash * 31 + parameterDelegateMap.hashCode();
+
+    return hash * 31 + name.hashCode();
   }
 
 
@@ -332,10 +340,8 @@ public final class TemplatePart implements MessagePart.Template
     public Object getParameterValue(@NotNull String parameter)
     {
       var delegatedParameter = parameterDelegateMap.get(parameter);
-      if (delegatedParameter != null)
-        parameter = delegatedParameter;
 
-      var value = parameters.getParameterValue(parameter);
+      var value = parameters.getParameterValue(delegatedParameter != null ? delegatedParameter : parameter);
       if (value == null)
       {
         var templateConfigValue = defaultParameterMap.get(parameter);

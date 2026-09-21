@@ -343,7 +343,7 @@ final class MessageCompilerTest
     assertArrayEquals(
         new MessagePart[] { new TemplatePart("pq", false, true,
             Map.of(), Map.of("a", "b", "c", "d")) },
-        COMPILER.compileMessage("%[pq,a='b',c='d'] ").getMessageParts());
+        COMPILER.compileMessage("%[pq,a->b,c->d] ").getMessageParts());
 
     var mpe = assertThrowsExactly(
         MessageParserException.class,
