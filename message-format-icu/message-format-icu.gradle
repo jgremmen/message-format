@@ -55,6 +55,13 @@ javadoc {
 }
 
 
+publishOnCentral {
+  projectDescription =
+      'ICU4J-based formatter extension for the Message Format library, providing locale-sensitive plural, select, ' +
+      'number, date and person name formatting.'
+}
+
+
 publishing {
   publications {
     withType(MavenPublication).configureEach {

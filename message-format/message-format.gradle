@@ -151,7 +151,9 @@ javadoc {
 
 
 publishOnCentral {
-  projectDescription = 'Highly configurable message format library supporting message definition through annotations'
+  projectDescription =
+      'Java library for producing human-readable, parameterized and locale-aware messages, with pluggable ' +
+      'formatters and reusable templates.'
 }
 
 

@@ -59,6 +59,13 @@ javadoc {
 }
 
 
+publishOnCentral {
+  projectDescription =
+      'Log4j integration for the Message Format library, providing a MessageFactory that lets log messages be ' +
+      'written using the message-format syntax.'
+}
+
+
 publishing {
   publications {
     withType(MavenPublication).configureEach {

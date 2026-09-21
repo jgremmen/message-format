@@ -84,12 +84,20 @@ gradlePlugin {
     messageFormat {
       id = 'de.sayayi.plugin.gradle.message'
       displayName = 'Message Format Gradle Plugin'
-      description = 'Gradle Plugin to scan the class path, pre-compile and pack message and ' +
-                    'template formats into a single file.'
+      description =
+          'Gradle plugin for the Message Format library that scans compiled classes for message and template ' +
+          'annotations at build time and packs them into a single message pack file.'
       implementationClass = 'de.sayayi.plugin.gradle.message.MessageFormatPlugin'
       tags.set([ 'sayayi', 'message-format', 'scan', 'pre-compile' ])
     }
   }
+}
+
+
+publishOnCentral {
+  projectDescription =
+      'Gradle plugin for the Message Format library that scans compiled classes for message and template ' +
+      'annotations at build time and packs them into a single message pack file.'
 }
 
 

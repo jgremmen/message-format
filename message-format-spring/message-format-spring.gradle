@@ -64,6 +64,13 @@ javadoc {
 }
 
 
+publishOnCentral {
+  projectDescription =
+      'Spring Framework integration for the Message Format library, providing a MessageSource implementation and ' +
+      'a formatter for Spring Expression Language (SpEL) parameters.'
+}
+
+
 publishing {
   publications {
     withType(MavenPublication).configureEach {

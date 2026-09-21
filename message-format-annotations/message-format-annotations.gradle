@@ -186,6 +186,13 @@ javadoc {
 }
 
 
+publishOnCentral {
+  projectDescription =
+      'Annotation-based extension for the Message Format library, allowing messages and templates to be declared ' +
+      'directly in Java source code.'
+}
+
+
 publishing {
   publications {
     withType(MavenPublication).configureEach {
