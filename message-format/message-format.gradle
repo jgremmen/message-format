@@ -61,7 +61,9 @@ dependencies {
   annotationProcessor libs.lombok
 
   implementation libs.bundles.antlr4.runtime
-  implementation libs.pack
+  implementation(libs.pack) {
+    exclude group: 'org.apache.tika'
+  }
 
   // test
   testImplementation libs.spring.core

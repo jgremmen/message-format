@@ -73,7 +73,6 @@ module de.sayayi.lib.message
 
   requires static java.xml;
   requires static lombok;
-  requires static org.apache.tika.core;
   requires static org.jetbrains.annotations;
 
   exports de.sayayi.lib.message;
@@ -92,6 +91,7 @@ module de.sayayi.lib.message
   exports de.sayayi.lib.message.template;
   exports de.sayayi.lib.message.util;
 
+  // service provider interfaces
   uses de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
   uses de.sayayi.lib.message.formatter.post.PostFormatter;
   uses de.sayayi.lib.message.template.NamedTemplate;

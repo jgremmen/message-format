@@ -30,7 +30,6 @@ import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
-import de.sayayi.lib.pack.PackConfig;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -64,17 +63,6 @@ public final class PackSupport
 {
   /** Current pack format version. */
   public static final int VERSION = 4;
-
-  /** MIME type used to identify message format pack data. */
-  public static final String MIME_TYPE = "application/x-message-format-pack";
-
-  /** Default pack configuration with magic bytes, version range and compression support. */
-  public static final PackConfig PACK_CONFIG = new PackConfig
-      .Builder()
-      .withMagic("%{msg}")
-      .withVersionRange(1, 100)
-      .withCompressionSupport(true)
-      .build();
 
   /** Type identifier for boolean map keys. */
   public static final int MAP_KEY_BOOL_ID = 0;
