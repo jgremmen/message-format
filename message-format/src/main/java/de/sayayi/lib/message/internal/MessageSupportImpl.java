@@ -45,8 +45,8 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import static de.sayayi.lib.message.PackConstants.PACK_CONFIG;
 import static de.sayayi.lib.message.internal.pack.PackSupport.VERSION;
+import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
 import static de.sayayi.lib.message.util.MessageUtil.*;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;

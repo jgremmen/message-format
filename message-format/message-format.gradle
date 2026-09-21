@@ -34,6 +34,12 @@ plugins {
 description = 'Message Format Library'
 
 
+sourceSets {
+  tika3
+  tika4
+}
+
+
 configurations {
   antlr4 {
     canBeConsumed = false
@@ -68,6 +74,20 @@ dependencies {
   // test
   testImplementation libs.spring.core
 
+  // tika
+  tika3CompileOnly sourceSets.main.output
+  tika3CompileOnly(libs.pack) {
+    exclude group: 'org.apache.tika'
+  }
+  tika3CompileOnly libs.tika3.core
+
+  tika4CompileOnly sourceSets.main.output
+  tika4CompileOnly(libs.pack) {
+    exclude group: 'org.apache.tika'
+  }
+  tika4CompileOnly libs.tika4.core
+
+  // antlr
   antlr4 libs.antlr4
 }
 
@@ -114,6 +134,9 @@ tasks.named('sourcesJar') {
 
 
 tasks.named('jar') {
+  from sourceSets.tika3.output
+  from sourceSets.tika4.output
+
   manifest {
     attributes['Implementation-Title'] = project.description
   }
@@ -121,6 +144,12 @@ tasks.named('jar') {
 
 
 javadoc {
+  source += sourceSets.tika3.allJava
+  source += sourceSets.tika4.allJava
+
+  classpath += sourceSets.tika3.compileClasspath
+  classpath += sourceSets.tika4.compileClasspath
+
   (options as StandardJavadocDocletOptions).with {
     group('Core', [
         'de.sayayi.lib.message',
@@ -147,6 +176,12 @@ javadoc {
         "https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/${resolveVersion('antlr4-runtime-ext')}/",
         "${rootDir}/gradle/javadocs/antlr4-runtime-ext")
   }
+}
+
+
+tasks.named('sourcesJar') {
+  from sourceSets.tika3.allJava
+  from sourceSets.tika4.allJava
 }
 
 

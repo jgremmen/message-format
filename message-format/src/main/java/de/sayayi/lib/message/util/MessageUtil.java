@@ -35,8 +35,8 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static de.sayayi.lib.message.PackConstants.MIME_TYPE;
-import static de.sayayi.lib.message.PackConstants.PACK_CONFIG;
+import static de.sayayi.lib.message.pack.PackConstants.MIME_TYPE;
+import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
 import static java.lang.Character.*;
 import static java.util.Objects.requireNonNull;
 

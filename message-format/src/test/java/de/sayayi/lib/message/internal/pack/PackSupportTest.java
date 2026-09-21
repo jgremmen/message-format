@@ -27,7 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
-import static de.sayayi.lib.message.PackConstants.PACK_CONFIG;
+import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 

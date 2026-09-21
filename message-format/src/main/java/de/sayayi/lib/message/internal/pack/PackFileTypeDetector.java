@@ -15,11 +15,11 @@
  */
 package de.sayayi.lib.message.internal.pack;
 
-import de.sayayi.lib.message.PackConstants;
+import de.sayayi.lib.message.pack.PackConstants;
 import de.sayayi.lib.pack.detector.AbstractFileTypeDetector;
 
-import static de.sayayi.lib.message.PackConstants.MIME_TYPE;
-import static de.sayayi.lib.message.PackConstants.PACK_CONFIG;
+import static de.sayayi.lib.message.pack.PackConstants.MIME_TYPE;
+import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
 
 
 /**

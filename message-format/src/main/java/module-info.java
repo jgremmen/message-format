@@ -86,6 +86,7 @@ module de.sayayi.lib.message
   exports de.sayayi.lib.message.formatter.parameter.runtime.extra;
   exports de.sayayi.lib.message.formatter.post;
   exports de.sayayi.lib.message.formatter.post.runtime;
+  exports de.sayayi.lib.message.pack;
   exports de.sayayi.lib.message.part;
   exports de.sayayi.lib.message.part.normalizer;
   exports de.sayayi.lib.message.template;

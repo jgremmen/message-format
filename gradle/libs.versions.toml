@@ -15,6 +15,8 @@ pack = '[0.1.2,0.4)'
 publish-on-central = '9.2.11'
 spring = '[6.0.8,7.1)'
 test-logger = '4.0.0'
+tika3 = '[1.19,4.0)'
+tika4 = '[4.0,5.0)'
 
 [libraries]
 antlr4 = { module = 'org.antlr:antlr4', version.ref = "antlr4" }
@@ -35,6 +37,8 @@ mockito-core = { module = 'org.mockito:mockito-core', version.ref = 'mockito' }
 pack = { module = 'de.sayayi.lib:pack', version.ref = 'pack' }
 spring-core = { module = 'org.springframework:spring-core', version.ref = 'spring' }
 spring-context = { module = 'org.springframework:spring-context', version.ref = 'spring' }
+tika3-core = { group = 'org.apache.tika', name = 'tika-core', version.ref = 'tika3' }
+tika4-core = { group = 'org.apache.tika', name = 'tika-core', version.ref = 'tika4' }
 
 [bundles]
 antlr4-runtime = [ 'antlr4-runtime', 'antlr4-ext-runtime' ]
