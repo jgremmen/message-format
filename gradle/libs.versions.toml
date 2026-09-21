@@ -1,6 +1,6 @@
 [versions]
 # message format version
-message-format = '0.24.1-SNAPSHOT'
+message-format = '0.25.0-SNAPSHOT'
 
 antlr4 = '[4.13.0,4.14)'
 asm = '[9.10,10)'
@@ -12,7 +12,7 @@ log4j = '[2.0,3.0)'
 lombok = '1.18.+'
 mockito = '5.23.+'
 pack = '[0.1.2,0.4)'
-publish-on-central = '9.2.8'
+publish-on-central = '9.2.11'
 spring = '[6.0.8,7.1)'
 test-logger = '4.0.0'
 

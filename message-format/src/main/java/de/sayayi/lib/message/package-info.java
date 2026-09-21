@@ -30,6 +30,8 @@
  *       {@code MessageSupport} instances</li>
  *   <li>{@link de.sayayi.lib.message.MessageBuilder MessageBuilder} – fluent builder for constructing and formatting
  *       messages with named parameters</li>
+ *   <li>{@link de.sayayi.lib.message.PackConstants PackConstants} – shared constants describing the packed (binary)
+ *       representation of messages and templates</li>
  * </ul>
  *
  * @author Jeroen Gremmen

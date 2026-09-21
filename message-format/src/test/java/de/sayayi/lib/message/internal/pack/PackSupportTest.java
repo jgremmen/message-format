@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
+import static de.sayayi.lib.message.PackConstants.PACK_CONFIG;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -66,14 +67,14 @@ final class PackSupportTest
 
     final var byteStream = new ByteArrayOutputStream();
 
-    try(var packStream = new PackOutputStream(PackSupport.PACK_CONFIG, false, byteStream)) {
+    try(var packStream = new PackOutputStream(PACK_CONFIG, false, byteStream)) {
       for(var number: numbers)
         PackSupport.packLongVar(number, packStream);
     }
 
-    var packed = byteStream.toByteArray();
+    final var packed = byteStream.toByteArray();
 
-    try(var packStream = new PackInputStream(PackSupport.PACK_CONFIG, new ByteArrayInputStream(packed))) {
+    try(var packStream = new PackInputStream(PACK_CONFIG, new ByteArrayInputStream(packed))) {
       for(var number: numbers)
         assertEquals(number, PackSupport.unpackLongVar(packStream));
     }
