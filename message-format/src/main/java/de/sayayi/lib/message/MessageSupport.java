@@ -599,7 +599,7 @@ public interface MessageSupport
      *
      * @return  configurable message support instance, never {@code null}
      *
-     * @throws DuplicateMessageException  in case a message with the same code already exists
+     * @throws DuplicateMessageException  if a message with the same code already exists and has different content
      */
     @Contract(value = "_, _ -> this", mutates = "this")
     default @NotNull ConfigurableMessageSupport addMessage(@NotNull String code,
@@ -1029,12 +1029,16 @@ public interface MessageSupport
   {
     /**
      * Adds a message with code to this publisher.
+     * <p>
+     * If a message with the same code already exists and has identical content, the new message is
+     * silently ignored.
      *
      * @param message  message with code, not {@code null}
      *
      * @return  this message publisher instance, never {@code null}
      *
-     * @throws DuplicateMessageException  in case a message with the same code already exists
+     * @throws DuplicateMessageException  if a message with the same code already exists and has
+     *                                    different content
      */
     @Contract(value = "_ -> this", mutates = "this")
     @NotNull MessagePublisher addMessage(@NotNull Message.WithCode message);
@@ -1042,6 +1046,9 @@ public interface MessageSupport
 
     /**
      * Adds a template identified by {@code name} to this publisher.
+     * <p>
+     * If a template with the same name already exists and has identical content, the new template
+     * is silently ignored.
      *
      * @param name      template name in kebab-case, not {@code null}
      * @param template  template message, not {@code null}
@@ -1049,7 +1056,8 @@ public interface MessageSupport
      * @return  this message publisher instance, never {@code null}
      *
      * @throws IllegalArgumentException   if {@code name} does not follow the kebab-case naming convention
-     * @throws DuplicateTemplateException  in case a template with the same name already exists
+     * @throws DuplicateTemplateException  if a template with the same name already exists and has
+     *                                     different content
      */
     @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull MessagePublisher addTemplate(@NotNull String name, @NotNull Template template);
