@@ -54,7 +54,7 @@ public final class SupplierDelegate<T> implements Supplier<T>
 {
   private volatile Lock lock = new ReentrantLock();
   private volatile Supplier<T> supplier;
-  private T value;
+  private volatile T value;
 
 
   private SupplierDelegate(@NotNull Supplier<T> supplier) {
