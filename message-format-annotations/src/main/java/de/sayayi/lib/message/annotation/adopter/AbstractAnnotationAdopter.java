@@ -272,8 +272,13 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   /**
    * Record a classpath name as visited, returning {@code true} if it was not already known.
    */
-  private boolean scan_checkVisited(@NotNull String classPathName) {
-    return indexedClasses.add(classPathName);
+  private boolean scan_checkVisited(@NotNull String classPathName)
+  {
+    var visitedClassKey = classPathName.replace('\\', '/');
+    if (visitedClassKey.endsWith(".class"))
+      visitedClassKey = visitedClassKey.substring(0, visitedClassKey.length() - 6);
+
+    return indexedClasses.add(visitedClassKey.replace('/', '.'));
   }
 
 
@@ -294,12 +299,13 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull Path classFile)
   {
     final var classPath = classFile.toAbsolutePath();
+    final var visitedClassKey = classPath.toString();
 
-    if (!indexedClasses.contains(classPath.toString()))
+    if (!indexedClasses.contains(visitedClassKey))
     {
       try(var inputStream = newInputStream(classPath)) {
         parseClass(inputStream);
-        indexedClasses.add(classPath.toString());
+        indexedClasses.add(visitedClassKey);
       } catch(Exception ex) {
         throw new MessageAdopterException("failed to adopt messages and templates from class file " + classFile, ex);
       }

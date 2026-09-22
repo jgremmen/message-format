@@ -140,6 +140,23 @@ class AnnotationAdopterTest
 
 
   @Test
+  @DisplayName("avoid duplicate visit across adopt(Class<?>) and adopt(ClassLoader, Set<String>)")
+  void testAvoidDuplicateVisitAcrossEntryPoints()
+  {
+    val cms = newMessageSupport();
+    val adopter = new AnnotationAdopter(cms);
+
+    adopter.adopt(AnnotationsFixture.class);
+    adopter.adopt(
+        AnnotationsFixture.class.getClassLoader(),
+        Set.of(AnnotationsFixture.class.getPackageName()));
+
+    verifyFixture(cms.getMessageAccessor());
+    verifyInnerRecordFixture(cms.getMessageAccessor());
+  }
+
+
+  @Test
   @DisplayName("adopt(MessageDef)")
   @SuppressWarnings("ExtractMethodRecommender")
   void testAdoptMessageDef()
