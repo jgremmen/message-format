@@ -25,6 +25,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
+import static java.util.Objects.requireNonNull;
+
 
 /**
  * Message adopter that reads messages and templates from {@link Properties} objects. Property keys are used as
@@ -73,7 +75,7 @@ public class PropertiesAdopter extends AbstractMessageAdopter
    */
   public void adopt(@NotNull Properties properties)
   {
-    properties.forEach((code,message) ->
+    requireNonNull(properties, "properties must not be null").forEach((code,message) ->
         messagePublisher.addMessage(messageFactory.parseMessage(code.toString(), message.toString())));
   }
 
@@ -89,7 +91,7 @@ public class PropertiesAdopter extends AbstractMessageAdopter
    */
   public void adoptTemplates(@NotNull Properties properties)
   {
-    properties.forEach((code,message) ->
+    requireNonNull(properties, "properties must not be null").forEach((code,message) ->
         messagePublisher.addTemplate(code.toString(), messageFactory.parseTemplate(message.toString())));
   }
 
@@ -109,7 +111,7 @@ public class PropertiesAdopter extends AbstractMessageAdopter
   {
     final var localizedMessagesByCode = new HashMap<String,Map<Locale,String>>();
 
-    for(var entry: properties.entrySet())
+    for(var entry: requireNonNull(properties, "properties must not be null").entrySet())
     {
       final var locale = entry.getKey();
 
