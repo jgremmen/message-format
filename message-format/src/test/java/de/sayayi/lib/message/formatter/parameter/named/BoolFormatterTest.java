@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter.parameter.named;
 
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.part.map.key.MapKeyBool;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
@@ -111,9 +110,7 @@ final class BoolFormatterTest extends AbstractFormatterTest
   @Test
   void testConfigKeyNull()
   {
-    val messageSupport = MessageSupportFactory
-        .create(DefaultFormatterService.getSharedInstance());
-
+    val messageSupport = MessageSupportFactory.createDefault();
     val message = messageSupport
         .message("%{b,empty:empty,!empty:'not empty',null:null,!null:'not null'}");
 
@@ -136,8 +133,7 @@ final class BoolFormatterTest extends AbstractFormatterTest
   @Test
   void testConfigKeyEmpty()
   {
-    val messageSupport = MessageSupportFactory
-        .create(DefaultFormatterService.getSharedInstance());
+    val messageSupport = MessageSupportFactory.createDefault();
 
     assertEquals("not empty", messageSupport
         .message("%{b,empty:empty,!empty:'not empty',null:null}")
@@ -159,9 +155,7 @@ final class BoolFormatterTest extends AbstractFormatterTest
   @Test
   void testConfigKeyBool()
   {
-    val messageSupport = MessageSupportFactory
-        .create(DefaultFormatterService.getSharedInstance());
-
+    val messageSupport = MessageSupportFactory.createDefault();
     var message = messageSupport.message("%{b,true:true,false:false}");
 
     assertEquals("true", message
@@ -244,9 +238,7 @@ final class BoolFormatterTest extends AbstractFormatterTest
   @Test
   void testConfigKeyString()
   {
-    val messageSupport = MessageSupportFactory
-        .create(DefaultFormatterService.getSharedInstance());
-
+    val messageSupport = MessageSupportFactory.createDefault();
     val message = messageSupport.message("%{b,format:bool,'false':false,'True':'True'}");
 
     assertEquals("true", message.with("b", TRUE).format());

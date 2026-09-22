@@ -3,7 +3,6 @@ package de.sayayi.lib.message.internal.pack;
 import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.formatter.GenericFormatterService;
 import lombok.val;
 import org.junit.jupiter.api.*;
 
@@ -36,7 +35,7 @@ final class MessageSupportPackTest
   @BeforeAll
   static void initMessageSupport()
   {
-    var cms = MessageSupportFactory.create(new GenericFormatterService());
+    var cms = MessageSupportFactory.createGeneric();
     var messageFactory = cms.getMessageAccessor().getMessageFactory();
 
     cms.addMessage("MSG-001", "");
@@ -63,10 +62,10 @@ final class MessageSupportPackTest
 
     messageSupport.exportMessages(pack);
 
-    val messageSupportCloned = MessageSupportFactory.create(new GenericFormatterService());
+    val messageSupportCloned = MessageSupportFactory.createGeneric();
 
-    try(val inStream = new ByteArrayInputStream(pack.toByteArray())) {
-      messageSupportCloned.importMessages(inStream);
+    try(val packStream = new ByteArrayInputStream(pack.toByteArray())) {
+      messageSupportCloned.importMessages(packStream);
     }
 
     val messageAccessor = messageSupport.getMessageAccessor();
@@ -88,7 +87,7 @@ final class MessageSupportPackTest
   @DisplayName("Pack/unpack localized bundle with default locale entry")
   void testExportImportDefaultLocaleMessage() throws IOException
   {
-    var cms = MessageSupportFactory.create(new GenericFormatterService());
+    var cms = MessageSupportFactory.createGeneric();
     var localizedMessages = new LinkedHashMap<Locale,String>();
 
     localizedMessages.put(ROOT, "Default");
@@ -99,7 +98,7 @@ final class MessageSupportPackTest
     val pack = new ByteArrayOutputStream();
     cms.exportMessages(pack);
 
-    val imported = MessageSupportFactory.create(new GenericFormatterService());
+    val imported = MessageSupportFactory.createGeneric();
     try(val packStream = new ByteArrayInputStream(pack.toByteArray())) {
       imported.importMessages(packStream);
     }

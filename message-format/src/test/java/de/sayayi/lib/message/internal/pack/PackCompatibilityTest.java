@@ -85,7 +85,7 @@ final class PackCompatibilityTest
       throws IOException
   {
     var messagePackPath = Path.of("src/test/resources/messages-" + libraryVersion + ".mfp");
-    var cms = MessageSupportFactory.create(new DefaultFormatterService());
+    var cms = MessageSupportFactory.createDefault();
 
     // mime type
     var mimeType = parseMimeType(probeContentType(messagePackPath));

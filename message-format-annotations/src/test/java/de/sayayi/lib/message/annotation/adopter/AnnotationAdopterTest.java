@@ -25,7 +25,6 @@ import de.sayayi.lib.message.annotation.adopter.fixture.AnnotationsFixture;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticMessageDef;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticTemplateDef;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticText;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.MessageTemplate;
 import lombok.val;
 import org.jetbrains.annotations.Contract;
@@ -230,7 +229,7 @@ class AnnotationAdopterTest
 
   @Contract(pure = true)
   private static @NotNull ConfigurableMessageSupport newMessageSupport() {
-    return MessageSupportFactory.create(DefaultFormatterService.getSharedInstance());
+    return MessageSupportFactory.createDefault();
   }
 
 

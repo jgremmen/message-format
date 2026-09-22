@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter.post.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +44,7 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
   void testClipNoEllipsis()
   {
     val messageSupport = MessageSupportFactory
-        .create(new DefaultFormatterService())
+        .createDefault()
         .setDefaultConfig("clip-suffix", false)
         .setLocale(GERMANY);
 
@@ -104,8 +103,7 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
   @DisplayName("Clip size")
   void testClipSize()
   {
-    val messageSupport = MessageSupportFactory
-        .create(new DefaultFormatterService());
+    val messageSupport = MessageSupportFactory.createDefault();
 
     assertEquals(
         TEXT.substring(0, 63) + "\u2026",
@@ -149,7 +147,7 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
   void testClipEllipsis()
   {
     val messageSupport = MessageSupportFactory
-        .create(new DefaultFormatterService())
+        .createDefault()
         .setLocale(GERMANY);
 
     assertEquals(
@@ -173,7 +171,7 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
   void testClipCustomSuffix()
   {
     val messageSupport = MessageSupportFactory
-        .create(new DefaultFormatterService())
+        .createDefault()
         .setLocale(GERMANY);
 
     assertEquals(

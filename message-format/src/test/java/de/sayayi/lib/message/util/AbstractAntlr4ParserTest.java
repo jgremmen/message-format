@@ -17,7 +17,6 @@ package de.sayayi.lib.message.util;
 
 import de.sayayi.lib.antlr4.syntax.SyntaxErrorException;
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,8 +37,7 @@ class AbstractAntlr4ParserTest
   @BeforeEach
   public void init()
   {
-    var messageSupport = MessageSupportFactory
-        .create(DefaultFormatterService.getSharedInstance());
+    var messageSupport = MessageSupportFactory.createDefault();
 
     messageSupport.addMessage("div-by-0", "division by zero: %{left} / 0");
 

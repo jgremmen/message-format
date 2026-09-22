@@ -16,8 +16,6 @@
 package de.sayayi.lib.message.formatter.parameter.named;
 
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
-import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +49,7 @@ final class StringFormatterTest extends AbstractFormatterTest
   public void testFormat()
   {
     val messageAccessor = MessageSupportFactory
-        .create(new GenericFormatterService())
+        .createGeneric()
         .getMessageAccessor();
 
     assertEquals(noSpaceText("text"), format(messageAccessor, " text "));
@@ -68,8 +66,7 @@ final class StringFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatter()
   {
-    val messageSupport = MessageSupportFactory
-        .create(new GenericFormatterService());
+    val messageSupport = MessageSupportFactory.createGeneric();
 
     assertEquals("This is a test 1234", messageSupport
         .message("This is %{a} %{b} %{c}")
@@ -83,7 +80,7 @@ final class StringFormatterTest extends AbstractFormatterTest
   @Test
   public void testFormatterWithMap()
   {
-    val messageSupport = MessageSupportFactory.create(new GenericFormatterService());
+    val messageSupport = MessageSupportFactory.createGeneric();
     val parameters = new HashMap<String,Object>();
 
     parameters.put("empty", "");
@@ -113,7 +110,7 @@ final class StringFormatterTest extends AbstractFormatterTest
   @Test
   void testMapKey()
   {
-    val messageSupport = MessageSupportFactory.create(new DefaultFormatterService());
+    val messageSupport = MessageSupportFactory.shared();
 
     assertEquals("exact", messageSupport
         .message("%{text,format:choice,'Süd':'exact'}")
@@ -130,7 +127,7 @@ final class StringFormatterTest extends AbstractFormatterTest
   @Test
   void testDefaultToString()
   {
-    val messageSupport = MessageSupportFactory.create(new DefaultFormatterService());
+    val messageSupport = MessageSupportFactory.createDefault();
     messageSupport.addMessage("OBJ", "%{object}");
 
     val object = new Object();

@@ -17,7 +17,6 @@ package de.sayayi.plugin.gradle.message;
 
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.formatter.GenericFormatterService;
 import lombok.val;
 import org.gradle.testkit.runner.GradleRunner;
 import org.jetbrains.annotations.Contract;
@@ -249,7 +248,7 @@ final class PluginTest
   private @NotNull MessageAccessor readMessagePack(@NotNull File pack) throws IOException
   {
     return MessageSupportFactory
-        .create(new GenericFormatterService())
+        .createGeneric()
         .importMessages(newInputStream(pack.toPath()))
         .getMessageAccessor();
   }

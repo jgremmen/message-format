@@ -23,7 +23,6 @@ import de.sayayi.lib.message.annotation.adopter.AnnotationAdopter;
 import de.sayayi.lib.message.annotation.adopter.asm.ClassReader;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
-import de.sayayi.lib.message.formatter.GenericFormatterService;
 import groovy.lang.GString;
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
@@ -285,7 +284,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   @TaskAction
   public void pack()
   {
-    final var messageSupport = MessageSupportFactory.create(new GenericFormatterService());
+    final var messageSupport = MessageSupportFactory.createGeneric();
 
     configureDuplicatesStrategy(messageSupport);
 

@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.spring;
 
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import lombok.val;
 import org.junit.jupiter.api.*;
 import org.springframework.context.MessageSource;
@@ -44,8 +43,7 @@ final class MessageSupportMessageSourceTest
   @BeforeEach
   void init()
   {
-    val messageSupport = MessageSupportFactory
-        .create(DefaultFormatterService.getSharedInstance());
+    val messageSupport = MessageSupportFactory.createDefault();
 
     messageSupport.addMessage("spring.message.1",
         "you have %{p1,format:choice,1:'a single result',:'%{p1} results'}");
