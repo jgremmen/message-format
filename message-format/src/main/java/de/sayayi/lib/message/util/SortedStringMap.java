@@ -247,6 +247,9 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
   @SuppressWarnings("unchecked")
   public V remove(Object key)
   {
+    if (sealed)
+      throw new UnsupportedOperationException("remove");
+
     V result = null;
 
     if (key instanceof String string)
@@ -254,9 +257,6 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
       final var idx = findKeyIndex(string);
       if (idx >= 0)
       {
-        if (sealed)
-          throw new UnsupportedOperationException("remove");
-
         final var offset = idx * 2;
 
         result = (V)kv[offset + 1];
