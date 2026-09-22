@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static de.sayayi.lib.message.util.MessageUtil.findEnumValue;
 import static de.sayayi.lib.message.util.MessageUtil.isMessageFormatPack;
@@ -75,8 +76,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
   private final MessageFormatMessagesExtension messages;
   private final MessageFormatTemplatesExtension templates;
   private final List<Action<@NotNull MessageAccessor>> actionList = new ArrayList<>();
-
-  private final ThreadLocal<String> currentClassName = new ThreadLocal<>();
+  private final AtomicReference<String> currentClassName = new AtomicReference<>();
 
 
   /**
@@ -302,8 +302,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
     logger.info("Scanning classes for messages and templates");
 
     try {
-      var adopter = new AnnotationAdopter(messageSupport);
-      var trace = logger.isTraceEnabled();
+      final var adopter = new AnnotationAdopter(messageSupport);
+      final var trace = logger.isTraceEnabled();
 
       getSources()
           .getAsFileTree()
@@ -324,6 +324,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
           });
     } catch(Exception ex) {
       throw new GradleException("Failed to scan messages", ex);
+    } finally {
+      currentClassName.set(null);
     }
   }
 
@@ -385,7 +387,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void pack_write(@NotNull MessageSupport messageSupport)
   {
-    var packFile = getPackFile().getAsFile().toPath();
+    final var packFile = getPackFile().getAsFile().toPath();
     getLogger().info("Writing message pack: {}", packFile);
 
     try {
@@ -401,10 +403,12 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  @Contract(pure = true)
   private boolean messageCodeFilter(@NotNull String code)
   {
-    var includeRegexFilters = messages.getIncludeRegexFilters();
-    var excludeRegexFilters = messages.getExcludeRegexFilters();
+    final var includeRegexFilters = messages.getIncludeRegexFilters();
+    final var excludeRegexFilters = messages.getExcludeRegexFilters();
+
     var match = includeRegexFilters.isEmpty();
 
     if (!match)
@@ -431,25 +435,11 @@ public abstract class MessageFormatPackTask extends DefaultTask
   {
     switch(configureDuplicatesStrategy_toEnum())
     {
-      case FAIL:
-        configureDuplicateFailStrategy(messageSupport);
-        break;
-
-      case OVERRIDE:
-        configureDuplicateOverrideStrategy(messageSupport, false);
-        break;
-
-      case OVERRIDE_AND_WARN:
-        configureDuplicateOverrideStrategy(messageSupport, true);
-        break;
-
-      case IGNORE:
-        configureDuplicateIgnoreStrategy(messageSupport, false);
-        break;
-
-      case IGNORE_AND_WARN:
-        configureDuplicateIgnoreStrategy(messageSupport, true);
-        break;
+      case FAIL -> configureDuplicateFailStrategy(messageSupport);
+      case OVERRIDE -> configureDuplicateOverrideStrategy(messageSupport, false);
+      case OVERRIDE_AND_WARN -> configureDuplicateOverrideStrategy(messageSupport, true);
+      case IGNORE -> configureDuplicateIgnoreStrategy(messageSupport, false);
+      case IGNORE_AND_WARN -> configureDuplicateIgnoreStrategy(messageSupport, true);
     }
   }
 
@@ -478,7 +468,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void configureDuplicateFailStrategy(@NotNull ConfigurableMessageSupport messageSupport)
   {
-    var messageAccessor = messageSupport.getMessageAccessor();
+    final var messageAccessor = messageSupport.getMessageAccessor();
 
     messageSupport.setMessageFilter(message -> {
       var code = message.getCode();
@@ -504,10 +494,10 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private void configureDuplicateIgnoreStrategy(@NotNull ConfigurableMessageSupport messageSupport, boolean warn)
   {
-    var messageAccessor = messageSupport.getMessageAccessor();
+    final var messageAccessor = messageSupport.getMessageAccessor();
 
     messageSupport.setMessageFilter(message -> {
-      var code = message.getCode();
+      final var code = message.getCode();
 
       if (!messageAccessor.hasMessageWithCode(code))
         return true;
@@ -533,7 +523,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
     var messageAccessor = messageSupport.getMessageAccessor();
 
     messageSupport.setMessageFilter(message -> {
-      var code = message.getCode();
+      final var code = message.getCode();
 
       if (warn && messageAccessor.hasMessageWithCode(code))
       {
@@ -562,7 +552,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private @NotNull String logDuplicateMessage(@NotNull LogLevel level, @NotNull String code)
   {
-    var msg = "Duplicate message code '" + code + "' in class " + currentClassName.get();
+    final var msg = "Duplicate message code '" + code + "' in class " + currentClassName.get();
 
     getLogger().log(level, msg);
 
@@ -572,7 +562,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
   private @NotNull String logDuplicateTemplate(@NotNull LogLevel level, @NotNull String name)
   {
-    var msg = "Duplicate template name '" + name + "' in class " + currentClassName.get();
+    final var msg = "Duplicate template name '" + name + "' in class " + currentClassName.get();
 
     getLogger().log(level, msg);
 
