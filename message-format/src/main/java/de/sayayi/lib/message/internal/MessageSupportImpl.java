@@ -188,8 +188,8 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     if (!isKebabCaseName(validateName(name, "template name")))
       throw new IllegalArgumentException("template name '" + name + "' must match the kebab-case naming convention");
 
-    if (templateFilter.filter(name, template))
-      templates.put(name, requireNonNull(template));
+    if (templateFilter.filter(name, requireNonNull(template)))
+      templates.put(name, template);
 
     return this;
   }
@@ -201,10 +201,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   {
     ServiceLoader
         .load(NamedTemplate.class, classLoader)
-        .forEach(template -> {
-          if (templateFilter.filter(template.getName(), template))
-            addTemplate(template);
-        });
+        .forEach(template -> addTemplate(template.getName(), template));
 
     return this;
   }
