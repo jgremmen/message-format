@@ -94,7 +94,7 @@ final class ArrayFormatterTest extends AbstractFormatterTest
 
       @Override
       public @NotNull String getName() {
-        return "bool";
+        return "bool-binary";
       }
 
       @Override
@@ -107,7 +107,7 @@ final class ArrayFormatterTest extends AbstractFormatterTest
     });
 
     assertEquals(new TextPart("1, 1, 0, 1, 0, 0, 0"), format(messageAccessor,
-        new boolean[] { true, true, false, true, false, false, false }, "bool"));
+        new boolean[] { true, true, false, true, false, false, false }, "bool-binary"));
   }
 
 

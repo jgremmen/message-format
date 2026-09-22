@@ -133,7 +133,8 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    * {@inheritDoc}
    * <p>
    * Formatters registered for {@link Object} must implement the {@link DefaultFormatter} interface. The formatter's
-   * parameter configuration names are validated to follow the kebab-case naming convention.
+   * parameter configuration names are validated to follow the kebab-case naming convention. All validation is
+   * performed before any internal state is mutated, so a failed registration leaves the formatter service unchanged.
    * <p>
    * Registering a formatter clears the internal formatter lookup cache.
    */
@@ -143,32 +144,58 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   {
     final var type = requireNonNull(formattableType, "formattableType must not be null").getType();
 
-    if (type == Object.class && !(formatter instanceof DefaultFormatter))
-      throw new FormatterServiceException("formatter associated with Object must implement DefaultFormatter interface");
-
     lock.lock();
     try {
-      typeFormatters
-          .computeIfAbsent(type, t -> new ArrayList<>(4))
-          .add(new PrioritizedFormatter(formattableType.getOrder(), formatter));
-
-      for(var parameterConfigName: formatter.getParameterConfigNames())
-        if (!isKebabCaseName(parameterConfigName))
-        {
-          final var formatterName = formatter instanceof NamedParameterFormatter namedParameterFormatter
-              ? '\'' + namedParameterFormatter.getName() + '\''
-              : formatter.getClass().getSimpleName();
-
-          throw new FormatterServiceException("parameter configuration name '" + parameterConfigName +
-              "' for formatter " + formatterName + " does not match the kebab case naming convention");
-        }
-        else
-          parameterConfigNames.add(parameterConfigName);
+      validateFormatterForType(type, requireNonNull(formatter, "formatter must not be null"));
+      registerFormatterForType(formattableType, formatter);
 
       formatterCache.clear();
     } finally {
       lock.unlock();
     }
+  }
+
+
+  /**
+   * Validates that {@code formatter} can be registered for {@code type}.
+   *
+   * @param type       the type the formatter is being registered for, not {@code null}
+   * @param formatter  the formatter to validate, not {@code null}
+   *
+   * @throws FormatterServiceException  if the formatter is not eligible for registration
+   */
+  private void validateFormatterForType(@NotNull Class<?> type, @NotNull ParameterFormatter formatter)
+  {
+    if (type == Object.class && !(formatter instanceof DefaultFormatter))
+      throw new FormatterServiceException("formatter associated with Object must implement DefaultFormatter interface");
+
+    for(var parameterConfigName: formatter.getParameterConfigNames())
+      if (!isKebabCaseName(parameterConfigName))
+      {
+        final var formatterName = formatter instanceof NamedParameterFormatter namedParameterFormatter
+            ? '\'' + namedParameterFormatter.getName() + '\''
+            : formatter.getClass().getSimpleName();
+
+        throw new FormatterServiceException("parameter configuration name '" + parameterConfigName +
+            "' for formatter " + formatterName + " does not match the kebab case naming convention");
+      }
+  }
+
+
+  /**
+   * Registers {@code formatter} for {@code formattableType}. This method must only be called after
+   * {@link #validateFormatterForType(Class, ParameterFormatter)} has passed for the same formatter and type.
+   *
+   * @param formattableType  the formattable type to register the formatter for, not {@code null}
+   * @param formatter        the formatter to register, not {@code null}
+   */
+  private void registerFormatterForType(@NotNull FormattableType formattableType, @NotNull ParameterFormatter formatter)
+  {
+    typeFormatters
+        .computeIfAbsent(formattableType.getType(), t -> new ArrayList<>(4))
+        .add(new PrioritizedFormatter(formattableType.getOrder(), formatter));
+
+    parameterConfigNames.addAll(formatter.getParameterConfigNames());
   }
 
 
@@ -179,7 +206,12 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    * support {@linkplain NamedParameterFormatter#autoApplyOnNamedConfigParameter() auto-apply} are additionally
    * registered to be selected automatically when their configuration key is present.
    * <p>
-   * Formatter names and parameter configuration names are validated to follow the kebab-case naming convention.
+   * Formatter names and parameter configuration names are validated to follow the kebab-case naming convention. A
+   * named formatter whose name has already been registered is rejected with a {@link FormatterServiceException},
+   * consistent with {@link #addPostFormatter(PostFormatter)}.
+   * <p>
+   * All validation is performed before any internal state is mutated, so a failed registration leaves the formatter
+   * service unchanged.
    */
   @Override
   @MustBeInvokedByOverriders
@@ -189,8 +221,12 @@ public non-sealed class GenericFormatterService implements FormatterService.With
 
     lock.lock();
     try {
-      if (formatter instanceof NamedParameterFormatter namedParameterFormatter)
+      NamedParameterFormatter namedParameterFormatter = null;
+
+      if (formatter instanceof NamedParameterFormatter npf)
       {
+        namedParameterFormatter = npf;
+
         final var formatterName = namedParameterFormatter.getName();
 
         if (isEmpty(formatterName))
@@ -200,15 +236,30 @@ public non-sealed class GenericFormatterService implements FormatterService.With
           throw new FormatterServiceException("formatter name '" + formatterName +
               "' must match the kebab case naming convention");
         }
-
-        namedFormatters.put(formatterName, namedParameterFormatter);
+        else if (namedFormatters.containsKey(formatterName))
+          throw new FormatterServiceException("named formatter '" + formatterName + "' has already been registered");
 
         if (namedParameterFormatter.autoApplyOnNamedConfigParameter())
-          addAutoApplyNamedFormatter(namedParameterFormatter);
+          validateAutoApplyNamedFormatter(namedParameterFormatter);
       }
 
-      for(var formattableType: formatter.getFormattableTypes())
-        addFormatterForType(formattableType, formatter);
+      final var formattableTypes = formatter.getFormattableTypes();
+      for(var formattableType: formattableTypes)
+        validateFormatterForType(formattableType.getType(), formatter);
+
+      // all validations passed; commit the mutations
+      if (namedParameterFormatter != null)
+      {
+        namedFormatters.put(namedParameterFormatter.getName(), namedParameterFormatter);
+
+        if (namedParameterFormatter.autoApplyOnNamedConfigParameter())
+          registerAutoApplyNamedFormatter(namedParameterFormatter);
+      }
+
+      for(var formattableType: formattableTypes)
+        registerFormatterForType(formattableType, formatter);
+
+      formatterCache.clear();
     } finally {
       lock.unlock();
     }
@@ -216,19 +267,17 @@ public non-sealed class GenericFormatterService implements FormatterService.With
 
 
   /**
-   * Registers a named formatter for automatic application when its configuration keys are present in the parameter
-   * configuration.
+   * Validates that {@code namedParameterFormatter} can be registered for auto-apply.
    *
-   * @param namedParameterFormatter  the named formatter to register for auto-apply, not {@code null}
+   * @param namedParameterFormatter  the named formatter to validate for auto-apply, not {@code null}
    *
    * @throws FormatterServiceException  if a configuration key conflicts with an already registered auto-apply formatter
    */
-  private void addAutoApplyNamedFormatter(@NotNull NamedParameterFormatter namedParameterFormatter)
+  private void validateAutoApplyNamedFormatter(@NotNull NamedParameterFormatter namedParameterFormatter)
   {
     for(var parameterConfigName: namedParameterFormatter.getParameterConfigNames())
     {
-      final var existingNamedFormatter =
-          configNameToNamedFormatterMap.put(parameterConfigName, namedParameterFormatter);
+      final var existingNamedFormatter = configNameToNamedFormatterMap.get(parameterConfigName);
 
       if (existingNamedFormatter != null && !existingNamedFormatter.equals(namedParameterFormatter))
       {
@@ -237,6 +286,20 @@ public non-sealed class GenericFormatterService implements FormatterService.With
             existingNamedFormatter.getName() + '\'');
       }
     }
+  }
+
+
+  /**
+   * Registers a named formatter for automatic application when its configuration keys are present in the parameter
+   * configuration. This method must only be called after
+   * {@link #validateAutoApplyNamedFormatter(NamedParameterFormatter)} has passed for the same formatter.
+   *
+   * @param namedParameterFormatter  the named formatter to register for auto-apply, not {@code null}
+   */
+  private void registerAutoApplyNamedFormatter(@NotNull NamedParameterFormatter namedParameterFormatter)
+  {
+    for(var parameterConfigName: namedParameterFormatter.getParameterConfigNames())
+      configNameToNamedFormatterMap.put(parameterConfigName, namedParameterFormatter);
   }
 
 
@@ -259,8 +322,10 @@ public non-sealed class GenericFormatterService implements FormatterService.With
 
     lock.lock();
     try {
-      if (postFormatters.put(postFormatterName, postFormatter) != null)
+      if (postFormatters.containsKey(postFormatterName))
         throw new FormatterServiceException("post formatter '" + postFormatterName + "' has already been registered");
+
+      postFormatters.put(postFormatterName, postFormatter);
     } finally {
       lock.unlock();
     }
