@@ -28,13 +28,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
+import static java.util.Locale.ROOT;
 import static java.util.Locale.forLanguageTag;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toUnmodifiableSet;
@@ -50,24 +51,33 @@ import static java.util.stream.Collectors.toUnmodifiableSet;
 public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCode implements LocaleAware
 {
   /** Localized message map. */
-  private final @NotNull Map<Locale,Message> localizedMessages;
+  private final @NotNull Map<@NotNull Locale,@NotNull Message> localizedMessages;
 
 
   /**
    * Create a localized message bundle with code.
    *
    * @param code               message code, not {@code null} and not empty
-   * @param localizedMessages  localized message map, not {@code null}. The map must contain at
-   *                           least 2 entries and no mapped value can be {@code null}
+   * @param localizedMessages  localized message map, not {@code null}. The map must contain at least 2 entries and
+   *                           no mapped value can be {@code null}
    */
-  public LocalizedMessageBundleWithCode(@NotNull String code, @NotNull Map<Locale,Message> localizedMessages)
+  public LocalizedMessageBundleWithCode(@NotNull String code, @NotNull Map<Locale,@NotNull Message> localizedMessages)
   {
     super(code);
 
-    if (requireNonNull(localizedMessages, "localizedMessages must not be null").isEmpty())
+    var size = requireNonNull(localizedMessages, "localizedMessages must not be null").size();
+    if (size == 0)
       throw new IllegalArgumentException("localizedMessages must not be empty");
 
-    this.localizedMessages = new HashMap<>(localizedMessages);
+    this.localizedMessages = new LinkedHashMap<>(size);
+
+    localizedMessages.forEach((locale, message) -> {
+      //noinspection ConstantValue
+      if (message == null)
+        throw new IllegalArgumentException("localizedMessages must not contain null values");
+
+      this.localizedMessages.put(locale == null ? ROOT : locale, message);
+    });
   }
 
 
@@ -99,12 +109,12 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
       final var keyLocale = entry.getKey();
       final var localizedMessage = entry.getValue();
 
-      if (match == -1 && (keyLocale == null || keyLocale.getLanguage().isEmpty()))
+      if (match == -1 && keyLocale.getLanguage().isEmpty())
       {
         message = localizedMessage;
         match = 0;  // "default" language match
       }
-      else if (keyLocale != null && keyLocale.getLanguage().equals(searchLanguage))
+      else if (keyLocale.getLanguage().equals(searchLanguage))
       {
         if (keyLocale.getCountry().equals(searchCountry))
           return localizedMessage;
@@ -212,7 +222,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   {
     final var messageCount = packStream.readSmallVar();
     final var code = requireNonNull(packStream.readString());
-    final var messages = new HashMap<Locale,Message>();
+    final var messages = new LinkedHashMap<Locale,Message>();
 
     for(var n = 0; n < messageCount; n++)
     {

@@ -19,6 +19,7 @@ import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.CompoundMessage;
 import de.sayayi.lib.message.internal.EmptyMessage;
 import de.sayayi.lib.message.internal.EmptyMessageWithCode;
+import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -26,9 +27,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.concurrent.CyclicBarrier;
 
 import static de.sayayi.lib.message.part.normalizer.MessagePartNormalizer.PASS_THROUGH;
+import static java.util.Locale.JAPANESE;
+import static java.util.Locale.forLanguageTag;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -162,5 +167,24 @@ final class MessageFactoryTest
       thread.join();
 
     assertTrue(errors.isEmpty(), "concurrent cache access should not throw: " + errors);
+  }
+
+
+  @Test
+  @DisplayName("Localized message bundle preserves insertion order for fallback selection")
+  void testParseLocalizedMessagePreservesFallbackOrder()
+  {
+    final var localizedTexts = new LinkedHashMap<Locale,String>();
+    localizedTexts.put(forLanguageTag("fr-CA"), "Bonjour");
+    localizedTexts.put(forLanguageTag("en"), "Hello");
+
+    final var messageSupport = MessageSupportFactory.shared();
+    final var messageAccessor = messageSupport.getMessageAccessor();
+    final var message = messageAccessor.getMessageFactory().parseMessage("MSG-001", localizedTexts);
+
+    assertInstanceOf(LocalizedMessageBundleWithCode.class, message);
+    assertEquals(
+        "Bonjour",
+        message.format(messageAccessor, Message.Parameters.empty(JAPANESE)));
   }
 }
