@@ -25,6 +25,7 @@ import de.sayayi.lib.message.annotation.adopter.fixture.AnnotationsFixture;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticMessageDef;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticTemplateDef;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticText;
+import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.MessageTemplate;
 import lombok.val;
 import org.jetbrains.annotations.Contract;
@@ -136,6 +137,23 @@ class AnnotationAdopterTest
         Set.of(AnnotationsFixture.class.getPackageName()));
     verifyFixture(cms.getMessageAccessor());
     verifyInnerRecordFixture(cms.getMessageAccessor());
+  }
+
+
+  @Test
+  @DisplayName("propagate MessageParserException from adopt entry points")
+  void testPropagateParserExceptionFromEntryPoints() throws Exception
+  {
+    val classFile = invalidTemplateClassFile();
+    val invalidTemplateFixtureClass = invalidTemplateFixtureClass();
+
+    assertThrows(MessageParserException.class,
+        () -> new AnnotationAdopter(newMessageSupport()).adopt(classFile));
+    assertThrows(MessageParserException.class,
+        () -> new AnnotationAdopter(newMessageSupport()).adopt(invalidTemplateFixtureClass));
+    assertThrows(MessageParserException.class,
+        () -> new AnnotationAdopter(newMessageSupport())
+            .adopt(invalidTemplateFixtureClass.getClassLoader(), Set.of(invalidTemplateFixtureClass.getPackageName())));
   }
 
 
@@ -312,6 +330,42 @@ class AnnotationAdopterTest
   }
 
 
+  private static @NotNull Path invalidTemplateClassFile() throws IOException
+  {
+    val writer = new ClassWriter(0);
+    val fixtureClassName = (AnnotationAdopterTest.class.getPackageName() + ".InvalidTemplateFixtureGenerated")
+        .replace('.', '/');
+
+    writer.visit(V21, ACC_PUBLIC | ACC_FINAL, fixtureClassName, null, "java/lang/Object", null);
+
+    MethodVisitor method = writer.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
+    method.visitCode();
+    method.visitVarInsn(ALOAD, 0);
+    method.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+    method.visitInsn(RETURN);
+    method.visitMaxs(1, 1);
+    method.visitEnd();
+
+    val classAnnotation = writer.visitAnnotation(Type.getDescriptor(TemplateDef.class), true);
+    classAnnotation.visit("name", "invalid-template");
+    classAnnotation.visit("text", "%{x,true false:1}");
+    classAnnotation.visitEnd();
+
+    writer.visitEnd();
+
+    val classFile = createTempFile("invalid-template-fixture-", ".class");
+    Files.write(classFile, writer.toByteArray());
+    classFile.toFile().deleteOnExit();
+
+    return classFile;
+  }
+
+
+  private static @NotNull Class<?> invalidTemplateFixtureClass() {
+    return InvalidTemplateFixture.class;
+  }
+
+
   private static void verifyFixture(@NotNull MessageAccessor accessor)
   {
     // --- Messages: type-level ---
@@ -425,5 +479,12 @@ class AnnotationAdopterTest
     assertTrue(accessor.hasTemplateWithName("inner-tmpl-1"));
     assertEquals("Inner template 1",
         ((MessageTemplate)accessor.getTemplateByName("inner-tmpl-1")).getMessage().asFormatString(UTF_8));
+  }
+
+
+
+
+  @TemplateDef(name = "invalid-template", text = "%{x,true false:1}")
+  private static final class InvalidTemplateFixture {
   }
 }

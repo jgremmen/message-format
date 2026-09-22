@@ -138,7 +138,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     try {
       for(var packageName: packageNames)
         adopt_scan(classLoader, packageName);
-    } catch(Exception ex) {
+    } catch(IOException ex) {
       throw new MessageAdopterException("failed to scan class path for messages and templates", ex);
     }
 
@@ -150,7 +150,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * Scan all classpath resources matching the given package name and adopt class files found in
    * directories and zip-based archives (jar, war, zip).
    */
-  private void adopt_scan(@NotNull ClassLoader classLoader, @NotNull String packageName) throws Exception
+  private void adopt_scan(@NotNull ClassLoader classLoader, @NotNull String packageName) throws IOException
   {
     var classPathPrefix = packageName.replace('.', '/');
     if (!classPathPrefix.endsWith("/"))
@@ -306,7 +306,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
       try(var inputStream = newInputStream(classPath)) {
         parseClass(inputStream);
         indexedClasses.add(visitedClassKey);
-      } catch(Exception ex) {
+      } catch(IOException ex) {
         throw new MessageAdopterException("failed to adopt messages and templates from class file " + classFile, ex);
       }
     }
@@ -361,7 +361,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
         try(var inputStream = classLoader.getResourceAsStream(classResourceName)) {
           parseClass(requireNonNull(inputStream));
           indexedClasses.add(typeName);
-        } catch(Exception ex) {
+        } catch(IOException ex) {
           throw new MessageAdopterException("failed to adopt messages and templates from type " + typeName, ex);
         }
       }
