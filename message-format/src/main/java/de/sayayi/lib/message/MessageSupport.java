@@ -136,9 +136,15 @@ public interface MessageSupport
 
 
   /**
-   * Export all messages and templates from this message support to a compact binary representation.
-   * This way a message support can be prepared once and loaded very quickly by importing the packed
-   * messages at runtime.
+   * Export all messages and templates from this message support to a compact binary representation. This way a
+   * message support can be prepared once and loaded very quickly by importing the packed messages at runtime.
+   * <p>
+   * Only templates backed by a {@link Message} (i.e. templates parsed from a message format string or created via
+   * {@link MessageFactory}) can be packed. Custom template implementations, such as those extending
+   * {@link AbstractNamedTemplate}, have no serializable message representation and are therefore never included in the
+   * exported pack, even if they are referenced by an exported message. Such custom templates must be registered again
+   * (e.g. via {@link ConfigurableMessageSupport#registerTemplatesFromService(ClassLoader)}) on the message support
+   * instance that imports the pack.
    *
    * @param stream  pack output stream, not {@code null}
    *
@@ -152,20 +158,29 @@ public interface MessageSupport
 
 
   /**
-   * Pack all messages (optionally filtering them using a {@code messageCodeFilter}) from this
-   * bundle into a compact binary representation. This way a message support can be prepared once
-   * and loaded very quickly by importing the packed messages at runtime.
+   * Pack all messages (optionally filtering them using a {@code messageCodeFilter}) from this bundle into a compact
+   * binary representation. This way a message support can be prepared once and loaded very quickly by importing the
+   * packed messages at runtime.
    * <p>
-   * Parameter {@code compress} switches GZip on/off, potentially reducing the packed size even
-   * more. For message support instances with a small amount of messages the compression may not be
-   * substantial as the binary representation does some extensive bit-packing already.
+   * Parameter {@code compress} switches GZip on/off, potentially reducing the packed size even more. For message
+   * support instances with a small amount of messages the compression may not be substantial as the binary
+   * representation does some extensive bit-packing already.
+   * <p>
+   * Only templates backed by a {@link Message} (i.e. templates parsed from a message format string or created via
+   * {@link MessageFactory}) can be packed. Custom template implementations, such as those extending
+   * {@link AbstractNamedTemplate}, have no serializable message representation, so regardless of
+   * {@code templateNameFilter} they are never included in the exported pack, even if they are referenced by an
+   * exported message. Such custom templates must be registered again (e.g. via
+   * {@link ConfigurableMessageSupport#registerTemplatesFromService(ClassLoader)}) on the message support instance that
+   * imports the pack.
    *
    * @param stream             pack output stream, not {@code null}
    * @param compress           {@code true} compress pack, {@code false} do not compress pack
-   * @param messageCodeFilter  optional predicate for selecting message codes. If {@code null}
-   *                           all messages from this message support will be selected
-   * @param templateNameFilter optional predicate for selecting template names. If {@code null}
-   *                           all templates referenced by the selected messages will be included
+   * @param messageCodeFilter  optional predicate for selecting message codes. If {@code null} all messages from this
+   *                           message support will be selected
+   * @param templateNameFilter optional predicate for selecting template names. If {@code null} all templates
+   *                           referenced by the selected messages will be included, except for custom
+   *                           (non-message-backed) template implementations, which are always excluded
    *
    * @throws IOException  if an I/O error occurs
    *
@@ -183,8 +198,8 @@ public interface MessageSupport
    * Fluent configurer for preparing a {@link Message} for formatting.
    * <p>
    * A message configurer is obtained via {@link MessageSupport#code(String)} or
-   * {@link MessageSupport#message(String) MessageSupport.message(...)} and allows setting
-   * parameter values and locale before producing a formatted string or exception.
+   * {@link MessageSupport#message(String) MessageSupport.message(...)} and allows setting parameter values and locale
+   * before producing a formatted string or exception.
    * <p>
    * All mutating methods return {@code this} configurer to allow method chaining:
    * <pre>
@@ -367,8 +382,7 @@ public interface MessageSupport
     /**
      * Sets multiple values for this message.
      *
-     * @param parameterValues  map with parameters (key = parameter name, value = parameter value),
-     *                         not {@code null}
+     * @param parameterValues  map with parameters (key = parameter name, value = parameter value), not {@code null}
      *
      * @return  message configurer instance for this message, never {@code null}
      */
@@ -383,8 +397,7 @@ public interface MessageSupport
     /**
      * Sets multiple values for this message.
      *
-     * @param properties  properties (key = parameter name, value = parameter value),
-     *                    not {@code null}
+     * @param properties  properties (key = parameter name, value = parameter value), not {@code null}
      *
      * @return  message configurer instance for this message, never {@code null}
      */
@@ -453,8 +466,7 @@ public interface MessageSupport
      * @param cause        the throwable that caused this exception
      * @param <X>          exception type
      *
-     * @return  newly created exception with the formatted message and the given root cause,
-     *          never {@code null}
+     * @return  newly created exception with the formatted message and the given root cause, never {@code null}
      *
      * @since 0.8.3
      */
@@ -497,9 +509,8 @@ public interface MessageSupport
 
 
     /**
-     * Returns a supplier capable of creating an exception with the formatted message.
-     * This method is useful in combination with one of the optional class methods like
-     * {@link OptionalInt#orElseThrow(Supplier)}.
+     * Returns a supplier capable of creating an exception with the formatted message. This method is useful in
+     * combination with one of the optional class methods like {@link OptionalInt#orElseThrow(Supplier)}.
      * <p>
      * Formatting the message is delayed until {@link Supplier#get()} is invoked.
      * <p>
@@ -519,9 +530,8 @@ public interface MessageSupport
 
 
     /**
-     * Returns a supplier capable of creating an exception with the formatted message.
-     * This method is useful in combination with one of the optional class methods like
-     * {@link OptionalInt#orElseThrow(Supplier)}.
+     * Returns a supplier capable of creating an exception with the formatted message. This method is useful in
+     * combination with one of the optional class methods like {@link OptionalInt#orElseThrow(Supplier)}.
      * <p>
      * Formatting the message is delayed until {@link Supplier#get()} is invoked.
      * <p>
@@ -542,9 +552,8 @@ public interface MessageSupport
 
 
     /**
-     * Returns a supplier capable of creating an exception with the formatted message.
-     * This method is useful in combination with one of the optional class methods like
-     * {@link OptionalInt#orElseThrow(Supplier)}.
+     * Returns a supplier capable of creating an exception with the formatted message. This method is useful in
+     * combination with one of the optional class methods like {@link OptionalInt#orElseThrow(Supplier)}.
      * <p>
      * Formatting the message is delayed until {@link Supplier#get()} is invoked.
      * <p>
@@ -564,8 +573,8 @@ public interface MessageSupport
 
 
   /**
-   * Configurable extension of {@link MessageSupport} providing methods to add/import messages,
-   * register templates, set default configuration values and change the default locale.
+   * Configurable extension of {@link MessageSupport} providing methods to add/import messages, register templates,
+   * set default configuration values and change the default locale.
    *
    * @see MessageSupportFactory#create(de.sayayi.lib.message.formatter.FormatterService, MessageFactory)
    */
@@ -609,12 +618,12 @@ public interface MessageSupport
 
 
     /**
-     * Import messages and templates from a message format pack file and add them to this message
-     * support instance. The {@code packStream} is validated and all entries are iterated. Each
-     * message and template found is added to this instance.
+     * Import messages and templates from a message format pack file and add them to this message support instance.
+     * The {@code packStream} is validated and all entries are iterated. Each message and template found is added to
+     * this instance.
      * <p>
-     * The {@code packStream} is closed when this method returns, regardless of whether the
-     * import was successful or not.
+     * The {@code packStream} is closed when this method returns, regardless of whether the import was successful or
+     * not.
      *
      * @param packStream  pack input stream, not {@code null}
      *
@@ -636,8 +645,8 @@ public interface MessageSupport
     /**
      * Set the default {@code value} for configuration parameter {@code name}.
      * <p>
-     * If a parameter formatter is looking for a boolean configuration value, which has not been
-     * provided by the message parameter, the message accessor is used to get a default value.
+     * If a parameter formatter is looking for a boolean configuration value, which has not been provided by the
+     * message parameter, the message accessor is used to get a default value.
      *
      * @param name   configuration parameter name, not {@code null} or empty
      * @param value  default value
@@ -651,8 +660,8 @@ public interface MessageSupport
     /**
      * Set the default {@code value} for configuration parameter {@code name}.
      * <p>
-     * If a parameter formatter is looking for a long configuration value, which has not been
-     * provided by the message parameter, the message accessor is used to get a default value.
+     * If a parameter formatter is looking for a long configuration value, which has not been provided by the message
+     * parameter, the message accessor is used to get a default value.
      *
      * @param name   configuration parameter name, not {@code null} or empty
      * @param value  default value
@@ -666,8 +675,8 @@ public interface MessageSupport
     /**
      * Set the default {@code value} for configuration parameter {@code name}.
      * <p>
-     * If a parameter formatter is looking for a string configuration value, which has not been
-     * provided by the message parameter, the message accessor is used to get a default value.
+     * If a parameter formatter is looking for a string configuration value, which has not been provided by the message
+     * parameter, the message accessor is used to get a default value.
      *
      * @param name   configuration parameter name, not {@code null} or empty
      * @param value  default value
@@ -681,8 +690,8 @@ public interface MessageSupport
     /**
      * Set the default {@code value} for configuration parameter {@code name}.
      * <p>
-     * If a parameter formatter is looking for a message configuration value, which has not been
-     * provided by the message parameter, the message accessor is used to get a default value.
+     * If a parameter formatter is looking for a message configuration value, which has not been provided by the
+     * message parameter, the message accessor is used to get a default value.
      *
      * @param name   configuration parameter name, not {@code null} or empty
      * @param value  default value
@@ -720,9 +729,9 @@ public interface MessageSupport
     /**
      * Set a {@code messageFilter} for this message support.
      * <p>
-     * On adding a message the message filter is invoked with the message. If the filter
-     * returns {@code true} the message is added to the message support. If the filter returns
-     * {@code false} the message is not added to the message support.
+     * On adding a message the message filter is invoked with the message. If the filter returns {@code true} the
+     * message is added to the message support. If the filter returns {@code false} the message is not added to the
+     * message support.
      * <p>
      * Exceptions thrown by the message filter are relayed to the caller.
      *
@@ -741,9 +750,9 @@ public interface MessageSupport
     /**
      * Set a {@code templateFilter} for this message support.
      * <p>
-     * On adding a template the template filter is invoked with the template name and template
-     * message. If the filter returns {@code true} the template is added to the message support.
-     * If the filter returns {@code false} the template is not added to the message support.
+     * On adding a template the template filter is invoked with the template name and template message. If the filter
+     * returns {@code true} the template is added to the message support. If the filter returns {@code false} the
+     * template is not added to the message support.
      * <p>
      * Exceptions thrown by the template filter are relayed to the caller.
      *
@@ -761,13 +770,11 @@ public interface MessageSupport
     /**
      * Discovers and registers all {@link NamedTemplate} service providers available from the given class loader.
      * <p>
-     * Each discovered {@code NamedTemplate} is registered under the name returned by
-     * {@link NamedTemplate#getName()}. The configured {@link TemplateFilter} is applied to each
-     * discovered template before registration.
+     * Each discovered {@code NamedTemplate} is registered under the name returned by {@link NamedTemplate#getName()}.
+     * The configured {@link TemplateFilter} is applied to each discovered template before registration.
      * <p>
-     * Service providers are declared either in a
-     * {@code META-INF/services/de.sayayi.lib.message.template.NamedTemplate} file or in
-     * a {@code module-info.java} using
+     * Service providers are declared either in a {@code META-INF/services/de.sayayi.lib.message.template.NamedTemplate}
+     * file or in a {@code module-info.java} using
      * {@code provides de.sayayi.lib.message.template.NamedTemplate with ...}.
      *
      * @param classLoader  class loader used for service discovery, not {@code null}
@@ -784,8 +791,8 @@ public interface MessageSupport
 
     /**
      * Seals off this message support instance by returning a wrapper that does not implement
-     * {@link ConfigurableMessageSupport} and thus is not modifiable. The returned {@link MessageSupport} wrapper
-     * is backed by this configurable message support, so changes always reflect in the returned instance.
+     * {@link ConfigurableMessageSupport} and thus is not modifiable. The returned {@link MessageSupport} wrapper is
+     * backed by this configurable message support, so changes always reflect in the returned instance.
      *
      * @return  sealed message support, never {@code null}
      *
@@ -829,8 +836,8 @@ public interface MessageSupport
 
 
   /**
-   * Read-only accessor providing access to messages, templates, formatters and default configuration
-   * values published to a {@link MessageSupport} instance.
+   * Read-only accessor providing access to messages, templates, formatters and default configuration values published
+   * to a {@link MessageSupport} instance.
    *
    * @see MessageSupport#getMessageAccessor()
    */
@@ -862,8 +869,8 @@ public interface MessageSupport
      *
      * @param code  message code to check, or {@code null}
      *
-     * @return  {@code true} if {@code code} is not {@code null} and this message support contains a
-     *          message with this code, {@code false} otherwise
+     * @return  {@code true} if {@code code} is not {@code null} and this message support contains a message with this
+     *          code, {@code false} otherwise
      */
     @Contract(value = "null -> false", pure = true)
     boolean hasMessageWithCode(String code);
@@ -883,14 +890,14 @@ public interface MessageSupport
     /**
      * Returns a prioritized list of matching formatter for the given {@code type}.
      * <p>
-     * If {@code config} is provided and contains a configuration name for a named formatter, the
-     * named formatter takes precedence over the type based formatter.
+     * If {@code config} is provided and contains a configuration name for a named formatter, the named formatter takes
+     * precedence over the type based formatter.
      *
      * @param type    type, never {@code null}
      * @param config  message part configuration
      *
-     * @return  prioritized list of formatters for the given {@code type} and {@code parameterConfig},
-     *          never {@code null} and never empty
+     * @return  prioritized list of formatters for the given {@code type} and {@code parameterConfig}, never
+     *          {@code null} and never empty
      */
     @Contract(value = "_, _ -> new", pure = true)
     default @NotNull ParameterFormatter[] getFormatters(@NotNull Class<?> type, MessagePart.Config config) {
@@ -903,8 +910,8 @@ public interface MessageSupport
      * <p>
      * If {@code format} matches a named formatter it always takes precedence over {@code type}.
      * <p>
-     * If {@code config} is provided and contains a configuration name for a named formatter, the
-     * named formatter takes precedence over the type based formatter.
+     * If {@code config} is provided and contains a configuration name for a named formatter, the named formatter takes
+     * precedence over the type based formatter.
      *
      * @param format  formatter name
      * @param type    type, never {@code null}
@@ -935,8 +942,8 @@ public interface MessageSupport
      *
      * @param name  parameter name, not {@code null}
      *
-     * @return  default configuration value, or {@code null} if no default configuration has been
-     *          set for parameter {@code name}
+     * @return  default configuration value, or {@code null} if no default configuration has been set for parameter
+     * {@code name}
      *
      * @see ConfigurableMessageSupport#setDefaultConfig(String, boolean)
      * @see ConfigurableMessageSupport#setDefaultConfig(String, long)
@@ -992,24 +999,24 @@ public interface MessageSupport
      *
      * @param name  template name to check, or {@code null}
      *
-     * @return  {@code true} if {@code name} is not {@code null} and this message support contains a
-     *          template with this name, {@code false} otherwise
+     * @return  {@code true} if {@code name} is not {@code null} and this message support contains a template with this
+     *          name, {@code false} otherwise
      */
     @Contract(value = "null -> false", pure = true)
     boolean hasTemplateWithName(String name);
 
 
     /**
-     * Returns a collection of template names, that are referenced from messages but have not been published to 
-     * this message support.
+     * Returns a collection of template names, that are referenced from messages but have not been published to this
+     * message support.
      * <p>
-     * The messages that are analyzed can be filtered by providing a {@code messageCodeFilter}. If this parameter 
-     * is {@code null} all known messages are analyzed.
+     * The messages that are analyzed can be filtered by providing a {@code messageCodeFilter}. If this parameter is
+     * {@code null} all known messages are analyzed.
      *
      * @param messageCodeFilter  message code filter or {@code null} to include all messages
      *
-     * @return  a collections with referenced template names, that are unknown to this message support, 
-     *          never {@code null}
+     * @return  a collections with referenced template names, that are unknown to this message support, never
+     *          {@code null}
      */
     @NotNull Set<String> findMissingTemplates(Predicate<String> messageCodeFilter);
   }
@@ -1030,15 +1037,13 @@ public interface MessageSupport
     /**
      * Adds a message with code to this publisher.
      * <p>
-     * If a message with the same code already exists and has identical content, the new message is
-     * silently ignored.
+     * If a message with the same code already exists and has identical content, the new message is silently ignored.
      *
      * @param message  message with code, not {@code null}
      *
      * @return  this message publisher instance, never {@code null}
      *
-     * @throws DuplicateMessageException  if a message with the same code already exists and has
-     *                                    different content
+     * @throws DuplicateMessageException  if a message with the same code already exists and has different content
      */
     @Contract(value = "_ -> this", mutates = "this")
     @NotNull MessagePublisher addMessage(@NotNull Message.WithCode message);
@@ -1047,8 +1052,7 @@ public interface MessageSupport
     /**
      * Adds a template identified by {@code name} to this publisher.
      * <p>
-     * If a template with the same name already exists and has identical content, the new template
-     * is silently ignored.
+     * If a template with the same name already exists and has identical content, the new template is silently ignored.
      *
      * @param name      template name in kebab-case, not {@code null}
      * @param template  template message, not {@code null}
@@ -1056,8 +1060,7 @@ public interface MessageSupport
      * @return  this message publisher instance, never {@code null}
      *
      * @throws IllegalArgumentException   if {@code name} does not follow the kebab-case naming convention
-     * @throws DuplicateTemplateException  if a template with the same name already exists and has
-     *                                     different content
+     * @throws DuplicateTemplateException  if a template with the same name already exists and has different content
      */
     @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull MessagePublisher addTemplate(@NotNull String name, @NotNull Template template);
@@ -1071,7 +1074,7 @@ public interface MessageSupport
      *
      * @return  this message publisher instance, never {@code null}
      *
-     * @throws IllegalArgumentException   if the template name does not follow the kebab-case naming convention
+     * @throws IllegalArgumentException  if the template name does not follow the kebab-case naming convention
      * @throws DuplicateTemplateException  in case a template with the same name already exists
      *
      * @since 0.24.0
