@@ -26,6 +26,8 @@ build:
     paths:
       - message-format/.build/libs/*.jar
       - message-format-annotations/.build/libs/*.jar
+      - message-format-icu/.build/libs/*.jar
+      - message-format-log4j/.build/libs/*.jar
       - message-format-spring/.build/libs/*.jar
       - message-gradle-plugin/.build/libs/*.jar
     expire_in: 2 weeks
