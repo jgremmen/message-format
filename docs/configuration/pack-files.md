@@ -81,6 +81,45 @@ generally be read by newer versions. However, pack files created with a newer ve
 When in doubt, re-export the pack files after upgrading.
 
 
+## Detecting Pack Files with Apache Tika
+
+Content inspection frameworks such as [Apache Tika](https://tika.apache.org/) can recognize a pack file by its magic 
+bytes and report the `application/x-message-format-pack` MIME type. The library ships two detector classes in the 
+`de.sayayi.lib.message.pack` package that plug into Tika's detection pipeline. Which class applies depends on the Tika 
+version on the classpath. `PackTika3Detector` covers Apache Tika in the range `[1.19,4.0)`, and `PackTika4Detector` 
+covers Apache Tika in the range `[4.0,5.0)`. A third class, `PackTikaDetector`, remains as a deprecated alias for 
+`PackTika3Detector` and exists only for source compatibility with earlier releases.
+
+Prior to version 0.25.0 the Tika 3 detector was registered automatically. That automatic registration has been removed.
+Tika discovers detectors through the `ServiceLoader` mechanism, so the appropriate detector must now be registered 
+explicitly. This is done by adding the fully qualified class name to a service file named 
+`META-INF/services/org.apache.tika.detect.Detector` on the application classpath.
+
+For Apache Tika 3, the service file contains a single line:
+
+```
+de.sayayi.lib.message.pack.PackTika3Detector
+```
+
+For Apache Tika 4, the same file references the Tika 4 detector instead:
+
+```
+de.sayayi.lib.message.pack.PackTika4Detector
+```
+
+Once the service file is present, detection works through the standard Tika API without any further configuration.
+
+```java
+Tika tika = new Tika();
+
+// detects "application/x-message-format-pack" for a pack file
+String mimeType = tika.detect(new File("messages.mfp"));
+```
+
+Applications that only need a direct check, without a full Tika integration, can use the 
+`MessageUtil.isMessageFormatPack(Path)` utility method described in the previous section instead.
+
+
 ## Generating Pack Files at Build Time
 
 If a project uses `@MessageDef` and `@TemplateDef` annotations to declare messages and templates in source code, the

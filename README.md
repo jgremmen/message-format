@@ -111,10 +111,11 @@ resources so it is included in the final artifact automatically.
 
 | Module                                                                                                             | Description                                                                    |
 |--------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| message-format&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format/0.24.0)                         | Core library: parsing, formatting, adopters, pack format and the formatter SPI |
-| message-format-annotations&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-annotations/0.24.0) | `@MessageDef`, `@TemplateDef`, annotation adopter and synthetic annotations    |
-| message-format-log4j&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-log4j/0.24.0)             | Log4j integration: `MessageFactory` using message-format syntax                |
-| message-format-spring&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-spring/0.24.0)           | Spring `MessageSource` bridge and SpEL formatter                               |
+| message-format&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format/0.25.0)                         | Core library: parsing, formatting, adopters, pack format and the formatter SPI |
+| message-format-annotations&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-annotations/0.25.0) | `@MessageDef`, `@TemplateDef`, annotation adopter and synthetic annotations    |
+| message-format-icu&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-icu/0.25.0)                 | ICU4J-backed named formatters: `icu` and `icu-person`                          |
+| message-format-log4j&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-log4j/0.25.0)             | Log4j integration: `MessageFactory` using message-format syntax                |
+| message-format-spring&nbsp;&nbsp;[📘](https://javadoc.io/doc/de.sayayi.lib/message-format-spring/0.25.0)           | Spring `MessageSource` bridge and SpEL formatter                               |
 | message-gradle-plugin                                                                                              | Gradle plugin for build-time annotation scanning and message packing           |
 
 

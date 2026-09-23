@@ -12,7 +12,8 @@ that every formatting operation relies on.
 
 ## Creating a MessageSupport
 
-Instances are created through `MessageSupportFactory`, which offers two strategies.
+Instances are created through `MessageSupportFactory`, which offers a sealed shared singleton for simple scenarios and
+several `create` methods for configurable instances.
 
 The `shared()` method returns a lazily initialized, sealed singleton that is backed by the shared 
 `DefaultFormatterService`. It also discovers and registers any `NamedTemplate` service providers on the classpath. It 
@@ -33,7 +34,8 @@ Because the shared instance is sealed, it does not expose any of the mutating me
 `ConfigurableMessageSupport`. Messages, templates or default configuration cannot be added through it.
 
 Most applications use the `create` method, which returns a `ConfigurableMessageSupport` that can be populated with 
-messages, templates and default configuration:
+messages, templates and default configuration. The backing `FormatterService` is passed explicitly, which makes it the
+right choice when a custom or pre-configured formatter service is already available:
 
 ```java
 var messageSupport = MessageSupportFactory.create(
@@ -42,6 +44,38 @@ var messageSupport = MessageSupportFactory.create(
 
 For a custom `MessageFactory`, for example to enable message caching, it can be supplied as a second argument. See 
 [MessageFactory](message-factory.md) for details.
+
+Two convenience methods cover the most common starting points and avoid the need to construct a formatter service by
+hand. `createDefault()` returns a `ConfigurableMessageSupport` backed by the shared `DefaultFormatterService`, which
+already provides the full set of built-in formatters. It is the natural choice for most applications that intend to
+register their own messages and templates:
+
+```java
+var messageSupport = MessageSupportFactory.createDefault();
+
+messageSupport.addMessage("greeting", "Hello %{name}!");
+
+String text = messageSupport
+    .code("greeting")
+    .with("name", "World")
+    .format();
+// "Hello World!"
+```
+
+`createGeneric()` instead starts from an empty `GenericFormatterService` that only provides the default string fallback
+formatter. Nothing else is registered, so every additional formatter has to be added explicitly. This is useful when
+full control over the available formatters is required, for example to keep the formatter set minimal or to avoid the
+default formatters entirely:
+
+```java
+var messageSupport = MessageSupportFactory.createGeneric();
+
+// only the string fallback is available until formatters
+// are registered on the underlying formatter service
+```
+
+Both convenience methods use the shared, non-caching `MessageFactory`. When message caching or another custom factory is
+needed, the explicit `create(FormatterService, MessageFactory)` overload remains the way to supply it.
 
 
 ## ConfigurableMessageSupport
