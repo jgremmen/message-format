@@ -45,6 +45,6 @@ antlr4-runtime = [ 'antlr4-runtime', 'antlr4-ext-runtime' ]
 mockito-test = [ 'mockito-core' ]
 
 [plugins]
-publish-gradle-plugin = { id = 'com.gradle.plugin-publish', version = '2.1.1' }
+publish-gradle-plugin = { id = 'com.gradle.plugin-publish', version = '2.2.1' }
 publish-on-central = { id = 'org.danilopianini.publish-on-central', version.ref = 'publish-on-central' }
 test-logger = { id = 'com.adarshr.test-logger', version.ref = 'test-logger' }

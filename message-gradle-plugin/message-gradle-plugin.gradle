@@ -89,6 +89,13 @@ gradlePlugin {
           'annotations at build time and packs them into a single message pack file.'
       implementationClass = 'de.sayayi.plugin.gradle.message.MessageFormatPlugin'
       tags.set([ 'sayayi', 'message-format', 'scan', 'pre-compile' ])
+
+      compatibility {
+        features {
+          configurationCache = true
+          isolatedProjects = true
+        }
+      }
     }
   }
 }
