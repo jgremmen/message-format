@@ -17,18 +17,20 @@ package de.sayayi.lib.message.exception;
 
 
 /**
+ * Exception thrown by a formatter service when a formatter or post formatter cannot be registered, for example because
+ * its name or configuration conflicts with a formatter that was already registered.
+ *
  * @author Jeroen Gremmen
  * @since 0.20.0
  */
 public class FormatterServiceException extends MessageException
 {
   /**
-   * Constructs a new formatter service exception with the specified detail message.
-   * The cause is not initialized and may subsequently be initialized by a
-   * call to {@link #initCause}.
+   * Constructs a new formatter service exception with the specified detail message. The cause is not initialized and
+   * may subsequently be initialized by a call to {@link #initCause}.
    *
-   * @param message  the detail message. The detail message is saved for later retrieval by the
-   *                 {@link #getMessage()} method.
+   * @param message  the detail message. The detail message is saved for later retrieval by the {@link #getMessage()}
+   *                 method.
    */
   public FormatterServiceException(String message) {
     super(message);

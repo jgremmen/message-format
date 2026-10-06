@@ -39,6 +39,9 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * Depending on the requested cache size, the factory selects an implementation optimized for either small or large
  * numbers of entries.
+ * <p>
+ * <b>Thread safety:</b> the normalizer instances returned by the factory methods in this class are thread-safe;
+ * all mutable cache access is guarded by a {@link java.util.concurrent.locks.ReentrantLock ReentrantLock}.
  *
  * @author Jeroen Gremmen
  * @since 0.6.0

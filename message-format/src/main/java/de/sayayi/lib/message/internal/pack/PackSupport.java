@@ -55,6 +55,10 @@ import static java.util.function.Function.identity;
  * This class also provides variable-length encoding for {@code long} values via
  * {@link #packLongVar(long, PackOutputStream)} and {@link #unpackLongVar(PackInputStream)},
  * optimized for smaller numbers that are closer to zero.
+ * <p>
+ * <b>Thread safety:</b> instances are not thread-safe. The deduplication caches used by the {@code unpack} methods
+ * are plain, unsynchronized maps, so a single {@code PackSupport} instance must not be used to (de)serialize
+ * concurrently from multiple threads; use a separate instance per thread/call instead.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

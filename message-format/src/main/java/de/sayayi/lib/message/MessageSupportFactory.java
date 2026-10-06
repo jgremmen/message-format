@@ -121,8 +121,8 @@ public final class MessageSupportFactory
 
 
   /**
-   * Create a new {@link MessageSupport} instance with the given {@code formatterService} and a non-caching
-   * {@link MessageFactory}.
+   * Create a new {@link MessageSupport} instance with the given {@code formatterService} and the
+   * {@linkplain MessageFactory#getSharedInstance() shared, caching} {@link MessageFactory}.
    * <p>
    * This is a convenience method equivalent to calling
    * {@link #create(FormatterService, MessageFactory) create(formatterService, MessageFactory.getSharedInstance())}.
@@ -141,7 +141,7 @@ public final class MessageSupportFactory
 
   /**
    * Create a new configurable {@link MessageSupport} instance backed by an empty {@link GenericFormatterService} and
-   * a non-caching {@link MessageFactory}.
+   * the {@linkplain MessageFactory#getSharedInstance() shared, caching} {@link MessageFactory}.
    * <p>
    * Use this method when you want full control over which formatters are registered, starting from a service that only
    * provides the default string fallback formatter.
@@ -158,8 +158,8 @@ public final class MessageSupportFactory
 
   /**
    * Create a new configurable {@link MessageSupport} instance backed by the
-   * {@linkplain DefaultFormatterService#getSharedInstance() shared default formatter service} and a non-caching
-   * {@link MessageFactory}.
+   * {@linkplain DefaultFormatterService#getSharedInstance() shared default formatter service} and the
+   * {@linkplain MessageFactory#getSharedInstance() shared, caching} {@link MessageFactory}.
    * <p>
    * The default formatter service provides the full set of built-in formatters, making this a convenient starting
    * point for most use cases that still require additional configuration such as adding messages and templates.

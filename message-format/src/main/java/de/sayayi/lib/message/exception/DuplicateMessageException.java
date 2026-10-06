@@ -22,8 +22,8 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
- * Duplicate message exception. This exception is thrown by the default message handler if a
- * message with the same code is published twice.
+ * Duplicate message exception. This exception is thrown by the default message handler if a message with the same code
+ * is published twice.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -36,11 +36,26 @@ public final class DuplicateMessageException extends MessageException
   private final String code;
 
 
+  /**
+   * Constructs a new duplicate message exception for the given message {@code code}.
+   *
+   * @param code     duplicate message code, not {@code null}
+   * @param message  the detail message. The detail message is saved for later retrieval by the {@link #getMessage()}
+   *                 method.
+   */
   public DuplicateMessageException(@NotNull String code, String message) {
     this(code, message, null);
   }
 
 
+  /**
+   * Constructs a new duplicate message exception for the given message {@code code} and cause.
+   *
+   * @param code     duplicate message code, not {@code null}
+   * @param message  the detail message (which is saved for later retrieval by the {@link #getMessage()} method).
+   * @param cause    the cause (which is saved for later retrieval by the {@link #getCause()} method). (A {@code null}
+   *                 value is permitted and indicates that the cause is nonexistent or unknown.)
+   */
   public DuplicateMessageException(@NotNull String code, String message, Throwable cause)
   {
     super(message, cause);

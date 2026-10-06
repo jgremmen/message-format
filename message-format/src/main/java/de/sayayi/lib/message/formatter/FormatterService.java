@@ -51,6 +51,11 @@ public sealed interface FormatterService
    * <p>
    * Implementing classes must make sure that for any combination of {@code format} and {@code type} this function
    * always returns at least 1 formatter. A good choice for a default formatter would be {@link StringFormatter}.
+   * <p>
+   * If {@code format} names a formatter that supports {@code type} (see
+   * {@link NamedParameterFormatter#canFormat(Class)}), implementations must return <em>only</em> that named
+   * formatter, even if type-based formatters would otherwise also apply. This is by design: explicitly selecting
+   * a formatter by name is authoritative and does not build a type-based fallback chain behind it.
    *
    * @param format  name of the formatter or {@code null}
    * @param type    type of the value to format
@@ -134,9 +139,14 @@ public sealed interface FormatterService
 
 
     /**
-     * Creates a sealed, immutable snapshot of this formatter service. The returned instance can no longer be modified.
+     * Seals off this formatter service by returning an instance that does not implement {@link WithRegistry} and thus
+     * is not modifiable directly. The returned {@link FormatterService} wrapper is backed by this formatter service,
+     * so changes made to this (still-mutable) formatter service after sealing continue to reflect in the returned
+     * instance — it is a live view, not an immutable snapshot or defensive copy. Use this when you want to expose a
+     * read-only API surface, not when you need a frozen copy safe to share with code that must be unaffected by later
+     * registrations.
      *
-     * @return  an immutable formatter service, never {@code null}
+     * @return  sealed formatter service, never {@code null}
      *
      * @since 0.22.0
      */

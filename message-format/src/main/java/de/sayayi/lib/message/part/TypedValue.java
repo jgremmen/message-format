@@ -28,6 +28,11 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface representing a typed value in a configuration or map.
+ * <p>
+ * Instances of this type (and its permitted subtypes) are constructed exclusively by internals of this module. This
+ * type is {@code sealed} by design and is not meant to be implemented by custom formatters or other adopters; it is
+ * intentionally read-only from the outside. Custom formatters can, however, freely receive and inspect instances of
+ * this type (e.g. via {@code ConfigAccessor}/{@code MapAccessor}) to read configuration or map values.
  *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)

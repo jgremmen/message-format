@@ -292,6 +292,10 @@ public interface ParameterFormatter
    * <p>
    * The default {@link #format(ParameterFormatterContext, Object)} implementation delegates to the next formatter in
    * the chain, since a map key comparator typically only contributes comparison logic rather than direct formatting.
+   * This means a {@code MapKeyComparator} must not be registered so that it is reachable <em>only</em> through
+   * explicit by-name selection (see {@link NamedParameterFormatter}): a formatter selected by name has no next
+   * formatter to delegate to and the default implementation would throw a {@code NoSuchElementException}. It must
+   * also be reachable through type-based resolution (e.g. via a registered {@link FormattableType}).
    *
    * @param <T>  type of the value this comparator is capable of comparing
    *
@@ -303,7 +307,8 @@ public interface ParameterFormatter
      * {@inheritDoc}
      * <p>
      * This default implementation delegates to the next formatter in the chain, since a map key
-     * comparator typically only contributes comparison logic rather than direct formatting.
+     * comparator typically only contributes comparison logic rather than direct formatting. See the
+     * {@link MapKeyComparator} class documentation for a caveat regarding by-name-only selection.
      *
      * @since 0.24.0
      */

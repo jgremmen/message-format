@@ -30,6 +30,11 @@ import static de.sayayi.lib.message.part.MapKey.CompareType.NE;
 
 /**
  * Interface representing a typed key in a map.
+ * <p>
+ * Instances of this type (and its permitted subtypes) are constructed exclusively by internals of this module. This
+ * type is {@code sealed} by design and is not meant to be implemented by custom formatters or other adopters; it is
+ * intentionally read-only from the outside. Custom formatters can, however, freely receive and inspect instances of
+ * this type to read map key information.
  *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)

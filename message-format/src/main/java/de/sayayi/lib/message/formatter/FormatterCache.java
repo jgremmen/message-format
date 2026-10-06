@@ -30,8 +30,13 @@ import static java.util.Arrays.fill;
 /**
  * The formatter cache is a fixed size cache for storing a sorted list of parameter formatters for each value type.
  * <p>
- * The cache prioritizes frequently used value types and drops the least used ones as soon as the cache size is
- * exhausted.
+ * The cache prioritizes frequently used value types and evicts entries using an approximate (recency-based)
+ * least-recently-used policy as soon as the cache size is exhausted.
+ * <p>
+ * <b>Thread safety:</b> this class is thread-safe. Structural mutation is protected by a lock, builder functions run
+ * outside the lock so that cache misses do not block other threads, and a modification-count check guards against
+ * corruption from re-entrant access. Note that it is not single-flight: concurrent cache misses for the same type
+ * may each independently build a formatter list.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

@@ -23,9 +23,17 @@ import java.util.Set;
 
 
 /**
- * Parameter formatter implementing this interface can be selected by specifying the formatter
- * name in a message parameter. If, for instance, this formatter is named {@code xyz}, it can
- * be addressed in a message as follows: {@code 'text %{p,xyz}.'}
+ * Parameter formatter implementing this interface can be selected by specifying the formatter name in a message
+ * parameter. If, for instance, this formatter is named {@code xyz}, it can be addressed in a message as follows:
+ * {@code 'text %{p,xyz}.'}
+ * <p>
+ * When a formatter is selected explicitly by name, it is treated as authoritative: the formatter service returns
+ * <em>only</em> that named formatter, regardless of the value's type and even if a type-based formatter chain would
+ * otherwise also apply. This is by design, not an inconsistency. As a consequence, a named formatter has no next
+ * formatter to fall back on in this case, so it must not unconditionally delegate to
+ * {@link de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext#delegateToNextFormatter()
+ * delegateToNextFormatter()} unless it is guaranteed to also be reachable through type-based resolution (e.g.
+ * because it is additionally registered as a type-based formatter for a matching {@link FormattableType}).
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

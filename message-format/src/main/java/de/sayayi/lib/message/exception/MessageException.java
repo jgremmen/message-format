@@ -17,18 +17,20 @@ package de.sayayi.lib.message.exception;
 
 
 /**
+ * Base class for all exceptions thrown by the message format library. It is used directly for generic failures and
+ * extended by more specific exceptions for parsing, formatting and message management errors.
+ *
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
 public class MessageException extends RuntimeException
 {
   /**
-   * Constructs a new message exception with the specified detail message.
-   * The cause is not initialized and may subsequently be initialized by a
-   * call to {@link #initCause}.
+   * Constructs a new message exception with the specified detail message. The cause is not initialized and may
+   * subsequently be initialized by a call to {@link #initCause}.
    *
-   * @param message  the detail message. The detail message is saved for later retrieval by the
-   *                 {@link #getMessage()} method.
+   * @param message  the detail message. The detail message is saved for later retrieval by the {@link #getMessage()}
+   *                 method.
    */
   public MessageException(String message) {
     super(message);
@@ -38,14 +40,12 @@ public class MessageException extends RuntimeException
   /**
    * Constructs a new message exception with the specified detail message and cause.
    * <p>
-   * Note that the detail message associated with {@code cause} is <i>not</i> automatically
-   * incorporated in this runtime exception's detail message.
+   * Note that the detail message associated with {@code cause} is <i>not</i> automatically incorporated in this
+   * runtime exception's detail message.
    *
-   * @param message  the detail message (which is saved for later retrieval by the
-   *                 {@link #getMessage()} method).
-   * @param cause    the cause (which is saved for later retrieval by the {@link #getCause()}
-   *                 method). (A {@code null} value is permitted and indicates that the cause is
-   *                 nonexistent or unknown.)
+   * @param message  the detail message (which is saved for later retrieval by the {@link #getMessage()} method).
+   * @param cause    the cause (which is saved for later retrieval by the {@link #getCause()} method). (A {@code null}
+   *                 value is permitted and indicates that the cause is nonexistent or unknown.)
    */
   public MessageException(String message, Throwable cause) {
     super(message, cause);
@@ -55,12 +55,11 @@ public class MessageException extends RuntimeException
   /**
    * Constructs a new message exception with the specified cause.
    * <p>
-   * Note that the detail message associated with {@code cause} is <i>not</i> automatically
-   * incorporated in this runtime exception's detail message.
+   * Note that the detail message associated with {@code cause} is <i>not</i> automatically incorporated in this
+   * runtime exception's detail message.
    *
-   * @param cause    the cause (which is saved for later retrieval by the {@link #getCause()}
-   *                 method). (A {@code null} value is permitted and indicates that the cause is
-   *                 nonexistent or unknown.)
+   * @param cause  the cause (which is saved for later retrieval by the {@link #getCause()} method). (A {@code null}
+   *               value is permitted and indicates that the cause is nonexistent or unknown.)
    */
   public MessageException(Throwable cause) {
     super(cause);

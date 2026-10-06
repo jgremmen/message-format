@@ -22,8 +22,8 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
- * Duplicate template exception. This exception is thrown by the default template handler if a
- * template with the same name is published twice.
+ * Duplicate template exception. This exception is thrown by the default template handler if a template with the same
+ * name is published twice.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -36,11 +36,26 @@ public final class DuplicateTemplateException extends MessageException
   private final @NotNull String name;
 
 
+  /**
+   * Constructs a new duplicate template exception for the given template {@code name}.
+   *
+   * @param name     duplicate template name, not {@code null}
+   * @param message  the detail message. The detail message is saved for later retrieval by the {@link #getMessage()}
+   *                 method.
+   */
   public DuplicateTemplateException(@NotNull String name, String message) {
     this(name, message, null);
   }
 
 
+  /**
+   * Constructs a new duplicate template exception for the given template {@code name} and cause.
+   *
+   * @param name     duplicate template name, not {@code null}
+   * @param message  the detail message (which is saved for later retrieval by the {@link #getMessage()} method).
+   * @param cause    the cause (which is saved for later retrieval by the {@link #getCause()} method). (A {@code null}
+   *                 value is permitted and indicates that the cause is nonexistent or unknown.)
+   */
   public DuplicateTemplateException(@NotNull String name, String message, Throwable cause)
   {
     super(message, cause);

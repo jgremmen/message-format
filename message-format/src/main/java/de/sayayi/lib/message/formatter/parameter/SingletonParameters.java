@@ -32,6 +32,11 @@ import static java.util.Collections.singletonMap;
  * in-place via {@link #setValue(Object)}.
  * <p>
  * Requesting the value of any parameter name other than the one provided at construction time will return {@code null}.
+ * <p>
+ * <b>Thread safety:</b> this class is not thread-safe. The parameter value is mutated in-place without
+ * synchronization, so instances are intended to be created and reused (via repeated {@code setValue} calls) from a
+ * single thread, e.g. when formatting the same message for successive elements of a collection; they must not be
+ * shared or mutated concurrently across threads.
  *
  * @author Jeroen Gremmen
  * @since 0.12.0

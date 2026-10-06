@@ -52,16 +52,20 @@ public interface ParameterFormatterContext extends Parameters, ConfigAccessor, M
   /**
    * Delegate formatting to the next best parameter formatter.
    * <p>
-   * Based on the object type, format and registered formatters, a list of prioritized formatters
-   * is calculated and the top formatter is invoked. If that formatter delegates formatting, the
-   * next formatter from the list will be invoked with the same formatter context.
+   * Based on the object type, format and registered formatters, a list of prioritized formatters is calculated and the
+   * top formatter is invoked. If that formatter delegates formatting, the next formatter from the list will be invoked
+   * with the same formatter context.
    * <p>
-   * The last formatter from the list, which is usually the formatter associated with type
-   * {@code Object}, must not delegate to the next formatter or a {@code NoSuchElementException}
-   * is thrown. By default, the {@code Object} formatter is a string formatter, which will never
-   * delegate. However, if this formatter is redefined, it must never delegate formatting.
+   * The last formatter from the list, which is usually the formatter associated with type {@code Object}, must not
+   * delegate to the next formatter or a {@code NoSuchElementException} is thrown. By default, the {@code Object}
+   * formatter is a string formatter, which will never delegate. However, if this formatter is redefined, it must never
+   * delegate formatting.
    * <p>
-   * A named-only formatter never has a next formatter it can delegate to.
+   * A formatter selected explicitly {@linkplain NamedParameterFormatter by name} never has a next formatter it can
+   * delegate to: by design, naming a formatter is authoritative and no type-based fallback chain is built behind it
+   * (see {@link NamedParameterFormatter}). Calling this method in that situation throws a
+   * {@code NoSuchElementException}, so a named formatter must only call it unconditionally if it is guaranteed to also
+   * be reachable through type-based resolution.
    *
    * @return  formatted text, never {@code null}
    */

@@ -337,9 +337,15 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    * <p>
    * Resolution order:
    * <ol>
-   *   <li>If a {@code format} name is given, the matching named formatter is returned (if it supports the type).</li>
    *   <li>
-   *     Named formatters whose configuration key is present in {@code config} and that support the type are added.
+   *     If a {@code format} name is given and the matching named formatter supports the type, that named formatter is
+   *     returned <em>on its own</em> — no type-based formatters are added behind it. This is by design: an explicit
+   *     by-name selection is authoritative, so such a formatter has no next formatter to delegate to via
+   *     {@link de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext#delegateToNextFormatter()}.
+   *   </li>
+   *   <li>
+   *     Otherwise, named formatters whose configuration key is present in {@code config} and that support the type are
+   *     added.
    *   </li>
    *   <li>
    *     Type-based formatters are resolved by walking the type hierarchy (superclasses and interfaces) and collected
