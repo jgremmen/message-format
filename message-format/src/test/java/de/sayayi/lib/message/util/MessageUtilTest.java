@@ -483,6 +483,25 @@ final class MessageUtilTest
 
 
     @Test
+    @DisplayName("single internal non-ASCII space character is normalized (no collapsing fast-path)")
+    void testSingleInternalNonAsciiSpaceChar()
+    {
+      // single internal NBSP, no adjacent spaces to collapse: same result length as input,
+      // must still be normalized to a regular ASCII space rather than left untouched
+      assertEquals("hello there", trimAndNormalizeSpaces("hello\u00a0there"));
+
+      // single internal tab, same result length as input
+      assertEquals("a b", trimAndNormalizeSpaces("a\tb"));
+
+      // single internal carriage return, same result length as input
+      assertEquals("a b", trimAndNormalizeSpaces("a\rb"));
+
+      // multiple, non-adjacent single non-ASCII space chars: still same result length as input
+      assertEquals("a b c", trimAndNormalizeSpaces("a\u00a0b\u00a0c"));
+    }
+
+
+    @Test
     @DisplayName("preserves newlines")
     void testPreservesNewlines()
     {

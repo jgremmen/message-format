@@ -169,7 +169,7 @@ public final class MessageUtil
    */
   @Contract(value = "null -> null; !null -> !null", pure = true)
   @SuppressWarnings("DuplicatedCode")
-  public static String trimAndNormalizeSpaces(String s)
+  public static String trimAndNormalizeSpaces(final String s)
   {
     if (s == null)
       return null;
@@ -191,11 +191,14 @@ public final class MessageUtil
     final var result = new char[len];
     var resultLen = 0;
     var lastWasSpace = false;
+    var changed = false;
+    char ch;
 
     for(var i = startIdx; i < endIndex; i++)
-    {
-      if (isSpaceChar(stringChars[i]))
+      if (isSpaceChar(ch = stringChars[i]))
       {
+        changed |= ch != ' ';
+
         if (!lastWasSpace)
         {
           result[resultLen++] = ' ';
@@ -204,12 +207,11 @@ public final class MessageUtil
       }
       else
       {
-        result[resultLen++] = stringChars[i];
+        result[resultLen++] = ch;
         lastWasSpace = false;
       }
-    }
 
-    if (resultLen == len)
+    if (resultLen == len && !changed)
       return startIdx == 0 && endIndex == stringChars.length ? s : new String(stringChars, startIdx, len);
 
     return new String(result, 0, resultLen);
