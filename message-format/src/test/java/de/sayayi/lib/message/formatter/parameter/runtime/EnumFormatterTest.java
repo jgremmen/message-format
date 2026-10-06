@@ -52,9 +52,10 @@ final class EnumFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(new EnumFormatter()))
         .setLocale(ROOT);
     val messageAccessor = messageSupport.getMessageAccessor();
+    val messageFactory = messageAccessor.getMessageFactory();
 
     assertEquals(noSpaceText("3"), format(messageAccessor, MyEnum.DD,
-        Map.of("enum", new TypedValueString("ordinal")), Map.of()));
+        Map.of("enum", new TypedValueString(messageFactory, "ordinal")), Map.of()));
 
     messageSupport.setDefaultConfig("enum", "ordinal");
     assertEquals(noSpaceText("0"), format(messageAccessor, MyEnum.AA));

@@ -17,7 +17,6 @@ package de.sayayi.lib.message.part;
 
 import de.sayayi.lib.message.FormatStringSerializer;
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueBool;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
@@ -55,14 +54,14 @@ public sealed interface TypedValue<T> extends FormatStringSerializer
 
 
   /**
-   * This class represents a boolean configuration value.
+   * This interface represents a boolean typed value.
    *
    * @since 0.21.0
    */
   sealed interface BoolValue extends TypedValue<Boolean> permits TypedValueBool
   {
     /**
-     * Return the number as boolean.
+     * Returns the number as a boolean.
      *
      * @return  number as boolean
      *
@@ -76,7 +75,7 @@ public sealed interface TypedValue<T> extends FormatStringSerializer
 
 
   /**
-   * This class represents a string configuration value.
+   * This interface represents a string typed value.
    *
    * @since 0.21.0
    */
@@ -92,27 +91,28 @@ public sealed interface TypedValue<T> extends FormatStringSerializer
 
 
     /**
-     * Returns the parsed string value as a message.
-     *
-     * @param messageFactory  message factory instance, not {@code null}
+     * Returns the string value parsed as a message, allowing it to be used wherever a message is expected (e.g. as
+     * a template reference or a formatted parameter value).
      *
      * @return  string value parsed as a message, never {@code null}
+     *
+     * @since 0.25.0
      */
-    @NotNull Message.WithSpaces asMessage(@NotNull MessageFactory messageFactory);
+    @NotNull Message.WithSpaces asMessage();
   }
 
 
 
 
   /**
-   * This class represents a numeric configuration value.
+   * This interface represents a numeric typed value.
    *
    * @since 0.21.0
    */
   sealed interface NumberValue extends TypedValue<Long> permits TypedValueNumber
   {
     /**
-     * Return the number as int.
+     * Returns the number as an int.
      * <p>
      * If the number is outside the integer range, the returned value is saturated to
      * {@link Integer#MAX_VALUE} for positive values or {@link Integer#MIN_VALUE} for
@@ -125,7 +125,7 @@ public sealed interface TypedValue<T> extends FormatStringSerializer
 
 
     /**
-     * Return the number as long.
+     * Returns the number as a long.
      *
      * @return  number as long
      */
@@ -137,7 +137,7 @@ public sealed interface TypedValue<T> extends FormatStringSerializer
 
 
   /**
-   * This class represents a message configuration value.
+   * This interface represents a message typed value.
    *
    * @since 0.21.0
    */

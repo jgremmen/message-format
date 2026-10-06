@@ -60,16 +60,17 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
         .create(formatterService)
         .setLocale("de-DE")
         .getMessageAccessor();
+    val messageFactory = messageAccessor.getMessageFactory();
 
     assertEquals(new TextPart("Größe"),
         format(messageAccessor, "Größe".getBytes(ISO_8859_1),
-            Map.of("bytes", new TypedValueString("iso-8859-1")), Map.of()));
-    assertEquals(new TextPart("Größe"),
-        format(messageAccessor, "Größe".getBytes(UTF_8), Map.of("bytes", new TypedValueString("utf-8")), Map.of()));
-    assertEquals(new TextPart("Größe"),
-        format(messageAccessor, "Größe".getBytes(), Map.of("bytes", new TypedValueString("")), Map.of()));
-    assertEquals(new TextPart("Größe"),
-        format(messageAccessor, "Größe".getBytes(), Map.of("bytes", new TypedValueString("AA-bb")), Map.of()));
+            Map.of("bytes", new TypedValueString(messageFactory, "iso-8859-1")), Map.of()));
+    assertEquals(new TextPart("Größe"), format(messageAccessor, "Größe".getBytes(UTF_8),
+        Map.of("bytes", new TypedValueString(messageFactory, "utf-8")), Map.of()));
+    assertEquals(new TextPart("Größe"), format(messageAccessor, "Größe".getBytes(),
+        Map.of("bytes", new TypedValueString(messageFactory, "")), Map.of()));
+    assertEquals(new TextPart("Größe"), format(messageAccessor, "Größe".getBytes(),
+        Map.of("bytes", new TypedValueString(messageFactory, "AA-bb")), Map.of()));
   }
 
 
@@ -82,8 +83,8 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
         .setLocale(ROOT)
         .getMessageAccessor();
 
-    assertEquals(EMPTY,
-        format(messageAccessor, "".getBytes(UTF_8), Map.of("bytes", new TypedValueString("utf-8")), Map.of()));
+    assertEquals(EMPTY, format(messageAccessor, "".getBytes(UTF_8),
+        Map.of("bytes", new TypedValueString(messageAccessor.getMessageFactory(), "utf-8")), Map.of()));
   }
 
 
@@ -96,8 +97,8 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
         .setLocale("de-DE")
         .getMessageAccessor();
 
-    assertThrowsExactly(IllegalCharsetNameException.class, () ->
-        format(messageAccessor, "Größe".getBytes(), Map.of("bytes", new TypedValueString("XYZ&%")), Map.of()));
+    assertThrowsExactly(IllegalCharsetNameException.class, () -> format(messageAccessor, "Größe".getBytes(),
+        Map.of("bytes", new TypedValueString(messageAccessor.getMessageFactory(), "XYZ&%")), Map.of()));
   }
 
 
@@ -110,7 +111,7 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
         .getMessageAccessor();
 
     assertEquals(new TextPart("R3LDtsOfZQ=="), format(messageAccessor, "Größe".getBytes(),
-        Map.of("bytes", new TypedValueString("base64")), Map.of()));
+        Map.of("bytes", new TypedValueString(messageAccessor.getMessageFactory(), "base64")), Map.of()));
   }
 
 
@@ -126,7 +127,7 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
         "VGhpcyBhcHBlYXJzIHRvIGJlIGEgdmVyeSBsb25nIHRleHQgd2l0aCBhIHNpbmdsZSBsaW5lZmVl\nZCE="),
         format(messageAccessor,
             "This appears to be a very long text with a single linefeed!".getBytes(),
-            Map.of("bytes", new TypedValueString("base64-lf")), Map.of()));
+            Map.of("bytes", new TypedValueString(messageAccessor.getMessageFactory(), "base64-lf")), Map.of()));
   }
 
 

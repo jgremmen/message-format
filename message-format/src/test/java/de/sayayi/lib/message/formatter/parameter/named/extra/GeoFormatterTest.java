@@ -111,28 +111,27 @@ final class GeoFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(new GeoFormatter()))
         .setLocale(ROOT)
         .getMessageAccessor();
+    val messageFactory = messageAccessor.getMessageFactory();
 
     // short-longitude
-    assertEquals(noSpaceText("4\u00b048'E"),
-        format(messageAccessor, dms(4, 48),
-            Map.of("geo", new TypedValueString("short-longitude")), Map.of(), "geo"));
+    assertEquals(noSpaceText("4\u00b048'E"), format(messageAccessor, dms(4, 48),
+        Map.of("geo", new TypedValueString(messageFactory, "short-longitude")), Map.of(), "geo"));
 
     // longitude
-    assertEquals(noSpaceText("19\u00b00'0\"W"),
-        format(messageAccessor, -dms(18, 59, 59, 501),
-            Map.of("geo", new TypedValueString("longitude")), Map.of(), "geo"));
+    assertEquals(noSpaceText("19\u00b00'0\"W"), format(messageAccessor, -dms(18, 59, 59, 501),
+        Map.of("geo", new TypedValueString(messageFactory, "longitude")), Map.of(), "geo"));
 
     // medium-longitude
     assertEquals(noSpaceText("18\u00b059'59,9\"E"),
         format(messageAccessor, Parameters.empty(GERMANY),
             dms(18, 59, 59, 891),
-            Map.of("geo", new TypedValueString("medium-longitude")), Map.of(), "geo"));
+            Map.of("geo", new TypedValueString(messageFactory, "medium-longitude")), Map.of(), "geo"));
 
     // long-longitude
     assertEquals(noSpaceText("18\u00b059'59.891\"W"),
         format(messageAccessor, Parameters.empty(UK),
             -dms(18, 59, 59, 891),
-            Map.of("geo", new TypedValueString("long-longitude")), Map.of(), "geo"));
+            Map.of("geo", new TypedValueString(messageFactory, "long-longitude")), Map.of(), "geo"));
   }
 
 

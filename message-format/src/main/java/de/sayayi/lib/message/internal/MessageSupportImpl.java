@@ -54,29 +54,45 @@ import static java.util.stream.Collectors.toCollection;
 
 
 /**
- * Default implementation of {@link ConfigurableMessageSupport}.
+ * Core implementation of {@link MessageSupport.ConfigurableMessageSupport}.
  * <p>
- * This class manages a set of messages (identified by code), templates (identified by name) and default configuration
- * values. It provides the fluent {@link MessageConfigurer} API for preparing and formatting messages.
+ * This class stores registered messages, templates and default configuration values for a message support instance.
+ * It exposes that state through the nested {@link Accessor} and creates {@link Configurer} instances for individual
+ * formatting operations.
  * <p>
  * Duplicate messages and templates are handled by configurable filters. By default, adding a message or template with
- * a code or name that already exists will throw a {@link DuplicateMessageException} or
- * {@link DuplicateTemplateException} respectively.
+ * an existing code or name throws a {@link DuplicateMessageException} or {@link DuplicateTemplateException}.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
 public final class MessageSupportImpl implements MessageSupport.ConfigurableMessageSupport
 {
+  /** Formatter registry used to resolve parameter and post formatters while formatting messages. */
   private final @NotNull FormatterService formatterService;
+
+  /** Factory used to parse literal message definitions and create typed message representations. */
   private final @NotNull MessageFactory messageFactory;
+
+  /** Default configuration values exposed through the message accessor to message parts during formatting. */
   private final @NotNull Map<String,TypedValue<?>> defaultConfig = new TreeMap<>();
+
+  /** Registered messages keyed by their unique message code. */
   private final @NotNull Map<String,Message.WithCode> messages = new TreeMap<>();
+
+  /** Registered templates keyed by their kebab-case template name. */
   private final @NotNull Map<String,Template> templates = new TreeMap<>();
+
+  /** Shared accessor instance exposing the current support state to messages and related infrastructure. */
   private final @NotNull MessageAccessor messageAccessor;
 
+  /** Default locale used for new formatting operations unless a configurer overrides it. */
   private @NotNull Locale locale;
+
+  /** Strategy deciding whether a newly added message should be accepted when its code already exists. */
   private @NotNull MessageFilter messageFilter;
+
+  /** Strategy deciding whether a newly added template should be accepted when its name already exists. */
   private @NotNull TemplateFilter templateFilter;
 
 
@@ -138,7 +154,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   @Override
   public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, @NotNull String value)
   {
-    defaultConfig.put(validateName(name, "config name"), new TypedValueString(value));
+    defaultConfig.put(validateName(name, "config name"), new TypedValueString(messageFactory, value));
     return this;
   }
 
@@ -348,11 +364,21 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
    */
   public final class Configurer<M extends Message> implements MessageConfigurer<M>
   {
+    /** Supplies the message instance to configure and format. */
     private final @NotNull Supplier<M> message;
+
+    /** Locale applied to the current formatting operation. */
     @NotNull Locale locale;
+
+    /** Parameter values collected for the current formatting operation. */
     @NotNull Map<String,Object> parameters;
 
 
+    /**
+     * Creates a configurer for a specific message supplier.
+     *
+     * @param message  supplier returning the message to configure, not {@code null}
+     */
     Configurer(@NotNull Supplier<M> message)
     {
       this.message = message;

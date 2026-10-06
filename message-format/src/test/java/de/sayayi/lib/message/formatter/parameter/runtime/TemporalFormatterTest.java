@@ -64,21 +64,22 @@ final class TemporalFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(new TemporalFormatter()))
         .setLocale(GERMANY)
         .getMessageAccessor();
+    val messageFactory = messageAccessor.getMessageFactory();
     val date = LocalDate.of(1972, 8, 17);
 
-    assertEquals(noSpaceText("17.08.72"),
-        format(messageAccessor, date, Map.of("date", new TypedValueString("short")), Map.of()));
-    assertEquals(noSpaceText("17.08.1972"),
-        format(messageAccessor, date, Map.of("date", new TypedValueString("medium")), Map.of()));
-    assertEquals(noSpaceText("17. August 1972"),
-        format(messageAccessor, date, Map.of("date", new TypedValueString("long")), Map.of()));
-    assertEquals(noSpaceText("Donnerstag, 17. August 1972"),
-        format(messageAccessor, date, Map.of("date", new TypedValueString("full")), Map.of()));
-    assertEquals(noSpaceText("17.08.1972"),
-        format(messageAccessor, date, Map.of("date", new TypedValueString("date")), Map.of()));
+    assertEquals(noSpaceText("17.08.72"), format(messageAccessor, date,
+        Map.of("date", new TypedValueString(messageFactory, "short")), Map.of()));
+    assertEquals(noSpaceText("17.08.1972"), format(messageAccessor, date,
+        Map.of("date", new TypedValueString(messageFactory, "medium")), Map.of()));
+    assertEquals(noSpaceText("17. August 1972"), format(messageAccessor, date,
+        Map.of("date", new TypedValueString(messageFactory, "long")), Map.of()));
+    assertEquals(noSpaceText("Donnerstag, 17. August 1972"), format(messageAccessor, date,
+        Map.of("date", new TypedValueString(messageFactory, "full")), Map.of()));
+    assertEquals(noSpaceText("17.08.1972"), format(messageAccessor, date,
+        Map.of("date", new TypedValueString(messageFactory, "date")), Map.of()));
 
     assertEquals(emptyText(), format(messageAccessor, date,
-        Map.of("date", new TypedValueString("time")), Map.of()));
+        Map.of("date", new TypedValueString(messageFactory, "time")), Map.of()));
   }
 
 
@@ -89,21 +90,22 @@ final class TemporalFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(new TemporalFormatter()))
         .setLocale(GERMANY)
         .getMessageAccessor();
+    val messageFactory = messageAccessor.getMessageFactory();
     val time = LocalTime.of(16, 34, 11, 672000000);
 
     assertEquals(new TextPart("16:34"), format(messageAccessor, time,
-        Map.of("date", new TypedValueString("short")), Map.of()));
+        Map.of("date", new TypedValueString(messageFactory, "short")), Map.of()));
     assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
-        Map.of("date", new TypedValueString("medium")), Map.of()));
+        Map.of("date", new TypedValueString(messageFactory, "medium")), Map.of()));
     assertEquals(new TextPart("16:34:11 MEZ"), format(messageAccessor, time,
-        Map.of("date", new TypedValueString("long")), Map.of()));
+        Map.of("date", new TypedValueString(messageFactory, "long")), Map.of()));
     assertEquals(new TextPart("16:34:11 Mitteleuropäische Zeit"), format(messageAccessor, time,
-        Map.of("date", new TypedValueString("full")), Map.of()));
+        Map.of("date", new TypedValueString(messageFactory, "full")), Map.of()));
     assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
-        Map.of("date", new TypedValueString("time")), Map.of()));
+        Map.of("date", new TypedValueString(messageFactory, "time")), Map.of()));
 
     assertEquals(Text.EMPTY, format(messageAccessor, time,
-        Map.of("date", new TypedValueString("date")), Map.of()));
+        Map.of("date", new TypedValueString(messageFactory, "date")), Map.of()));
   }
 
 
@@ -114,21 +116,23 @@ final class TemporalFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(new TemporalFormatter()))
         .setLocale(UK)
         .getMessageAccessor();
+    val messageFactory = messageAccessor.getMessageFactory();
     val datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
 
-    assertEquals(new TextPart("17/08/1972, 02:40"),
-        format(messageAccessor, datetime, Map.of("date", new TypedValueString("short")), Map.of()));
-    assertEquals(new TextPart("17 Aug 1972, 02:40:23"),
-        format(messageAccessor, datetime, Map.of("date", new TypedValueString("medium")), Map.of()));
-    assertEquals(new TextPart("17 August 1972, 02:40:23 CET"),
-        format(messageAccessor, datetime, Map.of("date", new TypedValueString("long")), Map.of()));
+    assertEquals(new TextPart("17/08/1972, 02:40"), format(messageAccessor, datetime,
+        Map.of("date", new TypedValueString(messageFactory, "short")), Map.of()));
+    assertEquals(new TextPart("17 Aug 1972, 02:40:23"), format(messageAccessor, datetime,
+        Map.of("date", new TypedValueString(messageFactory, "medium")), Map.of()));
+    assertEquals(new TextPart("17 August 1972, 02:40:23 CET"), format(messageAccessor, datetime,
+        Map.of("date", new TypedValueString(messageFactory, "long")), Map.of()));
     assertEquals(new TextPart("Thursday, 17 August 1972, 02:40:23 Central European Standard Time"),
-        format(messageAccessor, datetime, Map.of("date", new TypedValueString("full")), Map.of()));
+        format(messageAccessor, datetime,
+            Map.of("date", new TypedValueString(messageFactory, "full")), Map.of()));
 
-    assertEquals(new TextPart("17 Aug 1972"),
-        format(messageAccessor, datetime, Map.of("date", new TypedValueString("date")), Map.of()));
-    assertEquals(new TextPart("02:40:23"),
-        format(messageAccessor, datetime, Map.of("date", new TypedValueString("time")), Map.of()));
+    assertEquals(new TextPart("17 Aug 1972"), format(messageAccessor, datetime,
+        Map.of("date", new TypedValueString(messageFactory, "date")), Map.of()));
+    assertEquals(new TextPart("02:40:23"), format(messageAccessor, datetime,
+        Map.of("date", new TypedValueString(messageFactory, "time")), Map.of()));
   }
 
 
@@ -139,14 +143,15 @@ final class TemporalFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(new TemporalFormatter()))
         .setLocale(FRANCE)
         .getMessageAccessor();
+    val messageFactory = messageAccessor.getMessageFactory();
     val datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
 
-    assertEquals(new TextPart("17 août"),
-        format(messageAccessor, datetime, Map.of("date", new TypedValueString("dd MMMM")), Map.of()));
-    assertEquals(new TextPart("jeu. jeudi"),
-        format(messageAccessor, datetime, Map.of("date", new TypedValueString("EEE EEEE")), Map.of()));
-    assertEquals(new TextPart("02:40:23,833"),
-        format(messageAccessor, datetime, Map.of("date", new TypedValueString("HH:mm:ss,SSS")), Map.of()));
+    assertEquals(new TextPart("17 août"), format(messageAccessor, datetime,
+        Map.of("date", new TypedValueString(messageFactory, "dd MMMM")), Map.of()));
+    assertEquals(new TextPart("jeu. jeudi"), format(messageAccessor, datetime,
+        Map.of("date", new TypedValueString(messageFactory, "EEE EEEE")), Map.of()));
+    assertEquals(new TextPart("02:40:23,833"), format(messageAccessor, datetime,
+        Map.of("date", new TypedValueString(messageFactory, "HH:mm:ss,SSS")), Map.of()));
   }
 
 

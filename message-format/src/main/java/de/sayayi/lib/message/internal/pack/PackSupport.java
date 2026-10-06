@@ -109,6 +109,12 @@ public final class PackSupport
   private final Map<Message.WithSpaces,Message.WithSpaces> messagesWithSpaces = new HashMap<>();
 
 
+  /**
+   * Creates a new pack support instance using the given message factory to re-create messages from their packed
+   * string representation and to deduplicate equivalent instances encountered while unpacking.
+   *
+   * @param messageFactory  factory used for creating messages while unpacking, not {@code null}
+   */
   public PackSupport(@NotNull MessageFactory messageFactory) {
     this.messageFactory = messageFactory;
   }
@@ -450,7 +456,7 @@ public final class PackSupport
       case VALUE_BOOL_ID -> TypedValueBool.unpack(packStream);
       case VALUE_MESSAGE_ID -> TypedValueMessage.unpack(this, packStream);
       case VALUE_NUMBER_ID -> TypedValueNumber.unpack(packStream);
-      case VALUE_STRING_ID -> TypedValueString.unpack(packStream);
+      case VALUE_STRING_ID -> TypedValueString.unpack(messageFactory, packStream);
 
       default -> throw new IllegalStateException("typed value expected");
     };
@@ -609,7 +615,7 @@ public final class PackSupport
   {
     return switch(typedValue) {
       case TypedValue.MessageValue messageValue -> messageValue;
-      case TypedValue.StringValue stringValue -> new TypedValueMessage(stringValue.asMessage(messageFactory));
+      case TypedValue.StringValue stringValue -> new TypedValueMessage(stringValue.asMessage());
       default -> throw new IllegalStateException();
     };
   }

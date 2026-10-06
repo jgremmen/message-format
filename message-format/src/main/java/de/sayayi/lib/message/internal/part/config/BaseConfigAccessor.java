@@ -172,7 +172,7 @@ public class BaseConfigAccessor implements ConfigAccessor
     if (configValue instanceof MessageValue messageValue)
       return Optional.of(messageValue.messageValue());
     else if (configValue instanceof StringValue stringValue)
-      return Optional.of(stringValue.asMessage(messageAccessor.getMessageFactory()));
+      return Optional.of(stringValue.asMessage());
 
     return Optional.empty();
   }

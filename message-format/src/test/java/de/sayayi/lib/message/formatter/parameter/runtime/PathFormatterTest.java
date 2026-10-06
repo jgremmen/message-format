@@ -52,16 +52,17 @@ final class PathFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(new PathFormatter(), new IterableFormatter()))
         .setLocale(ROOT)
         .getMessageAccessor();
+    val messageFactory = messageAccessor.getMessageFactory();
     val f = new File("/path1/path2/filename.ext");
 
     assertEquals(nullText(), format(messageAccessor, null));
     assertEquals(noSpaceText("/path1/path2/filename.ext"), format(messageAccessor, f));
     assertEquals(noSpaceText("filename.ext"), format(messageAccessor, f,
-        Map.of("path", new TypedValueString("name")), Map.of()));
+        Map.of("path", new TypedValueString(messageFactory, "name")), Map.of()));
     assertEquals(noSpaceText("/path1/path2"), format(messageAccessor, f,
-        Map.of("path", new TypedValueString("parent")), Map.of()));
+        Map.of("path", new TypedValueString(messageFactory, "parent")), Map.of()));
     assertEquals(noSpaceText("ext"), format(messageAccessor, f,
-        Map.of("path", new TypedValueString("extension")), Map.of()));
+        Map.of("path", new TypedValueString(messageFactory, "extension")), Map.of()));
   }
 
 

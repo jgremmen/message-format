@@ -62,18 +62,17 @@ class TypedValueTest
   @Test
   void testString()
   {
-    //noinspection DataFlowIssue
-    assertThrows(Exception.class, () -> new TypedValueString(null));
+    val messageFactory = MessageFactory.getSharedInstance();
 
-    val string = new TypedValueString("Hello %{s}");
+    //noinspection DataFlowIssue
+    assertThrows(Exception.class, () -> new TypedValueString(messageFactory, null));
+
+    val string = new TypedValueString(messageFactory, "Hello %{s}");
 
     assertEquals("Hello %{s}", string.stringValue());
     assertEquals("Hello %{s}", string.asObject());
 
-    val messageFactory = MessageFactory.getSharedInstance();
-
-    assertEquals(messageFactory.parseMessage("Hello  %{ s }"),
-        string.asMessage(messageFactory));
+    assertEquals(messageFactory.parseMessage("Hello  %{ s }"), string.asMessage());
   }
 
 
@@ -91,6 +90,6 @@ class TypedValueTest
     assertEquals(messageFactory.parseMessage("%{a, format:bool } %{ s }."), message.asObject());
     assertEquals(
         message.asObject(),
-        new TypedValueString("%{a, format:bool } %{ s }.").asMessage(messageFactory));
+        new TypedValueString(messageFactory, "%{a, format:bool } %{ s }.").asMessage());
   }
 }

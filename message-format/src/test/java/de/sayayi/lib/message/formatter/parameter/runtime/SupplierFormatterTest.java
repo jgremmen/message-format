@@ -58,9 +58,10 @@ final class SupplierFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(new NumberFormatter(), new LongSupplierFormatter()))
         .setLocale("en")
         .getMessageAccessor();
+    val messageFactory = messageAccessor.getMessageFactory();
 
     assertEquals(noSpaceText("1,234,567,890"),
         format(messageAccessor, (LongSupplier)() -> 1234567890L,
-            Map.of("number", new TypedValueString("###,###,###,###")), Map.of()));
+            Map.of("number", new TypedValueString(messageFactory, "###,###,###,###")), Map.of()));
   }
 }

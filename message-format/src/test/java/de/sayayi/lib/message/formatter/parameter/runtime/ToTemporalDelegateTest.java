@@ -44,8 +44,8 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
   {
     val date = new Date(2024 - 1900, Calendar.NOVEMBER, 9);
 
-    assertEquals(noSpaceText("09.11.2024, 00:00:00"),
-        format(messageAccessor, date, Map.of("date", new TypedValueString("medium")), Map.of()));
+    assertEquals(noSpaceText("09.11.2024, 00:00:00"), format(messageAccessor, date,
+        Map.of("date", new TypedValueString(messageAccessor.getMessageFactory(), "medium")), Map.of()));
   }
 
 
@@ -57,8 +57,8 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
     val date = new Date(2024 - 1900, Calendar.NOVEMBER, 9);
     val sqlDate = new java.sql.Date(date.getTime());
 
-    assertEquals(noSpaceText("2024-11-09"),
-        format(messageAccessor, sqlDate, Map.of("date", new TypedValueString("yyyy-MM-dd")), Map.of()));
+    assertEquals(noSpaceText("2024-11-09"), format(messageAccessor, sqlDate,
+        Map.of("date", new TypedValueString(messageAccessor.getMessageFactory(), "yyyy-MM-dd")), Map.of()));
   }
 
 
@@ -69,7 +69,7 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
   {
     val sqlTime = new java.sql.Time(23, 36, 4);
 
-    assertEquals(noSpaceText("23:36"),
-        format(messageAccessor, sqlTime, Map.of("date", new TypedValueString("HH:mm")), Map.of()));
+    assertEquals(noSpaceText("23:36"), format(messageAccessor, sqlTime,
+        Map.of("date", new TypedValueString(messageAccessor.getMessageFactory(), "HH:mm")), Map.of()));
   }
 }

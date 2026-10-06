@@ -18,21 +18,22 @@ package de.sayayi.lib.message.internal.part.typedvalue;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.part.TypedValue.StringValue;
+import de.sayayi.lib.message.util.SupplierDelegate;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.util.MessageUtil.*;
 import static java.util.Objects.requireNonNull;
 
 
 /**
- * Internal implementation of {@link StringValue} representing a string typed configuration value.
- * The string can optionally be parsed into a {@link Message.WithSpaces} via
- * {@link #asMessage(MessageFactory)}.
+ * Typed value implementation for string configuration or map values. In addition to exposing the raw string, it is
+ * able to parse that string lazily into a {@link Message.WithSpaces message} on demand.
  *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
@@ -42,18 +43,26 @@ public final class TypedValueString implements StringValue
   /** The string value. */
   private final @NotNull String string;
 
-  private transient volatile Message.WithSpaces message;
+  /** Lazily evaluated, cached message representation of {@link #string}. */
+  private final Supplier<Message.WithSpaces> messageSupplier;
 
 
   /**
    * Creates a new typed value string wrapping the given string.
    *
-   * @param string  the string value, not {@code null}
+   * @param messageFactory  factory used for lazily parsing the string into a message, not {@code null}
+   * @param string          the string value, not {@code null}
    *
-   * @throws NullPointerException  if {@code string} is {@code null}
+   * @throws NullPointerException  if {@code messageFactory} or {@code string} is {@code null}
    */
-  public TypedValueString(@NotNull String string) {
+  public TypedValueString(@NotNull MessageFactory messageFactory, @NotNull String string)
+  {
+    requireNonNull(messageFactory, "messageFactory must not be null");
+
     this.string = requireNonNull(string, "string must not be null");
+
+    //noinspection LanguageMismatch
+    messageSupplier = SupplierDelegate.of(() -> messageFactory.parseMessage(string));
   }
 
 
@@ -80,15 +89,8 @@ public final class TypedValueString implements StringValue
    * {@inheritDoc}
    */
   @Override
-  public @NotNull Message.WithSpaces asMessage(@NotNull MessageFactory messageFactory)
-  {
-    if (message == null)
-    {
-      //noinspection LanguageMismatch
-      message = messageFactory.parseMessage(string);
-    }
-
-    return message;
+  public @NotNull Message.WithSpaces asMessage() {
+    return messageSupplier.get();
   }
 
 
@@ -171,7 +173,8 @@ public final class TypedValueString implements StringValue
    *
    * @since 0.8.0
    */
-  public static @NotNull TypedValueString unpack(@NotNull PackInputStream packStream) throws IOException {
-    return new TypedValueString(requireNonNull(packStream.readString()));
+  public static @NotNull TypedValueString unpack(@NotNull MessageFactory messageFactory,
+                                                 @NotNull PackInputStream packStream) throws IOException {
+    return new TypedValueString(messageFactory, requireNonNull(packStream.readString()));
   }
 }

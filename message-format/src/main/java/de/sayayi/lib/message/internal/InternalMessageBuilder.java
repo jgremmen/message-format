@@ -54,7 +54,11 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * Default implementation of the {@link MessageBuilder} interface.
+ * Internal {@link MessageBuilder} implementation for programmatically constructing message-format messages.
+ * <p>
+ * The builder collects literal text, parameter references, post-formatters and template references and turns them
+ * into the internal {@link Message} and {@link Template} implementations used by this package. Nested builder types
+ * in this class capture the state for individual parts until they are flushed into the resulting message structure.
  * <p>
  * This class is <strong>not thread-safe</strong>. A builder instance must only be used from a single thread and must
  * not be reused after calling {@link #build()} or {@link #buildWithCode(String)}.
@@ -67,9 +71,16 @@ import static java.util.Objects.requireNonNull;
  */
 public final class InternalMessageBuilder implements MessageBuilder
 {
+  /** Message factory used to parse nested messages and create coded messages. */
   private final @NotNull MessageFactory messageFactory;
+
+  /** Collected parts of the message currently being assembled. */
   private final @NotNull List<MessagePart> parts;
+
+  /** Flush callback for the currently active part builder, if any. */
   private Runnable activePartFlusher;
+
+  /** Indicates whether this builder has already produced its final message. */
   private boolean built;
 
 
@@ -86,7 +97,15 @@ public final class InternalMessageBuilder implements MessageBuilder
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * Starts a literal text part and makes it the active part of this message.
+   *
+   * @param text  literal text to append, not {@code null}
+   *
+   * @return  builder for configuring the new text part, never {@code null}
+   *
+   * @throws IllegalStateException if this builder has already been built
+   */
   @Override
   public @NotNull TextBuilder text(@NotNull String text)
   {
@@ -101,14 +120,23 @@ public final class InternalMessageBuilder implements MessageBuilder
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * Starts a parameter part and makes it the active part of this message.
+   *
+   * @param name  parameter name, not {@code null}
+   *
+   * @return  builder for configuring the new parameter part, never {@code null}
+   *
+   * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
+   * @throws IllegalStateException if this builder has already been built
+   */
   @Override
   public @NotNull ParameterBuilder parameter(@NotNull String name)
   {
     checkNotBuilt();
     flushActivePart();
 
-    final var builder = new ParameterBuilderImpl(name);
+    final var builder = new ParameterBuilderImpl(messageFactory, name);
 
     activePartFlusher = builder::flush;
 
@@ -116,14 +144,23 @@ public final class InternalMessageBuilder implements MessageBuilder
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * Starts a post-formatter part and makes it the active part of this message.
+   *
+   * @param name  post-formatter name, not {@code null}
+   *
+   * @return  builder for configuring the new post-formatter part, never {@code null}
+   *
+   * @throws IllegalArgumentException if {@code name} does not use kebab-case
+   * @throws IllegalStateException if this builder has already been built
+   */
   @Override
   public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
   {
     checkNotBuilt();
     flushActivePart();
 
-    final var builder = new PostFormatterBuilderImpl(name);
+    final var builder = new PostFormatterBuilderImpl(messageFactory, name);
 
     activePartFlusher = builder::flush;
 
@@ -131,7 +168,16 @@ public final class InternalMessageBuilder implements MessageBuilder
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * Starts a template reference part and makes it the active part of this message.
+   *
+   * @param name  template name, not {@code null}
+   *
+   * @return  builder for configuring the new template part, never {@code null}
+   *
+   * @throws IllegalArgumentException if {@code name} does not use kebab-case
+   * @throws IllegalStateException if this builder has already been built
+   */
   @Override
   public @NotNull TemplateBuilder template(@NotNull String name)
   {
@@ -146,7 +192,13 @@ public final class InternalMessageBuilder implements MessageBuilder
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * Builds the configured message.
+   *
+   * @return  message assembled from the configured parts, never {@code null}
+   *
+   * @throws IllegalStateException if this builder has already been built
+   */
   @Override
   public @NotNull Message.WithSpaces build()
   {
@@ -179,14 +231,28 @@ public final class InternalMessageBuilder implements MessageBuilder
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * Builds the configured message and wraps it with the supplied code.
+   *
+   * @param code  message code to associate with the built message, not {@code null}
+   *
+   * @return  coded message, never {@code null}
+   *
+   * @throws IllegalStateException if this builder has already been built
+   */
   @Override
   public @NotNull Message.WithCode buildWithCode(@NotNull String code) {
     return messageFactory.withCode(code, build());
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * Builds the configured message and exposes it as a {@link Template}.
+   *
+   * @return  template backed by the built message, never {@code null}
+   *
+   * @throws IllegalStateException if this builder has already been built
+   */
   @Override
   public @NotNull Template buildAsTemplate() {
     return new MessageTemplate(build());
@@ -232,11 +298,18 @@ public final class InternalMessageBuilder implements MessageBuilder
   public abstract static non-sealed class AbstractSpacedBuilder<S extends SpacedBuilder<S>>
       implements SpacedBuilder<S>
   {
+    /** Whether a space should be inserted before the part produced by this builder. */
     protected boolean spaceBefore;
+
+    /** Whether a space should be inserted after the part produced by this builder. */
     protected boolean spaceAfter;
 
 
-    /** {@inheritDoc} */
+    /**
+     * Marks the part produced by this builder to include a leading space when it is flushed.
+     *
+     * @return  this builder, never {@code null}
+     */
     @Override
     @SuppressWarnings("unchecked")
     public @NotNull S spaceBefore()
@@ -247,7 +320,11 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Marks the part produced by this builder to include a trailing space when it is flushed.
+     *
+     * @return  this builder, never {@code null}
+     */
     @Override
     @SuppressWarnings("unchecked")
     public @NotNull S spaceAfter()
@@ -270,8 +347,10 @@ public final class InternalMessageBuilder implements MessageBuilder
    */
   public final class TextBuilderImpl extends AbstractSpacedBuilder<TextBuilder> implements TextBuilder
   {
+    /** Literal text contributed by this builder. */
     private final @NotNull String text;
 
+    /** Indicates whether this text part has already been written to the enclosing builder. */
     private boolean flushed;
 
 
@@ -298,7 +377,15 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and starts a text part in the enclosing message builder.
+     *
+     * @param text  literal text for the next part, not {@code null}
+     *
+     * @return  builder for the next text part, never {@code null}
+     *
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull TextBuilder text(@NotNull String text)
     {
@@ -308,7 +395,16 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and starts a parameter part in the enclosing message builder.
+     *
+     * @param name  parameter name, not {@code null}
+     *
+     * @return  builder for the parameter part, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull ParameterBuilder parameter(@NotNull String name)
     {
@@ -318,7 +414,16 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and starts a post-formatter part in the enclosing message builder.
+     *
+     * @param name  post-formatter name, not {@code null}
+     *
+     * @return  builder for the post-formatter part, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use kebab-case
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
     {
@@ -328,7 +433,16 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and starts a template part in the enclosing message builder.
+     *
+     * @param name  template name, not {@code null}
+     *
+     * @return  builder for the template part, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use kebab-case
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull TemplateBuilder template(@NotNull String name)
     {
@@ -338,7 +452,13 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and builds the enclosing message.
+     *
+     * @return  built message, never {@code null}
+     *
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull Message.WithSpaces build()
     {
@@ -348,7 +468,15 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and builds a coded message from the enclosing builder.
+     *
+     * @param code  message code to associate with the built message, not {@code null}
+     *
+     * @return  coded message, never {@code null}
+     *
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull Message.WithCode buildWithCode(@NotNull String code)
     {
@@ -358,7 +486,13 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and builds the enclosing message as a template.
+     *
+     * @return  built template, never {@code null}
+     *
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull Template buildAsTemplate()
     {
@@ -383,39 +517,83 @@ public final class InternalMessageBuilder implements MessageBuilder
       extends AbstractSpacedBuilder<S>
       implements ConfigurableBuilder<S>
   {
+    /** Message factory used to convert string values into parsed message values. */
+    protected final MessageFactory messageFactory;
+
+    /** Configuration values collected for the part being built. */
     protected final @NotNull Map<String,TypedValue<?>> config;
 
 
     /**
      * Construct a new configurable builder with an empty configuration map.
+     *
+     * @param messageFactory  message factory used for parsing nested message values, not {@code null}
      */
-    protected AbstractConfigurableBuilder() {
+    protected AbstractConfigurableBuilder(@NotNull MessageFactory messageFactory)
+    {
+      this.messageFactory = messageFactory;
       this.config = new LinkedHashMap<>();
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Stores a string configuration value for the current part.
+     *
+     * @param name   configuration name, not {@code null}
+     * @param value  string value, not {@code null}
+     *
+     * @return  this builder, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use kebab-case
+     */
     @Override
     public @NotNull S configString(@NotNull String name, @NotNull String value) {
-      return withConfig(name, new TypedValueString(value));
+      return withConfig(name, new TypedValueString(messageFactory, value));
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Stores a boolean configuration value for the current part.
+     *
+     * @param name   configuration name, not {@code null}
+     * @param value  boolean value to store
+     *
+     * @return  this builder, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use kebab-case
+     */
     @Override
     public @NotNull S configBool(@NotNull String name, boolean value) {
       return withConfig(name, value ? TypedValueBool.TRUE : TypedValueBool.FALSE);
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Stores a numeric configuration value for the current part.
+     *
+     * @param name   configuration name, not {@code null}
+     * @param value  numeric value to store
+     *
+     * @return  this builder, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use kebab-case
+     */
     @Override
     public @NotNull S configNumber(@NotNull String name, long value) {
       return withConfig(name, new TypedValueNumber(value));
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Stores a nested message configuration value for the current part.
+     *
+     * @param name     configuration name, not {@code null}
+     * @param message  message value, not {@code null}
+     *
+     * @return  this builder, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use kebab-case
+     */
     @Override
     public @NotNull S configMessage(@NotNull String name, @NotNull Message.WithSpaces message) {
       return withConfig(name, new TypedValueMessage(message));
@@ -460,22 +638,31 @@ public final class InternalMessageBuilder implements MessageBuilder
       extends AbstractConfigurableBuilder<ParameterBuilder>
       implements ParameterBuilder
   {
+    /** Name of the parameter represented by this builder. */
     private final @NotNull String name;
+
+    /** Optional map entries keyed by value conditions for this parameter. */
     private final @NotNull Map<MapKey,TypedValue.MessageValue> map;
 
+    /** Optional format name associated with the parameter. */
     private String format;
+
+    /** Indicates whether this parameter part has already been written to the enclosing builder. */
     private boolean flushed;
 
 
     /**
      * Construct a new parameter builder for the given parameter name.
      *
-     * @param name  parameter name (must follow kebab-case or lower camel-case convention), not {@code null}
+     * @param messageFactory  message factory used to parse nested map messages, not {@code null}
+     * @param name            parameter name (must follow kebab-case or lower camel-case convention), not {@code null}
      *
      * @throws IllegalArgumentException if {@code name} does not match the expected naming convention
      */
-    private ParameterBuilderImpl(@NotNull String name)
+    private ParameterBuilderImpl(@NotNull MessageFactory messageFactory, @NotNull String name)
     {
+      super(messageFactory);
+
       if (!isKebabOrLowerCamelCaseName(requireNonNull(name, "name must not be null")))
       {
         throw new IllegalArgumentException("parameter name '" + name +
@@ -487,7 +674,15 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Sets the optional format name for this parameter part.
+     *
+     * @param format  format name, not {@code null}
+     *
+     * @return  this parameter builder, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code format} does not use kebab-case
+     */
     @Override
     public @NotNull ParameterBuilder withFormat(@NotNull String format)
     {
@@ -500,14 +695,24 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Starts a boolean keyed map entry for this parameter.
+     *
+     * @param key  boolean key for the entry
+     *
+     * @return  builder for supplying the entry value, never {@code null}
+     */
     @Override
     public @NotNull MapValueBuilder mapBool(boolean key) {
       return new MapValueBuilderImpl(this, key ? MapKeyBool.TRUE : MapKeyBool.FALSE);
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Starts a map entry keyed by an empty-value comparison for this parameter.
+     *
+     * @return  builder for choosing the comparison and supplying the entry value, never {@code null}
+     */
     @Override
     public @NotNull MapEqualityBuilder mapEmpty()
     {
@@ -516,7 +721,11 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Starts a map entry keyed by a null-value comparison for this parameter.
+     *
+     * @return  builder for choosing the comparison and supplying the entry value, never {@code null}
+     */
     @Override
     public @NotNull MapEqualityBuilder mapNull()
     {
@@ -525,7 +734,13 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Starts a numeric map entry for this parameter.
+     *
+     * @param number  numeric key value to compare against
+     *
+     * @return  builder for choosing the comparison and supplying the entry value, never {@code null}
+     */
     @Override
     public @NotNull MapRelationalBuilder mapNumber(long number)
     {
@@ -534,7 +749,13 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Starts a string keyed map entry for this parameter.
+     *
+     * @param string  string key value to compare against, not {@code null}
+     *
+     * @return  builder for choosing the comparison and supplying the entry value, never {@code null}
+     */
     @Override
     public @NotNull MapRelationalBuilder mapString(@NotNull String string)
     {
@@ -593,14 +814,26 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Starts the default map entry used when no keyed entry matches.
+     *
+     * @return  builder for supplying the default entry value, never {@code null}
+     */
     @Override
     public @NotNull MapValueBuilder mapDefault() {
       return new MapValueBuilderImpl(this, null);
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and starts a text part in the enclosing message builder.
+     *
+     * @param text  literal text for the next part, not {@code null}
+     *
+     * @return  builder for the next text part, never {@code null}
+     *
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull TextBuilder text(@NotNull String text)
     {
@@ -610,7 +843,16 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and starts a parameter part in the enclosing message builder.
+     *
+     * @param name  parameter name, not {@code null}
+     *
+     * @return  builder for the parameter part, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull ParameterBuilder parameter(@NotNull String name)
     {
@@ -620,7 +862,16 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and starts a post-formatter part in the enclosing message builder.
+     *
+     * @param name  post-formatter name, not {@code null}
+     *
+     * @return  builder for the post-formatter part, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use kebab-case
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
     {
@@ -630,7 +881,16 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and starts a template part in the enclosing message builder.
+     *
+     * @param name  template name, not {@code null}
+     *
+     * @return  builder for the template part, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use kebab-case
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull TemplateBuilder template(@NotNull String name)
     {
@@ -640,7 +900,13 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and builds the enclosing message.
+     *
+     * @return  built message, never {@code null}
+     *
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull Message.WithSpaces build()
     {
@@ -650,7 +916,15 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and builds a coded message from the enclosing builder.
+     *
+     * @param code  message code to associate with the built message, not {@code null}
+     *
+     * @return  coded message, never {@code null}
+     *
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull Message.WithCode buildWithCode(@NotNull String code)
     {
@@ -660,7 +934,13 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and builds the enclosing message as a template.
+     *
+     * @return  built template, never {@code null}
+     *
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull Template buildAsTemplate()
     {
@@ -701,21 +981,28 @@ public final class InternalMessageBuilder implements MessageBuilder
       extends AbstractConfigurableBuilder<PostFormatterBuilder>
       implements PostFormatterBuilder
   {
+    /** Name of the post-formatter represented by this builder. */
     private final @NotNull String name;
 
+    /** Message that will be passed to the post-formatter. */
     private @NotNull Message.WithSpaces innerMessage;
+
+    /** Indicates whether this post-formatter part has already been written to the enclosing builder. */
     private boolean flushed;
 
 
     /**
      * Construct a new post-formatter builder for the given formatter name.
      *
-     * @param name  post-formatter name (must follow kebab-case convention), not {@code null}
+     * @param messageFactory  message factory used to parse nested message values, not {@code null}
+     * @param name            post-formatter name (must follow kebab-case convention), not {@code null}
      *
      * @throws IllegalArgumentException if {@code name} does not match the kebab-case naming convention
      */
-    private PostFormatterBuilderImpl(@NotNull String name)
+    private PostFormatterBuilderImpl(@NotNull MessageFactory messageFactory, @NotNull String name)
     {
+      super(messageFactory);
+
       if (!isKebabCaseName(requireNonNull(name, "name must not be null")))
       {
         throw new IllegalArgumentException("post-formatter name '" + name +
@@ -742,14 +1029,26 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Sets the post-formatter input from a message-format string.
+     *
+     * @param message  message-format string to parse, not {@code null}
+     *
+     * @return  this post-formatter builder, never {@code null}
+     */
     @Override
     public @NotNull PostFormatterBuilder withMessage(@NotNull String message) {
       return withMessage(messageFactory.parseMessage(requireNonNull(message, "message must not be null")));
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Sets the post-formatter input from a pre-built message.
+     *
+     * @param message  message to pass to the post-formatter, not {@code null}
+     *
+     * @return  this post-formatter builder, never {@code null}
+     */
     @Override
     public @NotNull PostFormatterBuilder withMessage(@NotNull Message.WithSpaces message)
     {
@@ -759,7 +1058,13 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Sets the post-formatter input by configuring a nested message builder.
+     *
+     * @param messageConfigurer  callback that configures the nested message, not {@code null}
+     *
+     * @return  this post-formatter builder, never {@code null}
+     */
     @Override
     public @NotNull PostFormatterBuilder withMessage(@NotNull Consumer<MessageBuilder> messageConfigurer)
     {
@@ -775,7 +1080,15 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and starts a text part in the enclosing message builder.
+     *
+     * @param text  literal text for the next part, not {@code null}
+     *
+     * @return  builder for the next text part, never {@code null}
+     *
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull TextBuilder text(@NotNull String text)
     {
@@ -785,7 +1098,16 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and starts a parameter part in the enclosing message builder.
+     *
+     * @param name  parameter name, not {@code null}
+     *
+     * @return  builder for the parameter part, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull ParameterBuilder parameter(@NotNull String name)
     {
@@ -795,7 +1117,16 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and starts a post-formatter part in the enclosing message builder.
+     *
+     * @param name  post-formatter name, not {@code null}
+     *
+     * @return  builder for the post-formatter part, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use kebab-case
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
     {
@@ -805,7 +1136,16 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and starts a template part in the enclosing message builder.
+     *
+     * @param name  template name, not {@code null}
+     *
+     * @return  builder for the template part, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use kebab-case
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull TemplateBuilder template(@NotNull String name)
     {
@@ -815,7 +1155,13 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and builds the enclosing message.
+     *
+     * @return  built message, never {@code null}
+     *
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull Message.WithSpaces build()
     {
@@ -825,7 +1171,15 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and builds a coded message from the enclosing builder.
+     *
+     * @param code  message code to associate with the built message, not {@code null}
+     *
+     * @return  coded message, never {@code null}
+     *
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull Message.WithCode buildWithCode(@NotNull String code)
     {
@@ -835,7 +1189,13 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and builds the enclosing message as a template.
+     *
+     * @return  built template, never {@code null}
+     *
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull Template buildAsTemplate()
     {
@@ -860,10 +1220,16 @@ public final class InternalMessageBuilder implements MessageBuilder
       extends AbstractSpacedBuilder<TemplateBuilder>
       implements TemplateBuilder
   {
+    /** Name of the template referenced by this builder. */
     private final @NotNull String name;
+
+    /** Default values exposed to the referenced template. */
     private final @NotNull Map<String,TypedValue<?>> defaultParameters;
+
+    /** Mapping from template parameter names to message parameter names. */
     private final @NotNull Map<String,String> parameterDelegates;
 
+    /** Indicates whether this template part has already been written to the enclosing builder. */
     private boolean flushed;
 
 
@@ -900,35 +1266,80 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Adds a string default parameter for the referenced template.
+     *
+     * @param name   template parameter name, not {@code null}
+     * @param value  default string value, not {@code null}
+     *
+     * @return  this template builder, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
+     */
     @Override
     public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, @NotNull String value) {
-      return withDefaultParameter(name, new TypedValueString(value));
+      return withDefaultParameter(name, new TypedValueString(messageFactory, value));
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Adds a boolean default parameter for the referenced template.
+     *
+     * @param name   template parameter name, not {@code null}
+     * @param value  default boolean value
+     *
+     * @return  this template builder, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
+     */
     @Override
     public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, boolean value) {
       return withDefaultParameter(name, value ? TypedValueBool.TRUE : TypedValueBool.FALSE);
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Adds a numeric default parameter for the referenced template.
+     *
+     * @param name   template parameter name, not {@code null}
+     * @param value  default numeric value
+     *
+     * @return  this template builder, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
+     */
     @Override
     public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, long value) {
       return withDefaultParameter(name, new TypedValueNumber(value));
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Adds a message default parameter for the referenced template.
+     *
+     * @param name     template parameter name, not {@code null}
+     * @param message  default message value, not {@code null}
+     *
+     * @return  this template builder, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
+     */
     @Override
     public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, @NotNull Message.WithSpaces message) {
       return withDefaultParameter(name, new TypedValueMessage(message));
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Adds a message default parameter by configuring a nested message builder.
+     *
+     * @param name               template parameter name, not {@code null}
+     * @param messageConfigurer  callback that configures the nested message, not {@code null}
+     *
+     * @return  this template builder, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
+     */
     @Override
     public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name,
                                                          @NotNull Consumer<MessageBuilder> messageConfigurer)
@@ -968,7 +1379,16 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Delegates a template parameter to a parameter from the enclosing message.
+     *
+     * @param templateParam  template parameter name, not {@code null}
+     * @param messageParam   enclosing message parameter name, not {@code null}
+     *
+     * @return  this template builder, never {@code null}
+     *
+     * @throws IllegalArgumentException if either parameter name does not use a supported naming convention
+     */
     @Override
     public @NotNull TemplateBuilder withParameterDelegate(@NotNull String templateParam, @NotNull String messageParam)
     {
@@ -990,7 +1410,15 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and starts a text part in the enclosing message builder.
+     *
+     * @param text  literal text for the next part, not {@code null}
+     *
+     * @return  builder for the next text part, never {@code null}
+     *
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull TextBuilder text(@NotNull String text)
     {
@@ -1000,7 +1428,16 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and starts a parameter part in the enclosing message builder.
+     *
+     * @param name  parameter name, not {@code null}
+     *
+     * @return  builder for the parameter part, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull ParameterBuilder parameter(@NotNull String name)
     {
@@ -1010,7 +1447,16 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and starts a post-formatter part in the enclosing message builder.
+     *
+     * @param name  post-formatter name, not {@code null}
+     *
+     * @return  builder for the post-formatter part, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use kebab-case
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
     {
@@ -1020,7 +1466,16 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and starts a template part in the enclosing message builder.
+     *
+     * @param name  template name, not {@code null}
+     *
+     * @return  builder for the template part, never {@code null}
+     *
+     * @throws IllegalArgumentException if {@code name} does not use kebab-case
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull TemplateBuilder template(@NotNull String name)
     {
@@ -1030,7 +1485,13 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and builds the enclosing message.
+     *
+     * @return  built message, never {@code null}
+     *
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull Message.WithSpaces build()
     {
@@ -1040,7 +1501,15 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and builds a coded message from the enclosing builder.
+     *
+     * @param code  message code to associate with the built message, not {@code null}
+     *
+     * @return  coded message, never {@code null}
+     *
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull Message.WithCode buildWithCode(@NotNull String code)
     {
@@ -1050,7 +1519,13 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Flushes this part and builds the enclosing message as a template.
+     *
+     * @return  built template, never {@code null}
+     *
+     * @throws IllegalStateException if the enclosing builder has already been built
+     */
     @Override
     public @NotNull Template buildAsTemplate()
     {
@@ -1073,7 +1548,10 @@ public final class InternalMessageBuilder implements MessageBuilder
    */
   public static final class MapValueBuilderImpl implements MapValueBuilder
   {
+    /** Parameter builder that receives the completed map entry. */
     private final @NotNull ParameterBuilderImpl parameterBuilder;
+
+    /** Key associated with the map entry, or {@code null} for the default entry. */
     private final MapKey key;
 
 
@@ -1090,21 +1568,39 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Completes the map entry with a value parsed from a message-format string.
+     *
+     * @param message  message-format string for the entry value, not {@code null}
+     *
+     * @return  parameter builder that owns the map, never {@code null}
+     */
     @Override
     public @NotNull ParameterBuilder message(@NotNull String message) {
       return parameterBuilder.addMapEntry(key, message);
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Completes the map entry with a pre-built message value.
+     *
+     * @param message  message value for the entry, not {@code null}
+     *
+     * @return  parameter builder that owns the map, never {@code null}
+     */
     @Override
     public @NotNull ParameterBuilder message(@NotNull Message.WithSpaces message) {
       return parameterBuilder.addMapEntry(key, message);
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Completes the map entry by configuring a nested message builder.
+     *
+     * @param messageConfigurer  callback that configures the nested message, not {@code null}
+     *
+     * @return  parameter builder that owns the map, never {@code null}
+     */
     @Override
     public @NotNull ParameterBuilder message(@NotNull Consumer<MessageBuilder> messageConfigurer) {
       return parameterBuilder.addMapEntry(key, messageConfigurer);
@@ -1124,8 +1620,13 @@ public final class InternalMessageBuilder implements MessageBuilder
    */
   public static non-sealed class MapEqualityBuilderImpl implements MapEqualityBuilder
   {
+    /** Parameter builder that receives the completed map entry. */
     private final @NotNull ParameterBuilderImpl parameterBuilder;
+
+    /** Factory that turns the selected comparison type into a concrete map key. */
     private final @NotNull Function<CompareType,MapKey> keyFactory;
+
+    /** Comparison type currently selected for the entry being built. */
     protected @NotNull CompareType compareType;
 
 
@@ -1144,7 +1645,11 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Selects equality comparison for the map entry.
+     *
+     * @return  builder for supplying the entry value, never {@code null}
+     */
     @Override
     public @NotNull MapValueBuilder eq()
     {
@@ -1154,7 +1659,11 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Selects inequality comparison for the map entry.
+     *
+     * @return  builder for supplying the entry value, never {@code null}
+     */
     @Override
     public @NotNull MapValueBuilder ne()
     {
@@ -1164,21 +1673,39 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Completes the map entry with a pre-built message value.
+     *
+     * @param message  message value for the entry, not {@code null}
+     *
+     * @return  parameter builder that owns the map, never {@code null}
+     */
     @Override
     public @NotNull ParameterBuilder message(@NotNull Message.WithSpaces message) {
       return parameterBuilder.addMapEntry(keyFactory.apply(compareType), message);
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Completes the map entry with a value parsed from a message-format string.
+     *
+     * @param message  message-format string for the entry value, not {@code null}
+     *
+     * @return  parameter builder that owns the map, never {@code null}
+     */
     @Override
     public @NotNull ParameterBuilder message(@NotNull String message) {
       return parameterBuilder.addMapEntry(keyFactory.apply(compareType), message);
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Completes the map entry by configuring a nested message builder.
+     *
+     * @param messageConfigurer  callback that configures the nested message, not {@code null}
+     *
+     * @return  parameter builder that owns the map, never {@code null}
+     */
     @Override
     public @NotNull ParameterBuilder message(@NotNull Consumer<MessageBuilder> messageConfigurer) {
       return parameterBuilder.addMapEntry(keyFactory.apply(compareType), messageConfigurer);
@@ -1210,7 +1737,11 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Selects a less-than comparison for the map entry.
+     *
+     * @return  builder for supplying the entry value, never {@code null}
+     */
     @Override
     public @NotNull MapValueBuilder lt()
     {
@@ -1220,7 +1751,11 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Selects a less-than-or-equal comparison for the map entry.
+     *
+     * @return  builder for supplying the entry value, never {@code null}
+     */
     @Override
     public @NotNull MapValueBuilder lte()
     {
@@ -1230,7 +1765,11 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Selects a greater-than comparison for the map entry.
+     *
+     * @return  builder for supplying the entry value, never {@code null}
+     */
     @Override
     public @NotNull MapValueBuilder gt()
     {
@@ -1240,7 +1779,11 @@ public final class InternalMessageBuilder implements MessageBuilder
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * Selects a greater-than-or-equal comparison for the map entry.
+     *
+     * @return  builder for supplying the entry value, never {@code null}
+     */
     @Override
     public @NotNull MapValueBuilder gte()
     {

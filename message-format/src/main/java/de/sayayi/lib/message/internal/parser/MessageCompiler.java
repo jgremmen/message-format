@@ -84,6 +84,7 @@ import static org.antlr.v4.runtime.Token.EOF;
  */
 public final class MessageCompiler extends AbstractAntlr4Parser
 {
+  /** Formats syntax error locations reported for compiled message text. */
   private static final SyntaxErrorFormatter SYNTAX_ERROR_FORMATTER =
       new GenericSyntaxErrorFormatter(1, 0, 0 ,2);
 
@@ -133,8 +134,19 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   }
 
 
+  /**
+   * Compiles message text with the shared parser pipeline for either full messages or templates.
+   *
+   * @param text      message or template text, not {@code null}
+   * @param template  {@code true} to compile template input, {@code false} to compile a regular message
+   *
+   * @return  compiled message model, never {@code null}
+   *
+   * @throws MessageParserException  if the input contains invalid message-format syntax
+   */
   @Contract(pure = true)
-  private @NotNull Message.WithSpaces compileMessage(@NotNull @Language("MessageFormat") String text, boolean template)
+  private @NotNull Message.WithSpaces compileMessage(@NotNull @Language("MessageFormat") String text,
+                                                     boolean template)
   {
     final var listener = new Listener(template);
 
@@ -148,8 +160,15 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   /**
-   * Creates a {@link MessageParserException} from parser error information. This method is called by the ANTLR error
-   * handling framework when a syntax error is detected during parsing.
+   * Creates the parser exception type used for syntax errors raised while compiling message text.
+   *
+   * @param startToken        first token covered by the parser error
+   * @param stopToken         last token covered by the parser error
+   * @param formattedMessage  formatted error description including location information
+   * @param errorMsg          raw parser error message
+   * @param cause             underlying parser exception, if available
+   *
+   * @return  runtime exception to throw for the parse failure
    */
   @Override
   protected @NotNull RuntimeException createException(@NotNull Token startToken, @NotNull Token stopToken,
@@ -160,7 +179,13 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   /**
-   * Creates a human-readable error message for unrecognized tokens encountered during lexing.
+   * Creates the error message used when lexing encounters text that cannot be tokenized.
+   *
+   * @param lexer   lexer that detected the invalid input
+   * @param text    offending text fragment
+   * @param hasEOF  {@code true} if the invalid fragment reaches the end of the input
+   *
+   * @return  human-readable token recognition error message
    */
   @Override
   protected @NotNull String createTokenRecognitionMessage(@NotNull org.antlr.v4.runtime.Lexer lexer,
@@ -170,9 +195,13 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   /**
-   * Creates a context-aware error message when the parser encounters an ambiguity or dead end. Produces specific
-   * messages for common situations such as incomplete message formats, missing default messages in parameters and
-   * syntax errors in map elements.
+   * Creates an error message for parser branches that cannot be resolved from the current input.
+   *
+   * @param parser          parser that detected the problem
+   * @param startToken      first token of the unmatched input sequence
+   * @param offendingToken  token near the point where parsing failed
+   *
+   * @return  human-readable description of the parse failure
    */
   @Override
   protected @NotNull String createNoViableAlternativeMessage(@NotNull org.antlr.v4.runtime.Parser parser,
@@ -195,9 +224,13 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   /**
-   * Creates a context-aware error message when the parser encounters a token that does not match what is expected.
-   * Produces specific messages for missing parameter names, template names, default messages and unclosed parameter
-   * expressions.
+   * Creates an error message for tokens that do not match the current parser expectations.
+   *
+   * @param parser                     parser that detected the mismatch
+   * @param expectedTokens             tokens that would have been valid at the current position
+   * @param mismatchLocationNearToken  token near the mismatch location
+   *
+   * @return  human-readable description of the mismatch
    */
   @Override
   protected @NotNull String createInputMismatchMessage(@NotNull org.antlr.v4.runtime.Parser parser,
@@ -238,6 +271,15 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   }
 
 
+  /**
+   * Creates an error message for required tokens that are missing from the input.
+   *
+   * @param parser                    parser that detected the missing token
+   * @param expectedTokens            tokens that were expected at the current position
+   * @param missingLocationNearToken  token near the point where input is incomplete
+   *
+   * @return  human-readable description of the missing token
+   */
   @Override
   protected @NotNull String createMissingTokenMessage(@NotNull org.antlr.v4.runtime.Parser parser,
                                                       @NotNull IntervalSet expectedTokens,
@@ -251,8 +293,13 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   /**
-   * Creates a context-aware error message when an unwanted token is found, such as a premature end of input inside
-   * an unclosed parameter expression.
+   * Creates an error message for unexpected tokens that appear in otherwise valid input.
+   *
+   * @param parser          parser that detected the unwanted token
+   * @param unwantedToken   unexpected token
+   * @param expectedTokens  tokens that would have been accepted instead
+   *
+   * @return  human-readable description of the unwanted token
    */
   @Override
   protected @NotNull String createUnwantedTokenMessage(@NotNull org.antlr.v4.runtime.Parser parser,
@@ -276,6 +323,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    * errors are easier to understand.
    */
   private static final Vocabulary VOCABULARY = new AbstractVocabulary() {
+    /** Adds user-friendly display names for message parser tokens. */
     @Override
     protected void addTokens()
     {
@@ -318,11 +366,21 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    */
   private static final class Lexer extends MessageLexer
   {
+    /**
+     * Creates a lexer for message-format input.
+     *
+     * @param message  message text to tokenize, not {@code null}
+     */
     private Lexer(@NotNull String message) {
       super(CharStreams.fromString(message));
     }
 
 
+    /**
+     * Returns the custom vocabulary used for readable token names in error messages.
+     *
+     * @return  vocabulary used by this lexer
+     */
     @Override
     public Vocabulary getVocabulary() {
       return MessageCompiler.VOCABULARY;
@@ -338,11 +396,21 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    */
   private static final class Parser extends MessageParser
   {
+    /**
+     * Creates a parser for message-format tokens.
+     *
+     * @param tokenStream  token stream to parse, not {@code null}
+     */
     private Parser(@NotNull TokenStream tokenStream) {
       super(tokenStream);
     }
 
 
+    /**
+     * Returns the custom vocabulary used for readable token names in error messages.
+     *
+     * @return  vocabulary used by this parser
+     */
     @Override
     public Vocabulary getVocabulary() {
       return MessageCompiler.VOCABULARY;
@@ -375,7 +443,10 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    */
   private final class Listener extends MessageParserBaseListener implements WalkerSupplier
   {
+    /** Message fragment used in validation errors for kebab-case names. */
     private static final String KEBAB_CASE_MATCH = "must match the kebab case naming convention";
+
+    /** Message fragment used in validation errors for kebab-case or lower camel case names. */
     private static final String KEBAB_LOWER_CAMEL_CASE_MATCH =
         "must match the kebab- or lower camel case naming convention";
 
@@ -383,23 +454,43 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     private TokenStream tokenStream;
 
 
+    /**
+     * Creates a listener for either full message parsing or template parsing.
+     *
+     * @param template  {@code true} when compiling template input, {@code false} for full messages
+     */
     private Listener(boolean template) {
       this.template = template;
     }
 
 
+    /**
+     * Returns the parse-tree walker strategy used to build message parts from completed rules.
+     *
+     * @return  walker used for listener callbacks
+     */
     @Override
     public @NotNull Walker getWalker() {
       return WALK_EXIT_RULES_HEAP;
     }
 
 
+    /**
+     * Stores the compiled top-level message result.
+     *
+     * @param ctx  parsed message context
+     */
     @Override
     public void exitMessage(MessageContext ctx) {
       ctx.messageWithSpaces = ctx.message0().messageWithSpaces;
     }
 
 
+    /**
+     * Builds a message body from its parsed text, parameter, template and post-formatter parts.
+     *
+     * @param ctx  parsed message-body context
+     */
     @Override
     @SuppressWarnings("IfCanBeSwitch")
     public void exitMessage0(Message0Context ctx)
@@ -441,12 +532,24 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Determines whether a text part is empty spacer content that can be dropped from a compound message.
+     *
+     * @param messagePart  message part to inspect
+     *
+     * @return  {@code true} if the part is redundant spacer text
+     */
     @Contract(pure = true)
     private boolean exitMessage0_isRedundantTextPart(@NotNull MessagePart messagePart) {
       return messagePart instanceof TextPart textPart && textPart.isEmpty() && textPart.isSpaceAround();
     }
 
 
+    /**
+     * Builds a normalized text part from parsed message text.
+     *
+     * @param ctx  parsed text-part context
+     */
     @Override
     public void exitTextPart(TextPartContext ctx)
     {
@@ -456,6 +559,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Resolves text content by unescaping escaped characters and normalizing whitespace.
+     *
+     * @param ctx  parsed text context
+     */
     @Override
     public void exitText(TextContext ctx)
     {
@@ -486,12 +594,22 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Exposes the compiled content of a quoted message.
+     *
+     * @param ctx  parsed quoted-message context
+     */
     @Override
     public void exitQuotedMessage(QuotedMessageContext ctx) {
       ctx.messageWithSpaces = ctx.message0().messageWithSpaces;
     }
 
 
+    /**
+     * Resolves a quoted string literal to its plain string value.
+     *
+     * @param ctx  parsed quoted-string context
+     */
     @Override
     public void exitQuotedString(QuotedStringContext ctx)
     {
@@ -500,6 +618,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Resolves a simple string from either a quoted literal or a bare name-like token.
+     *
+     * @param ctx  parsed simple-string context
+     */
     @Override
     public void exitSimpleString(SimpleStringContext ctx)
     {
@@ -508,6 +631,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Builds a parameter part from its parsed name, format, configuration and map entries.
+     *
+     * @param ctx  parsed parameter-part context
+     */
     @Override
     public void exitParameterPart(ParameterPartContext ctx)
     {
@@ -537,6 +665,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Validates and stores a parameter name.
+     *
+     * @param ctx  parsed parameter-name context
+     */
     @Override
     public void exitParameterName(ParameterNameContext ctx)
     {
@@ -545,6 +678,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Collects a parameter's format, configuration values and conditional map entries.
+     *
+     * @param ctx  parsed parameter-entry collection context
+     */
     @Override
     public void exitParameterEntries(ParameterEntriesContext ctx)
     {
@@ -608,6 +746,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Validates and stores the format name assigned to a parameter.
+     *
+     * @param ctx  parsed parameter-format context
+     */
     @Override
     public void exitParameterFormat(ParameterFormatContext ctx)
     {
@@ -616,7 +759,9 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
-    final ContextToMapCollector<TemplateParameterDefaultContext,String,TypedValue<?>> TEMPLATE_PARAMETER_DEFAULT_COLLECTOR =
+    /** Collects template default parameter values keyed by parameter name. */
+    final ContextToMapCollector<TemplateParameterDefaultContext,String,TypedValue<?>>
+        TEMPLATE_PARAMETER_DEFAULT_COLLECTOR =
         new ContextToMapCollector<>(TreeMap::new, (map, context) -> {
           if (map.put(context.parameter, context.value) != null)
           {
@@ -627,6 +772,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         });
 
 
+    /** Collects template parameter delegations keyed by template parameter name. */
     final ContextToMapCollector<TemplateParameterDelegateContext,String,String> TEMPLATE_PARAMETER_DELEGATE_COLLECTOR =
         new ContextToMapCollector<>(HashMap::new, (map, context) -> {
           if (!context.parameter.equals(context.delegatedParameter) &&
@@ -639,6 +785,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         });
 
 
+    /**
+     * Builds a template part with its default values and delegated parameter mappings.
+     *
+     * @param ctx  parsed template-part context
+     */
     @Override
     public void exitTemplatePart(TemplatePartContext ctx)
     {
@@ -651,6 +802,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Validates and stores a template name.
+     *
+     * @param ctx  parsed template-name context
+     */
     @Override
     public void exitTemplateName(TemplateNameContext ctx)
     {
@@ -659,6 +815,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Validates a template parameter delegation and stores both parameter names.
+     *
+     * @param ctx  parsed template-parameter delegate context
+     */
     @Override
     public void exitTemplateParameterDelegate(TemplateParameterDelegateContext ctx)
     {
@@ -683,6 +844,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Builds a default boolean value for a template parameter.
+     *
+     * @param ctx  parsed template-parameter default context
+     */
     @Override
     public void exitTemplateParameterDefaultBool(TemplateParameterDefaultBoolContext ctx)
     {
@@ -697,6 +863,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Builds a default numeric value for a template parameter.
+     *
+     * @param ctx  parsed template-parameter default context
+     */
     @Override
     public void exitTemplateParameterDefaultNumber(TemplateParameterDefaultNumberContext ctx)
     {
@@ -711,6 +882,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Builds a default string value for a template parameter.
+     *
+     * @param ctx  parsed template-parameter default context
+     */
     @Override
     public void exitTemplateParameterDefaultString(TemplateParameterDefaultStringContext ctx)
     {
@@ -721,10 +897,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
             .report();
       }
 
-      ctx.value = new TypedValueString(ctx.quotedString().string);
+      ctx.value = new TypedValueString(messageFactory, ctx.quotedString().string);
     }
 
 
+    /** Collects post-formatter configuration entries keyed by configuration name. */
     final ContextToMapCollector<ConfigDefinitionContext,String,TypedValue<?>> POST_FORMAT_CONFIG_DEFINITION_COLLECTOR =
         new ContextToMapCollector<>(TreeMap::new, (map, context) -> {
           if (map.put(context.name, context.value) != null)
@@ -737,6 +914,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         });
 
 
+    /**
+     * Builds a post-formatter part for a quoted message and its configuration.
+     *
+     * @param ctx  parsed post-format part context
+     */
     @Override
     public void exitPostFormatPart(PostFormatPartContext ctx)
     {
@@ -749,6 +931,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Validates and stores a post-formatter name.
+     *
+     * @param ctx  parsed post-format name context
+     */
     @Override
     public void exitPostFormatName(PostFormatNameContext ctx)
     {
@@ -757,6 +944,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Builds a map entry whose value is a quoted message.
+     *
+     * @param ctx  parsed map-entry context
+     */
     @Override
     public void exitMapEntryMessage(MapEntryMessageContext ctx)
     {
@@ -765,6 +957,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Builds a map entry whose value comes from a simple inline message string.
+     *
+     * @param ctx  parsed map-entry context
+     */
     @Override
     @SuppressWarnings("LanguageMismatch")
     public void exitMapEntryString(MapEntryStringContext ctx)
@@ -774,6 +971,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Builds the default message used when no explicit map key matches.
+     *
+     * @param ctx  parsed default map-entry context
+     */
     @Override
     public void exitMapEntryDefault(MapEntryDefaultContext ctx)
     {
@@ -788,6 +990,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Builds a boolean configuration entry.
+     *
+     * @param ctx  parsed configuration-definition context
+     */
     @Override
     public void exitConfigDefinitionBool(ConfigDefinitionBoolContext ctx)
     {
@@ -798,6 +1005,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Builds a numeric configuration entry.
+     *
+     * @param ctx  parsed configuration-definition context
+     */
     @Override
     public void exitConfigDefinitionNumber(ConfigDefinitionNumberContext ctx)
     {
@@ -808,6 +1020,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Builds a message-valued configuration entry.
+     *
+     * @param ctx  parsed configuration-definition context
+     */
     @Override
     public void exitConfigDefinitionMessage(ConfigDefinitionMessageContext ctx)
     {
@@ -818,16 +1035,26 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Builds a string configuration entry.
+     *
+     * @param ctx  parsed configuration-definition context
+     */
     @Override
     public void exitConfigDefinitionString(ConfigDefinitionStringContext ctx)
     {
       if (!isKebabCaseName(ctx.name = ctx.NAME().getText()))
         syntaxError("config name for string value " + KEBAB_CASE_MATCH).with(ctx.NAME()).report();
 
-      ctx.value = new TypedValueString(ctx.simpleString().string);
+      ctx.value = new TypedValueString(messageFactory, ctx.simpleString().string);
     }
 
 
+    /**
+     * Collects the keys defined for a map entry.
+     *
+     * @param ctx  parsed map-keys context
+     */
     @Override
     public void exitMapKeys(MapKeysContext ctx)
     {
@@ -839,6 +1066,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Builds a map key that matches {@code null} values.
+     *
+     * @param ctx  parsed null-key context
+     */
     @Override
     public void exitMapKeyNull(MapKeyNullContext ctx)
     {
@@ -850,6 +1082,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Builds a map key that matches empty values.
+     *
+     * @param ctx  parsed empty-key context
+     */
     @Override
     public void exitMapKeyEmpty(MapKeyEmptyContext ctx)
     {
@@ -861,12 +1098,22 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Builds a map key that matches a boolean value.
+     *
+     * @param ctx  parsed boolean-key context
+     */
     @Override
     public void exitMapKeyBool(MapKeyBoolContext ctx) {
       ctx.key = parseBoolean(ctx.BOOL().getText()) ? MapKeyBool.TRUE : MapKeyBool.FALSE;
     }
 
 
+    /**
+     * Builds a map key that matches a numeric value.
+     *
+     * @param ctx  parsed numeric-key context
+     */
     @Override
     public void exitMapKeyNumber(MapKeyNumberContext ctx)
     {
@@ -878,6 +1125,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Builds a map key that matches a string value.
+     *
+     * @param ctx  parsed string-key context
+     */
     @Override
     public void exitMapKeyString(MapKeyStringContext ctx)
     {
@@ -889,6 +1141,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Resolves a relational operator to the comparison type used by map keys.
+     *
+     * @param ctx  parsed relational-operator context
+     */
     @Override
     public void exitRelationalOperator(RelationalOperatorContext ctx)
     {
@@ -906,18 +1163,35 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Resolves an equality operator to the matching comparison type.
+     *
+     * @param ctx  parsed equality-operator context
+     */
     @Override
     public void exitEqualOperator(EqualOperatorContext ctx) {
       ctx.cmp = ctx.EQ() != null ? CompareType.EQ : CompareType.NE;
     }
 
 
+    /**
+     * Stores the textual value of a name-or-keyword token.
+     *
+     * @param ctx  parsed name-or-keyword context
+     */
     @Override
     public void exitNameOrKeyword(NameOrKeywordContext ctx) {
       ctx.name = ctx.getChild(0).getText();
     }
 
 
+    /**
+     * Checks whether the token at the given index begins with a space character.
+     *
+     * @param i  token index to inspect
+     *
+     * @return  {@code true} if the indexed token starts with whitespace
+     */
     @Contract(pure = true)
     private boolean isSpaceAtTokenIndex(int i)
     {
@@ -935,6 +1209,15 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     }
 
 
+    /**
+     * Parses a numeric literal as a {@code long}.
+     *
+     * @param numberNode  parse-tree node containing the numeric literal
+     *
+     * @return  parsed long value
+     *
+     * @throws MessageParserException  if the literal is outside the supported {@code long} range
+     */
     private long parseLongValue(@NotNull TerminalNode numberNode)
     {
       final var number = new BigInteger(numberNode.getText());

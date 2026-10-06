@@ -53,11 +53,14 @@ import static org.junit.jupiter.api.Assertions.*;
 final class MessageCompilerTest
 {
   private static MessageCompiler COMPILER;
+  private static MessageFactory MESSAGE_FACTORY;
 
 
   @BeforeAll
-  static void init() {
-    COMPILER = new MessageCompiler(new MessageFactory(LRUMessagePartNormalizer.create(64)));
+  static void init()
+  {
+    MESSAGE_FACTORY = new MessageFactory(LRUMessagePartNormalizer.create(64));
+    COMPILER = new MessageCompiler(MESSAGE_FACTORY);
   }
 
 
@@ -149,13 +152,13 @@ final class MessageCompilerTest
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new MessagePartConfig(Map.of("default", new TypedValueString("yes"))), EMPTY_MAP)
+            new ParameterPart("p", new MessagePartConfig(Map.of("default", new TypedValueString(MESSAGE_FACTORY, "yes"))), EMPTY_MAP)
         },
         COMPILER.compileMessage("%{ p, default:'yes' }").getMessageParts());
 
     assertArrayEquals(
         new MessagePart[] {
-            new ParameterPart("p", new MessagePartConfig(Map.of("default", new TypedValueString("no"))), EMPTY_MAP)
+            new ParameterPart("p", new MessagePartConfig(Map.of("default", new TypedValueString(MESSAGE_FACTORY, "no"))), EMPTY_MAP)
         },
         COMPILER.compileMessage("%{ p, default:no }").getMessageParts());
 
@@ -361,7 +364,7 @@ final class MessageCompilerTest
         new MessagePart[] { new TemplatePart("pq", false, true,
             Map.of(
                 "a", TypedValueBool.TRUE,
-                "c", new TypedValueString("C")
+                "c", new TypedValueString(MESSAGE_FACTORY, "C")
             ), Map.of()) },
         COMPILER.compileMessage("%[pq,a=true,c='C'] ").getMessageParts());
 

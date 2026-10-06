@@ -55,12 +55,13 @@ final class LocaleFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(new LocaleFormatter()))
         .setLocale(FRANCE)
         .getMessageAccessor();
+    val messageFactory = messageAccessor.getMessageFactory();
 
     assertEquals(noSpaceText("États-Unis"), format(messageAccessor, US,
-        Map.of("locale", new TypedValueString("country")), Map.of()));
+        Map.of("locale", new TypedValueString(messageFactory, "country")), Map.of()));
 
     assertEquals(noSpaceText("The Great Kingdom"), format(messageAccessor, UK,
-        Map.of("locale", new TypedValueString("country")),
+        Map.of("locale", new TypedValueString(messageFactory, "country")),
         Map.of(new MapKeyString("GB"),
             new TypedValueMessage(messageAccessor.getMessageFactory().parseMessage("The Great Kingdom")))));
   }
@@ -73,12 +74,13 @@ final class LocaleFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(new LocaleFormatter()))
         .setLocale(Locale.forLanguageTag("es-ES"))
         .getMessageAccessor();
+    val messageFactory = messageAccessor.getMessageFactory();
 
     assertEquals(noSpaceText("inglés"), format(messageAccessor, UK,
-        Map.of("locale", new TypedValueString("language")), Map.of()));
+        Map.of("locale", new TypedValueString(messageFactory, "language")), Map.of()));
 
     assertEquals(noSpaceText("francesa"), format(messageAccessor, FRANCE,
-        Map.of("locale", new TypedValueString("language")),
+        Map.of("locale", new TypedValueString(messageFactory, "language")),
         Map.of(new MapKeyString("fr"),
             new TypedValueMessage(messageAccessor.getMessageFactory().parseMessage("francesa")))));
   }
@@ -91,13 +93,14 @@ final class LocaleFormatterTest extends AbstractFormatterTest
         .create(createFormatterService(new LocaleFormatter()))
         .setLocale(Locale.forLanguageTag("nl-BE"))
         .getMessageAccessor();
+    val messageFactory = messageAccessor.getMessageFactory();
 
     assertEquals(noSpaceText("Engels (Verenigd Koninkrijk)"), format(messageAccessor, UK));
 
     assertEquals(noSpaceText("Duits"), format(messageAccessor, GERMAN,
-        Map.of("locale", new TypedValueString("name")), Map.of()));
+        Map.of("locale", new TypedValueString(messageFactory, "name")), Map.of()));
 
     assertEquals(noSpaceText("Koreaans (Zuid-Korea)"), format(messageAccessor, KOREA,
-        Map.of("locale", new TypedValueString("name")), Map.of()));
+        Map.of("locale", new TypedValueString(messageFactory, "name")), Map.of()));
   }
 }
