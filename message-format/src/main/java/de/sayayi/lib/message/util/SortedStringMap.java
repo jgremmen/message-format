@@ -335,6 +335,8 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
   @SuppressWarnings("unchecked")
   public void forEach(BiConsumer<? super String,? super V> action)
   {
+    requireNonNull(action);
+
     for(int offset = 0, length = size * 2; offset < length; offset += 2)
       action.accept((String)kv[offset], (V)kv[offset + 1]);
   }
@@ -538,6 +540,8 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
     @Override
     public void forEach(@NotNull Consumer<? super Entry<String,V>> action)
     {
+      requireNonNull(action);
+
       for(var idx = 0; idx < size; idx++)
         action.accept(entry(idx));
     }
