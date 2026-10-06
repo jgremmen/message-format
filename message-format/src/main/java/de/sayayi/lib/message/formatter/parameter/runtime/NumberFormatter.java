@@ -120,8 +120,7 @@ public final class NumberFormatter
     if ((format == null || "integer".equals(format)) &&
         (number instanceof BigInteger || number instanceof Long || number instanceof Integer ||
          number instanceof Short || number instanceof Byte || number instanceof AtomicInteger ||
-         number instanceof AtomicLong || number instanceof LongAdder ||
-         number instanceof LongAccumulator))
+         number instanceof AtomicLong || number instanceof LongAdder || number instanceof LongAccumulator))
       return noSpaceText(number.toString());
 
     return noSpaceText(getFormatter(format, context).format(number));
@@ -185,8 +184,9 @@ public final class NumberFormatter
   {
     final boolean bool;
 
-    if (value instanceof Byte || value instanceof Short ||
-        value instanceof Integer || value instanceof Long)
+    if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long ||
+        value instanceof AtomicInteger || value instanceof AtomicLong ||  value instanceof LongAdder ||
+        value instanceof LongAccumulator)
       bool = value.longValue() != 0;
     else if (value instanceof BigInteger)
       bool = ((BigInteger)value).signum() != 0;
@@ -206,8 +206,9 @@ public final class NumberFormatter
     final var numberKeyValue = context.getNumberKeyValue();
     final var compareType = context.getCompareType();
 
-    if (number instanceof Byte || number instanceof Short ||
-        number instanceof Integer || number instanceof Long)
+    if (number instanceof Byte || number instanceof Short || number instanceof Integer || number instanceof Long ||
+        number instanceof AtomicInteger || number instanceof AtomicLong || number instanceof LongAdder ||
+        number instanceof LongAccumulator)
       return compareType.match(Long.compare(number.longValue(), numberKeyValue)) ? EXACT : MISMATCH;
 
     if (number instanceof BigInteger bigInteger)
@@ -224,8 +225,9 @@ public final class NumberFormatter
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull Number value, @NotNull ComparatorContext context)
   {
-    if (value instanceof Byte || value instanceof Short ||
-        value instanceof Integer || value instanceof Long)
+    if (value instanceof Byte || value instanceof Short ||  value instanceof Integer || value instanceof Long ||
+        value instanceof AtomicInteger || value instanceof AtomicLong ||  value instanceof LongAdder ||
+        value instanceof LongAccumulator)
       value = BigInteger.valueOf(value.longValue());
     else if (value instanceof Double || value instanceof Float)
       value = BigDecimal.valueOf(value.doubleValue());
