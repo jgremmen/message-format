@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.util.Collections.singletonMap;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -58,8 +59,8 @@ public final class SingletonParameters implements Parameters
    */
   public SingletonParameters(@NotNull Locale locale, @NotNull String parameterName)
   {
-    this.locale = locale;
-    this.parameterName = parameterName;
+    this.locale = requireNonNull(locale, "locale must not be null");
+    this.parameterName = requireNonNull(parameterName, "parameterName must not be null");
   }
 
 
