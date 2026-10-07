@@ -663,6 +663,48 @@ class MessageBuilderTest
 
 
   @Nested
+  @DisplayName("Finalized configuration builders")
+  class FinalizedConfigurationBuilderTest
+  {
+    @Test
+    @DisplayName("Parameter configuration cannot be changed after its part is flushed")
+    void testParameterConfigurationIsFinalized()
+    {
+      final var parameterBuilder = MessageBuilder
+          .create()
+          .parameter("value")
+          .configString("setting", "original");
+      final var message = parameterBuilder
+          .text("end")
+          .build();
+
+      assertThrows(IllegalStateException.class, () -> parameterBuilder.configString("setting", "changed"));
+      assertEquals("%{value,setting:original}end", message.asFormatString(UTF_8));
+    }
+
+
+    @Test
+    @DisplayName("Post-formatter configuration cannot be changed after its part is flushed")
+    void testPostFormatterConfigurationIsFinalized()
+    {
+      final var postFormatterBuilder = MessageBuilder
+          .create()
+          .postFormatter("case")
+          .withMessage("hello")
+          .configString("case", "upper");
+      final var message = postFormatterBuilder
+          .text("end")
+          .build();
+
+      assertThrows(IllegalStateException.class, () -> postFormatterBuilder.configString("case", "lower"));
+      assertEquals("%(case,'hello',case:upper)end", message.asFormatString(UTF_8));
+    }
+  }
+
+
+
+
+  @Nested
   @DisplayName("TemplateBuilder.withDefaultParameter")
   class TemplateBuilderWithDefaultParameterTest
   {

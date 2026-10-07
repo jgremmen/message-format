@@ -523,6 +523,9 @@ public final class InternalMessageBuilder implements MessageBuilder
     /** Configuration values collected for the part being built. */
     protected final @NotNull Map<String,TypedValue<?>> config;
 
+    /** Indicates whether this part's configuration has been finalized. */
+    protected boolean finalized;
+
 
     /**
      * Construct a new configurable builder with an empty configuration map.
@@ -608,12 +611,16 @@ public final class InternalMessageBuilder implements MessageBuilder
      *
      * @return  this builder, never {@code null}
      *
-     * @throws IllegalArgumentException if {@code name} does not match the kebab-case naming convention
+     * @throws IllegalArgumentException  if {@code name} does not match the kebab-case naming convention
+     * @throws IllegalStateException     if this part's configuration has already been finalized
      */
     @Contract("_, _ -> this")
     @SuppressWarnings("unchecked")
     private @NotNull S withConfig(@NotNull String name, @NotNull TypedValue<?> value)
     {
+      if (finalized)
+        throw new IllegalStateException("configuration builder has already been finalized");
+
       if (!isKebabCaseName(requireNonNull(name, "name must not be null")))
         throw new IllegalArgumentException("config name '" + name + "' must match the kebab-case naming convention");
 
@@ -958,6 +965,7 @@ public final class InternalMessageBuilder implements MessageBuilder
       if (!flushed)
       {
         flushed = true;
+        finalized = true;
         activePartFlusher = null;
 
         parts.add(new ParameterPart(name, format, spaceBefore, spaceAfter,
@@ -1022,6 +1030,7 @@ public final class InternalMessageBuilder implements MessageBuilder
       if (!flushed)
       {
         flushed = true;
+        finalized = true;
         activePartFlusher = null;
 
         parts.add(new PostFormatterPart(name, innerMessage, spaceBefore, spaceAfter, new MessagePartConfig(config)));

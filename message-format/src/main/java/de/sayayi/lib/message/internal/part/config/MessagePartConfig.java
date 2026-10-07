@@ -52,7 +52,7 @@ public final class MessagePartConfig implements MessagePart.Config
    * @param config  the configuration map, not {@code null}
    */
   public MessagePartConfig(@NotNull Map<String,TypedValue<?>> config) {
-    this.config = config;
+    this.config = Map.copyOf(config);
   }
 
 
