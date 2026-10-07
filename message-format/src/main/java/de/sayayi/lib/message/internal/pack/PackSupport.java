@@ -17,7 +17,7 @@ package de.sayayi.lib.message.internal.pack;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.internal.*;
+import de.sayayi.lib.message.internal.message.*;
 import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.internal.part.map.key.*;
 import de.sayayi.lib.message.internal.part.parameter.ParameterPart;

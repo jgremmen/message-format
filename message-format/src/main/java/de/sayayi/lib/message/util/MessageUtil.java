@@ -19,7 +19,7 @@ import de.sayayi.lib.message.FormatStringSerializer.Context;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.internal.MessageTemplate;
-import de.sayayi.lib.message.internal.TextMessage;
+import de.sayayi.lib.message.internal.message.TextMessage;
 import de.sayayi.lib.message.internal.pack.PackFileTypeDetector;
 import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.part.MessagePart.Text;

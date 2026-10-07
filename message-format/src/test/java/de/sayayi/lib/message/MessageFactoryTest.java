@@ -16,10 +16,10 @@
 package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.exception.MessageParserException;
-import de.sayayi.lib.message.internal.CompoundMessage;
-import de.sayayi.lib.message.internal.EmptyMessage;
-import de.sayayi.lib.message.internal.EmptyMessageWithCode;
-import de.sayayi.lib.message.internal.LocalizedMessageBundleWithCode;
+import de.sayayi.lib.message.internal.message.CompoundMessage;
+import de.sayayi.lib.message.internal.message.EmptyMessage;
+import de.sayayi.lib.message.internal.message.EmptyMessageWithCode;
+import de.sayayi.lib.message.internal.message.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;

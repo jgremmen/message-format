@@ -16,7 +16,11 @@
 package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.exception.MessageParserException;
-import de.sayayi.lib.message.internal.*;
+import de.sayayi.lib.message.internal.MessageTemplate;
+import de.sayayi.lib.message.internal.message.EmptyMessage;
+import de.sayayi.lib.message.internal.message.EmptyMessageWithCode;
+import de.sayayi.lib.message.internal.message.LocalizedMessageBundleWithCode;
+import de.sayayi.lib.message.internal.message.MessageDelegateWithCode;
 import de.sayayi.lib.message.internal.parser.MessageCompiler;
 import de.sayayi.lib.message.part.normalizer.MessagePartNormalizer;
 import de.sayayi.lib.message.template.Template;

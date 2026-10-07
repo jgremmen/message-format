@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.part.normalizer;
 
 import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.internal.CompoundMessage;
+import de.sayayi.lib.message.internal.message.CompoundMessage;
 import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
 import lombok.val;
