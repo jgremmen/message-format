@@ -98,5 +98,44 @@ module de.sayayi.lib.message
   uses de.sayayi.lib.message.template.NamedTemplate;
 
   // internal service implementations
-  provides java.nio.file.spi.FileTypeDetector with de.sayayi.lib.message.internal.pack.PackFileTypeDetector;
+  provides java.nio.file.spi.FileTypeDetector with
+      de.sayayi.lib.message.internal.pack.PackFileTypeDetector;
+  provides de.sayayi.lib.message.formatter.parameter.ParameterFormatter with
+      de.sayayi.lib.message.formatter.parameter.named.BoolFormatter,
+      de.sayayi.lib.message.formatter.parameter.named.ChoiceFormatter,
+      de.sayayi.lib.message.formatter.parameter.named.SizeFormatter,
+      de.sayayi.lib.message.formatter.parameter.named.StringFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.ArrayFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.AtomicBooleanFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.BitSetFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.BooleanSupplierFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.ByteArrayFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.CharsetFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.DictionaryFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.DoubleSupplierFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.EnumFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.IntSupplierFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.IterableFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.ToTemporalDelegate,
+      de.sayayi.lib.message.formatter.parameter.runtime.LocaleFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.LongSupplierFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.MapEntryFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.MapFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.NumberFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.OptionalDoubleFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.OptionalFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.OptionalIntFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.OptionalLongFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.PathFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.ReferenceFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.SupplierFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.TemporalFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.ThrowableFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.TimeZoneFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.TypeFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.URIFormatter,
+      de.sayayi.lib.message.formatter.parameter.runtime.URLFormatter;
+  provides de.sayayi.lib.message.formatter.post.PostFormatter with
+      de.sayayi.lib.message.formatter.post.runtime.CasePostFormatter,
+      de.sayayi.lib.message.formatter.post.runtime.ClipPostFormatter;
 }
