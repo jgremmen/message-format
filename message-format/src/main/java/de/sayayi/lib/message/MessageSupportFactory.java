@@ -20,11 +20,11 @@ import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.MessageSupportImpl;
+import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
 
 /**
@@ -58,8 +58,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class MessageSupportFactory
 {
-  private static final Lock LOCK = new ReentrantLock();
-  private static volatile MessageSupport SHARED = null;
+  private static final Supplier<MessageSupport> SHARED_SUPPLIER = SupplierDelegate.of(() ->
+      createDefault().registerTemplatesFromService(MessageSupportFactory.class.getClassLoader()).seal());
 
 
   /** This class is not meant to be instantiated. */
@@ -80,25 +80,8 @@ public final class MessageSupportFactory
    *
    * @return  shared message support instance, never {@code null}
    */
-  public static @NotNull MessageSupport shared()
-  {
-    var shared = SHARED;
-    if (shared == null)
-    {
-      LOCK.lock();
-      try {
-        if ((shared = SHARED) == null)
-        {
-          SHARED = shared = createDefault()
-              .registerTemplatesFromService(MessageSupportFactory.class.getClassLoader())
-              .seal();
-        }
-      } finally {
-        LOCK.unlock();
-      }
-    }
-
-    return shared;
+  public static @NotNull MessageSupport shared() {
+    return SHARED_SUPPLIER.get();
   }
 
 

@@ -24,6 +24,7 @@ import de.sayayi.lib.message.internal.message.MessageDelegateWithCode;
 import de.sayayi.lib.message.internal.parser.MessageCompiler;
 import de.sayayi.lib.message.part.normalizer.MessagePartNormalizer;
 import de.sayayi.lib.message.template.Template;
+import de.sayayi.lib.message.util.SupplierDelegate;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +35,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.normalizer.MessagePartNormalizer.PASS_THROUGH;
 import static java.util.Locale.ROOT;
@@ -69,8 +71,8 @@ import static java.util.Objects.requireNonNull;
  */
 public class MessageFactory
 {
-  private static final Lock LOCK = new ReentrantLock();
-  private static volatile MessageFactory INSTANCE = null;
+  private static final Supplier<MessageFactory> SHARED_INSTANCE_SUPPLIER =
+      SupplierDelegate.of(() -> new MessageFactory(PASS_THROUGH, 128));
 
   private static final SecureRandom RANDOM = new SecureRandom();
   private static final AtomicInteger CODE_ID = new AtomicInteger();
@@ -92,21 +94,8 @@ public class MessageFactory
    *
    * @since 0.23.0
    */
-  public static @NotNull MessageFactory getSharedInstance()
-  {
-    var instance = INSTANCE;
-    if (instance == null)
-    {
-      LOCK.lock();
-      try {
-        if ((instance = INSTANCE) == null)
-          INSTANCE = instance = new MessageFactory(PASS_THROUGH, 128);
-      } finally {
-        LOCK.unlock();
-      }
-    }
-
-    return instance;
+  public static @NotNull MessageFactory getSharedInstance() {
+    return SHARED_INSTANCE_SUPPLIER.get();
   }
 
 

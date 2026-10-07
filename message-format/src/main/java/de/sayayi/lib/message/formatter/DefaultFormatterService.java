@@ -17,10 +17,10 @@ package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.post.PostFormatter;
+import de.sayayi.lib.message.util.SupplierDelegate;
 
 import java.util.ServiceLoader;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
 
 /**
@@ -40,8 +40,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class DefaultFormatterService extends GenericFormatterService
 {
-  private static final Lock LOCK = new ReentrantLock();
-  private static volatile FormatterService INSTANCE = null;
+  private static final Supplier<FormatterService> SHARED_INSTANCE_SUPPLIER =
+      SupplierDelegate.of(() -> new DefaultFormatterService().seal());
 
   /**
    * Classloader to be used to load parameter formatter service classes or {@code null} for the system class loader.
@@ -55,21 +55,8 @@ public class DefaultFormatterService extends GenericFormatterService
    *
    * @return  shared instance of the default formatter service, never {@code null}
    */
-  public static FormatterService getSharedInstance()
-  {
-    var instance = INSTANCE;
-    if (instance == null)
-    {
-      LOCK.lock();
-      try {
-        if ((instance = INSTANCE) == null)
-          INSTANCE = instance = new DefaultFormatterService().seal();
-      } finally {
-        LOCK.unlock();
-      }
-    }
-
-    return instance;
+  public static FormatterService getSharedInstance() {
+    return SHARED_INSTANCE_SUPPLIER.get();
   }
 
 
