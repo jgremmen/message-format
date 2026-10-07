@@ -58,7 +58,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class MessageSupportFactory
 {
-  private static final Lock $LOCK = new ReentrantLock();
+  private static final Lock LOCK = new ReentrantLock();
   private static volatile MessageSupport SHARED = null;
 
 
@@ -85,7 +85,7 @@ public final class MessageSupportFactory
     var shared = SHARED;
     if (shared == null)
     {
-      $LOCK.lock();
+      LOCK.lock();
       try {
         if ((shared = SHARED) == null)
         {
@@ -94,7 +94,7 @@ public final class MessageSupportFactory
               .seal();
         }
       } finally {
-        $LOCK.unlock();
+        LOCK.unlock();
       }
     }
 

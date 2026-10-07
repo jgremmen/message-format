@@ -40,7 +40,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class DefaultFormatterService extends GenericFormatterService
 {
-  private static final Lock $LOCK = new ReentrantLock();
+  private static final Lock LOCK = new ReentrantLock();
   private static volatile FormatterService INSTANCE = null;
 
   /**
@@ -60,12 +60,12 @@ public class DefaultFormatterService extends GenericFormatterService
     var instance = INSTANCE;
     if (instance == null)
     {
-      $LOCK.lock();
+      LOCK.lock();
       try {
         if ((instance = INSTANCE) == null)
           INSTANCE = instance = new DefaultFormatterService().seal();
       } finally {
-        $LOCK.unlock();
+        LOCK.unlock();
       }
     }
 

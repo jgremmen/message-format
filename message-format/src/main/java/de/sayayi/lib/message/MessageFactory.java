@@ -69,7 +69,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class MessageFactory
 {
-  private static final Lock $LOCK = new ReentrantLock();
+  private static final Lock LOCK = new ReentrantLock();
   private static volatile MessageFactory INSTANCE = null;
 
   private static final SecureRandom RANDOM = new SecureRandom();
@@ -97,12 +97,12 @@ public class MessageFactory
     var instance = INSTANCE;
     if (instance == null)
     {
-      $LOCK.lock();
+      LOCK.lock();
       try {
         if ((instance = INSTANCE) == null)
           INSTANCE = instance = new MessageFactory(PASS_THROUGH, 128);
       } finally {
-        $LOCK.unlock();
+        LOCK.unlock();
       }
     }
 
