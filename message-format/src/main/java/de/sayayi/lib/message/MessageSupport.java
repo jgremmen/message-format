@@ -67,19 +67,24 @@ import static java.util.Locale.forLanguageTag;
  * This interface also defines several nested types:
  * <ul>
  *   <li>
- *     {@link MessageConfigurer} &ndash; fluent builder for configuring and formatting a message
+ *     {@link MessageConfigurer}: fluent builder for configuring and formatting a message
  *   </li>
  *   <li>
- *     {@link ConfigurableMessageSupport} &ndash; mutable extension for adding messages, templates and default
+ *     {@link ConfigurableMessageSupport}: mutable extension for adding messages, templates and default
  *     configuration
  *   </li>
  *   <li>
- *     {@link MessageAccessor} &ndash; read-only access to messages, templates, formatters and configuration
+ *     {@link MessageAccessor}: read-only access to messages, templates, formatters and configuration
  *   </li>
  *   <li>
- *     {@link MessagePublisher} &ndash; interface for registering messages and templates
+ *     {@link MessagePublisher}: interface for registering messages and templates
  *   </li>
  * </ul>
+ * <p>
+ * Implementations obtained through {@link MessageSupportFactory} are thread-safe and may be shared and used
+ * concurrently by multiple threads, both for reading (formatting messages) and for writing (adding messages,
+ * templates or configuration). A {@link MessageConfigurer} obtained from such an instance, however, represents a
+ * single formatting operation and is not intended to be shared between threads.
  *
  * @see MessageSupportFactory
  * @see MessageConfigurer
@@ -210,6 +215,11 @@ public interface MessageSupport
    *       .locale(userLocale)
    *       .format();
    * </pre>
+   *
+   * <p>
+   * A message configurer represents a single, in-progress formatting operation and is not thread-safe. Each call to
+   * {@link MessageSupport#code(String) code(...)} or {@link MessageSupport#message(String) message(...)} returns a
+   * new, independent instance, so configurers should not be shared between threads.
    *
    * @param <M>  the message type this configurer operates on
    */
@@ -575,6 +585,8 @@ public interface MessageSupport
   /**
    * Configurable extension of {@link MessageSupport} providing methods to add/import messages, register templates,
    * set default configuration values and change the default locale.
+   * <p>
+   * This interface is thread-safe; it may be shared and modified concurrently by multiple threads.
    *
    * @see MessageSupportFactory#create(de.sayayi.lib.message.formatter.FormatterService, MessageFactory)
    */
@@ -838,6 +850,8 @@ public interface MessageSupport
   /**
    * Read-only accessor providing access to messages, templates, formatters and default configuration values published
    * to a {@link MessageSupport} instance.
+   * <p>
+   * This interface is thread-safe; it may be shared and accessed concurrently by multiple threads.
    *
    * @see MessageSupport#getMessageAccessor()
    */
@@ -968,6 +982,8 @@ public interface MessageSupport
 
   /**
    * Read-only accessor providing access to all templates published to a {@link MessageSupport} instance.
+   * <p>
+   * This interface is thread-safe; it may be shared and accessed concurrently by multiple threads.
    *
    * @see MessageAccessor
    */
@@ -1028,6 +1044,8 @@ public interface MessageSupport
    * Message publisher provides methods for registering messages and templates.
    * <p>
    * The publisher is used intensively by message adopters (see package {@code de.sayayi.lib.message.adopter}).
+   * <p>
+   * This interface is thread-safe; it may be shared and modified concurrently by multiple threads.
    *
    * @author Jeroen Gremmen
    * @since 0.8.0

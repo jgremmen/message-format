@@ -28,8 +28,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT;
@@ -55,7 +55,7 @@ import static java.util.Objects.requireNonNull;
  * This class is thread-safe. All mutating operations ({@link #addFormatter(ParameterFormatter)},
  * {@link #addFormatterForType(FormattableType, ParameterFormatter)}, {@link #addPostFormatter(PostFormatter)}) and
  * read operations ({@link #getFormatters(String, Class, Config)}, {@link #getPostFormatters()},
- * {@link #getParameterConfigNames()}) are protected by a reentrant lock to ensure safe concurrent access.
+ * {@link #getParameterConfigNames()}) are protected by a reentrant read/write lock to ensure safe concurrent access.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0 (renamed in 0.4.1)
@@ -68,7 +68,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   /** Maps primitive types and primitive array types to their corresponding wrapper types. */
   private static final @NotNull Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
 
-  private final Lock lock = new ReentrantLock();
+  private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
   private final @NotNull Map<String,NamedParameterFormatter> namedFormatters = new TreeMap<>();
   private final @NotNull Map<String,NamedParameterFormatter> configNameToNamedFormatterMap = new TreeMap<>();
@@ -142,16 +142,19 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   @MustBeInvokedByOverriders
   public void addFormatterForType(@NotNull FormattableType formattableType, @NotNull ParameterFormatter formatter)
   {
-    final var type = requireNonNull(formattableType, "formattableType must not be null").getType();
+    validateFormatterForType(
+        requireNonNull(formattableType, "formattableType must not be null").getType(),
+        requireNonNull(formatter, "formatter must not be null"));
 
-    lock.lock();
+    final var writeLock = lock.writeLock();
+
+    writeLock.lock();
     try {
-      validateFormatterForType(type, requireNonNull(formatter, "formatter must not be null"));
       registerFormatterForType(formattableType, formatter);
 
       formatterCache.clear();
     } finally {
-      lock.unlock();
+      writeLock.unlock();
     }
   }
 
@@ -219,7 +222,9 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   {
     requireNonNull(formatter, "formatter must not be null");
 
-    lock.lock();
+    final var writeLock = lock.writeLock();
+
+    writeLock.lock();
     try {
       NamedParameterFormatter namedParameterFormatter = null;
 
@@ -261,7 +266,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
 
       formatterCache.clear();
     } finally {
-      lock.unlock();
+      writeLock.unlock();
     }
   }
 
@@ -320,14 +325,16 @@ public non-sealed class GenericFormatterService implements FormatterService.With
           postFormatter.getClass().getSimpleName() + " does not match the kebab case naming convention");
     }
 
-    lock.lock();
+    final var writeLock = lock.writeLock();
+
+    writeLock.lock();
     try {
       if (postFormatters.containsKey(postFormatterName))
         throw new FormatterServiceException("post formatter '" + postFormatterName + "' has already been registered");
 
       postFormatters.put(postFormatterName, postFormatter);
     } finally {
-      lock.unlock();
+      writeLock.unlock();
     }
   }
 
@@ -358,7 +365,9 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   {
     requireNonNull(type, "type must not be null");
 
-    lock.lock();
+    final var readLock = lock.readLock();
+
+    readLock.lock();
     try {
       if (format != null)
       {
@@ -391,7 +400,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
 
       return formatters.toArray(new ParameterFormatter[0]);
     } finally {
-      lock.unlock();
+      readLock.unlock();
     }
   }
 
@@ -456,11 +465,13 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   @Override
   public @UnmodifiableView @NotNull Map<String,PostFormatter> getPostFormatters()
   {
-    lock.lock();
+    final var readLock = lock.readLock();
+
+    readLock.lock();
     try {
       return Map.copyOf(postFormatters);
     } finally {
-      lock.unlock();
+      readLock.unlock();
     }
   }
 
@@ -469,11 +480,13 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   @Override
   public @UnmodifiableView @NotNull Set<String> getParameterConfigNames()
   {
-    lock.lock();
+    final var readLock = lock.readLock();
+
+    readLock.lock();
     try {
       return Set.copyOf(parameterConfigNames);
     } finally {
-      lock.unlock();
+      readLock.unlock();
     }
   }
 
@@ -520,8 +533,9 @@ public non-sealed class GenericFormatterService implements FormatterService.With
 
 
   /**
-   * Immutable, sealed view of the enclosing {@link GenericFormatterService}. All queries are delegated to the
-   * enclosing service instance. This class does not permit further formatter registrations.
+   * Read-only view of the enclosing {@link GenericFormatterService}. Queries are delegated to the enclosing service,
+   * so registrations made through that service remain visible; this is not an immutable snapshot. The view itself
+   * does not expose formatter registration methods.
    *
    * @since 0.22.0
    */

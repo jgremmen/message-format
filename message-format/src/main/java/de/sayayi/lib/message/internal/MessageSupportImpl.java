@@ -42,6 +42,8 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -62,12 +64,18 @@ import static java.util.stream.Collectors.toCollection;
  * <p>
  * Duplicate messages and templates are handled by configurable filters. By default, adding a message or template with
  * an existing code or name throws a {@link DuplicateMessageException} or {@link DuplicateTemplateException}.
+ * <p>
+ * This class is thread-safe. All mutable state (locale, default configuration, messages, templates and filters) is
+ * guarded by a read/write lock, allowing concurrent read access while serializing modifications.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
 public final class MessageSupportImpl implements MessageSupport.ConfigurableMessageSupport
 {
+  /** Guards concurrent access to the mutable state (default config, messages, templates, locale, filters). */
+  private final @NotNull ReadWriteLock lock = new ReentrantReadWriteLock();
+
   /** Formatter registry used to resolve parameter and post formatters while formatting messages. */
   private final @NotNull FormatterService formatterService;
 
@@ -125,7 +133,17 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   @Override
   public @NotNull ConfigurableMessageSupport setLocale(@NotNull Locale locale)
   {
-    this.locale = requireNonNull(locale, "locale must not be null");
+    requireNonNull(locale, "locale must not be null");
+
+    final var writeLock = lock.writeLock();
+
+    writeLock.lock();
+    try {
+      this.locale = locale;
+    } finally {
+      writeLock.unlock();
+    }
+
     return this;
   }
 
@@ -134,9 +152,17 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   @Override
   public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, boolean value)
   {
-    defaultConfig.put(
-        validateName(name, "config name"),
-        value ? TypedValueBool.TRUE : TypedValueBool.FALSE);
+    validateName(name, "config name");
+
+    final var writeLock = lock.writeLock();
+
+    writeLock.lock();
+    try {
+      defaultConfig.put(name, value ? TypedValueBool.TRUE : TypedValueBool.FALSE);
+    } finally {
+      writeLock.unlock();
+    }
+
     return this;
   }
 
@@ -145,7 +171,17 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   @Override
   public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, long value)
   {
-    defaultConfig.put(validateName(name, "config name"), new TypedValueNumber(value));
+    validateName(name, "config name");
+
+    final var writeLock = lock.writeLock();
+
+    writeLock.lock();
+    try {
+      defaultConfig.put(name, new TypedValueNumber(value));
+    } finally {
+      writeLock.unlock();
+    }
+
     return this;
   }
 
@@ -154,7 +190,17 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   @Override
   public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, @NotNull String value)
   {
-    defaultConfig.put(validateName(name, "config name"), new TypedValueString(messageFactory, value));
+    validateName(name, "config name");
+
+    final var writeLock = lock.writeLock();
+
+    writeLock.lock();
+    try {
+      defaultConfig.put(name, new TypedValueString(messageFactory, value));
+    } finally {
+      writeLock.unlock();
+    }
+
     return this;
   }
 
@@ -163,7 +209,17 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   @Override
   public @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, @NotNull Message.WithSpaces value)
   {
-    defaultConfig.put(validateName(name, "config name"), new TypedValueMessage(value));
+    validateName(name, "config name");
+
+    final var writeLock = lock.writeLock();
+
+    writeLock.lock();
+    try {
+      defaultConfig.put(name, new TypedValueMessage(value));
+    } finally {
+      writeLock.unlock();
+    }
+
     return this;
   }
 
@@ -172,7 +228,17 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   @Override
   public @NotNull ConfigurableMessageSupport setMessageFilter(@NotNull MessageFilter messageFilter)
   {
-    this.messageFilter = requireNonNull(messageFilter, "messageFilter must not be null");
+    requireNonNull(messageFilter, "messageFilter must not be null");
+
+    final var writeLock = lock.writeLock();
+
+    writeLock.lock();
+    try {
+      this.messageFilter = messageFilter;
+    } finally {
+      writeLock.unlock();
+    }
+
     return this;
   }
 
@@ -181,7 +247,17 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   @Override
   public @NotNull ConfigurableMessageSupport setTemplateFilter(@NotNull TemplateFilter templateFilter)
   {
-    this.templateFilter = requireNonNull(templateFilter, "templateFilter must not be null");
+    requireNonNull(templateFilter, "templateFilter must not be null");
+
+    final var writeLock = lock.writeLock();
+
+    writeLock.lock();
+    try {
+      this.templateFilter = templateFilter;
+    } finally {
+      writeLock.unlock();
+    }
+
     return this;
   }
 
@@ -190,8 +266,17 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   @Override
   public @NotNull ConfigurableMessageSupport addMessage(@NotNull Message.WithCode message)
   {
-    if (messageFilter.filter(requireNonNull(message, "message must not be null")))
-      messages.put(message.getCode(), message);
+    requireNonNull(message, "message must not be null");
+
+    final var writeLock = lock.writeLock();
+
+    writeLock.lock();
+    try {
+      if (messageFilter.filter(message))
+        messages.put(message.getCode(), message);
+    } finally {
+      writeLock.unlock();
+    }
 
     return this;
   }
@@ -204,8 +289,17 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     if (!isKebabCaseName(validateName(name, "template name")))
       throw new IllegalArgumentException("template name '" + name + "' must match the kebab-case naming convention");
 
-    if (templateFilter.filter(name, requireNonNull(template)))
-      templates.put(name, template);
+    requireNonNull(template);
+
+    final var writeLock = lock.writeLock();
+
+    writeLock.lock();
+    try {
+      if (templateFilter.filter(name, template))
+        templates.put(name, template);
+    } finally {
+      writeLock.unlock();
+    }
 
     return this;
   }
@@ -229,8 +323,20 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
                              Predicate<String> messageCodeFilter, Predicate<String> templateNameFilter)
       throws IOException
   {
+    final var readLock = lock.readLock();
+    final Map<String,Message.WithCode> messageSnapshot;
+    final Map<String,Template> templateSnapshot;
+
+    readLock.lock();
+    try {
+      messageSnapshot = new TreeMap<>(messages);
+      templateSnapshot = new TreeMap<>(templates);
+    } finally {
+      readLock.unlock();
+    }
+
     try(var dataStream = new PackOutputStream(PACK_CONFIG, VERSION, compress, stream)) {
-      final var messageCodes = new TreeSet<>(messages.keySet());
+      final var messageCodes = new TreeSet<>(messageSnapshot.keySet());
       final var templateNames = new TreeSet<String>();
 
       // filter message codes
@@ -241,14 +347,14 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
       dataStream.writeUnsignedShort(messageCodes.size());
       for(var code: messageCodes)
       {
-        final var message = messages.get(code);
+        final var message = messageSnapshot.get(code);
 
         templateNames.addAll(message.getTemplateNames());
         PackSupport.pack(message, dataStream);
       }
 
       // pack all required templates
-      templateNames.removeIf(templateName -> !(templates.get(templateName) instanceof MessageTemplate));
+      templateNames.removeIf(templateName -> !(templateSnapshot.get(templateName) instanceof MessageTemplate));
       if (templateNameFilter != null)
         templateNames.removeIf(templateNameFilter.negate());
 
@@ -256,7 +362,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
       for(var templateName: templateNames)
       {
         dataStream.writeString(templateName);
-        PackSupport.pack(((MessageTemplate)templates.get(templateName)).getMessage(), dataStream);
+        PackSupport.pack(((MessageTemplate)templateSnapshot.get(templateName)).getMessage(), dataStream);
       }
     }
   }
@@ -266,7 +372,18 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   @Override
   public @NotNull MessageConfigurer<Message.WithCode> code(@NotNull String code)
   {
-    var message = messages.get(validateName(code, "message code"));
+    validateName(code, "message code");
+
+    final var readLock = lock.readLock();
+    final Message.WithCode message;
+
+    readLock.lock();
+    try {
+      message = messages.get(code);
+    } finally {
+      readLock.unlock();
+    }
+
     if (message == null)
       throw new IllegalArgumentException("unknown message code '" + code + '\'');
 
@@ -288,6 +405,24 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     requireNonNull(message, "message must not be null");
 
     return new Configurer<>(() -> message);
+  }
+
+
+  /**
+   * Returns the current default locale, guarded by this instance's lock.
+   *
+   * @return  current default locale, never {@code null}
+   */
+  private @NotNull Locale getLocale()
+  {
+    final var readLock = lock.readLock();
+
+    readLock.lock();
+    try {
+      return locale;
+    } finally {
+      readLock.unlock();
+    }
   }
 
 
@@ -359,6 +494,9 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   /**
    * Internal {@link MessageConfigurer} implementation that holds the message, locale and parameter values for
    * a single formatting operation.
+   * <p>
+   * Instances are lightweight and intended for use by a single thread; they are not thread-safe and should not be
+   * shared between formatting operations.
    *
    * @param <M>  the message type this configurer operates on
    */
@@ -383,7 +521,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     {
       this.message = message;
 
-      locale = MessageSupportImpl.this.locale;
+      locale = MessageSupportImpl.this.getLocale();
       parameters = new SortedStringMap<>();
     }
 
@@ -443,7 +581,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     @Override
     public @NotNull MessageConfigurer<M> locale(Locale locale)
     {
-      this.locale = locale == null ? MessageSupportImpl.this.locale : locale;
+      this.locale = locale == null ? MessageSupportImpl.this.getLocale() : locale;
       return this;
     }
 
@@ -511,6 +649,8 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   /**
    * Internal {@link MessageAccessor} implementation providing read-only access to the messages, templates,
    * formatters and default configuration managed by the enclosing {@link MessageSupportImpl}.
+   * <p>
+   * This class is thread-safe; all accesses to the enclosing instance's state are guarded by its read/write lock.
    */
   public final class Accessor implements MessageAccessor
   {
@@ -524,56 +664,118 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     /** {@inheritDoc} */
     @Override
     public @NotNull Locale getLocale() {
-      return locale;
+      return MessageSupportImpl.this.getLocale();
     }
 
 
     /** {@inheritDoc} */
     @Override
-    public @NotNull @UnmodifiableView Set<String> getMessageCodes() {
-      return unmodifiableSet(messages.keySet());
+    public @NotNull @UnmodifiableView Set<String> getMessageCodes()
+    {
+      final var readLock = lock.readLock();
+
+      readLock.lock();
+      try {
+        return unmodifiableSet(new TreeSet<>(messages.keySet()));
+      } finally {
+        readLock.unlock();
+      }
     }
 
 
     /** {@inheritDoc} */
     @Override
-    public @NotNull @UnmodifiableView Set<String> getTemplateNames() {
-      return unmodifiableSet(templates.keySet());
+    public @NotNull @UnmodifiableView Set<String> getTemplateNames()
+    {
+      final var readLock = lock.readLock();
+
+      readLock.lock();
+      try {
+        return unmodifiableSet(new TreeSet<>(templates.keySet()));
+      } finally {
+        readLock.unlock();
+      }
     }
 
 
     /** {@inheritDoc} */
     @Override
-    public Template getTemplateByName(@NotNull String name) {
-      return templates.get(name);
+    public Template getTemplateByName(@NotNull String name)
+    {
+      final var readLock = lock.readLock();
+
+      readLock.lock();
+      try {
+        return templates.get(name);
+      } finally {
+        readLock.unlock();
+      }
     }
 
 
     /** {@inheritDoc} */
     @Override
-    public boolean hasMessageWithCode(String code) {
-      return code != null && messages.containsKey(code);
+    public boolean hasMessageWithCode(String code)
+    {
+      if (code == null)
+        return false;
+
+      final var readLock = lock.readLock();
+
+      readLock.lock();
+      try {
+        return messages.containsKey(code);
+      } finally {
+        readLock.unlock();
+      }
     }
 
 
     /** {@inheritDoc} */
     @Override
-    public Message.WithCode getMessageByCode(@NotNull String code) {
-      return messages.get(code);
+    public Message.WithCode getMessageByCode(@NotNull String code)
+    {
+      final var readLock = lock.readLock();
+
+      readLock.lock();
+      try {
+        return messages.get(code);
+      } finally {
+        readLock.unlock();
+      }
     }
 
 
     /** {@inheritDoc} */
     @Override
-    public boolean hasTemplateWithName(String name) {
-      return name != null && templates.containsKey(name);
+    public boolean hasTemplateWithName(String name)
+    {
+      if (name == null)
+        return false;
+
+      final var readLock = lock.readLock();
+
+      readLock.lock();
+      try {
+        return templates.containsKey(name);
+      } finally {
+        readLock.unlock();
+      }
     }
 
 
     /** {@inheritDoc} */
     @Override
-    public TypedValue<?> getDefaultConfig(@NotNull String name) {
-      return defaultConfig.get(name);
+    public TypedValue<?> getDefaultConfig(@NotNull String name)
+    {
+      final var readLock = lock.readLock();
+
+      readLock.lock();
+      try {
+        return defaultConfig.get(name);
+      } finally {
+        readLock.unlock();
+      }
     }
 
 
@@ -596,13 +798,24 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     @Override
     public @NotNull Set<String> findMissingTemplates(Predicate<String> messageCodeFilter)
     {
-      return messages
-          .values()
+      final var readLock = lock.readLock();
+      final List<Message.WithCode> messageSnapshot;
+      final Set<String> templateNames;
+
+      readLock.lock();
+      try {
+        messageSnapshot = new ArrayList<>(messages.values());
+        templateNames = new HashSet<>(templates.keySet());
+      } finally {
+        readLock.unlock();
+      }
+
+      return messageSnapshot
           .stream()
           .filter(message -> messageCodeFilter == null || messageCodeFilter.test(message.getCode()))
           .flatMap(message -> message.getTemplateNames().stream())
           .distinct()
-          .filter(templateName -> !templates.containsKey(templateName))
+          .filter(templateName -> !templateNames.contains(templateName))
           .collect(toCollection(TreeSet::new));
     }
   }
