@@ -390,7 +390,7 @@ properties and wire the pack file into the jar:
     }
 
     dependencies {
-      implementation 'de.sayayi.lib:message-format-annotations:0.24.0'
+      implementation 'de.sayayi.lib:message-format-annotations:0.25.0'
     }
 
     messageFormat {
@@ -417,7 +417,7 @@ properties and wire the pack file into the jar:
     }
 
     dependencies {
-      implementation("de.sayayi.lib:message-format-annotations:0.24.0")
+      implementation("de.sayayi.lib:message-format-annotations:0.25.0")
     }
 
     messageFormat {

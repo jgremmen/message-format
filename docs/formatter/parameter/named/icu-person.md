@@ -9,7 +9,7 @@ This formatter is **not** included in the core library. It is part of the `messa
 added as a dependency to use.
 
 ```
-de.sayayi.lib:message-format-icu:0.24.0
+de.sayayi.lib:message-format-icu:0.25.0
 ```
 ///
 
@@ -553,7 +553,7 @@ Add the `message-format-icu` module to the project alongside the core message fo
 
     ```groovy
     dependencies {
-      implementation 'de.sayayi.lib:message-format-icu:0.24.0'
+      implementation 'de.sayayi.lib:message-format-icu:0.25.0'
     }
     ```
 
@@ -561,7 +561,7 @@ Add the `message-format-icu` module to the project alongside the core message fo
 
     ```kotlin
     dependencies {
-      implementation("de.sayayi.lib:message-format-icu:0.24.0")
+      implementation("de.sayayi.lib:message-format-icu:0.25.0")
     }
     ```
 
@@ -571,7 +571,7 @@ Add the `message-format-icu` module to the project alongside the core message fo
     <dependency>
       <groupId>de.sayayi.lib</groupId>
       <artifactId>message-format-icu</artifactId>
-      <version>0.24.0</version>
+      <version>0.25.0</version>
     </dependency>
     ```
 

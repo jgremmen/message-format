@@ -394,7 +394,7 @@ The annotation adopter is part of the `message-format-annotations` module. No ad
 
     ```groovy
     dependencies {
-      implementation 'de.sayayi.lib:message-format-annotations:0.24.0'
+      implementation 'de.sayayi.lib:message-format-annotations:0.25.0'
     }
     ```
 
@@ -404,6 +404,6 @@ The annotation adopter is part of the `message-format-annotations` module. No ad
     <dependency>
       <groupId>de.sayayi.lib</groupId>
       <artifactId>message-format-annotations</artifactId>
-      <version>0.24.0</version>
+      <version>0.25.0</version>
     </dependency>
     ```

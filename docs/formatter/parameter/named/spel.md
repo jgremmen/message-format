@@ -9,7 +9,7 @@ This formatter is **not** included in the core library. It is part of the `messa
 added as a dependency to use.
 
 ```
-de.sayayi.lib:message-format-spring:0.24.0
+de.sayayi.lib:message-format-spring:0.25.0
 ```
 ///
 
