@@ -17,8 +17,7 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
-import de.sayayi.lib.message.internal.InternalMessageBuilder;
-import de.sayayi.lib.message.internal.InternalMessageBuilder.*;
+import de.sayayi.lib.message.internal.message.builder.*;
 import de.sayayi.lib.message.template.Template;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
@@ -60,7 +59,7 @@ import java.util.function.Consumer;
  * @see MessageFactory#messageBuilder()
  */
 public sealed interface MessageBuilder
-    permits InternalMessageBuilder,
+    permits FluentMessageBuilder,
             MessageBuilder.TextBuilder,
             MessageBuilder.ParameterBuilder,
             MessageBuilder.PostFormatterBuilder,
@@ -170,7 +169,7 @@ public sealed interface MessageBuilder
    */
   @Contract("_ -> new")
   static @NotNull MessageBuilder create(@NotNull MessageFactory messageFactory) {
-    return new InternalMessageBuilder(messageFactory);
+    return new FluentMessageBuilder(messageFactory);
   }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Jeroen Gremmen
+ * Copyright 2026 Jeroen Gremmen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,22 @@
  */
 
 /**
- * Internal implementations of the message format API.
+ * Contains internal implementations of the message API.
  * <p>
- * This package contains:
+ * Classes in this package include:
  * <ul>
  *   <li>
- *     {@link MessageSupportImpl} for managing messages and templates
+ *     {@link TextMessage} and {@link CompoundMessage} for text and multipart messages
  *   </li>
  *   <li>
- *     {@link MessageTemplate} for representing message templates
+ *     {@link EmptyMessage} for empty messages
  *   </li>
  *   <li>
- *     {@link MessageParameters} and {@link NoParameters} for formatting parameters
+ *     {@link EmptyMessageWithCode}, {@link MessageDelegateWithCode} and {@link LocalizedMessageBundleWithCode} for
+ *     messages associated with codes
  *   </li>
  * </ul>
+ * {@link AbstractMessageWithCode} is the base class for messages associated with codes.
  * <p>
  * <strong>This package is not part of the public API.</strong> Its classes are subject to change without notice and
  * should not be referenced directly by application code.
@@ -36,4 +38,4 @@
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
-package de.sayayi.lib.message.internal;
+package de.sayayi.lib.message.internal.message;

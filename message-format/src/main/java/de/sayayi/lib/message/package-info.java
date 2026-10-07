@@ -15,21 +15,25 @@
  */
 
 /**
- * Core API for the message format library. This package provides the primary interfaces and classes for parsing,
- * formatting and managing parameterized messages with locale support.
+ * Core API for parsing, formatting and managing parameterized messages with locale support.
  * <p>
- * The main types in this package are:
+ * The main types in this package include:
  * <ul>
- *   <li>{@link de.sayayi.lib.message.Message Message} – the parsed representation of a message format string,
- *       composed of message parts that can be formatted with parameter values</li>
- *   <li>{@link de.sayayi.lib.message.MessageSupport MessageSupport} – central registry for messages and templates,
- *       providing message access, configuration and formatting capabilities</li>
- *   <li>{@link de.sayayi.lib.message.MessageFactory MessageFactory} – factory for parsing message format strings
- *       into {@code Message} instances</li>
- *   <li>{@link de.sayayi.lib.message.MessageSupportFactory MessageSupportFactory} – factory for creating
- *       {@code MessageSupport} instances</li>
- *   <li>{@link de.sayayi.lib.message.MessageBuilder MessageBuilder} – fluent builder for constructing and formatting
- *       messages with named parameters</li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.Message Message} for formatted messages and their message parts
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.MessageSupport MessageSupport} for accessing and configuring messages
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.MessageFactory MessageFactory} for parsing message format strings
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.MessageSupportFactory MessageSupportFactory} for creating message support
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.MessageBuilder MessageBuilder} for building messages with named parameters
+ *   </li>
  * </ul>
  *
  * @author Jeroen Gremmen
