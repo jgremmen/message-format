@@ -23,6 +23,7 @@ import de.sayayi.lib.message.internal.part.config.MessagePartConfig;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,6 +51,7 @@ import static java.util.Objects.requireNonNull;
  * @see MessagePart.PostFormat
  * @see de.sayayi.lib.message.formatter.post.PostFormatter PostFormatter
  */
+@ApiStatus.Internal
 public final class PostFormatterPart implements MessagePart.PostFormat
 {
   /** post formatter name. */

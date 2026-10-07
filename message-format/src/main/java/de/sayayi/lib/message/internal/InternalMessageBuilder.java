@@ -35,6 +35,7 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextJoiner;
 import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.message.template.Template;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -69,6 +70,7 @@ import static java.util.Objects.requireNonNull;
  * @see MessageBuilder
  * @see MessageFactory#messageBuilder()
  */
+@ApiStatus.Internal
 public final class InternalMessageBuilder implements MessageBuilder
 {
   /** Message factory used to parse nested messages and create coded messages. */

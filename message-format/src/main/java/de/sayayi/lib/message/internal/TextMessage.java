@@ -23,6 +23,7 @@ import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,6 +37,7 @@ import java.io.IOException;
  * @author Jeroen Gremmen
  * @since 0.4.0
  */
+@ApiStatus.Internal
 public final class TextMessage implements Message.WithSpaces
 {
   /** Text part, not {@code null} */

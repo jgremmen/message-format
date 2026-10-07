@@ -24,6 +24,7 @@ import de.sayayi.lib.message.part.TypedValue.BoolValue;
 import de.sayayi.lib.message.part.TypedValue.MessageValue;
 import de.sayayi.lib.message.part.TypedValue.NumberValue;
 import de.sayayi.lib.message.part.TypedValue.StringValue;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,6 +43,7 @@ import static java.util.Optional.ofNullable;
  * @author Jeroen Gremmen
  * @since 0.8.4 (extracted from ParameterFormatterContext)
  */
+@ApiStatus.Internal
 public class BaseConfigAccessor implements ConfigAccessor
 {
   /** The message accessor used to resolve default configuration values. */

@@ -18,6 +18,7 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.internal.MessageSupportImpl.Configurer;
 import de.sayayi.lib.message.util.SortedStringMap;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -34,6 +35,7 @@ import java.util.Map;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
+@ApiStatus.Internal
 final class MessageParameters implements Parameters
 {
   private final Locale locale;

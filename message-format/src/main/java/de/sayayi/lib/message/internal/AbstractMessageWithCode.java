@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.Message;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.util.MessageUtil.validateName;
@@ -28,6 +29,7 @@ import static de.sayayi.lib.message.util.MessageUtil.validateName;
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
+@ApiStatus.Internal
 public sealed abstract class AbstractMessageWithCode implements Message.WithCode
     permits EmptyMessageWithCode, LocalizedMessageBundleWithCode, MessageDelegateWithCode
 {

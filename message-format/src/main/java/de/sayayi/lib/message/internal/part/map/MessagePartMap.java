@@ -33,6 +33,7 @@ import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -62,6 +63,7 @@ import static java.util.Collections.unmodifiableSet;
  * @see MapKey
  * @see MessagePart.Map
  */
+@ApiStatus.Internal
 public final class MessagePartMap implements MessagePart.Map
 {
   /** Shared empty map instance containing no keys and no default value. */

@@ -18,6 +18,7 @@ package de.sayayi.lib.message.internal.part.map.key;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -31,6 +32,7 @@ import java.io.IOException;
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
+@ApiStatus.Internal
 public enum MapKeyNull implements MapKey
 {
   /** Null map key with compare type {@link MapKey.CompareType#EQ EQ}. */

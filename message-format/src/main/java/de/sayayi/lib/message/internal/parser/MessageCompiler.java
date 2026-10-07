@@ -45,6 +45,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.intellij.lang.annotations.Language;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -82,6 +83,7 @@ import static org.antlr.v4.runtime.Token.EOF;
  *
  * @see MessageFactory
  */
+@ApiStatus.Internal
 public final class MessageCompiler extends AbstractAntlr4Parser
 {
   /** Formats syntax error locations reported for compiled message text. */

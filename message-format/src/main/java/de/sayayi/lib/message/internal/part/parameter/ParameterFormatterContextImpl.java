@@ -27,6 +27,7 @@ import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Config;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -47,6 +48,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
+@ApiStatus.Internal
 final class ParameterFormatterContextImpl extends BaseConfigAccessor implements ParameterFormatterContext
 {
   private final @NotNull MessagePart.Map map;

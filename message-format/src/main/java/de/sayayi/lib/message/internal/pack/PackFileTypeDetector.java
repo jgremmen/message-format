@@ -17,6 +17,7 @@ package de.sayayi.lib.message.internal.pack;
 
 import de.sayayi.lib.message.pack.PackConstants;
 import de.sayayi.lib.pack.detector.AbstractFileTypeDetector;
+import org.jetbrains.annotations.ApiStatus;
 
 import static de.sayayi.lib.message.pack.PackConstants.MIME_TYPE;
 import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
@@ -30,6 +31,7 @@ import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
  * @author Jeroen Gremmen
  * @since 0.12.1
  */
+@ApiStatus.Internal
 public final class PackFileTypeDetector extends AbstractFileTypeDetector
 {
   /** Creates a new file type detector for message format pack files. */

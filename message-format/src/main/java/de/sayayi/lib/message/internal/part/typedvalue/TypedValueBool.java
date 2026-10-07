@@ -18,6 +18,7 @@ package de.sayayi.lib.message.internal.part.typedvalue;
 import de.sayayi.lib.message.part.TypedValue.BoolValue;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,6 +33,7 @@ import java.io.IOException;
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  */
+@ApiStatus.Internal
 public enum TypedValueBool implements BoolValue
 {
   /** Boolean typed value representing {@code false}. */

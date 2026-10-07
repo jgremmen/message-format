@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.internal.parser;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
@@ -55,6 +56,7 @@ import static java.util.stream.Collector.Characteristics.UNORDERED;
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
+@ApiStatus.Internal
 final class ContextToMapCollector<C extends ParserRuleContext,K,V> implements Collector<C,Map<K,V>,Map<K,V>>
 {
   private final Supplier<Map<K,V>> supplier;

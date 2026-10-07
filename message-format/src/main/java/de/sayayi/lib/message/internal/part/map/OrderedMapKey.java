@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.internal.part.map;
 
 import de.sayayi.lib.message.part.MapKey;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,6 +51,7 @@ import static de.sayayi.lib.message.part.MapKey.Type.*;
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
+@ApiStatus.Internal
 record OrderedMapKey(int order, @NotNull MapKey mapKey)
 {
   /**

@@ -24,6 +24,7 @@ import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextJoiner;
 import de.sayayi.lib.message.template.Template;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,6 +40,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author Jeroen Gremmen
  * @since 0.24.0
  */
+@ApiStatus.Internal
 @SuppressWarnings("ClassCanBeRecord")
 public final class MessageTemplate implements Template
 {

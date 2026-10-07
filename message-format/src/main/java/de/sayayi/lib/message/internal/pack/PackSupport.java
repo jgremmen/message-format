@@ -32,6 +32,7 @@ import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -63,6 +64,7 @@ import static java.util.function.Function.identity;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
+@ApiStatus.Internal
 public final class PackSupport
 {
   /** Current pack format version. */

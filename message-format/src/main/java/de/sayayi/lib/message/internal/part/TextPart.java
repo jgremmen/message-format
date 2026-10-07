@@ -19,6 +19,7 @@ import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.util.MessageUtil;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,6 +46,7 @@ import static de.sayayi.lib.message.util.MessageUtil.trimAndNormalizeSpaces;
  * @see MessageUtil#trimAndNormalizeSpaces(String)
  * @see MessageUtil#isSpaceChar(char)
  */
+@ApiStatus.Internal
 public final class TextPart implements MessagePart.Text
 {
   /** trimmed text string or {@code null}. */

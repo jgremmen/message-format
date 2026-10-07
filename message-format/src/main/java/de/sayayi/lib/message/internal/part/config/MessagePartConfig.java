@@ -20,6 +20,7 @@ import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -37,6 +38,7 @@ import static java.util.Collections.unmodifiableSet;
  * @author Jeroen Gremmen
  * @since 0.4.0
  */
+@ApiStatus.Internal
 public final class MessagePartConfig implements MessagePart.Config
 {
   /** Shared empty configuration instance. */

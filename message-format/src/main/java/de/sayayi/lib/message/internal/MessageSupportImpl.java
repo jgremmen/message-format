@@ -35,6 +35,7 @@ import de.sayayi.lib.message.template.Template;
 import de.sayayi.lib.message.util.SortedStringMap;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import de.sayayi.lib.pack.PackOutputStream;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -71,6 +72,7 @@ import static java.util.stream.Collectors.toCollection;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
+@ApiStatus.Internal
 public final class MessageSupportImpl implements MessageSupport.ConfigurableMessageSupport
 {
   /** Guards concurrent access to the mutable state (default config, messages, templates, locale, filters). */

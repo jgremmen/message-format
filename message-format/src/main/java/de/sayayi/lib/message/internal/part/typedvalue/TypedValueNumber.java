@@ -18,6 +18,7 @@ package de.sayayi.lib.message.internal.part.typedvalue;
 import de.sayayi.lib.message.part.TypedValue.NumberValue;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,6 +39,7 @@ import static java.lang.Integer.MIN_VALUE;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
+@ApiStatus.Internal
 public record TypedValueNumber(long longValue) implements NumberValue
 {
   /**

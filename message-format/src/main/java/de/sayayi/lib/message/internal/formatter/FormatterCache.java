@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.StringJoiner;
@@ -41,7 +42,8 @@ import static java.util.Arrays.fill;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-final class FormatterCache
+@ApiStatus.Internal
+public final class FormatterCache
 {
   private final Lock lock = new ReentrantLock();
 
