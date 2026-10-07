@@ -4,14 +4,50 @@ icon: material/comment-text-multiple-outline
 
 # ResourceBundle Adopter
 
-`ResourceBundleAdopter` reads messages from Java `ResourceBundle` instances. Each key in a bundle becomes a message
-code and its value is parsed as a message format string. When the same code appears in bundles for different locales,
-the localized values are automatically combined into a single locale-aware message. This makes the adopter a natural
-fit for applications that already organize their translations as `.properties` files following the standard Java 
-resource bundle naming convention.
+`ResourceBundleAdopter` reads messages and templates from Java `ResourceBundle` instances. Each key in a bundle
+becomes a message code or template name and its value is parsed as a message or template format string. When the same
+code or template name appears in bundles for different locales, the localized values are automatically combined into
+a single locale-aware message or template. This makes the adopter a natural fit for applications that already
+organize their translations as `.properties` files following the standard Java resource bundle naming convention.
 
 The adopter provides several ways to load bundles: by base name (scanning all available locales or a specific set), 
 from a single `ResourceBundle` instance, or from a collection of bundles.
+
+Resource bundle entries can also be adopted as reusable templates with the corresponding `adoptTemplates` methods.
+Template keys must follow the library's kebab-case naming convention. When a template name is present in bundles for
+multiple locales, the localized values are combined into one locale-aware template.
+
+
+## Adopting Templates
+
+Template adoption supports the same sources and lookup options as message adoption. For example, the base-name
+overload scans available locales, while a set of locales can be specified to require those bundles:
+
+```properties
+# com/example/templates_en.properties
+greeting=Hello, %{name}!
+```
+
+```properties
+# com/example/templates_de.properties
+greeting=Hallo, %{name}!
+```
+
+```java
+adopter.adoptTemplates("com.example.templates",
+    Set.of(Locale.ENGLISH, Locale.GERMAN));
+
+messageSupport
+    .message("%[greeting]")
+    .with("name", "Alice")
+    .locale(Locale.GERMAN)
+    .format();
+// "Hallo, Alice!"
+```
+
+Templates can likewise be adopted from a single `ResourceBundle` or a collection of bundles with
+`adoptTemplates(ResourceBundle)` and `adoptTemplates(Collection)`. A custom class loader can be supplied to the
+base-name overloads just as with messages.
 
 
 ## Adopting by Bundle Base Name
