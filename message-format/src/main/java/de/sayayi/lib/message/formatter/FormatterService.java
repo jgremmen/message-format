@@ -37,6 +37,9 @@ import java.util.Set;
  * instances that perform text post-processing after formatting.
  * <p>
  * The {@link WithRegistry} sub-interface adds mutating methods for registering formatters.
+ * <p>
+ * This interface and its registry sub-interface are sealed intentionally. Applications cannot provide an independent
+ * implementation; customize or extend {@link GenericFormatterService}, or wrap a provided service instead.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

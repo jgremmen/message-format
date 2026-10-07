@@ -38,6 +38,9 @@ import java.util.function.Consumer;
  * <p>
  * Consecutive {@link #text(String)} calls are automatically merged into a single text part.
  * <p>
+ * If a configuration name, parameter map key, template default parameter name, or template parameter delegate name is
+ * supplied more than once, the most recently supplied value replaces the earlier value (last-value-wins).
+ * <p>
  * Instances are <strong>not thread-safe</strong>. A builder must only be used from a single thread and must not be
  * reused after calling {@link #build()} or {@link #buildWithCode(String)}.
  * <p>
