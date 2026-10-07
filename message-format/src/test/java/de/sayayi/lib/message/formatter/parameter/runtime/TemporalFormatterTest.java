@@ -23,9 +23,7 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import lombok.val;
 import org.junit.jupiter.api.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -49,6 +47,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Reports the supported temporal types")
   void testFormattableTypes()
   {
     assertFormatterForType(new TemporalFormatter(), LocalDate.class);
@@ -58,6 +57,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Formats local dates using localized styles")
   void testLocalDate()
   {
     val messageAccessor = MessageSupportFactory
@@ -84,6 +84,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Formats local times using localized styles")
   void testLocalTime()
   {
     val messageAccessor = MessageSupportFactory
@@ -110,6 +111,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Formats local date-times using localized styles")
   void testDateTime()
   {
     val messageAccessor = MessageSupportFactory
@@ -137,6 +139,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Formats temporal values with custom patterns")
   void testCustomPattern()
   {
     val messageAccessor = MessageSupportFactory
@@ -156,6 +159,29 @@ final class TemporalFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Preserves explicit zones and uses the system zone for instants")
+  void testExplicitZones()
+  {
+    val messageAccessor = MessageSupportFactory
+        .create(createFormatterService(new TemporalFormatter()))
+        .setLocale(UK)
+        .getMessageAccessor();
+    val messageFactory = messageAccessor.getMessageFactory();
+
+    assertEquals(new TextPart("2024-01-15 12:30 -05:00 America/New_York"),
+        format(messageAccessor, ZonedDateTime.of(2024, 1, 15, 12, 30, 0, 0, ZoneId.of("America/New_York")),
+            Map.of("date", new TypedValueString(messageFactory, "yyyy-MM-dd HH:mm XXX VV")), Map.of()));
+    assertEquals(new TextPart("2024-01-15 12:30 -05:00"),
+        format(messageAccessor, OffsetDateTime.parse("2024-01-15T12:30-05:00"),
+            Map.of("date", new TypedValueString(messageFactory, "yyyy-MM-dd HH:mm XXX")), Map.of()));
+    assertEquals(new TextPart("2024-01-15 13:30 +01:00 Europe/Berlin"),
+        format(messageAccessor, Instant.parse("2024-01-15T12:30:00Z"),
+            Map.of("date", new TypedValueString(messageFactory, "yyyy-MM-dd HH:mm XXX VV")), Map.of()));
+  }
+
+
+  @Test
+  @DisplayName("Formats temporal values through the message formatter")
   void testFormatter()
   {
     val messageSupport = MessageSupportFactory

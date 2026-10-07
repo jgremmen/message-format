@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
+import java.time.temporal.TemporalQueries;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,7 +59,8 @@ import static java.util.Objects.requireNonNull;
  * Alternatively, a custom {@link DateTimeFormatter} pattern can be provided (e.g. {@code "yyyy-MM-dd"}).
  * <p>
  * The formatter automatically detects whether the temporal value supports date fields, time fields, or both and
- * adjusts the output accordingly. All formatting is locale-aware using the formatting context's locale.
+ * adjusts the output accordingly. All formatting is locale-aware using the formatting context's locale. Values with
+ * an explicit zone or offset retain it; zone-less values and instants use the system default zone.
  *
  * @author Jeroen Gremmen
  */
@@ -139,10 +141,11 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
         return emptyText();
     }
 
-    return noSpaceText(formatter
-        .withZone(ZoneId.systemDefault())
-        .withLocale(context.getLocale())
-        .format(temporal));
+    final var formatterWithZone = temporal.query(TemporalQueries.zone()) == null
+        ? formatter.withZone(ZoneId.systemDefault())
+        : formatter;
+
+    return noSpaceText(formatterWithZone.withLocale(context.getLocale()).format(temporal));
   }
 
 
