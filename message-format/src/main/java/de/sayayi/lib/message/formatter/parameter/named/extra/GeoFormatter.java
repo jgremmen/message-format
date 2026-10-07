@@ -245,6 +245,7 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
 
 
   @Contract(pure = true)
+  @SuppressWarnings("StringConcatenationInFormatCall")
   private @NotNull String formatMinOrSec(@NotNull Locale locale, double d, int digits, boolean zeroPadding)
   {
     //noinspection MalformedFormatString
