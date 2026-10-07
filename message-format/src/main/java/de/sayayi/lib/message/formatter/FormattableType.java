@@ -26,15 +26,14 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * A formattable type is an ordered type (class). The order is explicitly defined within a range
- * {@code 0..127}.
+ * Describes a type that a parameter formatter can handle and the priority of that type during formatter selection.
+ * The order is explicitly defined within a range {@code 0..127}, where lower values have higher priority.
  * <p>
- * During formatting there may be multiple suitable formatters for a specific value. The order
- * determines in what order the formatters are presented. The best match (lowest order) will be
- * used to format the value. However, it can decide to delegate formatting to the next formatter.
+ * When multiple formatters can handle a value, the formatter for the highest priority matching type is tried first.
+ * It may delegate formatting to the next matching formatter.
  * <p>
- * All formatters bundled with the message format library (except for the Object and byte[]
- * formatter) have either a {@link #DEFAULT_ORDER} or {@link #DEFAULT_PRIMITIVE_OR_ARRAY_ORDER}.
+ * All formatters bundled with the message format library (except for the Object and byte[] formatter) have either a
+ * {@link #DEFAULT_ORDER} or {@link #DEFAULT_PRIMITIVE_OR_ARRAY_ORDER}.
  *
  * @see GenericFormatterService
  * @see ParameterFormatterContext#delegateToNextFormatter()
@@ -45,14 +44,13 @@ import static java.util.Objects.requireNonNull;
 public final class FormattableType implements Comparable<FormattableType>, Serializable
 {
   /**
-   * Default formattable type matching every Object.
+   * Default formattable type for {@link Object}, which can match values of any type.
    */
   public static final FormattableType DEFAULT = new FormattableType(Object.class);
 
 
   /**
-   * Default order value. If a formattable type has no explicit order, this default value will be
-   * used instead.
+   * Default order value. If a formattable type has no explicit order, this default value will be used instead.
    *
    * @see #getOrder()
    */
@@ -74,13 +72,16 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
 
 
   /**
-   * Constructs a formattable type with a specific {@code order}.
+   * Creates a formattable type with the specified priority order.
    * <p>
-   * Note: {@code Object} type must be fixed at order 127. If a lower order number is provided
-   *       for this type an {@code IllegalArgumentException} is thrown.
+   * The {@link Object} type must use order {@code 127}, so it is considered only after more specific types.
    *
-   * @param type   type, not {@code null}
-   * @param order  order ({@code 0..127})
+   * @param type   type handled by the formatter, not {@code null}
+   * @param order  priority order in the range {@code 0..127}
+   *
+   * @throws IllegalArgumentException  if the order is outside the allowed range or if {@link Object} is given an order
+   *                                   other than {@code 127}
+   * @throws NullPointerException      if {@code type} is {@code null}
    */
   @SuppressWarnings("ConstantValue")
   public FormattableType(@NotNull Class<?> type, @Range(from = 0, to = 127) int order)
@@ -96,12 +97,14 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
 
 
   /**
-   * Constructs a formattable type with default order.
+   * Creates a formattable type with the default priority for its type.
    *
-   * @param type  type, not {@code null}
+   * @param type  type handled by the formatter, not {@code null}
    *
    * @see #DEFAULT_ORDER
    * @see #DEFAULT_PRIMITIVE_OR_ARRAY_ORDER
+   *
+   * @throws NullPointerException  if {@code type} is {@code null}
    */
   public FormattableType(@NotNull Class<?> type)
   {
@@ -137,6 +140,14 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
   }
 
 
+  /**
+   * Indicates whether this formattable type is equal to another object.
+   * Two formattable types are equal when they describe the same class and priority order.
+   *
+   * @param o  object to compare with
+   *
+   * @return  {@code true} if the objects describe the same type and order
+   */
   @Override
   public boolean equals(Object o) {
     return this == o || (o instanceof FormattableType that && type == that.type && order == that.order);
@@ -149,6 +160,14 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
   }
 
 
+  /**
+   * Compares this formattable type with another by priority order, then by type name when the orders are equal.
+   *
+   * @param o  formattable type to compare with, not {@code null}
+   *
+   * @return  a negative value, zero, or a positive value when this type sorts before, equally to, or after the given
+   *          type
+   */
   @Override
   public int compareTo(@NotNull FormattableType o)
   {
@@ -163,6 +182,11 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
   }
 
 
+  /**
+   * Returns a readable representation of this formattable type.
+   *
+   * @return  a string containing the type and its priority order
+   */
   @Override
   public String toString() {
     return "FormattableType(type=" + type + ",order=" + order + ')';

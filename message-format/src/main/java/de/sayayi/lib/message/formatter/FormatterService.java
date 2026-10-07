@@ -19,6 +19,7 @@ import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.named.StringFormatter;
 import de.sayayi.lib.message.formatter.post.PostFormatter;
+import de.sayayi.lib.message.internal.formatter.FormatterServiceDelegate;
 import de.sayayi.lib.message.part.MessagePart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -43,8 +44,7 @@ import java.util.Set;
  * @see GenericFormatterService
  * @see DefaultFormatterService
  */
-public sealed interface FormatterService
-    permits FormatterService.WithRegistry, GenericFormatterService.SealedFormatterService
+public sealed interface FormatterService permits FormatterService.WithRegistry, FormatterServiceDelegate
 {
   /**
    * Returns a list of parameter formatters for the given {@code format}, {@code type} and {@code config}.

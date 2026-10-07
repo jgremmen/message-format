@@ -21,6 +21,9 @@ import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.DefaultFormatter;
 import de.sayayi.lib.message.formatter.parameter.named.StringFormatter;
 import de.sayayi.lib.message.formatter.post.PostFormatter;
+import de.sayayi.lib.message.internal.formatter.FormatterCache;
+import de.sayayi.lib.message.internal.formatter.FormatterServiceDelegate;
+import de.sayayi.lib.message.internal.formatter.PrioritizedParameterFormatter;
 import de.sayayi.lib.message.part.MessagePart.Config;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -72,7 +75,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
 
   private final @NotNull Map<String,NamedParameterFormatter> namedFormatters = new TreeMap<>();
   private final @NotNull Map<String,NamedParameterFormatter> configNameToNamedFormatterMap = new TreeMap<>();
-  private final @NotNull Map<Class<?>,List<PrioritizedFormatter>> typeFormatters = new HashMap<>();
+  private final @NotNull Map<Class<?>,List<PrioritizedParameterFormatter>> typeFormatters = new HashMap<>();
   private final @NotNull Set<String> parameterConfigNames = new TreeSet<>();
   private final @NotNull Map<String,PostFormatter> postFormatters = new HashMap<>();
   private final @NotNull FormatterCache formatterCache;
@@ -196,7 +199,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   {
     typeFormatters
         .computeIfAbsent(formattableType.getType(), t -> new ArrayList<>(4))
-        .add(new PrioritizedFormatter(formattableType.getOrder(), formatter));
+        .add(new PrioritizedParameterFormatter(formattableType.getOrder(), formatter));
 
     parameterConfigNames.addAll(formatter.getParameterConfigNames());
   }
@@ -392,7 +395,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
               .filter(Objects::nonNull)
               .flatMap(Collection::stream)
               .sorted()
-              .map(pf -> pf.formatter)
+              .map(PrioritizedParameterFormatter::formatter)
               .distinct()
               .toArray(ParameterFormatter[]::new));
 
@@ -494,82 +497,6 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   /** {@inheritDoc} */
   @Override
   public @NotNull FormatterService seal() {
-    return new SealedFormatterService();
-  }
-
-
-
-
-  /**
-   * A prioritized wrapper around a {@link ParameterFormatter} that is used for ordering formatters by their
-   * registration priority.
-   *
-   * @param order      the priority order (lower values have higher priority)
-   * @param formatter  the wrapped parameter formatter, not {@code null}
-   */
-  private record PrioritizedFormatter(int order, @NotNull ParameterFormatter formatter)
-      implements Comparable<PrioritizedFormatter>
-  {
-    /** {@inheritDoc} */
-    @Override
-    public int compareTo(@NotNull PrioritizedFormatter o)
-    {
-      var cmp = Integer.compare(order, o.order);
-      if (cmp == 0)
-        cmp = formatter.getClass().getName().compareTo(o.formatter.getClass().getName());
-
-      return cmp;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public @NotNull String toString() {
-      return "PrioritizedFormatter(order=" + order + ",formatter=" + formatter + ')';
-    }
-  }
-
-
-
-
-  /**
-   * Read-only view of the enclosing {@link GenericFormatterService}. Queries are delegated to the enclosing service,
-   * so registrations made through that service remain visible; this is not an immutable snapshot. The view itself
-   * does not expose formatter registration methods.
-   *
-   * @since 0.22.0
-   */
-  final class SealedFormatterService implements FormatterService
-  {
-    private SealedFormatterService() {
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, Config config) {
-      return GenericFormatterService.this.getFormatters(format, type, config);
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public @UnmodifiableView @NotNull Map<String,PostFormatter> getPostFormatters() {
-      return GenericFormatterService.this.getPostFormatters();
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public @UnmodifiableView @NotNull Set<String> getParameterConfigNames() {
-      return GenericFormatterService.this.getParameterConfigNames();
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-      return GenericFormatterService.this.toString();
-    }
+    return new FormatterServiceDelegate(this);
   }
 }

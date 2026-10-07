@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.formatter;
+package de.sayayi.lib.message.internal.formatter;
 
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import org.jetbrains.annotations.ApiStatus;
@@ -62,7 +62,7 @@ public final class FormatterCache
    *
    * @param n  desired cache capacity
    */
-  FormatterCache(int n)
+  public FormatterCache(int n)
   {
     capacity = Math.max(n, 8);
     typeFormatters = new Object[capacity * 2];
@@ -74,7 +74,7 @@ public final class FormatterCache
   /**
    * Removes all entries from this cache.
    */
-  void clear()
+  public void clear()
   {
     lock.lock();
     try {
@@ -104,8 +104,8 @@ public final class FormatterCache
    *
    * @return  cached or newly built parameter formatters for the given type, never {@code null}
    */
-  @NotNull ParameterFormatter[] lookup(@NotNull Class<?> type,
-                                       @NotNull Function<Class<?>,ParameterFormatter[]> buildFormatters)
+  public @NotNull ParameterFormatter[] lookup(@NotNull Class<?> type,
+                                              @NotNull Function<Class<?>,ParameterFormatter[]> buildFormatters)
   {
     final int _modCount;
     int idx;
