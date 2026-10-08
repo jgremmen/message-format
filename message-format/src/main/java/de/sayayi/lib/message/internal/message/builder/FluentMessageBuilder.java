@@ -233,11 +233,17 @@ public final class FluentMessageBuilder implements MessageBuilder
    *
    * @return  template backed by the built message, never {@code null}
    *
-   * @throws IllegalStateException if this builder has already been built
+   * @throws IllegalStateException  if this builder has already been built or the message contains template references
    */
   @Override
-  public @NotNull Template buildAsTemplate() {
-    return new MessageTemplate(build());
+  public @NotNull Template buildAsTemplate()
+  {
+    final var message = build();
+
+    if (!message.getTemplateNames().isEmpty())
+      throw new IllegalStateException("template must not contain template references");
+
+    return new MessageTemplate(message);
   }
 
 

@@ -146,6 +146,8 @@ public sealed interface MessageBuilder
    *
    * @return  the constructed template, never {@code null}
    *
+   * @throws IllegalStateException  if this builder has already been built or the message contains template references
+   *
    * @since 0.24.0
    */
   @NotNull Template buildAsTemplate();

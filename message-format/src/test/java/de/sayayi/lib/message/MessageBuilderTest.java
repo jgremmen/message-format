@@ -364,6 +364,19 @@ class MessageBuilderTest
 
 
     @Test
+    @DisplayName("Template references are not allowed in a template built by the builder")
+    void testNestedTemplateReferenceIsRejected()
+    {
+      final var builder = MessageBuilder
+          .create()
+          .text("outer")
+          .template("inner");
+
+      assertThrows(IllegalStateException.class, builder::buildAsTemplate);
+    }
+
+
+    @Test
     @DisplayName("Template with parameter part")
     void testTemplateWithParameter()
     {
