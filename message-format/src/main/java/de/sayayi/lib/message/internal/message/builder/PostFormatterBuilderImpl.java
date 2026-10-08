@@ -77,6 +77,12 @@ public final class PostFormatterBuilderImpl
   }
 
 
+  @Override
+  public @NotNull PostFormatterBuilder configMessage(@NotNull String name, @NotNull Message.WithSpaces message) {
+    throw new IllegalArgumentException("post-formatter config cannot be a message value");
+  }
+
+
   /**
    * Completes this post-formatter part in the enclosing message.
    */

@@ -924,6 +924,17 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     @Override
     public void exitPostFormatPart(PostFormatPartContext ctx)
     {
+      final var messageConfigValue = ctx
+          .configDefinition()
+          .stream()
+          .filter(cdc -> cdc.value instanceof TypedValue.MessageValue)
+          .findFirst();
+
+      messageConfigValue.ifPresent(cdc ->
+          syntaxError("post-format config '" + cdc.name + "' cannot be a message value")
+              .with(cdc.getChild(2))
+              .report());
+
       ctx.part = new PostFormatterPart(
           ctx.postFormatName().name,
           ctx.quotedMessage().messageWithSpaces,

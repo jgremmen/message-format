@@ -626,6 +626,19 @@ class MessageBuilderTest
 
 
     @Test
+    @DisplayName("configMessage is not supported for post-formatter configuration")
+    void testMessageConfigValueIsRejected()
+    {
+      final var message = MessageBuilder.create().text("config message").build();
+
+      assertThrows(IllegalArgumentException.class, () -> MessageBuilder
+          .create()
+          .postFormatter("case")
+              .configMessage("config", message));
+    }
+
+
+    @Test
     @DisplayName("withMessage(String) with null throws NullPointerException")
     @SuppressWarnings("DataFlowIssue")
     void testWithMessageStringNullThrows()

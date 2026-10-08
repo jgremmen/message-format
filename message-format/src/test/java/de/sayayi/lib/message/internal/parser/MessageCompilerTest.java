@@ -179,6 +179,19 @@ final class MessageCompilerTest
 
 
   @Test
+  @DisplayName("Post formatter with message configuration value")
+  void testPostFormatterWithMessageConfigValue()
+  {
+    var mpe = assertThrowsExactly(
+        MessageParserException.class,
+        () -> COMPILER.compileMessage("%(clip, 'text', config:'%{message}')"));
+
+    assertEquals("post-format config 'config' cannot be a message value", mpe.getErrorMessage());
+    assertEquals(MESSAGE, mpe.getType());
+  }
+
+
+  @Test
   @DisplayName("Parameter with 'null' configuration key")
   void testParameterWithNullKey()
   {

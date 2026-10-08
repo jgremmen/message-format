@@ -337,6 +337,8 @@ public sealed interface MessageBuilder
      * @param message  message value, not {@code null}
      *
      * @return  this builder, never {@code null}
+     *
+     * @throws IllegalArgumentException  if called on a post-formatter builder
      */
     @Contract("_, _ -> this")
     @NotNull S configMessage(@NotNull String name, @NotNull Message.WithSpaces message);
