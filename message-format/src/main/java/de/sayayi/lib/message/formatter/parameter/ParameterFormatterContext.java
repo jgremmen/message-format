@@ -25,13 +25,14 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.NoSuchElementException;
 import java.util.OptionalLong;
 import java.util.Set;
 
 
 /**
- * The formatter context provides a parameter formatter with all context information it requires
- * to format a parameter part.
+ * Provides a parameter formatter with message and parameter context, and operations for formatting values, measuring
+ * their size, and resolving their classifiers.
  *
  * @see ParameterFormatter#format(ParameterFormatterContext, Object)
  *
@@ -50,32 +51,22 @@ public interface ParameterFormatterContext extends Parameters, ConfigAccessor, M
 
 
   /**
-   * Delegate formatting to the next best parameter formatter.
-   * <p>
-   * Based on the object type, format and registered formatters, a list of prioritized formatters is calculated and the
-   * top formatter is invoked. If that formatter delegates formatting, the next formatter from the list will be invoked
-   * with the same formatter context.
-   * <p>
-   * The last formatter from the list, which is usually the formatter associated with type {@code Object}, must not
-   * delegate to the next formatter or a {@code NoSuchElementException} is thrown. By default, the {@code Object}
-   * formatter is a string formatter, which will never delegate. However, if this formatter is redefined, it must never
-   * delegate formatting.
-   * <p>
-   * A formatter selected explicitly {@linkplain NamedParameterFormatter by name} never has a next formatter it can
-   * delegate to: by design, naming a formatter is authoritative and no type-based fallback chain is built behind it
-   * (see {@link NamedParameterFormatter}). Calling this method in that situation throws a
-   * {@code NoSuchElementException}, so a named formatter must only call it unconditionally if it is guaranteed to also
-   * be reachable through type-based resolution.
+   * Delegates formatting to the next applicable formatter in the type-based formatter chain. A formatter selected
+   * explicitly by name has no next formatter unless it is also available through type-based resolution.
    *
    * @return  formatted text, never {@code null}
+   *
+   * @throws NoSuchElementException  if no next formatter is available
+   *
+   * @see NamedParameterFormatter
    */
   @NotNull Text delegateToNextFormatter();
 
 
   /**
-   * Format the given {@code value} using its type.
+   * Formats {@code value} using its runtime type and the current parameter context.
    *
-   * @param value  value to format
+   * @param value  value to format, or {@code null}
    *
    * @return  formatted text, never {@code null}
    */
@@ -84,10 +75,10 @@ public interface ParameterFormatterContext extends Parameters, ConfigAccessor, M
 
 
   /**
-   * Format the given {@code value} using {@code type}.
+   * Formats {@code value} using the specified {@code type} and the current parameter context.
    *
-   * @param value  value to format
-   * @param type   value type
+   * @param value  value to format, or {@code null}
+   * @param type   type to use for formatter selection, not {@code null}
    *
    * @return  formatted text, never {@code null}
    */
@@ -96,15 +87,15 @@ public interface ParameterFormatterContext extends Parameters, ConfigAccessor, M
 
 
   /**
-   * Format the given {@code value} using {@code type}, {@code format} and {@code config}.
+   * Formats {@code value} using the specified type, formatter name, and parameter configuration.
    * <p>
-   * If {@code type} is {@code null}, it will be determined by analyzing {@code value}.
-   * If {@code config} is null, the current parameter configuration map is used.
+   * If {@code type} is {@code null}, the type is determined from {@code value}. If {@code config} is {@code null},
+   * the current parameter configuration is used.
    *
-   * @param value   value to format
-   * @param type    value type
-   * @param format  formatter name
-   * @param config  parameter config instance
+   * @param value   value to format, or {@code null}
+   * @param type    type to use for formatter selection, or {@code null} to use the value's type
+   * @param format  formatter name, or {@code null} to use type-based selection
+   * @param config  parameter configuration, or {@code null} to use the current configuration
    *
    * @return  formatted text, never {@code null}
    */
@@ -113,9 +104,9 @@ public interface ParameterFormatterContext extends Parameters, ConfigAccessor, M
 
 
   /**
-   * Format the given {@code message}.
+   * Formats a nested {@code message} using the current message and parameter context.
    *
-   * @param message  message, or {@code null}
+   * @param message  message to format, or {@code null}
    *
    * @return  formatted text, never {@code null}
    */
@@ -124,19 +115,24 @@ public interface ParameterFormatterContext extends Parameters, ConfigAccessor, M
 
 
   /**
-   * Determines the size of {@code value}.
+   * Returns the size of {@code value} when a suitable formatter can determine it.
    *
-   * @param value  value to calculate size of or {@code null}
+   * @param value  value to measure, or {@code null}
    *
-   * @return  {@link OptionalLong#empty()} if {@code value} is {@code null} or if there's no
-   *          suitable formatter capable of calculating the size. If the size has been calculated,
-   *          {@link OptionalLong#getAsLong()} will return the value
+   * @return  the size when available, or {@link OptionalLong#empty()} when it cannot be determined
    */
   @Contract(pure = true)
   @NotNull OptionalLong size(Object value);
 
 
   /**
+   * Resolves the classifiers that describe {@code value}.
+   *
+   * @param value   value to classify, or {@code null}
+   * @param config  parameter configuration to use, or {@code null} to use the current configuration
+   *
+   * @return  classifier names, never {@code null}
+   *
    * @since 0.21.0
    */
   @Contract(pure = true)

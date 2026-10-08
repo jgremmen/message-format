@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter.parameter;
 
 import de.sayayi.lib.message.formatter.FormattableType;
-import de.sayayi.lib.message.formatter.FormatterService;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,14 +23,10 @@ import java.util.Set;
 
 
 /**
- * Convenience base class for parameter formatters that support exactly one {@link FormattableType}.
+ * Base class for parameter formatters that format values of one {@link FormattableType}.
  * <p>
- * Subclasses only need to implement {@link #getFormattableType()} (singular) instead of
- * {@link ParameterFormatter#getFormattableTypes() getFormattableTypes()}, which is implemented
- * as a {@code final} method delegating to the former.
- * <p>
- * This class inherits the {@code null}/empty value handling from {@link AbstractParameterFormatter},
- * so subclasses only need to provide {@link #formatValue(ParameterFormatterContext, Object)}.
+ * Subclasses provide the supported type and implement {@link #formatValue(ParameterFormatterContext, Object)} to
+ * format values of that type. Null and empty value handling is provided by {@link AbstractParameterFormatter}.
  *
  * @param <T>  the parameter value type handled by this formatter
  *
@@ -40,6 +35,16 @@ import java.util.Set;
  */
 public abstract class AbstractSingleTypeParameterFormatter<T> extends AbstractParameterFormatter<T>
 {
+  /**
+   * Updates the classifiers for a value handled by this formatter.
+   *
+   * @param context  classifier context to update, not {@code null}
+   * @param value    value to classify, not {@code null}
+   *
+   * @return  {@code true} if classification is complete, {@code false} to allow other formatters to add classifiers
+   *
+   * @since 0.21.0
+   */
   @Override
   @SuppressWarnings("unchecked")
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value) {
@@ -48,6 +53,15 @@ public abstract class AbstractSingleTypeParameterFormatter<T> extends AbstractPa
 
 
   /**
+   * Updates classifiers for a value of this formatter's type.
+   * <p>
+   * Override this method to add classifiers specific to values handled by this formatter.
+   *
+   * @param context  classifier context to update, not {@code null}
+   * @param value    value to classify, not {@code null}
+   *
+   * @return  {@code true} if classification is complete, {@code false} to allow other formatters to add classifiers
+   *
    * @since 0.21.0
    */
   @Contract(pure = true)
@@ -57,12 +71,11 @@ public abstract class AbstractSingleTypeParameterFormatter<T> extends AbstractPa
 
 
   /**
-   * Returns a singleton set containing the {@link FormattableType} returned by
-   * {@link #getFormattableType()}.
-   * <p>
-   * This method is {@code final}; subclasses must override {@link #getFormattableType()} instead.
+   * Returns the single supported type declared by {@link #getFormattableType()}.
    *
-   * @return  an immutable singleton set with the sole supported type, never {@code null}
+   * @return  a set containing the supported type, never {@code null}
+   *
+   * @see #getFormattableType()
    */
   @Override
   public final @NotNull Set<FormattableType> getFormattableTypes() {
@@ -71,15 +84,9 @@ public abstract class AbstractSingleTypeParameterFormatter<T> extends AbstractPa
 
 
   /**
-   * Returns the sole java type which is supported by this formatter.
-   * <p>
-   * On registration via {@link FormatterService.WithRegistry#addFormatter(ParameterFormatter)}, existing formatters
-   * for the same type will co-exist with this formatter. The {@linkplain FormattableType#getOrder() order} attribute
-   * determines which formatter is preferred. If different formatters share the same type and order, precedence is
-   * determined by the class name. The behavior is deterministic, but it is encouraged to select different order
-   * values for those cases.
+   * Returns the type supported by this formatter.
    *
-   * @return  the supported java type for this formatter, not {@code null}
+   * @return  the supported type, not {@code null}
    *
    * @see #getFormattableTypes()
    */

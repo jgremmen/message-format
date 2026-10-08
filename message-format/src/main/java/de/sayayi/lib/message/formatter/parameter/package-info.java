@@ -15,7 +15,8 @@
  */
 
 /**
- * Parameter formatters responsible for converting parameter values into formatted text during message formatting.
+ * APIs and implementations for formatting message parameter values, including formatter selection and the context
+ * available to parameter formatters.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0
