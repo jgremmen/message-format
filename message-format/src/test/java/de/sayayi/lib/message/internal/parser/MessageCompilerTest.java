@@ -179,6 +179,32 @@ final class MessageCompilerTest
 
 
   @Test
+  @DisplayName("Numeric configuration values must fit in a long")
+  void testNumericConfigurationLongRange()
+  {
+    assertArrayEquals(
+        new MessagePart[] {
+            new ParameterPart("p", new MessagePartConfig(Map.of(
+                "min", new TypedValueNumber(Long.MIN_VALUE),
+                "max", new TypedValueNumber(Long.MAX_VALUE)
+            )), EMPTY_MAP)
+        },
+        COMPILER.compileMessage(
+            "%{p,min:-9223372036854775808,max:9223372036854775807}").getMessageParts());
+
+    for(var number: new String[] { "9223372036854775808", "-9223372036854775809" })
+    {
+      var mpe = assertThrowsExactly(
+          MessageParserException.class,
+          () -> COMPILER.compileMessage("%{p,value:" + number + "}"));
+
+      assertEquals("number value out of range", mpe.getErrorMessage());
+      assertEquals(MESSAGE, mpe.getType());
+    }
+  }
+
+
+  @Test
   @DisplayName("Post formatter with message configuration value")
   void testPostFormatterWithMessageConfigValue()
   {

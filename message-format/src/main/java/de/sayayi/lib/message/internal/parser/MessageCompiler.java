@@ -60,8 +60,6 @@ import static de.sayayi.lib.message.util.MessageUtil.*;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
-import static java.lang.Long.MAX_VALUE;
-import static java.lang.Long.MIN_VALUE;
 import static java.util.Objects.requireNonNull;
 import static org.antlr.v4.runtime.Token.EOF;
 
@@ -1233,16 +1231,12 @@ public final class MessageCompiler extends AbstractAntlr4Parser
      */
     private long parseLongValue(@NotNull TerminalNode numberNode)
     {
-      final var number = new BigInteger(numberNode.getText());
-
-      if (number.compareTo(BigInteger.valueOf(MIN_VALUE)) < 0 ||
-          number.compareTo(BigInteger.valueOf(MAX_VALUE)) > 0)
-      {
+      try {
+        return new BigInteger(numberNode.getText()).longValueExact();
+      } catch(ArithmeticException ex) {
         syntaxError("number value out of range").with(numberNode).report();
         return 0;  // never reached
       }
-
-      return number.longValue();
     }
   }
 }

@@ -137,13 +137,11 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   {
     requireNonNull(locale, "locale must not be null");
 
-    final var writeLock = lock.writeLock();
-
-    writeLock.lock();
+    lock.writeLock().lock();
     try {
       this.locale = locale;
     } finally {
-      writeLock.unlock();
+      lock.writeLock().unlock();
     }
 
     return this;
@@ -156,13 +154,11 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   {
     validateName(name, "config name");
 
-    final var writeLock = lock.writeLock();
-
-    writeLock.lock();
+    lock.writeLock().lock();
     try {
       defaultConfig.put(name, value ? TypedValueBool.TRUE : TypedValueBool.FALSE);
     } finally {
-      writeLock.unlock();
+      lock.writeLock().unlock();
     }
 
     return this;
@@ -175,13 +171,11 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   {
     validateName(name, "config name");
 
-    final var writeLock = lock.writeLock();
-
-    writeLock.lock();
+    lock.writeLock().lock();
     try {
       defaultConfig.put(name, new TypedValueNumber(value));
     } finally {
-      writeLock.unlock();
+      lock.writeLock().unlock();
     }
 
     return this;
@@ -194,13 +188,11 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   {
     validateName(name, "config name");
 
-    final var writeLock = lock.writeLock();
-
-    writeLock.lock();
+    lock.writeLock().lock();
     try {
       defaultConfig.put(name, new TypedValueString(messageFactory, value));
     } finally {
-      writeLock.unlock();
+      lock.writeLock().unlock();
     }
 
     return this;
@@ -213,13 +205,11 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   {
     validateName(name, "config name");
 
-    final var writeLock = lock.writeLock();
-
-    writeLock.lock();
+    lock.writeLock().lock();
     try {
       defaultConfig.put(name, new TypedValueMessage(value));
     } finally {
-      writeLock.unlock();
+      lock.writeLock().unlock();
     }
 
     return this;
@@ -232,13 +222,11 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   {
     requireNonNull(messageFilter, "messageFilter must not be null");
 
-    final var writeLock = lock.writeLock();
-
-    writeLock.lock();
+    lock.writeLock().lock();
     try {
       this.messageFilter = messageFilter;
     } finally {
-      writeLock.unlock();
+      lock.writeLock().unlock();
     }
 
     return this;
@@ -251,13 +239,11 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   {
     requireNonNull(templateFilter, "templateFilter must not be null");
 
-    final var writeLock = lock.writeLock();
-
-    writeLock.lock();
+    lock.writeLock().lock();
     try {
       this.templateFilter = templateFilter;
     } finally {
-      writeLock.unlock();
+      lock.writeLock().unlock();
     }
 
     return this;
@@ -270,14 +256,14 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   {
     requireNonNull(message, "message must not be null");
 
-    final var writeLock = lock.writeLock();
-
-    writeLock.lock();
-    try {
-      if (messageFilter.filter(message))
+    if (messageFilter.filter(message))
+    {
+      lock.writeLock().lock();
+      try {
         messages.put(message.getCode(), message);
-    } finally {
-      writeLock.unlock();
+      } finally {
+        lock.writeLock().unlock();
+      }
     }
 
     return this;
@@ -325,16 +311,15 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
                              Predicate<String> messageCodeFilter, Predicate<String> templateNameFilter)
       throws IOException
   {
-    final var readLock = lock.readLock();
     final Map<String,Message.WithCode> messageSnapshot;
     final Map<String,Template> templateSnapshot;
 
-    readLock.lock();
+    lock.readLock().lock();
     try {
       messageSnapshot = new TreeMap<>(messages);
       templateSnapshot = new TreeMap<>(templates);
     } finally {
-      readLock.unlock();
+      lock.readLock().unlock();
     }
 
     try(var dataStream = new PackOutputStream(PACK_CONFIG, VERSION, compress, stream)) {
@@ -417,13 +402,11 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
    */
   private @NotNull Locale getLocale()
   {
-    final var readLock = lock.readLock();
-
-    readLock.lock();
+    lock.readLock().lock();
     try {
       return locale;
     } finally {
-      readLock.unlock();
+      lock.readLock().unlock();
     }
   }
 
@@ -674,13 +657,11 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     @Override
     public @NotNull @UnmodifiableView Set<String> getMessageCodes()
     {
-      final var readLock = lock.readLock();
-
-      readLock.lock();
+      lock.readLock().lock();
       try {
         return unmodifiableSet(new TreeSet<>(messages.keySet()));
       } finally {
-        readLock.unlock();
+        lock.readLock().unlock();
       }
     }
 
@@ -689,13 +670,11 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     @Override
     public @NotNull @UnmodifiableView Set<String> getTemplateNames()
     {
-      final var readLock = lock.readLock();
-
-      readLock.lock();
+      lock.readLock().lock();
       try {
         return unmodifiableSet(new TreeSet<>(templates.keySet()));
       } finally {
-        readLock.unlock();
+        lock.readLock().unlock();
       }
     }
 
@@ -704,13 +683,11 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     @Override
     public Template getTemplateByName(@NotNull String name)
     {
-      final var readLock = lock.readLock();
-
-      readLock.lock();
+      lock.readLock().lock();
       try {
         return templates.get(name);
       } finally {
-        readLock.unlock();
+        lock.readLock().unlock();
       }
     }
 
@@ -722,13 +699,11 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
       if (code == null)
         return false;
 
-      final var readLock = lock.readLock();
-
-      readLock.lock();
+      lock.readLock().lock();
       try {
         return messages.containsKey(code);
       } finally {
-        readLock.unlock();
+        lock.readLock().unlock();
       }
     }
 
@@ -737,13 +712,11 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     @Override
     public Message.WithCode getMessageByCode(@NotNull String code)
     {
-      final var readLock = lock.readLock();
-
-      readLock.lock();
+      lock.readLock().lock();
       try {
         return messages.get(code);
       } finally {
-        readLock.unlock();
+        lock.readLock().unlock();
       }
     }
 
@@ -755,13 +728,11 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
       if (name == null)
         return false;
 
-      final var readLock = lock.readLock();
-
-      readLock.lock();
+      lock.readLock().lock();
       try {
         return templates.containsKey(name);
       } finally {
-        readLock.unlock();
+        lock.readLock().unlock();
       }
     }
 
@@ -770,13 +741,11 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     @Override
     public TypedValue<?> getDefaultConfig(@NotNull String name)
     {
-      final var readLock = lock.readLock();
-
-      readLock.lock();
+      lock.readLock().lock();
       try {
         return defaultConfig.get(name);
       } finally {
-        readLock.unlock();
+        lock.readLock().unlock();
       }
     }
 
@@ -800,16 +769,15 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     @Override
     public @NotNull Set<String> findMissingTemplates(Predicate<String> messageCodeFilter)
     {
-      final var readLock = lock.readLock();
       final List<Message.WithCode> messageSnapshot;
       final Set<String> templateNames;
 
-      readLock.lock();
+      lock.readLock().lock();
       try {
         messageSnapshot = new ArrayList<>(messages.values());
         templateNames = new HashSet<>(templates.keySet());
       } finally {
-        readLock.unlock();
+        lock.readLock().unlock();
       }
 
       return messageSnapshot
