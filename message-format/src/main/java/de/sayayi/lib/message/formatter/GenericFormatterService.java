@@ -38,7 +38,7 @@ import java.util.stream.Stream;
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT;
 import static de.sayayi.lib.message.util.MessageUtil.isEmpty;
 import static de.sayayi.lib.message.util.MessageUtil.isKebabCaseName;
-import static java.util.Arrays.asList;
+import static java.util.Arrays.copyOf;
 import static java.util.Objects.requireNonNull;
 
 
@@ -372,6 +372,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
 
     readLock.lock();
     try {
+      // explicit named formatter
       if (format != null)
       {
         var namedFormatter = namedFormatters.get(format);
@@ -379,16 +380,16 @@ public non-sealed class GenericFormatterService implements FormatterService.With
           return new ParameterFormatter[] { namedFormatter };
       }
 
-      final var formatters = new LinkedHashSet<ParameterFormatter>();
-
-      if (!configNameToNamedFormatterMap.isEmpty())
+      // auto-config named formatter
+      if (config != null && !configNameToNamedFormatterMap.isEmpty())
         for(var parameterConfigName: config.getConfigNames())
         {
           var namedFormatter = configNameToNamedFormatterMap.get(parameterConfigName);
           if (namedFormatter != null && namedFormatter.canFormat(type))
-            formatters.add(namedFormatter);
+            return new ParameterFormatter[] { namedFormatter };
         }
 
+      // type based formatters
       final var formattersByType = formatterCache.lookup(type, t ->
           streamTypes(t)
               .map(typeFormatters::get)
@@ -399,9 +400,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
               .distinct()
               .toArray(ParameterFormatter[]::new));
 
-      formatters.addAll(asList(formattersByType));
-
-      return formatters.toArray(new ParameterFormatter[0]);
+      return copyOf(formattersByType, formattersByType.length);
     } finally {
       readLock.unlock();
     }
