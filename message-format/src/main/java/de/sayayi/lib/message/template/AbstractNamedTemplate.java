@@ -26,14 +26,13 @@ import org.jetbrains.annotations.NotNull;
  * {@link #formatAsText(de.sayayi.lib.message.MessageSupport.MessageAccessor,
  * de.sayayi.lib.message.Message.Parameters) formatAsText} to produce the formatted output.
  * <p>
- * This class provides a default {@link #isSame(Template)} implementation that considers two
- * templates the same if the other template is a {@link NamedTemplate} with the same
- * {@linkplain #getName() name}.
+ * This class provides a default {@link #isSame(Template)} implementation that considers two templates the same if the
+ * other template is a {@link NamedTemplate} with the same {@linkplain #getName() name}.
  * <p>
  * To make a custom template discoverable by
  * {@link de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport#registerTemplatesFromService(ClassLoader)
- * registerTemplatesFromService}, declare it as a service provider for
- * {@link NamedTemplate} in your {@code module-info.java}:
+ * registerTemplatesFromService}, declare it as a service provider for {@link NamedTemplate} in your
+ * {@code module-info.java}:
  * <pre>
  * provides de.sayayi.lib.message.template.NamedTemplate with com.example.MyCustomTemplate;
  * </pre>
@@ -53,5 +52,11 @@ public abstract non-sealed class AbstractNamedTemplate implements NamedTemplate
     return
         template instanceof NamedTemplate namedTemplate &&
         getName().equals(namedTemplate.getName());
+  }
+
+
+  @Override
+  public String toString() {
+    return "Template(" + getName() + ')';
   }
 }

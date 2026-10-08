@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
  * A {@link Template} that carries a name, making it eligible for automatic registration via the
  * {@link java.util.ServiceLoader} mechanism.
  * <p>
- * Implementations should extend {@link AbstractNamedTemplate} rather than implementing this interface directly. The
+ * Implementations must extend {@link AbstractNamedTemplate} rather than implementing this interface directly. The
  * name returned by {@link #getName()} is used as the registration key when the template is discovered through
  * {@link MessageSupport.ConfigurableMessageSupport#registerTemplatesFromService(ClassLoader)
  * registerTemplatesFromService}.

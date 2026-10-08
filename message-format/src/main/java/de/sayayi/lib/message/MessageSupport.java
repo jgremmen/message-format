@@ -1147,6 +1147,7 @@ public interface MessageSupport
      * @return  {@code true} if the template will be included,
      *          {@code false} if the template will be excluded
      */
+    @Contract(pure = true)
     boolean filter(@NotNull String name, @NotNull Template template);
   }
 

@@ -279,14 +279,22 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
 
     requireNonNull(template);
 
-    final var writeLock = lock.writeLock();
+    if (templateFilter.filter(name, template))
+    {
+      lock.readLock().lock();
+      try {
+        if (templates.containsKey(name) && !templates.get(name).isSame(template))
+          throw new DuplicateTemplateException(name, "template with name '" + name + "' already exists");
+      } finally {
+        lock.readLock().unlock();
+      }
 
-    writeLock.lock();
-    try {
-      if (templateFilter.filter(name, template))
+      lock.writeLock().lock();
+      try {
         templates.put(name, template);
-    } finally {
-      writeLock.unlock();
+      } finally {
+        lock.writeLock().unlock();
+      }
     }
 
     return this;
