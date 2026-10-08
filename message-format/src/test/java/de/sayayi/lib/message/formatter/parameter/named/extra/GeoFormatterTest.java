@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.formatter.parameter.named.extra;
 
 import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.formatter.parameter.named.extra.GeoFormatter.Format;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
@@ -53,6 +54,7 @@ final class GeoFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Rounds degree values")
   void testDmsSplitterDegree()
   {
     double[] dms;
@@ -70,6 +72,7 @@ final class GeoFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Rounds minute values to the configured precision")
   void testDmsSplitterMinute()
   {
     double[] dms;
@@ -105,6 +108,7 @@ final class GeoFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Formats longitude values using predefined formats")
   void testFormatLongitude()
   {
     val messageAccessor = MessageSupportFactory
@@ -136,6 +140,7 @@ final class GeoFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Formats coordinates using predefined and custom formats")
   void testFormatter()
   {
     val messageSupport = MessageSupportFactory
@@ -169,6 +174,23 @@ final class GeoFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Rejects an invalid custom format pattern")
+  void testInvalidFormatPattern()
+  {
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new GeoFormatter()))
+        .setLocale(ENGLISH);
+
+    val exception = assertThrows(MessageFormatException.class, () -> messageSupport
+        .message("%{lat,geo:'invalid'}")
+        .with("lat", dms(51, 34, 9, 0))
+        .format());
+    assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+  }
+
+
+  @Test
+  @DisplayName("Parses custom format patterns")
   void testParseFormatString()
   {
     Format fmt;

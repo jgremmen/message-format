@@ -91,6 +91,9 @@ Each element of the pattern controls a specific aspect of the output:
 | `LO`        | Append compass direction for longitude (E/W)                         |
 | `LA`        | Append compass direction for latitude (N/S)                          |
 
+An unrecognized format name or an invalid custom pattern causes a `MessageFormatException` when the message is
+formatted, with an `IllegalArgumentException` as its cause.
+
 When `LO` or `LA` is omitted, negative values are shown with a minus sign. When a compass direction is appended, the 
 sign is expressed as the direction letter instead.
 

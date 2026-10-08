@@ -37,38 +37,39 @@ import static java.lang.Math.round;
  * Named parameter formatter that formats numeric values as geographic coordinates in degrees, minutes and seconds
  * (DMS) notation.
  * <p>
- * This formatter is selected by using the name {@code geo} in a message parameter, e.g.
- * {@code %{myParam,format:geo}} or automatically when the {@code geo} configuration key is present.
+ * This formatter is selected by using the name {@code geo} in a message parameter, e.g. {@code %{myParam,format:geo}}
+ * or automatically when the {@code geo} configuration key is present.
  * <p>
- * It accepts {@link Number} values (including primitive {@code double} and {@code float}) representing a coordinate
- * in decimal degrees and formats them as DMS notation.
+ * It accepts {@link Number} values (including primitive {@code double} and {@code float}) representing a coordinate in
+ * decimal degrees and formats them as DMS notation.
  * <p>
  * The output format is controlled by the {@code geo} configuration key, which accepts either a predefined format name
  * or a custom format pattern:
  * <ul>
  *   <li>
- *     <b>Predefined longitude formats:</b> {@code short-longitude} (e.g. 12°45'E),
- *     {@code longitude} (e.g. 12°45'3"E), {@code medium-longitude} (e.g. 12°45'2.9"E),
- *     {@code long-longitude} (e.g. 12°45'2.581"E)
+ *     <b>Predefined longitude formats:</b> {@code short-longitude} (e.g. 12°45'E), {@code longitude} (e.g. 12°45'3"E),
+ *     {@code medium-longitude} (e.g. 12°45'2.9"E), {@code long-longitude} (e.g. 12°45'2.581"E)
  *   </li>
  *   <li>
- *     <b>Predefined latitude formats:</b> {@code short-latitude} (e.g. 12°45'S),
- *     {@code latitude} (e.g. 12°45'3"S), {@code medium-latitude} (e.g. 12°45'2.9"S),
- *     {@code long-latitude} (e.g. 12°45'2.581"S)
+ *     <b>Predefined latitude formats:</b> {@code short-latitude} (e.g. 12°45'S), {@code latitude} (e.g. 12°45'3"S),
+ *     {@code medium-latitude} (e.g. 12°45'2.9"S), {@code long-latitude} (e.g. 12°45'2.581"S)
  *   </li>
  *   <li>
  *     <b>Custom format pattern:</b> a pattern string following the syntax
- *     {@code d[ ][0](m|M|MM|MMM)[ ][0](s|S|SS|SSS)[ ](LO|LA)},
- *     where uppercase variants control the number of decimal digits for minutes/seconds,
- *     {@code 0} enables zero-padding, {@code LO}/{@code LA} appends a compass direction and
+ *     {@code d[ ][0](m|M|MM|MMM)[ ][0](s|S|SS|SSS)[ ](LO|LA)}, where uppercase variants control the number of decimal
+ *     digits for minutes/seconds, {@code 0} enables zero-padding, {@code LO}/{@code LA} appends a compass direction and
  *     spaces control separator characters
  *   </li>
  * </ul>
+ * An unknown format name or invalid custom format pattern causes a
+ * {@link de.sayayi.lib.message.exception.MessageFormatException} when the message is formatted, with an
+ * {@link IllegalArgumentException} as its cause.
  * <p>
  * The compass direction labels can be customized using the configuration keys {@code geo-n}, {@code geo-s},
  * {@code geo-e} and {@code geo-w}, defaulting to {@code N}, {@code S}, {@code E} and {@code W} respectively.
  *
  * @author Jeroen Gremmen
+ * @since 0.3.1
  */
 public final class GeoFormatter extends AbstractParameterFormatter<Number> implements NamedParameterFormatter
 {
@@ -103,8 +104,7 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   /**
    * {@inheritDoc}
    * <p>
-   * This formatter can handle {@link Number} types as well as primitive {@code double} and {@code float} values
-   * and {@code null}.
+   * This formatter accepts {@link Number} types, primitive {@code double} and {@code float} values, and {@code null}.
    */
   @Override
   public boolean canFormat(@NotNull Class<?> type)
@@ -120,8 +120,14 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   /**
    * {@inheritDoc}
    * <p>
-   * Formats the numeric value as a geographic coordinate in DMS notation, using the format specified by the
-   * {@code geo} configuration key.
+   * Formats the coordinate in degrees, minutes and seconds. The {@code geo} configuration selects a predefined
+   * format or a custom pattern, and the {@code geo-n}, {@code geo-s}, {@code geo-e} and {@code geo-w} configuration
+   * values customize the direction labels.
+   *
+   * @param context  formatting context, not {@code null}
+   * @param number   coordinate value in decimal degrees, not {@code null}
+   *
+   * @return  formatted coordinate, never {@code null}
    */
   @Override
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Number number)
@@ -174,6 +180,15 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   }
 
 
+  /**
+   * Selects the predefined or custom coordinate format specified in the formatter context.
+   *
+   * @param context  formatting context, not {@code null}
+   *
+   * @return  selected format, never {@code null}
+   *
+   * @throws IllegalArgumentException  if the configured format name or pattern is invalid
+   */
   private @NotNull Format getFormat(@NotNull ParameterFormatterContext context)
   {
     final var formatString = context.getConfigValueString("geo").orElse("dms");
@@ -185,9 +200,11 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
 
   /**
    * {@inheritDoc}
+   * <p>
+   * The supported configuration names select the coordinate format and customize its compass direction labels.
    *
-   * @return  a set containing {@code "geo"}, {@code "geo-w"}, {@code "geo-e"}, {@code "geo-n"}
-   *          and {@code "geo-s"}, never {@code null}
+   * @return  an unmodifiable set containing {@code "geo"}, {@code "geo-w"}, {@code "geo-e"}, {@code "geo-n"} and
+   *          {@code "geo-s"}, never {@code null}
    */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {
@@ -197,6 +214,8 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
 
   /**
    * {@inheritDoc}
+   * <p>
+   * Providing a {@code geo} configuration value selects this formatter without requiring an explicit formatter name.
    *
    * @return  {@code true}
    */
@@ -210,6 +229,14 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   private static final int DEGREE_MILLIS = 3600000;
   private static final int MINUTE_MILLIS = 60000;
 
+  /**
+   * Splits a decimal degree coordinate into degrees, minutes and seconds at the precision required by {@code fmt}.
+   *
+   * @param fmt  coordinate format, not {@code null}
+   * @param v    coordinate value in decimal degrees
+   *
+   * @return  an array containing degrees, minutes and seconds, in that order
+   */
   @Contract(pure = true)
   static double[] dmsSplitter(@NotNull Format fmt, double v)
   {
@@ -244,6 +271,16 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   }
 
 
+  /**
+   * Formats a minute or second value using the given locale and precision.
+   *
+   * @param locale       locale used for decimal formatting, not {@code null}
+   * @param d            value to format
+   * @param digits       number of decimal places
+   * @param zeroPadding  whether to pad single digit values with a leading zero
+   *
+   * @return  formatted value, never {@code null}
+   */
   @Contract(pure = true)
   @SuppressWarnings("StringConcatenationInFormatCall")
   private @NotNull String formatMinOrSec(@NotNull Locale locale, double d, int digits, boolean zeroPadding)
@@ -258,10 +295,7 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   }
 
 
-  private static final Pattern PATTERN_FORMAT =
-      Pattern.compile("d( )?(?:(0)?(m|M|MM|MMM))?( )?(?:(0)?(s|S|SS|SSS))?( )?(LO|LA)?");
-
-  /*
+  /**
      1 = ( )?  ->  separatorAfterDegree
      2 = (0)?  ->  zeroPadMinutes
      3 = (m|M|MM|MMM)  ->  withMinutes, minuteDigits
@@ -271,35 +305,46 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
      7 = ( )?  ->  separatorAfterSecond
      8 = (LO|LA)  ->  longitude
    */
+  private static final Pattern PATTERN_FORMAT =
+      Pattern.compile("d( )?(?:(0)?(m|M|MM|MMM))?( )?(?:(0)?(s|S|SS|SSS))?( )?(LO|LA)?");
 
+  /**
+   * Parses a custom coordinate format pattern.
+   *
+   * @param formatString  custom format pattern, not {@code null}
+   *
+   * @return  parsed format, never {@code null}
+   *
+   * @throws IllegalArgumentException  if the pattern is invalid or specifies seconds without minutes
+   */
   @Contract(pure = true)
   static @NotNull Format parseFormatString(@NotNull String formatString)
   {
     final var matcher = PATTERN_FORMAT.matcher(formatString.trim());
+    if (!matcher.matches())
+      throw new IllegalArgumentException("invalid geo format pattern: " + formatString);
+
     final var format = new Format();
 
-    if (matcher.matches())
+    format.longitude = matcher.group(8) == null ? null : "LO".equals(matcher.group(8));
+    format.separatorAfterDegree = matcher.group(1) != null;
+    format.separatorAfterMinute = matcher.group(4) != null;
+    format.separatorAfterSecond = matcher.group(7) != null;
+    format.zeroPadMinutes = matcher.group(2) != null;
+    format.zeroPadSeconds = matcher.group(5) != null;
+
+    var minuteFormat = matcher.group(3);
+    if (minuteFormat != null)
+      format.minuteDigits = "m".equals(minuteFormat) ? 0 : minuteFormat.length();
+
+    var secondsFormat = matcher.group(6);
+    if (secondsFormat != null)
     {
-      format.longitude = matcher.group(8) == null ? null : "LO".equals(matcher.group(8));
-      format.separatorAfterDegree = matcher.group(1) != null;
-      format.separatorAfterMinute = matcher.group(4) != null;
-      format.separatorAfterSecond = matcher.group(7) != null;
-      format.zeroPadMinutes = matcher.group(2) != null;
-      format.zeroPadSeconds = matcher.group(5) != null;
+      if (minuteFormat == null)
+        throw new IllegalArgumentException("missing minute specification in geo format: " + formatString);
 
-      var minuteFormat = matcher.group(3);
-      if (minuteFormat != null)
-        format.minuteDigits = "m".equals(minuteFormat) ? 0 : minuteFormat.length();
-
-      var secondsFormat = matcher.group(6);
-      if (secondsFormat != null)
-      {
-        if (minuteFormat == null)
-          throw new IllegalArgumentException("missing minute specification in geo format: " + formatString);
-
-        format.minuteDigits = 0;  // reduce precision for minutes
-        format.secondDigits = "s".equals(secondsFormat) ? 0 : secondsFormat.length();
-      }
+      format.minuteDigits = 0;  // reduce precision for minutes
+      format.secondDigits = "s".equals(secondsFormat) ? 0 : secondsFormat.length();
     }
 
     return format;
@@ -308,22 +353,46 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
 
 
 
+  /** The options used to format a coordinate. */
   static final class Format
   {
+    /** Whether the coordinate is longitude, latitude, or has no compass direction. */
     Boolean longitude;
+
+    /** Whether a space follows the degree symbol. */
     boolean separatorAfterDegree;
+
+    /** Whether a space follows the minute symbol. */
     boolean separatorAfterMinute;
+
+    /** Whether a space follows the second symbol. */
     boolean separatorAfterSecond;
+
+    /** Whether the minute value is zero-padded. */
     boolean zeroPadMinutes;
+
+    /** Whether the second value is zero-padded. */
     boolean zeroPadSeconds;
+
+    /** Number of decimal places for minutes, or {@code -1} when minutes are omitted. */
     int minuteDigits = -1;
+
+    /** Number of decimal places for seconds, or {@code -1} when seconds are omitted. */
     int secondDigits = -1;
 
 
+    /** Creates a format with no direction, minutes or seconds. */
     Format() {
     }
 
 
+    /**
+     * Creates a format with the specified direction and precision.
+     *
+     * @param longitude     {@code true} for longitude, {@code false} for latitude, or {@code null} for no direction
+     * @param minuteDigits  number of decimal places for minutes, or {@code -1} to omit minutes
+     * @param secondDigits  number of decimal places for seconds, or {@code -1} to omit seconds
+     */
     Format(Boolean longitude, int minuteDigits, int secondDigits)
     {
       this.longitude = longitude;
@@ -332,16 +401,19 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
     }
 
 
+    /** Tells whether the format appends a compass direction. */
     boolean hasLoLa() {
       return longitude != null;
     }
 
 
+    /** Tells whether the format includes minutes. */
     boolean hasMinutes() {
       return minuteDigits >= 0;
     }
 
 
+    /** Tells whether the format includes seconds. */
     boolean hasSeconds() {
       return secondDigits >= 0;
     }
