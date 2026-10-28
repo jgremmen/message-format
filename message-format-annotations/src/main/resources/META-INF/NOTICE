@@ -1,0 +1,11 @@
+Message Format Annotations
+Copyright 2025-${copyright} Jeroen Gremmen
+
+This product includes ASM (https://asm.ow2.io/), a Java bytecode
+manipulation framework, version ${asmVersion}.
+Copyright (c) 2000-2011 INRIA, France Telecom
+ASM is licensed under the BSD 3-Clause License. The full license text is
+provided in META-INF/LICENSE-asm.txt.
+
+The ASM classes are relocated from package org.objectweb.asm to package
+de.sayayi.lib.message.annotation.adopter.asm.

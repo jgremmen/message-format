@@ -419,8 +419,12 @@ String result = messageSupport
 ## Module Coordinates
 
 The annotation adopter is part of the `message-format-annotations` module. It depends on the core `message-format`
-module, which it exposes transitively. The ASM library used to read class files is bundled in relocated form, so no
-additional dependencies are required. On the module path, the module name is `de.sayayi.lib.message.annotations`.
+module, which it exposes transitively. The [ASM](https://asm.ow2.io/) library used to read class files is bundled in
+relocated form (package `de.sayayi.lib.message.annotation.adopter.asm`), so no additional dependencies are required.
+The bundled ASM classes are licensed under the [BSD 3-Clause License](https://asm.ow2.io/license.html). The jar
+contains the license text in `META-INF/LICENSE-asm.txt` and an attribution in `META-INF/NOTICE`, and the published
+POM lists the license next to the Apache License of the module. On the module path, the module name is
+`de.sayayi.lib.message.annotations`.
 
 ```java title="module-info.java"
 module com.example.shop {

@@ -161,6 +161,24 @@ tasks.register('prepareRelocatedAsmClasses') {
 sourceSets.main.output.dir(asmMainDir, builtBy: 'prepareRelocatedAsmClasses')
 
 
+tasks.named('processResources') {
+  // version of the bundled ASM library, mentioned in META-INF/NOTICE
+  def asmVersion = providers.provider {
+    configurations.asmToBundle.incoming.resolutionResult.allComponents
+        .find { it.moduleVersion?.group == 'org.ow2.asm' && it.moduleVersion?.name == 'asm' }
+        ?.moduleVersion?.version
+  }
+  def copyrightYear = new Date().format('yyyy')
+
+  inputs.property('asmVersion', asmVersion)
+  inputs.property('copyrightYear', copyrightYear)
+
+  filesMatching('META-INF/NOTICE') {
+    expand(copyright: copyrightYear, asmVersion: asmVersion.get())
+  }
+}
+
+
 tasks.named('sourcesJar') {
   eachFile { fileCopyDetails ->
     if (!fileCopyDetails.directory && fileCopyDetails.name.endsWith('.java')) {
@@ -200,6 +218,15 @@ publishing {
         inceptionYear = '2025'
 
         url = "https://lib.sayayi.de/message-format/${releaseVersion}/adopter/annotation/"
+
+        licenses {
+          license {
+            name = 'BSD-3-Clause'
+            url = 'https://asm.ow2.io/license.html'
+            comments = 'Applies to the bundled ASM library, relocated to package ' +
+                'de.sayayi.lib.message.annotation.adopter.asm'
+          }
+        }
       }
     }
   }
