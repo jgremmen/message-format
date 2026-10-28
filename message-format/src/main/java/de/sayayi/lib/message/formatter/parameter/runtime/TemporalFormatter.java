@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
@@ -61,6 +62,11 @@ import static java.util.Objects.requireNonNull;
  * The formatter automatically detects whether the temporal value supports date fields, time fields, or both and
  * adjusts the output accordingly. All formatting is locale-aware using the formatting context's locale. Values with
  * an explicit zone or offset retain it; zone-less values and instants use the system default zone.
+ * <p>
+ * Formatting never throws an exception. If the temporal value lacks a field required by the selected style or custom
+ * pattern (e.g. a {@link java.time.Year} or {@link java.time.YearMonth} formatted with a date style that requires the
+ * day of month, or a {@link java.time.LocalTime} formatted with pattern {@code "yyyy"}), or if the custom pattern is
+ * invalid, the result is an empty text.
  *
  * @author Jeroen Gremmen
  */
@@ -112,6 +118,9 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
    * <p>
    * Formats the temporal value using the style or pattern specified by the {@code date} configuration key. If no
    * configuration is provided, the medium date/time style is used.
+   * <p>
+   * If the temporal value does not support all fields required by the style or pattern, or if the pattern is invalid,
+   * an empty text is returned instead of throwing an exception.
    */
   @Override
   @Contract(pure = true)
@@ -121,7 +130,13 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
     final DateTimeFormatter formatter;
 
     if (format != null && !STYLE.containsKey(format))
-      formatter = ofPattern(requireNonNull(format));
+    {
+      try {
+        formatter = ofPattern(requireNonNull(format));
+      } catch(IllegalArgumentException ex) {
+        return emptyText();  // invalid pattern
+      }
+    }
     else
     {
       final var style = (format == null ? "MM" : STYLE.get(format)).toCharArray();
@@ -145,7 +160,12 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
         ? formatter.withZone(ZoneId.systemDefault())
         : formatter;
 
-    return noSpaceText(formatterWithZone.withLocale(context.getLocale()).format(temporal));
+    try {
+      return noSpaceText(formatterWithZone.withLocale(context.getLocale()).format(temporal));
+    } catch(DateTimeException ex) {
+      // temporal lacks a field required by the style or pattern (e.g. day of month for Year or YearMonth)
+      return emptyText();
+    }
   }
 
 

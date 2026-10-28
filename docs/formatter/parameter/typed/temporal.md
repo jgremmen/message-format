@@ -178,6 +178,33 @@ messageSupport
 // "17 août"
 ```
 
+An invalid pattern (for example one containing an unknown pattern letter) produces an empty string.
+
+### Missing Fields
+
+Formatting never throws an exception. If the temporal value does not support all fields required by the selected style
+or pattern, the formatter produces an empty string. This applies to partial temporals such as `Year` and `YearMonth`: 
+the localized date styles require a day of month, so `%{ym}` or `%{ym,date:short}` with a `YearMonth` produce nothing.
+The same happens when a pattern refers to fields the value lacks, such as `yyyy` for a `LocalTime` or `HH:mm` for a
+`LocalDate`.
+
+Use a custom pattern with the fields the value provides to format partial temporals:
+
+```java
+messageSupport
+    .message("%{ym,date:'MMMM yyyy'}")
+    .with("ym", YearMonth.of(2024, 3))
+    .locale("de-DE")
+    .format();
+// "März 2024"
+
+messageSupport
+    .message("%{ym}")
+    .with("ym", YearMonth.of(2024, 3))
+    .format();
+// ""
+```
+
 ### Null Handling
 
 A `null` parameter value produces an empty string by default. A `null` map key can be provided to handle this case

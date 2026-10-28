@@ -195,4 +195,78 @@ final class TemporalFormatterTest extends AbstractFormatterTest
         .locale("nl")
         .format());
   }
+
+
+  @Test
+  @DisplayName("Formats partial temporals as empty text if fields are missing")
+  void testPartialTemporalMissingFields()
+  {
+    val messageAccessor = MessageSupportFactory
+        .create(createFormatterService(new TemporalFormatter()))
+        .setLocale(GERMANY)
+        .getMessageAccessor();
+    val messageFactory = messageAccessor.getMessageFactory();
+
+    for(val temporal: new Object[] { Year.of(2024), YearMonth.of(2024, 3) })
+    {
+      assertEquals(emptyText(), format(messageAccessor, temporal), temporal::toString);
+
+      for(val style: new String[] { "short", "medium", "long", "full", "date", "time" })
+      {
+        assertEquals(emptyText(), format(messageAccessor, temporal,
+            Map.of("date", new TypedValueString(messageFactory, style)), Map.of()), () -> temporal + " " + style);
+      }
+    }
+
+    assertEquals(emptyText(), format(messageAccessor, LocalTime.of(16, 45),
+        Map.of("date", new TypedValueString(messageFactory, "yyyy")), Map.of()));
+    assertEquals(emptyText(), format(messageAccessor, LocalDate.of(2024, 3, 15),
+        Map.of("date", new TypedValueString(messageFactory, "HH:mm")), Map.of()));
+  }
+
+
+  @Test
+  @DisplayName("Formats partial temporals with patterns using supported fields")
+  void testPartialTemporalSupportedFields()
+  {
+    val messageAccessor = MessageSupportFactory
+        .create(createFormatterService(new TemporalFormatter()))
+        .setLocale(GERMANY)
+        .getMessageAccessor();
+    val messageFactory = messageAccessor.getMessageFactory();
+
+    assertEquals(new TextPart("2024"), format(messageAccessor, Year.of(2024),
+        Map.of("date", new TypedValueString(messageFactory, "yyyy")), Map.of()));
+    assertEquals(new TextPart("März 2024"), format(messageAccessor, YearMonth.of(2024, 3),
+        Map.of("date", new TypedValueString(messageFactory, "MMMM yyyy")), Map.of()));
+  }
+
+
+  @Test
+  @DisplayName("Formats as empty text for an invalid pattern")
+  void testInvalidPattern()
+  {
+    val messageAccessor = MessageSupportFactory
+        .create(createFormatterService(new TemporalFormatter()))
+        .getMessageAccessor();
+
+    assertEquals(emptyText(), format(messageAccessor, LocalDate.of(2024, 3, 15),
+        Map.of("date", new TypedValueString(messageAccessor.getMessageFactory(), "yyyy-bb")), Map.of()));
+  }
+
+
+  @Test
+  @DisplayName("Formats messages with partial temporals without throwing")
+  void testFormatterPartialTemporal()
+  {
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new TemporalFormatter()));
+
+    assertEquals("[] [] [2024]", messageSupport
+        .message("[%{y}] [%{ym,date:short}] [%{y,date:'yyyy'}]")
+        .with("y", Year.of(2024))
+        .with("ym", YearMonth.of(2024, 3))
+        .locale("nl")
+        .format());
+  }
 }
