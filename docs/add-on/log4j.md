@@ -12,6 +12,14 @@ methods to named parameters `p1`, `p2`, `p3` and so on. `Log4jMessage` is a pack
 `Message` interface that evaluates the formatted result lazily, so the formatting work only happens if the log message 
 is actually written to an appender.
 
+/// danger | Log Message Strings Must Be Constants
+`Log4jMessageFactory` parses every log message string as a message format string. A value concatenated into the
+message, such as `logger.info("Login failed for " + userName)`, is therefore interpreted as message format syntax. If
+the value comes from an untrusted source, an attacker controls part of the format string. Values must always be
+passed as arguments (`logger.info("Login failed for %{p1}", userName)`). See
+[Constant Message Strings](#constant-message-strings) for the details.
+///
+
 
 ## Dependency
 
@@ -314,25 +322,47 @@ diagnostic output makes it easy to spot and fix the problem without disrupting t
 ## Constant Message Strings
 
 Every log message string is parsed as a message format string. Values must therefore always be passed as arguments
-and never be concatenated into the message.
+and never be concatenated into the message. Only the arguments are treated as data; the message string is treated as
+part of the program.
 
 /// danger | Unsafe Concatenation
-The following statement is unsafe. A user name such as `%{p1,format:spel,spel-expr:'...'}` or `%[some-template]` is
-interpreted as message format syntax rather than printed as text. Depending on the registered formatters, untrusted
-input can then trigger arbitrary formatting logic, as described for the [SpEL formatter](../formatter/parameter/named/spel.md#security-considerations).
+The following statements are unsafe. The user name becomes part of the message format string, so a value such as
+`%{p1}` or `%[some-template]` is interpreted as message format syntax rather than printed as text.
 
 ```java
 // UNSAFE: user input becomes part of the message format string
 logger.info("Login failed for " + userName);
+
+// UNSAFE: also with arguments, which the input can now refer to
+logger.info("Login failed for " + userName + " from %{p1}",
+    remoteAddress);
 ```
+
+Text injected this way can do everything a message author can do:
+
+* It can refer to every argument of the same log call (`%{p1}`, `%{p2}`, ...) and print values that the log
+  statement was not meant to reveal.
+* It can render any template registered on the message support (`%[...]`).
+* It can apply formatters, configuration keys and post formatters to the arguments. This includes formatters with
+  side effects, for example a host name lookup by the `InetAddressFormatter` if it is registered, and expression
+  evaluation by the [SpEL formatter](../formatter/parameter/named/spel.md#security-considerations), which is applied
+  automatically by the `spel-expr` configuration key once the formatter is registered.
+* If the injected text makes formatting fail, the [error placeholder](#error-handling) repeats the raw message text,
+  including the injected part.
 ///
 
 The safe form passes the value as a parameter, so it is only ever formatted as a value:
 
 ```java
 // safe: user input is a parameter value, never parsed
-logger.info("Login failed for %{p1}", userName);
+logger.info("Login failed for %{p1} from %{p2}",
+    userName, remoteAddress);
 ```
+
+The same rule applies to every other way of building the message string at runtime, such as `String.format`,
+`StringBuilder` or text blocks with `formatted(...)`. It is particularly important when the factory is configured
+globally (see [Global Configuration](#global-configuration)), because then the log statements of all libraries in the
+application are parsed as well.
 
 Constant message strings also keep the message cache of the factory effective. Every distinct string is parsed and
 cached separately, so concatenated values cause a cache miss and a new parse on every call.
