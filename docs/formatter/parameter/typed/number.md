@@ -148,17 +148,25 @@ are applied automatically based on the formatting locale.
 ### Number Keys
 
 Number map keys are compared against the parameter value. When a match is found, the corresponding text is output 
-instead of the formatted number. Comparison operators are supported.
+instead of the formatted number. When no key matches, the number is formatted as usual. The number formatter does not
+use a default entry (`:`), so a fallback text requires the [`choice`](../named/choice.md) formatter. Comparison
+operators are supported.
 
 ```java
 messageSupport
-    .message("%{count,0:'none',1:'one',:'many'}")
+    .message("%{count,0:'none',1:'one'}")
     .with("count", 0)
     .format();
 // "none"
 
 messageSupport
-    .message("%{count,0:'none',1:'one',:'many'}")
+    .message("%{count,0:'none',1:'one'}")
+    .with("count", 5)
+    .format();
+// "5"
+
+messageSupport
+    .message("%{count,format:choice,0:'none',1:'one',:'many'}")
     .with("count", 5)
     .format();
 // "many"
@@ -172,35 +180,47 @@ messageSupport
 // "freezing"
 ```
 
-### Bool Keys
+### Bool and String Keys
 
-Bool keys interpret the number as a boolean: zero matches `false`, non-zero matches `true`.
+The number formatter only evaluates number keys (besides `null` and `empty`). Bool and string keys are evaluated for
+numbers when a selecting formatter such as [`choice`](../named/choice.md) picks the message. Bool keys then interpret
+the number as a boolean, so zero matches `false` and any other value matches `true`. This applies to all `Number`
+types, including `AtomicInteger`, `AtomicLong`, `LongAdder` and `LongAccumulator`.
 
 ```java
 messageSupport
-    .message("%{items,true:'has items',false:'empty'}")
+    .message("%{items,format:choice,true:'has items',false:'empty'}")
     .with("items", 0)
     .format();
 // "empty"
 
 messageSupport
-    .message("%{items,true:'has items',false:'empty'}")
-    .with("items", 7)
+    .message("%{items,format:choice,true:'has items',false:'empty'}")
+    .with("items", new AtomicInteger(7))
     .format();
 // "has items"
 ```
 
-### String Keys
+The [`bool`](../named/bool.md) formatter (`format:bool`) achieves the same for bool keys and, without map keys, outputs
+`true` or `false`.
 
 String keys are parsed as numbers and compared against the parameter value. This allows numeric comparison using quoted 
-strings, which can be useful for values that exceed the range of number map keys.
+strings, which can be useful for values that exceed the range of number map keys. A string that is not a number never
+matches.
 
 ```java
 messageSupport
-    .message("%{val,>'100':'large',<='100':'small'}")
+    .message("%{val,format:choice,>'100':'large',<='100':'small'}")
     .with("val", 200)
     .format();
 // "large"
+
+messageSupport
+    .message(
+        "%{val,format:choice,>'9223372036854775807':'huge',:'normal'}")
+    .with("val", new BigInteger("99999999999999999999"))
+    .format();
+// "huge"
 ```
 
 ### Null Handling

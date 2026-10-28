@@ -8,7 +8,7 @@ toc_depth: 2
 This formatter is **not** included in the core library. It is part of the `message-format-icu` module and must be
 added as a dependency to use.
 
-```
+```text
 de.sayayi.lib:message-format-icu:0.25.0
 ```
 ///
@@ -112,7 +112,7 @@ messageSupport
 messageSupport
     .message("""
         %{p,icu:\
-            '{name} doesn\\'\\'\\'t have\
+            '{name} doesn\\'\\'t have\
              {count, plural,one {# item} other {# items}}'}\
         """)
     .with("name", "Alice")
@@ -179,7 +179,7 @@ messageSupport
 
 After the ICU pattern is evaluated, the resulting text is checked against map keys defined in the parameter. The
 formatter supports the `empty` and `!empty` map key types. This allows providing fallback text when the ICU formatting
-produces an empty result.
+produces an empty result. Other map key types are ignored.
 
 ```java
 messageSupport
@@ -218,7 +218,10 @@ be verified with representative test data during development.
 ## Registration
 
 When using `DefaultFormatterService`, the `ICUFormatter` is registered automatically via the Java `ServiceLoader`
-mechanism. Having the `message-format-icu` module on the classpath is sufficient.
+mechanism. Having the `message-format-icu` module on the class path is sufficient. The module only lists its
+formatters in a `META-INF/services` file and its module descriptor contains no `provides` clause. When the
+application runs on the module path, the formatter is therefore not discovered and must be registered manually as
+shown below.
 
 When using `GenericFormatterService`, the formatter must be registered manually:
 
@@ -229,13 +232,14 @@ formatterService.addFormatter(new ICUFormatter());
 var messageSupport = MessageSupportFactory
     .create(formatterService)
     .setLocale(Locale.ENGLISH);
+// "icu" is available in addition to the string fallback formatter
 ```
 
 ### Dependency
 
 Add the `message-format-icu` module to the project alongside the core message format dependency.
 
-=== "Gradle (Groovy DSL)"
+=== "Gradle (Groovy)"
 
     ```groovy
     dependencies {
@@ -243,7 +247,7 @@ Add the `message-format-icu` module to the project alongside the core message fo
     }
     ```
 
-=== "Gradle (Kotlin DSL)"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     dependencies {
@@ -261,8 +265,14 @@ Add the `message-format-icu` module to the project alongside the core message fo
     </dependency>
     ```
 
-For JPMS-based projects, the module name is `de.sayayi.lib.message.icu`. It requires `de.sayayi.lib.message` and
-`com.ibm.icu`.
+For JPMS-based projects, the module name is `de.sayayi.lib.message.icu`. It requires `de.sayayi.lib.message`
+transitively and `com.ibm.icu`, and exports the package `de.sayayi.lib.message.icu.formatter`.
+
+```java title="module-info.java"
+module com.example.shop {
+  requires de.sayayi.lib.message.icu;
+}
+```
 
 
 ## Performance

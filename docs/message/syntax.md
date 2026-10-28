@@ -24,8 +24,25 @@ messageSupport.message("Hello World!").format();
 ```
 
 Text may contain Unicode letters, numbers, punctuation, symbols, combining marks, format characters (such as the zero 
-width joiner) and private use characters. Multiple consecutive whitespace characters are collapsed into a single space. 
-Control characters (U+0000 through U+001F and U+007F through U+009F) are silently ignored by the parser.
+width joiner) and private use characters. Every space character is converted into a regular space and consecutive spaces
+are collapsed into a single one. This also applies to space characters inserted through an escape sequence, so ` `
+(no-break space) produces an ordinary space. Control characters (U+0000 through U+001F and U+007F through U+009F) are
+silently ignored by the parser. Tabs and line breaks are control characters, so they are removed instead of being
+turned into a space.
+
+/// warning | Line Breaks Join Words
+Because line breaks are removed, two words that are separated only by a line break are joined. The format string
+`"Hello\nWorld"` produces `HelloWorld`. When a message is written as a Java text block, end each line with `\` (line
+continuation) and keep a space before it where the words must stay separated.
+///
+
+```java
+messageSupport.message("Hello\nWorld").format();
+// "HelloWorld"
+
+messageSupport.message("Hello \nWorld").format();
+// "Hello World"
+```
 
 ### Escape Sequences
 
@@ -45,6 +62,10 @@ The following escape sequences are recognized:
 | `\[`     | left square bracket              |
 | `\xNN`   | Latin-1 character (2 hex digits) |
 | `\uXXXX` | Unicode character (4 hex digits) |
+
+A backslash that is not followed by one of these characters is not an escape and appears in the output unchanged, so
+`C:\temp` needs no escaping. The closing characters `}`, `]` and `)` have no escape sequence because they never need
+one. In text and inside quoted messages they are ordinary characters.
 
 In the following example the literal text `%{` must be escaped because the parser would otherwise interpret it as the 
 start of a parameter reference. Note that in Java string literals the backslash itself must be doubled.
@@ -72,8 +93,11 @@ A parameter inserts a formatted value into the message. The simplest form refere
 `%{parameterName}`. When the message is formatted, the parameter is replaced with the string representation of the
 value that was provided for that name.
 
-Parameter names follow kebab-case or camelCase conventions. A name must start with a letter and may contain letters, 
-digits and `_` or `-` separators. Each separator must be followed by at least one letter or digit.
+Parameter names follow either the kebab-case or the lower camelCase convention. Both start with a lowercase letter. A
+kebab-case name contains lowercase letters, digits and single hyphens and does not end with a hyphen (`order-id`). A
+lower camelCase name contains letters and digits only (`orderId`). A name cannot mix both conventions, and underscores
+are not allowed. A name such as `order_id` is rejected with a `MessageParserException` when the message is parsed, and
+`MessageConfigurer.with("order_id", ...)` throws an `IllegalArgumentException`.
 
 /// note
 The keywords `null`, `empty`, `true`, `false` and `format` are also valid parameter names.
@@ -110,7 +134,10 @@ By default, the library selects a formatter based on the type of the value. This
 named formatter explicitly with the `format` keyword. The syntax is `format:<name>` where the name identifies a 
 registered `NamedParameterFormatter`.
 
-Built-in named formatters include `string`, `bool`, `choice`, `size` and `classifier`.
+The default formatter service registers the named formatters `string`, `bool`, `choice` and `size`. The library also
+ships the named formatters `classifier`, `bitmask` and `geo`, which are not registered by default. A format
+string that refers to an unregistered name silently falls back to type-based selection. See
+[Named Formatters](../formatter/parameter/named/index.md) for the complete list and how to register them.
 
 Explicitly selecting a named formatter is particularly useful when the automatic type-based selection would pick a 
 different formatter than the one required. In the following example the parameter value is the integer `4`. Without 
@@ -235,23 +262,40 @@ operators are `=` (equal, also the default when no operator is given), `!` or `<
 (less than or equal), `>` (greater than) and `>=` (greater than or equal). Numbers must be integers and may be 
 negative.
 
-A common use case is pluralization, where specific text is provided for zero, one and many items.
+When a number key matches, its message replaces the formatted number. When no key matches, the number formatter
+outputs the number itself.
 
 ```java
 messageSupport
-    .message("%{count,0:'no items',1:'one item',:'%{count} items'}")
+    .message("%{count,0:'no',1:'one'} new messages")
     .with("count", 0)
     .format();
-// "no items"
+// "no new messages"
 
 messageSupport
-    .message("%{count,0:'no items',1:'one item',:'%{count} items'}")
+    .message("%{count,0:'no',1:'one'} new messages")
+    .with("count", 42)
+    .format();
+// "42 new messages"
+```
+
+A common use case is pluralization, where specific text is provided for zero, one and many items. The text for
+"many" is a [default entry](#default-entry), which the number formatter does not consult. The
+[`choice`](#the-choice-formatter) formatter is therefore selected explicitly.
+
+```java
+messageSupport
+    .message(
+        "%{count,format:choice,0:'no items',1:'one item'," +
+        ":'%{count} items'}")
     .with("count", 1)
     .format();
 // "one item"
 
 messageSupport
-    .message("%{count,0:'no items',1:'one item',:'%{count} items'}")
+    .message(
+        "%{count,format:choice,0:'no items',1:'one item'," +
+        ":'%{count} items'}")
     .with("count", 42)
     .format();
 // "42 items"
@@ -298,12 +342,28 @@ messageSupport
 
 ### Default Entry
 
-A trailing entry with no key serves as a fallback when no other key matches. It consists of just a colon followed by 
-the value. The default entry must always be the last entry in the parameter.
+An entry without a key is the default entry. It consists of just a colon followed by the value. A parameter can have
+at most one default entry, and it is only valid together with at least one keyed entry, so `%{level,:'unknown'}` is
+rejected by the parser. The default entry can appear at any position, but by convention it is written last.
+
+The default entry is not a general fallback that applies to every parameter. Whether it is used depends on the
+formatter. Formatters whose purpose is to select a message, such as [`choice`](#the-choice-formatter),
+[`size`](#the-size-formatter) and [`classifier`](../formatter/parameter/named/classifier.md), use the default entry
+when no key matches. The [enum](../formatter/parameter/typed/enum.md) formatter and a few other type-specific
+formatters do the same, as described on their pages. The formatters for numbers, strings and booleans ignore the
+default entry and output the formatted value instead.
 
 ```java
 messageSupport
     .message("%{level,1:'low',2:'medium',3:'high',:'unknown'}")
+    .with("level", 99)
+    .format();
+// "99"
+
+messageSupport
+    .message(
+        "%{level,format:choice,1:'low',2:'medium',3:'high'," +
+        ":'unknown'}")
     .with("level", 99)
     .format();
 // "unknown"
@@ -404,6 +464,12 @@ messageSupport
 
 By default, a template accesses the same parameters as the enclosing message. The template in the example above reads
 the `who` parameter directly from the values provided to the message configurer.
+
+Spaces around the template reference are taken from the referencing message. Leading or trailing spaces produced by
+the template itself are discarded, so `%{value}%[unit]` never inserts a space between the value and the template
+output, even if the template text starts with a space. A template cannot reference another template. Parsing a
+template that contains `%[...]` fails with a `MessageParserException`. If a referenced template has not been
+registered, the reference produces no text. See [Templates](../configuration/templates.md) for the details.
 
 ### Parameter Delegation
 
@@ -546,8 +612,8 @@ messageSupport
 ## Putting It All Together
 
 The following example combines all four part types in a single message. It uses a post formatter to uppercase the 
-user name, a parameter with map keys to handle the empty-user case, a template reference with parameter delegation for 
-the item count and plain text to tie everything together.
+user name, a parameter with an `empty` map key to handle a missing user, a template reference with parameter delegation
+for the item count and plain text to tie everything together.
 
 ```java
 var factory = MessageFactory.getSharedInstance();
@@ -561,7 +627,7 @@ messageSupport.addTemplate("item-count",
 
 // A complex message combining all features
 String msg = 
-    "%(case,'%{user,!empty:'%{user}',:'Guest'}',case:upper) " +
+    "%(case,'%{user,empty:'Guest'}',case:upper) " +
     "has %[item-count,n->cartSize] in the cart.";
 
 messageSupport

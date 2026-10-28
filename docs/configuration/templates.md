@@ -10,7 +10,13 @@ references. Templates are registered on a `ConfigurableMessageSupport` under a n
 when a message references them.
 
 Template names must follow the kebab-case naming convention: lowercase letters and digits separated by single hyphens
-(e.g. `opt-error`, `item-count`).
+(e.g. `opt-error`, `item-count`). The name must start with a letter.
+
+A template is formatted in place of its `%[...]` reference. Leading and trailing spaces produced by the template are
+not significant. They are replaced by the spaces surrounding the reference in the enclosing message, so a space
+before or after the template output has to be written in the message, not in the template. A reference to a template
+that has not been registered produces no text. `TemplateAccessor.findMissingTemplates(...)`, described on the
+[MessageSupport](message-support.md#templateaccessor) page, finds such references in advance.
 
 This page explains how to create templates through `MessageFactory` parsing methods and the programmatic
 `MessageBuilder`, how to register them on a `ConfigurableMessageSupport` and how to implement custom templates in Java.
@@ -34,17 +40,23 @@ MessageFactory factory = MessageFactory.getSharedInstance();
 Template template = factory.parseTemplate("%{error,!empty:': %{error}'}");
 ```
 
+A template that contains a template reference is rejected with a `MessageParserException`.
+
 ### Parsing Localized Templates
 
 Localized templates work the same way as localized messages. Pass a `Map<Locale,String>` to `parseTemplate(Map)`:
 
 ```java
 Template template = factory.parseTemplate(Map.of(
-    Locale.ENGLISH, "%{count} %{count,1:'item',:'items'}",
-    Locale.GERMAN,  "%{count} %{count,1:'Eintrag',:'Einträge'}"));
+    Locale.ENGLISH,
+    "%{count} %{count,format:choice,1:'item',:'items'}",
+    Locale.GERMAN,
+    "%{count} %{count,format:choice,1:'Eintrag',:'Einträge'}"));
 ```
 
-When the map contains more than one entry, the factory generates a template code with the prefix `TPL[...]` internally.
+The locale is selected with the same rules as for [localized messages](messages.md#messagelocaleaware). When the map
+contains more than one entry, the factory generates a template code with the prefix `TPL[...]` internally. An empty
+map produces a template that formats to an empty string.
 
 
 ## Building Templates Programmatically
@@ -59,11 +71,12 @@ Template template = MessageBuilder
     .parameter("error")
         .mapEmpty().ne().message(inner ->
             inner.text(":").parameter("error").spaceBefore())
-        .mapDefault().message(Message.empty())
     .buildAsTemplate();
 
 messageSupport.addTemplate("opt-error", template);
 ```
+
+`buildAsTemplate()` throws an `IllegalStateException` if the built message contains a template reference.
 
 For the full `MessageBuilder` API including all part types, space control and configuration  options, see
 [Messages](messages.md#building-messages-programmatically).
@@ -107,21 +120,25 @@ Templates can also be built programmatically and then registered. When using a `
 ```java
 Template template = MessageBuilder
     .create()
+    .parameter("value")
     .parameter("unit")
         .mapEmpty().ne().message(inner ->
             inner.parameter("unit").spaceBefore())
-        .mapDefault().message(Message.empty())
     .buildAsTemplate();
 
-messageSupport.addTemplate("opt-unit", template);
+messageSupport.addTemplate("measure", template);
 
 messageSupport
-    .message("Distance: %{value}%[opt-unit]")
+    .message("Distance: %[measure].")
     .with("value", 42)
     .with("unit", "km")
     .format();
-// "Distance: 42 km"
+// "Distance: 42 km."
 ```
+
+The optional unit and its separating space are both part of the template. Writing the space inside the template is
+essential here. A template that only produced the unit, referenced as `%{value}%[opt-unit]`, would lose its leading
+space, because the spacing of a template reference is determined by the enclosing message.
 
 ### Custom Templates
 
@@ -129,10 +146,11 @@ Beyond message-based templates, the library supports custom `Template` implement
 `AbstractNamedTemplate` base class. A custom template receives the message accessor and parameters at format time and 
 returns formatted text directly from Java code, without a parsed message format string.
 
-The `Template` interface is sealed and permits two implementation paths: `MessageTemplate` for templates backed by a
-parsed message format string and `NamedTemplate` for templates implemented entirely in Java. `AbstractNamedTemplate`
-is the non-sealed base class that implements `NamedTemplate`, so extending it allows formatted output to be produced 
-through arbitrary logic rather than through the message format parser.
+The `Template` interface is sealed and permits two implementation paths. Templates backed by a parsed message format
+string are created by `MessageFactory` and `MessageBuilder` and use an internal implementation class. Templates
+implemented entirely in Java implement `NamedTemplate`, which is sealed as well and only permits
+`AbstractNamedTemplate`. Custom templates therefore always extend `AbstractNamedTemplate`, which allows formatted
+output to be produced through arbitrary logic rather than through the message format parser.
 
 A custom template must implement the `getName()` method (returning the kebab-case template name) and the `formatAsText`
 method, which receives a `MessageAccessor` and a `Parameters` object and returns a `MessagePart.Text`. The 
@@ -141,7 +159,19 @@ when the other template is a `NamedTemplate` with the same name.
 
 The following example implements a template that renders the current date:
 
-```java
+```java title="CurrentDateTemplate.java"
+package com.example;
+
+import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.TextPartFactory;
+import de.sayayi.lib.message.template.AbstractNamedTemplate;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import org.jetbrains.annotations.NotNull;
+
 public class CurrentDateTemplate extends AbstractNamedTemplate 
 {
   @Override
@@ -165,10 +195,11 @@ public class CurrentDateTemplate extends AbstractNamedTemplate
 }
 ```
 
-Register the custom template on a `ConfigurableMessageSupport` like any other template:
+Register the custom template on a `ConfigurableMessageSupport` like any other template. The `addTemplate(NamedTemplate)`
+overload registers it under the name returned by `getName()`:
 
 ```java
-messageSupport.addTemplate("current-date", new CurrentDateTemplate());
+messageSupport.addTemplate(new CurrentDateTemplate());
 
 messageSupport
     .message("Report generated on %[current-date].")
@@ -185,40 +216,29 @@ manually in code. This is especially useful for library authors who want to ship
 the box when the library is on the classpath.
 
 To participate in service-based discovery, extend `AbstractNamedTemplate` (which implements `NamedTemplate`) and 
-implement the `getName()` method to return the kebab-case name under which the template will be registered:
-
-```java
-public class CurrentDateTemplate extends AbstractNamedTemplate 
-{
-  @Override
-  public @NotNull String getName() {
-    return "current-date";
-  }
-
-  @Override
-  public @NotNull Text formatAsText(
-      @NotNull MessageAccessor messageAccessor,
-      @NotNull Parameters parameters)
-  {
-    var locale = parameters.getLocale();
-    var formatted = LocalDate.now()
-        .format(DateTimeFormatter
-            .ofLocalizedDate(FormatStyle.MEDIUM)
-            .withLocale(locale));
-
-    return TextPartFactory.noSpaceText(formatted);
-  }
-}
-```
+implement the `getName()` method to return the kebab-case name under which the template will be registered. The
+`CurrentDateTemplate` class shown above already meets these requirements. As with every service provider, the class
+must be public and have a public no-argument constructor.
 
 Declare the provider in the `module-info.java` or in a `META-INF/services/de.sayayi.lib.message.template.NamedTemplate`
 file:
 
-```java
-// module-info.java
-provides de.sayayi.lib.message.template.NamedTemplate
-    with com.example.CurrentDateTemplate;
-```
+=== "module-info.java"
+
+    ```java
+    module com.example.reports {
+      requires de.sayayi.lib.message;
+
+      provides de.sayayi.lib.message.template.NamedTemplate
+          with com.example.CurrentDateTemplate;
+    }
+    ```
+
+=== "META-INF/services"
+
+    ```text title="META-INF/services/de.sayayi.lib.message.template.NamedTemplate"
+    com.example.CurrentDateTemplate
+    ```
 
 To trigger discovery, call `registerTemplatesFromService` on a `ConfigurableMessageSupport`:
 
@@ -230,12 +250,22 @@ messageSupport.registerTemplatesFromService(
     CurrentDateTemplate.class.getClassLoader());
 ```
 
+Each discovered template is passed through the installed `TemplateFilter` and registered under the name returned by
+`getName()`. A provider whose name does not follow the kebab-case convention causes an `IllegalArgumentException`.
+
 The shared `MessageSupport` singleton returned by `MessageSupportFactory.shared()` performs this discovery 
-automatically, so any `NamedTemplate` providers on the classpath are registered without explicit code.
+automatically with the class loader of the library, so any `NamedTemplate` providers visible to that class loader are
+registered without explicit code.
+
+/// note | Custom Templates and Pack Files
+Custom templates have no format string representation and are never written to a [pack file](pack-files.md), even
+if an exported message references them. They must be registered again on the message support that imports the pack.
+///
 
 
 ### Duplicate Handling
 
-Attempting to add a template whose name already exists throws a `DuplicateTemplateException` if the content differs. 
-If the new template is identical to the existing one, the duplicate is silently ignored. This behavior can be 
-customized by installing a `TemplateFilter` as described on the [MessageSupport](message-support.md#filters) page.
+Attempting to add a template whose name already exists throws a `DuplicateTemplateException` if the content differs. If
+the new template is identical to the existing one, the duplicate is silently ignored. Two parsed templates are identical
+when their message parts are equal. Two custom templates are identical when they have the same name. This behavior can
+be customized by installing a `TemplateFilter` as described on the [MessageSupport](message-support.md#filters) page.

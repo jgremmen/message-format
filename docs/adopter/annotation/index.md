@@ -215,7 +215,19 @@ order, because the adopter tracks which classes have already been processed and 
 
 The broadest strategy scans one or more packages for class files. The scan traverses directories on the filesystem as 
 well as jar, war and zip archives on the classpath. Every `.class` file found under the specified packages, including 
-nested sub-packages, is analyzed for `@MessageDef` and `@TemplateDef` annotations.
+nested sub-packages, is analyzed for `@MessageDef` and `@TemplateDef` annotations. The class files are read as bytes,
+so the classes are not loaded or initialized. Directory paths that contain spaces or other characters that are
+encoded in URLs are supported.
+
+Only `file` URLs and the URLs of jar, war and zip archives can be scanned. If the class loader returns a package
+resource with another protocol, for example from an application server's virtual file system, the scan throws a
+`MessageAdopterException`.
+
+/// note | Migration from 0.24
+Up to version 0.24.0, package resources with an unsupported URL protocol were silently skipped, as were class
+directories whose path contained spaces or non-ASCII characters. Such directories are now scanned, and unsupported
+URLs cause a `MessageAdopterException` instead of an incomplete result.
+///
 
 ```java
 adopter.adopt(
@@ -230,8 +242,9 @@ of packages, because a single call processes everything:
 ```java
 // Scan the entire com.example hierarchy
 adopter.adopt(
-    getClass().getClassLoader(),
+    AnnotationAdopter.class.getClassLoader(),
     Set.of("com.example"));
+// all annotated classes below com.example are adopted
 ```
 
 ### Single Class File
@@ -297,14 +310,15 @@ Templates work the same way using `SyntheticTemplateDef`:
 
 ```java
 adopter.adopt(new SyntheticTemplateDef(
-    "opt-suffix", "%{suffix,!empty:' %{suffix}'}"));
-// Registers a template named "opt-suffix"
+    "job-result", "%{job}%{detail,!empty:' %{detail}'}"));
+// Registers a template named "job-result"
 
 messageSupport
-    .message("Done%[opt-suffix]")
-    .with("suffix", "successfully")
+    .message("%[job-result].")
+    .with("job", "Backup")
+    .with("detail", "completed successfully")
     .format();
-// "Done successfully"
+// "Backup completed successfully."
 ```
 
 The `SyntheticText` record accepts three string parameters: `locale`, `text` and `value`. When both `locale` and `text`
@@ -339,9 +353,25 @@ published, regardless of whether the class itself has been visited before.
 The adopter throws specific exceptions when problems are encountered during adoption.
 
 A `MessageAdopterException` is thrown when a class file cannot be read, for example because the specified path does not
-exist or a classpath scan encounters an I/O error. A `MessageParserException` is thrown when a message or template text 
-contains invalid message format syntax. In both cases the exception message provides details about the source of the
-error, such as the class file path or the type name that failed.
+exist or a classpath scan encounters an I/O error, and when a class path URL is invalid or uses an unsupported
+protocol. A `MessageParserException` is thrown when a message or template text contains invalid message format syntax.
+It is not wrapped in a `MessageAdopterException`, so code that needs to handle both cases catches both exception types.
+In both cases the exception message provides details about the source of the error, such as the class file path or
+the code of the message that failed.
+
+```java
+try {
+  new AnnotationAdopter(messageSupport).adopt(OrderMessages.class);
+} catch(MessageParserException ex) {
+  // invalid message or template format string
+} catch(MessageAdopterException ex) {
+  // class path scanning or class file I/O failure
+}
+```
+
+/// note | Migration from 0.24
+Up to version 0.24.0, a `MessageParserException` raised during adoption was wrapped in a `MessageAdopterException`.
+///
 
 When two `@Text` entries within the same `@MessageDef` target the same locale but contain different text, the adopter
 throws a `DuplicateMessageException`. The equivalent situation for `@TemplateDef` results in a 
@@ -388,13 +418,29 @@ String result = messageSupport
 
 ## Module Coordinates
 
-The annotation adopter is part of the `message-format-annotations` module. No additional dependencies are required.
+The annotation adopter is part of the `message-format-annotations` module. It depends on the core `message-format`
+module, which it exposes transitively. The ASM library used to read class files is bundled in relocated form, so no
+additional dependencies are required. On the module path, the module name is `de.sayayi.lib.message.annotations`.
 
-=== "Gradle"
+```java title="module-info.java"
+module com.example.shop {
+  requires de.sayayi.lib.message.annotations;
+}
+```
+
+=== "Gradle (Groovy)"
 
     ```groovy
     dependencies {
       implementation 'de.sayayi.lib:message-format-annotations:0.25.0'
+    }
+    ```
+
+=== "Gradle (Kotlin)"
+
+    ```kotlin
+    dependencies {
+      implementation("de.sayayi.lib:message-format-annotations:0.25.0")
     }
     ```
 

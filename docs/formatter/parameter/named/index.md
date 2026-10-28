@@ -185,18 +185,30 @@ messageSupport
 
 ## Reference
 
-| Format Name       | Formatter Class       | Documentation                    |
-|-------------------|-----------------------|----------------------------------|
-| `bitmask`         | `BitmaskFormatter`    | [Bitmask](bitmask.md)            |
-| `bool`            | `BoolFormatter`       | [Bool](bool.md)                  |
-| `choice`          | `ChoiceFormatter`     | [Choice](choice.md)              |
-| `classifier`      | `ClassifierFormatter` | [Classifier](classifier.md)      |
-| `geo`             | `GeoFormatter`        | [Geo](geo.md)                    |
-| `icu` [^1]        | `ICUFormatter`        | [ICU](icu.md)                    |
-| `icu-person` [^1] | `ICUPersonFormatter`  | [ICU Person Name](icu-person.md) |
-| `size`            | `SizeFormatter`       | [Size](size.md)                  |
-| `spel` [^2]       | `SpELFormatter`       | [SpEL](spel.md)                  |
-| `string`          | `StringFormatter`     | [String](string.md)              |
+The column "Default" tells whether the `DefaultFormatterService` registers the formatter automatically. All other
+formatters must be added with `addFormatter(...)` on a
+[formatter service](../../../configuration/formatter-service.md#registering-formatters).
 
-[^1]: Provided by the `message-format-icu` module, not the core `message-format` module.
-[^2]: Provided by the `message-format-spring` module, not the core `message-format` module.
+| Format Name  | Formatter Class       | Module                 | Default | Documentation                    |
+|--------------|-----------------------|------------------------|---------|----------------------------------|
+| `bitmask`    | `BitmaskFormatter`    | `message-format`       | no      | [Bitmask](bitmask.md)            |
+| `bool`       | `BoolFormatter`       | `message-format`       | yes     | [Bool](bool.md)                  |
+| `choice`     | `ChoiceFormatter`     | `message-format`       | yes     | [Choice](choice.md)              |
+| `classifier` | `ClassifierFormatter` | `message-format`       | no      | [Classifier](classifier.md)      |
+| `filesize`   | `FileSizeFormatter`   | `message-format`       | no      | deprecated, see below            |
+| `geo`        | `GeoFormatter`        | `message-format`       | no      | [Geo](geo.md)                    |
+| `icu`        | `ICUFormatter`        | `message-format-icu`   | yes (1) | [ICU](icu.md)                    |
+| `icu-person` | `ICUPersonFormatter`  | `message-format-icu`   | yes (1) | [ICU Person Name](icu-person.md) |
+| `size`       | `SizeFormatter`       | `message-format`       | yes     | [Size](size.md)                  |
+| `spel`       | `SpELFormatter`       | `message-format-spring`| no      | [SpEL](spel.md)                  |
+| `string`     | `StringFormatter`     | `message-format`       | yes     | [String](string.md)              |
+
+(1) The formatters of the `message-format-icu` module are registered by default when the module is on the class path,
+because the module lists them in a `META-INF/services` file. Its module descriptor does not declare them with
+`provides`, so on the module path they must be registered explicitly.
+
+/// warning | Deprecated: `filesize`
+`FileSizeFormatter` (`format:filesize`) is deprecated and marked for removal. It formats a number of bytes with a unit
+such as KB or MB. The library does not provide a replacement, so applications that use it should implement an
+equivalent [named formatter](../../development/named-parameter-formatter.md) of their own.
+///

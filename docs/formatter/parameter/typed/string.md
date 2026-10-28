@@ -6,7 +6,7 @@ The `StringFormatter` is a type-based formatter registered for `CharSequence` (w
 It is automatically selected by the library when a parameter holds one of these types. It also serves as the library's
 default formatter, the fallback used for any value type that has no specific formatter registered.
 
-By default, the formatter outputs the string representation of the parameter value. For `CharSequence` and`char[]` 
+By default, the formatter outputs the string representation of the parameter value. For `CharSequence` and `char[]`
 values this is their text content; for all other types it is the result of `String.valueOf(value)`.
 
 ```java
@@ -29,11 +29,13 @@ Because `StringFormatter` is the default formatter, it also handles values of ty
 In that case, `toString()` is called on the value.
 
 ```java
+record Point(int x, int y) {}
+
 messageSupport
     .message("%{obj}")
-    .with("obj", RetentionPolicy.RUNTIME)
+    .with("obj", new Point(3, 4))
     .format();
-// "RUNTIME"
+// "Point[x=3, y=4]"
 ```
 
 
@@ -101,35 +103,12 @@ messageSupport
 // "hello!"
 ```
 
-### Bool Keys
+### Bool Keys, Number Keys and the Default Entry
 
-Bool keys match when the string value equals the literal text `"true"` or `"false"`. The match is case-insensitive at 
-lenient strength.
-
-```java
-messageSupport
-    .message("%{val,true:'yes',false:'no'}")
-    .with("val", "true")
-    .format();
-// "yes"
-```
-
-### Number Keys
-
-Number keys parse the string value as a number and compare it against the key value. If the string is not a valid 
-number, the key does not match.
-
-```java
-messageSupport
-    .message("%{code,0:'ok',>0:'error'}")
-    .with("code", "0")
-    .format();
-// "ok"
-```
-
-### Default Key
-
-A default map key (`:`) catches any value that does not match a specific key.
+Bool keys, number keys and the default entry are not consulted when a string is formatted. A string value is output
+unchanged if none of the string, `empty` or `null` keys matches. The [`choice`](../named/choice.md) formatter evaluates
+all key types for a string, including the default entry. Bool keys then match the text `"true"` or `"false"` ignoring
+case, and number keys match if the string parses as an equal number.
 
 ```java
 messageSupport
@@ -137,7 +116,24 @@ messageSupport
         "%{status,'active':'Active','inactive':'Inactive',:'Unknown'}")
     .with("status", "other")
     .format();
+// "other"
+
+messageSupport
+    .message("""
+        %{status,format:choice,\
+            'active':'Active',\
+            'inactive':'Inactive',\
+            :'Unknown'}\
+        """)
+    .with("status", "other")
+    .format();
 // "Unknown"
+
+messageSupport
+    .message("%{code,format:choice,0:'ok',>0:'error'}")
+    .with("code", "0")
+    .format();
+// "ok"
 ```
 
 

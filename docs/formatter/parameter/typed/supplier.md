@@ -8,7 +8,27 @@ type. The core principle is the same for all five: the supplier is evaluated onc
 value is delegated to the formatter appropriate for its type.
 
 Suppliers are useful for deferring value computation until the message is actually formatted. The supplier is called
-exactly once during formatting, so any side effects occur at that point.
+when the parameter is formatted, not when it is passed to `with(...)`. It is not cached, though. A formatter that
+compares the value against several map keys, such as [`choice`](../named/choice.md), calls the supplier for every
+key it evaluates. A supplier should therefore be free of side effects and return the same value each time, and an
+expensive computation should cache its own result.
+
+```java
+var calls = new AtomicInteger();
+Supplier<Integer> level = () -> {
+  calls.incrementAndGet();
+  return 2;
+};
+
+messageSupport
+    .message("%{v,format:choice,1:'low',2:'medium',3:'high'}")
+    .with("v", level)
+    .format();
+// "medium"
+
+calls.get();
+// 3
+```
 
 
 ## SupplierFormatter
@@ -131,7 +151,7 @@ The `LongSupplierFormatter` handles `java.util.function.LongSupplier` values. It
 and delegates formatting to the long formatter. The result is identical to passing a plain `long` value directly.
 
 ```java
-LongSupplier timestamp = () -> System.currentTimeMillis();
+LongSupplier timestamp = () -> 1714645200000L;
 
 messageSupport
     .message("Time: %{ts}")

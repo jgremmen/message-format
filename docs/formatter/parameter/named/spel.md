@@ -8,7 +8,7 @@ toc_depth: 2
 This formatter is **not** included in the core library. It is part of the `message-format-spring` module and must be
 added as a dependency to use.
 
-```
+```text
 de.sayayi.lib:message-format-spring:0.25.0
 ```
 ///
@@ -215,20 +215,25 @@ evaluation is intended.
 
 ## Security Considerations
 
-/// warning
+/// danger | Untrusted Expressions
 SpEL is a powerful expression language that can invoke arbitrary methods on objects. Constructors are **not** available
-in the evaluation context (the constructor resolver list is empty) and bean resolution is disabled, which limits some 
-attack vectors. However, the expression can still call any public method on the root object and on objects reachable 
-from it.
+in the evaluation context (the constructor resolver list is empty), bean resolution is disabled and variables cannot
+be assigned, which limits some attack vectors. However, the expression can still call any public method on the root
+object and on objects reachable from it. Type references are resolved as well, so an expression such as
+`T(java.lang.System).exit(0)` calls static methods of any class visible to the class loader. Every message parameter
+is available to the expression as a variable (`#name`).
 
 Never allow untrusted user input to be used as a SpEL expression string. The `spel-expr` value should always be a fixed
-string defined by the developer in the message format, never a value derived from external input.
+string defined by the developer in the message format, never a value derived from external input. This also applies
+to message format strings that are loaded from sources an attacker could modify, and to format strings assembled at
+runtime and passed to `message(String)`.
 ///
 
 
 ## Registration
 
-Before the `spel` formatter can be used, it must be registered with the formatter service. The `SpELFormatter` class
+Before the `spel` formatter can be used, it must be registered with the formatter service. The module does not declare
+it as a service provider, so the `DefaultFormatterService` never registers it automatically. The `SpELFormatter` class
 provides three constructors for different levels of Spring integration.
 
 ### Default Constructor
@@ -239,11 +244,13 @@ loader configuration.
 ```java
 var formatterService = new DefaultFormatterService();
 formatterService.addFormatter(new SpELFormatter());
+// "spel" and its configuration keys are now available
 ```
 
 ### ConversionService and ResourceLoader
 
-In a Spring application a `ConversionService` and a `ResourceLoader` (often the `ApplicationContext` itself) available.
+In a Spring application a `ConversionService` and a `ResourceLoader` (often the `ApplicationContext` itself) are
+available.
 This constructor configures the SpEL parser with the application's class loader and wires the type converter to Spring's
 conversion infrastructure.
 
@@ -263,7 +270,8 @@ When a specific class loader is needed but no `ResourceLoader` is available, the
 var formatterService = new DefaultFormatterService();
 formatterService.addFormatter(new SpELFormatter(
     new DefaultConversionService(),
-    MyApp.class.getClassLoader()));
+    Thread.currentThread().getContextClassLoader()));
+// type references in expressions resolve through the given class loader
 ```
 
 The `ConversionService` is used by the SpEL `TypeConverter` to convert values during expression evaluation. The 

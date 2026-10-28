@@ -314,7 +314,8 @@ var context =
     new FormatStringSerializer.Context(StandardCharsets.UTF_8);
 
 // a simple text message that is a valid name can be serialized unquoted
-Message simpleMsg = ...;  // TextMessage containing "hello"
+Message simpleMsg = MessageFactory.getSharedInstance()
+    .parseMessage("hello");
 MessageUtil.serializeMessage(context, simpleMsg, false);
 // text joiner contains: hello
 
@@ -323,7 +324,8 @@ MessageUtil.serializeMessage(context, simpleMsg, true);
 // text joiner contains: 'hello'
 
 // a message containing spaces is always quoted regardless of forceQuoted
-Message spacedMsg = ...;  // TextMessage containing "hello world"
+Message spacedMsg = MessageFactory.getSharedInstance()
+    .parseMessage("hello world");
 MessageUtil.serializeMessage(context, spacedMsg, false);
 // text joiner contains: 'hello world'
 ```
@@ -353,27 +355,33 @@ MessageUtil.isMessageFormatPack(textFile);  // false
 The method returns `false` for any file that does not exist, cannot be read or does not contain a valid pack file
 header. It never throws an exception.
 
-### `importMessages(InputStream, Consumer, BiConsumer)`
+### `importMessages(MessageFactory, InputStream, Consumer, BiConsumer)`
 
 This method reads a pack input stream and delivers each message and template it contains to the provided consumers.
-The first consumer receives `Message.WithCode` instances (messages with their associated code). The second consumer
+The `MessageFactory` creates the imported messages and templates, and its part normalizer is applied to them. The
+first consumer receives `Message.WithCode` instances (messages with their associated code). The second consumer
 receives templates as name-template pairs. Either consumer may be `null` if only one type of entry is needed.
 
 The input stream is always closed when this method returns, regardless of success or failure.
 
 ```java
-try(var stream = Files.newInputStream(Path.of("messages.pack"))) {
-  MessageUtil.importMessages(
-      stream,
+var factory = messageSupport.getMessageAccessor().getMessageFactory();
+
+try(var stream = Files.newInputStream(Path.of("messages.mfp"))) {
+  MessageUtil.importMessages(factory, stream,
       message -> messageSupport.addMessage(message),
       (name, template) -> messageSupport.addTemplate(name, template));
 }
+// all messages and templates of the pack are registered
 
 // importing only messages, ignoring templates
-try(var stream = getClass().getResourceAsStream("/bundle.pack")) {
-  MessageUtil.importMessages(stream, 
+Map<String,Message.WithCode> registry = new TreeMap<>();
+
+try(var stream = Files.newInputStream(Path.of("bundle.mfp"))) {
+  MessageUtil.importMessages(factory, stream,
       message -> registry.put(message.getCode(), message), null);
 }
+// registry maps each message code of the pack to its message
 ```
 
 An `IOException` is thrown if the stream is unreadable or the content does not conform to the pack format. An
@@ -623,7 +631,7 @@ SingletonParameters params =
 // format individual elements by updating the value in place
 for(Object element: collection) 
 {
-  Text formatted = message.format(accessor, 
+  Text formatted = message.formatAsText(accessor, 
       params.setValue(element));
   joiner.add(formatted);
 }
@@ -646,6 +654,12 @@ params.getLocale();                 // Locale.GERMAN
 Because `SingletonParameters` is mutable through `setValue`, a single instance can be reused across many formatting 
 calls without allocating a new `Parameters` object for each iteration. This keeps memory overhead low when formatting 
 large collections.
+
+/// warning | Not Thread-Safe
+`SingletonParameters` is not thread-safe, because `setValue` changes the instance in place. An instance must be
+confined to the thread and the formatting call that created it. It must not be stored in a field of a formatter,
+because formatters are shared by all threads that use the formatter service.
+///
 
 
 ## `SupplierDelegate`
@@ -717,3 +731,37 @@ public @NotNull Text format(
 In this example, if no element in the list is a self-reference, the config value lookup and `Text` construction never 
 execute. When a self-reference does occur, the first call to `thisText.get()` computes and caches the result. Any 
 subsequent self-references in the same list reuse the cached value without repeating the lookup.
+
+
+## `SortedStringMap`
+
+`SortedStringMap<V>` is a compact `Map` implementation with `String` keys that keeps its keys in natural string order in
+a single array. Lookups use a binary search. The library uses it for the parameter maps of message configurers, and it
+can be useful in custom formatters that build small maps. `null` keys are not supported and throw a
+`NullPointerException`.
+
+A map is mutable until `seal()` is called. Sealing makes it immutable and trims its internal storage. After sealing,
+`put` and `remove` always throw an `UnsupportedOperationException`, even for a key that is not present, and `clear`
+throws it if the map is not empty. The constructor `SortedStringMap(Map, boolean)` copies a map and optionally seals
+the copy right away.
+
+```java
+var map = new SortedStringMap<Integer>();
+map.put("medium", 2);
+map.put("high", 3);
+map.put("low", 1);
+
+map.keySet();
+// [high, low, medium]
+
+var sealed = new SortedStringMap<>(map, true);
+
+sealed.remove("unknown");
+// throws UnsupportedOperationException
+```
+
+/// warning | Not Thread-Safe
+`SortedStringMap` is not thread-safe. While the map is mutable, its iterators are not fail-fast, so changing the map
+during an iteration produces undefined results instead of a `ConcurrentModificationException`. A sealed map cannot be
+changed, so iterating over it is always safe.
+///

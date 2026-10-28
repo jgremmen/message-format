@@ -133,9 +133,13 @@ All three types are now formatted by the same formatter instance. When the frame
 A formatter can accept configuration keys that influence its behavior. Configuration keys are named values embedded in
 the message syntax using the `name:value` notation. The `ParameterFormatterContext` (which extends `ConfigAccessor`) 
 provides typed accessors to read them: `getConfigValueString(name)`, `getConfigValueLong(name)`,
-`getConfigValueInt(name)`, `getConfigValueBool(name)`, `getConfigValueMessage(name)` and `getConfigValueEnum(name, enumType)`. Each returns an
-`Optional` that is empty when the key is absent or when the value type does not match. The enum accessor performs a
-case-insensitive match and also supports hyphenated names (e.g. `"my-value"` matches the enum constant `MY_VALUE`).
+`getConfigValueInt(name)`, `getConfigValueBool(name)`, `getConfigValueMessage(name)` and
+`getConfigValueEnum(name, enumType)`. Each returns an `Optional` (or `OptionalLong` and `OptionalInt` for the numeric
+variants) that is empty when the key is absent or when the value type does not match. If the message does not
+provide a value of the requested type, the accessors fall back to the
+[default configuration](../../configuration/default-configuration.md) of the message support. The enum accessor
+performs a case-insensitive match and also supports hyphenated names (e.g. `"my-value"` matches the enum constant
+`MY_VALUE`). `getConfigValueMessage` accepts a string value as well and parses it as a message.
 
 The following example extends the `ColorFormatter` to support a `color` configuration key that controls the output 
 format:
@@ -205,10 +209,12 @@ of matching against string and number map keys.
 
 The following example formats an `InetAddress` by rendering its host address. It first checks whether the message 
 author has provided a string map entry that matches the address and falls back to the plain host address string if no 
-mapping was found:
+mapping was found. The library ships an `InetAddressFormatter` of its own, which is not registered by default (see
+[Formatters Not Registered by Default](../parameter/typed/index.md#formatters-not-registered-by-default)). The example
+uses a different class name to avoid confusion with it.
 
 ```java
-public final class InetAddressFormatter
+public final class HostAddressFormatter
     extends AbstractSingleTypeParameterFormatter<InetAddress>
 {
   @Override
@@ -216,9 +222,11 @@ public final class InetAddressFormatter
       @NotNull ParameterFormatterContext context,
       @NotNull InetAddress address)
   {
+    var hostAddress = address.getHostAddress();
+
     // check for a string map entry matching the host address
-    return formatUsingMappedString(context, address.getHostAddress(), true)
-        .orElseGet(() -> noSpaceText(address.getHostAddress()));
+    return formatUsingMappedString(context, hostAddress, true)
+        .orElseGet(() -> noSpaceText(hostAddress));
   }
 
   @Override
@@ -243,10 +251,11 @@ messageSupport
 // "Connected to localhost"
 ```
 
-When no string key matches, `formatUsingMappedString` checks whether the map contains a default entry if 
-`includeDefault` is `true`. A default entry in the message syntax is written with a bare colon followed by a message.
-In the example above, the default entry `:'unknown host'` produces a generic label for any address that is not 
-explicitly mapped:
+When no string key matches, `formatUsingMappedString` checks whether the map contains a default entry if
+`includeDefault` is `true`. It only returns a result if the parameter has at least one string map key, otherwise the
+returned `Optional` is empty and the formatter produces its regular output. A default entry in the message syntax is
+written with a bare colon followed by a message. In the example above, the default entry `:'unknown host'` produces a
+generic label for any address that is not explicitly mapped:
 
 ```java
 messageSupport
@@ -262,7 +271,9 @@ messageSupport
 
 The `getMapMessage` method on the context provides the most flexibility. Any combination of `MapKey.Type` values can be
 passed to control which key types are considered during matching. This is useful when the formatted type maps naturally
-to more than one key type.
+to more than one key type. Only the key types passed by the formatter are evaluated. Map keys of other types are
+ignored, which is why, for example, the built-in number formatter ignores bool keys. The `null` and `empty` keys are
+evaluated by `AbstractParameterFormatter` before `formatValue` is called.
 
 
 ## Delegation to the Next Formatter
@@ -395,11 +406,26 @@ For library authors who distribute their formatters as a JAR, the Java `ServiceL
 registration. Create a file named `META-INF/services/de.sayayi.lib.message.formatter.parameter.ParameterFormatter` in 
 the resources directory and list the fully qualified class names of the formatters, one per line:
 
-```
+```text title="META-INF/services/de.sayayi.lib.message.formatter.parameter.ParameterFormatter"
 com.example.formatter.ColorFormatter
 com.example.formatter.MeasurementFormatter
 ```
 
+A library that is used on the module path declares the formatters in its module descriptor instead, because
+`META-INF/services` files of named modules are ignored:
+
+```java title="module-info.java"
+module com.example.formatter {
+  requires de.sayayi.lib.message;
+
+  provides de.sayayi.lib.message.formatter.parameter.ParameterFormatter
+      with com.example.formatter.ColorFormatter,
+           com.example.formatter.MeasurementFormatter;
+}
+```
+
 When the application creates a `DefaultFormatterService`, it calls `ServiceLoader.load` for the `ParameterFormatter` 
 interface and registers every discovered implementation. This allows the formatters to be picked up without any manual
-registration code.
+registration code. Service providers need a public no-argument constructor. A provider that fails validation, for
+example because of a duplicate formatter name, makes the constructor of `DefaultFormatterService` throw a
+`FormatterServiceException`.

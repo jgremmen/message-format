@@ -53,7 +53,16 @@ base-name overloads just as with messages.
 ## Adopting by Bundle Base Name
 
 The simplest approach is to pass a bundle base name to the `adopt(String)` method. The adopter resolves bundles for 
-every locale available to the JVM and silently ignores any locale for which no bundle file exists.
+every locale available to the JVM and silently ignores any locale for which no bundle file exists. Bundles are looked
+up with `ResourceBundle.getBundle`, so the standard fallback applies. For a locale without its own bundle, the bundle
+of the JVM default locale or the base bundle (`messages.properties`) is found instead, and its entries are registered
+under the locale of that bundle.
+
+/// tip | Startup Time
+`adopt(String)` calls `ResourceBundle.getBundle` once for every locale returned by `Locale.getAvailableLocales()`,
+which are several hundred. When the supported locales are known, `adopt(String, Set)` resolves only those and is
+considerably faster.
+///
 
 Suppose a project contains two property files on the classpath:
 
@@ -130,7 +139,9 @@ adopter.adopt("com.example.messages",
 ## Adopting a Single ResourceBundle
 
 When a `ResourceBundle` instance is already in hand, it can be adopted directly using `adopt(ResourceBundle)`.
-Every key in the bundle is registered as a message associated with the bundle's locale.
+Every key in the bundle is registered as a message. Because each message receives only a single text, the locale of
+the bundle is not retained: the message is a plain message that is used for every requested locale. To combine
+several locales into locale-aware messages, adopt the bundles together with `adopt(Collection)`.
 
 This is useful when the bundle was obtained through custom lookup logic, or to adopt only a single locale
 from a bundle family without scanning the rest.
@@ -168,9 +179,10 @@ var bundles = List.of(
 adopter.adopt(bundles);
 
 // Assumes messages_en.properties contains:
-//   item-count=%{count,1:'1 item',:'%{count} items'}
+//   item-count=%{count,format:choice,1:'1 item',:'%{count} items'}
 // and messages_de.properties contains:
-//   item-count=%{count,1:'1 Eintrag',:'%{count} Einträge'}
+//   item-count=%{count,format:choice,1:'1 Eintrag',
+//     :'%{count} Einträge'}
 messageSupport
     .code("item-count")
     .with("count", 3)

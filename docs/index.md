@@ -9,6 +9,85 @@ into reusable `Message` objects and formats them with named parameters, locale s
 The goal is to produce text that reads like a proper sentence rather than a mechanical concatenation of placeholder 
 values.
 
+
+## Getting Started
+
+The library requires Java 21 or later. The core module `message-format` is published to Maven Central under the group
+`de.sayayi.lib`. It brings the ANTLR 4 runtime and two small support libraries of the same author
+(`antlr4-runtime-ext` and `pack`) as transitive dependencies.
+
+=== "Gradle (Groovy)"
+
+    ```groovy
+    dependencies {
+      implementation 'de.sayayi.lib:message-format:0.25.0'
+    }
+    ```
+
+=== "Gradle (Kotlin)"
+
+    ```kotlin
+    dependencies {
+      implementation("de.sayayi.lib:message-format:0.25.0")
+    }
+    ```
+
+=== "Maven"
+
+    ```xml
+    <dependency>
+      <groupId>de.sayayi.lib</groupId>
+      <artifactId>message-format</artifactId>
+      <version>0.25.0</version>
+    </dependency>
+    ```
+
+On the module path, the module name is `de.sayayi.lib.message`. It requires the modules of its dependencies
+transitively, so a single `requires` statement is sufficient:
+
+```java title="module-info.java"
+module com.example.shop {
+  requires de.sayayi.lib.message;
+}
+```
+
+The add-on modules `message-format-annotations`, `message-format-icu`, `message-format-log4j` and
+`message-format-spring` and the Gradle plugin are optional and are described in their own sections.
+
+The following program registers a message under a code and formats it. `MessageSupportFactory.createDefault()` returns
+a message support that knows all built-in formatters, so numbers, dates, collections and other common types are
+formatted without any further setup. The `choice` formatter selects the text that matches the number of items.
+
+```java title="Main.java"
+import de.sayayi.lib.message.MessageSupportFactory;
+import java.util.Locale;
+
+public class Main
+{
+  public static void main(String[] args)
+  {
+    var messageSupport = MessageSupportFactory.createDefault();
+
+    messageSupport.addMessage("cart.summary",
+        "%{customer} has %{items,format:choice,0:'no items'," +
+        "1:'one item',:'%{items} items'} in the cart.");
+
+    String text = messageSupport
+        .code("cart.summary")
+        .with("customer", "Alice")
+        .with("items", 3)
+        .locale(Locale.US)
+        .format();
+
+    // prints "Alice has 3 items in the cart."
+    System.out.println(text);
+  }
+}
+```
+
+
+## Content of the Manual
+
 The [Message](message/index.md) section is the starting point. It introduces the format syntax and explains how to turn
 a format string into a formatted result through the formatting API.
 

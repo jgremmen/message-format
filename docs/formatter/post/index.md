@@ -11,7 +11,7 @@ truncating the text to a maximum length.
 
 A post formatter is invoked using the `%(...)` syntax inside a message format string. The general structure is:
 
-```
+```text
 %(name, 'sub-message', config-name:value, config-name:value, ...)
 ```
 
@@ -25,6 +25,7 @@ messageSupport
     .message("%(clip,'%{description}',clip:30)")
     .with("description", "A text that is longer than thirty characters")
     .format();
+// "A text that is longer than th…"
 ```
 
 The sub-message must be quoted using either single quotes (`'...'`) or double quotes (`"..."`). When the sub-message
@@ -38,16 +39,22 @@ messageSupport
     .with("flag", true)
     .locale(Locale.US)
     .format();
+// "ENABLED"
 ```
+
+Both quote characters may also be nested with the same character, because a parameter reference starts a new quoting
+context. `'%{flag,true:'enabled'}'` is therefore valid as well.
 
 
 ## Configuration Keys
 
 Each post formatter defines its own set of configuration keys. A configuration value can be a boolean (`true` or 
-`false`), a number, a plain string, or a quoted message. The key name must follow the kebab-case naming convention: 
-lowercase letters and digits separated by single hyphens.
+`false`), a number or a string, either plain or quoted. Unlike parameter configuration, a post formatter does not
+accept a message as a configuration value, so a quoted value that contains a parameter, template or post formatter
+reference is rejected by the parser. The key name must follow the kebab-case naming convention: lowercase letters and
+digits separated by single hyphens.
 
-```
+```text
 %(clip, '%{text}', clip:20, clip-suffix:false)
 ```
 
@@ -77,6 +84,7 @@ formatterService.addPostFormatter(new CasePostFormatter());
 formatterService.addPostFormatter(new ClipPostFormatter());
 
 var messageSupport = MessageSupportFactory.create(formatterService);
+// "case" and "clip" are available, no other post formatters
 ```
 
 
@@ -91,16 +99,33 @@ messageSupport
     .with("text", "important warning message")
     .locale(Locale.US)
     .format();
+// "IMPORTANT…"
 ```
 
-Post formatters can also appear inside parameter map values and template messages. There is no restriction on where a
-`%(...)` part can be placed as long as it is inside a quoted message context.
+Post formatters can appear at the top level of a message as well as inside parameter map values, inside the
+sub-message of another post formatter and in templates. A post formatter name that is not registered is not detected
+when the message is parsed. Formatting such a message throws a `MessageFormatException` whose cause names the missing
+post formatter.
 
 
 ## Empty Input
 
-If the sub-message produces an empty result, the post formatter is not invoked. The empty string is returned directly. 
-This means post formatters do not need to guard against empty input.
+If the sub-message produces an empty result, the post formatter is not invoked. This means post formatters do not need
+to guard against empty input. The post formatter part then produces no text. If the `%(...)` reference is surrounded by
+spaces in the message, a single space remains, so the surrounding words stay separated.
+
+```java
+messageSupport
+    .message("Name: %(case,'%{name}',case:upper) (unverified)")
+    .with("name", "")
+    .format();
+// "Name: (unverified)"
+```
+
+/// note | Migration from 0.24
+Up to version 0.24.0, the spaces around a post formatter with an empty result were discarded entirely, which could
+join the surrounding words.
+///
 
 
 ## Reference

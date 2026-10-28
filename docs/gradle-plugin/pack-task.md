@@ -54,7 +54,7 @@ templates only among messages that pass the filters. Messages that are excluded 
 
 To configure the filters directly on the task rather than through the extension:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     tasks.named('messageFormatPack') {
@@ -65,7 +65,7 @@ To configure the filters directly on the task rather than through the extension:
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     tasks.named<de.sayayi.plugin.gradle.message.MessageFormatPackTask>("messageFormatPack") {
@@ -95,7 +95,7 @@ template at runtime causes a formatting error when the message that references i
 The `ignore` method on the `templates` block allows selectively suppressing the validation for specific template names
 without disabling validation entirely. This is covered in detail on the [Extension](extension.md) page.
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     tasks.named('messageFormatPack') {
@@ -106,7 +106,7 @@ without disabling validation entirely. This is covered in detail on the [Extensi
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     tasks.named<de.sayayi.plugin.gradle.message.MessageFormatPackTask>("messageFormatPack") {
@@ -145,7 +145,7 @@ built-in checks offer.
 
 Actions are registered using the `action` method on the task:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     tasks.named('messageFormatPack') {
@@ -157,7 +157,7 @@ Actions are registered using the `action` method on the task:
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     tasks.named<de.sayayi.plugin.gradle.message.MessageFormatPackTask>("messageFormatPack") {
@@ -177,7 +177,7 @@ A more elaborate example uses the action to find unused message codes in a prede
 follow a naming convention where each code starts with `ERR-` followed by a four-digit number. The following action 
 prints the next ten available codes:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     tasks.named('messageFormatPack') {
@@ -198,7 +198,7 @@ prints the next ten available codes:
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     tasks.named<de.sayayi.plugin.gradle.message.MessageFormatPackTask>("messageFormatPack") {
@@ -223,7 +223,7 @@ prints the next ten available codes:
 Another practical use case is verifying that every message code matches a project-wide naming convention. The following
 action fails the build if any message code does not match the expected pattern:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     tasks.named('messageFormatPack') {
@@ -239,7 +239,7 @@ action fails the build if any message code does not match the expected pattern:
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     tasks.named<de.sayayi.plugin.gradle.message.MessageFormatPackTask>("messageFormatPack") {
@@ -257,6 +257,13 @@ action fails the build if any message code does not match the expected pattern:
 
 If multiple actions are registered, they are executed in the order they were defined. Each action receives the same
 `MessageAccessor` instance.
+
+/// warning | Actions and Build Caching
+Actions only run when the task itself executes. If Gradle considers the task up to date or restores its output from
+the build cache, no action is invoked. Actions are not part of the task inputs, so adding or changing an action does
+not make the task run again either. Checks that must run on every build, such as validating message codes, should
+therefore not rely on actions alone, or the task must be forced to run, for example with `--rerun-tasks`.
+///
 
 
 ## Writing the Pack File

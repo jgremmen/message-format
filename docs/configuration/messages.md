@@ -48,9 +48,19 @@ When a message is registered through `ConfigurableMessageSupport.addMessage(...)
 ### Message.LocaleAware
 
 `Message.LocaleAware` extends `Message` and holds multiple locale-specific messages. When the message is formatted, the
-locale provided through the `Parameters` is used to select the best matching variant. The matching algorithm first
-looks for an exact locale match (language and country), then falls back to the same language with a different country
-and finally selects the first available variant as a last resort.
+locale provided through the `Parameters` is used to select the best matching variant. The matching algorithm compares
+the language and country of each variant with the requested locale and ignores scripts and variants. It selects the
+first matching variant according to the following rules, in order of precedence:
+
+1. A variant with the same language and the same country.
+2. A variant with the same language but a different country.
+3. A variant for the root locale (an empty language, such as `Locale.ROOT`), which acts as the language-neutral default.
+4. The first variant in iteration order.
+
+The last rule only applies when no variant matches and no root locale variant exists. A localized message created by
+`MessageFactory.parseMessage(...)` from a `Map<Locale,String>` does not preserve the order of the map entries, so
+which variant this rule selects is not predictable. A root locale variant should be provided whenever the requested
+locales are not known in advance.
 
 A `Message.LocaleAware` does not have a single array of message parts or a single format string. Calling
 `getMessageParts()` or `asFormatString(Charset)` on it throws `UnsupportedOperationException`. To inspect individual 
@@ -88,12 +98,19 @@ For the same message in multiple languages, pass a `Map<Locale,String>` keyed by
 
 ```java
 Message.WithCode msg = factory.parseMessage("item.count", Map.of(
-    Locale.ENGLISH, "%{count,1:'1 item',:'%{count} items'}",
-    Locale.GERMAN,  "%{count,1:'1 Eintrag',:'%{count} Einträge'}"));
+    Locale.ENGLISH,
+    "%{count,format:choice,1:'1 item',:'%{count} items'}",
+    Locale.GERMAN,
+    "%{count,format:choice,1:'1 Eintrag',:'%{count} Einträge'}"));
 
-// The resulting message implements both Message.WithCode and Message.LocaleAware.
-// At format time, the best locale match is selected automatically.
+boolean localeAware = msg instanceof Message.LocaleAware;
+// true
 ```
+
+The resulting message implements both `Message.WithCode` and `Message.LocaleAware`. At format time, the best locale
+match is selected automatically. A `null` key in the map stands for the root locale. Every format string in the map
+must be valid. A parser error is reported as a `MessageParserException` that carries the code and the locale of the
+failing entry.
 
 Without an explicit code the factory generates one automatically. Generated codes follow the pattern `MSG[...]` and can
 be recognized with `MessageFactory.isGeneratedCode(String)`:
@@ -109,7 +126,8 @@ MessageFactory.isGeneratedCode(msg.getCode());
 ```
 
 When the map contains only a single entry, the result is a plain `Message.WithCode` rather than a `Message.LocaleAware`,
-because there is no locale selection to perform.
+because there is no locale selection to perform. The locale of that entry is discarded, so the message is used for
+every locale. An empty map produces a message with the given code that formats to an empty string.
 
 ### Wrapping a Message with a Code
 
@@ -139,14 +157,29 @@ A `MessageBuilder` is obtained from the factory or through the static convenienc
 
 ```java
 // from a MessageFactory instance
-MessageBuilder builder = factory.messageBuilder();
+MessageBuilder fromFactory = factory.messageBuilder();
 
 // using the shared factory
-MessageBuilder builder = MessageBuilder.create();
+MessageBuilder fromShared = MessageBuilder.create();
 ```
 
-The builder is not thread-safe and must not be reused after calling `build()`,
-`buildWithCode(String)` or `buildAsTemplate()`.
+Further `create(...)` overloads accept a `MessageAccessor`, a `MessageSupport` or a `ParameterFormatterContext` and
+use the message factory of that object. The last one is useful inside a custom formatter.
+
+The builder is not thread-safe and must not be reused after calling `build()`, `buildWithCode(String)` or
+`buildAsTemplate()`. Starting another part or building again throws an `IllegalStateException`.
+
+Each part builder belongs to the part it creates. Calling a method that starts another part, such as `text(...)` or
+`parameter(...)`, or one of the build methods finalizes the current part. A part builder that is retained in a variable
+must not be used after that point. Its configuration methods (`configString`, `configBool`, `configNumber` and
+`configMessage`) throw an `IllegalStateException`. The configuration values are copied when the part is finalized, so
+later changes cannot alter the part that was already built.
+
+Names are validated immediately. Parameter names must follow the kebab-case or lower camelCase convention, while
+formatter names, configuration names, post formatter names and template names must be kebab-case. A name that does
+not conform throws an `IllegalArgumentException`. Unlike the parser, which rejects duplicates, the builder lets a
+later value replace an earlier one when the same configuration name, map key, template default or parameter delegate
+is given twice.
 
 ### Text Parts
 
@@ -198,14 +231,20 @@ Message.WithSpaces msg = MessageBuilder
     .create()
     .text("You have")
     .parameter("count")
+        .withFormat("choice")
         .mapNumber(0).message("no items")
         .mapNumber(1).message("1 item")
         .mapDefault().message("%{count} items")
         .spaceBefore()
     .text(".")
     .build();
-// Equivalent format string: "You have %{count,0:'no items',1:'1 item',:'%{count} items'}."
+// Equivalent format string:
+// "You have %{count,format:choice,0:'no items',1:'1 item',
+//  :'%{count} items'}."
 ```
+
+As described on the [Syntax](../message/syntax.md#default-entry) page, the default entry created by `mapDefault()` is
+only used by formatters that select a message, which is why the example selects the `choice` formatter.
 
 Map entries support relational operators for numeric and string keys. For null and empty keys, equality operators 
 (`eq`, `ne`) are available:
@@ -217,9 +256,9 @@ Message.WithSpaces msg = MessageBuilder
         .mapNumber(0).lt().message("below zero")
         .mapNumber(0).eq().message("exactly zero")
         .mapNumber(0).gt().message("above zero")
-        .mapDefault().message("unknown")
     .build();
-// Equivalent format string: "%{temperature,<0:'below zero',0:'exactly zero',>0:'above zero',:'unknown'}"
+// Equivalent format string:
+// "%{temperature,<0:'below zero',0:'exactly zero',>0:'above zero'}"
 ```
 
 Boolean map keys use `mapBool(boolean)`:
@@ -256,12 +295,13 @@ Configuration values can be attached to a parameter through `configString`, `con
 ```java
 Message.WithSpaces msg = MessageBuilder
     .create()
-    .parameter("amount")
-        .withFormat("number")
-        .configString("grouping-separator", ".")
-        .configBool("leading-zero", true)
+    .parameter("items")
+        .configString("list-sep", ", ")
+        .configString("list-sep-last", " and ")
+        .configNumber("list-max-size", 3)
     .build();
-// Equivalent format string: "%{amount,format:number,grouping-separator:'.',leading-zero:true}"
+// Equivalent format string:
+// "%{items,list-max-size:3,list-sep:', ',list-sep-last:' and '}"
 ```
 
 ### Post-Formatter Parts
@@ -272,13 +312,17 @@ configured through a callback on `withMessage(Consumer<MessageBuilder>)`:
 ```java
 Message.WithSpaces msg = MessageBuilder
     .create()
-    .postFormatter("upper")
+    .postFormatter("case")
         .withMessage(inner -> inner.text("hello world"))
+        .configString("case", "upper")
     .build();
-// Equivalent format string: "%(upper,'hello world')"
+// Equivalent format string: "%(case,'hello world',case:upper)"
 ```
 
-Post-formatters also support configuration values and space control, just like parameter parts.
+The inner message can also be passed as a format string or as a parsed `Message.WithSpaces`. If no inner message is
+set, the post formatter receives an empty message. Post-formatters also support configuration values and space
+control, just like parameter parts. A message value is not accepted for a post formatter configuration, so
+`configMessage(...)` throws an `IllegalArgumentException` on a post formatter builder.
 
 ### Template Parts
 
@@ -311,6 +355,10 @@ Message.WithCode msg = MessageBuilder
     .buildWithCode("file.not-found");
 // Equivalent format string: "File %{filename} not found. "
 ```
+
+To produce a template that can be registered with `addTemplate(...)`, call `buildAsTemplate()`. Because templates
+cannot reference other templates, it throws an `IllegalStateException` if the built message contains a template
+part. See [Templates](templates.md) for details.
 
 
 ## Adding Messages to ConfigurableMessageSupport
@@ -369,9 +417,11 @@ Message.WithCode msg = factory.parseMessage(
     "cart.summary", 
     Map.of(
         Locale.ENGLISH, 
-        "%{count,1:'1 item',:'%{count} items'} in your cart", 
-        Locale.GERMAN,  
-        "%{count,1:'1 Artikel',:'%{count} Artikel'} in Ihrem Warenkorb"));
+        "%{count,format:choice,1:'1 item',:'%{count} items'} " +
+        "in your cart",
+        Locale.GERMAN,
+        "%{count,format:choice,1:'1 Artikel',:'%{count} Artikel'} " +
+        "in Ihrem Warenkorb"));
 
 messageSupport.addMessage(msg);
 

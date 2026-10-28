@@ -89,14 +89,20 @@ messageSupport
 // "Uptime: 2h 30m 15s"
 ```
 
-Short durations omit the hours component:
+Short durations omit the components that are zero, starting with the largest one:
 
 ```java
 messageSupport
     .message("Request took %{ms,format:elapsed}")
     .with("ms", 4200L)
     .format();
-// "Request took 0m 4s"
+// "Request took 4s"
+
+messageSupport
+    .message("Request took %{ms,format:elapsed}")
+    .with("ms", 64200L)
+    .format();
+// "Request took 1m 4s"
 ```
 
 Because the formatter handles `null` values through `formatNull`, the message author can provide a `null` map key to 
@@ -225,8 +231,9 @@ key and the configuration key feels redundant. For these cases, a named formatte
 
 When auto-apply is enabled, the formatter service registers a mapping from each of the formatter's configuration key 
 names (returned by `getParameterConfigNames()`) to the formatter itself. During formatter resolution, if any of those 
-configuration keys appear in the parameter configuration, the formatter is added to the formatter chain automatically,
-without the message author having to write `format:<name>`.
+configuration keys appear in the parameter configuration and the formatter accepts the value type, the formatter is
+selected automatically, without the message author having to write `format:<name>`. As with an explicit
+`format:<name>`, it is then the only formatter in the chain.
 
 The built-in `GeoFormatter` uses this mechanism. It declares a configuration key named `geo` and enables auto-apply. A
 message that contains the `geo` configuration key activates the geo formatter without needing `format:geo`:
@@ -500,7 +507,8 @@ Named formatters are registered with the formatter service in the same way as ty
 method handles both. When it detects that the formatter implements `NamedParameterFormatter`, it validates the name 
 against the kebab-case convention, registers the formatter under its name and, if the formatter returns types from
 `getFormattableTypes()`, also registers it for those types. If auto-apply is enabled, it additionally maps the 
-formatter's configuration key names for automatic activation.
+formatter's configuration key names for automatic activation. Registering a second named formatter with a name that
+is already taken throws a `FormatterServiceException`, and the formatter service remains unchanged.
 
 ```java
 var formatterService = new DefaultFormatterService();
@@ -518,11 +526,15 @@ automatic registration. Create a file named
 `META-INF/services/de.sayayi.lib.message.formatter.parameter.ParameterFormatter` in the resources directory and list
 the fully qualified class names of the formatters, one per line:
 
-```
+```text title="META-INF/services/de.sayayi.lib.message.formatter.parameter.ParameterFormatter"
 com.example.formatter.ElapsedNamedFormatter
 com.example.formatter.PercentNamedFormatter
 com.example.formatter.CurrencyNamedFormatter
 ```
+
+On the module path, the module descriptor declares the formatters instead, with a `provides` clause for
+`de.sayayi.lib.message.formatter.parameter.ParameterFormatter`, as shown for
+[type-specific formatters](typed-parameter-formatter.md#serviceloader-auto-discovery).
 
 When the application creates a `DefaultFormatterService`, it calls `ServiceLoader.load` for the `ParameterFormatter`
 interface and registers every discovered implementation. Named formatters are recognized and registered by name 

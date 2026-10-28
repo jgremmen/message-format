@@ -17,7 +17,7 @@ is actually written to an appender.
 
 Add the `message-format-log4j` module to the project alongside the Log4j API dependency.
 
-=== "Gradle (Groovy DSL)"
+=== "Gradle (Groovy)"
 
     ```groovy
     dependencies {
@@ -26,7 +26,7 @@ Add the `message-format-log4j` module to the project alongside the Log4j API dep
     }
     ```
 
-=== "Gradle (Kotlin DSL)"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     dependencies {
@@ -51,7 +51,8 @@ Add the `message-format-log4j` module to the project alongside the Log4j API dep
     ```
 
 For JPMS-based projects, the module name is `de.sayayi.lib.message.log4j`. It requires `de.sayayi.lib.message` and
-`org.apache.logging.log4j`.
+`org.apache.logging.log4j` transitively, so a module that requires `de.sayayi.lib.message.log4j` can use the types of
+both without declaring them itself.
 
 
 ## Creating a Logger
@@ -91,7 +92,7 @@ class for every logger that is created without an explicit factory argument.
 
 The most straightforward way to set this property is on the JVM command line:
 
-```
+```text
 -Dlog4j2.messageFactory=de.sayayi.lib.message.log4j.Log4jMessageFactory
 ```
 
@@ -308,3 +309,30 @@ logger.info("invalid %{}");
 
 This behavior is intentional for a logging context, where reliability is more important than strict validation. The 
 diagnostic output makes it easy to spot and fix the problem without disrupting the application's runtime behavior.
+
+
+## Constant Message Strings
+
+Every log message string is parsed as a message format string. Values must therefore always be passed as arguments
+and never be concatenated into the message.
+
+/// danger | Unsafe Concatenation
+The following statement is unsafe. A user name such as `%{p1,format:spel,spel-expr:'...'}` or `%[some-template]` is
+interpreted as message format syntax rather than printed as text. Depending on the registered formatters, untrusted
+input can then trigger arbitrary formatting logic, as described for the [SpEL formatter](../formatter/parameter/named/spel.md#security-considerations).
+
+```java
+// UNSAFE: user input becomes part of the message format string
+logger.info("Login failed for " + userName);
+```
+///
+
+The safe form passes the value as a parameter, so it is only ever formatted as a value:
+
+```java
+// safe: user input is a parameter value, never parsed
+logger.info("Login failed for %{p1}", userName);
+```
+
+Constant message strings also keep the message cache of the factory effective. Every distinct string is parsed and
+cached separately, so concatenated values cause a cache miss and a new parse on every call.

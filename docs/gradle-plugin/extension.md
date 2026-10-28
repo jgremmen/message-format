@@ -16,7 +16,7 @@ The name of the output pack file. The default value is the Gradle project name w
 project named `billing`, the default pack filename is `billing.mfp`. When a project produces multiple pack files (for
 example, one per subproject in a multi-project build), each one can be assigned a distinct name to avoid collisions:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     messageFormat {
@@ -24,7 +24,7 @@ example, one per subproject in a multi-project build), each one can be assigned 
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     messageFormat {
@@ -42,7 +42,7 @@ Controls whether the output pack file is GZip-compressed. The default value is `
 uses extensive bit-packing, so compression may not reduce the size noticeably for small message sets. For larger sets
 with hundreds or thousands of messages, enabling compression can reduce the file size significantly:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     messageFormat {
@@ -50,7 +50,7 @@ with hundreds or thousands of messages, enabling compression can reduce the file
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     messageFormat {
@@ -68,7 +68,7 @@ By default, the plugin scans the output of the `main` source set, which means al
 `<buildDir>/classes/java/main/`. When messages and templates are defined in additional source sets, they can be added 
 to the scan with the `sourceSet` method:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     messageFormat {
@@ -77,7 +77,7 @@ to the scan with the `sourceSet` method:
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     messageFormat {
@@ -89,7 +89,7 @@ to the scan with the `sourceSet` method:
 The plugin can also be pointed at arbitrary file collections through the `sources` property. Only `.class` files in the 
 collection are actually scanned; all other file types are ignored:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     messageFormat {
@@ -97,7 +97,7 @@ collection are actually scanned; all other file types are ignored:
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     messageFormat {
@@ -114,7 +114,7 @@ belong to a standard Gradle source set.
 The `messages` block configures how message codes are filtered and how duplicate definitions are handled. It is
 accessed as a nested closure inside the `messageFormat` extension:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     messageFormat {
@@ -126,7 +126,7 @@ accessed as a nested closure inside the `messageFormat` extension:
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     messageFormat {
@@ -162,7 +162,7 @@ which it was found.
 The property accepts both a `DuplicateStrategy` enum constant and a case-insensitive string. Dashes in the string are 
 converted to underscores automatically, so all the following are equivalent:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     messageFormat {
@@ -188,7 +188,7 @@ converted to underscores automatically, so all the following are equivalent:
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     messageFormat {
@@ -227,7 +227,7 @@ removed from the output even if it also matches an include pattern.
 
 The following example includes only message codes that start with `ORDER-` but excludes any codes ending in `-DRAFT`:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     messageFormat {
@@ -238,7 +238,7 @@ The following example includes only message codes that start with `ORDER-` but e
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     messageFormat {
@@ -251,7 +251,7 @@ The following example includes only message codes that start with `ORDER-` but e
 
 Multiple patterns can be passed in a single call or across multiple calls and they accumulate:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     messageFormat {
@@ -262,7 +262,7 @@ Multiple patterns can be passed in a single call or across multiple calls and th
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     messageFormat {
@@ -282,7 +282,7 @@ message that passes the filters.
 The `templates` block configures template reference validation and allows ignoring specific template names during that 
 validation. It is accessed as a nested closure inside the `messageFormat` extension:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     messageFormat {
@@ -293,7 +293,7 @@ validation. It is accessed as a nested closure inside the `messageFormat` extens
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     messageFormat {
@@ -318,7 +318,7 @@ than at runtime when a message is formatted.
 When disabled, no such validation is performed. This can be useful if templates are loaded from a different source at 
 runtime, for example from a separate pack file or through programmatic registration:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     messageFormat {
@@ -328,7 +328,7 @@ runtime, for example from a separate pack file or through programmatic registrat
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     messageFormat {
@@ -350,7 +350,7 @@ Consider a project that references templates from a shared library that is loade
 `ignore` method, validation would have to be disabled entirely, losing the safety net for the project's own templates. 
 With `ignore`, the check can be selectively suppressed for known external templates:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     messageFormat {
@@ -361,7 +361,7 @@ With `ignore`, the check can be selectively suppressed for known external templa
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     messageFormat {
@@ -381,12 +381,12 @@ failures even if they are absent from the scanned classes. All other template re
 A typical single-project setup requires very little configuration. Apply the plugin, optionally adjust the extension 
 properties and wire the pack file into the jar:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     plugins {
       id 'java'
-      id 'de.sayayi.plugin.gradle.message'
+      id 'de.sayayi.plugin.gradle.message' version '0.25.0'
     }
 
     dependencies {
@@ -408,12 +408,12 @@ properties and wire the pack file into the jar:
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     plugins {
       java
-      id("de.sayayi.plugin.gradle.message")
+      id("de.sayayi.plugin.gradle.message") version "0.25.0"
     }
 
     dependencies {
@@ -450,7 +450,7 @@ approaches for handling this.
 The simplest approach is to apply the plugin independently to each subproject that contains message definitions. Every
 subproject produces its own `.mfp` file and at runtime the application imports all of them:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     // settings.gradle
@@ -462,7 +462,7 @@ subproject produces its own `.mfp` file and at runtime the application imports a
     // core/build.gradle
     plugins {
       id 'java-library'
-      id 'de.sayayi.plugin.gradle.message'
+      id 'de.sayayi.plugin.gradle.message' version '0.25.0'
     }
 
     jar {
@@ -476,7 +476,7 @@ subproject produces its own `.mfp` file and at runtime the application imports a
     // orders/build.gradle
     plugins {
       id 'java-library'
-      id 'de.sayayi.plugin.gradle.message'
+      id 'de.sayayi.plugin.gradle.message' version '0.25.0'
     }
 
     jar {
@@ -486,7 +486,7 @@ subproject produces its own `.mfp` file and at runtime the application imports a
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     // settings.gradle.kts
@@ -498,7 +498,7 @@ subproject produces its own `.mfp` file and at runtime the application imports a
     // core/build.gradle.kts
     plugins {
       `java-library`
-      id("de.sayayi.plugin.gradle.message")
+      id("de.sayayi.plugin.gradle.message") version "0.25.0"
     }
 
     tasks.jar {
@@ -512,7 +512,7 @@ subproject produces its own `.mfp` file and at runtime the application imports a
     // orders/build.gradle.kts
     plugins {
       `java-library`
-      id("de.sayayi.plugin.gradle.message")
+      id("de.sayayi.plugin.gradle.message") version "0.25.0"
     }
 
     tasks.jar {
@@ -548,7 +548,7 @@ This approach keeps each subproject self-contained and allows independent builds
 If many subprojects share the same plugin configuration, it can be defined once in a convention plugin or a
 `subprojects` block in the root build script to avoid repetition:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     // build.gradle (root)
@@ -571,7 +571,7 @@ If many subprojects share the same plugin configuration, it can be defined once 
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     // build.gradle.kts (root)
@@ -604,13 +604,13 @@ not affected.
 For a single pack file that contains all messages from all subprojects, one subproject (or the root project) can be 
 configured to scan the compiled classes of multiple subprojects:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     // app/build.gradle
     plugins {
       id 'java'
-      id 'de.sayayi.plugin.gradle.message'
+      id 'de.sayayi.plugin.gradle.message' version '0.25.0'
     }
 
     dependencies {
@@ -636,13 +636,13 @@ configured to scan the compiled classes of multiple subprojects:
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     // app/build.gradle.kts
     plugins {
       java
-      id("de.sayayi.plugin.gradle.message")
+      id("de.sayayi.plugin.gradle.message") version "0.25.0"
     }
 
     dependencies {

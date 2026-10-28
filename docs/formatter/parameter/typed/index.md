@@ -164,12 +164,15 @@ date/time objects are formatted using the same temporal formatting logic as mode
 
 ```java
 messageSupport
-    .message("Timestamp: %{ts,date:medium}")
+    .message("Timestamp: %{ts,date:date}")
     .with("ts", new java.util.Date(1746489600000L))
     .locale(Locale.US)
     .format();
-// "Timestamp: May 6, 2025"
+// "Timestamp: May 6, 2025" (system time zone Europe/Berlin)
 ```
+
+An `Instant` has no time zone, so it is formatted in the system default time zone (see [Temporal](temporal.md)). The
+style `date:date` selects the date only, while `date:medium` would print the date and the time.
 
 ### Enum Values
 
@@ -213,13 +216,15 @@ messageSupport
 
 ### Map and Dictionary
 
-A `HashMap` implements `Map`, for which the `MapFormatter` is registered at order 75. For a regular `HashMap` there is
-only one candidate formatter and it handles the value directly.
+A `TreeMap` implements `Map`, for which the `MapFormatter` is registered at order 75. For a regular map there is
+only one candidate formatter and it handles the value directly. The entries are formatted in the iteration order of the
+map, so the example uses a sorted map to make the output predictable.
 
 ```java
 messageSupport
     .message("Settings: %{cfg}")
-    .with("cfg", Map.of("color", "blue", "size", "large"))
+    .with("cfg", new TreeMap<>(
+        Map.of("color", "blue", "size", "large")))
     .format();
 // "Settings: color=blue, size=large"
 ```
@@ -277,8 +282,8 @@ messageSupport
 | `byte[]`               | `ArrayFormatter`                   | 100   | [List](iterable.md)         |
 | `byte`                 | `NumberFormatter`                  | 100   | [Number](number.md)         |
 | `Calendar`             | `ToTemporalDelegate`               | 80    | [Temporal](temporal.md)     |
-| `char[]`               | `StringFormatter`[^1]              | 100   | [String](string.md)         |
-| `CharSequence`         | `StringFormatter`[^1]              | 80    | [String](string.md)         |
+| `char[]`               | `StringFormatter`                  | 100   | [String](string.md)         |
+| `CharSequence`         | `StringFormatter`                  | 80    | [String](string.md)         |
 | `Charset`              | `CharsetFormatter`                 | 80    | [Charset](charset.md)       |
 | `Date`                 | `ToTemporalDelegate`               | 80    | [Temporal](temporal.md)     |
 | `Dictionary`           | `DictionaryFormatter`              | 70    | [Dictionary](dictionary.md) |
@@ -286,6 +291,7 @@ messageSupport
 | `double`               | `NumberFormatter`                  | 100   | [Number](number.md)         |
 | `DoubleSupplier`       | `DoubleSupplierFormatter`          | 80    | [Supplier](supplier.md)     |
 | `Enum`                 | `EnumFormatter`                    | 80    | [Enum](enum.md)             |
+| `File`                 | `PathFormatter`                    | 80    | [Path](path.md)             |
 | `FileTime`             | `ToTemporalDelegate`               | 80    | [Temporal](temporal.md)     |
 | `float[]`              | `ArrayFormatter`                   | 100   | [List](iterable.md)         |
 | `float`                | `NumberFormatter`                  | 100   | [Number](number.md)         |
@@ -302,12 +308,12 @@ messageSupport
 | `Map`                  | `MapFormatter`                     | 75    | [Map](map.md)               |
 | `Number`               | `NumberFormatter`                  | 80    | [Number](number.md)         |
 | `Object[]`             | `ArrayFormatter`                   | 100   | [List](iterable.md)         |
-| `Object`               | _registered default formatter_[^1] | 127   |                             |
+| `Object`               | _registered default formatter_     | 127   |                             |
 | `Optional`             | `OptionalFormatter`                | 80    | [Optional](optional.md)     |
 | `OptionalDouble`       | `OptionalDoubleFormatter`          | 80    | [Optional](optional.md)     |
 | `OptionalInt`          | `OptionalIntFormatter`             | 80    | [Optional](optional.md)     |
 | `OptionalLong`         | `OptionalLongFormatter`            | 80    | [Optional](optional.md)     |
-| `Path`                 | `PathFormatter`                    | 80    | [Path](path.md)             |
+| `Path`                 | `PathFormatter`                    | 75    | [Path](path.md)             |
 | `Reference`            | `ReferenceFormatter`               | 80    | [Reference](reference.md)   |
 | `short[]`              | `ArrayFormatter`                   | 100   | [List](iterable.md)         |
 | `short`                | `NumberFormatter`                  | 100   | [Number](number.md)         |
@@ -315,10 +321,34 @@ messageSupport
 | `Temporal`             | `TemporalFormatter`                | 80    | [Temporal](temporal.md)     |
 | `Throwable`            | `ThrowableFormatter`               | 80    | [Throwable](throwable.md)   |
 | `TimeZone`             | `TimeZoneFormatter`                | 80    | [TimeZone](time-zone.md)    |
-| `Token`                | `TokenFormatter`                   | 80    | [Token](token.md)           |
 | `Type`                 | `TypeFormatter`                    | 80    | [Type](type.md)             |
 | `URI`                  | `URIFormatter`                     | 80    | [URI](uri.md)               |
 | `URL`                  | `URLFormatter`                     | 80    | [URL](url.md)               |
 
-[^1]: This formatter implements the `DefaultFormatter` interface and can be used to format any object which is not
-handled by any other registered formatter.
+The `StringFormatter` implements the `DefaultFormatter` interface and can therefore be registered for `Object`, where
+it formats any object that is not handled by another registered formatter.
+
+### Formatters Not Registered by Default
+
+The package `de.sayayi.lib.message.formatter.parameter.runtime.extra` contains further type-specific formatters. They
+are not declared as service providers, so the `DefaultFormatterService` does not register them. Each one is added with
+`addFormatter(...)` on a [formatter service](../../../configuration/formatter-service.md#registering-formatters) when
+it is needed. All of them use the default order of 80.
+
+| Java Type Simple Name | Formatter Class            | Configuration Key | Documentation     |
+|-----------------------|----------------------------|-------------------|-------------------|
+| `Annotation`          | `AnnotationFormatter`      | `annotation`      |                   |
+| `Attr`, `Element`     | `NodeFormatter`            |                   |                   |
+| `CollationKey`        | `CollationKeyFormatter`    |                   |                   |
+| `Field`               | `FieldFormatter`           | `field`           |                   |
+| `InetAddress`         | `InetAddressFormatter`     | `inet`            |                   |
+| `Key`                 | `KeyFormatter`             | `key`             |                   |
+| `Manifest`            | `ManifestFormatter`        | `manifest`        |                   |
+| `MatchResult`         | `MatchResultFormatter`     | `matcher`         |                   |
+| `Method`              | `MethodFormatter`          | `method`          |                   |
+| `Package`             | `PackageFormatter`         |                   |                   |
+| `Parameter`           | `MethodParameterFormatter` | `parameter`       |                   |
+| `Principal`           | `PrincipalFormatter`       |                   |                   |
+| `Token`               | `TokenFormatter`           |                   | [Token](token.md) |
+
+The Javadoc of each class describes the supported configuration values.

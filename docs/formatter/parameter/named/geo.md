@@ -67,10 +67,12 @@ messageSupport
 ## Custom Format Patterns
 
 When none of the predefined formats fit, a custom format pattern can be provided as the `geo` configuration value. The
-pattern syntax is:
+pattern syntax is shown below. Square brackets mark optional elements and `|` separates alternatives. Only the degrees
+element `d` is required, and the elements must appear in the order shown. Leading and trailing spaces of the pattern
+are ignored.
 
-```
-d[ ][0](m|M|MM|MMM)[ ][0](s|S|SS|SSS)[ ](LO|LA)
+```text
+d[ ][[0](m|M|MM|MMM)][ ][[0](s|S|SS|SSS)][ ][LO|LA]
 ```
 
 Each element of the pattern controls a specific aspect of the output:

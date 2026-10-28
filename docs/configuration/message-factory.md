@@ -11,9 +11,11 @@ methods and the `MessageBuilder`, see [Messages](messages.md) and [Templates](te
 For most applications the shared `MessageFactory.getSharedInstance()` singleton is sufficient. It uses the 
 `PASS_THROUGH` normalizer, which means message parts are not deduplicated and it caches up to 128 parsed messages. When
 `MessageSupportFactory.create(FormatterService)` is called without specifying a factory, this is the instance that is 
-used:
+used. `MessageSupportFactory.createDefault()` and `createGeneric()` use it as well:
 
 ```java
+var formatterService = DefaultFormatterService.getSharedInstance();
+
 // these two calls are equivalent
 var ms1 = MessageSupportFactory.create(formatterService);
 var ms2 = MessageSupportFactory.create(formatterService,
@@ -30,7 +32,7 @@ only a normalizer and disables caching:
 var factory = new MessageFactory(MessagePartNormalizer.PASS_THROUGH);
 ```
 
-To enable caching, pass a positive cache size as the second argument:
+To enable caching, pass a positive cache size as the second argument. A size of `0` or less disables the cache:
 
 ```java
 var factory = new MessageFactory(MessagePartNormalizer.PASS_THROUGH, 256);
@@ -46,10 +48,10 @@ var messageSupport = MessageSupportFactory.create(
 
 ## Message Caching
 
-When an application formats the same inline message string repeatedly (via `messageSupport.message("...")`), the format 
-string is parsed on every call unless caching is enabled. A caching `MessageFactory` keeps up to the configured number 
-of parsed messages in an LRU cache. Once the cache is full, the least recently used entry is evicted to make room for
-new ones.
+When an application formats the same inline message string repeatedly (via `messageSupport.message("...")`), the format
+string is parsed on every call unless the factory has a message cache. The shared factory has one. A caching
+`MessageFactory` keeps up to the configured number of parsed messages in an LRU cache. Once the cache is full, the least
+recently used entry is evicted to make room for new ones.
 
 ```java
 var factory = new MessageFactory(MessagePartNormalizer.PASS_THROUGH, 512);
@@ -71,9 +73,17 @@ messageSupport
 // "Hello Bob!"
 ```
 
-The cache only applies to the `parseMessage(String)` method, which is what gets called when formatting inline message
-strings. Messages registered by code through `addMessage(String, String)` are parsed once and stored directly in the 
-message support, so they do not go through the cache.
+The cache is keyed by the format string and is used by every method that parses a message: `parseMessage(String)`,
+which is what gets called when formatting inline message strings, as well as `parseMessage(String, String)` and the
+map-based variants. Messages registered by code through `addMessage(String, String)` therefore also pass through the
+cache, although they are parsed only once and then stored in the message support. Templates parsed with
+`parseTemplate(...)` are never cached.
+
+/// tip | Cache Contention
+Lookups, and parsing on a cache miss, happen while the factory holds its cache lock. Threads that parse many
+different format strings at the same time therefore wait for each other. Registering frequently used messages by code,
+or importing them from a [pack file](pack-files.md), avoids repeated parsing altogether.
+///
 
 
 ## MessagePartNormalizer
@@ -99,7 +109,8 @@ var factory = new MessageFactory(MessagePartNormalizer.PASS_THROUGH);
 
 For applications with a large number of messages, `LRUMessagePartNormalizer` maintains a bounded cache of previously 
 seen parts. When a part equal to a cached one is normalized, the cached instance is returned instead of keeping the new
-one. The cache evicts the least recently used entry when it reaches the configured maximum size.
+one. The cache evicts the least recently used entry when it reaches the configured maximum size. The maximum size
+passed to `LRUMessagePartNormalizer.create(int)` must be positive, otherwise an `IllegalArgumentException` is thrown.
 
 ```java
 MessagePartNormalizer normalizer = LRUMessagePartNormalizer.create(512);
@@ -115,30 +126,46 @@ string.
 
 ### Custom Normalizers
 
-Since `MessagePartNormalizer` is a functional interface, a custom implementation can be provided. A custom normalizer 
-receives a `MessagePart` and must return an equal instance (which may or may not be the same object):
+A custom implementation of `MessagePartNormalizer` can be provided as well. Because `normalize` is a generic method,
+the interface cannot be implemented with a lambda expression, even though it is annotated as a functional interface. A
+custom normalizer receives a `MessagePart` and must return an equal instance (which may or may not be the same
+object). The factory calls the normalizer from every thread that parses messages, so the implementation must be
+thread-safe:
 
-```java
-MessagePartNormalizer myNormalizer = new MessagePartNormalizer() {
-  private final Map<MessagePart,MessagePart> cache = 
+```java title="UnboundedPartNormalizer.java"
+import de.sayayi.lib.message.part.MessagePart;
+import de.sayayi.lib.message.part.normalizer.MessagePartNormalizer;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.jetbrains.annotations.NotNull;
+
+public final class UnboundedPartNormalizer
+    implements MessagePartNormalizer
+{
+  private final Map<MessagePart,MessagePart> cache =
       new ConcurrentHashMap<>();
 
   @Override
-  public <T extends MessagePart> @NotNull T normalize(@NotNull T part) 
+  public <T extends MessagePart> @NotNull T normalize(@NotNull T part)
   {
     @SuppressWarnings("unchecked")
     T cached = (T)cache.putIfAbsent(part, part);
 
+    // returns the first instance seen for each distinct part
     return cached != null ? cached : part;
   }
-};
+}
 ```
 
-!!! warning
-    A normalizer that grows without bound will eventually consume more memory than it saves.
-    Always use a bounded cache or a strategy that limits the number of retained entries.
+/// warning | Unbounded Normalizer
+The normalizer above is unsafe for long-running applications that parse format strings from unbounded sources. It
+grows without bound and will eventually consume more memory than it saves. Always use a bounded cache or a strategy
+that limits the number of retained entries.
+///
 
 
 ## Thread Safety
 
-`MessageFactory` is thread-safe. All its public methods can be called concurrently from multiple threads.
+`MessageFactory` is thread-safe. All its public methods can be called concurrently from multiple threads. The
+normalizers returned by `LRUMessagePartNormalizer.create(int)` are thread-safe as well. A `MessageBuilder` obtained
+from `messageBuilder()` is not thread-safe and must be used by a single thread only.

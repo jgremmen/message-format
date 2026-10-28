@@ -42,8 +42,8 @@ messageSupport
 
 ## Map Key Types
 
-The named `string` formatter supports the following map key types: `string`, `bool`, `number`, `null`, `empty` and 
-default.
+The named `string` formatter supports the map key types `string`, `null` and `empty`. Bool keys, number keys and the
+default entry are not consulted. When no key matches, the string value itself is the output.
 
 ### String Keys
 
@@ -77,27 +77,22 @@ messageSupport
 // "good"
 ```
 
-### Bool Keys
+### Bool and Number Keys
 
-Bool keys match when the string value equals the literal text `"true"` or `"false"`. The match is case-insensitive at 
-lenient strength.
+The `string` formatter ignores bool and number keys. For a string value they are only evaluated when the
+[`choice`](choice.md) formatter selects the message. Bool keys then match when the string equals `"true"` or `"false"`,
+ignoring case. Number keys parse the string as a number and compare it against the key value. A string that is not a
+valid number does not match.
 
 ```java
 messageSupport
     .message("%{val,format:string,true:'yes',false:'no'}")
     .with("val", "true")
     .format();
-// "yes"
-```
+// "true"
 
-### Number Keys
-
-Number keys parse the string value as a number and compare it against the key value. If the string is not a valid 
-number, the key does not match.
-
-```java
 messageSupport
-    .message("%{code,format:string,0:'ok',>0:'error'}")
+    .message("%{code,format:choice,0:'ok',>0:'error'}")
     .with("code", "0")
     .format();
 // "ok"
@@ -140,14 +135,15 @@ messageSupport
 // "hello!"
 ```
 
-### Default Key
+### Default Entry
 
-A default map key (`:`) catches any value that does not match a specific key.
+The `string` formatter does not use a default entry (`:`). To provide a fallback for values that match none of the
+string keys, select the [`choice`](choice.md) formatter instead.
 
 ```java
 messageSupport
     .message("""
-        %{status,format:string,\
+        %{status,format:choice,\
             'active':'Active',\
             'inactive':'Inactive',\
             :'Unknown'}\
@@ -209,7 +205,8 @@ messageSupport
 ## Practical Example
 
 A common use case is normalizing a status field that may arrive as different types (enum, string, number) into a 
-user-facing label. The following example shows how to match specific values and provide a fallback.
+user-facing label. String keys match the string representation of the value. Values without a matching key are
+output unchanged.
 
 ```java
 messageSupport
@@ -217,8 +214,7 @@ messageSupport
         Status: %{code,format:string,\
             '200':'OK',\
             '404':'Not Found',\
-            '500':'Server Error',\
-            :'Unexpected'}\
+            '500':'Server Error'}\
         """)
     .with("code", 200)
     .format();
@@ -229,21 +225,34 @@ messageSupport
         Status: %{code,format:string,\
             '200':'OK',\
             '404':'Not Found',\
-            '500':'Server Error',\
-            :'Unexpected'}\
+            '500':'Server Error'}\
         """)
     .with("code", 418)
     .format();
-// "Status: Unexpected"
+// "Status: 418"
 
 messageSupport
     .message("""
         Status: %{code,format:string,\
             null:'No status received',\
-            '200':'OK',\
-            :'Other'}\
+            '200':'OK'}\
         """)
     .with("code", null)
     .format();
 // "Status: No status received"
+```
+
+A fixed label for unexpected codes requires a default entry, which the [`choice`](choice.md) formatter provides.
+
+```java
+messageSupport
+    .message("""
+        Status: %{code,format:choice,\
+            '200':'OK',\
+            '404':'Not Found',\
+            :'Unexpected'}\
+        """)
+    .with("code", 418)
+    .format();
+// "Status: Unexpected"
 ```

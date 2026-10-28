@@ -87,7 +87,12 @@ itself, so calls can be chained fluently.
 
 The most common pattern is setting parameters one at a time with `.with(name, value)`. The library provides overloaded
 methods for all Java primitive types (`boolean`, `byte`, `char`, `short`, `int`, `long`, `float`, `double`) as well as 
-`Object`, so values never need to be boxed manually.
+`Object`, so values never need to be boxed manually. Setting a parameter that already has a value replaces it, and
+`null` is a valid value.
+
+The parameter name must follow the kebab-case or lower camelCase convention described on the
+[Syntax](syntax.md#parameters) page. A `null` name throws a `NullPointerException`, and an empty or non-conforming name
+throws an `IllegalArgumentException`.
 
 ```java
 String text = messageSupport
@@ -105,8 +110,9 @@ String text = messageSupport
 
 ### Bulk Parameters from a Map
 
-When parameter values are already collected in a `Map<String,Object>`, the entire map can be passed in a single call. 
-Since `Properties` extends `Map`, this works with `Properties` objects as well.
+When parameter values are already collected in a `Map<String,?>`, the entire map can be passed in a single call. Each
+entry is set as if `with(name, value)` had been called for it. A separate overload accepts a `Properties` object, whose
+keys must be strings.
 
 ```java
 var params = Map.of(
@@ -124,7 +130,8 @@ String text = messageSupport
 ### Removing and Clearing Parameters
 
 The configurer is mutable. A single parameter can be removed by name or all parameters cleared at once. This is useful 
-when a configurer is reused for multiple formatting calls with slightly different parameter sets.
+when a configurer is reused for multiple formatting calls with slightly different parameter sets. Removing a name that
+has no value has no effect.
 
 ```java
 var configurer = messageSupport
@@ -148,6 +155,12 @@ configurer
     .format();
 // "Goodbye Charlie!"
 ```
+
+/// warning | Configurers Are Not Thread-Safe
+A `MessageConfigurer` represents a single formatting operation and must not be shared between threads. Each call to
+`code(...)` or `message(...)` returns a new, independent configurer. The `MessageSupport` it was obtained from can be
+shared freely.
+///
 
 
 ## Choosing a Locale
@@ -173,8 +186,10 @@ String text = messageSupport
 // "1 mai 2026"
 ```
 
-If no locale is set, the default locale configured on the `MessageSupport` instance is used. Passing `null` explicitly
-resets to the default locale.
+If no locale is set, the default locale configured on the `MessageSupport` instance is used. The configurer reads
+this default when it is created, so a later call to `setLocale(...)` on the message support does not affect existing
+configurers. Passing `null` explicitly resets the configurer to the current default locale. The `locale(String)`
+overload converts the language tag with `Locale.forLanguageTag(String)`.
 
 
 ## Producing the Formatted Result
@@ -186,10 +201,10 @@ a `String` immediately.
 
 ```java
 String text = messageSupport
-    .message("%{n,0:'no messages',1:'1 message',:'%{n} messages'}")
+    .message("You have %{n,0:'no',1:'one'} new messages.")
     .with("n", 5)
     .format();
-// "5 messages"
+// "You have 5 new messages."
 ```
 
 ### Deferred Formatting with a Supplier
@@ -203,7 +218,8 @@ deferred parsing. The format string is only parsed the first time the supplier i
 performance-sensitive code paths where the formatted result may never be needed at all.
 
 This is particularly useful for logging frameworks where the message should only be formatted if the log level is 
-active, or for lazy evaluation scenarios.
+active, or for lazy evaluation scenarios. The supplier formats the message on the first call to `get()` and returns the
+same string on every later call.
 
 ```java
 var configurer = messageSupport
@@ -247,23 +263,40 @@ need to format the message into a temporary variable before constructing the exc
 
 ### Immediate Exception
 
-The `formattedException` method formats the message and passes the result to the constructor function provided. A 
-method reference or a lambda expression can be used for any exception type.
+The `formattedException` method formats the message and passes the result to the constructor function provided. The
+function is either an `ExceptionConstructor`, which receives the formatted message, or an
+`ExceptionConstructorWithCause`, which also receives a cause. Exceptions thrown by the function are passed on to the
+caller.
 
 ```java
+int userId = 42;
+String tenantName = "ACME";
+
 throw messageSupport
     .message("User %{userId} not found in tenant %{tenant}.")
     .with("userId", userId)
     .with("tenant", tenantName)
-    .formattedException(IllegalArgumentException::new);
+    .formattedException(msg -> new IllegalArgumentException(msg));
 // throws IllegalArgumentException("User 42 not found in tenant ACME.")
 ```
+
+/// warning | Ambiguous Constructor References
+Without a cause argument, `formattedException` and `formattedExceptionSupplier` each have two overloads, one for each
+functional interface. For an exception class that has a `(String)` and a `(String, Throwable)` constructor, a
+constructor reference such as `IllegalArgumentException::new` matches both overloads and does not compile. Use a
+lambda expression with one parameter, as shown above, to select `ExceptionConstructor`. A constructor reference works
+when the cause is passed as well, as in the next example.
+///
 
 If the exception needs a root cause, use the overload that accepts a `Throwable`.
 
 ```java
+String dbHost = "db.local";
+int dbPort = 5432;
+
 try {
-    connectToDatabase();
+    DriverManager.getConnection(
+        "jdbc:postgresql://" + dbHost + ":" + dbPort + "/shop");
 } catch(SQLException ex) {
     throw messageSupport
         .message("Failed to connect to %{host}:%{port}")
@@ -281,12 +314,17 @@ combination with `Optional.orElseThrow` and similar methods where the exception 
 is actually absent.
 
 ```java
-User user = findUserById(userId)
+Map<Integer,String> users = Map.of(7, "Alice");
+int userId = 42;
+
+String user = Optional
+    .ofNullable(users.get(userId))
     .orElseThrow(messageSupport
         .message("No user with id %{id}")
         .with("id", userId)
-        .formattedExceptionSupplier(IllegalStateException::new));
-// throws IllegalStateException("No user with id 42") only if the 
+        .formattedExceptionSupplier(
+            msg -> new IllegalStateException(msg)));
+// throws IllegalStateException("No user with id 42") only if the
 // Optional is empty
 ```
 
@@ -294,11 +332,14 @@ Just like `formatSupplier`, the exception supplier captures a snapshot of the cu
 message is only formatted (and, for inline format strings, only parsed) when `Supplier.get()` is invoked.
 
 ```java
+int timeout = 30;
+String url = "/api/data";
+
 Supplier<IOException> supplier = messageSupport
     .message("Timeout after %{seconds}s on %{endpoint}")
     .with("seconds", timeout)
     .with("endpoint", url)
-    .formattedExceptionSupplier(IOException::new);
+    .formattedExceptionSupplier(msg -> new IOException(msg));
 
 // Much later, when the exception is actually needed
 OptionalInt.empty().orElseThrow(supplier);
@@ -309,12 +350,15 @@ OptionalInt.empty().orElseThrow(supplier);
 ## Accessing the Message and Parameters
 
 The configurer also provides read access to the message it is working with and to the parameters that have been set so 
-far. The `getMessage()` method returns the `Message` object and `getParameters()` returns an unmodifiable snapshot of
-the current parameter map.
+far. The `getMessage()` method returns the `Message` object and `getParameters()` returns the parameter map of the
+configurer. For a configurer created from an inline format string, `getMessage()` parses the string if it has not
+been parsed yet.
 
 This can be useful for debugging or when the configurer's state needs to be inspected programmatically.
 
 ```java
+messageSupport.addMessage("welcome", "Welcome %{name} (%{role})!");
+
 var configurer = messageSupport
     .code("welcome")
     .with("name", "Alice")
@@ -327,5 +371,16 @@ Map<String,Object> params = configurer.getParameters();
 // {name=Alice, role=admin}
 ```
 
-The map returned by `getParameters()` is a snapshot. Subsequent changes to the configurer are not reflected in a
-previously obtained map.
+The map returned by `getParameters()` is a live view backed by the configurer. Parameters set or removed later are
+visible in a previously obtained map. To keep the current state, copy the map, for example with `Map.copyOf(...)`.
+The map is intended for reading only. Parameters are changed through the `with`, `remove` and `clear` methods of
+the configurer.
+
+```java
+Map<String,Object> view = configurer.getParameters();
+
+configurer.with("lang", "en");
+
+view.containsKey("lang");
+// true
+```

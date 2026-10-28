@@ -42,7 +42,7 @@ var messageSupport = MessageSupportFactory.create(
     DefaultFormatterService.getSharedInstance());
 ```
 
-For a custom `MessageFactory`, for example to enable message caching, it can be supplied as a second argument. See 
+A custom `MessageFactory`, for example one with a larger message cache, can be supplied as a second argument. See 
 [MessageFactory](message-factory.md) for details.
 
 Two convenience methods cover the most common starting points and avoid the need to construct a formatter service by
@@ -74,8 +74,9 @@ var messageSupport = MessageSupportFactory.createGeneric();
 // are registered on the underlying formatter service
 ```
 
-Both convenience methods use the shared, non-caching `MessageFactory`. When message caching or another custom factory is
-needed, the explicit `create(FormatterService, MessageFactory)` overload remains the way to supply it.
+Both convenience methods, as well as `create(FormatterService)`, use the shared `MessageFactory`, which caches up to
+128 parsed messages. When a different cache size, a part normalizer or another custom factory is needed, the explicit
+`create(FormatterService, MessageFactory)` overload remains the way to supply it.
 
 
 ## ConfigurableMessageSupport
@@ -104,9 +105,11 @@ messageSupport
 A convenience overload accepts the code and a format string directly. An existing parsed `Message.WithCode` object (for
 example from a `MessageFactory`) can be passed to `addMessage(Message.WithCode)` instead.
 
-Attempting to add a message with a code that already exists throws a `DuplicateMessageException` when the content 
-differs. If the new message is identical to the existing one, the duplicate is silently ignored. This default behavior 
-can be changed by installing a custom `MessageFilter` (see [Filters](#filters)).
+Attempting to add a message with a code that already exists throws a `DuplicateMessageException` when the content
+differs. Two messages have the same content when their parsed message parts are equal. For localized messages, the
+locales and the message of every locale must be equal. If the new message is identical to the existing one, the
+duplicate is silently ignored. This default behavior can be changed by installing a custom `MessageFilter` (see
+[Filters](#filters)).
 
 ### Adding Templates
 
@@ -117,23 +120,25 @@ same parameter values without any extra wiring:
 ```java
 var factory = messageSupport.getMessageAccessor().getMessageFactory();
 
-messageSupport.addTemplate("opt-unit",
-    factory.parseTemplate("%{unit,!empty:' %{unit}'}"));
+messageSupport.addTemplate("measure",
+    factory.parseTemplate("%{value}%{unit,!empty:' %{unit}'}"));
 
 messageSupport
-    .message("Distance: %{value}%[opt-unit]")
+    .message("Distance: %[measure].")
     .with("value", 42)
     .with("unit", "km")
     .format();
-// "Distance: 42 km"
+// "Distance: 42 km."
 
 messageSupport
-    .message("Distance: %{value}%[opt-unit]")
+    .message("Distance: %[measure].")
     .with("value", 42)
     .with("unit", "")
     .format();
-// "Distance: 42"
+// "Distance: 42."
 ```
+
+A name that does not follow the kebab-case convention is rejected with an `IllegalArgumentException`.
 
 Just like messages, adding a template whose name already exists throws a `DuplicateTemplateException` when the content
 differs. Identical duplicates are silently ignored.
@@ -151,14 +156,24 @@ locale. These topics are covered in detail on the [Default Configuration](defaul
 
 The default duplicate handling described above can be customized by installing a `MessageFilter` or `TemplateFilter`. 
 Both are functional interfaces whose single method receives the incoming entry and returns `true` to accept it or 
-`false` to skip it.
+`false` to skip it. An exception thrown by a filter is passed on to the caller of `addMessage` or `addTemplate`.
+Installing a filter replaces the default filter, so the filter itself must detect duplicates if they are to be
+rejected.
+
+The filter is invoked while the message support holds its internal write lock. Checking for an existing entry and
+adding the new one is therefore atomic. A filter may read from the message support, for example through its message
+accessor, but it must return quickly and must never wait for another thread that uses the same message support, as
+this would cause a deadlock.
 
 A typical use case is logging every message that gets registered, for example during development when tracking what is
 being loaded from annotation scanning or pack files is desired:
 
 ```java
+System.Logger logger = System.getLogger("messages");
+
 messageSupport.setMessageFilter(message -> {
-    logger.debug("Registering message '{}'", message.getCode());
+    logger.log(System.Logger.Level.DEBUG,
+        "Registering message " + message.getCode());
     var existing = messageSupport.getMessageAccessor()
         .getMessageByCode(message.getCode());
     if (existing != null && !existing.isSame(message))
@@ -222,6 +237,9 @@ methods to query messages by code, list all registered message codes, check whet
 formatters, retrieve default configuration values and access the `MessageFactory`.
 
 ```java
+messageSupport.addMessage("user.welcome", "Welcome, %{name}!");
+String userName = "Alice";
+
 // check if a message exists before formatting
 if (accessor.hasMessageWithCode("user.welcome")) 
 {
@@ -279,4 +297,11 @@ page.
 
 `MessageFactory`, `ConfigurableMessageSupport` and the singletons returned by
 `DefaultFormatterService.getSharedInstance()` and `MessageSupportFactory.shared()` are all thread-safe. Adding messages,
-changing configuration and formatting can happen concurrently.
+changing configuration and formatting can happen concurrently. The same applies to the sealed view returned by
+`seal()`, to the `MessageAccessor` and to all `Message` objects, which are immutable.
+
+The objects that represent a single operation are not thread-safe and must be confined to the thread that created
+them. These are the `MessageConfigurer` returned by `code(...)` and `message(...)`, the
+[`MessageBuilder`](messages.md#building-messages-programmatically) and the
+[`SingletonParameters`](../formatter/development/utilities.md#singletonparameters) helper. Filters installed with `setMessageFilter` and
+`setTemplateFilter` run while the message support holds its write lock (see [Filters](#filters)).

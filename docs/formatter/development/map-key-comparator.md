@@ -60,6 +60,15 @@ When the comparator can match a value against a key, return the result that best
 Use `EXACT` when value and key share the same type and the comparison succeeds, `EQUIVALENT` when the key is a different
 representation of the same value and `LENIENT` when the match requires interpreting the value in a non-obvious way.
 
+To compare a value with a key, the engine asks every formatter registered for the value's type that implements
+`MapKeyComparator` and keeps the best result. The `DefaultFormatter` registered for `Object` is only asked if it is the
+only formatter for the type. If two keys produce the same score, the key that appears first in the message wins.
+
+Which key types are compared at all is decided by the formatter that formats the value. The built-in
+[number](../parameter/typed/number.md) formatter, for example, only looks up number keys (besides `null` and
+`empty`), while the [`choice`](../parameter/named/choice.md) formatter looks up all key types. A comparator method for
+a key type that the formatting formatter does not request is never called.
+
 The scoring matters when a message contains keys of different types that could both match. For example, if a message 
 contains both `1:'one'` and `'1':'one as string'`, a numeric value of `1` would match the number key with `EXACT` and 
 the string key with `EQUIVALENT`. The engine picks the number key because `EXACT` scores higher.
@@ -106,13 +115,19 @@ public final class HttpStatusFormatter
     extends AbstractSingleTypeParameterFormatter<HttpStatus>
     implements MapKeyComparator<HttpStatus>
 {
+  private static final Set<MapKey.Type> KEY_TYPES =
+      Set.of(MapKey.Type.NUMBER, MapKey.Type.STRING);
+
   @Override
   protected @NotNull Text formatValue(
       @NotNull ParameterFormatterContext context,
       @NotNull HttpStatus status)
   {
-    // check number map entries first, then fall back to "code reason"
-    return formatUsingMappedNumber(context, status.getCode(), true)
+    // check number and string map entries, then fall back to
+    // "code reason"
+    return context
+        .getMapMessage(status, KEY_TYPES, true)
+        .map(context::format)
         .orElseGet(() -> noSpaceText(
             status.getCode() + " " + status.getReasonPhrase()));
   }
@@ -148,6 +163,12 @@ public final class HttpStatusFormatter
   }
 }
 ```
+
+The formatter passes the `HttpStatus` value itself to `getMapMessage`. The engine therefore compares the value with
+each number and string key through the comparator methods of this formatter. Passing a converted value instead, for
+example the code as a `long` through `formatUsingMappedNumber`, would compare that value with the comparators of its
+own type, so the `compareTo...Key` methods of this class would never be called and string keys would not match the
+reason phrase.
 
 With this formatter registered, the message author can map individual status codes to labels:
 
@@ -382,7 +403,7 @@ For library authors distributing comparators as a JAR, the Java `ServiceLoader` 
 registration. Create a file named `META-INF/services/de.sayayi.lib.message.formatter.parameter.ParameterFormatter` in 
 the resources directory and list the fully qualified class names:
 
-```
+```text title="META-INF/services/de.sayayi.lib.message.formatter.parameter.ParameterFormatter"
 com.example.formatter.HttpStatusFormatter
 com.example.formatter.CountryMapKeyComparator
 ```

@@ -76,21 +76,28 @@ are parsed as template format strings.
 
 ```java
 var templateProps = new Properties();
-templateProps.setProperty("opt-detail", "%{detail,!empty:' (%{detail})'}");
+templateProps.setProperty("task-status",
+    "%{task}%{detail,!empty:' (%{detail})'}");
 adopter.adoptTemplates(templateProps);
 
 messageSupport
-    .message("Task completed%[opt-detail]")
+    .message("%[task-status] completed.")
+    .with("task", "Import")
     .with("detail", "3 warnings")
     .format();
-// "Task completed (3 warnings)"
+// "Import (3 warnings) completed."
 
 messageSupport
-    .message("Task completed%[opt-detail]")
+    .message("%[task-status] completed.")
+    .with("task", "Import")
     .with("detail", "")
     .format();
-// "Task completed"
+// "Import completed."
 ```
+
+The optional detail and its separating space are both written inside the template. A template that produced only the
+detail would lose its leading space, because the spacing around a template reference is determined by the
+referencing message (see [Templates](../../configuration/templates.md)).
 
 Because templates are shared across all messages, they are a natural way to enforce consistent formatting patterns 
 throughout an application. For example, a template can be defined that renders an optional suffix only when its
@@ -101,7 +108,7 @@ var templates = new Properties();
 templates.setProperty("user-label",
     "%{name,null:'unknown',!null:'%{name}'}");
 templates.setProperty("item-count",
-    "%{n,0:'no items',1:'1 item',:'%{n} items'}");
+    "%{n,format:choice,0:'no items',1:'1 item',:'%{n} items'}");
 adopter.adoptTemplates(templates);
 
 messageSupport
@@ -160,8 +167,9 @@ messageSupport
 ```
 
 The map can contain as many locales as needed. If only some property keys appear in a given locale, the adopter still
-registers whatever is available. Messages that exist for only one locale will simply not produce a result for the other 
-locales.
+registers whatever is available. A message that exists in only one locale is registered as a plain message and is
+used for every requested locale. A message that exists in several locales, but not in the requested one, falls back
+as described in [Messages](../../configuration/messages.md#messagelocaleaware).
 
 ```java
 var english = new Properties();
@@ -201,11 +209,13 @@ pluralization rules or different word order.
 ```java
 var english = new Properties();
 english.setProperty("item-summary",
-    "%{count,0:'no items',1:'1 item',:'%{count} items'}");
+    "%{count,format:choice,0:'no items',1:'1 item'," +
+    ":'%{count} items'}");
 
 var german = new Properties();
 german.setProperty("item-summary",
-    "%{count,0:'keine Einträge',1:'1 Eintrag',:'%{count} Einträge'}");
+    "%{count,format:choice,0:'keine Einträge',1:'1 Eintrag'," +
+    ":'%{count} Einträge'}");
 
 adopter.adopt(Map.of(
     Locale.ENGLISH, english,
@@ -232,3 +242,13 @@ messageSupport
     .format();
 // "7 Einträge"
 ```
+
+
+## Error Handling
+
+All three methods throw a `NullPointerException` if the `properties` argument is `null`. Every value is parsed
+immediately, so an invalid format string throws a `MessageParserException` that carries the message code and, for
+localized messages, the locale. A template name that is not kebab-case throws an `IllegalArgumentException`. Messages
+and templates that conflict with already registered ones throw a `DuplicateMessageException` or a
+`DuplicateTemplateException` (see [Exceptions](../../configuration/exceptions.md)). Entries processed before the
+failing one remain registered.

@@ -26,8 +26,31 @@ messageSupport
     .setDefaultConfig("list-sep-last", " and ");
 ```
 
-Calling `setDefaultConfig` with a key that already has a value simply overwrites the previous entry. Configuration keys 
-must be kebab-case: lowercase letters and digits separated by single hyphens, such as `clip-suffix` or `list-sep-last`.
+Calling `setDefaultConfig` with a key that already has a value simply overwrites the previous entry. A `null` key
+throws a `NullPointerException` and a blank key an `IllegalArgumentException`. The key is not checked any further.
+Because configuration keys in format strings are always kebab-case (lowercase letters and digits separated by single
+hyphens, such as `clip-suffix` or `list-sep-last`), a default only takes effect if its key is written the same way.
+
+### Value Types
+
+Every configuration value has one of the four types. A formatter always asks for a value of a particular type, for
+example a number for `clip` or a string for `list-sep`. If the value found in the format string has a different type,
+it is treated as absent and the default configuration is consulted instead. If the default has the wrong type as well,
+the formatter applies its built-in default. In the following example the quoted `'20'` is a string, so the `clip`
+post formatter ignores it and uses the numeric default.
+
+```java
+messageSupport.setDefaultConfig("clip", 10);
+
+messageSupport
+    .message("%(clip,'%{text}',clip:'20')")
+    .with("text", "A sentence that is way too long")
+    .format();
+// "A sentenc…"
+```
+
+A string value is the one exception. Where a formatter asks for a message, a string value is accepted as well and is
+parsed as a message format string.
 
 
 ## Overriding at the Message Level
@@ -133,15 +156,25 @@ messageSupport
 ### Message-Typed Defaults
 
 The default configuration also accepts a parsed `Message.WithSpaces` value. This is useful when a formatter expects a 
-message as its configuration value, such as a custom suffix or prefix template. The message is parsed separately and 
-passed as a default:
+message as its configuration value. The [iterable](../formatter/parameter/typed/iterable.md) formatter, for example,
+formats every element with the message configured by `list-value`. The message is parsed separately and passed as a
+default:
 
 ```java
 var factory = messageSupport.getMessageAccessor().getMessageFactory();
 
-messageSupport.setDefaultConfig("clip-suffix-text",
-    factory.parseMessage("..."));
+messageSupport.setDefaultConfig("list-value",
+    factory.parseMessage("'%{value}'"));
+
+messageSupport
+    .message("Tags: %{tags}")
+    .with("tags", List.of("new", "sale"))
+    .format();
+// "Tags: 'new', 'sale'"
 ```
+
+A message is only used by keys whose formatter asks for a message. Keys that expect a string, such as
+`clip-suffix-text`, ignore a message-typed default.
 
 
 ## Default Locale

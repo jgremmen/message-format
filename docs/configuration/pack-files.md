@@ -11,12 +11,15 @@ The `exportMessages` method on `MessageSupport` writes all published messages an
 `OutputStream`.
 
 ```java
+messageSupport.addMessage("order.placed", "Order %{orderId} placed.");
+
 try(var out = new FileOutputStream("messages.mfp")) {
   messageSupport.exportMessages(out);
 }
+// messages.mfp contains the message "order.placed"
 ```
 
-The no-argument convenience overload enables compression and exports all messages. The full signature gives more 
+The single-argument convenience overload enables compression and exports all messages. The full signature gives more 
 control:
 
 ```java
@@ -26,19 +29,24 @@ void exportMessages(OutputStream stream, boolean compress,
     throws IOException
 ```
 
-- **compress** – when `true`, the output is wrapped in GZip compression. The binary format already uses extensive 
-  bit-packing, so compression may not reduce the size significantly for small message sets. For larger sets, enabling 
-  compression typically reduces the file size noticeably.
-- **messageCodeFilter** – an optional predicate that selects which message codes to include.
-  Pass `null` to export all messages.
-- **templateNameFilter** – an optional predicate that selects which template names to include.
-  Pass `null` to include all templates referenced by the selected messages. Only templates
-  that were created from parsed message format strings (i.e. `MessageTemplate` instances) can
-  be serialized; custom `AbstractNamedTemplate` implementations are excluded automatically since
-  they have no serializable message representation.
+When `compress` is `true`, the output is GZip compressed. The binary format already uses extensive bit-packing, so
+compression may not reduce the size significantly for small message sets. For larger sets, enabling compression
+typically reduces the file size noticeably.
+
+The optional `messageCodeFilter` selects which message codes to include, and `null` exports all messages. The optional
+`templateNameFilter` selects which of the referenced templates to include, and `null` includes all templates
+referenced by the selected messages. Only templates that were created from parsed message format strings, through
+`MessageFactory` or `MessageBuilder`, can be serialized. Custom `AbstractNamedTemplate` implementations are excluded
+automatically since they have no serializable message representation, so they must be registered again on the message
+support that imports the pack.
 
 Only the templates that are actually referenced by the exported messages are included in the pack file. Templates that
-exist in the message support but are not used by any selected message are omitted.
+exist in the message support but are not used by any selected message are omitted. The method takes a snapshot of the
+registered messages and templates, so registrations from other threads during the export do not affect the result.
+
+A pack file holds at most 65535 messages and 65535 templates. If the selection exceeds either limit, `exportMessages`
+throws an `IOException` and writes nothing to the stream. The stream passed to `exportMessages` is closed when the
+method returns.
 
 
 ## Importing Messages
@@ -50,28 +58,60 @@ messages and templates it contains to the message support instance.
 try(var in = new FileInputStream("messages.mfp")) {
   messageSupport.importMessages(in);
 }
+// all messages and templates from messages.mfp are registered
 ```
 
 The stream is closed automatically when the method returns, regardless of whether the import succeeded. Each message
 and template found in the pack file is added to the message support through the same mechanism as `addMessage` and
-`addTemplate`, so message filters and template filters apply as usual.
+`addTemplate`, so message filters and template filters apply as usual. A message or template that conflicts with an
+already registered one therefore throws a `DuplicateMessageException` or `DuplicateTemplateException`, and the entries
+read before the conflict remain registered. A stream that is not a valid pack file results in an `IOException`.
 
 For lower-level control over the imported entries, the static utility method `MessageUtil.importMessages` can be used 
-instead. It accepts a `Consumer<Message.WithCode>` for messages and a `BiConsumer<String,Template>` for templates,
-allowing each entry to be inspected or transformed before adding it.
+instead. It takes the `MessageFactory` used to create the messages, a `Consumer<Message.WithCode>` for messages and a
+`BiConsumer<String,Template>` for templates, allowing each entry to be inspected or transformed before adding it.
+Either consumer may be `null` to skip that kind of entry. The stream is closed when the method returns.
 
 ```java
-MessageUtil.importMessages(inputStream,
-    message -> System.out.println("Message: " + message.getCode()),
-    (name, template) -> System.out.println("Template: " + name));
+try(var inputStream = new FileInputStream("messages.mfp")) {
+  MessageUtil.importMessages(MessageFactory.getSharedInstance(),
+      inputStream,
+      message -> System.out.println("Message: " + message.getCode()),
+      (name, template) -> System.out.println("Template: " + name));
+}
+// prints one line per message and template in the pack file
 ```
 
 
 ## Pack File Format
 
 A pack file uses the magic bytes `%{msg}` and a version number to identify itself. The MIME type is 
-`application/x-message-format-pack`. The `MessageUtil.isMessageFormatPack(Path)` utility method can be used to check 
-whether a given file is a valid pack file.
+`application/x-message-format-pack`. Both are available as constants in `de.sayayi.lib.message.pack.PackConstants`.
+`PackConstants.MIME_TYPE` holds the MIME type and `PackConstants.PACK_CONFIG` the pack configuration with the magic
+bytes, the supported version range and compression support.
+
+/// note | Migration from 0.24
+`PackConstants` moved from `de.sayayi.lib.message` to the new package `de.sayayi.lib.message.pack`. Imports of the
+old class must be updated.
+///
+
+The library registers a `java.nio.file.spi.FileTypeDetector`, so `Files.probeContentType(Path)` reports the MIME type
+for pack files without further setup. In environments where this service is not active, for example because of class
+loader separation in plugin frameworks, the `MessageUtil.isMessageFormatPack(Path)` utility method probes the file
+content directly. It returns `false` for files that are not pack files and for files that cannot be read.
+
+```java
+Path pack = Path.of("messages.mfp");
+
+boolean isPack = MessageUtil.isMessageFormatPack(pack);
+// true for a file written by exportMessages
+
+String mimeType = Files.probeContentType(pack);
+// "application/x-message-format-pack;version=4;compress=true"
+```
+
+The MIME type reported by `Files.probeContentType(Path)` carries the pack version and the compression flag as
+parameters, so a check for a pack file compares the start of the string with `PackConstants.MIME_TYPE`.
 
 The binary format uses bit-packing techniques that produce a very compact representation of messages and templates, 
 including localized message variants, parameter configurations, map keys and template references.
@@ -87,8 +127,8 @@ Content inspection frameworks such as [Apache Tika](https://tika.apache.org/) ca
 bytes and report the `application/x-message-format-pack` MIME type. The library ships two detector classes in the 
 `de.sayayi.lib.message.pack` package that plug into Tika's detection pipeline. Which class applies depends on the Tika 
 version on the classpath. `PackTika3Detector` covers Apache Tika in the range `[1.19,4.0)`, and `PackTika4Detector` 
-covers Apache Tika in the range `[4.0,5.0)`. A third class, `PackTikaDetector`, remains as a deprecated alias for 
-`PackTika3Detector` and exists only for source compatibility with earlier releases.
+covers Apache Tika in the range `[4.0,5.0)`. A third class, `PackTikaDetector`, keeps the class name used by earlier
+releases and behaves like `PackTika3Detector`.
 
 Prior to version 0.25.0 the Tika 3 detector was registered automatically. That automatic registration has been removed.
 Tika discovers detectors through the `ServiceLoader` mechanism, so the appropriate detector must now be registered 
@@ -97,13 +137,13 @@ explicitly. This is done by adding the fully qualified class name to a service f
 
 For Apache Tika 3, the service file contains a single line:
 
-```
+```text title="META-INF/services/org.apache.tika.detect.Detector"
 de.sayayi.lib.message.pack.PackTika3Detector
 ```
 
 For Apache Tika 4, the same file references the Tika 4 detector instead:
 
-```
+```text title="META-INF/services/org.apache.tika.detect.Detector"
 de.sayayi.lib.message.pack.PackTika4Detector
 ```
 

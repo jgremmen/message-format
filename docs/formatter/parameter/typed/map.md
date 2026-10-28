@@ -56,7 +56,8 @@ messageSupport
 ```java
 messageSupport
     .message("%{map,map-kv:'%{key}: %{value}'}")
-    .with("map", Map.of("host", "localhost", "port", "8080"))
+    .with("map", new TreeMap<>(
+        Map.of("host", "localhost", "port", "8080")))
     .format();
 // "host: localhost, port: 8080"
 ```

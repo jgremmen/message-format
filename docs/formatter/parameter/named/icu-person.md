@@ -8,7 +8,7 @@ toc_depth: 2
 This formatter is **not** included in the core library. It is part of the `message-format-icu` module and must be
 added as a dependency to use.
 
-```
+```text
 de.sayayi.lib:message-format-icu:0.25.0
 ```
 ///
@@ -396,16 +396,20 @@ messageSupport.addTemplate("name-full", factory.parseTemplate(
     "%{unused,format:icu-person}"));
 
 messageSupport.addTemplate("name-citation", factory.parseTemplate(
-    "%{unused,format:icu-person,order:sorting,given-format:initial,middle-format:initial}"));
+    "%{unused,format:icu-person,order:sorting,given-format:initial," +
+    "middle-format:initial}"));
 
 messageSupport.addTemplate("name-informal", factory.parseTemplate(
-    "%{unused,format:icu-person,family-format:none,prefix-format:none,suffix-format:none}"));
+    "%{unused,format:icu-person,family-format:none,prefix-format:none," +
+    "suffix-format:none}"));
 
 messageSupport.addTemplate("name-formal", factory.parseTemplate(
-    "%{unused,format:icu-person,middle-format:full,prefix-format:full,suffix-format:full}"));
+    "%{unused,format:icu-person,middle-format:full,prefix-format:full," +
+    "suffix-format:full}"));
 
 messageSupport.addTemplate("name-family-only", factory.parseTemplate(
-    "%{unused,format:icu-person,given-format:none,middle-format:none,prefix-format:none,suffix-format:none}"));
+    "%{unused,format:icu-person,given-format:none,middle-format:none," +
+    "prefix-format:none,suffix-format:none}"));
 ```
 
 ### Using Templates in Messages
@@ -464,7 +468,7 @@ messageSupport
     .with("family-name", "Doe")
     .with("suffix", "Ph.D.")
     .format();
-// "Dr. Jane Marie Doe Ph.D. (see also: Doe, J. M.)"
+// "Dr. Jane Marie Doe Ph.D. (see also: Doe, Dr. J. M. Ph.D.)"
 ```
 
 ### Parameter Delegation
@@ -532,7 +536,9 @@ If no `null` map key is defined and both required name parts are missing, the fo
 ## Registration
 
 When using `DefaultFormatterService`, the `ICUPersonFormatter` is registered automatically via the Java `ServiceLoader`
-mechanism. Having the `message-format-icu` module on the classpath is sufficient.
+mechanism. Having the `message-format-icu` module on the class path is sufficient. On the module path the formatter is
+not discovered, because the module descriptor contains no `provides` clause (see [ICU](icu.md#registration)), so it
+must be registered manually as shown below.
 
 When using `GenericFormatterService`, the formatter must be registered manually:
 
@@ -543,13 +549,14 @@ formatterService.addFormatter(new ICUPersonFormatter());
 var messageSupport = MessageSupportFactory
     .create(formatterService)
     .setLocale(Locale.ENGLISH);
+// "icu-person" is available in addition to the string fallback formatter
 ```
 
 ### Dependency
 
 Add the `message-format-icu` module to the project alongside the core message format dependency.
 
-=== "Gradle (Groovy DSL)"
+=== "Gradle (Groovy)"
 
     ```groovy
     dependencies {
@@ -557,7 +564,7 @@ Add the `message-format-icu` module to the project alongside the core message fo
     }
     ```
 
-=== "Gradle (Kotlin DSL)"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     dependencies {

@@ -10,6 +10,41 @@ MVC validation messages, or custom service beans) can transparently benefit from
 formatting capabilities without any code changes on the consumer side.
 
 
+## Dependency
+
+The class is part of the `message-format-spring` module, which also contains the
+[SpEL formatter](../../formatter/parameter/named/spel.md). It requires Spring Framework 6.0.8 or later.
+
+=== "Gradle (Groovy)"
+
+    ```groovy
+    dependencies {
+      implementation 'de.sayayi.lib:message-format-spring:0.25.0'
+    }
+    ```
+
+=== "Gradle (Kotlin)"
+
+    ```kotlin
+    dependencies {
+      implementation("de.sayayi.lib:message-format-spring:0.25.0")
+    }
+    ```
+
+=== "Maven"
+
+    ```xml
+    <dependency>
+      <groupId>de.sayayi.lib</groupId>
+      <artifactId>message-format-spring</artifactId>
+      <version>0.25.0</version>
+    </dependency>
+    ```
+
+For JPMS-based projects, the module name is `de.sayayi.lib.message.spring`. It requires `de.sayayi.lib.message`,
+`spring.core` and `spring.context` transitively.
+
+
 ## Positional Argument Mapping
 
 The Spring `MessageSource` API passes arguments as a positional `Object[]` array rather than as named parameters. 
@@ -39,8 +74,7 @@ The simplest way to create the message source is to pass a `MessageSupport` inst
 default parameter prefix `p`.
 
 ```java
-MessageSupport messageSupport = MessageSupportFactory.create(
-    DefaultFormatterService.getSharedInstance());
+var messageSupport = MessageSupportFactory.createDefault();
 
 messageSupport.addMessage("greeting", "Hello %{p1}!");
 
@@ -54,7 +88,10 @@ messageSource.getMessage("greeting", new Object[] { "World" }, Locale.US);
 ### Custom Parameter Prefix
 
 If `p1`, `p2`, etc. are not descriptive enough or conflict with existing parameter names in the templates, a custom 
-prefix can be specified. The prefix must start with a letter and must not be blank.
+prefix can be specified. The prefix must start with a letter and must not be blank. In addition, the generated names
+must be valid parameter names (see [Syntax](../../message/syntax.md#parameters)). A prefix such as `Arg` or `my_arg`
+is accepted by the constructor, but formatting a message with arguments then throws an `IllegalArgumentException`,
+because `Arg1` and `my_arg1` are not valid parameter names.
 
 ```java
 MessageSupportMessageSource messageSource =
@@ -84,8 +121,8 @@ new MessageSupportMessageSource("1x", messageSupport);
 
 ## Parent Message Source Fallback
 
-Because `MessageSupportMessageSource` implements `HierarchicalMessageSource`, a parent configure a parent
-`MessageSource` that acts as a fallback. When a message code is not found in the backing `MessageSupport`, the adapter 
+Because `MessageSupportMessageSource` implements `HierarchicalMessageSource`, a parent `MessageSource` can be
+configured that acts as a fallback. When a message code is not found in the backing `MessageSupport`, the adapter 
 delegates to the parent before giving up.
 
 This is useful in applications where some messages are managed by the message format library while others come from 
@@ -127,6 +164,9 @@ messageSource.getMessage("unknown.code", null, "fallback text", Locale.US);
 The current parent can also be retrieved using `getParentMessageSource()`, which returns `null` if no parent has been 
 configured.
 
+A default message is returned as it is. It is not parsed as a message format string, so it cannot contain parameter
+references. A `null` locale formats the message in the default locale of the backing message support.
+
 
 ## MessageSourceResolvable Support
 
@@ -151,6 +191,14 @@ In this example, `error.specific` does not exist in `MessageSupport`, so the ada
 does exist and formats it with the provided argument. If none of the codes were found in `MessageSupport`, the adapter
 would consult the parent message source. If that also fails, the default message from the resolvable (`"An error 
 occurred"`) would be returned. If no default message is available either, a `NoSuchMessageException` is thrown.
+
+/// note | Arguments Are Not Resolved
+The arguments are passed to the message as they are. Unlike Spring's own `AbstractMessageSource`, the adapter does not
+resolve arguments that are themselves a `MessageSourceResolvable`. Spring's validation framework passes the field name
+as such an argument, so a message for a validation error receives the resolvable object as `p1` rather than the
+localized field name. Such arguments have to be resolved before they are passed, or the message must not refer to
+them.
+///
 
 
 ## Spring Bean Configuration

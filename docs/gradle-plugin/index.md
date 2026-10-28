@@ -15,21 +15,21 @@ message definitions in the codebase.
 Apply the plugin in the `build.gradle` file. Because the plugin requires compiled class files to scan, the project must
 also apply the `java` plugin (or a plugin that extends it, such as `java-library`):
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     plugins {
       id 'java'
-      id 'de.sayayi.plugin.gradle.message'
+      id 'de.sayayi.plugin.gradle.message' version '0.25.0'
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     plugins {
       java
-      id("de.sayayi.plugin.gradle.message")
+      id("de.sayayi.plugin.gradle.message") version "0.25.0"
     }
     ```
 
@@ -44,7 +44,7 @@ task specifics are covered on the [Pack Task](pack-task.md) page.
 The `messageFormatPack` task produces its output in the `<buildDir>/messageFormatPack/` directory. To include the 
 generated pack file in the application jar, add a `from` directive to the `jar` task:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     jar {
@@ -54,7 +54,7 @@ generated pack file in the application jar, add a `from` directive to the `jar` 
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     tasks.jar {
@@ -71,10 +71,10 @@ At runtime, the pack file can then be loaded from the classpath. The default fil
 (e.g. a project named `my-app` produces `my-app.mfp`):
 
 ```java
-var messageSupport = MessageSupportFactory.create(
-    DefaultFormatterService.getSharedInstance());
+var messageSupport = MessageSupportFactory.createDefault();
 
-try(var in = getClass().getResourceAsStream("/META-INF/my-app.mfp")) {
+try(var in = ShopMessages.class
+    .getResourceAsStream("/META-INF/my-app.mfp")) {
   messageSupport.importMessages(in);
 }
 // All messages and templates from the pack file are now available.
@@ -89,18 +89,23 @@ class with a few message definitions:
 ```java
 @MessageDef(code = "greeting", text = "Hello %{name}!")
 @MessageDef(code = "item-count",
-    text = "%{count,0:'No items',1:'1 item',:'%{count} items'} in stock.")
+    text = "%{count,format:choice,0:'No items',1:'1 item'," +
+        ":'%{count} items'} in stock.")
 public class ShopMessages {}
 ```
 
 The build script applies the plugin and includes the pack file in the jar:
 
-=== "Groovy DSL"
+=== "Gradle (Groovy)"
 
     ```groovy
     plugins {
       id 'java'
-      id 'de.sayayi.plugin.gradle.message'
+      id 'de.sayayi.plugin.gradle.message' version '0.25.0'
+    }
+
+    dependencies {
+      implementation 'de.sayayi.lib:message-format-annotations:0.25.0'
     }
 
     jar {
@@ -110,12 +115,16 @@ The build script applies the plugin and includes the pack file in the jar:
     }
     ```
 
-=== "Kotlin DSL"
+=== "Gradle (Kotlin)"
 
     ```kotlin
     plugins {
       java
-      id("de.sayayi.plugin.gradle.message")
+      id("de.sayayi.plugin.gradle.message") version "0.25.0"
+    }
+
+    dependencies {
+      implementation("de.sayayi.lib:message-format-annotations:0.25.0")
     }
 
     tasks.jar {
@@ -125,14 +134,18 @@ The build script applies the plugin and includes the pack file in the jar:
     }
     ```
 
+The annotations have class retention, so they are not needed by the compiled classes at runtime. The dependency is
+still declared with `implementation` because the application needs the core `message-format` module at runtime,
+which `message-format-annotations` provides transitively.
+
 Running `./gradlew jar` compiles the source, scans the compiled classes for annotations, writes the pack file and
 bundles it into the jar. At runtime:
 
 ```java
-var messageSupport = MessageSupportFactory.create(
-    DefaultFormatterService.getSharedInstance());
+var messageSupport = MessageSupportFactory.createDefault();
 
-try(var in = getClass().getResourceAsStream("/META-INF/shop.mfp")) {
+try(var in = ShopMessages.class
+    .getResourceAsStream("/META-INF/shop.mfp")) {
   messageSupport.importMessages(in);
 }
 

@@ -10,7 +10,7 @@ The `url` configuration key controls which component of the URL to display:
 | Value       | Output                                                                   |
 |-------------|--------------------------------------------------------------------------|
 | `external`  | Full external form of the URL (default when no config is set)            |
-| `authority` | Authority component (e.g. `host:8080`)                                   |
+| `authority` | Authority component including user info (e.g. `user@host:8080`)          |
 | `file`      | File component (path + query)                                            |
 | `host`      | Host name                                                                |
 | `path`      | Path component                                                           |
@@ -29,7 +29,9 @@ form.
 ```java
 messageSupport
     .message("%{u}")
-    .with("u", new URL("https://example.com:8443/api/v1?q=test#section"))
+    .with("u", URI
+        .create("https://example.com:8443/api/v1?q=test#section")
+        .toURL())
     .format();
 // "https://example.com:8443/api/v1?q=test#section"
 ```
@@ -40,7 +42,9 @@ messageSupport
 Each component can be extracted using the `url` configuration key.
 
 ```java
-URL url = new URL("https://user@example.com:8443/api/v1?q=test#section");
+URL url = URI
+    .create("https://user@example.com:8443/api/v1?q=test#section")
+    .toURL();
 
 messageSupport
     .message("%{u,url:protocol}")
@@ -88,7 +92,7 @@ messageSupport
     .message("%{u,url:authority}")
     .with("u", url)
     .format();
-// "example.com:8443"
+// "user@example.com:8443"
 
 messageSupport
     .message("%{u,url:user-info}")
@@ -106,13 +110,13 @@ is specified. For example, an `https` URL without a port returns `443`.
 ```java
 messageSupport
     .message("%{u,url:port}")
-    .with("u", new URL("https://example.com/"))
+    .with("u", URI.create("https://example.com/").toURL())
     .format();
 // "443"
 
 messageSupport
     .message("%{u,url:port}")
-    .with("u", new URL("http://example.com/"))
+    .with("u", URI.create("http://example.com/").toURL())
     .format();
 // "80"
 ```
@@ -125,7 +129,7 @@ The `protocol` component supports string map keys to override the output for spe
 ```java
 messageSupport
     .message("%{u,url:protocol,'https':'secure','http':'insecure'}")
-    .with("u", new URL("https://example.com"))
+    .with("u", URI.create("https://example.com").toURL())
     .format();
 // "secure"
 ```
@@ -135,7 +139,7 @@ The `port` component supports number map keys to override the output for specifi
 ```java
 messageSupport
     .message("%{u,url:port,443:'standard HTTPS',80:'standard HTTP'}")
-    .with("u", new URL("https://example.com/"))
+    .with("u", URI.create("https://example.com/").toURL())
     .format();
 // "standard HTTPS"
 ```

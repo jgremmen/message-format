@@ -91,6 +91,16 @@ messageSupport
 ```
 
 
+The locale is the one used for the current formatting call, as set with `locale(...)` on the message configurer, or
+the default locale of the message support if none was set.
+
+/// note | Migration from 0.24
+Up to version 0.24.0, post formatters always received the default locale of the message support, even if a different
+locale had been set on the message configurer. Messages formatted with an explicit locale may now produce different
+case conversions, for example for Turkish.
+///
+
+
 ## Configuration Reference
 
 | Key    | Type   | Default | Description                                               |

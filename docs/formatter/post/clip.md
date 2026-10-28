@@ -22,7 +22,9 @@ messageSupport
 The total length of the result, including the ellipsis, does not exceed the configured maximum. In the example above 
 the output is exactly 20 characters: 19 visible characters plus the ellipsis.
 
-If the text is shorter than or equal to the maximum length, it is returned unchanged.
+If the text is shorter than or equal to the maximum length, it is returned unchanged. Lengths are measured in Java
+`char` values (UTF-16 code units). A character outside the Basic Multilingual Plane, such as most emoji, counts as two,
+and clipping can split it.
 
 ```java
 messageSupport
@@ -62,8 +64,9 @@ messageSupport
 // "This…"
 ```
 
-The minimum scales with the suffix length. For a custom suffix of 3 characters, the minimum effective length is 7: at
-least 4 content characters plus the 3-character suffix.
+The minimum scales with the suffix length. The content keeps at least 4 characters, or one character more than the
+suffix if the suffix is longer than 3 characters. For a custom suffix of 3 characters, the minimum effective length is
+7: 4 content characters plus the 3-character suffix. For the 7-character suffix `" [more]"` it is 15.
 
 
 ## Trailing Whitespace
@@ -94,15 +97,20 @@ messageSupport
     .message("%(clip,'%{text}',clip:10,clip-suffix:false)")
     .with("text", "This is a very long text")
     .format();
-// "This is a "
+// "This is a"
 ```
+
+The clipped text `"This is a "` ends with a space, but the formatted message does not. Spaces at the start or end of
+a post formatter result are not kept, because the spacing between message parts is determined by the spaces around
+the `%(...)` reference in the message.
 
 
 ## Custom Suffix Text
 
 Instead of the default ellipsis character, a custom suffix string can be provided using the `clip-suffix-text` 
-configuration key. This replaces the ellipsis entirely. When a custom suffix is set, the `clip-suffix` key does not 
-need to be specified because providing a custom suffix text implicitly enables the suffix behavior.
+configuration key. This replaces the ellipsis entirely. Since the suffix is enabled by default, the `clip-suffix` key
+does not need to be specified. If `clip-suffix` is `false`, either in the message or in the default configuration,
+the custom suffix text is ignored and the text is hard-truncated.
 
 ```java
 messageSupport
@@ -205,6 +213,6 @@ messageSupport
 
 | Key                | Type    | Default | Description                                       |
 |--------------------|---------|---------|---------------------------------------------------|
-| `clip`             | number  |         | Maximum length of the output text                 |
+| `clip`             | number  | `0`     | Maximum length of the output text, `0` disables   |
 | `clip-suffix`      | boolean | `true`  | Whether to append a suffix when text is clipped   |
 | `clip-suffix-text` | string  | `…`     | Custom suffix text to use instead of the ellipsis |

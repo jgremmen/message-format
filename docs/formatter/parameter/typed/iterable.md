@@ -61,10 +61,13 @@ messageSupport
 ```java
 messageSupport
     .message("%{ids}")
-    .with("ids", Set.of(1, 2, 3))
+    .with("ids", new TreeSet<>(Set.of(3, 1, 2)))
     .format();
 // "1, 2, 3"
 ```
+
+Elements are formatted in iteration order. For a set without a defined order, such as the one returned by `Set.of`,
+the order of the elements in the output is therefore unpredictable.
 
 
 ## Configuration Keys

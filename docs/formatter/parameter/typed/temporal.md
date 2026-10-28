@@ -122,7 +122,11 @@ messageSupport
     .locale("en-GB")
     .format();
 // "Thursday, 17 August 1972, 02:40:23 Central European Standard Time"
+// (system time zone Europe/Berlin)
 ```
+
+The `long` and `full` styles include a time zone name. For a value without a zone, such as a `LocalDateTime`, the
+system default time zone is used, as described in [Time Zones](#time-zones).
 
 The `date` and `time` styles extract only one portion:
 
@@ -205,6 +209,37 @@ messageSupport
 // ""
 ```
 
+### Time Zones
+
+A value that carries a zone or offset, such as a `ZonedDateTime` or an `OffsetDateTime`, is formatted in that zone.
+A value without a zone, such as a `LocalDateTime`, and an `Instant` are formatted in the system default time zone
+(`ZoneId.systemDefault()`). For an `Instant`, this determines which local date and time is printed, so the output of
+the same instant differs between servers with different time zone settings. To format an instant for a particular
+zone, convert it before passing it to the message, for example with `instant.atZone(zone)`.
+
+```java
+var instant = Instant.parse("2024-03-01T23:30:00Z");
+
+messageSupport
+    .message("%{ts,date:short}")
+    .with("ts", instant.atZone(ZoneId.of("America/New_York")))
+    .locale(Locale.US)
+    .format();
+// "3/1/24, 6:30 PM"
+
+messageSupport
+    .message("%{ts,date:short}")
+    .with("ts", instant.atZone(ZoneId.of("Asia/Tokyo")))
+    .locale(Locale.US)
+    .format();
+// "3/2/24, 8:30 AM"
+```
+
+/// note | Migration from 0.24
+Up to version 0.24.0, every value was formatted in the system default time zone, even a `ZonedDateTime` or an
+`OffsetDateTime` with a different zone. Such values are now formatted in their own zone.
+///
+
 ### Null Handling
 
 A `null` parameter value produces an empty string by default. A `null` map key can be provided to handle this case
@@ -235,7 +270,9 @@ The `date` configuration key and all predefined styles and custom patterns work 
 `TemporalFormatter`, since it is the temporal formatter that ultimately produces the output.
 
 ```java
-Date legacyDate = new Date(124, Calendar.NOVEMBER, 9);  // 2024-11-09
+Date legacyDate = Date.from(LocalDate.of(2024, 11, 9)
+    .atStartOfDay(ZoneId.systemDefault())
+    .toInstant());
 
 messageSupport
     .message("%{d,date:medium}")
@@ -244,6 +281,8 @@ messageSupport
     .format();
 // "09.11.2024, 00:00:00"
 ```
+
+The converted `Instant` has no time zone, so it is formatted in the system default time zone like any other instant.
 
 ```java
 java.sql.Date sqlDate = java.sql.Date.valueOf("2024-11-09");
