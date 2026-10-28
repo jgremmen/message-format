@@ -174,6 +174,29 @@ final class GeoFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Formats non-finite values as empty text")
+  void testNonFiniteValues()
+  {
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new GeoFormatter()))
+        .setLocale(ENGLISH);
+
+    for(var value: new Object[] { Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Float.NaN })
+    {
+      assertEquals("", messageSupport
+          .message("%{lat,geo:latitude}")
+          .with("lat", value)
+          .format());
+
+      assertEquals("unknown", messageSupport
+          .message("%{lat,geo:'dM LA',empty:'unknown'}")
+          .with("lat", value)
+          .format());
+    }
+  }
+
+
+  @Test
   @DisplayName("Rejects an invalid custom format pattern")
   void testInvalidFormatPattern()
   {

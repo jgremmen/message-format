@@ -29,7 +29,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static java.lang.Double.isFinite;
 import static java.lang.Math.round;
 
 
@@ -67,6 +69,9 @@ import static java.lang.Math.round;
  * <p>
  * The compass direction labels can be customized using the configuration keys {@code geo-n}, {@code geo-s},
  * {@code geo-e} and {@code geo-w}, defaulting to {@code N}, {@code S}, {@code E} and {@code W} respectively.
+ * <p>
+ * Values that are not finite ({@code NaN}, positive or negative infinity) have no coordinate representation and are
+ * formatted as empty text, so the {@code empty} map key applies to them.
  *
  * @author Jeroen Gremmen
  * @since 0.3.1
@@ -120,9 +125,11 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   /**
    * {@inheritDoc}
    * <p>
-   * Formats the coordinate in degrees, minutes and seconds. The {@code geo} configuration selects a predefined
-   * format or a custom pattern, and the {@code geo-n}, {@code geo-s}, {@code geo-e} and {@code geo-w} configuration
-   * values customize the direction labels.
+   * Formats the coordinate in degrees, minutes and seconds. The {@code geo} configuration selects a predefined format
+   * or a custom pattern, and the {@code geo-n}, {@code geo-s}, {@code geo-e} and {@code geo-w} configuration values
+   * customize the direction labels.
+   * <p>
+   * Values that are {@code NaN} or infinite produce empty text.
    *
    * @param context  formatting context, not {@code null}
    * @param number   coordinate value in decimal degrees, not {@code null}
@@ -132,9 +139,13 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   @Override
   public @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Number number)
   {
-    final var fmt = getFormat(context);
-    final var s = new StringBuilder();
+    // NaN and infinity have no coordinate representation
     final var v = number.doubleValue();
+    if (!isFinite(v))
+      return emptyText();
+
+    final var s = new StringBuilder();
+    final var fmt = getFormat(context);
     final var dms = dmsSplitter(fmt, v);
 
     if (!fmt.hasLoLa() && v < 0.0 && (dms[0] > 0 || dms[1] > 0 || dms[2] > 0))

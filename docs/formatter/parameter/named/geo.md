@@ -166,3 +166,14 @@ messageSupport
     .format();
 // ""
 ```
+
+The values `NaN`, positive infinity and negative infinity have no coordinate representation. They are formatted as an
+empty string, so an `empty` map key can provide a replacement text.
+
+```java
+messageSupport
+    .message("Position: %{lat,geo:latitude,empty:'unknown'}")
+    .with("lat", Double.NaN)
+    .format();
+// "Position: unknown"
+```
