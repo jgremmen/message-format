@@ -32,6 +32,12 @@ import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
  * <pre>
  * de.sayayi.lib.message.pack.PackTika3Detector
  * </pre>
+ * Register this detector only if the application uses Apache Tika in the version range {@code [1.19,4.0)}, and never
+ * together with {@code PackTika4Detector} or {@code PackTikaDetector}. The {@code Detector} interface differs between
+ * Tika 3 and Tika 4, so a detector for the other major version is loaded by Tika but fails with an {@link
+ * AbstractMethodError} as soon as it is invoked. The service file therefore belongs to the application that controls
+ * the Tika version.
+ * <p>
  * With the detector on the classpath, Tika picks it up automatically:
  * <pre>
  * Tika tika = new Tika();

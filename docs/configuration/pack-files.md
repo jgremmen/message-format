@@ -152,9 +152,27 @@ Once the service file is present, detection works through the standard Tika API 
 ```java
 Tika tika = new Tika();
 
-// detects "application/x-message-format-pack" for a pack file
 String mimeType = tika.detect(new File("messages.mfp"));
+// "application/x-message-format-pack; compress=true; version=4"
 ```
+
+/// warning | Register Exactly One Detector
+The detector must match the major version of Apache Tika that the application actually uses, and only one of the
+detectors may be registered. The service file is read by Tika itself, so the library cannot pick the right detector
+automatically. Because the `Detector` interface changed between Tika 3 and Tika 4, a detector for the other version
+still loads without an error, but it does not implement the methods Tika calls. Under Tika 4, `PackTika3Detector` and
+`PackTikaDetector` make every call of `Tika.detect` fail with an `AbstractMethodError`, not only the calls for pack
+files. The same applies when both detectors are listed in the service file.
+
+For this reason, the service file belongs to the application, which controls the Tika version. A reusable library
+should not ship it, because it cannot know which Tika version its users choose. When the Tika dependency is upgraded
+from version 3 to version 4, the service file must be changed at the same time.
+///
+
+The detectors are meant for use on the class path. The module `de.sayayi.lib.message` neither requires Apache Tika nor
+declares a detector with `provides`, and a `provides` clause in an application module cannot name a class of another
+module. A modular application therefore registers the detector through a `META-INF/services` file on the class path,
+together with Tika.
 
 Applications that only need a direct check, without a full Tika integration, can use the 
 `MessageUtil.isMessageFormatPack(Path)` utility method described in the previous section instead.
