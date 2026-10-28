@@ -15,6 +15,8 @@
  */
 package de.sayayi.lib.message;
 
+import de.sayayi.lib.message.exception.DuplicateMessageException;
+import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
@@ -29,6 +31,7 @@ import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntConsumer;
 
 import static de.sayayi.lib.message.MessageSupportFactory.createGeneric;
 import static java.util.Locale.GERMANY;
@@ -193,6 +196,82 @@ final class MessageSupportConcurrencyTest
   }
 
 
+  @RepeatedTest(3)
+  @Timeout(value = 10, unit = SECONDS)
+  @DisplayName("Concurrent registration of different messages with the same code adds exactly one")
+  void concurrentDuplicateMessageRegistration() throws InterruptedException
+  {
+    val support = createGeneric();
+    val threadCount = 8;
+
+    // slow filter which reads through the accessor, widening the window between check and put
+    support.setMessageFilter(message -> {
+      if (support.getMessageAccessor().hasMessageWithCode(message.getCode()))
+        throw new DuplicateMessageException(message.getCode(), "duplicate");
+
+      sleep();
+      return true;
+    });
+
+    val results = runConcurrently(threadCount, idx -> support.addMessage("MSG", "text " + idx));
+
+    assertEquals(1, results.added);
+    assertEquals(threadCount - 1, results.duplicates);
+    assertEquals(0, results.errors);
+  }
+
+
+  @RepeatedTest(3)
+  @Timeout(value = 10, unit = SECONDS)
+  @DisplayName("Concurrent registration of different templates with the same name adds exactly one")
+  void concurrentDuplicateTemplateRegistration() throws InterruptedException
+  {
+    val support = createGeneric();
+    val messageFactory = support.getMessageAccessor().getMessageFactory();
+    val threadCount = 8;
+
+    // slow filter which reads through the accessor, widening the window between check and put
+    support.setTemplateFilter((name, template) -> {
+      if (support.getMessageAccessor().hasTemplateWithName(name))
+        throw new DuplicateTemplateException(name, "duplicate");
+
+      sleep();
+      return true;
+    });
+
+    val results = runConcurrently(threadCount,
+        idx -> support.addTemplate("tpl", messageFactory.parseTemplate("template " + idx)));
+
+    assertEquals(1, results.added);
+    assertEquals(threadCount - 1, results.duplicates);
+    assertEquals(0, results.errors);
+  }
+
+
+  @RepeatedTest(3)
+  @Timeout(value = 10, unit = SECONDS)
+  @DisplayName("Concurrent registration with default filters detects all duplicates")
+  void concurrentDuplicateRegistrationDefaultFilters() throws InterruptedException
+  {
+    val support = createGeneric();
+    val messageFactory = support.getMessageAccessor().getMessageFactory();
+    val threadCount = 16;
+
+    val messageResults = runConcurrently(threadCount, idx -> support.addMessage("MSG", "text " + idx));
+
+    assertEquals(1, messageResults.added);
+    assertEquals(threadCount - 1, messageResults.duplicates);
+    assertEquals(0, messageResults.errors);
+
+    val templateResults = runConcurrently(threadCount,
+        idx -> support.addTemplate("tpl", messageFactory.parseTemplate("template " + idx)));
+
+    assertEquals(1, templateResults.added);
+    assertEquals(threadCount - 1, templateResults.duplicates);
+    assertEquals(0, templateResults.errors);
+  }
+
+
   @Test
   @Timeout(value = 5, unit = SECONDS)
   @DisplayName("Missing-template predicates can update the support")
@@ -331,4 +410,52 @@ final class MessageSupportConcurrencyTest
 
     assertEquals(0, errors.get(), "Stress test produced errors");
   }
+
+
+  private static @NotNull RegistrationResults runConcurrently(int threadCount, @NotNull IntConsumer registration)
+      throws InterruptedException
+  {
+    val latch = new CountDownLatch(1);
+    val added = new AtomicInteger(0);
+    val duplicates = new AtomicInteger(0);
+    val errors = new AtomicInteger(0);
+    val threads = new Thread[threadCount];
+
+    for(var i = 0; i < threadCount; i++)
+    {
+      final var idx = i;
+
+      (threads[i] = new Thread(() -> {
+        try {
+          latch.await();
+          registration.accept(idx);
+          added.incrementAndGet();
+        } catch(DuplicateMessageException | DuplicateTemplateException ex) {
+          duplicates.incrementAndGet();
+        } catch(Exception ex) {
+          errors.incrementAndGet();
+        }
+      })).start();
+    }
+
+    latch.countDown();
+
+    for(var thread: threads)
+      thread.join(5000);
+
+    return new RegistrationResults(added.get(), duplicates.get(), errors.get());
+  }
+
+
+  private static void sleep()
+  {
+    try {
+      Thread.sleep(20);
+    } catch(InterruptedException ex) {
+      Thread.currentThread().interrupt();
+    }
+  }
+
+
+  private record RegistrationResults(int added, int duplicates, int errors) {}
 }

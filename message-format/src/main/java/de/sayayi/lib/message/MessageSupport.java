@@ -745,6 +745,11 @@ public interface MessageSupport
      * message is added to the message support. If the filter returns {@code false} the message is not added to the
      * message support.
      * <p>
+     * The filter is invoked while this message support holds its write lock, so checking for an existing message and
+     * adding the new one is atomic. The filter may read from this message support (e.g. through its
+     * {@link MessageSupport#getMessageAccessor() message accessor}), but it should return quickly and must not wait for
+     * other threads that access this message support, as this would deadlock.
+     * <p>
      * Exceptions thrown by the message filter are relayed to the caller.
      *
      * @param messageFilter  message filter, not {@code null}
@@ -765,6 +770,11 @@ public interface MessageSupport
      * On adding a template the template filter is invoked with the template name and template message. If the filter
      * returns {@code true} the template is added to the message support. If the filter returns {@code false} the
      * template is not added to the message support.
+     * <p>
+     * The filter is invoked while this message support holds its write lock, so checking for an existing template and
+     * adding the new one is atomic. The filter may read from this message support (e.g. through its
+     * {@link MessageSupport#getMessageAccessor() message accessor}), but it should return quickly and must not wait
+     * for other threads that access this message support, as this would deadlock.
      * <p>
      * Exceptions thrown by the template filter are relayed to the caller.
      *

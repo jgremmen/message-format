@@ -256,14 +256,12 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   {
     requireNonNull(message, "message must not be null");
 
-    if (messageFilter.filter(message))
-    {
-      lock.writeLock().lock();
-      try {
+    lock.writeLock().lock();
+    try {
+      if (messageFilter.filter(message))
         messages.put(message.getCode(), message);
-      } finally {
-        lock.writeLock().unlock();
-      }
+    } finally {
+      lock.writeLock().unlock();
     }
 
     return this;
@@ -279,22 +277,17 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
 
     requireNonNull(template);
 
-    if (templateFilter.filter(name, template))
-    {
-      lock.readLock().lock();
-      try {
+    lock.writeLock().lock();
+    try {
+      if (templateFilter.filter(name, template))
+      {
         if (templates.containsKey(name) && !templates.get(name).isSame(template))
           throw new DuplicateTemplateException(name, "template with name '" + name + "' already exists");
-      } finally {
-        lock.readLock().unlock();
-      }
 
-      lock.writeLock().lock();
-      try {
         templates.put(name, template);
-      } finally {
-        lock.writeLock().unlock();
       }
+    } finally {
+      lock.writeLock().unlock();
     }
 
     return this;
