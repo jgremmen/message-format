@@ -256,7 +256,7 @@ fragment PostFormatStart
         ;
 
 fragment CtrlChar
-        : [\u0000-\u001f]
+        : [\u0000-\u001f\u007f-\u009f]  // C0 and C1 controls
         ;
 
 fragment Name
@@ -265,7 +265,9 @@ fragment Name
 
 fragment NameChar
         : NameStartChar
-        | [\p{N}]  // Unicode N (number)
+        | [\p{N}]         // Unicode N (number)
+        | [\p{M}]         // Unicode M (combining mark)
+        | [\u200c\u200d]  // zero width non-joiner/joiner
         ;
 
 fragment NameStartChar
@@ -283,6 +285,9 @@ fragment Character
         | [\p{N}]    // Unicode N (number)
         | [\p{P}]    // Unicode P (punctuation)
         | [\p{S}]    // Unicode S (symbol)
+        | [\p{M}]    // Unicode M (combining mark)
+        | [\p{Cf}]   // Unicode Cf (format)
+        | [\p{Co}]   // Unicode Co (private use)
         ;
 
 fragment EscapeSequence

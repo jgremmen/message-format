@@ -411,11 +411,11 @@ public final class MessageUtil
    * <ul>
    *   <li> It must not be empty.
    *   <li> It must start with a Unicode letter (category {@code \p{L}}).
-   *   <li> After the first letter, it may contain zero or more Unicode letters or numbers
-   *        (categories {@code \p{L}} or {@code \p{N}}).
-   *   <li> Optionally followed by one or more groups, each consisting of a single underscore
-   *        ({@code '_'}) or hyphen ({@code '-'}) followed by one or more Unicode letters or
-   *        numbers.
+   *   <li> After the first letter, it may contain zero or more name characters: Unicode letters, numbers or combining
+   *        marks (categories {@code \p{L}}, {@code \p{N}} or {@code \p{M}}), zero width non-joiner (U+200C) or zero
+   *        width joiner (U+200D).
+   *   <li> Optionally followed by one or more groups, each consisting of a single underscore ({@code '_'}) or hyphen
+   *        ({@code '-'}) followed by one or more name characters.
    * </ul>
    *
    * @param name  the name to check, not {@code null}
@@ -436,7 +436,7 @@ public final class MessageUtil
 
     var idx = charCount(cp);
 
-    // Zero or more NameChar: Unicode letter (\p{L}) or Unicode number (\p{N})
+    // Zero or more NameChar: Unicode letter (\p{L}), number (\p{N}), combining mark (\p{M}) or ZWNJ/ZWJ
     while(idx < length && isNameChar(cp = name.codePointAt(idx)))
       idx += charCount(cp);
 
@@ -463,8 +463,14 @@ public final class MessageUtil
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   private static boolean isNameChar(int cp)
   {
-    final var type = getType(cp);
-    return isLetter(cp) || type == DECIMAL_DIGIT_NUMBER || type == LETTER_NUMBER || type == OTHER_NUMBER;
+    if (isLetter(cp) || cp == '\u200c' || cp == '\u200d')
+      return true;
+
+    return switch(getType(cp)) {
+      case DECIMAL_DIGIT_NUMBER, LETTER_NUMBER, OTHER_NUMBER, NON_SPACING_MARK, COMBINING_SPACING_MARK,
+           ENCLOSING_MARK -> true;
+      default -> false;
+    };
   }
 
 

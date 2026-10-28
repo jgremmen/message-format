@@ -109,6 +109,73 @@ final class MessageCompilerTest
 
 
   @Test
+  @DisplayName("Text with combining marks, format and private use characters")
+  void testTextCombiningMarksAndFormatCharacters()
+  {
+    // NFD-normalised Latin
+    assertArrayEquals(
+        new MessagePart[] { noSpaceText("Cafe\u0301") },
+        COMPILER.compileMessage("Cafe\u0301").getMessageParts());
+
+    // Indic scripts (virama U+094D, vowel sign U+093E)
+    assertArrayEquals(
+        new MessagePart[] { noSpaceText("नमस्ते दुनिया") },
+        COMPILER.compileMessage("नमस्ते दुनिया").getMessageParts());
+
+    // Thai and Arabic with harakat
+    assertArrayEquals(
+        new MessagePart[] { noSpaceText("สวัสดี مَرْحَبًا") },
+        COMPILER.compileMessage("สวัสดี مَرْحَبًا").getMessageParts());
+
+    // Emoji with variation selector and ZWJ sequence
+    assertArrayEquals(
+        new MessagePart[] { noSpaceText("\u2764\ufe0f \ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67") },
+        COMPILER.compileMessage("\u2764\ufe0f \ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67").getMessageParts());
+
+    // ZWNJ, bidi marks and private use characters
+    assertArrayEquals(
+        new MessagePart[] { noSpaceText("می\u200cخواهم \u200ea\u200f \ue000") },
+        COMPILER.compileMessage("می\u200cخواهم \u200ea\u200f \ue000").getMessageParts());
+
+    // Combining mark following a parameter
+    final var parts = COMPILER.compileMessage("%{p}\u0301").getMessageParts();
+    assertEquals(2, parts.length);
+    assertEquals(noSpaceText("\u0301"), parts[1]);
+  }
+
+
+  @Test
+  @DisplayName("Text with C1 control characters")
+  void testTextC1ControlCharacters()
+  {
+    assertArrayEquals(
+        new MessagePart[] { noSpaceText("ab") },
+        COMPILER.compileMessage("a\u007f\u0085\u009fb").getMessageParts());
+
+    assertArrayEquals(
+        new MessagePart[] { new ParameterPart("p", false, false) },
+        COMPILER.compileMessage("%{\u0085p\u009f}").getMessageParts());
+  }
+
+
+  @Test
+  @DisplayName("Unquoted values with combining marks and joiners")
+  void testUnquotedValueCombiningMarks()
+  {
+    for(var value: new String[] { "नमस्ते", "cafe\u0301-au-lait", "می\u200cخواهم" })
+    {
+      assertArrayEquals(
+          new MessagePart[] {
+              new ParameterPart("p", new MessagePartConfig(Map.of("default", new TypedValueString(MESSAGE_FACTORY, value))), EMPTY_MAP)
+          },
+          COMPILER.compileMessage("%{ p, default:" + value + " }").getMessageParts());
+    }
+
+    assertThrows(MessageParserException.class, () -> COMPILER.compileMessage("%{ p, default:a\u200eb }"));
+  }
+
+
+  @Test
   @DisplayName("Parameter with name only")
   void testParameterWithNameOnly()
   {

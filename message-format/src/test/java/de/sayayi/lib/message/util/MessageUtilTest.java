@@ -389,6 +389,50 @@ final class MessageUtilTest
   }
 
 
+  @Test
+  @DisplayName("valid names")
+  void testIsNameValid()
+  {
+    assertTrue(isName("a"));
+    assertTrue(isName("name"));
+    assertTrue(isName("test-id"));
+    assertTrue(isName("snake_case_2"));
+    assertTrue(isName("ä1"));
+
+    // Combining marks
+    assertTrue(isName("नाम"));
+    assertTrue(isName("cafe\u0301"));
+    assertTrue(isName("a-\u0301"));
+
+    // Zero width non-joiner/joiner
+    assertTrue(isName("می\u200cخواهم"));
+    assertTrue(isName("a\u200db"));
+  }
+
+
+  @Test
+  @DisplayName("invalid names")
+  void testIsNameInvalid()
+  {
+    assertFalse(isName(""));
+    assertFalse(isName("1a"));
+    assertFalse(isName("-a"));
+    assertFalse(isName("a-"));
+    assertFalse(isName("a--b"));
+    assertFalse(isName("a b"));
+    assertFalse(isName("a.b"));
+
+    // Combining mark or joiner must not start a name
+    assertFalse(isName("\u0301a"));
+    assertFalse(isName("\u200da"));
+
+    // Other format characters are not allowed
+    assertFalse(isName("a\u200eb"));
+    assertFalse(isName("a\u202eb"));
+    assertFalse(isName("a\u00adb"));
+  }
+
+
 
 
   @Nested

@@ -23,8 +23,9 @@ messageSupport.message("Hello World!").format();
 // "Hello World!"
 ```
 
-Text may contain Unicode letters, numbers, punctuation and symbols. Multiple consecutive whitespace characters are 
-collapsed into a single space. Control characters (U+0000 through U+001F) are silently ignored by the parser.
+Text may contain Unicode letters, numbers, punctuation, symbols, combining marks, format characters (such as the zero 
+width joiner) and private use characters. Multiple consecutive whitespace characters are collapsed into a single space. 
+Control characters (U+0000 through U+001F and U+007F through U+009F) are silently ignored by the parser.
 
 ### Escape Sequences
 
