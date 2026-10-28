@@ -43,11 +43,12 @@ import java.util.List;
  */
 public abstract class MessageFormatTemplatesExtension
 {
+  /** Regular expressions selecting the template names to ignore during template validation. */
   private final List<String> ignoreRegexFilter = new ArrayList<>();
 
 
   /**
-   * Return a list of regular expressions which will be matched against each template name. If it matches, the
+   * Returns a list of regular expressions which will be matched against each template name. If it matches, the
    * template will be ignored during validation of referenced templates.
    *
    * @return  list of regular expressions for template name filtering, never {@code null}
@@ -77,7 +78,7 @@ public abstract class MessageFormatTemplatesExtension
 
 
   /**
-   * Ignore templates whose name matches the given regular expressions during template validation.
+   * Ignores templates whose name matches the given regular expressions during template validation.
    *
    * @param regex  array of regular expressions matching template names, not {@code null}
    *

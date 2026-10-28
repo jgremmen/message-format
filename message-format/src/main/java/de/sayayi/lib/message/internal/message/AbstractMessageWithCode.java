@@ -58,12 +58,14 @@ public sealed abstract class AbstractMessageWithCode implements Message.WithCode
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public int hashCode() {
     return code.hashCode();
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean equals(Object o) {
     return o instanceof AbstractMessageWithCode && code.equals(((AbstractMessageWithCode)o).code);

@@ -30,14 +30,15 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * <p>
  * This formatter uses the {@code inet} configuration key to select which representation of the address to format:
  * <ul>
- *   <li>{@code ip} (default) &ndash; the IP address string</li>
- *   <li>{@code name} &ndash; the host name</li>
- *   <li>{@code fqdn} &ndash; the fully qualified domain name (canonical host name)</li>
+ *   <li>{@code ip} (default): the IP address string</li>
+ *   <li>{@code name}: the host name</li>
+ *   <li>{@code fqdn}: the fully qualified domain name (canonical host name)</li>
  * </ul>
  * <p>
  * If the configuration value does not match a known option, formatting is delegated to the next available formatter.
  *
  * @author Jeroen Gremmen
+ * @since 0.3.1
  */
 public final class InetAddressFormatter extends AbstractMultiSelectFormatter<InetAddress>
 {

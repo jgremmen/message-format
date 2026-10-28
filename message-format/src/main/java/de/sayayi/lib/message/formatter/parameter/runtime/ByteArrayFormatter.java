@@ -45,10 +45,10 @@ import static java.util.Base64.getMimeEncoder;
  * <p>
  * This formatter converts a byte array to a string representation based on the {@code bytes} configuration key:
  * <ul>
- *   <li>{@code base64} &ndash; encodes the bytes as a Base64 string</li>
- *   <li>{@code base64-lf} &ndash; encodes the bytes as a MIME Base64 string with line breaks</li>
- *   <li>A charset name (e.g. {@code UTF-8}) &ndash; decodes the bytes as a string using the given charset</li>
- *   <li>Empty or unsupported charset &ndash; decodes the bytes using the platform default charset</li>
+ *   <li>{@code base64}: encodes the bytes as a Base64 string</li>
+ *   <li>{@code base64-lf}: encodes the bytes as a MIME Base64 string with line breaks</li>
+ *   <li>A charset name (e.g. {@code UTF-8}): decodes the bytes as a string using the given charset</li>
+ *   <li>Empty or unsupported charset: decodes the bytes using the platform default charset</li>
  * </ul>
  * <p>
  * If the {@code bytes} configuration key is absent, formatting is delegated to the next available formatter
@@ -62,6 +62,7 @@ import static java.util.Base64.getMimeEncoder;
 public final class ByteArrayFormatter extends AbstractSingleTypeParameterFormatter<byte[]>
     implements SizeQueryable, MapKeyComparator<byte[]>
 {
+  /** Line separator used when encoding a byte array in base64 MIME format. */
   private static final byte[] LINE_SEPARATOR = new byte[] { '\n' };
 
 

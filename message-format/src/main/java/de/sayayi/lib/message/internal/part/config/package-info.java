@@ -16,6 +16,11 @@
 
 /**
  * Internal implementations for parameter configuration and configuration accessors used by message parts.
+ * <p>
+ * {@link de.sayayi.lib.message.internal.part.config.MessagePartConfig MessagePartConfig} holds the configuration of a
+ * parameter or post formatter part and
+ * {@link de.sayayi.lib.message.internal.part.config.BaseConfigAccessor BaseConfigAccessor} resolves configuration
+ * values, falling back to the default configuration of the message support.
  *
  * @author Jeroen Gremmen
  * @since 0.5.0

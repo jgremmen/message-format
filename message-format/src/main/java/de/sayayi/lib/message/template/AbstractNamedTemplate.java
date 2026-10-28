@@ -45,7 +45,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract non-sealed class AbstractNamedTemplate implements NamedTemplate
 {
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This implementation considers {@code template} the same if it is a named template with the same name.
+   */
   @Override
   public boolean isSame(@NotNull Template template)
   {
@@ -55,6 +59,7 @@ public abstract non-sealed class AbstractNamedTemplate implements NamedTemplate
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public String toString() {
     return "Template(" + getName() + ')';

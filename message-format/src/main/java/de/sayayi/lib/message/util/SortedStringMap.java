@@ -56,8 +56,13 @@ import static java.util.Objects.requireNonNull;
  */
 public final class SortedStringMap<V> extends AbstractMap<String,V> implements Cloneable
 {
+  /** Keys and values in sorted key order: index {@code 2n} holds a key and index {@code 2n + 1} its value. */
   private Object[] kv;
+
+  /** Number of entries in this map. */
   private int size;
+
+  /** {@code true} if this map has been sealed and can no longer be modified. */
   private boolean sealed;
 
 
@@ -476,6 +481,8 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
 
   /**
    * A {@link Set} view of the entries in the enclosing {@link SortedStringMap}, maintaining sorted key order.
+   *
+   * @since 0.24.0
    */
   private final class SortedEntrySet extends AbstractSet<Entry<String,V>>
   {
@@ -599,9 +606,12 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
    * A lightweight {@link java.util.Map.Entry} delegate that provides a direct view onto a specific entry in the
    * enclosing {@link SortedStringMap}. This delegate is only used for sealed maps, where the internal data cannot
    * change, making it safe to reference the backing array by position.
+   *
+   * @since 0.24.0
    */
   private final class EntryDelegate implements Entry<String,V>
   {
+    /** Offset of the entry key in the key/value array. */
     private final int offset;
 
 
@@ -672,12 +682,16 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
   /**
    * A {@link Spliterator} over the entries of the enclosing {@link SortedStringMap}, providing
    * ordered, sized and non-splitting traversal.
+   *
+   * @since 0.24.0
    */
   private final class EntrySpliterator implements Spliterator<Entry<String,V>>
   {
+    /** Index of the next entry to return. */
     int index = 0;
 
 
+    /** Creates a new spliterator positioned at the first entry. */
     private EntrySpliterator() {
     }
 
@@ -733,12 +747,16 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
   /**
    * An {@link Iterator} over the entries of the enclosing {@link SortedStringMap}, traversing entries in sorted
    * key order.
+   *
+   * @since 0.24.0
    */
   private final class EntryIterator implements Iterator<Entry<String,V>>
   {
+    /** Index of the next entry to return. */
     int index = 0;
 
 
+    /** Creates a new iterator positioned at the first entry. */
     private EntryIterator() {
     }
 

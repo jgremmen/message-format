@@ -26,12 +26,12 @@ import org.jetbrains.annotations.NotNull;
  * This post formatter is identified by the name {@code case}. The target case is specified by the {@code case}
  * configuration key, which accepts the following values:
  * <ul>
- *   <li>{@code upper} or {@code uppercase} &ndash; converts the string to uppercase</li>
- *   <li>{@code lower} or {@code lowercase} &ndash; converts the string to lowercase</li>
+ *   <li>{@code upper} or {@code uppercase}: converts the string to uppercase</li>
+ *   <li>{@code lower} or {@code lowercase}: converts the string to lowercase</li>
  * </ul>
  * <p>
- * The case conversion is locale-aware, using the locale from the formatting context. If the configuration value is
- * not recognized, the string is returned unchanged.
+ * The case conversion is locale-aware, using the locale from the formatting context. If the configuration value is not
+ * recognized, the string is returned unchanged.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0

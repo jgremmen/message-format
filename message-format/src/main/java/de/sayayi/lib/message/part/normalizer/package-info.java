@@ -17,6 +17,11 @@
 /**
  * Message part normalizers for deduplicating and caching {@link de.sayayi.lib.message.part.MessagePart} instances
  * in order to reduce the overall memory footprint.
+ * <p>
+ * {@link de.sayayi.lib.message.part.normalizer.MessagePartNormalizer MessagePartNormalizer} defines the normalizer
+ * contract, including a pass-through implementation.
+ * {@link de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer LRUMessagePartNormalizer} creates normalizers
+ * backed by a bounded cache with least recently used eviction.
  *
  * @author Jeroen Gremmen
  * @since 0.6.0

@@ -22,8 +22,10 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
- * Duplicate message exception. This exception is thrown by the default message handler if a message with the same code
- * is published twice.
+ * Exception thrown when a message is published with a code that is already in use by a message with different content.
+ * It is thrown by the default {@linkplain ConfigurableMessageSupport#setMessageFilter(MessageFilter) message filter}
+ * and by adopters that detect conflicting message definitions. Publishing an identical message twice is not considered
+ * an error.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

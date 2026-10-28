@@ -53,11 +53,11 @@ import static java.lang.Math.signum;
  * <p>
  * The output format is controlled by the {@code number} configuration key, which accepts the following values:
  * <ul>
- *   <li>{@code integer} &ndash; formats the number as an integer</li>
- *   <li>{@code percent} &ndash; formats the number as a percentage</li>
- *   <li>{@code currency} &ndash; formats the number as a currency value</li>
- *   <li>{@code bool} &ndash; formats the number as a boolean (zero is {@code false}, non-zero is {@code true})</li>
- *   <li>A custom {@link DecimalFormat} pattern &ndash; formats the number using the given pattern</li>
+ *   <li>{@code integer}: formats the number as an integer</li>
+ *   <li>{@code percent}: formats the number as a percentage</li>
+ *   <li>{@code currency}: formats the number as a currency value</li>
+ *   <li>{@code bool}: formats the number as a boolean (zero is {@code false}, non-zero is {@code true})</li>
+ *   <li>A custom {@link DecimalFormat} pattern: formats the number using the given pattern</li>
  * </ul>
  * <p>
  * If the configuration key is absent, integer types are rendered using their plain {@code toString()} representation;
@@ -69,11 +69,13 @@ import static java.lang.Math.signum;
  * {@code string} keys (parsed numeric comparison).
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public final class NumberFormatter
     extends AbstractParameterFormatter<Number>
     implements MapKeyComparator<Number>
 {
+  /** Cache of decimal format symbols used for custom format patterns, keyed by locale. */
   private static final Map<Locale,DecimalFormatSymbols> FORMAT_SYMBOLS_CACHE = new ConcurrentHashMap<>();
 
 
@@ -127,6 +129,15 @@ public final class NumberFormatter
   }
 
 
+  /**
+   * Returns a number format for the given {@code format} and the locale of {@code parameters}.
+   *
+   * @param format      {@code integer}, {@code percent}, {@code currency}, a custom {@link DecimalFormat} pattern or
+   *                    {@code null} for the default number format
+   * @param parameters  parameters providing the locale, not {@code null}
+   *
+   * @return  number format, never {@code null}
+   */
   private @NotNull NumberFormat getFormatter(String format, Parameters parameters)
   {
     final var locale = parameters.getLocale();

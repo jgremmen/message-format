@@ -72,8 +72,10 @@ import static java.lang.Math.signum;
  */
 public final class BoolFormatter implements NamedParameterFormatter, MapKeyComparator<Object>
 {
+  /** Map key types used to look up a mapped message for a boolean value. */
   private static final Set<MapKey.Type> BOOL_KEY_TYPES = Set.of(EMPTY, NULL, BOOL, STRING);
 
+  /** Default texts for {@code false} (index 0) and {@code true} (index 1). */
   private static final Text[] BOOL_TEXT = new Text[] {
       noSpaceText("false"),
       noSpaceText("true")
@@ -92,6 +94,13 @@ public final class BoolFormatter implements NamedParameterFormatter, MapKeyCompa
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Adds the {@code bool} classifier.
+   *
+   * @return  always {@code true}
+   */
   @Override
   public boolean updateClassifiers(@NotNull ClassifierContext context, @NotNull Object value)
   {
@@ -149,6 +158,14 @@ public final class BoolFormatter implements NamedParameterFormatter, MapKeyCompa
   }
 
 
+  /**
+   * Formats a boolean value, using a mapped message if available or the default text otherwise.
+   *
+   * @param context  formatter context, not {@code null}
+   * @param bool     boolean value to format
+   *
+   * @return  formatted text, never {@code null}
+   */
   @Contract(pure = true)
   private @NotNull Text formatBool(@NotNull ParameterFormatterContext context, boolean bool)
   {
@@ -159,6 +176,14 @@ public final class BoolFormatter implements NamedParameterFormatter, MapKeyCompa
   }
 
 
+  /**
+   * Converts {@code value} into a boolean, unwrapping optionals and parsing numeric strings.
+   *
+   * @param value  value to convert, or {@code null}
+   *
+   * @return  optional containing the boolean value, or an empty optional if {@code value} cannot be converted, never
+   *          {@code null}
+   */
   @Contract(pure = true)
   private @NotNull Optional<Boolean> convertValueToBool(Object value)
   {
@@ -195,6 +220,13 @@ public final class BoolFormatter implements NamedParameterFormatter, MapKeyCompa
   }
 
 
+  /**
+   * Converts a number into a boolean: zero is {@code false}, any other value (including {@code NaN}) is {@code true}.
+   *
+   * @param number  number to convert, not {@code null}
+   *
+   * @return  optional containing the boolean value, never {@code null}
+   */
   private @NotNull Optional<Boolean> convertNumberToBool(@NotNull Number number)
   {
     if (number instanceof Byte || number instanceof Short ||

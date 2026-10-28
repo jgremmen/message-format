@@ -42,6 +42,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
  * An empty optional results in a mismatch for these key types.
  *
  * @author Jeroen Gremmen
+ * @since 0.4.2
  */
 public final class OptionalIntFormatter
     extends AbstractSingleTypeParameterFormatter<OptionalInt>

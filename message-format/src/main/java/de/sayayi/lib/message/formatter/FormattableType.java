@@ -154,6 +154,11 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
   }
 
 
+  /**
+   * Returns a hash code consistent with {@link #equals(Object)}, based on the type and the order.
+   *
+   * @return  hash code value for this formattable type
+   */
   @Override
   public int hashCode() {
     return type.hashCode() * 31 + order;

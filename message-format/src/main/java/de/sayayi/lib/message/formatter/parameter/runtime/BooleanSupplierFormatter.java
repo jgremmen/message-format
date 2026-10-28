@@ -32,12 +32,13 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.Class
 /**
  * Parameter formatter for {@link BooleanSupplier} values.
  * <p>
- * This formatter evaluates the supplier by calling {@link BooleanSupplier#getAsBoolean()} and delegates the
- * formatting of the resulting {@code boolean} value to the appropriate boolean formatter.
+ * This formatter evaluates the supplier by calling {@link BooleanSupplier#getAsBoolean()} and delegates the formatting
+ * of the resulting {@code boolean} value to the appropriate boolean formatter.
  * <p>
  * Map key comparison for {@code bool} and {@code string} keys is also based on the evaluated boolean value.
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public final class BooleanSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<BooleanSupplier>

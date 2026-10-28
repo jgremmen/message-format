@@ -22,6 +22,9 @@ import org.jetbrains.annotations.NotNull;
 /**
  * A normalizer for {@link MessagePart} instances. Implementations can be used to deduplicate or cache message parts
  * in order to reduce the overall memory footprint.
+ * <p>
+ * A normalizer is used by a {@link de.sayayi.lib.message.MessageFactory MessageFactory}, which may parse messages
+ * concurrently. Implementations must therefore be thread-safe.
  *
  * @author Jeroen Gremmen
  * @since 0.6.0
@@ -44,7 +47,7 @@ public interface MessagePartNormalizer
 
 
   /**
-   * Normalize the given message part. The returned part may be replaced with an identical cached version in order
+   * Normalizes the given message part. The returned part may be replaced with an identical cached version in order
    * to reduce the memory footprint.
    *
    * @param <T>   message part implementation type

@@ -16,6 +16,13 @@
 
 /**
  * Serialization and deserialization support for packing messages and templates into a compact binary format.
+ * <p>
+ * {@link de.sayayi.lib.message.internal.pack.PackSupport PackSupport} packs and unpacks messages, message parts, map
+ * keys and typed values. {@link de.sayayi.lib.message.internal.pack.PackFileTypeDetector PackFileTypeDetector} is a
+ * {@link java.nio.file.spi.FileTypeDetector FileTypeDetector} service recognizing pack files by their magic bytes.
+ * <p>
+ * <strong>This package is not part of the public API.</strong> Its classes are subject to change without notice and
+ * should not be referenced directly by application code.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

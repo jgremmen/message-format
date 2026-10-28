@@ -144,14 +144,14 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
    * registered {@link MultiSelectFunction} and applies it to the given value.
    * <p>
    * If the config key is absent from the parameter configuration, the {@code defaultConfigValueForAbsentKey} is used
-   * instead.  If no registered function matches the resolved config value, behavior depends on the
+   * instead. If no registered function matches the resolved config value, behavior depends on the
    * {@code delegateOnMismatch} flag:
    * <ul>
    *   <li>
-   *     {@code true} — delegates formatting to the {@linkplain ParameterFormatterContext#delegateToNextFormatter()
-   *     next formatter}
+   *     {@code true}: delegates formatting to the {@linkplain ParameterFormatterContext#delegateToNextFormatter() next
+   *     formatter}
    *   </li>
-   *   <li>{@code false} — calls {@link #formatMultiSelectMismatch(ParameterFormatterContext, Object)}</li>
+   *   <li>{@code false}: calls {@link #formatMultiSelectMismatch(ParameterFormatterContext, Object)}</li>
    * </ul>
    *
    * @param context  formatter context, not {@code null}
@@ -214,6 +214,8 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
    *
    * @see #register(String, MultiSelectFunction)
    * @see #register(String[], MultiSelectFunction)
+   *
+   * @since 0.12.0
    */
   @FunctionalInterface
   protected interface MultiSelectFunction<T>

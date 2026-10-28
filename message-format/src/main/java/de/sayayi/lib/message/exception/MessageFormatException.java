@@ -26,8 +26,11 @@ import static java.util.Locale.UK;
 
 
 /**
- * Exception providing detailed information about what went wrong during message/template
- * formatting.
+ * Exception providing detailed information about what went wrong during message or template formatting.
+ * <p>
+ * Besides the cause, the exception records the context in which the error occurred (message code, template name, locale
+ * and parameter name), as far as it is known. The context is typically added while the exception propagates through
+ * nested messages and templates, using the {@code with...} methods.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -48,7 +51,7 @@ public class MessageFormatException extends MessageException
 
 
   /**
-   * Constructs a new message exception with the specified cause.
+   * Constructs a new message format exception with the specified cause.
    * <p>
    * Note that the detail message associated with {@code cause} is <i>not</i>
    * incorporated in this runtime exception's detail message.
@@ -63,13 +66,14 @@ public class MessageFormatException extends MessageException
 
 
   /**
-   * All arguments constructor for internal use.
+   * Constructs a new message format exception with the given formatting context and cause. This constructor is
+   * intended for internal use.
    *
-   * @param code       message code
-   * @param template   template name
-   * @param locale     message locale
-   * @param parameter  message parameter name
-   * @param cause      cause
+   * @param code       message code, or {@code null}
+   * @param template   template name, or {@code null}
+   * @param locale     message locale, or {@code null}
+   * @param parameter  message parameter name, or {@code null}
+   * @param cause      the cause, or {@code null} if nonexistent or unknown
    */
   protected MessageFormatException(String code, String template, Locale locale, String parameter, Throwable cause)
   {
@@ -82,6 +86,14 @@ public class MessageFormatException extends MessageException
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The returned message describes which message, template, parameter and locale failed to format, as far as they are
+   * known. Generated message codes and template names are omitted.
+   *
+   * @return  detail message, never {@code null}
+   */
   @Override
   @SuppressWarnings("GrazieStyle")
   public String getMessage()
@@ -250,7 +262,8 @@ public class MessageFormatException extends MessageException
 
 
   /**
-   * Cast to or create a new MessageFormatException instance based of {@code ex}.
+   * Returns {@code ex} if it is a {@code MessageFormatException}, or a new {@code MessageFormatException} with
+   * {@code ex} as its cause otherwise.
    *
    * @param ex  exception, or {@code null}
    *

@@ -53,15 +53,15 @@ import static java.util.Optional.empty;
  * This interface also defines several sub-interfaces that extend the formatter's capabilities:
  * <ul>
  *   <li>
- *     {@link SizeQueryable} – allows a formatter to report the size (e.g. length or count) of a value, used by the
+ *     {@link SizeQueryable}: allows a formatter to report the size (e.g. length or count) of a value, used by the
  *     {@code size} named formatter.
  *   </li>
  *   <li>
- *     {@link MapKeyComparator} – enables a formatter to match parameter values against map keys
+ *     {@link MapKeyComparator}: enables a formatter to match parameter values against map keys
  *     (null, empty, bool, number, string) in the parameter configuration.
  *   </li>
  *   <li>
- *     {@link DefaultFormatter} – marks a formatter as the fallback for {@code Object}-typed values when no more
+ *     {@link DefaultFormatter}: marks a formatter as the fallback for {@code Object}-typed values when no more
  *     specific formatter is available.
  *   </li>
  * </ul>
@@ -114,8 +114,8 @@ public interface ParameterFormatter
 
 
   /**
-   * Format a {@code null} value, optionally using a mapped message from the parameter
-   * configuration using key type {@code null}.
+   * Formats a {@code null} value, optionally using a mapped message from the parameter configuration using key type
+   * {@code null}.
    *
    * @param context  message context providing formatting information, never {@code null}
    *
@@ -134,8 +134,8 @@ public interface ParameterFormatter
 
 
   /**
-   * Format an empty value, optionally using a mapped message from the parameter
-   * configuration using key type {@code empty}.
+   * Formats an empty value, optionally using a mapped message from the parameter configuration using key type
+   * {@code empty}.
    *
    * @param context  message context providing formatting information, never {@code null}
    *
@@ -154,22 +154,21 @@ public interface ParameterFormatter
 
 
   /**
-   * Lookup a message in the parameter configuration map with the given number key {@code n}.
+   * Looks up a message in the parameter configuration map with the given number key {@code n} and formats it.
    * <p>
-   * If the key is matched, the mapped message will be formatted with the formatter {@code context}.
-   * If the key is not found an empty message is returned unless {@code includeDefault} is set
-   * to {@code true} and the map contains a default mapped message.
-   * <p>
-   * The default mapped message will be used only if {@code includeDefault} is set to {@code true}
-   * and at least 1 key of type number is present in the parameter configuration map.
+   * If the parameter configuration map does not contain any key of type number, an empty optional is returned.
+   * Otherwise, the message mapped to the best matching key is formatted with the formatter {@code context}. If no key
+   * matches, the default mapped message is used if {@code includeDefault} is {@code true} and the map contains one. If
+   * no message is found at all, the optional contains empty text.
    *
    * @param context         formatter context instance, not {@code null}
-   * @param n               number key, not {@code null}
+   * @param n               number key
    * @param includeDefault  {@code true} use the default message if no mapping was found for the
    *                                     given number key {@code n},
    *                        {@code false} use only the mapped messages with keys of type number
    *
-   * @return  formatted text for the given search key {@code n}, never {@code null}
+   * @return  optional containing the formatted text for the given search key {@code n}, or an empty optional if the
+   *          map contains no key of type number, never {@code null}
    *
    * @since 0.8.4 (moved up from AbstractParameterFormatter)
    */
@@ -190,14 +189,12 @@ public interface ParameterFormatter
 
 
   /**
-   * Lookup a message in the parameter configuration map with the given string key {@code s}.
+   * Looks up a message in the parameter configuration map with the given string key {@code s} and formats it.
    * <p>
-   * If the key is matched, the mapped message will be formatted with the formatter {@code context}.
-   * If the key is not found an empty message is returned unless {@code includeDefault} is set
-   * to {@code true} and the map contains a default mapped message.
-   * <p>
-   * The default mapped message will be used only if {@code includeDefault} is set to {@code true}
-   * and at least 1 key of type string is present in the parameter configuration map.
+   * If the parameter configuration map does not contain any key of type string, an empty optional is returned.
+   * Otherwise, the message mapped to the best matching key is formatted with the formatter {@code context}. If no key
+   * matches, the default mapped message is used if {@code includeDefault} is {@code true} and the map contains one. If
+   * no message is found at all, the optional contains empty text.
    *
    * @param context         formatter context instance, not {@code null}
    * @param s               string key, not {@code null}
@@ -205,7 +202,8 @@ public interface ParameterFormatter
    *                                     given string key {@code s},
    *                        {@code false} use only the mapped messages with keys of type string
    *
-   * @return  formatted text for the given search key {@code s}, never {@code null}
+   * @return  optional containing the formatted text for the given search key {@code s}, or an empty optional if the
+   *          map contains no key of type string, never {@code null}
    *
    * @since 0.8.4 (moved up from AbstractParameterFormatter)
    */
@@ -248,7 +246,7 @@ public interface ParameterFormatter
    * <p>
    * The formatter service will use this information to detect overlapping configuration key names.
    *
-   * @return  a set with parameter configuration names.
+   * @return  a set with parameter configuration names, never {@code null}
    *
    * @since 0.20.0
    */
@@ -420,7 +418,7 @@ public interface ParameterFormatter
     /**
      * Returns the configuration key type.
      *
-     * @return  configuration key type, never {@code null}, {@code NAME} or {@code NULL}
+     * @return  configuration key type, never {@code null}
      */
     @Contract(pure = true)
     @NotNull MapKey.Type getKeyType();

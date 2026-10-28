@@ -71,16 +71,26 @@ import static java.util.Objects.requireNonNull;
  */
 public class MessageFactory
 {
+  /** Lazily created shared factory instance, returned by {@link #getSharedInstance()}. */
   private static final Supplier<MessageFactory> SHARED_INSTANCE_SUPPLIER =
       SupplierDelegate.of(() -> new MessageFactory(PASS_THROUGH, 128));
 
+  /** Source of randomness for the hash part of generated message and template codes. */
   private static final SecureRandom RANDOM = new SecureRandom();
+
+  /** Sequence number appended to generated codes, ensuring their uniqueness within this JVM. */
   private static final AtomicInteger CODE_ID = new AtomicInteger();
 
+  /** Normalizer applied to all message parts created by this factory. */
   private final @NotNull MessagePartNormalizer messagePartNormalizer;
+
+  /** Compiler translating message and template format strings into messages. */
   final MessageCompiler messageCompiler;
 
+  /** Cache of parsed messages keyed by their format string, or {@code null} if caching is disabled. */
   private final @Nullable Map<String,Message.WithSpaces> messageCache;
+
+  /** Lock guarding access to {@link #messageCache}, or {@code null} if caching is disabled. */
   private final @Nullable Lock messageCacheLock;
 
 
@@ -100,7 +110,7 @@ public class MessageFactory
 
 
   /**
-   * Construct a new message factory with the given {@code messagePartNormalizer} and no message cache.
+   * Constructs a new message factory with the given {@code messagePartNormalizer} and no message cache.
    *
    * @param messagePartNormalizer  message part normalizer instance, never {@code null}
    */
@@ -110,7 +120,7 @@ public class MessageFactory
 
 
   /**
-   * Construct a new message factory with the given {@code messagePartNormalizer} and a message cache of the given
+   * Constructs a new message factory with the given {@code messagePartNormalizer} and a message cache of the given
    * {@code messageCacheSize}.
    * <p>
    * When the cache is full, the least recently used message is evicted before adding a new one.
@@ -129,6 +139,7 @@ public class MessageFactory
     if (messageCacheSize > 0)
     {
       messageCache = new LinkedHashMap<>(32, 0.75f, true) {
+        /** Evicts the least recently used message once the cache exceeds its maximum size. */
         @Override
         protected boolean removeEldestEntry(Map.Entry<String,Message.WithSpaces> eldest) {
           return size() > messageCacheSize;
@@ -172,7 +183,7 @@ public class MessageFactory
 
 
   /**
-   * Parse a message format text into a message instance.
+   * Parses a message format text into a message instance.
    * <p>
    * If this factory was created with a message cache (see {@link #MessageFactory(MessagePartNormalizer, int)}),
    * previously parsed messages are returned from the cache. When the cache is full, the least recently used entry
@@ -207,7 +218,7 @@ public class MessageFactory
 
 
   /**
-   * Parse localized message format texts into a {@link Message} instance with an automatically generated message code.
+   * Parses localized message format texts into a {@link Message} instance with an automatically generated message code.
    *
    * @param localizedTexts  a map containing message formats, keyed by locale, not {@code null}
    *
@@ -224,7 +235,7 @@ public class MessageFactory
 
 
   /**
-   * Parse the message {@code text} into a {@link Message} instance and associate it with the given {@code code}.
+   * Parses the message {@code text} into a {@link Message} instance and associates it with the given {@code code}.
    *
    * @param code  message code, not {@code null}
    * @param text  message format, not {@code null}
@@ -245,7 +256,11 @@ public class MessageFactory
 
 
   /**
-   * Parse the localized messages {@code localizedTexts} into a {@link Message} instance.
+   * Parses the localized messages {@code localizedTexts} into a {@link Message} instance.
+   * <p>
+   * An empty map results in an empty message. A map with a single entry results in a message that is independent of
+   * the locale; the locale of the entry is only used to report parser errors. Otherwise, a
+   * {@linkplain Message.LocaleAware locale aware} message is returned.
    *
    * @param code            message code, not {@code null}
    * @param localizedTexts  a map containing message formats, keyed by locale, not {@code null}
@@ -288,7 +303,7 @@ public class MessageFactory
 
 
   /**
-   * Parse a template format text into a template instance.
+   * Parses a template format text into a template instance.
    *
    * @param text  template format text, not {@code null}
    *
@@ -303,7 +318,10 @@ public class MessageFactory
 
 
   /**
-   * Parse the localized template messages {@code localizedTexts} into a {@link Template} instance.
+   * Parses the localized template messages {@code localizedTexts} into a {@link Template} instance.
+   * <p>
+   * An empty map results in an empty template. A map with a single entry results in a template that is independent of
+   * the locale; the locale of the entry is only used to report parser errors.
    *
    * @param localizedTexts  a map containing template message formats, keyed by locale, not {@code null}
    *
@@ -380,7 +398,8 @@ public class MessageFactory
 
   /**
    * Generates a unique message or template code with the given {@code prefix}. The resulting code has the form
-   * <code>PREFIX[...]</code> (e.g. {@code MSG[1A2B3C4D5E-XXXXX]}) and can be recognized by {@link #isGeneratedCode(String)}.
+   * <code>PREFIX[...]</code> (e.g. {@code MSG[1A2B3C4D5E-XXXXX]}) and can be recognized by
+   * {@link #isGeneratedCode(String)}.
    *
    * @param prefix  code prefix (e.g. {@code "MSG"} or {@code "TPL"}), not {@code null}
    *
@@ -462,6 +481,15 @@ public class MessageFactory
   }
 
 
+  /**
+   * Checks whether two locale aware messages are the same. They are the same if they provide messages for the same
+   * set of locales and the messages for each locale are {@linkplain Message#isSame(Message) the same}.
+   *
+   * @param m1  locale aware message 1 to compare, not {@code null}
+   * @param m2  locale aware message 2 to compare, not {@code null}
+   *
+   * @return  {@code true} if both messages are identical, {@code false} otherwise
+   */
   @Contract(pure = true)
   private static boolean isSame(@NotNull Message.LocaleAware m1, @NotNull Message.LocaleAware m2)
   {

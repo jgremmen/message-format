@@ -78,6 +78,7 @@ import static java.lang.Math.round;
  */
 public final class GeoFormatter extends AbstractParameterFormatter<Number> implements NamedParameterFormatter
 {
+  /** Predefined coordinate formats, keyed by format name. */
   private static final Map<String,Format> FORMAT = new HashMap<>();
 
   static {
@@ -236,8 +237,13 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
   }
 
 
+  /** Factors for rounding a value in milliseconds of arc to 0, 1, 2 or 3 decimal places of a second. */
   private static final int[] DIGIT_FACTOR = new int[] { 1000, 100, 10, 1 };
+
+  /** Number of milliseconds of arc in a degree. */
   private static final int DEGREE_MILLIS = 3600000;
+
+  /** Number of milliseconds of arc in a minute. */
   private static final int MINUTE_MILLIS = 60000;
 
   /**
@@ -364,7 +370,11 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
 
 
 
-  /** The options used to format a coordinate. */
+  /**
+   * The options used to format a coordinate.
+   *
+   * @since 0.3.1
+   */
   static final class Format
   {
     /** Whether the coordinate is longitude, latitude, or has no compass direction. */
@@ -412,19 +422,31 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
     }
 
 
-    /** Tells whether the format appends a compass direction. */
+    /**
+     * Tells whether the format appends a compass direction.
+     *
+     * @return  {@code true} if a compass direction is appended, {@code false} otherwise
+     */
     boolean hasLoLa() {
       return longitude != null;
     }
 
 
-    /** Tells whether the format includes minutes. */
+    /**
+     * Tells whether the format includes minutes.
+     *
+     * @return  {@code true} if minutes are included, {@code false} otherwise
+     */
     boolean hasMinutes() {
       return minuteDigits >= 0;
     }
 
 
-    /** Tells whether the format includes seconds. */
+    /**
+     * Tells whether the format includes seconds.
+     *
+     * @return  {@code true} if seconds are included, {@code false} otherwise
+     */
     boolean hasSeconds() {
       return secondDigits >= 0;
     }

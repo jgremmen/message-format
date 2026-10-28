@@ -19,13 +19,19 @@
  * <p>
  * This module provides:
  * <ul>
- *   <li>{@link de.sayayi.lib.message.spring.MessageSupportMessageSource MessageSupportMessageSource} – a Spring
+ *   <li>{@link de.sayayi.lib.message.spring.MessageSupportMessageSource MessageSupportMessageSource}: a Spring
  *       {@link org.springframework.context.MessageSource MessageSource} implementation backed by
  *       {@link de.sayayi.lib.message.MessageSupport MessageSupport}, allowing the message format library to serve
  *       as a drop-in replacement for Spring's message resolution</li>
- *   <li>{@link de.sayayi.lib.message.spring.formatter.SpELFormatter SpELFormatter} – a parameter formatter that
- *       evaluates Spring Expression Language (SpEL) expressions within message templates</li>
+ *   <li>{@link de.sayayi.lib.message.spring.formatter.SpELFormatter SpELFormatter}: a parameter formatter that
+ *       evaluates Spring Expression Language (SpEL) expressions on parameter values</li>
  * </ul>
+ * <p>
+ * The message source is located in package {@code de.sayayi.lib.message.spring} and the SpEL formatter in package
+ * {@code de.sayayi.lib.message.spring.formatter}. The SpEL formatter is not registered automatically; it must be
+ * added to the formatter service explicitly.
+ *
+ * @since 0.12.0
  */
 @SuppressWarnings({ "JavaRequiresAutoModule", "requires-transitive-automatic" })
 module de.sayayi.lib.message.spring

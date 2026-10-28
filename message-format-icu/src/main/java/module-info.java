@@ -22,15 +22,19 @@
  * formatting:
  * <ul>
  *   <li>
- *     {@link de.sayayi.lib.message.icu.formatter.ICUFormatter ICUFormatter} ({@code icu}) – formats parameter values
+ *     {@link de.sayayi.lib.message.icu.formatter.ICUFormatter ICUFormatter} ({@code icu}): formats parameter values
  *     using ICU {@link com.ibm.icu.text.MessageFormat MessageFormat} patterns, supporting plurals, select expressions
  *     and locale-aware number/date formatting.
  *   </li>
  *   <li>
- *     {@link de.sayayi.lib.message.icu.formatter.ICUPersonFormatter ICUPersonFormatter} ({@code icu-person}) – formats
+ *     {@link de.sayayi.lib.message.icu.formatter.ICUPersonFormatter ICUPersonFormatter} ({@code icu-person}): formats
  *     person names with configurable control over name part visibility, ordering, formality and length.
  *   </li>
  * </ul>
+ * <p>
+ * Both formatters are listed in a {@code META-INF/services} file, so they are registered automatically by the
+ * {@link de.sayayi.lib.message.formatter.DefaultFormatterService DefaultFormatterService} when this module is on the
+ * class path. On the module path, they must be registered explicitly.
  *
  * @author Jeroen Gremmen
  * @since 0.24.0

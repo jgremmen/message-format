@@ -42,18 +42,18 @@ import static java.util.OptionalLong.empty;
  * <p>
  * This formatter uses the {@code path} configuration key to select which aspect of the path to format:
  * <ul>
- *   <li>{@code path} (default) &ndash; the path as-is</li>
- *   <li>{@code name} &ndash; the file name component</li>
- *   <li>{@code parent} &ndash; the parent path</li>
- *   <li>{@code root} &ndash; the root component</li>
- *   <li>{@code absolute-path} &ndash; the absolute path</li>
- *   <li>{@code real-path} &ndash; the real (resolved) path, falling back to the absolute path if resolution fails</li>
- *   <li>{@code normalize} or {@code normalized-path} &ndash; the normalized path</li>
+ *   <li>{@code path} (default): the path as-is</li>
+ *   <li>{@code name}: the file name component</li>
+ *   <li>{@code parent}: the parent path</li>
+ *   <li>{@code root}: the root component</li>
+ *   <li>{@code absolute-path}: the absolute path</li>
+ *   <li>{@code real-path}: the real (resolved) path, falling back to the absolute path if resolution fails</li>
+ *   <li>{@code normalize} or {@code normalized-path}: the normalized path</li>
  *   <li>
- *     {@code ext} or {@code extension} &ndash; the file extension; string map keys can be used to override the
+ *     {@code ext} or {@code extension}: the file extension; string map keys can be used to override the
  *     output for specific extensions
  *   </li>
- *   <li>{@code mimetype} &ndash; the MIME type of the file (regular files only)</li>
+ *   <li>{@code mimetype}: the MIME type of the file (regular files only)</li>
  * </ul>
  * <p>
  * If the configuration key is absent, the path is used as-is. If the value does not match a known option, formatting
@@ -62,6 +62,7 @@ import static java.util.OptionalLong.empty;
  * As a {@link SizeQueryable} formatter, it reports the file size in bytes for regular files.
  *
  * @author Jeroen Gremmen
+ * @since 0.3.1
  */
 public final class PathFormatter extends AbstractMultiSelectFormatter<Object> implements SizeQueryable
 {
@@ -99,6 +100,13 @@ public final class PathFormatter extends AbstractMultiSelectFormatter<Object> im
   }
 
 
+  /**
+   * Formats the real path of {@code path}, falling back to the absolute path if the real path cannot be determined.
+   *
+   * @param path  path to format, not {@code null}
+   *
+   * @return  formatted real path, never {@code null}
+   */
   @Contract(pure = true)
   private @NotNull Text formatPathRealPath(@NotNull Path path)
   {
@@ -111,12 +119,28 @@ public final class PathFormatter extends AbstractMultiSelectFormatter<Object> im
   }
 
 
+  /**
+   * Formats the absolute path of {@code path}.
+   *
+   * @param path  path to format, not {@code null}
+   *
+   * @return  formatted absolute path, never {@code null}
+   */
   @Contract(pure = true)
   private @NotNull Text formatPathAbsolutePath(@NotNull Path path) {
     return toText(path.toAbsolutePath());
   }
 
 
+  /**
+   * Formats the extension of the file name of {@code path}, using a message mapped to the extension if available.
+   *
+   * @param context  formatter context, not {@code null}
+   * @param path     path to format, not {@code null}
+   *
+   * @return  formatted extension, empty text if the file name has no extension or {@code null} text if the path has no
+   *          file name, never {@code null}
+   */
   @Contract(pure = true)
   private @NotNull Text formatPathExtension(@NotNull ParameterFormatterContext context, @NotNull Path path)
   {
@@ -136,6 +160,14 @@ public final class PathFormatter extends AbstractMultiSelectFormatter<Object> im
   }
 
 
+  /**
+   * Formats the MIME type of the regular file denoted by {@code path}.
+   *
+   * @param path  path to format, not {@code null}
+   *
+   * @return  formatted MIME type, or {@code null} text if the path is not a regular file or its MIME type cannot be
+   *          determined, never {@code null}
+   */
   @Contract(pure = true)
   private @NotNull Text formatPathMimeType(@NotNull Path path)
   {
@@ -190,12 +222,26 @@ public final class PathFormatter extends AbstractMultiSelectFormatter<Object> im
   }
 
 
+  /**
+   * Converts {@code fileOrPath} into a path.
+   *
+   * @param fileOrPath  {@link File} or {@link Path} instance, not {@code null}
+   *
+   * @return  path, never {@code null}
+   */
   @Contract(pure = true)
   private static Path toPath(@NotNull Object fileOrPath) {
     return fileOrPath instanceof File ? ((File)fileOrPath).toPath() : (Path)fileOrPath;
   }
 
 
+  /**
+   * Converts {@code path} into text.
+   *
+   * @param path  path to convert, or {@code null}
+   *
+   * @return  text containing the path, or empty text if {@code path} is {@code null}, never {@code null}
+   */
   @Contract(pure = true)
   private static @NotNull Text toText(Path path) {
     return path == null ? emptyText() : noSpaceText(path.toString());

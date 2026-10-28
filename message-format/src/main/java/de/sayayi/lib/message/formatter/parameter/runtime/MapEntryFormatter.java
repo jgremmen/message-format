@@ -28,8 +28,8 @@ import java.util.Set;
  * <p>
  * This formatter uses the {@code entry} configuration key to select which part of the map entry to format:
  * <ul>
- *   <li>{@code key} &ndash; formats the entry's key</li>
- *   <li>{@code value} &ndash; formats the entry's value</li>
+ *   <li>{@code key}: formats the entry's key</li>
+ *   <li>{@code value}: formats the entry's value</li>
  * </ul>
  * <p>
  * If the configuration key is absent or does not match a known option, formatting is delegated to the next available

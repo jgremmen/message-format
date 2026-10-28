@@ -38,7 +38,7 @@ public class MessageAdopterException extends MessageException
 
 
   /**
-   * Constructs a new message adapter exception with the specified detail message and cause.
+   * Constructs a new message adopter exception with the specified detail message and cause.
    * <p>
    * Note that the detail message associated with {@code cause} is <i>not</i> automatically incorporated in this
    * runtime exception's detail message.

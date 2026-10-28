@@ -67,7 +67,7 @@ public final class FluentMessageBuilder implements MessageBuilder
 
 
   /**
-   * Construct a new builder using the given {@code messageFactory}.
+   * Constructs a new builder using the given {@code messageFactory}.
    *
    * @param messageFactory  message factory, not {@code null}
    */

@@ -40,10 +40,10 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * <p>
  * This formatter uses the {@code method} configuration key to select the output format:
  * <ul>
- *   <li>{@code default} (default) &ndash; the method's default string representation</li>
- *   <li>{@code name} &ndash; the method name</li>
- *   <li>{@code class} &ndash; the declaring class</li>
- *   <li>{@code return-type} &ndash; the method's return type</li>
+ *   <li>{@code default} (default): the method's default string representation</li>
+ *   <li>{@code name}: the method name</li>
+ *   <li>{@code class}: the declaring class</li>
+ *   <li>{@code return-type}: the method's return type</li>
  * </ul>
  * <p>
  * If the configuration value does not match a known option, formatting is delegated to the next available formatter.
@@ -51,6 +51,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * Map key comparison for {@code string} keys is based on the method name.
  *
  * @author Jeroen Gremmen
+ * @since 0.5.0
  */
 public final class MethodFormatter
     extends AbstractSingleTypeParameterFormatter<Method>

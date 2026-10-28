@@ -16,6 +16,10 @@
 
 /**
  * Spring-specific parameter formatter, providing integration with the Spring Expression Language (SpEL).
+ * <p>
+ * {@link de.sayayi.lib.message.spring.formatter.SpELFormatter SpELFormatter} ({@code spel}) evaluates a SpEL expression
+ * on a parameter value and formats the result. It is not registered automatically and must be added to a formatter
+ * service explicitly.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

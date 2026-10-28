@@ -16,6 +16,22 @@
 
 /**
  * Exceptions thrown by the message format library during parsing, formatting and message management.
+ * <p>
+ * All exceptions are unchecked and derive from {@link de.sayayi.lib.message.exception.MessageException
+ * MessageException}:
+ * <ul>
+ *   <li>{@link de.sayayi.lib.message.exception.MessageParserException MessageParserException}: a message or template
+ *       format string could not be parsed</li>
+ *   <li>{@link de.sayayi.lib.message.exception.MessageFormatException MessageFormatException}: a message or template
+ *       could not be formatted</li>
+ *   <li>{@link de.sayayi.lib.message.exception.DuplicateMessageException DuplicateMessageException} and
+ *       {@link de.sayayi.lib.message.exception.DuplicateTemplateException DuplicateTemplateException}: a message code
+ *       or template name is already in use by a message or template with different content</li>
+ *   <li>{@link de.sayayi.lib.message.exception.MessageAdopterException MessageAdopterException}: messages or
+ *       templates could not be adopted from an external source</li>
+ *   <li>{@link de.sayayi.lib.message.exception.FormatterServiceException FormatterServiceException}: a formatter
+ *       could not be registered with a formatter service</li>
+ * </ul>
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

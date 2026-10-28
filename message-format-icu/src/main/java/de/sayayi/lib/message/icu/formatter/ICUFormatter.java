@@ -37,7 +37,7 @@ import static de.sayayi.lib.message.util.MessageUtil.trimAndNormalizeSpaces;
  * <p>
  * This formatter is selected by using the name {@code icu} in a message parameter, or automatically when the parameter
  * configuration contains the {@code icu} config key:
- * <pre>{@code %{p,icu:''{0,number,currency}''}}</pre>
+ * <pre>{@code %{amount,icu:'{amount,number,currency}'}}</pre>
  * <p>
  * The ICU pattern is read from the {@code icu} configuration value. All parameters available in the formatting context
  * are passed to the ICU message format as a named argument map. The formatter uses the context locale for

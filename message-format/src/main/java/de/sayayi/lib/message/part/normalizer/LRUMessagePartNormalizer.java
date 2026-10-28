@@ -40,8 +40,8 @@ import static java.util.Objects.requireNonNull;
  * Depending on the requested cache size, the factory selects an implementation optimized for either small or large
  * numbers of entries.
  * <p>
- * <b>Thread safety:</b> the normalizer instances returned by the factory methods in this class are thread-safe;
- * all mutable cache access is guarded by a {@link java.util.concurrent.locks.ReentrantLock ReentrantLock}.
+ * <b>Thread safety:</b> the normalizer instances returned by the factory methods in this class are thread-safe; all
+ * mutable cache access is guarded by a {@link java.util.concurrent.locks.ReentrantLock ReentrantLock}.
  *
  * @author Jeroen Gremmen
  * @since 0.6.0
@@ -50,12 +50,13 @@ import static java.util.Objects.requireNonNull;
  */
 public final class LRUMessagePartNormalizer
 {
+  /** This class is not meant to be instantiated. */
   private LRUMessagePartNormalizer() {
   }
 
 
   /**
-   * Create an LRU-based message part normalizer with the given maximum cache size.
+   * Creates an LRU-based message part normalizer with the given maximum cache size.
    *
    * @param maxSize  maximum number of cached parts, must be positive
    *
@@ -78,17 +79,31 @@ public final class LRUMessagePartNormalizer
 
 
   /**
-   * Array-based LRU normalizer optimized for small cache sizes. Provides excellent CPU cache locality for fast
-   * linear scans over a limited number of entries.
+   * Array-based LRU normalizer optimized for small cache sizes. Provides excellent CPU cache locality for fast linear
+   * scans over a limited number of entries.
+   *
+   * @since 0.21.0
    */
   private static final class Small implements MessagePartNormalizer
   {
+    /** Maximum number of cached parts. */
     private final int maxSize;
+
+    /** Lock guarding access to the cached parts. */
     private final Lock cacheLock;
+
+    /** Cached parts, ordered from most to least recently used, or {@code null} if nothing has been cached yet. */
     private MessagePart[] parts;
+
+    /** Number of cached parts. */
     private int size;
 
 
+    /**
+     * Creates an empty normalizer with the given maximum cache size.
+     *
+     * @param maxSize  maximum number of cached parts, positive
+     */
     private Small(int maxSize)
     {
       this.maxSize = maxSize;
@@ -99,6 +114,7 @@ public final class LRUMessagePartNormalizer
     }
 
 
+    /** {@inheritDoc} */
     @Override
     @Contract(mutates = "this")
     @SuppressWarnings("unchecked")
@@ -149,6 +165,7 @@ public final class LRUMessagePartNormalizer
     }
 
 
+    /** Makes sure that the parts array can hold another part, growing it up to the maximum cache size if required. */
     private void ensureSize()
     {
       if (parts == null || (parts.length == size && size < maxSize))
@@ -166,13 +183,23 @@ public final class LRUMessagePartNormalizer
   /**
    * {@link LinkedHashMap}-based LRU normalizer suitable for larger cache sizes. Provides constant-time lookup and
    * automatic eviction of the least recently used entry.
+   *
+   * @since 0.21.0
    */
   private static final class Large implements MessagePartNormalizer
   {
+    /** Cached parts in access order; the least recently used part is evicted first. */
     private final LinkedHashMap<MessagePart,MessagePart> cache;
+
+    /** Lock guarding access to the cached parts. */
     private final Lock cacheLock;
 
 
+    /**
+     * Creates an empty normalizer with the given maximum cache size.
+     *
+     * @param maxSize  maximum number of cached parts, positive
+     */
     private Large(int maxSize)
     {
       cache = new LinkedHashMap<>(clamp(maxSize, 16, 64), 0.75f, true) {
@@ -186,6 +213,7 @@ public final class LRUMessagePartNormalizer
     }
 
 
+    /** {@inheritDoc} */
     @Override
     @Contract(mutates = "this")
     @SuppressWarnings("unchecked")

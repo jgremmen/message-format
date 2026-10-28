@@ -36,7 +36,7 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 public @interface MessageDefs
 {
   /**
-   * 0..n message definitions.
+   * Message definitions contained in this container annotation.
    *
    * @return  message definitions
    */

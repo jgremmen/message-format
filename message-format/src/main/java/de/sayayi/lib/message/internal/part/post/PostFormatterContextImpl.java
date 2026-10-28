@@ -42,6 +42,7 @@ import java.util.Optional;
 @ApiStatus.Internal
 final class PostFormatterContextImpl extends BaseConfigAccessor implements PostFormatterContext
 {
+  /** Parameters of the message being formatted, providing the formatting locale. */
   private final @NotNull Parameters parameters;
 
 

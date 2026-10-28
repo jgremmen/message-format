@@ -35,7 +35,7 @@ import static java.util.Locale.UK;
  */
 public class MessageParserException extends MessageException
 {
-  /** Exception type. */
+  /** Kind of input (message or template) that failed to parse, or {@code null} if unknown. */
   private final Type type;
 
   /** Error message describing the error that occurred during parsing. */
@@ -55,7 +55,7 @@ public class MessageParserException extends MessageException
 
 
   /**
-   * Create a new message parser exception.
+   * Creates a new message parser exception.
    *
    * @param errorMessage  error message describing what went wrong during parsing, not {@code null}
    * @param syntaxError   a visual representation showing where the parsing error occurred, not {@code null}
@@ -69,9 +69,9 @@ public class MessageParserException extends MessageException
 
 
   /**
-   * Create a new message parser exception.
+   * Creates a new message parser exception.
    *
-   * @param type          parse type
+   * @param type          kind of input that failed to parse, or {@code null} if unknown
    * @param errorMessage  error message describing what went wrong during parsing, not {@code null}
    * @param syntaxError   a visual representation showing where the parsing error occurred, not {@code null}
    * @param code          message code associated with the message being parsed
@@ -95,6 +95,15 @@ public class MessageParserException extends MessageException
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The returned message describes what failed to parse (message code, template name and locale, as far as they are
+   * known), followed by the {@linkplain #getErrorMessage() error message} and the
+   * {@linkplain #getSyntaxError() syntax error} visualization on a separate line.
+   *
+   * @return  detail message, never {@code null}
+   */
   @Override
   public String getMessage()
   {
@@ -148,9 +157,9 @@ public class MessageParserException extends MessageException
 
 
   /**
-   * Returns the exception type, if available.
+   * Returns the kind of input that failed to parse, if available.
    *
-   * @return  exception type, or {@code null}
+   * @return  parse type, or {@code null}
    *
    * @since 0.9.1
    */
@@ -227,13 +236,12 @@ public class MessageParserException extends MessageException
 
 
   /**
-   * Returns a copy of this exception where the code value has been replaced with
-   * the given {@code code}.
+   * Returns a copy of this exception where the code value has been replaced with the given {@code code}. The type of
+   * the copy is set to {@link Type#MESSAGE MESSAGE} and the template name is cleared.
    *
    * @param code  new code, not {@code null}
    *
-   * @return  new exception based on the current exception with modified code value,
-   *          never {@code null}
+   * @return  new exception based on the current exception with modified code value, never {@code null}
    *
    * @since 0.9.1
    */
@@ -246,13 +254,12 @@ public class MessageParserException extends MessageException
 
 
   /**
-   * Returns a copy of this exception where the template value has been replaced with
-   * the given {@code template}.
+   * Returns a copy of this exception where the template value has been replaced with the given {@code template}. The
+   * type of the copy is set to {@link Type#TEMPLATE TEMPLATE} and the message code is cleared.
    *
    * @param template  new template, not {@code null}
    *
-   * @return  new exception based on the current exception with modified template value,
-   *          never {@code null}
+   * @return  new exception based on the current exception with modified template value, never {@code null}
    *
    * @since 0.9.1
    */
@@ -265,13 +272,11 @@ public class MessageParserException extends MessageException
 
 
   /**
-   * Returns a copy of this exception where the locale value has been replaced with
-   * the given {@code locale}.
+   * Returns a copy of this exception where the locale value has been replaced with the given {@code locale}.
    *
    * @param locale  new locale, not {@code null}
    *
-   * @return  new exception based on the current exception with modified locale value,
-   *          never {@code null}
+   * @return  new exception based on the current exception with modified locale value, never {@code null}
    *
    * @since 0.9.1
    */
@@ -282,12 +287,13 @@ public class MessageParserException extends MessageException
 
 
   /**
-   * Returns a copy of this exception where the type has been replaced with the given {@code type}.
+   * Returns a copy of this exception where the type has been replaced with the given {@code type}. The message code
+   * is only retained for type {@link Type#MESSAGE MESSAGE} and the template name only for type
+   * {@link Type#TEMPLATE TEMPLATE}.
    *
    * @param type  type, not {@code null}
    *
-   * @return  new exception based on the current exception with modified locale value,
-   *          never {@code null}
+   * @return  new exception based on the current exception with modified type, never {@code null}
    *
    * @since 0.9.1
    */
@@ -302,9 +308,17 @@ public class MessageParserException extends MessageException
 
 
 
+  /**
+   * Kind of input that failed to parse.
+   *
+   * @since 0.9.1
+   */
   public enum Type
   {
+    /** A message format string was being parsed. */
     MESSAGE,
+
+    /** A template format string was being parsed. */
     TEMPLATE
   }
 }

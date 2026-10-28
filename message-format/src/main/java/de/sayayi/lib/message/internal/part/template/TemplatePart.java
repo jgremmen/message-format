@@ -302,9 +302,12 @@ public final class TemplatePart implements MessagePart.Template
   /**
    * A {@link Parameters} adapter that resolves parameter name delegation and provides default values for missing
    * parameters as configured in the enclosing {@link TemplatePart}.
+   *
+   * @since 0.8.3
    */
   private final class ParameterAdapter implements Parameters
   {
+    /** Original parameters of the message referencing the template. */
     private final Parameters parameters;
 
 

@@ -53,8 +53,10 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
   /** Enclosing message builder that receives the completed template part. */
   private final FluentMessageBuilder builder;
 
+  /** Message factory used to parse default parameter message values. */
   private final @NotNull MessageFactory messageFactory;
 
+  /** Name of the referenced template. */
   private final @NotNull String name;
 
   /** Default values exposed to the referenced template. */
@@ -68,7 +70,7 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
 
 
   /**
-   * Construct a new template builder for the given template name.
+   * Constructs a new template builder for the given template name.
    *
    * @param builder  enclosing message builder, not {@code null}
    * @param name     template name (must follow kebab-case convention), not {@code null}

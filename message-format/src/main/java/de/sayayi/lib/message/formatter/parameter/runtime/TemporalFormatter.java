@@ -49,12 +49,12 @@ import static java.util.Objects.requireNonNull;
  * The output format is controlled by the {@code date} configuration key, which accepts the following predefined style
  * names:
  * <ul>
- *   <li>{@code short} &ndash; short date and time</li>
- *   <li>{@code medium} (default) &ndash; medium date and time</li>
- *   <li>{@code long} &ndash; long date and time</li>
- *   <li>{@code full} &ndash; full date and time</li>
- *   <li>{@code date} &ndash; date only (medium style)</li>
- *   <li>{@code time} &ndash; time only (medium style)</li>
+ *   <li>{@code short}: short date and time</li>
+ *   <li>{@code medium} (default): medium date and time</li>
+ *   <li>{@code long}: long date and time</li>
+ *   <li>{@code full}: full date and time</li>
+ *   <li>{@code date}: date only (medium style)</li>
+ *   <li>{@code time}: time only (medium style)</li>
  * </ul>
  * <p>
  * Alternatively, a custom {@link DateTimeFormatter} pattern can be provided (e.g. {@code "yyyy-MM-dd"}).
@@ -69,9 +69,14 @@ import static java.util.Objects.requireNonNull;
  * invalid, the result is an empty text.
  *
  * @author Jeroen Gremmen
+ * @since 0.12.0
  */
 public final class TemporalFormatter extends AbstractParameterFormatter<Temporal>
 {
+  /**
+   * Maps style names to style codes. A style code consists of the date style followed by the time style, where
+   * {@code S}, {@code M}, {@code L} and {@code F} denote short, medium, long and full and {@code -} denotes absence.
+   */
   private static final Map<String,String> STYLE = ofEntries(
       entry("short", "SS"),
       entry("medium", "MM"),
@@ -80,6 +85,11 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
       entry("date", "M-"),
       entry("time", "-M"));
 
+  /**
+   * Localized date/time formatters, keyed by style code.
+   *
+   * @see #STYLE
+   */
   private static final Map<String,DateTimeFormatter> FORMATTER = ofEntries(
       entry("SS", ofLocalizedDateTime(SHORT, SHORT)),
       entry("S-", ofLocalizedDate(SHORT)),

@@ -33,6 +33,8 @@ import org.jetbrains.annotations.NotNull;
  * intentionally read-only from the outside. Custom formatters can, however, freely receive and inspect instances of
  * this type (e.g. via {@code ConfigAccessor}/{@code MapAccessor}) to read configuration or map values.
  *
+ * @param <T>  type of the raw value
+ *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
  *
@@ -61,9 +63,9 @@ public sealed interface TypedValue<T> extends FormatStringSerializer
   sealed interface BoolValue extends TypedValue<Boolean> permits TypedValueBool
   {
     /**
-     * Returns the number as a boolean.
+     * Returns the boolean value.
      *
-     * @return  number as boolean
+     * @return  boolean value
      *
      * @since 0.21.0
      */
@@ -93,6 +95,9 @@ public sealed interface TypedValue<T> extends FormatStringSerializer
     /**
      * Returns the string value parsed as a message, allowing it to be used wherever a message is expected (e.g. as
      * a template reference or a formatted parameter value).
+     * <p>
+     * The string is parsed lazily on first access, using the message factory that was in effect when this value was
+     * created, and the resulting message is cached.
      *
      * @return  string value parsed as a message, never {@code null}
      *

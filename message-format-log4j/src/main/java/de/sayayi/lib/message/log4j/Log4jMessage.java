@@ -30,7 +30,10 @@ import java.util.function.Supplier;
  */
 final class Log4jMessage implements Message
 {
+  /** Supplier providing the formatted message. */
   private final Supplier<String> messageSupplier;
+
+  /** Throwable associated with this log message, or {@code null}. */
   private final Throwable throwable;
 
 

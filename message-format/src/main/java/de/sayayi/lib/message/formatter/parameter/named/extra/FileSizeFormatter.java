@@ -39,7 +39,7 @@ import static java.lang.Boolean.FALSE;
  * <p>
  * It accepts numeric values representing a file size in bytes and automatically selects the appropriate unit
  * (B, KB, MB, GB, TB, PB). The number of decimal places is controlled by the {@code scale} configuration key
- * (0&ndash;3, default: 1).
+ * (0 to 3, default: 1).
  * <p>
  * String map keys in the parameter configuration can be used to override the unit labels (e.g. to provide localized
  * unit names). A {@code space} boolean configuration key controls whether a space is inserted between the number and
@@ -47,19 +47,25 @@ import static java.lang.Boolean.FALSE;
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
+ *
+ * @deprecated  This formatter will be removed without a direct replacement. Applications that need it should implement
+ *              an equivalent {@link NamedParameterFormatter} of their own.
  */
 @Deprecated(forRemoval = true)
 public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
     implements NamedParameterFormatter
 {
+  /** File size units, from bytes up to petabytes. */
   private static final String[] UNITS = new String[] { "B", "KB", "MB", "GB", "TB", "PB" };
 
+  /** Powers of 10, from 10<sup>0</sup> up to 10<sup>15</sup>. */
   private static final long[] POW10 = new long[] {
       1L, 10L, 100L, 1000L, 10000L, 100000L, 1000000L, 10000000L, 100000000L, 1000000000L,
       10000000000L, 100000000000L, 1000000000000L, 10000000000000L, 100000000000000L,
       1000000000000000L
   };
 
+  /** Decimal format patterns, indexed by scale (number of decimal places). */
   private static final String[] FORMAT = new String[] {
       "#,##0", "#,##0.0", "#,##0.00", "#,##0.000"
   };
@@ -135,16 +141,38 @@ public final class FileSizeFormatter extends AbstractParameterFormatter<Number>
   }
 
 
+  /**
+   * Limits {@code scale} to the supported range of 0 to 3 decimal places.
+   *
+   * @param scale  requested scale
+   *
+   * @return  scale in the range 0 to 3
+   */
   private static int normalizeScale(int scale) {
     return scale < 0 ? 0 : (int)Math.min(scale, 3);
   }
 
 
+  /**
+   * Determines the unit for file size {@code n}, taking rounding to {@code scale} decimal places into account.
+   *
+   * @param n      file size in bytes, positive
+   * @param scale  number of decimal places
+   *
+   * @return  index into the units array
+   */
   private static int calculateUnitIndex(long n, int scale) {
     return n < 1000 ? 0 : log1000(n + POW10[log1000(n) * 3 - scale] / 2);
   }
 
 
+  /**
+   * Returns the integral base 1000 logarithm of {@code n}.
+   *
+   * @param n  positive number
+   *
+   * @return  integral base 1000 logarithm, or {@code 0} if {@code n} is less than 1000
+   */
   private static int log1000(long n)
   {
     for(var i = (POW10.length - 1) / 3; i >= 0; i--)

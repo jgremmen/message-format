@@ -58,7 +58,7 @@ public sealed interface MapKey extends FormatStringSerializer
 
 
   /**
-   * Return the type for this key.
+   * Returns the type for this key.
    *
    * @return  key type, never {@code null}
    */
@@ -87,6 +87,8 @@ public sealed interface MapKey extends FormatStringSerializer
    * by delegating to the appropriate method on a {@link MapKeyComparator}.
    *
    * @see MapKey#getType()
+   *
+   * @since 0.4.0
    */
   enum Type
   {
@@ -179,25 +181,27 @@ public sealed interface MapKey extends FormatStringSerializer
 
   /**
    * Comparison type for parameter configuration map keys.
+   *
+   * @since 0.4.0
    */
   enum CompareType
   {
-    /** Compare for "less than". */
+    /** Comparison for "less than". */
     LT,
 
-    /** Compare for "less than or equal to". */
+    /** Comparison for "less than or equal to". */
     LTE,
 
-    /** Compare for "equal". */
+    /** Comparison for "equal". */
     EQ,
 
-    /** Compare for "not equal". */
+    /** Comparison for "not equal". */
     NE,
 
-    /** Compare for "greater than". */
+    /** Comparison for "greater than". */
     GT,
 
-    /** Compare for "greater than or equal to". */
+    /** Comparison for "greater than or equal to". */
     GTE;
 
 
@@ -222,6 +226,7 @@ public sealed interface MapKey extends FormatStringSerializer
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public String toString()
     {
@@ -237,7 +242,7 @@ public sealed interface MapKey extends FormatStringSerializer
 
 
     /**
-     * Return a prefix representation for the comparison type.
+     * Returns a prefix representation for the comparison type.
      *
      * @return  comparison type as prefix, never {@code null}
      */
@@ -251,17 +256,19 @@ public sealed interface MapKey extends FormatStringSerializer
 
   /**
    * Interface representing the match result when comparing a provided value to a map key. The match result is
-   * represented by a numeric value, where higher values indicate better matches and zero or negative values
-   * indicate mismatches.
+   * represented by a numeric value, where higher values indicate better matches and zero or negative values indicate
+   * mismatches.
    *
    * @see Defined
+   *
+   * @since 0.21.0
    */
   @FunctionalInterface
   interface MatchResult
   {
     /**
-     * Numeric value representing the match result. Higher values represent better matches, while zero or
-     * negative values represent mismatches.
+     * Numeric value representing the match result. Higher values represent better matches, while zero or negative
+     * values represent mismatches.
      *
      * @return  numeric value of the match result
      */
@@ -281,7 +288,7 @@ public sealed interface MapKey extends FormatStringSerializer
 
 
     /**
-     * Match result comparator.
+     * Compares two match results by their value.
      *
      * @param r1 match result 1, not {@code null}
      * @param r2 match result 2, not {@code null}
@@ -297,8 +304,8 @@ public sealed interface MapKey extends FormatStringSerializer
 
 
     /**
-     * Returns a match result for a {@code null} key. The result is determined by the given {@code compareType}
-     * and the {@code isNull} flag.
+     * Returns a match result for a {@code null} key. The result is determined by the given {@code compareType} and the
+     * {@code isNull} flag.
      * <p>
      * The logic is as follows:
      * <ul>
@@ -357,46 +364,59 @@ public sealed interface MapKey extends FormatStringSerializer
     /**
      * Predefined match results for map key comparisons. The results are ordered by their value, with higher values
      * representing better matches.
+     *
+     * @since 0.21.0
      */
     enum Defined implements MatchResult
     {
-      /** no match */
+      /** The value does not match the key. */
       MISMATCH,
 
-      /** not empty match */
+      /** The value matches a not empty ({@code !empty}) key. */
       NOT_EMPTY,
 
-      /** not null match */
+      /** The value matches a not null ({@code !null}) key. */
       NOT_NULL,
 
-      /** empty match */
+      /** The value matches an {@code empty} key. */
       EMPTY,
 
-      /** null match */
+      /** The value matches a {@code null} key. */
       NULL,
 
-      /** same value meaning (e.g. 0 = false, "yes" = "Yes") */
+      /** The value has the same meaning as the key (e.g. 0 = false, "yes" = "Yes"). */
       LENIENT,
 
-      /** same value but different type (e.g. 4 = "4") */
+      /** The value is the same as the key, but has a different type (e.g. 4 = "4"). */
       EQUIVALENT,
 
-      /** exact match (type equality) */
+      /** The value and type are identical to the key. */
       EXACT;
 
 
+      /**
+       * {@inheritDoc}
+       * <p>
+       * The value of a predefined match result is twice its ordinal, leaving room for custom match results in between.
+       */
       @Override
       public int value() {
         return ordinal() * 2;
       }
 
 
+      /**
+       * {@inheritDoc}
+       * <p>
+       * Only {@link #MISMATCH} represents a mismatch.
+       */
       @Override
       public boolean isMismatch() {
         return this == MISMATCH;
       }
 
 
+      /** {@inheritDoc} */
       @Override
       public String toString() {
         return name() + '(' + value() + ')';

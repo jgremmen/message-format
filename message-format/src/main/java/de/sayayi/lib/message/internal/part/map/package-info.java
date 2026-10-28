@@ -16,6 +16,11 @@
 
 /**
  * Internal implementations for message part maps and their key ordering.
+ * <p>
+ * {@link de.sayayi.lib.message.internal.part.map.MessagePartMap MessagePartMap} holds the map entries of a parameter
+ * part and selects the best matching message for a parameter value.
+ * {@link de.sayayi.lib.message.internal.part.map.OrderedMapKey OrderedMapKey} defines the order in which map keys are
+ * sorted.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0

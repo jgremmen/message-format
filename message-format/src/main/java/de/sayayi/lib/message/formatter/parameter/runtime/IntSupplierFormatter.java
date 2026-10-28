@@ -39,6 +39,7 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.Class
  * value.
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public final class IntSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<IntSupplier>

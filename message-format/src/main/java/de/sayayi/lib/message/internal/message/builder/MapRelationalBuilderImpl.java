@@ -39,7 +39,7 @@ import static de.sayayi.lib.message.part.MapKey.CompareType.*;
 public final class MapRelationalBuilderImpl extends MapEqualityBuilderImpl implements MapRelationalBuilder
 {
   /**
-   * Construct a new relational map entry builder.
+   * Constructs a new relational map entry builder.
    *
    * @param parameterBuilder  the enclosing parameter builder, not {@code null}
    * @param keyFactory        factory that creates a {@link MapKey} for the given comparison type, not {@code null}

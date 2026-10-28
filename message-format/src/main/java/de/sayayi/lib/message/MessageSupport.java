@@ -105,7 +105,7 @@ public interface MessageSupport
 
 
   /**
-   * Prepare a message with the given {@code code} for formatting.
+   * Prepares a message with the given {@code code} for formatting.
    *
    * @param code  message code, not {@code null}
    *
@@ -118,9 +118,12 @@ public interface MessageSupport
 
 
   /**
-   * Prepare a {@code message} for formatting.
+   * Prepares a {@code message} for formatting.
+   * <p>
+   * The message format string is parsed lazily, so parser errors are reported when the message is first accessed or
+   * formatted.
    *
-   * @param message  message, not {@code null}
+   * @param message  message format string, not {@code null}
    *
    * @return  message configurer instance for the given {@code message}, never {@code null}
    */
@@ -129,7 +132,7 @@ public interface MessageSupport
 
 
   /**
-   * Prepare a {@code message} for formatting.
+   * Prepares a {@code message} for formatting.
    *
    * @param message  message, not {@code null}
    * @param <M>      message type
@@ -141,7 +144,7 @@ public interface MessageSupport
 
 
   /**
-   * Export all messages and templates from this message support to a compact binary representation. This way a
+   * Exports all messages and templates from this message support to a compact binary representation. This way a
    * message support can be prepared once and loaded very quickly by importing the packed messages at runtime.
    * <p>
    * Only templates backed by a {@link Message} (i.e. templates parsed from a message format string or created via
@@ -164,9 +167,9 @@ public interface MessageSupport
 
 
   /**
-   * Pack all messages (optionally filtering them using a {@code messageCodeFilter}) from this bundle into a compact
-   * binary representation. This way a message support can be prepared once and loaded very quickly by importing the
-   * packed messages at runtime.
+   * Packs all messages (optionally filtering them using a {@code messageCodeFilter}) from this message support into a
+   * compact binary representation. This way a message support can be prepared once and loaded very quickly by importing
+   * the packed messages at runtime.
    * <p>
    * Parameter {@code compress} switches GZip on/off, potentially reducing the packed size even more. For message
    * support instances with a small amount of messages the compression may not be substantial as the binary
@@ -224,6 +227,8 @@ public interface MessageSupport
    * new, independent instance, so configurers should not be shared between threads.
    *
    * @param <M>  the message type this configurer operates on
+   *
+   * @since 0.8.0
    */
   sealed interface MessageConfigurer<M extends Message> permits MessageSupportImpl.Configurer
   {
@@ -239,7 +244,9 @@ public interface MessageSupport
     /**
      * Returns the current parameter map configured for this message.
      * <p>
-     * The returned map is backed by this configurer, so changes to the configurer will reflect in the map.
+     * The returned map is backed by this configurer, so changes to the configurer will reflect in the map. The map must
+     * not be modified directly; use {@link #with(String, Object)}, {@link #remove(String)} and {@link #clear()}
+     * instead.
      *
      * @return  parameter map, never {@code null}
      */
@@ -248,7 +255,7 @@ public interface MessageSupport
 
 
     /**
-     * Clear all message parameter values.
+     * Clears all message parameter values.
      *
      * @return  message configurer instance for this message, never {@code null}
      */
@@ -257,7 +264,7 @@ public interface MessageSupport
 
 
     /**
-     * Remove message parameter values with the given {@code parameter} name.
+     * Removes message parameter values with the given {@code parameter} name.
      *
      * @param parameter  parameter name, not {@code null}
      *
@@ -422,7 +429,7 @@ public interface MessageSupport
 
 
     /**
-     * Change the locale.
+     * Changes the locale.
      * <p>
      * If {@code locale} is {@code null} the default locale for this message support is used.
      *
@@ -435,7 +442,7 @@ public interface MessageSupport
 
 
     /**
-     * Change the locale.
+     * Changes the locale.
      * <p>
      * If {@code locale} is {@code null} the default locale for this message support is used.
      *
@@ -470,7 +477,7 @@ public interface MessageSupport
 
 
     /**
-     * Create an exception with the formatted message.
+     * Creates an exception with the formatted message.
      * <p>
      * Exceptions thrown by the constructor function are relayed to the caller.
      *
@@ -488,7 +495,7 @@ public interface MessageSupport
 
 
     /**
-     * Create an exception with the formatted message.
+     * Creates an exception with the formatted message.
      * <p>
      * Exceptions thrown by the constructor function are relayed to the caller.
      *
@@ -507,7 +514,7 @@ public interface MessageSupport
 
 
     /**
-     * Create an exception with the formatted message.
+     * Creates an exception with the formatted message.
      * <p>
      * Exceptions thrown by the constructor function are relayed to the caller.
      *
@@ -591,6 +598,8 @@ public interface MessageSupport
    * This interface is thread-safe; it may be shared and modified concurrently by multiple threads.
    *
    * @see MessageSupportFactory#create(de.sayayi.lib.message.formatter.FormatterService, MessageFactory)
+   *
+   * @since 0.8.0
    */
   sealed interface ConfigurableMessageSupport extends MessageSupport, MessagePublisher permits MessageSupportImpl
   {
@@ -632,7 +641,7 @@ public interface MessageSupport
 
 
     /**
-     * Import messages and templates from a message format pack file and add them to this message support instance.
+     * Imports messages and templates from a message format pack file and adds them to this message support instance.
      * The {@code packStream} is validated and all entries are iterated. Each message and template found is added to
      * this instance.
      * <p>
@@ -657,7 +666,7 @@ public interface MessageSupport
 
 
     /**
-     * Set the default {@code value} for configuration parameter {@code name}.
+     * Sets the default {@code value} for configuration parameter {@code name}.
      * <p>
      * If a parameter formatter is looking for a boolean configuration value, which has not been provided by the
      * message parameter, the message accessor is used to get a default value.
@@ -672,7 +681,7 @@ public interface MessageSupport
 
 
     /**
-     * Set the default {@code value} for configuration parameter {@code name}.
+     * Sets the default {@code value} for configuration parameter {@code name}.
      * <p>
      * If a parameter formatter is looking for a long configuration value, which has not been provided by the message
      * parameter, the message accessor is used to get a default value.
@@ -687,7 +696,7 @@ public interface MessageSupport
 
 
     /**
-     * Set the default {@code value} for configuration parameter {@code name}.
+     * Sets the default {@code value} for configuration parameter {@code name}.
      * <p>
      * If a parameter formatter is looking for a string configuration value, which has not been provided by the message
      * parameter, the message accessor is used to get a default value.
@@ -702,7 +711,7 @@ public interface MessageSupport
 
 
     /**
-     * Set the default {@code value} for configuration parameter {@code name}.
+     * Sets the default {@code value} for configuration parameter {@code name}.
      * <p>
      * If a parameter formatter is looking for a message configuration value, which has not been provided by the
      * message parameter, the message accessor is used to get a default value.
@@ -741,7 +750,7 @@ public interface MessageSupport
 
 
     /**
-     * Set a {@code messageFilter} for this message support.
+     * Sets a {@code messageFilter} for this message support.
      * <p>
      * On adding a message the message filter is invoked with the message. If the filter returns {@code true} the
      * message is added to the message support. If the filter returns {@code false} the message is not added to the
@@ -767,7 +776,7 @@ public interface MessageSupport
 
 
     /**
-     * Set a {@code templateFilter} for this message support.
+     * Sets a {@code templateFilter} for this message support.
      * <p>
      * On adding a template the template filter is invoked with the template name and template message. If the filter
      * returns {@code true} the template is added to the message support. If the filter returns {@code false} the
@@ -866,6 +875,8 @@ public interface MessageSupport
    * This interface is thread-safe; it may be shared and accessed concurrently by multiple threads.
    *
    * @see MessageSupport#getMessageAccessor()
+   *
+   * @since 0.8.0
    */
   sealed interface MessageAccessor extends TemplateAccessor permits MessageSupportImpl.Accessor
   {
@@ -914,16 +925,16 @@ public interface MessageSupport
 
 
     /**
-     * Returns a prioritized list of matching formatter for the given {@code type}.
+     * Returns a prioritized list of matching formatters for the given {@code type}.
      * <p>
      * If {@code config} is provided and contains a configuration name for a named formatter, the named formatter takes
      * precedence over the type based formatter.
      *
-     * @param type    type, never {@code null}
+     * @param type    type, not {@code null}
      * @param config  message part configuration
      *
-     * @return  prioritized list of formatters for the given {@code type} and {@code parameterConfig}, never
-     *          {@code null} and never empty
+     * @return  prioritized list of formatters for the given {@code type} and {@code config}, never {@code null}
+     *          and never empty
      */
     @Contract(value = "_, _ -> new", pure = true)
     default @NotNull ParameterFormatter[] getFormatters(@NotNull Class<?> type, MessagePart.Config config) {
@@ -932,7 +943,7 @@ public interface MessageSupport
 
 
     /**
-     * Returns a prioritized list of matching formatter for the given {@code format} and {@code type}.
+     * Returns a prioritized list of matching formatters for the given {@code format} and {@code type}.
      * <p>
      * If {@code format} matches a named formatter it always takes precedence over {@code type}.
      * <p>
@@ -940,10 +951,10 @@ public interface MessageSupport
      * precedence over the type based formatter.
      *
      * @param format  formatter name
-     * @param type    type, never {@code null}
+     * @param type    type, not {@code null}
      * @param config  message part configuration
      *
-     * @return  prioritized list of formatters for the given {@code format}, {@code type} and {@code parameterConfig},
+     * @return  prioritized list of formatters for the given {@code format}, {@code type} and {@code config},
      *          never {@code null} and never empty
      */
     @Contract(value = "_, _, _ -> new", pure = true)
@@ -969,7 +980,7 @@ public interface MessageSupport
      * @param name  parameter name, not {@code null}
      *
      * @return  default configuration value, or {@code null} if no default configuration has been set for parameter
-     * {@code name}
+     *          {@code name}
      *
      * @see ConfigurableMessageSupport#setDefaultConfig(String, boolean)
      * @see ConfigurableMessageSupport#setDefaultConfig(String, long)
@@ -998,6 +1009,8 @@ public interface MessageSupport
    * This interface is thread-safe; it may be shared and accessed concurrently by multiple threads.
    *
    * @see MessageAccessor
+   *
+   * @since 0.8.0
    */
   sealed interface TemplateAccessor permits MessageAccessor
   {
@@ -1014,7 +1027,7 @@ public interface MessageSupport
     /**
      * Returns the template associated with {@code name}.
      *
-     * @param name  template name
+     * @param name  template name, not {@code null}
      *
      * @return  template or {@code null} if no template with this name exists
      */
@@ -1035,16 +1048,15 @@ public interface MessageSupport
 
 
     /**
-     * Returns a collection of template names, that are referenced from messages but have not been published to this
-     * message support.
+     * Returns the names of templates that are referenced from messages but have not been published to this message
+     * support.
      * <p>
      * The messages that are analyzed can be filtered by providing a {@code messageCodeFilter}. If this parameter is
      * {@code null} all known messages are analyzed.
      *
      * @param messageCodeFilter  message code filter or {@code null} to include all messages
      *
-     * @return  a collections with referenced template names, that are unknown to this message support, never
-     *          {@code null}
+     * @return  set with referenced template names that are unknown to this message support, never {@code null}
      */
     @NotNull Set<String> findMissingTemplates(Predicate<String> messageCodeFilter);
   }
@@ -1178,7 +1190,7 @@ public interface MessageSupport
   interface ExceptionConstructor<X extends Exception>
   {
     /**
-     * Create a new exception for the given {@code message}.
+     * Creates a new exception for the given {@code message}.
      *
      * @param message  formatted message, not {@code null}
      *
@@ -1202,7 +1214,7 @@ public interface MessageSupport
   interface ExceptionConstructorWithCause<X extends Exception>
   {
     /**
-     * Create a new exception for the given {@code message} and {@code cause}.
+     * Creates a new exception for the given {@code message} and {@code cause}.
      *
      * @param message  formatted message, not {@code null}
      * @param cause    root cause of the exception

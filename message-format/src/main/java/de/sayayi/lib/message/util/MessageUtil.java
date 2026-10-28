@@ -57,6 +57,7 @@ import static java.util.Objects.requireNonNull;
  */
 public final class MessageUtil
 {
+  /** This class is not meant to be instantiated. */
   private MessageUtil() {}
 
 
@@ -261,8 +262,8 @@ public final class MessageUtil
 
 
   /**
-   * Check whether {@code name} is a valid kebab-case name.
-   * A valid kebab-case name must satisfy the following conditions:
+   * Checks whether {@code name} is a valid kebab-case name. A valid kebab-case name must satisfy the following
+   * conditions:
    * <ul>
    *   <li> It must not be empty.
    *   <li> It must start with a lowercase letter.
@@ -299,8 +300,8 @@ public final class MessageUtil
 
 
   /**
-   * Check whether {@code name} is a valid lower camel-case name.
-   * A valid lower camel case name must satisfy the following conditions:
+   * Checks whether {@code name} is a valid lower camel-case name. A valid lower camel case name must satisfy the
+   * following conditions:
    * <ul>
    *   <li> It must not be empty.
    *   <li> It must start with a lowercase letter.
@@ -335,9 +336,9 @@ public final class MessageUtil
 
 
   /**
-   * Check whether {@code name} is either a valid kebab-case or lower camel-case name.
-   * This method combines the logic of {@link #isKebabCaseName(String)} and
-   * {@link #isLowerCamelCaseName(String)} in a single pass for optimal performance.
+   * Checks whether {@code name} is either a valid kebab-case or lower camel-case name. This method combines the logic
+   * of {@link #isKebabCaseName(String)} and {@link #isLowerCamelCaseName(String)} in a single pass for optimal
+   * performance.
    * <p>
    * A valid kebab-case name must satisfy the following conditions:
    * <ul>
@@ -405,7 +406,7 @@ public final class MessageUtil
 
 
   /**
-   * Check whether {@code name} is a valid name as defined by the message format lexer grammar.
+   * Checks whether {@code name} is a valid name as defined by the message format lexer grammar.
    * <p>
    * A valid name must satisfy the following conditions:
    * <ul>
@@ -460,7 +461,7 @@ public final class MessageUtil
 
 
   /**
-   * Check whether {@code string} can be serialized without quotes, i.e. it is a valid {@linkplain #isName(String)
+   * Checks whether {@code string} can be serialized without quotes, i.e. it is a valid {@linkplain #isName(String)
    * name} and not a keyword which would be parsed as a different value or token.
    *
    * @param string  the string to check, not {@code null}
@@ -479,6 +480,14 @@ public final class MessageUtil
   }
 
 
+  /**
+   * Tells whether code point {@code cp} may be used within a name, i.e. it is a letter, a zero width (non) joiner, a
+   * digit, a letter number or a combining mark.
+   *
+   * @param cp  code point to check
+   *
+   * @return  {@code true} if the code point may be used within a name, {@code false} otherwise
+   */
   @Contract(pure = true)
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   private static boolean isNameChar(int cp)
@@ -676,13 +685,14 @@ public final class MessageUtil
 
 
   /**
-   * Import messages and templates from a message format pack file. The {@code packStream} is
+   * Imports messages and templates from a message format pack file. The {@code packStream} is
    * validated and all entries are iterated. Each message is passed to the optional
    * {@code messageConsumer} and each template to the optional {@code templateConsumer}.
    * <p>
    * The {@code packStream} is closed when this method returns, regardless of whether the
    * import was successful or not.
    *
+   * @param messageFactory    message factory used to create the imported messages and templates, not {@code null}
    * @param packStream        pack input stream, not {@code null}
    * @param messageConsumer   consumer invoked for each message found, or {@code null}
    * @param templateConsumer  consumer invoked for each template found, or {@code null}

@@ -22,8 +22,10 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
- * Duplicate template exception. This exception is thrown by the default template handler if a template with the same
- * name is published twice.
+ * Exception thrown when a template is published with a name that is already in use by a template with different
+ * content. It is thrown by the default {@linkplain ConfigurableMessageSupport#setTemplateFilter(TemplateFilter)
+ * template filter} and by adopters that detect conflicting template definitions. Publishing an identical template twice
+ * is not considered an error.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

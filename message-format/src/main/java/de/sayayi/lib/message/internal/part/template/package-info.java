@@ -16,6 +16,9 @@
 
 /**
  * Internal implementations for template parts and their supporting data structures.
+ * <p>
+ * {@link de.sayayi.lib.message.internal.part.template.TemplatePart TemplatePart} represents a template reference in a
+ * message, including default parameter values and parameter name delegation.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

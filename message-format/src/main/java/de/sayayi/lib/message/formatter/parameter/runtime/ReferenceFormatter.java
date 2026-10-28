@@ -42,6 +42,7 @@ import static de.sayayi.lib.message.part.MapKey.MatchResult.forNullKey;
  * Size queries and map key comparisons are also based on the referenced value.
  *
  * @author Jeroen Gremmen
+ * @since 0.3.1
  */
 public final class ReferenceFormatter
     extends AbstractSingleTypeParameterFormatter<Reference<?>>

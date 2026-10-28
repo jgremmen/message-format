@@ -16,6 +16,12 @@
 
 /**
  * Internal implementations of {@link de.sayayi.lib.message.part.MessagePart MessagePart}.
+ * <p>
+ * {@link de.sayayi.lib.message.internal.part.TextPart TextPart} represents literal text with leading and trailing space
+ * information. The other message part implementations are located in the sub-packages.
+ * <p>
+ * <strong>This package is not part of the public API.</strong> Its classes are subject to change without notice and
+ * should not be referenced directly by application code.
  *
  * @author Jeroen Gremmen
  * @since 0.5.0

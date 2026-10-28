@@ -31,6 +31,7 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.Class
  * delegates the formatting to the string formatter.
  *
  * @author Jeroen Gremmen
+ * @since 0.5.0
  */
 public final class ThrowableFormatter extends AbstractSingleTypeParameterFormatter<Throwable>
 {

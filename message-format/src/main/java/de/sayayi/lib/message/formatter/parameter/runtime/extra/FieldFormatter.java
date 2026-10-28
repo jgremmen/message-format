@@ -41,10 +41,10 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * This formatter renders a Java reflection field as a human-readable string. The output is controlled by the
  * {@code field} configuration key, which accepts a combination of the following format flags:
  * <ul>
- *   <li>{@code M} &ndash; include modifiers (e.g. {@code public static final})</li>
- *   <li>{@code T} &ndash; include the field type</li>
- *   <li>{@code N} &ndash; include the field name</li>
- *   <li>{@code c}, {@code j}, {@code u} &ndash; type formatting flags as described by {@link TypeFormatter}</li>
+ *   <li>{@code M}: include modifiers (e.g. {@code public static final})</li>
+ *   <li>{@code T}: include the field type</li>
+ *   <li>{@code N}: include the field name</li>
+ *   <li>{@code c}, {@code j}, {@code u}: type formatting flags as described by {@link TypeFormatter}</li>
  * </ul>
  * <p>
  * The default format is {@code "juMTN"}, which includes modifiers, type and name with {@code java.lang.} and
@@ -53,6 +53,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * Map key comparison for {@code string} keys is based on the field name.
  *
  * @author Jeroen Gremmen
+ * @since 0.6.0
  */
 public final class FieldFormatter
     extends AbstractSingleTypeParameterFormatter<Field>

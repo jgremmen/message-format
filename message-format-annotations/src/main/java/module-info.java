@@ -20,10 +20,10 @@
  * <p>
  * <b>Annotations</b> ({@code de.sayayi.lib.message.annotation}):
  * <ul>
- *   <li>{@link de.sayayi.lib.message.annotation.MessageDef MessageDef} – defines a message with a unique code</li>
- *   <li>{@link de.sayayi.lib.message.annotation.TemplateDef TemplateDef} – defines a reusable template with a
+ *   <li>{@link de.sayayi.lib.message.annotation.MessageDef MessageDef}: defines a message with a unique code</li>
+ *   <li>{@link de.sayayi.lib.message.annotation.TemplateDef TemplateDef}: defines a reusable template with a
  *       unique name</li>
- *   <li>{@link de.sayayi.lib.message.annotation.Text Text} – provides localized text variants for messages and
+ *   <li>{@link de.sayayi.lib.message.annotation.Text Text}: provides localized text variants for messages and
  *       templates</li>
  * </ul>
  * <p>
@@ -42,6 +42,8 @@
  * Synthetic implementations of the annotation interfaces allow messages and templates to be constructed and
  * registered programmatically without requiring annotated class files, which is useful in programmatic and testing
  * scenarios.
+ *
+ * @since 0.12.0
  */
 module de.sayayi.lib.message.annotations
 {

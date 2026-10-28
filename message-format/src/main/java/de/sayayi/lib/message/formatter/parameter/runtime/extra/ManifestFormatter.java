@@ -29,9 +29,9 @@ import java.util.jar.Manifest;
  * This formatter uses the {@code manifest} configuration key to select which part of the manifest to format:
  * <ul>
  *   <li>
- *     {@code main-attrs} or {@code main-attributes} (default) &ndash; formats the main attributes of the manifest
+ *     {@code main-attrs} or {@code main-attributes} (default): formats the main attributes of the manifest
  *   </li>
- *   <li>{@code entries} &ndash; formats the manifest entries map</li>
+ *   <li>{@code entries}: formats the manifest entries map</li>
  * </ul>
  * <p>
  * If the configuration value does not match a known option, formatting is delegated to the next available formatter.

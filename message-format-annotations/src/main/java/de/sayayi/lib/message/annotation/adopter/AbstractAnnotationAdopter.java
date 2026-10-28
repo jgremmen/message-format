@@ -57,17 +57,17 @@ import static java.util.Objects.requireNonNull;
  * This adopter provides multiple strategies for discovering annotated classes:
  * <ul>
  *   <li>
- *     <b>Classpath scanning</b> – {@link #adopt(ClassLoader, Set)} scans one or more packages for class files and
- *     parses every class found on the classpath (including jar, war and zip archives).
+ *     <b>Classpath scanning</b>: {@link #adopt(ClassLoader, Set)} scans one or more packages for class files and parses
+ *     every class found on the classpath (including jar, war and zip archives).
  *   </li>
  *   <li>
- *     <b>Single class file</b> – {@link #adopt(Path)} and {@link #adopt(File)} accept individual class files.
+ *     <b>Single class file</b>: {@link #adopt(Path)} and {@link #adopt(File)} accept individual class files.
  *   </li>
  *   <li>
- *     <b>Loaded type</b> – {@link #adopt(Class)} uses the class loader of a loaded type to locate its class file.
+ *     <b>Loaded type</b>: {@link #adopt(Class)} uses the class loader of a loaded type to locate its class file.
  *   </li>
  *   <li>
- *     <b>Annotation instances</b> – {@link #adopt(MessageDef)} and {@link #adopt(TemplateDef)} accept synthesized or
+ *     <b>Annotation instances</b>: {@link #adopt(MessageDef)} and {@link #adopt(TemplateDef)} accept synthesized or
  *     mocked annotation instances directly, even though the annotations have
  *     {@linkplain java.lang.annotation.RetentionPolicy#CLASS CLASS} retention.
  *   </li>
@@ -91,13 +91,15 @@ import static java.util.Objects.requireNonNull;
 @SuppressWarnings("UnusedReturnValue")
 public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 {
+  /** URL protocols of classpath resources that are scanned as zip-based archives. */
   private static final Set<String> ZIP_PROTOCOLS = Set.of("zip", "jar", "war");
 
+  /** Names of the classes that have already been visited. */
   private final Set<String> indexedClasses = new HashSet<>();
 
 
   /**
-   * Create an annotation adopter for the given {@code configurableMessageSupport}. The message factory and message
+   * Creates an annotation adopter for the given {@code configurableMessageSupport}. The message factory and message
    * publisher are both obtained from the configurable message support instance.
    *
    * @param configurableMessageSupport  configurable message support, not {@code null}
@@ -108,7 +110,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Create an annotation adopter for the given {@code messageFactory} and {@code publisher}. This constructor allows
+   * Creates an annotation adopter for the given {@code messageFactory} and {@code publisher}. This constructor allows
    * the message factory and message publisher to be provided independently.
    *
    * @param messageFactory  message factory used for parsing message format strings, not {@code null}
@@ -120,7 +122,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Scan the classpath for class files in the given packages and adopt all message and template annotations found.
+   * Scans the classpath for class files in the given packages and adopts all message and template annotations found.
    * The scan includes directories as well as jar, war and zip archives on the classpath. Each package is resolved using
    * the given {@code classLoader}. Classes that have already been visited are silently skipped.
    *
@@ -149,9 +151,13 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Scan all classpath resources matching the given package name and adopt class files found in directories and
+   * Scans all classpath resources matching the given package name and adopts class files found in directories and
    * zip-based archives (jar, war, zip).
    *
+   * @param classLoader  class loader for locating package resources on the classpath, not {@code null}
+   * @param packageName  name of the package to scan, not {@code null}
+   *
+   * @throws IOException              if an I/O error occurs while scanning the classpath
    * @throws MessageAdopterException  if a classpath resource uses a protocol other than {@code file} or a zip-based
    *                                  protocol
    */
@@ -195,7 +201,12 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Recursively scan a filesystem directory for class files and parse each one that has not been visited yet.
+   * Recursively scans a filesystem directory for class files and parses each one that has not been visited yet.
+   *
+   * @param baseDirectory  classpath root directory, used to determine the class names, not {@code null}
+   * @param directory      directory to scan, not {@code null}
+   *
+   * @throws IOException  if an I/O error occurs while reading a class file
    */
   private void adopt_scan_directory(@NotNull File baseDirectory, @NotNull File directory) throws IOException
   {
@@ -224,8 +235,14 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Scan the entries of a zip-based archive (jar, war, zip) for class files matching the given classpath prefix
-   * and parse each one that has not been visited yet.
+   * Scans the entries of a zip-based archive (jar, war, zip) for class files matching the given classpath prefix and
+   * parses each one that has not been visited yet.
+   *
+   * @param zipUrl           URL of a resource inside the archive, not {@code null}
+   * @param classPathPrefix  classpath prefix (package path ending with {@code /}) the entries must match, not
+   *                         {@code null}
+   *
+   * @throws IOException  if an I/O error occurs while reading the archive
    */
   private void adopt_scan_zipEntries(@NotNull URL zipUrl, @NotNull String classPathPrefix) throws IOException
   {
@@ -276,7 +293,13 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Open a {@link ZipFile} from the given URL string, handling {@code file:} scheme URLs.
+   * Opens a {@link ZipFile} from the given URL string, handling {@code file:} scheme URLs.
+   *
+   * @param zipFileUrl  URL or path of the archive, not {@code null}
+   *
+   * @return  opened zip file, never {@code null}
+   *
+   * @throws IOException  if the archive cannot be opened
    */
   private @NotNull ZipFile adopt_scan_createZipFileFromUrl(@NotNull String zipFileUrl) throws IOException
   {
@@ -294,7 +317,11 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Record a classpath name as visited, returning {@code true} if it was not already known.
+   * Records a classpath name as visited.
+   *
+   * @param classPathName  classpath name of a class file, not {@code null}
+   *
+   * @return  {@code true} if the class had not been visited before, {@code false} otherwise
    */
   private boolean scan_checkVisited(@NotNull String classPathName)
   {
@@ -307,7 +334,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt messages and templates from the given class file identified by {@code classFile}. If the class file has
+   * Adopts messages and templates from the given class file identified by {@code classFile}. If the class file has
    * already been visited, this method returns immediately without re-parsing.
    *
    * @param classFile  path to the class file to analyze for message annotations, not {@code null}
@@ -340,7 +367,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt messages and templates from the given class file identified by {@code classFile}. This method delegates to
+   * Adopts messages and templates from the given class file identified by {@code classFile}. This method delegates to
    * {@link #adopt(Path)} after converting the {@link File} to a {@link Path}.
    *
    * @param classFile  location of the class file to analyze for message annotations, not {@code null}
@@ -359,7 +386,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt messages and templates from the class file of the given {@code type}. The class file is located via the
+   * Adopts messages and templates from the class file of the given {@code type}. The class file is located via the
    * type's class loader. If the type has already been visited or has no class loader (e.g. bootstrap classes), this
    * method returns immediately.
    *
@@ -396,7 +423,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Publish the message defined in the given {@link MessageDef} annotation. If the annotation contains multiple
+   * Publishes the message defined in the given {@link MessageDef} annotation. If the annotation contains multiple
    * {@link Text} entries, they are treated as localized variants of the same message. If only a single
    * {@linkplain MessageDef#text() text} is provided, it is used as the sole message text.
    *
@@ -440,7 +467,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Publish the template defined in the given {@link TemplateDef} annotation. If the annotation contains multiple
+   * Publishes the template defined in the given {@link TemplateDef} annotation. If the annotation contains multiple
    * {@link Text} entries, they are treated as localized variants of the same template. If only a single
    * {@linkplain TemplateDef#text() text} is provided, it is used as the sole template text.
    *
@@ -488,7 +515,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Parse the contents of a class file provided by {@code classInputStream} and adopt any {@link MessageDef} and
+   * Parses the contents of a class file provided by {@code classInputStream} and adopts any {@link MessageDef} and
    * {@link TemplateDef} annotations found. Concrete subclasses implement this method to provide the actual bytecode
    * analysis strategy.
    *

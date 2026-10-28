@@ -30,38 +30,54 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
+ * Read-only formatter service that forwards all calls to another formatter service.
+ * <p>
+ * Instances are returned by {@link de.sayayi.lib.message.formatter.FormatterService.WithRegistry#seal()} to expose a
+ * formatter service without its registration methods. The delegate is a live view: formatters registered with the
+ * wrapped service afterwards are visible through the delegate as well.
+ *
  * @author Jeroen Gremmen
  * @since 0.25.0
  */
 @ApiStatus.Internal
 public final class FormatterServiceDelegate implements FormatterService
 {
+  /** Formatter service all calls are forwarded to. */
   private final FormatterService delegate;
 
 
+  /**
+   * Creates a delegate for the given formatter service.
+   *
+   * @param delegate  formatter service to forward all calls to, not {@code null}
+   */
   public FormatterServiceDelegate(@NotNull FormatterService delegate) {
     this.delegate = requireNonNull(delegate, "delegate must not be null");
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @NotNull ParameterFormatter[] getFormatters(String format, @NotNull Class<?> type, Config config) {
     return delegate.getFormatters(format, type, config);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @UnmodifiableView @NotNull Map<String,PostFormatter> getPostFormatters() {
     return delegate.getPostFormatters();
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public @UnmodifiableView @NotNull Set<String> getParameterConfigNames() {
     return delegate.getParameterConfigNames();
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public String toString() {
     return delegate.toString();

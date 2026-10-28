@@ -47,14 +47,18 @@ import static org.springframework.util.ObjectUtils.isEmpty;
  */
 public class MessageSupportMessageSource implements HierarchicalMessageSource
 {
+  /** Prefix for the names of the positional message arguments. */
   private final String parameterPrefix;
+
+  /** Message support used to resolve and format messages. */
   private final MessageSupport messageSupport;
 
+  /** Parent message source used as fallback for unknown message codes, or {@code null}. */
   private MessageSource parentMessageSource;
 
 
   /**
-   * Create a message source backed by the given {@code messageSupport} with the default parameter prefix {@code "p"}
+   * Creates a message source backed by the given {@code messageSupport} with the default parameter prefix {@code "p"}
    * and no parent message source.
    *
    * @param messageSupport  message support instance, not {@code null}
@@ -65,7 +69,7 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
 
 
   /**
-   * Create a message source backed by the given {@code messageSupport} with a custom {@code parameterPrefix} and no
+   * Creates a message source backed by the given {@code messageSupport} with a custom {@code parameterPrefix} and no
    * parent message source.
    *
    * @param parameterPrefix  prefix for positional parameter names (e.g. {@code "p"} results in {@code p1},
@@ -80,7 +84,7 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
 
 
   /**
-   * Create a message source backed by the given {@code messageSupport} with the default parameter prefix {@code "p"}
+   * Creates a message source backed by the given {@code messageSupport} with the default parameter prefix {@code "p"}
    * and an optional parent message source.
    *
    * @param messageSupport      message support instance, not {@code null}
@@ -92,7 +96,7 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
 
 
   /**
-   * Create a message source backed by the given {@code messageSupport} with a custom {@code parameterPrefix} and an
+   * Creates a message source backed by the given {@code messageSupport} with a custom {@code parameterPrefix} and an
    * optional parent message source.
    *
    * @param parameterPrefix      prefix for positional parameter names (e.g. {@code "p"} results in {@code p1},
@@ -135,7 +139,7 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
 
 
   /**
-   * Resolve and format a message for the given {@code code} and {@code locale}. If the code is known to the backing
+   * Resolves and formats a message for the given {@code code} and {@code locale}. If the code is known to the backing
    * {@link MessageSupport}, the message is formatted with the supplied {@code args} mapped as positional parameters.
    * Otherwise, the parent message source is consulted. If no message can be resolved, the {@code defaultMessage}
    * is returned.
@@ -166,7 +170,7 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
 
 
   /**
-   * Resolve and format a message for the given {@code code} and {@code locale}. The supplied {@code args} are mapped
+   * Resolves and formats a message for the given {@code code} and {@code locale}. The supplied {@code args} are mapped
    * to positional parameters using the configured parameter prefix. If the code is unknown to the backing
    * {@link MessageSupport}, the parent message source is consulted.
    *
@@ -176,7 +180,8 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
    *
    * @return  the formatted message, never {@code null}
    *
-   * @throws NoSuchMessageException  if the code cannot be resolved and no parent message source is available
+   * @throws NoSuchMessageException  if the code cannot be resolved, neither by the backing message support nor by the
+   *                                 parent message source
    */
   @Override
   public @NotNull String getMessage(@NotNull String code, Object[] args, Locale locale) throws NoSuchMessageException
@@ -203,7 +208,7 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
 
 
   /**
-   * Resolve and format a message using the codes, arguments and default message provided by the given
+   * Resolves and formats a message using the codes, arguments and default message provided by the given
    * {@code resolvable}. The codes are tried in order; the first code known to the backing {@link MessageSupport} is
    * used. If none of the codes can be resolved, the parent message source is consulted. If that also fails, the
    * {@linkplain MessageSourceResolvable#getDefaultMessage() default message} is returned, or a

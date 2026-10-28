@@ -87,12 +87,14 @@ public final class EmptyMessageWithCode extends AbstractMessageWithCode
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean equals(Object o) {
     return o instanceof EmptyMessageWithCode && code.equals(((EmptyMessageWithCode)o).code);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public String toString() {
     return "EmptyMessageWithCode(" + code + ')';

@@ -44,12 +44,15 @@ import java.util.List;
  */
 public abstract class MessageFormatMessagesExtension
 {
+  /** Regular expressions selecting the message codes to include. */
   private final List<String> includeRegexFilter = new ArrayList<>();
+
+  /** Regular expressions selecting the message codes to exclude. */
   private final List<String> excludeRegexFilter = new ArrayList<>();
 
 
   /**
-   * Return a list of regular expressions which will be matched against each message code. If it matches, the message
+   * Returns a list of regular expressions which will be matched against each message code. If it matches, the message
    * will be included in the packed message file. If it doesn't match the message is skipped.
    * <p>
    * If the list is empty, all messages are included, unless they're explicitly excluded.
@@ -65,7 +68,7 @@ public abstract class MessageFormatMessagesExtension
 
 
   /**
-   * Return a list of regular expressions which will be matched against each message code. If it matches, the message
+   * Returns a list of regular expressions which will be matched against each message code. If it matches, the message
    * will be excluded from the packed message file. If it doesn't match the message is included.
    *
    * @return  list of regular expressions for message exclusion, never {@code null}
@@ -107,7 +110,7 @@ public abstract class MessageFormatMessagesExtension
 
 
   /**
-   * Include messages that match the given regular expressions.
+   * Includes messages that match the given regular expressions.
    *
    * @param regex  array of regular expressions, not {@code null}
    *
@@ -119,7 +122,7 @@ public abstract class MessageFormatMessagesExtension
 
 
   /**
-   * Exclude messages that match the given regular expressions.
+   * Excludes messages that match the given regular expressions.
    *
    * @param regex  array of regular expressions, not {@code null}
    *

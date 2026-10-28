@@ -71,13 +71,25 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   /** Maps primitive types and primitive array types to their corresponding wrapper types. */
   private static final @NotNull Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
 
+  /** Lock guarding all formatter registrations and lookups. */
   private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
+  /** Registered named formatters, keyed by formatter name. */
   private final @NotNull Map<String,NamedParameterFormatter> namedFormatters = new TreeMap<>();
+
+  /** Auto-apply named formatters, keyed by the parameter configuration names that trigger them. */
   private final @NotNull Map<String,NamedParameterFormatter> configNameToNamedFormatterMap = new TreeMap<>();
+
+  /** Type based formatters with their priority, keyed by the type they have been registered for. */
   private final @NotNull Map<Class<?>,List<PrioritizedParameterFormatter>> typeFormatters = new HashMap<>();
+
+  /** Accumulated parameter configuration names of all registered formatters. */
   private final @NotNull Set<String> parameterConfigNames = new TreeSet<>();
+
+  /** Registered post formatters, keyed by post formatter name. */
   private final @NotNull Map<String,PostFormatter> postFormatters = new HashMap<>();
+
+  /** Cache of resolved type based formatters, keyed by value type. */
   private final @NotNull FormatterCache formatterCache;
 
 
@@ -106,7 +118,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
 
 
   /**
-   * Create a generic formatter service with a {@link #DEFAULT_FORMATTER_CACHE_SIZE default} size.
+   * Creates a generic formatter service with a {@link #DEFAULT_FORMATTER_CACHE_SIZE default} size.
    * <p>
    * The formatter service provides a default formatter which translates every object into a string using the
    * {@link Object#toString()} method.
@@ -117,7 +129,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
 
 
   /**
-   * Create a generic formatter service with the given {@code formatterCacheSize}.
+   * Creates a generic formatter service with the given {@code formatterCacheSize}.
    * <p>
    * The formatter service provides a default formatter which translates every object into a string using the
    * {@link Object#toString()} method.
@@ -349,17 +361,17 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    * <ol>
    *   <li>
    *     If a {@code format} name is given and the matching named formatter supports the type, that named formatter is
-   *     returned <em>on its own</em> — no type-based formatters are added behind it. This is by design: an explicit
+   *     returned <em>on its own</em>; no type-based formatters are added behind it. This is by design: an explicit
    *     by-name selection is authoritative, so such a formatter has no next formatter to delegate to via
    *     {@link de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext#delegateToNextFormatter()}.
    *   </li>
    *   <li>
-   *     Otherwise, named formatters whose configuration key is present in {@code config} and that support the type are
-   *     added.
+   *     Otherwise, if {@code config} contains a configuration key of an auto-apply named formatter that supports the
+   *     type, the first such formatter is returned on its own.
    *   </li>
    *   <li>
-   *     Type-based formatters are resolved by walking the type hierarchy (superclasses and interfaces) and collected
-   *     in priority order.
+   *     Otherwise, type-based formatters are resolved by walking the type hierarchy (superclasses and interfaces) and
+   *     collected in priority order.
    *   </li>
    * </ol>
    */
@@ -463,7 +475,11 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This implementation returns an immutable snapshot of the post formatters registered at the time of the call.
+   */
   @Override
   public @UnmodifiableView @NotNull Map<String,PostFormatter> getPostFormatters()
   {
@@ -478,7 +494,11 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This implementation returns an immutable snapshot of the configuration names known at the time of the call.
+   */
   @Override
   public @UnmodifiableView @NotNull Set<String> getParameterConfigNames()
   {

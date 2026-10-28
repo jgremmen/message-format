@@ -45,8 +45,8 @@ public @interface Text
   /**
    * Message locale, either the language code (e.g. de, es) or the language with country (e.g. de_DE, fr_CA).
    * <p>
-   * The default value corresponds to {@link java.util.Locale#ROOT} which will match any locale
-   * used for formatting this message.
+   * The default value corresponds to {@link java.util.Locale#ROOT}, which is used for any locale that has no text with
+   * a matching language.
    *
    * @return  message locale
    *

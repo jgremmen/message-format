@@ -36,7 +36,7 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 public @interface TemplateDefs
 {
   /**
-   * 0..n template definitions.
+   * Template definitions contained in this container annotation.
    *
    * @return  template definitions
    */

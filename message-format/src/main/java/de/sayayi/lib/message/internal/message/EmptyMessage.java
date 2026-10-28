@@ -38,6 +38,7 @@ public final class EmptyMessage implements Message.WithSpaces
   public static final Message.WithSpaces INSTANCE = new EmptyMessage();
 
 
+  /** Private constructor; use {@link #INSTANCE} instead. */
   private EmptyMessage() {}
 
 
@@ -97,18 +98,21 @@ public final class EmptyMessage implements Message.WithSpaces
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean equals(Object o) {
     return o instanceof EmptyMessage;
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public int hashCode() {
     return EmptyMessage.class.hashCode();
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public String toString() {
     return "EmptyMessage";

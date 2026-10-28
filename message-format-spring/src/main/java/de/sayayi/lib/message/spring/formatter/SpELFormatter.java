@@ -49,11 +49,11 @@ import static org.springframework.expression.spel.support.DataBindingPropertyAcc
  * This formatter is registered under the name {@code spel} and supports the following parameter configuration options:
  * <ul>
  *   <li>
- *     {@code spel-expr} a SpEL expression to evaluate against the parameter value. The parameter value serves as the
+ *     {@code spel-expr}: a SpEL expression to evaluate against the parameter value. The parameter value serves as the
  *     root object of the expression.
  *   </li>
  *   <li>
- *     {@code spel-format} an optional format name used to format the result of the SpEL expression.
+ *     {@code spel-format}: an optional format name used to format the result of the SpEL expression.
  *   </li>
  * </ul>
  * <p>
@@ -86,11 +86,22 @@ import static org.springframework.expression.spel.support.DataBindingPropertyAcc
 @SuppressWarnings("SpellCheckingInspection")
 public final class SpELFormatter extends AbstractParameterFormatter<Object> implements NamedParameterFormatter
 {
+  /** Configuration keys supported by this formatter. */
   private static final Set<String> PARAMETER_CONFIG_NAMES = Set.of("spel-expr", "spel-format");
 
+  /** Operator overloader supporting the standard operators only. */
   private static final OperatorOverloader OPERATOR_OVERLOADER = new StandardOperatorOverloader();
+
+  /** Standard type comparator. */
   private static final TypeComparator TYPE_COMPARATOR = new StandardTypeComparator();
+
+  /**
+   * Method resolvers allowing instance methods to be invoked, but no static methods or methods on {@link Class}
+   * objects.
+   */
   private static final List<MethodResolver> METHOD_RESOLVERS = List.of(forInstanceMethodInvocation());
+
+  /** Property accessors allowing properties to be read, but not written. */
   private static final List<PropertyAccessor> PROPERTY_ACCESSORS = List.of(forReadOnlyAccess());
 
   /** Type locator rejecting all type references, so {@code T(...)} cannot be used to access arbitrary classes. */
@@ -98,12 +109,15 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
     throw new SpelEvaluationException(TYPE_NOT_FOUND, typeName);
   };
 
+  /** Parser for SpEL expressions. */
   private final SpelExpressionParser spelExpressionParser;
+
+  /** Type converter used while evaluating expressions. */
   private final TypeConverter typeConverter;
 
 
   /**
-   * Create a new SpEL formatter with the default configuration.
+   * Creates a new SpEL formatter with the default configuration.
    */
   public SpELFormatter()
   {
@@ -113,7 +127,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
 
 
   /**
-   * Create a new SpEL formatter with the given conversion service and resource loader.
+   * Creates a new SpEL formatter with the given conversion service and resource loader.
    *
    * @param conversionService  type conversion service, not {@code null}
    * @param resourceLoader     resource loader (usually the application context), not {@code null}
@@ -124,7 +138,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
 
 
   /**
-   * Create a new SpEL formatter with the given conversion service and class loader.
+   * Creates a new SpEL formatter with the given conversion service and class loader.
    *
    * @param conversionService  type conversion service, not {@code null}
    * @param classLoader        class loader used by the SpEL parser configuration, not {@code null}
@@ -145,8 +159,12 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
 
 
   /**
-   * Formats the given value by optionally evaluating a SpEL expression ({@code spel-expr}) against it and then
-   * delegating to the next formatter in the chain.
+   * {@inheritDoc}
+   * <p>
+   * If a SpEL expression ({@code spel-expr}) is configured, it is evaluated with {@code value} as its root object.
+   * The result (or the original value if no expression is configured) is then formatted using the formatter named by
+   * {@code spel-format}, or the formatters for its type if no format is configured. The {@code spel-expr} and
+   * {@code spel-format} configuration entries are not passed on to that formatter.
    */
   @Override
   protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Object value)
@@ -184,13 +202,24 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
    * A read-only SpEL {@link EvaluationContext} that uses the parameter value as its root object and exposes other
    * message parameters as SpEL variables. Type references, static method invocations, constructors, bean references,
    * property writes and variable assignments are not supported.
+   *
+   * @since 0.8.3
    */
   private final class ParameterEvaluationContext implements EvaluationContext
   {
+    /** Formatter context providing the message parameters as variables. */
     private final ParameterFormatterContext context;
+
+    /** Parameter value, used as root object. */
     private final TypedValue value;
 
 
+    /**
+     * Creates a new evaluation context for the given parameter value.
+     *
+     * @param context  formatter context providing the message parameters as variables, not {@code null}
+     * @param value    parameter value, used as root object, not {@code null}
+     */
     private ParameterEvaluationContext(@NotNull ParameterFormatterContext context, @NotNull Object value)
     {
       this.context = context;
@@ -198,66 +227,111 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Bean references are not supported, so this method always returns {@code null}.
+     */
     @Override
     public BeanResolver getBeanResolver() {
       return null;
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Constructors are not supported, so this method always returns an empty list.
+     */
     @Override
     public @NotNull List<ConstructorResolver> getConstructorResolvers() {
       return List.of();
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Only instance methods can be invoked.
+     */
     @Override
     public @NotNull List<MethodResolver> getMethodResolvers() {
       return METHOD_RESOLVERS;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull OperatorOverloader getOperatorOverloader() {
       return OPERATOR_OVERLOADER;
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Properties can be read, but not written.
+     */
     @Override
     public @NotNull List<PropertyAccessor> getPropertyAccessors() {
       return PROPERTY_ACCESSORS;
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The root object is the parameter value.
+     */
     @Override
     public @NotNull TypedValue getRootObject() {
       return value;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull TypeComparator getTypeComparator() {
       return TYPE_COMPARATOR;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull TypeConverter getTypeConverter() {
       return typeConverter;
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The returned type locator rejects all type references.
+     */
     @Override
     public @NotNull TypeLocator getTypeLocator() {
       return TYPE_LOCATOR;
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Variables resolve to the message parameters with the same name.
+     */
     @Override
     public Object lookupVariable(@NotNull String name) {
       return context.getParameterValue(name);
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Variable assignment is not supported.
+     *
+     * @throws SpelEvaluationException  always
+     */
     @Override
     public void setVariable(@NotNull String name, Object value) {
       throw new SpelEvaluationException(VARIABLE_ASSIGNMENT_NOT_SUPPORTED, "#" + name);

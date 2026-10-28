@@ -17,6 +17,25 @@
 /**
  * APIs and implementations for formatting message parameter values, including formatter selection and the context
  * available to parameter formatters.
+ * <p>
+ * This package defines the parameter formatter SPI. Built-in implementations are located in the {@code named} and
+ * {@code runtime} sub-packages. The main types are:
+ * <ul>
+ *   <li>{@link de.sayayi.lib.message.formatter.parameter.ParameterFormatter ParameterFormatter}: converts a parameter
+ *       value into text and defines optional capabilities such as size queries and map key comparison</li>
+ *   <li>{@link de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter NamedParameterFormatter}: a parameter
+ *       formatter that can be selected by name in a message format</li>
+ *   <li>{@link de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext ParameterFormatterContext}: the
+ *       context passed to a parameter formatter while formatting a value</li>
+ *   <li>{@link de.sayayi.lib.message.formatter.parameter.AbstractParameterFormatter AbstractParameterFormatter}: base
+ *       class handling {@code null} and empty values</li>
+ *   <li>{@link de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter
+ *       AbstractSingleTypeParameterFormatter}: base class for formatters supporting a single type</li>
+ *   <li>{@link de.sayayi.lib.message.formatter.parameter.AbstractMultiSelectFormatter AbstractMultiSelectFormatter}:
+ *       base class for formatters selecting a formatting function by configuration value</li>
+ *   <li>{@link de.sayayi.lib.message.formatter.parameter.SingletonParameters SingletonParameters}: lightweight
+ *       parameters holding a single, reusable parameter value</li>
+ * </ul>
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

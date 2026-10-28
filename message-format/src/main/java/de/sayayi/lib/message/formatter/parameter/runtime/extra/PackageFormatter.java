@@ -30,6 +30,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * This formatter renders the package using its fully qualified name obtained from {@link Package#getName()}.
  *
  * @author Jeroen Gremmen
+ * @since 0.3.1
  */
 public final class PackageFormatter extends AbstractSingleTypeParameterFormatter<Package>
 {

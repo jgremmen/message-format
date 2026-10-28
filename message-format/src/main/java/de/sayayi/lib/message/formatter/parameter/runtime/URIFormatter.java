@@ -36,20 +36,21 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * <p>
  * This formatter uses the {@code uri} configuration key to select which component of the URI to format:
  * <ul>
- *   <li>{@code default} (default) &ndash; the full URI string representation</li>
- *   <li>{@code authority} &ndash; the authority component</li>
- *   <li>{@code fragment} &ndash; the fragment component</li>
- *   <li>{@code host} &ndash; the host name</li>
- *   <li>{@code path} &ndash; the path component</li>
- *   <li>{@code port} &ndash; the port number; number map keys can be used to override the output</li>
- *   <li>{@code query} &ndash; the query string</li>
- *   <li>{@code scheme} &ndash; the scheme; string map keys can be used to override the output</li>
- *   <li>{@code user-info} &ndash; the user info component</li>
+ *   <li>{@code default} (default): the full URI string representation</li>
+ *   <li>{@code authority}: the authority component</li>
+ *   <li>{@code fragment}: the fragment component</li>
+ *   <li>{@code host}: the host name</li>
+ *   <li>{@code path}: the path component</li>
+ *   <li>{@code port}: the port number; number map keys can be used to override the output</li>
+ *   <li>{@code query}: the query string</li>
+ *   <li>{@code scheme}: the scheme; string map keys can be used to override the output</li>
+ *   <li>{@code user-info}: the user info component</li>
  * </ul>
  * <p>
  * If the configuration value does not match a known option, formatting is delegated to the next available formatter.
  *
  * @author Jeroen Gremmen
+ * @since 0.3.1
  */
 public final class URIFormatter extends AbstractSingleTypeParameterFormatter<URI>
 {

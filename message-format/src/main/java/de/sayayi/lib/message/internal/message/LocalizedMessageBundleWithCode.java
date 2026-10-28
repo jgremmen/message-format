@@ -57,11 +57,11 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
 
   /**
-   * Create a localized message bundle with code.
+   * Creates a localized message bundle with code.
    *
    * @param code               message code, not {@code null} and not empty
-   * @param localizedMessages  localized message map, not {@code null}. The map must contain at least 2 entries and
-   *                           no mapped value can be {@code null}
+   * @param localizedMessages  localized message map, not {@code null}. The map must contain at least 2 entries and no
+   *                           mapped value can be {@code null}
    */
   public LocalizedMessageBundleWithCode(@NotNull String code, @NotNull Map<Locale,@NotNull Message> localizedMessages)
   {
@@ -97,6 +97,15 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   }
 
 
+  /**
+   * Finds the message that best matches {@code locale}. In order of preference, this is the message for the same
+   * language and country, a message for the same language, a message for a locale without language (e.g.
+   * {@link Locale#ROOT}) or the first available message.
+   *
+   * @param locale  locale to find a message for, not {@code null}
+   *
+   * @return  best matching message, never {@code null}
+   */
   @Contract(pure = true)
   private @NotNull Message findMessageByLocale(@NotNull Locale locale)
   {
@@ -164,6 +173,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean equals(Object o)
   {
@@ -173,12 +183,14 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public int hashCode() {
     return (59 + code.hashCode()) * 59 + localizedMessages.hashCode();
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public String toString() {
     return "LocalizedMessageBundleWithCode(" + localizedMessages + ')';

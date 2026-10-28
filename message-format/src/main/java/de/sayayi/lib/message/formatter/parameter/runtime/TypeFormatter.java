@@ -37,16 +37,17 @@ import static java.util.stream.Collectors.joining;
  * This formatter renders a Java type as a human-readable string. The output is controlled by the {@code type}
  * configuration key, which accepts a combination of the following format flags:
  * <ul>
- *   <li>{@code c} &ndash; use the simple class name only</li>
- *   <li>{@code j} &ndash; omit the {@code java.lang.} package prefix</li>
- *   <li>{@code u} &ndash; omit the {@code java.util.} package prefix</li>
- *   <li>{@code v} &ndash; expand type variable bounds</li>
+ *   <li>{@code c}: use the simple class name only</li>
+ *   <li>{@code j}: omit the {@code java.lang.} package prefix</li>
+ *   <li>{@code u}: omit the {@code java.util.} package prefix</li>
+ *   <li>{@code v}: expand type variable bounds</li>
  * </ul>
  * <p>
  * The default format is {@code "ju"}, which strips both the {@code java.lang.} and {@code java.util.} prefixes.
  * The formatter handles generic types, parameterized types, type variables, wildcard types and arrays.
  *
  * @author Jeroen Gremmen
+ * @since 0.6.0
  */
 public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Type>
 {
@@ -102,6 +103,14 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
   }
 
 
+  /**
+   * Returns the textual representation of class {@code type}, including array dimensions.
+   *
+   * @param type        class to format, not {@code null}
+   * @param typeFormat  format flags, not {@code null}
+   *
+   * @return  class representation, never {@code null}
+   */
   private static String toString_class(@NotNull Class<?> type, @NotNull String typeFormat)
   {
     final var arraySuffix = new StringBuilder();
@@ -126,6 +135,14 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
   }
 
 
+  /**
+   * Returns the textual representation of a parameterized type, including its owner type and type arguments.
+   *
+   * @param parameterizedType  parameterized type to format, not {@code null}
+   * @param typeFormat         format flags, not {@code null}
+   *
+   * @return  parameterized type representation, never {@code null}
+   */
   private static String toString_parameterized(@NotNull ParameterizedType parameterizedType,
                                                @NotNull String typeFormat)
   {
@@ -161,6 +178,14 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
   }
 
 
+  /**
+   * Returns the textual representation of a type variable. Its bounds are included if format flag {@code v} is set.
+   *
+   * @param typeVariable  type variable to format, not {@code null}
+   * @param typeFormat    format flags, not {@code null}
+   *
+   * @return  type variable representation, never {@code null}
+   */
   private static String toString_typeVariable(@NotNull TypeVariable<?> typeVariable, @NotNull String typeFormat)
   {
     if (typeFormat.indexOf('v') < 0)
@@ -182,6 +207,14 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
   }
 
 
+  /**
+   * Returns the textual representation of a wildcard type, including its lower or upper bounds.
+   *
+   * @param wildcardType  wildcard type to format, not {@code null}
+   * @param typeFormat    format flags, not {@code null}
+   *
+   * @return  wildcard type representation, never {@code null}
+   */
   private static String toString_wildcard(@NotNull WildcardType wildcardType, @NotNull String typeFormat)
   {
     final var formattedWildcardType = new StringBuilder();

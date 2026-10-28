@@ -44,6 +44,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @SuppressWarnings("ClassCanBeRecord")
 public final class MessageTemplate implements Template
 {
+  /** Message this template delegates formatting to. */
   private final Message message;
 
 

@@ -35,10 +35,10 @@ import static java.util.Collections.emptyIterator;
  * <p>
  * The {@code bitset} configuration key controls the output mode:
  * <ul>
- *   <li>{@code lsb-set} (default) &ndash; renders set bits using their mapped messages, least significant bit first</li>
- *   <li>{@code msb-set} &ndash; renders set bits using their mapped messages, most significant bit first</li>
- *   <li>{@code lsb-bits} &ndash; formats all bits as a binary string, least significant bit first</li>
- *   <li>{@code msb-bits} &ndash; formats all bits as a binary string, most significant bit first</li>
+ *   <li>{@code lsb-set} (default): renders set bits using their mapped messages, least significant bit first</li>
+ *   <li>{@code msb-set}: renders set bits using their mapped messages, most significant bit first</li>
+ *   <li>{@code lsb-bits}: formats all bits as a binary string, least significant bit first</li>
+ *   <li>{@code msb-bits}: formats all bits as a binary string, most significant bit first</li>
  * </ul>
  * <p>
  * In {@code lsb-set}/{@code msb-set} mode, each set bit is mapped to a message via a number-keyed map entry in the
@@ -49,8 +49,8 @@ import static java.util.Collections.emptyIterator;
  * <p>
  * In {@code lsb-bits}/{@code msb-bits} mode, the following additional configuration keys are available:
  * <ul>
- *   <li>{@code bit0} &ndash; text representation for an unset bit (default: {@code 0})</li>
- *   <li>{@code bit1} &ndash; text representation for a set bit (default: {@code 1})</li>
+ *   <li>{@code bit0}: text representation for an unset bit (default: {@code 0})</li>
+ *   <li>{@code bit1}: text representation for a set bit (default: {@code 1})</li>
  * </ul>
  *
  * @author Jeroen Gremmen
@@ -215,14 +215,23 @@ public final class BitSetFormatter extends AbstractListFormatter<BitSet>
 
 
   /**
-   * Iterator that formats each bit message using the configured list value message and yields the resulting
-   * non-empty text elements.
+   * Iterator that formats each bit message using the configured list value message and yields the resulting non-empty
+   * text elements.
+   *
+   * @since 0.22.0
    */
   private static final class TextIterator extends AbstractTextIterator
   {
+    /** Formatter context used to format the bit messages. */
     private final ParameterFormatterContext context;
+
+    /** Message used to format each element. */
     private final Message valueMessage;
+
+    /** Reusable parameters holding the element currently being formatted. */
     private final SingletonParameters parameters;
+
+    /** Iterator providing the messages of the set bits. */
     private final Iterator<Message.WithSpaces> messageIterator;
 
 

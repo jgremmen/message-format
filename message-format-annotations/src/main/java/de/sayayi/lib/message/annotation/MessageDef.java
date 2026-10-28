@@ -32,8 +32,8 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * For example:
  * <blockquote><pre>
  * &#x40;MessageDef(code = "MSG-001", texts = {
- *   &#x40;Text(locale = "en", text = "%{r,size,1:'1 result',:'%{r,size,0:no} results'} found"),
- *   &#x40;Text(locale = "de", text = "%{r,size,1:'1 Ergebnis',:'%{r,size,0:keine} Ergebnisse'} gefunden")
+ *   &#x40;Text(locale = "en", text = "%{r,format:size,1:'1 result',:'%{r,format:size,0:no} results'} found"),
+ *   &#x40;Text(locale = "de", text = "%{r,format:size,1:'1 Ergebnis',:'%{r,format:size,0:keine} Ergebnisse'} gefunden")
  * })
  * </pre></blockquote>
  *

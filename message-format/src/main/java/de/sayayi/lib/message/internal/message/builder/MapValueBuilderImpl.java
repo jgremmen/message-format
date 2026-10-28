@@ -45,7 +45,7 @@ public final class MapValueBuilderImpl implements MapValueBuilder
 
 
   /**
-   * Construct a new map value builder.
+   * Constructs a new map value builder.
    *
    * @param parameterBuilder  the enclosing parameter builder, not {@code null}
    * @param key               the map key, or {@code null} for the default entry

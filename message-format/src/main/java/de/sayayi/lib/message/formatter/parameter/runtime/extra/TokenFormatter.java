@@ -161,11 +161,16 @@ public final class TokenFormatter extends AbstractSingleTypeParameterFormatter<T
   /**
    * Message parameters implementation that provides {@code line} and {@code column} values for the position format
    * message. This class supplies the adjusted line and column numbers of a token to the position format template.
+   *
+   * @since 0.24.0
    */
   @SuppressWarnings({"ClassCanBeRecord", "OptionalGetWithoutIsPresent"})
   private static class PositionParameters implements Parameters
   {
+    /** Formatter context providing the line and column configuration. */
     private final ParameterFormatterContext context;
+
+    /** Token whose position is provided. */
     private final Token token;
 
 

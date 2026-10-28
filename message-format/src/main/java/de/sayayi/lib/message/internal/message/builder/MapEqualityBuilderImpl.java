@@ -54,7 +54,7 @@ public non-sealed class MapEqualityBuilderImpl implements MapEqualityBuilder
 
 
   /**
-   * Construct a new equality map entry builder.
+   * Constructs a new equality map entry builder.
    *
    * @param parameterBuilder  the enclosing parameter builder, not {@code null}
    * @param keyFactory        factory that creates a {@link MapKey} for the given comparison type, not {@code null}

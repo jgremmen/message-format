@@ -65,6 +65,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  */
 public final class ICUPersonFormatter implements NamedParameterFormatter
 {
+  /** Configuration keys supported by this formatter. */
   private static final Set<String> CONFIG_NAMES = Set.of(
       "given-format", "family-format", "middle-format", "prefix-format", "suffix-format",
       "order", "usage", "formality", "length");
@@ -156,8 +157,21 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
 
 
   /**
-   * Formats a person name using the ICU {@link PersonNameFormatter}, which provides locale-sensitive
-   * name formatting. This method is used for {@link Usage#MONOGRAM monogram} usage.
+   * Formats a person name using the ICU {@link PersonNameFormatter}, which provides locale-sensitive name formatting.
+   * This method is used for {@link Usage#MONOGRAM monogram} usage.
+   *
+   * @param locale      locale used for formatting
+   * @param givenName   given name, or {@code null}
+   * @param familyName  family name, or {@code null}
+   * @param middleName  middle name, or {@code null}
+   * @param prefix      prefix (title), or {@code null}
+   * @param suffix      suffix (generation), or {@code null}
+   * @param order       name display order, not {@code null}
+   * @param usage       formatting context, not {@code null}
+   * @param formality   formality level, not {@code null}
+   * @param length      overall name length, not {@code null}
+   *
+   * @return  formatted person name, or empty text if the name is empty, never {@code null}
    */
   private static @NotNull Text formatWithICU(Locale locale, String givenName, String familyName, String middleName,
                                              String prefix, String suffix, Order order, Usage usage,
@@ -197,8 +211,22 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
 
 
   /**
-   * Assembles a person name manually based on per-part format settings. Each name part is individually
-   * formatted according to its configured format before assembly.
+   * Assembles a person name manually based on per-part format settings. Each name part is individually formatted
+   * according to its configured format before assembly.
+   *
+   * @param givenName     given name, or {@code null}
+   * @param familyName    family name, or {@code null}
+   * @param middleName    middle name, or {@code null}
+   * @param prefix        prefix (title), or {@code null}
+   * @param suffix        suffix (generation), or {@code null}
+   * @param givenFormat   given name format, not {@code null}
+   * @param familyFormat  family name format, not {@code null}
+   * @param middleFormat  middle name format, not {@code null}
+   * @param prefixFormat  prefix format, not {@code null}
+   * @param suffixFormat  suffix format, not {@code null}
+   * @param order         name display order, not {@code null}
+   *
+   * @return  formatted person name, or empty text if the name is empty, never {@code null}
    */
   private static @NotNull Text formatManually(String givenName, String familyName, String middleName, String prefix,
                                               String suffix, PartFormat givenFormat, PartFormat familyFormat,
@@ -225,7 +253,16 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
   }
 
 
-  /** Assembles name parts in given-first order: prefix, given, middle, family, suffix. */
+  /**
+   * Assembles name parts in given-first order: prefix, given, middle, family, suffix.
+   *
+   * @param sb      string builder receiving the assembled name, not {@code null}
+   * @param given   formatted given name, or {@code null} to omit it
+   * @param middle  formatted middle name, or {@code null} to omit it
+   * @param family  formatted family name, or {@code null} to omit it
+   * @param prefix  formatted prefix, or {@code null} to omit it
+   * @param suffix  formatted suffix, or {@code null} to omit it
+   */
   private static void assembleGivenFirst(@NotNull StringBuilder sb, String given, String middle, String family,
                                          String prefix, String suffix)
   {
@@ -245,6 +282,14 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
   /**
    * Assembles name parts in surname-first order: family, prefix, given, middle, suffix.
    * In sorting mode, a comma separates the family name from the remaining parts.
+   *
+   * @param sb       string builder receiving the assembled name, not {@code null}
+   * @param family   formatted family name, or {@code null} to omit it
+   * @param given    formatted given name, or {@code null} to omit it
+   * @param middle   formatted middle name, or {@code null} to omit it
+   * @param prefix   formatted prefix, or {@code null} to omit it
+   * @param suffix   formatted suffix, or {@code null} to omit it
+   * @param sorting  {@code true} to separate the family name with a comma, {@code false} otherwise
    */
   private static void assembleSurnameFirst(@NotNull StringBuilder sb, String family, String given, String middle,
                                            String prefix, String suffix, boolean sorting)
@@ -280,9 +325,11 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
 
 
   /**
-   * Format for name parts that support full, initial and none.
+   * Display format for name parts that can be shown in full, as an initial or not at all.
    *
    * @see #apply(String)
+   *
+   * @since 0.24.0
    */
   public enum PartFormat
   {
@@ -318,9 +365,11 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
 
 
   /**
-   * Format for prefix/suffix parts that only support full and none.
+   * Display format for prefix and suffix parts, which can only be shown in full or not at all.
    *
    * @see #apply(String)
+   *
+   * @since 0.24.0
    */
   public enum PresenceFormat
   {
@@ -349,6 +398,8 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
 
   /**
    * Name display order, mapping to the corresponding ICU {@link DisplayOrder} values.
+   *
+   * @since 0.24.0
    */
   public enum Order
   {
@@ -361,9 +412,15 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
     /** Family name first, separated by a comma for sorting purposes. */
     SORTING(DisplayOrder.SORTING);
 
+    /** Corresponding ICU display order. */
     final DisplayOrder displayOrder;
 
 
+    /**
+     * Creates an order constant for the given ICU display order.
+     *
+     * @param displayOrder  corresponding ICU display order, not {@code null}
+     */
     Order(DisplayOrder displayOrder) {
       this.displayOrder = displayOrder;
     }

@@ -40,6 +40,7 @@ public final class TextBuilderImpl extends AbstractSpacedBuilder<TextBuilder> im
   /** Enclosing message builder that receives the completed text part. */
   private final @NotNull FluentMessageBuilder builder;
 
+  /** Literal text of the text part. */
   private final @NotNull String text;
 
   /** Indicates whether this text part has already been written to the enclosing builder. */
@@ -47,7 +48,7 @@ public final class TextBuilderImpl extends AbstractSpacedBuilder<TextBuilder> im
 
 
   /**
-   * Construct a new text builder for the given literal text.
+   * Constructs a new text builder for the given literal text.
    *
    * @param builder  enclosing message builder, not {@code null}
    * @param text     literal text, not {@code null}

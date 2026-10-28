@@ -33,7 +33,10 @@ import static de.sayayi.lib.message.util.MessageUtil.*;
  */
 public final class TextJoiner
 {
+  /** Joined text content; it may start with a single space, but never ends with one. */
   private final StringBuilder joined = new StringBuilder();
+
+  /** {@code true} if a space must be inserted before the next non-space content. */
   private boolean insertSpaceBefore;
 
 

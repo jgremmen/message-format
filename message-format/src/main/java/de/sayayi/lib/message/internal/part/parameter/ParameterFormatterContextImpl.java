@@ -51,11 +51,22 @@ import static java.util.Objects.requireNonNull;
 @ApiStatus.Internal
 final class ParameterFormatterContextImpl extends BaseConfigAccessor implements ParameterFormatterContext
 {
+  /** Parameter configuration map of the parameter being formatted. */
   private final @NotNull MessagePart.Map map;
+
+  /** Parameters of the message being formatted. */
   private final @NotNull Parameters parameters;
+
+  /** Parameter value being formatted, or {@code null}. */
   private final Object value;
+
+  /** Explicit formatter name, or {@code null}. */
   private final String format;
+
+  /** Prioritized formatters available for the value being formatted. */
   private final @NotNull ParameterFormatter[] parameterFormatters;
+
+  /** Index of the next formatter to delegate to. */
   private int parameterFormatterIndex = 0;
 
 
@@ -231,9 +242,12 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
   /**
    * Internal implementation of {@link ClassifierContext} that collects classifier labels for a parameter value by
    * consulting registered formatters.
+   *
+   * @since 0.21.0
    */
   private final class InternalClassifierContext extends BaseConfigAccessor implements ClassifierContext
   {
+    /** Classifiers collected so far, in insertion order. */
     private final Set<String> classifiers = new LinkedHashSet<>();
 
 

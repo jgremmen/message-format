@@ -25,6 +25,11 @@
  * adopt(MessageDef)} and
  * {@link de.sayayi.lib.message.annotation.adopter.AbstractAnnotationAdopter#adopt(de.sayayi.lib.message.annotation.TemplateDef)
  * adopt(TemplateDef)} without requiring annotated class files, which is useful in programmatic and testing scenarios.
+ * <p>
+ * {@link de.sayayi.lib.message.annotation.adopter.util.SyntheticMessageDef SyntheticMessageDef},
+ * {@link de.sayayi.lib.message.annotation.adopter.util.SyntheticTemplateDef SyntheticTemplateDef} and
+ * {@link de.sayayi.lib.message.annotation.adopter.util.SyntheticText SyntheticText} implement the corresponding
+ * annotation interfaces as records.
  *
  * @author Jeroen Gremmen
  * @since 0.24.0

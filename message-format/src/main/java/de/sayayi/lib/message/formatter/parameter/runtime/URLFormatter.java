@@ -36,24 +36,25 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * <p>
  * This formatter uses the {@code url} configuration key to select which component of the URL to format:
  * <ul>
- *   <li>{@code external} (default) &ndash; the full external form of the URL</li>
- *   <li>{@code authority} &ndash; the authority component</li>
- *   <li>{@code file} &ndash; the file component</li>
- *   <li>{@code host} &ndash; the host name</li>
- *   <li>{@code path} &ndash; the path component</li>
+ *   <li>{@code external} (default): the full external form of the URL</li>
+ *   <li>{@code authority}: the authority component</li>
+ *   <li>{@code file}: the file component</li>
+ *   <li>{@code host}: the host name</li>
+ *   <li>{@code path}: the path component</li>
  *   <li>
- *     {@code port} &ndash; the port number (falls back to the default port if none is specified); number map keys
+ *     {@code port}: the port number (falls back to the default port if none is specified); number map keys
  *     can be used to override the output
  *   </li>
- *   <li>{@code protocol} &ndash; the protocol; string map keys can be used to override the output</li>
- *   <li>{@code query} &ndash; the query string</li>
- *   <li>{@code user-info} &ndash; the user info component</li>
- *   <li>{@code ref} &ndash; the reference (fragment) component</li>
+ *   <li>{@code protocol}: the protocol; string map keys can be used to override the output</li>
+ *   <li>{@code query}: the query string</li>
+ *   <li>{@code user-info}: the user info component</li>
+ *   <li>{@code ref}: the reference (fragment) component</li>
  * </ul>
  * <p>
  * If the configuration value does not match a known option, formatting is delegated to the next available formatter.
  *
  * @author Jeroen Gremmen
+ * @since 0.3.1
  */
 public final class URLFormatter extends AbstractSingleTypeParameterFormatter<URL>
 {

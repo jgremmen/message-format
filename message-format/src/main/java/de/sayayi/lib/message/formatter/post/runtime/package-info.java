@@ -15,7 +15,15 @@
  */
 
 /**
- * Built-in post formatter implementations for common text transformations such as case conversion and clipping.
+ * Built-in post formatter implementations for common text transformations such as case conversion and clipping:
+ * <ul>
+ *   <li>{@link de.sayayi.lib.message.formatter.post.runtime.CasePostFormatter CasePostFormatter} ({@code case}):
+ *       converts the text to upper or lower case</li>
+ *   <li>{@link de.sayayi.lib.message.formatter.post.runtime.ClipPostFormatter ClipPostFormatter} ({@code clip}):
+ *       clips the text to a maximum length</li>
+ * </ul>
+ * <p>
+ * Both post formatters are registered by default.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0

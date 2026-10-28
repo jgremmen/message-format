@@ -17,22 +17,34 @@
 /**
  * Core API for parsing, formatting and managing parameterized messages with locale support.
  * <p>
- * The main types in this package include:
+ * This package is the main entry point of the library. Applications typically obtain a {@code MessageSupport} from
+ * {@code MessageSupportFactory}, register messages and templates with it and format messages by code.
+ * <p>
+ * The main types in this package are:
  * <ul>
  *   <li>
- *     {@link de.sayayi.lib.message.Message Message} for formatted messages and their message parts
+ *     {@link de.sayayi.lib.message.Message Message}: the parsed, immutable representation of a message format string
  *   </li>
  *   <li>
- *     {@link de.sayayi.lib.message.MessageSupport MessageSupport} for accessing and configuring messages
+ *     {@link de.sayayi.lib.message.MessageSupport MessageSupport}: looks up, configures and formats messages
  *   </li>
  *   <li>
- *     {@link de.sayayi.lib.message.MessageFactory MessageFactory} for parsing message format strings
+ *     {@link de.sayayi.lib.message.MessageSupportFactory MessageSupportFactory}: creates message support instances
  *   </li>
  *   <li>
- *     {@link de.sayayi.lib.message.MessageSupportFactory MessageSupportFactory} for creating message support
+ *     {@link de.sayayi.lib.message.MessageFactory MessageFactory}: parses message format strings into messages and
+ *     templates
  *   </li>
  *   <li>
- *     {@link de.sayayi.lib.message.MessageBuilder MessageBuilder} for building messages with named parameters
+ *     {@link de.sayayi.lib.message.MessageBuilder MessageBuilder}: builds messages programmatically
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.SpacesAware SpacesAware}: tracks leading and trailing spaces of messages and
+ *     message parts
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.FormatStringSerializer FormatStringSerializer}: serializes messages back into
+ *     their message format string representation
  *   </li>
  * </ul>
  *

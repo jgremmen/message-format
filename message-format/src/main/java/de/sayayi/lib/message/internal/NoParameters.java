@@ -37,6 +37,7 @@ import static java.util.Objects.requireNonNull;
 @SuppressWarnings("ClassCanBeRecord")
 public final class NoParameters implements Parameters
 {
+  /** Locale used for formatting. */
   private final Locale locale;
 
 

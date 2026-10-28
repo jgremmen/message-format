@@ -16,6 +16,11 @@
 
 /**
  * Internal implementations for parameter parts and their formatter context.
+ * <p>
+ * {@link de.sayayi.lib.message.internal.part.parameter.ParameterPart ParameterPart} represents a parameter reference in
+ * a message and
+ * {@link de.sayayi.lib.message.internal.part.parameter.ParameterFormatterContextImpl ParameterFormatterContextImpl} is
+ * the context passed to parameter formatters while formatting its value.
  *
  * @author Jeroen Gremmen
  * @since 0.5.0

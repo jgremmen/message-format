@@ -53,7 +53,11 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * <p>
  * The table below illustrates how the configuration keys interact:
  * <table border="1">
- *   <tr><th>&nbsp;array&nbsp;</th><th>&nbsp;sep-last&nbsp;</th><th>&nbsp;max-size&nbsp;</th><th>&nbsp;value-more&nbsp;</th><th>&nbsp;result&nbsp;</th></tr>
+ *   <caption>Interaction of list configuration keys</caption>
+ *   <tr>
+ *     <th>&nbsp;array&nbsp;</th><th>&nbsp;sep-last&nbsp;</th><th>&nbsp;max-size&nbsp;</th>
+ *     <th>&nbsp;value-more&nbsp;</th><th>&nbsp;result&nbsp;</th>
+ *   </tr>
  *   <tr><td>[]</td><td>n/a</td><td>0</td><td>n/a</td><td>''</td></tr>
  *   <tr><td>[A,B,C]</td><td>'&nbsp;and'</td><td>(undefined)</td><td>n/a</td><td>'A, B and C'</td></tr>
  *   <tr><td>[A,B,C]</td><td>n/a</td><td>2</td><td>'...'</td><td>'A, B, ...'</td></tr>
@@ -179,18 +183,35 @@ public final class ArrayFormatter extends AbstractListFormatter<Object> implemen
 
 
   /**
-   * Iterator that formats each array element using the configured list value message and yields the resulting
-   * non-empty text elements.
+   * Iterator that formats each array element using the configured list value message and yields the resulting non-empty
+   * text elements.
+   *
+   * @since 0.8.0
    */
   private static final class TextIterator extends AbstractTextIterator
   {
+    /** Message accessor used to format the elements. */
     private final MessageAccessor messageAccessor;
+
+    /** Function returning the array element at a given index. */
     private final IntFunction<Object> getter;
+
+    /** Message used to format each element. */
     private final Message.WithSpaces valueMessage;
+
+    /** Reusable parameters holding the element currently being formatted. */
     private final SingletonParameters parameters;
+
+    /** Lazily created text for elements referring to the formatted value itself. */
     private final Supplier<Text> thisText;
+
+    /** Array being iterated. */
     private final Object array;
+
+    /** Length of the array being iterated. */
     private final int length;
+
+    /** Index of the next array element to format. */
     private int idx = 0;
 
 

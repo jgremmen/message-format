@@ -59,8 +59,13 @@ import static java.util.stream.Collector.Characteristics.UNORDERED;
 @ApiStatus.Internal
 final class ContextToMapCollector<C extends ParserRuleContext,K,V> implements Collector<C,Map<K,V>,Map<K,V>>
 {
+  /** Supplier creating the result map. */
   private final Supplier<Map<K,V>> supplier;
+
+  /** Function adding the key and value of a parser rule context to the result map. */
   private final BiConsumer<@NotNull Map<K,V>,@NotNull C> accumulator;
+
+  /** Characteristics of this collector. */
   private final Set<Characteristics> characteristics;
 
 

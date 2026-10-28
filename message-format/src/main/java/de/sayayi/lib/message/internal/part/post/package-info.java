@@ -16,6 +16,10 @@
 
 /**
  * Internal implementations for post formatter parts and their context.
+ * <p>
+ * {@link de.sayayi.lib.message.internal.part.post.PostFormatterPart PostFormatterPart} represents a post format message
+ * part and {@link de.sayayi.lib.message.internal.part.post.PostFormatterContextImpl PostFormatterContextImpl} is the
+ * context passed to post formatters.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0

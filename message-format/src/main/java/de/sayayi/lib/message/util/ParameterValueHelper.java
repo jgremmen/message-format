@@ -48,6 +48,7 @@ import static de.sayayi.lib.message.util.MessageUtil.findEnumValue;
 @SuppressWarnings("IfCanBeSwitch")
 public final class ParameterValueHelper
 {
+  /** This class is not meant to be instantiated. */
   private ParameterValueHelper() {}
 
 

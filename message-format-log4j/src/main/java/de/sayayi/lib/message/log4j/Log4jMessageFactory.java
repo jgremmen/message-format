@@ -46,7 +46,10 @@ import static de.sayayi.lib.message.part.normalizer.MessagePartNormalizer.PASS_T
  */
 public final class Log4jMessageFactory extends AbstractMessageFactory
 {
+  /** Message support used to parse and format the log messages. */
   private final MessageSupport messageSupport;
+
+  /** {@code true} if messages with Log4j-style placeholders only are delegated to {@link ParameterizedMessage}. */
   private final boolean parameterizedMessageFallback;
 
 
@@ -63,8 +66,8 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
    * Creates a new factory with a default {@link MessageSupport} instance using the shared
    * {@link DefaultFormatterService}.
    *
-   * @param parameterizedMessageFallback  if {@code true}, messages containing Log4j-style <code>{}</code>
-   *                                      placeholders (and no message-format placeholders) are delegated to
+   * @param parameterizedMessageFallback  if {@code true}, messages containing Log4j-style <code>{}</code> placeholders
+   *                                      (and no message-format placeholders) are delegated to
    *                                      {@link ParameterizedMessage} for backward compatibility
    */
   public Log4jMessageFactory(boolean parameterizedMessageFallback)
@@ -92,6 +95,11 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The character sequence is converted into a string and handled like {@link #newMessage(String)}.
+   */
   @Override
   public Message newMessage(CharSequence charSequence) {
     return newMessage(charSequence == null ? null : charSequence.toString(), (Object[])null);
@@ -116,8 +124,9 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
    * for backward compatibility. Otherwise, the message is parsed using message-format syntax and parameters are
    * mapped to variables {@code p1}, {@code p2}, etc.
    * <p>
-   * If the last parameter is a {@link Throwable}, it is additionally attached to the returned message.
-   * The formatted message string is evaluated lazily when first requested.
+   * If the last parameter is a {@link Throwable}, it is additionally attached to the returned message. The formatted
+   * message string is evaluated lazily when first requested and then cached. Errors occurring while formatting are not
+   * thrown; instead, a placeholder text containing the message format string is returned.
    * <p>
    * A {@code null} message string results in a {@link SimpleMessage} with {@code null} content.
    */

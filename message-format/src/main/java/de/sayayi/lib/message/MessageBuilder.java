@@ -77,6 +77,8 @@ public sealed interface MessageBuilder
    * @param text  literal text to append, not {@code null}
    *
    * @return  text builder for optional space configuration, never {@code null}
+   *
+   * @throws IllegalStateException  if this builder has already been built
    */
   @NotNull TextBuilder text(@NotNull String text);
 
@@ -89,6 +91,9 @@ public sealed interface MessageBuilder
    * @param name  parameter name, not {@code null} or empty
    *
    * @return  parameter builder for further configuration, never {@code null}
+   *
+   * @throws IllegalArgumentException  if {@code name} does not use a supported naming convention
+   * @throws IllegalStateException  if this builder has already been built
    */
   @NotNull ParameterBuilder parameter(@NotNull String name);
 
@@ -101,6 +106,9 @@ public sealed interface MessageBuilder
    * @param name  post-formatter name, not {@code null} or empty
    *
    * @return  post-formatter builder for further configuration, never {@code null}
+   *
+   * @throws IllegalArgumentException  if {@code name} does not use kebab-case
+   * @throws IllegalStateException  if this builder has already been built
    */
   @NotNull PostFormatterBuilder postFormatter(@NotNull String name);
 
@@ -113,6 +121,9 @@ public sealed interface MessageBuilder
    * @param name  template name, not {@code null} or empty
    *
    * @return  template builder for further configuration, never {@code null}
+   *
+   * @throws IllegalArgumentException  if {@code name} does not use kebab-case
+   * @throws IllegalStateException  if this builder has already been built
    */
   @NotNull TemplateBuilder template(@NotNull String name);
 
@@ -123,6 +134,8 @@ public sealed interface MessageBuilder
    * When called on a sub-builder, the current part is finalized first.
    *
    * @return  the constructed message, never {@code null}
+   *
+   * @throws IllegalStateException  if this builder has already been built
    */
   @NotNull Message.WithSpaces build();
 
@@ -135,6 +148,8 @@ public sealed interface MessageBuilder
    * @param code  message code, not {@code null} or empty
    *
    * @return  the constructed message with code, never {@code null}
+   *
+   * @throws IllegalStateException  if this builder has already been built
    */
   @NotNull Message.WithCode buildWithCode(@NotNull String code);
 
@@ -286,6 +301,9 @@ public sealed interface MessageBuilder
 
   /**
    * Mixin interface for sub-builders that support typed configuration values.
+   * <p>
+   * The configuration of a part is finalized as soon as the part is flushed by moving on to another message part or by
+   * building the message. After that, the configuration can no longer be changed.
    *
    * @param <S>  the self type of the sub-builder
    *
@@ -301,6 +319,9 @@ public sealed interface MessageBuilder
      * @param value  string value, not {@code null}
      *
      * @return  this builder, never {@code null}
+     *
+     * @throws IllegalArgumentException  if {@code name} does not use kebab-case
+     * @throws IllegalStateException     if the configuration of this part has already been finalized
      */
     @Contract("_, _ -> this")
     @NotNull S configString(@NotNull String name, @NotNull String value);
@@ -313,6 +334,9 @@ public sealed interface MessageBuilder
      * @param value  boolean value
      *
      * @return  this builder, never {@code null}
+     *
+     * @throws IllegalArgumentException  if {@code name} does not use kebab-case
+     * @throws IllegalStateException     if the configuration of this part has already been finalized
      */
     @Contract("_, _ -> this")
     @NotNull S configBool(@NotNull String name, boolean value);
@@ -325,6 +349,9 @@ public sealed interface MessageBuilder
      * @param value  numeric value
      *
      * @return  this builder, never {@code null}
+     *
+     * @throws IllegalArgumentException  if {@code name} does not use kebab-case
+     * @throws IllegalStateException     if the configuration of this part has already been finalized
      */
     @Contract("_, _ -> this")
     @NotNull S configNumber(@NotNull String name, long value);
@@ -338,7 +365,9 @@ public sealed interface MessageBuilder
      *
      * @return  this builder, never {@code null}
      *
-     * @throws IllegalArgumentException  if called on a post-formatter builder
+     * @throws IllegalArgumentException  if called on a post-formatter builder or if {@code name} does not use
+     *                                   kebab-case
+     * @throws IllegalStateException     if the configuration of this part has already been finalized
      */
     @Contract("_, _ -> this")
     @NotNull S configMessage(@NotNull String name, @NotNull Message.WithSpaces message);
@@ -366,6 +395,8 @@ public sealed interface MessageBuilder
      * @param format  formatter name, not {@code null}
      *
      * @return  this parameter builder, never {@code null}
+     *
+     * @throws IllegalArgumentException  if {@code format} does not use kebab-case
      */
     @Contract("_ -> this")
     @NotNull ParameterBuilder withFormat(@NotNull String format);

@@ -93,6 +93,15 @@ public final class DictionaryFormatter implements ParameterFormatter
   }
 
 
+  /**
+   * Looks up the dictionary value for string key {@code string}. A single character string is also tried as a
+   * {@code Character} key.
+   *
+   * @param dictionary  dictionary to look up the value from, not {@code null}
+   * @param string      string key, not {@code null}
+   *
+   * @return  dictionary value, or {@code null} if no value was found
+   */
   @Contract(pure = true)
   private Object getValueByString(@NotNull Dictionary<?,?> dictionary, @NotNull String string)
   {
@@ -105,6 +114,15 @@ public final class DictionaryFormatter implements ParameterFormatter
   }
 
 
+  /**
+   * Looks up the dictionary value for number key {@code number}. The key is tried as {@code Long}, {@code BigInteger}
+   * and {@code BigDecimal} and, if it fits, as {@code Integer}, {@code Short} and {@code Byte}.
+   *
+   * @param dictionary  dictionary to look up the value from, not {@code null}
+   * @param number      number key
+   *
+   * @return  dictionary value, or {@code null} if no value was found
+   */
   @Contract(pure = true)
   private Object getValueByNumber(@NotNull Dictionary<?,?> dictionary, long number)
   {

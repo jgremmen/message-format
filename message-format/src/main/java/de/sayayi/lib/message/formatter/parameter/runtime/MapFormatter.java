@@ -49,11 +49,11 @@ import static java.util.Collections.unmodifiableMap;
  * In addition to the inherited configuration keys, this formatter supports:
  * <ul>
  *   <li>
- *     {@code map-kv} &ndash; message format used to render each entry; the parameters {@code key} and {@code value}
+ *     {@code map-kv}: message format used to render each entry; the parameters {@code key} and {@code value}
  *     are available in the message (default: {@code %{key,null:'(null)'}=%{value,null:'(null)'}})
  *   </li>
  *   <li>
- *     {@code map-this} &ndash; text to use when the map references itself as a key or value
+ *     {@code map-this}: text to use when the map references itself as a key or value
  *     (default: {@code "(this map)"})
  *   </li>
  * </ul>
@@ -61,6 +61,7 @@ import static java.util.Collections.unmodifiableMap;
  * As a {@link SizeQueryable} formatter, it reports the number of entries in the map.
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implements SizeQueryable
 {
@@ -161,16 +162,29 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
 
 
   /**
-   * Iterator that formats each map entry using the configured key-value message and yields the resulting
-   * non-empty text elements.
+   * Iterator that formats each map entry using the configured key-value message and yields the resulting non-empty text
+   * elements.
+   *
+   * @since 0.12.0
    */
   private static final class TextIterator extends AbstractTextIterator
   {
+    /** Message accessor used to format the elements. */
     private final MessageAccessor messageAccessor;
+
+    /** Reusable parameters holding the key and value of the entry currently being formatted. */
     private final KeyValueParameters parameters;
+
+    /** Lazily created text for elements referring to the formatted value itself. */
     private final Supplier<Text> thisText;
+
+    /** Map being iterated. */
     private final Map<?,?> map;
+
+    /** Iterator providing the map entries to format. */
     private final Iterator<Entry<?,?>> iterator;
+
+    /** Message used to format each map entry. */
     private final Message.WithSpaces keyValueMessage;
 
 
@@ -239,11 +253,18 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
   /**
    * A {@link Parameters} implementation that provides {@code key} and {@code value} parameters for formatting
    * individual map entries.
+   *
+   * @since 0.8.0
    */
   private static final class KeyValueParameters implements Parameters
   {
+    /** Locale used for formatting. */
     private final Locale locale;
+
+    /** Key of the map entry currently being formatted. */
     private Object key;
+
+    /** Value of the map entry currently being formatted. */
     private Object value;
 
 

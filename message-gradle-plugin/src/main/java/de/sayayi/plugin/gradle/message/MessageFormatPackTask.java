@@ -70,17 +70,26 @@ import static org.gradle.api.tasks.PathSensitivity.RELATIVE;
 @CacheableTask
 public abstract class MessageFormatPackTask extends DefaultTask
 {
+  /** Filter selecting class files only. */
   private static final Action<@NotNull PatternFilterable> CLASS_FILES =
       patternFilterable -> patternFilterable.include("**/*.class");
 
+  /** Nested messages configuration. */
   private final MessageFormatMessagesExtension messages;
+
+  /** Nested templates configuration. */
   private final MessageFormatTemplatesExtension templates;
+
+  /** Custom actions, executed in order of definition before the message pack is written. */
   private final List<Action<@NotNull MessageAccessor>> actionList = new ArrayList<>();
+
+  /** Name of the class currently being scanned, used for reporting duplicates. */
   private final AtomicReference<String> currentClassName = new AtomicReference<>();
 
 
   /**
-   * Gradle task constructor.
+   * Creates a new message pack task. Duplicate messages and templates are ignored with a warning, template references
+   * are validated and the message pack is not compressed by default.
    *
    * @param objectFactory  Gradle object factory for creating managed instances
    */
@@ -204,7 +213,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Add all outputs for the given {@code sourceSet} to the collection of sources.
+   * Adds all outputs for the given {@code sourceSet} to the collection of sources.
    *
    * @param sourceSet  source set to include in message/template scanning
    *
@@ -216,7 +225,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Return compress message pack property. The default for this property is {@code false}.
+   * Returns compress message pack property. The default for this property is {@code false}.
    *
    * @return  compress property, never {@code null}
    */
@@ -236,7 +245,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Provide the task with an action that allows for querying the scanned messages and templates. This action is
+   * Provides the task with an action that allows for querying the scanned messages and templates. This action is
    * invoked just before the messages and templates are written to the packed message file.
    * <p>
    * Here's an example of how to use this action.<br>
@@ -295,6 +304,14 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  /**
+   * Scans all class files in the configured sources and adds the messages and templates found to
+   * {@code messageSupport}.
+   *
+   * @param messageSupport  message support receiving the messages and templates, not {@code null}
+   *
+   * @throws GradleException  if scanning fails
+   */
   private void pack_scanMessages(@NotNull ConfigurableMessageSupport messageSupport)
   {
     final var logger = getLogger();
@@ -330,6 +347,14 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  /**
+   * Validates that all templates referenced by the selected messages are available, unless template validation is
+   * disabled. Missing templates matching one of the ignore patterns are not reported.
+   *
+   * @param messageSupport  message support containing the scanned messages and templates, not {@code null}
+   *
+   * @throws GradleException  if referenced templates are missing
+   */
   private void pack_validateTemplates(@NotNull MessageSupport messageSupport)
   {
     final var templates = getTemplates();
@@ -377,6 +402,11 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  /**
+   * Executes all registered custom actions.
+   *
+   * @param messageSupport  message support containing the scanned messages and templates, not {@code null}
+   */
   private void pack_action(@NotNull MessageSupport messageSupport)
   {
     final var messageAccessor = messageSupport.getMessageAccessor();
@@ -385,6 +415,13 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  /**
+   * Writes the selected messages and their templates to the message pack file and verifies the result.
+   *
+   * @param messageSupport  message support containing the scanned messages and templates, not {@code null}
+   *
+   * @throws GradleException  if the message pack cannot be written
+   */
   private void pack_write(@NotNull MessageSupport messageSupport)
   {
     final var packFile = getPackFile().getAsFile().toPath();
@@ -403,6 +440,14 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  /**
+   * Tells whether the message with the given code is selected by the include and exclude patterns. If no include
+   * patterns are configured, all messages are included; exclude patterns take precedence over include patterns.
+   *
+   * @param code  message code, not {@code null}
+   *
+   * @return  {@code true} if the message is selected, {@code false} otherwise
+   */
   @Contract(pure = true)
   private boolean messageCodeFilter(@NotNull String code)
   {
@@ -431,6 +476,13 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  /**
+   * Configures the message and template filters of {@code messageSupport} according to the duplicate strategy.
+   *
+   * @param messageSupport  message support to configure, not {@code null}
+   *
+   * @throws InvalidUserDataException  if the configured duplicate strategy is unknown
+   */
   private void configureDuplicatesStrategy(@NotNull ConfigurableMessageSupport messageSupport)
   {
     switch(configureDuplicatesStrategy_toEnum())
@@ -444,6 +496,14 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  /**
+   * Converts the configured duplicate strategy, which may be a {@link DuplicateStrategy} or its name, into an enum
+   * constant.
+   *
+   * @return  duplicate strategy, never {@code null}
+   *
+   * @throws InvalidUserDataException  if the configured duplicate strategy is unknown
+   */
   @Contract(pure = true)
   private @NotNull DuplicateStrategy configureDuplicatesStrategy_toEnum()
   {
@@ -466,6 +526,12 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  /**
+   * Configures filters that fail on duplicate messages or templates with different content and ignore identical
+   * duplicates.
+   *
+   * @param messageSupport  message support to configure, not {@code null}
+   */
   private void configureDuplicateFailStrategy(@NotNull ConfigurableMessageSupport messageSupport)
   {
     final var messageAccessor = messageSupport.getMessageAccessor();
@@ -492,6 +558,12 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  /**
+   * Configures filters that keep the first message or template and ignore any duplicates.
+   *
+   * @param messageSupport  message support to configure, not {@code null}
+   * @param warn            {@code true} to log a warning for duplicates with different content, {@code false} otherwise
+   */
   private void configureDuplicateIgnoreStrategy(@NotNull ConfigurableMessageSupport messageSupport, boolean warn)
   {
     final var messageAccessor = messageSupport.getMessageAccessor();
@@ -518,6 +590,13 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  /**
+   * Configures filters that replace an existing message or template with a duplicate.
+   *
+   * @param messageSupport  message support to configure, not {@code null}
+   * @param warn {@code true} to log a warning for duplicates with different content (identical duplicates are ignored
+   *                        in this case), {@code false} otherwise
+   */
   private void configureDuplicateOverrideStrategy(@NotNull ConfigurableMessageSupport messageSupport, boolean warn)
   {
     var messageAccessor = messageSupport.getMessageAccessor();
@@ -550,6 +629,14 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  /**
+   * Logs a duplicate message code, including the name of the class currently being scanned.
+   *
+   * @param level  log level, not {@code null}
+   * @param code   duplicate message code, not {@code null}
+   *
+   * @return  logged message, never {@code null}
+   */
   private @NotNull String logDuplicateMessage(@NotNull LogLevel level, @NotNull String code)
   {
     final var msg = "Duplicate message code '" + code + "' in class " + currentClassName.get();
@@ -560,6 +647,14 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  /**
+   * Logs a duplicate template name, including the name of the class currently being scanned.
+   *
+   * @param level  log level, not {@code null}
+   * @param name   duplicate template name, not {@code null}
+   *
+   * @return  logged message, never {@code null}
+   */
   private @NotNull String logDuplicateTemplate(@NotNull LogLevel level, @NotNull String name)
   {
     final var msg = "Duplicate template name '" + name + "' in class " + currentClassName.get();
@@ -570,6 +665,15 @@ public abstract class MessageFormatPackTask extends DefaultTask
   }
 
 
+  /**
+   * Reads the fully qualified class name from a class file.
+   *
+   * @param classPath  path of the class file, not {@code null}
+   *
+   * @return  fully qualified class name, never {@code null}
+   *
+   * @throws GradleException  if the class file cannot be read
+   */
   @Contract(pure = true)
   private @NotNull String getClassName(@NotNull Path classPath)
   {

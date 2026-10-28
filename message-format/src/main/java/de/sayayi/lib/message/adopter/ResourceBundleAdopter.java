@@ -33,7 +33,8 @@ import static java.util.ResourceBundle.getBundle;
  * <p>
  * Several {@code adopt} overloads are provided:
  * <ul>
- *   <li>A single {@link ResourceBundle} or a collection of bundles can be adopted directly as messages or templates.</li>
+ *   <li>A single {@link ResourceBundle} or a collection of bundles can be adopted directly as messages or
+ *       templates.</li>
  *   <li>A bundle base name can be provided, in which case the adopter resolves bundles for all
  *       {@linkplain java.util.Locale#getAvailableLocales() available locales} or a specified set
  *       of locales, optionally using a custom {@link ClassLoader}.</li>
@@ -48,7 +49,7 @@ import static java.util.ResourceBundle.getBundle;
 public class ResourceBundleAdopter extends AbstractMessageAdopter
 {
   /**
-   * Create a resource bundle adopter for the given {@code configurableMessageSupport}. The message
+   * Creates a resource bundle adopter for the given {@code configurableMessageSupport}. The message
    * factory and message publisher are both obtained from the configurable message support instance.
    *
    * @param configurableMessageSupport  configurable message support, not {@code null}
@@ -59,7 +60,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Create a resource bundle adopter for the given {@code messageFactory} and {@code publisher}.
+   * Creates a resource bundle adopter for the given {@code messageFactory} and {@code publisher}.
    * This constructor allows the message factory and message publisher to be provided
    * independently.
    *
@@ -72,9 +73,10 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt messages from a single resource bundle. Each key in the bundle is used as the message code and its value
-   * is parsed as a message format string, associated with the bundle's {@linkplain ResourceBundle#getLocale() locale}.
-   * The resulting messages are published to the {@linkplain MessagePublisher message publisher}.
+   * Adopts messages from a single resource bundle. Each key in the bundle is used as the message code and its value
+   * is parsed as a message format string. As only a single locale is involved, the resulting messages are
+   * independent of the locale; the bundle's {@linkplain ResourceBundle#getLocale() locale} is only used for reporting
+   * parser errors. The resulting messages are published to the {@linkplain MessagePublisher message publisher}.
    *
    * @param resourceBundle  resource bundle to adopt, not {@code null}
    *
@@ -92,9 +94,10 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt templates from a single resource bundle. Each key in the bundle is used as the template name and its value
-   * is parsed as a template format string, associated with the bundle's
-   * {@linkplain ResourceBundle#getLocale() locale}. The resulting templates are published to the
+   * Adopts templates from a single resource bundle. Each key in the bundle is used as the template name and its value
+   * is parsed as a template format string. As only a single locale is involved, the resulting templates are
+   * independent of the locale; the bundle's {@linkplain ResourceBundle#getLocale() locale} is only used for reporting
+   * parser errors. The resulting templates are published to the
    * {@linkplain MessagePublisher message publisher}.
    *
    * @param resourceBundle  resource bundle to adopt, not {@code null}
@@ -114,7 +117,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt messages from a collection of resource bundles. If the same message code appears in multiple bundles, the
+   * Adopts messages from a collection of resource bundles. If the same message code appears in multiple bundles, the
    * localized values are combined into a single locale-aware message. The resulting messages are published to the
    * {@linkplain MessagePublisher message publisher}.
    *
@@ -144,7 +147,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt templates from a collection of resource bundles. If the same template name appears in multiple bundles, the
+   * Adopts templates from a collection of resource bundles. If the same template name appears in multiple bundles, the
    * localized values are combined into a single locale-aware template. The resulting templates are published to the
    * {@linkplain MessagePublisher message publisher}.
    *
@@ -176,7 +179,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt messages from resource bundles resolved by the given base name. Bundles are looked up for all
+   * Adopts messages from resource bundles resolved by the given base name. Bundles are looked up for all
    * {@linkplain java.util.Locale#getAvailableLocales() available locales} using the adopter's class loader. Missing
    * bundles are silently ignored.
    *
@@ -191,7 +194,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt templates from resource bundles resolved by the given base name. Bundles are looked up for all
+   * Adopts templates from resource bundles resolved by the given base name. Bundles are looked up for all
    * {@linkplain java.util.Locale#getAvailableLocales() available locales} using the adopter's class loader. Missing
    * bundles are silently ignored.
    *
@@ -208,7 +211,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt messages from resource bundles resolved by the given base name and class loader. Bundles are looked up for
+   * Adopts messages from resource bundles resolved by the given base name and class loader. Bundles are looked up for
    * all {@linkplain java.util.Locale#getAvailableLocales() available locales}. Missing bundles are silently ignored.
    *
    * @param bundleBaseName  resource bundle base name, not {@code null}
@@ -223,7 +226,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt templates from resource bundles resolved by the given base name and class loader. Bundles are looked up for
+   * Adopts templates from resource bundles resolved by the given base name and class loader. Bundles are looked up for
    * all {@linkplain java.util.Locale#getAvailableLocales() available locales}. Missing bundles are silently ignored.
    *
    * @param bundleBaseName  resource bundle base name, not {@code null}
@@ -240,7 +243,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt messages from resource bundles resolved by the given base name for the specified set of locales.
+   * Adopts messages from resource bundles resolved by the given base name for the specified set of locales.
    * The adopter's class loader is used for loading the bundles. If a bundle for a requested locale cannot be found,
    * a {@link MessageAdopterException} is thrown.
    *
@@ -258,7 +261,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt templates from resource bundles resolved by the given base name for the specified set of locales.
+   * Adopts templates from resource bundles resolved by the given base name for the specified set of locales.
    * The adopter's class loader is used for loading the bundles. If a bundle for a requested locale cannot be found,
    * a {@link MessageAdopterException} is thrown.
    *
@@ -278,7 +281,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt messages from resource bundles resolved by the given base name for the specified set of locales, using
+   * Adopts messages from resource bundles resolved by the given base name for the specified set of locales, using
    * the provided class loader. If a bundle for a requested locale cannot be found, a {@link MessageAdopterException}
    * is thrown.
    *
@@ -297,7 +300,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt templates from resource bundles resolved by the given base name for the specified set of locales, using
+   * Adopts templates from resource bundles resolved by the given base name for the specified set of locales, using
    * the provided class loader. If a bundle for a requested locale cannot be found, a {@link MessageAdopterException}
    * is thrown.
    *
@@ -377,6 +380,16 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    * If {@code locales} is {@code null}, all {@linkplain java.util.Locale#getAvailableLocales() available locales} are
    * used and missing bundles are silently ignored. If {@code classLoader} is {@code null}, the adopter's own class
    * loader is used.
+   *
+   * @param bundleBaseName                resource bundle base name, not {@code null}
+   * @param locales                       locales to resolve, or {@code null} for all available locales
+   * @param classLoader                   class loader for bundle loading, or {@code null} to use the adopter's
+   *                                      class loader
+   * @param throwOnMissingResourceBundle  whether to throw a {@link MessageAdopterException} when a bundle cannot
+   *                                      be found
+   *
+   * @throws MessageAdopterException  if {@code throwOnMissingResourceBundle} is {@code true} and a resource bundle
+   *                                  is missing
    *
    * @since 0.25.0
    */

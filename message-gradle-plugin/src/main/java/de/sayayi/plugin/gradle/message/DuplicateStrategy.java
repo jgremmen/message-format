@@ -17,26 +17,26 @@ package de.sayayi.plugin.gradle.message;
 
 
 /**
- * Strategy for handling duplicate message codes and template names. Duplicate messages are messages with the same
- * message code or template name but with different message text definitions.
+ * Strategy for handling duplicate message codes and template names, i.e. messages or templates that are defined more
+ * than once, possibly with different texts.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
 public enum DuplicateStrategy
 {
-  /** silently ignore duplicate messages and templates */
+  /** Keeps the first message or template and silently ignores any duplicates. */
   IGNORE,
 
-  /** ignore duplicate messages and templates but log a warning */
+  /** Keeps the first message or template and ignores any duplicates, logging a warning if their content differs. */
   IGNORE_AND_WARN,
 
-  /** silently override duplicate messages and templates */
+  /** Replaces an existing message or template with its duplicate without notice. */
   OVERRIDE,
 
-  /** override duplicate messages and templates and log a warning */
+  /** Replaces an existing message or template with a duplicate of different content, logging a warning. */
   OVERRIDE_AND_WARN,
 
-  /** stop processing messages and templates if a duplicate is found */
+  /** Fails the build if a duplicate with different content is found; identical duplicates are ignored. */
   FAIL
 }

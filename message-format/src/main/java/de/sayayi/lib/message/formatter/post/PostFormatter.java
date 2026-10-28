@@ -20,7 +20,16 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
- * Interface for post formatters. A post formatter is used to post format a message after it has been formatted.
+ * Interface for post formatters. A post formatter transforms the text of a nested message after it has been formatted.
+ * <p>
+ * A post formatter is referenced by name in a post format message part, followed by the message to format and an
+ * optional configuration, e.g. {@code %(case,'Hello %{who}!',case:upper)}. Post formatters are discovered with the
+ * {@link java.util.ServiceLoader} mechanism by the
+ * {@link de.sayayi.lib.message.formatter.DefaultFormatterService DefaultFormatterService} or can be registered with
+ * {@link de.sayayi.lib.message.formatter.FormatterService.WithRegistry#addPostFormatter(PostFormatter)
+ * addPostFormatter}.
+ *
+ * @see PostFormatterContext
  *
  * @author Jeroen Gremmen
  * @since 0.21.0

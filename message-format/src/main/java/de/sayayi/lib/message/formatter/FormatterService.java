@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.formatter;
 
+import de.sayayi.lib.message.exception.FormatterServiceException;
 import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.named.StringFormatter;
@@ -61,8 +62,8 @@ public sealed interface FormatterService permits FormatterService.WithRegistry, 
    * a formatter by name is authoritative and does not build a type-based fallback chain behind it.
    *
    * @param format  name of the formatter or {@code null}
-   * @param type    type of the value to format
-   * @param config  message part config
+   * @param type    type of the value to format, not {@code null}
+   * @param config  message part config, or {@code null}
    *
    * @return  array of prioritized parameter formatters, never {@code null} and never empty
    *
@@ -84,7 +85,7 @@ public sealed interface FormatterService permits FormatterService.WithRegistry, 
 
 
   /**
-   * Return the accumulated set of parameter configuration names for all registered parameter formatters.
+   * Returns the accumulated set of parameter configuration names for all registered parameter formatters.
    *
    * @return  all known parameter config names, never {@code null}
    *
@@ -98,15 +99,19 @@ public sealed interface FormatterService permits FormatterService.WithRegistry, 
 
   /**
    * Extension of {@link FormatterService} that adds methods for registering parameter formatters and post formatters.
+   *
+   * @since 0.4.1
    */
   sealed interface WithRegistry extends FormatterService permits GenericFormatterService
   {
     /**
-     * Register a parameter formatter for the given formattable type. The formattable types returned by
+     * Registers a parameter formatter for the given formattable type. The formattable types returned by
      * {@link ParameterFormatter#getFormattableTypes()} are ignored by this method.
      *
      * @param formattableType  formattable type, not {@code null}
      * @param formatter        formatter to be registered, not {@code null}
+     *
+     * @throws FormatterServiceException  if the formatter cannot be registered for the given type
      *
      * @see #addFormatter(ParameterFormatter)
      */
@@ -115,15 +120,18 @@ public sealed interface FormatterService permits FormatterService.WithRegistry, 
 
 
     /**
-     * Register a parameter formatter.
+     * Registers a parameter formatter.
      * <p>
      * The formatter will be registered for all formattable types, returned by
      * {@link ParameterFormatter#getFormattableTypes()}.
      * <p>
      * If the formatter implements {@link NamedParameterFormatter}, it will additionally be registered as a named
-     * parameter with the name returned by {@link NamedParameterFormatter#getName()}.
+     * parameter formatter with the name returned by {@link NamedParameterFormatter#getName()}.
      *
      * @param formatter  parameter formatter, not {@code null}
+     *
+     * @throws FormatterServiceException  if the formatter cannot be registered, e.g. because its name is invalid or
+     *                                    already in use
      *
      * @see #addFormatterForType(FormattableType, ParameterFormatter)                   
      */
@@ -132,9 +140,11 @@ public sealed interface FormatterService permits FormatterService.WithRegistry, 
 
 
     /**
-     * Register a post formatter.
+     * Registers a post formatter.
      *
      * @param postFormatter  post formatter to register, not {@code null}
+     *
+     * @throws FormatterServiceException  if the post formatter name is invalid or already in use
      *
      * @since 0.21.0
      */
@@ -145,7 +155,7 @@ public sealed interface FormatterService permits FormatterService.WithRegistry, 
      * Seals off this formatter service by returning an instance that does not implement {@link WithRegistry} and thus
      * is not modifiable directly. The returned {@link FormatterService} wrapper is backed by this formatter service,
      * so changes made to this (still-mutable) formatter service after sealing continue to reflect in the returned
-     * instance — it is a live view, not an immutable snapshot or defensive copy. Use this when you want to expose a
+     * instance. It is a live view, not an immutable snapshot or defensive copy. Use this when you want to expose a
      * read-only API surface, not when you need a frozen copy safe to share with code that must be unaffected by later
      * registrations.
      *

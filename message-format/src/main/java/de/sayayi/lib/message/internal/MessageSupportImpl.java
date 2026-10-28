@@ -64,7 +64,8 @@ import static java.util.stream.Collectors.toCollection;
  * formatting operations.
  * <p>
  * Duplicate messages and templates are handled by configurable filters. By default, adding a message or template with
- * an existing code or name throws a {@link DuplicateMessageException} or {@link DuplicateTemplateException}.
+ * an existing code or name is ignored if its content is identical; otherwise a {@link DuplicateMessageException} or
+ * {@link DuplicateTemplateException} is thrown.
  * <p>
  * This class is thread-safe. All mutable state (locale, default configuration, messages, templates and filters) is
  * guarded by a read/write lock, allowing concurrent read access while serializing modifications.
@@ -494,13 +495,15 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
 
 
   /**
-   * Internal {@link MessageConfigurer} implementation that holds the message, locale and parameter values for
-   * a single formatting operation.
+   * Internal {@link MessageConfigurer} implementation that holds the message, locale and parameter values for a single
+   * formatting operation.
    * <p>
    * Instances are lightweight and intended for use by a single thread; they are not thread-safe and should not be
    * shared between formatting operations.
    *
    * @param <M>  the message type this configurer operates on
+   *
+   * @since 0.8.0
    */
   public final class Configurer<M extends Message> implements MessageConfigurer<M>
   {
@@ -653,6 +656,8 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
    * formatters and default configuration managed by the enclosing {@link MessageSupportImpl}.
    * <p>
    * This class is thread-safe; all accesses to the enclosing instance's state are guarded by its read/write lock.
+   *
+   * @since 0.8.0
    */
   public final class Accessor implements MessageAccessor
   {

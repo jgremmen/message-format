@@ -64,7 +64,9 @@ import static java.util.Objects.toIdentityString;
  * The resulting string value can be mapped to custom text using map keys of type {@code string}, {@code empty} and
  * {@code null} in the parameter configuration. If no mapping matches, the string value itself is returned as text.
  * <p>
- * This formatter also supports the {@code ignore-default-tostring} configuration option. When enabled, values whose
+ * This formatter also supports the {@code ignore-default-tostring} option, which is read from the
+ * {@linkplain de.sayayi.lib.message.MessageSupport.MessageAccessor#getDefaultConfig(String) default configuration} of
+ * the message support. When enabled, values (other than character sequences) whose
  * {@code toString()} output matches the default {@link Object#toString()} identity string (or lambda class names)
  * are treated as empty strings instead.
  * <p>
@@ -75,6 +77,7 @@ import static java.util.Objects.toIdentityString;
  */
 public final class StringFormatter implements SizeQueryable, NamedParameterFormatter, DefaultFormatter
 {
+  /** Map key types used to look up a mapped message for a string value. */
   private static final Set<MapKey.Type> STRING_KEY_TYPES = Set.of(EMPTY, NULL, STRING);
 
 
@@ -124,6 +127,15 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   }
 
 
+  /**
+   * Converts {@code value} into a string. If the {@code ignore-default-tostring} default configuration is enabled, a
+   * value whose string representation is the default identity string is converted into an empty string.
+   *
+   * @param messageAccessor  message accessor providing the default configuration, not {@code null}
+   * @param value            value to convert, not {@code null}
+   *
+   * @return  string representation of the value, never {@code null}
+   */
   @Contract(pure = true)
   private @NotNull String valueAsString(@NotNull MessageAccessor messageAccessor, @NotNull Object value)
   {
@@ -140,6 +152,14 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   }
 
 
+  /**
+   * Tells whether the string representation of {@code value} is the default {@link Object#toString()} identity string
+   * or the value is a lambda instance.
+   *
+   * @param value  value to check, not {@code null}
+   *
+   * @return  {@code true} if the value has no meaningful string representation, {@code false} otherwise
+   */
   @Contract(pure = true)
   @SuppressWarnings("RedundantIfStatement")
   private boolean isDefaultToString(@NotNull Object value)
@@ -280,8 +300,8 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
    * {@inheritDoc}
    * <p>
    * Compares the string representation of the value against the string key value using a locale-sensitive
-   * {@link Collator}. An identical match (including case and accents) yields an {@code EXACT} result, while a
-   * case-insensitive match yields {@code LENIENT}.
+   * {@link Collator}. An identical match (including case and accents) yields an {@code EXACT} result, while a match
+   * ignoring case and accents yields {@code LENIENT}.
    */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull Object value, @NotNull ComparatorContext context)
@@ -308,6 +328,13 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   }
 
 
+  /**
+   * Returns the string representation of {@code value}, converting {@code char[]} arrays into their content.
+   *
+   * @param value  value to convert, not {@code null}
+   *
+   * @return  string representation of the value, never {@code null}
+   */
   @Contract(pure = true)
   private static String asString(@NotNull Object value) {
     return value instanceof char[] ? new String((char[])value) : String.valueOf(value);

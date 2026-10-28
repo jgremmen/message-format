@@ -45,7 +45,7 @@ public final class TextMessage implements Message.WithSpaces
 
 
   /**
-   * Construct a text message based on a {@code textPart}.
+   * Constructs a text message based on a {@code textPart}.
    *
    * @param textPart  text part, not {@code null}
    */
@@ -83,18 +83,21 @@ public final class TextMessage implements Message.WithSpaces
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean equals(Object o) {
     return o instanceof TextMessage && textPart.equals(((TextMessage)o).textPart);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public int hashCode() {
     return textPart.hashCode();
   }
 
 
+  /** {@inheritDoc} */
   @Override
   @Contract(pure = true)
   public String toString()

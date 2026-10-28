@@ -49,6 +49,7 @@ import static de.sayayi.lib.message.part.MapKey.Type.*;
  */
 public final class ChoiceFormatter implements NamedParameterFormatter
 {
+  /** Map key types considered when selecting a message; all key types are supported. */
   private static final Set<MapKey.Type> KEY_TYPES = EnumSet.of(NULL, EMPTY, BOOL, NUMBER, STRING);
 
 

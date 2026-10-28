@@ -89,6 +89,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   private static final SyntaxErrorFormatter SYNTAX_ERROR_FORMATTER =
       new GenericSyntaxErrorFormatter(1, 0, 0 ,2);
 
+  /** Message factory providing the message part normalizer and used to create nested messages. */
   private final @NotNull MessageFactory messageFactory;
 
 
@@ -106,7 +107,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   /**
-   * Compile the given message {@code text} into a space-aware message object.
+   * Compiles the given message {@code text} into a space-aware message object.
    *
    * @param text  message text, not {@code null}
    *
@@ -121,7 +122,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   /**
-   * Compile the given template {@code text} into a space-aware message object.
+   * Compiles the given template {@code text} into a space-aware message object.
    *
    * @param text  template text, not {@code null}
    *
@@ -320,8 +321,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
   /**
    * Custom vocabulary providing human-readable token display names for error messages. Maps token types
-   * (e.g. {@code P_START}, {@code COMMA}) to descriptive labels (e.g. {@code '%\{'}, {@code ','}) so that syntax
-   * errors are easier to understand.
+   * (e.g. {@code P_START}, {@code COMMA}) to descriptive labels (e.g. <code>'%&#123;'</code>, {@code ','}) so that
+   * syntax errors are easier to understand.
    */
   private static final Vocabulary VOCABULARY = new AbstractVocabulary() {
     /** Adds user-friendly display names for message parser tokens. */
@@ -364,6 +365,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   /**
    * ANTLR lexer that tokenizes message format strings. Extends the generated {@link MessageLexer} to use the
    * compiler's custom {@link #VOCABULARY} for producing human-readable error messages.
+   *
+   * @since 0.5.0
    */
   private static final class Lexer extends MessageLexer
   {
@@ -394,6 +397,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   /**
    * ANTLR parser that processes message format token streams. Extends the generated {@link MessageParser} to use the
    * compiler's custom {@link #VOCABULARY} for producing human-readable error messages.
+   *
+   * @since 0.5.0
    */
   private static final class Parser extends MessageParser
   {
@@ -422,7 +427,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   /**
-   * Parse tree listener that builds the {@link Message} object model from the ANTLR parse tree.
+   * Parses tree listener that builds the {@link Message} object model from the ANTLR parse tree.
    * This listener is invoked as the parser walks the tree and is responsible for:
    * <ul>
    *   <li>
@@ -441,6 +446,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    *     Assembling the final {@link Message.WithSpaces} from its constituent parts
    *   </li>
    * </ul>
+   *
+   * @since 0.7.0
    */
   private final class Listener extends MessageParserBaseListener implements WalkerSupplier
   {
@@ -451,7 +458,9 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     private static final String KEBAB_LOWER_CAMEL_CASE_MATCH =
         "must match the kebab- or lower camel case naming convention";
 
+    /** {@code true} if a template is compiled, {@code false} if a message is compiled. */
     private final boolean template;
+    /** Token stream of the input being compiled, used to detect spaces surrounding message parts. */
     private TokenStream tokenStream;
 
 

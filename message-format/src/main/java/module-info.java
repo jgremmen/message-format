@@ -17,7 +17,7 @@
 import de.sayayi.lib.message.template.AbstractNamedTemplate;
 
 /**
- * Message Format – a Java library for parsing, formatting and managing parameterized, locale-aware messages.
+ * Provides the message format library for parsing, formatting and managing parameterized, locale-aware messages.
  *
  * <p>The central entry point is {@link de.sayayi.lib.message.MessageSupport MessageSupport}, which lets you look up
  * messages by code, bind parameters and format them for a given locale. Instances are obtained through
@@ -26,43 +26,75 @@ import de.sayayi.lib.message.template.AbstractNamedTemplate;
  * <h2>Core concepts</h2>
  * <ul>
  *   <li>
- *     {@link de.sayayi.lib.message.Message Message} – the parsed, immutable representation of a message format string,
- *     composed of text, parameter and template parts.
+ *     {@link de.sayayi.lib.message.Message Message}: the parsed, immutable representation of a message format string,
+ *     composed of text, parameter, template and post format parts.
  *   </li>
  *   <li>
- *     {@link de.sayayi.lib.message.MessageFactory MessageFactory} – parses message format strings (and locale-keyed
+ *     {@link de.sayayi.lib.message.MessageFactory MessageFactory}: parses message format strings (and locale-keyed
  *     maps) into {@code Message} instances.
  *   </li>
  *   <li>
- *     {@link de.sayayi.lib.message.MessageBuilder MessageBuilder} – fluent builder for constructing messages
+ *     {@link de.sayayi.lib.message.MessageBuilder MessageBuilder}: fluent builder for constructing messages
  *     programmatically.
  *   </li>
  *   <li>
- *     {@link de.sayayi.lib.message.template.Template Template} – reusable template that can be registered by name
+ *     {@link de.sayayi.lib.message.template.Template Template}: reusable template that can be registered by name
  *     and referenced from messages. Custom templates extend
  *     {@link AbstractNamedTemplate AbstractNamedTemplate} and can be discovered automatically
  *     via the {@link java.util.ServiceLoader} mechanism.
  *   </li>
  * </ul>
  *
+ * <h2>Exported packages</h2>
+ * <ul>
+ *   <li>{@code de.sayayi.lib.message}: core API (messages, message support, factories and builders)</li>
+ *   <li>{@code de.sayayi.lib.message.adopter}: adopters reading messages and templates from resource bundles and
+ *       properties</li>
+ *   <li>{@code de.sayayi.lib.message.exception}: exceptions thrown by the library</li>
+ *   <li>{@code de.sayayi.lib.message.formatter}: formatter services resolving parameter and post formatters</li>
+ *   <li>{@code de.sayayi.lib.message.formatter.parameter}: parameter formatter SPI and base classes</li>
+ *   <li>{@code de.sayayi.lib.message.formatter.parameter.named} and {@code ...named.extra}: formatters selected by
+ *       name</li>
+ *   <li>{@code de.sayayi.lib.message.formatter.parameter.runtime} and {@code ...runtime.extra}: formatters selected by
+ *       the type of the parameter value</li>
+ *   <li>{@code de.sayayi.lib.message.formatter.post} and {@code ...post.runtime}: post formatter SPI and built-in post
+ *       formatters</li>
+ *   <li>{@code de.sayayi.lib.message.pack}: constants and Apache Tika detectors for packed messages</li>
+ *   <li>{@code de.sayayi.lib.message.part} and {@code ...part.normalizer}: building blocks of parsed messages and
+ *       message part normalizers</li>
+ *   <li>{@code de.sayayi.lib.message.template}: template API</li>
+ *   <li>{@code de.sayayi.lib.message.util}: general-purpose helper classes</li>
+ * </ul>
+ *
  * <h2>Formatting</h2>
  * <p>Parameter values are converted to text by
  * {@linkplain de.sayayi.lib.message.formatter.parameter.ParameterFormatter parameter formatters}, which are type-based
  * or {@linkplain de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter named}. Additional transformations
- * can be applied through {@linkplain de.sayayi.lib.message.formatter.post.PostFormatter post-formatters}. Both
- * formatter types are discovered via the {@link java.util.ServiceLoader} mechanism.
+ * can be applied through {@linkplain de.sayayi.lib.message.formatter.post.PostFormatter post formatters}.
+ *
+ * <h2>Services</h2>
+ * <p>The module uses the following service interfaces:
+ * <ul>
+ *   <li>{@link de.sayayi.lib.message.formatter.parameter.ParameterFormatter ParameterFormatter} and
+ *       {@link de.sayayi.lib.message.formatter.post.PostFormatter PostFormatter}: discovered by the
+ *       {@link de.sayayi.lib.message.formatter.DefaultFormatterService DefaultFormatterService}</li>
+ *   <li>{@link de.sayayi.lib.message.template.NamedTemplate NamedTemplate}: discovered by
+ *       {@link de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport#registerTemplatesFromService
+ *       registerTemplatesFromService}</li>
+ * </ul>
+ * <p>It provides its built-in named and runtime parameter formatters and its post formatters as implementations of
+ * these services, as well as a {@link java.nio.file.spi.FileTypeDetector FileTypeDetector} that recognizes message
+ * format pack files.
  *
  * <h2>Message sources</h2>
  * <p>Messages can be loaded from properties files or resource bundles using the
  * {@linkplain de.sayayi.lib.message.adopter adopter} classes, or packed into a compact binary format for efficient
  * storage and distribution.
  *
- * <h2>Message parts and utilities</h2>
- * <p>The {@link de.sayayi.lib.message.part} package exposes the building blocks of a parsed message (text, parameters,
- * templates, maps), while {@link de.sayayi.lib.message.util} provides general-purpose helper methods.
- *
  * @see de.sayayi.lib.message.MessageSupport
  * @see de.sayayi.lib.message.MessageFactory
+ *
+ * @since 0.12.0
  */
 @SuppressWarnings({ "JavaRequiresAutoModule", "requires-transitive-automatic" })
 module de.sayayi.lib.message

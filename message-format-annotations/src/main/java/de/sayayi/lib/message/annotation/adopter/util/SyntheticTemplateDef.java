@@ -32,7 +32,7 @@ import static de.sayayi.lib.message.util.MessageUtil.validateName;
  * {@link de.sayayi.lib.message.annotation.adopter.AnnotationAdopter#adopt(TemplateDef) adopt(TemplateDef)} without
  * requiring an annotated class.
  * <p>
- * The {@code name} is validated on construction. A {@code null} text defaults to an empty string.
+ * The {@code name} must not be blank. A {@code null} text defaults to an empty string.
  *
  * @param name   unique template name, not {@code null}
  * @param text   single template text (used when {@code texts} is empty), not {@code null}
@@ -57,12 +57,14 @@ public record SyntheticTemplateDef(@NotNull String name, @Language("MessageForma
 
 
   /**
-   * Creates a new {@code SyntheticTemplateDef} instance. The {@code name} is validated and a {@code null} text is
+   * Creates a new {@code SyntheticTemplateDef} instance. The {@code name} must not be blank and a {@code null} text is
    * replaced with an empty string.
    *
    * @param name   unique template name, not {@code null}
    * @param text   single template text, or {@code null} to default to an empty string
    * @param texts  localized text variants, not {@code null}
+   *
+   * @throws IllegalArgumentException  if {@code name} is blank
    */
   public SyntheticTemplateDef(@NotNull String name, String text, @NotNull Text[] texts)
   {

@@ -44,9 +44,13 @@ import static java.util.Objects.requireNonNull;
  */
 public final class SingletonParameters implements Parameters
 {
+  /** Locale used for message formatting. */
   private final Locale locale;
+
+  /** Name of the single parameter held by this instance. */
   private final String parameterName;
 
+  /** Current value of the parameter, or {@code null}. */
   private Object value;
 
 

@@ -20,6 +20,15 @@
  * Annotated classes can be scanned and published using the
  * {@link de.sayayi.lib.message.annotation.adopter.AnnotationAdopter AnnotationAdopter} from the
  * {@code de.sayayi.lib.message.annotation.adopter} package.
+ * <p>
+ * The annotations have class retention, so they are available in class files but not at runtime:
+ * <ul>
+ *   <li>{@link de.sayayi.lib.message.annotation.MessageDef MessageDef}: defines a message with a unique code</li>
+ *   <li>{@link de.sayayi.lib.message.annotation.TemplateDef TemplateDef}: defines a template with a unique name</li>
+ *   <li>{@link de.sayayi.lib.message.annotation.Text Text}: provides a localized text for a message or template</li>
+ *   <li>{@link de.sayayi.lib.message.annotation.MessageDefs MessageDefs} and
+ *       {@link de.sayayi.lib.message.annotation.TemplateDefs TemplateDefs}: containers for repeated definitions</li>
+ * </ul>
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

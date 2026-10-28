@@ -408,9 +408,12 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
   /**
    * Implementation of {@link SyntaxErrorMessageBuilder} that delegates parameter configuration to a
    * {@link MessageConfigurer} and creates a {@link SyntaxErrorBuilder} when token position methods are invoked.
+   *
+   * @since 0.24.0
    */
   private final class SyntaxErrorMessageBuilderImpl implements SyntaxErrorMessageBuilder
   {
+    /** Message configurer collecting the parameters and locale for the syntax error message. */
     private final MessageConfigurer<? extends Message> messageConfigurer;
 
 
@@ -424,6 +427,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, boolean value)
     {
@@ -432,6 +436,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, byte value)
     {
@@ -440,6 +445,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, char value)
     {
@@ -448,6 +454,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, short value)
     {
@@ -456,6 +463,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, int value)
     {
@@ -464,6 +472,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, long value)
     {
@@ -472,6 +481,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, float value)
     {
@@ -480,6 +490,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, double value)
     {
@@ -488,6 +499,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorMessageBuilder with(@NotNull String parameter, Object value)
     {
@@ -496,6 +508,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorMessageBuilder with(@NotNull Map<String,?> parameterValues)
     {
@@ -504,6 +517,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorMessageBuilder with(@NotNull Properties properties)
     {
@@ -512,6 +526,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorMessageBuilder locale(Locale locale)
     {
@@ -520,6 +535,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorMessageBuilder locale(String locale)
     {
@@ -528,42 +544,49 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorBuilder withStart(@NotNull Token token) {
       return createSyntaxErrorBuilder().withStart(token);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorBuilder withStart(@NotNull SyntaxTree syntaxTree) {
       return createSyntaxErrorBuilder().withStart(syntaxTree);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorBuilder withStop(@NotNull Token token) {
       return createSyntaxErrorBuilder().withStop(token);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorBuilder withStop(@NotNull SyntaxTree syntaxTree) {
       return createSyntaxErrorBuilder().withStop(syntaxTree);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorBuilder with(@NotNull Token token) {
       return createSyntaxErrorBuilder().with(token);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorBuilder with(@NotNull SyntaxTree syntaxTree) {
       return createSyntaxErrorBuilder().with(syntaxTree);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull SyntaxErrorBuilder withCause(Exception cause) {
       return createSyntaxErrorBuilder().withCause(cause);

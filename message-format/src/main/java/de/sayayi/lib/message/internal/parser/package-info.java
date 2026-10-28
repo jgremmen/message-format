@@ -16,6 +16,14 @@
 
 /**
  * Internal parser for compiling message format strings into their structural representation.
+ * <p>
+ * {@link de.sayayi.lib.message.internal.parser.MessageCompiler MessageCompiler} parses message and template format
+ * strings with the ANTLR generated lexer and parser and assembles the resulting message parts.
+ * {@link de.sayayi.lib.message.internal.parser.ContextToMapCollector ContextToMapCollector} is a helper collecting
+ * parser rule contexts into a map.
+ * <p>
+ * <strong>This package is not part of the public API.</strong> Its classes are subject to change without notice and
+ * should not be referenced directly by application code.
  *
  * @author Jeroen Gremmen
  * @since 0.5.0

@@ -18,6 +18,9 @@ package de.sayayi.lib.message.adopter;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessagePublisher;
+import de.sayayi.lib.message.exception.DuplicateMessageException;
+import de.sayayi.lib.message.exception.DuplicateTemplateException;
+import de.sayayi.lib.message.exception.MessageParserException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -42,7 +45,7 @@ import static java.util.Objects.requireNonNull;
 public class PropertiesAdopter extends AbstractMessageAdopter
 {
   /**
-   * Create a properties adopter for the given {@code configurableMessageSupport}. The message
+   * Creates a properties adopter for the given {@code configurableMessageSupport}. The message
    * factory and message publisher are both obtained from the configurable message support instance.
    *
    * @param configurableMessageSupport  configurable message support, not {@code null}
@@ -53,7 +56,7 @@ public class PropertiesAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Create a properties adopter for the given {@code messageFactory} and {@code publisher}. This constructor allows
+   * Creates a properties adopter for the given {@code messageFactory} and {@code publisher}. This constructor allows
    * the message factory and message publisher to be provided independently.
    *
    * @param messageFactory  message factory used for parsing message format strings, not {@code null}
@@ -65,11 +68,15 @@ public class PropertiesAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt messages from properties. Each property key is used as the message code and its
+   * Adopts messages from properties. Each property key is used as the message code and its
    * corresponding value is parsed as a message format string. The resulting messages are
    * published to the {@linkplain MessagePublisher message publisher}.
    *
    * @param properties  message properties, not {@code null}
+   *
+   * @throws MessageParserException  if a property value cannot be parsed
+   * @throws DuplicateMessageException  if a message with the same code but different
+   *         content has already been published
    *
    * @see #adopt(Map)
    */
@@ -81,11 +88,16 @@ public class PropertiesAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt templates from properties. Each property key is used as the template name and its
-   * corresponding value is parsed as a template format string. The resulting templates are
-   * published to the {@linkplain MessagePublisher message publisher}.
+   * Adopts templates from properties. Each property key is used as the template name and its corresponding value is
+   * parsed as a template format string. The resulting templates are published to the
+   * {@linkplain MessagePublisher message publisher}.
    *
    * @param properties  template properties, not {@code null}
+   *
+   * @throws MessageParserException      if a property value cannot be parsed
+   * @throws DuplicateTemplateException  if a template with the same name but different content has already been
+   *                                     published
+   * @throws IllegalArgumentException    if a property key is not a valid kebab-case template name
    *
    * @since 0.20.0
    */
@@ -97,13 +109,15 @@ public class PropertiesAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopt messages from localized properties. Each property key is used as the message code and
-   * its corresponding value is parsed as a message format string. If the same message code
-   * appears in multiple locale entries, the localized values are combined into a single
-   * locale-aware message. The resulting messages are published to the
+   * Adopts messages from localized properties. Each property key is used as the message code and its corresponding
+   * value is parsed as a message format string. If the same message code appears in multiple locale entries, the
+   * localized values are combined into a single locale-aware message. The resulting messages are published to the
    * {@linkplain MessagePublisher message publisher}.
    *
    * @param properties  map with property messages keyed by locale, not {@code null}
+   *
+   * @throws MessageParserException     if a property value cannot be parsed
+   * @throws DuplicateMessageException  if a message with the same code but different content has already been published
    *
    * @see #adopt(Properties)
    */

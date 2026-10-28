@@ -46,9 +46,9 @@ import static java.util.Locale.ROOT;
  * <p>
  * Several sub-interfaces refine the message contract:
  * <ul>
- *   <li>{@link WithSpaces} – exposes leading and trailing space information.</li>
- *   <li>{@link WithCode} – associates a unique code with the message.</li>
- *   <li>{@link LocaleAware} – holds multiple locale-specific messages and selects the best match at format time.</li>
+ *   <li>{@link WithSpaces}: exposes leading and trailing space information.</li>
+ *   <li>{@link WithCode}: associates a unique code with the message.</li>
+ *   <li>{@link LocaleAware}: holds multiple locale-specific messages and selects the best match at format time.</li>
  * </ul>
  * <p>
  * Messages are immutable and thread safe.
@@ -79,12 +79,13 @@ public sealed interface Message extends FormatStringSerializer
 
 
   /**
-   * Formats the message based on the message parameters provided.
+   * Formats the message based on the given parameter values map. The locale is obtained from the
+   * {@code messageAccessor}.
    *
    * @param messageAccessor   message accessor providing formatting information, not {@code null}
    * @param parameterValues   message parameter values, not {@code null}
    *
-   * @return  formatted message, never {@code null}
+   * @return  formatted message without leading/trailing spaces, never {@code null}
    *
    * @throws MessageFormatException  in case a formatting error occurred
    */
@@ -169,7 +170,7 @@ public sealed interface Message extends FormatStringSerializer
 
 
   /**
-   * Returns a set with all templates names in use by this message.
+   * Returns a set with the names of all templates referenced by this message.
    *
    * @return  unmodifiable set of template names, never {@code null}
    *
@@ -338,7 +339,8 @@ public sealed interface Message extends FormatStringSerializer
      * any of the localized messages, a default message will be selected using the following rules
      * <ol>
      *   <li>a message with the same language but a different country</li>
-     *   <li>the 1st available message (this may be implementation dependant)</li>
+     *   <li>a message for a locale without language (e.g. {@link Locale#ROOT})</li>
+     *   <li>the first available message (this may be implementation dependent)</li>
      * </ol>
      *
      * @see Parameters#getLocale()
@@ -533,7 +535,7 @@ public sealed interface Message extends FormatStringSerializer
     /**
      * Returns a set with names for all parameters available in this context.
      *
-     * @return  set with all data names, never {@code null}
+     * @return  unmodifiable set with all parameter names, never {@code null}
      */
     @Contract(pure = true)
     default @Unmodifiable @NotNull Set<String> getParameterNames() {
@@ -553,9 +555,9 @@ public sealed interface Message extends FormatStringSerializer
 
 
     /**
-     * Returns the hash code value for this parameter's instance.
+     * Returns the hash code value for this parameters instance.
      * <p>
-     * The hash code of a parameter's instance is defined to be the sum of the hash codes of the locale, the parameter
+     * The hash code of a parameters instance is defined to be the sum of the hash codes of the locale, the parameter
      * name strings and the parameter values. This ensures that {@code p1.equals(p2)} implies that
      * {@code p1.hashCode() == p2.hashCode()} for any two parameter instances {@code p1} and {@code p2}, as required
      * by the general contract of {@link Object#hashCode}.

@@ -107,6 +107,12 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
   }
 
 
+  /**
+   * Adds a positional predicate {@code [index]} to the XPath being built backwards.
+   *
+   * @param path   XPath builder, not {@code null}
+   * @param index  1-based element index
+   */
   private static void addIndexPredicateToPath(@NotNull XPathBuilder path, int index)
   {
     path.add(']');
@@ -115,6 +121,15 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
   }
 
 
+  /**
+   * Determines the 1-based position of {@code node} among its sibling elements with the same name.
+   *
+   * @param node  element node, not {@code null}
+   * @param name  element name, not {@code null}
+   *
+   * @return  optional containing the element position, or an empty optional if the element has no siblings with the
+   *          same name, never {@code null}
+   */
   @Contract(pure = true)
   private static @NotNull OptionalInt determineElementIndex(@NotNull Node node, @NotNull String name)
   {
@@ -151,13 +166,27 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
 
 
 
+  /**
+   * Builder for XPath expressions, constructed from the last step towards the first by prepending characters.
+   *
+   * @since 0.8.0
+   */
   @SuppressWarnings("UnusedReturnValue")
   private static final class XPathBuilder
   {
+    /** Character buffer, filled from the end towards the beginning. */
     private char[] xpath = new char[64];
+    /** Index of the first used character in {@link #xpath}. */
     private int idx = xpath.length;
 
 
+    /**
+     * Prepends character {@code c}.
+     *
+     * @param c  character to prepend
+     *
+     * @return  this builder, never {@code null}
+     */
     @Contract(value = "_ -> this", mutates = "this")
     public @NotNull XPathBuilder add(char c)
     {
@@ -168,6 +197,13 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
     }
 
 
+    /**
+     * Prepends string {@code s}.
+     *
+     * @param s  string to prepend, not {@code null}
+     *
+     * @return  this builder, never {@code null}
+     */
     @Contract(value = "_ -> this", mutates = "this")
     public @NotNull XPathBuilder add(@NotNull String s)
     {
@@ -182,6 +218,11 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
     }
 
 
+    /**
+     * Makes sure that at least {@code n} characters can be prepended, growing the buffer if required.
+     *
+     * @param n  number of characters to prepend
+     */
     private void assureCapacity(int n)
     {
       if (idx < n)
@@ -198,6 +239,11 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
     }
 
 
+    /**
+     * Returns the XPath expression built so far.
+     *
+     * @return  XPath expression, never {@code null}
+     */
     @Override
     public String toString() {
       return new String(xpath, idx, xpath.length - idx);

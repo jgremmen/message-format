@@ -33,15 +33,15 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * <p>
  * This formatter uses the {@code locale} configuration key to select which aspect of the locale to format:
  * <ul>
- *   <li>{@code name} (default) &ndash; the locale's display name</li>
- *   <li>{@code country} &ndash; the locale's country display name</li>
- *   <li>{@code lang} or {@code language} &ndash; the locale's language display name</li>
- *   <li>{@code script} &ndash; the locale's script display name</li>
- *   <li>{@code variant} &ndash; the locale's variant display name</li>
+ *   <li>{@code name} (default): the locale's display name</li>
+ *   <li>{@code country}: the locale's country display name</li>
+ *   <li>{@code lang} or {@code language}: the locale's language display name</li>
+ *   <li>{@code script}: the locale's script display name</li>
+ *   <li>{@code variant}: the locale's variant display name</li>
  * </ul>
  * <p>
  * All display values are resolved using the formatting context's locale. For {@code country} and {@code language},
- * string map keys in the parameter configuration can be used to override the display value.
+ * string map keys matching the country or language code can be used to override the display value.
  * <p>
  * If the configuration key is absent, the locale's display name is used. If the value does not match a known option,
  * formatting is delegated to the next available formatter.
@@ -89,6 +89,14 @@ public final class LocaleFormatter extends AbstractMultiSelectFormatter<Locale>
   }
 
 
+  /**
+   * Formats the display name of the country of {@code locale}, using a message mapped to the country code if available.
+   *
+   * @param context  formatter context, not {@code null}
+   * @param locale   locale to format, not {@code null}
+   *
+   * @return  formatted country, never {@code null}
+   */
   private @NotNull Text formatLocaleCountry(@NotNull ParameterFormatterContext context, @NotNull Locale locale)
   {
     return formatUsingMappedString(context, locale.getCountry(), true)
@@ -96,6 +104,15 @@ public final class LocaleFormatter extends AbstractMultiSelectFormatter<Locale>
   }
 
 
+  /**
+   * Formats the display name of the language of {@code locale}, using a message mapped to the language code if
+   * available.
+   *
+   * @param context  formatter context, not {@code null}
+   * @param locale   locale to format, not {@code null}
+   *
+   * @return  formatted language, never {@code null}
+   */
   private @NotNull Text formatLocaleLanguage(@NotNull ParameterFormatterContext context, @NotNull Locale locale)
   {
     return formatUsingMappedString(context, locale.getLanguage(), true)
@@ -103,16 +120,40 @@ public final class LocaleFormatter extends AbstractMultiSelectFormatter<Locale>
   }
 
 
+  /**
+   * Formats the display name of {@code locale}.
+   *
+   * @param context  formatter context, not {@code null}
+   * @param locale   locale to format, not {@code null}
+   *
+   * @return  formatted display name, never {@code null}
+   */
   private @NotNull Text formatLocaleDisplayName(@NotNull ParameterFormatterContext context, @NotNull Locale locale) {
     return noSpaceText(locale.getDisplayName(context.getLocale()));
   }
 
 
+  /**
+   * Formats the display name of the script of {@code locale}.
+   *
+   * @param context  formatter context, not {@code null}
+   * @param locale   locale to format, not {@code null}
+   *
+   * @return  formatted script, never {@code null}
+   */
   private @NotNull Text formatLocaleScript(@NotNull ParameterFormatterContext context, @NotNull Locale locale) {
     return noSpaceText(locale.getDisplayScript(context.getLocale()));
   }
 
 
+  /**
+   * Formats the display name of the variant of {@code locale}.
+   *
+   * @param context  formatter context, not {@code null}
+   * @param locale   locale to format, not {@code null}
+   *
+   * @return  formatted variant, never {@code null}
+   */
   private @NotNull Text formatLocaleVariant(@NotNull ParameterFormatterContext context, @NotNull Locale locale) {
     return noSpaceText(locale.getDisplayVariant(context.getLocale()));
   }

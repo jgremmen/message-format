@@ -163,7 +163,8 @@ public final class TypedValueString implements StringValue
   /**
    * Reads a {@code TypedValueString} from the given pack input stream.
    *
-   * @param packStream  source data input, not {@code null}
+   * @param messageFactory  message factory used to lazily parse the string into a message, not {@code null}
+   * @param packStream      source data input, not {@code null}
    *
    * @return  unpacked string value, never {@code null}
    *

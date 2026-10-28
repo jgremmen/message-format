@@ -70,44 +70,90 @@ public final class PackSupport
   /** Current pack format version. */
   public static final int VERSION = 4;
 
+
   /** Type identifier for boolean map keys. */
   public static final int MAP_KEY_BOOL_ID = 0;
+
   /** Type identifier for empty map keys. */
   public static final int MAP_KEY_EMPTY_ID = 1;
+
   /** Type identifier for name map keys (used in versions prior to 3). */
   public static final int MAP_KEY_NAME_ID = 2;  // < version 3
+
   /** Type identifier for null map keys. */
   public static final int MAP_KEY_NULL_ID = 3;
+
   /** Type identifier for number map keys. */
   public static final int MAP_KEY_NUMBER_ID = 4;
+
   /** Type identifier for string map keys. */
   public static final int MAP_KEY_STRING_ID = 5;
+
   /** Type identifier for default/catch-all map keys. */
   public static final int MAP_KEY_DEFAULT_ID = 6;
 
+
+  /** Type identifier for boolean typed values. */
   private static final int VALUE_BOOL_ID = 0;
+
+  /** Type identifier for message typed values. */
   private static final int VALUE_MESSAGE_ID = 1;
+
+  /** Type identifier for number typed values. */
   private static final int VALUE_NUMBER_ID = 2;
+
+  /** Type identifier for string typed values. */
   private static final int VALUE_STRING_ID = 3;
 
+
+  /** Type identifier for text parts without surrounding spaces (obsolete since version 3). */
   private static final int PART_NO_SPACE_TEXT_ID = 0;  // obsolete since version 3
+
+  /** Type identifier for parameter parts. */
   private static final int PART_PARAMETER_ID = 1;
+
+  /** Type identifier for text parts. */
   private static final int PART_TEXT_ID = 2;
+
+  /** Type identifier for template parts. */
   private static final int PART_TEMPLATE_ID = 3;
+
+  /** Type identifier for post format parts (since version 3). */
   private static final int PART_POST_FORMAT_ID = 4;  // >= version 3
 
+
+  /** Type identifier for empty messages. */
   private static final int MESSAGE_EMPTY = 0;
+
+  /** Type identifier for empty messages with a code. */
   private static final int MESSAGE_EMPTY_WITH_CODE = 1;
+
+  /** Type identifier for localized message bundles with a code. */
   private static final int MESSAGE_LOCALIZED_BUNDLE_WITH_CODE = 2;
+
+  /** Type identifier for messages with a code that delegate to another message. */
   private static final int MESSAGE_DELEGATE_WITH_CODE = 3;
+
+  /** Type identifier for messages consisting of multiple message parts. */
   private static final int MESSAGE_COMPOUND = 4;
+
+  /** Type identifier for messages consisting of a single text part. */
   private static final int MESSAGE_TEXT = 5;
 
 
+  /** Message factory used for creating messages while unpacking. */
   private final MessageFactory messageFactory;
+
+  /** Deduplication cache for unpacked map keys. */
   private final Map<MapKey,MapKey> mapKeys = new HashMap<>();
+
+  /** Deduplication cache for unpacked typed values. */
   private final Map<TypedValue<?>,TypedValue<?>> mapValues = new HashMap<>();
+
+  /** Deduplication cache for unpacked message parts. */
   private final Map<MessagePart,MessagePart> messageParts = new HashMap<>();
+
+  /** Deduplication cache for unpacked messages. */
   private final Map<Message.WithSpaces,Message.WithSpaces> messagesWithSpaces = new HashMap<>();
 
 

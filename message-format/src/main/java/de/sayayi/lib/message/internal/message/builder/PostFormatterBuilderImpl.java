@@ -55,7 +55,7 @@ public final class PostFormatterBuilderImpl
 
 
   /**
-   * Construct a new post-formatter builder for the given formatter name.
+   * Constructs a new post-formatter builder for the given formatter name.
    *
    * @param builder  enclosing message builder, not {@code null}
    * @param name     post-formatter name (must follow kebab-case convention), not {@code null}
@@ -77,6 +77,13 @@ public final class PostFormatterBuilderImpl
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Post formatter configurations do not support message values, so this method always throws an exception.
+   *
+   * @throws IllegalArgumentException  always
+   */
   @Override
   public @NotNull PostFormatterBuilder configMessage(@NotNull String name, @NotNull Message.WithSpaces message) {
     throw new IllegalArgumentException("post-formatter config cannot be a message value");

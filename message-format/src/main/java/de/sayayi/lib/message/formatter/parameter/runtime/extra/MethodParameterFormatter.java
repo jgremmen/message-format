@@ -40,9 +40,9 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * <p>
  * This formatter uses the {@code parameter} configuration key to select the output format:
  * <ul>
- *   <li>{@code default} (default) &ndash; the parameter's default string representation</li>
- *   <li>{@code name} &ndash; the parameter name</li>
- *   <li>{@code class} &ndash; the parameter's type</li>
+ *   <li>{@code default} (default): the parameter's default string representation</li>
+ *   <li>{@code name}: the parameter name</li>
+ *   <li>{@code class}: the parameter's type</li>
  * </ul>
  * <p>
  * If the configuration value does not match a known option, formatting is delegated to the next available formatter.

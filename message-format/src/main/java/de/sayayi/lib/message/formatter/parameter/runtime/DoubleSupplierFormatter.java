@@ -32,13 +32,14 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.Class
 /**
  * Parameter formatter for {@link DoubleSupplier} values.
  * <p>
- * This formatter evaluates the supplier by calling {@link DoubleSupplier#getAsDouble()} and delegates the formatting
- * of the resulting {@code double} value to the appropriate number formatter.
+ * This formatter evaluates the supplier by calling {@link DoubleSupplier#getAsDouble()} and delegates the formatting of
+ * the resulting {@code double} value to the appropriate number formatter.
  * <p>
  * Map key comparison for {@code bool}, {@code number} and {@code string} keys is also based on the evaluated double
  * value.
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public final class DoubleSupplierFormatter
     extends AbstractSingleTypeParameterFormatter<DoubleSupplier>

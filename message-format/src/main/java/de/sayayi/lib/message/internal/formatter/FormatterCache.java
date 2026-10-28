@@ -60,15 +60,26 @@ public final class FormatterCache
     }
   };
 
+  /** Lock guarding all structural modifications of this cache. */
   private final Lock lock = new ReentrantLock();
 
+  /** Maximum number of cached types. */
   private final int capacity;
+
+  /**
+   * Types and their list nodes, sorted by type for binary search: index {@code 2n} holds the type and index
+   * {@code 2n + 1} the associated {@link Node}.
+   */
   private final Object[] typeFormatters;  // 2 * n = type, 2 * n + 1 = node
 
+  /** Number of cached types. */
   private int typeCount;
+  /** Modification counter, incremented on each structural change. */
   private int modCount;
 
+  /** Most recently promoted node, or {@code null} if the cache is empty. */
   private Node head;
+  /** Least recently promoted node, which is evicted first, or {@code null} if the cache is empty. */
   private Node tail;
 
 
@@ -326,17 +337,33 @@ public final class FormatterCache
 
   /**
    * Doubly-linked list node holding the cached formatter list for a single value type.
+   *
+   * @since 0.8.0
    */
   private static final class Node
   {
+    /** Cached value type. */
     private final Class<?> type;
+
+    /** Sorted parameter formatters for {@link #type}. */
     private final ParameterFormatter[] formatters;
 
+    /** Previous (more recently promoted) node, or {@code null} for the head node. */
     private Node prev;
+
+    /** Next (less recently promoted) node, or {@code null} for the tail node. */
     private Node next;
+
+    /** Number of nodes following this node in the list. */
     private int countNext;
 
 
+    /**
+     * Creates a new list node for the given type and formatters.
+     *
+     * @param type        cached value type, not {@code null}
+     * @param formatters  sorted parameter formatters for {@code type}, not {@code null}
+     */
     private Node(@NotNull Class<?> type, @NotNull ParameterFormatter[] formatters)
     {
       this.type = type;

@@ -16,7 +16,15 @@
 
 /**
  * Additional named parameter formatter implementations for specialized formatting purposes such as geographic
- * coordinates with {@link GeoFormatter}, file sizes and bitmasks.
+ * coordinates, file sizes and bitmasks:
+ * <ul>
+ *   <li>{@link de.sayayi.lib.message.formatter.parameter.named.extra.GeoFormatter GeoFormatter} ({@code geo}): formats
+ *       a number as a geographic coordinate in degrees, minutes and seconds</li>
+ *   <li>{@link de.sayayi.lib.message.formatter.parameter.named.extra.BitmaskFormatter BitmaskFormatter}
+ *       ({@code bitmask}): formats an integral number as a set of bits</li>
+ *   <li>{@link de.sayayi.lib.message.formatter.parameter.named.extra.FileSizeFormatter FileSizeFormatter}
+ *       ({@code filesize}): formats a number of bytes with a unit; deprecated for removal</li>
+ * </ul>
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

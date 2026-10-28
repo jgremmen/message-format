@@ -38,7 +38,10 @@ import java.util.Map;
 @ApiStatus.Internal
 final class MessageParameters implements Parameters
 {
+  /** Locale used for formatting. */
   private final Locale locale;
+
+  /** Parameter values, keyed by parameter name in sorted order. */
   private final Map<String,Object> parameters;
 
 

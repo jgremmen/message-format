@@ -66,7 +66,7 @@ public final class ParameterBuilderImpl
 
 
   /**
-   * Construct a new parameter builder for the given parameter name.
+   * Constructs a new parameter builder for the given parameter name.
    *
    * @param builder  enclosing message builder, not {@code null}
    * @param name     parameter name (must follow kebab-case or lower camel-case convention), not {@code null}

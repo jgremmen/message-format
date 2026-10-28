@@ -18,6 +18,18 @@
  * Adopters for reading messages and templates from external sources such as
  * {@link java.util.ResourceBundle ResourceBundle} and {@link java.util.Properties Properties} and publishing them to
  * a {@link de.sayayi.lib.message.MessageSupport.MessagePublisher MessagePublisher}.
+ * <p>
+ * The types in this package are:
+ * <ul>
+ *   <li>{@link de.sayayi.lib.message.adopter.AbstractMessageAdopter AbstractMessageAdopter}: base class holding the
+ *       message factory and message publisher shared by all adopters</li>
+ *   <li>{@link de.sayayi.lib.message.adopter.PropertiesAdopter PropertiesAdopter}: adopts messages and templates
+ *       from {@code Properties}</li>
+ *   <li>{@link de.sayayi.lib.message.adopter.ResourceBundleAdopter ResourceBundleAdopter}: adopts messages and
+ *       templates from resource bundles, combining localized values into locale aware messages</li>
+ * </ul>
+ * <p>
+ * The annotation based adopter is provided by the separate {@code de.sayayi.lib.message.annotations} module.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

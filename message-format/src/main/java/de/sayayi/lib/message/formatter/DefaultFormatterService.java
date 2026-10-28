@@ -47,18 +47,18 @@ import java.util.function.Supplier;
  */
 public class DefaultFormatterService extends GenericFormatterService
 {
+  /** Lazily created, sealed default formatter service returned by {@link #getSharedInstance()}. */
   private static final Supplier<FormatterService> SHARED_INSTANCE_SUPPLIER =
       SupplierDelegate.of(() -> new DefaultFormatterService().seal());
 
-  /**
-   * Class loader used to load parameter and post formatter service classes, never {@code null}.
-   */
+  /** Class loader used to load parameter and post formatter service classes, never {@code null}. */
   protected final ClassLoader classLoader;
 
 
   /**
    * Returns a shared instance of the default formatter service. This service includes all parameter formatters which
-   * are available as a service and accessible by the class loader that loaded this library.
+   * are available as a service and accessible by the class loader that loaded this library. The shared instance is
+   * {@linkplain FormatterService.WithRegistry#seal() sealed}, so it cannot be modified.
    *
    * @return  shared instance of the default formatter service, never {@code null}
    */

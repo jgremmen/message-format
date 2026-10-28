@@ -40,12 +40,15 @@ import javax.inject.Inject;
  */
 public abstract class MessageFormatExtension
 {
+  /** Nested messages configuration. */
   private final MessageFormatMessagesExtension messages;
+
+  /** Nested templates configuration. */
   private final MessageFormatTemplatesExtension templates;
 
 
   /**
-   * Creates the extension and instantiates the nested {@code messages} extension.
+   * Creates the extension and instantiates the nested {@code messages} and {@code templates} extensions.
    *
    * @param objectFactory  Gradle object factory for creating managed instances
    */
@@ -129,7 +132,7 @@ public abstract class MessageFormatExtension
 
 
   /**
-   * Return the pack filename property. The default value is {@code messages.mfp}.
+   * Returns the pack filename property. The default value is the project name with extension {@code .mfp}.
    *
    * @return  pack filename property, never {@code null}
    *
@@ -162,7 +165,7 @@ public abstract class MessageFormatExtension
 
 
   /**
-   * Add all outputs for the given {@code sourceSet} to the collection of sources.
+   * Adds all outputs for the given {@code sourceSet} to the collection of sources.
    *
    * @param sourceSet  source set to include in message/template scanning
    *

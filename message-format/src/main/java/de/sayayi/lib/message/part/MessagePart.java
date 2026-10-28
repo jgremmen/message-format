@@ -77,6 +77,8 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
 
   /**
    * Message part representing text only, optionally decorated with leading/trailing space.
+   *
+   * @since 0.5.0
    */
   non-sealed interface Text extends MessagePart
   {
@@ -144,12 +146,22 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
     boolean isEmpty();
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * A text part is already formatted, so this implementation returns the text part itself.
+     */
     @Override
     default @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters) {
       return this;
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This implementation serializes the text, including leading and trailing spaces, as escaped literal text.
+     */
     @Override
     default void serialize(@NotNull Context context) {
       serializeString(context, getTextWithSpaces());
@@ -161,6 +173,8 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
 
   /**
    * Message part representing a parameter to be evaluated during formatting.
+   *
+   * @since 0.5.0
    */
   non-sealed interface Parameter extends NamedMessagePart
   {

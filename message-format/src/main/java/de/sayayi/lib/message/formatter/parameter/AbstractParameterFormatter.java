@@ -27,8 +27,8 @@ import static de.sayayi.lib.message.part.TextPartFactory.nullText;
  * This class provides a basic formatter implementation that handles empty and {@code null} values and is suitable for
  * most parameter formatters.
  * <p>
- * Method {@link #format(ParameterFormatterContext, Object)} takes care of mapping {@code null} and empty values. It does
- * so for both the value to be formatted and the formatted text returned by
+ * Method {@link #format(ParameterFormatterContext, Object)} takes care of mapping {@code null} and empty values. It
+ * does so for both the value to be formatted and the formatted text returned by
  * {@link #formatValue(ParameterFormatterContext, Object)}.
  * <p>
  * If a {@code null} or empty value is matched in the parameter configuration (e.g.
@@ -47,6 +47,13 @@ import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractParameterFormatter<T> implements ParameterFormatter
 {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This implementation first matches {@code value} against the {@code null} and {@code empty} keys of the parameter
+   * configuration map. If no key matches and {@code value} is not {@code null}, formatting is delegated to
+   * {@link #formatValue(ParameterFormatterContext, Object)} and the resulting text is matched against the same keys.
+   */
   @Override
   @SuppressWarnings("unchecked")
   public final @NotNull Text format(@NotNull ParameterFormatterContext context, Object value)
@@ -73,7 +80,7 @@ public abstract class AbstractParameterFormatter<T> implements ParameterFormatte
 
 
   /**
-   * Format {@code value} using {@code context}.
+   * Formats {@code value} using {@code context}.
    * <p>
    * This method differs from {@link #format(ParameterFormatterContext, Object)} in that it has already handled
    * {@code empty} and {@code null} cases matched in the parameter configuration.

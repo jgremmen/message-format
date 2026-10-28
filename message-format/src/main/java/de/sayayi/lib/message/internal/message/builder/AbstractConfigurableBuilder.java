@@ -64,7 +64,7 @@ public abstract non-sealed class AbstractConfigurableBuilder<S extends Configura
 
 
   /**
-   * Construct a new configurable builder with an empty configuration map.
+   * Constructs a new configurable builder with an empty configuration map.
    *
    * @param builder  enclosing message builder, not {@code null}
    */

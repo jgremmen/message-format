@@ -46,6 +46,7 @@ import static de.sayayi.lib.message.part.MapKey.MatchResult.forNullKey;
  * An empty optional results in a mismatch for these key types.
  *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public final class OptionalFormatter extends AbstractSingleTypeParameterFormatter<Optional<?>>
     implements SizeQueryable, MapKeyComparator<Optional<?>>

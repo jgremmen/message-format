@@ -30,9 +30,9 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * <p>
  * This formatter uses the {@code key} configuration key to select which aspect of the cryptographic key to format:
  * <ul>
- *   <li>{@code algorithm} &ndash; the key's algorithm name</li>
- *   <li>{@code format} &ndash; the key's encoding format name</li>
- *   <li>{@code encoded} &ndash; the key's encoded form (as a byte array)</li>
+ *   <li>{@code algorithm}: the key's algorithm name</li>
+ *   <li>{@code format}: the key's encoding format name</li>
+ *   <li>{@code encoded}: the key's encoded form (as a byte array)</li>
  * </ul>
  * <p>
  * If the configuration key is absent or does not match a known option, formatting is delegated to the next available

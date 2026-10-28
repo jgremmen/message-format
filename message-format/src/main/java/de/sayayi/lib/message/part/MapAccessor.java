@@ -63,16 +63,16 @@ public interface MapAccessor
    * Gets a message for {@code key} from the parameter configuration map. The map will be probed for keys with the
    * given {@code keyTypes} only.
    * <p>
-   * If {@code includeDefault} is {@code true} and no matching key is found, the default message is returned
-   * instead — but only if the map contains at least 1 key with a type contained in {@code keyTypes}. If the map
-   * has no keys matching any of the given key types, the default message is not considered and
-   * {@link Optional#empty()} is returned.
+   * If {@code includeDefault} is {@code true} and no matching key is found, the default message is returned instead,
+   * but only if the map contains at least 1 key with a type contained in {@code keyTypes}. If the map has no keys
+   * matching any of the given key types, the default message is not considered and {@link Optional#empty()} is
+   * returned.
    *
    * @param key             the key to get the message for
    * @param keyTypes        key types to be considered when matching the {@code key}, not {@code null}
-   * @param includeDefault  {@code true} will return the default message (if any) in case no matching key is found
-   *                        and the map contains at least 1 key with a type in {@code keyTypes}, {@code false} will
-   *                        never return the default message
+   * @param includeDefault  {@code true} will return the default message (if any) in case no matching key is found and
+   *                        the map contains at least 1 key with a type in {@code keyTypes}, {@code false} will never
+   *                        return the default message
    *
    * @return  optional instance containing the mapped message, never {@code null}. If no matching message is found,
    *          {@link Optional#empty()} is returned

@@ -37,6 +37,7 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.Class
  * Map key comparison for {@code bool} and {@code string} keys is also based on the extracted boolean value.
  *
  * @author Jeroen Gremmen
+ * @since 0.3.1
  */
 public final class AtomicBooleanFormatter
     extends AbstractSingleTypeParameterFormatter<AtomicBoolean>

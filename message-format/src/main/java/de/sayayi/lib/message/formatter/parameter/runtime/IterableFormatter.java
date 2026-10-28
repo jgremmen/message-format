@@ -47,6 +47,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * iteration.
  *
  * @author Jeroen Gremmen
+ * @since 0.6.0
  */
 public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> implements SizeQueryable
 {
@@ -105,14 +106,27 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> 
   /**
    * Iterator that formats each iterable element using the configured list value message and yields the resulting
    * non-empty text elements.
+   *
+   * @since 0.8.0
    */
   private static final class TextIterator extends AbstractTextIterator
   {
+    /** Message accessor used to format the elements. */
     private final MessageAccessor messageAccessor;
+
+    /** Message used to format each element. */
     private final Message.WithSpaces valueMessage;
+
+    /** Reusable parameters holding the element currently being formatted. */
     private final SingletonParameters parameters;
+
+    /** Lazily created text for elements referring to the formatted value itself. */
     private final Supplier<Text> thisText;
+
+    /** Iterable being iterated. */
     private final Iterable<?> iterable;
+
+    /** Iterator providing the elements to format. */
     private final Iterator<?> iterator;
 
 

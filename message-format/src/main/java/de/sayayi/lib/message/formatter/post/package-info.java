@@ -16,6 +16,11 @@
 
 /**
  * Post formatters that apply additional formatting to a message after it has been formatted.
+ * <p>
+ * The {@link de.sayayi.lib.message.formatter.post.PostFormatter PostFormatter} interface transforms the text of a
+ * formatted message, using the configuration and locale provided by a
+ * {@link de.sayayi.lib.message.formatter.post.PostFormatterContext PostFormatterContext}. Built-in implementations are
+ * located in the {@code runtime} sub-package.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0

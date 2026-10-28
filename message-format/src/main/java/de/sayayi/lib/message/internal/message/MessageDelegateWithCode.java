@@ -102,18 +102,21 @@ public final class MessageDelegateWithCode extends AbstractMessageWithCode
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean equals(Object o) {
     return o instanceof MessageDelegateWithCode that && code.equals(that.code) && message.equals(that.message);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public int hashCode() {
     return (59 + code.hashCode()) * 59 + message.hashCode();
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public String toString() {
     return "MessageDelegateWithCode(code=" + code + ",message=" + message + ')';

@@ -20,13 +20,13 @@
  * <p>
  * The main types in this package are:
  * <ul>
- *   <li>{@link de.sayayi.lib.message.template.Template Template} – represents a reusable template that can be
+ *   <li>{@link de.sayayi.lib.message.template.Template Template}: represents a reusable template that can be
  *       registered by name in a
  *       {@link de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport ConfigurableMessageSupport} and
  *       referenced from messages</li>
- *   <li>{@link de.sayayi.lib.message.template.NamedTemplate NamedTemplate} – a template that
+ *   <li>{@link de.sayayi.lib.message.template.NamedTemplate NamedTemplate}: a template that
  *       carries a name, enabling automatic registration via the {@link java.util.ServiceLoader} mechanism</li>
- *   <li>{@link de.sayayi.lib.message.template.AbstractNamedTemplate AbstractNamedTemplate} – base class for custom
+ *   <li>{@link de.sayayi.lib.message.template.AbstractNamedTemplate AbstractNamedTemplate}: base class for custom
  *       template implementations; extends {@code NamedTemplate} and provides a default
  *       {@link de.sayayi.lib.message.template.Template#isSame(de.sayayi.lib.message.template.Template) isSame}
  *       implementation</li>

@@ -38,9 +38,9 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * This formatter extracts and formats a capture group from a regex match result. The {@code matcher} configuration
  * key controls which group is returned:
  * <ul>
- *   <li>A number value &ndash; returns the capture group at the given index (0 for the entire match)</li>
- *   <li>A string value &ndash; returns the named capture group</li>
- *   <li>Absent &ndash; returns the entire match (group 0)</li>
+ *   <li>A number value: returns the capture group at the given index (0 for the entire match)</li>
+ *   <li>A string value: returns the named capture group</li>
+ *   <li>Absent: returns the entire match (group 0)</li>
  * </ul>
  * <p>
  * If the match result is a {@link Matcher} without an existing match, the whole input is matched against the
@@ -83,6 +83,14 @@ public final class MatchResultFormatter extends AbstractSingleTypeParameterForma
   }
 
 
+  /**
+   * Returns the text captured by the group with the given number.
+   *
+   * @param matchResult  match result, not {@code null}
+   * @param groupNumber  group number, {@code 0} denoting the entire match
+   *
+   * @return  captured text, or empty text if the group does not exist, never {@code null}
+   */
   private @NotNull Text byGroupNumber(@NotNull MatchResult matchResult, int groupNumber)
   {
     return groupNumber < 0 || groupNumber > matchResult.groupCount()
@@ -91,6 +99,14 @@ public final class MatchResultFormatter extends AbstractSingleTypeParameterForma
   }
 
 
+  /**
+   * Returns the text captured by the named group.
+   *
+   * @param matchResult  match result, not {@code null}
+   * @param groupName    group name
+   *
+   * @return  captured text, or empty text if no group with the given name exists, never {@code null}
+   */
   private @NotNull Text byGroupName(@NotNull MatchResult matchResult, String groupName)
   {
     try {

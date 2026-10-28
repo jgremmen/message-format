@@ -42,11 +42,10 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 @Target({ ANNOTATION_TYPE, METHOD, CONSTRUCTOR, TYPE })
 @Retention(CLASS)
 @Repeatable(TemplateDefs.class)
-@SuppressWarnings("GrazieInspection")
 public @interface TemplateDef
 {
   /**
-   * Unique template name.
+   * Unique template name. The name must follow the kebab-case naming convention.
    *
    * @return  unique template name, not empty
    */
@@ -54,7 +53,9 @@ public @interface TemplateDef
 
 
   /**
-   * 1..n localized texts.
+   * Localized template texts. Use this attribute to provide template texts for one or more locales.
+   * <p>
+   * Either this attribute or {@link #text()} must be specified, but not both.
    *
    * @return  localized texts
    */
@@ -62,7 +63,10 @@ public @interface TemplateDef
 
 
   /**
-   * Template text. Short for {@code texts = @Text("...")}
+   * Convenience attribute for specifying a single locale-independent template text.
+   * Short for {@code texts = @Text("...")}.
+   * <p>
+   * Either this attribute or {@link #texts()} must be specified, but not both.
    *
    * @return  template text
    */

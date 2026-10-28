@@ -58,6 +58,7 @@ import java.util.function.Supplier;
  */
 public final class MessageSupportFactory
 {
+  /** Lazily created, sealed message support instance returned by {@link #shared()}. */
   private static final Supplier<MessageSupport> SHARED_SUPPLIER = SupplierDelegate.of(() ->
       createDefault().registerTemplatesFromService(MessageSupportFactory.class.getClassLoader()).seal());
 
@@ -86,7 +87,7 @@ public final class MessageSupportFactory
 
 
   /**
-   * Create a new {@link MessageSupport} instance with the given {@code formatterService} and {@code messageFactory}.
+   * Creates a new {@link MessageSupport} instance with the given {@code formatterService} and {@code messageFactory}.
    * <p>
    * The returned instance is the configurable version of the message support, which allows for further configuration
    * such as adding messages and templates.
@@ -104,7 +105,7 @@ public final class MessageSupportFactory
 
 
   /**
-   * Create a new {@link MessageSupport} instance with the given {@code formatterService} and the
+   * Creates a new {@link MessageSupport} instance with the given {@code formatterService} and the
    * {@linkplain MessageFactory#getSharedInstance() shared, caching} {@link MessageFactory}.
    * <p>
    * This is a convenience method equivalent to calling
@@ -123,7 +124,7 @@ public final class MessageSupportFactory
 
 
   /**
-   * Create a new configurable {@link MessageSupport} instance backed by an empty {@link GenericFormatterService} and
+   * Creates a new configurable {@link MessageSupport} instance backed by an empty {@link GenericFormatterService} and
    * the {@linkplain MessageFactory#getSharedInstance() shared, caching} {@link MessageFactory}.
    * <p>
    * Use this method when you want full control over which formatters are registered, starting from a service that only
@@ -140,7 +141,7 @@ public final class MessageSupportFactory
 
 
   /**
-   * Create a new configurable {@link MessageSupport} instance backed by the
+   * Creates a new configurable {@link MessageSupport} instance backed by the
    * {@linkplain DefaultFormatterService#getSharedInstance() shared default formatter service} and the
    * {@linkplain MessageFactory#getSharedInstance() shared, caching} {@link MessageFactory}.
    * <p>

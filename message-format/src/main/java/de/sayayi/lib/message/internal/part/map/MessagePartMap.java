@@ -84,7 +84,7 @@ public final class MessagePartMap implements MessagePart.Map
 
 
   /**
-   * Create a message parameter map instance with the given {@code map}.
+   * Creates a message parameter map instance with the given {@code map}.
    *
    * @param map  message parameter map, not {@code null}
    */
@@ -413,18 +413,25 @@ public final class MessagePartMap implements MessagePart.Map
   /**
    * Iterator over all key-value entries in the enclosing {@link MessagePartMap}. Yields sorted map key entries first,
    * followed by the default entry (if present).
+   *
+   * @since 0.21.0
    */
   private final class MapEntryIterator implements Iterator<Entry<MapKey,TypedValue<?>>>
   {
+    /** Next entry to return, or {@code null} if the iteration is complete. */
     private Entry<MapKey,TypedValue<?>> nextEntry;
+
+    /** Index of the map key entry to prepare next; the default entry follows the last map key entry. */
     private int idx;
 
 
+    /** Creates a new iterator positioned at the first entry. */
     private MapEntryIterator() {
       prepareNextEntry();
     }
 
 
+    /** Prepares the next entry, advancing from the map key entries to the default entry. */
     private void prepareNextEntry()
     {
       if (idx == mapKeys.length && defaultValue != null)
@@ -474,13 +481,25 @@ public final class MessagePartMap implements MessagePart.Map
   /**
    * {@link ComparatorContext} implementation that provides access to the current map key and locale during
    * value-to-key matching within this message part map.
+   *
+   * @since 0.21.0
    */
   private static final class ConfigKeyComparatorContext extends BaseConfigAccessor implements ComparatorContext
   {
+    /** Locale used for comparing values with map keys. */
     private final Locale locale;
+
+    /** Map key currently being compared. */
     private MapKey mapKey;
 
 
+    /**
+     * Creates a new comparator context.
+     *
+     * @param messageAccessor  message accessor providing default configuration values, not {@code null}
+     * @param locale           locale used for comparing values with map keys, not {@code null}
+     * @param config           parameter configuration
+     */
     private ConfigKeyComparatorContext(@NotNull MessageAccessor messageAccessor, @NotNull Locale locale,
                                        MessagePart.Config config)
     {

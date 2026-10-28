@@ -45,8 +45,8 @@ import static org.objectweb.asm.Type.getDescriptor;
  * <p>
  * This adopter recognizes the following annotations (including their repeatable container forms):
  * <ul>
- *   <li>{@link MessageDef} / {@link MessageDefs} – message definitions</li>
- *   <li>{@link TemplateDef} / {@link TemplateDefs} – template definitions</li>
+ *   <li>{@link MessageDef} / {@link MessageDefs}: message definitions</li>
+ *   <li>{@link TemplateDef} / {@link TemplateDefs}: template definitions</li>
  * </ul>
  * Annotations are detected on class-level as well as on non-synthetic methods.
  * <p>
@@ -66,15 +66,24 @@ import static org.objectweb.asm.Type.getDescriptor;
  */
 public final class AnnotationAdopter extends AbstractAnnotationAdopter
 {
+  /** Type descriptor of the {@link MessageDefs} annotation. */
   private static final String MESSAGE_DEFS_DESCRIPTOR = getDescriptor(MessageDefs.class);
+
+  /** Type descriptor of the {@link MessageDef} annotation. */
   private static final String MESSAGE_DEF_DESCRIPTOR = getDescriptor(MessageDef.class);
+
+  /** Type descriptor of the {@link TemplateDefs} annotation. */
   private static final String TEMPLATE_DEFS_DESCRIPTOR = getDescriptor(TemplateDefs.class);
+
+  /** Type descriptor of the {@link TemplateDef} annotation. */
   private static final String TEMPLATE_DEF_DESCRIPTOR = getDescriptor(TemplateDef.class);
+
+  /** Type descriptor of the {@link Text} annotation. */
   private static final String TEXT_DESCRIPTOR = getDescriptor(Text.class);
 
 
   /**
-   * Create an ASM annotation adopter for the given {@code configurableMessageSupport}. The message factory and
+   * Creates an ASM annotation adopter for the given {@code configurableMessageSupport}. The message factory and
    * message publisher are both obtained from the configurable message support instance.
    *
    * @param configurableMessageSupport  configurable message support, not {@code null}
@@ -85,7 +94,7 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
 
 
   /**
-   * Create an ASM annotation adopter for the given {@code messageFactory} and {@code publisher}. This constructor
+   * Creates an ASM annotation adopter for the given {@code messageFactory} and {@code publisher}. This constructor
    * allows the message factory and message publisher to be provided independently.
    *
    * @param messageFactory  message factory used for parsing message format strings, not {@code null}
@@ -115,14 +124,22 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
   /**
    * ASM class visitor that delegates class-level and method-level annotation visits to the enclosing adopter.
    * Synthetic methods are skipped.
+   *
+   * @since 0.24.0
    */
   private final class MainClassVisitor extends ClassVisitor
   {
+    /** Creates a new class visitor. */
     private MainClassVisitor() {
       super(ASM9);
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns a visitor for the annotations of non-synthetic methods.
+     */
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
                                      String[] exceptions) {
@@ -130,6 +147,11 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns a visitor for recognized message and template annotations.
+     */
     @Override
     public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
       return AnnotationAdopter.this.visitAnnotation(descriptor);
@@ -140,8 +162,12 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
 
 
   /**
-   * Returns an appropriate annotation visitor for the given annotation descriptor, or {@code null} if the
-   * descriptor does not match a recognized message or template annotation.
+   * Returns an appropriate annotation visitor for the given annotation descriptor, or {@code null} if the descriptor
+   * does not match a recognized message or template annotation.
+   *
+   * @param descriptor  annotation type descriptor
+   *
+   * @return  annotation visitor, or {@code null} if the annotation is not recognized
    */
   @SuppressWarnings("DuplicatedCode")
   private AnnotationVisitor visitAnnotation(String descriptor)
@@ -163,14 +189,22 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
 
   /**
    * ASM method visitor that delegates method-level annotation visits to the enclosing adopter.
+   *
+   * @since 0.24.0
    */
   private final class MessageMethodVisitor extends MethodVisitor
   {
+    /** Creates a new method visitor. */
     private MessageMethodVisitor() {
       super(ASM9);
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns a visitor for recognized message and template annotations.
+     */
     @Override
     public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
       return AnnotationAdopter.this.visitAnnotation(descriptor);
@@ -181,16 +215,20 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
 
 
   /**
-   * Visitor for the {@link MessageDefs} repeatable container annotation. Delegates each contained
-   * {@link MessageDef} to a {@link MessageDefAnnotationVisitor}.
+   * Visitor for the {@link MessageDefs} repeatable container annotation. Delegates each contained {@link MessageDef} to
+   * a {@link MessageDefAnnotationVisitor}.
+   *
+   * @since 0.24.0
    */
   private final class MessageDefsAnnotationVisitor extends AnnotationVisitor
   {
+    /** Creates a new visitor for a {@link MessageDefs} annotation. */
     private MessageDefsAnnotationVisitor() {
       super(ASM9);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public AnnotationVisitor visitArray(String name)
     {
@@ -207,21 +245,30 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
 
 
   /**
-   * Visitor for a single {@link MessageDef} annotation. Collects the message code, text and localized
-   * {@link Text} entries, then adopts the resulting message definition.
+   * Visitor for a single {@link MessageDef} annotation. Collects the message code, text and localized {@link Text}
+   * entries, then adopts the resulting message definition.
+   *
+   * @since 0.24.0
    */
   private final class MessageDefAnnotationVisitor extends AnnotationVisitor
   {
+    /** Message code collected from the annotation. */
     private String code;
+
+    /** Default text collected from the annotation. */
     private String text;
+
+    /** Localized texts collected from the annotation. */
     private final List<Text> texts = new ArrayList<>();
 
 
+    /** Creates a new visitor for a {@link MessageDef} annotation. */
     private MessageDefAnnotationVisitor() {
       super(ASM9);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public void visit(String name, Object value)
     {
@@ -232,6 +279,7 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public AnnotationVisitor visitArray(String name)
     {
@@ -244,6 +292,11 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Adopts or collects the definition gathered by this visitor.
+     */
     @Override
     public void visitEnd() {
       adopt(new SyntheticMessageDef(code, text, texts.toArray(Text[]::new)));
@@ -254,16 +307,20 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
 
 
   /**
-   * Visitor for the {@link TemplateDefs} repeatable container annotation. Delegates each contained
-   * {@link TemplateDef} to a {@link TemplateDefAnnotationVisitor}.
+   * Visitor for the {@link TemplateDefs} repeatable container annotation. Delegates each contained {@link TemplateDef}
+   * to a {@link TemplateDefAnnotationVisitor}.
+   *
+   * @since 0.24.0
    */
   private final class TemplateDefsAnnotationVisitor extends AnnotationVisitor
   {
+    /** Creates a new visitor for a {@link TemplateDefs} annotation. */
     private TemplateDefsAnnotationVisitor() {
       super(ASM9);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public AnnotationVisitor visitArray(String name)
     {
@@ -280,21 +337,30 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
 
 
   /**
-   * Visitor for a single {@link TemplateDef} annotation. Collects the template name, text and localized
-   * {@link Text} entries, then adopts the resulting template definition.
+   * Visitor for a single {@link TemplateDef} annotation. Collects the template name, text and localized {@link Text}
+   * entries, then adopts the resulting template definition.
+   *
+   * @since 0.24.0
    */
   private final class TemplateDefAnnotationVisitor extends AnnotationVisitor
   {
+    /** Template name collected from the annotation. */
     private String name;
+
+    /** Default text collected from the annotation. */
     private String text;
+
+    /** Localized texts collected from the annotation. */
     private final List<Text> texts = new ArrayList<>();
 
 
+    /** Creates a new visitor for a {@link TemplateDef} annotation. */
     private TemplateDefAnnotationVisitor() {
       super(ASM9);
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public void visit(String name, Object value)
     {
@@ -305,6 +371,7 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public AnnotationVisitor visitArray(String name)
     {
@@ -317,6 +384,11 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Adopts or collects the definition gathered by this visitor.
+     */
     @Override
     public void visitEnd() {
       adopt(new SyntheticTemplateDef(name, text, texts.toArray(Text[]::new)));
@@ -327,17 +399,31 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
 
 
   /**
-   * Visitor for a single {@link Text} annotation. Collects the locale, text and value attributes
-   * and adds the resulting synthetic text to a shared list.
+   * Visitor for a single {@link Text} annotation. Collects the locale, text and value attributes and adds the resulting
+   * synthetic text to a shared list.
+   *
+   * @since 0.24.0
    */
   private static final class TextAnnotationVisitor extends AnnotationVisitor
   {
+    /** List receiving the text collected from the annotation. */
     private final List<Text> inheritedTexts;
+
+    /** Locale collected from the annotation. */
     private String locale;
+
+    /** Localized text collected from the annotation. */
     private String text;
+
+    /** Value collected from the annotation. */
     private String value;
 
 
+    /**
+     * Creates a new visitor for a {@link Text} annotation.
+     *
+     * @param inheritedTexts  list receiving the collected text, not {@code null}
+     */
     private TextAnnotationVisitor(@NotNull List<Text> inheritedTexts)
     {
       super(ASM9);
@@ -346,6 +432,7 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public void visit(String name, Object value)
     {
@@ -358,6 +445,11 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Adopts or collects the definition gathered by this visitor.
+     */
     @Override
     public void visitEnd() {
       inheritedTexts.add(new SyntheticText(locale, text, value));

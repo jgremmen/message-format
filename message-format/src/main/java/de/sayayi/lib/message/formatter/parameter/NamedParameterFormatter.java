@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * Parameter formatter implementing this interface can be selected by specifying the formatter name in a message
  * parameter. If, for instance, this formatter is named {@code xyz}, it can be addressed in a message as follows:
- * {@code 'text %{p,xyz}.'}
+ * {@code 'text %{p,format:xyz}.'}
  * <p>
  * When a formatter is selected explicitly by name, it is treated as authoritative: the formatter service returns
  * <em>only</em> that named formatter, regardless of the value's type and even if a type-based formatter chain would

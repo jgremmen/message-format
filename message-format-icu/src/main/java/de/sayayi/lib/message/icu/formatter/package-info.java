@@ -21,12 +21,12 @@
  * This package provides the following formatters:
  * <ul>
  *   <li>
- *     {@link de.sayayi.lib.message.icu.formatter.ICUFormatter ICUFormatter} ({@code icu}) – formats parameter values
+ *     {@link de.sayayi.lib.message.icu.formatter.ICUFormatter ICUFormatter} ({@code icu}): formats parameter values
  *     using ICU {@link com.ibm.icu.text.MessageFormat MessageFormat} patterns, providing access to ICU's rich
  *     locale-sensitive formatting features such as plurals, select and number/date formatting.
  *   </li>
  *   <li>
- *     {@link de.sayayi.lib.message.icu.formatter.ICUPersonFormatter ICUPersonFormatter} ({@code icu-person}) – formats
+ *     {@link de.sayayi.lib.message.icu.formatter.ICUPersonFormatter ICUPersonFormatter} ({@code icu-person}): formats
  *     person names using the ICU {@link com.ibm.icu.text.PersonNameFormatter PersonNameFormatter}, with configurable
  *     control over name part visibility, ordering, formality and length.
  *   </li>

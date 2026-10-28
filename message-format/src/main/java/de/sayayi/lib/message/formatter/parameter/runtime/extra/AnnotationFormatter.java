@@ -43,6 +43,7 @@ import java.util.Set;
  */
 public final class AnnotationFormatter extends AbstractSingleTypeParameterFormatter<Annotation>
 {
+  /** Cache of annotation element accessor methods, keyed by annotation type and element name. */
   private final Map<AnnotationField,Method> annotationFieldMap = new HashMap<>();
 
 
@@ -131,7 +132,9 @@ public final class AnnotationFormatter extends AbstractSingleTypeParameterFormat
    * Cache key combining an annotation type with a field name.
    *
    * @param annotationType  the annotation type, not {@code null}
-   * @param field            the annotation element name, not {@code null}
+   * @param field           the annotation element name, not {@code null}
+   *
+   * @since 0.21.0
    */
   private record AnnotationField(@NotNull Class<? extends Annotation> annotationType, @NotNull String field) {
   }

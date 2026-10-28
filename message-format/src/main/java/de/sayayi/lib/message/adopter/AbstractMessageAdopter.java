@@ -47,7 +47,7 @@ public abstract class AbstractMessageAdopter
 
 
   /**
-   * Create a message adopter for the given {@code configurableMessageSupport}. The message factory and message
+   * Creates a message adopter for the given {@code configurableMessageSupport}. The message factory and message
    * publisher are both obtained from the configurable message support instance: the factory via
    * {@link ConfigurableMessageSupport#getMessageAccessor() getMessageAccessor()}.{@link
    * de.sayayi.lib.message.MessageSupport.MessageAccessor#getMessageFactory() getMessageFactory()} and the publisher is
@@ -61,7 +61,7 @@ public abstract class AbstractMessageAdopter
 
 
   /**
-   * Create a message adopter for the given {@code messageFactory} and {@code publisher}. This constructor allows the
+   * Creates a message adopter for the given {@code messageFactory} and {@code publisher}. This constructor allows the
    * message factory and message publisher to be provided independently, which is useful when the publisher is not a
    * {@link ConfigurableMessageSupport} instance or when a custom message factory is required.
    *

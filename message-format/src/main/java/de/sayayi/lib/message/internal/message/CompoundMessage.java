@@ -62,10 +62,10 @@ public final class CompoundMessage implements Message.WithSpaces
 
 
   /**
-   * Construct a compound message based on the given {@code messageParts}.
+   * Constructs a compound message based on the given {@code messageParts}.
    * <p>
-   * At least 1 message part is required. The message parts must not contain adjacent text parts,
-   * otherwise an {@link IllegalArgumentException} is thrown.
+   * At least 1 message part is required. The message parts must not contain adjacent text parts, otherwise an
+   * {@link IllegalArgumentException} is thrown.
    *
    * @param messageParts  message parts, not {@code null} and not empty
    */
@@ -104,6 +104,16 @@ public final class CompoundMessage implements Message.WithSpaces
   }
 
 
+  /**
+   * Formats a single message part. Exceptions thrown while formatting a parameter, post formatter or template part are
+   * converted into a {@link MessageFormatException} enriched with the parameter or template name.
+   *
+   * @param messageAccessor  message accessor, not {@code null}
+   * @param parameters       message parameters, not {@code null}
+   * @param messagePart      message part to format, not {@code null}
+   *
+   * @return  formatted text, never {@code null}
+   */
   @Contract(pure = true)
   private @NotNull Text format(@NotNull MessageAccessor messageAccessor,
                                @NotNull Parameters parameters,
@@ -187,18 +197,21 @@ public final class CompoundMessage implements Message.WithSpaces
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean equals(Object o) {
     return o instanceof CompoundMessage && deepEquals(messageParts, ((CompoundMessage)o).messageParts);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public int hashCode() {
     return 59 + deepHashCode(messageParts);
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public String toString() {
     return "CompoundMessage(parts=" + deepToString(messageParts) + ')';

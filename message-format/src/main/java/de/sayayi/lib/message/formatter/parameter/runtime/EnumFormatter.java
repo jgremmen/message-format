@@ -36,12 +36,12 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * This formatter uses the {@code enum} configuration key to select the output format:
  * <ul>
  *   <li>
- *     {@code name} (default) &ndash; formats the enum constant's name; string map keys can be used to override the
- *     output for specific names
+ *     {@code name} (default): formats the enum constant's name; string map keys can be used to override the output for
+ *     specific names
  *   </li>
  *   <li>
- *     {@code ord} or {@code ordinal} &ndash; formats the enum constant's ordinal value; number map keys can be used
- *     to override the output for specific ordinals
+ *     {@code ord} or {@code ordinal}: formats the enum constant's ordinal value; number map keys can be used to
+ *     override the output for specific ordinals
  *   </li>
  * </ul>
  * <p>
@@ -52,6 +52,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * (compared against the name).
  *
  * @author Jeroen Gremmen
+ * @since 0.4.2
  */
 public final class EnumFormatter extends AbstractMultiSelectFormatter<Enum<?>> implements MapKeyComparator<Enum<?>>
 {
@@ -81,6 +82,14 @@ public final class EnumFormatter extends AbstractMultiSelectFormatter<Enum<?>> i
   }
 
 
+  /**
+   * Formats the ordinal of {@code enumValue}, using a message mapped to the ordinal if available.
+   *
+   * @param context    formatter context, not {@code null}
+   * @param enumValue  enum value to format, not {@code null}
+   *
+   * @return  formatted ordinal, never {@code null}
+   */
   private @NotNull Text formatEnumOrdinal(@NotNull ParameterFormatterContext context, @NotNull Enum<?> enumValue)
   {
     final var ordinal = enumValue.ordinal();
@@ -90,6 +99,14 @@ public final class EnumFormatter extends AbstractMultiSelectFormatter<Enum<?>> i
   }
 
 
+  /**
+   * Formats the name of {@code enumValue}, using a message mapped to the name if available.
+   *
+   * @param context    formatter context, not {@code null}
+   * @param enumValue  enum value to format, not {@code null}
+   *
+   * @return  formatted name, never {@code null}
+   */
   private @NotNull Text formatEnumName(@NotNull ParameterFormatterContext context, @NotNull Enum<?> enumValue)
   {
     final var name = enumValue.name();

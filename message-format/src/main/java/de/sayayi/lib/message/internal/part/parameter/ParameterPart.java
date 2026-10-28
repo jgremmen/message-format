@@ -82,7 +82,7 @@ public final class ParameterPart implements MessagePart.Parameter
 
 
   /**
-   * Construct a parameter part with the given parameter {@code name}.
+   * Constructs a parameter part with the given parameter {@code name}.
    *
    * @param name  parameter name, not {@code null} or empty
    */
@@ -92,8 +92,7 @@ public final class ParameterPart implements MessagePart.Parameter
 
 
   /**
-   * Construct a parameter part with the given parameter {@code name} and optional leading and
-   * trailing spaces.
+   * Constructs a parameter part with the given parameter {@code name} and optional leading and trailing spaces.
    *
    * @param name  parameter name, not {@code null} or empty
    * @param spaceBefore  adds a leading space to this parameter
@@ -105,10 +104,11 @@ public final class ParameterPart implements MessagePart.Parameter
 
 
   /**
-   * Construct a parameter part with the given parameter {@code name} and parameter configuration.
+   * Constructs a parameter part with the given parameter {@code name} and parameter configuration.
    *
-   * @param name         parameter name, not {@code null} or empty
+   * @param name    parameter name, not {@code null} or empty
    * @param config  parameter configuration, not {@code null}
+   * @param map     parameter configuration map, not {@code null}
    */
   public ParameterPart(@NotNull String name, @NotNull MessagePartConfig config, @NotNull MessagePartMap map) {
     this(name, null, false, false, config, map);
@@ -116,7 +116,7 @@ public final class ParameterPart implements MessagePart.Parameter
 
 
   /**
-   * Construct a parameter part with all options specified.
+   * Constructs a parameter part with all options specified.
    *
    * @param name         parameter name, not {@code null} or empty
    * @param format       optional formatter name, or {@code null} for automatic formatter selection

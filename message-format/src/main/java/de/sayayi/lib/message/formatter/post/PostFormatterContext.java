@@ -23,7 +23,8 @@ import java.util.Locale;
 
 
 /**
- * Context for post formatters.
+ * Context passed to a {@link PostFormatter} while formatting. It provides the formatting locale and access to the
+ * configuration of the post format message part.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0

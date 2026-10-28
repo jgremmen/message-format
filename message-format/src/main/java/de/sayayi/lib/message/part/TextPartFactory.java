@@ -38,6 +38,7 @@ import static de.sayayi.lib.message.util.MessageUtil.trimSpaces;
  */
 public final class TextPartFactory
 {
+  /** This class is not meant to be instantiated. */
   private TextPartFactory() {}
 
 

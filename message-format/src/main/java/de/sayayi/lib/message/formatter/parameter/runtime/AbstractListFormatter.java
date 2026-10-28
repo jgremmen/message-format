@@ -45,23 +45,27 @@ import static java.lang.Integer.MAX_VALUE;
  * The following configuration keys control the output. Keys marked with (*) are handled by this base class; the
  * remaining keys must be handled appropriately by the implementing subclass.
  * <ul>
- *   <li>{@code list-sep} (*) &ndash; separator between elements (default: {@code ", "})</li>
+ *   <li>{@code list-sep} (*): separator between elements (default: {@code ", "})</li>
  *   <li>
- *     {@code list-sep-last} (*) &ndash; separator before the last element (e.g. {@code " and "}); if not set, the
- *     regular separator is used
+ *     {@code list-sep-last} (*): separator before the last element (e.g. {@code " and "}); if not set, the regular
+ *     separator is used
  *   </li>
- *   <li>{@code list-max-size} (*) &ndash; maximum number of elements to include</li>
- *   <li>{@code list-value-more} (*) &ndash; text to append when the list is truncated (e.g. {@code "..."})</li>
- *   <li>{@code list-unique} (*) &ndash; if {@code true}, duplicate element texts are suppressed</li>
+ *   <li>{@code list-max-size} (*): maximum number of elements to include</li>
+ *   <li>{@code list-value-more} (*): text to append when the list is truncated (e.g. {@code "..."})</li>
+ *   <li>{@code list-unique} (*): if {@code true}, duplicate element texts are suppressed</li>
  *   <li>
- *     {@code list-value} &ndash; message format used to format each individual element (default: {@code %{value}})
+ *     {@code list-value}: message format used to format each individual element (default: {@code %{value}})
  *   </li>
- *   <li>{@code list-this} &ndash; message for a reference to the list value itself</li>
+ *   <li>{@code list-this}: message for a reference to the list value itself</li>
  * </ul>
  * <p>
  * The table below illustrates how the configuration keys interact:
  * <table border="1">
- *   <tr><th>&nbsp;array&nbsp;</th><th>&nbsp;sep-last&nbsp;</th><th>&nbsp;max-size&nbsp;</th><th>&nbsp;value-more&nbsp;</th><th>&nbsp;result&nbsp;</th></tr>
+ *   <caption>Interaction of list configuration keys</caption>
+ *   <tr>
+ *     <th>&nbsp;array&nbsp;</th><th>&nbsp;sep-last&nbsp;</th><th>&nbsp;max-size&nbsp;</th>
+ *     <th>&nbsp;value-more&nbsp;</th><th>&nbsp;result&nbsp;</th>
+ *   </tr>
  *   <tr><td>[]</td><td>n/a</td><td>0</td><td>n/a</td><td>''</td></tr>
  *   <tr><td>[A,B,C]</td><td>'&nbsp;and'</td><td>(undefined)</td><td>n/a</td><td>'A, B and C'</td></tr>
  *   <tr><td>[A,B,C]</td><td>n/a</td><td>2</td><td>'...'</td><td>'A, B, ...'</td></tr>
@@ -229,6 +233,7 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
    */
   protected static abstract class AbstractTextIterator implements Iterator<Text>
   {
+    /** Next text element to return, or {@code null} if the iterator is exhausted. */
     private Text nextText = null;
 
 
@@ -277,10 +282,15 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
   /**
    * An iterator wrapper that filters out duplicate {@link Text} elements, ensuring each unique text is returned only
    * once.
+   *
+   * @since 0.22.0
    */
   private static final class UniqueTextIterator extends AbstractTextIterator
   {
+    /** Texts that have already been returned by this iterator. */
     private final Set<String> uniqueTexts = new HashSet<>();
+
+    /** Delegate iterator providing the unfiltered texts. */
     private final Iterator<Text> iterator;
 
 
