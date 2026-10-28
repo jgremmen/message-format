@@ -15,17 +15,24 @@
  */
 package de.sayayi.lib.message.internal.part.config;
 
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueBool;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
 import de.sayayi.lib.message.part.TypedValue;
+import de.sayayi.lib.pack.PackOutputStream;
+import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static de.sayayi.lib.message.internal.part.typedvalue.TypedValueBool.FALSE;
+import static de.sayayi.lib.message.internal.part.typedvalue.TypedValueBool.TRUE;
+import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -39,15 +46,54 @@ class MessagePartConfigTest
   @DisplayName("Copies the configuration map")
   void copiesConfigurationMap()
   {
-    final Map<String,TypedValue<?>> source = new HashMap<>();
-    source.put("enabled", TypedValueBool.TRUE);
+    val source = new HashMap<String,TypedValue<?>>();
+    source.put("enabled", TRUE);
 
-    final var config = new MessagePartConfig(source);
+    val config = new MessagePartConfig(source);
 
-    source.put("enabled", TypedValueBool.FALSE);
-    source.put("added", TypedValueBool.TRUE);
+    source.put("enabled", FALSE);
+    source.put("added", TRUE);
 
     assertEquals(Set.of("enabled"), config.getConfigNames());
-    assertSame(TypedValueBool.TRUE, config.getConfigValue("enabled"));
+    assertSame(TRUE, config.getConfigValue("enabled"));
+  }
+
+
+  @Test
+  @DisplayName("Iterates config names in sorted order")
+  void iteratesConfigNamesSorted()
+  {
+    val source = new HashMap<String,TypedValue<?>>();
+    for(val name: List.of("g", "f", "a", "e", "c", "b", "d"))
+      source.put(name, new TypedValueNumber(name.charAt(0)));
+
+    val config = new MessagePartConfig(source);
+
+    assertEquals(List.of("a", "b", "c", "d", "e", "f", "g"), List.copyOf(config.getConfigNames()));
+    assertEquals(config, new MessagePartConfig(Map.copyOf(source)));
+  }
+
+
+  @Test
+  @DisplayName("Packs identical configurations into identical bytes")
+  void packIsIndependentOfSourceMapOrder() throws Exception
+  {
+    val source = new HashMap<String,TypedValue<?>>();
+    for(val name: List.of("zeta", "alpha", "mu", "beta", "omega"))
+      source.put(name, TRUE);
+
+    assertArrayEquals(pack(new MessagePartConfig(source)), pack(new MessagePartConfig(Map.copyOf(source))));
+  }
+
+
+  private static byte[] pack(@NotNull MessagePartConfig config) throws Exception
+  {
+    val bytes = new ByteArrayOutputStream();
+
+    try(val packStream = new PackOutputStream(PACK_CONFIG, 1, false, bytes)) {
+      config.pack(packStream);
+    }
+
+    return bytes.toByteArray();
   }
 }

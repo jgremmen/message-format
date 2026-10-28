@@ -18,6 +18,7 @@ package de.sayayi.lib.message.internal.part.config;
 import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
+import de.sayayi.lib.message.util.SortedStringMap;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.ApiStatus;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static java.util.Collections.unmodifiableSet;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -44,17 +46,26 @@ public final class MessagePartConfig implements MessagePart.Config
   /** Shared empty configuration instance. */
   public static final MessagePartConfig EMPTY_CONFIG = new MessagePartConfig(Map.of());
 
-  /** The configuration map, keyed by config name. */
-  private final @NotNull Map<String,TypedValue<?>> config;
+  /**
+   * The configuration map, keyed by config name. The map is sealed and sorted by config name, so iteration (and
+   * therefore packing, serialization and auto-apply formatter selection) is deterministic.
+   */
+  private final @NotNull SortedStringMap<TypedValue<?>> config;
 
 
   /**
-   * Creates a new configuration backed by the given map.
+   * Creates a new configuration with a copy of the given map. Later changes to {@code config} do not affect this
+   * configuration.
    *
-   * @param config  the configuration map, not {@code null}
+   * @param config  the configuration map, not {@code null} and without {@code null} keys or values
+   *
+   * @throws NullPointerException  if {@code config} contains a {@code null} key or value
    */
-  public MessagePartConfig(@NotNull Map<String,TypedValue<?>> config) {
-    this.config = Map.copyOf(config);
+  public MessagePartConfig(@NotNull Map<String,TypedValue<?>> config)
+  {
+    config.values().forEach(value -> requireNonNull(value, "config value must not be null"));
+
+    this.config = new SortedStringMap<>(config, true);
   }
 
 
