@@ -20,6 +20,7 @@ import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
+import de.sayayi.lib.message.part.TypedValue.StringValue;
 import de.sayayi.lib.message.util.SortedStringMap;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
@@ -34,6 +35,7 @@ import java.util.Map.Entry;
 import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
 import static de.sayayi.lib.message.part.MessagePart.Text.SPACE;
 import static de.sayayi.lib.message.part.TextPartFactory.setSpaces;
+import static de.sayayi.lib.message.util.MessageUtil.serializeQuotedString;
 import static de.sayayi.lib.message.util.MessageUtil.validateName;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
@@ -157,7 +159,12 @@ public final class TemplatePart implements MessagePart.Template
 
     defaultParameterMap.forEach((key, value) -> {
       textJoiner.add(',').addNoSpace(key).add('=');
-      value.serialize(contextWithoutQuotes);
+
+      // the template syntax only accepts quoted strings as default parameter values
+      if (value instanceof StringValue stringValue)
+        serializeQuotedString(contextWithoutQuotes, stringValue.stringValue());
+      else
+        value.serialize(contextWithoutQuotes);
     });
 
     textJoiner.add(']');

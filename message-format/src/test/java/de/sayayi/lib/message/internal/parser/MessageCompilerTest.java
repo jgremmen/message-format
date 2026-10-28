@@ -91,6 +91,16 @@ final class MessageCompilerTest
 
 
   @Test
+  @DisplayName("Text with lone backslash")
+  void testTextLoneBackslash()
+  {
+    assertArrayEquals(
+        new MessagePart[] { noSpaceText("C:\\temp \\ x\\") },
+        COMPILER.compileMessage("C:\\temp \\ x\\").getMessageParts());
+  }
+
+
+  @Test
   @DisplayName("Text with supplementary characters")
   void testTextSupplementaryCharacters()
   {

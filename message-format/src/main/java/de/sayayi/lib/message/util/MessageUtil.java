@@ -459,6 +459,26 @@ public final class MessageUtil
   }
 
 
+  /**
+   * Check whether {@code string} can be serialized without quotes, i.e. it is a valid {@linkplain #isName(String)
+   * name} and not a keyword which would be parsed as a different value or token.
+   *
+   * @param string  the string to check, not {@code null}
+   *
+   * @return  {@code true} if {@code string} can be serialized unquoted, {@code false} otherwise
+   *
+   * @since 0.25.0
+   */
+  @Contract(pure = true)
+  public static boolean isUnquotableString(@NotNull String string)
+  {
+    return isName(string) && switch(string) {
+      case "true", "false", "null", "empty", "format" -> false;
+      default -> true;
+    };
+  }
+
+
   @Contract(pure = true)
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   private static boolean isNameChar(int cp)
@@ -478,7 +498,8 @@ public final class MessageUtil
    * Serializes a string into the format string representation by appending characters to the
    * context's {@linkplain Context#textJoiner() text joiner}, applying the following escaping rules:
    * <ul>
-   *   <li>The active {@linkplain Context#inStringWithQuote() string quote character} is backslash-escaped.</li>
+   *   <li>The active {@linkplain Context#inStringWithQuote() string quote character} and the backslash
+   *       character are backslash-escaped.</li>
    *   <li>A {@code %} character followed by <code>{</code>, <code>[</code> or <code>(</code> is
    *       backslash-escaped to prevent it from being interpreted as a parameter reference.</li>
    *   <li>ISO control characters and characters that cannot be
@@ -502,7 +523,7 @@ public final class MessageUtil
     {
       final var ch = stringCharArray[i];
 
-      if (Character.valueOf(ch).equals(context.inStringWithQuote()))
+      if (ch == '\\' || Character.valueOf(ch).equals(context.inStringWithQuote()))
         textJoiner.add('\\').add(ch);
       else if (ch == '%' && i + 1 < l && "{[(".indexOf(stringCharArray[i + 1]) >= 0)
         textJoiner.addNoSpace("\\%");
@@ -511,6 +532,30 @@ public final class MessageUtil
       else
         textJoiner.addNoSpace(String.format("\\u%04x", (int)ch));
     }
+  }
+
+
+  /**
+   * Serializes a string value into the format string representation. If the string is a valid
+   * {@linkplain #isName(String) name} and not one of the keywords {@code true}, {@code false}, {@code null},
+   * {@code empty} or {@code format}, it is serialized unquoted. Otherwise, it is serialized as a quoted string,
+   * so parsing the result yields the same string value.
+   *
+   * @param context  the serialization context providing charset encoding, text joiner and
+   *                 string quoting information, not {@code null}
+   * @param string   the string to serialize, not {@code null}
+   *
+   * @see #serializeString(Context, String)
+   * @see #serializeQuotedString(Context, String)
+   *
+   * @since 0.25.0
+   */
+  public static void serializeSimpleString(@NotNull Context context, @NotNull String string)
+  {
+    if (isUnquotableString(string))
+      serializeString(context, string);
+    else
+      serializeQuotedString(context, string);
   }
 
 
@@ -553,7 +598,7 @@ public final class MessageUtil
 
   /**
    * Serializes a message into the format string representation. If the message is a simple
-   * {@link TextMessage} whose text is a valid {@linkplain #isName(String) name} and
+   * {@link TextMessage} whose text is a valid {@linkplain #isName(String) name}, is not a keyword and
    * {@code forceQuoted} is {@code false}, the text is serialized without quotes. Otherwise,
    * the message is wrapped in quotes and serialized using the message's own serialization logic.
    * <p>
@@ -577,7 +622,7 @@ public final class MessageUtil
     if (!forceQuoted && message instanceof TextMessage textMessage)
     {
       final var string = ((Text)textMessage.getMessageParts()[0]).getTextWithSpaces();
-      if (isName(string))
+      if (isUnquotableString(string))
       {
         serializeString(context, string);
         return;

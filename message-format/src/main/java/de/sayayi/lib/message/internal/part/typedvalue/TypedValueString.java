@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.function.Supplier;
 
-import static de.sayayi.lib.message.util.MessageUtil.*;
+import static de.sayayi.lib.message.util.MessageUtil.serializeSimpleString;
 import static java.util.Objects.requireNonNull;
 
 
@@ -98,18 +98,14 @@ public final class TypedValueString implements StringValue
 
   /**
    * Serializes this string value into its format string representation. If the string is a valid
-   * {@linkplain de.sayayi.lib.message.util.MessageUtil#isName(String) name}, it is serialized
+   * {@linkplain de.sayayi.lib.message.util.MessageUtil#isName(String) name} and not a keyword, it is serialized
    * unquoted; otherwise it is serialized as a quoted string.
    *
    * @param context  the serialization context, not {@code null}
    */
   @Override
-  public void serialize(@NotNull Context context)
-  {
-    if (isName(string))
-      serializeString(context, string);
-    else
-      serializeQuotedString(context, string);
+  public void serialize(@NotNull Context context) {
+    serializeSimpleString(context, string);
   }
 
 

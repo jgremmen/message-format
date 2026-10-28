@@ -576,9 +576,9 @@ public final class MessageCompiler extends AbstractAntlr4Parser
         final var chText = chNode.getText();
         var ch = chText.charAt(0);
 
-        if (ch == '\\')
+        if (ch == '\\' && chText.length() > 1)
         {
-          // handle escape characters
+          // handle escape characters (a lone backslash is a regular character)
           ch = chText.length() == 2
               ? chText.charAt(1)
               : (char)parseInt(chText.substring(2), 16);
