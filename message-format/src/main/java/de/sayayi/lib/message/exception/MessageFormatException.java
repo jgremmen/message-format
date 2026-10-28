@@ -53,12 +53,11 @@ public class MessageFormatException extends MessageException
   /**
    * Constructs a new message format exception with the specified cause.
    * <p>
-   * Note that the detail message associated with {@code cause} is <i>not</i>
-   * incorporated in this runtime exception's detail message.
+   * Note that the detail message associated with {@code cause} is <i>not</i> incorporated in this runtime exception's
+   * detail message.
    *
-   * @param cause    the cause (which is saved for later retrieval by the {@link #getCause()}
-   *                 method). (A {@code null} value is permitted and indicates that the cause is
-   *                 nonexistent or unknown.)
+   * @param cause  the cause (which is saved for later retrieval by the {@link #getCause()} method). (A {@code null}
+   *               value is permitted and indicates that the cause is nonexistent or unknown.)
    */
   protected MessageFormatException(Throwable cause) {
     this(null, null, null, null, cause);
@@ -66,8 +65,8 @@ public class MessageFormatException extends MessageException
 
 
   /**
-   * Constructs a new message format exception with the given formatting context and cause. This constructor is
-   * intended for internal use.
+   * Constructs a new message format exception with the given formatting context and cause. This constructor is intended
+   * for internal use.
    *
    * @param code       message code, or {@code null}
    * @param template   template name, or {@code null}
@@ -202,62 +201,75 @@ public class MessageFormatException extends MessageException
 
 
   /**
-   * Returns a copy of this exception where the code value has been replaced with
-   * the given {@code code}.
+   * Returns a copy of this exception where the code value has been replaced with the given {@code code}.
    *
    * @param code  new code, not {@code null}
    *
-   * @return  new exception based on the current exception with modified code value,
-   *          never {@code null}
+   * @return  new exception based on the current exception with modified code value, never {@code null}
    */
   @Contract("_ -> new")
   public @NotNull MessageFormatException withCode(@NotNull String code) {
-    return new MessageFormatException(code, template, locale, parameter, getCause());
+    return copyWith(code, template, locale, parameter);
   }
 
 
   /**
-   * Returns a copy of this exception where the template value has been replaced with
-   * the given {@code template}.
+   * Returns a copy of this exception where the template value has been replaced with the given {@code template}.
    *
    * @param template  new template, not {@code null}
    *
-   * @return  new exception based on the current exception with modified template value,
-   *          never {@code null}
+   * @return  new exception based on the current exception with modified template value, never {@code null}
    */
   @Contract("_ -> new")
   public @NotNull MessageFormatException withTemplate(@NotNull String template) {
-    return new MessageFormatException(code, template, locale, parameter, getCause());
+    return copyWith(code, template, locale, parameter);
   }
 
 
   /**
-   * Returns a copy of this exception where the locale value has been replaced with
-   * the given {@code locale}.
+   * Returns a copy of this exception where the locale value has been replaced with the given {@code locale}.
    *
    * @param locale  new locale, not {@code null}
    *
-   * @return  new exception based on the current exception with modified locale value,
-   *          never {@code null}
+   * @return  new exception based on the current exception with modified locale value, never {@code null}
    */
   @Contract("_ -> new")
   public @NotNull MessageFormatException withLocale(@NotNull Locale locale) {
-    return new MessageFormatException(code, template, locale, parameter, getCause());
+    return copyWith(code, template, locale, parameter);
   }
 
 
   /**
-   * Returns a copy of this exception where the parameter value has been replaced with
-   * the given {@code parameter}.
+   * Returns a copy of this exception where the parameter value has been replaced with the given {@code parameter}.
    *
    * @param parameter  new parameter, not {@code null}
    *
-   * @return  new exception based on the current exception with modified parameter value,
-   *          never {@code null}
+   * @return  new exception based on the current exception with modified parameter value, never {@code null}
    */
   @Contract("_ -> new")
   public @NotNull MessageFormatException withParameter(@NotNull String parameter) {
-    return new MessageFormatException(code, template, locale, parameter, getCause());
+    return copyWith(code, template, locale, parameter);
+  }
+
+
+  /**
+   * Creates a copy of this exception with the given formatting context. The copy keeps the cause and the stack trace of
+   * this exception, so the location where the error was originally reported is not lost.
+   *
+   * @param code       message code, or {@code null}
+   * @param template   template name, or {@code null}
+   * @param locale     message locale, or {@code null}
+   * @param parameter  message parameter name, or {@code null}
+   *
+   * @return  new exception with the given formatting context, never {@code null}
+   */
+  @Contract("_, _, _, _ -> new")
+  private @NotNull MessageFormatException copyWith(String code, String template, Locale locale, String parameter)
+  {
+    final var copy = new MessageFormatException(code, template, locale, parameter, getCause());
+    copy.setStackTrace(getStackTrace());
+
+    return copy;
   }
 
 

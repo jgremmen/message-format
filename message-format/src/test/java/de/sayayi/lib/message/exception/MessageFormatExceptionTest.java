@@ -43,7 +43,9 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.util.Locale.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.Answers.CALLS_REAL_METHODS;
 import static org.mockito.ArgumentMatchers.any;
@@ -410,5 +412,24 @@ final class MessageFormatExceptionTest
             .locale(Locale.forLanguageTag("fr-CH"))
             .format())
             .getMessage());
+  }
+
+
+  @Test
+  @DisplayName("with...: copies keep the original stack trace and cause")
+  void testWithKeepsStackTrace()
+  {
+    val cause = new IllegalStateException("cause");
+    val ex = MessageFormatException.of(cause);
+    val stackTrace = ex.getStackTrace();
+
+    val copy = ex
+        .withParameter("p")
+        .withTemplate("tpl")
+        .withLocale(GERMANY)
+        .withCode("MSG-1");
+
+    assertArrayEquals(stackTrace, copy.getStackTrace());
+    assertSame(cause, copy.getCause());
   }
 }
