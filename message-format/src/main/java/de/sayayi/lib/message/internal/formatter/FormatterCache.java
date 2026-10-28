@@ -20,6 +20,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.StringJoiner;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
@@ -45,6 +46,20 @@ import static java.util.Arrays.fill;
 @ApiStatus.Internal
 public final class FormatterCache
 {
+  /** Sequence for assigning unique ids to types. */
+  private static final AtomicLong TYPE_ID_SEQUENCE = new AtomicLong();
+
+  /**
+   * Unique id per type, used to order different types with the same class name (e.g. loaded by different class
+   * loaders). {@code ClassValue} guarantees a single id per type and does not prevent the type from being unloaded.
+   */
+  private static final ClassValue<Long> TYPE_ID = new ClassValue<>() {
+    @Override
+    protected Long computeValue(@NotNull Class<?> type) {
+      return TYPE_ID_SEQUENCE.incrementAndGet();
+    }
+  };
+
   private final Lock lock = new ReentrantLock();
 
   private final int capacity;
@@ -238,30 +253,52 @@ public final class FormatterCache
    * @param type  the type to search for, not {@code null}
    *
    * @return  the index if found, or {@code -(insertion point) - 1} if not found
+   *
+   * @see #compareTypes(Class, Class)
    */
   private int findTypeIndex(@NotNull Class<?> type)
   {
-    final var typeName = type.getName();
     var low = 0;
     var high = typeCount - 1;
 
     while(low <= high)
     {
       final var mid = (low + high) >>> 1;
-      final var midClass = (Class<?>)typeFormatters[mid * 2];
+      final var cmp = compareTypes((Class<?>)typeFormatters[mid * 2], type);
 
-      if (midClass == type)
-        return mid;
-
-      final var midValCmp = midClass.getName().compareTo(typeName);
-
-      if (midValCmp < 0)
+      if (cmp < 0)
         low = mid + 1;
-      else if (midValCmp > 0)
+      else if (cmp > 0)
         high = mid - 1;
+      else
+        return mid;
     }
 
     return -(low + 1);  // type not found
+  }
+
+
+  /**
+   * Compares two types by class name. Different types with the same class name (e.g. loaded by different class
+   * loaders) are ordered by their unique type id. Hence, this comparison returns {@code 0} if, and only if, both types
+   * are identical.
+   *
+   * @param type1  first type, not {@code null}
+   * @param type2  second type, not {@code null}
+   *
+   * @return  a negative value, zero or a positive value if {@code type1} is less than, equal to or greater than
+   *          {@code type2}
+   *
+   * @since 0.25.0
+   */
+  private static int compareTypes(@NotNull Class<?> type1, @NotNull Class<?> type2)
+  {
+    if (type1 == type2)
+      return 0;
+
+    final var cmp = type1.getName().compareTo(type2.getName());
+
+    return cmp != 0 ? cmp : Long.compare(TYPE_ID.get(type1), TYPE_ID.get(type2));
   }
 
 

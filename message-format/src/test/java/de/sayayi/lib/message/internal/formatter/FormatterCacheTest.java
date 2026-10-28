@@ -23,13 +23,15 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static java.time.Duration.ofSeconds;
+import static java.util.Objects.requireNonNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -83,5 +85,85 @@ final class FormatterCacheTest
     // lookup Double which moves it to head (in lower quarter)
     // cache: Double, Iterator, int, List, boolean, byte[], Map, String
     assertArrayEquals(new ParameterFormatter[0], cache.lookup(Double.class, t -> fail()));
+  }
+
+
+  @Test
+  @DisplayName("Same class name loaded by different class loaders")
+  void lookupSameClassNameDifferentClassLoaders() throws Exception
+  {
+    val cache = new FormatterCache(8);
+    val type1 = new IsolatingClassLoader().loadClass(SameNameType.class.getName());
+    val type2 = new IsolatingClassLoader().loadClass(SameNameType.class.getName());
+    val type3 = new IsolatingClassLoader().loadClass(SameNameType.class.getName());
+    val pf1 = new ParameterFormatter[] { new ArrayFormatter() };
+    val pf2 = new ParameterFormatter[] { new ArrayFormatter() };
+    val pf3 = new ParameterFormatter[] { new ArrayFormatter() };
+
+    assertNotSame(type1, type2);
+    assertEquals(type1.getName(), type2.getName());
+
+    assertTimeoutPreemptively(ofSeconds(5), () -> {
+      cache.lookup(String.class, t -> new ParameterFormatter[0]);
+      cache.lookup(type1, t -> pf1);
+      cache.lookup(Map.class, t -> new ParameterFormatter[0]);
+      assertSame(pf2, cache.lookup(type2, t -> pf2));
+      assertSame(pf3, cache.lookup(type3, t -> pf3));
+
+      // cached by identity, not by name
+      assertSame(pf1, cache.lookup(type1, t -> fail()));
+      assertSame(pf2, cache.lookup(type2, t -> fail()));
+      assertSame(pf3, cache.lookup(type3, t -> fail()));
+      assertSame(pf2, cache.lookup(SameNameType.class, t -> pf2));
+
+      // force eviction of same named types
+      for(var type: List.of(int.class, long.class, short.class, byte.class, char.class, float.class, double.class))
+        cache.lookup(type, t -> new ParameterFormatter[0]);
+
+      val pf = new ParameterFormatter[] { new ArrayFormatter() };
+      assertSame(pf, cache.lookup(type1, t -> pf));
+    });
+  }
+
+
+
+
+  /** Type loaded by multiple class loaders, resulting in different classes with the same name. */
+  public static final class SameNameType {
+  }
+
+
+
+
+  /** Class loader defining its own copy of {@link SameNameType}. */
+  private static final class IsolatingClassLoader extends ClassLoader
+  {
+    private IsolatingClassLoader() {
+      super(FormatterCacheTest.class.getClassLoader());
+    }
+
+
+    @Override
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
+    {
+      if (!name.equals(SameNameType.class.getName()))
+        return super.loadClass(name, resolve);
+
+      synchronized(getClassLoadingLock(name))
+      {
+        var type = findLoadedClass(name);
+        if (type == null)
+        {
+          try(val in = getParent().getResourceAsStream(name.replace('.', '/') + ".class")) {
+            val bytes = requireNonNull(in).readAllBytes();
+            type = defineClass(name, bytes, 0, bytes.length);
+          } catch(IOException ex) {
+            throw new ClassNotFoundException(name, ex);
+          }
+        }
+
+        return type;
+      }
+    }
   }
 }
