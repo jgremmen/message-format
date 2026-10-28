@@ -32,8 +32,8 @@ description = 'Message Format Library (log4j formatter)'
 
 
 dependencies {
-  implementation project(':message-format')
-  implementation libs.log4j.api
+  api project(':message-format')
+  api libs.log4j.api
 
   testImplementation project(path: ':message-format', configuration: 'testOutput')
   testImplementation libs.log4j.core

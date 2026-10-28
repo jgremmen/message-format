@@ -64,11 +64,13 @@ import de.sayayi.lib.message.template.AbstractNamedTemplate;
  * @see de.sayayi.lib.message.MessageSupport
  * @see de.sayayi.lib.message.MessageFactory
  */
+@SuppressWarnings({ "JavaRequiresAutoModule", "requires-transitive-automatic" })
 module de.sayayi.lib.message
 {
-  requires de.sayayi.lib.antlr;
-  requires de.sayayi.lib.pack;
-  requires org.antlr.antlr4.runtime;
+  requires transitive de.sayayi.lib.antlr;
+  requires transitive de.sayayi.lib.pack;
+  requires transitive org.antlr.antlr4.runtime;
+
   requires java.sql;
 
   requires static java.xml;

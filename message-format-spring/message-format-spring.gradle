@@ -32,8 +32,8 @@ description = 'Message Format Library (Spring adopter and formatter)'
 
 
 dependencies {
-  implementation project(':message-format')
-  implementation libs.spring.context
+  api project(':message-format')
+  api libs.spring.context
 
   testImplementation project(path: ':message-format', configuration: 'testOutput')
 }

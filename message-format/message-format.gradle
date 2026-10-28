@@ -66,8 +66,9 @@ dependencies {
   // main
   annotationProcessor libs.lombok
 
-  implementation libs.bundles.antlr4.runtime
-  implementation(libs.pack) {
+  // types of these libraries are part of the public API
+  api libs.bundles.antlr4.runtime
+  api(libs.pack) {
     exclude group: 'org.apache.tika'
   }
 

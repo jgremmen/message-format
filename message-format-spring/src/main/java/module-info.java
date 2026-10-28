@@ -27,12 +27,13 @@
  *       evaluates Spring Expression Language (SpEL) expressions within message templates</li>
  * </ul>
  */
+@SuppressWarnings({ "JavaRequiresAutoModule", "requires-transitive-automatic" })
 module de.sayayi.lib.message.spring
 {
   requires transitive de.sayayi.lib.message;
+  requires transitive spring.core;
+  requires transitive spring.context;
 
-  requires spring.core;
-  requires spring.context;
   requires spring.expression;
 
   requires static org.jetbrains.annotations;

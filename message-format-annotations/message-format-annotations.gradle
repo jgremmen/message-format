@@ -63,7 +63,7 @@ configurations {
 
 
 dependencies {
-  implementation project(':message-format')
+  api project(':message-format')
 
   asmToBundle libs.asm
 }

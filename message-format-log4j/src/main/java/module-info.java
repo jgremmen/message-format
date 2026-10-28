@@ -37,8 +37,8 @@
  */
 module de.sayayi.lib.message.log4j
 {
-  requires de.sayayi.lib.message;
-  requires org.apache.logging.log4j;
+  requires transitive de.sayayi.lib.message;
+  requires transitive org.apache.logging.log4j;
 
   requires static org.jetbrains.annotations;
 
