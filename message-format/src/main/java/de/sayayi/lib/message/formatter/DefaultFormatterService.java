@@ -34,6 +34,13 @@ import java.util.function.Supplier;
  * Subclasses can override {@link #addDefaultFormatters()} or the individual
  * {@link #addParameterFormattersFromService()} and {@link #addPostFormattersFromService()} methods to customize which
  * formatters are loaded.
+ * <p>
+ * Unless a class loader is given explicitly, service-provided formatters are discovered using the class loader that
+ * loaded this library ({@code DefaultFormatterService.class.getClassLoader()}). This makes formatters from add-on
+ * modules on the same class path visible in environments where the system class loader does not see the
+ * application's libraries (e.g. Spring Boot executable jars, servlet containers or build tool plugins). The thread
+ * context class loader is deliberately not used, as the {@link #getSharedInstance() shared instance} would then
+ * depend on the thread that happens to create it first.
  *
  * @author Jeroen Gremmen
  * @since 0.4.2
@@ -44,14 +51,14 @@ public class DefaultFormatterService extends GenericFormatterService
       SupplierDelegate.of(() -> new DefaultFormatterService().seal());
 
   /**
-   * Classloader to be used to load parameter formatter service classes or {@code null} for the system class loader.
+   * Class loader used to load parameter and post formatter service classes, never {@code null}.
    */
   protected final ClassLoader classLoader;
 
 
   /**
    * Returns a shared instance of the default formatter service. This service includes all parameter formatters which
-   * are available as a service and accessible by the system class loader.
+   * are available as a service and accessible by the class loader that loaded this library.
    *
    * @return  shared instance of the default formatter service, never {@code null}
    */
@@ -61,7 +68,7 @@ public class DefaultFormatterService extends GenericFormatterService
 
 
   /**
-   * Creates a default formatter service using the system class loader and the
+   * Creates a default formatter service using the class loader that loaded this library and the
    * {@link #DEFAULT_FORMATTER_CACHE_SIZE default} cache size.
    */
   public DefaultFormatterService() {
@@ -70,7 +77,7 @@ public class DefaultFormatterService extends GenericFormatterService
 
 
   /**
-   * Creates a default formatter service using the system class loader and the given cache size.
+   * Creates a default formatter service using the class loader that loaded this library and the given cache size.
    *
    * @param formatterCacheSize  maximum number of type-to-formatter mappings to cache
    */
@@ -82,8 +89,8 @@ public class DefaultFormatterService extends GenericFormatterService
   /**
    * Creates a default formatter service using the given class loader and cache size.
    *
-   * @param classLoader         class loader used to discover service-provided formatters, or {@code null} for
-   *                            the system class loader
+   * @param classLoader         class loader used to discover service-provided formatters, or {@code null} for the class
+   *                            loader that loaded this library
    * @param formatterCacheSize  maximum number of type-to-formatter mappings to cache
    */
   @SuppressWarnings("WeakerAccess")
@@ -91,7 +98,7 @@ public class DefaultFormatterService extends GenericFormatterService
   {
     super(formatterCacheSize);
 
-    this.classLoader = classLoader == null ? ClassLoader.getSystemClassLoader() : classLoader;
+    this.classLoader = classLoader == null ? DefaultFormatterService.class.getClassLoader() : classLoader;
 
     addDefaultFormatters();
   }
