@@ -81,4 +81,20 @@ final class IterableFormatterTest extends AbstractFormatterTest
     assertEquals("1.2.3.4.5", messageSupport
         .message("%{c,list-sep:'.'}").with("c", List.of(1, 2, 3, 4, 5)).format());
   }
+
+
+  @Test
+  void testMaxSizeWithMoreValue()
+  {
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new IterableFormatter()));
+
+    assertEquals("1, 2, ...", messageSupport
+        .message("%{c,list-max-size:2,list-value-more:'...'}").with("c", List.of(1, 2, 3, 4, 5)).format());
+
+    assertEquals("1, 2, ...", messageSupport
+        .message("%{c,list-max-size:2,list-value-more:'...',list-unique:true}")
+        .with("c", List.of(1, 1, 2, 2, 3, 3, 4, 4))
+        .format());
+  }
 }

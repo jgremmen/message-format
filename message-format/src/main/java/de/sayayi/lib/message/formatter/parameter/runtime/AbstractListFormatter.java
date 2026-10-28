@@ -177,7 +177,13 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
         else
           joiner.add(separator);
 
-        joiner.add(n-- == 0 ? moreValue : text.getText());
+        if (n-- == 0)
+        {
+          joiner.add(moreValue);
+          break;
+        }
+
+        joiner.add(text.getText());
       }
     }
 
