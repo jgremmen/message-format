@@ -58,6 +58,7 @@ import static de.sayayi.lib.message.exception.MessageParserException.Type.TEMPLA
 import static de.sayayi.lib.message.internal.parser.MessageParser.*;
 import static de.sayayi.lib.message.util.MessageUtil.*;
 import static java.lang.Boolean.parseBoolean;
+import static java.lang.Character.isHighSurrogate;
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
 import static java.util.Objects.requireNonNull;
@@ -568,8 +569,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
     public void exitText(TextContext ctx)
     {
       final var chNodes = ctx.CH();
-      final var text = new char[chNodes.size()];
-      var n = 0;
+      final var text = new StringBuilder(chNodes.size());
 
       for(var chNode: chNodes)
       {
@@ -583,14 +583,19 @@ public final class MessageCompiler extends AbstractAntlr4Parser
               ? chText.charAt(1)
               : (char)parseInt(chText.substring(2), 16);
         }
+        else if (isHighSurrogate(ch))  // e.g. an emoji
+        {
+          text.append(chText);
+          continue;
+        }
 
         if (!isSpaceChar(ch))
-          text[n++] = ch;
-        else if (n == 0 || !isSpaceChar(text[n - 1]))
-          text[n++] = ' ';
+          text.append(ch);
+        else if (text.isEmpty() || text.charAt(text.length() - 1) != ' ')
+          text.append(' ');
       }
 
-      ctx.characters = new String(text, 0, n);
+      ctx.characters = text.toString();
     }
 
 

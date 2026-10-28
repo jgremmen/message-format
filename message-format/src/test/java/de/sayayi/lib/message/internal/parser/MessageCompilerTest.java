@@ -91,6 +91,24 @@ final class MessageCompilerTest
 
 
   @Test
+  @DisplayName("Text with supplementary characters")
+  void testTextSupplementaryCharacters()
+  {
+    assertArrayEquals(
+        new MessagePart[] { noSpaceText("Smile 😀 now") },
+        COMPILER.compileMessage("Smile 😀 now").getMessageParts());
+
+    assertArrayEquals(
+        new MessagePart[] { noSpaceText("😀𝔸𐌀") },
+        COMPILER.compileMessage("😀𝔸𐌀").getMessageParts());
+
+    assertArrayEquals(
+        new MessagePart[] { addSpaces(noSpaceText("😀 😀"), true, true) },
+        COMPILER.compileMessage("  😀   😀  ").getMessageParts());
+  }
+
+
+  @Test
   @DisplayName("Parameter with name only")
   void testParameterWithNameOnly()
   {
@@ -407,6 +425,7 @@ final class MessageCompilerTest
             ), Map.of()) },
         COMPILER.compileMessage("%[pq,a=true,c='C'] ").getMessageParts());
 
+    //noinspection UnreachableTemplateEntry
     var mpe = assertThrowsExactly(
         MessageParserException.class,
         () -> COMPILER.compileMessage("%[ xyz, a=true, a=false ]"));
