@@ -75,6 +75,9 @@ import static java.util.stream.Collectors.toCollection;
 @ApiStatus.Internal
 public final class MessageSupportImpl implements MessageSupport.ConfigurableMessageSupport
 {
+  /** Maximum number of messages and templates in a pack, as each count is packed as an unsigned short. */
+  private static final int MAX_PACK_COUNT = 0xffff;
+
   /** Guards concurrent access to the mutable state (default config, messages, templates, locale, filters). */
   private final @NotNull ReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -323,30 +326,43 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
       lock.readLock().unlock();
     }
 
+    final var messageCodes = new TreeSet<>(messageSnapshot.keySet());
+    final var templateNames = new TreeSet<String>();
+
+    // filter message codes
+    if (messageCodeFilter != null)
+      messageCodes.removeIf(messageCodeFilter.negate());
+
+    var messageCodesCount = messageCodes.size();
+    if (messageCodesCount > MAX_PACK_COUNT)
+    {
+      throw new IOException("pack cannot contain more than " + MAX_PACK_COUNT + " messages (" + messageCodesCount +
+          " selected)");
+    }
+
+    // collect all required templates
+    for(var code: messageCodes)
+      templateNames.addAll(messageSnapshot.get(code).getTemplateNames());
+
+    templateNames.removeIf(templateName -> !(templateSnapshot.get(templateName) instanceof MessageTemplate));
+    if (templateNameFilter != null)
+      templateNames.removeIf(templateNameFilter.negate());
+
+    var templateNamesCount = templateNames.size();
+    if (templateNamesCount > MAX_PACK_COUNT)
+    {
+      throw new IOException("pack cannot contain more than " + MAX_PACK_COUNT + " templates (" + templateNamesCount +
+          " selected)");
+    }
+
     try(var dataStream = new PackOutputStream(PACK_CONFIG, VERSION, compress, stream)) {
-      final var messageCodes = new TreeSet<>(messageSnapshot.keySet());
-      final var templateNames = new TreeSet<String>();
-
-      // filter message codes
-      if (messageCodeFilter != null)
-        messageCodes.removeIf(messageCodeFilter.negate());
-
       // pack all filtered messages
-      dataStream.writeUnsignedShort(messageCodes.size());
+      dataStream.writeUnsignedShort(messageCodesCount);
       for(var code: messageCodes)
-      {
-        final var message = messageSnapshot.get(code);
-
-        templateNames.addAll(message.getTemplateNames());
-        PackSupport.pack(message, dataStream);
-      }
+        PackSupport.pack(messageSnapshot.get(code), dataStream);
 
       // pack all required templates
-      templateNames.removeIf(templateName -> !(templateSnapshot.get(templateName) instanceof MessageTemplate));
-      if (templateNameFilter != null)
-        templateNames.removeIf(templateNameFilter.negate());
-
-      dataStream.writeUnsignedShort(templateNames.size());
+      dataStream.writeUnsignedShort(templateNamesCount);
       for(var templateName: templateNames)
       {
         dataStream.writeString(templateName);

@@ -153,7 +153,8 @@ public interface MessageSupport
    *
    * @param stream  pack output stream, not {@code null}
    *
-   * @throws IOException  if an I/O error occurs
+   * @throws IOException  if an I/O error occurs or if the pack would contain more than 65535 messages or more
+   *                      than 65535 templates
    *
    * @see ConfigurableMessageSupport#importMessages(InputStream)
    */
@@ -187,7 +188,8 @@ public interface MessageSupport
    *                           referenced by the selected messages will be included, except for custom
    *                           (non-message-backed) template implementations, which are always excluded
    *
-   * @throws IOException  if an I/O error occurs
+   * @throws IOException  if an I/O error occurs or if the pack would contain more than 65535 messages or more
+   *                      than 65535 templates. If a limit is exceeded, nothing is written to {@code stream}
    *
    * @see ConfigurableMessageSupport#importMessages(InputStream)
    */

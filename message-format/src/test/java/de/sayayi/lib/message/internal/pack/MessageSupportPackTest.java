@@ -17,8 +17,7 @@ import java.util.Map.Entry;
 import static de.sayayi.lib.message.Message.Parameters;
 import static java.util.Locale.*;
 import static java.util.stream.Collectors.toMap;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -119,5 +118,71 @@ final class MessageSupportPackTest
     assertEquals(
         "Default",
         importedMessage.format(importedMessageAccessor, Parameters.empty(JAPANESE)));
+  }
+
+
+  @Test
+  @DisplayName("Export maximum number of messages")
+  void testExportMaxMessageCount() throws IOException
+  {
+    val cms = MessageSupportFactory.createGeneric();
+    for(var n = 0; n < 0xffff; n++)
+      cms.addMessage("MSG-" + n, "text");
+
+    val pack = new ByteArrayOutputStream();
+    cms.exportMessages(pack);
+
+    val imported = MessageSupportFactory.createGeneric();
+    try(val packStream = new ByteArrayInputStream(pack.toByteArray())) {
+      imported.importMessages(packStream);
+    }
+
+    assertEquals(0xffff, imported.getMessageAccessor().getMessageCodes().size());
+  }
+
+
+  @Test
+  @DisplayName("Export too many messages")
+  void testExportTooManyMessages()
+  {
+    val cms = MessageSupportFactory.createGeneric();
+    for(var n = 0; n <= 0xffff; n++)
+      cms.addMessage("MSG-" + n, "text");
+
+    val pack = new ByteArrayOutputStream();
+    val ex = assertThrows(IOException.class, () -> cms.exportMessages(pack));
+
+    assertTrue(ex.getMessage().contains("messages"));
+    assertEquals(0, pack.size());
+
+    // filtering below the limit makes the export succeed
+    assertDoesNotThrow(() -> cms.exportMessages(new ByteArrayOutputStream(), false, code -> !code.equals("MSG-0"), null));
+  }
+
+
+  @Test
+  @DisplayName("Export too many templates")
+  void testExportTooManyTemplates()
+  {
+    val cms = MessageSupportFactory.createGeneric();
+    val messageFactory = cms.getMessageAccessor().getMessageFactory();
+    val message = new StringBuilder();
+
+    for(var n = 0; n <= 0xffff; n++)
+    {
+      cms.addTemplate("tpl-" + n, messageFactory.parseTemplate("template"));
+      message.append("%[tpl-").append(n).append(']');
+    }
+
+    cms.addMessage("MSG", message.toString());
+
+    val pack = new ByteArrayOutputStream();
+    val ex = assertThrows(IOException.class, () -> cms.exportMessages(pack));
+
+    assertTrue(ex.getMessage().contains("templates"));
+    assertEquals(0, pack.size());
+
+    // filtering below the limit makes the export succeed
+    assertDoesNotThrow(() -> cms.exportMessages(new ByteArrayOutputStream(), false, null, name -> !name.equals("tpl-0")));
   }
 }
