@@ -18,6 +18,7 @@ package de.sayayi.lib.message.internal.part.post;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
+import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.internal.part.config.MessagePartConfig;
 import de.sayayi.lib.message.part.MessagePart;
@@ -146,6 +147,8 @@ public final class PostFormatterPart implements MessagePart.PostFormat
    * @param parameters       formatting parameters, not {@code null}
    *
    * @return  the post-formatted text, never {@code null}
+   *
+   * @throws MessageFormatException  if no post formatter with the name of this part has been registered
    */
   @Override
   @Contract(pure = true)
@@ -155,9 +158,12 @@ public final class PostFormatterPart implements MessagePart.PostFormat
     if (text.isEmpty())
       return spaceBefore || spaceAfter ? spacedText(" ") : text;
 
-    final var postFormatter = requireNonNull(
-        messageAccessor.getPostFormatter(name),
-        "post formatter with name '" + name + "' has not been registered");
+    final var postFormatter = messageAccessor.getPostFormatter(name);
+    if (postFormatter == null)
+    {
+      throw MessageFormatException
+          .of(new IllegalStateException("post formatter with name '" + name + "' has not been registered"));
+    }
 
     return addSpaces(
         noSpaceText(postFormatter.format(text.getTextNotNull(),

@@ -106,7 +106,7 @@ public final class CompoundMessage implements Message.WithSpaces
 
   /**
    * Formats a single message part. Exceptions thrown while formatting a parameter, post formatter or template part are
-   * converted into a {@link MessageFormatException} enriched with the parameter or template name.
+   * converted into a {@link MessageFormatException} enriched with the parameter, post formatter or template name.
    *
    * @param messageAccessor  message accessor, not {@code null}
    * @param parameters       message parameters, not {@code null}
@@ -133,7 +133,7 @@ public final class CompoundMessage implements Message.WithSpaces
         try {
           return postFormatterPart.getText(messageAccessor, parameters);
         } catch(Exception ex) {
-          throw MessageFormatException.of(ex);
+          throw MessageFormatException.of(ex).withPostFormatter(postFormatterPart.getName());
         }
       }
 
