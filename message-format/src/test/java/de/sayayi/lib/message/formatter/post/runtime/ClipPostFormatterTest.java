@@ -167,6 +167,83 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Clip counts supplementary characters as one character")
+  void testClipSupplementaryCharacters()
+  {
+    val messageSupport = MessageSupportFactory.createDefault();
+    val emojis = "😀😁😂😃😄😅😆";  // 7 emojis
+
+    // not clipped: 7 code points (14 chars) fit into 7
+    assertEquals(
+        emojis,
+        messageSupport
+            .message("%(clip,'%{v}',clip:7)")
+            .with("v", emojis)
+            .format());
+
+    // hard clip after 3 emojis
+    assertEquals(
+        "😀😁😂",
+        messageSupport
+            .message("%(clip,'%{v}',clip:3,clip-suffix:false)")
+            .with("v", emojis)
+            .format());
+
+    // 5 emojis + ellipsis
+    assertEquals(
+        "😀😁😂😃😄…",
+        messageSupport
+            .message("%(clip,'%{v}',clip:6)")
+            .with("v", emojis)
+            .format());
+
+    // emoji suffix counts as 1 character
+    assertEquals(
+        "abcd😀",
+        messageSupport
+            .message("%(clip,'%{v}',clip:5,clip-suffix-text:'😀')")
+            .with("v", "abcdefgh")
+            .format());
+  }
+
+
+  @Test
+  @DisplayName("Clip counts grapheme clusters as one character")
+  void testClipGraphemeClusters()
+  {
+    val messageSupport = MessageSupportFactory
+        .createDefault()
+        .setDefaultConfig("clip-suffix", false);
+
+    val thumbsUpWithSkinTone = "👍🏽";
+    val family = "👨‍👩‍👧";
+    val eWithAcute = "é";
+
+    assertEquals(
+        thumbsUpWithSkinTone + family,
+        messageSupport
+            .message("%(clip,'%{v}',clip:2)")
+            .with("v", thumbsUpWithSkinTone + family + eWithAcute + "x")
+            .format());
+
+    assertEquals(
+        "Caf" + eWithAcute,
+        messageSupport
+            .message("%(clip,'%{v}',clip:4)")
+            .with("v", "Caf" + eWithAcute + " au lait")
+            .format());
+
+    // 4 grapheme clusters (13 chars) fit into 4
+    assertEquals(
+        thumbsUpWithSkinTone + family + eWithAcute + "x",
+        messageSupport
+            .message("%(clip,'%{v}',clip:4)")
+            .with("v", thumbsUpWithSkinTone + family + eWithAcute + "x")
+            .format());
+  }
+
+
+  @Test
   @DisplayName("Clip with custom suffix")
   void testClipCustomSuffix()
   {

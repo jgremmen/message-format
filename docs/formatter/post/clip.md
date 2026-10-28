@@ -22,9 +22,31 @@ messageSupport
 The total length of the result, including the ellipsis, does not exceed the configured maximum. In the example above 
 the output is exactly 20 characters: 19 visible characters plus the ellipsis.
 
-If the text is shorter than or equal to the maximum length, it is returned unchanged. Lengths are measured in Java
-`char` values (UTF-16 code units). A character outside the Basic Multilingual Plane, such as most emoji, counts as two,
-and clipping can split it.
+If the text is shorter than or equal to the maximum length, it is returned unchanged. Lengths, including the length
+of a custom suffix, are measured in user-perceived characters. The formatter determines them with a character
+`BreakIterator` for the formatting locale, which follows the extended grapheme cluster rules of the Unicode Standard
+(UAX #29). An emoji, which is stored as two Java `char` values (a surrogate pair), counts as a single character and is
+never split.
+
+```java
+messageSupport
+    .message("%(clip,'%{reaction}',clip:3,clip-suffix:false)")
+    .with("reaction", "\uD83D\uDE00\uD83D\uDE01\uD83D\uDE02\uD83D\uDE03")
+    .format();
+// "😀😁😂"
+```
+
+The same applies to characters composed of several code points, such as an emoji with a skin tone modifier, a family
+emoji whose members are joined by zero width joiners, or a letter followed by a combining accent. Each of them counts
+as one character.
+
+```java
+messageSupport
+    .message("%(clip,'%{name}',clip:4,clip-suffix:false)")
+    .with("name", "Cafe\u0301 au lait")
+    .format();
+// "Café"
+```
 
 ```java
 messageSupport
