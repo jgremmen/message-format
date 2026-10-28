@@ -25,6 +25,7 @@ import de.sayayi.lib.message.annotation.adopter.fixture.AnnotationsFixture;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticMessageDef;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticTemplateDef;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticText;
+import de.sayayi.lib.message.exception.MessageAdopterException;
 import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.MessageTemplate;
 import lombok.val;
@@ -34,15 +35,21 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.io.TempDir;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createTempFile;
@@ -137,6 +144,80 @@ class AnnotationAdopterTest
         Set.of(AnnotationsFixture.class.getPackageName()));
     verifyFixture(cms.getMessageAccessor());
     verifyInnerRecordFixture(cms.getMessageAccessor());
+  }
+
+
+  @Test
+  @DisplayName("adopt(ClassLoader, Set<String>) with spaces and non-ASCII characters in directory path")
+  void testAdoptClassLoaderDirectoryWithSpaces(@TempDir Path tempDir) throws Exception
+  {
+    val classesDir = copyFixturePackage(tempDir.resolve("with space/\u00e4\u00f6\u00fc \u65e5\u672c"));
+    val cms = newMessageSupport();
+
+    try(val classLoader = new URLClassLoader(new URL[] { classesDir.toUri().toURL() }, null)) {
+      new AnnotationAdopter(cms).adopt(classLoader, Set.of(AnnotationsFixture.class.getPackageName()));
+    }
+
+    verifyFixture(cms.getMessageAccessor());
+    verifyInnerRecordFixture(cms.getMessageAccessor());
+  }
+
+
+  @Test
+  @DisplayName("adopt(ClassLoader, Set<String>) with spaces and non-ASCII characters in jar path")
+  void testAdoptClassLoaderJarWithSpaces(@TempDir Path tempDir) throws Exception
+  {
+    val classesDir = copyFixturePackage(tempDir.resolve("classes"));
+    val jarFile = Files.createDirectories(tempDir.resolve("with space/\u00e4\u00f6\u00fc")).resolve("fixture.jar");
+
+    try(val jar = new JarOutputStream(Files.newOutputStream(jarFile)); val paths = Files.walk(classesDir)) {
+      for(val path: (Iterable<Path>)paths.filter(p -> !p.equals(classesDir))::iterator)
+      {
+        val entryName = classesDir.relativize(path).toString().replace('\\', '/');
+
+        if (Files.isDirectory(path))
+          jar.putNextEntry(new JarEntry(entryName + '/'));  // required to locate the package
+        else
+        {
+          jar.putNextEntry(new JarEntry(entryName));
+          jar.write(Files.readAllBytes(path));
+        }
+
+        jar.closeEntry();
+      }
+    }
+
+    val cms = newMessageSupport();
+
+    try(val classLoader = new URLClassLoader(new URL[] { jarFile.toUri().toURL() }, null)) {
+      new AnnotationAdopter(cms).adopt(classLoader, Set.of(AnnotationsFixture.class.getPackageName()));
+    }
+
+    verifyFixture(cms.getMessageAccessor());
+    verifyInnerRecordFixture(cms.getMessageAccessor());
+  }
+
+
+  @Test
+  @DisplayName("adopt(ClassLoader, Set<String>) fails for unsupported url protocols")
+  void testAdoptClassLoaderUnsupportedProtocol() throws Exception
+  {
+    val url = URL.of(URI.create("vfs:/content/app.war/WEB-INF/classes/test/"), new URLStreamHandler() {
+      @Override
+      protected URLConnection openConnection(URL u) {
+        throw new UnsupportedOperationException();
+      }
+    });
+    val classLoader = new ClassLoader(null) {
+      @Override
+      public Enumeration<URL> getResources(String name) {
+        return Collections.enumeration(List.of(url));
+      }
+    };
+
+    val ex = assertThrows(MessageAdopterException.class,
+        () -> new AnnotationAdopter(newMessageSupport()).adopt(classLoader, Set.of("test")));
+    assertTrue(ex.getMessage().contains("vfs:"));
   }
 
 
@@ -269,6 +350,21 @@ class AnnotationAdopterTest
 
 
   @Contract(pure = true)
+  private static @NotNull Path copyFixturePackage(@NotNull Path classesDir) throws Exception
+  {
+    val packagePath = AnnotationsFixture.class.getPackageName().replace('.', '/');
+    val sourceDir = classFilePath(AnnotationsFixture.class).getParent();
+    val targetDir = Files.createDirectories(classesDir.resolve(packagePath));
+
+    try(val files = Files.list(sourceDir)) {
+      for(val file: (Iterable<Path>)files.filter(f -> f.toString().endsWith(".class"))::iterator)
+        Files.copy(file, targetDir.resolve(file.getFileName().toString()));
+    }
+
+    return classesDir;
+  }
+
+
   private static @NotNull Path classFilePath(Class<?> type) throws URISyntaxException
   {
     val resourceName = type.getName().replace('.', '/') + ".class";

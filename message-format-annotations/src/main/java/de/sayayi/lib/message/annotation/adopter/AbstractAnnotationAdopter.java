@@ -121,15 +121,17 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
   /**
    * Scan the classpath for class files in the given packages and adopt all message and template annotations found.
-   * The scan includes directories as well as jar, war and zip archives on the classpath. Each package is resolved
-   * using the given {@code classLoader}. Classes that have already been visited are silently skipped.
+   * The scan includes directories as well as jar, war and zip archives on the classpath. Each package is resolved using
+   * the given {@code classLoader}. Classes that have already been visited are silently skipped.
    *
    * @param classLoader   classloader for locating package resources on the classpath, not {@code null}
    * @param packageNames  package names to scan (e.g. {@code "com.example.messages"}), not {@code null}
    *
    * @return  this annotation adopter instance, never {@code null}
    *
-   * @throws MessageAdopterException  if the classpath scan fails
+   * @throws MessageAdopterException  if the classpath scan fails or if a package is located in a classpath resource
+   *                                  which cannot be scanned (only {@code file} directories and jar, war and zip
+   *                                  archives are supported)
    * @throws MessageParserException   if a message or template text cannot be parsed
    */
   @Contract(value = "_, _ -> this")
@@ -147,8 +149,11 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Scan all classpath resources matching the given package name and adopt class files found in
-   * directories and zip-based archives (jar, war, zip).
+   * Scan all classpath resources matching the given package name and adopt class files found in directories and
+   * zip-based archives (jar, war, zip).
+   *
+   * @throws MessageAdopterException  if a classpath resource uses a protocol other than {@code file} or a zip-based
+   *                                  protocol
    */
   private void adopt_scan(@NotNull ClassLoader classLoader, @NotNull String packageName) throws IOException
   {
@@ -162,14 +167,28 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
       if (ZIP_PROTOCOLS.contains(url.getProtocol()))
         adopt_scan_zipEntries(url, classPathPrefix);
+      else if ("file".equals(url.getProtocol()))
+      {
+        // decode the url (e.g. %20 for spaces or non-ASCII characters) instead of using the raw url path
+        final File directory;
+        try {
+          directory = Path.of(url.toURI()).toFile();
+        } catch(URISyntaxException | IllegalArgumentException ex) {
+          throw new MessageAdopterException("invalid class path url '" + url + "'", ex);
+        }
+
+        // the base directory is the directory containing the package directory tree
+        var baseDirectory = directory;
+        for(var n = classPathPrefix.split("/").length; n > 0 && baseDirectory != null; n--)
+          baseDirectory = baseDirectory.getParentFile();
+
+        if (baseDirectory != null && directory.isDirectory())
+          adopt_scan_directory(baseDirectory, directory);
+      }
       else
       {
-        final var directory = url.getFile();
-        final var baseDirectory = new File(directory.endsWith(classPathPrefix)
-            ? directory.substring(0, directory.length() - classPathPrefix.length()) : directory);
-
-        if (baseDirectory.isDirectory())
-          adopt_scan_directory(baseDirectory, new File(directory));
+        throw new MessageAdopterException("unsupported class path url '" + url + "' for package " + packageName +
+            "; only file and " + ZIP_PROTOCOLS + " urls can be scanned");
       }
     }
   }
