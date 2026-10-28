@@ -81,6 +81,29 @@ final class LRUMessagePartNormalizerTest
 
 
   @Test
+  @DisplayName("normalize identical instance not at head")
+  void testIdenticalInstanceNotAtHead()
+  {
+    for(val maxSize: new int[] { 4, 100 })
+    {
+      val cache = LRUMessagePartNormalizer.create(maxSize);
+      val mp1 = new TextPart("mp1");
+      val mp2 = new TextPart("mp2");
+      val mp3 = new TextPart("mp3");
+
+      cache.normalize(mp1);
+      cache.normalize(mp2);
+      cache.normalize(mp3);
+
+      assertSame(mp1, cache.normalize(mp1));
+      assertSame(mp2, cache.normalize(mp2));
+      assertSame(mp3, cache.normalize(new TextPart("mp3")));
+      assertSame(mp1, cache.normalize(new TextPart("mp1")));
+    }
+  }
+
+
+  @Test
   @DisplayName("validate normalization on message parsing")
   void testCache() throws Exception
   {

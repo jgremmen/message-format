@@ -113,13 +113,16 @@ public final class LRUMessagePartNormalizer
 
         if (parts != null)
           for(var i = 0; i < size; i++)
-            if (parts[i] == part || (cachedPart = parts[i]).equals(part))
+          {
+            final var p = parts[i];
+
+            if (p == part || p.equals(part))
             {
-              if (cachedPart == null)
-                cachedPart = parts[i];
+              cachedPart = p;
               n = i;
               break;
             }
+          }
 
         if (n != 0)
         {
