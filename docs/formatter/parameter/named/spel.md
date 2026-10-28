@@ -215,18 +215,42 @@ evaluation is intended.
 
 ## Security Considerations
 
+The evaluation context only allows reading data from the parameter value, the other message parameters and the
+objects reachable from them. Properties can be read but not written, and instance methods can be invoked. The
+following constructs are rejected and make formatting fail with a `MessageFormatException` whose cause is a
+`SpelEvaluationException`:
+
+* type references such as `T(java.lang.System)`, so static methods, static fields and classes cannot be accessed by
+  name,
+* method invocations on `Class` objects, such as `getClass().forName(...)`,
+* constructors (`new ...`) and bean references (`@name`),
+* property writes and variable assignments.
+
+```java
+messageSupport
+    .message("%{v,spel-expr:'T(java.lang.Math).max(1, 2)'}")
+    .with("v", 1)
+    .format();
+// throws MessageFormatException caused by SpelEvaluationException
+```
+
 /// danger | Untrusted Expressions
-SpEL is a powerful expression language that can invoke arbitrary methods on objects. Constructors are **not** available
-in the evaluation context (the constructor resolver list is empty), bean resolution is disabled and variables cannot
-be assigned, which limits some attack vectors. However, the expression can still call any public method on the root
-object and on objects reachable from it. Type references are resolved as well, so an expression such as
-`T(java.lang.System).exit(0)` calls static methods of any class visible to the class loader. Every message parameter
-is available to the expression as a variable (`#name`).
+The restrictions limit what an expression can reach, but they do not make arbitrary expressions safe. Any public
+instance method of the root object, of the other message parameters and of every object reachable from them can still
+be invoked, including methods with side effects. Every message parameter is available to the expression as a variable
+(`#name`).
 
 Never allow untrusted user input to be used as a SpEL expression string. The `spel-expr` value should always be a fixed
 string defined by the developer in the message format, never a value derived from external input. This also applies
 to message format strings that are loaded from sources an attacker could modify, and to format strings assembled at
-runtime and passed to `message(String)`.
+runtime and passed to `message(String)` or to a [Log4j](../../../add-on/log4j.md#constant-message-strings) logger.
+///
+
+/// note | Migration from 0.24
+Up to version 0.24.0, the evaluation context resolved type references and static methods through a standard type
+locator and method resolver. Expressions that use `T(...)`, static methods or methods of `Class` objects now fail and
+must be rewritten, for example by passing the required value as an additional message parameter and referring to it
+as a variable.
 ///
 
 
@@ -238,8 +262,7 @@ provides three constructors for different levels of Spring integration.
 
 ### Default Constructor
 
-The simplest option creates a formatter with default type conversion, a default type locator and no special class 
-loader configuration.
+The simplest option creates a formatter with default type conversion and no special class loader configuration.
 
 ```java
 var formatterService = new DefaultFormatterService();
@@ -271,12 +294,12 @@ var formatterService = new DefaultFormatterService();
 formatterService.addFormatter(new SpELFormatter(
     new DefaultConversionService(),
     Thread.currentThread().getContextClassLoader()));
-// type references in expressions resolve through the given class loader
+// the SpEL parser configuration uses the given class loader
 ```
 
-The `ConversionService` is used by the SpEL `TypeConverter` to convert values during expression evaluation. The 
-`ClassLoader` is used by the `TypeLocator` to resolve type references in expressions and by the
-`SpelParserConfiguration` to locate classes at parse time.
+The `ConversionService` is used by the SpEL `TypeConverter` to convert values during expression evaluation. The
+`ClassLoader` is passed to the `SpelParserConfiguration`. It does not enable type references, which are always
+rejected.
 
 
 ## Null Handling

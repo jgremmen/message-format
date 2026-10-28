@@ -17,15 +17,21 @@ package de.sayayi.lib.message.spring.formatter;
 
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.expression.spel.SpelEvaluationException;
 
 import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 /**
@@ -74,5 +80,52 @@ final class SpELFormatterTest extends AbstractFormatterTest
         .message("%{map,spel-expr:'entrySet().toArray()[2].value',spel-format:choice,<0:negative}")
         .with("map", map)
         .format());
+  }
+
+
+  @Test
+  @DisplayName("Instance methods, properties and variables are available")
+  void testReadOnlyDataAccess()
+  {
+    assertEquals("ALICE", messageSupport
+        .message("%{name,spel-expr:'toUpperCase()'}")
+        .with("name", "alice")
+        .format());
+
+    assertEquals("5", messageSupport
+        .message("%{name,spel-expr:'bytes.length'}")
+        .with("name", "alice")
+        .format());
+
+    assertEquals("42", messageSupport
+        .message("%{a,spel-expr:'#b + 1'}")
+        .with("a", 1)
+        .with("b", 41)
+        .format());
+  }
+
+
+  @ParameterizedTest(name = "[{index}] {0}")
+  @DisplayName("Type references, static methods, constructors and assignments are rejected")
+  @ValueSource(strings = {
+      "T(java.lang.System).getProperty(\"java.version\")",
+      "T(java.lang.Math).PI",
+      "getClass().forName(\"java.lang.Runtime\")",
+      "getClass().getMethods()",
+      "new java.lang.StringBuilder(\"x\")",
+      "@systemProperties",
+      "#b = 1",
+      "bytes = null"
+  })
+  void testRestrictedExpressions(String expression)
+  {
+    val message = messageSupport.message("%{v,spel-expr:\"" + expression.replace("\"", "'") + "\"}");
+
+    val exception = assertThrows(MessageFormatException.class, () -> message
+        .with("v", "value")
+        .with("b", 41)
+        .format());
+
+    assertInstanceOf(SpelEvaluationException.class, exception.getCause());
   }
 }

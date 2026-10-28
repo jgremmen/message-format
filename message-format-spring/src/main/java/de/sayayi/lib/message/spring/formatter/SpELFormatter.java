@@ -28,13 +28,17 @@ import org.springframework.expression.*;
 import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.*;
+import org.springframework.expression.spel.support.StandardOperatorOverloader;
+import org.springframework.expression.spel.support.StandardTypeComparator;
+import org.springframework.expression.spel.support.StandardTypeConverter;
 
 import java.util.List;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
+import static org.springframework.expression.spel.SpelMessage.TYPE_NOT_FOUND;
 import static org.springframework.expression.spel.SpelMessage.VARIABLE_ASSIGNMENT_NOT_SUPPORTED;
+import static org.springframework.expression.spel.support.DataBindingMethodResolver.forInstanceMethodInvocation;
 import static org.springframework.expression.spel.support.DataBindingPropertyAccessor.forReadOnlyAccess;
 
 
@@ -45,8 +49,8 @@ import static org.springframework.expression.spel.support.DataBindingPropertyAcc
  * This formatter is registered under the name {@code spel} and supports the following parameter configuration options:
  * <ul>
  *   <li>
- *     {@code spel-expr} a SpEL expression to evaluate against the parameter value. The parameter value serves as
- *     the root object of the expression.
+ *     {@code spel-expr} a SpEL expression to evaluate against the parameter value. The parameter value serves as the
+ *     root object of the expression.
  *   </li>
  *   <li>
  *     {@code spel-format} an optional format name used to format the result of the SpEL expression.
@@ -56,6 +60,25 @@ import static org.springframework.expression.spel.support.DataBindingPropertyAcc
  * Message parameters referencing other parameter values are made available as SpEL variables
  * (e.g. {@code #otherParam}). Variable assignment is not supported and will result in a
  * {@link org.springframework.expression.spel.SpelEvaluationException SpelEvaluationException}.
+ * <p>
+ * The evaluation context is restricted to reading data from the root object, the variables and the objects reachable
+ * from them:
+ * <ul>
+ *   <li>properties can be read, but not written</li>
+ *   <li>instance methods can be invoked, but static methods and methods on {@link Class} objects cannot</li>
+ *   <li>
+ *     type references ({@code T(...)}) are rejected, so static methods, static fields and classes cannot be accessed by
+ *     name
+ *   </li>
+ *   <li>constructors ({@code new ...}) and bean references ({@code @bean}) are not available</li>
+ * </ul>
+ * Expressions that violate these restrictions fail with a
+ * {@link org.springframework.expression.spel.SpelEvaluationException SpelEvaluationException}, which is reported as a
+ * {@link de.sayayi.lib.message.exception.MessageFormatException MessageFormatException}.
+ * <p>
+ * Instance methods of the reachable objects are still invoked, including methods with side effects. SpEL expressions
+ * must therefore never be taken from untrusted input; message format strings that contain a {@code spel-expr}
+ * configuration must be constant or come from a trusted source.
  *
  * @author Jeroen Gremmen
  * @since 0.8.3  (refactored in 0.12.0)
@@ -67,12 +90,16 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
 
   private static final OperatorOverloader OPERATOR_OVERLOADER = new StandardOperatorOverloader();
   private static final TypeComparator TYPE_COMPARATOR = new StandardTypeComparator();
-  private static final List<MethodResolver> METHOD_RESOLVERS = List.of(new ReflectiveMethodResolver());
+  private static final List<MethodResolver> METHOD_RESOLVERS = List.of(forInstanceMethodInvocation());
   private static final List<PropertyAccessor> PROPERTY_ACCESSORS = List.of(forReadOnlyAccess());
+
+  /** Type locator rejecting all type references, so {@code T(...)} cannot be used to access arbitrary classes. */
+  private static final TypeLocator TYPE_LOCATOR = typeName -> {
+    throw new SpelEvaluationException(TYPE_NOT_FOUND, typeName);
+  };
 
   private final SpelExpressionParser spelExpressionParser;
   private final TypeConverter typeConverter;
-  private final TypeLocator typeLocator;
 
 
   /**
@@ -82,7 +109,6 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
   {
     spelExpressionParser = new SpelExpressionParser();
     typeConverter = new StandardTypeConverter();
-    typeLocator = new StandardTypeLocator();
   }
 
 
@@ -101,13 +127,12 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
    * Create a new SpEL formatter with the given conversion service and class loader.
    *
    * @param conversionService  type conversion service, not {@code null}
-   * @param classLoader        class loader, not {@code null}
+   * @param classLoader        class loader used by the SpEL parser configuration, not {@code null}
    */
   public SpELFormatter(@NotNull ConversionService conversionService, @NotNull ClassLoader classLoader)
   {
     spelExpressionParser = new SpelExpressionParser(new SpelParserConfiguration(null, classLoader));
     typeConverter = new StandardTypeConverter(conversionService);
-    typeLocator = new StandardTypeLocator(classLoader);
   }
 
 
@@ -157,7 +182,8 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
 
   /**
    * A read-only SpEL {@link EvaluationContext} that uses the parameter value as its root object and exposes other
-   * message parameters as SpEL variables.
+   * message parameters as SpEL variables. Type references, static method invocations, constructors, bean references,
+   * property writes and variable assignments are not supported.
    */
   private final class ParameterEvaluationContext implements EvaluationContext
   {
@@ -222,7 +248,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
 
     @Override
     public @NotNull TypeLocator getTypeLocator() {
-      return typeLocator;
+      return TYPE_LOCATOR;
     }
 
 
