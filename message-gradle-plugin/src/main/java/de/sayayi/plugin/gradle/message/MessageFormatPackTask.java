@@ -573,8 +573,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
   @Contract(pure = true)
   private @NotNull String getClassName(@NotNull Path classPath)
   {
-    try {
-      return new ClassReader(newInputStream(classPath)).getClassName().replace('/', '.');
+    try(var classStream = newInputStream(classPath)) {
+      return new ClassReader(classStream).getClassName().replace('/', '.');
     } catch(IOException ex) {
       throw new GradleException("Failed to read class name from " + classPath, ex);
     }
