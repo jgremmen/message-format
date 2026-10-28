@@ -232,8 +232,13 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     final var con = zipUrl.openConnection();
     final ZipFile zipFile;
 
-    if (con instanceof JarURLConnection)
-      zipFile = ((JarURLConnection)con).getJarFile();
+    if (con instanceof JarURLConnection jarURLConnection)
+    {
+      // use a private jar file instance, as the zip file is closed after scanning and a cached instance may be
+      // shared with other code (e.g. the class loader)
+      jarURLConnection.setUseCaches(false);
+      zipFile = jarURLConnection.getJarFile();
+    }
     else
     {
       final var urlFile = zipUrl.getFile();
