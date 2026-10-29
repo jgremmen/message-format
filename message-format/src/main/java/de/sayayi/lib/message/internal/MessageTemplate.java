@@ -28,7 +28,11 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Locale.ROOT;
+import static java.util.stream.Collectors.joining;
 
 
 /**
@@ -88,17 +92,60 @@ public final class MessageTemplate implements Template
 
 
   /**
-   * Returns a string representation of this template, useful for debugging.
+   * Returns a string representation of this template, useful for debugging. A localized template lists the format
+   * string of each locale, e.g. {@code Template(en="Hello",de="Hallo")}.
    *
    * @return  string representation, never {@code null}
    */
   @Override
   public String toString()
   {
+    if (message instanceof Message.LocaleAware localeAware)
+    {
+      return localeAware
+          .getLocalizedMessages()
+          .entrySet()
+          .stream()
+          .map(entry -> toLocaleString(entry.getKey()) + '=' + toFormatString(entry.getValue()))
+          .collect(joining(",", "Template(", ")"));
+    }
+
+    return "Template(" + toFormatString(message) + ')';
+  }
+
+
+  /**
+   * Returns the locale as a language tag for use in {@link #toString()}. {@link Locale#ROOT} is returned as
+   * {@code ROOT}.
+   *
+   * @param locale  locale, not {@code null}
+   *
+   * @return  locale string, never {@code null}
+   *
+   * @since 0.25.0
+   */
+  @Contract(pure = true)
+  private static @NotNull String toLocaleString(@NotNull Locale locale) {
+    return ROOT.equals(locale) ? "ROOT" : locale.toLanguageTag();
+  }
+
+
+  /**
+   * Returns the message as a double-quoted format string for use in {@link #toString()}.
+   *
+   * @param message  message, not {@code null}
+   *
+   * @return  quoted format string, never {@code null}
+   *
+   * @since 0.25.0
+   */
+  @Contract(pure = true)
+  private static @NotNull String toFormatString(@NotNull Message message)
+  {
     final var textJoiner = new TextJoiner();
 
     message.serialize(new Context(UTF_8.newEncoder(), textJoiner, '"'));
 
-    return "Template(\"" + textJoiner.asNoSpaceText().getText() + "\")";
+    return '"' + textJoiner.asNoSpaceText().getText() + '"';
   }
 }
