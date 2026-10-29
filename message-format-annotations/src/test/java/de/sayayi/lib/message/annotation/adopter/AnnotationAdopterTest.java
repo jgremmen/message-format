@@ -21,6 +21,7 @@ import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.TemplateDef;
+import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.annotation.adopter.fixture.AnnotationsFixture;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticMessageDef;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticTemplateDef;
@@ -44,10 +45,7 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
@@ -323,6 +321,103 @@ class AnnotationAdopterTest
     assertEquals("EN direct tmpl 3", locTemplates3.get(ENGLISH).asFormatString(UTF_8));
     assertEquals("DE direct tmpl 3", locTemplates3.get(GERMAN).asFormatString(UTF_8));
     assertEquals("FR direct tmpl 3", locTemplates3.get(FRENCH).asFormatString(UTF_8));
+  }
+
+
+  @Test
+  @DisplayName("adopt(MessageDef) with BCP 47 language tags")
+  void testAdoptMessageDefLanguageTags()
+  {
+    val cms = newMessageSupport();
+
+    new AnnotationAdopter(cms).adopt(new SyntheticMessageDef("MSG-L1", "",
+        new SyntheticText[] {
+            new SyntheticText("", "root", ""),
+            new SyntheticText("de", "de", ""),
+            new SyntheticText("de-DE", "de-DE", ""),
+            new SyntheticText("fr-CA", "fr-CA", ""),
+            new SyntheticText("zh-Hant-TW", "zh-Hant-TW", "")
+        }));
+
+    val localizedMessages =
+        ((LocaleAware)cms.getMessageAccessor().getMessageByCode("MSG-L1")).getLocalizedMessages();
+
+    assertEquals(
+        Set.of(ROOT, GERMAN, GERMANY, CANADA_FRENCH, Locale.forLanguageTag("zh-Hant-TW")),
+        localizedMessages.keySet());
+    assertEquals("de-DE", localizedMessages.get(GERMANY).asFormatString(UTF_8));
+    assertEquals("de-DE", cms.code("MSG-L1").locale(GERMANY).format());
+    assertEquals("root", cms.code("MSG-L1").locale(ITALIAN).format());
+  }
+
+
+  @Test
+  @DisplayName("adopt(MessageDef) rejects invalid locales")
+  void testAdoptMessageDefInvalidLocale()
+  {
+    for(var locale: List.of("de_DE", "fr_CA", "not a locale", "de-"))
+    {
+      val adopter = new AnnotationAdopter(newMessageSupport());
+      val messageDef = new SyntheticMessageDef("MSG-INVALID", "",
+          new SyntheticText[] {
+              new SyntheticText("en", "English", ""),
+              new SyntheticText(locale, "Other", "")
+          });
+
+      val message =
+          assertThrows(MessageAdopterException.class, () -> adopter.adopt(messageDef), locale).getMessage();
+      assertTrue(message.contains("'" + locale + "'"), message);
+      assertTrue(message.contains("message 'MSG-INVALID'"), message);
+    }
+  }
+
+
+  @Test
+  @DisplayName("adopt(TemplateDef) with BCP 47 language tags")
+  void testAdoptTemplateDefLanguageTags()
+  {
+    val cms = newMessageSupport();
+
+    new AnnotationAdopter(cms).adopt(new SyntheticTemplateDef("tmpl-l1", "",
+        new SyntheticText[] {
+            new SyntheticText("en", "en", ""),
+            new SyntheticText("en-GB", "en-GB", "")
+        }));
+
+    val localizedTemplates =
+        ((LocaleAware)((MessageTemplate)cms.getMessageAccessor().getTemplateByName("tmpl-l1")).getMessage())
+            .getLocalizedMessages();
+
+    assertEquals(Set.of(ENGLISH, UK), localizedTemplates.keySet());
+    assertEquals("en-GB", localizedTemplates.get(UK).asFormatString(UTF_8));
+  }
+
+
+  @Test
+  @DisplayName("adopt(TemplateDef) rejects invalid locales")
+  void testAdoptTemplateDefInvalidLocale()
+  {
+    val adopter = new AnnotationAdopter(newMessageSupport());
+    val templateDef = new SyntheticTemplateDef("tmpl-invalid", "",
+        new SyntheticText[] {
+            new SyntheticText("en_GB", "English", ""),
+            new SyntheticText("de", "Deutsch", "")
+        });
+
+    val ex = assertThrows(MessageAdopterException.class, () -> adopter.adopt(templateDef));
+    assertTrue(ex.getMessage().contains("'en_GB'"), ex.getMessage());
+    assertTrue(ex.getMessage().contains("template 'tmpl-invalid'"), ex.getMessage());
+  }
+
+
+  @Test
+  @DisplayName("adopt(Class<?> type) rejects invalid locales")
+  void testAdoptTypeInvalidLocale()
+  {
+    assertThrows(MessageAdopterException.class,
+        () -> new AnnotationAdopter(newMessageSupport()).adopt(InvalidMessageLocaleFixture.class));
+    assertThrows(MessageAdopterException.class,
+        () -> new AnnotationAdopter(newMessageSupport()).adopt(InvalidTemplateLocaleFixture.class));
   }
 
 
@@ -621,5 +716,18 @@ class AnnotationAdopterTest
 
   @TemplateDef(name = "invalid-template", text = "%{x,true false:1}")
   private static final class InvalidTemplateFixture {
+  }
+
+
+  @MessageDef(code = "invalid-locale", texts = {
+      @Text(locale = "en", text = "English"),
+      @Text(locale = "de_DE", text = "Deutsch")
+  })
+  private static final class InvalidMessageLocaleFixture {
+  }
+
+
+  @TemplateDef(name = "invalid-locale", texts = @Text(locale = "de_DE", text = "Deutsch"))
+  private static final class InvalidTemplateLocaleFixture {
   }
 }

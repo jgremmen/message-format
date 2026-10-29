@@ -63,6 +63,25 @@ try {
 }
 ```
 
+### `@Text` locales must be valid language tags
+
+The `locale` of a `@Text` annotation was converted with `Locale.forLanguageTag`, although its documentation suggested
+Java locale notations like `de_DE`. `forLanguageTag` does not understand such notations and silently returns
+`Locale.ROOT` for them, so a text declared for `de_DE` became the fallback text for every locale, and two such texts
+failed with a misleading duplicate definition error for locale `''`.
+
+The locale must now be empty (for `Locale.ROOT`), an ISO 639 language code like `de`, or an IETF BCP 47 language tag
+like `de-DE`. Any other value, including the underscore notation, makes the annotation adopter throw a
+`MessageAdopterException` that names the offending locale. Annotations using the underscore notation must be changed:
+
+```java
+// before
+@Text(locale = "de_DE", text = "Hallo %{name}!")
+
+// after
+@Text(locale = "de-DE", text = "Hallo %{name}!")
+```
+
 ### Apache Tika pack detectors are no longer auto-registered
 
 Automatic detection of message format pack files by Apache Tika previously worked out of the box: the module declared

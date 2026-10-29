@@ -37,16 +37,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.jar.JarFile;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import static java.nio.file.Files.newInputStream;
-import static java.util.Locale.forLanguageTag;
+import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
 
 
@@ -432,6 +429,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * @return  this annotation adopter instance, never {@code null}
    *
    * @throws DuplicateMessageException  if different messages are provided for the same locale
+   * @throws MessageAdopterException    if a {@linkplain Text#locale() locale} is not a valid language tag
    * @throws MessageParserException     if a message or template text cannot be parsed
    */
   @Contract(value = "_ -> this")
@@ -450,7 +448,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
       {
         final var value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
 
-        localizedTexts.compute(forLanguageTag(text.locale()), (locale,mappedValue) -> {
+        localizedTexts.compute(parseLocale(text.locale(), "message", code), (locale,mappedValue) -> {
           if (mappedValue == null || mappedValue.equals(value))
             return value;
 
@@ -476,6 +474,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * @return  this annotation adopter instance, never {@code null}
    *
    * @throws DuplicateTemplateException  if different template messages are provided for the same locale
+   * @throws MessageAdopterException     if a {@linkplain Text#locale() locale} is not a valid language tag
    * @throws MessageParserException      if the template text cannot be parsed
    */
   @Contract(value = "_ -> this")
@@ -494,7 +493,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
       {
         final var value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
 
-        localizedTexts.compute(forLanguageTag(text.locale()), (locale, mappedValue) -> {
+        localizedTexts.compute(parseLocale(text.locale(), "template", name), (locale, mappedValue) -> {
           if (mappedValue == null || mappedValue.equals(value))
             return value;
 
@@ -511,6 +510,35 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     }
 
     return this;
+  }
+
+
+  /**
+   * Parses the {@linkplain Text#locale() locale} of a {@link Text} annotation. An empty locale denotes
+   * {@link Locale#ROOT}; any other value must be a well-formed IETF BCP 47 language tag, e.g. {@code de} or
+   * {@code de-DE}. Java locale notations like {@code de_DE} are rejected.
+   *
+   * @param locale  locale string, not {@code null}
+   * @param kind    kind of the annotated definition ({@code message} or {@code template}), used in the error message
+   * @param name    message code or template name, used in the error message
+   *
+   * @return  parsed locale, never {@code null}
+   *
+   * @throws MessageAdopterException  if {@code locale} is not a well-formed language tag
+   *
+   * @since 0.25.0
+   */
+  private static @NotNull Locale parseLocale(@NotNull String locale, @NotNull String kind, @NotNull String name)
+  {
+    if (locale.isEmpty())
+      return ROOT;
+
+    try {
+      return new Locale.Builder().setLanguageTag(locale).build();
+    } catch(IllformedLocaleException ex) {
+      throw new MessageAdopterException("invalid locale '" + locale + "' for " + kind + " '" + name +
+          "'; a language code (e.g. 'de') or an IETF BCP 47 language tag (e.g. 'de-DE') is required", ex);
+    }
   }
 
 

@@ -98,8 +98,9 @@ messageSupport
 ### Locale Dependent Messages
 
 To provide translations, list several `@Text` entries in the `texts` element and give each one a `locale`. The locale 
-is either a plain language code such as `en` or `de`, or a language and country combination such as `de_DE` or `fr_CA`.
-Leave the `text` element unset when `texts` is used.
+is either a plain language code such as `en` or `de`, or an IETF BCP 47 language tag such as `de-DE` or `fr-CA`. Java
+locale notations with an underscore, such as `de_DE`, are not supported: the adopter rejects them, like any other
+ill-formed language tag, with a `MessageAdopterException`. Leave the `text` element unset when `texts` is used.
 
 ```java
 @MessageDef(code = "greeting", texts = {

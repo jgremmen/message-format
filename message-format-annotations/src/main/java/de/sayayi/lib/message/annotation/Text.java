@@ -43,7 +43,10 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 public @interface Text
 {
   /**
-   * Message locale, either the language code (e.g. de, es) or the language with country (e.g. de_DE, fr_CA).
+   * Message locale, either an ISO 639 language code (e.g. {@code de}, {@code es}) or an IETF BCP 47 language tag
+   * (e.g. {@code de-DE}, {@code fr-CA}). Java locale notations with an underscore (e.g. {@code de_DE}) are not
+   * supported; adopting a definition with such a locale, or any other ill-formed language tag, fails with a
+   * {@link de.sayayi.lib.message.exception.MessageAdopterException MessageAdopterException}.
    * <p>
    * The default value corresponds to {@link java.util.Locale#ROOT}, which is used for any locale that has no text with
    * a matching language.
