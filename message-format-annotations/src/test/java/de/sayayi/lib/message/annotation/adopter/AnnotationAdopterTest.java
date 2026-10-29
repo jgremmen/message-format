@@ -23,6 +23,7 @@ import de.sayayi.lib.message.annotation.MessageDef;
 import de.sayayi.lib.message.annotation.TemplateDef;
 import de.sayayi.lib.message.annotation.Text;
 import de.sayayi.lib.message.annotation.adopter.fixture.AnnotationsFixture;
+import de.sayayi.lib.message.annotation.adopter.invalid.InvalidTemplateFixture;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticMessageDef;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticTemplateDef;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticText;
@@ -714,17 +715,14 @@ class AnnotationAdopterTest
 
 
 
-  @TemplateDef(name = "invalid-template", text = "%{x,true false:1}")
-  private static final class InvalidTemplateFixture {
-  }
-
-
   @MessageDef(code = "invalid-locale", texts = {
       @Text(locale = "en", text = "English"),
       @Text(locale = "de_DE", text = "Deutsch")
   })
   private static final class InvalidMessageLocaleFixture {
   }
+
+
 
 
   @TemplateDef(name = "invalid-locale", texts = @Text(locale = "de_DE", text = "Deutsch"))
