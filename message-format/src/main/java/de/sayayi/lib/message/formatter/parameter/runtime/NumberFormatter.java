@@ -31,10 +31,7 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAccumulator;
@@ -77,10 +74,6 @@ public final class NumberFormatter
     extends AbstractParameterFormatter<Number>
     implements MapKeyComparator<Number>
 {
-  /** Cache of decimal format symbols used for custom format patterns, keyed by locale. */
-  private static final Map<Locale,DecimalFormatSymbols> FORMAT_SYMBOLS_CACHE = new ConcurrentHashMap<>();
-
-
   /**
    * {@inheritDoc}
    * <p>
@@ -98,8 +91,8 @@ public final class NumberFormatter
   /**
    * {@inheritDoc}
    * <p>
-   * Formats the number based on the {@code number} configuration key, or using number map keys if a match is found.
-   * If no configuration is provided, integer types use their plain string representation while other types use a
+   * Formats the number based on the {@code number} configuration key, or using number map keys if a match is found. If
+   * no configuration is provided, integer types use their plain string representation while other types use a
    * locale-specific number format.
    */
   @Override
@@ -154,7 +147,7 @@ public final class NumberFormatter
       return NumberFormat.getCurrencyInstance(locale);
 
     if (!isEmpty(format))
-      return new DecimalFormat(format, FORMAT_SYMBOLS_CACHE.computeIfAbsent(locale, DecimalFormatSymbols::new));
+      return new DecimalFormat(format, DecimalFormatSymbols.getInstance(locale));
 
     return NumberFormat.getNumberInstance(locale);
   }
