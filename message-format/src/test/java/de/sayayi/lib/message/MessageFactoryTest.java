@@ -20,7 +20,10 @@ import de.sayayi.lib.message.internal.message.CompoundMessage;
 import de.sayayi.lib.message.internal.message.EmptyMessage;
 import de.sayayi.lib.message.internal.message.EmptyMessageWithCode;
 import de.sayayi.lib.message.internal.message.LocalizedMessageBundleWithCode;
+import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer;
+import de.sayayi.lib.message.part.normalizer.MessagePartNormalizer;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -29,11 +32,14 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 
 import static de.sayayi.lib.message.part.normalizer.MessagePartNormalizer.PASS_THROUGH;
 import static java.util.Locale.JAPANESE;
 import static java.util.Locale.forLanguageTag;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -186,5 +192,87 @@ final class MessageFactoryTest
     assertEquals(
         "Bonjour",
         message.format(messageAccessor, Message.Parameters.empty(JAPANESE)));
+  }
+
+
+  @Test
+  @DisplayName("Cache does not block other threads while compiling a message")
+  void testParseMessageCacheCompilesOutsideLock() throws Exception
+  {
+    final var normalizer = new BlockingNormalizer();
+    final var messageFactory = new MessageFactory(normalizer, 16);
+    final var blockedParse = supplyAsync(() -> messageFactory.parseMessage("blocked %{a}"));
+
+    try {
+      assertTrue(normalizer.entered.await(5, SECONDS));
+
+      // must not wait for the blocked compilation of another text
+      final var otherParse = supplyAsync(() -> messageFactory.parseMessage("other %{b}"));
+      assertInstanceOf(CompoundMessage.class, otherParse.get(5, SECONDS));
+    } finally {
+      normalizer.release.countDown();
+    }
+
+    assertInstanceOf(CompoundMessage.class, blockedParse.get(5, SECONDS));
+  }
+
+
+  @Test
+  @DisplayName("Cache returns the first cached message for concurrently compiled identical texts")
+  void testParseMessageCacheConcurrentIdenticalText() throws Exception
+  {
+    final var normalizer = new BlockingNormalizer();
+    final var messageFactory = new MessageFactory(normalizer, 16);
+    final var blockedParse = supplyAsync(() -> messageFactory.parseMessage("same %{a}"));
+    final Message.WithSpaces message;
+
+    try {
+      assertTrue(normalizer.entered.await(5, SECONDS));
+
+      // compiles and caches the text while the other thread is still compiling it
+      message = supplyAsync(() -> messageFactory.parseMessage("same %{a}")).get(5, SECONDS);
+    } finally {
+      normalizer.release.countDown();
+    }
+
+    assertSame(message, blockedParse.get(5, SECONDS));
+    assertSame(message, messageFactory.parseMessage("same %{a}"));
+  }
+
+
+
+
+  /**
+   * Normalizer that blocks the first thread which normalizes a message part until {@link #release} is counted down.
+   */
+  private static final class BlockingNormalizer implements MessagePartNormalizer
+  {
+    private final CountDownLatch entered = new CountDownLatch(1);
+    private final CountDownLatch release = new CountDownLatch(1);
+    private volatile Thread blockedThread;
+
+
+    @Override
+    public <T extends MessagePart> @NotNull T normalize(@NotNull T part)
+    {
+      synchronized(this) {
+        if (blockedThread == null)
+          blockedThread = Thread.currentThread();
+      }
+
+      if (blockedThread == Thread.currentThread())
+      {
+        entered.countDown();
+
+        try {
+          if (!release.await(10, SECONDS))
+            throw new IllegalStateException("normalizer was not released");
+        } catch(InterruptedException ex) {
+          Thread.currentThread().interrupt();
+        }
+      }
+
+      return part;
+    }
   }
 }

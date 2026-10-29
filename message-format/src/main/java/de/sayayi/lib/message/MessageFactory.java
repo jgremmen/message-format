@@ -186,8 +186,10 @@ public class MessageFactory
    * Parses a message format text into a message instance.
    * <p>
    * If this factory was created with a message cache (see {@link #MessageFactory(MessagePartNormalizer, int)}),
-   * previously parsed messages are returned from the cache. When the cache is full, the least recently used entry
-   * is evicted.
+   * previously parsed messages are returned from the cache. When the cache is full, the least recently used entry is
+   * evicted. Messages are compiled outside the cache lock, so concurrent calls do not wait for each other's
+   * compilation. If two threads parse the same uncached text at the same time, both compile it and the message cached
+   * first is returned to both of them, unless it has been evicted in the meantime.
    *
    * @param text  message format text, not {@code null}
    *
@@ -201,19 +203,32 @@ public class MessageFactory
     if (messageCacheLock == null)
       return messageCompiler.compileMessage(text);
 
+    Message.WithSpaces message;
+
     messageCacheLock.lock();
     try {
       //noinspection DataFlowIssue
-      var message = messageCache.get(text);
-
-      //noinspection Java8MapApi
-      if (message == null)
-        messageCache.put(text, message = messageCompiler.compileMessage(text));
-
-      return message;
+      message = messageCache.get(text);
     } finally {
       messageCacheLock.unlock();
     }
+
+    if (message == null)
+    {
+      // compile outside the lock, so other threads are not blocked; if another thread has cached the same text in the
+      // meantime, its message is returned instead
+      final var compiledMessage = messageCompiler.compileMessage(text);
+
+      messageCacheLock.lock();
+      try {
+        if ((message = messageCache.putIfAbsent(text, compiledMessage)) == null)
+          message = compiledMessage;
+      } finally {
+        messageCacheLock.unlock();
+      }
+    }
+
+    return message;
   }
 
 
