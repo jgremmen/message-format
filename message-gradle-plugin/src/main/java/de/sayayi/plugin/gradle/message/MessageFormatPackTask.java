@@ -58,8 +58,9 @@ import static org.gradle.api.tasks.PathSensitivity.RELATIVE;
 
 
 /**
- * Gradle task for scanning messages and templates in classes and packing them into a single file which can be
- * imported into a {@link MessageSupport.ConfigurableMessageSupport}.
+ * Gradle task for scanning messages and templates in classes and packing the messages, together with the templates they
+ * reference, into a single file which can be imported into a {@link MessageSupport.ConfigurableMessageSupport}.
+ * Templates not referenced by any packed message are not included.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -107,8 +108,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Returns the nested messages extension for configuring message inclusion/exclusion filters and
-   * duplicate message handling strategy.
+   * Returns the nested messages extension for configuring message inclusion/exclusion filters and duplicate message
+   * handling strategy.
    *
    * @return  nested messages extension, never {@code null}
    *
@@ -249,9 +250,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * invoked just before the messages and templates are written to the packed message file.
    * <p>
    * Here's an example of how to use this action.<br>
-   * Let's say all message codes start with a prefix
-   * {@code MSG-} followed by a 4-digit number (e.g. {@code MSG-0318}). The action could then be used to output the
-   * next 10 available message codes:
+   * Let's say all message codes start with a prefix {@code MSG-} followed by a 4-digit number (e.g. {@code MSG-0318}).
+   * The action could then be used to output the next 10 available message codes:
    * <pre>
    *   action {
    *       def codes = getMessageCodes()
@@ -594,8 +594,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * Configures filters that replace an existing message or template with a duplicate.
    *
    * @param messageSupport  message support to configure, not {@code null}
-   * @param warn {@code true} to log a warning for duplicates with different content (identical duplicates are ignored
-   *                        in this case), {@code false} otherwise
+   * @param warn            {@code true} to log a warning for duplicates with different content (identical duplicates
+   *                        are ignored in this case), {@code false} otherwise
    */
   private void configureDuplicateOverrideStrategy(@NotNull ConfigurableMessageSupport messageSupport, boolean warn)
   {

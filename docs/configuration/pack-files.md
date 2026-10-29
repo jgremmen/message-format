@@ -19,8 +19,8 @@ try(var out = new FileOutputStream("messages.mfp")) {
 // messages.mfp contains the message "order.placed"
 ```
 
-The single-argument convenience overload enables compression and exports all messages. The full signature gives more 
-control:
+The single-argument convenience overload enables compression and exports all messages together with the templates they
+reference. The full signature gives more control:
 
 ```java
 void exportMessages(OutputStream stream, boolean compress,
@@ -34,8 +34,9 @@ compression may not reduce the size significantly for small message sets. For la
 typically reduces the file size noticeably.
 
 The optional `messageCodeFilter` selects which message codes to include, and `null` exports all messages. The optional
-`templateNameFilter` selects which of the referenced templates to include, and `null` includes all templates
-referenced by the selected messages. Only templates that were created from parsed message format strings, through
+`templateNameFilter` selects which of the referenced templates to include, and `null` includes all templates referenced
+by the selected messages. The filter can only exclude referenced templates; it never adds templates that are not 
+referenced by a selected message. Only templates that were created from parsed message format strings, through
 `MessageFactory` or `MessageBuilder`, can be serialized. Custom `AbstractNamedTemplate` implementations are excluded
 automatically since they have no serializable message representation, so they must be registered again on the message
 support that imports the pack.

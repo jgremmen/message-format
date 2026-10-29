@@ -268,9 +268,10 @@ therefore not rely on actions alone, or the task must be forced to run, for exam
 
 ## Writing the Pack File
 
-After scanning, validation and action execution, the task serializes all collected messages and templates into the 
-output pack file. Messages that were excluded by the include/exclude filters are omitted. Templates that are referenced 
-by the included messages are written automatically.
+After scanning, validation and action execution, the task serializes the collected messages and the templates they
+reference into the output pack file. Messages that were excluded by the include/exclude filters are omitted. Templates
+that are referenced by the included messages are written automatically; templates that are not referenced by any
+included message are not written.
 
 If the `compress` property is `true`, the output is wrapped in GZip compression. After writing, the task verifies that 
 the produced file is a valid message format pack by checking its magic bytes. If the check fails, the task throws a 

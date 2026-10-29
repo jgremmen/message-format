@@ -144,8 +144,11 @@ public interface MessageSupport
 
 
   /**
-   * Exports all messages and templates from this message support to a compact binary representation. This way a
-   * message support can be prepared once and loaded very quickly by importing the packed messages at runtime.
+   * Exports all messages from this message support, together with the templates they reference, to a compact binary
+   * representation. This way a message support can be prepared once and loaded very quickly by importing the packed
+   * messages at runtime.
+   * <p>
+   * Templates that are not referenced by any message are not exported.
    * <p>
    * Only templates backed by a {@link Message} (i.e. templates parsed from a message format string or created via
    * {@link MessageFactory}) can be packed. Custom template implementations, such as those extending
@@ -175,6 +178,9 @@ public interface MessageSupport
    * support instances with a small amount of messages the compression may not be substantial as the binary
    * representation does some extensive bit-packing already.
    * <p>
+   * The pack contains only templates referenced by the selected messages. Parameter {@code templateNameFilter} can
+   * exclude some of these templates, but never adds templates that are not referenced by a selected message.
+   * <p>
    * Only templates backed by a {@link Message} (i.e. templates parsed from a message format string or created via
    * {@link MessageFactory}) can be packed. Custom template implementations, such as those extending
    * {@link AbstractNamedTemplate}, have no serializable message representation, so regardless of
@@ -187,9 +193,9 @@ public interface MessageSupport
    * @param compress           {@code true} compress pack, {@code false} do not compress pack
    * @param messageCodeFilter  optional predicate for selecting message codes. If {@code null} all messages from this
    *                           message support will be selected
-   * @param templateNameFilter optional predicate for selecting template names. If {@code null} all templates
-   *                           referenced by the selected messages will be included, except for custom
-   *                           (non-message-backed) template implementations, which are always excluded
+   * @param templateNameFilter optional predicate for selecting which of the referenced templates are included. If
+   *                           {@code null} all templates referenced by the selected messages will be included, except
+   *                           for custom (non-message-backed) template implementations, which are always excluded
    *
    * @throws IOException  if an I/O error occurs or if the pack would contain more than 65535 messages or more
    *                      than 65535 templates. If a limit is exceeded, nothing is written to {@code stream}

@@ -668,10 +668,11 @@ configured to scan the compiled classes of multiple subprojects:
     }
     ```
 
-This configuration produces a single pack file containing all messages and templates from the `core`, `orders` and 
-`billing` subprojects, plus any messages defined in `app` itself (because the plugin always includes the `main` source 
-set by default). Because the sources from other subprojects are added explicitly, the task also depends on their
-compilation output, so Gradle compiles all three subprojects before scanning.
+This configuration produces a single pack file containing all messages from the `core`, `orders` and `billing`
+subprojects, plus any messages defined in `app` itself (because the plugin always includes the `main` source set by
+default), together with the templates referenced by these messages. Templates from any of the scanned projects that are 
+not referenced by a packed message are not included. Because the sources from other subprojects are added explicitly, 
+the task also depends on their compilation output, so Gradle compiles all three subprojects before scanning.
 
 Using the `FAIL` strategy in an aggregated setup is recommended because it catches accidental code collisions between 
 subprojects at build time.
