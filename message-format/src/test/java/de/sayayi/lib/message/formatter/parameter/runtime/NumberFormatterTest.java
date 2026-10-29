@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.parameter.named.ChoiceFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
@@ -23,8 +24,10 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import static java.lang.Double.*;
 import static java.lang.Math.PI;
 import static java.util.Locale.GERMANY;
+import static java.util.Locale.UK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -67,5 +70,49 @@ final class NumberFormatterTest extends AbstractFormatterTest
         .message("%{d}")
         .with("d", 0.1d)
         .format());
+  }
+
+
+  @Test
+  @DisplayName("Compare non-finite values to numeric string keys")
+  void testNonFiniteValueWithNumericStringKey()
+  {
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new NumberFormatter(), new ChoiceFormatter()))
+        .setLocale(UK);
+    val message = messageSupport.message("%{x,format:choice,'1':'one',:'other'}");
+
+    assertEquals("one", message.with("x", 1.0).format());
+    assertEquals("other", message.with("x", 2.0).format());
+    assertEquals("other", message.with("x", NaN).format());
+    assertEquals("other", message.with("x", POSITIVE_INFINITY).format());
+    assertEquals("other", message.with("x", NEGATIVE_INFINITY).format());
+    assertEquals("other", message.with("x", Float.NaN).format());
+
+    val relational = messageSupport.message("%{x,format:choice,>'1000':'large',<>'1':'not one',:'other'}");
+
+    assertEquals("large", relational.with("x", 2000.0).format());
+    assertEquals("other", relational.with("x", POSITIVE_INFINITY).format());
+    assertEquals("other", relational.with("x", NEGATIVE_INFINITY).format());
+    assertEquals("other", relational.with("x", NaN).format());
+    assertEquals("other", relational.with("x", Float.POSITIVE_INFINITY).format());
+  }
+
+
+  @Test
+  @DisplayName("Compare non-finite values to non-numeric string keys")
+  void testNonFiniteValueWithNonNumericStringKey()
+  {
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new NumberFormatter(), new ChoiceFormatter()))
+        .setLocale(UK);
+    val message = messageSupport.message(
+        "%{x,format:choice,'abc':'abc','NaN':'nan','Infinity':'+inf','-Infinity':'-inf',:'other'}");
+
+    assertEquals("other", message.with("x", NaN).format());
+    assertEquals("other", message.with("x", POSITIVE_INFINITY).format());
+    assertEquals("other", message.with("x", NEGATIVE_INFINITY).format());
+    assertEquals("other", message.with("x", Float.NaN).format());
+    assertEquals("other", message.with("x", 1.5).format());
   }
 }

@@ -223,6 +223,8 @@ messageSupport
 // "huge"
 ```
 
+`NaN` and infinite `double` or `float` values are not valid numbers, so they never match a string key.
+
 ### Null Handling
 
 When the parameter value is `null`, the formatter outputs an empty string by default. A `null` map key can be provided 

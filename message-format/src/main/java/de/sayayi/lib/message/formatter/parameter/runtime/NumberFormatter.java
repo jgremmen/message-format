@@ -45,6 +45,7 @@ import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.*;
 import static de.sayayi.lib.message.part.MapKey.NUMBER_TYPE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.util.MessageUtil.isEmpty;
+import static java.lang.Double.isFinite;
 import static java.lang.Math.signum;
 
 
@@ -66,7 +67,8 @@ import static java.lang.Math.signum;
  * Number map keys in the parameter configuration can be used to map specific numeric values to custom text.
  * <p>
  * Map key comparison supports {@code bool} keys (zero/non-zero), {@code number} keys (numeric comparison) and
- * {@code string} keys (parsed numeric comparison).
+ * {@code string} keys (parsed numeric comparison). {@code NaN} and infinite {@code double} or {@code float} values
+ * never match a string key.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0
@@ -241,7 +243,13 @@ public final class NumberFormatter
         value instanceof LongAccumulator)
       value = BigInteger.valueOf(value.longValue());
     else if (value instanceof Double || value instanceof Float)
-      value = BigDecimal.valueOf(value.doubleValue());
+    {
+      final var doubleValue = value.doubleValue();
+      if (!isFinite(doubleValue))
+        return MISMATCH;
+
+      value = BigDecimal.valueOf(doubleValue);
+    }
 
     final var compareType = context.getCompareType();
     final var string = context.getStringKeyValue();
