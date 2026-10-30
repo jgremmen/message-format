@@ -57,8 +57,8 @@ import static org.springframework.expression.spel.support.DataBindingPropertyAcc
  *   </li>
  * </ul>
  * <p>
- * Message parameters referencing other parameter values are made available as SpEL variables
- * (e.g. {@code #otherParam}). Variable assignment is not supported and will result in a
+ * Message parameters referencing other parameter values are made available as SpEL variables (e.g.
+ * {@code #otherParam}). Variable assignment is not supported and will result in a
  * {@link org.springframework.expression.spel.SpelEvaluationException SpelEvaluationException}.
  * <p>
  * The evaluation context is restricted to reading data from the root object, the variables and the objects reachable
@@ -95,15 +95,6 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
   /** Standard type comparator. */
   private static final TypeComparator TYPE_COMPARATOR = new StandardTypeComparator();
 
-  /**
-   * Method resolvers allowing instance methods to be invoked, but no static methods or methods on {@link Class}
-   * objects.
-   */
-  private static final List<MethodResolver> METHOD_RESOLVERS = List.of(forInstanceMethodInvocation());
-
-  /** Property accessors allowing properties to be read, but not written. */
-  private static final List<PropertyAccessor> PROPERTY_ACCESSORS = List.of(forReadOnlyAccess());
-
   /** Type locator rejecting all type references, so {@code T(...)} cannot be used to access arbitrary classes. */
   private static final TypeLocator TYPE_LOCATOR = typeName -> {
     throw new SpelEvaluationException(TYPE_NOT_FOUND, typeName);
@@ -114,6 +105,18 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
 
   /** Type converter used while evaluating expressions. */
   private final TypeConverter typeConverter;
+
+  /**
+   * Method resolvers allowing instance methods to be invoked, but no static methods or methods on {@link Class}
+   * objects.
+   * <p>
+   * The resolvers and accessors are not shared between formatter instances, as they cache reflection data of the
+   * evaluated types without bound. Kept per instance, the cached types can be unloaded together with the formatter.
+   */
+  private final List<MethodResolver> methodResolvers = List.of(forInstanceMethodInvocation());
+
+  /** Property accessors allowing properties to be read, but not written. */
+  private final List<PropertyAccessor> propertyAccessors = List.of(forReadOnlyAccess());
 
 
   /**
@@ -161,8 +164,8 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
   /**
    * {@inheritDoc}
    * <p>
-   * If a SpEL expression ({@code spel-expr}) is configured, it is evaluated with {@code value} as its root object.
-   * The result (or the original value if no expression is configured) is then formatted using the formatter named by
+   * If a SpEL expression ({@code spel-expr}) is configured, it is evaluated with {@code value} as its root object. The
+   * result (or the original value if no expression is configured) is then formatted using the formatter named by
    * {@code spel-format}, or the formatters for its type if no format is configured. The {@code spel-expr} and
    * {@code spel-format} configuration entries are not passed on to that formatter.
    */
@@ -256,7 +259,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
      */
     @Override
     public @NotNull List<MethodResolver> getMethodResolvers() {
-      return METHOD_RESOLVERS;
+      return methodResolvers;
     }
 
 
@@ -274,7 +277,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
      */
     @Override
     public @NotNull List<PropertyAccessor> getPropertyAccessors() {
-      return PROPERTY_ACCESSORS;
+      return propertyAccessors;
     }
 
 
