@@ -45,6 +45,101 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * As a {@link SizeQueryable} formatter, it reports the number of elements in the iterable. For {@link Collection}
  * instances, the {@link Collection#size()} method is used directly; for other iterables, the elements are counted by
  * iteration.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the iterable formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code list-sep}</td>
+ *     <td>string</td>
+ *     <td>{@code ", "}</td>
+ *     <td>Separator inserted between two elements.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-sep-last}</td>
+ *     <td>string</td>
+ *     <td>value of {@code list-sep}</td>
+ *     <td>
+ *       Separator inserted before the last element, e.g. {@code " and "}. It is not used if {@code
+ *       list-value-more} is set.
+ *     </td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-max-size}</td>
+ *     <td>number</td>
+ *     <td>unlimited</td>
+ *     <td>Maximum number of elements to include. With {@code 0} no element is included.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-value-more}</td>
+ *     <td>string</td>
+ *     <td>(none)</td>
+ *     <td>Text added as a final element if the list is truncated by {@code list-max-size}.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-unique}</td>
+ *     <td>boolean</td>
+ *     <td>{@code false}</td>
+ *     <td>If {@code true}, only the first occurrence of each formatted element text is included.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-value}</td>
+ *     <td>message</td>
+ *     <td>{@code %{value}}</td>
+ *     <td>
+ *       Message used to format each element, which is available as parameter {@code value}. Elements formatted as
+ *       empty text are omitted.
+ *     </td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-this}</td>
+ *     <td>string</td>
+ *     <td>{@code (this collection)}</td>
+ *     <td>Text used for an element that refers to the formatted value itself.</td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Format a list as natural language:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Choose %{colors,list-sep-last:' or '}")
+ *     .with("colors", List.of("red", "green", "blue"))
+ *     .format();
+ * // "Choose red, green or blue"
+ * }</pre>
+ * <p>
+ * Show only the first elements of a large collection:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Missing: %{files,list-max-size:2,list-value-more:'...'}")
+ *     .with("files", List.of("a.txt", "b.txt", "c.txt", "d.txt"))
+ *     .format();
+ * // "Missing: a.txt, b.txt, ..."
+ * }</pre>
+ * <p>
+ * Apply a message to each element, including the formatting options of the element type:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{days,list-value:'%{value,date:\"d MMM\"}',list-sep:' / '}")
+ *     .with("days", List.of(LocalDate.of(2026, 5, 1), LocalDate.of(2026, 12, 25)))
+ *     .locale(Locale.UK)
+ *     .format();
+ * // "1 May / 25 Dec"
+ * }</pre>
+ * <p>
+ * Combine it with the {@code empty} key and the size of the collection:
+ * <pre>{@code
+ * var message = "%{users,empty:'No users',!empty:'%{users,format:size} users: %{users}'}";
+ *
+ * messageSupport.message(message).with("users", List.of()).format();
+ * // "No users"
+ *
+ * messageSupport.message(message).with("users", List.of("alice", "bob")).format();
+ * // "2 users: alice, bob"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.6.0

@@ -35,6 +35,28 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.Class
  * delegates the formatting to the appropriate boolean formatter.
  * <p>
  * Map key comparison for {@code bool} and {@code string} keys is also based on the extracted boolean value.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Report the current state of a flag, which is shared with other threads:
+ * <pre>{@code
+ * var shutdown = new AtomicBoolean(true);
+ *
+ * messageSupport
+ *     .message("Service is %{shutdown,true:'stopping',false:'running'}")
+ *     .with("shutdown", shutdown)
+ *     .format();
+ * // "Service is stopping"
+ * }</pre>
+ * <p>
+ * Without map keys, the boolean value is formatted:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Cache enabled: %{enabled}")
+ *     .with("enabled", new AtomicBoolean(false))
+ *     .format();
+ * // "Cache enabled: false"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.3.1

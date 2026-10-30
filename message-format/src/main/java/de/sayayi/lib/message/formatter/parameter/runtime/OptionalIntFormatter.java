@@ -40,6 +40,22 @@ import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
  * <p>
  * Map key comparisons for {@code bool}, {@code number} and {@code string} keys are based on the contained int value.
  * An empty optional results in a mismatch for these key types.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Number keys are compared with the contained value and the {@code empty} key handles an absent one:
+ * <pre>{@code
+ * var message = "Maximum: %{max,empty:'no values',<0:'negative'}";
+ *
+ * messageSupport.message(message).with("max", IntStream.of(3, 9, 4).max()).format();
+ * // "Maximum: 9"
+ *
+ * messageSupport.message(message).with("max", IntStream.of(-3).max()).format();
+ * // "Maximum: negative"
+ *
+ * messageSupport.message(message).with("max", OptionalInt.empty()).format();
+ * // "Maximum: no values"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.4.2

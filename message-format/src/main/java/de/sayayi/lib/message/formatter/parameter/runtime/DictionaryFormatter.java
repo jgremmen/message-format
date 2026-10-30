@@ -53,6 +53,58 @@ import static de.sayayi.lib.message.part.TextPartFactory.nullText;
  * taking priority, this formatter gets the first chance to handle the value. When the {@code key} configuration is
  * absent, it delegates to the next formatter, allowing the value to be formatted as a map or in any other applicable
  * way.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the dictionary formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code key}</td>
+ *     <td>boolean, number or string</td>
+ *     <td>(none)</td>
+ *     <td>
+ *       Key of the entry whose value is formatted. A number is tried for all integral key types and a single
+ *       character string as a {@link Character} as well. If absent, formatting is delegated to the next
+ *       formatter.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Look up individual values of a {@link java.util.Properties Properties} instance:
+ * <pre>{@code
+ * var properties = new Properties();
+ * properties.setProperty("host", "localhost");
+ * properties.setProperty("port", "8080");
+ *
+ * messageSupport
+ *     .message("Server: %{cfg,key:'host'}:%{cfg,key:'port'}")
+ *     .with("cfg", properties)
+ *     .format();
+ * // "Server: localhost:8080"
+ * }</pre>
+ * <p>
+ * Number keys match all integral key types. A key that is not found can be handled by the {@code null} key:
+ * <pre>{@code
+ * var codes = new Hashtable<Integer,String>();
+ * codes.put(200, "OK");
+ *
+ * messageSupport.message("%{codes,key:200}").with("codes", codes).format();
+ * // "OK"
+ *
+ * messageSupport.message("%{codes,key:500,null:'unknown code'}").with("codes", codes).format();
+ * // "unknown code"
+ * }</pre>
+ * <p>
+ * Without the {@code key} configuration, a {@link java.util.Hashtable Hashtable} is formatted as a map:
+ * <pre>{@code
+ * var table = new Hashtable<String,Integer>();
+ * table.put("size", 3);
+ *
+ * messageSupport.message("%{table}").with("table", table).format();
+ * // "size=3"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.21.0

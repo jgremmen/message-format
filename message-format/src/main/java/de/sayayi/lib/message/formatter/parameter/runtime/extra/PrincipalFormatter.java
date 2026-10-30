@@ -37,6 +37,42 @@ import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
  * string formatter.
  * <p>
  * Map key comparison for {@code string} keys is based on the principal's name.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not part of the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService} and must be registered explicitly:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new PrincipalFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * Format the name of a principal:
+ * <pre>{@code
+ * var principal = new X500Principal("CN=Alice,O=Example");
+ *
+ * messageSupport.message("Signed by %{user}").with("user", principal).format();
+ * // "Signed by CN=Alice,O=Example"
+ * }</pre>
+ * <p>
+ * A missing principal is matched by the {@code null} key:
+ * <pre>{@code
+ * messageSupport.message("Logged in as %{user,null:'guest'}").with("user", null).format();
+ * // "Logged in as guest"
+ * }</pre>
+ * <p>
+ * The name of the principal is compared with string keys if selected by a formatter like {@code choice}:
+ * <pre>{@code
+ * Principal admin = () -> "admin";
+ *
+ * messageSupport
+ *     .message("%{user,format:choice,'admin':'Administrator',:'Regular user'}")
+ *     .with("user", admin)
+ *     .format();
+ * // "Administrator"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

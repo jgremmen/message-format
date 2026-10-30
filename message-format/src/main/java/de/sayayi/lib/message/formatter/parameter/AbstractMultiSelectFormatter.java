@@ -51,6 +51,48 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * The {@code null}/empty value handling inherited from {@link AbstractParameterFormatter} is applied before the
  * multi-select dispatch, so registered functions only receive non-{@code null} values.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * A subclass defines the name of its configuration key, the value to assume if the key is absent and whether to
+ * delegate on an unknown value. The following formatter selects the unit for a {@link java.time.Duration Duration}:
+ * <pre>{@code
+ * public final class DurationUnitFormatter extends AbstractMultiSelectFormatter<Duration>
+ * {
+ *   public DurationUnitFormatter()
+ *   {
+ *     super("duration", "seconds", true);
+ *
+ *     register("seconds", (context,duration) -> noSpaceText(Long.toString(duration.toSeconds())));
+ *     register(new String[] { "min", "minutes" },
+ *         (context,duration) -> noSpaceText(Long.toString(duration.toMinutes())));
+ *   }
+ *
+ *   @Override
+ *   public @NotNull Set<FormattableType> getFormattableTypes() {
+ *     return Set.of(new FormattableType(Duration.class));
+ *   }
+ * }
+ * }</pre>
+ * <p>
+ * The key is absent in the first message, a registered function is selected in the second and the third message uses an
+ * unknown value, which delegates to the next formatter for the type:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new DurationUnitFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * var duration = Duration.ofMinutes(90);
+ *
+ * messageSupport.message("%{d} seconds").with("d", duration).format();
+ * // "5400 seconds"
+ *
+ * messageSupport.message("%{d,duration:min} minutes").with("d", duration).format();
+ * // "90 minutes"
+ *
+ * messageSupport.message("%{d,duration:iso}").with("d", duration).format();
+ * // "PT1H30M"
+ * }</pre>
  *
  * @param <T>  the parameter value type handled by this formatter
  *

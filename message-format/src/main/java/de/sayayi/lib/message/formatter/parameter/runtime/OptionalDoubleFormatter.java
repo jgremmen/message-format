@@ -40,6 +40,28 @@ import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
  * <p>
  * Map key comparisons for {@code bool}, {@code number} and {@code string} keys are based on the contained double
  * value. An empty optional results in a mismatch for these key types.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Number keys and the configuration keys of the number formatter apply to the contained value, whereas the {@code
+ * empty} key handles an absent one:
+ * <pre>{@code
+ * var message = "Average: %{avg,number:'0.0',empty:'n/a'}";
+ *
+ * messageSupport
+ *     .message(message)
+ *     .with("avg", IntStream.of(1, 2, 4).average())
+ *     .locale(Locale.US)
+ *     .format();
+ * // "Average: 2.3"
+ *
+ * messageSupport
+ *     .message(message)
+ *     .with("avg", IntStream.empty().average())
+ *     .locale(Locale.US)
+ *     .format();
+ * // "Average: n/a"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.4.2

@@ -44,6 +44,68 @@ import static de.sayayi.lib.message.util.MessageUtil.trimAndNormalizeSpaces;
  * locale-sensitive formatting.
  * <p>
  * If the ICU pattern is missing or formatting fails, empty text is returned.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the icu formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code icu}</td>
+ *     <td>ICU message format pattern</td>
+ *     <td>(none)</td>
+ *     <td>
+ *       Pattern to evaluate. All message parameters are available to the pattern by their name. The pattern is
+ *       trimmed and consecutive whitespace is collapsed. Without a pattern, or if formatting fails, the result is
+ *       an empty text.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * The value of the anchor parameter is not used, so it does not need to exist. All other parameters are available by
+ * their name:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{p,icu:'{name} has {count, plural, one {# cat} other {# cats}}'}")
+ *     .with("name", "Bob")
+ *     .with("count", 3)
+ *     .format();
+ * // "Bob has 3 cats"
+ * }</pre>
+ * <p>
+ * Plural categories and number formats follow the locale of the message:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{p,icu:'{count, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}'}")
+ *     .with("count", 22)
+ *     .locale(Locale.of("pl"))
+ *     .format();
+ * // "22 pliki"
+ * }</pre>
+ * <p>
+ * The {@code select} argument chooses text based on a value. A double quoted pattern allows for literal single quotes,
+ * written as two consecutive single quotes in ICU:
+ * <pre>{@code
+ * messageSupport
+ *     .message("""
+ *         %{p,icu:"{name} doesn''t like {gender, select, female {her} male {his} other {their}} job"}\
+ *         """)
+ *     .with("name", "Alice")
+ *     .with("gender", "female")
+ *     .format();
+ * // "Alice doesn't like her job"
+ * }</pre>
+ * <p>
+ * Number formats of the pattern use the locale of the message as well:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Total: %{p,icu:'{amount, number, currency}'}")
+ *     .with("amount", 1234.5)
+ *     .locale(Locale.US)
+ *     .format();
+ * // "Total: $1,234.50"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.24.0

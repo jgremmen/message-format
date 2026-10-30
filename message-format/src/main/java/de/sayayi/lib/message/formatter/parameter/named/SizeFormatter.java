@@ -38,6 +38,40 @@ import static de.sayayi.lib.message.part.MapKey.NUMBER_TYPE;
  * The resulting size value can be mapped to custom text using number map keys in the parameter configuration. If no
  * mapping is provided, the numeric size is formatted as text. If the size cannot be determined, the empty map key
  * is used. {@code null} values are handled separately using the null map key.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Without map keys the size is formatted as a number. It works for any type with a size aware formatter:
+ * <pre>{@code
+ * messageSupport.message("%{v,format:size} characters").with("v", "Hello").format();
+ * // "5 characters"
+ *
+ * messageSupport.message("%{v,format:size} entries").with("v", Map.of("a", 1, "b", 2)).format();
+ * // "2 entries"
+ * }</pre>
+ * <p>
+ * Number keys select the wording for a size, independent of the actual type of the value:
+ * <pre>{@code
+ * var message = "Cart: %{cart,format:size,null:'not loaded',0:'empty',1:'1 item',:'%{cart,format:size} items'}";
+ *
+ * messageSupport.message(message).with("cart", List.of()).format();
+ * // "Cart: empty"
+ *
+ * messageSupport.message(message).with("cart", new String[] { "Laptop", "Mouse", "Keyboard" }).format();
+ * // "Cart: 3 items"
+ *
+ * messageSupport.message(message).with("cart", null).format();
+ * // "Cart: not loaded"
+ * }</pre>
+ * <p>
+ * The {@code empty} key is used for values whose size cannot be determined:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{v,format:size,empty:'no size available'}")
+ *     .with("v", true)
+ *     .format();
+ * // "no size available"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

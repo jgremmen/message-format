@@ -46,18 +46,8 @@ import static java.util.Objects.requireNonNull;
  * Parameter formatter for {@link Temporal} values (e.g. {@link java.time.LocalDate}, {@link java.time.LocalDateTime},
  * {@link java.time.Instant}).
  * <p>
- * The output format is controlled by the {@code date} configuration key, which accepts the following predefined style
- * names:
- * <ul>
- *   <li>{@code short}: short date and time</li>
- *   <li>{@code medium} (default): medium date and time</li>
- *   <li>{@code long}: long date and time</li>
- *   <li>{@code full}: full date and time</li>
- *   <li>{@code date}: date only (medium style)</li>
- *   <li>{@code time}: time only (medium style)</li>
- * </ul>
- * <p>
- * Alternatively, a custom {@link DateTimeFormatter} pattern can be provided (e.g. {@code "yyyy-MM-dd"}).
+ * The output format is controlled by the {@code date} configuration key, which accepts a predefined style name or a
+ * custom {@link DateTimeFormatter} pattern.
  * <p>
  * The formatter automatically detects whether the temporal value supports date fields, time fields, or both and
  * adjusts the output accordingly. All formatting is locale-aware using the formatting context's locale. Values with
@@ -67,6 +57,74 @@ import static java.util.Objects.requireNonNull;
  * pattern (e.g. a {@link java.time.Year} or {@link java.time.YearMonth} formatted with a date style that requires the
  * day of month, or a {@link java.time.LocalTime} formatted with pattern {@code "yyyy"}), or if the custom pattern is
  * invalid, the result is an empty text.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the temporal formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code date}</td>
+ *     <td>
+ *       {@code short}, {@code medium}, {@code long}, {@code full}, {@code date}, {@code time}, {@link
+ *       DateTimeFormatter} pattern
+ *     </td>
+ *     <td>{@code medium}</td>
+ *     <td>
+ *       The first four values format the date and time in the given style, limited to the fields supported by the
+ *       value. {@code date} and {@code time} format the date or the time only, in medium style. Any other value
+ *       is used as a pattern, e.g. {@code yyyy-MM-dd}.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Format a date in a predefined style. The output depends on the locale of the message:
+ * <pre>{@code
+ * var date = LocalDate.of(2026, 5, 1);
+ *
+ * messageSupport.message("%{d,date:long}").with("d", date).locale(Locale.US).format();
+ * // "May 1, 2026"
+ *
+ * messageSupport.message("%{d,date:full}").with("d", date).locale(Locale.GERMANY).format();
+ * // "Freitag, 1. Mai 2026"
+ * }</pre>
+ * <p>
+ * Use a custom pattern, which also has access to the offset of the value:
+ * <pre>{@code
+ * var timestamp = OffsetDateTime.of(2026, 5, 1, 14, 30, 0, 0, ZoneOffset.ofHours(2));
+ *
+ * messageSupport
+ *     .message("%{ts,date:\"yyyy-MM-dd'T'HH:mmxxx\"}")
+ *     .with("ts", timestamp)
+ *     .format();
+ * // "2026-05-01T14:30+02:00"
+ * }</pre>
+ * <p>
+ * Only the date of a date and time value:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Created on %{ts,date:date}")
+ *     .with("ts", LocalDateTime.of(2026, 5, 1, 14, 30))
+ *     .locale(Locale.UK)
+ *     .format();
+ * // "Created on 1 May 2026"
+ * }</pre>
+ * <p>
+ * A value lacking a field required by the pattern results in an empty text, which the {@code empty} key can handle. The
+ * {@code null} key handles a missing value:
+ * <pre>{@code
+ * var message = "Time: %{t,date:'HH:mm',empty:'not available',null:'not set'}";
+ *
+ * messageSupport.message(message).with("t", LocalTime.of(9, 5)).format();
+ * // "Time: 09:05"
+ *
+ * messageSupport.message(message).with("t", YearMonth.of(2026, 5)).format();
+ * // "Time: not available"
+ *
+ * messageSupport.message(message).with("t", null).format();
+ * // "Time: not set"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.12.0

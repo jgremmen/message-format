@@ -44,6 +44,71 @@ import static java.lang.Boolean.FALSE;
  * String map keys in the parameter configuration can be used to override the unit labels (e.g. to provide localized
  * unit names). A {@code space} boolean configuration key controls whether a space is inserted between the number and
  * the unit.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the filesize formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code scale}</td>
+ *     <td>number, {@code 0} to {@code 3}</td>
+ *     <td>{@code 1}</td>
+ *     <td>
+ *       Number of decimal places. Values outside the range are limited to it. Sizes in bytes have no decimal
+ *       places.
+ *     </td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code space}</td>
+ *     <td>boolean</td>
+ *     <td>{@code false}</td>
+ *     <td>If {@code true}, a space is inserted between the number and the unit.</td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not part of the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService} and must be registered explicitly:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new FileSizeFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * The unit is selected automatically, based on powers of 1000:
+ * <pre>{@code
+ * messageSupport.message("%{size,format:filesize}").with("size", 1234567).locale(Locale.US).format();
+ * // "1.2MB"
+ *
+ * messageSupport
+ *     .message("%{size,format:filesize,scale:2,space:true}")
+ *     .with("size", 1234567)
+ *     .locale(Locale.US)
+ *     .format();
+ * // "1.23 MB"
+ * }</pre>
+ * <p>
+ * A string map key replaces the label of a unit. A leading space in the mapped message also separates it from the
+ * number:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{size,format:filesize,scale:0,'GB':' Gigabyte'}")
+ *     .with("size", 5_000_000_000L)
+ *     .locale(Locale.GERMANY)
+ *     .format();
+ * // "5 Gigabyte"
+ * }</pre>
+ * <p>
+ * {@code null} is matched by the {@code null} key:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Size: %{size,format:filesize,null:'unknown'}")
+ *     .with("size", null)
+ *     .format();
+ * // "Size: unknown"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

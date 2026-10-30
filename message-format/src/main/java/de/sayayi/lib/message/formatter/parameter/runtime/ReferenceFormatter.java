@@ -40,6 +40,32 @@ import static de.sayayi.lib.message.part.MapKey.MatchResult.forNullKey;
  * the value is treated as {@code null}.
  * <p>
  * Size queries and map key comparisons are also based on the referenced value.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * A reference is formatted like the referenced value, so its map keys and configuration keys apply:
+ * <pre>{@code
+ * var user = "alice";
+ * var reference = new WeakReference<>(user);
+ *
+ * messageSupport.message("User: %{u}").with("u", reference).format();
+ * // "User: alice"
+ *
+ * messageSupport.message("Length: %{u,format:size}").with("u", reference).format();
+ * // "Length: 5"
+ * }</pre>
+ * <p>
+ * A reference to an object that has been garbage collected is treated as {@code null}:
+ * <pre>{@code
+ * var reference = new SoftReference<>(new Object());
+ * reference.clear();
+ *
+ * messageSupport
+ *     .message("Cached: %{entry,null:'(evicted)'}")
+ *     .with("entry", reference)
+ *     .format();
+ * // "Cached: (evicted)"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.3.1

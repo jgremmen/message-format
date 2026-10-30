@@ -46,19 +46,119 @@ import static java.util.Collections.unmodifiableMap;
  * truncation and overflow behavior are controlled by the list configuration keys inherited from
  * {@link AbstractListFormatter}.
  * <p>
- * In addition to the inherited configuration keys, this formatter supports:
- * <ul>
- *   <li>
- *     {@code map-kv}: message format used to render each entry; the parameters {@code key} and {@code value}
- *     are available in the message (default: {@code %{key,null:'(null)'}=%{value,null:'(null)'}})
- *   </li>
- *   <li>
- *     {@code map-this}: text to use when the map references itself as a key or value
- *     (default: {@code "(this map)"})
- *   </li>
- * </ul>
- * <p>
  * As a {@link SizeQueryable} formatter, it reports the number of entries in the map.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the map formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code map-kv}</td>
+ *     <td>message</td>
+ *     <td>{@code %{key,null:'(null)'}=%{value,null:'(null)'}}</td>
+ *     <td>
+ *       Message used to format each entry. The parameters {@code key} and {@code value} are available in the
+ *       message.
+ *     </td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code map-this}</td>
+ *     <td>string</td>
+ *     <td>{@code (this map)}</td>
+ *     <td>Text used if the map refers to itself as a key or value.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-sep}</td>
+ *     <td>string</td>
+ *     <td>{@code ", "}</td>
+ *     <td>Separator inserted between two elements.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-sep-last}</td>
+ *     <td>string</td>
+ *     <td>value of {@code list-sep}</td>
+ *     <td>
+ *       Separator inserted before the last element, e.g. {@code " and "}. It is not used if {@code
+ *       list-value-more} is set.
+ *     </td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-max-size}</td>
+ *     <td>number</td>
+ *     <td>unlimited</td>
+ *     <td>Maximum number of elements to include. With {@code 0} no element is included.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-value-more}</td>
+ *     <td>string</td>
+ *     <td>(none)</td>
+ *     <td>Text added as a final element if the list is truncated by {@code list-max-size}.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-unique}</td>
+ *     <td>boolean</td>
+ *     <td>{@code false}</td>
+ *     <td>If {@code true}, only the first occurrence of each formatted element text is included.</td>
+ *   </tr>
+ * </table>
+ * <p>
+ * The inherited keys {@code list-value} and {@code list-this} have no effect; use {@code map-kv} and {@code map-this}
+ * instead.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * By default, entries are formatted as {@code key=value}:
+ * <pre>{@code
+ * var scores = new LinkedHashMap<String,Integer>();
+ * scores.put("Alice", 95);
+ * scores.put("Bob", 87);
+ *
+ * messageSupport.message("%{scores}").with("scores", scores).format();
+ * // "Alice=95, Bob=87"
+ * }</pre>
+ * <p>
+ * Customize the format of the entries and the separators. Keys and values can use their own configuration:
+ * <pre>{@code
+ * var limits = new LinkedHashMap<String,Double>();
+ * limits.put("cpu", 0.5);
+ * limits.put("memory", 0.875);
+ * limits.put("disk", 1.0);
+ *
+ * messageSupport
+ *     .message("%{limits,map-kv:'%{key}: %{value,number:\"0.0\"}',list-sep:'; ',list-sep-last:' and '}")
+ *     .with("limits", limits)
+ *     .locale(Locale.US)
+ *     .format();
+ * // "cpu: 0.5; memory: 0.9 and disk: 1.0"
+ * }</pre>
+ * <p>
+ * Limit the number of entries for large maps:
+ * <pre>{@code
+ * var env = new LinkedHashMap<String,String>();
+ * env.put("HOME", "/home/user");
+ * env.put("LANG", "en_US");
+ * env.put("PATH", "/usr/bin");
+ *
+ * messageSupport
+ *     .message("%{env,list-max-size:2,list-value-more:'...'}")
+ *     .with("env", env)
+ *     .format();
+ * // "HOME=/home/user, LANG=en_US, ..."
+ * }</pre>
+ * <p>
+ * Handle missing or empty maps and select the wording using the number of entries:
+ * <pre>{@code
+ * var message = "%{map,null:'no map',empty:'no entries',!empty:'%{map,format:size} entries'}";
+ *
+ * messageSupport.message(message).with("map", null).format();
+ * // "no map"
+ *
+ * messageSupport.message(message).with("map", Map.of()).format();
+ * // "no entries"
+ *
+ * messageSupport.message(message).with("map", Map.of("a", 1, "b", 2)).format();
+ * // "2 entries"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

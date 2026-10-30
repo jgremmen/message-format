@@ -40,6 +40,22 @@ import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
  * <p>
  * Map key comparisons for {@code bool}, {@code number} and {@code string} keys are based on the contained long value.
  * An empty optional results in a mismatch for these key types.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Number keys and configuration keys apply to the contained value and the {@code empty} key handles an absent one:
+ * <pre>{@code
+ * var message = "Rows: %{rows,number:'#,##0',empty:'not counted',0:'none'}";
+ *
+ * messageSupport.message(message).with("rows", OptionalLong.of(1_250_000L)).locale(Locale.US).format();
+ * // "Rows: 1,250,000"
+ *
+ * messageSupport.message(message).with("rows", OptionalLong.of(0L)).locale(Locale.US).format();
+ * // "Rows: none"
+ *
+ * messageSupport.message(message).with("rows", OptionalLong.empty()).locale(Locale.US).format();
+ * // "Rows: not counted"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.4.2

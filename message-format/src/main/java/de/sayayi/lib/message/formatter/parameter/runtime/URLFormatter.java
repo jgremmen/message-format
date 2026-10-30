@@ -34,24 +34,61 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 /**
  * Parameter formatter for {@link URL} values.
  * <p>
- * This formatter uses the {@code url} configuration key to select which component of the URL to format:
- * <ul>
- *   <li>{@code external} (default): the full external form of the URL</li>
- *   <li>{@code authority}: the authority component</li>
- *   <li>{@code file}: the file component</li>
- *   <li>{@code host}: the host name</li>
- *   <li>{@code path}: the path component</li>
- *   <li>
- *     {@code port}: the port number (falls back to the default port if none is specified); number map keys
- *     can be used to override the output
- *   </li>
- *   <li>{@code protocol}: the protocol; string map keys can be used to override the output</li>
- *   <li>{@code query}: the query string</li>
- *   <li>{@code user-info}: the user info component</li>
- *   <li>{@code ref}: the reference (fragment) component</li>
- * </ul>
+ * This formatter uses the {@code url} configuration key to select which component of the URL to format.
  * <p>
  * If the configuration value does not match a known option, formatting is delegated to the next available formatter.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the url formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code url}</td>
+ *     <td>
+ *       {@code external}, {@code authority}, {@code file}, {@code host}, {@code path}, {@code port}, {@code
+ *       protocol}, {@code query}, {@code user-info}, {@code ref}
+ *     </td>
+ *     <td>{@code external}</td>
+ *     <td>
+ *       Component of the URL to format, {@code external} being its full external form. {@code port} falls back to
+ *       the default port of the protocol. Number keys override the output for {@code port} and string keys for
+ *       {@code protocol}. Any other value delegates to the next formatter.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Format individual components of a URL:
+ * <pre>{@code
+ * var url = URI.create("https://example.com/search?q=test#results").toURL();
+ *
+ * messageSupport.message("%{u,url:host}%{u,url:file}").with("u", url).format();
+ * // "example.com/search?q=test"
+ *
+ * messageSupport.message("Section: %{u,url:ref}").with("u", url).format();
+ * // "Section: results"
+ * }</pre>
+ * <p>
+ * Without an explicit port, the default port of the protocol is used:
+ * <pre>{@code
+ * var url = URI.create("https://example.com/").toURL();
+ *
+ * messageSupport.message("Port %{u,url:port}").with("u", url).format();
+ * // "Port 443"
+ *
+ * messageSupport.message("%{u,url:port,443:'standard port',:'custom port'}").with("u", url).format();
+ * // "standard port"
+ * }</pre>
+ * <p>
+ * Describe the protocol using string keys:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{u,url:protocol,'https':'encrypted',:'not encrypted'}")
+ *     .with("u", URI.create("http://example.com/").toURL())
+ *     .format();
+ * // "not encrypted"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.3.1

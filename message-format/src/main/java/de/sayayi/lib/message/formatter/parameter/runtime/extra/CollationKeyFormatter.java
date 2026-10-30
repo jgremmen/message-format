@@ -39,6 +39,36 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * {@link CollationKey#getSourceString()}.
  * <p>
  * As a {@link SizeQueryable} formatter, it reports the length of the source string.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not part of the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService} and must be registered explicitly:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new CollationKeyFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * A collation key is formatted as the string it was created for:
+ * <pre>{@code
+ * var key = Collator.getInstance(Locale.GERMANY).getCollationKey("Straße");
+ *
+ * messageSupport.message("Sorted by %{key}").with("key", key).format();
+ * // "Sorted by Straße"
+ *
+ * messageSupport.message("%{key,format:size} characters").with("key", key).format();
+ * // "6 characters"
+ * }</pre>
+ * <p>
+ * The {@code empty} key matches a collation key for an empty string:
+ * <pre>{@code
+ * var key = Collator.getInstance(Locale.GERMANY).getCollationKey("");
+ *
+ * messageSupport.message("%{key,empty:'no sort key'}").with("key", key).format();
+ * // "no sort key"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

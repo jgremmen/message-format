@@ -49,14 +49,7 @@ import static java.lang.Math.signum;
 /**
  * Parameter formatter for {@link Number} values and primitive numeric types.
  * <p>
- * The output format is controlled by the {@code number} configuration key, which accepts the following values:
- * <ul>
- *   <li>{@code integer}: formats the number as an integer</li>
- *   <li>{@code percent}: formats the number as a percentage</li>
- *   <li>{@code currency}: formats the number as a currency value</li>
- *   <li>{@code bool}: formats the number as a boolean (zero is {@code false}, non-zero is {@code true})</li>
- *   <li>A custom {@link DecimalFormat} pattern: formats the number using the given pattern</li>
- * </ul>
+ * The output format is controlled by the {@code number} configuration key.
  * <p>
  * If the configuration key is absent, integer types are rendered using their plain {@code toString()} representation;
  * all other numeric types are formatted using a locale-specific number format.
@@ -66,6 +59,62 @@ import static java.lang.Math.signum;
  * Map key comparison supports {@code bool} keys (zero/non-zero), {@code number} keys (numeric comparison) and
  * {@code string} keys (parsed numeric comparison). {@code NaN} and infinite {@code double} or {@code float} values
  * never match a string key.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the number formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code number}</td>
+ *     <td>{@code integer}, {@code percent}, {@code currency}, {@code bool}, {@link DecimalFormat} pattern</td>
+ *     <td>(see above)</td>
+ *     <td>
+ *       Formats the number as an integer, a percentage, a currency value or a boolean (zero is {@code false},
+ *       non-zero is {@code true}). Any other value is used as a pattern. Number map keys take precedence over
+ *       this key.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Use predefined number formats, which depend on the locale of the message:
+ * <pre>{@code
+ * messageSupport.message("%{price,number:currency}").with("price", 1234.5).locale(Locale.US).format();
+ * // "$1,234.50"
+ *
+ * messageSupport.message("%{progress,number:percent}").with("progress", 0.75).locale(Locale.US).format();
+ * // "75%"
+ *
+ * messageSupport.message("%{v,number:integer}").with("v", 3.7).locale(Locale.US).format();
+ * // "4"
+ * }</pre>
+ * <p>
+ * Use a custom pattern with the symbols of the locale:
+ * <pre>{@code
+ * messageSupport.message("%{v,number:'#,##0.00'}").with("v", 12345.678).locale(Locale.GERMANY).format();
+ * // "12.345,68"
+ * }</pre>
+ * <p>
+ * Number keys replace specific values or ranges, all other values are formatted as a number:
+ * <pre>{@code
+ * var message = "%{count,0:'no',1:'one',<0:'invalid'} new messages";
+ *
+ * messageSupport.message(message).with("count", 0).format();
+ * // "no new messages"
+ *
+ * messageSupport.message(message).with("count", 42).format();
+ * // "42 new messages"
+ * }</pre>
+ * <p>
+ * Interpret a number as a boolean:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{errors,number:bool,true:'has errors',false:'no errors'}")
+ *     .with("errors", 3)
+ *     .format();
+ * // "has errors"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

@@ -42,22 +42,8 @@ import static java.lang.Integer.MAX_VALUE;
  * Subclasses (such as array, iterable and map formatters) provide an iterator over the elements; this class takes
  * care of joining them with separators and applying optional truncation.
  * <p>
- * The following configuration keys control the output. Keys marked with (*) are handled by this base class; the
- * remaining keys must be handled appropriately by the implementing subclass.
- * <ul>
- *   <li>{@code list-sep} (*): separator between elements (default: {@code ", "})</li>
- *   <li>
- *     {@code list-sep-last} (*): separator before the last element (e.g. {@code " and "}); if not set, the regular
- *     separator is used
- *   </li>
- *   <li>{@code list-max-size} (*): maximum number of elements to include</li>
- *   <li>{@code list-value-more} (*): text to append when the list is truncated (e.g. {@code "..."})</li>
- *   <li>{@code list-unique} (*): if {@code true}, duplicate element texts are suppressed</li>
- *   <li>
- *     {@code list-value}: message format used to format each individual element (default: {@code %{value}})
- *   </li>
- *   <li>{@code list-this}: message for a reference to the list value itself</li>
- * </ul>
+ * The configuration keys listed below control the output. The keys {@code list-value} and {@code list-this} must be
+ * handled by the implementing subclass; all other keys are handled by this base class.
  * <p>
  * The table below illustrates how the configuration keys interact:
  * <table border="1">
@@ -78,6 +64,105 @@ import static java.lang.Integer.MAX_VALUE;
  *   <tr><td>[A,B,C]</td><td>(undefined)</td><td>1</td><td>(undefined)</td><td>'A'</td></tr>
  *   <tr><td>[A,B,C]</td><td>(undefined)</td><td>0</td><td>(undefined)</td><td>''</td></tr>
  * </table>
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the list formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code list-sep}</td>
+ *     <td>string</td>
+ *     <td>{@code ", "}</td>
+ *     <td>Separator inserted between two elements.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-sep-last}</td>
+ *     <td>string</td>
+ *     <td>value of {@code list-sep}</td>
+ *     <td>
+ *       Separator inserted before the last element, e.g. {@code " and "}. It is not used if {@code
+ *       list-value-more} is set.
+ *     </td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-max-size}</td>
+ *     <td>number</td>
+ *     <td>unlimited</td>
+ *     <td>Maximum number of elements to include. With {@code 0} no element is included.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-value-more}</td>
+ *     <td>string</td>
+ *     <td>(none)</td>
+ *     <td>Text added as a final element if the list is truncated by {@code list-max-size}.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-unique}</td>
+ *     <td>boolean</td>
+ *     <td>{@code false}</td>
+ *     <td>If {@code true}, only the first occurrence of each formatted element text is included.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-value}</td>
+ *     <td>message</td>
+ *     <td>{@code %{value}}</td>
+ *     <td>
+ *       Message used to format each element, which is available as parameter {@code value}. Elements formatted as
+ *       empty text are omitted.
+ *     </td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-this}</td>
+ *     <td>string</td>
+ *     <td>defined by the subclass</td>
+ *     <td>Text used for an element that refers to the formatted value itself.</td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * A subclass provides the formatted element texts, while joining them is handled by this class. The following formatter
+ * adds support for {@link java.util.Enumeration Enumeration} values:
+ * <pre>{@code
+ * public final class EnumerationFormatter extends AbstractListFormatter<Enumeration<?>>
+ * {
+ *   @Override
+ *   protected @NotNull Iterator<Text> createIterator(@NotNull ParameterFormatterContext context,
+ *                                                    @NotNull Enumeration<?> enumeration)
+ *   {
+ *     final var texts = new ArrayList<Text>();
+ *
+ *     enumeration.asIterator().forEachRemaining(element -> texts.add(context.format(element)));
+ *
+ *     return texts.iterator();
+ *   }
+ *
+ *   @Override
+ *   public @NotNull Set<FormattableType> getFormattableTypes() {
+ *     return Set.of(new FormattableType(Enumeration.class));
+ *   }
+ * }
+ * }</pre>
+ * <p>
+ * The list configuration keys are immediately available for the new type:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new EnumerationFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ *
+ * messageSupport
+ *     .message("Choose %{colors,list-sep-last:' or '}")
+ *     .with("colors", Collections.enumeration(List.of("red", "green", "blue")))
+ *     .format();
+ * // "Choose red, green or blue"
+ *
+ * messageSupport
+ *     .message("%{colors,list-max-size:2,list-value-more:'...'}")
+ *     .with("colors", Collections.enumeration(List.of("red", "green", "blue")))
+ *     .format();
+ * // "red, green, ..."
+ * }</pre>
  *
  * @param <T>  the collection/container type handled by this formatter
  *

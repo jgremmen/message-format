@@ -28,15 +28,58 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 /**
  * Parameter formatter for {@link Key} (cryptographic key) values.
  * <p>
- * This formatter uses the {@code key} configuration key to select which aspect of the cryptographic key to format:
- * <ul>
- *   <li>{@code algorithm}: the key's algorithm name</li>
- *   <li>{@code format}: the key's encoding format name</li>
- *   <li>{@code encoded}: the key's encoded form (as a byte array)</li>
- * </ul>
+ * This formatter uses the {@code key} configuration key to select which aspect of the cryptographic key to format.
  * <p>
  * If the configuration key is absent or does not match a known option, formatting is delegated to the next available
  * formatter.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the key formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code key}</td>
+ *     <td>{@code algorithm}, {@code format}, {@code encoded}</td>
+ *     <td>(none)</td>
+ *     <td>
+ *       Formats the algorithm name, the encoding format name or the encoded form of the key. The encoded form is
+ *       formatted as a byte array. If absent or any other value, formatting is delegated to the next formatter.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not part of the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService} and must be registered explicitly:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new KeyFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * Describe a key, without exposing its content:
+ * <pre>{@code
+ * var publicKey = KeyPairGenerator.getInstance("RSA").generateKeyPair().getPublic();
+ *
+ * messageSupport
+ *     .message("Using %{k,key:algorithm} key in %{k,key:format} format")
+ *     .with("k", publicKey)
+ *     .format();
+ * // "Using RSA key in X.509 format"
+ * }</pre>
+ * <p>
+ * The encoded form of a public key, using the {@code bytes} configuration key of the byte array formatter:
+ * <pre>{@code
+ * var publicKey = KeyPairGenerator.getInstance("RSA").generateKeyPair().getPublic();
+ *
+ * messageSupport
+ *     .message("%{k,key:encoded,bytes:base64}")
+ *     .with("k", publicKey)
+ *     .format();
+ * // e.g. "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA..."
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

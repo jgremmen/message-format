@@ -66,11 +66,70 @@ import static java.util.Objects.toIdentityString;
  * <p>
  * This formatter also supports the {@code ignore-default-tostring} option, which is read from the
  * {@linkplain de.sayayi.lib.message.MessageSupport.MessageAccessor#getDefaultConfig(String) default configuration} of
- * the message support. When enabled, values (other than character sequences) whose
- * {@code toString()} output matches the default {@link Object#toString()} identity string (or lambda class names)
- * are treated as empty strings instead.
+ * the message support only.
  * <p>
  * As a {@link SizeQueryable} formatter, it can report the length of {@link CharSequence} and {@code char[]} values.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the string formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code ignore-default-tostring}</td>
+ *     <td>boolean</td>
+ *     <td>{@code false}</td>
+ *     <td>
+ *       Set with {@code setDefaultConfig}. If {@code true}, values (other than character sequences) whose {@code
+ *       toString()} output is the default {@link Object#toString()} identity string, as well as lambdas, are
+ *       treated as empty strings.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Force the string representation of a value, so it can be compared with string keys regardless of its type. Values
+ * without a matching key are formatted unchanged:
+ * <pre>{@code
+ * var message = "Status: %{code,format:string,'200':'OK','404':'Not Found'}";
+ *
+ * messageSupport.message(message).with("code", 404).format();
+ * // "Status: Not Found"
+ *
+ * messageSupport.message(message).with("code", 418).format();
+ * // "Status: 418"
+ * }</pre>
+ * <p>
+ * String keys are compared using a locale-sensitive collator. An exact match is preferred, but case and accents are
+ * ignored if there is none:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{direction,format:string,'SUD':'south'}")
+ *     .with("direction", "Süd")
+ *     .locale(Locale.GERMANY)
+ *     .format();
+ * // "south"
+ * }</pre>
+ * <p>
+ * The {@code empty} key also matches strings consisting of whitespace only:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{comment,format:string,empty:'no comment',null:'not available'}")
+ *     .with("comment", "   ")
+ *     .format();
+ * // "no comment"
+ * }</pre>
+ * <p>
+ * Suppress meaningless identity strings for all messages of a message support:
+ * <pre>{@code
+ * messageSupport.setDefaultConfig("ignore-default-tostring", true);
+ *
+ * messageSupport
+ *     .message("%{object,format:string,empty:'(no description)'}")
+ *     .with("object", new Object())
+ *     .format();
+ * // "(no description)"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

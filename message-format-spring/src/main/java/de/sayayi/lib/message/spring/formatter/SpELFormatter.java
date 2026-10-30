@@ -46,16 +46,7 @@ import static org.springframework.expression.spel.support.DataBindingPropertyAcc
  * A named parameter formatter that evaluates Spring Expression Language (SpEL) expressions on parameter values during
  * message formatting.
  * <p>
- * This formatter is registered under the name {@code spel} and supports the following parameter configuration options:
- * <ul>
- *   <li>
- *     {@code spel-expr}: a SpEL expression to evaluate against the parameter value. The parameter value serves as the
- *     root object of the expression.
- *   </li>
- *   <li>
- *     {@code spel-format}: an optional format name used to format the result of the SpEL expression.
- *   </li>
- * </ul>
+ * This formatter is registered under the name {@code spel} and supports the configuration keys listed below.
  * <p>
  * Message parameters referencing other parameter values are made available as SpEL variables (e.g.
  * {@code #otherParam}). Variable assignment is not supported and will result in a
@@ -79,6 +70,90 @@ import static org.springframework.expression.spel.support.DataBindingPropertyAcc
  * Instance methods of the reachable objects are still invoked, including methods with side effects. SpEL expressions
  * must therefore never be taken from untrusted input; message format strings that contain a {@code spel-expr}
  * configuration must be constant or come from a trusted source.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the spel formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code spel-expr}</td>
+ *     <td>SpEL expression</td>
+ *     <td>(none)</td>
+ *     <td>
+ *       Expression to evaluate, with the parameter value being its root object. Without an expression, the
+ *       parameter value itself is formatted. The expression must come from a trusted source.
+ *     </td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code spel-format}</td>
+ *     <td>formatter name</td>
+ *     <td>(none)</td>
+ *     <td>
+ *       Name of the formatter used to format the result of the expression. Without a name, the result is
+ *       formatted according to its type.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not registered automatically and must be added to the formatter service:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new SpELFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * Navigate to a nested value of the parameter. The {@code spel-expr} key selects this formatter automatically:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Month: %{date,spel-expr:'month.value'}")
+ *     .with("date", LocalDate.of(2026, 5, 1))
+ *     .format();
+ * // "Month: 5"
+ *
+ * messageSupport
+ *     .message("%{names,spel-expr:'get(0).toUpperCase()'}")
+ *     .with("names", List.of("alice", "bob"))
+ *     .format();
+ * // "ALICE"
+ * }</pre>
+ * <p>
+ * Other message parameters are available as variables:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{names,spel-expr:'get(#index)'}")
+ *     .with("names", List.of("alice", "bob"))
+ *     .with("index", 1)
+ *     .format();
+ * // "bob"
+ * }</pre>
+ * <p>
+ * Pass the result to a named formatter. Map keys and other configuration keys are applied by that formatter:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{order,spel-expr:'size()',spel-format:choice,0:'empty',1:'one item',:'multiple items'}")
+ *     .with("order", List.of("a", "b", "c"))
+ *     .format();
+ * // "multiple items"
+ *
+ * messageSupport
+ *     .message("%{price,spel-expr:'doubleValue() * 2',number:'0.00'}")
+ *     .with("price", BigDecimal.valueOf(1.5))
+ *     .locale(Locale.US)
+ *     .format();
+ * // "3.00"
+ * }</pre>
+ * <p>
+ * Expressions are not evaluated for {@code null} and are restricted to reading data, so static access is rejected:
+ * <pre>{@code
+ * messageSupport.message("%{v,spel-expr:'length()'}").with("v", null).format();
+ * // ""
+ *
+ * messageSupport.message("%{v,spel-expr:'T(java.lang.System).exit(0)'}").with("v", 1).format();
+ * // throws MessageFormatException
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.8.3  (refactored in 0.12.0)

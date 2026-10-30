@@ -41,6 +41,40 @@ import static org.w3c.dom.Node.ELEMENT_NODE;
  * <p>
  * This formatter renders a DOM node as its XPath expression. Elements are represented with their positional index
  * predicate when siblings with the same name exist and attributes are prefixed with {@code @}.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not part of the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService} and must be registered explicitly:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new NodeFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * Report the location of an element or attribute in a document. An index is added for elements having siblings with the
+ * same name:
+ * <pre>{@code
+ * var document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(
+ *     "<catalog><book id='1'/><book id='2'><title/></book></catalog>")));
+ * var book = (Element)document.getElementsByTagName("book").item(1);
+ *
+ * messageSupport.message("Invalid element: %{node}").with("node", book).format();
+ * // "Invalid element: //catalog/book[2]"
+ *
+ * messageSupport.message("Invalid attribute: %{node}").with("node", book.getAttributeNode("id")).format();
+ * // "Invalid attribute: //catalog/book[2]/@id"
+ *
+ * messageSupport.message("%{node}").with("node", book.getFirstChild()).format();
+ * // "//catalog/book[2]/title"
+ * }</pre>
+ * <p>
+ * {@code null} is matched by the {@code null} key:
+ * <pre>{@code
+ * messageSupport.message("%{node,null:'document root'}").with("node", (Element)null).format();
+ * // "document root"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

@@ -36,16 +36,69 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * Parameter formatter for {@link MatchResult} values.
  * <p>
  * This formatter extracts and formats a capture group from a regex match result. The {@code matcher} configuration
- * key controls which group is returned:
- * <ul>
- *   <li>A number value: returns the capture group at the given index (0 for the entire match)</li>
- *   <li>A string value: returns the named capture group</li>
- *   <li>Absent: returns the entire match (group 0)</li>
- * </ul>
+ * key controls which group is returned.
  * <p>
  * If the match result is a {@link Matcher} without an existing match, the whole input is matched against the
  * pattern as a fallback (without disturbing an already established match, e.g. from a prior {@code find()} call).
  * If no match can be established this way, or the specified group does not exist, empty text is returned.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the match result formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code matcher}</td>
+ *     <td>number or string</td>
+ *     <td>{@code 0}</td>
+ *     <td>
+ *       A number selects the capture group with the given index, with {@code 0} being the entire match. A string
+ *       selects the named capture group.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not part of the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService} and must be registered explicitly:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new MatchResultFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * Extract capture groups by index or by name:
+ * <pre>{@code
+ * var matcher = Pattern.compile("(\\w+)@(?<host>[\\w.]+)").matcher("alice@example.com");
+ *
+ * messageSupport
+ *     .message("User %{m,matcher:1} at %{m,matcher:'host'}")
+ *     .with("m", matcher)
+ *     .format();
+ * // "User alice at example.com"
+ *
+ * messageSupport.message("%{m}").with("m", matcher).format();
+ * // "alice@example.com"
+ * }</pre>
+ * <p>
+ * A prior {@code find()} is retained, and a {@link MatchResult} can be used as well:
+ * <pre>{@code
+ * var matcher = Pattern.compile("\\d+").matcher("Error 404 at line 12");
+ *
+ * matcher.find();
+ *
+ * messageSupport.message("Code %{m}").with("m", matcher.toMatchResult()).format();
+ * // "Code 404"
+ * }</pre>
+ * <p>
+ * A failed match or an unknown group results in an empty text, which the {@code empty} key can handle:
+ * <pre>{@code
+ * var matcher = Pattern.compile("\\d+").matcher("no digits");
+ *
+ * messageSupport.message("%{m,empty:'no match'}").with("m", matcher).format();
+ * // "no match"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

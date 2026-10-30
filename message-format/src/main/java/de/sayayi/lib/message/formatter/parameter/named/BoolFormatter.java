@@ -66,6 +66,41 @@ import static java.lang.Math.signum;
  * The resulting boolean value can be mapped to custom text using map keys of type {@code bool}, {@code string},
  * {@code empty} and {@code null} in the parameter configuration. If no mapping is provided, the formatter defaults
  * to the text {@code "true"} or {@code "false"}.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Any non-zero number is {@code true}, which makes this formatter useful for counters and legacy flag columns:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{errors,format:bool,true:'failed',false:'passed'}")
+ *     .with("errors", 4)
+ *     .format();
+ * // "failed"
+ * }</pre>
+ * <p>
+ * Strings are recognized literally or parsed as a number. A value that cannot be converted to a boolean is matched by
+ * the {@code empty} key, while {@code null} is matched by the {@code null} key:
+ * <pre>{@code
+ * var message = "%{flag,format:bool,true:'on',false:'off',empty:'invalid',null:'not set'}";
+ *
+ * messageSupport.message(message).with("flag", "0").format();
+ * // "off"
+ *
+ * messageSupport.message(message).with("flag", "maybe").format();
+ * // "invalid"
+ *
+ * messageSupport.message(message).with("flag", null).format();
+ * // "not set"
+ * }</pre>
+ * <p>
+ * Without map keys, the boolean value itself is formatted. Optional values are unwrapped first:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Enabled: %{enabled,format:bool}")
+ *     .with("enabled", Optional.of(1))
+ *     .format();
+ * // "Enabled: true"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

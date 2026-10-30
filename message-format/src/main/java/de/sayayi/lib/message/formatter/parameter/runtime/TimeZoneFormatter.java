@@ -31,6 +31,25 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.Class
  * <p>
  * This formatter renders the time zone using its locale-specific display name obtained from
  * {@link TimeZone#getDisplayName(java.util.Locale)}.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * The display name of the time zone depends on the locale of the message:
+ * <pre>{@code
+ * var timeZone = TimeZone.getTimeZone("Europe/Amsterdam");
+ *
+ * messageSupport.message("Zone: %{tz}").with("tz", timeZone).locale(Locale.US).format();
+ * // "Zone: Central European Standard Time"
+ *
+ * messageSupport.message("Zone: %{tz}").with("tz", timeZone).locale(Locale.GERMANY).format();
+ * // "Zone: Mitteleuropäische Normalzeit"
+ * }</pre>
+ * <p>
+ * A missing time zone is matched by the {@code null} key:
+ * <pre>{@code
+ * messageSupport.message("Zone: %{tz,null:'system default'}").with("tz", null).format();
+ * // "Zone: system default"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.12.0

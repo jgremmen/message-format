@@ -43,6 +43,42 @@ import static de.sayayi.lib.message.part.MapKey.Type.*;
  * <p>
  * Unlike other formatters, the choice formatter does not convert or format the value itself. Instead, it purely acts
  * as a selector that picks one of several mapped messages based on the value.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Select the wording for a number. Unlike the number formatter, this formatter uses the default map entry:
+ * <pre>{@code
+ * var message = "%{n} %{n,format:choice,1:'file',:'files'} deleted";
+ *
+ * messageSupport.message(message).with("n", 1).format();
+ * // "1 file deleted"
+ *
+ * messageSupport.message(message).with("n", 12).format();
+ * // "12 files deleted"
+ * }</pre>
+ * <p>
+ * Comparison operators express ranges and the selected message can refer to the parameter again:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{used,format:choice,>=90:'disk almost full (%{used}%)',>=70:'disk filling up',:'disk ok'}")
+ *     .with("used", 93)
+ *     .format();
+ * // "disk almost full (93%)"
+ * }</pre>
+ * <p>
+ * All key types can be mixed, so a single parameter can cover missing, blank and unexpected values:
+ * <pre>{@code
+ * var message = "%{state,format:choice,null:'unknown',empty:'blank','A':'active','I':'inactive',:'invalid: %{state}'}";
+ *
+ * messageSupport.message(message).with("state", "I").format();
+ * // "inactive"
+ *
+ * messageSupport.message(message).with("state", "").format();
+ * // "blank"
+ *
+ * messageSupport.message(message).with("state", "X").format();
+ * // "invalid: X"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

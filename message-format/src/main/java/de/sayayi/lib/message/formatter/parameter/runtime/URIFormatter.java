@@ -34,20 +34,67 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 /**
  * Parameter formatter for {@link URI} values.
  * <p>
- * This formatter uses the {@code uri} configuration key to select which component of the URI to format:
- * <ul>
- *   <li>{@code default} (default): the full URI string representation</li>
- *   <li>{@code authority}: the authority component</li>
- *   <li>{@code fragment}: the fragment component</li>
- *   <li>{@code host}: the host name</li>
- *   <li>{@code path}: the path component</li>
- *   <li>{@code port}: the port number; number map keys can be used to override the output</li>
- *   <li>{@code query}: the query string</li>
- *   <li>{@code scheme}: the scheme; string map keys can be used to override the output</li>
- *   <li>{@code user-info}: the user info component</li>
- * </ul>
+ * This formatter uses the {@code uri} configuration key to select which component of the URI to format.
  * <p>
  * If the configuration value does not match a known option, formatting is delegated to the next available formatter.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the uri formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code uri}</td>
+ *     <td>
+ *       {@code default}, {@code authority}, {@code fragment}, {@code host}, {@code path}, {@code port}, {@code
+ *       query}, {@code scheme}, {@code user-info}
+ *     </td>
+ *     <td>{@code default}</td>
+ *     <td>
+ *       Component of the URI to format, {@code default} being the full string representation. Number keys
+ *       override the output for {@code port} and string keys for {@code scheme}. Any other value delegates to the
+ *       next formatter.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Format individual components of a URI:
+ * <pre>{@code
+ * var uri = URI.create("https://user@example.com:8443/api/v1?q=test#section");
+ *
+ * messageSupport
+ *     .message("Connecting to %{u,uri:host} on port %{u,uri:port}")
+ *     .with("u", uri)
+ *     .format();
+ * // "Connecting to example.com on port 8443"
+ *
+ * messageSupport.message("%{u,uri:path}?%{u,uri:query}").with("u", uri).format();
+ * // "/api/v1?q=test"
+ * }</pre>
+ * <p>
+ * Describe the scheme using string keys, with the default entry being used for all other schemes:
+ * <pre>{@code
+ * var message = "%{u,uri:scheme,'https':'secure','http':'not secure',:'unsupported'}";
+ *
+ * messageSupport.message(message).with("u", URI.create("https://example.com")).format();
+ * // "secure"
+ *
+ * messageSupport.message(message).with("u", URI.create("ftp://example.com")).format();
+ * // "unsupported"
+ * }</pre>
+ * <p>
+ * A missing component results in an empty text, which the {@code empty} key can handle. A missing port has the number
+ * {@code -1}:
+ * <pre>{@code
+ * var uri = URI.create("https://example.com");
+ *
+ * messageSupport.message("%{u,uri:fragment,empty:'no fragment'}").with("u", uri).format();
+ * // "no fragment"
+ *
+ * messageSupport.message("%{u,uri:port,-1:'default port'}").with("u", uri).format();
+ * // "default port"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.3.1

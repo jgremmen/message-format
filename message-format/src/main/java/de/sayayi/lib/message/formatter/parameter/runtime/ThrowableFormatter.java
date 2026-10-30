@@ -29,6 +29,31 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.Class
  * <p>
  * This formatter extracts the throwable's localized message using {@link Throwable#getLocalizedMessage()} and
  * delegates the formatting to the string formatter.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Include the message of an exception. Map keys of the string formatter are applied to the message:
+ * <pre>{@code
+ * var exception = new IOException("Connection refused");
+ *
+ * messageSupport.message("Upload failed: %{ex}").with("ex", exception).format();
+ * // "Upload failed: Connection refused"
+ *
+ * messageSupport
+ *     .message("%{ex,'Connection refused':'The server is not reachable'}")
+ *     .with("ex", exception)
+ *     .format();
+ * // "The server is not reachable"
+ * }</pre>
+ * <p>
+ * Handle an exception without a message:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Upload failed: %{ex,null:'unknown reason'}")
+ *     .with("ex", new IOException())
+ *     .format();
+ * // "Upload failed: unknown reason"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.5.0

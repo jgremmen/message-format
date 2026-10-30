@@ -67,11 +67,94 @@ import static java.lang.Math.round;
  * {@link de.sayayi.lib.message.exception.MessageFormatException} when the message is formatted, with an
  * {@link IllegalArgumentException} as its cause.
  * <p>
- * The compass direction labels can be customized using the configuration keys {@code geo-n}, {@code geo-s},
- * {@code geo-e} and {@code geo-w}, defaulting to {@code N}, {@code S}, {@code E} and {@code W} respectively.
- * <p>
  * Values that are not finite ({@code NaN}, positive or negative infinity) have no coordinate representation and are
  * formatted as empty text, so the {@code empty} map key applies to them.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the geo formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code geo}</td>
+ *     <td>format name or custom format pattern</td>
+ *     <td>{@code dms}</td>
+ *     <td>Selects the output format as described above.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code geo-n}</td>
+ *     <td>string</td>
+ *     <td>{@code N}</td>
+ *     <td>Compass direction label for a latitude greater than or equal to 0.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code geo-s}</td>
+ *     <td>string</td>
+ *     <td>{@code S}</td>
+ *     <td>Compass direction label for a negative latitude.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code geo-e}</td>
+ *     <td>string</td>
+ *     <td>{@code E}</td>
+ *     <td>Compass direction label for a longitude greater than or equal to 0.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code geo-w}</td>
+ *     <td>string</td>
+ *     <td>{@code W}</td>
+ *     <td>Compass direction label for a negative longitude.</td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not part of the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService} and must be registered explicitly:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new GeoFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * Format a position using predefined formats. The {@code geo} key selects this formatter automatically and a negative
+ * value results in the opposite compass direction:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Position: %{lat,geo:latitude}, %{lon,geo:'medium-longitude'}")
+ *     .with("lat", -33.8688)
+ *     .with("lon", 151.2093)
+ *     .locale(Locale.US)
+ *     .format();
+ * // "Position: 33°52'8"S, 151°12'33.5"E"
+ * }</pre>
+ * <p>
+ * A custom pattern with zero-padded minutes and seconds and spaces as separators. Without a compass direction, a
+ * negative value has a minus sign:
+ * <pre>{@code
+ * messageSupport.message("%{v,geo:'d 0m 0s'}").with("v", -18.999697).format();
+ * // "-18° 59' 59""
+ * }</pre>
+ * <p>
+ * Localized compass direction labels:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{lat,geo:'short-latitude',geo-n:' Nord',geo-s:' Süd'}")
+ *     .with("lat", 51.569167)
+ *     .format();
+ * // "51°34' Nord"
+ * }</pre>
+ * <p>
+ * Values without a coordinate representation can be handled by the {@code empty} and {@code null} keys:
+ * <pre>{@code
+ * var message = "Position: %{lat,geo:latitude,empty:'invalid',null:'unknown'}";
+ *
+ * messageSupport.message(message).with("lat", Double.NaN).format();
+ * // "Position: invalid"
+ *
+ * messageSupport.message(message).with("lat", null).format();
+ * // "Position: unknown"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.3.1

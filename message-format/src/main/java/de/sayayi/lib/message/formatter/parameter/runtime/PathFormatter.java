@@ -40,26 +40,73 @@ import static java.util.OptionalLong.empty;
 /**
  * Parameter formatter for {@link Path} and {@link File} values.
  * <p>
- * This formatter uses the {@code path} configuration key to select which aspect of the path to format:
- * <ul>
- *   <li>{@code path} (default): the path as-is</li>
- *   <li>{@code name}: the file name component</li>
- *   <li>{@code parent}: the parent path</li>
- *   <li>{@code root}: the root component</li>
- *   <li>{@code absolute-path}: the absolute path</li>
- *   <li>{@code real-path}: the real (resolved) path, falling back to the absolute path if resolution fails</li>
- *   <li>{@code normalize} or {@code normalized-path}: the normalized path</li>
- *   <li>
- *     {@code ext} or {@code extension}: the file extension; string map keys can be used to override the
- *     output for specific extensions
- *   </li>
- *   <li>{@code mimetype}: the MIME type of the file (regular files only)</li>
- * </ul>
+ * This formatter uses the {@code path} configuration key to select which aspect of the path to format.
  * <p>
  * If the configuration key is absent, the path is used as-is. If the value does not match a known option, formatting
  * is delegated to the next available formatter.
  * <p>
  * As a {@link SizeQueryable} formatter, it reports the file size in bytes for regular files.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the path formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code path}</td>
+ *     <td>
+ *       {@code path}, {@code name}, {@code parent}, {@code root}, {@code absolute-path}, {@code real-path},
+ *       {@code normalize}, {@code normalized-path}, {@code ext}, {@code extension}, {@code mimetype}
+ *     </td>
+ *     <td>{@code path}</td>
+ *     <td>
+ *       Aspect of the path to format: the path as-is, the file name, the parent path, the root component, the
+ *       absolute path, the real path (or the absolute path if it cannot be resolved), the normalized path, the
+ *       file extension or the MIME type of a regular file. String keys override the output for specific
+ *       extensions. Any other value delegates to the next formatter.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Format individual components of a path:
+ * <pre>{@code
+ * var path = Path.of("/home/user/docs/report.pdf");
+ *
+ * messageSupport
+ *     .message("File %{p,path:name} in %{p,path:parent}")
+ *     .with("p", path)
+ *     .format();
+ * // "File report.pdf in /home/user/docs"
+ * }</pre>
+ * <p>
+ * Map a file extension to a description, using the default entry for all other extensions:
+ * <pre>{@code
+ * var message = "%{p,path:ext,'pdf':'PDF document','txt':'text file',:'unknown file type'}";
+ *
+ * messageSupport.message(message).with("p", Path.of("report.pdf")).format();
+ * // "PDF document"
+ *
+ * messageSupport.message(message).with("p", Path.of("archive.zip")).format();
+ * // "unknown file type"
+ * }</pre>
+ * <p>
+ * Remove redundant elements from a path. {@link java.io.File File} values are supported as well:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{f,path:normalize}")
+ *     .with("f", new File("/home/user/../shared/./data.csv"))
+ *     .format();
+ * // "/home/shared/data.csv"
+ * }</pre>
+ * <p>
+ * The size of a path to a regular file is the size of that file in bytes:
+ * <pre>{@code
+ * var file = Files.writeString(Files.createTempFile("report", ".txt"), "Hello");
+ *
+ * messageSupport.message("%{p,format:size} bytes").with("p", file).format();
+ * // "5 bytes"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.3.1

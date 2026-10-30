@@ -27,6 +27,54 @@ import java.util.Set;
  * <p>
  * Subclasses provide the supported type and implement {@link #formatValue(ParameterFormatterContext, Object)} to
  * format values of that type. Null and empty value handling is provided by {@link AbstractParameterFormatter}.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * A formatter for a single type, which also contributes a classifier for its values:
+ * <pre>{@code
+ * public final class CurrencyFormatter extends AbstractSingleTypeParameterFormatter<Currency>
+ * {
+ *   @Override
+ *   protected boolean updateTypedClassifiers(@NotNull ClassifierContext context, @NotNull Currency value)
+ *   {
+ *     context.addClassifier("currency");
+ *     return true;
+ *   }
+ *
+ *   @Override
+ *   protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Currency currency) {
+ *     return noSpaceText(currency.getDisplayName(context.getLocale()));
+ *   }
+ *
+ *   @Override
+ *   protected @NotNull FormattableType getFormattableType() {
+ *     return new FormattableType(Currency.class);
+ *   }
+ * }
+ * }</pre>
+ * <p>
+ * After registering the formatter, values are formatted using the locale of the message. The classifier can be matched
+ * by the {@link de.sayayi.lib.message.formatter.parameter.named.ClassifierFormatter ClassifierFormatter}:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new CurrencyFormatter());
+ * formatterService.addFormatter(new ClassifierFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ *
+ * messageSupport
+ *     .message("Paid in %{currency}")
+ *     .with("currency", Currency.getInstance("USD"))
+ *     .locale(Locale.GERMANY)
+ *     .format();
+ * // "Paid in US-Dollar"
+ *
+ * messageSupport
+ *     .message("%{value,format:classifier,'currency':'a currency',:'something else'}")
+ *     .with("value", Currency.getInstance("USD"))
+ *     .format();
+ * // "a currency"
+ * }</pre>
  *
  * @param <T>  the parameter value type handled by this formatter
  *

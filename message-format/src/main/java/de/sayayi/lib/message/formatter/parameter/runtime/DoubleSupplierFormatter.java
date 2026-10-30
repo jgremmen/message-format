@@ -37,6 +37,21 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.Class
  * <p>
  * Map key comparison for {@code bool}, {@code number} and {@code string} keys is also based on the evaluated double
  * value.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Evaluate an expensive value only when the message is actually formatted. Configuration keys and map keys of the
+ * number formatter apply to the supplied value:
+ * <pre>{@code
+ * DoubleSupplier load = () -> 0.875;
+ *
+ * messageSupport
+ *     .message("Load: %{load,number:percent}")
+ *     .with("load", load)
+ *     .locale(Locale.US)
+ *     .format();
+ * // "Load: 88%"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

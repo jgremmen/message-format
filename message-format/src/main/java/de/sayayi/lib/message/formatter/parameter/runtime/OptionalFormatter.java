@@ -44,6 +44,44 @@ import static de.sayayi.lib.message.part.MapKey.MatchResult.forNullKey;
  * <p>
  * Map key comparisons for {@code bool}, {@code number} and {@code string} keys are based on the contained value.
  * An empty optional results in a mismatch for these key types.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * A value is formatted as if it was passed directly, so map keys and configuration keys of its type apply. An empty
+ * optional is matched by the {@code empty} and {@code null} keys:
+ * <pre>{@code
+ * var message = "Owner: %{owner,empty:'nobody'}";
+ *
+ * messageSupport.message(message).with("owner", Optional.of("Alice")).format();
+ * // "Owner: Alice"
+ *
+ * messageSupport.message(message).with("owner", Optional.empty()).format();
+ * // "Owner: nobody"
+ * }</pre>
+ * <p>
+ * Formatting options for the contained value:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Due: %{due,date:'yyyy-MM-dd'}")
+ *     .with("due", Optional.of(LocalDate.of(2026, 5, 1)))
+ *     .format();
+ * // "Due: 2026-05-01"
+ *
+ * messageSupport
+ *     .message("%{count,0:'none',>0:'some'}")
+ *     .with("count", Optional.of(5))
+ *     .format();
+ * // "some"
+ * }</pre>
+ * <p>
+ * Size queries are delegated to the contained value:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{items,format:size,empty:'unknown'}")
+ *     .with("items", Optional.of(List.of(1, 2, 3)))
+ *     .format();
+ * // "3"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

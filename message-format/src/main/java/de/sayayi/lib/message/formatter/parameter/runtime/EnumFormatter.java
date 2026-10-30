@@ -33,23 +33,62 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 /**
  * Parameter formatter for {@link Enum} values.
  * <p>
- * This formatter uses the {@code enum} configuration key to select the output format:
- * <ul>
- *   <li>
- *     {@code name} (default): formats the enum constant's name; string map keys can be used to override the output for
- *     specific names
- *   </li>
- *   <li>
- *     {@code ord} or {@code ordinal}: formats the enum constant's ordinal value; number map keys can be used to
- *     override the output for specific ordinals
- *   </li>
- * </ul>
+ * This formatter uses the {@code enum} configuration key to select the output format.
  * <p>
  * If the configuration key is absent, the enum's name is used. If the value does not match a known option, formatting
  * is delegated to the next available formatter.
  * <p>
  * Map key comparison supports {@code number} keys (compared against the ordinal) and {@code string} keys
  * (compared against the name).
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the enum formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code enum}</td>
+ *     <td>{@code name}, {@code ord}, {@code ordinal}</td>
+ *     <td>{@code name}</td>
+ *     <td>
+ *       Formats the name or the ordinal of the enum constant. String keys override the output for specific names
+ *       and number keys for specific ordinals. Any other value delegates to the next formatter.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Translate enum constants using string keys. The default entry is used for all other constants:
+ * <pre>{@code
+ * var message = "Today is %{day,'SATURDAY':'weekend','SUNDAY':'weekend',:'a working day'}";
+ *
+ * messageSupport.message(message).with("day", DayOfWeek.SUNDAY).format();
+ * // "Today is weekend"
+ *
+ * messageSupport.message(message).with("day", DayOfWeek.MONDAY).format();
+ * // "Today is a working day"
+ * }</pre>
+ * <p>
+ * Use the ordinal, optionally with number keys and comparison operators:
+ * <pre>{@code
+ * messageSupport.message("%{day,enum:ordinal}").with("day", DayOfWeek.WEDNESDAY).format();
+ * // "2"
+ *
+ * messageSupport
+ *     .message("%{day,enum:ord,<5:'working day',:'weekend'}")
+ *     .with("day", DayOfWeek.FRIDAY)
+ *     .format();
+ * // "working day"
+ * }</pre>
+ * <p>
+ * {@code null} is matched by the {@code null} key:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{policy,null:'no policy'}")
+ *     .with("policy", null)
+ *     .format();
+ * // "no policy"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.4.2

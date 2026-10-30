@@ -56,6 +56,32 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  *     {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#MISMATCH MISMATCH}
  *   </li>
  * </ul>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * The display name of the charset is formatted by default:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Encoding: %{charset}")
+ *     .with("charset", StandardCharsets.UTF_8)
+ *     .format();
+ * // "Encoding: UTF-8"
+ * }</pre>
+ * <p>
+ * String keys are matched against the canonical name and the aliases of the charset, the default entry is used if there
+ * is no match:
+ * <pre>{@code
+ * var message = "%{charset,'UTF-8':'unicode','latin1':'western',:'other'}";
+ *
+ * messageSupport.message(message).with("charset", StandardCharsets.UTF_8).format();
+ * // "unicode"
+ *
+ * messageSupport.message(message).with("charset", StandardCharsets.ISO_8859_1).format();
+ * // "western"
+ *
+ * messageSupport.message(message).with("charset", StandardCharsets.US_ASCII).format();
+ * // "other"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.22.1

@@ -43,18 +43,66 @@ import static java.util.Base64.getMimeEncoder;
 /**
  * Parameter formatter for {@code byte[]} values.
  * <p>
- * This formatter converts a byte array to a string representation based on the {@code bytes} configuration key:
- * <ul>
- *   <li>{@code base64}: encodes the bytes as a Base64 string</li>
- *   <li>{@code base64-lf}: encodes the bytes as a MIME Base64 string with line breaks</li>
- *   <li>A charset name (e.g. {@code UTF-8}): decodes the bytes as a string using the given charset</li>
- *   <li>Empty or unsupported charset: decodes the bytes using the platform default charset</li>
- * </ul>
+ * This formatter converts a byte array to a string representation based on the {@code bytes} configuration key.
  * <p>
  * If the {@code bytes} configuration key is absent, formatting is delegated to the next available formatter
  * (e.g. the general array formatter).
  * <p>
  * As a {@link SizeQueryable} formatter, it reports the length of the byte array.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the byte array formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code bytes}</td>
+ *     <td>{@code base64}, {@code base64-lf}, charset name</td>
+ *     <td>(none)</td>
+ *     <td>
+ *       {@code base64} encodes the bytes as a Base64 string, {@code base64-lf} as a MIME Base64 string with line
+ *       breaks. A charset name, e.g. {@code UTF-8}, decodes the bytes as a string. An empty or unsupported
+ *       charset name uses the platform default charset. If absent, formatting is delegated to the next formatter.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Encode binary data as Base64 for diagnostic output:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Checksum: %{sum,bytes:base64}")
+ *     .with("sum", new byte[] { 1, 2, 3, 4 })
+ *     .format();
+ * // "Checksum: AQIDBA=="
+ * }</pre>
+ * <p>
+ * Decode text received as bytes. The decoded string is formatted by the string formatter, so its map keys apply:
+ * <pre>{@code
+ * var payload = "Grüße".getBytes(StandardCharsets.ISO_8859_1);
+ *
+ * messageSupport.message("%{data,bytes:'ISO-8859-1'}").with("data", payload).format();
+ * // "Grüße"
+ *
+ * messageSupport
+ *     .message("%{data,bytes:'US-ASCII','OK':'accepted',:'rejected'}")
+ *     .with("data", "OK".getBytes(StandardCharsets.US_ASCII))
+ *     .format();
+ * // "accepted"
+ * }</pre>
+ * <p>
+ * Without the {@code bytes} key, the array formatter is used. The size and emptiness of the array are available in
+ * either case:
+ * <pre>{@code
+ * messageSupport.message("%{data}").with("data", new byte[] { 1, 2, 3 }).format();
+ * // "1, 2, 3"
+ *
+ * messageSupport
+ *     .message("%{data,bytes:base64,empty:'no data',!empty:'%{data,format:size} bytes'}")
+ *     .with("data", new byte[16])
+ *     .format();
+ * // "16 bytes"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

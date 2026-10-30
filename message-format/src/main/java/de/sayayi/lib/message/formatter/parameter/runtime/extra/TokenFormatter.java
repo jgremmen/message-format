@@ -37,22 +37,95 @@ import static de.sayayi.lib.message.part.TextPartFactory.*;
 
 /**
  * Parameter formatter for ANTLR {@link Token} values. This formatter extracts various aspects of a token depending on
- * the {@code token} configuration value:
- * <ul>
- *   <li>{@code "text"} (default) formats the token text</li>
- *   <li>{@code "type"} formats the token type number</li>
- *   <li>{@code "channel"} formats the token channel number</li>
- *   <li>{@code "line"} formats the token line number</li>
- *   <li>{@code "column"} formats the token column number</li>
- *   <li>{@code "position"} formats the token position as a combined line and column string</li>
- * </ul>
+ * the {@code token} configuration value.
  * <p>
- * The line and column numbers can be adjusted using the {@code token-1st-line} (default {@code 1}) and
- * {@code token-1st-column} (default {@code 0}) configuration values.
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the token formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code token}</td>
+ *     <td>{@code text}, {@code type}, {@code channel}, {@code line}, {@code column}, {@code position}</td>
+ *     <td>{@code text}</td>
+ *     <td>
+ *       Formats the token text, the token type number, the channel number, the line number, the column number or
+ *       the combined position. Line, column and position are empty if the token has no such information. Any
+ *       other value results in a {@code null} text.
+ *     </td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code token-1st-line}</td>
+ *     <td>number</td>
+ *     <td>{@code 1}</td>
+ *     <td>Number that is reported for the first line.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code token-1st-column}</td>
+ *     <td>number</td>
+ *     <td>{@code 0}</td>
+ *     <td>Number that is reported for the first column.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code token-position-format}</td>
+ *     <td>message</td>
+ *     <td>{@code %{line}%{column,!empty:':%{column}'}}</td>
+ *     <td>
+ *       Message used to format the position. The parameters {@code line} and {@code column} are available in the
+ *       message. By default it renders as {@code line:column} or just {@code line} if the column is empty.
+ *     </td>
+ *   </tr>
+ * </table>
  * <p>
- * The position format can be customized with the {@code token-position-format} configuration message. If no custom
- * format is provided, the default position format is {@code %{line}%{column,!empty:':%{column}'}} which renders as
- * {@code line:column} when a column is available, or just {@code line} when the column is empty.
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not part of the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService} and must be registered explicitly:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new TokenFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * Report a syntax error at the position of a token. ANTLR columns start at 0, which is adjustable:
+ * <pre>{@code
+ * var token = new CommonToken(Token.MIN_USER_TOKEN_TYPE, "bloolean");
+ * token.setLine(12);
+ * token.setCharPositionInLine(4);
+ *
+ * messageSupport
+ *     .message("Unexpected '%{t}' at %{t,token:position}")
+ *     .with("t", token)
+ *     .format();
+ * // "Unexpected 'bloolean' at 12:4"
+ *
+ * messageSupport
+ *     .message("Line %{t,token:line}, column %{t,token:column,token-1st-column:1}")
+ *     .with("t", token)
+ *     .format();
+ * // "Line 12, column 5"
+ * }</pre>
+ * <p>
+ * Use a custom format for the position:
+ * <pre>{@code
+ * var token = new CommonToken(Token.MIN_USER_TOKEN_TYPE, "bloolean");
+ * token.setLine(12);
+ * token.setCharPositionInLine(4);
+ *
+ * messageSupport
+ *     .message("at %{t,token:position,token-position-format:'(%{line}, %{column})'}")
+ *     .with("t", token)
+ *     .format();
+ * // "at (12, 4)"
+ * }</pre>
+ * <p>
+ * A token without line information, e.g. a synthetic one, has no position:
+ * <pre>{@code
+ * var token = new CommonToken(Token.EOF, "<EOF>");
+ *
+ * messageSupport.message("%{t,token:position,empty:'at end of input'}").with("t", token).format();
+ * // "at end of input"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.24.0

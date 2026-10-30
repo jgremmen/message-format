@@ -28,14 +28,55 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 /**
  * Parameter formatter for {@link InetAddress} values.
  * <p>
- * This formatter uses the {@code inet} configuration key to select which representation of the address to format:
- * <ul>
- *   <li>{@code ip} (default): the IP address string</li>
- *   <li>{@code name}: the host name</li>
- *   <li>{@code fqdn}: the fully qualified domain name (canonical host name)</li>
- * </ul>
+ * This formatter uses the {@code inet} configuration key to select which representation of the address to format.
  * <p>
  * If the configuration value does not match a known option, formatting is delegated to the next available formatter.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the inet address formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code inet}</td>
+ *     <td>{@code ip}, {@code name}, {@code fqdn}</td>
+ *     <td>{@code ip}</td>
+ *     <td>
+ *       Formats the IP address string, the host name or the fully qualified domain name (canonical host name).
+ *       The latter two may require a name service lookup. Any other value delegates to the next formatter.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not part of the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService} and must be registered explicitly:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new InetAddressFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * Format the IP address and the host name of an address:
+ * <pre>{@code
+ * var address = InetAddress.getByAddress("db01", new byte[] { 10, 0, 0, 7 });
+ *
+ * messageSupport
+ *     .message("Connected to %{a,inet:name} (%{a})")
+ *     .with("a", address)
+ *     .format();
+ * // "Connected to db01 (10.0.0.7)"
+ * }</pre>
+ * <p>
+ * The canonical host name depends on the name service of the system:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Host: %{a,inet:fqdn}")
+ *     .with("a", InetAddress.getLoopbackAddress())
+ *     .format();
+ * // e.g. "Host: localhost"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.3.1

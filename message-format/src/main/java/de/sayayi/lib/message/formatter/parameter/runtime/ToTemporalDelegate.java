@@ -41,6 +41,41 @@ import static de.sayayi.lib.message.part.TextPartFactory.nullText;
  * {@link Temporal} representation and delegates formatting. In order to actually format those objects, a formatter
  * for {@link Instant}, {@link LocalDate} and {@link LocalTime} must be registered.
  * {@link TemporalFormatter}, which is part of this library, covers all three types out of the box.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Legacy values can be used like their {@link Temporal} equivalents. The {@code date} configuration key of the {@link
+ * TemporalFormatter} therefore applies to them as well:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{d,date:long}")
+ *     .with("d", java.sql.Date.valueOf("2026-05-01"))
+ *     .locale(Locale.US)
+ *     .format();
+ * // "May 1, 2026"
+ *
+ * messageSupport
+ *     .message("%{t,date:'HH:mm'}")
+ *     .with("t", java.sql.Time.valueOf("14:30:00"))
+ *     .format();
+ * // "14:30"
+ * }</pre>
+ * <p>
+ * {@link Calendar}, {@link Date}, {@link java.nio.file.attribute.FileTime FileTime} and {@link InstantSource} values
+ * are instants, which are formatted using the system default time zone:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{c,date:'yyyy-MM-dd'}")
+ *     .with("c", new GregorianCalendar(2026, Calendar.MAY, 1))
+ *     .format();
+ * // "2026-05-01"
+ * }</pre>
+ * <p>
+ * {@code null} is matched by the {@code null} key:
+ * <pre>{@code
+ * messageSupport.message("%{d,null:'never'}").with("d", (Date)null).format();
+ * // "never"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.12.0  (renamed in 0.20.0)

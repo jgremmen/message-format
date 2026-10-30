@@ -37,6 +37,31 @@ import java.util.function.Supplier;
  * <p>
  * Size queries and map key comparisons ({@code bool}, {@code number} and {@code string} keys) are also based on the
  * supplied value.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Postpone an expensive calculation until the message is actually formatted. The supplied value is formatted according
+ * to its own type, so its configuration keys apply:
+ * <pre>{@code
+ * Supplier<List<String>> names = () -> List.of("alice", "bob", "carol");
+ *
+ * messageSupport
+ *     .message("Users: %{names,list-sep-last:' and '}")
+ *     .with("names", names)
+ *     .format();
+ * // "Users: alice, bob and carol"
+ * }</pre>
+ * <p>
+ * Size queries and map key comparisons are based on the supplied value as well:
+ * <pre>{@code
+ * Supplier<String> comment = () -> "";
+ *
+ * messageSupport
+ *     .message("%{comment,empty:'no comment'}")
+ *     .with("comment", comment)
+ *     .format();
+ * // "no comment"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

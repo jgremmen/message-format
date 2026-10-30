@@ -24,14 +24,56 @@ import org.jetbrains.annotations.NotNull;
  * Post formatter that converts the case of a formatted string.
  * <p>
  * This post formatter is identified by the name {@code case}. The target case is specified by the {@code case}
- * configuration key, which accepts the following values:
- * <ul>
- *   <li>{@code upper} or {@code uppercase}: converts the string to uppercase</li>
- *   <li>{@code lower} or {@code lowercase}: converts the string to lowercase</li>
- * </ul>
+ * configuration key.
  * <p>
  * The case conversion is locale-aware, using the locale from the formatting context. If the configuration value is not
  * recognized, the string is returned unchanged.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the case formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code case}</td>
+ *     <td>{@code upper}, {@code uppercase}, {@code lower}, {@code lowercase}</td>
+ *     <td>(none)</td>
+ *     <td>Target case. The string is returned unchanged if the key is absent or has any other value.</td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Convert a complete sub-message, including its literal text and formatted parameters:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%(case,'%{level}: %{text}',case:upper)")
+ *     .with("level", "warning")
+ *     .with("text", "disk full")
+ *     .locale(Locale.US)
+ *     .format();
+ * // "WARNING: DISK FULL"
+ * }</pre>
+ * <p>
+ * The conversion follows the casing rules of the locale, as for the dotted capital I in Turkish:
+ * <pre>{@code
+ * var message = "%(case,'bilgi',case:upper)";
+ *
+ * messageSupport.message(message).locale(Locale.US).format();
+ * // "BILGI"
+ *
+ * messageSupport.message(message).locale(Locale.of("tr", "TR")).format();
+ * // "BİLGİ"
+ * }</pre>
+ * <p>
+ * Combined with a map key, the mapped text is converted as well:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%(case,'%{active,true:Enabled,false:Disabled}',case:lowercase)")
+ *     .with("active", true)
+ *     .locale(Locale.US)
+ *     .format();
+ * // "enabled"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.21.0

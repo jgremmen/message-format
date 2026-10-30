@@ -31,20 +31,61 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 /**
  * Parameter formatter for {@link Locale} values.
  * <p>
- * This formatter uses the {@code locale} configuration key to select which aspect of the locale to format:
- * <ul>
- *   <li>{@code name} (default): the locale's display name</li>
- *   <li>{@code country}: the locale's country display name</li>
- *   <li>{@code lang} or {@code language}: the locale's language display name</li>
- *   <li>{@code script}: the locale's script display name</li>
- *   <li>{@code variant}: the locale's variant display name</li>
- * </ul>
+ * This formatter uses the {@code locale} configuration key to select which aspect of the locale to format.
  * <p>
  * All display values are resolved using the formatting context's locale. For {@code country} and {@code language},
  * string map keys matching the country or language code can be used to override the display value.
  * <p>
  * If the configuration key is absent, the locale's display name is used. If the value does not match a known option,
  * formatting is delegated to the next available formatter.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the locale formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code locale}</td>
+ *     <td>{@code name}, {@code country}, {@code lang}, {@code language}, {@code script}, {@code variant}</td>
+ *     <td>{@code name}</td>
+ *     <td>
+ *       Aspect of the locale to format as a display name. For {@code country} and {@code language}, string keys
+ *       matching the country or language code override the output. Any other value delegates to the next
+ *       formatter.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * The parameter value selects what is displayed, while the locale of the message selects the language it is displayed
+ * in:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Language: %{lang}")
+ *     .with("lang", Locale.UK)
+ *     .locale(Locale.GERMANY)
+ *     .format();
+ * // "Language: Englisch (Vereinigtes Königreich)"
+ * }</pre>
+ * <p>
+ * Display a single aspect of the locale:
+ * <pre>{@code
+ * messageSupport.message("%{l,locale:country}").with("l", Locale.US).locale(Locale.FRANCE).format();
+ * // "États-Unis"
+ *
+ * messageSupport.message("%{l,locale:lang}").with("l", Locale.UK).locale(Locale.of("es", "ES")).format();
+ * // "inglés"
+ * }</pre>
+ * <p>
+ * Override the display name for specific countries:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{l,locale:country,'GB':'Britain'}")
+ *     .with("l", Locale.UK)
+ *     .locale(Locale.US)
+ *     .format();
+ * // "Britain"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

@@ -37,6 +37,20 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.Class
  * <p>
  * Map key comparison for {@code bool}, {@code number} and {@code string} keys is also based on the evaluated integer
  * value.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Provide a live counter. Number keys are compared with the supplied value:
+ * <pre>{@code
+ * var queue = new ArrayDeque<>(List.of("a", "b", "c"));
+ * IntSupplier pending = queue::size;
+ *
+ * messageSupport
+ *     .message("%{pending,0:'Nothing to do',1:'One job pending',>1:'%{pending} jobs pending'}")
+ *     .with("pending", pending)
+ *     .format();
+ * // "3 jobs pending"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

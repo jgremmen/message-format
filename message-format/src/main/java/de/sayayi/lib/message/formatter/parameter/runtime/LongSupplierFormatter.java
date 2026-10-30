@@ -37,6 +37,21 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.Class
  * <p>
  * Map key comparison for {@code bool}, {@code number} and {@code string} keys is also based on the evaluated long
  * value.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Provide a value that is only determined when the message is actually formatted. The configuration keys of the number
+ * formatter apply to the supplied value:
+ * <pre>{@code
+ * LongSupplier freeBytes = () -> 1_500_000L;
+ *
+ * messageSupport
+ *     .message("Free: %{free,number:'#,##0'} bytes")
+ *     .with("free", freeBytes)
+ *     .locale(Locale.US)
+ *     .format();
+ * // "Free: 1,500,000 bytes"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

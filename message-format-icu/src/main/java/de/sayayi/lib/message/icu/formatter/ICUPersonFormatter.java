@@ -49,16 +49,98 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * <table border="1">
  *   <caption>Configuration keys for the icu-person formatter</caption>
  *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
- *   <tr><td>given-format</td><td>full, initial, none</td><td>full</td><td>Given name format</td></tr>
- *   <tr><td>family-format</td><td>full, initial, none</td><td>full</td><td>Family name format</td></tr>
- *   <tr><td>middle-format</td><td>full, initial, none</td><td>initial</td><td>Middle name format</td></tr>
- *   <tr><td>prefix-format</td><td>full, none</td><td>full</td><td>Prefix/title format</td></tr>
- *   <tr><td>suffix-format</td><td>full, none</td><td>full</td><td>Suffix/generation format</td></tr>
- *   <tr><td>order</td><td>given-first, surname-first, sorting</td><td>given-first</td><td>Name ordering</td></tr>
- *   <tr><td>usage</td><td>referring, addressing, monogram</td><td>referring</td><td>Formatting context</td></tr>
- *   <tr><td>formality</td><td>formal, informal</td><td>formal</td><td>Formality level</td></tr>
- *   <tr><td>length</td><td>long, medium, short</td><td>medium</td><td>Overall name length</td></tr>
+ *   <tr>
+ *     <td>{@code given-format}</td>
+ *     <td>{@code full}, {@code initial}, {@code none}</td>
+ *     <td>{@code full}</td>
+ *     <td>Format of the given name: as provided, as an initial or omitted.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code family-format}</td>
+ *     <td>{@code full}, {@code initial}, {@code none}</td>
+ *     <td>{@code full}</td>
+ *     <td>Format of the family name: as provided, as an initial or omitted.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code middle-format}</td>
+ *     <td>{@code full}, {@code initial}, {@code none}</td>
+ *     <td>{@code initial}</td>
+ *     <td>Format of the middle name: as provided, as an initial or omitted.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code prefix-format}</td>
+ *     <td>{@code full}, {@code none}</td>
+ *     <td>{@code full}</td>
+ *     <td>Whether the prefix or title is included.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code suffix-format}</td>
+ *     <td>{@code full}, {@code none}</td>
+ *     <td>{@code full}</td>
+ *     <td>Whether the suffix or generation is included.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code order}</td>
+ *     <td>{@code given-first}, {@code surname-first}, {@code sorting}</td>
+ *     <td>{@code given-first}</td>
+ *     <td>Order of the name parts. With {@code sorting}, the family name comes first and is followed by a comma.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code usage}</td>
+ *     <td>{@code referring}, {@code addressing}, {@code monogram}</td>
+ *     <td>{@code referring}</td>
+ *     <td>Formatting context. {@code monogram} uses the ICU formatter, which ignores the {@code *-format} keys.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code formality}</td>
+ *     <td>{@code formal}, {@code informal}</td>
+ *     <td>{@code formal}</td>
+ *     <td>Formality level. Only used with usage {@code monogram}.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code length}</td>
+ *     <td>{@code long}, {@code medium}, {@code short}</td>
+ *     <td>{@code medium}</td>
+ *     <td>Overall name length. Only used with usage {@code monogram}.</td>
+ *   </tr>
  * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * A middle name is formatted as an initial by default. The value of the anchor parameter is not used:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Dear %{unused,format:icu-person}")
+ *     .with("prefix", "Dr.")
+ *     .with("given-name", "John")
+ *     .with("middle-name", "Michael")
+ *     .with("family-name", "Smith")
+ *     .format();
+ * // "Dear Dr. John M. Smith"
+ * }</pre>
+ * <p>
+ * Control the format of each name part:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{unused,format:icu-person,given-format:initial,middle-format:none}")
+ *     .with("given-name", "John")
+ *     .with("middle-name", "Michael")
+ *     .with("family-name", "Smith")
+ *     .format();
+ * // "J. Smith"
+ * }</pre>
+ * <p>
+ * Format the name for an alphabetical index:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{unused,format:icu-person,order:sorting,middle-format:full}")
+ *     .with("given-name", "James")
+ *     .with("middle-name", "Earl")
+ *     .with("family-name", "Carter")
+ *     .with("suffix", "Jr.")
+ *     .format();
+ * // "Carter, James Earl Jr."
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.24.0

@@ -39,6 +39,78 @@ import java.util.BitSet;
  * <p>
  * The formatter is selected by specifying the name {@code "bitmask"} in a message parameter, for example:<br>
  * {@code %{flags,format:bitmask,0:'bit 0',1:'bit 1',2:'bit 2'}}.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the bitmask formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code bitset}</td>
+ *     <td>{@code lsb-set}, {@code msb-set}, {@code lsb-bits}, {@code msb-bits}</td>
+ *     <td>{@code lsb-set}</td>
+ *     <td>Selects labels for the set bits or a binary string, each with the least or most significant bit first.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code bit0}</td>
+ *     <td>string</td>
+ *     <td>{@code 0}</td>
+ *     <td>Text for an unset bit in binary string mode.</td>
+ *   </tr>
+ *   <tr><td>{@code bit1}</td><td>string</td><td>{@code 1}</td><td>Text for a set bit in binary string mode.</td></tr>
+ *   <tr>
+ *     <td>{@code list-sep}</td>
+ *     <td>string</td>
+ *     <td>{@code ", "}</td>
+ *     <td>Separator between the labels of the set bits.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-sep-last}</td>
+ *     <td>string</td>
+ *     <td>value of {@code list-sep}</td>
+ *     <td>Separator before the last label.</td>
+ *   </tr>
+ * </table>
+ * <p>
+ * All configuration keys are evaluated by the {@code BitSet} formatter, which supports additional list configuration
+ * keys.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not part of the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService} and must be registered explicitly:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new BitmaskFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * Label the bits of a flag value. Set bits without a matching number key are skipped:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Permissions: %{flags,format:bitmask,list-sep-last:' and ',0:'read',1:'write',2:'execute'}")
+ *     .with("flags", 0b1101)
+ *     .format();
+ * // "Permissions: read and execute"
+ * }</pre>
+ * <p>
+ * Render the bit pattern as a string. Negative values are treated as unsigned, so all bits of the type are shown:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{mask,format:bitmask,bitset:'msb-bits',bit0:'.',bit1:'x'}")
+ *     .with("mask", (byte)-107)
+ *     .format();
+ * // "x..x.x.x"
+ * }</pre>
+ * <p>
+ * {@link BigInteger} values are not limited to 64 bits:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{v,format:bitmask,bitset:'msb-set',0:'low',100:'high'}")
+ *     .with("v", BigInteger.ONE.shiftLeft(100).or(BigInteger.ONE))
+ *     .format();
+ * // "high, low"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.21.1

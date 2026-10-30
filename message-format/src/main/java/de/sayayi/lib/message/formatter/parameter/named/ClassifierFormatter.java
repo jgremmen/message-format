@@ -38,6 +38,48 @@ import static de.sayayi.lib.message.part.MapKey.Type.STRING;
  * etc.) that describe the nature of a parameter value. This formatter iterates over the classifiers of the given value
  * and returns the message associated with the first matching string map key. If no classifier matches, the default map
  * entry is used. If no default is present either, the {@code null} representation is returned.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not part of the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService} and must be registered explicitly:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new ClassifierFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * Adapt a message to the kind of value it receives, without having to know its exact Java type:
+ * <pre>{@code
+ * var message = """
+ *     Received %{v,format:classifier,\
+ *         'null':'nothing',\
+ *         'bool':'flag %{v}',\
+ *         'number':'number %{v}',\
+ *         'list':'%{v,format:size} elements',\
+ *         :'text %{v}'}\
+ *     """;
+ *
+ * messageSupport.message(message).with("v", 42).format();
+ * // "Received number 42"
+ *
+ * messageSupport.message(message).with("v", List.of("a", "b")).format();
+ * // "Received 2 elements"
+ *
+ * messageSupport.message(message).with("v", null).format();
+ * // "Received nothing"
+ * }</pre>
+ * <p>
+ * A value can have multiple classifiers, which are checked in the order they were added. A more specific classifier
+ * therefore takes precedence over a general one:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{v,format:classifier,'string':'some text','locale':'a language setting'}")
+ *     .with("v", Locale.GERMANY)
+ *     .format();
+ * // "a language setting"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.21.0

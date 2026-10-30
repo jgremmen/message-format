@@ -39,18 +39,57 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * Parameter formatter for {@link Field} values.
  * <p>
  * This formatter renders a Java reflection field as a human-readable string. The output is controlled by the
- * {@code field} configuration key, which accepts a combination of the following format flags:
- * <ul>
- *   <li>{@code M}: include modifiers (e.g. {@code public static final})</li>
- *   <li>{@code T}: include the field type</li>
- *   <li>{@code N}: include the field name</li>
- *   <li>{@code c}, {@code j}, {@code u}: type formatting flags as described by {@link TypeFormatter}</li>
- * </ul>
- * <p>
- * The default format is {@code "juMTN"}, which includes modifiers, type and name with {@code java.lang.} and
- * {@code java.util.} prefixes stripped from the type.
+ * {@code field} configuration key.
  * <p>
  * Map key comparison for {@code string} keys is based on the field name.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the field formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code field}</td>
+ *     <td>combination of the flags {@code M}, {@code T}, {@code N}, {@code c}, {@code j} and {@code u}</td>
+ *     <td>{@code juMTN}</td>
+ *     <td>
+ *       Flag {@code M} includes the modifiers, {@code T} the field type and {@code N} the field name. The flags
+ *       {@code c}, {@code j} and {@code u} control the format of the type as described by {@link TypeFormatter}.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not part of the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService} and must be registered explicitly:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new FieldFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * By default, modifiers, type and name are included:
+ * <pre>{@code
+ * var field = Integer.class.getField("MAX_VALUE");
+ *
+ * messageSupport.message("%{f}").with("f", field).format();
+ * // "public static final int MAX_VALUE"
+ * }</pre>
+ * <p>
+ * Select the parts of the field and the format of the type:
+ * <pre>{@code
+ * var field = Locale.class.getField("GERMANY");
+ *
+ * messageSupport.message("%{f,field:TN}").with("f", field).format();
+ * // "java.util.Locale GERMANY"
+ *
+ * messageSupport.message("%{f,field:cTN}").with("f", field).format();
+ * // "Locale GERMANY"
+ *
+ * messageSupport.message("Field %{f,field:N} not accessible").with("f", field).format();
+ * // "Field GERMANY not accessible"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.6.0

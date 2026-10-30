@@ -26,14 +26,58 @@ import java.util.Set;
 /**
  * Parameter formatter for {@link Entry Map.Entry} values.
  * <p>
- * This formatter uses the {@code entry} configuration key to select which part of the map entry to format:
- * <ul>
- *   <li>{@code key}: formats the entry's key</li>
- *   <li>{@code value}: formats the entry's value</li>
- * </ul>
+ * This formatter uses the {@code entry} configuration key to select which part of the map entry to format.
  * <p>
  * If the configuration key is absent or does not match a known option, formatting is delegated to the next available
  * formatter.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the map entry formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code entry}</td>
+ *     <td>{@code key}, {@code value}</td>
+ *     <td>(none)</td>
+ *     <td>
+ *       Part of the entry to format, using the formatter appropriate for its type. If absent or any other value,
+ *       formatting is delegated to the next formatter.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Format the key and the value of an entry independently:
+ * <pre>{@code
+ * var entry = Map.entry("score", 42);
+ *
+ * messageSupport
+ *     .message("%{e,entry:key} is %{e,entry:value}")
+ *     .with("e", entry)
+ *     .format();
+ * // "score is 42"
+ * }</pre>
+ * <p>
+ * Map keys and configuration keys apply to the selected part:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{e,entry:value,true:'enabled',false:'disabled'}")
+ *     .with("e", Map.entry("active", true))
+ *     .format();
+ * // "enabled"
+ * }</pre>
+ * <p>
+ * Format the elements of an entry set individually:
+ * <pre>{@code
+ * var limits = new TreeMap<>(Map.of("cpu", 4, "memory", 16));
+ *
+ * messageSupport
+ *     .message("%{limits,list-value:'%{value,entry:key} (%{value,entry:value})'}")
+ *     .with("limits", limits.entrySet())
+ *     .format();
+ * // "cpu (4), memory (16)"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.12.0

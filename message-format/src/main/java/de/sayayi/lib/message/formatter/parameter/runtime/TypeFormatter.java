@@ -35,16 +35,65 @@ import static java.util.stream.Collectors.joining;
  * Parameter formatter for {@link Type} values (including {@link Class}).
  * <p>
  * This formatter renders a Java type as a human-readable string. The output is controlled by the {@code type}
- * configuration key, which accepts a combination of the following format flags:
- * <ul>
- *   <li>{@code c}: use the simple class name only</li>
- *   <li>{@code j}: omit the {@code java.lang.} package prefix</li>
- *   <li>{@code u}: omit the {@code java.util.} package prefix</li>
- *   <li>{@code v}: expand type variable bounds</li>
- * </ul>
- * <p>
- * The default format is {@code "ju"}, which strips both the {@code java.lang.} and {@code java.util.} prefixes.
+ * configuration key.
  * The formatter handles generic types, parameterized types, type variables, wildcard types and arrays.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the type formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code type}</td>
+ *     <td>combination of the flags {@code c}, {@code j}, {@code u} and {@code v}</td>
+ *     <td>{@code ju}</td>
+ *     <td>
+ *       Flag {@code c} uses the simple class name only, {@code j} omits the {@code java.lang.} package prefix,
+ *       {@code u} omits the {@code java.util.} package prefix and {@code v} expands type variable bounds.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * By default, the prefixes of the most common packages are omitted:
+ * <pre>{@code
+ * messageSupport.message("%{t}").with("t", String.class).format();
+ * // "String"
+ *
+ * messageSupport.message("%{t}").with("t", List.class).format();
+ * // "List"
+ *
+ * messageSupport.message("%{t}").with("t", LocalDate.class).format();
+ * // "java.time.LocalDate"
+ * }</pre>
+ * <p>
+ * Select the level of detail using the format flags. Array types are supported as well:
+ * <pre>{@code
+ * messageSupport.message("%{t,type:c}").with("t", LocalDate[].class).format();
+ * // "LocalDate[]"
+ *
+ * messageSupport.message("%{t,type:j}").with("t", List.class).format();
+ * // "java.util.List"
+ * }</pre>
+ * <p>
+ * Generic types are formatted including their type arguments:
+ * <pre>{@code
+ * var returnType = Map.class.getMethod("keySet").getGenericReturnType();
+ *
+ * messageSupport.message("%{t}").with("t", returnType).format();
+ * // "Set<K>"
+ * }</pre>
+ * <p>
+ * Expand the bounds of a type variable:
+ * <pre>{@code
+ * var typeVariable = List.class.getTypeParameters()[0];
+ *
+ * messageSupport.message("%{t}").with("t", typeVariable).format();
+ * // "E"
+ *
+ * messageSupport.message("%{t,type:juv}").with("t", typeVariable).format();
+ * // "<E extends Object>"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.6.0

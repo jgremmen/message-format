@@ -33,13 +33,8 @@ import static java.util.Collections.emptyIterator;
 /**
  * Parameter formatter for {@link BitSet} values.
  * <p>
- * The {@code bitset} configuration key controls the output mode:
- * <ul>
- *   <li>{@code lsb-set} (default): renders set bits using their mapped messages, least significant bit first</li>
- *   <li>{@code msb-set}: renders set bits using their mapped messages, most significant bit first</li>
- *   <li>{@code lsb-bits}: formats all bits as a binary string, least significant bit first</li>
- *   <li>{@code msb-bits}: formats all bits as a binary string, most significant bit first</li>
- * </ul>
+ * The {@code bitset} configuration key controls the output mode, which either renders the labels of the set bits or a
+ * binary string.
  * <p>
  * In {@code lsb-set}/{@code msb-set} mode, each set bit is mapped to a message via a number-keyed map entry in the
  * parameter configuration. The resulting messages are formatted individually and joined into a single text string.
@@ -47,11 +42,108 @@ import static java.util.Collections.emptyIterator;
  * skipped. Separator, truncation and overflow behavior are controlled by the list configuration keys inherited from
  * {@link AbstractListFormatter}.
  * <p>
- * In {@code lsb-bits}/{@code msb-bits} mode, the following additional configuration keys are available:
- * <ul>
- *   <li>{@code bit0}: text representation for an unset bit (default: {@code 0})</li>
- *   <li>{@code bit1}: text representation for a set bit (default: {@code 1})</li>
- * </ul>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the bit set formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code bitset}</td>
+ *     <td>{@code lsb-set}, {@code msb-set}, {@code lsb-bits}, {@code msb-bits}</td>
+ *     <td>{@code lsb-set}</td>
+ *     <td>
+ *       The {@code -set} values render the labels of the set bits and the {@code -bits} values all bits as a
+ *       binary string, each with the least ({@code lsb}) or most ({@code msb}) significant bit first.
+ *     </td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code bit0}</td>
+ *     <td>string</td>
+ *     <td>{@code 0}</td>
+ *     <td>Binary string mode only: text representation for an unset bit.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code bit1}</td>
+ *     <td>string</td>
+ *     <td>{@code 1}</td>
+ *     <td>Binary string mode only: text representation for a set bit.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-sep}</td>
+ *     <td>string</td>
+ *     <td>{@code ", "}</td>
+ *     <td>Separator inserted between two elements.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-sep-last}</td>
+ *     <td>string</td>
+ *     <td>value of {@code list-sep}</td>
+ *     <td>
+ *       Separator inserted before the last element, e.g. {@code " and "}. It is not used if {@code
+ *       list-value-more} is set.
+ *     </td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-max-size}</td>
+ *     <td>number</td>
+ *     <td>unlimited</td>
+ *     <td>Maximum number of elements to include. With {@code 0} no element is included.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-value-more}</td>
+ *     <td>string</td>
+ *     <td>(none)</td>
+ *     <td>Text added as a final element if the list is truncated by {@code list-max-size}.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-unique}</td>
+ *     <td>boolean</td>
+ *     <td>{@code false}</td>
+ *     <td>If {@code true}, only the first occurrence of each formatted element text is included.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-value}</td>
+ *     <td>message</td>
+ *     <td>{@code %{value}}</td>
+ *     <td>Message used to format the text of each set bit, which is available as parameter {@code value}.</td>
+ *   </tr>
+ * </table>
+ * <p>
+ * The list configuration keys only apply to the labels of the set bits.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Label the set bits. Bits without a matching number key are skipped:
+ * <pre>{@code
+ * var permissions = BitSet.valueOf(new long[] { 0b10101 });
+ *
+ * messageSupport
+ *     .message("%{p,list-sep-last:' and ',0:'read',1:'write',2:'execute',4:'admin'}")
+ *     .with("p", permissions)
+ *     .format();
+ * // "read, execute and admin"
+ * }</pre>
+ * <p>
+ * Reverse the order of the labels and format each of them individually:
+ * <pre>{@code
+ * var permissions = BitSet.valueOf(new long[] { 0b101 });
+ *
+ * messageSupport
+ *     .message("%{p,bitset:'msb-set',list-value:'[%{value}]',list-sep:' ',0:'read',2:'execute'}")
+ *     .with("p", permissions)
+ *     .format();
+ * // "[execute] [read]"
+ * }</pre>
+ * <p>
+ * Render all bits up to the highest set bit as a binary string, optionally with custom characters:
+ * <pre>{@code
+ * var bits = BitSet.valueOf(new long[] { 0b101001 });
+ *
+ * messageSupport.message("%{b,bitset:'msb-bits'}").with("b", bits).format();
+ * // "101001"
+ *
+ * messageSupport.message("%{b,bitset:'lsb-bits',bit0:'-',bit1:'x'}").with("b", bits).format();
+ * // "x--x-x"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.21.1

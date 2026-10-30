@@ -38,17 +38,67 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 /**
  * Parameter formatter for {@link Method} values.
  * <p>
- * This formatter uses the {@code method} configuration key to select the output format:
- * <ul>
- *   <li>{@code default} (default): the method's default string representation</li>
- *   <li>{@code name}: the method name</li>
- *   <li>{@code class}: the declaring class</li>
- *   <li>{@code return-type}: the method's return type</li>
- * </ul>
+ * This formatter uses the {@code method} configuration key to select the output format.
  * <p>
  * If the configuration value does not match a known option, formatting is delegated to the next available formatter.
  * <p>
  * Map key comparison for {@code string} keys is based on the method name.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the method formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code method}</td>
+ *     <td>{@code default}, {@code name}, {@code class}, {@code return-type}</td>
+ *     <td>{@code default}</td>
+ *     <td>
+ *       Formats the default string representation of the method, its name, its declaring class or its return
+ *       type. Any other value delegates to the next formatter.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not part of the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService} and must be registered explicitly:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new MethodFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * Format individual aspects of a method:
+ * <pre>{@code
+ * var method = String.class.getMethod("substring", int.class);
+ *
+ * messageSupport.message("%{m,method:class}.%{m,method:name}()").with("m", method).format();
+ * // "String.substring()"
+ *
+ * messageSupport.message("returns %{m,method:'return-type'}").with("m", method).format();
+ * // "returns String"
+ * }</pre>
+ * <p>
+ * The default string representation of a method includes its signature:
+ * <pre>{@code
+ * var method = String.class.getMethod("length");
+ *
+ * messageSupport.message("%{m}").with("m", method).format();
+ * // "public int java.lang.String.length()"
+ * }</pre>
+ * <p>
+ * String keys are compared with the method name if selected by a formatter like {@code choice}:
+ * <pre>{@code
+ * var message = "%{m,format:choice,'length':'size query',:'other'}";
+ *
+ * messageSupport.message(message).with("m", String.class.getMethod("length")).format();
+ * // "size query"
+ *
+ * messageSupport.message(message).with("m", String.class.getMethod("trim")).format();
+ * // "other"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.5.0

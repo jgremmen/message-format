@@ -26,15 +26,63 @@ import java.util.jar.Manifest;
 /**
  * Parameter formatter for {@link Manifest} values.
  * <p>
- * This formatter uses the {@code manifest} configuration key to select which part of the manifest to format:
- * <ul>
- *   <li>
- *     {@code main-attrs} or {@code main-attributes} (default): formats the main attributes of the manifest
- *   </li>
- *   <li>{@code entries}: formats the manifest entries map</li>
- * </ul>
+ * This formatter uses the {@code manifest} configuration key to select which part of the manifest to format.
  * <p>
  * If the configuration value does not match a known option, formatting is delegated to the next available formatter.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the manifest formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code manifest}</td>
+ *     <td>{@code main-attrs}, {@code main-attributes}, {@code entries}</td>
+ *     <td>{@code main-attrs}</td>
+ *     <td>
+ *       Formats the main attributes or the entries of the manifest, both of which are maps. Any other value
+ *       delegates to the next formatter.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * The configuration keys of the {@link de.sayayi.lib.message.formatter.parameter.runtime.MapFormatter MapFormatter}
+ * apply to the selected part.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not part of the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService} and must be registered explicitly:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new ManifestFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * Format the main attributes, using the configuration keys of the map formatter:
+ * <pre>{@code
+ * var manifest = new Manifest();
+ * manifest.getMainAttributes().putValue("Manifest-Version", "1.0");
+ * manifest.getMainAttributes().putValue("Implementation-Title", "demo");
+ *
+ * messageSupport
+ *     .message("%{m,map-kv:'%{key}: %{value}',list-sep:'; '}")
+ *     .with("m", manifest)
+ *     .format();
+ * // "Manifest-Version: 1.0; Implementation-Title: demo"
+ * }</pre>
+ * <p>
+ * List the names of the manifest entries:
+ * <pre>{@code
+ * var manifest = new Manifest();
+ * manifest.getEntries().put("de/sayayi/Main.class", new Attributes());
+ *
+ * messageSupport
+ *     .message("Signed: %{m,manifest:entries,map-kv:'%{key}'}")
+ *     .with("m", manifest)
+ *     .format();
+ * // "Signed: de/sayayi/Main.class"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.12.0

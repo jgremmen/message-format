@@ -38,6 +38,41 @@ import static de.sayayi.lib.message.part.TextPartFactory.nullText;
  * Non-{@code null} values are delegated to {@link #formatValue(ParameterFormatterContext, Object)}. The returned text
  * will be matched against {@code null} and empty parameter configuration entries and is replaced by the best matching
  * message found.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * A subclass only provides the formatted text and its supported types. Both the {@code null} and {@code empty} map keys
+ * work without further code, including for an empty text returned by {@code formatValue}:
+ * <pre>{@code
+ * public final class DurationFormatter extends AbstractParameterFormatter<Duration>
+ * {
+ *   @Override
+ *   protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Duration duration) {
+ *     return duration.isZero() ? emptyText() : noSpaceText(duration.toMinutes() + " min");
+ *   }
+ *
+ *   @Override
+ *   public @NotNull Set<FormattableType> getFormattableTypes() {
+ *     return Set.of(new FormattableType(Duration.class));
+ *   }
+ * }
+ * }</pre>
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new DurationFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * var message = "Timeout: %{timeout,null:'not set',empty:'disabled'}";
+ *
+ * messageSupport.message(message).with("timeout", Duration.ofMinutes(5)).format();
+ * // "Timeout: 5 min"
+ *
+ * messageSupport.message(message).with("timeout", Duration.ZERO).format();
+ * // "Timeout: disabled"
+ *
+ * messageSupport.message(message).with("timeout", null).format();
+ * // "Timeout: not set"
+ * }</pre>
  *
  * @param <T>  parameter type
  *

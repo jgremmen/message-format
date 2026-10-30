@@ -36,6 +36,19 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.Class
  * of the resulting {@code boolean} value to the appropriate boolean formatter.
  * <p>
  * Map key comparison for {@code bool} and {@code string} keys is also based on the evaluated boolean value.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Evaluate a condition only when the message is actually formatted:
+ * <pre>{@code
+ * BooleanSupplier connected = () -> true;
+ *
+ * messageSupport
+ *     .message("Database: %{connected,true:'online',false:'offline'}")
+ *     .with("connected", connected)
+ *     .format();
+ * // "Database: online"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

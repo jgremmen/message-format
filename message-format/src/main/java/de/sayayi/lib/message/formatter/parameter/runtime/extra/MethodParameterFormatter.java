@@ -38,16 +38,70 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 /**
  * Parameter formatter for method {@link Parameter} values.
  * <p>
- * This formatter uses the {@code parameter} configuration key to select the output format:
- * <ul>
- *   <li>{@code default} (default): the parameter's default string representation</li>
- *   <li>{@code name}: the parameter name</li>
- *   <li>{@code class}: the parameter's type</li>
- * </ul>
+ * This formatter uses the {@code parameter} configuration key to select the output format.
  * <p>
  * If the configuration value does not match a known option, formatting is delegated to the next available formatter.
  * <p>
  * Map key comparison for {@code string} keys is based on the parameter name.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the method parameter formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code parameter}</td>
+ *     <td>{@code default}, {@code name}, {@code class}</td>
+ *     <td>{@code default}</td>
+ *     <td>
+ *       Formats the default string representation of the parameter, its name or its type. Any other value
+ *       delegates to the next formatter.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * Real parameter names are only available for classes compiled with the {@code -parameters} option.
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not part of the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService} and must be registered explicitly:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new MethodParameterFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * Describe a parameter of a method:
+ * <pre>{@code
+ * var parameter = List.class.getMethod("get", int.class).getParameters()[0];
+ *
+ * messageSupport.message("%{p}").with("p", parameter).format();
+ * // "int arg0"
+ *
+ * messageSupport.message("Type: %{p,parameter:class}").with("p", parameter).format();
+ * // "Type: int"
+ * }</pre>
+ * <p>
+ * Generic types are supported, with the prefixes of the most common packages being omitted:
+ * <pre>{@code
+ * var parameter = List.class.getMethod("addAll", Collection.class).getParameters()[0];
+ *
+ * messageSupport.message("%{p,parameter:class}").with("p", parameter).format();
+ * // "Collection<? extends E>"
+ * }</pre>
+ * <p>
+ * List all parameters of a method:
+ * <pre>{@code
+ * var method = String.class.getMethod("replace", char.class, char.class);
+ *
+ * messageSupport
+ *     .message("%{m,method:name}(%{params,list-value:'%{value,parameter:class}'})")
+ *     .with("m", method)
+ *     .with("params", method.getParameters())
+ *     .format();
+ * // "replace(char, char)"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.10.0

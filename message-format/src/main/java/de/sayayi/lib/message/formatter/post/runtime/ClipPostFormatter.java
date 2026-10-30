@@ -30,19 +30,8 @@ import static java.text.BreakIterator.getCharacterInstance;
  * Post formatter that clips a formatted string to a maximum length.
  * <p>
  * This post formatter is identified by the name {@code clip}. The maximum length is specified by the {@code clip}
- * configuration key as a numeric value. If the string exceeds this length, it is truncated.
- * <p>
- * By default, a suffix (ellipsis character {@code \u2026}) is appended to the truncated string to indicate that the
- * text has been clipped. The suffix behavior can be controlled with the following configuration keys:
- * <ul>
- *   <li>
- *     {@code clip-suffix}: set to {@code false} to disable the suffix and perform a hard truncation at the maximum
- *     length
- *   </li>
- *   <li>
- *     {@code clip-suffix-text}: a custom suffix string to use instead of the default ellipsis character
- *   </li>
- * </ul>
+ * configuration key as a numeric value. If the string exceeds this length, it is truncated. By default, a suffix
+ * (ellipsis character {@code \u2026}) is appended to the truncated string to indicate that the text has been clipped.
  * <p>
  * When a suffix is used, the configured maximum is treated as a lower bound rather than a hard limit: it may be
  * increased internally so that the truncated text combined with the suffix remains meaningful. Only when the suffix is
@@ -54,6 +43,92 @@ import static java.text.BreakIterator.getCharacterInstance;
  * pair of two {@code char} values, an emoji sequence (e.g. an emoji with a skin tone modifier or a family emoji joined
  * by zero width joiners) and a letter followed by combining marks each count as a single character and are never
  * split.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the clip formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code clip}</td>
+ *     <td>number</td>
+ *     <td>{@code 0}</td>
+ *     <td>Maximum length of the text. With {@code 0} or a negative value the text is not clipped.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code clip-suffix}</td>
+ *     <td>boolean</td>
+ *     <td>{@code true}</td>
+ *     <td>Set to {@code false} to disable the suffix and perform a hard truncation at the maximum length.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code clip-suffix-text}</td>
+ *     <td>string</td>
+ *     <td>{@code \u2026}</td>
+ *     <td>Suffix to use instead of the ellipsis character. It is ignored if {@code clip-suffix} is {@code false}.</td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Limit the length of a sub-message. Whitespace at the truncation point is removed before adding the suffix:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%(clip,'%{title}',clip:20)")
+ *     .with("title", "A very elaborate and excessively long title")
+ *     .format();
+ * // "A very elaborate an…"
+ *
+ * messageSupport
+ *     .message("%(clip,'%{title}',clip:9)")
+ *     .with("title", "This is a very long text")
+ *     .format();
+ * // "This is…"
+ * }</pre>
+ * <p>
+ * Use a custom suffix or perform a hard truncation:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%(clip,'%{text}',clip:20,clip-suffix-text:' [more]')")
+ *     .with("text", "Documentation for the message format library")
+ *     .format();
+ * // "Documentation [more]"
+ *
+ * messageSupport
+ *     .message("%(clip,'%{text}',clip:10,clip-suffix:false)")
+ *     .with("text", "Hello World, this is too long")
+ *     .format();
+ * // "Hello Worl"
+ * }</pre>
+ * <p>
+ * With a suffix, the configured length is a lower bound, so a small value still leaves some of the text visible:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%(clip,'%{text}',clip:2)")
+ *     .with("text", "This is a very long text")
+ *     .format();
+ * // "This…"
+ * }</pre>
+ * <p>
+ * Cap the output of other formatters:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%(clip,\"%(case,'%{label}',case:upper)\",clip:10)")
+ *     .with("label", "important warning message")
+ *     .locale(Locale.US)
+ *     .format();
+ * // "IMPORTANT…"
+ * }</pre>
+ * <p>
+ * Disable the suffix for all messages of a message support, unless a message specifies otherwise:
+ * <pre>{@code
+ * messageSupport.setDefaultConfig("clip-suffix", false);
+ *
+ * messageSupport
+ *     .message("%(clip,'%{text}',clip:10)")
+ *     .with("text", "Hello World, this is too long")
+ *     .format();
+ * // "Hello Worl"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.21.0

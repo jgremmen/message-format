@@ -70,6 +70,111 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  *   <tr><td>[A,B,C]</td><td>(undefined)</td><td>1</td><td>(undefined)</td><td>'A'</td></tr>
  *   <tr><td>[A,B,C]</td><td>(undefined)</td><td>0</td><td>(undefined)</td><td>''</td></tr>
  * </table>
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the array formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code list-sep}</td>
+ *     <td>string</td>
+ *     <td>{@code ", "}</td>
+ *     <td>Separator inserted between two elements.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-sep-last}</td>
+ *     <td>string</td>
+ *     <td>value of {@code list-sep}</td>
+ *     <td>
+ *       Separator inserted before the last element, e.g. {@code " and "}. It is not used if {@code
+ *       list-value-more} is set.
+ *     </td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-max-size}</td>
+ *     <td>number</td>
+ *     <td>unlimited</td>
+ *     <td>Maximum number of elements to include. With {@code 0} no element is included.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-value-more}</td>
+ *     <td>string</td>
+ *     <td>(none)</td>
+ *     <td>Text added as a final element if the list is truncated by {@code list-max-size}.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-unique}</td>
+ *     <td>boolean</td>
+ *     <td>{@code false}</td>
+ *     <td>If {@code true}, only the first occurrence of each formatted element text is included.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-value}</td>
+ *     <td>message</td>
+ *     <td>{@code %{value}}</td>
+ *     <td>
+ *       Message used to format each element, which is available as parameter {@code value}. Elements formatted as
+ *       empty text are omitted.
+ *     </td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code list-this}</td>
+ *     <td>string</td>
+ *     <td>{@code (this array)}</td>
+ *     <td>Text used for an element that refers to the formatted value itself.</td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * Join the elements using a natural language separator:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{items,list-sep-last:' and '}")
+ *     .with("items", new String[] { "apples", "bananas", "cherries" })
+ *     .format();
+ * // "apples, bananas and cherries"
+ * }</pre>
+ * <p>
+ * Show only the first elements and indicate that there are more:
+ * <pre>{@code
+ * messageSupport
+ *     .message("Failed ids: %{ids,list-max-size:3,list-value-more:'...'}")
+ *     .with("ids", new long[] { 101, 102, 103, 104, 105 })
+ *     .format();
+ * // "Failed ids: 101, 102, 103, ..."
+ * }</pre>
+ * <p>
+ * Format each element individually. Elements formatted as empty text are omitted, which allows for filtering:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{amounts,list-value:'%{value,number:\"#,##0.00\"}',list-sep:' | '}")
+ *     .with("amounts", new double[] { 1234.5, 0.25 })
+ *     .locale(Locale.US)
+ *     .format();
+ * // "1,234.50 | 0.25"
+ *
+ * messageSupport
+ *     .message("%{values,list-value:\"%{value,<0:''}\"}")
+ *     .with("values", new int[] { 3, -1, 7 })
+ *     .format();
+ * // "3, 7"
+ * }</pre>
+ * <p>
+ * Suppress duplicates and use the size of the array for selecting the wording:
+ * <pre>{@code
+ * messageSupport
+ *     .message("%{tags,format:size} tags: %{tags,list-unique:true}")
+ *     .with("tags", new String[] { "java", "kotlin", "java" })
+ *     .format();
+ * // "3 tags: java, kotlin"
+ *
+ * messageSupport
+ *     .message("%{tags,empty:'no tags',!empty:'tags: %{tags}'}")
+ *     .with("tags", new String[0])
+ *     .format();
+ * // "no tags"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

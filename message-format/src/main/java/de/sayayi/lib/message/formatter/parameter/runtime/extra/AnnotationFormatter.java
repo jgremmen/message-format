@@ -37,6 +37,54 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * If the configuration key is absent, empty, or refers to a non-existent element, formatting is delegated to the next
  * available formatter.
+ * <p>
+ * <b>Configuration keys:</b>
+ * <table border="1">
+ *   <caption>Configuration keys for the annotation formatter</caption>
+ *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
+ *   <tr>
+ *     <td>{@code annotation}</td>
+ *     <td>annotation element name</td>
+ *     <td>(none)</td>
+ *     <td>
+ *       Name of the annotation element whose value is formatted, using the formatter appropriate for its type. If
+ *       absent, empty or not an element of the annotation, formatting is delegated to the next formatter.
+ *     </td>
+ *   </tr>
+ * </table>
+ * <p>
+ * <b>Examples:</b>
+ * <p>
+ * This formatter is not part of the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService} and must be registered explicitly:
+ * <pre>{@code
+ * var formatterService = new DefaultFormatterService();
+ * formatterService.addFormatter(new AnnotationFormatter());
+ *
+ * var messageSupport = MessageSupportFactory.create(formatterService).seal();
+ * }</pre>
+ * <p>
+ * Format individual elements of an annotation:
+ * <pre>{@code
+ * var deprecated = LegacyApi.class.getAnnotation(Deprecated.class);
+ *
+ * messageSupport
+ *     .message("Deprecated since version %{a,annotation:since}")
+ *     .with("a", deprecated)
+ *     .format();
+ * // "Deprecated since version 2.1"
+ * }</pre>
+ * <p>
+ * Map keys and configuration keys apply to the value of the element:
+ * <pre>{@code
+ * var deprecated = LegacyApi.class.getAnnotation(Deprecated.class);
+ *
+ * messageSupport
+ *     .message("%{a,annotation:forRemoval,true:'will be removed',false:'will be kept'}")
+ *     .with("a", deprecated)
+ *     .format();
+ * // "will be removed"
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.12.0
