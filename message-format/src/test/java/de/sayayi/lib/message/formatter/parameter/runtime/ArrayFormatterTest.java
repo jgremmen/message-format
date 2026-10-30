@@ -45,7 +45,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link ArrayFormatter}: formattable types, primitive and object arrays, empty and {@code null} arrays and list
+ * separators.
+ *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 @DisplayName("Array formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

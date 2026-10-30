@@ -30,6 +30,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 /**
+ * Tests {@link MessageSupportMessageSource}: message lookup with and without a default message and resolution of
+ * {@code MessageSourceResolvable} instances, including their arguments.
+ *
  * @author Jeroen Gremmen
  * @since 0.9.2
  */

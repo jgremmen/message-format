@@ -29,6 +29,9 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 
 /**
+ * Tests {@link BitSetFormatter}: empty sets, full and partial map key matching, unique values, and the bit ordering and
+ * default bit configuration for lsb and msb.
+ *
  * @author Jeroen Gremmen
  * @since 0.21.1
  */

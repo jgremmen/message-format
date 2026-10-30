@@ -21,6 +21,9 @@ import de.sayayi.lib.message.annotation.TemplateDef;
 /**
  * Fixture class with an invalid template, used by {@code AnnotationAdopterTest}. It lives in its own package, so
  * scanning this package finds no other fixture that fails differently.
+ *
+ * @author Jeroen Gremmen
+ * @since 0.25.0
  */
 @TemplateDef(name = "invalid-template", text = "%{x,true false:1}")
 public final class InvalidTemplateFixture {

@@ -15,8 +15,9 @@
  */
 
 /**
- * Internal implementations of {@link de.sayayi.lib.message.part.MapKey MapKey} for the various key types: boolean,
- * number, string, null and empty.
+ * Internal implementations of {@link de.sayayi.lib.message.part.MapKey MapKey} for the various key types: boolean
+ * ({@link MapKeyBool}), number ({@link MapKeyNumber}), string ({@link MapKeyString}), null ({@link MapKeyNull}) and
+ * empty ({@link MapKeyEmpty}).
  *
  * @author Jeroen Gremmen
  * @since 0.5.0

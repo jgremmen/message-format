@@ -183,6 +183,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * Parameter containing the destination directory where the packed message file is stored.
    *
    * @return  destination directory parameter, never {@code null}
+   *
+   * @since 0.8.1
    */
   @Internal("tracked via packFile")  // part of task output
   public abstract DirectoryProperty getDestinationDir();

@@ -37,7 +37,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link PathFormatter}: formatting of files and paths, including the file extension.
+ *
  * @author Jeroen Gremmen
+ * @since 0.10.0
  */
 @DisplayName("File/Path formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

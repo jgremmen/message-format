@@ -35,7 +35,8 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 /**
  * Parameter formatter for {@link CollationKey} values.
  * <p>
- * This formatter renders the collation key using its source string obtained from {@link CollationKey#getSourceString()}.
+ * This formatter renders the collation key using its source string obtained from
+ * {@link CollationKey#getSourceString()}.
  * <p>
  * As a {@link SizeQueryable} formatter, it reports the length of the source string.
  *

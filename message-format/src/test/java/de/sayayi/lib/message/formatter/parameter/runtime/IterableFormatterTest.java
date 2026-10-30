@@ -32,7 +32,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link IterableFormatter}: formattable types, element formatting, empty and {@code null} collections,
+ * separators and size limits.
+ *
  * @author Jeroen Gremmen
+ * @since 0.6.0
  */
 @DisplayName("Iterable formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

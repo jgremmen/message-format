@@ -31,7 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link AtomicBooleanFormatter}: formattable types and formatting of the contained value.
+ *
  * @author Jeroen Gremmen
+ * @since 0.6.3
  */
 @DisplayName("AtomicBoolean formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

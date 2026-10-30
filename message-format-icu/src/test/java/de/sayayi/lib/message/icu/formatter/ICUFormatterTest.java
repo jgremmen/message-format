@@ -30,6 +30,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link ICUFormatter}: plural, select, select ordinal and choice patterns, number and date formats, and multiple
+ * parameters, including locale sensitive plural rules.
+ *
  * @author Jeroen Gremmen
  * @since 0.24.0
  */

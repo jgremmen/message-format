@@ -37,7 +37,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
+ * Tests {@link FormatterCache}: formatter lookup, separation of equally named classes from different class loaders, and
+ * that class loaders are not retained.
+ *
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 @DisplayName("Formatter cache")
 @TestMethodOrder(MethodOrderer.DisplayName.class)
@@ -128,9 +132,8 @@ final class FormatterCacheTest
   }
 
 
-
-
   @Test
+  @SuppressWarnings("BusyWait")
   @DisplayName("Cached types do not prevent their class loader from being unloaded")
   void lookupDoesNotRetainClassLoader() throws Exception
   {

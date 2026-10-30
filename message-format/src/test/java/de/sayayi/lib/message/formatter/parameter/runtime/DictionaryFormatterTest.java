@@ -35,6 +35,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
+ * Tests {@link DictionaryFormatter}: formattable types, and entry listing and key lookup for hash tables, properties
+ * and custom dictionaries.
+ *
  * @author Jeroen Gremmen
  * @since 0.21.0
  */

@@ -28,7 +28,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
- * Test class for {@link MessageUtil}.
+ * Tests {@link MessageUtil}: validation of kebab case and lower camel case names, trimming and collapsing of spaces,
+ * and quoting of text in format strings.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0

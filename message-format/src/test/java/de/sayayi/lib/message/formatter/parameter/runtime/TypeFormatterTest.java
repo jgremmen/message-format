@@ -29,7 +29,11 @@ import static org.junit.platform.commons.util.ReflectionUtils.findMethod;
 
 
 /**
+ * Tests {@link TypeFormatter}: textual representation of native, array, Java, project and nested classes as well as
+ * parameterized types, type variables, wildcards and generic arrays.
+ *
  * @author Jeroen Gremmen
+ * @since 0.6.0
  */
 @DisplayName("Type formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

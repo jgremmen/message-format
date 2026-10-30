@@ -121,6 +121,12 @@ public class MessageFormatException extends MessageException
   }
 
 
+  /**
+   * Constructs a new message format exception with the specified recorded context and cause.
+   *
+   * @param context  formatting context, innermost first, not {@code null}
+   * @param cause    the cause, or {@code null} if the cause is nonexistent or unknown
+   */
   private MessageFormatException(@NotNull @Unmodifiable List<Context> context, Throwable cause)
   {
     super(cause);
@@ -243,6 +249,8 @@ public class MessageFormatException extends MessageException
    * testing purposes only.
    *
    * @return  unmodifiable set of registered context key sequences, never {@code null}
+   *
+   * @since 0.25.0
    */
   @Contract(pure = true)
   static @NotNull @Unmodifiable Set<String> getContextKeys()
@@ -417,6 +425,13 @@ public class MessageFormatException extends MessageException
   }
 
 
+  /**
+   * Returns the value of the first recorded context of the given kind.
+   *
+   * @param kind  context kind, not {@code null}
+   *
+   * @return  context value, or {@code null} if no context of this kind has been recorded
+   */
   @Contract(pure = true)
   private Object get(@NotNull Kind kind)
   {
@@ -428,6 +443,13 @@ public class MessageFormatException extends MessageException
   }
 
 
+  /**
+   * Returns the value of the last recorded context of the given kind.
+   *
+   * @param kind  context kind, not {@code null}
+   *
+   * @return  context value, or {@code null} if no context of this kind has been recorded
+   */
   @Contract(pure = true)
   private Object getLast(@NotNull Kind kind)
   {
@@ -458,18 +480,38 @@ public class MessageFormatException extends MessageException
 
 
 
+  /**
+   * Kinds of formatting context that can be recorded for an exception.
+   *
+   * @since 0.25.0
+   */
   private enum Kind
   {
+    /** Name of the parameter being formatted. */
     PARAMETER("p"),
+
+    /** Name of the post formatter being applied. */
     POST_FORMATTER("pf"),
+
+    /** Name of the template being formatted. */
     TEMPLATE("t"),
+
+    /** Code of the message being formatted. */
     CODE("c"),
+
+    /** Locale used for formatting. */
     LOCALE("l");
 
 
+    /** Prefix of the context keys of this kind. */
     private final String prefix;
 
 
+    /**
+     * Constructs a context kind with the given context key prefix.
+     *
+     * @param prefix  context key prefix, not {@code null}
+     */
     Kind(@NotNull String prefix) {
       this.prefix = prefix;
     }
@@ -484,9 +526,17 @@ public class MessageFormatException extends MessageException
    * @param kind   context kind, not {@code null}
    * @param key    context key (e.g. {@code p1}), not {@code null}
    * @param value  context value ({@link String} or {@link Locale}), not {@code null}
+   *
+   * @since 0.25.0
    */
   private record Context(@NotNull Kind kind, @NotNull String key, @NotNull Object value) implements Serializable
   {
+    /**
+     * Returns the context value as it is shown in the detail message. Locales are shown by their display name in
+     * English, or as {@code ROOT} for the root locale.
+     *
+     * @return  context value as text, never {@code null}
+     */
     @Contract(pure = true)
     private @NotNull String valueAsString()
     {

@@ -29,7 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link ClipPostFormatter}: clipping by size with and without ellipsis, custom suffixes, and the handling of
+ * supplementary characters and grapheme clusters.
+ *
  * @author Jeroen Gremmen
+ * @since 0.20.0
  */
 @DisplayName("'clip' post-formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

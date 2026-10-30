@@ -45,6 +45,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
+ * Tests {@link MessageFormatPlugin}: pack task runs with no, plain and filtered sources, duplicate message handling and
+ * the packaged jar.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */

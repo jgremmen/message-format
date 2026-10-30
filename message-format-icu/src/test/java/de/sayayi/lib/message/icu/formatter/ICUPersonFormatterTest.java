@@ -27,6 +27,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link ICUPersonFormatter}: rendering of person names with configurable name part length, ordering and
+ * visibility, including prefixes, suffixes and missing names.
+ *
  * @author Jeroen Gremmen
  * @since 0.24.0
  */

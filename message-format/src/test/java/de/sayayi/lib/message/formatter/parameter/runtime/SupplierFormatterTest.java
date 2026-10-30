@@ -34,7 +34,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link SupplierFormatter}: formatting of values supplied as boolean and long.
+ *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 @DisplayName("Supplier formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

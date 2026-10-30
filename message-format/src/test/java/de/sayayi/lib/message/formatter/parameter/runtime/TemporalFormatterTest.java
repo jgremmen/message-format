@@ -34,7 +34,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link TemporalFormatter}: formattable types, date, time and date time values, custom patterns, explicit zones,
+ * partial temporals and invalid patterns.
+ *
  * @author Jeroen Gremmen
+ * @since 0.12.0
  */
 @DisplayName("Temporal formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

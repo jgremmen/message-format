@@ -34,6 +34,8 @@ import static org.mockito.Mockito.when;
 
 
 /**
+ * Tests {@link MessageParameters}: parameter value lookup and the {@code equals} and {@code hashCode} contract.
+ *
  * @author Jeroen Gremmen
  * @since 0.20.0
  */

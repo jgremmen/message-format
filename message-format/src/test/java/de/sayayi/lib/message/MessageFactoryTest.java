@@ -44,7 +44,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
+ * Tests {@link MessageFactory}: parsing of format strings and localized messages, syntax errors, and the behavior of
+ * the message cache (hits, eviction and thread safety).
+ *
  * @author Jeroen Gremmen
+ * @since 0.3.1
  */
 @DisplayName("MessageFactory")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

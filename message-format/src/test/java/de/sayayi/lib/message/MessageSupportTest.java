@@ -37,6 +37,9 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 
 /**
+ * Tests {@link MessageSupport}: formatting of messages, format suppliers, exception creation and post formatter locale
+ * handling.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */

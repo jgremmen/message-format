@@ -268,7 +268,7 @@ public final class MessageUtil
    *   <li> It must not be empty.
    *   <li> It must start with a lowercase letter.
    *   <li> It must not end with a hyphen ('-').
-   *   <li> It must not contain consecutive hyphens ('--').
+   *   <li> It must not contain consecutive hyphens ({@code --}).
    *   <li> It must only contain lowercase letters, digits and hyphens ('-').
    * </ul>
    *
@@ -345,7 +345,7 @@ public final class MessageUtil
    *   <li> It must not be empty.
    *   <li> It must start with a lowercase letter.
    *   <li> It must not end with a hyphen ('-').
-   *   <li> It must not contain consecutive hyphens ('--').
+   *   <li> It must not contain consecutive hyphens ({@code --}).
    *   <li> It must only contain lowercase letters, digits and hyphens ('-').
    * </ul>
    * <p>
@@ -698,6 +698,8 @@ public final class MessageUtil
    * @param templateConsumer  consumer invoked for each template found, or {@code null}
    *
    * @throws IOException  if an I/O error occurs or the pack stream is invalid
+   *
+   * @since 0.24.0
    */
   @Contract(mutates = "param2,io")
   public static void importMessages(@NotNull MessageFactory messageFactory,

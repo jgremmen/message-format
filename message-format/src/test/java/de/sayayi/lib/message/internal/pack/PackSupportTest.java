@@ -32,6 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link PackSupport}: encoding of variable length long values.
+ *
  * @author Jeroen Gremmen
  * @since 0.20.1
  */

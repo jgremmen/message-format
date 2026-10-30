@@ -18,8 +18,17 @@
  * Provides the internal builders that implement the public message building API.
  * <p>
  * {@link FluentMessageBuilder} assembles messages from text, parameter, post-formatter and template parts. The other
- * builders configure individual parts before they are added to a message. These classes are implementation details and
- * are not intended for direct application use.
+ * builders configure individual parts before they are added to a message:
+ * <ul>
+ *   <li>{@link TextBuilderImpl}, {@link ParameterBuilderImpl}, {@link PostFormatterBuilderImpl} and
+ *       {@link TemplateBuilderImpl} configure the corresponding message parts</li>
+ *   <li>{@link MapEqualityBuilderImpl}, {@link MapRelationalBuilderImpl} and {@link MapValueBuilderImpl} configure map
+ *       entries</li>
+ *   <li>{@link AbstractConfigurableBuilder} and {@link AbstractSpacedBuilder} provide the common configuration and
+ *       spacing methods</li>
+ * </ul>
+ * <p>
+ * These classes are implementation details and are not intended for direct application use.
  *
  * @see de.sayayi.lib.message.MessageBuilder
  *

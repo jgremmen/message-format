@@ -36,6 +36,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
+ * Tests {@link MessagePartConfig}: copying of the configuration map, sorted iteration of configuration names, and
+ * packing that does not depend on the source map order.
+ *
  * @author Jeroen Gremmen
  * @since 0.25.0
  */

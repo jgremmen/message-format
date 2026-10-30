@@ -82,6 +82,8 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    *
    * @param resourceBundle  resource bundle to adopt, not {@code null}
    *
+   * @since 0.11.0
+   *
    * @see #adopt(Collection)
    * @see #adopt(String)
    */

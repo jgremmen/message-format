@@ -34,7 +34,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link SizeFormatter}: formatting of value sizes, including values for which no size can be determined.
+ *
  * @author Jeroen Gremmen
+ * @since 0.6.3
  */
 @DisplayName("'size' formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

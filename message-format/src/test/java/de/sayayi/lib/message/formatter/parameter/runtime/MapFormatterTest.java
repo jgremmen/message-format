@@ -33,7 +33,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link MapFormatter}: formattable types, separators, {@code null} keys and values, empty maps, multiple entries
+ * and key formats.
+ *
  * @author Jeroen Gremmen
+ * @since 0.4.0
  */
 @DisplayName("Map formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

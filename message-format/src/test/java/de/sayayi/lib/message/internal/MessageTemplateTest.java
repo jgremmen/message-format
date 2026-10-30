@@ -31,6 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link MessageTemplate}: the string representation of plain and localized templates.
+ *
  * @author Jeroen Gremmen
  * @since 0.25.0
  */

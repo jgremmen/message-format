@@ -70,6 +70,8 @@ public sealed interface Message extends FormatStringSerializer
    * @return  formatted message without leading/trailing spaces, never {@code null}
    *
    * @throws MessageFormatException  in case a formatting error occurred
+   *
+   * @since 0.6.0
    */
   @Contract(pure = true)
   default @NotNull String format(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)

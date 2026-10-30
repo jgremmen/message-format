@@ -30,6 +30,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link de.sayayi.lib.message.template.Template Template}: use of a template that selects singular and plural
+ * text.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.3
  */

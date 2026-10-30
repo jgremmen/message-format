@@ -240,6 +240,8 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
     /**
      * Initializes the iterator by preparing the first text element. Must be called by subclass constructors after
      * all fields have been assigned.
+     *
+     * @since 0.22.0
      */
     protected void initIterator() {
       nextText = prepareNextText();

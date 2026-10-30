@@ -33,6 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link CharsetFormatter}: formattable types, display names, {@code null} values, and map matching of canonical
+ * names and aliases.
+ *
  * @author Jeroen Gremmen
  * @since 0.22.1
  */

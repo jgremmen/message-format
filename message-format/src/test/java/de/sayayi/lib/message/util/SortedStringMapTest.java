@@ -27,6 +27,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
+ * Tests {@link SortedStringMap}: construction and sealing, the {@link java.util.Map} operations and their views, and
+ * handling of {@code null} keys and values.
+ *
  * @author Jeroen Gremmen
  * @since 0.24.0
  */

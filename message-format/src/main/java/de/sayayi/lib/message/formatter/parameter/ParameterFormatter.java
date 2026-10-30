@@ -108,6 +108,8 @@ public interface ParameterFormatter
    * @param value    parameter value (can be {@code null})
    *
    * @return  formatted parameter value, never {@code null}
+   *
+   * @since 0.8.0
    */
   @Contract(pure = true)
   @NotNull Text format(@NotNull ParameterFormatterContext context, Object value);
@@ -410,6 +412,8 @@ public interface ParameterFormatter
      * Returns the comparison type for the current configuration key.
      *
      * @return  comparison type, never {@code null}
+     *
+     * @since 0.9.0
      */
     @Contract(pure = true)
     @NotNull CompareType getCompareType();
@@ -419,6 +423,8 @@ public interface ParameterFormatter
      * Returns the configuration key type.
      *
      * @return  configuration key type, never {@code null}
+     *
+     * @since 0.9.0
      */
     @Contract(pure = true)
     @NotNull MapKey.Type getKeyType();
@@ -430,6 +436,8 @@ public interface ParameterFormatter
      * @return  boolean key value
      *
      * @throws ClassCastException  if the configuration key is not a bool type
+     *
+     * @since 0.9.0
      */
     @Contract(pure = true)
     boolean getBoolKeyValue();
@@ -441,6 +449,8 @@ public interface ParameterFormatter
      * @return  number key value
      *
      * @throws ClassCastException  if the configuration key is not a number type
+     *
+     * @since 0.9.0
      */
     @Contract(pure = true)
     long getNumberKeyValue();
@@ -452,6 +462,8 @@ public interface ParameterFormatter
      * @return  string key value, never {@code null}
      *
      * @throws ClassCastException  if the configuration key is not a string type
+     *
+     * @since 0.9.0
      */
     @Contract(pure = true)
     @NotNull String getStringKeyValue();
@@ -472,6 +484,8 @@ public interface ParameterFormatter
      * @param value  value to match, or {@code null}
      *
      * @return  match result, never {@code null}
+     *
+     * @since 0.9.0
      */
     @Contract(pure = true)
     @NotNull MatchResult matchForObject(Object value);

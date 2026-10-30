@@ -32,6 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
+ * Tests {@link Log4jMessageFactory}: creation of log messages with parameters and throwables, and the selection between
+ * message format and Log4j placeholder styles.
+ *
  * @author Jeroen Gremmen
  * @since 0.21.0
  */

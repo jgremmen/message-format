@@ -196,6 +196,8 @@ public class MessageFactory
    * @return  message instance, never {@code null}
    *
    * @throws MessageParserException  in case the message could not be parsed
+   *
+   * @since 0.8.0
    */
   @Contract(pure = true)
   public @NotNull Message.WithSpaces parseMessage(@NotNull @Language("MessageFormat") String text)
@@ -325,6 +327,8 @@ public class MessageFactory
    * @return  template instance, never {@code null}
    *
    * @throws MessageParserException  in case the template could not be parsed
+   *
+   * @since 0.8.0
    */
   @Contract(value = "_ -> new", pure = true)
   public @NotNull Template parseTemplate(@NotNull @Language("MessageFormat") String text) {
@@ -447,6 +451,8 @@ public class MessageFactory
    *
    * @return  {@code true} if the given code is a generated message or template code,
    *          {@code false} otherwise
+   *
+   * @since 0.8.0
    */
   @Contract(pure = true)
   public static boolean isGeneratedCode(String code) {

@@ -496,6 +496,8 @@ public final class PackSupport
    * @return  unpacked typed value, never {@code null}
    *
    * @throws IOException  if an I/O error occurs during unpacking
+   *
+   * @since 0.21.0
    */
   @Contract(mutates = "param1,io")
   public @NotNull TypedValue<?> unpackTypedValue(@NotNull PackInputStream packStream) throws IOException
@@ -523,6 +525,8 @@ public final class PackSupport
    * @param packStream   output stream to write to, not {@code null}
    *
    * @throws IOException  if an I/O error occurs during packing
+   *
+   * @since 0.20.1
    *
    * @see #unpackLongVar(PackInputStream)
    */
@@ -601,6 +605,8 @@ public final class PackSupport
    * @return  the unpacked long value
    *
    * @throws IOException  if an I/O error occurs during unpacking
+   *
+   * @since 0.20.1
    *
    * @see #packLongVar(long, PackOutputStream)
    */

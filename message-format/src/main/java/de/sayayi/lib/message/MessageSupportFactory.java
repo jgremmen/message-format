@@ -96,6 +96,8 @@ public final class MessageSupportFactory
    * @param messageFactory    message factory, not {@code null}
    *
    * @return  new configurable message support instance, never {@code null}
+   *
+   * @since 0.22.0
    */
   @Contract(value = "_, _ -> new")
   public static @NotNull ConfigurableMessageSupport create(@NotNull FormatterService formatterService,

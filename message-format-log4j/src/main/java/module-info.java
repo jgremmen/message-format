@@ -20,7 +20,7 @@
  * Provides {@link de.sayayi.lib.message.log4j.Log4jMessageFactory Log4jMessageFactory}, a Log4j
  * {@link org.apache.logging.log4j.message.MessageFactory MessageFactory} that uses the message-format syntax for
  * formatting log messages. Parameters passed to log methods are available as {@code p1}, {@code p2}, etc. in the
- * message format.
+ * message format. The factory is located in the exported package {@code de.sayayi.lib.message.log4j}.
  * <p>
  * Example usage:
  * <pre>{@code

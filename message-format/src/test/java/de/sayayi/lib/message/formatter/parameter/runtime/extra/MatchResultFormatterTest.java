@@ -27,7 +27,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link MatchResultFormatter}: formattable types and formatting of match results, including access by group
+ * number and group name.
+ *
  * @author Jeroen Gremmen
+ * @since 0.21.0
  */
 @DisplayName("Matcher formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

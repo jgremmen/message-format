@@ -31,7 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link MethodFormatter}: formattable types and formatting of reflected methods.
+ *
  * @author Jeroen Gremmen
+ * @since 0.5.0
  */
 @DisplayName("Method formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)
@@ -58,6 +61,7 @@ final class MethodFormatterTest extends AbstractFormatterTest
   }
 
 
+  @SuppressWarnings("ProtectedMemberInFinalClass")
   protected static Set<String> dummy() {
     return null;
   }

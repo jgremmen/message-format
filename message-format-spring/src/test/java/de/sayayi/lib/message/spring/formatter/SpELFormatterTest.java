@@ -29,12 +29,13 @@ import org.springframework.expression.spel.SpelEvaluationException;
 
 import java.util.TreeMap;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
+ * Tests {@link SpELFormatter}: evaluation of Spring expressions on parameter values and read only access to the
+ * evaluated data.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.3
  */

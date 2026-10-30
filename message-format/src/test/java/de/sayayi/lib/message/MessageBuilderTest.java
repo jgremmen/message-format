@@ -34,6 +34,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
+ * Tests {@link MessageBuilder}: programmatic construction of messages from text, parameter and map parts, including
+ * merging of consecutive text parts and handling of invalid arguments.
+ *
  * @author Jeroen Gremmen
  * @since 0.23.0
  */

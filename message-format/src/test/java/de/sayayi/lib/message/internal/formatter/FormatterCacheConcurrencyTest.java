@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
- * Concurrency tests for {@link FormatterCache}.
+ * Tests the concurrency behavior of {@link FormatterCache}: formatters must not be built while its lock is held.
  *
  * @author Jeroen Gremmen
  * @since 0.24.0

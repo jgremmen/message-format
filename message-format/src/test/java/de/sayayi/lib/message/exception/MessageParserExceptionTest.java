@@ -39,6 +39,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
+ * Tests {@link MessageParserException}: detail messages for parse failures, including generated message codes and
+ * template names.
+ *
  * @author Jeroen Gremmen
  * @since 0.9.1
  */

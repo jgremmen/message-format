@@ -40,7 +40,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link BoolFormatter}: formattable types, formatting of boolean and convertible values, named use and map key
+ * matching for null, empty, boolean and string keys.
+ *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 @DisplayName("'bool' formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

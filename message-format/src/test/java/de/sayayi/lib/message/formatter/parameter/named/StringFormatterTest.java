@@ -31,7 +31,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link StringFormatter}: formattable types, formatting with and without maps, map key matching and the use of
+ * {@code toString()}.
+ *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 @DisplayName("'string' formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

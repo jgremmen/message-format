@@ -29,7 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link FieldFormatter}: formattable types and formatting of reflected fields.
+ *
  * @author Jeroen Gremmen
+ * @since 0.6.0
  */
 @DisplayName("Field formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

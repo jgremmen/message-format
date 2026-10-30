@@ -43,13 +43,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
- * Message compiler test cases.
+ * Tests {@link MessageCompiler}: compilation of text, parameters, configuration values, map keys and post formatters
+ * into message parts.
  *
  * @author Jeroen Gremmen
  * @since 0.20.0
  */
 @DisplayName("Message compiler")
 @TestMethodOrder(MethodOrderer.DisplayName.class)
+@SuppressWarnings("UnnecessaryUnicodeEscape")
 final class MessageCompilerTest
 {
   private static MessageCompiler COMPILER;

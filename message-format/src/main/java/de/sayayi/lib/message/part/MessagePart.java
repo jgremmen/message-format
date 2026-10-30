@@ -48,6 +48,8 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
    * @param parameters       formatting parameters, not {@code null}
    *
    * @return  formatted text, never {@code null}
+   *
+   * @since 0.6.0
    */
   @Contract(pure = true)
   @NotNull Text getText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters);
@@ -121,6 +123,8 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
      * text is {@code null} an empty string is returned.
      *
      * @return  text, never {@code null}
+     *
+     * @since 0.8.0
      */
     @Contract(pure = true)
     @NotNull String getTextWithSpaces();
@@ -192,6 +196,8 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
      * Returns the configuration settings for this parameter.
      *
      * @return  parameter configuration, never {@code null}
+     *
+     * @since 0.21.0
      */
     @Contract(pure = true)
     @NotNull MessagePart.Config getConfig();
@@ -201,6 +207,8 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
      * Returns the map for this parameter.
      *
      * @return  parameter map, never {@code null}
+     *
+     * @since 0.21.0
      */
     @Contract(pure = true)
     @NotNull MessagePart.Map getMap();

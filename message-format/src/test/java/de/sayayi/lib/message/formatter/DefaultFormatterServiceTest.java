@@ -35,6 +35,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
+ * Tests {@link DefaultFormatterService}: discovery of formatters through the default class loader and through an
+ * isolated class loader.
+ *
  * @author Jeroen Gremmen
  * @since 0.25.0
  */

@@ -24,6 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 
 /**
+ * Tests {@link AbstractAntlr4Parser} using a simple calculator grammar: syntax errors for invalid and incomplete input,
+ * and errors raised while evaluating the parse tree.
+ *
  * @author Jeroen Gremmen
  * @since 0.24.0
  */

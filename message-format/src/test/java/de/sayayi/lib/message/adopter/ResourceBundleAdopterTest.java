@@ -33,6 +33,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
+ * Tests {@link ResourceBundleAdopter}: adoption of messages and templates from resource bundles, by bundle or base
+ * name, for requested and available locales, including missing locale handling.
+ *
  * @author Jeroen Gremmen
  * @since 0.25.0
  */

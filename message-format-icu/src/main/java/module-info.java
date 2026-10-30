@@ -32,7 +32,8 @@
  *   </li>
  * </ul>
  * <p>
- * Both formatters are listed in a {@code META-INF/services} file, so they are registered automatically by the
+ * Both formatters are located in the exported package {@code de.sayayi.lib.message.icu.formatter}. They are listed in
+ * a {@code META-INF/services} file, so they are registered automatically by the
  * {@link de.sayayi.lib.message.formatter.DefaultFormatterService DefaultFormatterService} when this module is on the
  * class path. On the module path, they must be registered explicitly.
  *

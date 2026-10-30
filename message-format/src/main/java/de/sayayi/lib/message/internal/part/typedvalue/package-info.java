@@ -15,8 +15,9 @@
  */
 
 /**
- * Internal implementations of {@link de.sayayi.lib.message.part.TypedValue TypedValue} for the
- * various value types: string, number, boolean and message.
+ * Internal implementations of {@link de.sayayi.lib.message.part.TypedValue TypedValue} for the various value types:
+ * string ({@link TypedValueString}), number ({@link TypedValueNumber}), boolean ({@link TypedValueBool}) and message
+ * ({@link TypedValueMessage}).
  *
  * @author Jeroen Gremmen
  * @since 0.5.0

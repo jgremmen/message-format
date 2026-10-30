@@ -31,6 +31,9 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 
 /**
+ * Tests {@link BitmaskFormatter}: bit order (lsb and msb first) for all integral types and
+ * {@link java.math.BigInteger}, including negative values and high bits.
+ *
  * @author Jeroen Gremmen
  * @since 0.21.1
  */

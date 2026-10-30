@@ -162,6 +162,8 @@ public interface MessageSupport
    * @throws IOException  if an I/O error occurs or if the pack would contain more than 65535 messages or more
    *                      than 65535 templates
    *
+   * @since 0.24.0
+   *
    * @see ConfigurableMessageSupport#importMessages(InputStream)
    */
   default void exportMessages(@NotNull OutputStream stream) throws IOException {
@@ -255,6 +257,8 @@ public interface MessageSupport
      * instead.
      *
      * @return  parameter map, never {@code null}
+     *
+     * @since 0.11.0
      */
     @Contract(pure = true)
     @NotNull Map<String,Object> getParameters();
@@ -681,6 +685,8 @@ public interface MessageSupport
      * @param value  default value
      *
      * @return  configurable message support instance, never {@code null}
+     *
+     * @since 0.21.0
      */
     @Contract(value = "_, _ -> this", mutates = "this")
     @NotNull ConfigurableMessageSupport setDefaultConfig(@NotNull String name, boolean value);
@@ -941,6 +947,8 @@ public interface MessageSupport
      *
      * @return  prioritized list of formatters for the given {@code type} and {@code config}, never {@code null}
      *          and never empty
+     *
+     * @since 0.21.0
      */
     @Contract(value = "_, _ -> new", pure = true)
     default @NotNull ParameterFormatter[] getFormatters(@NotNull Class<?> type, MessagePart.Config config) {
@@ -987,6 +995,8 @@ public interface MessageSupport
      *
      * @return  default configuration value, or {@code null} if no default configuration has been set for parameter
      *          {@code name}
+     *
+     * @since 0.21.0
      *
      * @see ConfigurableMessageSupport#setDefaultConfig(String, boolean)
      * @see ConfigurableMessageSupport#setDefaultConfig(String, long)
@@ -1201,6 +1211,8 @@ public interface MessageSupport
      * @param message  formatted message, not {@code null}
      *
      * @return  exception instance, never {@code null}
+     *
+     * @since 0.8.3
      */
     @NotNull X construct(@NotNull String message);
   }

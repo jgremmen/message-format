@@ -16,7 +16,8 @@
 
 /**
  * Spring Framework integration for the message format library, providing a
- * {@link org.springframework.context.MessageSource MessageSource} implementation backed by
+ * {@link org.springframework.context.MessageSource MessageSource} implementation
+ * ({@link de.sayayi.lib.message.spring.MessageSupportMessageSource MessageSupportMessageSource}) backed by
  * {@link de.sayayi.lib.message.MessageSupport MessageSupport}.
  *
  * @author Jeroen Gremmen

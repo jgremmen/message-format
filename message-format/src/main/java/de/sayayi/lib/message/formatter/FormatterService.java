@@ -67,6 +67,8 @@ public sealed interface FormatterService permits FormatterService.WithRegistry, 
    *
    * @return  array of prioritized parameter formatters, never {@code null} and never empty
    *
+   * @since 0.21.0
+   *
    * @see GenericFormatterService
    */
   @Contract(value = "_, _, _ -> new", pure = true)

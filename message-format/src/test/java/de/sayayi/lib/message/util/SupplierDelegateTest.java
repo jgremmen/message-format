@@ -37,7 +37,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
+ * Tests {@link SupplierDelegate}: caching of values including {@code null}, retry after exceptions, concurrent calls
+ * and recursive initialization.
+ *
  * @author Jeroen Gremmen
+ * @since 0.25.0
  */
 @DisplayName("Supplier delegate")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

@@ -50,7 +50,6 @@ import static java.util.stream.Collectors.joining;
  * parameter values can fall back to configured defaults.
  *
  * @author Jeroen Gremmen
- *
  * @since 0.8.0
  */
 @ApiStatus.Internal
@@ -266,6 +265,8 @@ public final class TemplatePart implements MessagePart.Template
    * @return  unpacked template part, never {@code null}
    *
    * @throws IOException  if an I/O error occurs
+   *
+   * @since 0.8.3
    */
   public static @NotNull Template unpack(@NotNull PackSupport unpack, @NotNull PackInputStream packStream)
       throws IOException

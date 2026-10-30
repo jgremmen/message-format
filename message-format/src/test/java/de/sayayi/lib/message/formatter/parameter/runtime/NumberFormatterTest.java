@@ -32,6 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link NumberFormatter}: formattable types, decimal formats and non finite values matched against numeric and
+ * non numeric string keys.
+ *
  * @author Jeroen Gremmen
  * @since 0.9.1
  */

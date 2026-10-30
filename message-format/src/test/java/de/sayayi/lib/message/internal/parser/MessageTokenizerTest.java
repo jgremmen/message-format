@@ -28,7 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests the message format lexer: tokenization of input in its default mode.
+ *
  * @author Jeroen Gremmen
+ * @since 0.4.0
  */
 @DisplayName("Message format lexer")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

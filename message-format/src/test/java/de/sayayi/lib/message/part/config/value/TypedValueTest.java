@@ -30,7 +30,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 /**
+ * Tests {@link de.sayayi.lib.message.part.TypedValue TypedValue} implementations for boolean, number, string and
+ * message values.
+ *
  * @author Jeroen Gremmen
+ * @since 0.21.0
  */
 class TypedValueTest
 {

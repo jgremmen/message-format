@@ -69,6 +69,14 @@ record OrderedMapKey(int order, @NotNull MapKey mapKey)
     }
 
 
+    /**
+     * Returns the sort priority of the given map key. Keys are ordered {@code =null}, {@code =empty}, boolean, number,
+     * string, {@code !empty} and {@code !null}, followed by all other keys.
+     *
+     * @param mapKey  map key, not {@code null}
+     *
+     * @return  sort priority, lower values sort first
+     */
     @Contract(pure = true)
     private static int configKeyToOrder(@NotNull MapKey mapKey)
     {

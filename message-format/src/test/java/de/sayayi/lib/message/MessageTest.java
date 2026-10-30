@@ -26,7 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link Message}: parsing of single and multi locale messages, compare types in map keys and empty messages.
+ *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public class MessageTest
 {

@@ -32,7 +32,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link BooleanSupplierFormatter}: formattable types and formatting of the supplied value.
+ *
  * @author Jeroen Gremmen
+ * @since 0.6.3
  */
 @DisplayName("BooleanSupplier formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

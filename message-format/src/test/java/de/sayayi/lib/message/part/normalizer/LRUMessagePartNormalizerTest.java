@@ -38,7 +38,11 @@ import static org.junit.platform.commons.util.ReflectionUtils.tryToReadFieldValu
 
 
 /**
+ * Tests {@link LRUMessagePartNormalizer}: normalization with and without eviction, instance reuse, caching and
+ * concurrent use.
+ *
  * @author Jeroen Gremmen
+ * @since 0.6.0
  */
 @DisplayName("LRU message part normalizer")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

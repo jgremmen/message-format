@@ -35,7 +35,11 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 
 /**
+ * Base class for parameter formatter tests. It provides helpers for asserting the formatter selected for a type,
+ * formatting values into message parts and creating formatter services.
+ *
  * @author Jeroen Gremmen
+ * @since 0.1.0
  */
 public abstract class AbstractFormatterTest
 {

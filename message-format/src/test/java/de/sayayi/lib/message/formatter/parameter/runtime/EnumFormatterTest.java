@@ -33,7 +33,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link EnumFormatter}: formattable types, formatting of enum constants and map matching with and without a
+ * default.
+ *
  * @author Jeroen Gremmen
+ * @since 0.6.3
  */
 @DisplayName("Enum formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

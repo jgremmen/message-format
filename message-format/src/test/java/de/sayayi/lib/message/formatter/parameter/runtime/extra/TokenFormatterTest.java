@@ -34,6 +34,9 @@ import static org.mockito.Mockito.when;
 
 
 /**
+ * Tests {@link TokenFormatter}: formattable type, formatting of token text, type, channel, line, column and position,
+ * custom position formats, adjusted values and invalid configuration.
+ *
  * @author Jeroen Gremmen
  * @since 0.24.0
  */

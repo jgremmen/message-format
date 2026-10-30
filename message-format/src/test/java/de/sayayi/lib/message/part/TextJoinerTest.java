@@ -26,7 +26,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
+ * Tests {@link TextJoiner}: joining of strings, texts and characters, with the handling of spaces, {@code null} values
+ * and empty text.
+ *
  * @author Jeroen Gremmen
+ * @since 0.8.0
  */
 @DisplayName("Text joiner")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

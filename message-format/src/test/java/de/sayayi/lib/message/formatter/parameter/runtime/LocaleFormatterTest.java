@@ -35,6 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link LocaleFormatter}: formattable types and formatting of the country, language and name of a locale.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */

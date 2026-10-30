@@ -54,6 +54,9 @@ import static org.mockito.Mockito.when;
 
 
 /**
+ * Tests {@link MessageFormatException}: creation of the detail message from every combination of recorded context, and
+ * preservation of the stack trace when adding context.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
@@ -639,7 +642,7 @@ final class MessageFormatExceptionTest
   @DisplayName("format: context key sequence")
   @ParameterizedTest(name = "sequence: {0}")
   @MethodSource("producibleContextKeys")
-  @SuppressWarnings("LanguageMismatch")
+  @SuppressWarnings({"LanguageMismatch", "DataFlowIssue"})
   void testContextKeySequence(@NotNull String sequence)
   {
     val messageFactory = MESSAGE_SUPPORT.getMessageAccessor().getMessageFactory();

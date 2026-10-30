@@ -36,7 +36,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
+ * Tests {@link GeoFormatter}: splitting into degrees, minutes and seconds, formatting of coordinates, parsing of format
+ * strings, and handling of non finite values and invalid patterns.
+ *
  * @author Jeroen Gremmen
+ * @since 0.3.1
  */
 @DisplayName("'geo' formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

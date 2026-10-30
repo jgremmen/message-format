@@ -34,7 +34,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
+ * Tests {@link LongSupplierFormatter}: formattable types and formatting of the supplied value.
+ *
  * @author Jeroen Gremmen
+ * @since 0.6.3
  */
 @DisplayName("LongSupplier formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

@@ -114,6 +114,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    * @return  compiled message, never {@code null}
    *
    * @throws MessageParserException  in case the message could not be parsed
+   *
+   * @since 0.8.0
    */
   @Contract(pure = true)
   public @NotNull Message.WithSpaces compileMessage(@NotNull @Language("MessageFormat") String text) {

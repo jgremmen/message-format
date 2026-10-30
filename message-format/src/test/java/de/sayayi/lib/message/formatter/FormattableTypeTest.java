@@ -28,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
+ * Tests {@link FormattableType}: construction and the ordering of formattable types.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */

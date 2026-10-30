@@ -37,7 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
- * Test class for {@link ParameterValueHelper}.
+ * Tests {@link ParameterValueHelper}: conversion of parameter values to target types, including {@code null}, missing,
+ * overflowing and optional wrapped values.
  *
  * @author Jeroen Gremmen
  * @since 0.24.0

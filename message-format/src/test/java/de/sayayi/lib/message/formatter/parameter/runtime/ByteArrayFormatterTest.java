@@ -38,6 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 
 /**
+ * Tests {@link ByteArrayFormatter}: formattable types, charset and base64 encoding, empty arrays, illegal charsets,
+ * delegation and size queries.
+ *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
