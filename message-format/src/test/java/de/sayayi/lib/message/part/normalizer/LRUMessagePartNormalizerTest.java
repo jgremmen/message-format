@@ -20,11 +20,19 @@ import de.sayayi.lib.message.internal.message.CompoundMessage;
 import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.ArrayList;
+import java.util.concurrent.*;
+import java.util.function.IntConsumer;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.platform.commons.util.ReflectionUtils.tryToReadFieldValue;
 
@@ -34,6 +42,7 @@ import static org.junit.platform.commons.util.ReflectionUtils.tryToReadFieldValu
  */
 @DisplayName("LRU message part normalizer")
 @TestMethodOrder(MethodOrderer.DisplayName.class)
+@SuppressWarnings("SameParameterValue")
 final class LRUMessagePartNormalizerTest
 {
   @Test
@@ -117,5 +126,91 @@ final class LRUMessagePartNormalizerTest
 
     assertSame(parts[0], parts[4]);
     assertSame(parts[3], parts[5]);
+  }
+
+
+  @ParameterizedTest(name = "max size {0}")
+  @DisplayName("concurrent normalization of overlapping parts without eviction")
+  @ValueSource(ints = { 16, 200 })
+  void testConcurrentNoEviction(int maxSize) throws Exception
+  {
+    val cache = LRUMessagePartNormalizer.create(maxSize);
+    val normalized = new ConcurrentHashMap<String,MessagePart>();
+
+    // all threads normalize the same maxSize values, each starting at a different offset
+    runConcurrently(8, thread -> {
+      for(var n = 0; n < 50 * maxSize; n++)
+      {
+        val text = "mp" + ((thread * 7 + n) % maxSize);
+        val part = cache.normalize(new TextPart(text));
+
+        assertEquals(text, part.getText());
+        assertSame(normalized.computeIfAbsent(text, t -> part), part);
+      }
+    });
+
+    assertEquals(maxSize, normalized.size());
+
+    for(val entry: normalized.entrySet())
+      assertSame(entry.getValue(), cache.normalize(new TextPart(entry.getKey())));
+  }
+
+
+  @ParameterizedTest(name = "max size {0}")
+  @DisplayName("concurrent normalization with eviction keeps the cache bounded and consistent")
+  @ValueSource(ints = { 16, 200 })
+  void testConcurrentWithEviction(int maxSize) throws Exception
+  {
+    val cache = LRUMessagePartNormalizer.create(maxSize);
+
+    runConcurrently(8, thread -> {
+      val random = ThreadLocalRandom.current();
+
+      for(var n = 0; n < 50 * maxSize; n++)
+      {
+        val text = "mp" + random.nextInt(4 * maxSize);
+        assertEquals(text, cache.normalize(new TextPart(text)).getText());
+      }
+    });
+
+    // fill the cache with maxSize new parts, which must all be retained
+    val parts = new TextPart[maxSize];
+    for(var n = 0; n < maxSize; n++)
+      assertSame(parts[n] = new TextPart("new" + n), cache.normalize(parts[n]));
+
+    for(var n = 0; n < maxSize; n++)
+      assertSame(parts[n], cache.normalize(new TextPart("new" + n)));
+
+    // one more part exceeds the bound and evicts the least recently used part
+    cache.normalize(new TextPart("extra"));
+
+    assertNotSame(parts[0], cache.normalize(new TextPart("new0")));
+    assertSame(parts[maxSize - 1], cache.normalize(new TextPart("new" + (maxSize - 1))));
+  }
+
+
+  private static void runConcurrently(int threads, @NotNull IntConsumer task) throws Exception
+  {
+    val start = new CountDownLatch(1);
+    val tasks = new ArrayList<Callable<Void>>();
+
+    for(var t = 0; t < threads; t++)
+    {
+      val thread = t;
+
+      tasks.add(() -> {
+        start.await();
+        task.accept(thread);
+        return null;
+      });
+    }
+
+    try(val executor = Executors.newFixedThreadPool(threads)) {
+      val futures = tasks.stream().map(executor::submit).toList();
+      start.countDown();
+
+      for(val future: futures)
+        future.get(30, SECONDS);
+    }
   }
 }
