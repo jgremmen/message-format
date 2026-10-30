@@ -51,6 +51,7 @@ final class MessageSupportMessageSourceTest
         "hello%{p1,!empty:' %{p1}',empty:'!'}");
     messageSupport.addMessage("spring.message.3",
         "0=%{p0} 1=%{p1} 2=%{p2} 3=%{p3}");
+    messageSupport.addMessage("spring.field.name", "user name");
 
     messageSource = new MessageSupportMessageSource(messageSupport);
   }
@@ -99,5 +100,21 @@ final class MessageSupportMessageSourceTest
             new String[] { "spring.message.12", "spring.message.11" },
             new Object[] { "jack" },
             "Default text"), ENGLISH));
+  }
+
+
+  @Test
+  @DisplayName("getMessage with resolvable arguments")
+  void testGetMessageWithResolvableArguments()
+  {
+    assertEquals("hello user name", messageSource.getMessage("spring.message.2",
+        new Object[] { new DefaultMessageSourceResolvable("spring.field.name") }, ENGLISH));
+
+    // p2 is not used by the message, so the unresolvable argument is never resolved
+    assertEquals("hello jack", messageSource.getMessage("spring.message.2",
+        new Object[] { "jack", new DefaultMessageSourceResolvable("spring.no-field") }, ENGLISH));
+
+    assertThrows(NoSuchMessageException.class, () -> messageSource.getMessage("spring.message.2",
+        new Object[] { new DefaultMessageSourceResolvable("spring.no-field") }, ENGLISH));
   }
 }

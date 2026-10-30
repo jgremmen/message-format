@@ -18,6 +18,8 @@ package de.sayayi.lib.message.spring;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessageConfigurer;
+import de.sayayi.lib.message.exception.MessageFormatException;
+import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.HierarchicalMessageSource;
 import org.springframework.context.MessageSource;
@@ -171,7 +173,9 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
 
   /**
    * Resolves and formats a message for the given {@code code} and {@code locale}. The supplied {@code args} are mapped
-   * to positional parameters using the configured parameter prefix. If the code is unknown to the backing
+   * to positional parameters using the configured parameter prefix. Arguments that are a
+   * {@link MessageSourceResolvable} are resolved with this message source, like Spring's {@code AbstractMessageSource}
+   * does. They are resolved lazily, only if the message uses the parameter. If the code is unknown to the backing
    * {@link MessageSupport}, the parent message source is consulted.
    *
    * @param code    message code to look up, not {@code null}
@@ -199,11 +203,26 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
 
     if (args != null)
       for(var n = 0; n < args.length; n++)
-        msg.with(parameterPrefix + (n + 1), args[n]);
+      {
+        var arg = args[n];
+        if (arg instanceof MessageSourceResolvable resolvable)
+          arg = SupplierDelegate.of(() -> getMessage(resolvable, locale));
 
-    return msg
-        .locale(locale)
-        .format();
+        msg.with(parameterPrefix + (n + 1), arg);
+      }
+
+    try {
+      return msg
+          .locale(locale)
+          .format();
+    } catch(MessageFormatException ex) {
+      // a lazily resolved argument that cannot be resolved must fail like it does in Spring's AbstractMessageSource
+      for(Throwable cause = ex.getCause(); cause != null; cause = cause.getCause())
+        if (cause instanceof NoSuchMessageException noSuchMessageException)
+          throw noSuchMessageException;
+
+      throw ex;
+    }
   }
 
 
