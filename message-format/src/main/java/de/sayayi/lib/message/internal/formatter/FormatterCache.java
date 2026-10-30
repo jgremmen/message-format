@@ -27,6 +27,7 @@ import java.util.function.Function;
 
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.fill;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -35,10 +36,15 @@ import static java.util.Arrays.fill;
  * The cache prioritizes frequently used value types and evicts entries using an approximate (recency-based)
  * least-recently-used policy as soon as the cache size is exhausted.
  * <p>
+ * Cached types are identified by their class name and a unique type id; the cache keeps no reference to the
+ * {@code Class} objects themselves. A cached type, and the class loader that loaded it, can therefore be unloaded
+ * (e.g. after redeploying an application while this library is loaded by a parent class loader). The cache entry of an
+ * unloaded type is never matched again and is eventually evicted.
+ * <p>
  * <b>Thread safety:</b> this class is thread-safe. Structural mutation is protected by a lock, builder functions run
  * outside the lock so that cache misses do not block other threads, and a modification-count check guards against
- * corruption from re-entrant access. Note that it is not single-flight: concurrent cache misses for the same type
- * may each independently build a formatter list.
+ * corruption from re-entrant access. Note that it is not single-flight: concurrent cache misses for the same type may
+ * each independently build a formatter list.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -50,8 +56,9 @@ public final class FormatterCache
   private static final AtomicLong TYPE_ID_SEQUENCE = new AtomicLong();
 
   /**
-   * Unique id per type, used to order different types with the same class name (e.g. loaded by different class
-   * loaders). {@code ClassValue} guarantees a single id per type and does not prevent the type from being unloaded.
+   * Unique id per type, used to distinguish different types with the same class name (e.g. loaded by different class
+   * loaders). {@code ClassValue} guarantees a single id per type and does not prevent the type from being unloaded. Ids
+   * start at 1 and are never reused, so the id of an unloaded type is never matched again.
    */
   private static final ClassValue<Long> TYPE_ID = new ClassValue<>() {
     @Override
@@ -66,21 +73,20 @@ public final class FormatterCache
   /** Maximum number of cached types. */
   private final int capacity;
 
-  /**
-   * Types and their list nodes, sorted by type for binary search: index {@code 2n} holds the type and index
-   * {@code 2n + 1} the associated {@link Node}.
-   */
-  private final Object[] typeFormatters;  // 2 * n = type, 2 * n + 1 = node
+  /** List nodes of the cached types, sorted by type name and type id for binary search. */
+  private final TypeFormatterNode[] typeFormatterNodes;
 
   /** Number of cached types. */
   private int typeCount;
+
   /** Modification counter, incremented on each structural change. */
   private int modCount;
 
   /** Most recently promoted node, or {@code null} if the cache is empty. */
-  private Node head;
+  private TypeFormatterNode head;
+
   /** Least recently promoted node, which is evicted first, or {@code null} if the cache is empty. */
-  private Node tail;
+  private TypeFormatterNode tail;
 
 
   /**
@@ -91,7 +97,7 @@ public final class FormatterCache
   public FormatterCache(int n)
   {
     capacity = Math.max(n, 8);
-    typeFormatters = new Object[capacity * 2];
+    typeFormatterNodes = new TypeFormatterNode[capacity];
 
     clear();
   }
@@ -104,7 +110,7 @@ public final class FormatterCache
   {
     lock.lock();
     try {
-      fill(typeFormatters, null);
+      fill(typeFormatterNodes, null);
 
       head = null;
       tail = null;
@@ -121,9 +127,9 @@ public final class FormatterCache
    * Looks up the parameter formatters for the given {@code type}. If the type is not yet cached, the
    * {@code buildFormatters} function is invoked to create the formatter list and the result is added to the cache.
    * <p>
-   * The {@code buildFormatters} function is invoked outside the lock to avoid blocking other threads during
-   * potentially expensive formatter construction. A modification counter is used to skip the redundant type lookup
-   * on re-entry when no concurrent modification occurred.
+   * The {@code buildFormatters} function is invoked outside the lock to avoid blocking other threads during potentially
+   * expensive formatter construction. A modification counter is used to skip the redundant type lookup on re-entry when
+   * no concurrent modification occurred.
    *
    * @param type             value type to look up formatters for, not {@code null}
    * @param buildFormatters  function to build the formatter list if not cached, not {@code null}
@@ -140,7 +146,7 @@ public final class FormatterCache
     try {
       if ((idx = findTypeIndex(type)) >= 0)
       {
-        final var node = (Node)typeFormatters[idx * 2 + 1];
+        final var node = typeFormatterNodes[idx];
 
         // move to head?
         // start moving if we've reached 75% of the total capacity and the node is located in the lower 25%
@@ -161,7 +167,7 @@ public final class FormatterCache
     lock.lock();
     try {
       if (modCount != _modCount && (idx = findTypeIndex(type)) >= 0)
-        return ((Node)typeFormatters[idx * 2 + 1]).formatters;
+        return typeFormatterNodes[idx].formatters;
 
       addNew(type, formatters);
 
@@ -175,35 +181,35 @@ public final class FormatterCache
   /**
    * Moves the given node to the head of the linked list, promoting it as the most recently accessed entry.
    *
-   * @param node  the node to promote, not {@code null}
+   * @param typeFormatterNode  the node to promote, not {@code null}
    */
-  private void moveNodeToHead(@NotNull Node node)
+  private void moveNodeToHead(@NotNull FormatterCache.TypeFormatterNode typeFormatterNode)
   {
-    final var prevNode = node.prev;
+    final var prevNode = typeFormatterNode.prev;
     assert prevNode != null;
 
     for(var n = prevNode; n != null; n = n.prev)
       n.countNext--;
 
-    prevNode.next = node.next;
+    prevNode.next = typeFormatterNode.next;
 
-    if (node == tail)
+    if (typeFormatterNode == tail)
       tail = prevNode;
     else
-      node.next.prev = prevNode;
+      typeFormatterNode.next.prev = prevNode;
 
-    node.prev = null;
-    node.next = head;
-    node.countNext = head.countNext + 1;
+    typeFormatterNode.prev = null;
+    typeFormatterNode.next = head;
+    typeFormatterNode.countNext = head.countNext + 1;
 
-    head.prev = node;
-    head = node;
+    head.prev = typeFormatterNode;
+    head = typeFormatterNode;
   }
 
 
   /**
-   * Adds a new type-to-formatters mapping to the cache. If the cache is at full capacity, the least recently used
-   * entry (tail) is evicted first.
+   * Adds a new type-to-formatters mapping to the cache. If the cache is at full capacity, the least recently used entry
+   * (tail) is evicted first.
    *
    * @param type        the value type to cache, not {@code null}
    * @param formatters  the formatter list for the type, not {@code null}
@@ -213,11 +219,10 @@ public final class FormatterCache
     // if capacity has been reached -> remove tail
     if (typeCount == capacity)
     {
-      final var typeOffset = findTypeIndex(tail.type) * 2;
+      final var tailIndex = findIndex(tail.typeName, null, tail.typeId);
 
-      arraycopy(typeFormatters, typeOffset + 2, typeFormatters, typeOffset,
-          (capacity - 1) * 2 - typeOffset);
-      typeCount--;
+      arraycopy(typeFormatterNodes, tailIndex + 1, typeFormatterNodes, tailIndex, capacity - 1 - tailIndex);
+      typeFormatterNodes[--typeCount] = null;
 
       final var prevNode = tail.prev;
       assert prevNode != null;
@@ -229,45 +234,62 @@ public final class FormatterCache
       tail = prevNode;
     }
 
-    final var node = new Node(type, formatters);
-    final int insertOffset;
+    final var typeFormatterNode = new TypeFormatterNode(type.getName(), TYPE_ID.get(type), formatters);
+    final int insertIndex;
 
     if (head != null)
     {
-      insertOffset = (-findTypeIndex(type) - 1) * 2;
+      insertIndex = -findIndex(typeFormatterNode.typeName, null, typeFormatterNode.typeId) - 1;
 
-      arraycopy(typeFormatters, insertOffset, typeFormatters, insertOffset + 2,
-          typeCount * 2 - insertOffset);
+      arraycopy(typeFormatterNodes, insertIndex, typeFormatterNodes, insertIndex + 1, typeCount - insertIndex);
 
-      node.next = head;
-      node.countNext = head.countNext + 1;
-      head.prev = node;
+      typeFormatterNode.next = head;
+      typeFormatterNode.countNext = head.countNext + 1;
+      head.prev = typeFormatterNode;
     }
     else
     {
-      insertOffset = 0;
-      tail = node;
+      insertIndex = 0;
+      tail = typeFormatterNode;
     }
 
-    typeFormatters[insertOffset] = type;
-    typeFormatters[insertOffset + 1] = node;
+    typeFormatterNodes[insertIndex] = typeFormatterNode;
     typeCount++;
     modCount++;
 
-    head = node;
+    head = typeFormatterNode;
   }
 
 
   /**
-   * Performs a binary search for the given type in the sorted type array.
+   * Performs a binary search for the given type in the sorted node array.
    *
    * @param type  the type to search for, not {@code null}
    *
    * @return  the index if found, or {@code -(insertion point) - 1} if not found
-   *
-   * @see #compareTypes(Class, Class)
    */
-  private int findTypeIndex(@NotNull Class<?> type)
+  private int findTypeIndex(@NotNull Class<?> type) {
+    return findIndex(type.getName(), type, 0);
+  }
+
+
+  /**
+   * Performs a binary search for the given type name and type id in the sorted node array. Nodes are ordered by type
+   * name; different types with the same name (e.g. loaded by different class loaders) are ordered by their unique type
+   * id. Hence, a node matches if, and only if, it was created for the identical type.
+   * <p>
+   * If {@code typeId} is {@code 0}, the type id is obtained from {@code type}, but only if a node with the same type
+   * name is found. This keeps the common case, where type names are unique, free of type id lookups.
+   *
+   * @param typeName  name of the type to search for, not {@code null}
+   * @param type      type to obtain the type id from, or {@code null} if {@code typeId} is given
+   * @param typeId    unique type id, or {@code 0} if it must be obtained from {@code type}
+   *
+   * @return  the index if found, or {@code -(insertion point) - 1} if not found
+   *
+   * @since 0.25.0
+   */
+  private int findIndex(@NotNull String typeName, Class<?> type, long typeId)
   {
     var low = 0;
     var high = typeCount - 1;
@@ -275,7 +297,16 @@ public final class FormatterCache
     while(low <= high)
     {
       final var mid = (low + high) >>> 1;
-      final var cmp = compareTypes((Class<?>)typeFormatters[mid * 2], type);
+      final var typeFormatterNode = typeFormatterNodes[mid];
+      var cmp = typeFormatterNode.typeName.compareTo(typeName);
+
+      if (cmp == 0)
+      {
+        if (typeId == 0)
+          typeId = TYPE_ID.get(requireNonNull(type));
+
+        cmp = Long.compare(typeFormatterNode.typeId, typeId);
+      }
 
       if (cmp < 0)
         low = mid + 1;
@@ -286,30 +317,6 @@ public final class FormatterCache
     }
 
     return -(low + 1);  // type not found
-  }
-
-
-  /**
-   * Compares two types by class name. Different types with the same class name (e.g. loaded by different class
-   * loaders) are ordered by their unique type id. Hence, this comparison returns {@code 0} if, and only if, both types
-   * are identical.
-   *
-   * @param type1  first type, not {@code null}
-   * @param type2  second type, not {@code null}
-   *
-   * @return  a negative value, zero or a positive value if {@code type1} is less than, equal to or greater than
-   *          {@code type2}
-   *
-   * @since 0.25.0
-   */
-  private static int compareTypes(@NotNull Class<?> type1, @NotNull Class<?> type2)
-  {
-    if (type1 == type2)
-      return 0;
-
-    final var cmp = type1.getName().compareTo(type2.getName());
-
-    return cmp != 0 ? cmp : Long.compare(TYPE_ID.get(type1), TYPE_ID.get(type2));
   }
 
 
@@ -336,23 +343,27 @@ public final class FormatterCache
 
 
   /**
-   * Doubly-linked list node holding the cached formatter list for a single value type.
+   * Doubly-linked list node holding the cached formatter list for a single value type. The node identifies the type by
+   * its name and unique type id and holds no reference to the type itself, so the type can be unloaded.
    *
    * @since 0.8.0
    */
-  private static final class Node
+  private static final class TypeFormatterNode
   {
-    /** Cached value type. */
-    private final Class<?> type;
+    /** Class name of the cached value type. */
+    private final String typeName;
 
-    /** Sorted parameter formatters for {@link #type}. */
+    /** Unique id of the cached value type, see {@link FormatterCache#TYPE_ID}. */
+    private final long typeId;
+
+    /** Sorted parameter formatters for the cached value type. */
     private final ParameterFormatter[] formatters;
 
     /** Previous (more recently promoted) node, or {@code null} for the head node. */
-    private Node prev;
+    private TypeFormatterNode prev;
 
     /** Next (less recently promoted) node, or {@code null} for the tail node. */
-    private Node next;
+    private TypeFormatterNode next;
 
     /** Number of nodes following this node in the list. */
     private int countNext;
@@ -361,12 +372,14 @@ public final class FormatterCache
     /**
      * Creates a new list node for the given type and formatters.
      *
-     * @param type        cached value type, not {@code null}
-     * @param formatters  sorted parameter formatters for {@code type}, not {@code null}
+     * @param typeName    class name of the cached value type, not {@code null}
+     * @param typeId      unique id of the cached value type
+     * @param formatters  sorted parameter formatters for the cached value type, not {@code null}
      */
-    private Node(@NotNull Class<?> type, @NotNull ParameterFormatter[] formatters)
+    private TypeFormatterNode(@NotNull String typeName, long typeId, @NotNull ParameterFormatter[] formatters)
     {
-      this.type = type;
+      this.typeName = typeName;
+      this.typeId = typeId;
       this.formatters = formatters;
     }
 
@@ -375,11 +388,8 @@ public final class FormatterCache
      * {@inheritDoc}
      */
     @Override
-    public String toString()
-    {
-      final var name = type.getCanonicalName();
-
-      return countNext + ":(" + (name == null ? type.toString() : name) + ')';
+    public String toString() {
+      return countNext + ":(" + typeName + ')';
     }
   }
 }

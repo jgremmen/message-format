@@ -18,12 +18,14 @@ package de.sayayi.lib.message.internal.formatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.runtime.ArrayFormatter;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -123,6 +125,43 @@ final class FormatterCacheTest
       val pf = new ParameterFormatter[] { new ArrayFormatter() };
       assertSame(pf, cache.lookup(type1, t -> pf));
     });
+  }
+
+
+
+
+  @Test
+  @DisplayName("Cached types do not prevent their class loader from being unloaded")
+  void lookupDoesNotRetainClassLoader() throws Exception
+  {
+    val cache = new FormatterCache(8);
+    val classLoaderRef = cacheTypeFromIsolatingClassLoader(cache);
+
+    for(var n = 0; n < 50 && classLoaderRef.get() != null; n++)
+    {
+      System.gc();
+      Thread.sleep(10);
+    }
+
+    assertNull(classLoaderRef.get(), "class loader of a cached type has not been garbage collected");
+
+    // the cache is still usable and a newly loaded type with the same name gets its own entry
+    val pf = new ParameterFormatter[] { new ArrayFormatter() };
+    assertSame(pf, cache.lookup(new IsolatingClassLoader().loadClass(SameNameType.class.getName()), t -> pf));
+  }
+
+
+  private static @NotNull WeakReference<ClassLoader> cacheTypeFromIsolatingClassLoader(@NotNull FormatterCache cache)
+      throws ClassNotFoundException
+  {
+    val classLoader = new IsolatingClassLoader();
+    val type = classLoader.loadClass(SameNameType.class.getName());
+    val pf = new ParameterFormatter[] { new ArrayFormatter() };
+
+    assertSame(pf, cache.lookup(type, t -> pf));
+    assertSame(pf, cache.lookup(type, t -> fail()));
+
+    return new WeakReference<>(classLoader);
   }
 
 
