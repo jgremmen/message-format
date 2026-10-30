@@ -24,9 +24,9 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -43,8 +43,16 @@ import java.util.Set;
  */
 public final class AnnotationFormatter extends AbstractSingleTypeParameterFormatter<Annotation>
 {
-  /** Cache of annotation element accessor methods, keyed by annotation type and element name. */
-  private final Map<AnnotationField,Method> annotationFieldMap = new HashMap<>();
+  /**
+   * Cache of annotation element accessor methods per annotation type, keyed by element name. {@code ClassValue} does
+   * not prevent the annotation type, and its class loader, from being unloaded.
+   */
+  private static final ClassValue<Map<String,Method>> ANNOTATION_ELEMENTS = new ClassValue<>() {
+    @Override
+    protected Map<String,Method> computeValue(@NotNull Class<?> annotationType) {
+      return new ConcurrentHashMap<>();
+    }
+  };
 
 
   /**
@@ -76,23 +84,17 @@ public final class AnnotationFormatter extends AbstractSingleTypeParameterFormat
         break formatByField;
 
       final var annotationType = annotation.annotationType();
-      final var key = new AnnotationField(annotationType, fieldName);
-
-      Method method;
-
-      synchronized(annotationFieldMap) {
-        if ((method = annotationFieldMap.get(key)) == null)
-        {
-          try {
-            if ((method = annotationType.getDeclaredMethod(fieldName)).getReturnType() == void.class)
-              break formatByField;
-
-            annotationFieldMap.put(key, method);
-          } catch(ReflectiveOperationException ex) {
-            break formatByField;
-          }
+      final var method = ANNOTATION_ELEMENTS.get(annotationType).computeIfAbsent(fieldName, name -> {
+        try {
+          final var m = annotationType.getDeclaredMethod(name);
+          return m.getReturnType() == void.class ? null : m;
+        } catch(ReflectiveOperationException ex) {
+          return null;
         }
-      }
+      });
+
+      if (method == null)
+        break formatByField;
 
       try {
         return context.format(method.invoke(annotation), method.getReturnType());
@@ -125,17 +127,4 @@ public final class AnnotationFormatter extends AbstractSingleTypeParameterFormat
     return Set.of("annotation");
   }
 
-
-
-
-  /**
-   * Cache key combining an annotation type with a field name.
-   *
-   * @param annotationType  the annotation type, not {@code null}
-   * @param field           the annotation element name, not {@code null}
-   *
-   * @since 0.21.0
-   */
-  private record AnnotationField(@NotNull Class<? extends Annotation> annotationType, @NotNull String field) {
-  }
 }
