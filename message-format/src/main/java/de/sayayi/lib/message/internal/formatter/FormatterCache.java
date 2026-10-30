@@ -45,6 +45,12 @@ import static java.util.Objects.requireNonNull;
  * outside the lock so that cache misses do not block other threads, and a modification-count check guards against
  * corruption from re-entrant access. Note that it is not single-flight: concurrent cache misses for the same type may
  * each independently build a formatter list.
+ * <p>
+ * If {@link #clear()} runs while a formatter list is being built, the list built before the clear is still added to the
+ * cache. Callers that clear the cache because the formatters have changed must therefore make sure that {@code clear()}
+ * does not run concurrently with {@link #lookup(Class, Function) lookup}.
+ * {@link de.sayayi.lib.message.formatter.GenericFormatterService GenericFormatterService} ensures this by calling
+ * {@code lookup} under its read lock and {@code clear} under its write lock.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
