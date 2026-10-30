@@ -78,6 +78,9 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * Concrete subclasses must implement the {@link #parseClass(InputStream)} method to provide the actual bytecode
  * analysis strategy (e.g. using the ASM library).
+ * <p>
+ * <b>Thread safety:</b> instances of this class are not thread-safe. The visited classes are tracked without
+ * synchronization, so an adopter instance must not be used by multiple threads at the same time.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0  (refactored in 0.24.0)

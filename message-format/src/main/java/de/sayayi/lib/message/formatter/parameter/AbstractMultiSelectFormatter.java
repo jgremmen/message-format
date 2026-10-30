@@ -31,14 +31,14 @@ import static java.util.Objects.requireNonNull;
 /**
  * Base class for parameter formatters that select a formatting strategy based on a configuration key value.
  * <p>
- * A multi-select formatter reads the string value of a named configuration key from the parameter configuration
- * (e.g. {@code %{val,locale:'country'}}). That value is then used to look up a {@link MultiSelectFunction} registered
- * by the subclass. If a matching function is found, it formats the value; otherwise the formatter either
+ * A multi-select formatter reads the string value of a named configuration key from the parameter configuration (e.g.
+ * {@code %{val,locale:'country'}}). That value is then used to look up a {@link MultiSelectFunction} registered by the
+ * subclass. If a matching function is found, it formats the value; otherwise the formatter either
  * {@linkplain ParameterFormatterContext#delegateToNextFormatter() delegates to the next formatter} or falls back to
  * {@link #formatMultiSelectMismatch(ParameterFormatterContext, Object)}, depending on the {@code delegateOnMismatch}
  * flag.
  * <p>
- * Subclasses typically register their formatting functions in their constructor:
+ * Subclasses must register their formatting functions in their constructor:
  * <pre>{@code
  * public MyFormatter() {
  *   super("my-key", "default-value", true);
@@ -46,6 +46,8 @@ import static java.util.Objects.requireNonNull;
  *   register("option-a", this::formatOptionA);
  *   register(new String[] { "option-b", "option-c" }, this::formatOptionBC);
  * }}</pre>
+ * The registered functions are stored without synchronization. Registering functions after construction, once the
+ * formatter may be used by other threads, is not thread-safe.
  * <p>
  * The {@code null}/empty value handling inherited from {@link AbstractParameterFormatter} is applied before the
  * multi-select dispatch, so registered functions only receive non-{@code null} values.
@@ -74,8 +76,8 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
 
 
   /**
-   * Creates a multi-select formatter with the given configuration key, no default config value for an absent key,
-   * and delegation enabled on mismatch.
+   * Creates a multi-select formatter with the given configuration key, no default config value for an absent key, and
+   * delegation enabled on mismatch.
    * <p>
    * This is equivalent to calling {@link #AbstractMultiSelectFormatter(String, String, boolean)
    * AbstractMultiSelectFormatter(configKey, null, true)}.
@@ -115,6 +117,8 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
 
   /**
    * Registers the same formatting function for multiple config values.
+   * <p>
+   * This method must only be called from the constructor of a subclass.
    *
    * @param configKeys  the config value strings that should map to the given function, not {@code null}
    * @param function    the formatting function to invoke when one of the config values matches, not {@code null}
@@ -130,6 +134,8 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
 
   /**
    * Registers a formatting function for a single config value.
+   * <p>
+   * This method must only be called from the constructor of a subclass.
    *
    * @param configValue  the config value string that should trigger the given function, not {@code null}
    * @param function     the formatting function to invoke when the config value matches, not {@code null}

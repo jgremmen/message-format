@@ -33,6 +33,10 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * Concrete implementations (e.g. {@link ResourceBundleAdopter}, {@link PropertiesAdopter}) define one or more
  * {@code adopt} methods that read from their specific source.
+ * <p>
+ * <b>Thread safety:</b> message adopters are intended to be used by a single thread, typically once while setting up
+ * the message support. Unless an implementation states otherwise, an adopter instance must not be used by multiple
+ * threads at the same time.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
