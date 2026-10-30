@@ -18,7 +18,6 @@ package de.sayayi.lib.message.util;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
@@ -53,7 +52,7 @@ import static java.util.Objects.requireNonNull;
 public final class SupplierDelegate<T> implements Supplier<T>
 {
   /** Lock guarding the first invocation of the delegate supplier, or {@code null} once the value has been obtained. */
-  private volatile Lock lock = new ReentrantLock();
+  private volatile ReentrantLock lock = new ReentrantLock();
 
   /** Delegate supplier, or {@code null} once the value has been obtained. */
   private volatile Supplier<T> supplier;
@@ -79,8 +78,13 @@ public final class SupplierDelegate<T> implements Supplier<T>
    * This method is thread-safe: concurrent first calls invoke the delegate supplier only once. If the delegate supplier
    * throws an exception, the exception is relayed to the caller and the delegate supplier is invoked again on the next
    * call.
+   * <p>
+   * If the delegate supplier calls this method on the same supplier delegate from the same thread, an
+   * {@link IllegalStateException} is thrown instead of invoking the delegate supplier recursively.
    *
    * @return  the supplied value, which may be {@code null} depending on the delegate
+   *
+   * @throws IllegalStateException  if called recursively by the delegate supplier
    */
   @Override
   public T get()
@@ -94,6 +98,10 @@ public final class SupplierDelegate<T> implements Supplier<T>
         try {
           if (supplier != null)
           {
+            // detect recursion
+            if (_lock.getHoldCount() > 1)
+              throw new IllegalStateException("recursive SupplierDelegate initialization");
+
             value = supplier.get();
             supplier = null;
             lock = null;

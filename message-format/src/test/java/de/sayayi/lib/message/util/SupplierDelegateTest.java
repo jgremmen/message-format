@@ -27,7 +27,9 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -144,6 +146,79 @@ final class SupplierDelegateTest
       assertSame(value, v);
 
     assertEquals(4, calls.get());
+  }
+
+
+  @Test
+  @DisplayName("Recursive call from the delegate fails instead of recursing endlessly")
+  void testRecursiveCall()
+  {
+    val calls = new AtomicInteger();
+    val self = new AtomicReference<Supplier<Object>>();
+
+    // without detection, the re-entrant lock lets the delegate run again and again until the stack overflows
+    self.set(SupplierDelegate.of(() -> {
+      calls.incrementAndGet();
+      return self.get().get();
+    }));
+
+    assertEquals("recursive SupplierDelegate initialization",
+        assertThrows(IllegalStateException.class, self.get()::get).getMessage());
+    assertEquals(1, calls.get());
+  }
+
+
+  @Test
+  @DisplayName("Delegate is invoked again after a recursive call failed")
+  void testRetryAfterRecursiveCall()
+  {
+    val calls = new AtomicInteger();
+    val recurse = new AtomicBoolean(true);
+    val self = new AtomicReference<Supplier<Object>>();
+    val value = new Object();
+
+    self.set(SupplierDelegate.of(() -> {
+      calls.incrementAndGet();
+      return recurse.get() ? self.get().get() : value;
+    }));
+
+    assertThrows(IllegalStateException.class, self.get()::get);
+
+    recurse.set(false);
+
+    assertSame(value, self.get().get());
+    assertSame(value, self.get().get());
+    assertEquals(2, calls.get());
+  }
+
+
+  @Test
+  @DisplayName("Caught recursive call does not invoke the delegate twice")
+  void testCaughtRecursiveCall()
+  {
+    val calls = new AtomicInteger();
+    val self = new AtomicReference<Supplier<Object>>();
+    val innerValue = new AtomicReference<>();
+
+    // the delegate re-enters only once; without detection, the nested invocation caches a value which is then
+    // overwritten by the outer invocation, so callers see two different values
+    self.set(SupplierDelegate.of(() -> {
+      if (calls.incrementAndGet() == 1)
+      {
+        try {
+          innerValue.set(self.get().get());
+        } catch(IllegalStateException ignored) {
+        }
+      }
+
+      return new Object();
+    }));
+
+    val value = self.get().get();
+
+    assertNull(innerValue.get());
+    assertSame(value, self.get().get());
+    assertEquals(1, calls.get());
   }
 
 
