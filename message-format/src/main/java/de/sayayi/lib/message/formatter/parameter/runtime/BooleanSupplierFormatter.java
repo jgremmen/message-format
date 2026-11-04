@@ -37,6 +37,12 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.Class
  * <p>
  * Map key comparison for {@code bool} and {@code string} keys is also based on the evaluated boolean value.
  * <p>
+ * The formatter evaluates the supplier each time the value is needed: for every map key comparison and for formatting.
+ * A supplier set with
+ * {@link de.sayayi.lib.message.MessageSupport.MessageConfigurer#with(String, Object) MessageConfigurer.with} is wrapped
+ * in a caching delegate, so it is invoked at most once. A supplier passed to a message by other means is not cached and
+ * should therefore be cheap and return the same value each time.
+ * <p>
  * <b>Examples:</b>
  * <p>
  * Evaluate a condition only when the message is actually formatted:

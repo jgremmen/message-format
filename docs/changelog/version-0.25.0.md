@@ -116,6 +116,29 @@ also allows applications running on Apache Tika 4 to use the message pack detect
 *Dependency versions for compile and runtime scopes are unchanged in this release.*
 
 
+### Supplier parameter values are evaluated at most once
+
+The supplier formatters (`SupplierFormatter`, `BooleanSupplierFormatter`, `IntSupplierFormatter`,
+`LongSupplierFormatter` and `DoubleSupplierFormatter`) used to invoke the supplier once for every map key comparison
+and once more for formatting. An expensive supplier was evaluated several times per format, and a supplier returning
+a different value on each call (a counter, a clock or a random value) could select a map entry that did not match
+the formatted value.
+
+`MessageConfigurer.with(String, Object)` now wraps `Supplier`, `BooleanSupplier`, `IntSupplier`, `LongSupplier` and
+`DoubleSupplier` values in a caching delegate, so the supplier is invoked at most once. The cached value is kept for
+as long as the parameter is set: formatting the message again with the same configurer, or using a supplier returned
+by `formatSupplier()`, reuses the value supplied on the first evaluation instead of invoking the supplier again.
+
+Code that reuses a configurer and expects a supplier parameter to be re-evaluated on each format must set the
+parameter again with `with(...)` before formatting. `MessageConfigurer.getParameters()` now returns the caching
+delegate instead of the supplier passed to `with(...)`.
+
+Formatters are now selected based on the type of the caching delegate. If an application implements one of these
+supplier interfaces itself (e.g. `MySupplier implements LongSupplier`) and has registered a parameter formatter for
+that specific type, that formatter is no longer used for values set with `with(...)`. The value is formatted by the
+formatter for the supplier interface (here `LongSupplierFormatter`) instead.
+
+
 ## New Features
 
 ### `MessageSupportFactory.createDefault()` and `createGeneric()`

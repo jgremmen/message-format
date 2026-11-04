@@ -8,10 +8,14 @@ type. The core principle is the same for all five: the supplier is evaluated onc
 value is delegated to the formatter appropriate for its type.
 
 Suppliers are useful for deferring value computation until the message is actually formatted. The supplier is called
-when the parameter is formatted, not when it is passed to `with(...)`. It is not cached, though. A formatter that
-compares the value against several map keys, such as [`choice`](../named/choice.md), calls the supplier for every
-key it evaluates. A supplier should therefore be free of side effects and return the same value each time, and an
-expensive computation should cache its own result.
+when the parameter is formatted, not when it is passed to `with(...)`. In most cases, however, it is better to
+compute the value up front and pass the result instead of a supplier. See
+[Choosing Parameter Values](../../../message/formatting.md#choosing-parameter-values) for the reasons.
+
+A supplier set with `with(...)` is wrapped in a caching delegate and is invoked at most once. This holds no matter how
+many map keys the value is compared with, as with [`choice`](../named/choice.md), and how often the parameter is
+referenced in the message. The selected map entry and the formatted text are therefore always based on the same
+value, even for suppliers that return a different value on each call, such as a counter, a clock or a random value.
 
 ```java
 var calls = new AtomicInteger();
@@ -27,8 +31,71 @@ messageSupport
 // "medium"
 
 calls.get();
-// 3
+// 1
 ```
+
+The cached value is kept for as long as the parameter is set. Formatting the message again with the same configurer,
+or using a supplier returned by `formatSupplier()`, does not invoke the supplier again but reuses the value supplied
+on the first evaluation. To have the supplier evaluated anew, set the parameter again:
+
+```java
+calls.set(0);
+
+var configurer = messageSupport
+    .message("%{v}")
+    .with("v", level);
+
+configurer.format();
+configurer.format();
+calls.get();
+// 1
+
+configurer.with("v", level).format();
+calls.get();
+// 2
+```
+
+If the supplier throws an exception, no value is cached and the supplier is invoked again the next time the parameter
+is formatted. `getParameters()` returns the caching delegate, not the supplier passed to `with(...)`.
+
+/// warning | Formatters for custom supplier types are not used
+The formatter for a parameter value is selected based on the type of the caching delegate, not on the type of the
+supplier passed to `with(...)`. If an application provides its own implementation of one of the supplier interfaces
+and registers a formatter for that specific type, the formatter never becomes a candidate for a value set with
+`with(...)`. The delegate only implements the supplier interface, so the value is formatted by the matching supplier
+formatter described on this page instead.
+
+```java
+public final class FreeMemory implements LongSupplier
+{
+  @Override
+  public long getAsLong() {
+    return Runtime.getRuntime().freeMemory();
+  }
+}
+
+formatterService.addFormatter(new FreeMemoryFormatter());  // registered for FreeMemory.class
+
+messageSupport
+    .message("%{mem}")
+    .with("mem", new FreeMemory())
+    .format();
+// formatted by LongSupplierFormatter, FreeMemoryFormatter is not used
+```
+
+The same applies to any other interface or type implemented by the supplier: the delegate does not implement it, so
+formatters registered for those types are not used either. A formatter registered for the supplier interface itself
+(e.g. `LongSupplier`) is still used.
+///
+
+/// note | Supplier caching only applies to `MessageConfigurer`
+Supplier parameter values are only cached when they are set with `MessageConfigurer.with(...)`, which includes
+`with(Map)`. If parameters are passed to a `Message` by other means, for example by calling
+`Message.format(MessageAccessor, Parameters)` or `Message.format(MessageAccessor, Map)` directly, the supplier
+formatters invoke the supplier each time the value is needed. In that case, the supplier should be cheap and return
+the same value on each call, or be wrapped in a [`SupplierDelegate`](../../development/utilities.md#supplierdelegate)
+by the caller.
+///
 
 
 ## SupplierFormatter

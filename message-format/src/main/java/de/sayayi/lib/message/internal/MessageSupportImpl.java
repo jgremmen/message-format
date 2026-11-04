@@ -35,10 +35,7 @@ import de.sayayi.lib.message.template.Template;
 import de.sayayi.lib.message.util.SortedStringMap;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import de.sayayi.lib.pack.PackOutputStream;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
-import org.jetbrains.annotations.UnmodifiableView;
+import org.jetbrains.annotations.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -576,7 +573,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
             "' must match the camel- or kebab-case naming convention");
       }
 
-      parameters.put(parameter, value);
+      parameters.put(parameter, ValueProtector.protect(value));
 
       return this;
     }

@@ -400,6 +400,13 @@ formatterService.addFormatterForType(
 This registers the `ColorFormatter` for `MySpecialColor` at order 40, even though the formatter's `getFormattableType()` 
 method returns `Color.class`. This is useful for reusing an existing formatter for a subclass at a different priority.
 
+/// warning | Custom supplier types
+Do not register a formatter for a type that implements `Supplier`, `BooleanSupplier`, `IntSupplier`, `LongSupplier`
+or `DoubleSupplier`. Parameter values of these types that are set with `MessageConfigurer.with(...)` are wrapped in a
+caching delegate, and the formatter is selected based on the delegate's type. A formatter registered for the custom
+supplier type therefore never becomes a candidate. See [Supplier](../parameter/typed/supplier.md) for details.
+///
+
 ### ServiceLoader Auto-Discovery
 
 For library authors who distribute their formatters as a JAR, the Java `ServiceLoader` mechanism provides automatic

@@ -118,7 +118,8 @@ messageSupport
 
 When a parameter value implements `java.util.function.BooleanSupplier`, the library automatically selects the
 `BooleanSupplierFormatter`. This formatter calls `getAsBoolean()` on the supplier to obtain the actual boolean value 
-and then delegates all rendering to the boolean formatter. The supplier is evaluated once at format time.
+and then delegates all rendering to the boolean formatter. A supplier set with `with(...)` is evaluated at most
+once, when the message is formatted. See [Supplier](supplier.md) for details on how supplier values are cached.
 
 From the perspective of map key matching and text output, the result is identical to passing a plain `boolean`. All map
 key types that work with `Boolean` values work with `BooleanSupplier` values as well.

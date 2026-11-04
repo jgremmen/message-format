@@ -38,9 +38,16 @@ import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.Class
  * Map key comparison for {@code bool}, {@code number} and {@code string} keys is also based on the evaluated integer
  * value.
  * <p>
+ * The formatter evaluates the supplier each time the value is needed: for every map key comparison and for
+ * formatting. A supplier set with
+ * {@link de.sayayi.lib.message.MessageSupport.MessageConfigurer#with(String, Object) MessageConfigurer.with} is wrapped
+ * in a caching delegate, so it is invoked at most once. A supplier passed to a message by other means is not cached and
+ * should therefore be cheap and return the same value each time.
+ * <p>
  * <b>Examples:</b>
  * <p>
- * Provide a live counter. Number keys are compared with the supplied value:
+ * Provide a value that is only determined when the message is actually formatted. Number keys are compared with the
+ * supplied value:
  * <pre>{@code
  * var queue = new ArrayDeque<>(List.of("a", "b", "c"));
  * IntSupplier pending = queue::size;

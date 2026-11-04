@@ -162,6 +162,55 @@ A `MessageConfigurer` represents a single formatting operation and must not be s
 shared freely.
 ///
 
+### Choosing Parameter Values
+
+A parameter value is not read just once while a message is formatted. Depending on the message, the same value may be
+accessed several times:
+
+- to classify the value and select the formatter for it,
+- for every map key it is compared with, until a matching key is found,
+- for size queries, such as `empty` and `!empty` map keys,
+- for the actual formatting,
+- for every reference to the parameter in the message, including references in nested messages and templates.
+
+Parameter values should therefore be plain, ready-to-format values: computed before they are passed to `with(...)`,
+cheap to access, and stable for the duration of the formatting operation. It is generally a bad idea to pass:
+
+- **Suppliers** (`Supplier`, `BooleanSupplier`, `IntSupplier`, `LongSupplier`, `DoubleSupplier`). A supplier set with
+  `with(...)` is cached and invoked at most once, but it is invoked during formatting, so any exception it throws is
+  raised by `format()`. The cached value also stays the same for as long as the parameter is set, and formatters
+  registered for a custom supplier type are not used. See [Supplier](../formatter/parameter/typed/supplier.md) for
+  details.
+- **Objects that require heavy or long-running computation to produce a formattable value**, for example a lazily
+  loaded entity, an object that reads from a file or the network, or one with an expensive `toString()`. The
+  computation runs while the message is formatted, possibly several times, and slows down every formatting call.
+- **Objects without a stable value when used multiple times**, for example a counter, a clock, a random value
+  generator, a collection that is modified concurrently, a `WeakReference` that may be cleared, or an `Iterable` that
+  can only be iterated once. Different accesses may see different values, so the selected map entry can disagree with
+  the formatted text, or the parameter can be formatted differently each time it is referenced.
+
+Instead, evaluate such values up front and pass the result:
+
+```java
+// not recommended: the computation runs during formatting
+messageSupport
+    .message("%{count,0:'no orders',1:'one order',>1:'%{count} orders'}")
+    .with("count", (IntSupplier)() -> orderRepository.countOpenOrders())
+    .format();
+
+// recommended: the value is computed once, before formatting
+int count = orderRepository.countOpenOrders();
+
+messageSupport
+    .message("%{count,0:'no orders',1:'one order',>1:'%{count} orders'}")
+    .with("count", count)
+    .format();
+```
+
+Suppliers remain useful when formatting is deferred and the message may never be formatted at all, for example with
+[`formatSupplier()`](#deferred-formatting-with-a-supplier) or in log statements below the active log level. In that
+case, the supplier should still be cheap, free of side effects and return the same value each time.
+
 
 ## Choosing a Locale
 
@@ -253,6 +302,11 @@ first.get();
 second.get();
 // "Hello Bob!"
 ```
+
+The snapshot contains the parameter values, not their evaluated results. A [supplier](../formatter/parameter/typed/supplier.md)
+parameter value is wrapped in a caching delegate when it is set with `with(...)`. The configurer and all suppliers
+returned by `formatSupplier()` share this delegate, so the supplier is invoked at most once and all of them format
+the same supplied value.
 
 
 ## Creating Exceptions with Formatted Messages

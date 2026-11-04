@@ -38,6 +38,12 @@ import java.util.function.Supplier;
  * Size queries and map key comparisons ({@code bool}, {@code number} and {@code string} keys) are also based on the
  * supplied value.
  * <p>
+ * The formatter evaluates the supplier each time the value is needed: for classification, for every map key
+ * comparison, for size queries and for formatting. A supplier set with
+ * {@link de.sayayi.lib.message.MessageSupport.MessageConfigurer#with(String, Object) MessageConfigurer.with} is wrapped
+ * in a caching delegate, so it is invoked at most once. A supplier passed to a message by other means is no cached and
+ * should therefore be cheap and return the same value each time.
+ * <p>
  * <b>Examples:</b>
  * <p>
  * Postpone an expensive calculation until the message is actually formatted. The supplied value is formatted according

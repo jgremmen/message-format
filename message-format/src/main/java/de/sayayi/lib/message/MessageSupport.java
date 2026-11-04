@@ -398,6 +398,42 @@ public interface MessageSupport
 
     /**
      * Sets a value for this message.
+     * <p>
+     * While formatting the message, the value may be accessed several times: for formatter selection, for each map key
+     * comparison, for size queries, for formatting and for each reference to the parameter in the message. The value
+     * should therefore be ready to format, cheap to access and stable. Passing suppliers, objects that require heavy or
+     * long-running computation to produce a formattable value, or objects which do not have a stable value when
+     * accessed multiple times is discouraged. Such values should be evaluated before calling this method and the result
+     * should be passed instead.
+     * <p>
+     * If {@code value} is a {@link Supplier}, {@link java.util.function.BooleanSupplier BooleanSupplier},
+     * {@link java.util.function.IntSupplier IntSupplier}, {@link java.util.function.LongSupplier LongSupplier} or
+     * {@link java.util.function.DoubleSupplier DoubleSupplier}, it is not evaluated by this method. Instead, it is
+     * wrapped in a caching delegate of the same supplier type, which is stored as the parameter value. The supplier is
+     * evaluated lazily, when the message is formatted and the parameter value is actually required, and it is invoked
+     * at most once, no matter how many map keys the value is compared with or how often the parameter is referenced in
+     * the message. As a consequence:
+     * <ul>
+     *   <li>
+     *     The supplied value is cached for as long as the parameter is set. Formatting the message again with this
+     *     configurer, or using a supplier returned by {@link #formatSupplier()}, returns the value supplied on the
+     *     first evaluation. Call this method again with the supplier to have it re-evaluated.
+     *   </li>
+     *   <li>
+     *     If the supplier throws an exception, no value is cached and the supplier is invoked again on the next
+     *     evaluation.
+     *   </li>
+     *   <li>
+     *     {@link #getParameters()} returns the caching delegate, not the supplier passed to this method. If the
+     *     supplier implements other types besides the supplier interface, the delegate does not.
+     *   </li>
+     *   <li>
+     *     Formatters are selected based on the type of the delegate, not on the type of the supplier passed to this
+     *     method. A parameter formatter registered for an application specific supplier type (e.g.
+     *     {@code MySupplier implements LongSupplier}) is therefore never used for a value set with this method;
+     *     the value is formatted by the formatter for the supplier interface instead.
+     *   </li>
+     * </ul>
      *
      * @param parameter  parameter name, not {@code null}
      * @param value      parameter value
