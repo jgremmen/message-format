@@ -41,8 +41,11 @@ level, the full file path is logged alongside the class name.
 ## Include and Exclude Filters
 
 The include and exclude regex filters configured through the [extension](extension.md) `messages` block are forwarded
-to the task as conventions. They can also be set directly on the task if needed. The filters control which message 
-codes are written to the pack file and which are skipped.
+to the task lazily. They are read when the task executes, so it does not matter whether the `messageFormat` block
+appears before or after the task is configured or realized, for example by `jar { from messageFormatPack }`. Filters
+can also be added directly on the task with `include` and `exclude`; they are added to the filters from the extension.
+Assigning the `includeRegexFilters` or `excludeRegexFilters` property on the task replaces the extension's filters
+instead. The filters control which message codes are written to the pack file and which are skipped.
 
 The filtering logic works as follows. If no include filters are defined, every scanned message is eligible. If at least
 one include filter is defined, a message is eligible only when its code matches at least one of the include patterns. 
@@ -93,7 +96,9 @@ source at runtime, for example from a separate pack file or through programmatic
 template at runtime causes a formatting error when the message that references it is formatted.
 
 The `ignore` method on the `templates` block allows selectively suppressing the validation for specific template names
-without disabling validation entirely. This is covered in detail on the [Extension](extension.md) page.
+without disabling validation entirely. This is covered in detail on the [Extension](extension.md) page. Like the
+include and exclude filters, the ignore patterns of the extension are forwarded to the task lazily, and patterns
+added on the task with `ignore` are added to them.
 
 === "Gradle (Groovy)"
 

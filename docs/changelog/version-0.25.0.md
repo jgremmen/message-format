@@ -139,6 +139,26 @@ that specific type, that formatter is no longer used for values set with `with(.
 formatter for the supplier interface (here `LongSupplierFormatter`) instead.
 
 
+### Gradle plugin regex filters are `ListProperty` instead of `List`
+
+The Gradle plugin copied the `include`, `exclude` and `ignore` regex filters from the `messageFormat` extension to the
+`messageFormatPack` task once, when the task was realized. If anything realized the task before the `messageFormat`
+block was evaluated, for example `jar { from messageFormatPack }` placed above it, `tasks.named(...).get()` or an eager
+`tasks.withType(...).all { ... }`, every filter added in the `messageFormat` block afterwards was silently dropped.
+
+The filters are now modelled as `ListProperty<String>` and forwarded to the task lazily, so they are evaluated when the
+task executes. As a consequence, the return type of the following methods changed from `List<String>` to
+`ListProperty<String>`:
+
+- `MessageFormatMessagesExtension.getIncludeRegexFilters()`
+- `MessageFormatMessagesExtension.getExcludeRegexFilters()`
+- `MessageFormatTemplatesExtension.getIgnoreRegexFilters()`
+
+Build scripts that use the `include`, `exclude` and `ignore` methods are not affected. Build logic that reads or
+modifies the returned list directly must use the `ListProperty` API instead (e.g. `get()`, `add(...)` or
+`addAll(...)`). Filters added on the task are added to the filters of the extension; assigning the property on the
+task replaces them.
+
 ## New Features
 
 ### `MessageSupportFactory.createDefault()` and `createGeneric()`

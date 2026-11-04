@@ -1,8 +1,10 @@
 # Extension Configuration
 
 The `messageFormat` extension is the central configuration point for the Gradle plugin. All properties set on the 
-extension are forwarded as conventions to the `messageFormatPack` task, so in most cases only the extension needs to be 
-configured and the task picks up the values automatically.
+extension are forwarded lazily to the `messageFormatPack` task, so in most cases only the extension needs to be 
+configured and the task picks up the values automatically. Because the values are read when the task executes, the
+`messageFormat` block may appear anywhere in the build script, even after a block that already configures or realizes
+the task, such as `jar { from messageFormatPack }`.
 
 The extension is organized into top-level properties that control the output file and source scanning and two nested 
 blocks (`messages` and `templates`) that control filtering, duplicate handling and template validation respectively.

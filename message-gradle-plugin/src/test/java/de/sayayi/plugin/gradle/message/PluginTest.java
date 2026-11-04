@@ -171,6 +171,80 @@ final class PluginTest
   }
 
 
+  @Test
+  @DisplayName("Pack task with filtered message codes configured after task realization")
+  void testWithFilteredSourceAfterRealization() throws IOException
+  {
+    writeBuildGradle(List.of(
+        "jar {",
+        "  from messageFormatPack {",
+        "    into 'META-INF'",
+        "  }",
+        "}",
+        "messageFormat {",
+        "  messages {",
+        "    include '.*INNER.*'",
+        "  }",
+        "}"
+    ));
+
+    copy(getResource("test-source-1.java"),
+        new File(testPackageDir, "Source1.java").toPath());
+
+    val result = GradleRunner.create()
+        .withProjectDir(testProjectDir)
+        .withArguments("messageFormatPack")
+        .withPluginClasspath()
+        .withDebug(true)
+        .forwardOutput()
+        .build();
+
+    assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
+    assertTrue(packFile.isFile() && packFile.canRead());
+
+    val pack = readMessagePack(packFile);
+    assertEquals(Set.of("MSG-INNER1"), pack.getMessageCodes());
+    assertEquals(Set.of(), pack.getTemplateNames());
+  }
+
+
+  @Test
+  @DisplayName("Pack task with message code filters from extension and task")
+  void testWithFilteredSourceFromExtensionAndTask() throws IOException
+  {
+    writeBuildGradle(List.of(
+        "messageFormatPack {",
+        "  messages {",
+        "    include 'MSG1'",
+        "  }",
+        "}",
+        "messageFormat {",
+        "  messages {",
+        "    include '.*INNER.*'",
+        "  }",
+        "}"
+    ));
+
+    copy(getResource("test-source-1.java"),
+        new File(testPackageDir, "Source1.java").toPath());
+
+    val result = GradleRunner.create()
+        .withProjectDir(testProjectDir)
+        .withArguments("messageFormatPack")
+        .withPluginClasspath()
+        .withDebug(true)
+        .forwardOutput()
+        .build();
+
+    assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
+    assertTrue(packFile.isFile() && packFile.canRead());
+
+    val pack = readMessagePack(packFile);
+    assertEquals(Set.of("MSG1", "MSG-INNER1"), pack.getMessageCodes());
+    assertEquals(Set.of(), pack.getTemplateNames());
+  }
+
+
   private static Stream<Arguments> testDuplicateMessage_parameters()
   {
     return Stream.of(

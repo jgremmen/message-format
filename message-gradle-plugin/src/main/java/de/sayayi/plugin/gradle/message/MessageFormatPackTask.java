@@ -370,7 +370,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
       final var missingTemplateNames = new ArrayList<>(messageSupport
           .getMessageAccessor()
           .findMissingTemplates(this::messageCodeFilter));
-      final var ignoreRegexFilters = templates.getIgnoreRegexFilters();
+      final var ignoreRegexFilters = templates.getIgnoreRegexFilters().get();
 
       for(var iterator = missingTemplateNames.iterator(); iterator.hasNext();)
       {
@@ -453,8 +453,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
   @Contract(pure = true)
   private boolean messageCodeFilter(@NotNull String code)
   {
-    final var includeRegexFilters = messages.getIncludeRegexFilters();
-    final var excludeRegexFilters = messages.getExcludeRegexFilters();
+    final var includeRegexFilters = messages.getIncludeRegexFilters().get();
+    final var excludeRegexFilters = messages.getExcludeRegexFilters().get();
 
     var match = includeRegexFilters.isEmpty();
 

@@ -15,12 +15,10 @@
  */
 package de.sayayi.plugin.gradle.message;
 
+import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -43,22 +41,19 @@ import java.util.List;
  */
 public abstract class MessageFormatTemplatesExtension
 {
-  /** Regular expressions selecting the template names to ignore during template validation. */
-  private final List<String> ignoreRegexFilter = new ArrayList<>();
-
-
   /**
-   * Returns a list of regular expressions which will be matched against each template name. If it matches, the
-   * template will be ignored during validation of referenced templates.
+   * Returns a list of regular expressions which will be matched against each template name. If it matches, the template
+   * will be ignored during validation of referenced templates.
+   * <p>
+   * The property is evaluated lazily when the task executes, so regular expressions added after the task has been
+   * configured are taken into account.
    *
-   * @return  list of regular expressions for template name filtering, never {@code null}
+   * @return  list property of regular expressions for template name filtering, never {@code null}
    *
    * @see #ignore(String...)
    */
   @Input
-  public List<String> getIgnoreRegexFilters() {
-    return ignoreRegexFilter;
-  }
+  public abstract ListProperty<@NotNull String> getIgnoreRegexFilters();
 
 
   /**
@@ -78,13 +73,14 @@ public abstract class MessageFormatTemplatesExtension
 
 
   /**
-   * Ignores templates whose name matches the given regular expressions during template validation.
+   * Ignores templates whose name matches the given regular expressions during template validation. The regular
+   * expressions are added to the {@link #getIgnoreRegexFilters() ignore filters}.
    *
    * @param regex  array of regular expressions matching template names, not {@code null}
    *
    * @see #getIgnoreRegexFilters()
    */
   public void ignore(String... regex) {
-    ignoreRegexFilter.addAll(List.of(regex));
+    getIgnoreRegexFilters().addAll(regex);
   }
 }

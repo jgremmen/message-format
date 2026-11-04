@@ -15,12 +15,10 @@
  */
 package de.sayayi.plugin.gradle.message;
 
+import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -44,41 +42,38 @@ import java.util.List;
  */
 public abstract class MessageFormatMessagesExtension
 {
-  /** Regular expressions selecting the message codes to include. */
-  private final List<String> includeRegexFilter = new ArrayList<>();
-
-  /** Regular expressions selecting the message codes to exclude. */
-  private final List<String> excludeRegexFilter = new ArrayList<>();
-
-
   /**
    * Returns a list of regular expressions which will be matched against each message code. If it matches, the message
    * will be included in the packed message file. If it doesn't match the message is skipped.
    * <p>
    * If the list is empty, all messages are included, unless they're explicitly excluded.
+   * <p>
+   * The property is evaluated lazily when the task executes, so regular expressions added after the task has been
+   * configured are taken into account.
    *
-   * @return  list of regular expressions for message inclusion, never {@code null}
+   * @return  list property of regular expressions for message inclusion, never {@code null}
    *
+   * @see #include(String...)
    * @see #getExcludeRegexFilters()
    */
   @Input
-  public List<String> getIncludeRegexFilters() {
-    return includeRegexFilter;
-  }
+  public abstract ListProperty<@NotNull String> getIncludeRegexFilters();
 
 
   /**
    * Returns a list of regular expressions which will be matched against each message code. If it matches, the message
    * will be excluded from the packed message file. If it doesn't match the message is included.
+   * <p>
+   * The property is evaluated lazily when the task executes, so regular expressions added after the task has been
+   * configured are taken into account.
    *
-   * @return  list of regular expressions for message exclusion, never {@code null}
+   * @return  list property of regular expressions for message exclusion, never {@code null}
    *
+   * @see #exclude(String...)
    * @see #getIncludeRegexFilters()
    */
   @Input
-  public List<String> getExcludeRegexFilters() {
-    return excludeRegexFilter;
-  }
+  public abstract ListProperty<@NotNull String> getExcludeRegexFilters();
 
 
   /**
@@ -110,25 +105,27 @@ public abstract class MessageFormatMessagesExtension
 
 
   /**
-   * Includes messages that match the given regular expressions.
+   * Includes messages that match the given regular expressions. The regular expressions are added to the
+   * {@link #getIncludeRegexFilters() include filters}.
    *
    * @param regex  array of regular expressions, not {@code null}
    *
    * @see #getIncludeRegexFilters()
    */
   public void include(String... regex) {
-    includeRegexFilter.addAll(List.of(regex));
+    getIncludeRegexFilters().addAll(regex);
   }
 
 
   /**
-   * Excludes messages that match the given regular expressions.
+   * Excludes messages that match the given regular expressions. The regular expressions are added to the
+   * {@link #getExcludeRegexFilters() exclude filters}.
    *
    * @param regex  array of regular expressions, not {@code null}
    *
    * @see #getExcludeRegexFilters()
    */
   public void exclude(String... regex) {
-    excludeRegexFilter.addAll(List.of(regex));
+    getExcludeRegexFilters().addAll(regex);
   }
 }

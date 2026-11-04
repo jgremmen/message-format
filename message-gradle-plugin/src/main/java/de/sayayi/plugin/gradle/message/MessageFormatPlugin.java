@@ -118,8 +118,8 @@ public class MessageFormatPlugin implements Plugin<@NotNull Project>
 
       packTaskMessages.getDuplicateStrategy().convention(messagesExtension.getDuplicateStrategy());
 
-      packTaskMessages.include(messagesExtension.getIncludeRegexFilters().toArray(String[]::new));
-      packTaskMessages.exclude(messagesExtension.getExcludeRegexFilters().toArray(String[]::new));
+      packTaskMessages.getIncludeRegexFilters().addAll(messagesExtension.getIncludeRegexFilters());
+      packTaskMessages.getExcludeRegexFilters().addAll(messagesExtension.getExcludeRegexFilters());
 
       // templates {... }
       final var templatesExtension = extension.getTemplates();
@@ -127,7 +127,7 @@ public class MessageFormatPlugin implements Plugin<@NotNull Project>
 
       packTaskTemplates.getValidateReferences().convention(templatesExtension.getValidateReferences());
 
-      packTaskTemplates.ignore(templatesExtension.getIgnoreRegexFilters().toArray(String[]::new));
+      packTaskTemplates.getIgnoreRegexFilters().addAll(templatesExtension.getIgnoreRegexFilters());
     });
   }
 }
