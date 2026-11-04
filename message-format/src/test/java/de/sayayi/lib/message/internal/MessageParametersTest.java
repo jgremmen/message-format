@@ -19,8 +19,10 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -87,6 +89,15 @@ final class MessageParametersTest
   @DisplayName("Equals")
   void testEquals()
   {
+    assertEquals(parameters, createParameters(ITALIAN));
+    assertNotEquals(parameters, createParameters(GERMAN));
+  }
+
+
+  @Test
+  @DisplayName("Not equal to other Parameters implementations")
+  void testNotEqualsOtherImplementation()
+  {
     val otherParameters = mock(Parameters.class);
     val otherMap = Map.of(
         "o", OptionalInt.empty(),
@@ -100,25 +111,32 @@ final class MessageParametersTest
         .thenAnswer(invocation -> otherMap.get(invocation.getArgument(0, String.class)));
     when(otherParameters.asParameterMap()).thenReturn(otherMap);
 
-    assertEquals(parameters, otherParameters);
-
-    when(otherParameters.getLocale()).thenReturn(GERMAN);
-
+    // symmetric: neither side considers the other equal
     assertNotEquals(parameters, otherParameters);
+    assertNotEquals(otherParameters, parameters);
   }
 
 
   @Test
   @DisplayName("HashCode")
-  void testHashCode()
-  {
-    val otherMap = Map.of(
-        "o", OptionalInt.empty(),
-        "b", 45,
-        "c", true,
-        "a", "Hello");
+  void testHashCode() {
+    assertEquals(parameters.hashCode(), createParameters(ITALIAN).hashCode());
+  }
 
-    assertEquals(parameters.hashCode(), otherMap.entrySet().stream()
-        .mapToInt(e -> e.getKey().hashCode() ^ e.getValue().hashCode()).sum() + ITALIAN.hashCode());
+
+  private static @NotNull MessageParameters createParameters(@NotNull Locale locale)
+  {
+    val messageSupport = new MessageSupportImpl(DefaultFormatterService.getSharedInstance(),
+        MessageFactory.getSharedInstance());
+    val configurer = messageSupport.new Configurer<>(() -> null);
+
+    configurer
+        .locale(locale)
+        .with("a", "Hello")
+        .with("b", 45)
+        .with("c", true)
+        .with("o", OptionalInt.empty());
+
+    return new MessageParameters(configurer);
   }
 }

@@ -82,24 +82,36 @@ final class MessageParameters implements Parameters
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * Tells whether the given object is a {@code MessageParameters} instance with the same locale and parameter values
+   * as this instance.
+   * <p>
+   * Other {@link Parameters} implementations are never considered equal, even if they provide the same locale and
+   * parameter values. This keeps {@code equals} symmetric, as other implementations may use identity equality.
+   *
+   * @param o  object to compare with
+   *
+   * @return  {@code true} if {@code o} is a {@code MessageParameters} instance with equal locale and parameter values,
+   *          {@code false} otherwise
+   */
   @Override
   public boolean equals(Object o)
   {
     if (this == o)
       return true;
-    else if (!(o instanceof Parameters))
-      return false;
-
-    var that = (Parameters)o;
 
     return
-        locale.equals(that.getLocale()) &&
-        parameters.equals(that.asParameterMap());
+        o instanceof MessageParameters that &&
+        locale.equals(that.locale) &&
+        parameters.equals(that.parameters);
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * Returns the hash code for this instance, based on the locale and the parameter values.
+   *
+   * @return  hash code
+   */
   @Override
   public int hashCode() {
     return locale.hashCode() + parameters.hashCode();

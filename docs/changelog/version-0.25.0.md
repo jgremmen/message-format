@@ -159,6 +159,19 @@ modifies the returned list directly must use the `ListProperty` API instead (e.g
 `addAll(...)`). Filters added on the task are added to the filters of the extension; assigning the property on the
 task replaces them.
 
+### `Message.Parameters` no longer specifies `hashCode()`
+
+`Message.Parameters` redeclared `hashCode()` and documented it as the sum of the hash codes of the locale, the
+parameter names and the parameter values. None of the implementations followed this contract: most of them use
+identity equality, and `MessageParameters.equals(Object)` accepted any `Parameters` implementation, so equality was
+not symmetric.
+
+The `hashCode()` redeclaration and its contract have been removed. The interface now states that implementations
+may use identity equality and that code must not rely on two parameters instances being equal because they provide
+the same locale and parameter values. `MessageParameters` is only equal to another `MessageParameters` instance with
+the same locale and parameter values, which makes `equals` symmetric. To compare the content of two parameters
+instances, compare `getLocale()` and `asParameterMap()` instead.
+
 ## New Features
 
 ### `MessageSupportFactory.createDefault()` and `createGeneric()`
