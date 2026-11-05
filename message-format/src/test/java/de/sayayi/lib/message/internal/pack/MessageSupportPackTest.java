@@ -28,6 +28,9 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import static de.sayayi.lib.message.Message.Parameters;
 import static java.util.Locale.*;
@@ -96,6 +99,36 @@ final class MessageSupportPackTest
       assertEquals(
           messageAccessor.getMessageByCode(messageCode),
           messageAccessorCloned.getMessageByCode(messageCode));
+    }
+  }
+
+
+  @Test
+  @DisplayName("Export does not close the output stream")
+  void testExportDoesNotCloseStream() throws IOException
+  {
+    val zip = new ByteArrayOutputStream();
+
+    try(val zipStream = new ZipOutputStream(zip)) {
+      zipStream.putNextEntry(new ZipEntry("compressed.mfp"));
+      messageSupport.exportMessages(zipStream, true, null, null);
+      zipStream.closeEntry();
+
+      // would fail with "Stream closed" if the export had closed the zip stream
+      zipStream.putNextEntry(new ZipEntry("uncompressed.mfp"));
+      messageSupport.exportMessages(zipStream, false, null, null);
+      zipStream.closeEntry();
+    }
+
+    try(val zipStream = new ZipInputStream(new ByteArrayInputStream(zip.toByteArray()))) {
+      for(ZipEntry entry; (entry = zipStream.getNextEntry()) != null;)
+      {
+        val imported = MessageSupportFactory.createGeneric();
+        imported.importMessages(new ByteArrayInputStream(zipStream.readAllBytes()));
+
+        assertEquals(messageSupport.getMessageAccessor().getMessageCodes(),
+            imported.getMessageAccessor().getMessageCodes(), entry.getName());
+      }
     }
   }
 

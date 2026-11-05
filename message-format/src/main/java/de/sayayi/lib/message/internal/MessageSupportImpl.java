@@ -37,6 +37,7 @@ import de.sayayi.lib.message.util.SupplierDelegate;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.*;
 
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
@@ -353,7 +354,8 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
           " selected)");
     }
 
-    try(var dataStream = new PackOutputStream(PACK_CONFIG, VERSION, compress, stream)) {
+    // closing the pack stream finishes the pack (e.g. GZip trailer), but must not close the caller's stream
+    try(var dataStream = new PackOutputStream(PACK_CONFIG, VERSION, compress, new NonClosingOutputStream(stream))) {
       // pack all filtered messages
       dataStream.writeUnsignedShort(messageCodesCount);
       for(var code: messageCodes)
@@ -806,6 +808,51 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
           .distinct()
           .filter(templateName -> !templateNames.contains(templateName))
           .collect(toCollection(TreeSet::new));
+    }
+  }
+
+
+
+
+  /**
+   * Output stream delegating to another output stream, which flushes instead of closing the delegate stream when
+   * closed.
+   * <p>
+   * This class is used to protect the caller's stream from being closed by {@link PackOutputStream#close()}.
+   *
+   * @since 0.25.0
+   */
+  private static final class NonClosingOutputStream extends FilterOutputStream
+  {
+    /**
+     * Creates a non-closing output stream for the given {@code stream}.
+     *
+     * @param stream  output stream to delegate to, not {@code null}
+     */
+    private NonClosingOutputStream(@NotNull OutputStream stream) {
+      super(requireNonNull(stream, "stream must not be null"));
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Writes the bytes to the delegate stream in a single call, instead of writing them byte by byte.
+     */
+    @Override
+    public void write(byte @NotNull [] b, int off, int len) throws IOException {
+      out.write(b, off, len);
+    }
+
+
+    /**
+     * Flushes the delegate stream without closing it.
+     *
+     * @throws IOException  if an I/O error occurs while flushing
+     */
+    @Override
+    public void close() throws IOException {
+      flush();
     }
   }
 }

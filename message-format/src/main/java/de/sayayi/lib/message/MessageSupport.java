@@ -156,8 +156,12 @@ public interface MessageSupport
    * exported pack, even if they are referenced by an exported message. Such custom templates must be registered again
    * (e.g. via {@link ConfigurableMessageSupport#registerTemplatesFromService(ClassLoader)}) on the message support
    * instance that imports the pack.
+   * <p>
+   * The {@code stream} is flushed, but not closed, when this method returns. This allows the pack to be written as part
+   * of a larger stream, e.g. as an entry of a {@link java.util.zip.ZipOutputStream ZipOutputStream}. Closing the
+   * stream is the responsibility of the caller.
    *
-   * @param stream  pack output stream, not {@code null}
+   * @param stream  pack output stream, not {@code null}. The stream is not closed by this method
    *
    * @throws IOException  if an I/O error occurs or if the pack would contain more than 65535 messages or more
    *                      than 65535 templates
@@ -190,8 +194,12 @@ public interface MessageSupport
    * exported message. Such custom templates must be registered again (e.g. via
    * {@link ConfigurableMessageSupport#registerTemplatesFromService(ClassLoader)}) on the message support instance that
    * imports the pack.
+   * <p>
+   * The {@code stream} is flushed, but not closed, when this method returns. This allows the pack to be written as part
+   * of a larger stream, e.g. as an entry of a {@link java.util.zip.ZipOutputStream ZipOutputStream}. Closing the
+   * stream is the responsibility of the caller.
    *
-   * @param stream             pack output stream, not {@code null}
+   * @param stream             pack output stream, not {@code null}. The stream is not closed by this method
    * @param compress           {@code true} compress pack, {@code false} do not compress pack
    * @param messageCodeFilter  optional predicate for selecting message codes. If {@code null} all messages from this
    *                           message support will be selected

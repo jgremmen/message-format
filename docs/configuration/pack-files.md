@@ -46,8 +46,24 @@ exist in the message support but are not used by any selected message are omitte
 registered messages and templates, so registrations from other threads during the export do not affect the result.
 
 A pack file holds at most 65535 messages and 65535 templates. If the selection exceeds either limit, `exportMessages`
-throws an `IOException` and writes nothing to the stream. The stream passed to `exportMessages` is closed when the
-method returns.
+throws an `IOException` and writes nothing to the stream.
+
+The stream passed to `exportMessages` is flushed, but not closed, when the method returns. Closing it is the
+responsibility of the caller, as in the `try`-with-resources example above. This allows a pack to be written as part
+of a larger stream, for example as an entry of a ZIP or JAR file:
+
+```java
+try(var zip = new ZipOutputStream(new FileOutputStream("bundle.zip"))) {
+  zip.putNextEntry(new ZipEntry("META-INF/messages.mfp"));
+  messageSupport.exportMessages(zip);
+  zip.closeEntry();
+
+  // the zip stream is still open, so more entries can be written
+  zip.putNextEntry(new ZipEntry("README.txt"));
+  zip.write("...".getBytes(UTF_8));
+  zip.closeEntry();
+}
+```
 
 
 ## Importing Messages
