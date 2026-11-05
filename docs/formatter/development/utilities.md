@@ -362,7 +362,8 @@ The `MessageFactory` creates the imported messages and templates, and its part n
 first consumer receives `Message.WithCode` instances (messages with their associated code). The second consumer
 receives templates as name-template pairs. Either consumer may be `null` if only one type of entry is needed.
 
-The input stream is always closed when this method returns, regardless of success or failure.
+The input stream is always closed when this method returns, regardless of success or failure. To read a pack from
+a part of a larger stream, see [Packs Inside Other Streams](../../configuration/pack-files.md#packs-inside-other-streams).
 
 ```java
 var factory = messageSupport.getMessageAccessor().getMessageFactory();

@@ -689,11 +689,16 @@ public final class MessageUtil
    * validated and all entries are iterated. Each message is passed to the optional
    * {@code messageConsumer} and each template to the optional {@code templateConsumer}.
    * <p>
-   * The {@code packStream} is closed when this method returns, regardless of whether the
-   * import was successful or not.
+   * The {@code packStream} is closed when this method returns, regardless of whether the import was successful or not.
+   * Packs are meant to be read as a whole, e.g. from a file. To read a pack from a part of a larger stream
+   * nevertheless, e.g. from an entry of a {@link java.util.zip.ZipInputStream ZipInputStream}, pass a
+   * {@link java.io.FilterInputStream FilterInputStream} wrapping that stream, which overrides
+   * {@link InputStream#close() close()} to do nothing. Note that a compressed pack may be read beyond its end, so the
+   * position of the wrapped stream is undefined after the import, unless the pack is delimited by the wrapped stream
+   * itself, as is the case for a ZIP entry.
    *
    * @param messageFactory    message factory used to create the imported messages and templates, not {@code null}
-   * @param packStream        pack input stream, not {@code null}
+   * @param packStream        pack input stream, not {@code null}. The stream is closed by this method
    * @param messageConsumer   consumer invoked for each message found, or {@code null}
    * @param templateConsumer  consumer invoked for each template found, or {@code null}
    *
@@ -712,7 +717,7 @@ public final class MessageUtil
 
     final var packHelper = new PackSupport(messageFactory);
 
-    try(var dataStream = new PackInputStream(PACK_CONFIG, packStream)) {
+    try(packStream; var dataStream = new PackInputStream(PACK_CONFIG, packStream)) {
       if (dataStream.getVersion().isEmpty())
         throw new IllegalArgumentException("packStream has no version");
 

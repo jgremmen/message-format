@@ -28,11 +28,10 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static de.sayayi.lib.message.Message.Parameters;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Locale.*;
 import static java.util.stream.Collectors.toMap;
 import static org.junit.jupiter.api.Assertions.*;
@@ -104,36 +103,6 @@ final class MessageSupportPackTest
 
 
   @Test
-  @DisplayName("Export does not close the output stream")
-  void testExportDoesNotCloseStream() throws IOException
-  {
-    val zip = new ByteArrayOutputStream();
-
-    try(val zipStream = new ZipOutputStream(zip)) {
-      zipStream.putNextEntry(new ZipEntry("compressed.mfp"));
-      messageSupport.exportMessages(zipStream, true, null, null);
-      zipStream.closeEntry();
-
-      // would fail with "Stream closed" if the export had closed the zip stream
-      zipStream.putNextEntry(new ZipEntry("uncompressed.mfp"));
-      messageSupport.exportMessages(zipStream, false, null, null);
-      zipStream.closeEntry();
-    }
-
-    try(val zipStream = new ZipInputStream(new ByteArrayInputStream(zip.toByteArray()))) {
-      for(ZipEntry entry; (entry = zipStream.getNextEntry()) != null;)
-      {
-        val imported = MessageSupportFactory.createGeneric();
-        imported.importMessages(new ByteArrayInputStream(zipStream.readAllBytes()));
-
-        assertEquals(messageSupport.getMessageAccessor().getMessageCodes(),
-            imported.getMessageAccessor().getMessageCodes(), entry.getName());
-      }
-    }
-  }
-
-
-  @Test
   @DisplayName("Pack/unpack localized bundle with default locale entry")
   void testExportImportDefaultLocaleMessage() throws IOException
   {
@@ -189,6 +158,72 @@ final class MessageSupportPackTest
     }
 
     assertEquals(0xffff, imported.getMessageAccessor().getMessageCodes().size());
+  }
+
+
+  @Test
+  @DisplayName("Export and import close the stream")
+  void testStreamsClosed() throws IOException
+  {
+    val packClosed = new AtomicBoolean();
+    val pack = new ByteArrayOutputStream() {
+      @Override
+      public void close() {
+        packClosed.set(true);
+      }
+    };
+
+    messageSupport.exportMessages(pack);
+    assertTrue(packClosed.get());
+
+    val packStreamClosed = new AtomicBoolean();
+    val packStream = new ByteArrayInputStream(pack.toByteArray()) {
+      @Override
+      public void close() {
+        packStreamClosed.set(true);
+      }
+    };
+
+    MessageSupportFactory.createGeneric().importMessages(packStream);
+    assertTrue(packStreamClosed.get());
+  }
+
+
+  @Test
+  @DisplayName("Export closes the stream if the pack cannot be written")
+  void testExportFailureClosesStream()
+  {
+    val cms = MessageSupportFactory.createGeneric();
+    for(var n = 0; n <= 0xffff; n++)
+      cms.addMessage("MSG-" + n, "text");
+
+    val closed = new AtomicBoolean();
+    val pack = new ByteArrayOutputStream() {
+      @Override
+      public void close() {
+        closed.set(true);
+      }
+    };
+
+    assertThrows(IOException.class, () -> cms.exportMessages(pack));
+    assertTrue(closed.get());
+  }
+
+
+  @Test
+  @DisplayName("Import closes the stream if the pack is invalid")
+  void testImportFailureClosesStream()
+  {
+    val closed = new AtomicBoolean();
+    val packStream = new ByteArrayInputStream("not a message pack".getBytes(UTF_8)) {
+      @Override
+      public void close() {
+        closed.set(true);
+      }
+    };
+
+    assertThrows(IOException.class, () -> MessageSupportFactory.createGeneric().importMessages(packStream));
+    assertTrue(closed.get());
   }
 
 

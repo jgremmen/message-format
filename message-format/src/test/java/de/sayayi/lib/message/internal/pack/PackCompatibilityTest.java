@@ -140,9 +140,6 @@ final class PackCompatibilityTest
   public static void main(String[] args) throws IOException
   {
     init();
-
-    try(var stream = newOutputStream(Path.of(args[0]))) {
-      MESSAGE_SUPPORT.exportMessages(stream);
-    }
+    MESSAGE_SUPPORT.exportMessages(newOutputStream(Path.of(args[0])));
   }
 }

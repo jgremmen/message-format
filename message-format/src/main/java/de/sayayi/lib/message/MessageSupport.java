@@ -157,11 +157,13 @@ public interface MessageSupport
    * (e.g. via {@link ConfigurableMessageSupport#registerTemplatesFromService(ClassLoader)}) on the message support
    * instance that imports the pack.
    * <p>
-   * The {@code stream} is flushed, but not closed, when this method returns. This allows the pack to be written as part
-   * of a larger stream, e.g. as an entry of a {@link java.util.zip.ZipOutputStream ZipOutputStream}. Closing the
-   * stream is the responsibility of the caller.
+   * The {@code stream} is closed when this method returns, regardless of whether the export was successful or not.
+   * Packs are meant to be written as a whole, e.g. to a file. To write a pack as part of a larger stream nevertheless,
+   * e.g. as an entry of a {@link java.util.zip.ZipOutputStream ZipOutputStream}, pass a
+   * {@link java.io.FilterOutputStream FilterOutputStream} wrapping that stream, which overrides
+   * {@link OutputStream#close() close()} to only flush the wrapped stream.
    *
-   * @param stream  pack output stream, not {@code null}. The stream is not closed by this method
+   * @param stream  pack output stream, not {@code null}. The stream is closed by this method
    *
    * @throws IOException  if an I/O error occurs or if the pack would contain more than 65535 messages or more
    *                      than 65535 templates
@@ -195,11 +197,13 @@ public interface MessageSupport
    * {@link ConfigurableMessageSupport#registerTemplatesFromService(ClassLoader)}) on the message support instance that
    * imports the pack.
    * <p>
-   * The {@code stream} is flushed, but not closed, when this method returns. This allows the pack to be written as part
-   * of a larger stream, e.g. as an entry of a {@link java.util.zip.ZipOutputStream ZipOutputStream}. Closing the
-   * stream is the responsibility of the caller.
+   * The {@code stream} is closed when this method returns, regardless of whether the export was successful or not.
+   * Packs are meant to be written as a whole, e.g. to a file. To write a pack as part of a larger stream nevertheless,
+   * e.g. as an entry of a {@link java.util.zip.ZipOutputStream ZipOutputStream}, pass a
+   * {@link java.io.FilterOutputStream FilterOutputStream} wrapping that stream, which overrides
+   * {@link OutputStream#close() close()} to only flush the wrapped stream.
    *
-   * @param stream             pack output stream, not {@code null}. The stream is not closed by this method
+   * @param stream             pack output stream, not {@code null}. The stream is closed by this method
    * @param compress           {@code true} compress pack, {@code false} do not compress pack
    * @param messageCodeFilter  optional predicate for selecting message codes. If {@code null} all messages from this
    *                           message support will be selected
@@ -700,9 +704,14 @@ public interface MessageSupport
      * this instance.
      * <p>
      * The {@code packStream} is closed when this method returns, regardless of whether the import was successful or
-     * not.
+     * not. Packs are meant to be read as a whole, e.g. from a file. To read a pack from a part of a larger stream
+     * nevertheless, e.g. from an entry of a {@link java.util.zip.ZipInputStream ZipInputStream}, pass a
+     * {@link java.io.FilterInputStream FilterInputStream} wrapping that stream, which overrides
+     * {@link InputStream#close() close()} to do nothing. Note that a compressed pack may be read beyond its end, so the
+     * position of the wrapped stream is undefined after the import, unless the pack is delimited by the wrapped stream
+     * itself, as is the case for a ZIP entry.
      *
-     * @param packStream  pack input stream, not {@code null}
+     * @param packStream  pack input stream, not {@code null}. The stream is closed by this method
      *
      * @return  configurable message support instance, never {@code null}
      *

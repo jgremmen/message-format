@@ -35,9 +35,11 @@ import de.sayayi.lib.message.template.Template;
 import de.sayayi.lib.message.util.SortedStringMap;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import de.sayayi.lib.pack.PackOutputStream;
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
+import org.jetbrains.annotations.UnmodifiableView;
 
-import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
@@ -314,59 +316,60 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
                              Predicate<String> messageCodeFilter, Predicate<String> templateNameFilter)
       throws IOException
   {
-    final Map<String,Message.WithCode> messageSnapshot;
-    final Map<String,Template> templateSnapshot;
+    try(stream) {
+      final Map<String,Message.WithCode> messageSnapshot;
+      final Map<String,Template> templateSnapshot;
 
-    lock.readLock().lock();
-    try {
-      messageSnapshot = new TreeMap<>(messages);
-      templateSnapshot = new TreeMap<>(templates);
-    } finally {
-      lock.readLock().unlock();
-    }
+      lock.readLock().lock();
+      try {
+        messageSnapshot = new TreeMap<>(messages);
+        templateSnapshot = new TreeMap<>(templates);
+      } finally {
+        lock.readLock().unlock();
+      }
 
-    final var messageCodes = new TreeSet<>(messageSnapshot.keySet());
-    final var templateNames = new TreeSet<String>();
+      final var messageCodes = new TreeSet<>(messageSnapshot.keySet());
+      final var templateNames = new TreeSet<String>();
 
-    // filter message codes
-    if (messageCodeFilter != null)
-      messageCodes.removeIf(messageCodeFilter.negate());
+      // filter message codes
+      if (messageCodeFilter != null)
+        messageCodes.removeIf(messageCodeFilter.negate());
 
-    var messageCodesCount = messageCodes.size();
-    if (messageCodesCount > MAX_PACK_COUNT)
-    {
-      throw new IOException("pack cannot contain more than " + MAX_PACK_COUNT + " messages (" + messageCodesCount +
-          " selected)");
-    }
-
-    // collect all required templates
-    for(var code: messageCodes)
-      templateNames.addAll(messageSnapshot.get(code).getTemplateNames());
-
-    templateNames.removeIf(templateName -> !(templateSnapshot.get(templateName) instanceof MessageTemplate));
-    if (templateNameFilter != null)
-      templateNames.removeIf(templateNameFilter.negate());
-
-    var templateNamesCount = templateNames.size();
-    if (templateNamesCount > MAX_PACK_COUNT)
-    {
-      throw new IOException("pack cannot contain more than " + MAX_PACK_COUNT + " templates (" + templateNamesCount +
-          " selected)");
-    }
-
-    // closing the pack stream finishes the pack (e.g. GZip trailer), but must not close the caller's stream
-    try(var dataStream = new PackOutputStream(PACK_CONFIG, VERSION, compress, new NonClosingOutputStream(stream))) {
-      // pack all filtered messages
-      dataStream.writeUnsignedShort(messageCodesCount);
-      for(var code: messageCodes)
-        PackSupport.pack(messageSnapshot.get(code), dataStream);
-
-      // pack all required templates
-      dataStream.writeUnsignedShort(templateNamesCount);
-      for(var templateName: templateNames)
+      var messageCodesCount = messageCodes.size();
+      if (messageCodesCount > MAX_PACK_COUNT)
       {
-        dataStream.writeString(templateName);
-        PackSupport.pack(((MessageTemplate)templateSnapshot.get(templateName)).getMessage(), dataStream);
+        throw new IOException("pack cannot contain more than " + MAX_PACK_COUNT + " messages (" + messageCodesCount +
+            " selected)");
+      }
+
+      // collect all required templates
+      for(var code: messageCodes)
+        templateNames.addAll(messageSnapshot.get(code).getTemplateNames());
+
+      templateNames.removeIf(templateName -> !(templateSnapshot.get(templateName) instanceof MessageTemplate));
+      if (templateNameFilter != null)
+        templateNames.removeIf(templateNameFilter.negate());
+
+      var templateNamesCount = templateNames.size();
+      if (templateNamesCount > MAX_PACK_COUNT)
+      {
+        throw new IOException("pack cannot contain more than " + MAX_PACK_COUNT + " templates (" + templateNamesCount +
+            " selected)");
+      }
+
+      try(var dataStream = new PackOutputStream(PACK_CONFIG, VERSION, compress, stream)) {
+        // pack all filtered messages
+        dataStream.writeUnsignedShort(messageCodesCount);
+        for(var code: messageCodes)
+          PackSupport.pack(messageSnapshot.get(code), dataStream);
+
+        // pack all required templates
+        dataStream.writeUnsignedShort(templateNamesCount);
+        for(var templateName: templateNames)
+        {
+          dataStream.writeString(templateName);
+          PackSupport.pack(((MessageTemplate)templateSnapshot.get(templateName)).getMessage(), dataStream);
+        }
       }
     }
   }
@@ -808,51 +811,6 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
           .distinct()
           .filter(templateName -> !templateNames.contains(templateName))
           .collect(toCollection(TreeSet::new));
-    }
-  }
-
-
-
-
-  /**
-   * Output stream delegating to another output stream, which flushes instead of closing the delegate stream when
-   * closed.
-   * <p>
-   * This class is used to protect the caller's stream from being closed by {@link PackOutputStream#close()}.
-   *
-   * @since 0.25.0
-   */
-  private static final class NonClosingOutputStream extends FilterOutputStream
-  {
-    /**
-     * Creates a non-closing output stream for the given {@code stream}.
-     *
-     * @param stream  output stream to delegate to, not {@code null}
-     */
-    private NonClosingOutputStream(@NotNull OutputStream stream) {
-      super(requireNonNull(stream, "stream must not be null"));
-    }
-
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Writes the bytes to the delegate stream in a single call, instead of writing them byte by byte.
-     */
-    @Override
-    public void write(byte @NotNull [] b, int off, int len) throws IOException {
-      out.write(b, off, len);
-    }
-
-
-    /**
-     * Flushes the delegate stream without closing it.
-     *
-     * @throws IOException  if an I/O error occurs while flushing
-     */
-    @Override
-    public void close() throws IOException {
-      flush();
     }
   }
 }

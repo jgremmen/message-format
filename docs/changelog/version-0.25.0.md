@@ -172,24 +172,6 @@ the same locale and parameter values. `MessageParameters` is only equal to anoth
 the same locale and parameter values, which makes `equals` symmetric. To compare the content of two parameters
 instances, compare `getLocale()` and `asParameterMap()` instead.
 
-### `exportMessages` no longer closes the output stream
-
-`MessageSupport.exportMessages(...)` closed the `OutputStream` passed to it when the method returned. This was not
-mentioned in the Javadoc and made it impossible to write a pack as part of a larger stream: writing a pack as an
-entry of a `ZipOutputStream` or `JarOutputStream` closed the whole archive.
-
-Both `exportMessages` overloads now flush the stream but leave it open. The pack itself is still written completely,
-including the GZip trailer for compressed packs. Code that relied on the stream being closed must now close it
-itself, preferably with `try`-with-resources:
-
-```java
-try(var out = Files.newOutputStream(packFile)) {
-  messageSupport.exportMessages(out);
-}
-```
-
-The behavior of `importMessages(...)`, which closes the input stream, is unchanged.
-
 ## New Features
 
 ### `MessageSupportFactory.createDefault()` and `createGeneric()`
@@ -250,6 +232,13 @@ internal, non-exported classes.
 
 
 ## Bug Fixes
+
+`ConfigurableMessageSupport.importMessages(InputStream)` and `MessageUtil.importMessages(...)` are documented to close
+the pack stream regardless of whether the import succeeds, but left it open if the stream did not start with a valid
+pack header. `MessageSupport.exportMessages(...)` closed the output stream after writing the pack, but left it open if
+the pack exceeded the message or template limit. Both directions now close the stream in all cases, and the Javadoc of
+all import and export methods documents this. To write or read a pack as part of a larger stream, such as a ZIP entry,
+pass a `FilterOutputStream` or `FilterInputStream` that does not close the wrapped stream.
 
 `InternalMessageBuilder` allowed methods such as `text(...)`, `parameter(...)` and `build()` to be called again after
 `build()`, `buildWithCode(String)` or `buildAsTemplate()` had already produced a message. Since the built

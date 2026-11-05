@@ -46,24 +46,9 @@ exist in the message support but are not used by any selected message are omitte
 registered messages and templates, so registrations from other threads during the export do not affect the result.
 
 A pack file holds at most 65535 messages and 65535 templates. If the selection exceeds either limit, `exportMessages`
-throws an `IOException` and writes nothing to the stream.
-
-The stream passed to `exportMessages` is flushed, but not closed, when the method returns. Closing it is the
-responsibility of the caller, as in the `try`-with-resources example above. This allows a pack to be written as part
-of a larger stream, for example as an entry of a ZIP or JAR file:
-
-```java
-try(var zip = new ZipOutputStream(new FileOutputStream("bundle.zip"))) {
-  zip.putNextEntry(new ZipEntry("META-INF/messages.mfp"));
-  messageSupport.exportMessages(zip);
-  zip.closeEntry();
-
-  // the zip stream is still open, so more entries can be written
-  zip.putNextEntry(new ZipEntry("README.txt"));
-  zip.write("...".getBytes(UTF_8));
-  zip.closeEntry();
-}
-```
+throws an `IOException` and writes nothing to the stream. The stream passed to `exportMessages` is closed when the
+method returns, regardless of whether the export succeeded. See
+[Packs Inside Other Streams](#packs-inside-other-streams) for writing a pack without closing the stream.
 
 
 ## Importing Messages
@@ -78,7 +63,8 @@ try(var in = new FileInputStream("messages.mfp")) {
 // all messages and templates from messages.mfp are registered
 ```
 
-The stream is closed automatically when the method returns, regardless of whether the import succeeded. Each message
+The stream is closed automatically when the method returns, regardless of whether the import succeeded, even if it is
+not a valid pack file. Each message
 and template found in the pack file is added to the message support through the same mechanism as `addMessage` and
 `addTemplate`, so message filters and template filters apply as usual. A message or template that conflicts with an
 already registered one therefore throws a `DuplicateMessageException` or `DuplicateTemplateException`, and the entries
@@ -87,7 +73,8 @@ read before the conflict remain registered. A stream that is not a valid pack fi
 For lower-level control over the imported entries, the static utility method `MessageUtil.importMessages` can be used 
 instead. It takes the `MessageFactory` used to create the messages, a `Consumer<Message.WithCode>` for messages and a
 `BiConsumer<String,Template>` for templates, allowing each entry to be inspected or transformed before adding it.
-Either consumer may be `null` to skip that kind of entry. The stream is closed when the method returns.
+Either consumer may be `null` to skip that kind of entry. The stream is closed when the method returns, regardless of
+whether the import succeeded.
 
 ```java
 try(var inputStream = new FileInputStream("messages.mfp")) {
@@ -99,6 +86,52 @@ try(var inputStream = new FileInputStream("messages.mfp")) {
 // prints one line per message and template in the pack file
 ```
 
+
+## Packs Inside Other Streams
+
+Packs are meant to be written and read as a whole, typically as a file of their own. That is why `exportMessages` and
+`importMessages` always close the stream they are given. If a pack must nevertheless be written to or read from a part
+of a larger stream, such as an entry of a ZIP or JAR file, wrap that stream in a `FilterOutputStream` or
+`FilterInputStream` whose `close()` method does not close the wrapped stream:
+
+```java
+try(var zip = new ZipOutputStream(new FileOutputStream("bundle.zip"))) {
+  zip.putNextEntry(new ZipEntry("META-INF/messages.mfp"));
+  messageSupport.exportMessages(new FilterOutputStream(zip) {
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+      out.write(b, off, len);  // FilterOutputStream writes byte by byte otherwise
+    }
+
+    @Override
+    public void close() throws IOException {
+      flush();  // finish the pack, but keep the zip stream open
+    }
+  });
+  zip.closeEntry();
+}
+```
+
+```java
+try(var zip = new ZipInputStream(new FileInputStream("bundle.zip"))) {
+  for(ZipEntry entry; (entry = zip.getNextEntry()) != null;)
+    if (entry.getName().equals("META-INF/messages.mfp"))
+    {
+      messageSupport.importMessages(new FilterInputStream(zip) {
+        @Override
+        public void close() {
+          // keep the zip stream open
+        }
+      });
+    }
+}
+```
+
+/// warning | Position after importing a compressed pack
+A compressed pack is read through a GZip decompressor, which may read beyond the end of the pack. After importing a
+compressed pack, the position of the wrapped stream is therefore undefined. This is not a problem if the wrapped
+stream ends where the pack ends, as is the case for a ZIP entry. Uncompressed packs are read exactly up to their end.
+///
 
 ## Pack File Format
 
