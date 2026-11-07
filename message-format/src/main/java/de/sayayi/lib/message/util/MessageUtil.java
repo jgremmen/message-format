@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static de.sayayi.lib.message.internal.pack.PackSupport.VERSION;
 import static de.sayayi.lib.message.pack.PackConstants.MIME_TYPE;
 import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
 import static java.lang.Character.*;
@@ -702,7 +703,7 @@ public final class MessageUtil
    * @param messageConsumer   consumer invoked for each message found, or {@code null}
    * @param templateConsumer  consumer invoked for each template found, or {@code null}
    *
-   * @throws IOException  if an I/O error occurs or the pack stream is invalid
+   * @throws IOException  if an I/O error occurs, the pack stream is invalid or its pack version is not supported
    *
    * @since 0.24.0
    */
@@ -720,6 +721,10 @@ public final class MessageUtil
     try(packStream; var dataStream = new PackInputStream(PACK_CONFIG, packStream)) {
       if (dataStream.getVersion().isEmpty())
         throw new IllegalArgumentException("packStream has no version");
+
+      var version = dataStream.getVersion().getAsInt();
+      if (version > VERSION)
+        throw new IOException("unsupported pack version " + version + " (max. " + VERSION + ')');
 
       // messages
       for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)

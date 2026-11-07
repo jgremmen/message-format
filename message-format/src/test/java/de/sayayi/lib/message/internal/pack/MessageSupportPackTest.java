@@ -18,6 +18,7 @@ package de.sayayi.lib.message.internal.pack;
 import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.pack.PackOutputStream;
 import lombok.val;
 import org.junit.jupiter.api.*;
 
@@ -31,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static de.sayayi.lib.message.Message.Parameters;
+import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Locale.*;
 import static java.util.stream.Collectors.toMap;
@@ -224,6 +226,25 @@ final class MessageSupportPackTest
 
     assertThrows(IOException.class, () -> MessageSupportFactory.createGeneric().importMessages(packStream));
     assertTrue(closed.get());
+  }
+
+
+  @Test
+  @DisplayName("Import rejects a pack with an unsupported version")
+  void testImportUnsupportedVersion() throws IOException
+  {
+    val pack = new ByteArrayOutputStream();
+
+    try(val packStream = new PackOutputStream(PACK_CONFIG, PackSupport.VERSION + 1, false, pack)) {
+      packStream.writeUnsignedShort(0);  // messages
+      packStream.writeUnsignedShort(0);  // templates
+    }
+
+    val ex = assertThrows(IOException.class, () -> MessageSupportFactory
+        .createGeneric()
+        .importMessages(new ByteArrayInputStream(pack.toByteArray())));
+
+    assertTrue(ex.getMessage().contains("unsupported pack version " + (PackSupport.VERSION + 1)));
   }
 
 

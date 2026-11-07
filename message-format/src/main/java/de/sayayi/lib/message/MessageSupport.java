@@ -715,7 +715,7 @@ public interface MessageSupport
      *
      * @return  configurable message support instance, never {@code null}
      *
-     * @throws IOException  if an I/O error occurs or the pack stream is invalid
+     * @throws IOException  if an I/O error occurs, the pack stream is invalid or its pack version is not supported
      *
      * @see MessageUtil#importMessages(MessageFactory, InputStream, Consumer, BiConsumer) 
      */
