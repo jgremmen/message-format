@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message;
 
+import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
+import static de.sayayi.lib.message.MessageSupportFactory.createDefault;
 import static de.sayayi.lib.message.MessageSupportFactory.shared;
 import static java.util.Locale.GERMANY;
 import static java.util.Locale.US;
@@ -137,5 +139,38 @@ final class MessageSupportTest
         .message("%(case,'i',case:upper)")
         .locale(Locale.forLanguageTag("tr"))
         .format());
+  }
+
+
+  @Test
+  @DisplayName("Template filter accepting a duplicate replaces the existing template")
+  void testTemplateFilterReplacesDuplicate()
+  {
+    val messageSupport = createDefault();
+    val messageFactory = messageSupport.getMessageAccessor().getMessageFactory();
+
+    messageSupport
+        .addTemplate("tpl", messageFactory.parseTemplate("first"))
+        .setTemplateFilter((name, template) -> true)
+        .addTemplate("tpl", messageFactory.parseTemplate("second"));
+
+    assertEquals("second", messageSupport.message("%[tpl]").format());
+  }
+
+
+  @Test
+  @DisplayName("Default template filter rejects a different duplicate")
+  void testDefaultTemplateFilterRejectsDuplicate()
+  {
+    val messageSupport = createDefault();
+    val messageFactory = messageSupport.getMessageAccessor().getMessageFactory();
+
+    messageSupport
+        .addTemplate("tpl", messageFactory.parseTemplate("first"))
+        .addTemplate("tpl", messageFactory.parseTemplate("first"));
+
+    assertThrowsExactly(DuplicateTemplateException.class,
+        () -> messageSupport.addTemplate("tpl", messageFactory.parseTemplate("second")));
+    assertEquals("first", messageSupport.message("%[tpl]").format());
   }
 }

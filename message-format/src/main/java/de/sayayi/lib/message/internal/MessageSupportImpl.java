@@ -284,12 +284,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     lock.writeLock().lock();
     try {
       if (templateFilter.filter(name, template))
-      {
-        if (templates.containsKey(name) && !templates.get(name).isSame(template))
-          throw new DuplicateTemplateException(name, "template with name '" + name + "' already exists");
-
         templates.put(name, template);
-      }
     } finally {
       lock.writeLock().unlock();
     }
