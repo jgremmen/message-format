@@ -379,7 +379,9 @@ String user = Optional
 ```
 
 Just like `formatSupplier`, the exception supplier captures a snapshot of the current parameters and locale. The
-message is only formatted (and, for inline format strings, only parsed) when `Supplier.get()` is invoked.
+message is only formatted (and, for inline format strings, only parsed) when `Supplier.get()` is invoked for the first
+time. Each call to `Supplier.get()` creates a new exception instance with that formatted message, so the stack trace
+always reflects where the exception was requested.
 
 ```java
 int timeout = 30;

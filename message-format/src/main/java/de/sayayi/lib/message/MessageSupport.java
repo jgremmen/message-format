@@ -574,7 +574,8 @@ public interface MessageSupport
      * Returns a supplier capable of creating an exception with the formatted message. This method is useful in
      * combination with one of the optional class methods like {@link OptionalInt#orElseThrow(Supplier)}.
      * <p>
-     * Formatting the message is delayed until {@link Supplier#get()} is invoked.
+     * Formatting the message is delayed until {@link Supplier#get()} is invoked for the first time. Every invocation of
+     * {@link Supplier#get()} creates a new exception with the message formatted on the first invocation.
      * <p>
      * Exceptions thrown by the constructor function are relayed to the caller.
      * <p>
@@ -597,7 +598,8 @@ public interface MessageSupport
      * Returns a supplier capable of creating an exception with the formatted message. This method is useful in
      * combination with one of the optional class methods like {@link OptionalInt#orElseThrow(Supplier)}.
      * <p>
-     * Formatting the message is delayed until {@link Supplier#get()} is invoked.
+     * Formatting the message is delayed until {@link Supplier#get()} is invoked for the first time. Every invocation of
+     * {@link Supplier#get()} creates a new exception with the message formatted on the first invocation.
      * <p>
      * Exceptions thrown by the constructor function are relayed to the caller.
      * <p>

@@ -626,10 +626,9 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     public @NotNull <X extends Exception> Supplier<X> formattedExceptionSupplier(
         @NotNull ExceptionConstructorWithCause<X> constructor, Throwable cause)
     {
-      // as formatting is deferred, make sure we're using a copy of the parameters
-      final var parameters = new MessageParameters(this);
+      final var formattedMessage = formatSupplier();
 
-      return SupplierDelegate.of(() -> constructor.construct(getMessage().format(messageAccessor, parameters), cause));
+      return () -> constructor.construct(formattedMessage.get(), cause);
     }
 
 
@@ -638,10 +637,9 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     public @NotNull <X extends Exception> Supplier<X> formattedExceptionSupplier(
         @NotNull ExceptionConstructor<X> constructor)
     {
-      // as formatting is deferred, make sure we're using a copy of the parameters
-      final var parameters = new MessageParameters(this);
+      final var formattedMessage = formatSupplier();
 
-      return () -> constructor.construct(getMessage().format(messageAccessor, parameters));
+      return () -> constructor.construct(formattedMessage.get());
     }
   }
 

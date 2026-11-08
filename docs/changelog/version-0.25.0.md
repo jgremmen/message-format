@@ -258,6 +258,11 @@ the pack exceeded the message or template limit. Both directions now close the s
 all import and export methods documents this. To write or read a pack as part of a larger stream, such as a ZIP entry,
 pass a `FilterOutputStream` or `FilterInputStream` that does not close the wrapped stream.
 
+`MessageConfigurer.formattedExceptionSupplier(ExceptionConstructorWithCause, Throwable)` returned the same exception
+instance on every `Supplier.get()`, so a thrown exception kept the stack trace of its first creation and accumulated
+suppressed exceptions. The variant without a cause created a new exception, but formatted the message again on every
+call. Both variants now format the message once and create a new exception on every call.
+
 `InternalMessageBuilder` allowed methods such as `text(...)`, `parameter(...)` and `build()` to be called again after
 `build()`, `buildWithCode(String)` or `buildAsTemplate()` had already produced a message. Since the built
 `CompoundMessage` holds a direct reference to the builder's internal parts list, continuing to use the builder after

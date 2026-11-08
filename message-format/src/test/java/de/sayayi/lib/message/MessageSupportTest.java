@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.sayayi.lib.message.MessageSupportFactory.createDefault;
 import static de.sayayi.lib.message.MessageSupportFactory.shared;
@@ -138,6 +139,42 @@ final class MessageSupportTest
     assertEquals("value 7",
         configurer.formattedExceptionSupplier(IllegalStateException::new).get().getMessage());
     assertSame(cause, configurer.formattedExceptionSupplier(IllegalStateException::new, cause).get().getCause());
+  }
+
+
+  @Test
+  @DisplayName("Exception suppliers create a new exception on every call and format the message once")
+  void testFormattedExceptionSupplierCreatesNewException()
+  {
+    val formatCount = new AtomicInteger();
+    val cause = new IOException("cause");
+    val configurer = shared()
+        .message("%{v}")
+        .with("v", new Object() {
+          @Override
+          public String toString() {
+            return "value " + formatCount.incrementAndGet();
+          }
+        });
+
+    val supplier = configurer.formattedExceptionSupplier(IllegalStateException::new);
+    val supplierWithCause = configurer.formattedExceptionSupplier(IllegalStateException::new, cause);
+
+    val exception1 = supplier.get();
+    val exception2 = supplier.get();
+    assertNotSame(exception1, exception2);
+    assertEquals("value 1", exception1.getMessage());
+    assertEquals("value 1", exception2.getMessage());
+
+    val exceptionWithCause1 = supplierWithCause.get();
+    val exceptionWithCause2 = supplierWithCause.get();
+    assertNotSame(exceptionWithCause1, exceptionWithCause2);
+    assertEquals("value 2", exceptionWithCause1.getMessage());
+    assertEquals("value 2", exceptionWithCause2.getMessage());
+    assertSame(cause, exceptionWithCause2.getCause());
+
+    // each supplier formats the message once
+    assertEquals(2, formatCount.get());
   }
 
 
