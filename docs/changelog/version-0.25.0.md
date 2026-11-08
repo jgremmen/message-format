@@ -263,6 +263,11 @@ instance on every `Supplier.get()`, so a thrown exception kept the stack trace o
 suppressed exceptions. The variant without a cause created a new exception, but formatted the message again on every
 call. Both variants now format the message once and create a new exception on every call.
 
+`MessageConfigurer.getParameters()` was annotated as unmodifiable, but returned the configurer's internal parameter
+map. Modifying that map bypassed the parameter name validation and the caching of supplier values in
+`with(String, Object)`. The method now returns an unmodifiable view, which still reflects later changes made through
+the configurer.
+
 `InternalMessageBuilder` allowed methods such as `text(...)`, `parameter(...)` and `build()` to be called again after
 `build()`, `buildWithCode(String)` or `buildAsTemplate()` had already produced a message. Since the built
 `CompoundMessage` holds a direct reference to the builder's internal parts list, continuing to use the builder after

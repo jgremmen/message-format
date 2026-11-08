@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.sayayi.lib.message.MessageSupportFactory.createDefault;
@@ -175,6 +176,25 @@ final class MessageSupportTest
 
     // each supplier formats the message once
     assertEquals(2, formatCount.get());
+  }
+
+
+  @Test
+  @DisplayName("Parameter map is an unmodifiable view of the configured parameters")
+  void testGetParametersUnmodifiableView()
+  {
+    val configurer = shared().message("%{a}").with("a", 1);
+    val parameters = configurer.getParameters();
+
+    assertThrowsExactly(UnsupportedOperationException.class, () -> parameters.put("b", 2));
+    assertThrowsExactly(UnsupportedOperationException.class, () -> parameters.remove("a"));
+    assertThrowsExactly(UnsupportedOperationException.class, parameters::clear);
+
+    configurer.with("b", 2);
+    assertEquals(Set.of("a", "b"), parameters.keySet());
+
+    configurer.remove("a");
+    assertEquals(Set.of("b"), parameters.keySet());
   }
 
 

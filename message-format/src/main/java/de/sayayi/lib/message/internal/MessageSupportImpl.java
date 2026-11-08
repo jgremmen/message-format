@@ -37,7 +37,6 @@ import de.sayayi.lib.message.util.SupplierDelegate;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.IOException;
@@ -51,6 +50,7 @@ import java.util.function.Supplier;
 import static de.sayayi.lib.message.internal.pack.PackSupport.VERSION;
 import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
 import static de.sayayi.lib.message.util.MessageUtil.*;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
@@ -537,8 +537,8 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
 
     /** {@inheritDoc} */
     @Override
-    public @Unmodifiable @NotNull Map<String,Object> getParameters() {
-      return parameters;
+    public @UnmodifiableView @NotNull Map<String,Object> getParameters() {
+      return unmodifiableMap(parameters);
     }
 
 

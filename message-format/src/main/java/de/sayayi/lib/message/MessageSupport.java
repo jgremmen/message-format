@@ -264,16 +264,16 @@ public interface MessageSupport
     /**
      * Returns the current parameter map configured for this message.
      * <p>
-     * The returned map is backed by this configurer, so changes to the configurer will reflect in the map. The map must
-     * not be modified directly; use {@link #with(String, Object)}, {@link #remove(String)} and {@link #clear()}
-     * instead.
+     * The returned map is an unmodifiable view backed by this configurer, so changes to the configurer will reflect in
+     * the map. Attempts to modify the map throw an {@link UnsupportedOperationException}; use
+     * {@link #with(String, Object)}, {@link #remove(String)} and {@link #clear()} instead.
      *
-     * @return  parameter map, never {@code null}
+     * @return  unmodifiable parameter map, never {@code null}
      *
      * @since 0.11.0
      */
     @Contract(pure = true)
-    @NotNull Map<String,Object> getParameters();
+    @UnmodifiableView @NotNull Map<String,Object> getParameters();
 
 
     /**
