@@ -40,13 +40,14 @@ import static java.nio.file.Files.*;
 import static java.util.Objects.requireNonNull;
 import static org.gradle.testkit.runner.TaskOutcome.FAILED;
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS;
+import static org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
  * Tests {@link MessageFormatPlugin}: pack task runs with no, plain and filtered sources, duplicate message handling,
- * plugin order and the packaged jar.
+ * duplicate strategy formats, plugin order and the packaged jar.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -313,6 +314,48 @@ final class PluginTest
     assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
     assertTrue(packFile.isFile() && packFile.canRead());
     assertTrue(readMessagePack(packFile).getMessageCodes().size() > 0);
+  }
+
+
+  @Test
+  @DisplayName("Equal duplicate strategies in different formats keep the pack task up-to-date")
+  void testDuplicateStrategyFormats() throws IOException
+  {
+    copy(getResource("test-source-1.java"),
+        new File(testPackageDir, "Source1.java").toPath());
+
+    for(var duplicateStrategy: List.of("'fail'", "'FAIL'", "\"${'fail'}\"",
+                                       "de.sayayi.plugin.gradle.message.DuplicateStrategy.FAIL"))
+    {
+      writeBuildGradle(List.of("messageFormat.messages.duplicateStrategy = " + duplicateStrategy));
+
+      val result = GradleRunner.create()
+          .withProjectDir(testProjectDir)
+          .withArguments("messageFormatPack")
+          .withPluginClasspath()
+          .forwardOutput()
+          .build();
+
+      assertEquals(duplicateStrategy.equals("'fail'") ? SUCCESS : UP_TO_DATE,
+          requireNonNull(result.task(":messageFormatPack")).getOutcome(), duplicateStrategy);
+    }
+  }
+
+
+  @Test
+  @DisplayName("Unknown duplicate strategy")
+  void testUnknownDuplicateStrategy() throws IOException
+  {
+    writeBuildGradle(List.of("messageFormat.messages.duplicateStrategy = 'unknown'"));
+
+    val result = GradleRunner.create()
+        .withProjectDir(testProjectDir)
+        .withArguments("messageFormatPack")
+        .withPluginClasspath()
+        .forwardOutput()
+        .buildAndFail();
+
+    assertTrue(result.getOutput().contains("Unknown duplicates strategy: unknown"));
   }
 
 

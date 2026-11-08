@@ -15,10 +15,17 @@
  */
 package de.sayayi.plugin.gradle.message;
 
+import groovy.lang.GString;
+import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.Internal;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+
+import static de.sayayi.lib.message.util.MessageUtil.findEnumValue;
 
 
 /**
@@ -99,9 +106,29 @@ public abstract class MessageFormatMessagesExtension
    * @return  duplicate message strategy property, never {@code null}
    *
    * @see DuplicateStrategy
+   * @see #getResolvedDuplicateStrategy()
+   */
+  @Internal
+  public abstract Property<@NotNull Object> getDuplicateStrategy();
+
+
+  /**
+   * Returns the {@link #getDuplicateStrategy() duplicate strategy} converted into a {@link DuplicateStrategy} enum
+   * constant.
+   * <p>
+   * This provider is the task input for the duplicate strategy. Equal strategies given in different formats (e.g.
+   * {@code 'fail'}, {@code 'FAIL'} or {@link DuplicateStrategy#FAIL FAIL}) therefore result in the same input value.
+   *
+   * @return  provider for the resolved duplicate strategy, never {@code null}
+   *
+   * @throws InvalidUserDataException  on querying the provider, if the configured duplicate strategy is unknown
+   *
+   * @since 0.25.0
    */
   @Input
-  public abstract Property<@NotNull Object> getDuplicateStrategy();
+  public Provider<@NotNull DuplicateStrategy> getResolvedDuplicateStrategy() {
+    return getDuplicateStrategy().map(MessageFormatMessagesExtension::toDuplicateStrategy);
+  }
 
 
   /**
@@ -127,5 +154,35 @@ public abstract class MessageFormatMessagesExtension
    */
   public void exclude(String... regex) {
     getExcludeRegexFilters().addAll(regex);
+  }
+
+
+  /**
+   * Converts a configured duplicate strategy, which may be a {@link DuplicateStrategy} or its name, into an enum
+   * constant.
+   *
+   * @param value  configured duplicate strategy, not {@code null}
+   *
+   * @return  duplicate strategy, never {@code null}
+   *
+   * @throws InvalidUserDataException  if {@code value} is not a known duplicate strategy
+   */
+  @Contract(pure = true)
+  private static @NotNull DuplicateStrategy toDuplicateStrategy(@NotNull Object value)
+  {
+    if (value instanceof DuplicateStrategy duplicateStrategy)
+      return duplicateStrategy;
+
+    if (value instanceof GString)
+      value = value.toString();
+
+    if (value instanceof String string)
+    {
+      var ds = findEnumValue(string, DuplicateStrategy.class);
+      if (ds.isPresent())
+        return ds.get();
+    }
+
+    throw new InvalidUserDataException("Unknown duplicates strategy: " + value);
   }
 }

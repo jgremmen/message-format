@@ -23,7 +23,6 @@ import de.sayayi.lib.message.annotation.adopter.AnnotationAdopter;
 import de.sayayi.lib.message.annotation.adopter.asm.ClassReader;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
-import groovy.lang.GString;
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
@@ -47,7 +46,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static de.sayayi.lib.message.util.MessageUtil.findEnumValue;
 import static de.sayayi.lib.message.util.MessageUtil.isMessageFormatPack;
 import static de.sayayi.plugin.gradle.message.DuplicateStrategy.IGNORE_AND_WARN;
 import static java.nio.file.Files.newInputStream;
@@ -487,7 +485,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
    */
   private void configureDuplicatesStrategy(@NotNull ConfigurableMessageSupport messageSupport)
   {
-    switch(configureDuplicatesStrategy_toEnum())
+    switch(messages.getResolvedDuplicateStrategy().get())
     {
       case FAIL -> configureDuplicateFailStrategy(messageSupport);
       case OVERRIDE -> configureDuplicateOverrideStrategy(messageSupport, false);
@@ -495,36 +493,6 @@ public abstract class MessageFormatPackTask extends DefaultTask
       case IGNORE -> configureDuplicateIgnoreStrategy(messageSupport, false);
       case IGNORE_AND_WARN -> configureDuplicateIgnoreStrategy(messageSupport, true);
     }
-  }
-
-
-  /**
-   * Converts the configured duplicate strategy, which may be a {@link DuplicateStrategy} or its name, into an enum
-   * constant.
-   *
-   * @return  duplicate strategy, never {@code null}
-   *
-   * @throws InvalidUserDataException  if the configured duplicate strategy is unknown
-   */
-  @Contract(pure = true)
-  private @NotNull DuplicateStrategy configureDuplicatesStrategy_toEnum()
-  {
-    var value = messages.getDuplicateStrategy().get();
-
-    if (value instanceof DuplicateStrategy)
-      return (DuplicateStrategy)value;
-
-    if (value instanceof GString)
-      value = ((GString)value).toString();
-
-    if (value instanceof String string)
-    {
-      var ds = findEnumValue(string, DuplicateStrategy.class);
-      if (ds.isPresent())
-        return ds.get();
-    }
-
-    throw new InvalidUserDataException("Unknown duplicates strategy: " + value);
   }
 
 
