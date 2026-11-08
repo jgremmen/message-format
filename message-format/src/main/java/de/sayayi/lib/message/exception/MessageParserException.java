@@ -266,8 +266,8 @@ public class MessageParserException extends MessageException
   @Contract("_ -> new")
   public @NotNull MessageParserException withTemplate(@NotNull String template)
   {
-    return new MessageParserException(Type.TEMPLATE, errorMessage, syntaxError, null, template,
-        locale, (Exception)getCause());
+    return new MessageParserException(Type.TEMPLATE, errorMessage, syntaxError, null, template, locale,
+        (Exception)getCause());
   }
 
 

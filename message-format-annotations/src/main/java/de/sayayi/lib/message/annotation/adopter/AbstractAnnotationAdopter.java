@@ -26,6 +26,7 @@ import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.exception.MessageAdopterException;
 import de.sayayi.lib.message.exception.MessageParserException;
+import de.sayayi.lib.message.template.Template;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -485,9 +486,16 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   {
     final var texts = templateDef.texts();
     final var name = templateDef.name();
+    final Template template;
 
     if (texts.length == 0)
-      messagePublisher.addTemplate(name, messageFactory.parseTemplate(templateDef.text()));
+    {
+      try {
+        template = messageFactory.parseTemplate(templateDef.text());
+      } catch(MessageParserException ex) {
+        throw ex.withTemplate(name);
+      }
+    }
     else
     {
       final var localizedTexts = new LinkedHashMap<Locale,String>();
@@ -506,11 +514,13 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
       }
 
       try {
-        messagePublisher.addTemplate(name, messageFactory.parseTemplate(localizedTexts));
+        template = messageFactory.parseTemplate(localizedTexts);
       } catch(MessageParserException ex) {
         throw ex.withTemplate(name);
       }
     }
+
+    messagePublisher.addTemplate(name, template);
 
     return this;
   }

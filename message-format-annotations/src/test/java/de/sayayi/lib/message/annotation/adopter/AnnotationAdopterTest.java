@@ -212,13 +212,14 @@ class AnnotationAdopterTest
     val classFile = invalidTemplateClassFile();
     val invalidTemplateFixtureClass = invalidTemplateFixtureClass();
 
-    assertThrows(MessageParserException.class,
-        () -> new AnnotationAdopter(newMessageSupport()).adopt(classFile));
-    assertThrows(MessageParserException.class,
-        () -> new AnnotationAdopter(newMessageSupport()).adopt(invalidTemplateFixtureClass));
-    assertThrows(MessageParserException.class,
+    assertEquals("invalid-template", assertThrows(MessageParserException.class,
+        () -> new AnnotationAdopter(newMessageSupport()).adopt(classFile)).getTemplate());
+    assertEquals("invalid-template", assertThrows(MessageParserException.class,
+        () -> new AnnotationAdopter(newMessageSupport()).adopt(invalidTemplateFixtureClass)).getTemplate());
+    assertEquals("invalid-template", assertThrows(MessageParserException.class,
         () -> new AnnotationAdopter(newMessageSupport())
-            .adopt(invalidTemplateFixtureClass.getClassLoader(), Set.of(invalidTemplateFixtureClass.getPackageName())));
+            .adopt(invalidTemplateFixtureClass.getClassLoader(), Set.of(invalidTemplateFixtureClass.getPackageName())))
+        .getTemplate());
   }
 
 
