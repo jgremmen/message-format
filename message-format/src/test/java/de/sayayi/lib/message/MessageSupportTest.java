@@ -34,8 +34,7 @@ import static de.sayayi.lib.message.MessageSupportFactory.createDefault;
 import static de.sayayi.lib.message.MessageSupportFactory.shared;
 import static java.util.Locale.GERMANY;
 import static java.util.Locale.US;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -118,6 +117,27 @@ final class MessageSupportTest
     });
 
     assertEquals("answer = yes", exception.getMessage());
+  }
+
+
+  @Test
+  @DisplayName("Exception construction with constructor references")
+  void testFormattedExceptionConstructorReference()
+  {
+    val cause = new IOException("cause");
+    val configurer = shared().message("value %{v}").with("v", 7);
+
+    val exception = configurer.formattedException(IllegalStateException::new);
+    assertEquals("value 7", exception.getMessage());
+    assertNull(exception.getCause());
+
+    val exceptionWithCause = configurer.formattedException(IllegalStateException::new, cause);
+    assertEquals("value 7", exceptionWithCause.getMessage());
+    assertSame(cause, exceptionWithCause.getCause());
+
+    assertEquals("value 7",
+        configurer.formattedExceptionSupplier(IllegalStateException::new).get().getMessage());
+    assertSame(cause, configurer.formattedExceptionSupplier(IllegalStateException::new, cause).get().getCause());
   }
 
 

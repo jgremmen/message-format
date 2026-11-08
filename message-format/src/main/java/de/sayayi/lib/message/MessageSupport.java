@@ -535,12 +535,14 @@ public interface MessageSupport
 
 
     /**
-     * Creates an exception with the formatted message.
+     * Creates an exception with the formatted message and the given root cause.
      * <p>
      * Exceptions thrown by the constructor function are relayed to the caller.
+     * <p>
+     * Example: {@code formattedException(IllegalStateException::new, ex)}
      *
      * @param constructor  exception constructor, not {@code null}
-     * @param cause        the throwable that caused this exception
+     * @param cause        the throwable that caused this exception, or {@code null}
      * @param <X>          exception type
      *
      * @return  newly created exception with the formatted message and the given root cause, never {@code null}
@@ -556,25 +558,8 @@ public interface MessageSupport
      * Creates an exception with the formatted message.
      * <p>
      * Exceptions thrown by the constructor function are relayed to the caller.
-     *
-     * @param constructor  exception constructor, not {@code null}
-     * @param <X>          exception type
-     *
-     * @return  newly created exception with the formatted message, never {@code null}
-     *
-     * @since 0.8.3
-     */
-    @Contract("_ -> new")
-    default @NotNull <X extends Exception> X formattedException(
-        @NotNull ExceptionConstructorWithCause<X> constructor) {
-      return formattedException(constructor, null);
-    }
-
-
-    /**
-     * Creates an exception with the formatted message.
      * <p>
-     * Exceptions thrown by the constructor function are relayed to the caller.
+     * Example: {@code formattedException(IllegalStateException::new)}
      *
      * @param constructor  exception constructor, not {@code null}
      * @param <X>          exception type
@@ -592,9 +577,11 @@ public interface MessageSupport
      * Formatting the message is delayed until {@link Supplier#get()} is invoked.
      * <p>
      * Exceptions thrown by the constructor function are relayed to the caller.
+     * <p>
+     * Example: {@code formattedExceptionSupplier(IllegalStateException::new, ex)}
      *
      * @param constructor  exception constructor, not {@code null}
-     * @param cause        the throwable that caused this exception
+     * @param cause        the throwable that caused this exception, or {@code null}
      * @param <X>          exception type
      *
      * @return  format supplier, never {@code null}
@@ -613,28 +600,8 @@ public interface MessageSupport
      * Formatting the message is delayed until {@link Supplier#get()} is invoked.
      * <p>
      * Exceptions thrown by the constructor function are relayed to the caller.
-     *
-     * @param constructor  exception constructor, not {@code null}
-     * @param <X>          exception type
-     *
-     * @return  format supplier, never {@code null}
-     *
-     * @since 0.8.3
-     */
-    @Contract(pure = true)
-    default <X extends Exception> @NotNull Supplier<X> formattedExceptionSupplier(
-        @NotNull ExceptionConstructorWithCause<X> constructor) {
-      return formattedExceptionSupplier(constructor, null);
-    }
-
-
-    /**
-     * Returns a supplier capable of creating an exception with the formatted message. This method is useful in
-     * combination with one of the optional class methods like {@link OptionalInt#orElseThrow(Supplier)}.
      * <p>
-     * Formatting the message is delayed until {@link Supplier#get()} is invoked.
-     * <p>
-     * Exceptions thrown by the constructor function are relayed to the caller.
+     * Example: {@code formattedExceptionSupplier(IllegalStateException::new)}
      *
      * @param constructor  exception constructor, not {@code null}
      * @param <X>          exception type

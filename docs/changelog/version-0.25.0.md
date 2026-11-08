@@ -172,6 +172,24 @@ the same locale and parameter values. `MessageParameters` is only equal to anoth
 the same locale and parameter values, which makes `equals` symmetric. To compare the content of two parameters
 instances, compare `getLocale()` and `asParameterMap()` instead.
 
+### Exception constructor references are no longer ambiguous
+
+`MessageConfigurer.formattedException(...)` and `formattedExceptionSupplier(...)` had two overloads with a single
+argument, one for `ExceptionConstructor` and one for `ExceptionConstructorWithCause`. For an exception class with a
+`(String)` and a `(String, Throwable)` constructor, which includes almost every JDK exception, a constructor reference
+such as `formattedException(IllegalStateException::new)` matched both overloads and did not compile.
+
+The single-argument overloads for `ExceptionConstructorWithCause` have been removed. They only passed `null` as
+cause to the constructor. The remaining overloads are:
+
+- `formattedException(ExceptionConstructor)` and `formattedExceptionSupplier(ExceptionConstructor)`
+- `formattedException(ExceptionConstructorWithCause, Throwable)` and
+  `formattedExceptionSupplier(ExceptionConstructorWithCause, Throwable)`
+
+Constructor references now work with and without a cause. Code that passed a two-parameter lambda or a reference to
+a `(String, Throwable)`-only constructor without a cause no longer compiles. Pass `null` as cause, e.g.
+`formattedException((msg, cause) -> new MyException(msg, cause), null)`, or use a lambda with one parameter.
+
 ## New Features
 
 ### `MessageSupportFactory.createDefault()` and `createGeneric()`

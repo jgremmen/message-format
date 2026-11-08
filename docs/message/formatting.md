@@ -334,15 +334,11 @@ throw messageSupport
 // throws IllegalArgumentException("User 42 not found in tenant ACME.")
 ```
 
-/// warning | Ambiguous Constructor References
-Without a cause argument, `formattedException` and `formattedExceptionSupplier` each have two overloads, one for each
-functional interface. For an exception class that has a `(String)` and a `(String, Throwable)` constructor, a
-constructor reference such as `IllegalArgumentException::new` matches both overloads and does not compile. Use a
-lambda expression with one parameter, as shown above, to select `ExceptionConstructor`. A constructor reference works
-when the cause is passed as well, as in the next example.
-///
+A constructor reference works as well: `formattedException(IllegalArgumentException::new)` uses the `(String)`
+constructor.
 
-If the exception needs a root cause, use the overload that accepts a `Throwable`.
+If the exception needs a root cause, use the overload that accepts a `Throwable`. It takes an
+`ExceptionConstructorWithCause` and passes the cause, which may be `null`, to the `(String, Throwable)` constructor.
 
 ```java
 String dbHost = "db.local";
