@@ -18,6 +18,7 @@ package de.sayayi.lib.message.internal.pack;
 import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.pack.PackOutputStream;
 import lombok.val;
 import org.junit.jupiter.api.*;
@@ -25,6 +26,8 @@ import org.junit.jupiter.api.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StreamCorruptedException;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -245,6 +248,76 @@ final class MessageSupportPackTest
         .importMessages(new ByteArrayInputStream(pack.toByteArray())));
 
     assertTrue(ex.getMessage().contains("unsupported pack version " + (PackSupport.VERSION + 1)));
+  }
+
+
+  @Test
+  @DisplayName("Import rejects a pack with an invalid message type")
+  void testImportInvalidMessageType() throws IOException
+  {
+    val pack = new ByteArrayOutputStream();
+
+    try(val packStream = new PackOutputStream(PACK_CONFIG, PackSupport.VERSION, false, pack)) {
+      packStream.writeUnsignedShort(1);  // messages
+      packStream.writeSmall(7, 3);       // invalid message type
+      packStream.writeUnsignedShort(0);  // templates
+    }
+
+    val ex = assertThrows(StreamCorruptedException.class, () -> MessageSupportFactory
+        .createGeneric()
+        .importMessages(new ByteArrayInputStream(pack.toByteArray())));
+
+    assertInstanceOf(IllegalStateException.class, ex.getCause());
+  }
+
+
+  @Test
+  @DisplayName("Import rejects a pack with a missing template name")
+  void testImportMissingTemplateName() throws IOException
+  {
+    val pack = new ByteArrayOutputStream();
+
+    try(val packStream = new PackOutputStream(PACK_CONFIG, PackSupport.VERSION, false, pack)) {
+      packStream.writeUnsignedShort(0);  // messages
+      packStream.writeUnsignedShort(1);  // templates
+      packStream.writeString(null);      // template name
+    }
+
+    val ex = assertThrows(StreamCorruptedException.class, () -> MessageSupportFactory
+        .createGeneric()
+        .importMessages(new ByteArrayInputStream(pack.toByteArray())));
+
+    assertInstanceOf(NullPointerException.class, ex.getCause());
+  }
+
+
+  @Test
+  @DisplayName("Import rejects a truncated pack")
+  void testImportTruncatedPack() throws IOException
+  {
+    val pack = new ByteArrayOutputStream();
+    messageSupport.exportMessages(pack, false, null, null);
+
+    val bytes = pack.toByteArray();
+    val truncated = Arrays.copyOf(bytes, bytes.length / 2);
+
+    assertThrows(IOException.class, () -> MessageSupportFactory
+        .createGeneric()
+        .importMessages(new ByteArrayInputStream(truncated)));
+  }
+
+
+  @Test
+  @DisplayName("Import relays exceptions from adding messages")
+  void testImportDuplicateMessage() throws IOException
+  {
+    val pack = new ByteArrayOutputStream();
+    messageSupport.exportMessages(pack);
+
+    val cms = MessageSupportFactory.createGeneric().addMessage("MSG-002", "Different");
+
+    assertThrows(DuplicateMessageException.class,
+        () -> cms.importMessages(new ByteArrayInputStream(pack.toByteArray())));
   }
 
 

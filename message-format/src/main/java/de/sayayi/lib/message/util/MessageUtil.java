@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StreamCorruptedException;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -720,7 +721,7 @@ public final class MessageUtil
 
     try(packStream; var dataStream = new PackInputStream(PACK_CONFIG, packStream)) {
       if (dataStream.getVersion().isEmpty())
-        throw new IllegalArgumentException("packStream has no version");
+        throw new StreamCorruptedException("pack stream has no version");
 
       var version = dataStream.getVersion().getAsInt();
       if (version > VERSION)
@@ -729,7 +730,13 @@ public final class MessageUtil
       // messages
       for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
       {
-        final var message = packHelper.unpackMessageWithCode(dataStream);
+        final Message.WithCode message;
+
+        try {
+          message = packHelper.unpackMessageWithCode(dataStream);
+        } catch(RuntimeException ex) {
+          throw invalidPack(ex);
+        }
 
         if (messageConsumer != null)
           messageConsumer.accept(message);
@@ -738,13 +745,40 @@ public final class MessageUtil
       // templates
       for(int n = 0, size = dataStream.readUnsignedShort(); n < size; n++)
       {
-        final var name = requireNonNull(dataStream.readString());
-        final var template = new MessageTemplate(packHelper.unpackMessage(dataStream));
+        final String name;
+        final Template template;
+
+        try {
+          name = requireNonNull(dataStream.readString());
+          template = new MessageTemplate(packHelper.unpackMessage(dataStream));
+        } catch(RuntimeException ex) {
+          throw invalidPack(ex);
+        }
 
         if (templateConsumer != null)
           templateConsumer.accept(name, template);
       }
     }
+  }
+
+
+  /**
+   * Creates an exception reporting invalid pack content. Unpacking corrupt data may fail with arbitrary runtime
+   * exceptions, which are translated to the {@code IOException} documented by
+   * {@link #importMessages(MessageFactory, InputStream, Consumer, BiConsumer) importMessages}.
+   *
+   * @param cause  runtime exception raised while unpacking, not {@code null}
+   *
+   * @return  stream corrupted exception with {@code cause} attached, never {@code null}
+   */
+  @Contract(pure = true)
+  private static @NotNull StreamCorruptedException invalidPack(@NotNull RuntimeException cause)
+  {
+    final var ex = new StreamCorruptedException("invalid message pack: " + cause);
+
+    ex.initCause(cause);
+
+    return ex;
   }
 
 
