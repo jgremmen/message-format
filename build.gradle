@@ -33,16 +33,27 @@ allprojects {
 pluginManager.apply('de.sayayi.message.base')
 
 
+// local repositories of all subprojects, provided by the de.sayayi.message.publish plugin
+def projectLocalRepositories = configurations.dependencyScope('projectLocalRepositories')
+def projectLocalRepositoryDirs = configurations.resolvable('projectLocalRepositoryDirs') {
+  extendsFrom projectLocalRepositories.get()
+
+  attributes {
+    attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category, 'project-local-repository'))
+  }
+}
+
+dependencies {
+  subprojects.each { subproject -> add(projectLocalRepositories.name, project(subproject.path)) }
+}
+
+
 tasks.register('releaseAllDryRun', Sync) {
   group = 'release'
   description = 'Release all artifacts to temporary Maven repository.'
 
   into layout.buildDirectory.dir('repository')
-
-  configure(subprojects) { subproject ->
-    if (subproject.tasks.names.contains('publishToProjectLocalRepository'))
-      from subproject.tasks.named('publishToProjectLocalRepository')
-  }
+  from projectLocalRepositoryDirs
 }
 
 

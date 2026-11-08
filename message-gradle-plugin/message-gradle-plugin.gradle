@@ -36,28 +36,37 @@ plugins {
 description = 'Message Format Gradle Plugin'
 
 
-def messageFormatAnnotationsProject = rootProject.project(':message-format-annotations')
+configurations {
+  // the relocated ASM classes are only part of the annotations jar, not of its classes directory variant
+  compileClasspath {
+    attributes {
+      attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements, LibraryElements.JAR))
+    }
+  }
+}
 
 
 dependencies {
   api gradleApi()
 
-  implementation files(messageFormatAnnotationsProject.tasks.named('jar', Jar).flatMap { it.archiveFile })
+  implementation project(':message-format-annotations')
 
   compileOnly project(':message-format')
-  runtimeOnly project(':message-format-annotations')
 }
 
 
 sourceSets.test.resources.srcDir tasks.register('generateTestResources') {
   description = 'Generates test resources for the Message Format Gradle Plugin.'
 
-  dependsOn ':message-format-annotations:jar'
-
   def testResourcesDir = layout.buildDirectory.dir('generated/resources/test')
-  def annotationsJarFile = messageFormatAnnotationsProject.tasks.named('jar', Jar).flatMap { it.archiveFile }
+  def annotationsJarFiles = configurations.runtimeClasspath.incoming.artifactView {
+    componentFilter {
+      it instanceof ProjectComponentIdentifier &&
+      it.projectPath == ':message-format-annotations'
+    }
+  }.files
 
-  inputs.file annotationsJarFile
+  inputs.files annotationsJarFiles
   outputs.dir testResourcesDir
 
   doLast {
@@ -65,7 +74,7 @@ sourceSets.test.resources.srcDir tasks.register('generateTestResources') {
     testResourcesDirAsFile.mkdirs()
 
     new File(testResourcesDirAsFile, 'external-jars.properties').setText(
-        "message-format-annotations=${annotationsJarFile.get().asFile.toURI().path}\n",
+        "message-format-annotations=${annotationsJarFiles.singleFile.toURI().path}\n",
         'ISO-8859-1')
   }
 }

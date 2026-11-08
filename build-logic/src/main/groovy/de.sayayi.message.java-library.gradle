@@ -39,16 +39,16 @@ configurations.named('testCompileOnly') {
 
 
 dependencies {
-  compileOnly rootProject.libs.jetbrains.annotations
+  compileOnly libs.jetbrains.annotations
 
-  testAnnotationProcessor rootProject.libs.lombok
+  testAnnotationProcessor libs.lombok
 
-  testImplementation rootProject.libs.bundles.mockito.test
-  testImplementation rootProject.libs.junit.jupiter.api
-  testImplementation rootProject.libs.junit.jupiter.params
+  testImplementation libs.bundles.mockito.test
+  testImplementation libs.junit.jupiter.api
+  testImplementation libs.junit.jupiter.params
 
-  testRuntimeOnly rootProject.libs.junit.jupiter.engine
-  testRuntimeOnly rootProject.libs.junit.platform.launcher
+  testRuntimeOnly libs.junit.jupiter.engine
+  testRuntimeOnly libs.junit.platform.launcher
 }
 
 
