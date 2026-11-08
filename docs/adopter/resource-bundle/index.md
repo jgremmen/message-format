@@ -58,10 +58,13 @@ up with `ResourceBundle.getBundle`, so the standard fallback applies. For a loca
 of the JVM default locale or the base bundle (`messages.properties`) is found instead, and its entries are registered
 under the locale of that bundle.
 
-/// tip | Startup Time
-`adopt(String)` calls `ResourceBundle.getBundle` once for every locale returned by `Locale.getAvailableLocales()`,
-which are several hundred. When the supported locales are known, `adopt(String, Set)` resolves only those and is
-considerably faster.
+/// warning | Startup Time
+`adopt(String)` and `adoptTemplates(String)`, with or without a class loader, call `ResourceBundle.getBundle` once
+for every locale returned by `Locale.getAvailableLocales()`. Current JDKs return more than a thousand locales, and
+every lookup probes the class loader for several candidate bundle names, no matter how many bundle files actually
+exist. For a small bundle this took about 25 ms after warm-up and about 160 ms on first use, compared to about 1-2 ms
+when only two locales are requested. When the supported locales are known, use `adopt(String, Set)` or
+`adoptTemplates(String, Set)` instead, which resolve only those locales.
 ///
 
 Suppose a project contains two property files on the classpath:

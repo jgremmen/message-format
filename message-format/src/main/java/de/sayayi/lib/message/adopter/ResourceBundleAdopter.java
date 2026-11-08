@@ -44,6 +44,13 @@ import static java.util.ResourceBundle.getBundle;
  * </ul>
  * When the same message code or template name appears in multiple bundles (or multiple locales), the localized values
  * are combined into a single locale-aware message or template.
+ * <p>
+ * <b>Performance:</b> the overloads without a set of locales call
+ * {@link ResourceBundle#getBundle(String, Locale, ClassLoader) ResourceBundle.getBundle} once for every
+ * {@linkplain Locale#getAvailableLocales() available locale}, which are more than a thousand on current JDKs,
+ * regardless of how many bundles actually exist. Each call probes the class loader for several candidate bundle names.
+ * If the supported locales are known, the overloads accepting a {@code Set<Locale>} should be used instead, as they
+ * only resolve the requested locales.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -185,6 +192,9 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    * Adopts messages from resource bundles resolved by the given base name. Bundles are looked up for all
    * {@linkplain java.util.Locale#getAvailableLocales() available locales} using the adopter's class loader. A bundle
    * is only adopted for the locale it has been provided for; missing bundles are silently ignored.
+   * <p>
+   * This method looks up a bundle for every available locale (more than a thousand). If the supported locales are
+   * known, {@link #adopt(String, Set)} is considerably faster.
    *
    * @param bundleBaseName  resource bundle base name, not {@code null}
    *
@@ -200,6 +210,9 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    * Adopts templates from resource bundles resolved by the given base name. Bundles are looked up for all
    * {@linkplain java.util.Locale#getAvailableLocales() available locales} using the adopter's class loader. A bundle is
    * only adopted for the locale it has been provided for; missing bundles are silently ignored.
+   * <p>
+   * This method looks up a bundle for every available locale (more than a thousand). If the supported locales are
+   * known, {@link #adoptTemplates(String, Set)} is considerably faster.
    *
    * @param bundleBaseName  resource bundle base name, not {@code null}
    *
@@ -217,6 +230,9 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    * Adopts messages from resource bundles resolved by the given base name and class loader. Bundles are looked up for
    * all {@linkplain java.util.Locale#getAvailableLocales() available locales}. A bundle is only adopted for the locale
    * it has been provided for; missing bundles are silently ignored.
+   * <p>
+   * This method looks up a bundle for every available locale (more than a thousand). If the supported locales are
+   * known, {@link #adopt(String, Set, ClassLoader)} is considerably faster.
    *
    * @param bundleBaseName  resource bundle base name, not {@code null}
    * @param classLoader     class loader used for loading the resource bundles, not {@code null}
@@ -233,6 +249,9 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    * Adopts templates from resource bundles resolved by the given base name and class loader. Bundles are looked up for
    * all {@linkplain java.util.Locale#getAvailableLocales() available locales}. A bundle is only adopted for the locale
    * it has been provided for; missing bundles are silently ignored.
+   * <p>
+   * This method looks up a bundle for every available locale (more than a thousand). If the supported locales are
+   * known, {@link #adoptTemplates(String, Set, ClassLoader)} is considerably faster.
    *
    * @param bundleBaseName  resource bundle base name, not {@code null}
    * @param classLoader     class loader used for loading the resource bundles, not {@code null}
