@@ -223,7 +223,7 @@ messageSupport
 // "huge"
 ```
 
-`NaN` and infinite `double` or `float` values are not valid numbers, so they never match a string key.
+`NaN` and infinite `double` or `float` values are not valid numbers, so they never match a number or string key.
 
 ### Null Handling
 

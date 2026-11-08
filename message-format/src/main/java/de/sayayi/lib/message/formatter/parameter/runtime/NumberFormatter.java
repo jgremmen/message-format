@@ -58,7 +58,7 @@ import static java.lang.Math.signum;
  * <p>
  * Map key comparison supports {@code bool} keys (zero/non-zero), {@code number} keys (numeric comparison) and
  * {@code string} keys (parsed numeric comparison). {@code NaN} and infinite {@code double} or {@code float} values
- * never match a string key.
+ * never match a number or string key.
  * <p>
  * <b>Configuration keys:</b>
  * <table border="1">
@@ -69,9 +69,8 @@ import static java.lang.Math.signum;
  *     <td>{@code integer}, {@code percent}, {@code currency}, {@code bool}, {@link DecimalFormat} pattern</td>
  *     <td>(see above)</td>
  *     <td>
- *       Formats the number as an integer, a percentage, a currency value or a boolean (zero is {@code false},
- *       non-zero is {@code true}). Any other value is used as a pattern. Number map keys take precedence over
- *       this key.
+ *       Formats the number as an integer, a percentage, a currency value or a boolean (zero is {@code false}, non-zero
+ *       is {@code true}). Any other value is used as a pattern. Number map keys take precedence over this key.
  *     </td>
  *   </tr>
  * </table>
@@ -272,7 +271,11 @@ public final class NumberFormatter
     if (number instanceof BigDecimal bigDecimal)
       return compareType.match(bigDecimal.compareTo(BigDecimal.valueOf(numberKeyValue))) ? EXACT : MISMATCH;
 
-    return compareType.match(Double.compare(number.doubleValue(), numberKeyValue)) ? EXACT : MISMATCH;
+    final var doubleValue = number.doubleValue();
+    if (!isFinite(doubleValue))
+      return MISMATCH;
+
+    return compareType.match(Double.compare(doubleValue, numberKeyValue)) ? EXACT : MISMATCH;
   }
 
 

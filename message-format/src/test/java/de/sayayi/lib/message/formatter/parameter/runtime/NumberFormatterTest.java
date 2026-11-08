@@ -32,8 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
- * Tests {@link NumberFormatter}: formattable types, decimal formats and non finite values matched against numeric and
- * non numeric string keys.
+ * Tests {@link NumberFormatter}: formattable types, decimal formats and non finite values matched against number keys,
+ * numeric and non numeric string keys.
  *
  * @author Jeroen Gremmen
  * @since 0.9.1
@@ -72,6 +72,29 @@ final class NumberFormatterTest extends AbstractFormatterTest
     assertEquals("0,1", messageSupport
         .message("%{d}")
         .with("d", 0.1d)
+        .format());
+  }
+
+
+  @Test
+  @DisplayName("Compare non-finite values to number keys")
+  void testNonFiniteValueWithNumberKey()
+  {
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new NumberFormatter(), new ChoiceFormatter()))
+        .setLocale(UK);
+    val message = messageSupport.message("%{x,format:choice,>5:'big',<=5:'small',:'other'}");
+
+    assertEquals("big", message.with("x", 6.0).format());
+    assertEquals("small", message.with("x", 5.0).format());
+    assertEquals("other", message.with("x", NaN).format());
+    assertEquals("other", message.with("x", POSITIVE_INFINITY).format());
+    assertEquals("other", message.with("x", NEGATIVE_INFINITY).format());
+    assertEquals("other", message.with("x", Float.NaN).format());
+
+    assertEquals("other", messageSupport
+        .message("%{x,format:choice,<>1:'not one',:'other'}")
+        .with("x", NaN)
         .format());
   }
 
