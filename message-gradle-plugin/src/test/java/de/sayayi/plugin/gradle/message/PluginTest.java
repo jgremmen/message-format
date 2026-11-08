@@ -360,6 +360,26 @@ final class PluginTest
 
 
   @Test
+  @DisplayName("Invalid regular expression")
+  void testInvalidRegex() throws IOException
+  {
+    writeBuildGradle(List.of("messageFormat.messages.include '[invalid'"));
+
+    copy(getResource("test-source-1.java"),
+        new File(testPackageDir, "Source1.java").toPath());
+
+    val result = GradleRunner.create()
+        .withProjectDir(testProjectDir)
+        .withArguments("messageFormatPack")
+        .withPluginClasspath()
+        .forwardOutput()
+        .buildAndFail();
+
+    assertTrue(result.getOutput().contains("Invalid include regular expression '[invalid'"));
+  }
+
+
+  @Test
   @DisplayName("Jar task with messageFormatPack dependency")
   void testJar() throws IOException
   {

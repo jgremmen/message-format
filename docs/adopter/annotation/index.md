@@ -258,6 +258,16 @@ adopter.adopt(Path.of(
     "build/classes/java/main/com/example/MyMessages.class"));
 ```
 
+If the content of the class file has already been read, for example to inspect it first, the bytes can be passed
+instead. This avoids reading the file a second time:
+
+```java
+byte[] classFile = Files.readAllBytes(classPath);
+adopter.adopt(classFile);
+```
+
+A class that has already been adopted, through any of these methods or by scanning a package, is skipped.
+
 ### Loaded Type
 
 If the annotated class is already loaded in the JVM, its `Class` object can be passed. If the type has no class loader

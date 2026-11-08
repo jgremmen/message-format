@@ -242,7 +242,7 @@ class AnnotationAdopterTest
 
 
   @Test
-  @DisplayName("avoid duplicate visit across adopt(Path), adopt(File) and adopt(Class<?>)")
+  @DisplayName("avoid duplicate visit across adopt(Path), adopt(File), adopt(byte[]) and adopt(Class<?>)")
   void testAvoidDuplicateVisitWithClassFile() throws Exception
   {
     for(var pathFirst: new boolean[] { true, false })
@@ -267,10 +267,26 @@ class AnnotationAdopterTest
         adopter.adopt(classFilePath(AnnotationsFixture.class));
 
       adopter.adopt(classFilePath(AnnotationsFixture.class).toFile());
+      adopter.adopt(Files.readAllBytes(classFilePath(AnnotationsFixture.class)));
 
       assertEquals(messageCount, addedMessages.get(), "pathFirst=" + pathFirst);
       verifyFixture(cms.getMessageAccessor());
     }
+  }
+
+
+  @Test
+  @DisplayName("adopt(byte[] classFileContent)")
+  void testAdoptClassFileContent() throws Exception
+  {
+    val cms = newMessageSupport();
+
+    new AnnotationAdopter(cms).adopt(Files.readAllBytes(classFilePath(AnnotationsFixture.class)));
+    verifyFixture(cms.getMessageAccessor());
+
+    assertThrows(MessageAdopterException.class, () -> new AnnotationAdopter(newMessageSupport()).adopt(new byte[0]));
+    assertThrows(MessageAdopterException.class,
+        () -> new AnnotationAdopter(newMessageSupport()).adopt("not a class file".getBytes(UTF_8)));
   }
 
 

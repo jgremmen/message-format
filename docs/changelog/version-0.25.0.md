@@ -241,6 +241,13 @@ throw createSyntaxError()
     .build();
 ```
 
+### `AbstractAnnotationAdopter.adopt(byte[])`
+
+The annotation adopter can adopt messages and templates from class file content that has already been read. Classes
+adopted this way are deduplicated together with `adopt(Path)`, `adopt(Class)` and package scanning. The Gradle plugin
+uses it to read each class file only once. Invalid class file content, given to `adopt(byte[])` or `adopt(Path)`,
+is reported as `MessageAdopterException`.
+
 ### Apache Tika pack detectors as public API
 
 The `de.sayayi.lib.message.pack` package is now exported from the module and contains `PackConstants` (the shared

@@ -36,22 +36,19 @@ plugins {
 description = 'Message Format Gradle Plugin'
 
 
-configurations {
-  // the relocated ASM classes are only part of the annotations jar, not of its classes directory variant
-  compileClasspath {
-    attributes {
-      attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements, LibraryElements.JAR))
-    }
-  }
-}
+def messageFormatAnnotationsProject = rootProject.project(':message-format-annotations')
 
 
 dependencies {
   api gradleApi()
 
-  implementation project(':message-format-annotations')
+  // the relocated ASM classes are only part of the annotations jar, not of its classes directory. IntelliJ IDEA maps
+  // project dependencies (and artifacts resolved from them) to module dependencies and would not see these classes, so
+  // the jar is added as a file dependency for compilation and the project dependency is used at runtime
+  implementation files(messageFormatAnnotationsProject.tasks.named('jar', Jar).flatMap { it.archiveFile })
 
   compileOnly project(':message-format')
+  runtimeOnly project(':message-format-annotations')
 }
 
 

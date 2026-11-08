@@ -346,7 +346,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    *
    * @return  this annotation adopter instance, never {@code null}
    *
-   * @throws MessageAdopterException  if the class file cannot be read
+   * @throws MessageAdopterException  if the class file cannot be read or is not a valid class file
    * @throws MessageParserException   if a message or template text cannot be parsed
    *
    * @since 0.12.0
@@ -362,15 +362,44 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
       throw new MessageAdopterException("failed to adopt messages and templates from class file " + classFile, ex);
     }
 
-    final var visitedClassKey = new ClassReader(classBytes).getClassName().replace('/', '.');
+    return adopt(classBytes);
+  }
 
-    if (!indexedClasses.contains(visitedClassKey))
+
+  /**
+   * Adopts messages and templates from the given class file content. If the class contained in the class file has
+   * already been visited, e.g. by {@link #adopt(Class)}, {@link #adopt(Path)} or by scanning a package, this method
+   * returns immediately without re-parsing.
+   * <p>
+   * This method is useful if the class file has already been read, e.g. to inspect it before adopting its messages.
+   *
+   * @param classFileContent  content of the class file to analyze for message annotations, not {@code null}
+   *
+   * @return  this annotation adopter instance, never {@code null}
+   *
+   * @throws MessageAdopterException  if {@code classFileContent} is not a valid class file
+   * @throws MessageParserException   if a message or template text cannot be parsed
+   *
+   * @since 0.25.0
+   */
+  @Contract(value = "_ -> this")
+  public @NotNull AbstractAnnotationAdopter adopt(byte @NotNull [] classFileContent)
+  {
+    final String className;
+
+    try {
+      className = new ClassReader(classFileContent).getClassName().replace('/', '.');
+    } catch(RuntimeException ex) {
+      throw new MessageAdopterException("invalid class file: " + ex.getMessage(), ex);
+    }
+
+    if (!indexedClasses.contains(className))
     {
       try {
-        parseClass(new ByteArrayInputStream(classBytes));
-        indexedClasses.add(visitedClassKey);
+        parseClass(new ByteArrayInputStream(classFileContent));
+        indexedClasses.add(className);
       } catch(IOException ex) {
-        throw new MessageAdopterException("failed to adopt messages and templates from class file " + classFile, ex);
+        throw new MessageAdopterException("failed to adopt messages and templates from class " + className, ex);
       }
     }
 

@@ -45,11 +45,14 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import static de.sayayi.lib.message.util.MessageUtil.isMessageFormatPack;
 import static de.sayayi.plugin.gradle.message.DuplicateStrategy.IGNORE_AND_WARN;
-import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
+import static java.nio.file.Files.readAllBytes;
 import static org.gradle.api.logging.LogLevel.ERROR;
 import static org.gradle.api.logging.LogLevel.WARN;
 import static org.gradle.api.tasks.PathSensitivity.RELATIVE;
@@ -293,14 +296,16 @@ public abstract class MessageFormatPackTask extends DefaultTask
   @TaskAction
   public void pack()
   {
+    final var messageCodeFilter = createMessageCodeFilter();
+    final var ignoreTemplatePatterns = compilePatterns(getTemplates().getIgnoreRegexFilters().get(), "ignore");
     final var messageSupport = MessageSupportFactory.createGeneric();
 
     configureDuplicatesStrategy(messageSupport);
 
     pack_scanMessages(messageSupport);
-    pack_validateTemplates(messageSupport);
+    pack_validateTemplates(messageSupport, messageCodeFilter, ignoreTemplatePatterns);
     pack_action(messageSupport);
-    pack_write(messageSupport);
+    pack_write(messageSupport, messageCodeFilter);
   }
 
 
@@ -329,7 +334,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
           .stream()
           .map(File::toPath)
           .forEach(classPath -> {
-            var className = getClassName(classPath);
+            final var classFileContent = readClassFile(classPath);
+            final var className = new ClassReader(classFileContent).getClassName().replace('/', '.');
 
             if (trace)
               logger.trace("Scanning class {}, path {}", className, classPath);
@@ -337,7 +343,7 @@ public abstract class MessageFormatPackTask extends DefaultTask
               logger.debug("Scanning class {}", className);
 
             currentClassName.set(className);
-            adopter.adopt(classPath);
+            adopter.adopt(classFileContent);
           });
     } catch(Exception ex) {
       throw new GradleException("Failed to scan messages", ex);
@@ -351,11 +357,15 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * Validates that all templates referenced by the selected messages are available, unless template validation is
    * disabled. Missing templates matching one of the ignore patterns are not reported.
    *
-   * @param messageSupport  message support containing the scanned messages and templates, not {@code null}
+   * @param messageSupport          message support containing the scanned messages and templates, not {@code null}
+   * @param messageCodeFilter       filter selecting the messages to validate, not {@code null}
+   * @param ignoreTemplatePatterns  patterns of missing template names to ignore, not {@code null}
    *
    * @throws GradleException  if referenced templates are missing
    */
-  private void pack_validateTemplates(@NotNull MessageSupport messageSupport)
+  private void pack_validateTemplates(@NotNull MessageSupport messageSupport,
+                                      @NotNull Predicate<String> messageCodeFilter,
+                                      @NotNull List<Pattern> ignoreTemplatePatterns)
   {
     final var templates = getTemplates();
 
@@ -367,15 +377,14 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
       final var missingTemplateNames = new ArrayList<>(messageSupport
           .getMessageAccessor()
-          .findMissingTemplates(this::messageCodeFilter));
-      final var ignoreRegexFilters = templates.getIgnoreRegexFilters().get();
+          .findMissingTemplates(messageCodeFilter));
 
       for(var iterator = missingTemplateNames.iterator(); iterator.hasNext();)
       {
         final var templateName = iterator.next();
 
-        for(var ignoreRegex: ignoreRegexFilters)
-          if (ignoreRegex.matches(templateName))
+        for(var ignorePattern: ignoreTemplatePatterns)
+          if (ignorePattern.matcher(templateName).matches())
           {
             logger.debug("Ignore missing template '{}'", templateName);
             iterator.remove();
@@ -418,18 +427,19 @@ public abstract class MessageFormatPackTask extends DefaultTask
   /**
    * Writes the selected messages and their templates to the message pack file and verifies the result.
    *
-   * @param messageSupport  message support containing the scanned messages and templates, not {@code null}
+   * @param messageSupport     message support containing the scanned messages and templates, not {@code null}
+   * @param messageCodeFilter  filter selecting the messages to write, not {@code null}
    *
    * @throws GradleException  if the message pack cannot be written
    */
-  private void pack_write(@NotNull MessageSupport messageSupport)
+  private void pack_write(@NotNull MessageSupport messageSupport, @NotNull Predicate<String> messageCodeFilter)
   {
     final var packFile = getPackFile().getAsFile().toPath();
     getLogger().info("Writing message pack: {}", packFile);
 
     try {
       try(var packOutputStream = newOutputStream(packFile)) {
-        messageSupport.exportMessages(packOutputStream, getCompress().get(), this::messageCodeFilter, null);
+        messageSupport.exportMessages(packOutputStream, getCompress().get(), messageCodeFilter, null);
       }
 
       if (!isMessageFormatPack(packFile))
@@ -441,38 +451,70 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Tells whether the message with the given code is selected by the include and exclude patterns. If no include
-   * patterns are configured, all messages are included; exclude patterns take precedence over include patterns.
+   * Creates a filter that tells whether the message with a given code is selected by the include and exclude patterns.
+   * If no include patterns are configured, all messages are included; exclude patterns take precedence over include
+   * patterns. The patterns are compiled once.
    *
-   * @param code  message code, not {@code null}
+   * @return  message code filter, never {@code null}
    *
-   * @return  {@code true} if the message is selected, {@code false} otherwise
+   * @throws InvalidUserDataException  if an include or exclude pattern is not a valid regular expression
    */
   @Contract(pure = true)
-  private boolean messageCodeFilter(@NotNull String code)
+  private @NotNull Predicate<String> createMessageCodeFilter()
   {
-    final var includeRegexFilters = messages.getIncludeRegexFilters().get();
-    final var excludeRegexFilters = messages.getExcludeRegexFilters().get();
+    final var includePatterns = compilePatterns(messages.getIncludeRegexFilters().get(), "include");
+    final var excludePatterns = compilePatterns(messages.getExcludeRegexFilters().get(), "exclude");
 
-    var match = includeRegexFilters.isEmpty();
+    return code -> {
+      var match = includePatterns.isEmpty();
 
-    if (!match)
-      for(var regex: includeRegexFilters)
-        if (code.matches(regex))
-        {
-          match = true;
-          break;
-        }
+      if (!match)
+        for(var pattern: includePatterns)
+          if (pattern.matcher(code).matches())
+          {
+            match = true;
+            break;
+          }
 
-    if (match)
-      for(var regex: excludeRegexFilters)
-        if (code.matches(regex))
-        {
-          match = false;
-          break;
-        }
+      if (match)
+        for(var pattern: excludePatterns)
+          if (pattern.matcher(code).matches())
+          {
+            match = false;
+            break;
+          }
 
-    return match;
+      return match;
+    };
+  }
+
+
+  /**
+   * Compiles the given regular expressions.
+   *
+   * @param regexList  regular expressions, not {@code null}
+   * @param kind       kind of the filter ({@code include}, {@code exclude} or {@code ignore}), used in the error message
+   *
+   * @return  compiled patterns, never {@code null}
+   *
+   * @throws InvalidUserDataException  if a regular expression is not valid
+   */
+  @Contract(pure = true)
+  private static @NotNull List<Pattern> compilePatterns(@NotNull List<String> regexList, @NotNull String kind)
+  {
+    final var patterns = new ArrayList<Pattern>(regexList.size());
+
+    for(var regex: regexList)
+    {
+      try {
+        patterns.add(Pattern.compile(regex));
+      } catch(PatternSyntaxException ex) {
+        throw new InvalidUserDataException("Invalid " + kind + " regular expression '" + regex + "': " +
+            ex.getDescription(), ex);
+      }
+    }
+
+    return patterns;
   }
 
 
@@ -636,21 +678,21 @@ public abstract class MessageFormatPackTask extends DefaultTask
 
 
   /**
-   * Reads the fully qualified class name from a class file.
+   * Reads the content of a class file.
    *
    * @param classPath  path of the class file, not {@code null}
    *
-   * @return  fully qualified class name, never {@code null}
+   * @return  class file content, never {@code null}
    *
    * @throws GradleException  if the class file cannot be read
    */
   @Contract(pure = true)
-  private @NotNull String getClassName(@NotNull Path classPath)
+  private static byte @NotNull [] readClassFile(@NotNull Path classPath)
   {
-    try(var classStream = newInputStream(classPath)) {
-      return new ClassReader(classStream).getClassName().replace('/', '.');
+    try {
+      return readAllBytes(classPath);
     } catch(IOException ex) {
-      throw new GradleException("Failed to read class name from " + classPath, ex);
+      throw new GradleException("Failed to read class file " + classPath, ex);
     }
   }
 }
