@@ -30,6 +30,9 @@ import java.util.function.Supplier;
  */
 final class Log4jMessage implements Message
 {
+  /** Message format string. */
+  private final String format;
+
   /** Supplier providing the formatted message. */
   private final Supplier<String> messageSupplier;
 
@@ -38,13 +41,15 @@ final class Log4jMessage implements Message
 
 
   /**
-   * Creates a new Log4j message with the given message supplier and optional throwable.
+   * Creates a new Log4j message with the given format string, message supplier and optional throwable.
    *
+   * @param format           message format string, not {@code null}
    * @param messageSupplier  supplier providing the formatted message string, not {@code null}
    * @param throwable        throwable associated with this log message, or {@code null}
    */
-  Log4jMessage(@NotNull Supplier<String> messageSupplier, Throwable throwable)
+  Log4jMessage(@NotNull String format, @NotNull Supplier<String> messageSupplier, Throwable throwable)
   {
+    this.format = format;
     this.messageSupplier = messageSupplier;
     this.throwable = throwable;
   }
@@ -58,6 +63,19 @@ final class Log4jMessage implements Message
   @Override
   public String getFormattedMessage() {
     return messageSupplier.get();
+  }
+
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Returns the unformatted message format string. This method must be implemented, as it is abstract in Log4j API
+   * versions prior to 2.24.0 (and deprecated since then).
+   */
+  @Override
+  @SuppressWarnings("deprecation")
+  public String getFormat() {
+    return format;
   }
 
 

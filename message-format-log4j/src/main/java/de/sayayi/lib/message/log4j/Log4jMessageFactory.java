@@ -160,7 +160,7 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
 
     final var formatSupplier = builder.formatSupplier();
 
-    return new Log4jMessage(
+    return new Log4jMessage(message,
         SupplierDelegate.of(() -> {
           try {
             return formatSupplier.get();

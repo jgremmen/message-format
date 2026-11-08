@@ -23,7 +23,8 @@ passed as arguments (`logger.info("Login failed for %{p1}", userName)`). See
 
 ## Dependency
 
-Add the `message-format-log4j` module to the project alongside the Log4j API dependency.
+Add the `message-format-log4j` module to the project alongside the Log4j API dependency. The module requires Log4j
+2.11.0 or later (Log4j 3 is not supported).
 
 === "Gradle (Groovy)"
 

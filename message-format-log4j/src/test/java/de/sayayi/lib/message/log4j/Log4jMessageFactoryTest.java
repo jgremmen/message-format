@@ -230,4 +230,16 @@ class Log4jMessageFactoryTest
     logger.info("not valid %{}");
     assertEquals("<internal error formatting: not valid %{}>\n", stringWriter.toString());
   }
+
+
+  @Test
+  @DisplayName("Message returns the unformatted format string")
+  @SuppressWarnings("deprecation")
+  void testGetFormat()
+  {
+    final var message = LOG4J_MESSAGE_FACTORY.newMessage("Hello %{p1}", "Alice");
+
+    assertEquals("Hello %{p1}", message.getFormat());
+    assertEquals("Hello Alice", message.getFormattedMessage());
+  }
 }
