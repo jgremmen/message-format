@@ -164,17 +164,22 @@ sourceSets.main.output.dir(asmMainDir, builtBy: 'prepareRelocatedAsmClasses')
 tasks.named('processResources') {
   // version of the bundled ASM library, mentioned in META-INF/NOTICE
   def asmVersion = providers.provider {
-    configurations.asmToBundle.incoming.resolutionResult.allComponents
+    configurations
+        .asmToBundle
+        .incoming
+        .resolutionResult
+        .allComponents
         .find { it.moduleVersion?.group == 'org.ow2.asm' && it.moduleVersion?.name == 'asm' }
-        ?.moduleVersion?.version
+        ?.moduleVersion
+        ?.version
   }
-  def copyrightYear = new Date().format('yyyy')
+  def copyrightYear = commitTime.map { it.year as String }
 
   inputs.property('asmVersion', asmVersion)
   inputs.property('copyrightYear', copyrightYear)
 
   filesMatching('META-INF/NOTICE') {
-    expand(copyright: copyrightYear, asmVersion: asmVersion.get())
+    expand(copyright: copyrightYear.get(), asmVersion: asmVersion.get())
   }
 }
 

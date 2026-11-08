@@ -17,6 +17,11 @@
 //file:noinspection DependencyNotationArgument
 
 
+import java.time.Instant
+
+import static java.time.ZoneOffset.UTC
+
+
 plugins {
   id 'java-library'
   id 'com.adarshr.test-logger'
@@ -63,13 +68,24 @@ test {
 }
 
 
-jar.dependsOn test
+// time of the last commit
+ext.commitTime = providers
+    .exec {
+      workingDir = rootDir
+      commandLine 'git', 'log', '-1', '--format=%ct'
+    }
+    .standardOutput
+    .asText
+    .map { Instant.ofEpochSecond(it.trim() as long).atOffset(UTC) }
+
+
+tasks.named('jar') {
+  dependsOn tasks.named('test')
+}
 
 
 tasks.withType(Jar).configureEach {
   includeEmptyDirs = false
-  preserveFileTimestamps = true
-  reproducibleFileOrder = true
 
   manifest {
     attributes(
@@ -79,7 +95,7 @@ tasks.withType(Jar).configureEach {
         'Implementation-Version': releaseVersion,
         'Implementation-URL': "https://lib.sayayi.de/message-format/${releaseVersion}/",
         'Created-By': System.getProperty('java.version'),
-        'Built-Date': new Date().format('yyyy-MM-dd HH:mm:ss')
+        'Built-Date': commitTime.map { it.format('yyyy-MM-dd HH:mm:ss') }
     )
   }
 
@@ -87,7 +103,7 @@ tasks.withType(Jar).configureEach {
     include 'LICENSE'
     into 'META-INF'
     expand(
-        copyright: new Date().format('yyyy'),
+        copyright: commitTime.get().year,
         version: project.version)
   }
 }
