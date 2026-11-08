@@ -18,6 +18,7 @@ package de.sayayi.plugin.gradle.message;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaBasePlugin;
+import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
 import org.jetbrains.annotations.NotNull;
@@ -32,8 +33,9 @@ import static org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME;
  * compiled classes.
  * <p>
  * The plugin automatically applies the {@link JavaBasePlugin} if not already present and configures the
- * {@link MessageFormatExtension} with sensible defaults. The {@code main} source set is used as the default source for
- * class scanning.
+ * {@link MessageFormatExtension} with sensible defaults. As soon as the {@link JavaPlugin} is applied, before or after
+ * this plugin, the {@code main} source set is used as the default source for class scanning and the pack task is
+ * registered.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -50,7 +52,8 @@ public class MessageFormatPlugin implements Plugin<@NotNull Project>
 
   /**
    * Applies the plugin to the given {@code project} by registering the {@link MessageFormatExtension messageFormat}
-   * extension and the {@link MessageFormatPackTask messageFormatPack} task.
+   * extension. The {@link MessageFormatPackTask messageFormatPack} task is registered once the {@link JavaPlugin} has
+   * been applied to the project.
    *
    * @param project  the Gradle project to apply this plugin to, never {@code null}
    */
@@ -71,15 +74,17 @@ public class MessageFormatPlugin implements Plugin<@NotNull Project>
     messageFormatExtension.getMessages().getDuplicateStrategy().convention(IGNORE_AND_WARN);
     messageFormatExtension.getTemplates().getValidateReferences().convention(true);
 
-    final var mainJavaSourceSet = extensions
-        .getByType(JavaPluginExtension.class)
-        .getSourceSets()
-        .getByName(MAIN_SOURCE_SET_NAME);
+    plugins.withType(JavaPlugin.class, javaPlugin -> {
+      final var mainJavaSourceSet = extensions
+          .getByType(JavaPluginExtension.class)
+          .getSourceSets()
+          .getByName(MAIN_SOURCE_SET_NAME);
 
-    // sources = {.build/classes/java/main/}**/*.class
-    messageFormatExtension.sourceSet(mainJavaSourceSet);
+      // sources = {.build/classes/java/main/}**/*.class
+      messageFormatExtension.sourceSet(mainJavaSourceSet);
 
-    registerPackTask(project, messageFormatExtension, mainJavaSourceSet);
+      registerPackTask(project, messageFormatExtension, mainJavaSourceSet);
+    });
   }
 
 

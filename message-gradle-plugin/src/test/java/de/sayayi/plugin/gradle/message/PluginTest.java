@@ -45,8 +45,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
- * Tests {@link MessageFormatPlugin}: pack task runs with no, plain and filtered sources, duplicate message handling and
- * the packaged jar.
+ * Tests {@link MessageFormatPlugin}: pack task runs with no, plain and filtered sources, duplicate message handling,
+ * plugin order and the packaged jar.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -282,6 +282,37 @@ final class PluginTest
 
     assertEquals(success ? SUCCESS : FAILED,
         requireNonNull(result.task(":messageFormatPack")).getOutcome());
+  }
+
+
+  @Test
+  @DisplayName("Plugin applied before the java plugin")
+  void testAppliedBeforeJavaPlugin() throws IOException
+  {
+    write(new File(testProjectDir, "build.gradle").toPath(), List.of(
+        "plugins {",
+        "  id 'de.sayayi.plugin.gradle.message'",
+        "  id 'java'",
+        "}",
+        "dependencies {",
+        "  implementation files('" + MESSAGE_FORMAT_ANNOTATIONS_JAR + "')",
+        "}"
+    ));
+
+    copy(getResource("test-source-1.java"),
+        new File(testPackageDir, "Source1.java").toPath());
+
+    val result = GradleRunner.create()
+        .withProjectDir(testProjectDir)
+        .withArguments("messageFormatPack")
+        .withPluginClasspath()
+        .withDebug(true)
+        .forwardOutput()
+        .build();
+
+    assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
+    assertTrue(packFile.isFile() && packFile.canRead());
+    assertTrue(readMessagePack(packFile).getMessageCodes().size() > 0);
   }
 
 

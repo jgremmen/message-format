@@ -13,7 +13,8 @@ message definitions in the codebase.
 ## Applying the Plugin
 
 Apply the plugin in the `build.gradle` file. Because the plugin requires compiled class files to scan, the project must
-also apply the `java` plugin (or a plugin that extends it, such as `java-library`):
+also apply the `java` plugin (or a plugin that extends it, such as `java-library`). The plugins can be applied in any
+order:
 
 === "Gradle (Groovy)"
 
