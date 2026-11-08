@@ -114,6 +114,7 @@ tasks.withType(JavaCompile).configureEach {
     languageVersion = JavaLanguageVersion.of(21)
   }
 
+  options.release = 21
   options.encoding = 'UTF-8'
   options.compilerArgs << '-parameters'
 }
@@ -134,18 +135,6 @@ tasks.withType(Test).configureEach {
     if (byteBuddyAgent)
       jvmArgs "-javaagent:${byteBuddyAgent.absolutePath}"
   }
-}
-
-
-tasks.named('compileJava') {
-  sourceCompatibility = 21
-  targetCompatibility = 21
-}
-
-
-tasks.named('compileTestJava') {
-  sourceCompatibility = 21
-  targetCompatibility = 21
 }
 
 
