@@ -200,6 +200,60 @@ final class MessageFactoryTest
 
 
   @Test
+  @DisplayName("Localized message prefers the language without country over a different country")
+  void testParseLocalizedMessageLanguageFallback()
+  {
+    final var messageAccessor = MessageSupportFactory.shared().getMessageAccessor();
+    final var messageFactory = messageAccessor.getMessageFactory();
+
+    final var localizedTexts = new LinkedHashMap<Locale,String>();
+    localizedTexts.put(Locale.ROOT, "root");
+    localizedTexts.put(forLanguageTag("de-DE"), "de-DE");
+    localizedTexts.put(forLanguageTag("de-CH"), "de-CH");
+    localizedTexts.put(forLanguageTag("de"), "de");
+    localizedTexts.put(forLanguageTag("fr-FR"), "fr-FR");
+    localizedTexts.put(forLanguageTag("fr-CA"), "fr-CA");
+
+    final var message = messageFactory.parseMessage("MSG-001", localizedTexts);
+
+    assertEquals("de-CH", message.format(messageAccessor, Message.Parameters.empty(forLanguageTag("de-CH"))));
+    assertEquals("de", message.format(messageAccessor, Message.Parameters.empty(forLanguageTag("de-AT"))));
+    assertEquals("de", message.format(messageAccessor, Message.Parameters.empty(forLanguageTag("de"))));
+    assertEquals("fr-FR", message.format(messageAccessor, Message.Parameters.empty(forLanguageTag("fr-BE"))));
+    assertEquals("root", message.format(messageAccessor, Message.Parameters.empty(JAPANESE)));
+  }
+
+
+  @Test
+  @DisplayName("Localized message and template preserve the map order for the first available message")
+  void testParseLocalizedPreservesMapOrder()
+  {
+    final var messageAccessor = MessageSupportFactory.shared().getMessageAccessor();
+    final var messageFactory = messageAccessor.getMessageFactory();
+    final var tags = new String[] { "sv", "fi", "nl", "pt", "it", "es", "fr", "de", "en", "pl", "cs", "da" };
+
+    for(var first: tags)
+    {
+      final var localizedTexts = new LinkedHashMap<Locale,String>();
+      localizedTexts.put(forLanguageTag(first), first);
+      for(var tag: tags)
+        localizedTexts.putIfAbsent(forLanguageTag(tag), tag);
+
+      assertEquals(first, messageFactory
+          .parseMessage("MSG-001", localizedTexts)
+          .format(messageAccessor, Message.Parameters.empty(JAPANESE)));
+
+      assertEquals(first, MessageSupportFactory
+          .createDefault()
+          .addTemplate("tpl", messageFactory.parseTemplate(localizedTexts))
+          .message("%[tpl]")
+          .locale(JAPANESE)
+          .format());
+    }
+  }
+
+
+  @Test
   @DisplayName("Cache does not block other threads while compiling a message")
   void testParseMessageCacheCompilesOutsideLock() throws Exception
   {

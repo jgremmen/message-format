@@ -303,7 +303,7 @@ public class MessageFactory
       }
 
       default -> {
-        final var localizedMessages = new HashMap<Locale,Message>();
+        final var localizedMessages = new LinkedHashMap<Locale,Message>();
 
         localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) -> {
           try {
@@ -366,7 +366,7 @@ public class MessageFactory
       }
 
       default -> {
-        final var localizedMessages = new HashMap<Locale,Message>();
+        final var localizedMessages = new LinkedHashMap<Locale,Message>();
 
         localizedTexts.forEach((Locale locale, @Language("MessageFormat") String text) -> {
           try {

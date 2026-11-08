@@ -53,14 +53,16 @@ the language and country of each variant with the requested locale and ignores s
 first matching variant according to the following rules, in order of precedence:
 
 1. A variant with the same language and the same country.
-2. A variant with the same language but a different country.
-3. A variant for the root locale (an empty language, such as `Locale.ROOT`), which acts as the language-neutral default.
-4. The first variant in iteration order.
+2. A variant with the same language and no country (e.g. `de` for `de-AT`).
+3. A variant with the same language but a different country (e.g. `de-DE` for `de-AT`).
+4. A variant for the root locale (an empty language, such as `Locale.ROOT`), which acts as the language-neutral default.
+5. The first variant in iteration order.
 
-The last rule only applies when no variant matches and no root locale variant exists. A localized message created by
-`MessageFactory.parseMessage(...)` from a `Map<Locale,String>` does not preserve the order of the map entries, so
-which variant this rule selects is not predictable. A root locale variant should be provided whenever the requested
-locales are not known in advance.
+If several variants match the same rule, the first one in iteration order is selected. A localized message created by
+`MessageFactory.parseMessage(...)` from a `Map<Locale,String>` preserves the iteration order of that map, so an
+ordered map such as `LinkedHashMap` makes the selection predictable. The last rule only applies when no variant matches
+and no root locale variant exists. A root locale variant should be provided whenever the requested locales are not
+known in advance.
 
 A `Message.LocaleAware` does not have a single array of message parts or a single format string. Calling
 `getMessageParts()` or `asFormatString(Charset)` on it throws `UnsupportedOperationException`. To inspect individual 

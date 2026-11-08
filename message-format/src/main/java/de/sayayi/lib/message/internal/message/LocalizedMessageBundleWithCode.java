@@ -99,8 +99,9 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
   /**
    * Finds the message that best matches {@code locale}. In order of preference, this is the message for the same
-   * language and country, a message for the same language, a message for a locale without language (e.g.
-   * {@link Locale#ROOT}) or the first available message.
+   * language and country, a message for the same language without country, a message for the same language and a
+   * different country, a message for a locale without language (e.g. {@link Locale#ROOT}) or the first available
+   * message. If several messages match equally well, the first one in iteration order is selected.
    *
    * @param locale  locale to find a message for, not {@code null}
    *
@@ -112,33 +113,32 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
     final var searchLanguage = locale.getLanguage();
     final var searchCountry = locale.getCountry();
 
-    var match = -1;
+    var bestMatch = -1;
     Message message = null;
 
     for(var entry: localizedMessages.entrySet())
     {
       final var keyLocale = entry.getKey();
-      final var localizedMessage = entry.getValue();
+      final var keyLanguage = keyLocale.getLanguage();
+      final int match;
 
-      if (match == -1 && keyLocale.getLanguage().isEmpty())
+      if (keyLanguage.equals(searchLanguage))
       {
-        message = localizedMessage;
-        match = 0;  // "default" language match
+        final var keyCountry = keyLocale.getCountry();
+
+        if (keyCountry.equals(searchCountry))
+          return entry.getValue();  // same language and country
+
+        match = keyCountry.isEmpty() ? 3 : 2;  // same language without country / with different country
       }
-      else if (keyLocale.getLanguage().equals(searchLanguage))
+      else
+        match = keyLanguage.isEmpty() ? 1 : 0;  // "default" language / any other language
+
+      if (match > bestMatch)
       {
-        if (keyLocale.getCountry().equals(searchCountry))
-          return localizedMessage;
-
-        if (match < 1)
-        {
-          message = localizedMessage;
-          match = 1;  // same language, different country
-        }
+        message = entry.getValue();
+        bestMatch = match;
       }
-
-      if (message == null)
-        message = localizedMessage;  // 1st match
     }
 
     return requireNonNull(message);

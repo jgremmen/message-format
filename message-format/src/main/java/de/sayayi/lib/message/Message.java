@@ -327,8 +327,8 @@ public sealed interface Message extends FormatStringSerializer
    * <p>
    * Because a locale-aware message delegates to different underlying messages depending on the locale, methods like
    * {@link #getMessageParts()} and {@link #asFormatString(Charset)} are not supported and will throw
-   * {@link UnsupportedOperationException}. Use {@link #getLocalizedMessages()} to access the individual
-   * locale-specific messages.
+   * {@link UnsupportedOperationException}. Use {@link #getLocalizedMessages()} to access the individual locale-specific
+   * messages.
    *
    * @since 0.1.0
    */
@@ -340,10 +340,12 @@ public sealed interface Message extends FormatStringSerializer
      * The message is formatted with respect to the locale provided by {@code parameters}. If the locale does not match
      * any of the localized messages, a default message will be selected using the following rules
      * <ol>
+     *   <li>a message with the same language and no country</li>
      *   <li>a message with the same language but a different country</li>
      *   <li>a message for a locale without language (e.g. {@link Locale#ROOT})</li>
      *   <li>the first available message (this may be implementation dependent)</li>
      * </ol>
+     * If several messages match equally well, the first one in iteration order is selected.
      *
      * @see Parameters#getLocale()
      */
