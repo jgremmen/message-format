@@ -29,7 +29,9 @@ import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.template.Template;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.objectweb.asm.ClassReader;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +46,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Files.readAllBytes;
 import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
 
@@ -335,8 +338,9 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopts messages and templates from the given class file identified by {@code classFile}. If the class file has
-   * already been visited, this method returns immediately without re-parsing.
+   * Adopts messages and templates from the given class file identified by {@code classFile}. If the class contained in
+   * the class file has already been visited, e.g. by {@link #adopt(Class)} or by scanning a package, this method
+   * returns immediately without re-parsing.
    *
    * @param classFile  path to the class file to analyze for message annotations, not {@code null}
    *
@@ -350,13 +354,20 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
   @Contract(value = "_ -> this")
   public @NotNull AbstractAnnotationAdopter adopt(@NotNull Path classFile)
   {
-    final var classPath = classFile.toAbsolutePath();
-    final var visitedClassKey = classPath.toString();
+    final byte[] classBytes;
+
+    try {
+      classBytes = readAllBytes(classFile);
+    } catch(IOException ex) {
+      throw new MessageAdopterException("failed to adopt messages and templates from class file " + classFile, ex);
+    }
+
+    final var visitedClassKey = new ClassReader(classBytes).getClassName().replace('/', '.');
 
     if (!indexedClasses.contains(visitedClassKey))
     {
-      try(var inputStream = newInputStream(classPath)) {
-        parseClass(inputStream);
+      try {
+        parseClass(new ByteArrayInputStream(classBytes));
         indexedClasses.add(visitedClassKey);
       } catch(IOException ex) {
         throw new MessageAdopterException("failed to adopt messages and templates from class file " + classFile, ex);

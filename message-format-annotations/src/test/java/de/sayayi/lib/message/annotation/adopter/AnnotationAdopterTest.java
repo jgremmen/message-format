@@ -47,6 +47,7 @@ import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
@@ -237,6 +238,39 @@ class AnnotationAdopterTest
 
     verifyFixture(cms.getMessageAccessor());
     verifyInnerRecordFixture(cms.getMessageAccessor());
+  }
+
+
+  @Test
+  @DisplayName("avoid duplicate visit across adopt(Path), adopt(File) and adopt(Class<?>)")
+  void testAvoidDuplicateVisitWithClassFile() throws Exception
+  {
+    for(var pathFirst: new boolean[] { true, false })
+    {
+      val cms = newMessageSupport();
+      val addedMessages = new AtomicInteger();
+      cms.setMessageFilter(message -> addedMessages.incrementAndGet() > 0);
+
+      val adopter = new AnnotationAdopter(cms);
+
+      if (pathFirst)
+        adopter.adopt(classFilePath(AnnotationsFixture.class));
+      else
+        adopter.adopt(AnnotationsFixture.class);
+
+      val messageCount = addedMessages.get();
+      assertTrue(messageCount > 0);
+
+      if (pathFirst)
+        adopter.adopt(AnnotationsFixture.class);
+      else
+        adopter.adopt(classFilePath(AnnotationsFixture.class));
+
+      adopter.adopt(classFilePath(AnnotationsFixture.class).toFile());
+
+      assertEquals(messageCount, addedMessages.get(), "pathFirst=" + pathFirst);
+      verifyFixture(cms.getMessageAccessor());
+    }
   }
 
 
