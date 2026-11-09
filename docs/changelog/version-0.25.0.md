@@ -350,6 +350,13 @@ some have already been consumed. Both characteristics are now reported correctly
 empty `SortedStringMap` (whose backing array is `null`) into a new mutable map no longer throws a
 `NullPointerException`.
 
+An unsealed (mutable) `SortedStringMap` rejected several standard `Map` operations with an
+`UnsupportedOperationException`. Its entries were immutable snapshots and its iterators did not support `remove()`,
+so `replaceAll(...)`, `Entry.setValue(...)`, `entrySet().remove(...)`, `entrySet().removeIf(...)`,
+`keySet().remove(...)`, `values().remove(...)` and `Iterator.remove()` all failed. An unsealed map now supports all of
+these operations. `Entry.setValue(...)` writes the value through to the map. Once the map is sealed, these operations
+throw `UnsupportedOperationException`, as before.
+
 `SupplierDelegate.value` was not declared `volatile`, so a thread reading a cached value after another thread had
 already computed and stored it via the delegate supplier was not guaranteed to see the up-to-date value under the
 Java Memory Model. The field is now `volatile`, making the cached value visible across threads as intended.

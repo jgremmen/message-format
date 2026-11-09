@@ -1091,30 +1091,170 @@ class SortedStringMapTest
 
 
     @Test
-    @DisplayName("entrySet remove throws UnsupportedOperationException")
-    @SuppressWarnings({"WriteOnlyObject", "MismatchedQueryAndUpdateOfCollection"})
-    void entrySetRemoveThrows()
+    @DisplayName("entrySet remove removes matching entry only")
+    @SuppressWarnings("SuspiciousMethodCalls")
+    void entrySetRemove()
     {
       var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
+      map.put("bravo", "2");
 
-      assertThrows(UnsupportedOperationException.class,
-          () -> map.entrySet().remove(Map.entry("alpha", "1")));
+      assertFalse(map.entrySet().remove(Map.entry("alpha", "99")));
+      assertFalse(map.entrySet().remove(Map.entry("charlie", "3")));
+      assertFalse(map.entrySet().remove("alpha"));
+      assertTrue(map.entrySet().remove(Map.entry("alpha", "1")));
+
+      assertEquals(Map.of("bravo", "2"), map);
     }
 
 
     @Test
-    @DisplayName("entrySet removeIf throws UnsupportedOperationException")
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    void entrySetRemoveIfThrows()
+    @DisplayName("entrySet remove on sealed map throws UnsupportedOperationException")
+    @SuppressWarnings("WriteOnlyObject")
+    void entrySetRemoveSealedThrows()
+    {
+      var map = new SortedStringMap<>(Map.of("alpha", "1"), true);
+
+      assertThrows(UnsupportedOperationException.class,
+          () -> map.entrySet().remove(Map.entry("alpha", "1")));
+      assertThrows(UnsupportedOperationException.class,
+          () -> map.entrySet().remove(Map.entry("bravo", "2")));
+    }
+
+
+    @Test
+    @DisplayName("entrySet contains checks key and value")
+    @SuppressWarnings("SuspiciousMethodCalls")
+    void entrySetContains()
     {
       var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
+      map.put("bravo", null);
 
-      assertThrows(UnsupportedOperationException.class,
-          () -> map.entrySet().removeIf(e -> true));
+      assertTrue(map.entrySet().contains(Map.entry("alpha", "1")));
+      assertTrue(map.entrySet().contains(new AbstractMap.SimpleEntry<>("bravo", null)));
+      assertFalse(map.entrySet().contains(Map.entry("alpha", "2")));
+      assertFalse(map.entrySet().contains(new AbstractMap.SimpleEntry<>("charlie", null)));
+      assertFalse(map.entrySet().contains("alpha"));
+    }
+
+
+    @Test
+    @DisplayName("entrySet removeIf removes matching entries in sorted order")
+    void entrySetRemoveIf()
+    {
+      var map = new SortedStringMap<String>();
+
+      map.put("alpha", "1");
+      map.put("bravo", "2");
+      map.put("charlie", "3");
+      map.put("delta", "4");
+      map.put("echo", "5");
+
+      var tested = new ArrayList<String>();
+
+      assertTrue(map.entrySet().removeIf(e -> tested.add(e.getKey()) && Integer.parseInt(e.getValue()) % 2 == 1));
+      assertEquals(List.of("alpha", "bravo", "charlie", "delta", "echo"), tested);
+      assertArrayEquals(new String[] { "bravo", "delta" }, map.getKeys());
+      assertEquals("4", map.get("delta"));
+
+      assertFalse(map.entrySet().removeIf(e -> false));
+      assertEquals(2, map.size());
+    }
+
+
+    @Test
+    @DisplayName("entrySet removeIf leaves map unchanged if the filter throws")
+    void entrySetRemoveIfFilterThrows()
+    {
+      var map = new SortedStringMap<String>();
+
+      map.put("alpha", "1");
+      map.put("bravo", "2");
+      map.put("charlie", "3");
+
+      assertThrows(IllegalStateException.class, () -> map.entrySet().removeIf(e -> {
+        if (e.getKey().equals("charlie"))
+          throw new IllegalStateException();
+        return true;
+      }));
+
+      assertArrayEquals(new String[] { "alpha", "bravo", "charlie" }, map.getKeys());
+    }
+
+
+    @Test
+    @DisplayName("entrySet removeIf on sealed map throws UnsupportedOperationException")
+    void entrySetRemoveIfSealedThrows()
+    {
+      var map = new SortedStringMap<>(Map.of("alpha", "1"), true);
+
+      assertThrows(UnsupportedOperationException.class, () -> map.entrySet().removeIf(e -> false));
+    }
+
+
+    @Test
+    @DisplayName("entrySet iterator remove removes current entry")
+    void entrySetIteratorRemove()
+    {
+      var map = new SortedStringMap<String>();
+
+      map.put("alpha", "1");
+      map.put("bravo", "2");
+      map.put("charlie", "3");
+
+      var iterator = map.entrySet().iterator();
+
+      assertThrows(IllegalStateException.class, iterator::remove);
+
+      var keys = new ArrayList<String>();
+
+      while(iterator.hasNext())
+      {
+        var entry = iterator.next();
+        keys.add(entry.getKey());
+
+        if (!entry.getKey().equals("bravo"))
+          iterator.remove();
+      }
+
+      assertEquals(List.of("alpha", "bravo", "charlie"), keys);
+      assertEquals(Map.of("bravo", "2"), map);
+      assertThrows(IllegalStateException.class, iterator::remove);
+    }
+
+
+    @Test
+    @DisplayName("entrySet iterator remove twice throws IllegalStateException")
+    void entrySetIteratorRemoveTwice()
+    {
+      var map = new SortedStringMap<String>();
+
+      map.put("alpha", "1");
+      map.put("bravo", "2");
+
+      var iterator = map.entrySet().iterator();
+      iterator.next();
+      iterator.remove();
+
+      assertThrows(IllegalStateException.class, iterator::remove);
+      assertEquals(Map.of("bravo", "2"), map);
+    }
+
+
+    @Test
+    @DisplayName("entrySet iterator remove on sealed map throws UnsupportedOperationException")
+    void entrySetIteratorRemoveSealedThrows()
+    {
+      var map = new SortedStringMap<>(Map.of("alpha", "1"), true);
+      var iterator = map.entrySet().iterator();
+
+      iterator.next();
+
+      assertThrows(UnsupportedOperationException.class, iterator::remove);
+      assertEquals(1, map.size());
     }
 
 
@@ -1267,20 +1407,65 @@ class SortedStringMapTest
 
 
     @Test
-    @DisplayName("Entry setValue always throws")
-    void entrySetValueThrows()
+    @DisplayName("Entry setValue on sealed map throws")
+    void entrySetValueSealedThrows()
     {
       var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
-      map.put("charlie", "3");
-      map.put("delta", "4");
-      map.put("echo", "5");
+      map.seal();
 
       var entry = map.entrySet().iterator().next();
 
       assertThrows(UnsupportedOperationException.class, () -> entry.setValue("11"));
+      assertEquals("1", map.get("alpha"));
+    }
+
+
+    @Test
+    @DisplayName("Entry setValue on unsealed map writes through")
+    void entrySetValueWritesThrough()
+    {
+      var map = new SortedStringMap<String>();
+
+      map.put("alpha", "1");
+      map.put("bravo", "2");
+
+      var entry = map.entrySet().iterator().next();
+
+      assertEquals("1", entry.setValue("11"));
+      assertEquals("11", entry.getValue());
+      assertEquals("11", map.get("alpha"));
+
+      // entry is looked up by key, so structural modifications do not break it
+      map.put("aardvark", "0");
+
+      assertEquals("11", entry.setValue("111"));
+      assertEquals(Map.of("aardvark", "0", "alpha", "111", "bravo", "2"), map);
+    }
+
+
+    @Test
+    @DisplayName("Entry setValue after removal or sealing throws")
+    void entrySetValueAfterRemovalOrSeal()
+    {
+      var map = new SortedStringMap<String>();
+
+      map.put("alpha", "1");
+      map.put("bravo", "2");
+
+      var iterator = map.entrySet().iterator();
+      var alpha = iterator.next();
+      var bravo = iterator.next();
+
+      map.remove("alpha");
+      assertThrows(IllegalStateException.class, () -> alpha.setValue("11"));
+      assertFalse(map.containsKey("alpha"));
+
+      map.seal();
+      assertThrows(UnsupportedOperationException.class, () -> bravo.setValue("22"));
+      assertEquals("2", map.get("bravo"));
     }
 
 
@@ -1624,6 +1809,148 @@ class SortedStringMapTest
       assertEquals(5, values.size());
       assertTrue(values.contains("1"));
       assertTrue(values.contains("5"));
+    }
+
+
+    @Test
+    @DisplayName("keySet iterates keys in sorted order")
+    @SuppressWarnings({"RedundantCollectionOperation", "SuspiciousMethodCalls"})
+    void keySetSortedOrder()
+    {
+      var map = new SortedStringMap<String>();
+
+      map.put("charlie", "3");
+      map.put("alpha", "1");
+      map.put("bravo", "2");
+
+      assertEquals(List.of("alpha", "bravo", "charlie"), new ArrayList<>(map.keySet()));
+      assertFalse(map.keySet().contains(1));
+    }
+
+
+    @Test
+    @DisplayName("keySet remove, removeIf, retainAll and iterator remove modify the map")
+    @SuppressWarnings({"RedundantCollectionOperation", "WriteOnlyObject", "ConstantValue"})
+    void keySetRemove()
+    {
+      var map = new SortedStringMap<String>();
+
+      map.put("alpha", "1");
+      map.put("bravo", "2");
+      map.put("charlie", "3");
+      map.put("delta", "4");
+      map.put("echo", "5");
+
+      assertTrue(map.keySet().remove("alpha"));
+      assertFalse(map.keySet().remove("alpha"));
+      assertTrue(map.keySet().removeIf(k -> k.startsWith("b")));
+      assertTrue(map.keySet().retainAll(Set.of("charlie", "delta")));
+
+      var iterator = map.keySet().iterator();
+      assertEquals("charlie", iterator.next());
+      iterator.remove();
+
+      assertEquals(Map.of("delta", "4"), map);
+
+      map.keySet().clear();
+      assertTrue(map.isEmpty());
+    }
+
+
+    @Test
+    @DisplayName("values remove and removeIf modify the map")
+    void valuesRemove()
+    {
+      var map = new SortedStringMap<String>();
+
+      map.put("alpha", "1");
+      map.put("bravo", "2");
+      map.put("charlie", "1");
+
+      assertTrue(map.values().remove("1"));
+      assertEquals(Map.of("bravo", "2", "charlie", "1"), map);
+
+      assertTrue(map.values().removeIf("1"::equals));
+      assertEquals(Map.of("bravo", "2"), map);
+    }
+
+
+    @Test
+    @DisplayName("keySet and values modifications on sealed map throw")
+    @SuppressWarnings({"RedundantCollectionOperation", "WriteOnlyObject"})
+    void sealedViewsThrow()
+    {
+      var map = new SortedStringMap<>(Map.of("alpha", "1", "bravo", "2"), true);
+
+      assertThrows(UnsupportedOperationException.class, () -> map.keySet().remove("alpha"));
+      assertThrows(UnsupportedOperationException.class, () -> map.keySet().remove("charlie"));
+      assertThrows(UnsupportedOperationException.class, () -> map.keySet().removeIf(k -> true));
+      assertThrows(UnsupportedOperationException.class, () -> map.keySet().clear());
+      assertThrows(UnsupportedOperationException.class, () -> map.values().remove("1"));
+
+      var iterator = map.keySet().iterator();
+      iterator.next();
+      assertThrows(UnsupportedOperationException.class, iterator::remove);
+
+      assertEquals(Map.of("alpha", "1", "bravo", "2"), map);
+    }
+  }
+
+
+
+
+  // ---- replaceAll ----
+
+  @Nested
+  @DisplayName("replaceAll")
+  class ReplaceAllTest
+  {
+    @Test
+    @DisplayName("replaceAll replaces all values in sorted key order")
+    void replaceAll()
+    {
+      var map = new SortedStringMap<String>();
+
+      map.put("charlie", "3");
+      map.put("alpha", "1");
+      map.put("bravo", "2");
+
+      var keys = new ArrayList<String>();
+
+      map.replaceAll((k, v) -> {
+        keys.add(k);
+        return k + v;
+      });
+
+      assertEquals(List.of("alpha", "bravo", "charlie"), keys);
+      assertEquals(Map.of("alpha", "alpha1", "bravo", "bravo2", "charlie", "charlie3"), map);
+    }
+
+
+    @Test
+    @DisplayName("replaceAll on sealed map throws")
+    void replaceAllSealedThrows()
+    {
+      var map = new SortedStringMap<>(Map.of("alpha", "1"), true);
+
+      assertThrows(UnsupportedOperationException.class, () -> map.replaceAll((k, v) -> v));
+      assertEquals("1", map.get("alpha"));
+    }
+
+
+    @Test
+    @DisplayName("Default compute and merge operations work on unsealed map")
+    void computeAndMerge()
+    {
+      var map = new SortedStringMap<Integer>();
+
+      map.put("alpha", 1);
+      map.merge("alpha", 10, Integer::sum);
+      map.compute("bravo", (k, v) -> v == null ? 2 : v + 1);
+      map.computeIfPresent("bravo", (k, v) -> null);
+      map.putIfAbsent("charlie", 3);
+
+      assertEquals(Map.of("alpha", 11, "charlie", 3), map);
     }
   }
 

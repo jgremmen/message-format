@@ -19,10 +19,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -36,14 +33,20 @@ import static java.util.Objects.requireNonNull;
  * A compact, array-backed {@link Map} implementation with {@link String} keys kept in sorted order. This map supports
  * an optional {@linkplain #seal() seal} operation that makes it immutable and trims internal storage.
  * <p>
- * Keys are maintained in natural string order, enabling binary search for efficient lookups. {@code null} keys are
- * not supported.
+ * Keys are maintained in natural string order, enabling binary search for efficient lookups. {@code null} keys are not
+ * supported.
+ * <p>
+ * While the map is unsealed, it supports all optional {@link Map} operations, including removal through the
+ * {@linkplain #keySet() key set}, {@linkplain #values() values} and {@linkplain #entrySet() entry set} views and their
+ * iterators, and {@link java.util.Map.Entry#setValue(Object) Entry.setValue}, which writes the value through to this
+ * map. Once the map is sealed, every modifying operation, including those of the views, iterators and entries, throws
+ * an {@link UnsupportedOperationException}.
  * <p>
  * <b>Concurrent modification while iterating:</b> While the map is unsealed, the iterators, spliterators and streams
  * returned by this map (and its collection views) are <em>not</em> fail-fast. If the map is structurally modified
  * after an iterator or spliterator is created, the iteration result is undefined: entries may be skipped, duplicated
- * or otherwise inconsistent, and no {@link java.util.ConcurrentModificationException} will be thrown. The same
- * applies to {@link #forEach(java.util.function.BiConsumer)} and the entry set's
+ * or otherwise inconsistent, and no {@link java.util.ConcurrentModificationException} will be thrown. The same applies
+ * to {@link #forEach(java.util.function.BiConsumer)} and the entry set's
  * {@link java.util.Set#forEach(java.util.function.Consumer) forEach}. Once the map is {@linkplain #seal() sealed},
  * structural modification is impossible and iteration is inherently safe.
  * <p>
@@ -249,32 +252,19 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
    */
   @Override
   @Contract(mutates = "this")
-  @SuppressWarnings("unchecked")
   public V remove(Object key)
   {
     if (sealed)
       throw new UnsupportedOperationException("remove");
 
-    V result = null;
-
     if (key instanceof String string)
     {
       final var idx = findKeyIndex(string);
       if (idx >= 0)
-      {
-        final var offset = idx * 2;
-
-        result = (V)kv[offset + 1];
-
-        final var newSize = --size * 2;
-        arraycopy(kv, offset + 2, kv, offset, newSize - offset);
-
-        kv[newSize] = null;
-        kv[newSize + 1] = null;
-      }
+        return removeAt(idx);
     }
 
-    return result;
+    return null;
   }
 
 
@@ -296,6 +286,26 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
 
       fill(kv, null);
     }
+  }
+
+
+  /**
+   * {@inheritDoc}
+   *
+   * @throws UnsupportedOperationException  if this map is sealed
+   */
+  @Override
+  @Contract(mutates = "this")
+  @SuppressWarnings("unchecked")
+  public void replaceAll(@NotNull BiFunction<? super String,? super V,? extends V> function)
+  {
+    requireNonNull(function);
+
+    if (sealed)
+      throw new UnsupportedOperationException("replaceAll");
+
+    for(int offset = 0, length = size * 2; offset < length; offset += 2)
+      kv[offset + 1] = function.apply((String)kv[offset], (V)kv[offset + 1]);
   }
 
 
@@ -328,7 +338,24 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Keys are returned in sorted order. Removing a key from the returned set removes the corresponding entry from this
+   * map.
+   */
+  @Override
+  public @NotNull Set<String> keySet() {
+    return new SortedKeySet();
+  }
+
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Entries are returned in sorted key order. For an unsealed map, {@link java.util.Map.Entry#setValue(Object)
+   * setValue} on a returned entry writes the value through to this map.
+   */
   @Override
   public @NotNull Set<Entry<String,V>> entrySet() {
     return new SortedEntrySet();
@@ -455,10 +482,33 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
 
 
   /**
+   * Removes the entry at the given index. The map must not be sealed.
+   *
+   * @param index  the zero-based index of the entry in the map
+   *
+   * @return  the value of the removed entry
+   */
+  @Contract(mutates = "this")
+  @SuppressWarnings("unchecked")
+  private V removeAt(int index)
+  {
+    final var offset = index * 2;
+    final var value = (V)kv[offset + 1];
+
+    final var newSize = --size * 2;
+    arraycopy(kv, offset + 2, kv, offset, newSize - offset);
+
+    kv[newSize] = null;
+    kv[newSize + 1] = null;
+
+    return value;
+  }
+
+
+  /**
    * Returns an entry for the given index. For a sealed map, a lightweight {@link EntryDelegate} is returned that
-   * directly references the internal array. For an unsealed map, a
-   * {@link java.util.AbstractMap.SimpleImmutableEntry SimpleImmutableEntry} snapshot is returned, so the entry remains
-   * stable even if the map is subsequently modified.
+   * directly references the internal array. For an unsealed map, a {@link MutableEntry} snapshot is returned, so the
+   * entry remains stable even if the map is subsequently modified, while {@code setValue} writes through to the map.
    *
    * @param index  the zero-based index of the entry in the map
    *
@@ -473,7 +523,7 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
 
     final var offset = index * 2;
 
-    return new SimpleImmutableEntry<>((String)kv[offset], (V)kv[offset + 1]);
+    return new MutableEntry((String)kv[offset], (V)kv[offset + 1]);
   }
 
 
@@ -521,25 +571,80 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
     }
 
 
-    /**
-     * Always throws {@link UnsupportedOperationException}.
-     *
-     * @throws UnsupportedOperationException  always
-     */
+    /** {@inheritDoc} */
     @Override
-    public boolean remove(Object o) {
-      throw new UnsupportedOperationException("remove");
+    public boolean contains(Object o)
+    {
+      if (o instanceof Entry<?,?> entry && entry.getKey() instanceof String key)
+      {
+        final var idx = findKeyIndex(key);
+        return idx >= 0 && Objects.equals(kv[idx * 2 + 1], entry.getValue());
+      }
+
+      return false;
     }
 
 
     /**
-     * Always throws {@link UnsupportedOperationException}.
+     * {@inheritDoc}
      *
-     * @throws UnsupportedOperationException  always
+     * @throws UnsupportedOperationException  if the map is sealed
      */
     @Override
-    public boolean removeIf(@NotNull Predicate<? super Entry<String,V>> filter) {
-      throw new UnsupportedOperationException("removeIf");
+    public boolean remove(Object o)
+    {
+      if (sealed)
+        throw new UnsupportedOperationException("remove");
+
+      if (o instanceof Entry<?,?> entry && entry.getKey() instanceof String key)
+      {
+        final var idx = findKeyIndex(key);
+        if (idx >= 0 && Objects.equals(kv[idx * 2 + 1], entry.getValue()))
+        {
+          removeAt(idx);
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws UnsupportedOperationException  if the map is sealed
+     */
+    @Override
+    public boolean removeIf(@NotNull Predicate<? super Entry<String,V>> filter)
+    {
+      requireNonNull(filter);
+
+      if (sealed)
+        throw new UnsupportedOperationException("removeIf");
+
+      // test all entries first, so the map remains unchanged if the filter throws an exception
+      final var remove = new BitSet(size);
+      for(var idx = 0; idx < size; idx++)
+        if (filter.test(entry(idx)))
+          remove.set(idx);
+
+      if (remove.isEmpty())
+        return false;
+
+      var newLength = 0;
+
+      for(int offset = 0, length = size * 2; offset < length; offset += 2)
+        if (!remove.get(offset / 2))
+        {
+          kv[newLength++] = kv[offset];
+          kv[newLength++] = kv[offset + 1];
+        }
+
+      fill(kv, newLength, size * 2, null);
+      size = newLength / 2;
+
+      return true;
     }
 
 
@@ -562,10 +667,7 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
       final var array = generator.apply(size);
 
       for(var idx = 0; idx < size; idx++)
-      {
-        final var offset = idx * 2;
-        array[idx] = (T)new SimpleImmutableEntry<>(kv[offset], kv[offset + 1]);
-      }
+        array[idx] = (T)entry(idx);
 
       return array;
     }
@@ -596,6 +698,138 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
       }
 
       return sb.append("]").toString();
+    }
+  }
+
+
+
+
+  /**
+   * A {@link Set} view of the keys in the enclosing {@link SortedStringMap}, maintaining sorted key order. Lookups and
+   * removals use a binary search.
+   *
+   * @since 0.25.0
+   */
+  private final class SortedKeySet extends AbstractSet<String>
+  {
+    /** {@inheritDoc} */
+    @Override
+    public int size() {
+      return size;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isEmpty() {
+      return size == 0;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean contains(Object o) {
+      return containsKey(o);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull Iterator<String> iterator()
+    {
+      final var iterator = new EntryIterator();
+
+      return new Iterator<>() {
+        @Override public boolean hasNext() { return iterator.hasNext(); }
+        @Override public String next() { return iterator.next().getKey(); }
+        @Override public void remove() { iterator.remove(); }
+      };
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws UnsupportedOperationException  if the map is sealed
+     */
+    @Override
+    public boolean remove(Object o)
+    {
+      if (sealed)
+        throw new UnsupportedOperationException("remove");
+
+      if (o instanceof String key)
+      {
+        final var idx = findKeyIndex(key);
+        if (idx >= 0)
+        {
+          removeAt(idx);
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void clear() {
+      SortedStringMap.this.clear();
+    }
+  }
+
+
+
+
+  /**
+   * A {@link java.util.Map.Entry} snapshot for unsealed maps. The key and value are captured when the entry is
+   * created, so the entry remains stable even if the map is subsequently modified. {@link #setValue(Object)} writes the
+   * value through to the enclosing {@link SortedStringMap}, looking up the entry by its key.
+   *
+   * @since 0.25.0
+   */
+  private final class MutableEntry extends SimpleEntry<String,V>
+  {
+    /**
+     * Creates a new entry snapshot.
+     *
+     * @param key    the entry key, not {@code null}
+     * @param value  the entry value
+     */
+    private MutableEntry(@NotNull String key, V value) {
+      super(key, value);
+    }
+
+
+    /**
+     * Sets the value of this entry and of the corresponding entry in the enclosing map.
+     *
+     * @param value  new value
+     *
+     * @return  the previous value of the entry in the enclosing map
+     *
+     * @throws UnsupportedOperationException  if the map has been sealed in the meantime
+     * @throws IllegalStateException          if the entry has been removed from the map
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public V setValue(V value)
+    {
+      if (sealed)
+        throw new UnsupportedOperationException("setValue");
+
+      final var idx = findKeyIndex(getKey());
+      if (idx < 0)
+        throw new IllegalStateException("entry " + getKey() + " has been removed from the map");
+
+      final var valueOffset = idx * 2 + 1;
+      final var previous = (V)kv[valueOffset];
+
+      kv[valueOffset] = value;
+      super.setValue(value);
+
+      return previous;
     }
   }
 
@@ -755,6 +989,9 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
     /** Index of the next entry to return. */
     int index = 0;
 
+    /** {@code true} if {@link #next()} has been called and the returned entry has not been removed yet. */
+    boolean canRemove;
+
 
     /** Creates a new iterator positioned at the first entry. */
     private EntryIterator() {
@@ -775,7 +1012,27 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
       if (!hasNext())
         throw new NoSuchElementException();
 
+      canRemove = true;
+
       return entry(index++);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws UnsupportedOperationException  if the map is sealed
+     */
+    @Override
+    public void remove()
+    {
+      if (sealed)
+        throw new UnsupportedOperationException("remove");
+      if (!canRemove)
+        throw new IllegalStateException();
+
+      removeAt(--index);
+      canRemove = false;
     }
   }
 }
