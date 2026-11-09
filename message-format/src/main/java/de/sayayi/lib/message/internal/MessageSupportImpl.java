@@ -279,7 +279,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     if (!isKebabCaseName(validateName(name, "template name")))
       throw new IllegalArgumentException("template name '" + name + "' must match the kebab-case naming convention");
 
-    requireNonNull(template);
+    requireNonNull(template, "template must not be null");
 
     lock.writeLock().lock();
     try {

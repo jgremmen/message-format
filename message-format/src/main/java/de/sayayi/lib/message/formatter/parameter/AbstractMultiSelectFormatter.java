@@ -149,7 +149,7 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
   protected AbstractMultiSelectFormatter(@NotNull String configKey, String defaultConfigValueForAbsentKey,
                                          boolean delegateOnMismatch)
   {
-    this.configKey = requireNonNull(configKey);
+    this.configKey = requireNonNull(configKey, "configKey must not be null");
     this.defaultConfigValueForAbsentKey = defaultConfigValueForAbsentKey;
     this.delegateOnMismatch = delegateOnMismatch;
 
@@ -169,7 +169,7 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
    */
   protected void register(@NotNull String[] configKeys, @NotNull MultiSelectFunction<T> function)
   {
-    for(var configKey: requireNonNull(configKeys))
+    for(var configKey: requireNonNull(configKeys, "configKeys must not be null"))
       register(configKey, function);
   }
 
@@ -182,8 +182,11 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
    * @param configValue  the config value string that should trigger the given function, not {@code null}
    * @param function     the formatting function to invoke when the config value matches, not {@code null}
    */
-  protected void register(@NotNull String configValue, @NotNull MultiSelectFunction<T> function) {
-    multiSelectFunctionMap.put(requireNonNull(configValue), requireNonNull(function));
+  protected void register(@NotNull String configValue, @NotNull MultiSelectFunction<T> function)
+  {
+    multiSelectFunctionMap.put(
+        requireNonNull(configValue, "configValue must not be null"),
+        requireNonNull(function, "function must not be null"));
   }
 
 

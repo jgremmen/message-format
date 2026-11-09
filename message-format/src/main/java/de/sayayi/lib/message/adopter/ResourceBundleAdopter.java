@@ -421,8 +421,8 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    *
    * @since 0.25.0
    */
-  private void adoptTemplates(@NotNull String bundleBaseName, Locale[] locales, ClassLoader classLoader,
-                              boolean throwOnMissingResourceBundle)
+  protected void adoptTemplates(@NotNull String bundleBaseName, Locale[] locales, ClassLoader classLoader,
+                                boolean throwOnMissingResourceBundle)
   {
     final var localizedTemplatesByName = new HashMap<String,Map<Locale,String>>();
 

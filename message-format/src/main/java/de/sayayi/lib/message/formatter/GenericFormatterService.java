@@ -332,7 +332,10 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   @MustBeInvokedByOverriders
   public void addPostFormatter(@NotNull PostFormatter postFormatter)
   {
-    final var postFormatterName = requireNonNull(postFormatter.getName());
+    final var postFormatterName = requireNonNull(
+        requireNonNull(postFormatter, "postFormatter must not be null").getName(),
+        () -> "name of post formatter " + postFormatter.getClass().getSimpleName() + " must not be null");
+
     if (!isKebabCaseName(postFormatterName))
     {
       throw new FormatterServiceException("name '" + postFormatterName + "' for post formatter " +

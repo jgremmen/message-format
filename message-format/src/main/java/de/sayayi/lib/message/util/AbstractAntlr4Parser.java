@@ -56,7 +56,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
    * @param messageSupport  message support instance for error message formatting, not {@code null}
    */
   protected AbstractAntlr4Parser(@NotNull MessageSupport messageSupport) {
-    this.messageSupport = requireNonNull(messageSupport);
+    this.messageSupport = requireNonNull(messageSupport, "messageSupport must not be null");
   }
 
 
@@ -71,7 +71,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
   {
     super(syntaxErrorFormatter);
 
-    this.messageSupport = requireNonNull(messageSupport);
+    this.messageSupport = requireNonNull(messageSupport, "messageSupport must not be null");
   }
 
 
@@ -88,7 +88,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
   {
     super(syntaxErrorFormatter, keepConsoleErrorListeners);
 
-    this.messageSupport = requireNonNull(messageSupport);
+    this.messageSupport = requireNonNull(messageSupport, "messageSupport must not be null");
   }
 
 

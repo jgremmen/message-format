@@ -15,20 +15,26 @@
  */
 package de.sayayi.lib.message.log4j;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.WriterAppender;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.message.MessageFactory;
+import org.apache.logging.log4j.status.StatusData;
+import org.apache.logging.log4j.status.StatusListener;
+import org.apache.logging.log4j.status.StatusLogger;
 import org.junit.jupiter.api.*;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.apache.logging.log4j.Level.ALL;
+import static org.apache.logging.log4j.Level.WARN;
 import static org.apache.logging.log4j.LogManager.ROOT_LOGGER_NAME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -229,6 +235,51 @@ class Log4jMessageFactoryTest
   {
     logger.info("not valid %{}");
     assertEquals("<internal error formatting: not valid %{}>\n", stringWriter.toString());
+  }
+
+
+  @Test
+  @DisplayName("Report formatting errors through the status logger")
+  void testInvalidMessageFormatReportsCause()
+  {
+    final List<StatusData> statusData = new ArrayList<>();
+    final var listener = new StatusListener() {
+      @Override public void log(StatusData data) { statusData.add(data); }
+      @Override public Level getStatusLevel() { return WARN; }
+      @Override public void close() {}
+    };
+
+    StatusLogger.getLogger().registerListener(listener);
+    try {
+      assertEquals("<internal error formatting: not valid %{}>",
+          LOG4J_MESSAGE_FACTORY.newMessage("not valid %{}").getFormattedMessage());
+    } finally {
+      StatusLogger.getLogger().removeListener(listener);
+    }
+
+    final var warning = statusData
+        .stream()
+        .filter(data -> data.getMessage().getFormattedMessage().contains("not valid %{}"))
+        .findFirst()
+        .orElse(null);
+
+    assertNotNull(warning, "no status logger warning for invalid message");
+    assertEquals(WARN, warning.getLevel());
+    assertInstanceOf(RuntimeException.class, warning.getThrowable());
+  }
+
+
+  @Test
+  @DisplayName("Propagate errors thrown while formatting")
+  void testFormattingErrorIsPropagated()
+  {
+    final var message = LOG4J_MESSAGE_FACTORY.newMessage("value %{p1}", new Object() {
+      @Override public String toString() {
+        throw new StackOverflowError("test");
+      }
+    });
+
+    assertThrows(StackOverflowError.class, message::getFormattedMessage);
   }
 
 

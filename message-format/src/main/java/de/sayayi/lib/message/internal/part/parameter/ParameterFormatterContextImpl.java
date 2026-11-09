@@ -29,6 +29,7 @@ import de.sayayi.lib.message.part.MessagePart.Config;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
@@ -63,6 +64,9 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
   /** Explicit formatter name, or {@code null}. */
   private final String format;
 
+  /** Type used to select the formatters, {@link ParameterFormatter#NULL_TYPE NULL_TYPE} for {@code null} values. */
+  private final @NotNull Class<?> type;
+
   /** Prioritized formatters available for the value being formatted. */
   private final @NotNull ParameterFormatter[] parameterFormatters;
 
@@ -82,7 +86,7 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
    * @param map              parameter map, not {@code null}
    */
   ParameterFormatterContextImpl(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters,
-                                Object value, Class<?> type, String format, @NotNull Config config,
+                                Object value, @Nullable Class<?> type, String format, @NotNull Config config,
                                 @NotNull MessagePart.Map map)
   {
     super(messageAccessor, config);
@@ -94,6 +98,8 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
 
     if (type == null)
       type = value == null ? NULL_TYPE : value.getClass();
+
+    this.type = type;
 
     parameterFormatters = messageAccessor.getFormatters(format, type, config);
   }
@@ -158,7 +164,11 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
   public @NotNull Text delegateToNextFormatter()
   {
     if (parameterFormatterIndex == parameterFormatters.length)
-      throw new NoSuchElementException();
+    {
+      throw new NoSuchElementException("no further formatter for type " +
+          (type == NULL_TYPE ? "null" : type.getTypeName()) +
+          (format == null ? "" : " (format: " + format + ')'));
+    }
 
     return parameterFormatters[parameterFormatterIndex++].format(this, value);
   }

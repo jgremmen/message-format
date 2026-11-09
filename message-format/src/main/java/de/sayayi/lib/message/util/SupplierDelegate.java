@@ -67,7 +67,7 @@ public final class SupplierDelegate<T> implements Supplier<T>
    * @param supplier  supplier to delegate to, not {@code null}
    */
   private SupplierDelegate(@NotNull Supplier<T> supplier) {
-    this.supplier = requireNonNull(supplier);
+    this.supplier = requireNonNull(supplier, "supplier must not be null");
   }
 
 

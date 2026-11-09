@@ -24,6 +24,7 @@ import org.apache.logging.log4j.message.AbstractMessageFactory;
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.ParameterizedMessage;
 import org.apache.logging.log4j.message.SimpleMessage;
+import org.apache.logging.log4j.status.StatusLogger;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
@@ -125,8 +126,10 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
    * mapped to variables {@code p1}, {@code p2}, etc.
    * <p>
    * If the last parameter is a {@link Throwable}, it is additionally attached to the returned message. The formatted
-   * message string is evaluated lazily when first requested and then cached. Errors occurring while formatting are not
-   * thrown; instead, a placeholder text containing the message format string is returned.
+   * message string is evaluated lazily when first requested and then cached. Runtime exceptions occurring while
+   * formatting are not thrown; instead, they are reported as a warning through Log4j's
+   * {@link StatusLogger StatusLogger} and a placeholder text containing the message format string is returned.
+   * {@link Error Errors} are propagated to the caller.
    * <p>
    * A {@code null} message string results in a {@link SimpleMessage} with {@code null} content.
    */
@@ -164,8 +167,9 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
         SupplierDelegate.of(() -> {
           try {
             return formatSupplier.get();
-          } catch(Throwable ex) {
-            // don't throw exceptions if the message is not valid!!
+          } catch(RuntimeException ex) {
+            // don't throw exceptions if the message is not valid; report the cause via the status logger
+            StatusLogger.getLogger().warn("failed to format message: {}", message, ex);
             return "<internal error formatting: " + message + '>';
           }
         }),

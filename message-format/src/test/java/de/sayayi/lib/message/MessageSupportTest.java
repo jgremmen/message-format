@@ -25,11 +25,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.sayayi.lib.message.MessageSupportFactory.createDefault;
@@ -181,6 +177,7 @@ final class MessageSupportTest
 
   @Test
   @DisplayName("Parameter map is an unmodifiable view of the configured parameters")
+  @SuppressWarnings("DataFlowIssue")
   void testGetParametersUnmodifiableView()
   {
     val configurer = shared().message("%{a}").with("a", 1);
@@ -249,5 +246,17 @@ final class MessageSupportTest
     assertThrowsExactly(DuplicateTemplateException.class,
         () -> messageSupport.addTemplate("tpl", messageFactory.parseTemplate("second")));
     assertEquals("first", messageSupport.message("%[tpl]").format());
+  }
+
+
+  @Test
+  @DisplayName("Adding a null template throws with a descriptive message")
+  @SuppressWarnings("DataFlowIssue")
+  void testAddNullTemplate()
+  {
+    val ex = assertThrowsExactly(NullPointerException.class,
+        () -> createDefault().addTemplate("tpl", null));
+
+    assertEquals("template must not be null", ex.getMessage());
   }
 }

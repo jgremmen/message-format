@@ -299,10 +299,10 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
   @SuppressWarnings("unchecked")
   public void replaceAll(@NotNull BiFunction<? super String,? super V,? extends V> function)
   {
-    requireNonNull(function);
-
     if (sealed)
       throw new UnsupportedOperationException("replaceAll");
+
+    requireNonNull(function, "function must not be null");
 
     for(int offset = 0, length = size * 2; offset < length; offset += 2)
       kv[offset + 1] = function.apply((String)kv[offset], (V)kv[offset + 1]);
@@ -367,7 +367,7 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
   @SuppressWarnings("unchecked")
   public void forEach(BiConsumer<? super String,? super V> action)
   {
-    requireNonNull(action);
+    requireNonNull(action, "action must not be null");
 
     for(int offset = 0, length = size * 2; offset < length; offset += 2)
       action.accept((String)kv[offset], (V)kv[offset + 1]);
@@ -618,10 +618,10 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
     @Override
     public boolean removeIf(@NotNull Predicate<? super Entry<String,V>> filter)
     {
-      requireNonNull(filter);
-
       if (sealed)
         throw new UnsupportedOperationException("removeIf");
+
+      requireNonNull(filter, "filter must not be null");
 
       // test all entries first, so the map remains unchanged if the filter throws an exception
       final var remove = new BitSet(size);
@@ -652,7 +652,7 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
     @Override
     public void forEach(@NotNull Consumer<? super Entry<String,V>> action)
     {
-      requireNonNull(action);
+      requireNonNull(action, "action must not be null");
 
       for(var idx = 0; idx < size; idx++)
         action.accept(entry(idx));

@@ -18,14 +18,12 @@ package de.sayayi.lib.message.adopter;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.exception.MessageAdopterException;
 import de.sayayi.lib.message.internal.MessageTemplate;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 import static de.sayayi.lib.message.MessageSupportFactory.createDefault;
 import static java.util.Locale.*;
@@ -96,6 +94,32 @@ final class ResourceBundleAdopterTest
 
     adopter.adoptTemplates(TEMPLATE_BUNDLE, Set.of(ENGLISH, GERMAN), getClass().getClassLoader());
 
+    assertEquals("Hallo, Alice!", messageSupport.message("%[greeting]")
+        .with("name", "Alice")
+        .locale(GERMAN)
+        .format());
+  }
+
+
+  @Test
+  @DisplayName("Core template adoption method can be overridden")
+  void adoptTemplatesCanBeOverridden()
+  {
+    final var messageSupport = createDefault();
+    final var baseNames = new ArrayList<String>();
+    final var adopter = new ResourceBundleAdopter(messageSupport) {
+      @Override
+      protected void adoptTemplates(@NotNull String bundleBaseName, Locale[] locales,
+                                    ClassLoader classLoader, boolean throwOnMissingResourceBundle)
+      {
+        baseNames.add(bundleBaseName);
+        super.adoptTemplates(bundleBaseName, locales, classLoader, throwOnMissingResourceBundle);
+      }
+    };
+
+    adopter.adoptTemplates(TEMPLATE_BUNDLE, Set.of(ENGLISH, GERMAN));
+
+    assertEquals(List.of(TEMPLATE_BUNDLE), baseNames);
     assertEquals("Hallo, Alice!", messageSupport.message("%[greeting]")
         .with("name", "Alice")
         .locale(GERMAN)
