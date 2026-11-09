@@ -340,9 +340,6 @@ public final class PackSupport
         packStream.writeSmall(PART_POST_FORMAT_ID, 3);
         postFormatterPart.pack(packStream);
       }
-
-      default ->
-          throw new IllegalArgumentException("unknown message part type " + messagePart.getClass().getSimpleName());
     }
   }
 

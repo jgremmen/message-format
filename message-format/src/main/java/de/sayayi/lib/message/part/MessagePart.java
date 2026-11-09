@@ -21,6 +21,9 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.SpacesAware;
 import de.sayayi.lib.message.internal.part.TextPart;
+import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
+import de.sayayi.lib.message.internal.part.post.PostFormatterPart;
+import de.sayayi.lib.message.internal.part.template.TemplatePart;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -82,7 +85,7 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
    *
    * @since 0.5.0
    */
-  non-sealed interface Text extends MessagePart
+  sealed interface Text extends MessagePart permits TextPart
   {
     /** Message part representing a {@code null} value. */
     Text NULL = new TextPart(null);
@@ -119,8 +122,8 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
 
 
     /**
-     * Returns the text for this message part decorated with spaces, if available. If the message
-     * text is {@code null} an empty string is returned.
+     * Returns the text for this message part decorated with spaces, if available. If the message text is {@code null}
+     * an empty string is returned.
      *
      * @return  text, never {@code null}
      *
@@ -180,13 +183,13 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
    *
    * @since 0.5.0
    */
-  non-sealed interface Parameter extends NamedMessagePart
+  sealed interface Parameter extends NamedMessagePart permits ParameterPart
   {
     /**
      * Returns the name of the preferred formatter for this parameter.
      *
-     * @return  formatter name or {@code null} if the formatter should be determined by the parameter value type
-     *          or the default formatter
+     * @return  formatter name or {@code null} if the formatter should be determined by the parameter value type or the
+     *          default formatter
      */
     @Contract(pure = true)
     String getFormat();
@@ -224,19 +227,19 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
    *
    * @since 0.8.0
    */
-  non-sealed interface Template extends NamedMessagePart {
+  sealed interface Template extends NamedMessagePart permits TemplatePart {
   }
 
 
 
 
   /**
-   * Message part representing a post formatter that transforms the formatted text of its contained message
-   * using a named post formatter.
+   * Message part representing a post formatter that transforms the formatted text of its contained message using a
+   * named post formatter.
    *
    * @since 0.21.0
    */
-  non-sealed interface PostFormat extends NamedMessagePart
+  sealed interface PostFormat extends NamedMessagePart permits PostFormatterPart
   {
     /**
      * Returns the message to be post formatted.
@@ -353,14 +356,14 @@ public sealed interface MessagePart extends SpacesAware, FormatStringSerializer
 
 
     /**
-     * Returns the default message, but only if the map contains at least one non-default entry
-     * with the given {@code keyType}. If no entries for the given key type exist, the default
-     * message is not applicable and an empty optional is returned.
+     * Returns the default message, but only if the map contains at least one non-default entry with the given
+     * {@code keyType}. If no entries for the given key type exist, the default message is not applicable and an empty
+     * optional is returned.
      *
      * @param keyType  key type to look for, not {@code null}
      *
-     * @return  an optional containing the default message, or empty if there is no default or if
-     *          the map has no entries for the given key type
+     * @return  an optional containing the default message, or empty if there is no default or if the map has no entries
+     *          for the given key type
      *
      * @since 0.21.0
      */

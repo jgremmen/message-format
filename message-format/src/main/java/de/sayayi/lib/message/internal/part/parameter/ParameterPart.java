@@ -260,13 +260,19 @@ public final class ParameterPart implements MessagePart.Parameter
   @Override
   public boolean equals(Object o)
   {
-    return o instanceof Parameter that &&
-        name.equals(that.getName()) &&
-        Objects.equals(format, that.getFormat()) &&
-        spaceBefore == that.isSpaceBefore() &&
-        spaceAfter == that.isSpaceAfter() &&
-        config.equals(that.getConfig()) &&
-        map.equals(that.getMap());
+    if (this == o)
+      return true;
+
+    if (!(o instanceof ParameterPart that))
+      return false;
+
+    return
+        name.equals(that.name) &&
+        Objects.equals(format, that.format) &&
+        spaceBefore == that.spaceBefore &&
+        spaceAfter == that.spaceAfter &&
+        config.equals(that.config) &&
+        map.equals(that.map);
   }
 
 

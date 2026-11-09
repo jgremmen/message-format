@@ -20,6 +20,7 @@ import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.SpacesAware;
 import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.internal.pack.PackSupport;
+import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
 import de.sayayi.lib.message.internal.part.post.PostFormatterPart;
 import de.sayayi.lib.message.internal.part.template.TemplatePart;
@@ -145,8 +146,8 @@ public final class CompoundMessage implements Message.WithSpaces
         }
       }
 
-      default -> {
-        return (Text)messagePart;
+      case TextPart textPart -> {
+        return textPart;
       }
     }
   }
@@ -189,7 +190,7 @@ public final class CompoundMessage implements Message.WithSpaces
           templateNames.addAll(parameter.getMap().getTemplateNames());
         }
         case PostFormatterPart postFormatter -> templateNames.addAll(postFormatter.getConfig().getTemplateNames());
-        default -> {
+        case TextPart ignored -> {
         }
       }
 

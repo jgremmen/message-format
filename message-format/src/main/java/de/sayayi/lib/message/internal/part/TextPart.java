@@ -209,19 +209,26 @@ public final class TextPart implements MessagePart.Text
 
   /**
    * Compares this text part to the specified object. The result is {@code true} if and only if the argument is an
-   * instance of {@link Text} with the same text content, space-before and space-after flags.
+   * instance of {@code TextPart} with the same text content, space-before and space-after flags.
    *
    * @param o  the object to compare this text part against
    *
-   * @return  {@code true} if the given object is a {@link Text} equivalent to this text part, {@code false} otherwise
+   * @return  {@code true} if the given object is a {@code TextPart} equivalent to this text part,
+   *          {@code false} otherwise
    */
   @Override
   public boolean equals(Object o)
   {
-    return o instanceof Text that &&
-        spaceBefore == that.isSpaceBefore() &&
-        spaceAfter == that.isSpaceAfter() &&
-        Objects.equals(text, that.getText());
+    if (this == o)
+      return true;
+
+    if (!(o instanceof TextPart that))
+      return false;
+
+    return
+        spaceBefore == that.spaceBefore &&
+        spaceAfter == that.spaceAfter &&
+        Objects.equals(text, that.text);
   }
 
 

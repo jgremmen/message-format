@@ -208,12 +208,18 @@ public final class PostFormatterPart implements MessagePart.PostFormat
   @Override
   public boolean equals(Object o)
   {
-    return o instanceof PostFormat that &&
-        name.equals(that.getName()) &&
-        message.equals(that.getMessage()) &&
-        spaceBefore == that.isSpaceBefore() &&
-        spaceAfter == that.isSpaceAfter() &&
-        config.equals(that.getConfig());
+    if (this == o)
+      return true;
+
+    if (!(o instanceof PostFormatterPart that))
+      return false;
+
+    return
+        name.equals(that.name) &&
+        message.equals(that.message) &&
+        spaceBefore == that.spaceBefore &&
+        spaceAfter == that.spaceAfter &&
+        config.equals(that.config);
   }
 
 

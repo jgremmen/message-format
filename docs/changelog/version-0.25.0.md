@@ -211,6 +211,19 @@ messageSupport.message("%{v,number:plain}").with("v", 1234567).locale(Locale.US)
 
 Messages using `number:integer` for integer values to suppress grouping separators must use `number:plain` instead.
 
+### `MessagePart` leaf interfaces are sealed
+
+`MessagePart.Text`, `MessagePart.Parameter`, `MessagePart.Template` and `MessagePart.PostFormat` were declared
+`non-sealed`, so any class could implement them. Custom implementations were never supported, though: formatting a
+message containing a custom parameter, template or post format part failed with a `ClassCastException`, exporting
+such a message failed with an `IllegalArgumentException`, and template references in custom parts were not collected.
+In addition, the built-in parts considered themselves equal to custom parts with the same properties, but not vice
+versa, which broke the `equals`/`hashCode` contract and could make `LRUMessagePartNormalizer` return a part of the
+wrong type.
+
+The four interfaces are now `sealed` and permit the built-in implementations only. Classes implementing one of these
+interfaces no longer compile. The built-in parts are only equal to parts of the same implementation class.
+
 ## New Features
 
 ### `MessageSupportFactory.createDefault()` and `createGeneric()`
