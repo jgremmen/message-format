@@ -33,14 +33,42 @@ import java.util.function.Supplier;
  * <p>
  * Subclasses can override {@link #addDefaultFormatters()} or the individual
  * {@link #addParameterFormattersFromService()} and {@link #addPostFormattersFromService()} methods to customize which
- * formatters are loaded.
+ * formatters are loaded. The public constructors call {@link #addDefaultFormatters()} before the fields of a subclass
+ * are initialized. A subclass whose overrides depend on its own fields must therefore use the
+ * {@link #DefaultFormatterService(ClassLoader, int, boolean) protected constructor} with
+ * {@code addDefaultFormatters = false}, and call {@link #addDefaultFormatters()} at the end of its own constructor:
+ * <pre>{@code
+ * public class FilteringFormatterService extends DefaultFormatterService
+ * {
+ *   private final Set<String> excludedFormatters;
+ *
+ *   public FilteringFormatterService(Set<String> excludedFormatters)
+ *   {
+ *     super(null, DEFAULT_FORMATTER_CACHE_SIZE, false);
+ *
+ *     this.excludedFormatters = excludedFormatters;
+ *
+ *     addDefaultFormatters();
+ *   }
+ *
+ *   @Override
+ *   protected void addParameterFormattersFromService()
+ *   {
+ *     ServiceLoader
+ *         .load(ParameterFormatter.class, classLoader)
+ *         .stream()
+ *         .filter(provider -> !excludedFormatters.contains(provider.type().getName()))
+ *         .forEach(provider -> addFormatter(provider.get()));
+ *   }
+ * }
+ * }</pre>
  * <p>
  * Unless a class loader is given explicitly, service-provided formatters are discovered using the class loader that
  * loaded this library ({@code DefaultFormatterService.class.getClassLoader()}). This makes formatters from add-on
- * modules on the same class path visible in environments where the system class loader does not see the
- * application's libraries (e.g. Spring Boot executable jars, servlet containers or build tool plugins). The thread
- * context class loader is deliberately not used, as the {@link #getSharedInstance() shared instance} would then
- * depend on the thread that happens to create it first.
+ * modules on the same class path visible in environments where the system class loader does not see the application's
+ * libraries (e.g. Spring Boot executable jars, servlet containers or build tool plugins). The thread context class
+ * loader is deliberately not used, as the {@link #getSharedInstance() shared instance} would then depend on the thread
+ * that happens to create it first.
  *
  * @author Jeroen Gremmen
  * @since 0.4.2
@@ -94,21 +122,49 @@ public class DefaultFormatterService extends GenericFormatterService
    * @param formatterCacheSize  maximum number of type-to-formatter mappings to cache
    */
   @SuppressWarnings("WeakerAccess")
-  public DefaultFormatterService(ClassLoader classLoader, int formatterCacheSize)
+  public DefaultFormatterService(ClassLoader classLoader, int formatterCacheSize) {
+    this(classLoader, formatterCacheSize, true);
+  }
+
+
+  /**
+   * Creates a default formatter service using the given class loader and cache size, optionally without adding the
+   * default formatters.
+   * <p>
+   * This constructor is intended for subclasses that override {@link #addDefaultFormatters()},
+   * {@link #addParameterFormattersFromService()} or {@link #addPostFormattersFromService()} and depend on their own
+   * fields in these overrides. Such fields are not initialized yet while this constructor runs. With
+   * {@code addDefaultFormatters = false}, the subclass must call {@link #addDefaultFormatters()} itself, after its
+   * fields have been initialized.
+   *
+   * @param classLoader           class loader used to discover service-provided formatters, or {@code null} for the
+   *                              class loader that loaded this library
+   * @param formatterCacheSize    maximum number of type-to-formatter mappings to cache
+   * @param addDefaultFormatters  {@code true} to call {@link #addDefaultFormatters()} from this constructor,
+   *                              {@code false} if the subclass calls it itself
+   *
+   * @since 0.25.0
+   */
+  protected DefaultFormatterService(ClassLoader classLoader, int formatterCacheSize, boolean addDefaultFormatters)
   {
     super(formatterCacheSize);
 
     this.classLoader = classLoader == null ? DefaultFormatterService.class.getClassLoader() : classLoader;
 
-    addDefaultFormatters();
+    if (addDefaultFormatters)
+      addDefaultFormatters();
   }
 
 
   /**
-   * Adds the default formatters for this service. This method is called during construction and loads both parameter
-   * formatters and post formatters via the {@link ServiceLoader}.
+   * Adds the default formatters for this service. This method loads both parameter formatters and post formatters
+   * via the {@link ServiceLoader}.
    * <p>
    * Subclasses can override this method to customize which formatters are registered.
+   * <p>
+   * This method is called from the constructor, unless a subclass passes {@code addDefaultFormatters = false} to
+   * {@link #DefaultFormatterService(ClassLoader, int, boolean)}. When called from the constructor, the fields of a
+   * subclass are not initialized yet, so an override must not depend on them.
    *
    * @see #addParameterFormattersFromService()
    * @see #addPostFormattersFromService()
@@ -124,6 +180,9 @@ public class DefaultFormatterService extends GenericFormatterService
   /**
    * Discovers and registers all {@link ParameterFormatter} implementations available on the classpath via the
    * {@link ServiceLoader} mechanism.
+   * <p>
+   * This method is called by {@link #addDefaultFormatters()}, and therefore usually from the constructor. See
+   * {@link #addDefaultFormatters()} for the implications for overriding methods.
    */
   protected void addParameterFormattersFromService()
   {
@@ -136,6 +195,9 @@ public class DefaultFormatterService extends GenericFormatterService
   /**
    * Discovers and registers all {@link PostFormatter} implementations available on the classpath via the
    * {@link ServiceLoader} mechanism.
+   * <p>
+   * This method is called by {@link #addDefaultFormatters()}, and therefore usually from the constructor. See
+   * {@link #addDefaultFormatters()} for the implications for overriding methods.
    *
    * @since 0.20.0
    */

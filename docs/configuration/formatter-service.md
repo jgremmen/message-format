@@ -122,6 +122,37 @@ Subclasses of `DefaultFormatterService` can override `addDefaultFormatters()` or
 `addParameterFormattersFromService()` and `addPostFormattersFromService()` methods to customize which formatters are
 loaded during construction.
 
+The public constructors call `addDefaultFormatters()` before the fields of the subclass are initialized. An override
+that depends on such fields sees `null` or default values. In this case, use the protected constructor with
+`addDefaultFormatters = false`, and call `addDefaultFormatters()` at the end of the subclass constructor:
+
+```java
+public class ExcludingFormatterService extends DefaultFormatterService
+{
+  private final Set<String> excludedPostFormatters;
+
+  public ExcludingFormatterService(Set<String> excludedPostFormatters)
+  {
+    super(null, DEFAULT_FORMATTER_CACHE_SIZE, false);
+
+    this.excludedPostFormatters = excludedPostFormatters;
+
+    addDefaultFormatters();
+  }
+
+  @Override
+  protected void addPostFormattersFromService()
+  {
+    ServiceLoader
+        .load(PostFormatter.class, classLoader)
+        .stream()
+        .map(ServiceLoader.Provider::get)
+        .filter(postFormatter -> !excludedPostFormatters.contains(postFormatter.getName()))
+        .forEach(this::addPostFormatter);
+  }
+}
+```
+
 
 ## Registering Formatters
 

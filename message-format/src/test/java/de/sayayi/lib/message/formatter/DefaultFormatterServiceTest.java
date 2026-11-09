@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.formatter;
 
+import de.sayayi.lib.message.formatter.post.PostFormatter;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -28,6 +29,9 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.ServiceLoader.Provider;
+import java.util.Set;
 
 import static java.io.File.pathSeparator;
 import static java.lang.ClassLoader.getPlatformClassLoader;
@@ -54,6 +58,50 @@ final class DefaultFormatterServiceTest
 
     val classLoader = new URLClassLoader(new URL[0]);
     assertSame(classLoader, new DefaultFormatterService(classLoader, 16).classLoader);
+  }
+
+
+  @Test
+  @DisplayName("Subclass can add default formatters after its fields are initialized")
+  void testDeferredDefaultFormatters()
+  {
+    val service = new ExcludingFormatterService(Set.of("clip"));
+
+    assertTrue(service.getPostFormatters().containsKey("case"));
+    assertFalse(service.getPostFormatters().containsKey("clip"));
+  }
+
+
+  @Test
+  @DisplayName("Overrides called from the public constructor see uninitialized subclass fields")
+  void testOverrideCalledFromConstructor()
+  {
+    // the excluded names are not yet assigned when the public constructor calls addPostFormattersFromService()
+    assertThrows(NullPointerException.class, () -> new DefaultFormatterService() {
+      final Set<String> excluded = Set.of("clip");
+
+      @Override
+      protected void addPostFormattersFromService()
+      {
+        ServiceLoader
+            .load(PostFormatter.class, classLoader)
+            .stream()
+            .map(Provider::get)
+            .filter(postFormatter -> !excluded.contains(postFormatter.getName()))
+            .forEach(this::addPostFormatter);
+      }
+    });
+  }
+
+
+  @Test
+  @DisplayName("Protected constructor without default formatters registers no service formatters")
+  void testWithoutDefaultFormatters()
+  {
+    val service = new DefaultFormatterService(null, 16, false) {};
+
+    assertTrue(service.getPostFormatters().isEmpty());
+    assertSame(DefaultFormatterService.class.getClassLoader(), service.classLoader);
   }
 
 
@@ -96,6 +144,37 @@ final class DefaultFormatterServiceTest
       return Path.of(entry).toUri().toURL();
     } catch(MalformedURLException ex) {
       throw new IllegalStateException(ex);
+    }
+  }
+
+
+
+
+  /** Formatter service that excludes post formatters by name, using a field in its override. */
+  private static final class ExcludingFormatterService extends DefaultFormatterService
+  {
+    private final Set<String> excludedPostFormatters;
+
+
+    private ExcludingFormatterService(Set<String> excludedPostFormatters)
+    {
+      super(null, DEFAULT_FORMATTER_CACHE_SIZE, false);
+
+      this.excludedPostFormatters = excludedPostFormatters;
+
+      addDefaultFormatters();
+    }
+
+
+    @Override
+    protected void addPostFormattersFromService()
+    {
+      ServiceLoader
+          .load(PostFormatter.class, classLoader)
+          .stream()
+          .map(Provider::get)
+          .filter(postFormatter -> !excludedPostFormatters.contains(postFormatter.getName()))
+          .forEach(this::addPostFormatter);
     }
   }
 }

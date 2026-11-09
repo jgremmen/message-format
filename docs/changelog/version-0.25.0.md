@@ -289,6 +289,43 @@ MIME type and pack configuration), together with `PackTika3Detector` and `PackTi
 Changes above. Applications integrating with Apache Tika can now reference these types directly instead of relying on
 internal, non-exported classes.
 
+### Deferred discovery in `DefaultFormatterService` subclasses
+
+The `DefaultFormatterService` constructors call the overridable `addDefaultFormatters()`, which in turn calls
+`addParameterFormattersFromService()` and `addPostFormattersFromService()`. These calls happen before the fields of a
+subclass are initialized, so an override that uses such fields sees `null` or default values. The new protected
+constructor `DefaultFormatterService(ClassLoader, int, boolean)` lets a subclass skip this call and invoke
+`addDefaultFormatters()` itself, at the end of its own constructor:
+
+```java
+public class ExcludingFormatterService extends DefaultFormatterService
+{
+  private final Set<String> excludedPostFormatters;
+
+  public ExcludingFormatterService(Set<String> excludedPostFormatters)
+  {
+    super(null, DEFAULT_FORMATTER_CACHE_SIZE, false);
+
+    this.excludedPostFormatters = excludedPostFormatters;
+
+    addDefaultFormatters();
+  }
+
+  @Override
+  protected void addPostFormattersFromService()
+  {
+    ServiceLoader
+        .load(PostFormatter.class, classLoader)
+        .stream()
+        .map(ServiceLoader.Provider::get)
+        .filter(postFormatter -> !excludedPostFormatters.contains(postFormatter.getName()))
+        .forEach(this::addPostFormatter);
+  }
+}
+```
+
+The public constructors behave as before.
+
 
 ## Bug Fixes
 
