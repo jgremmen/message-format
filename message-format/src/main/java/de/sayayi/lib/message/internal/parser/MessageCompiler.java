@@ -429,7 +429,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   /**
-   * Parses tree listener that builds the {@link Message} object model from the ANTLR parse tree.
+   * Parse tree listener that builds the {@link Message} object model from the ANTLR parse tree.
    * This listener is invoked as the parser walks the tree and is responsible for:
    * <ul>
    *   <li>
