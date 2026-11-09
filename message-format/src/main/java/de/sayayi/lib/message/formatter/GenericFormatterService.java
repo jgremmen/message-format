@@ -38,7 +38,6 @@ import java.util.stream.Stream;
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT;
 import static de.sayayi.lib.message.util.MessageUtil.isEmpty;
 import static de.sayayi.lib.message.util.MessageUtil.isKebabCaseName;
-import static java.util.Arrays.copyOf;
 import static java.util.Objects.requireNonNull;
 
 
@@ -412,7 +411,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
               .distinct()
               .toArray(ParameterFormatter[]::new));
 
-      return copyOf(formattersByType, formattersByType.length);
+      return formattersByType.clone();  // defensive copy
     } finally {
       readLock.unlock();
     }

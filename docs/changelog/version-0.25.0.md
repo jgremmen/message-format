@@ -338,3 +338,8 @@ suffixes and OS-specific path separators) as visited, while `adopt(ClassLoader, 
 binary class names. As a result, the same class scanned through both entry points could be visited and adopted
 twice, which could lead to duplicate message or template registration errors. Classpath names are now normalized to
 binary class names consistently across both entry points.
+
+`ParameterValueHelper.getEnum(...)`, and with it `Parameters.getParameterValueAsEnum(...)`, checked whether the value
+is a constant of the requested enum type before unwrapping an `Optional`, so `Optional.of(MyEnum.A)` returned an empty
+result. This was documented, but inconsistent with `getBoolean`, `getLong` and `getString`, which accept wrapped
+values of their own type. The `Optional` is now unwrapped first, so a wrapped enum constant is returned as well.

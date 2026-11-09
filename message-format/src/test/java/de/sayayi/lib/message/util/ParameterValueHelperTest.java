@@ -666,6 +666,17 @@ class ParameterValueHelperTest
 
 
     @Test
+    @DisplayName("Optional wrapping enum constant is unwrapped")
+    void optionalWrappedEnum()
+    {
+      assertEquals(Optional.of(SECONDS),
+          ParameterValueHelper.getEnum(parametersOf("p", Optional.of(SECONDS)), "p", TimeUnit.class));
+      assertTrue(ParameterValueHelper.getEnum(
+          parametersOf("p", Optional.of(SECONDS)), "p", TestEnum.class).isEmpty());
+    }
+
+
+    @Test
     @DisplayName("Empty Optional returns empty")
     void emptyOptional()
     {
