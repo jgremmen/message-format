@@ -190,6 +190,27 @@ Constructor references now work with and without a cause. Code that passed a two
 a `(String, Throwable)`-only constructor without a cause no longer compiles. Pass `null` as cause, e.g.
 `formattedException((msg, cause) -> new MyException(msg, cause), null)`, or use a lambda with one parameter.
 
+### `number:integer` applies the locale-specific integer format to integer types
+
+The number formatter rendered integer types (`Integer`, `Long`, `BigInteger`, etc.) with their plain `toString()`
+representation for `number:integer`, while floating point values and `BigDecimal` were formatted using the
+locale-specific integer format. For `Locale.US`, `1234567L` was rendered as `1234567`, but `1234567.0` as
+`1,234,567`.
+
+`number:integer` now uses the locale-specific integer format for all numeric types, so integer types are rendered with
+grouping separators as well. The previous behavior is available as `number:plain`, which is also the default when
+the `number` configuration key is absent:
+
+```java
+// before: "1234567", after: "1,234,567"
+messageSupport.message("%{v,number:integer}").with("v", 1234567).locale(Locale.US).format();
+
+// "1234567"
+messageSupport.message("%{v,number:plain}").with("v", 1234567).locale(Locale.US).format();
+```
+
+Messages using `number:integer` for integer values to suppress grouping separators must use `number:plain` instead.
+
 ## New Features
 
 ### `MessageSupportFactory.createDefault()` and `createGeneric()`

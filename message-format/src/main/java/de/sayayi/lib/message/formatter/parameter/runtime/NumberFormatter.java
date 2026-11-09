@@ -51,8 +51,8 @@ import static java.lang.Math.signum;
  * <p>
  * The output format is controlled by the {@code number} configuration key.
  * <p>
- * If the configuration key is absent, integer types are rendered using their plain {@code toString()} representation;
- * all other numeric types are formatted using a locale-specific number format.
+ * If the configuration key is absent or {@code plain}, integer types are rendered using their plain {@code toString()}
+ * representation; all other numeric types are formatted using a locale-specific number format.
  * <p>
  * Number map keys in the parameter configuration can be used to map specific numeric values to custom text.
  * <p>
@@ -66,11 +66,14 @@ import static java.lang.Math.signum;
  *   <tr><th>Key</th><th>Values</th><th>Default</th><th>Purpose</th></tr>
  *   <tr>
  *     <td>{@code number}</td>
- *     <td>{@code integer}, {@code percent}, {@code currency}, {@code bool}, {@link DecimalFormat} pattern</td>
- *     <td>(see above)</td>
  *     <td>
- *       Formats the number as an integer, a percentage, a currency value or a boolean (zero is {@code false}, non-zero
- *       is {@code true}). Any other value is used as a pattern. Number map keys take precedence over this key.
+ *       {@code plain}, {@code integer}, {@code percent}, {@code currency}, {@code bool}, {@link DecimalFormat} pattern
+ *     </td>
+ *     <td>{@code plain}</td>
+ *     <td>
+ *       Formats the number as described above ({@code plain}), as a locale-specific integer with grouping, a
+ *       percentage, a currency value or a boolean (zero is {@code false}, non-zero is {@code true}). Any other value is
+ *       used as a pattern. Number map keys take precedence over this key.
  *     </td>
  *   </tr>
  * </table>
@@ -87,6 +90,9 @@ import static java.lang.Math.signum;
  *
  * messageSupport.message("%{v,number:integer}").with("v", 3.7).locale(Locale.US).format();
  * // "4"
+ *
+ * messageSupport.message("%{v,number:integer}").with("v", 1234567).locale(Locale.US).format();
+ * // "1,234,567"
  * }</pre>
  * <p>
  * Use a custom pattern with the symbols of the locale:
@@ -140,8 +146,8 @@ public final class NumberFormatter
    * {@inheritDoc}
    * <p>
    * Formats the number based on the {@code number} configuration key, or using number map keys if a match is found. If
-   * no configuration is provided, integer types use their plain string representation while other types use a
-   * locale-specific number format.
+   * no configuration or {@code plain} is provided, integer types use their plain string representation while other
+   * types use a locale-specific number format.
    */
   @Override
   @Contract(pure = true)
@@ -162,7 +168,7 @@ public final class NumberFormatter
     if ("bool".equals(format))
       return context.format(number, boolean.class);
 
-    if ((format == null || "integer".equals(format)) &&
+    if ((format == null || "plain".equals(format)) &&
         (number instanceof BigInteger || number instanceof Long || number instanceof Integer ||
          number instanceof Short || number instanceof Byte || number instanceof AtomicInteger ||
          number instanceof AtomicLong || number instanceof LongAdder || number instanceof LongAccumulator))
@@ -175,8 +181,8 @@ public final class NumberFormatter
   /**
    * Returns a number format for the given {@code format} and the locale of {@code parameters}.
    *
-   * @param format      {@code integer}, {@code percent}, {@code currency}, a custom {@link DecimalFormat} pattern or
-   *                    {@code null} for the default number format
+   * @param format      {@code integer}, {@code percent}, {@code currency}, a custom {@link DecimalFormat} pattern,
+   *                    {@code plain} or {@code null} for the default number format
    * @param parameters  parameters providing the locale, not {@code null}
    *
    * @return  number format, never {@code null}
@@ -194,7 +200,7 @@ public final class NumberFormatter
     if ("currency".equals(format))
       return NumberFormat.getCurrencyInstance(locale);
 
-    if (!isEmpty(format))
+    if (!isEmpty(format) && !"plain".equals(format))
       return new DecimalFormat(format, DecimalFormatSymbols.getInstance(locale));
 
     return NumberFormat.getNumberInstance(locale);

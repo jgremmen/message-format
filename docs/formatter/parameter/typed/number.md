@@ -50,11 +50,25 @@ messageSupport
 
 The formatter uses the `number` configuration key to select the output format. The following values are recognized.
 
+### `plain`
+
+Formats the number as described above. This is the default when the `number` configuration key is absent. Integer
+types are rendered using their plain `toString()` representation, without grouping. All other numeric types are
+formatted using a locale-specific number format.
+
+```java
+messageSupport
+    .message("%{amount,number:plain}")
+    .with("amount", 1234567)
+    .locale(Locale.US)
+    .format();
+// "1234567"
+```
+
 ### `integer`
 
-Formats the number as an integer using a locale-specific integer format. For types that are already integer types, this
-produces the same output as the default (plain `toString()`). For floating point values, it rounds to the nearest
-integer and applies locale-specific grouping.
+Formats the number as an integer using a locale-specific integer format, including integer types. Floating point
+values are rounded to the nearest integer. Locale-specific grouping is applied to all values.
 
 ```java
 messageSupport
@@ -62,6 +76,13 @@ messageSupport
     .with("val", 3.7)
     .format();
 // "4"
+
+messageSupport
+    .message("%{amount,number:integer}")
+    .with("amount", 1234567)
+    .locale(Locale.US)
+    .format();
+// "1,234,567"
 ```
 
 ### `percent`

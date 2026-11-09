@@ -24,10 +24,15 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
 import static java.lang.Double.*;
 import static java.lang.Math.PI;
 import static java.util.Locale.GERMANY;
 import static java.util.Locale.UK;
+import static java.util.Locale.US;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -73,6 +78,41 @@ final class NumberFormatterTest extends AbstractFormatterTest
         .message("%{d}")
         .with("d", 0.1d)
         .format());
+  }
+
+
+  @Test
+  @DisplayName("Plain and integer formats")
+  void testPlainAndIntegerFormat()
+  {
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new NumberFormatter()))
+        .setLocale(US);
+
+    for(val value: new Number[] {
+        1234567, 1234567L, BigInteger.valueOf(1234567), new AtomicLong(1234567), 1234567.0, new BigDecimal("1234567") })
+    {
+      assertEquals("1,234,567", messageSupport
+          .message("%{v,number:integer}")
+          .with("v", value)
+          .format(), value.getClass().getSimpleName());
+    }
+
+    assertEquals("4", messageSupport
+        .message("%{v,number:integer}")
+        .with("v", 3.7)
+        .format());
+
+    for(val format: new String[] { "%{v}", "%{v,number:plain}" })
+    {
+      val message = messageSupport.message(format);
+
+      assertEquals("1234567", message.with("v", 1234567).format());
+      assertEquals("1234567", message.with("v", 1234567L).format());
+      assertEquals("1234567", message.with("v", BigInteger.valueOf(1234567)).format());
+      assertEquals("1,234,567.5", message.with("v", 1234567.5).format());
+      assertEquals("1,234,567", message.with("v", new BigDecimal("1234567")).format());
+    }
   }
 
 
