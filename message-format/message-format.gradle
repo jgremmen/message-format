@@ -51,6 +51,8 @@ configurations {
     canBeResolved = false
   }
 
+  // the antlr plugin makes api extend antlr, which would publish the antlr tool (antlr:antlr:2.7.7 by default) as an
+  // api dependency; the tool is resolved from antlr4 instead
   api.setExtendsFrom([])
 }
 

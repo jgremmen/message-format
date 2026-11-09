@@ -22,11 +22,11 @@ javadoc {
 
     noQualifiers 'java.util', 'java.lang'
 
-    addStringOption('Xdoclint:none', '-quiet')
+    addBooleanOption('Xdoclint:all,-missing', true)
     addStringOption('-show-module-contents', 'api')
   }
 
-  failOnError = false
+  failOnError = true
 }
 
 

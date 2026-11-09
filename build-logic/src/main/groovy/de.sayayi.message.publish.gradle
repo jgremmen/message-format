@@ -28,9 +28,8 @@ plugins {
 publishOnCentral {
   repoOwner = 'jgremmen'
 
-  afterEvaluate {
-    projectLongName = "${project.description}"
-  }
+  // lazy, as the project scripts set the description after applying this plugin
+  projectLongName = providers.provider { project.description }
 
   licenseName = 'Apache License, Version 2.0'
   licenseUrl = 'https://www.apache.org/licenses/LICENSE-2.0'
