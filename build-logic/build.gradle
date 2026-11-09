@@ -34,4 +34,8 @@ repositories {
 dependencies {
   implementation "org.danilopianini.publish-on-central:org.danilopianini.publish-on-central.gradle.plugin:${libs.versions.publish.on.central.get()}"
   implementation "com.adarshr:gradle-test-logger-plugin:${libs.versions.test.logger.get()}"
+
+  // ASM relocation for message-format-annotations
+  implementation libs.asm
+  implementation libs.asm.commons
 }

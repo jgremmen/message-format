@@ -17,6 +17,8 @@
 //file:noinspection DependencyNotationArgument
 
 
+import de.sayayi.gradle.JavaAgentArgumentProvider
+
 import java.time.Instant
 
 import static java.time.ZoneOffset.UTC
@@ -130,11 +132,9 @@ tasks.withType(Test).configureEach {
   // Disable class data sharing to avoid bootstrap classpath warning from Lombok
   jvmArgs '-Xshare:off'
 
-  doFirst {
-    def byteBuddyAgent = configurations.testRuntimeClasspath.find { it.name.contains('byte-buddy-agent') }
-    if (byteBuddyAgent)
-      jvmArgs "-javaagent:${byteBuddyAgent.absolutePath}"
-  }
+  def javaAgents = objects.newInstance(JavaAgentArgumentProvider)
+  javaAgents.agentJars.from(configurations.testRuntimeClasspath.filter { it.name.contains('byte-buddy-agent') })
+  jvmArgumentProviders.add(javaAgents)
 }
 
 

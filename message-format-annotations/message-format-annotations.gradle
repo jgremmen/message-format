@@ -19,36 +19,16 @@
 
 
 import de.sayayi.gradle.BuildSupport
-import org.objectweb.asm.ClassReader
-import org.objectweb.asm.ClassVisitor
-import org.objectweb.asm.ClassWriter
-import org.objectweb.asm.ModuleVisitor
-import org.objectweb.asm.commons.ClassRemapper
-import org.objectweb.asm.commons.Remapper
-
-import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
-
-import static groovy.io.FileType.FILES
-import static org.objectweb.asm.Opcodes.ASM9
+import de.sayayi.gradle.RelocateAsmClasses
+import de.sayayi.gradle.RelocateAsmReferences
 
 
-buildscript {
-  repositories {
-    mavenCentral()
-  }
-
-  dependencies {
-    classpath libs.asm
-    classpath libs.asm.commons
-  }
+plugins {
+  id 'de.sayayi.message.base'
+  id 'de.sayayi.message.java-library'
+  id 'de.sayayi.message.javadoc'
+  id 'de.sayayi.message.publish'
 }
-
-
-pluginManager.apply('de.sayayi.message.base')
-pluginManager.apply('de.sayayi.message.java-library')
-pluginManager.apply('de.sayayi.message.javadoc')
-pluginManager.apply('de.sayayi.message.publish')
 
 
 description = 'Message Format Library (annotations)'
@@ -69,92 +49,24 @@ dependencies {
 }
 
 
-//noinspection deprecation
-def asmRemapper = new Remapper(ASM9) {
-  def asmPackagePrefix = 'org/objectweb/asm'
-
-  @Override
-  String map(String internalName) {
-    return internalName.startsWith(asmPackagePrefix)
-        ? 'de/sayayi/lib/message/annotation/adopter/asm' + internalName.substring(asmPackagePrefix.length())
-        : internalName
-  }
-}
+// package the bundled ASM library is relocated to
+def relocatedAsmPackage = 'de.sayayi.lib.message.annotation.adopter.asm'
 
 
 tasks.named('compileJava') {
-  doLast {
-    logger.info('Rewriting project class references to relocated ASM classes...')
-
-    sourceSets.main.java.classesDirectory.get().asFile.eachFileRecurse(FILES) { classFile ->
-      if (classFile.name == 'module-info.class')
-      {
-        def writer = new ClassWriter(0)
-
-        new ClassReader(classFile.bytes).accept(new ClassVisitor(ASM9, writer) {
-          @Override
-          ModuleVisitor visitModule(String name, int access, String version)
-          {
-            return new ModuleVisitor(ASM9, super.visitModule(name, access, version)) {
-              @Override
-              void visitRequire(String module, int reqAccess, String reqVersion)
-              {
-                if (module != 'org.objectweb.asm')
-                  super.visitRequire(module, reqAccess, reqVersion)
-              }
-            }
-          }
-        }, 0)
-
-        classFile.bytes = writer.toByteArray()
-      }
-      else if (classFile.name.endsWith('.class'))
-      {
-        def writer = new ClassWriter(0)
-
-        new ClassReader(classFile.bytes).accept(new ClassRemapper(writer, asmRemapper), 0)
-
-        classFile.bytes = writer.toByteArray()
-      }
-    }
-  }
+  doLast(new RelocateAsmReferences(destinationDirectory, relocatedAsmPackage))
 }
 
 
 def asmMainDir = layout.buildDirectory.dir('classes/asm/main')
 
 
-tasks.register('prepareRelocatedAsmClasses') {
+tasks.register('prepareRelocatedAsmClasses', RelocateAsmClasses) {
   description = 'Prepare relocated ASM library classes.'
 
-  inputs.files(configurations.asmToBundle)
-  outputs.dir(asmMainDir)
-
-  doLast {
-    def outputDir = asmMainDir.get().asFile
-
-    outputDir.deleteDir()
-    outputDir.mkdirs()
-
-    logger.info("Relocating ASM library classes to ${outputDir.absolutePath}...")
-
-    configurations.asmToBundle.each { jar ->
-      new ZipFile(jar).withCloseable { zip -> zip
-          .entries()
-          .findAll { !it.directory && it.name.endsWith('.class') && it.name != 'module-info.class' }
-          .each { ZipEntry entry ->
-            def writer = new ClassWriter(0)
-
-            new ClassReader(zip.getInputStream(entry)).accept(new ClassRemapper(writer, asmRemapper), 0)
-
-            def outFile = new File(outputDir, asmRemapper.map(entry.name.replace('.class', '')) + '.class')
-
-            outFile.parentFile.mkdirs()
-            outFile.bytes = writer.toByteArray()
-          }
-      }
-    }
-  }
+  asmJars.from(configurations.asmToBundle)
+  relocatedPackage = relocatedAsmPackage
+  outputDirectory = asmMainDir
 }
 
 
@@ -187,7 +99,7 @@ tasks.named('processResources') {
 tasks.named('sourcesJar') {
   eachFile { fileCopyDetails ->
     if (!fileCopyDetails.directory && fileCopyDetails.name.endsWith('.java')) {
-      filter { line -> line.replace('org.objectweb.asm', 'de.sayayi.lib.message.annotation.adopter.asm') }
+      filter { line -> line.replace('org.objectweb.asm', relocatedAsmPackage) }
     }
   }
 }
