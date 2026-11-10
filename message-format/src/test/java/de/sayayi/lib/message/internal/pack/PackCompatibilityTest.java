@@ -90,7 +90,8 @@ final class PackCompatibilityTest
         Arguments.of("0.21.0", 3, 10, 2),
         Arguments.of("0.22.0", 3, 10, 2),
         Arguments.of("0.23.0", 3, 10, 2),
-        Arguments.of("0.24.0", 4, 11, 2)
+        Arguments.of("0.24.0", 4, 11, 2),
+        Arguments.of("0.25.0", 4, 12, 2)
     );
   }
 

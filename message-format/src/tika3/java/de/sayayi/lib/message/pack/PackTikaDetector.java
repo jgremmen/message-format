@@ -47,7 +47,7 @@ import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
  * @author Jeroen Gremmen
  * @since 0.20.0
  */
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"removal", "deprecation"})
 public final class PackTikaDetector extends AbstractTikaDetector
 {
   /** Creates a new Tika detector for message format pack files. */

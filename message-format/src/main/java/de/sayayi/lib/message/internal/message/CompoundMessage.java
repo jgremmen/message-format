@@ -58,6 +58,13 @@ import static java.util.Objects.requireNonNull;
 @SuppressWarnings("ClassCanBeRecord")
 public final class CompoundMessage implements Message.WithSpaces
 {
+  /**
+   * Maximum number of message parts a compound message can have in order to be packed.
+   *
+   * @since 0.25.0
+   */
+  private static final int MAX_PACK_PARTS = 255;
+
   /** Message parts, not empty */
   private final @NotNull MessagePart[] messageParts;
 
@@ -221,16 +228,22 @@ public final class CompoundMessage implements Message.WithSpaces
 
   /**
    * Writes this compound message to the given pack output stream.
+   * <p>
+   * A compound message with more than 255 message parts cannot be packed.
    *
    * @param packStream  data output pack target, not {@code null}
    *
-   * @throws IOException  if an I/O error occurs
+   * @throws IOException  if the message has more than 255 message parts or if an I/O error occurs
    *
    * @since 0.8.0
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.writeSmallVar(messageParts.length);
+    var partCount = messageParts.length;
+    if (partCount > MAX_PACK_PARTS)
+      throw new IOException("message cannot contain more than " + MAX_PACK_PARTS + " parts (" + partCount + " found)");
+
+    packStream.writeSmallVar(partCount);
 
     for(var part: messageParts)
       PackSupport.pack(part, packStream);

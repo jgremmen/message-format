@@ -336,7 +336,8 @@ final class MessageSupportPackTest
     assertEquals(0, pack.size());
 
     // filtering below the limit makes the export succeed
-    assertDoesNotThrow(() -> cms.exportMessages(new ByteArrayOutputStream(), false, code -> !code.equals("MSG-0"), null));
+    assertDoesNotThrow(() -> cms.exportMessages(new ByteArrayOutputStream(), false,
+        code -> !code.equals("MSG-0"), null));
   }
 
 
@@ -348,13 +349,18 @@ final class MessageSupportPackTest
     val messageFactory = cms.getMessageAccessor().getMessageFactory();
     val message = new StringBuilder();
 
+    // spread template references over several messages, each below the message part limit
     for(var n = 0; n <= 0xffff; n++)
     {
       cms.addTemplate("tpl-" + n, messageFactory.parseTemplate("template"));
       message.append("%[tpl-").append(n).append(']');
-    }
 
-    cms.addMessage("MSG", message.toString());
+      if (n % 255 == 254 || n == 0xffff)
+      {
+        cms.addMessage("MSG-" + n, message.toString());
+        message.setLength(0);
+      }
+    }
 
     val pack = new ByteArrayOutputStream();
     val ex = assertThrows(IOException.class, () -> cms.exportMessages(pack));
@@ -363,6 +369,25 @@ final class MessageSupportPackTest
     assertEquals(0, pack.size());
 
     // filtering below the limit makes the export succeed
-    assertDoesNotThrow(() -> cms.exportMessages(new ByteArrayOutputStream(), false, null, name -> !name.equals("tpl-0")));
+    assertDoesNotThrow(() -> cms.exportMessages(new ByteArrayOutputStream(), false, null,
+        name -> !name.equals("tpl-0")));
+  }
+
+
+  @Test
+  @DisplayName("Export message with too many parts")
+  void testExportTooManyMessageParts()
+  {
+    val cms = MessageSupportFactory.createGeneric();
+
+    cms.addMessage("MSG-255", "%{p}.".repeat(127) + "%{p}");
+    cms.addMessage("MSG-256", "%{p}.".repeat(128));
+
+    // 255 message parts is the limit
+    assertDoesNotThrow(() -> cms.exportMessages(new ByteArrayOutputStream(), false, "MSG-255"::equals,
+        null));
+
+    val ex = assertThrows(IOException.class, () -> cms.exportMessages(new ByteArrayOutputStream()));
+    assertTrue(ex.getMessage().contains("255 parts"));
   }
 }
