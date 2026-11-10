@@ -19,6 +19,10 @@
 
 import de.sayayi.gradle.BuildSupport
 
+import java.nio.file.Files
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
+
 
 plugins {
   id 'antlr'
@@ -99,8 +103,22 @@ generateGrammarSource {
   //noinspection GroovyAccessibility
   antlrClasspath = configurations.antlr4
 
+  def parserPackage = 'de.sayayi.lib.message.internal.parser'
+
   outputDirectory = layout.buildDirectory.dir('generated/sources/antlr/main').get().asFile
-  packageName = 'de.sayayi.lib.message.internal.parser'
+  packageName = parserPackage
+
+  // the IntelliJ Antlr plugin resolves tokenVocab = MessageLexer from the grammar directory
+  def grammarTokens = layout.projectDirectory.file('src/main/antlr/MessageLexer.tokens').asFile
+
+  outputs.file grammarTokens
+
+  doLast {
+    Files.copy(
+        new File(outputDirectory, parserPackage.replace('.', '/') + '/MessageLexer.tokens').toPath(),
+        grammarTokens.toPath(),
+        REPLACE_EXISTING)
+  }
 }
 
 
