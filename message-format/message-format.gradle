@@ -99,11 +99,8 @@ generateGrammarSource {
   //noinspection GroovyAccessibility
   antlrClasspath = configurations.antlr4
 
-  def parserPackage = 'de.sayayi.lib.message.internal.parser'
-
-  outputDirectory = layout.buildDirectory
-      .dir('generated/sources/antlr/main/' + parserPackage.replace('.', '/')).get().asFile
-  packageName = parserPackage
+  outputDirectory = layout.buildDirectory.dir('generated/sources/antlr/main').get().asFile
+  packageName = 'de.sayayi.lib.message.internal.parser'
 }
 
 
