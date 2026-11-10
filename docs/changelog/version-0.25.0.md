@@ -55,6 +55,42 @@ Formatter selection is based on the type of the delegate. If an application clas
 interfaces, for example `class Counter implements LongSupplier`, a parameter formatter registered for `Counter` is no
 longer used for values set with `with(...)`. Such values are formatted by the formatter of the supplier interface.
 
+For an application class implementing `Supplier`, the formatter for that class can be replaced by a parameter
+formatter for `SupplierDelegate` with a higher priority than the `Supplier` formatter. The new method
+`SupplierDelegate.getDelegateClass()` returns the class of the wrapped supplier, so the formatter can handle the
+application supplier and pass all other suppliers on to the next formatter:
+
+```java
+public final class ReportSupplierFormatter
+    extends AbstractSingleTypeParameterFormatter<SupplierDelegate<?>>
+{
+  @Override
+  protected @NotNull FormattableType getFormattableType() 
+  {
+    // takes precedence over the Supplier formatter (default order)
+    return new FormattableType(SupplierDelegate.class,
+        FormattableType.DEFAULT_ORDER - 10);
+  }
+
+  @Override
+  protected @NotNull Text formatValue(
+      @NotNull ParameterFormatterContext context,
+      @NotNull SupplierDelegate<?> delegate)
+  {
+    var delegateClass = delegate.getDelegateClass();
+
+    if (ReportSupplier.class.isAssignableFrom(delegateClass))
+      return context.format(((Report)delegate.get()).getTitle());
+
+    return context.delegateToNextFormatter();
+  }
+}
+```
+
+The formatter has access to the supplied value only, as the original supplier instance is released after its first
+evaluation. For application classes implementing `BooleanSupplier`, `IntSupplier`, `LongSupplier` or
+`DoubleSupplier`, the delegate class does not identify the application class, so this approach is not available.
+
 ### Zoned temporal values keep their time zone
 
 The temporal formatter converted every value to the system default time zone before formatting, so a `ZonedDateTime`
